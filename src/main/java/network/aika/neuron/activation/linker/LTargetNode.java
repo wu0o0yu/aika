@@ -1,26 +1,36 @@
 package network.aika.neuron.activation.linker;
 
+import network.aika.Document;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
+
+import java.lang.reflect.InvocationTargetException;
+
+import static network.aika.neuron.activation.linker.Mode.INDUCTION;
 
 public class LTargetNode<N extends INeuron> extends LNode<N> {
 
     Boolean assumePosRecLinks;
 
-    public LTargetNode(PatternType patternType, Class<N> neuronClass, String label) {
+    public LTargetNode(PatternType patternType, Class<N> neuronClass, String label, Boolean assumePosRecLinks) {
         super(patternType, neuronClass, label);
+        this.assumePosRecLinks = assumePosRecLinks;
     }
 
-    public void follow(Mode m, Link l, LLink from, Activation startAct) {
-    }
+    public Activation follow(Mode m, INeuron n, Activation act, LLink from, Activation startAct) {
+        if(n == null && m == INDUCTION) {
+            try {
+                n = neuronClass.getConstructor().newInstance();
+            } catch (Exception e) {
+            }
+        }
 
-    /*
-        propagationTargets
-                .forEach(s ->
-                        addLinkToQueue(queue, s, act,
-                                new Activation(doc.getNewActivationId(), doc, s.getOutput())
-                        )
-                );
-*/
+        if(act == null) {
+            Document doc = startAct.getDocument();
+            act = new Activation(doc.getNewActivationId(), doc, n);
+            act.assumePosRecLinks = assumePosRecLinks;
+        }
+
+        return act;
+    }
 }

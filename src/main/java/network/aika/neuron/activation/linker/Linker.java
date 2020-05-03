@@ -122,7 +122,7 @@ public class Linker {
             act.lastRound.outputLinks
                     .values()
                     .forEach(l ->
-                            queue.add(Link.link(l.getSynapse(), act, l.getOutput()))
+                            addToQueue(Link.link(l.getSynapse(), act, l.getOutput()))
                     );
             act.lastRound.unlink();
             act.lastRound = null;
@@ -151,5 +151,9 @@ public class Linker {
 
             n.linkBackwards(l);
         }
+    }
+
+    public void addToQueue(Link l) {
+        queue.add(l);
     }
 }

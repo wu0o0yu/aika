@@ -39,6 +39,11 @@ public class InhibitorySynapse extends Synapse<INeuron, InhibitoryNeuron> {
     }
 
     @Override
+    public void init(PatternScope patternScope, Boolean isRecurrent, Boolean isNegative, boolean propagate) {
+
+    }
+
+    @Override
     public byte getType() {
         return type;
     }

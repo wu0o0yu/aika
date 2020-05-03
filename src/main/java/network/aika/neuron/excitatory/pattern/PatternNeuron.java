@@ -86,7 +86,8 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         );
 
         sortedSynapses.addAll(inputSynapses.values());
-
+/*
+TODO:
         double sum = getBias(CURRENT);
         for(PatternSynapse s: sortedSynapses) {
             if(!s.isRecurrent() && !s.isNegative()) {
@@ -95,6 +96,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
                 sum -= s.getWeight();
             }
         }
+ */
     }
 
     @Override
@@ -108,11 +110,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     @Override
     public void linkPosRecSynapses(Activation act) {
-    }
-
-    @Override
-    public Synapse createSynapse(Neuron input, PatternScope patternScope, Boolean isRecurrent, Boolean isNegative) {
-        return new PatternSynapse(input, getProvider());
     }
 
     public void createSynapses(Config c, Activation act) {

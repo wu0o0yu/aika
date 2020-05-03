@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import static network.aika.neuron.PatternScope.INPUT_PATTERN;
 import static network.aika.neuron.PatternScope.SAME_PATTERN;
 import static network.aika.neuron.activation.linker.Mode.LINKING;
-import static network.aika.neuron.activation.linker.Mode.SYNAPSE_INDUCTION;
+import static network.aika.neuron.activation.linker.Mode.INDUCTION;
 
 /**
  * @author Lukas Molzberger
@@ -187,13 +187,8 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     public void collectNewSynapseCandidates(Activation act) {
-        Linker.sameInputLinkT.output.follow(SYNAPSE_INDUCTION, act, Linker.sameInputLinkT, act);
-        Linker.relatedInputLinkT.output.follow(SYNAPSE_INDUCTION, act, Linker.relatedInputLinkT, act);
-    }
-
-    @Override
-    public Synapse createSynapse(Neuron input, PatternScope patternScope, Boolean isRecurrent, Boolean isNegative) {
-        return new PatternPartSynapse(input, getProvider(), patternScope, isRecurrent, isNegative);
+        Linker.sameInputLinkT.output.follow(INDUCTION, act, Linker.sameInputLinkT, act);
+        Linker.relatedInputLinkT.output.follow(INDUCTION, act, Linker.relatedInputLinkT, act);
     }
 
     @Override

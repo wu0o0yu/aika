@@ -2,7 +2,7 @@ package network.aika.neuron.activation.linker;
 
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
+
 
 public class LMatchingNode<N extends INeuron> extends LNode<N> {
 
@@ -10,14 +10,13 @@ public class LMatchingNode<N extends INeuron> extends LNode<N> {
         super(patternType, neuronClass, label);
     }
 
-    public void follow(Mode m, Link l, LLink from, Activation startAct) {
-        Activation act = from.getToActivation(l, this);
+    public Activation follow(Mode m, INeuron n, Activation act, LLink from, Activation startAct) {
 
         if(neuronClass != null && act.getINeuron().getClass().equals(neuronClass)) {
-            return;
+            return null;
         }
 
-        if(act.isConflicting()) return;
+        if(act.isConflicting()) return null;
 
         act.lNode = this;
 
@@ -26,5 +25,7 @@ public class LMatchingNode<N extends INeuron> extends LNode<N> {
                 .forEach(nl -> nl.follow(m, act, this, startAct));
 
         act.lNode = null;
+
+        return act;
     }
 }

@@ -26,6 +26,8 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
             return;
         }
 
+        LNode to = getTo(from);
+
         Activation iAct = from == input ? act : startAct;
         Activation oAct = from == input ? startAct : act;
 
@@ -38,16 +40,21 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
             return;
         }
 
-        if(s == null && m == Mode.SYNAPSE_INDUCTION) {
-            s = on.get().createSynapse(in, patternScope, isRecurrent, isNegative);
+        if(s == null && m == Mode.INDUCTION) {
+            try {
+                s = synapseClass.getConstructor().newInstance();
+                s.setInput(in);
+                s.setOutput(on);
+            } catch (Exception e) {
+            }
         }
 
         if(oAct == null) {
-
+            oAct = to.follow(m, on != null ? on.get() : null, oAct, this, startAct);
         }
 
         Link l = Link.link(s, iAct, oAct);
-        act.getDocument().getLinker().queue.add(l);
+        act.getDocument().getLinker().addToQueue(l);
     }
 
     public boolean matchSynapse(Synapse ts) {

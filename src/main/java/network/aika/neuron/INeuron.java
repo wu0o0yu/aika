@@ -47,7 +47,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     private volatile double biasDelta;
 
     protected TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(OUTPUT_COMP);
-    protected Set<Synapse> propagateTargets = new TreeSet<>(OUTPUT_COMP);
 
     ReadWriteLock lock = new ReadWriteLock();
 
@@ -110,10 +109,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         return provider.getModel();
     }
 
-    public Set<Synapse> getPropagationTargets() {
-        return propagateTargets;
-    }
-
     /**
      * Propagate an input activation into the network.
      *
@@ -129,14 +124,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     public void commitBias() {
         bias += biasDelta;
         biasDelta = 0.0;
-    }
-
-    public void addPropagateTarget(Synapse target) {
-        propagateTargets.add(target);
-    }
-
-    public void removePropagateTarget(Synapse target) {
-        propagateTargets.remove(target);
     }
 
     public void setBias(double b) {
@@ -182,8 +169,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
 
     public abstract boolean isMature(Config c);
-
-    public abstract Synapse createSynapse(Neuron input, PatternScope patternScope, Boolean isRecurrent, Boolean isNegative);
 
     public abstract void createSynapses(Config c, Activation act);
 

@@ -24,12 +24,18 @@ import network.aika.neuron.*;
  */
 public abstract class ExcitatorySynapse<I extends INeuron, O extends ExcitatoryNeuron> extends Synapse<I, O> {
 
+    protected boolean propagate;
+
     public ExcitatorySynapse() {
         super();
     }
 
     public ExcitatorySynapse(Neuron input, Neuron output) {
         super(input, output);
+    }
+
+    public boolean isPropagate() {
+        return propagate;
     }
 
     protected void addLinkInternal(INeuron in, INeuron out) {

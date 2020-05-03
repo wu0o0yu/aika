@@ -167,11 +167,6 @@ public class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
     }
 
     @Override
-    public Synapse createSynapse(Neuron input, PatternScope patternScope, Boolean isRecurrent, Boolean isNegative) {
-        return null;
-    }
-
-    @Override
     public void createSynapses(Config c, Activation act) {
 
     }

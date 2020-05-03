@@ -1,6 +1,7 @@
 package network.aika.neuron.activation.linker;
 
 
+import network.aika.neuron.INeuron;
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -30,12 +31,32 @@ public abstract class LLink<S extends Synapse> {
 
     public abstract String getTypeStr();
 
+    protected LNode getTo(LNode from) {
+        if(from == input) {
+            return output;
+        }
+        if(from == output) {
+            return input;
+        }
+        return null;
+    }
+
     public Activation getToActivation(Link l, LNode to) {
         if(to == output) {
             return l.getOutput();
         }
         if(to == input) {
             return l.getInput();
+        }
+        return null;
+    }
+
+    public INeuron getToNeuron(Synapse s, LNode to) {
+        if(to == output) {
+            return s.getOutput();
+        }
+        if(to == input) {
+            return s.getInput();
         }
         return null;
     }

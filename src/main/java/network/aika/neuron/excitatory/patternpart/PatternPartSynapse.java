@@ -5,7 +5,7 @@ import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
-import network.aika.neuron.excitatory.pattern.PatternNeuron;
+
 
 public class PatternPartSynapse<I extends INeuron> extends ExcitatorySynapse<I, PatternPartNeuron> {
 
@@ -27,6 +27,14 @@ public class PatternPartSynapse<I extends INeuron> extends ExcitatorySynapse<I, 
     }
 
     @Override
+    public void init(PatternScope patternScope, Boolean isRecurrent, Boolean isNegative, boolean propagate) {
+        this.patternScope = patternScope;
+        this.isRecurrent = isRecurrent;
+        this.isNegative = isNegative;
+        this.propagate = propagate;
+    }
+
+    @Override
     public byte getType() {
         return type;
     }
@@ -37,11 +45,6 @@ public class PatternPartSynapse<I extends INeuron> extends ExcitatorySynapse<I, 
 
     public void setPatternScope(PatternScope patternScope) {
         this.patternScope = patternScope;
-    }
-
-    @Override
-    public boolean isPropagate() {
-        return !isRecurrent && input.get() instanceof PatternNeuron;
     }
 
     public void setRecurrent(boolean recurrent) {

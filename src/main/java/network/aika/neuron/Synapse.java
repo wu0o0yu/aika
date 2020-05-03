@@ -49,6 +49,16 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         this.output = output;
     }
 
+    public void setInput(Neuron input) {
+        this.input = input;
+    }
+
+    public void setOutput(Neuron output) {
+        this.output = output;
+    }
+
+    public abstract void init(PatternScope patternScope, Boolean isRecurrent, Boolean isNegative, boolean propagate);
+
     public abstract byte getType();
 
     public abstract boolean isPropagate();
@@ -105,9 +115,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         (dir ? out : in).lock.acquireWriteLock();
 
         input.lock.acquireWriteLock();
-        if(isPropagate()) {
-            in.addPropagateTarget(this);
-        }
         input.activeOutputSynapses.put(this, this);
         input.lock.releaseWriteLock();
 
@@ -132,9 +139,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         (dir ? out : in).lock.acquireWriteLock();
 
         input.lock.acquireWriteLock();
-        if(isPropagate()) {
-            in.removePropagateTarget(this);
-        }
         input.activeOutputSynapses.remove(this);
         input.lock.releaseWriteLock();
 

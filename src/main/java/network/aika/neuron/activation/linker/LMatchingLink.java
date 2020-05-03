@@ -1,5 +1,6 @@
 package network.aika.neuron.activation.linker;
 
+import network.aika.neuron.INeuron;
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -15,16 +16,6 @@ public class LMatchingLink<S extends Synapse> extends LLink<S> {
         super(input, output, patternScope, synapseClass, label);
 
         this.dir = dir;
-    }
-
-    protected LNode getTo(LNode from) {
-        if(from == input) {
-            return output;
-        }
-        if(from == output) {
-            return input;
-        }
-        return null;
     }
 
     public void follow(Mode m, Activation act, LNode from, Activation startAct) {
@@ -47,7 +38,9 @@ public class LMatchingLink<S extends Synapse> extends LLink<S> {
             return;
         }
 
-        to.follow(m, l, this, startAct);
+        Activation act = getToActivation(l, to);
+        INeuron n = getToNeuron(l.getSynapse(), to);
+        to.follow(m, n, act, this, startAct);
     }
 
     private boolean checkLink(Link l) {

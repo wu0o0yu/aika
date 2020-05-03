@@ -17,13 +17,16 @@ public class PatternSynapse extends ExcitatorySynapse<PatternPartNeuron, Pattern
 
     public static byte type;
 
-    private boolean propagate;
-
     public PatternSynapse() {
     }
 
     public PatternSynapse(Neuron input, Neuron output) {
         super(input, output);
+    }
+
+    @Override
+    public void init(PatternScope patternScope, Boolean isRecurrent, Boolean isNegative, boolean propagate) {
+        this.propagate = propagate;
     }
 
     @Override
@@ -44,20 +47,6 @@ public class PatternSynapse extends ExcitatorySynapse<PatternPartNeuron, Pattern
     @Override
     public PatternScope getPatternScope() {
         return SAME_PATTERN;
-    }
-
-    public boolean isPropagate() {
-        return propagate;
-    }
-
-    public void setPropagate(boolean propagate) {
-        this.propagate = propagate;
-
-        if(propagate) {
-            input.get().addPropagateTarget(this);
-        } else {
-            input.get().removePropagateTarget(this);
-        }
     }
 
     @Override
