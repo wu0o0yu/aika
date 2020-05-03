@@ -1,17 +1,18 @@
 package network.aika.neuron.activation.linker;
 
 import network.aika.neuron.PatternScope;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 
 import java.util.stream.Stream;
 
-public class LMatchingLink extends LLink {
+public class LMatchingLink<S extends Synapse> extends LLink<S> {
 
     boolean dir;
 
-    public LMatchingLink(LNode input, LNode output, PatternScope patternScope, String label, boolean dir) {
-        super(input, output, patternScope, label);
+    public LMatchingLink(LNode input, LNode output, PatternScope patternScope, Class<S> synapseClass, String label, boolean dir) {
+        super(input, output, patternScope, synapseClass, label);
 
         this.dir = dir;
     }

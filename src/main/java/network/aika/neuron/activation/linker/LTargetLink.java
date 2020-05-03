@@ -1,6 +1,5 @@
 package network.aika.neuron.activation.linker;
 
-import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
@@ -8,14 +7,14 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 
 
-public class LTargetLink extends LLink {
+public class LTargetLink<S extends Synapse> extends LLink<S> {
 
     Boolean isRecurrent;
     Boolean isNegative;
     Boolean isPropagate;
 
-    public LTargetLink(LNode input, LNode output, PatternScope patternScope, String label, Boolean isRecurrent, Boolean isNegative, Boolean isPropagate) {
-        super(input, output, patternScope, label);
+    public LTargetLink(LNode input, LNode output, PatternScope patternScope, Class<S> synapseClass, String label, Boolean isRecurrent, Boolean isNegative, Boolean isPropagate) {
+        super(input, output, patternScope, synapseClass, label);
         this.isRecurrent = isRecurrent;
         this.isNegative = isNegative;
         this.isPropagate = isPropagate;
@@ -31,11 +30,11 @@ public class LTargetLink extends LLink {
         Activation oAct = from == input ? startAct : act;
 
         Neuron in = iAct.getNeuron();
-        Neuron on = oAct.getNeuron();
+        Neuron on = oAct != null ? oAct.getNeuron() : null;
 
-        Synapse s = on.getInputSynapse(in, patternScope);
+        Synapse s = on != null ? on.getInputSynapse(in, patternScope) : null;
 
-        if(m == Mode.LINKING && !matchSynapse(s)) {
+        if(m == Mode.LINKING && (s == null || !matchSynapse(s))) {
             return;
         }
 
@@ -43,9 +42,12 @@ public class LTargetLink extends LLink {
             s = on.get().createSynapse(in, patternScope, isRecurrent, isNegative);
         }
 
-        if(s != null) {
-            act.getDocument().getLinker().queue.add(Link.link(s, iAct, oAct));
+        if(oAct == null) {
+
         }
+
+        Link l = Link.link(s, iAct, oAct);
+        act.getDocument().getLinker().queue.add(l);
     }
 
     public boolean matchSynapse(Synapse ts) {
