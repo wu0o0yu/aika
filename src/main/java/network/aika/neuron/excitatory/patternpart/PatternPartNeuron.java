@@ -105,6 +105,8 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public void linkForwards(Activation act) {
+        super.linkForwards(act);
+
         Linker.sameInputLinkT.input.follow(LINKING, act.getINeuron(), act, Linker.sameInputLinkT, act);
         Linker.relatedInputLinkT.input.follow(LINKING, act.getINeuron(), act, Linker.relatedInputLinkT, act);
         Linker.patternInputLinkT.input.follow(LINKING, act.getINeuron(), act, Linker.patternInputLinkT, act);

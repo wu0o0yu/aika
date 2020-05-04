@@ -101,6 +101,7 @@ TODO:
 
     @Override
     public void linkForwards(Activation act) {
+        super.linkForwards(act);
     }
 
     @Override
