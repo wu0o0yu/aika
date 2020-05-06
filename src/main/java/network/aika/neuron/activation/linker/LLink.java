@@ -29,6 +29,8 @@ public abstract class LLink<S extends Synapse> {
 
     public abstract void follow(Mode m, Activation act, LNode from, Activation startAct);
 
+    protected abstract boolean checkSynapse(Synapse s);
+
     public abstract String getTypeStr();
 
     protected LNode getTo(LNode from) {

@@ -34,7 +34,7 @@ public class LMatchingLink<S extends Synapse> extends LLink<S> {
 
     public void follow(Mode m, Link l, LNode from, Activation startAct) {
         LNode to = getTo(from);
-        if(!checkLink(l)) {
+        if(!checkSynapse(l.getSynapse())) {
             return;
         }
 
@@ -43,8 +43,8 @@ public class LMatchingLink<S extends Synapse> extends LLink<S> {
         to.follow(m, n, act, this, startAct);
     }
 
-    private boolean checkLink(Link l) {
-        if(patternScope != null && patternScope != l.getSynapse().getPatternScope()) {
+    protected boolean checkSynapse(Synapse s) {
+        if(patternScope != null && patternScope != s.getPatternScope()) {
             return false;
         }
 

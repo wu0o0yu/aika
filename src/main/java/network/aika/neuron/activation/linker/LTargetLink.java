@@ -21,22 +21,62 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
     }
 
     public void follow(Mode m, Activation act, LNode from, Activation startAct) {
-        Link existingLink = lookupExistingLink(act, from, startAct);
-        if(existingLink != null) {
-            return;
-        }
+        Activation iAct = from == input ? act : startAct;
+        Neuron in = iAct.getNeuron();
 
         LNode to = getTo(from);
+        Activation oAct = startAct.lNode == to ? startAct : null;
 
-        Activation iAct = from == input ? act : startAct;
-        Activation oAct = from == input ? startAct : act;
+        if(oAct != null) {
+            if(iAct.outputLinks.get(oAct) != null) {
+                return;
+            }
 
-        Neuron in = iAct.getNeuron();
-        Neuron on = oAct != null ? oAct.getNeuron() : null;
+            Neuron on = oAct.getNeuron();
+            Synapse s = in.getOutputSynapse(on, patternScope);
 
-        Synapse s = on != null ? on.getInputSynapse(in, patternScope) : null;
+            if(s == null) {
+                 if(m != Mode.INDUCTION) return;
 
-        if(m == Mode.LINKING && (s == null || !matchSynapse(s))) {
+             // TODO: synapse Induction
+
+            }
+
+            Link l = Link.link(s, iAct, oAct);
+            act.getDocument().getLinker().addToQueue(l);
+        } else {
+            if(m == Mode.LINKING) {
+                in.getActiveOutputSynapses().stream()
+                        .filter(s -> checkSynapse(s))
+                        .forEach(s -> {
+                            try {
+                                s = synapseClass.getConstructor().newInstance();
+                                s.setInput(in);
+                            } catch (Exception e) {
+                            }
+                            Activation oa = to.follow(m, s.getOutput(), null, this, startAct);
+
+                            if(s.getOutput() == null) {
+                                s.setOutput(oa.getNeuron());
+                                s.link();
+                            }
+
+                            Link l = Link.link(s, iAct, oa);
+                            act.getDocument().getLinker().addToQueue(l);
+                        });
+            } else if(m == Mode.INDUCTION) {
+                boolean exists = !iAct.outputLinks.values().stream()
+                        .filter(l -> checkSynapse(l.getSynapse()))
+                        .filter(l -> to.matchNeuron(l.getOutput()))
+                        .findAny()
+                        .isEmpty();
+
+
+            }
+        }
+
+
+        if(m == Mode.LINKING && (s == null || !checkSynapse(s))) {
             return;
         }
 
@@ -44,20 +84,28 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
             try {
                 s = synapseClass.getConstructor().newInstance();
                 s.setInput(in);
-                s.setOutput(on);
             } catch (Exception e) {
             }
         }
 
-        if(oAct == null) {
-            oAct = to.follow(m, on != null ? on.get() : null, oAct, this, startAct);
+        oAct = to.follow(m, s.getOutput(), oAct, this, startAct);
+
+        if(s.getOutput() == null) {
+            s.setOutput(oAct.getNeuron());
+            s.link();
         }
 
         Link l = Link.link(s, iAct, oAct);
-        act.getDocument().getLinker().addToQueue(l);
+
+
+
     }
 
-    public boolean matchSynapse(Synapse ts) {
+    protected boolean checkSynapse(Synapse ts) {
+        if(synapseClass != null && synapseClass.equals(ts.getClass())) {
+            return false;
+        }
+
         if(patternScope != null && patternScope != ts.getPatternScope()) {
             return false;
         }
@@ -73,15 +121,8 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
         if(isPropagate != null && isPropagate.booleanValue() != ts.isPropagate()) {
             return false;
         }
-        return true;
-    }
 
-    public Link lookupExistingLink(Activation act, LNode from, Activation startAct) {
-        if(from == output) {
-            return startAct.outputLinks.get(act);
-        } else {
-            return act.outputLinks.get(startAct);
-        }
+        return true;
     }
 
     @Override
