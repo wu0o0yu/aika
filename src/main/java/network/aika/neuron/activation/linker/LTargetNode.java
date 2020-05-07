@@ -12,8 +12,8 @@ public class LTargetNode<N extends INeuron> extends LNode<N> {
 
     Boolean assumePosRecLinks;
 
-    public LTargetNode(PatternType patternType, Class<N> neuronClass, String label, Boolean assumePosRecLinks) {
-        super(patternType, neuronClass, label);
+    public LTargetNode(Class<N> neuronClass, String label, Boolean assumePosRecLinks) {
+        super(neuronClass, label);
         this.assumePosRecLinks = assumePosRecLinks;
     }
 

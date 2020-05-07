@@ -29,7 +29,17 @@ public abstract class LLink<S extends Synapse> {
 
     public abstract void follow(Mode m, Activation act, LNode from, Activation startAct);
 
-    protected abstract boolean checkSynapse(Synapse s);
+    protected boolean checkSynapse(Synapse s) {
+        if(synapseClass != null && !synapseClass.equals(s.getClass())) {
+            return false;
+        }
+
+        if(patternScope != null && patternScope != s.getPatternScope()) {
+            return false;
+        }
+
+        return true;
+    }
 
     public abstract String getTypeStr();
 

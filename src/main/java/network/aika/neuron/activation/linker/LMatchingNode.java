@@ -6,13 +6,13 @@ import network.aika.neuron.activation.Activation;
 
 public class LMatchingNode<N extends INeuron> extends LNode<N> {
 
-    public LMatchingNode(PatternType patternType, Class<N> neuronClass, String label) {
-        super(patternType, neuronClass, label);
+    public LMatchingNode(Class<N> neuronClass, String label) {
+        super(neuronClass, label);
     }
 
     public Activation follow(Mode m, INeuron n, Activation act, LLink from, Activation startAct) {
 
-        if(neuronClass != null && act.getINeuron().getClass().equals(neuronClass)) {
+        if(!checkNeuron(n)) {
             return null;
         }
 

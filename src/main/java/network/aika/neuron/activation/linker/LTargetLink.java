@@ -36,10 +36,14 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
             Synapse s = in.getOutputSynapse(on, patternScope);
 
             if(s == null) {
-                 if(m != Mode.INDUCTION) return;
+                if(m != Mode.INDUCTION) return;
 
-             // TODO: synapse Induction
-
+                try {
+                    s = synapseClass.getConstructor().newInstance();
+                    s.setInput(in);
+                    s.setOutput(on);
+                } catch (Exception e) {
+                }
             }
 
             Link l = Link.link(s, iAct, oAct);
@@ -49,17 +53,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
                 in.getActiveOutputSynapses().stream()
                         .filter(s -> checkSynapse(s))
                         .forEach(s -> {
-                            try {
-                                s = synapseClass.getConstructor().newInstance();
-                                s.setInput(in);
-                            } catch (Exception e) {
-                            }
                             Activation oa = to.follow(m, s.getOutput(), null, this, startAct);
-
-                            if(s.getOutput() == null) {
-                                s.setOutput(oa.getNeuron());
-                                s.link();
-                            }
 
                             Link l = Link.link(s, iAct, oa);
                             act.getDocument().getLinker().addToQueue(l);
@@ -67,58 +61,44 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
             } else if(m == Mode.INDUCTION) {
                 boolean exists = !iAct.outputLinks.values().stream()
                         .filter(l -> checkSynapse(l.getSynapse()))
-                        .filter(l -> to.matchNeuron(l.getOutput()))
+                        .filter(l -> to.checkNeuron(l.getOutput().getINeuron()))
                         .findAny()
                         .isEmpty();
 
+                if(!exists) {
+                    Synapse s = null;
+                    try {
+                        s = synapseClass.getConstructor().newInstance();
+                        s.setInput(in);
+                    } catch (Exception e) {
+                    }
 
+                    Activation oa = to.follow(m, s.getOutput(), null, this, startAct);
+
+                    if(s.getOutput() == null) {
+                        s.setOutput(oa.getNeuron());
+                        s.link();
+                    }
+
+                    Link l = Link.link(s, iAct, oa);
+                    act.getDocument().getLinker().addToQueue(l);
+                }
             }
         }
-
-
-        if(m == Mode.LINKING && (s == null || !checkSynapse(s))) {
-            return;
-        }
-
-        if(s == null && m == Mode.INDUCTION) {
-            try {
-                s = synapseClass.getConstructor().newInstance();
-                s.setInput(in);
-            } catch (Exception e) {
-            }
-        }
-
-        oAct = to.follow(m, s.getOutput(), oAct, this, startAct);
-
-        if(s.getOutput() == null) {
-            s.setOutput(oAct.getNeuron());
-            s.link();
-        }
-
-        Link l = Link.link(s, iAct, oAct);
-
-
-
     }
 
-    protected boolean checkSynapse(Synapse ts) {
-        if(synapseClass != null && synapseClass.equals(ts.getClass())) {
+    protected boolean checkSynapse(Synapse s) {
+        super.checkSynapse(s);
+
+        if(isRecurrent != null && isRecurrent.booleanValue() != s.isRecurrent()) {
             return false;
         }
 
-        if(patternScope != null && patternScope != ts.getPatternScope()) {
+        if(isNegative != null && isNegative.booleanValue() != s.isNegative()) {
             return false;
         }
 
-        if(isRecurrent != null && isRecurrent.booleanValue() != ts.isRecurrent()) {
-            return false;
-        }
-
-        if(isNegative != null && isNegative.booleanValue() != ts.isNegative()) {
-            return false;
-        }
-
-        if(isPropagate != null && isPropagate.booleanValue() != ts.isPropagate()) {
+        if(isPropagate != null && isPropagate.booleanValue() != s.isPropagate()) {
             return false;
         }
 

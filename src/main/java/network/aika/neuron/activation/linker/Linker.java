@@ -59,9 +59,9 @@ public class Linker {
     static {
         // Pattern
         {
-            LNode target = new LMatchingNode(CURRENT, PatternNeuron.class, "target");
-            LNode inputA = new LMatchingNode(CURRENT, PatternPartNeuron.class, "inputA");
-            LNode inputB = new LMatchingNode(CURRENT, PatternPartNeuron.class, "inputB");
+            LNode target = new LMatchingNode(PatternNeuron.class, "CURRENT-target");
+            LNode inputA = new LMatchingNode(PatternPartNeuron.class, "CURRENT-inputA");
+            LNode inputB = new LMatchingNode(PatternPartNeuron.class, "CURRENT-inputB");
 
             patternInputLinkT = new LTargetLink(inputB, target, SAME_PATTERN, null, "inputLink", false, false, null);
             patternInputLinkI = new LMatchingLink(inputA, target, SAME_PATTERN, null, "l2",true);
@@ -70,10 +70,10 @@ public class Linker {
 
         // Same Input
         {
-            LNode target = new LMatchingNode(CURRENT, PatternPartNeuron.class, "target");
-            LNode inputPattern = new LMatchingNode(INPUT, PatternNeuron.class, "inputPattern");
-            LNode inputRel = new LMatchingNode(INPUT, PatternPartNeuron.class, "inputRel");
-            LNode inhib = new LMatchingNode(INPUT, InhibitoryNeuron.class, "inhib");
+            LNode target = new LMatchingNode(PatternPartNeuron.class, "CURRENT-target");
+            LNode inputPattern = new LMatchingNode(PatternNeuron.class, "INPUT-inputPattern");
+            LNode inputRel = new LMatchingNode(PatternPartNeuron.class, "INPUT-inputRel");
+            LNode inhib = new LMatchingNode(InhibitoryNeuron.class, "INPUT-inhib");
 
             sameInputLinkT = new LTargetLink(inputRel, target, INPUT_PATTERN, null, "sameInputLink", false, false, null);
             sameInputLinkI = new LMatchingLink(inputPattern, target, INPUT_PATTERN, null, "inputPatternLink", true);
@@ -84,11 +84,11 @@ public class Linker {
 
         // Related Input
         {
-            LNode target = new LMatchingNode(CURRENT, PatternPartNeuron.class, "target");
-            LNode samePatternPP = new LMatchingNode(CURRENT, PatternPartNeuron.class, "samePatternPP");
-            LNode inputRel = new LMatchingNode(INPUT, PatternPartNeuron.class, "inputRel");
-            LNode relPattern = new LMatchingNode(RELATED, PatternNeuron.class, "relPattern");
-            LNode inhib = new LMatchingNode(INPUT, InhibitoryNeuron.class, "inhib");
+            LNode target = new LMatchingNode(PatternPartNeuron.class, "CURRENT-target");
+            LNode samePatternPP = new LMatchingNode(PatternPartNeuron.class, "CURRENT-samePatternPP");
+            LNode inputRel = new LMatchingNode(PatternPartNeuron.class, "INPUT-inputRel");
+            LNode relPattern = new LMatchingNode(PatternNeuron.class, "RELATED-relPattern");
+            LNode inhib = new LMatchingNode(InhibitoryNeuron.class, "INPUT-inhib");
 
             relatedInputLinkT = new LTargetLink(samePatternPP, target, SAME_PATTERN, null, "relatedInputLink", false, false, null);
             relatedInputLinkI = new LMatchingLink(inputRel, target, INPUT_PATTERN, null, "inputRelLink", false);
@@ -100,10 +100,10 @@ public class Linker {
 
         // Inhibitory
         {
-            LNode target = new LMatchingNode(CURRENT, PatternPartNeuron.class, "target");
-            LNode inhib = new LMatchingNode(null, InhibitoryNeuron.class, "inhib");
-            LNode patternpart = new LMatchingNode(CURRENT, PatternPartNeuron.class, "patternpart");
-            LNode input = new LMatchingNode(INPUT, PatternNeuron.class, "input");
+            LNode target = new LMatchingNode(PatternPartNeuron.class, "CURRENT-target");
+            LNode inhib = new LMatchingNode(InhibitoryNeuron.class, "inhib");
+            LNode patternpart = new LMatchingNode(PatternPartNeuron.class, "CURRENT-patternpart");
+            LNode input = new LMatchingNode(PatternNeuron.class, "INPUT-input");
 
             inhibitoryLinkT = new LTargetLink(inhib, target, CONFLICTING_PATTERN, null, "inhibLink", true, true, null);
             inhibitoryLinkI = new LMatchingLink(input, target, INPUT_PATTERN, null, "l1", true);
@@ -113,8 +113,8 @@ public class Linker {
 
         // Positive Recurrent Pattern Link
         {
-            LNode target = new LMatchingNode(CURRENT, PatternPartNeuron.class, "target");
-            LNode pattern = new LMatchingNode(CURRENT, PatternNeuron.class, "pattern");
+            LNode target = new LMatchingNode(PatternPartNeuron.class, "CURRENT-target");
+            LNode pattern = new LMatchingNode(PatternNeuron.class, "CURRENT-pattern");
 
             posRecLinkT = new LTargetLink(pattern, target, SAME_PATTERN, null, "posRecLink", true, false, null);
             posRecLinkI = new LMatchingLink(target, pattern, SAME_PATTERN, null, "patternLink", true);
@@ -122,16 +122,16 @@ public class Linker {
 
         // Propagate
         {
-            LNode target = new LTargetNode(null, null, "target", null);
-            LNode input = new LMatchingNode(null, null, "input");
+            LNode target = new LTargetNode(null, "target", null);
+            LNode input = new LMatchingNode(null, "input");
 
             propagateT = new LTargetLink(input, target, null, null, "propagateLink", null, false, true);
         }
 
         // Induce Pattern Part
         {
-            LNode target = new LTargetNode(CURRENT, PatternPartNeuron.class, "target", null);
-            LNode input = new LMatchingNode(INPUT, PatternNeuron.class, "input");
+            LNode target = new LTargetNode(PatternPartNeuron.class, "CURRENT-target", null);
+            LNode input = new LMatchingNode(PatternNeuron.class, "INPUT-input");
 
             inducePatternPart = new LTargetLink(input, target, INPUT_PATTERN, PatternPartSynapse.class, "inducePatternPart", false, false, true);
         }

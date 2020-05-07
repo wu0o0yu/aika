@@ -43,13 +43,6 @@ public class LMatchingLink<S extends Synapse> extends LLink<S> {
         to.follow(m, n, act, this, startAct);
     }
 
-    protected boolean checkSynapse(Synapse s) {
-        if(patternScope != null && patternScope != s.getPatternScope()) {
-            return false;
-        }
-
-        return true;
-    }
 
     @Override
     public String getTypeStr() {
