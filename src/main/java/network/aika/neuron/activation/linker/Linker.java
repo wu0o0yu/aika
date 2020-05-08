@@ -137,38 +137,10 @@ public class Linker {
         }
     }
 
-
-    public void linkForward(Activation act) {
-        if(act.lastRound != null) {
-            act.lastRound.outputLinks
-                    .values()
-                    .forEach(l -> Link.link(l.getSynapse(), act, l.getOutput()));
-            act.lastRound.unlink();
-            act.lastRound = null;
-        }
-
-        act.getINeuron().linkForwards(act);
-
-        process();
-    }
-
     public void process() {
         while (!queue.isEmpty()) {
             Link l = queue.pollFirst();
-            Activation act = l.getOutput();
-            INeuron n = act.getINeuron();
-
-            if(act.isFinal && !l.isSelfRef()) {
-                if(l.isConflict()) {
-                    act = act.createBranch();
-                } else {
-                    act = act.createUpdate();
-                }
-            }
-
-            act.addLink(l);
-
-            n.linkBackwards(l);
+            l.process();
         }
     }
 

@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 
 /**
@@ -95,5 +94,16 @@ public class Link {
 
     public Activation getActivation(Direction dir) {
         return dir == Direction.INPUT ? input : output;
+    }
+
+    public void process() {
+        if (output.isFinal && !isSelfRef()) {
+            output = isConflict() ?
+                    output.createBranch() :
+                    output.createUpdate();
+        }
+
+        output.addLink(this);
+        output.getINeuron().linkBackwards(this);
     }
 }

@@ -158,7 +158,7 @@ public class Activation implements Comparable<Activation> {
         isFinal = true;
         assumePosRecLinks = false;
 
-        doc.getLinker().linkForward(this);
+        linkForward();
         doc.getQueue().process();
     }
 
@@ -220,6 +220,21 @@ public class Activation implements Comparable<Activation> {
                 .anyMatch(l -> l.input.lNode == null);
     }
 
+    public void linkForward() {
+        if(lastRound != null) {
+            lastRound.outputLinks
+                    .values()
+                    .forEach(l -> Link.link(l.getSynapse(), this, l.getOutput()));
+            lastRound.unlink();
+            lastRound = null;
+        }
+
+        getINeuron().linkForwards(this);
+
+        doc.getLinker().process();
+    }
+
+
     public void addLink(Link l) {
         boolean firedInOrder = inputLinks.isEmpty() || l.input.fired.compareTo(inputLinksFiredOrder.lastKey().input.fired) >= 0;
 
@@ -262,7 +277,7 @@ public class Activation implements Comparable<Activation> {
         value = p * neuron.getActivationFunction().f(net);
         isFinal = true;
         if(lastRound == null || !equals(lastRound)) {
-            doc.getLinker().linkForward(this);
+            linkForward();
         }
     }
 
