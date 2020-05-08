@@ -142,9 +142,7 @@ public class Linker {
         if(act.lastRound != null) {
             act.lastRound.outputLinks
                     .values()
-                    .forEach(l ->
-                            addToQueue(Link.link(l.getSynapse(), act, l.getOutput()))
-                    );
+                    .forEach(l -> Link.link(l.getSynapse(), act, l.getOutput()));
             act.lastRound.unlink();
             act.lastRound = null;
         }

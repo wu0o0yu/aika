@@ -37,11 +37,12 @@ public class Link {
         this.output = output;
     }
 
-    public static Link link(Synapse s, Activation input, Activation output) {
+    public static void link(Synapse s, Activation input, Activation output) {
         if(output != null && output.isFinal) {
             output = output.createUpdate();
         }
-        return new Link(s, input, output);
+        Link l = new Link(s, input, output);
+        input.getDocument().getLinker().addToQueue(l);
     }
 
     public Synapse getSynapse() {

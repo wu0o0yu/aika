@@ -37,26 +37,17 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
 
             if(s == null) {
                 if(m != Mode.INDUCTION) return;
-
-                try {
-                    s = synapseClass.getConstructor().newInstance();
-                    s.setInput(in);
-                    s.setOutput(on);
-                } catch (Exception e) {
-                }
+                s = createSynapse(in, on);
             }
 
-            Link l = Link.link(s, iAct, oAct);
-            act.getDocument().getLinker().addToQueue(l);
+            Link.link(s, iAct, oAct);
         } else {
             if(m == Mode.LINKING) {
                 in.getActiveOutputSynapses().stream()
                         .filter(s -> checkSynapse(s))
                         .forEach(s -> {
                             Activation oa = to.follow(m, s.getOutput(), null, this, startAct);
-
-                            Link l = Link.link(s, iAct, oa);
-                            act.getDocument().getLinker().addToQueue(l);
+                            Link.link(s, iAct, oa);
                         });
             } else if(m == Mode.INDUCTION) {
                 boolean exists = !iAct.outputLinks.values().stream()
@@ -66,25 +57,25 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
                         .isEmpty();
 
                 if(!exists) {
-                    Synapse s = null;
-                    try {
-                        s = synapseClass.getConstructor().newInstance();
-                        s.setInput(in);
-                    } catch (Exception e) {
-                    }
-
-                    Activation oa = to.follow(m, s.getOutput(), null, this, startAct);
-
-                    if(s.getOutput() == null) {
-                        s.setOutput(oa.getNeuron());
-                        s.link();
-                    }
-
-                    Link l = Link.link(s, iAct, oa);
-                    act.getDocument().getLinker().addToQueue(l);
+                    oAct = to.follow(m, null, null, this, startAct);
+                    Synapse s = createSynapse(in, oAct.getNeuron());
+                    Link.link(s, iAct, oAct);
                 }
             }
         }
+    }
+
+    public Synapse createSynapse(Neuron in, Neuron on) {
+        try {
+            Synapse s = synapseClass.getConstructor().newInstance();
+            s.setInput(in);
+            s.setOutput(on);
+
+            s.link();
+            return s;
+        } catch (Exception e) {
+        }
+        return null;
     }
 
     protected boolean checkSynapse(Synapse s) {
