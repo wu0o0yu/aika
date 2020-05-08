@@ -121,8 +121,9 @@ public class Document implements Comparable<Document> {
 
     public void processLinks() {
         while (!linkQueue.isEmpty()) {
-            Link l = linkQueue.pollFirst();
-            l.process();
+            linkQueue
+                    .pollFirst()
+                    .process();
         }
     }
 

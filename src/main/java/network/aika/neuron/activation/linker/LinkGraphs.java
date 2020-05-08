@@ -116,7 +116,7 @@ public class LinkGraphs {
 
         // Propagate
         {
-            LNode target = new LTargetNode(null, "target", null);
+            LNode target = new LTargetNode(null, "target", true);
             LNode input = new LMatchingNode(null, "input");
 
             propagateT = new LTargetLink(input, target, null, null, "propagateLink", null, false, true);
@@ -124,7 +124,7 @@ public class LinkGraphs {
 
         // Induce Pattern Part
         {
-            LNode target = new LTargetNode(PatternPartNeuron.class, "CURRENT-target", null);
+            LNode target = new LTargetNode(PatternPartNeuron.class, "CURRENT-target", true);
             LNode input = new LMatchingNode(PatternNeuron.class, "INPUT-input");
 
             inducePatternPart = new LTargetLink(input, target, INPUT_PATTERN, PatternPartSynapse.class, "inducePatternPart", false, false, true);

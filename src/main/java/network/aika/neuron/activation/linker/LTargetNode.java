@@ -10,9 +10,9 @@ import static network.aika.neuron.activation.linker.Mode.INDUCTION;
 
 public class LTargetNode<N extends INeuron> extends LNode<N> {
 
-    Boolean assumePosRecLinks;
+    boolean assumePosRecLinks;
 
-    public LTargetNode(Class<N> neuronClass, String label, Boolean assumePosRecLinks) {
+    public LTargetNode(Class<N> neuronClass, String label, boolean assumePosRecLinks) {
         super(neuronClass, label);
         this.assumePosRecLinks = assumePosRecLinks;
     }

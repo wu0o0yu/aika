@@ -66,11 +66,6 @@ public class Activation implements Comparable<Activation> {
     public Set<Activation> branches = new TreeSet<>();
     public Activation mainBranch;
 
-    private Activation(int id, INeuron<?> n) {
-        this.id = id;
-        this.neuron = n;
-    }
-
     public Activation(int id, Document doc, INeuron<?> n) {
         this.id = id;
         this.doc = doc;
@@ -127,10 +122,6 @@ public class Activation implements Comparable<Activation> {
 
     public Fired getFired() {
         return fired;
-    }
-
-    public Collection<Link> getLinks(Direction dir) {
-        return dir == INPUT ? inputLinks.values() : outputLinks.values();
     }
 
     public Stream<Link> getOutputLinks(Neuron n, PatternScope ps) {
