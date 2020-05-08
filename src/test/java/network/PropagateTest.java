@@ -26,6 +26,7 @@ public class PropagateTest {
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
                         .setNegative(false)
+                        .setPropagate(true)
                         .setNeuron(in)
                         .setWeight(10.0)
                 );

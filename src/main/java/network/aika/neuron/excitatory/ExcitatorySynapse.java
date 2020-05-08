@@ -40,9 +40,15 @@ public abstract class ExcitatorySynapse<I extends INeuron, O extends ExcitatoryN
 
     protected void addLinkInternal(INeuron in, INeuron out) {
         out.addInputSynapse(this);
+        if(isPropagate()) {
+            in.addOutputSynapse(this);
+        }
     }
 
     protected void removeLinkInternal(INeuron in, INeuron out) {
         out.removeInputSynapse(this);
+        if(isPropagate()) {
+            in.removeOutputSynapse(this);
+        }
     }
 }

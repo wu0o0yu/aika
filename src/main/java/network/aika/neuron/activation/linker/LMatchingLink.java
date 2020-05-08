@@ -43,7 +43,6 @@ public class LMatchingLink<S extends Synapse> extends LLink<S> {
         to.follow(m, n, act, this, startAct);
     }
 
-
     @Override
     public String getTypeStr() {
         return "M";

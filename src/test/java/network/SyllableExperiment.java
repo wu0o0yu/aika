@@ -145,6 +145,7 @@ public class SyllableExperiment {
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
                         .setNegative(false)
+                        .setPropagate(true)
                         .setNeuron(lookupChar('d'))
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
@@ -160,6 +161,7 @@ public class SyllableExperiment {
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
                         .setNegative(false)
+                        .setPropagate(true)
                         .setNeuron(lookupChar('e'))
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
@@ -187,6 +189,7 @@ public class SyllableExperiment {
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
                         .setNegative(false)
+                        .setPropagate(true)
                         .setNeuron(lookupChar('r'))
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()

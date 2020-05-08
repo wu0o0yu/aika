@@ -31,6 +31,7 @@ public class MutualExclusionTest {
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
                         .setNegative(false)
+                        .setPropagate(true)
                         .setNeuron(in)
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
@@ -46,6 +47,7 @@ public class MutualExclusionTest {
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
                         .setNegative(false)
+                        .setPropagate(true)
                         .setNeuron(in)
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
@@ -61,6 +63,7 @@ public class MutualExclusionTest {
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
                         .setNegative(false)
+                        .setPropagate(true)
                         .setNeuron(in)
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()

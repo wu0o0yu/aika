@@ -45,6 +45,7 @@ public class PatternTest {
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
                         .setNegative(false)
+                        .setPropagate(true)
                         .setNeuron(inputInhibN)
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
@@ -68,6 +69,7 @@ public class PatternTest {
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
                         .setNegative(false)
+                        .setPropagate(true)
                         .setNeuron(inA)
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
@@ -83,6 +85,7 @@ public class PatternTest {
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
                         .setNegative(false)
+                        .setPropagate(true)
                         .setNeuron(inB)
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
@@ -110,6 +113,7 @@ public class PatternTest {
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
                         .setNegative(false)
+                        .setPropagate(true)
                         .setNeuron(inC)
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
