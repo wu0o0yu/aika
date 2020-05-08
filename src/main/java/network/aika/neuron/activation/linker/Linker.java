@@ -16,8 +16,6 @@
  */
 package network.aika.neuron.activation.linker;
 
-import network.aika.neuron.INeuron;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
@@ -27,7 +25,6 @@ import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import java.util.*;
 
 import static network.aika.neuron.PatternScope.*;
-import static network.aika.neuron.activation.linker.PatternType.*;
 
 /**
  *
@@ -35,7 +32,6 @@ import static network.aika.neuron.activation.linker.PatternType.*;
  */
 public class Linker {
 
-    Deque<Link> queue = new ArrayDeque<>();
 
     public static LTargetLink patternInputLinkT;
     public static LMatchingLink patternInputLinkI;
@@ -135,16 +131,5 @@ public class Linker {
 
             inducePatternPart = new LTargetLink(input, target, INPUT_PATTERN, PatternPartSynapse.class, "inducePatternPart", false, false, true);
         }
-    }
-
-    public void process() {
-        while (!queue.isEmpty()) {
-            Link l = queue.pollFirst();
-            l.process();
-        }
-    }
-
-    public void addToQueue(Link l) {
-        queue.add(l);
     }
 }

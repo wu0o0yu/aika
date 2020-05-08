@@ -83,8 +83,8 @@ public class Activation implements Comparable<Activation> {
 
         inputLinksFiredOrder = new TreeMap<>(Comparator
                 .<Link, Boolean>comparing(l -> !l.isRecurrent())
-                .thenComparing(l -> l.input.getFired())
-                .thenComparing(l -> l.input)
+                .thenComparing(l -> l.getInput().getFired())
+                .thenComparing(l -> l.getInput())
         );
 
         inputLinks = new TreeMap<>(INPUT_COMP);
@@ -138,8 +138,8 @@ public class Activation implements Comparable<Activation> {
         return outputLinks
                 .values()
                 .stream()
-                .filter(l -> l.output.getNeuron().getId() == n.getId())
-                .filter(l -> l.synapse.getPatternScope() == ps);
+                .filter(l -> l.getOutput().getNeuron().getId() == n.getId())
+                .filter(l -> l.getSynapse().getPatternScope() == ps);
     }
 
     public void initInputActivation(Activation.Builder input) {
@@ -159,7 +159,7 @@ public class Activation implements Comparable<Activation> {
         assumePosRecLinks = false;
 
         linkForward();
-        doc.getQueue().process();
+        doc.processActivations();
     }
 
     public Activation createBranch() {
@@ -184,7 +184,7 @@ public class Activation implements Comparable<Activation> {
         inputLinks
                 .values()
                 .forEach(l -> {
-                    new Link(l.synapse, l.input, clonedAct)
+                    new Link(l.getSynapse(), l.getInput(), clonedAct)
                             .link();
                 });
     }
@@ -216,8 +216,8 @@ public class Activation implements Comparable<Activation> {
     public boolean isConflicting() {
         return inputLinks.values().stream()
                 .filter(l -> l.isConflict() && !l.isSelfRef())
-                .flatMap(l -> l.input.inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
-                .anyMatch(l -> l.input.lNode == null);
+                .flatMap(l -> l.getInput().inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
+                .anyMatch(l -> l.getInput().lNode == null);
     }
 
     public void linkForward() {
@@ -230,15 +230,14 @@ public class Activation implements Comparable<Activation> {
         }
 
         getINeuron().linkForwards(this);
-
-        doc.getLinker().process();
+        doc.processLinks();
     }
 
-
     public void addLink(Link l) {
-        boolean firedInOrder = inputLinks.isEmpty() || l.input.fired.compareTo(inputLinksFiredOrder.lastKey().input.fired) >= 0;
+        boolean firedInOrder =
+                inputLinks.isEmpty() ||
+                        l.getInput().fired.compareTo(inputLinksFiredOrder.lastKey().getInput().fired) >= 0;
 
-        l.output = this;
         l.link();
 
         if(isFinal) return;
@@ -251,9 +250,9 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void sumUpLink(Link l) {
-        double w = l.synapse.getWeight();
-        net += l.input.value * w;
-        rangeCoverage += getINeuron().propagateRangeCoverage(l.input);
+        double w = l.getSynapse().getWeight();
+        net += l.getInput().value * w;
+        rangeCoverage += getINeuron().propagateRangeCoverage(l.getInput());
 
         checkIfFired(l);
     }
@@ -268,8 +267,8 @@ public class Activation implements Comparable<Activation> {
 
     public void checkIfFired(Link l) {
         if(fired == NOT_FIRED && net > 0.0) {
-            fired = neuron.incrementFired(l.input.fired);
-            doc.getQueue().add(this);
+            fired = neuron.incrementFired(l.getInput().fired);
+            doc.add(this);
         }
     }
 
@@ -320,7 +319,7 @@ public class Activation implements Comparable<Activation> {
         cAct.net = net;
         cAct.p = p;
 
-        doc.getQueue().add(cAct);
+        doc.add(cAct);
     }
 
     public void count() {

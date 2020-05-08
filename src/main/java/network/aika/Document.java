@@ -21,8 +21,8 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
-import network.aika.neuron.activation.linker.Linker;
-import network.aika.neuron.activation.Queue;
+import network.aika.neuron.activation.Fired;
+import network.aika.neuron.activation.Link;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,8 +51,12 @@ public class Document implements Comparable<Document> {
 
     private Model model;
 
-    private Queue queue = new Queue();
-    private Linker linker = new Linker();
+    private final TreeSet<Activation> activationsQueue = new TreeSet<>(
+            Comparator.<Activation, Fired>comparing(act -> act.fired)
+                    .thenComparing(Activation::getId)
+    );
+
+    private final Deque<Link> linkQueue = new ArrayDeque<>();
 
     private TreeMap<INeuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
 
@@ -80,14 +84,6 @@ public class Document implements Comparable<Document> {
         return model;
     }
 
-    public Queue getQueue() {
-        return queue;
-    }
-
-    public Linker getLinker() {
-        return linker;
-    }
-
     public void process() {
         activationsById
                 .values()
@@ -97,14 +93,37 @@ public class Document implements Comparable<Document> {
                         act.getINeuron().linkPosRecSynapses(act)
                 );
 
-        queue.process();
+        processActivations();
 
         activationsById
                 .values()
                 .stream()
                 .forEach(act -> act.computeP());
 
-        queue.process();
+        processActivations();
+    }
+
+    public void add(Activation act) {
+        activationsQueue.add(act);
+    }
+
+    public void add(Link l) {
+        linkQueue.add(l);
+    }
+
+    public void processActivations() throws Activation.OscillatingActivationsException {
+        while (!activationsQueue.isEmpty()) {
+            activationsQueue
+                    .pollFirst()
+                    .process();
+        }
+    }
+
+    public void processLinks() {
+        while (!linkQueue.isEmpty()) {
+            Link l = linkQueue.pollFirst();
+            l.process();
+        }
     }
 
     public long getNewVisitedId() {

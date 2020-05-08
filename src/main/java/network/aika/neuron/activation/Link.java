@@ -24,11 +24,10 @@ import network.aika.neuron.Synapse;
  */
 public class Link {
 
-    final Synapse synapse;
+    private final Synapse synapse;
 
-    Activation input;
-    Activation output;
-
+    private Activation input;
+    private Activation output;
 
     public Link(Synapse s, Activation input, Activation output) {
         this.synapse = s;
@@ -41,7 +40,7 @@ public class Link {
             output = output.createUpdate();
         }
         Link l = new Link(s, input, output);
-        input.getDocument().getLinker().addToQueue(l);
+        input.getDocument().add(l);
     }
 
     public Synapse getSynapse() {
