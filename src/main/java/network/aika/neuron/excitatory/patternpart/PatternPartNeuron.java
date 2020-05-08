@@ -107,21 +107,21 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     public void linkForwards(Activation act) {
         super.linkForwards(act);
 
-        Linker.sameInputLinkT.input.follow(LINKING, act.getINeuron(), act, Linker.sameInputLinkT, act);
-        Linker.relatedInputLinkT.input.follow(LINKING, act.getINeuron(), act, Linker.relatedInputLinkT, act);
-        Linker.patternInputLinkT.input.follow(LINKING, act.getINeuron(), act, Linker.patternInputLinkT, act);
+        LinkGraphs.sameInputLinkT.input.follow(LINKING, act.getINeuron(), act, LinkGraphs.sameInputLinkT, act);
+        LinkGraphs.relatedInputLinkT.input.follow(LINKING, act.getINeuron(), act, LinkGraphs.relatedInputLinkT, act);
+        LinkGraphs.patternInputLinkT.input.follow(LINKING, act.getINeuron(), act, LinkGraphs.patternInputLinkT, act);
     }
 
     @Override
     public void linkBackwards(Link l) {
-        Linker.sameInputLinkI.follow(LINKING, l, Linker.sameInputLinkI.output, l.getOutput());
-        Linker.relatedInputLinkI.follow(LINKING, l, Linker.relatedInputLinkI.output, l.getOutput());
-        Linker.inhibitoryLinkI.follow(LINKING, l, Linker.inhibitoryLinkI.output, l.getOutput());
+        LinkGraphs.sameInputLinkI.follow(LINKING, l, LinkGraphs.sameInputLinkI.output, l.getOutput());
+        LinkGraphs.relatedInputLinkI.follow(LINKING, l, LinkGraphs.relatedInputLinkI.output, l.getOutput());
+        LinkGraphs.inhibitoryLinkI.follow(LINKING, l, LinkGraphs.inhibitoryLinkI.output, l.getOutput());
     }
 
     @Override
     public void linkPosRecSynapses(Activation act) {
-        Linker.posRecLinkT.output.follow(LINKING, act.getINeuron(), act, Linker.posRecLinkT, act);
+        LinkGraphs.posRecLinkT.output.follow(LINKING, act.getINeuron(), act, LinkGraphs.posRecLinkT, act);
     }
 
     public double getCost(Sign s) {
@@ -189,8 +189,8 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     public void collectNewSynapseCandidates(Activation act) {
-        Linker.sameInputLinkT.output.follow(INDUCTION, act.getINeuron(), act, Linker.sameInputLinkT, act);
-        Linker.relatedInputLinkT.output.follow(INDUCTION, act.getINeuron(), act, Linker.relatedInputLinkT, act);
+        LinkGraphs.sameInputLinkT.output.follow(INDUCTION, act.getINeuron(), act, LinkGraphs.sameInputLinkT, act);
+        LinkGraphs.relatedInputLinkT.output.follow(INDUCTION, act.getINeuron(), act, LinkGraphs.relatedInputLinkT, act);
     }
 
     @Override

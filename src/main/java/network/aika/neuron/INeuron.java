@@ -19,7 +19,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.activation.linker.Linker;
+import network.aika.neuron.activation.linker.LinkGraphs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,7 +158,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     public abstract double propagateRangeCoverage(Activation iAct);
 
     public void linkForwards(Activation act) {
-        Linker.propagateT.input.follow(LINKING, this, act, null, act);
+        LinkGraphs.propagateT.input.follow(LINKING, this, act, null, act);
     }
 
     public abstract void linkBackwards(Link l);

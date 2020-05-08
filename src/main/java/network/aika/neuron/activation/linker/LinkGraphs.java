@@ -22,7 +22,6 @@ import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
-import java.util.*;
 
 import static network.aika.neuron.PatternScope.*;
 
@@ -30,8 +29,7 @@ import static network.aika.neuron.PatternScope.*;
  *
  * @author Lukas Molzberger
  */
-public class Linker {
-
+public class LinkGraphs {
 
     public static LTargetLink patternInputLinkT;
     public static LMatchingLink patternInputLinkI;

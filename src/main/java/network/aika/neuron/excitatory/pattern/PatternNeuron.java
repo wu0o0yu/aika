@@ -19,7 +19,6 @@ package network.aika.neuron.excitatory.pattern;
 import network.aika.Config;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.PatternScope;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -34,8 +33,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.TreeSet;
 
-import static network.aika.neuron.Synapse.State.CURRENT;
-import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.linker.Mode.LINKING;
 
 /**
@@ -106,7 +103,7 @@ TODO:
 
     @Override
     public void linkBackwards(Link l) {
-        Linker.patternInputLinkI.follow(LINKING, l, Linker.patternInputLinkI.output, l.getOutput());
+        LinkGraphs.patternInputLinkI.follow(LINKING, l, LinkGraphs.patternInputLinkI.output, l.getOutput());
     }
 
     @Override
