@@ -107,16 +107,16 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     public void linkForwards(Activation act) {
         super.linkForwards(act);
 
-        LinkGraphs.sameInputLinkT.input.follow(LINKING, act.getINeuron(), act, LinkGraphs.sameInputLinkT, act);
-        LinkGraphs.relatedInputLinkT.input.follow(LINKING, act.getINeuron(), act, LinkGraphs.relatedInputLinkT, act);
-        LinkGraphs.patternInputLinkT.input.follow(LINKING, act.getINeuron(), act, LinkGraphs.patternInputLinkT, act);
+        LinkGraphs.sameInputLinkT.followForwards(LINKING, act);
+        LinkGraphs.relatedInputLinkT.followForwards(LINKING, act);
+        LinkGraphs.patternInputLinkT.followForwards(LINKING, act);
     }
 
     @Override
     public void linkBackwards(Link l) {
-        LinkGraphs.sameInputLinkI.follow(LINKING, l, LinkGraphs.sameInputLinkI.output, l.getOutput());
-        LinkGraphs.relatedInputLinkI.follow(LINKING, l, LinkGraphs.relatedInputLinkI.output, l.getOutput());
-        LinkGraphs.inhibitoryLinkI.follow(LINKING, l, LinkGraphs.inhibitoryLinkI.output, l.getOutput());
+        LinkGraphs.sameInputLinkI.followBackwards(LINKING, l);
+        LinkGraphs.relatedInputLinkI.followBackwards(LINKING, l);
+        LinkGraphs.inhibitoryLinkI.followBackwards(LINKING, l);
     }
 
     @Override

@@ -8,6 +8,8 @@ import network.aika.neuron.activation.Link;
 
 import java.util.stream.Stream;
 
+import static network.aika.neuron.activation.linker.Mode.LINKING;
+
 public class LMatchingLink<S extends Synapse> extends LLink<S> {
 
     boolean dir;
@@ -30,6 +32,12 @@ public class LMatchingLink<S extends Synapse> extends LLink<S> {
         }
 
         s.forEach(l -> follow(m, l, from, startAct));
+    }
+
+    public void followBackwards(Mode m, Link l) {
+        Activation startAct = l.getOutput();
+        startAct.lNode = output;
+        follow(m, l, output, startAct);
     }
 
     public void follow(Mode m, Link l, LNode from, Activation startAct) {

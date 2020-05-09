@@ -21,11 +21,10 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
     }
 
     public void follow(Mode m, Activation act, LNode from, Activation startAct) {
-        Activation iAct = from == input ? act : startAct;
+        Activation iAct = selectActivation(input, act, startAct);
+        Activation oAct = selectActivation(output, act, startAct);
         Neuron in = iAct.getNeuron();
-
         LNode to = getTo(from);
-        Activation oAct = startAct.lNode == to ? startAct : null;
 
         if(oAct != null) {
             if(iAct.outputLinks.get(oAct) != null) {
@@ -63,6 +62,15 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
                 }
             }
         }
+    }
+
+    private Activation selectActivation(LNode n, Activation... acts) {
+        for(Activation act : acts) {
+            if(act.lNode == n) {
+                return act;
+            }
+        }
+        return null;
     }
 
     public Synapse createSynapse(Neuron in, Neuron on) {

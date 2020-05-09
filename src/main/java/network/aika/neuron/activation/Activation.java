@@ -27,7 +27,6 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.InputKey.INPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
-import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 
 /**

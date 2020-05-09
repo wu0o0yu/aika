@@ -103,7 +103,7 @@ TODO:
 
     @Override
     public void linkBackwards(Link l) {
-        LinkGraphs.patternInputLinkI.follow(LINKING, l, LinkGraphs.patternInputLinkI.output, l.getOutput());
+        LinkGraphs.patternInputLinkI.followBackwards(LINKING, l);
     }
 
     @Override

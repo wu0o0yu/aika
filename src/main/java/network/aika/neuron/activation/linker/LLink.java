@@ -7,6 +7,8 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 
+import static network.aika.neuron.activation.linker.Mode.LINKING;
+
 public abstract class LLink<S extends Synapse> {
     public String label;
 
@@ -28,6 +30,10 @@ public abstract class LLink<S extends Synapse> {
     }
 
     public abstract void follow(Mode m, Activation act, LNode from, Activation startAct);
+
+    public void followForwards(Mode m, Activation act) {
+        input.follow(m, act.getINeuron(), act, this, act);
+    }
 
     protected boolean checkSynapse(Synapse s) {
         if(synapseClass != null && !synapseClass.equals(s.getClass())) {
