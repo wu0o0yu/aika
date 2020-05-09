@@ -78,8 +78,9 @@ public class InhibitorySynapse extends Synapse<INeuron, InhibitoryNeuron> {
 
 
     public static class Builder extends Synapse.Builder {
-        protected SynapseFactory getSynapseFactory() {
-            return (input, output) -> new InhibitorySynapse(input, output);
+        @Override
+        public Synapse getSynapse(Neuron outputNeuron) {
+            return new InhibitorySynapse(inputNeuron, outputNeuron);
         }
     }
 }

@@ -37,7 +37,6 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
     public static final Neuron MIN_NEURON = new Neuron(null, Integer.MIN_VALUE);
     public static final Neuron MAX_NEURON = new Neuron(null, Integer.MAX_VALUE);
 
-
     ReadWriteLock lock = new ReadWriteLock();
 
     NavigableMap<InputKey, Synapse> activeInputSynapses = new TreeMap<>(INPUT_COMP);
@@ -48,16 +47,13 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
         super(m, id);
     }
 
-
     public Neuron(Model m, INeuron n) {
         super(m, n);
     }
 
-
     public String getLabel() {
         return get().getLabel();
     }
-
 
 
     /**
@@ -70,17 +66,14 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
         return get(doc).addInputActivation(doc, inputAct);
     }
 
-
     public static Neuron init(Neuron n, Builder... inputs) {
         return init(null, n, inputs);
     }
-
 
     public static Neuron init(Document doc, Neuron n, Builder... inputs) {
         n.init(doc, null, getSynapseBuilders(inputs));
         return n;
     }
-
 
     /**
      * Creates a neuron with the given bias.
@@ -111,18 +104,15 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
     }
 
 
-
     public static Neuron init(Neuron n, double bias, Collection<Synapse.Builder> inputs) {
         n.init((Document) null, bias, getSynapseBuilders(inputs));
         return n;
     }
 
-
     public static Neuron init(Document doc, Neuron n, double bias, Collection<Synapse.Builder> inputs) {
         n.init(doc, bias, getSynapseBuilders(inputs));
         return n;
     }
-
 
     private void init(Document doc, Double bias, Collection<Synapse.Builder> synapseBuilders) {
         INeuron n = get();
@@ -135,6 +125,7 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
         // s.link requires an updated n.biasSumDelta value.
         synapseBuilders.forEach(input -> {
             Synapse s = input.getSynapse(this);
+            s.link();
             s.update(doc, input.weight);
             modifiedSynapses.add(s);
         });
@@ -184,13 +175,11 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
         return s;
     }
 
-
     public void addActiveInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         activeInputSynapses.put(s, s);
         lock.releaseWriteLock();
     }
-
 
     public void removeActiveInputSynapse(Synapse s) {
         lock.acquireWriteLock();
@@ -198,13 +187,11 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
         lock.releaseWriteLock();
     }
 
-
     public void addActiveOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
         activeOutputSynapses.put(s, s);
         lock.releaseWriteLock();
     }
-
 
     public void removeActiveOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
@@ -212,14 +199,12 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
         lock.releaseWriteLock();
     }
 
-
     public String toString() {
         if(this == MIN_NEURON) return "MIN_NEURON";
         if(this == MAX_NEURON) return "MAX_NEURON";
 
         return super.toString();
     }
-
 
     /**
      * Active input synapses are those synapses that are currently available in the main memory.
@@ -230,11 +215,9 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
         return activeInputSynapses.values();
     }
 
-
     public Collection<Synapse> getActiveOutputSynapses() {
         return activeOutputSynapses.values();
     }
-
 
     private static Collection<Synapse.Builder> getSynapseBuilders(Collection<Synapse.Builder> builders) {
         ArrayList<Synapse.Builder> result = new ArrayList<>();
@@ -246,7 +229,6 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
         return result;
     }
 
-
     private static Collection<Synapse.Builder> getSynapseBuilders(Builder... builders) {
         ArrayList<Synapse.Builder> result = new ArrayList<>();
         for(Builder b: builders) {
@@ -257,8 +239,6 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
         return result;
     }
 
-
     public interface Builder {
     }
-
 }

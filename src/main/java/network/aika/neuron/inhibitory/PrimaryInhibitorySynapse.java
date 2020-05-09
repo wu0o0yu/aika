@@ -67,8 +67,9 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
     }
 
     public static class Builder extends Synapse.Builder {
-        protected SynapseFactory getSynapseFactory() {
-            return (input, output) -> new PrimaryInhibitorySynapse(input, output);
+        @Override
+        public Synapse getSynapse(Neuron outputNeuron) {
+            return new PrimaryInhibitorySynapse(inputNeuron, outputNeuron);
         }
     }
 }

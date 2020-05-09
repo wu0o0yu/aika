@@ -67,7 +67,6 @@ public class PatternPartSynapse<I extends INeuron> extends ExcitatorySynapse<I, 
         private PatternScope patternScope;
         private boolean isRecurrent;
         private boolean isNegative;
-        private boolean propagate;
 
         public Builder setPatternScope(PatternScope ps) {
             patternScope = ps;
@@ -84,20 +83,8 @@ public class PatternPartSynapse<I extends INeuron> extends ExcitatorySynapse<I, 
             return this;
         }
 
-        public Builder setPropagate(boolean propagate) {
-            this.propagate = propagate;
-            return this;
-        }
-
-
         public Synapse getSynapse(Neuron outputNeuron) {
-            PatternPartSynapse s = (PatternPartSynapse) super.getSynapse(outputNeuron);
-
-            return s;
-        }
-
-        protected SynapseFactory getSynapseFactory() {
-            return (input, output) -> new PatternPartSynapse(input, output, patternScope, isRecurrent, isNegative, propagate);
+            return new PatternPartSynapse(inputNeuron, outputNeuron, patternScope, isRecurrent, isNegative, propagate);
         }
     }
 }

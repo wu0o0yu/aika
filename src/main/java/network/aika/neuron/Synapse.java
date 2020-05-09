@@ -208,13 +208,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         input.addActiveOutputSynapse(this);
     }
 
-    public static Synapse createOrReplace(Neuron inputNeuron, Neuron outputNeuron, SynapseFactory synapseFactory) {
-        Synapse s = synapseFactory.createSynapse(inputNeuron, outputNeuron);
-        s.link();
-
-        return s;
-    }
-
     public String toString() {
         return "S W:" + Utils.round(getNewWeight()) + " " + input + "->" + output;
     }
@@ -227,19 +220,20 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
      */
     public static abstract class Builder implements Neuron.Builder {
 
-        private Neuron neuron;
-        double weight;
+        protected Neuron inputNeuron;
+        protected double weight;
+        protected boolean propagate;
 
 
         /**
          * Determines the input neuron.
          *
-         * @param neuron
+         * @param inputNeuron
          * @return
          */
-        public Builder setNeuron(Neuron neuron) {
-            assert neuron != null;
-            this.neuron = neuron;
+        public Builder setInputNeuron(Neuron inputNeuron) {
+            assert inputNeuron != null;
+            this.inputNeuron = inputNeuron;
             return this;
         }
 
@@ -251,7 +245,12 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
          */
         public Builder setNeuron(INeuron<?> neuron) {
             assert neuron != null;
-            this.neuron = neuron.getProvider();
+            this.inputNeuron = neuron.getProvider();
+            return this;
+        }
+
+        public Builder setPropagate(boolean propagate) {
+            this.propagate = propagate;
             return this;
         }
 
@@ -266,14 +265,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
             return this;
         }
 
-        public Synapse getSynapse(Neuron outputNeuron) {
-            return createOrReplace(neuron, outputNeuron, getSynapseFactory());
-        }
-
-        protected abstract SynapseFactory getSynapseFactory();
-    }
-
-    public interface SynapseFactory {
-        Synapse createSynapse(Neuron input, Neuron output);
+        public abstract Synapse getSynapse(Neuron outputNeuron);
     }
 }

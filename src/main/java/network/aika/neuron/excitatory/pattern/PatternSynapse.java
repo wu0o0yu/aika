@@ -20,8 +20,9 @@ public class PatternSynapse extends ExcitatorySynapse<PatternPartNeuron, Pattern
     public PatternSynapse() {
     }
 
-    public PatternSynapse(Neuron input, Neuron output) {
+    public PatternSynapse(Neuron input, Neuron output, boolean propagate) {
         super(input, output);
+        this.propagate = propagate;
     }
 
     @Override
@@ -67,13 +68,7 @@ public class PatternSynapse extends ExcitatorySynapse<PatternPartNeuron, Pattern
     public static class Builder extends Synapse.Builder {
 
         public Synapse getSynapse(Neuron outputNeuron) {
-            PatternSynapse s = (PatternSynapse) super.getSynapse(outputNeuron);
-
-            return s;
-        }
-
-        protected SynapseFactory getSynapseFactory() {
-            return (input, output) -> new PatternSynapse(input, output);
+            return new PatternSynapse(inputNeuron, outputNeuron, propagate);
         }
     }
 }
