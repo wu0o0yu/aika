@@ -38,6 +38,7 @@ public class LMatchingLink<S extends Synapse> extends LLink<S> {
         Activation startAct = l.getOutput();
         startAct.lNode = output;
         follow(m, l, output, startAct);
+        startAct.lNode = null;
     }
 
     public void follow(Mode m, Link l, LNode from, Activation startAct) {

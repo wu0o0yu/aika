@@ -83,7 +83,7 @@ public class Document {
         activationsById
                 .values()
                 .stream()
-                .filter(act -> act.assumePosRecLinks)
+//                .filter(act -> act.)
                 .forEach(act -> act.computeP());
 
         processActivations();
