@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 import static network.aika.neuron.InputKey.INPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
+import static network.aika.neuron.activation.LinkingMode.PRELIMINARY;
 
 /**
  *
@@ -54,6 +55,7 @@ public class Activation implements Comparable<Activation> {
     public NavigableMap<Activation, Link> outputLinks;
 
     public boolean assumePosRecLinks;
+    private boolean requiresFullUpdate = false;
     public boolean isFinal;
 
     public LNode lNode;
@@ -65,11 +67,11 @@ public class Activation implements Comparable<Activation> {
     public Set<Activation> branches = new TreeSet<>();
     public Activation mainBranch;
 
-    public Activation(int id, Document doc, INeuron<?> n, boolean assumePosRecLinks) {
+    public Activation(int id, Document doc, INeuron<?> n) {
         this.id = id;
         this.doc = doc;
         this.neuron = n;
-        this.assumePosRecLinks = assumePosRecLinks;
+        this.assumePosRecLinks = n.hasPositiveRecurrentSynapses() && doc.getLinkingMode() == PRELIMINARY;
         this.net = n.getTotalBias(this.assumePosRecLinks, CURRENT);
 
         doc.addActivation(this);
@@ -152,19 +154,21 @@ public class Activation implements Comparable<Activation> {
     }
 
     public Activation createBranch() {
-        Activation clonedAct = new Activation(doc.getNewActivationId(), doc, neuron, assumePosRecLinks);
+        Activation clonedAct = new Activation(doc.getNewActivationId(), doc, neuron);
         clonedAct.setRound(round + 1);
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
         linkClone(clonedAct);
+        clonedAct.requiresFullUpdate = true;
         return clonedAct;
     }
 
     public Activation createUpdate() {
-        Activation clonedAct = new Activation(id, doc, neuron, assumePosRecLinks);
+        Activation clonedAct = new Activation(id, doc, neuron);
         clonedAct.setRound(round + 1);
         clonedAct.setLastRound(this);
         linkClone(clonedAct);
+        clonedAct.requiresFullUpdate = true;
         return clonedAct;
     }
 
@@ -222,19 +226,24 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void addLink(Link l) {
-        boolean firedInOrder =
-                inputLinks.isEmpty() ||
-                        l.getInput().fired.compareTo(inputLinksFiredOrder.lastKey().getInput().fired) >= 0;
+        if(l.getSynapse().isRecurrent() || !isLastLink(l)) {
+            requiresFullUpdate = true;
+        }
 
         l.link();
 
         if(isFinal) return;
 
-        if(firedInOrder) {
-            sumUpLink(l);
-        } else {
+        if(requiresFullUpdate) {
             compute();
+            requiresFullUpdate = false;
+        }else{
+            sumUpLink(l);
         }
+    }
+
+    private boolean isLastLink(Link l) {
+        return inputLinksFiredOrder.isEmpty() || l.getInput().fired.compareTo(inputLinksFiredOrder.lastKey().getInput().fired) >= 0;
     }
 
     public void sumUpLink(Link l) {

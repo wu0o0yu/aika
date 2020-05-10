@@ -10,11 +10,8 @@ import static network.aika.neuron.activation.linker.Mode.INDUCTION;
 
 public class LTargetNode<N extends INeuron> extends LNode<N> {
 
-    boolean assumePosRecLinks;
-
-    public LTargetNode(Class<N> neuronClass, String label, boolean assumePosRecLinks) {
+    public LTargetNode(Class<N> neuronClass, String label) {
         super(neuronClass, label);
-        this.assumePosRecLinks = assumePosRecLinks;
     }
 
     public Activation follow(Mode m, INeuron n, Activation act, LLink from, Activation startAct) {
@@ -27,12 +24,7 @@ public class LTargetNode<N extends INeuron> extends LNode<N> {
 
         if(act == null) {
             Document doc = startAct.getDocument();
-            act = new Activation(
-                    doc.getNewActivationId(),
-                    doc,
-                    n,
-                    n.hasPositiveRecurrentSynapses() && assumePosRecLinks
-            );
+            act = new Activation(doc.getNewActivationId(), doc, n);
         }
 
         return act;

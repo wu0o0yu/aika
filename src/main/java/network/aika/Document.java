@@ -19,14 +19,14 @@ package network.aika;
 
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Direction;
-import network.aika.neuron.activation.Fired;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+
+import static network.aika.neuron.activation.LinkingMode.FINAL;
+import static network.aika.neuron.activation.LinkingMode.PRELIMINARY;
 
 
 /**
@@ -64,6 +64,7 @@ public class Document implements Comparable<Document> {
 
     public long createV;
 
+    private LinkingMode linkingMode = PRELIMINARY;
 
     public Document(Model model, String content) {
         this(model, model.getNewDocumentId(), content);
@@ -85,6 +86,7 @@ public class Document implements Comparable<Document> {
     }
 
     public void process() {
+        linkingMode = FINAL;
         activationsById
                 .values()
                 .stream()
@@ -93,13 +95,7 @@ public class Document implements Comparable<Document> {
                         act.getINeuron().linkPosRecSynapses(act)
                 );
 
-        processActivations();
-
-        activationsById
-                .values()
-                .stream()
-                .forEach(act -> act.computeP());
-
+        processLinks();
         processActivations();
     }
 
@@ -133,6 +129,10 @@ public class Document implements Comparable<Document> {
 
     public int getNewActivationId() {
         return activationIdCounter++;
+    }
+
+    public LinkingMode getLinkingMode() {
+        return linkingMode;
     }
 
     public void append(String txt) {

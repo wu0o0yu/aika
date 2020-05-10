@@ -45,7 +45,6 @@ public class PatternTest {
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
                         .setNegative(false)
-                        .setPropagate(true)
                         .setNeuron(inputInhibN)
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
