@@ -55,8 +55,8 @@ public class SyllableExperiment {
 
 
     private void train(String word) {
-        Document doc = new Document(model, word);
-        System.out.println("DocId:" + doc.getId() + "  " + word);
+        Document doc = new Document(word);
+        System.out.println("  " + word);
 
         Activation lastAct = null;
         Activation lastInInhibAct = null;
@@ -97,7 +97,7 @@ public class SyllableExperiment {
 
         System.out.println(doc.activationsToString());
 
-        doc.train(
+        doc.train(model,
                 new Config()
                         .setLearnRate(0.025)
                         .setMetaThreshold(0.3)

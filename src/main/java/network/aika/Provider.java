@@ -17,12 +17,10 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
     private volatile T n;
 
-
     public enum SuspensionMode {
         SAVE,
         DISCARD
     }
-
 
     public Provider(Model model, int id) {
         this.model = model;
@@ -34,7 +32,6 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
             }
         }
     }
-
 
     public Provider(Model model, T n) {
         this.model = model;
@@ -50,51 +47,29 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         }
     }
 
-
     public Integer getId() {
         return id;
     }
-
 
     public Model getModel() {
         return model;
     }
 
-
     public boolean isSuspended() {
         return n == null;
     }
-
 
     public T getIfNotSuspended() {
         return n;
     }
 
-
     public synchronized T get() {
         if (n == null) {
             reactivate();
         }
+ //       n.lastUsedDocumentId = TODO!
         return n;
     }
-
-
-    public synchronized T get(int lastUsedDocumentId) {
-        T n = get();
-        n.lastUsedDocumentId = Math.max(n.lastUsedDocumentId, lastUsedDocumentId);
-        return n;
-    }
-
-
-    /**
-     *
-     * @param doc The document is used to remember when this node has been used last.
-     * @return
-     */
-    public T get(Document doc) {
-        return doc != null ? get(doc.getId()) : get();
-    }
-
 
     public synchronized void suspend(SuspensionMode sm) {
         if(n == null) return;
@@ -112,7 +87,6 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         n = null;
     }
 
-
     public void save() {
         if (n.modified) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -129,7 +103,6 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         }
         n.modified = false;
     }
-
 
     private void reactivate() {
         assert model.suspensionHook != null;
@@ -149,23 +122,19 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         model.register(this);
     }
 
-
     @Override
     public boolean equals(Object o) {
         return id == ((Provider<?>) o).id;
     }
-
 
     @Override
     public int hashCode() {
         return id;
     }
 
-
     public String toString() {
         return "p(" + id + ":" + (n != null ? n.toString() : "SUSPENDED") + ")";
     }
-
 
     public int compareTo(Provider<?> n) {
         return Integer.compare(id, n.id);

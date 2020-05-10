@@ -87,7 +87,7 @@ public class MutualExclusionTest {
                 );
 
 
-        Document doc = new Document(m, "test");
+        Document doc = new Document("test");
 
         Activation inAct = in.addInputActivation(doc,
                 new Activation.Builder()

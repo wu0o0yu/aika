@@ -176,7 +176,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     public abstract void createSynapses(Config c, Activation act);
 
     public void count(Activation act) {
-        double v = act.value * act.getP();
+        double v = act.value;
         frequency += v;
         binaryFrequency += (v > 0.0 ? 1.0 : 0.0);
 

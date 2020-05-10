@@ -149,7 +149,7 @@ public class PatternTest {
         );
 
 
-        Document doc = new Document(m, "ABC");
+        Document doc = new Document("ABC");
 
         Activation actA = inA.addInputActivation(doc,
                 new Activation.Builder()

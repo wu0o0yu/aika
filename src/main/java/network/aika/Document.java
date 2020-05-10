@@ -38,18 +38,15 @@ import static network.aika.neuron.activation.LinkingMode.PRELIMINARY;
  *
  * @author Lukas Molzberger
  */
-public class Document implements Comparable<Document> {
+public class Document {
     private static final Logger log = LoggerFactory.getLogger(Document.class);
 
     public static int MAX_ROUND = 20;
 
-    private final int id;
     private final StringBuilder content;
 
     private long visitedCounter = 1;
     private int activationIdCounter = 0;
-
-    private Model model;
 
     private final TreeSet<Activation> activationsQueue = new TreeSet<>(
             Comparator.<Activation, Fired>comparing(act -> act.fired)
@@ -66,23 +63,8 @@ public class Document implements Comparable<Document> {
 
     private LinkingMode linkingMode = PRELIMINARY;
 
-    public Document(Model model, String content) {
-        this(model, model.getNewDocumentId(), content);
-    }
-
-    public Document(Model model, int id, String content) {
-        this.id = id;
+    public Document(String content) {
         this.content = new StringBuilder(content);
-
-        this.model = model;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public Model getModel() {
-        return model;
     }
 
     public void process() {
@@ -96,6 +78,14 @@ public class Document implements Comparable<Document> {
                 );
 
         processLinks();
+        processActivations();
+
+        activationsById
+                .values()
+                .stream()
+                .filter(act -> act.assumePosRecLinks)
+                .forEach(act -> act.computeP());
+
         processActivations();
     }
 
@@ -178,7 +168,7 @@ public class Document implements Comparable<Document> {
         return activationsById.size();
     }
 
-    public void train(Config c) {
+    public void train(Model m, Config c) {
         long v = getNewVisitedId();
         createV = v;
 /*
@@ -194,7 +184,7 @@ public class Document implements Comparable<Document> {
 
         commit();
 
-        getModel().N += length();
+        m.N += length();
     }
 
 
@@ -250,10 +240,5 @@ public class Document implements Comparable<Document> {
         }
 
         return sb.toString();
-    }
-
-    @Override
-    public int compareTo(Document doc) {
-        return Integer.compare(id, doc.id);
     }
 }

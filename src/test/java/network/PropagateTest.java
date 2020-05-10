@@ -32,7 +32,7 @@ public class PropagateTest {
                 );
 
 
-        Document doc = new Document(m, "test");
+        Document doc = new Document("test");
 
         in.addInputActivation(doc,
                 new Activation.Builder()

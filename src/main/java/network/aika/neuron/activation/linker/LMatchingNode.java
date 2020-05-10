@@ -11,7 +11,6 @@ public class LMatchingNode<N extends INeuron> extends LNode<N> {
     }
 
     public Activation follow(Mode m, INeuron n, Activation act, LLink from, Activation startAct) {
-
         if(!checkNeuron(n)) {
             return null;
         }
