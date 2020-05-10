@@ -17,7 +17,6 @@
 package network.aika.neuron.excitatory.patternpart;
 
 import network.aika.Config;
-import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;

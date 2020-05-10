@@ -83,17 +83,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         );
 
         sortedSynapses.addAll(inputSynapses.values());
-/*
-TODO:
-        double sum = getBias(CURRENT);
-        for(PatternSynapse s: sortedSynapses) {
-            if(!s.isRecurrent() && !s.isNegative()) {
-                s.setPropagate(sum > 0.0);
-
-                sum -= s.getWeight();
-            }
-        }
- */
     }
 
     @Override

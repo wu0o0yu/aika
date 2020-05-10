@@ -64,7 +64,6 @@ public class PatternSynapse extends ExcitatorySynapse<PatternPartNeuron, Pattern
         super.readFields(in, m);
     }
 
-
     public static class Builder extends Synapse.Builder {
 
         public Synapse getSynapse(Neuron outputNeuron) {
