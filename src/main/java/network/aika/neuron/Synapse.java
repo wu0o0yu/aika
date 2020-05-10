@@ -116,13 +116,8 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         (dir ? in : out).lock.acquireWriteLock();
         (dir ? out : in).lock.acquireWriteLock();
 
-        input.lock.acquireWriteLock();
-        input.activeOutputSynapses.put(this, this);
-        input.lock.releaseWriteLock();
-
-        output.lock.acquireWriteLock();
-        output.activeInputSynapses.put(this, this);
-        output.lock.releaseWriteLock();
+        input.addActiveOutputSynapse(this);
+        output.addActiveInputSynapse(this);
 
         addLinkInternal(in, out);
 
@@ -139,13 +134,8 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         (dir ? in : out).lock.acquireWriteLock();
         (dir ? out : in).lock.acquireWriteLock();
 
-        input.lock.acquireWriteLock();
-        input.activeOutputSynapses.remove(this);
-        input.lock.releaseWriteLock();
-
-        output.lock.acquireWriteLock();
-        output.activeInputSynapses.remove(this);
-        output.lock.releaseWriteLock();
+        input.removeActiveOutputSynapse(this);
+        output.removeActiveInputSynapse(this);
 
         removeLinkInternal(in, out);
 
