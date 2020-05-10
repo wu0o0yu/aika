@@ -83,7 +83,7 @@ public class Document {
         activationsById
                 .values()
                 .stream()
-//                .filter(act -> act.)
+                .filter(act -> !act.branches.isEmpty())
                 .forEach(act -> act.computeP());
 
         processActivations();
