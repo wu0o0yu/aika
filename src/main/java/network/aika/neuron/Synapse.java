@@ -23,6 +23,7 @@ import network.aika.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Comparator;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
 
@@ -33,6 +34,8 @@ import static network.aika.neuron.Synapse.State.CURRENT;
 public abstract class Synapse<I extends INeuron, O extends INeuron> implements Writable, InputKey, OutputKey {
 
     public static double TOLERANCE = 0.0000001;
+
+    public static Comparator<Synapse> INPUT_COMPARATOR = Comparator.comparing(s -> s.getInput());
 
     protected Neuron input;
     protected Neuron output;

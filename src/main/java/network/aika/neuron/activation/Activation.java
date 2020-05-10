@@ -392,19 +392,4 @@ public class Activation implements Comparable<Activation> {
             return this;
         }
     }
-
-    public static class OscillatingActivationsException extends RuntimeException {
-
-        private String activationsDump;
-
-        public OscillatingActivationsException(String activationsDump) {
-            super("Maximum number of rounds reached. The network might be oscillating.");
-
-            this.activationsDump = activationsDump;
-        }
-
-        public String getActivationsDump() {
-            return activationsDump;
-        }
-    }
 }

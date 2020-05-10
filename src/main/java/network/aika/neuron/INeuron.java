@@ -29,7 +29,6 @@ import java.util.function.Function;
 
 import static network.aika.neuron.Synapse.OUTPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
-import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.linker.Mode.LINKING;
 
 /**
@@ -96,14 +95,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     public String getLabel() {
         return label;
-    }
-
-    public Collection<? extends Synapse> getSynapses(Direction dir) {
-        return dir == INPUT ? getProvider().getActiveInputSynapses() : getProvider().getActiveOutputSynapses();
-    }
-
-    public Collection<Synapse> getOutputSynapses() {
-        return outputSynapses.values();
     }
 
     public Model getModel() {

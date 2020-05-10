@@ -22,7 +22,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.linker.*;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
@@ -33,6 +32,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.TreeSet;
 
+import static network.aika.neuron.Synapse.INPUT_COMPARATOR;
 import static network.aika.neuron.activation.linker.Mode.LINKING;
 
 /**
@@ -79,7 +79,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
         TreeSet<PatternSynapse> sortedSynapses = new TreeSet<>(
                 Comparator.<Synapse>comparingDouble(s -> s.getWeight()).reversed()
-                        .thenComparing(Direction.INPUT.getSynapseComparator())
+                        .thenComparing(INPUT_COMPARATOR)
         );
 
         sortedSynapses.addAll(inputSynapses.values());

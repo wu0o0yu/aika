@@ -16,7 +16,6 @@
  */
 package network.aika;
 
-
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
@@ -25,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+import static network.aika.neuron.Synapse.INPUT_COMPARATOR;
 import static network.aika.neuron.activation.LinkingMode.FINAL;
 import static network.aika.neuron.activation.LinkingMode.PRELIMINARY;
 
@@ -191,7 +191,7 @@ public class Document {
     public void notifyWeightModified(Synapse synapse) {
         Set<Synapse> is = modifiedWeights.get(synapse.getOutput());
         if(is == null) {
-            is = new TreeSet<>(Direction.INPUT.getSynapseComparator());
+            is = new TreeSet<>(INPUT_COMPARATOR);
             modifiedWeights.put(synapse.getOutput(), is);
         }
         is.add(synapse);

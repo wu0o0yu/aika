@@ -88,10 +88,6 @@ public class Link {
         return synapse + ": " + input + " --> " + output;
     }
 
-    public Activation getActivation(Direction dir) {
-        return dir == Direction.INPUT ? input : output;
-    }
-
     public void process() {
         if (output.isFinal && !isSelfRef()) {
             output = isConflict() ?

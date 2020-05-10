@@ -16,12 +16,10 @@
  */
 package network.aika.neuron.activation.linker;
 
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-
 
 import static network.aika.neuron.PatternScope.*;
 
