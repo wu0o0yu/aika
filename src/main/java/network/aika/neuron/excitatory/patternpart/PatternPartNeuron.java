@@ -164,30 +164,6 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         return getPatternSynapse(SAME_PATTERN).getInput();
     }
 
-    public Activation init(Activation iAct) {
-        Document doc = iAct.getDocument();
-
-        setBias(2.0);
-
-        int actBegin = 0; // iAct.getSlot(BEGIN).getFinalPosition();
-
-        PatternPartSynapse s = null; //new PatternPartSynapse(iAct.getNeuron(), getProvider());
-
-        s.updateDelta(doc, 2.0);
-
-        s.link();
-
-        if (log.isDebugEnabled()) {
-            log.debug("    Created Synapse: " + s.getInput().getId() + ":" + s.getInput().getLabel() + " -> " + s.getOutput().getId() + ":" + s.getOutput().getLabel());
-        }
-
-        Activation targetAct = new Activation(doc.getNewActivationId(), doc, this);
-        Link l = new Link(s, iAct, targetAct);
-        targetAct.addLink(l);
-
-        return targetAct;
-    }
-
     public void collectNewSynapseCandidates(Activation act) {
         LinkGraphs.sameInputLinkT.output.follow(INDUCTION, act.getINeuron(), act, LinkGraphs.sameInputLinkT, act);
         LinkGraphs.relatedInputLinkT.output.follow(INDUCTION, act.getINeuron(), act, LinkGraphs.relatedInputLinkT, act);

@@ -139,6 +139,7 @@ public class PatternTest {
         Neuron.init(out, 4.0,
                 new PatternSynapse.Builder()
                         .setNeuron(eA)
+                        .setPropagate(true)
                         .setWeight(10.0),
                 new PatternSynapse.Builder()
                         .setNeuron(eB)

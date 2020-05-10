@@ -27,8 +27,12 @@ public class LTargetNode<N extends INeuron> extends LNode<N> {
 
         if(act == null) {
             Document doc = startAct.getDocument();
-            act = new Activation(doc.getNewActivationId(), doc, n);
-            act.assumePosRecLinks = assumePosRecLinks;
+            act = new Activation(
+                    doc.getNewActivationId(),
+                    doc,
+                    n,
+                    n.hasPositiveRecurrentSynapses() && assumePosRecLinks
+            );
         }
 
         return act;

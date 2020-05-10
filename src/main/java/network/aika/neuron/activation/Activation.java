@@ -65,11 +65,11 @@ public class Activation implements Comparable<Activation> {
     public Set<Activation> branches = new TreeSet<>();
     public Activation mainBranch;
 
-    public Activation(int id, Document doc, INeuron<?> n) {
+    public Activation(int id, Document doc, INeuron<?> n, boolean assumePosRecLinks) {
         this.id = id;
         this.doc = doc;
         this.neuron = n;
-        this.assumePosRecLinks = neuron.hasPositiveRecurrentSynapses();
+        this.assumePosRecLinks = assumePosRecLinks;
         this.net = n.getTotalBias(this.assumePosRecLinks, CURRENT);
 
         doc.addActivation(this);
@@ -152,7 +152,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public Activation createBranch() {
-        Activation clonedAct = new Activation(doc.getNewActivationId(), doc, neuron);
+        Activation clonedAct = new Activation(doc.getNewActivationId(), doc, neuron, assumePosRecLinks);
         clonedAct.setRound(round + 1);
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
@@ -161,7 +161,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public Activation createUpdate() {
-        Activation clonedAct = new Activation(id, doc, neuron);
+        Activation clonedAct = new Activation(id, doc, neuron, assumePosRecLinks);
         clonedAct.setRound(round + 1);
         clonedAct.setLastRound(this);
         linkClone(clonedAct);
@@ -169,7 +169,6 @@ public class Activation implements Comparable<Activation> {
     }
 
     private void linkClone(Activation clonedAct) {
-        clonedAct.assumePosRecLinks = assumePosRecLinks;
         inputLinks
                 .values()
                 .forEach(l -> {
