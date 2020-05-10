@@ -58,46 +58,9 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         return type;
     }
 
-
     public boolean isMature(Config c) {
         return binaryFrequency >= c.getMaturityThreshold();  // Sign.NEG, Sign.POS
     }
-
-    /*
-    public double getInformationGain(Sign si, Sign so) {
-        INeuron primaryInput = getPrimaryInput().getInput();
-        INeuron patternInput = getPatternInput().getInput();
-
-        double fz = primaryInput.frequency;
-        double Nz = primaryInput.N;
-        double fy = patternInput.frequency;
-        double Ny = patternInput.N;
-
-        double pXi = fz / Nz;
-        pXi = si == Sign.POS ? pXi : 1.0 - pXi;
-
-        double pXo = fy / Ny;
-        pXo = so == Sign.POS ? pXo : 1.0 - pXo;
-
-        double f;
-        if(si == Sign.POS) {
-            if(so == Sign.POS) {
-                f = frequency;
-            } else {
-                f = fz - frequency;
-            }
-        } else {
-            if(so == Sign.POS) {
-                f = fy - frequency;
-            } else {
-                f = N + frequency - (fz + fy);
-            }
-        }
-        double pXio = f / N;
-
-        return Math.log(pXio) - (Math.log(pXi) + Math.log(pXo));
-    }
-    */
 
     public double propagateRangeCoverage(Activation iAct) {
         return getPrimaryInput() == iAct.getINeuron() ? iAct.rangeCoverage : 0.0;

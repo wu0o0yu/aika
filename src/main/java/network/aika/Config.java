@@ -12,7 +12,6 @@ public class Config {
         return this;
     }
 
-
     public double getMetaThreshold() {
         return metaThreshold;
     }

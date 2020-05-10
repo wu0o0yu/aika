@@ -34,7 +34,6 @@ import java.util.List;
 
 import static network.aika.neuron.activation.linker.Mode.LINKING;
 
-
 /**
  *
  * @author Lukas Molzberger

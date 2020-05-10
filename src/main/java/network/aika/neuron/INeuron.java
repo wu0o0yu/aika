@@ -170,7 +170,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         return Integer.compare(getId(), n.getId());
     }
 
-
     public abstract boolean isMature(Config c);
 
     public abstract void createSynapses(Config c, Activation act);

@@ -16,7 +16,6 @@
  */
 package network.aika.neuron;
 
-
 import network.aika.*;
 import network.aika.Document;
 import network.aika.Writable;
@@ -128,7 +127,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         (dir ? out : in).lock.releaseWriteLock();
     }
 
-
     public void unlink() {
         INeuron in = input.get();
         INeuron out = output.get();
@@ -186,7 +184,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         }
     }
 
-
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeByte(getType());
@@ -224,14 +221,13 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         protected double weight;
         protected boolean propagate;
 
-
         /**
          * Determines the input neuron.
          *
          * @param inputNeuron
          * @return
          */
-        public Builder setInputNeuron(Neuron inputNeuron) {
+        public Builder setNeuron(Neuron inputNeuron) {
             assert inputNeuron != null;
             this.inputNeuron = inputNeuron;
             return this;

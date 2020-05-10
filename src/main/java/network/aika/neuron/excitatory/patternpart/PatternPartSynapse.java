@@ -6,7 +6,6 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 
-
 public class PatternPartSynapse<I extends INeuron> extends ExcitatorySynapse<I, PatternPartNeuron> {
 
     public static byte type;
@@ -14,7 +13,6 @@ public class PatternPartSynapse<I extends INeuron> extends ExcitatorySynapse<I, 
     private PatternScope patternScope;
     private boolean isRecurrent;
     private boolean isNegative;
-
 
     public PatternPartSynapse() {
     }

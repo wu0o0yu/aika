@@ -16,11 +16,9 @@
  */
 package network.aika.neuron.inhibitory;
 
-
 import network.aika.neuron.*;
 
 import static network.aika.neuron.PatternScope.SAME_PATTERN;
-
 
 /**
  *
@@ -75,7 +73,6 @@ public class InhibitorySynapse extends Synapse<INeuron, InhibitoryNeuron> {
     protected void removeLinkInternal(INeuron in, INeuron out) {
         in.removeOutputSynapse(this);
     }
-
 
     public static class Builder extends Synapse.Builder {
         @Override

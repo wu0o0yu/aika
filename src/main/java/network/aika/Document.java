@@ -97,7 +97,7 @@ public class Document {
         linkQueue.add(l);
     }
 
-    public void processActivations() throws Activation.OscillatingActivationsException {
+    public void processActivations() {
         while (!activationsQueue.isEmpty()) {
             activationsQueue
                     .pollFirst()

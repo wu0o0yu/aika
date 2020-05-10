@@ -16,7 +16,6 @@
  */
 package network.aika.neuron;
 
-
 import network.aika.*;
 import network.aika.neuron.activation.Activation;
 
@@ -24,7 +23,6 @@ import java.util.*;
 
 import static network.aika.neuron.Synapse.INPUT_COMP;
 import static network.aika.neuron.Synapse.OUTPUT_COMP;
-
 
 /**
  * The {@code Neuron} class is a proxy implementation for the real neuron implementation in the class {@code INeuron}.
@@ -54,7 +52,6 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
     public String getLabel() {
         return get().getLabel();
     }
-
 
     /**
      * Propagate an input activation into the network.
@@ -102,7 +99,6 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
     public static Neuron init(Document doc, Neuron n, double bias, Builder... inputs) {
         return init(doc, n, bias, getSynapseBuilders(inputs));
     }
-
 
     public static Neuron init(Neuron n, double bias, Collection<Synapse.Builder> inputs) {
         n.init((Document) null, bias, getSynapseBuilders(inputs));
