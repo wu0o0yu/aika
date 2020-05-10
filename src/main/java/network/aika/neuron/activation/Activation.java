@@ -216,7 +216,9 @@ public class Activation implements Comparable<Activation> {
         if(lastRound != null) {
             lastRound.outputLinks
                     .values()
-                    .forEach(l -> Link.link(l.getSynapse(), this, l.getOutput()));
+                    .forEach(l ->
+                            Link.link(l.getSynapse(), this, l.getOutput())
+                    );
             lastRound.unlink();
             lastRound = null;
         }
