@@ -79,9 +79,9 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends INeuron<S> {
         return sum;
     }
 
-    public void train(Config c, Activation act) {
+    public void train(Activation act) {
         addDummyLinks(act);
-        super.train(c, act);
+        super.train(act);
     }
 
     protected void addDummyLinks(Activation act) {

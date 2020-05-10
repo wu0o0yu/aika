@@ -16,7 +16,9 @@
  */
 package network.aika.neuron.activation.linker;
 
+import network.aika.Config;
 import network.aika.Document;
+import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
 
@@ -29,14 +31,16 @@ import static network.aika.neuron.activation.linker.Mode.INDUCTION;
  */
 public class LTargetNode<N extends INeuron> extends LNode<N> {
 
-    public LTargetNode(Class<N> neuronClass, String label) {
-        super(neuronClass, label);
+    public LTargetNode(Class<N> neuronClass, Boolean isMature, String label) {
+        super(neuronClass, isMature, label);
     }
 
     public Activation follow(Mode m, INeuron n, Activation act, LLink from, Activation startAct) {
         if(n == null && m == INDUCTION) {
             try {
-                n = neuronClass.getConstructor().newInstance();
+                Model model = startAct.getNeuron().getModel();
+                n = neuronClass.getConstructor(Model.class, String.class)
+                        .newInstance(model, "");
             } catch (Exception e) {
             }
         }

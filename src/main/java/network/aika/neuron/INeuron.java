@@ -156,14 +156,14 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     public abstract void linkPosRecSynapses(Activation act);
 
+    public abstract void induceStructure(Activation act);
+
     public int compareTo(INeuron n) {
         if (this == n) return 0;
         return Integer.compare(getId(), n.getId());
     }
 
-    public abstract boolean isMature(Config c);
-
-    public abstract void createSynapses(Config c, Activation act);
+    public abstract boolean isMature();
 
     public void count(Activation act) {
         double v = act.value;
@@ -175,13 +175,15 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     }
 
     public void applyMovingAverage() {
-        double alpha = getModel().ALPHA;
-        frequency *= alpha;
-        binaryFrequency *= alpha;
+        Double alpha = getModel().getTrainingConfig().getAlpha();
+        if(alpha != null) {
+            frequency *= alpha;
+            binaryFrequency *= alpha;
+        }
     }
 
-    public void train(Config c, Activation act) {
-        createSynapses(c, act);
+    public void train(Activation act) {
+        induceStructure(act);
     }
 
     public double getP() {
@@ -190,7 +192,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     public double getN() {
         double coveredFactor = coveredFactorSum / coveredFactorCount;
-        return getModel().N / coveredFactor;
+        return getModel().getN() / coveredFactor;
     }
 
     public double getReliability() {

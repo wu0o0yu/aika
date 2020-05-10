@@ -57,8 +57,8 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         return type;
     }
 
-    public boolean isMature(Config c) {
-        return binaryFrequency >= c.getMaturityThreshold();  // Sign.NEG, Sign.POS
+    public boolean isMature() {
+        return binaryFrequency >= getModel().getTrainingConfig().getMaturityThreshold();  // Sign.NEG, Sign.POS
     }
 
     public double propagateRangeCoverage(Activation iAct) {
@@ -84,6 +84,11 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     @Override
     public void linkPosRecSynapses(Activation act) {
         LinkGraphs.posRecLinkT.output.follow(LINKING, act.getINeuron(), act, LinkGraphs.posRecLinkT, act);
+    }
+
+    @Override
+    public void induceStructure(Activation act) {
+
     }
 
     public double getCost(Sign s) {
@@ -129,10 +134,5 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     public void collectNewSynapseCandidates(Activation act) {
         LinkGraphs.sameInputLinkT.output.follow(INDUCTION, act.getINeuron(), act, LinkGraphs.sameInputLinkT, act);
         LinkGraphs.relatedInputLinkT.output.follow(INDUCTION, act.getINeuron(), act, LinkGraphs.relatedInputLinkT, act);
-    }
-
-    @Override
-    public void createSynapses(Config c, Activation act) {
-
     }
 }

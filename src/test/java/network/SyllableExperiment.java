@@ -53,6 +53,13 @@ public class SyllableExperiment {
     public void init() {
         model = new Model();
 
+        model.setTrainingConfig(
+                new Config()
+                        .setLearnRate(0.025)
+                        .setMetaThreshold(0.3)
+                        .setMaturityThreshold(10)
+        );
+
         inputInhibN = new InhibitoryNeuron(model, "INPUT INHIB", PatternNeuron.type);
         relN = new PatternPartNeuron(model, "Char-Relation");
     }
@@ -111,12 +118,7 @@ public class SyllableExperiment {
 
         System.out.println(doc.activationsToString());
 
-        doc.train(model,
-                new Config()
-                        .setLearnRate(0.025)
-                        .setMetaThreshold(0.3)
-                        .setMaturityThreshold(10)
-        );
+        doc.train(model);
     }
 
     @Test

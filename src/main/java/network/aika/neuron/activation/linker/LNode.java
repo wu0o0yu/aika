@@ -30,19 +30,26 @@ public abstract class LNode<N extends INeuron> {
 
     String label;
 
+    Boolean isMature;
+
     List<LLink> links = new ArrayList<>();
 
     Class<N> neuronClass;
 
     public abstract Activation follow(Mode m, INeuron n, Activation act, LLink from, Activation startAct);
 
-    public LNode(Class<N> neuronClass, String label) {
+    public LNode(Class<N> neuronClass, Boolean isMature, String label) {
         this.neuronClass = neuronClass;
+        this.isMature = isMature;
         this.label = label;
     }
 
     public boolean checkNeuron(INeuron n) {
         if(neuronClass != null && !n.getClass().equals(neuronClass)) {
+            return false;
+        }
+
+        if(isMature != null && isMature != n.isMature()) {
             return false;
         }
 

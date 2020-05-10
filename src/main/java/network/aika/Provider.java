@@ -1,5 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package network.aika;
-
 
 import java.io.*;
 import java.lang.ref.WeakReference;
@@ -37,7 +52,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         this.model = model;
         this.n = n;
 
-        id = model.suspensionHook != null ? model.suspensionHook.getNewId() : model.currentId.addAndGet(1);
+        id = model.createId();
         synchronized (model.providers) {
             model.providers.put(id, new WeakReference<>(this));
 
@@ -73,11 +88,8 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
     public synchronized void suspend(SuspensionMode sm) {
         if(n == null) return;
-
-        assert model.suspensionHook != null;
-
+        assert model.getSuspensionHook() != null;
         n.suspend();
-
         model.unregister(this);
 
         if(sm == SuspensionMode.SAVE) {
@@ -99,15 +111,15 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
                 throw new RuntimeException(e);
             }
 
-            model.suspensionHook.store(id, baos.toByteArray());
+            model.getSuspensionHook().store(id, baos.toByteArray());
         }
         n.modified = false;
     }
 
     private void reactivate() {
-        assert model.suspensionHook != null;
+        assert model.getSuspensionHook() != null;
 
-        byte[] data = model.suspensionHook.retrieve(id);
+        byte[] data = model.getSuspensionHook().retrieve(id);
         ByteArrayInputStream bais = new ByteArrayInputStream(data);
         try (
                 GZIPInputStream gzipis = new GZIPInputStream(bais);

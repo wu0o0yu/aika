@@ -54,11 +54,9 @@ public class Model {
 
     private static final Logger log = LoggerFactory.getLogger(Model.class);
 
-    public static double ALPHA = 0.99;
+    private int N = 0; // needs to be stored
 
-    public int N = 0; // needs to be stored
-
-    public static Map<Byte, Class> typeRegistry = new HashMap<>();
+    private static Map<Byte, Class> typeRegistry = new HashMap<>();
 
     static {
         register(PatternNeuron.class);
@@ -71,16 +69,14 @@ public class Model {
         register(InhibitorySynapse.class);
     }
 
-    public SuspensionHook suspensionHook;
-
-    public AtomicInteger docIdCounter = new AtomicInteger(0);
-    public AtomicInteger currentId = new AtomicInteger(0);
+    private SuspensionHook suspensionHook;
+    private AtomicInteger currentId = new AtomicInteger(0);
 
     // Important: the id field needs to be referenced by the provider!
     public WeakHashMap<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new WeakHashMap<>();
     public Map<Integer, Provider<? extends AbstractNode>> activeProviders = new TreeMap<>();
 
-    public static AtomicLong visitedCounter = new AtomicLong(1);
+    private Config trainingConfig = new Config();
 
     public Model() {
         this(null);
@@ -90,8 +86,14 @@ public class Model {
         suspensionHook = sh;
     }
 
+    public int createId() {
+        return suspensionHook != null ? suspensionHook.getNewId() : currentId.addAndGet(1);
+    }
+
     public void applyMovingAverage() {
-        N *= ALPHA;
+        if(trainingConfig.getAlpha() != null) {
+            N *= trainingConfig.getAlpha();
+        }
     }
 
     private static void register(Class clazz) {
@@ -104,6 +106,13 @@ public class Model {
         }
     }
 
+    public Config getTrainingConfig() {
+        return trainingConfig;
+    }
+
+    public void setTrainingConfig(Config trainingConfig) {
+        this.trainingConfig = trainingConfig;
+    }
 
     public static Class getClassForType(byte type) {
         return typeRegistry.get(type);
@@ -134,8 +143,12 @@ public class Model {
         s.write(out);
     }
 
-    public int getNewDocumentId() {
-        return docIdCounter.addAndGet(1);
+    public void addToN(int l) {
+        N += l;
+    }
+
+    public int getN() {
+        return N;
     }
 
     public Collection<Neuron> getActiveNeurons() {

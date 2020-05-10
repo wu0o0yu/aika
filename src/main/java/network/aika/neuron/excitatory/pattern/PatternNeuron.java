@@ -33,6 +33,8 @@ import java.util.Comparator;
 import java.util.TreeSet;
 
 import static network.aika.neuron.Synapse.INPUT_COMPARATOR;
+import static network.aika.neuron.activation.linker.LinkGraphs.inducePatternPart;
+import static network.aika.neuron.activation.linker.Mode.INDUCTION;
 import static network.aika.neuron.activation.linker.Mode.LINKING;
 
 /**
@@ -70,8 +72,8 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         return iAct.rangeCoverage;
     }
 
-    public boolean isMature(Config c) {
-        return binaryFrequency >= c.getMaturityThreshold();
+    public boolean isMature() {
+        return binaryFrequency >= getModel().getTrainingConfig().getMaturityThreshold();
     }
 
     public void commit(Collection<? extends Synapse> modifiedSynapses) {
@@ -99,7 +101,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     public void linkPosRecSynapses(Activation act) {
     }
 
-    public void createSynapses(Config c, Activation act) {
-
+    public void induceStructure(Activation act) {
+        inducePatternPart.input.follow(INDUCTION, act.getINeuron(), act, null, act);
     }
 }

@@ -79,6 +79,11 @@ public class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
     }
 
     @Override
+    public void induceStructure(Activation act) {
+
+    }
+
+    @Override
     public Fired incrementFired(Fired f) {
         return f;
     }
@@ -153,7 +158,7 @@ public class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
         return n;
     }
 
-    public boolean isMature(Config c) {
+    public boolean isMature() {
         return true;
     }
 
@@ -163,10 +168,5 @@ public class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
 
     public String typeToString() {
         return "INHIBITORY";
-    }
-
-    @Override
-    public void createSynapses(Config c, Activation act) {
-
     }
 }

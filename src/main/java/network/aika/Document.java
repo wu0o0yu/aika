@@ -16,6 +16,7 @@
  */
 package network.aika;
 
+
 import network.aika.neuron.INeuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
@@ -58,8 +59,6 @@ public class Document {
     private TreeMap<INeuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
-
-    public long createV;
 
     private LinkingMode linkingMode = PRELIMINARY;
 
@@ -168,23 +167,34 @@ public class Document {
         return activationsById.size();
     }
 
-    public void train(Model m, Config c) {
-        long v = getNewVisitedId();
-        createV = v;
-/*
-        model.applyMovingAverage();
-        for(INeuron n: activatedNeurons) {
-            n.applyMovingAverage(v);
+    public void train(Model m) {
+        if(m.getTrainingConfig().getAlpha() != null) {
+            Set<INeuron> activatedNeurons = new TreeSet<>();
+            getActivations()
+                .stream()
+                .filter(act -> act.isActive())
+                .forEach(act -> activatedNeurons.add(act.getINeuron()));
+
+            m.applyMovingAverage();
+            activatedNeurons.forEach(n ->
+                n.applyMovingAverage()
+            );
         }
-*/
+
         getActivations()
-                .forEach(act -> act.count());
+                .forEach(act ->
+                        act.count()
+                );
 
-//        propagate();
+        getActivations()
+                .forEach(act ->
+                        act.getINeuron().train(act)
+                );
 
+        process();
         commit();
 
-        m.N += length();
+        m.addToN(length());
     }
 
 
