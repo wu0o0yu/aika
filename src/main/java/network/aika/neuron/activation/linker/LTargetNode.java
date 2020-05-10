@@ -42,6 +42,7 @@ public class LTargetNode<N extends INeuron> extends LNode<N> {
                 n = neuronClass.getConstructor(Model.class, String.class)
                         .newInstance(model, "");
             } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
 

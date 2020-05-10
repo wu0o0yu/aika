@@ -98,8 +98,8 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
             s.link();
             return s;
         } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     protected boolean checkSynapse(Synapse s) {
