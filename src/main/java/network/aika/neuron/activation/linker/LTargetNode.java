@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.activation.linker;
 
-import network.aika.Config;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.INeuron;
@@ -37,13 +36,7 @@ public class LTargetNode<N extends INeuron> extends LNode<N> {
 
     public Activation follow(Mode m, INeuron n, Activation act, LLink from, Activation startAct) {
         if(n == null && m == INDUCTION) {
-            try {
-                Model model = startAct.getNeuron().getModel();
-                n = neuronClass.getConstructor(Model.class, String.class)
-                        .newInstance(model, "");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            n = createNeuron(startAct.getNeuron().getModel(), "");
         }
 
         if(act == null) {
@@ -52,5 +45,16 @@ public class LTargetNode<N extends INeuron> extends LNode<N> {
         }
 
         return act;
+    }
+
+    private INeuron createNeuron(Model m, String label) {
+        INeuron n;
+        try {
+            n = neuronClass.getConstructor(Model.class, String.class)
+                    .newInstance(m, label);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return n;
     }
 }
