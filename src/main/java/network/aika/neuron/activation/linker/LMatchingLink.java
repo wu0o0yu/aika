@@ -20,9 +20,13 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Link;
 
 import java.util.stream.Stream;
+
+import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
 
 
 /**
@@ -40,17 +44,8 @@ public class LMatchingLink<S extends Synapse> extends LLink<S> {
     }
 
     public void follow(Mode m, Activation act, LNode from, Activation startAct) {
-        Stream<Link> s = null;
-        if(from == input) {
-            if(!act.isFinal && act.lastRound != null) {
-                act = act.lastRound;
-            }
-            s = act.outputLinks.values().stream();
-        } else if(from == output) {
-            s = act.inputLinks.values().stream();
-        }
-
-        s.forEach(l -> follow(m, l, from, startAct));
+        act.getLinks(from == input ? OUTPUT : INPUT)
+                .forEach(l -> follow(m, l, from, startAct));
     }
 
     public void followBackwards(Mode m, Link l) {

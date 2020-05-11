@@ -46,9 +46,9 @@ public class Activation implements Comparable<Activation> {
 
     private int id;
     private INeuron<?> neuron;
-    private Thought doc;
+    private Thought thought;
 
-    public double p = 1.0;
+    private double p = 1.0;
 
     public TreeMap<Link, Link> inputLinksFiredOrder;
     public Map<InputKey, Link> inputLinks;
@@ -56,25 +56,26 @@ public class Activation implements Comparable<Activation> {
 
     public boolean assumePosRecLinks;
     private boolean requiresFullUpdate = false;
-    public boolean isFinal;
+    private boolean isFinal;
 
     public LNode lNode;
 
-    public int round; // Nur als Abbruchbedingung
-    public Activation nextRound;
-    public Activation lastRound;
+    private int round; // Nur als Abbruchbedingung
+    private Activation lastRound;
 
     public Set<Activation> branches = new TreeSet<>();
     public Activation mainBranch;
 
-    public Activation(int id, Thought doc, INeuron<?> n) {
+    private Reference groundRef;
+
+    public Activation(int id, Thought thought, INeuron<?> n) {
         this.id = id;
-        this.doc = doc;
+        this.thought = thought;
         this.neuron = n;
-        this.assumePosRecLinks = n.hasPositiveRecurrentSynapses() && doc.getLinkingMode() == PRELIMINARY;
+        this.assumePosRecLinks = n.hasPositiveRecurrentSynapses() && thought.getLinkingMode() == PRELIMINARY;
         this.net = n.getTotalBias(this.assumePosRecLinks, CURRENT);
 
-        doc.addActivation(this);
+        thought.addActivation(this);
 
         inputLinksFiredOrder = new TreeMap<>(Comparator
                 .<Link, Boolean>comparing(l -> !l.isRecurrent())
@@ -105,24 +106,32 @@ public class Activation implements Comparable<Activation> {
         return fired;
     }
 
+    public boolean isFinal() {
+        return isFinal;
+    }
+
     public Thought getThought() {
-        return doc;
+        return thought;
     }
 
     public String getLabel() {
         return getINeuron().getLabel();
     }
 
-    public boolean isInitialRound() {
-        return round == 0;
+    public Reference getGroundRef() {
+        return groundRef;
+    }
+
+    public void setGroundRef(Reference groundRef) {
+        this.groundRef = groundRef;
     }
 
     public void setLastRound(Activation lrAct) {
         this.lastRound = lrAct;
+    }
 
-        if (lrAct != null) {
-            lrAct.nextRound = this;
-        }
+    public Activation getLastRound() {
+        return lastRound;
     }
 
     public <N extends INeuron> N getINeuron() {
@@ -158,11 +167,11 @@ public class Activation implements Comparable<Activation> {
         assumePosRecLinks = false;
 
         linkForward();
-        doc.processActivations();
+        thought.processActivations();
     }
 
     public Activation createBranch() {
-        Activation clonedAct = new Activation(doc.getNewActivationId(), doc, neuron);
+        Activation clonedAct = new Activation(thought.getNewActivationId(), thought, neuron);
         clonedAct.setRound(round + 1);
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
@@ -172,7 +181,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public Activation createUpdate() {
-        Activation clonedAct = new Activation(id, doc, neuron);
+        Activation clonedAct = new Activation(id, thought, neuron);
         clonedAct.setRound(round + 1);
         clonedAct.setLastRound(this);
         linkClone(clonedAct);
@@ -232,7 +241,7 @@ public class Activation implements Comparable<Activation> {
         }
 
         getINeuron().linkForwards(this);
-        doc.processLinks();
+        thought.processLinks();
     }
 
     public void addLink(Link l) {
@@ -275,7 +284,7 @@ public class Activation implements Comparable<Activation> {
     public void checkIfFired(Link l) {
         if(fired == NOT_FIRED && net > 0.0) {
             fired = neuron.incrementFired(l.getInput().fired);
-            doc.add(this);
+            thought.add(this);
         }
     }
 
@@ -326,7 +335,7 @@ public class Activation implements Comparable<Activation> {
         cAct.net = net;
         cAct.p = p;
 
-        doc.add(cAct);
+        thought.add(cAct);
     }
 
     public void count() {
@@ -350,6 +359,24 @@ public class Activation implements Comparable<Activation> {
     @Override
     public int compareTo(Activation act) {
         return Integer.compare(id, act.id);
+    }
+
+    private Activation getMostRecentFinalActivation() {
+        if(!isFinal && lastRound != null) {
+            return lastRound;
+        }
+        return this;
+    }
+
+    public Stream<Link> getLinks(Direction dir) {
+        switch(dir) {
+            case OUTPUT:
+                Activation act = getMostRecentFinalActivation();
+                return act.outputLinks.values().stream();
+            case INPUT:
+                return inputLinks.values().stream();
+        }
+        return null;
     }
 
     public static class Builder {
