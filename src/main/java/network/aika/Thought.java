@@ -38,7 +38,7 @@ public abstract class Thought {
     private int activationIdCounter = 0;
 
     private final TreeSet<Activation> activationsQueue = new TreeSet<>(
-            Comparator.<Activation, Fired>comparing(act -> act.fired)
+            Comparator.<Activation, Fired>comparing(act -> act.getFired())
                     .thenComparing(Activation::getId)
     );
 

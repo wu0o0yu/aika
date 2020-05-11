@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.SortedSet;
 
 import static network.aika.neuron.PatternScope.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -128,6 +129,6 @@ public class MutualExclusionTest {
         SortedSet<Activation> nbActs = results.get(nb);
         Activation nbAct = nbActs.first();
 
-
+        assertTrue(nbAct.getValue() > 0.38);
     }
 }

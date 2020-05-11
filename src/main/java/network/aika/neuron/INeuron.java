@@ -166,7 +166,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     public abstract boolean isMature();
 
     public void count(Activation act) {
-        double v = act.value;
+        double v = act.getValue();
         frequency += v;
         binaryFrequency += (v > 0.0 ? 1.0 : 0.0);
 
@@ -211,7 +211,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     private static double getCoverage(Link ol) {
         Activation oAct = ol.getOutput();
         INeuron n = oAct.getINeuron();
-        return Math.min(Math.max(0.0, oAct.net), Math.max(0.0, ol.getInput().value * ol.getSynapse().getWeight())) / n.getBias();
+        return Math.min(Math.max(0.0, oAct.getNet()), Math.max(0.0, ol.getInput().getValue() * ol.getSynapse().getWeight())) / n.getBias();
     }
 
     @Override

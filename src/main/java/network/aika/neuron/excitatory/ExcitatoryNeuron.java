@@ -60,13 +60,13 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends INeuron<S> {
     }
 
     public double computeWeightGradient(Link il) {
-        return computeGradient(il, 0, l -> l.getInput().value);
+        return computeGradient(il, 0, l -> l.getInput().getValue());
     }
 
     public double computeGradient(Link il, int depth, Function<Link, Double> f) {
         if(depth > 2) return 0.0;
 
-        double g = f.apply(il) * getActivationFunction().outerGrad(il.getOutput().net);
+        double g = f.apply(il) * getActivationFunction().outerGrad(il.getOutput().getNet());
 
         double sum = 0.0;
         for (Sign s : Sign.values()) {

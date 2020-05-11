@@ -38,9 +38,9 @@ public class Activation implements Comparable<Activation> {
 
     public static double TOLERANCE = 0.001;
 
-    public double value;
-    public double net;
-    public Fired fired = NOT_FIRED;
+    private double value;
+    private double net;
+    private Fired fired = NOT_FIRED;
 
     public double rangeCoverage;
 
@@ -93,7 +93,19 @@ public class Activation implements Comparable<Activation> {
         return id;
     }
 
-    public Thought getDocument() {
+    public double getValue() {
+        return value;
+    }
+
+    public double getNet() {
+        return net;
+    }
+
+    public Fired getFired() {
+        return fired;
+    }
+
+    public Thought getThought() {
         return doc;
     }
 
@@ -119,10 +131,6 @@ public class Activation implements Comparable<Activation> {
 
     public Neuron getNeuron() {
         return neuron.getProvider();
-    }
-
-    public Fired getFired() {
-        return fired;
     }
 
     public Stream<Link> getOutputLinks(Neuron n, PatternScope ps) {

@@ -40,7 +40,7 @@ public class LTargetNode<N extends INeuron> extends LNode<N> {
         }
 
         if(act == null) {
-            Thought doc = startAct.getDocument();
+            Thought doc = startAct.getThought();
             act = new Activation(doc.getNewActivationId(), doc, n);
         }
 

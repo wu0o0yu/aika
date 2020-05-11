@@ -37,7 +37,7 @@ public class Link {
 
     public static void link(Synapse s, Activation input, Activation output) {
         Link l = new Link(s, input, output);
-        input.getDocument().add(l);
+        input.getThought().add(l);
     }
 
     public Synapse getSynapse() {
