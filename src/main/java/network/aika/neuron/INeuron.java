@@ -107,7 +107,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
      * @param doc   The current document
      * @param input
      */
-    public Activation addInputActivation(Document doc, Activation.Builder input) {
+    public Activation addInputActivation(Thought doc, Activation.Builder input) {
         Activation act = new Activation(doc.getNewActivationId(), doc, this);
         act.initInputActivation(input);
         return act;

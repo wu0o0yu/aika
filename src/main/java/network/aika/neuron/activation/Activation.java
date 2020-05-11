@@ -16,7 +16,7 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.Document;
+import network.aika.Thought;
 import network.aika.Utils;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.linker.LNode;
@@ -46,7 +46,7 @@ public class Activation implements Comparable<Activation> {
 
     private int id;
     private INeuron<?> neuron;
-    private Document doc;
+    private Thought doc;
 
     public double p = 1.0;
 
@@ -67,7 +67,7 @@ public class Activation implements Comparable<Activation> {
     public Set<Activation> branches = new TreeSet<>();
     public Activation mainBranch;
 
-    public Activation(int id, Document doc, INeuron<?> n) {
+    public Activation(int id, Thought doc, INeuron<?> n) {
         this.id = id;
         this.doc = doc;
         this.neuron = n;
@@ -93,7 +93,7 @@ public class Activation implements Comparable<Activation> {
         return id;
     }
 
-    public Document getDocument() {
+    public Thought getDocument() {
         return doc;
     }
 

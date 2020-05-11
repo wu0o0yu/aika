@@ -17,7 +17,7 @@
 package network.aika.neuron;
 
 import network.aika.*;
-import network.aika.Document;
+import network.aika.Thought;
 import network.aika.Writable;
 
 import java.io.DataInput;
@@ -161,7 +161,7 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         return output.get().isWeak(this, state);
     }
 
-    public void updateDelta(Document doc, double weightDelta) {
+    public void updateDelta(Thought doc, double weightDelta) {
         this.weightDelta += weightDelta;
 
         if(doc != null) {
@@ -169,7 +169,7 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         }
     }
 
-    public void update(Document doc, double weight) {
+    public void update(Thought doc, double weight) {
         this.weightDelta = weight - this.weight;
 
         if(doc != null) {

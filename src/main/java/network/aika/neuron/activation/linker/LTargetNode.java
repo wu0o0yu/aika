@@ -16,7 +16,7 @@
  */
 package network.aika.neuron.activation.linker;
 
-import network.aika.Document;
+import network.aika.Thought;
 import network.aika.Model;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Activation;
@@ -40,7 +40,7 @@ public class LTargetNode<N extends INeuron> extends LNode<N> {
         }
 
         if(act == null) {
-            Document doc = startAct.getDocument();
+            Thought doc = startAct.getDocument();
             act = new Activation(doc.getNewActivationId(), doc, n);
         }
 

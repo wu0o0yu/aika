@@ -59,7 +59,7 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
      * @param doc   The current document
      * @param inputAct
      */
-    public Activation addInput(Document doc, Activation.Builder inputAct) {
+    public Activation addInput(Thought doc, Activation.Builder inputAct) {
         return get().addInputActivation(doc, inputAct);
     }
 
@@ -67,7 +67,7 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
         return init(null, n, inputs);
     }
 
-    public static Neuron init(Document doc, Neuron n, Builder... inputs) {
+    public static Neuron init(Thought doc, Neuron n, Builder... inputs) {
         n.init(doc, null, getSynapseBuilders(inputs));
         return n;
     }
@@ -96,21 +96,21 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
      * @param inputs
      * @return
      */
-    public static Neuron init(Document doc, Neuron n, double bias, Builder... inputs) {
+    public static Neuron init(Thought doc, Neuron n, double bias, Builder... inputs) {
         return init(doc, n, bias, getSynapseBuilders(inputs));
     }
 
     public static Neuron init(Neuron n, double bias, Collection<Synapse.Builder> inputs) {
-        n.init((Document) null, bias, getSynapseBuilders(inputs));
+        n.init((Thought) null, bias, getSynapseBuilders(inputs));
         return n;
     }
 
-    public static Neuron init(Document doc, Neuron n, double bias, Collection<Synapse.Builder> inputs) {
+    public static Neuron init(Thought doc, Neuron n, double bias, Collection<Synapse.Builder> inputs) {
         n.init(doc, bias, getSynapseBuilders(inputs));
         return n;
     }
 
-    private void init(Document doc, Double bias, Collection<Synapse.Builder> synapseBuilders) {
+    private void init(Thought doc, Double bias, Collection<Synapse.Builder> synapseBuilders) {
         INeuron n = get();
 
         if(bias != null) {
