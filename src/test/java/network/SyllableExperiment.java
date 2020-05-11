@@ -19,11 +19,14 @@ package network;
 import network.aika.Config;
 import network.aika.Document;
 import network.aika.Model;
+import network.aika.neuron.INeuron;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.inhibitory.InhibitorySynapse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -57,17 +60,38 @@ public class SyllableExperiment {
                         .setMaturityThreshold(10)
         );
 
-        inputInhibN = new InhibitoryNeuron(model, "INPUT INHIB", PatternNeuron.type);
+        inputInhibN = new InhibitoryNeuron(model, "Input-Inhib", PatternNeuron.type);
         relN = new PatternPartNeuron(model, "Char-Relation");
+
+        PatternPartNeuron relN = new PatternPartNeuron(model, "Rel");
+        Neuron.init(relN, 1.0,
+                new PatternPartSynapse.Builder()
+                        .setPatternScope(INPUT_PATTERN)
+                        .setRecurrent(false)
+                        .setNegative(false)
+                        .setNeuron(inputInhibN)
+                        .setWeight(10.0),
+                new PatternPartSynapse.Builder()
+                        .setPatternScope(SAME_PATTERN)
+                        .setRecurrent(true)
+                        .setNegative(false)
+                        .setNeuron(inputInhibN)
+                        .setWeight(10.0)
+        );
     }
 
-    public PatternNeuron lookupChar(Character c) {
-        PatternNeuron n = inputLetters.get(c);
-        if(n == null) {
-            n = new PatternNeuron(model, "" + c);
-            inputLetters.put(c, n);
-        }
-        return n;
+    public PatternNeuron lookupChar(Character character) {
+        return inputLetters.computeIfAbsent(character, c -> {
+            PatternNeuron n = new PatternNeuron(model, "" + c);
+
+            Neuron.init(inputInhibN, 0.0,
+                    new InhibitorySynapse.Builder()
+                            .setNeuron(n)
+                            .setWeight(1.0)
+            );
+
+            return n;
+        });
     }
 
     private void train(String word) {
@@ -87,14 +111,10 @@ public class SyllableExperiment {
                             .setRangeCoverage(1.0)
             );
 
-            Activation currentInInhibAct = inputInhibN.addInputActivation(doc,
-                    new Activation.Builder()
-                            .setInputTimestamp(i)
-                            .setFired(0)
-                            .setValue(1.0)
-                            .setRangeCoverage(1.0)
-                            .addInputLink(SAME_PATTERN, currentAct)
-            );
+            Activation currentInInhibAct = currentAct.getOutputLinks(inputInhibN.getProvider(), SAME_PATTERN)
+                    .findAny()
+                    .map(l -> l.getOutput())
+                    .orElse(null);
 
             if(lastAct != null) {
                 relN.addInputActivation(doc,
@@ -118,7 +138,7 @@ public class SyllableExperiment {
 
     @Test
     public void testTraining() throws IOException {
-        for(String word: Util.loadExamplesAsWords(new File("/Users/lukas.molzberger/aika-ws/maerchen"))) {
+        for(String word: Util.loadExamplesAsWords(new File("C:\\ws\\aika-syllables\\src\\main\\resources\\text\\maerchen"))) {
             train( word + " ");
         }
 
