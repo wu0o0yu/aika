@@ -121,6 +121,22 @@ public abstract class Thought {
         return activationsById.size();
     }
 
+    public Map<INeuron, SortedSet<Activation>> getActivationsPerNeuron() {
+        Map<INeuron, SortedSet<Activation>> results = new TreeMap<>();
+
+        activationsById.values().stream()
+                .filter(act -> act.isActive())
+                .forEach(act -> {
+                    Set<Activation> acts = results.computeIfAbsent(
+                            act.getINeuron(),
+                            n -> new TreeSet<>()
+                    );
+                    acts.add(act);
+                });
+
+        return results;
+    }
+
     public void train(Model m) {
         if(m.getTrainingConfig().getAlpha() != null) {
             Set<INeuron> activatedNeurons = new TreeSet<>();

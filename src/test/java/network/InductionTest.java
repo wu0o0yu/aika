@@ -5,7 +5,7 @@ import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class InductionTest {
 

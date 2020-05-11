@@ -18,6 +18,7 @@ package network;
 
 import network.aika.Document;
 import network.aika.Model;
+import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
@@ -25,7 +26,10 @@ import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import java.util.Map;
+import java.util.SortedSet;
 
 import static network.aika.neuron.PatternScope.*;
 
@@ -118,5 +122,12 @@ public class MutualExclusionTest {
         doc.process();
 
         System.out.println(doc.activationsToString());
+
+        Map<INeuron, SortedSet<Activation>> results = doc.getActivationsPerNeuron();
+
+        SortedSet<Activation> nbActs = results.get(nb);
+        Activation nbAct = nbActs.first();
+
+
     }
 }

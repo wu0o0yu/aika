@@ -26,8 +26,8 @@ import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.Map;
@@ -49,7 +49,7 @@ public class SyllableExperiment {
     ExcitatoryNeuron relN;
 
 
-    @Before
+    @BeforeEach
     public void init() {
         model = new Model();
 
@@ -63,7 +63,6 @@ public class SyllableExperiment {
         inputInhibN = new InhibitoryNeuron(model, "INPUT INHIB", PatternNeuron.type);
         relN = new PatternPartNeuron(model, "Char-Relation");
     }
-
 
     public PatternNeuron lookupChar(Character c) {
         PatternNeuron n = inputLetters.get(c);
