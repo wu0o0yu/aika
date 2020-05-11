@@ -19,12 +19,10 @@ package network;
 import network.aika.Config;
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.*;
-import network.aika.neuron.excitatory.pattern.PatternSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,12 +40,11 @@ import static network.aika.neuron.PatternScope.SAME_PATTERN;
  */
 public class SyllableExperiment {
 
-    Model model;
+    private Model model;
 
-    Map<Character, PatternNeuron> inputLetters = new TreeMap<>();
-    InhibitoryNeuron inputInhibN;
-    ExcitatoryNeuron relN;
-
+    private Map<Character, PatternNeuron> inputLetters = new TreeMap<>();
+    private InhibitoryNeuron inputInhibN;
+    private ExcitatoryNeuron relN;
 
     @BeforeEach
     public void init() {
@@ -72,7 +69,6 @@ public class SyllableExperiment {
         }
         return n;
     }
-
 
     private void train(String word) {
         Document doc = new Document(word);
@@ -128,113 +124,5 @@ public class SyllableExperiment {
 
         model.dumpModel();
         System.out.println();
-    }
-
-    @Test
-    public void testTrainingDer() throws IOException {
-        PatternNeuron derN = initDer();
-
-        train("der ");
-
-/*        for(String word: Util.loadExamplesAsWords(new File("/Users/lukas.molzberger/aika-ws/maerchen"))) {
-            train( word + " ");
-        }
-*/
-        model.dumpModel();
-        System.out.println();
-    }
-
-    public PatternNeuron initDer() {
-        PatternPartNeuron eD = new PatternPartNeuron(model, "TP-d");
-        PatternPartNeuron eE = new PatternPartNeuron(model, "TP-e");
-        PatternPartNeuron eR = new PatternPartNeuron(model, "TP-r");
-
-        PatternNeuron derN = new PatternNeuron(model, "P-der");
-
-        Neuron.init(eD, 5.0,
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(INPUT_PATTERN)
-                        .setRecurrent(false)
-                        .setNegative(false)
-                        .setPropagate(true)
-                        .setNeuron(lookupChar('d'))
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(SAME_PATTERN)
-                        .setRecurrent(true)
-                        .setNegative(false)
-                        .setNeuron(derN)
-                        .setWeight(10.0)
-        );
-
-        Neuron.init(eE, 5.0,
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(INPUT_PATTERN)
-                        .setRecurrent(false)
-                        .setNegative(false)
-                        .setPropagate(true)
-                        .setNeuron(lookupChar('e'))
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(SAME_PATTERN)
-                        .setRecurrent(false)
-                        .setNegative(false)
-                        .setNeuron(eD)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(INPUT_PATTERN)
-                        .setRecurrent(false)
-                        .setNegative(false)
-                        .setNeuron(relN)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(SAME_PATTERN)
-                        .setRecurrent(true)
-                        .setNegative(false)
-                        .setNeuron(derN)
-                        .setWeight(10.0)
-        );
-
-        Neuron.init(eR, 5.0,
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(INPUT_PATTERN)
-                        .setRecurrent(false)
-                        .setNegative(false)
-                        .setPropagate(true)
-                        .setNeuron(lookupChar('r'))
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(SAME_PATTERN)
-                        .setRecurrent(false)
-                        .setNegative(false)
-                        .setNeuron(eE)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(INPUT_PATTERN)
-                        .setRecurrent(false)
-                        .setNegative(false)
-                        .setNeuron(relN)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(SAME_PATTERN)
-                        .setRecurrent(true)
-                        .setNegative(false)
-                        .setNeuron(derN)
-                        .setWeight(10.0)
-        );
-
-        Neuron.init(derN, 1.0,
-                new PatternSynapse.Builder()
-                        .setNeuron(eD)
-                        .setWeight(10.0),
-                new PatternSynapse.Builder()
-                        .setNeuron(eE)
-                        .setWeight(10.0),
-                new PatternSynapse.Builder()
-                        .setNeuron(eR)
-                        .setWeight(10.0)
-        );
-
-        return derN;
     }
 }
