@@ -156,7 +156,7 @@ public abstract class Thought {
                         act.count()
                 );
 
-        getActivations()
+        new ArrayList<>(getActivations())
                 .forEach(act ->
                         act.getINeuron().train(act)
                 );
