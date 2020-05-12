@@ -161,7 +161,7 @@ public abstract class Thought {
                         act.getINeuron().train(act)
                 );
 
-        process();
+//        process();
         commit();
 
         m.addToN(length());

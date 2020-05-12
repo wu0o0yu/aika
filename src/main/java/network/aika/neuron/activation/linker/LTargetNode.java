@@ -50,8 +50,8 @@ public class LTargetNode<N extends INeuron> extends LNode<N> {
     private INeuron createNeuron(Model m, String label) {
         INeuron n;
         try {
-            n = neuronClass.getConstructor(Model.class, String.class)
-                    .newInstance(m, label);
+            n = neuronClass.getConstructor(Model.class, String.class, Boolean.class)
+                    .newInstance(m, label, false);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

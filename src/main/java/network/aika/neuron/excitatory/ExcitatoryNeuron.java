@@ -55,7 +55,7 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends INeuron<S> {
         super(p);
     }
 
-    public ExcitatoryNeuron(Model model, String label, boolean isInputNeuron) {
+    public ExcitatoryNeuron(Model model, String label, Boolean isInputNeuron) {
         super(model, label, isInputNeuron);
     }
 

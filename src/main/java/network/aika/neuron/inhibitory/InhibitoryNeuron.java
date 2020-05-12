@@ -52,7 +52,7 @@ public class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
         super(p);
     }
 
-    public InhibitoryNeuron(Model model, String label, byte outerType, boolean isInputNeuron) {
+    public InhibitoryNeuron(Model model, String label, byte outerType, Boolean isInputNeuron) {
         super(model, label, isInputNeuron);
         this.outerType = outerType;
     }

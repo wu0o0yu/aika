@@ -65,7 +65,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         provider = p;
     }
 
-    public INeuron(Model m, String label, boolean isInputNeuron) {
+    public INeuron(Model m, String label, Boolean isInputNeuron) {
         this.label = label;
         this.isInputNeuron = isInputNeuron;
         provider = new Neuron(m, this);

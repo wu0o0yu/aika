@@ -50,7 +50,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         super(p);
     }
 
-    public PatternNeuron(Model model, String label, boolean isInputNeuron) {
+    public PatternNeuron(Model model, String label, Boolean isInputNeuron) {
         super(model, label, isInputNeuron);
     }
 
