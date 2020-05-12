@@ -82,6 +82,15 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends INeuron<S> {
     public void train(Activation act) {
         addDummyLinks(act);
         super.train(act);
+
+        double learnRate = getModel().getTrainingConfig().getLearnRate();
+        act.inputLinks.values()
+                .forEach(l ->
+                        l.getSynapse().update(
+                                act.getThought(),
+                                learnRate * computeWeightGradient(l)
+                        )
+                );
     }
 
     protected void addDummyLinks(Activation act) {
