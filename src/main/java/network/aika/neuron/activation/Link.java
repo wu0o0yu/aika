@@ -89,7 +89,7 @@ public class Link {
     }
 
     public void process() {
-        if (output.isFinal && !isSelfRef()) {
+        if (output.isFinal() && !isSelfRef()) {
             output = isConflict() ?
                     output.createBranch() :
                     output.createUpdate();

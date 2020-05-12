@@ -63,7 +63,6 @@ public class SyllableExperiment {
         inputInhibN = new InhibitoryNeuron(model, "Input-Inhib", PatternNeuron.type);
         relN = new PatternPartNeuron(model, "Char-Relation");
 
-        PatternPartNeuron relN = new PatternPartNeuron(model, "Rel");
         Neuron.init(relN, 1.0,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
