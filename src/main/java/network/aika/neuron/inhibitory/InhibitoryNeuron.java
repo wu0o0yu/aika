@@ -52,8 +52,8 @@ public class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
         super(p);
     }
 
-    public InhibitoryNeuron(Model model, String label, byte outerType) {
-        super(model, label);
+    public InhibitoryNeuron(Model model, String label, byte outerType, boolean isInputNeuron) {
+        super(model, label, isInputNeuron);
         this.outerType = outerType;
     }
 
@@ -138,24 +138,6 @@ public class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
         }
 
         setModified();
-    }
-
-    public static InhibitoryNeuron induceIncoming(Model m, int threadId, List<ExcitatorySynapse> targetSyns) {
-        // TODO: Prüfen, ob schon ein passendes inhibitorisches Neuron existiert.
-
-        InhibitoryNeuron n = new InhibitoryNeuron(m, "", PatternPartNeuron.type);
-        n.setBias(0.0);
-
-        for(ExcitatorySynapse es: targetSyns) {
-            InhibitorySynapse is = new InhibitorySynapse(es.getPInput(), n.getProvider());
-
-            is.link();
-
-            is.update(null, 1.0);
-        }
-
-        n.commit(n.getProvider().getActiveInputSynapses());
-        return n;
     }
 
     public boolean isMature() {

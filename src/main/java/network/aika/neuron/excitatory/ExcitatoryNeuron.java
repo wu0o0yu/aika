@@ -55,8 +55,8 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends INeuron<S> {
         super(p);
     }
 
-    public ExcitatoryNeuron(Model model, String label) {
-        super(model, label);
+    public ExcitatoryNeuron(Model model, String label, boolean isInputNeuron) {
+        super(model, label, isInputNeuron);
     }
 
     public double computeWeightGradient(Link il) {
@@ -82,6 +82,9 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends INeuron<S> {
     public void train(Activation act) {
         addDummyLinks(act);
         super.train(act);
+
+        if(isInputNeuron)
+            return;
 
         double learnRate = getModel().getTrainingConfig().getLearnRate();
         act.inputLinks.values()

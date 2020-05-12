@@ -60,8 +60,8 @@ public class SyllableExperiment {
                         .setMaturityThreshold(10)
         );
 
-        inputInhibN = new InhibitoryNeuron(model, "Input-Inhib", PatternNeuron.type);
-        relN = new PatternPartNeuron(model, "Char-Relation");
+        inputInhibN = new InhibitoryNeuron(model, "Input-Inhib", PatternNeuron.type, true);
+        relN = new PatternPartNeuron(model, "Char-Relation", true);
 
         Neuron.init(relN, 1.0,
                 new PatternPartSynapse.Builder()
@@ -81,7 +81,7 @@ public class SyllableExperiment {
 
     public PatternNeuron lookupChar(Character character) {
         return inputLetters.computeIfAbsent(character, c -> {
-            PatternNeuron n = new PatternNeuron(model, "" + c);
+            PatternNeuron n = new PatternNeuron(model, "" + c, true);
 
             Neuron.init(inputInhibN, 0.0,
                     new InhibitorySynapse.Builder()

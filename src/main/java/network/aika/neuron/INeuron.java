@@ -55,6 +55,8 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     public double coveredFactorSum;
     public double coveredFactorCount;
 
+    protected boolean isInputNeuron; // Input Neurons won't be trained!
+
 
     protected INeuron() {
     }
@@ -63,8 +65,9 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         provider = p;
     }
 
-    public INeuron(Model m, String label) {
+    public INeuron(Model m, String label, boolean isInputNeuron) {
         this.label = label;
+        this.isInputNeuron = isInputNeuron;
         provider = new Neuron(m, this);
         setModified();
     }

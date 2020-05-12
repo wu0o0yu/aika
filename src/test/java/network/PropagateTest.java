@@ -37,8 +37,8 @@ public class PropagateTest {
     public void testPropagation() {
         Model m = new Model();
 
-        PatternNeuron in = new PatternNeuron(m, "IN");
-        PatternPartNeuron na = new PatternPartNeuron(m, "A");
+        PatternNeuron in = new PatternNeuron(m, "IN", true);
+        PatternPartNeuron na = new PatternPartNeuron(m, "A", false);
 
         Neuron.init(na.getProvider(), 1.0,
                 new PatternPartSynapse.Builder()

@@ -40,12 +40,12 @@ public class PatternTest {
     public void testPattern() {
         Model m = new Model();
 
-        PatternNeuron inA = new PatternNeuron(m, "IN A");
-        PatternNeuron inB = new PatternNeuron(m, "IN B");
-        PatternNeuron inC = new PatternNeuron(m, "IN C");
+        PatternNeuron inA = new PatternNeuron(m, "IN A", true);
+        PatternNeuron inB = new PatternNeuron(m, "IN B", true);
+        PatternNeuron inC = new PatternNeuron(m, "IN C", true);
 
 
-        InhibitoryNeuron inputInhibN = new InhibitoryNeuron(m, "INPUT INHIB", PatternNeuron.type);
+        InhibitoryNeuron inputInhibN = new InhibitoryNeuron(m, "INPUT INHIB", PatternNeuron.type, true);
         Neuron.init(inputInhibN, 0.0,
                 new InhibitorySynapse.Builder()
                         .setNeuron(inA)
@@ -58,7 +58,7 @@ public class PatternTest {
                         .setWeight(1.0)
         );
 
-        PatternPartNeuron relN = new PatternPartNeuron(m, "Rel");
+        PatternPartNeuron relN = new PatternPartNeuron(m, "Rel", true);
         Neuron.init(relN, 1.0,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
@@ -75,11 +75,11 @@ public class PatternTest {
         );
 
 
-        PatternPartNeuron eA = new PatternPartNeuron(m, "E A");
-        PatternPartNeuron eB = new PatternPartNeuron(m, "E B");
-        PatternPartNeuron eC = new PatternPartNeuron(m, "E C");
+        PatternPartNeuron eA = new PatternPartNeuron(m, "E A", false);
+        PatternPartNeuron eB = new PatternPartNeuron(m, "E B", false);
+        PatternPartNeuron eC = new PatternPartNeuron(m, "E C", false);
 
-        PatternNeuron out = new PatternNeuron(m, "OUT");
+        PatternNeuron out = new PatternNeuron(m, "OUT", false);
 
 
         Neuron.init(eA, 4.0,

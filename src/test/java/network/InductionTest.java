@@ -17,7 +17,7 @@ public class InductionTest {
                         .setMaturityThreshold(10)
         );
 
-        PatternNeuron in = new PatternNeuron(m, "IN");
+        PatternNeuron in = new PatternNeuron(m, "IN", true);
         in.binaryFrequency = 12;
 
         Document doc = new Document("");

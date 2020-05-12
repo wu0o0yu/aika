@@ -44,11 +44,11 @@ public class MutualExclusionTest {
     public void testPropagation() {
         Model m = new Model();
 
-        PatternNeuron in = new PatternNeuron(m, "IN");
-        PatternPartNeuron na = new PatternPartNeuron(m, "A");
-        PatternPartNeuron nb = new PatternPartNeuron(m, "B");
-        PatternPartNeuron nc = new PatternPartNeuron(m, "C");
-        InhibitoryNeuron inhib = new InhibitoryNeuron(m, "I", PatternPartNeuron.type);
+        PatternNeuron in = new PatternNeuron(m, "IN", true);
+        PatternPartNeuron na = new PatternPartNeuron(m, "A", false);
+        PatternPartNeuron nb = new PatternPartNeuron(m, "B", false);
+        PatternPartNeuron nc = new PatternPartNeuron(m, "C", false);
+        InhibitoryNeuron inhib = new InhibitoryNeuron(m, "I", PatternPartNeuron.type, false);
 
         Neuron.init(na, 1.0,
                 new PatternPartSynapse.Builder()
