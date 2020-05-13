@@ -19,10 +19,7 @@ package network.aika.neuron.activation.linker;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.PatternInhibitoryNeuron;
-import network.aika.neuron.inhibitory.PatternPartInhibitoryNeuron;
-import network.aika.neuron.inhibitory.PrimaryInhibitorySynapse;
+import network.aika.neuron.inhibitory.*;
 
 import static network.aika.neuron.PatternScope.*;
 
@@ -50,6 +47,8 @@ public class LinkGraphs {
     public static LTargetLink propagateT;
 
     public static LTargetLink inducePatternPart;
+
+    public static LTargetLink inducePPInhibInputSynapse;
 
     static {
         // Pattern
@@ -137,6 +136,17 @@ public class LinkGraphs {
             LNode input = new LMatchingNode(PatternNeuron.class, true, "INPUT-input");
 
             inducePatternPart = new LTargetLink(input, target, INPUT_PATTERN, PrimaryInhibitorySynapse.class, "induceInhibitoryNeuron", false, false, true);
+        }
+
+        // Induce Input PP-Inhibitory Synapse
+        {
+            LNode target = new LMatchingNode(PatternPartInhibitoryNeuron.class, null, "CURRENT-target");
+            LNode input = new LMatchingNode(PatternPartNeuron.class, null, "INPUT-input");
+            LNode inputPattern = new LMatchingNode(PatternNeuron.class, true, "INPUT-input-pattern");
+
+            inducePPInhibInputSynapse = new LTargetLink(input, target, SAME_PATTERN, InhibitorySynapse.class, "induceInhibitorySynapse", false, false, true);
+            new LMatchingLink(inputPattern, input, INPUT_PATTERN, PatternPartSynapse.class, "pp-input-syn", false);
+            new LMatchingLink(inputPattern, target, INPUT_PATTERN, PrimaryInhibitorySynapse.class, "primary-inhib-syn", true);
         }
     }
 }
