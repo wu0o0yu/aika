@@ -18,6 +18,10 @@ package network.aika.neuron.inhibitory;
 
 import network.aika.Model;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Activation;
+
+import static network.aika.neuron.activation.linker.LinkGraphs.inducePPInhibInputSynapse;
+import static network.aika.neuron.activation.linker.Mode.INDUCTION;
 
 /**
  *
@@ -42,6 +46,10 @@ public class PatternInhibitoryNeuron extends InhibitoryNeuron {
     @Override
     public byte getOuterType() {
         return getType();
+    }
+
+    @Override
+    public void induceStructure(Activation act) {
     }
 
     public String typeToString() {

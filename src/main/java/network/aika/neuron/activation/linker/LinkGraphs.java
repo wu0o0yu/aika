@@ -48,7 +48,11 @@ public class LinkGraphs {
 
     public static LTargetLink inducePatternPart;
 
+    public static LTargetLink inducePPInhibitoryNeuron;
+
     public static LTargetLink inducePPInhibInputSynapse;
+
+    public static LTargetLink induceNegativePPInputSynapse;
 
     static {
         // Pattern
@@ -135,18 +139,27 @@ public class LinkGraphs {
             LNode target = new LTargetNode(PatternPartInhibitoryNeuron.class, null, "CURRENT-target");
             LNode input = new LMatchingNode(PatternNeuron.class, true, "INPUT-input");
 
-            inducePatternPart = new LTargetLink(input, target, INPUT_PATTERN, PrimaryInhibitorySynapse.class, "induceInhibitoryNeuron", false, false, true);
+            inducePPInhibitoryNeuron = new LTargetLink(input, target, INPUT_PATTERN, PrimaryInhibitorySynapse.class, "induceInhibitoryNeuron", false, false, true);
         }
 
         // Induce Input PP-Inhibitory Synapse
         {
             LNode target = new LMatchingNode(PatternPartInhibitoryNeuron.class, null, "CURRENT-target");
-            LNode input = new LMatchingNode(PatternPartNeuron.class, null, "INPUT-input");
+            LNode input = new LMatchingNode(PatternPartNeuron.class, null, "CURRENT-input");
             LNode inputPattern = new LMatchingNode(PatternNeuron.class, true, "INPUT-input-pattern");
 
             inducePPInhibInputSynapse = new LTargetLink(input, target, SAME_PATTERN, InhibitorySynapse.class, "induceInhibitorySynapse", false, false, true);
             new LMatchingLink(inputPattern, input, INPUT_PATTERN, PatternPartSynapse.class, "pp-input-syn", false);
             new LMatchingLink(inputPattern, target, INPUT_PATTERN, PrimaryInhibitorySynapse.class, "primary-inhib-syn", true);
+        }
+
+        // Induce negative PP-Input Synapse
+        {
+            LNode target = new LMatchingNode(PatternPartNeuron.class, null, "CURRENT-target");
+            LNode input = new LMatchingNode(PatternPartInhibitoryNeuron.class, null, "CURRENT-input");
+
+            induceNegativePPInputSynapse = new LTargetLink(input, target, SAME_PATTERN, PatternPartSynapse.class, "induce pp-input-syn", true, true, false);
+            new LMatchingLink(target, input, SAME_PATTERN, InhibitorySynapse.class, "pp-inhib-syn", false);
         }
     }
 }

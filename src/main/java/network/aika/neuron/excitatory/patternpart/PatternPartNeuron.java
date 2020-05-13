@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import static network.aika.neuron.PatternScope.INPUT_PATTERN;
 import static network.aika.neuron.PatternScope.SAME_PATTERN;
+import static network.aika.neuron.activation.linker.LinkGraphs.inducePPInhibInputSynapse;
 import static network.aika.neuron.activation.linker.Mode.LINKING;
 import static network.aika.neuron.activation.linker.Mode.INDUCTION;
 
@@ -88,6 +89,10 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public void induceStructure(Activation act) {
+        LinkGraphs.sameInputLinkT.output.follow(INDUCTION, act.getINeuron(), act, LinkGraphs.sameInputLinkT, act);
+        LinkGraphs.relatedInputLinkT.output.follow(INDUCTION, act.getINeuron(), act, LinkGraphs.relatedInputLinkT, act);
+
+        inducePPInhibInputSynapse.input.follow(INDUCTION, act.getINeuron(), act, null, act);
 
     }
 
@@ -131,8 +136,4 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         return getPatternSynapse(SAME_PATTERN).getInput();
     }
 
-    public void collectNewSynapseCandidates(Activation act) {
-        LinkGraphs.sameInputLinkT.output.follow(INDUCTION, act.getINeuron(), act, LinkGraphs.sameInputLinkT, act);
-        LinkGraphs.relatedInputLinkT.output.follow(INDUCTION, act.getINeuron(), act, LinkGraphs.relatedInputLinkT, act);
-    }
 }
