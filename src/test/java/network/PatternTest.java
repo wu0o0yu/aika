@@ -25,6 +25,7 @@ import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
+import network.aika.neuron.inhibitory.PatternInhibitoryNeuron;
 import org.junit.jupiter.api.Test;
 
 import static network.aika.neuron.PatternScope.INPUT_PATTERN;
@@ -45,7 +46,7 @@ public class PatternTest {
         PatternNeuron inC = new PatternNeuron(m, "IN C", true);
 
 
-        InhibitoryNeuron inputInhibN = new InhibitoryNeuron(m, "INPUT INHIB", PatternNeuron.type, true);
+        InhibitoryNeuron inputInhibN = new PatternInhibitoryNeuron(m, "INPUT INHIB", true);
         Neuron.init(inputInhibN, 0.0,
                 new InhibitorySynapse.Builder()
                         .setNeuron(inA)

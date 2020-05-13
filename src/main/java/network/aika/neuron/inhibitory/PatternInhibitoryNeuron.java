@@ -16,58 +16,35 @@
  */
 package network.aika.neuron.inhibitory;
 
-import network.aika.neuron.INeuron;
+import network.aika.Model;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PrimaryInhibitorySynapse extends InhibitorySynapse {
+public class PatternInhibitoryNeuron extends InhibitoryNeuron {
 
     public static byte type;
 
-    public PrimaryInhibitorySynapse() {
-        super();
+    public PatternInhibitoryNeuron(Neuron p) {
+        super(p);
     }
 
-    public PrimaryInhibitorySynapse(Neuron input, Neuron output) {
-        super(input, output);
+    public PatternInhibitoryNeuron(Model model, String label, Boolean isInputNeuron) {
+        super(model, label, isInputNeuron);
     }
 
-    @Override
     public byte getType() {
         return type;
     }
 
     @Override
-    public boolean isRecurrent() {
-        return false;
+    public byte getOuterType() {
+        return getType();
     }
 
-    @Override
-    public boolean isNegative() {
-        return false;
-    }
-
-    @Override
-    public boolean isPropagate() {
-        return true;
-    }
-
-    protected void addLinkInternal(INeuron in, INeuron out) {
-        in.addOutputSynapse(this);
-    }
-
-    protected void removeLinkInternal(INeuron in, INeuron out) {
-        in.removeOutputSynapse(this);
-    }
-
-    public static class Builder extends Synapse.Builder {
-        @Override
-        public Synapse getSynapse(Neuron outputNeuron) {
-            return new PrimaryInhibitorySynapse(inputNeuron, outputNeuron);
-        }
+    public String typeToString() {
+        return "P-INHIBITORY";
     }
 }

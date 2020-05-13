@@ -20,6 +20,9 @@ import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.inhibitory.PatternInhibitoryNeuron;
+import network.aika.neuron.inhibitory.PatternPartInhibitoryNeuron;
+import network.aika.neuron.inhibitory.PrimaryInhibitorySynapse;
 
 import static network.aika.neuron.PatternScope.*;
 
@@ -126,6 +129,14 @@ public class LinkGraphs {
             LNode input = new LMatchingNode(PatternNeuron.class, true, "INPUT-input");
 
             inducePatternPart = new LTargetLink(input, target, INPUT_PATTERN, PatternPartSynapse.class, "inducePatternPart", false, false, true);
+        }
+
+        // Induce Inhibitory Neuron
+        {
+            LNode target = new LTargetNode(PatternPartInhibitoryNeuron.class, null, "CURRENT-target");
+            LNode input = new LMatchingNode(PatternNeuron.class, true, "INPUT-input");
+
+            inducePatternPart = new LTargetLink(input, target, INPUT_PATTERN, PrimaryInhibitorySynapse.class, "induceInhibitoryNeuron", false, false, true);
         }
     }
 }

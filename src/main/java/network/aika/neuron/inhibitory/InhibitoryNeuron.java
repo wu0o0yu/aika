@@ -22,15 +22,11 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
-import network.aika.Config;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.linker.LinkGraphs;
-import network.aika.neuron.excitatory.ExcitatorySynapse;
-import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 
 import java.util.Collection;
-import java.util.List;
 
 import static network.aika.neuron.activation.linker.Mode.LINKING;
 
@@ -38,11 +34,7 @@ import static network.aika.neuron.activation.linker.Mode.LINKING;
  *
  * @author Lukas Molzberger
  */
-public class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
-
-    public static byte type;
-
-    private byte outerType;
+public abstract class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
 
     protected InhibitoryNeuron() {
         super();
@@ -52,9 +44,8 @@ public class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
         super(p);
     }
 
-    public InhibitoryNeuron(Model model, String label, byte outerType, Boolean isInputNeuron) {
+    public InhibitoryNeuron(Model model, String label, Boolean isInputNeuron) {
         super(model, label, isInputNeuron);
-        this.outerType = outerType;
     }
 
     public double propagateRangeCoverage(Activation iAct) {
@@ -92,14 +83,6 @@ public class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
         return s.getWeight(state) < -getBias();
     }
 
-    public byte getType() {
-        return type;
-    }
-
-    @Override
-    public byte getOuterType() {
-        return outerType;
-    }
 
     public double getTotalBias(boolean assumePosRecLinks, Synapse.State state) {
         return getBias(state);
@@ -146,9 +129,5 @@ public class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
 
     @Override
     public void dumpStat() {
-    }
-
-    public String typeToString() {
-        return "INHIBITORY";
     }
 }

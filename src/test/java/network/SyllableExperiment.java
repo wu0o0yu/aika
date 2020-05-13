@@ -27,6 +27,7 @@ import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
+import network.aika.neuron.inhibitory.PatternInhibitoryNeuron;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -60,7 +61,7 @@ public class SyllableExperiment {
                         .setMaturityThreshold(10)
         );
 
-        inputInhibN = new InhibitoryNeuron(model, "Input-Inhib", PatternNeuron.type, true);
+        inputInhibN = new PatternInhibitoryNeuron(model, "Input-Inhib", true);
         relN = new PatternPartNeuron(model, "Char-Relation", true);
 
         Neuron.init(relN, 1.0,

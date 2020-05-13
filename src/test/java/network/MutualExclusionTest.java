@@ -26,6 +26,7 @@ import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
+import network.aika.neuron.inhibitory.PatternPartInhibitoryNeuron;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -48,7 +49,7 @@ public class MutualExclusionTest {
         PatternPartNeuron na = new PatternPartNeuron(m, "A", false);
         PatternPartNeuron nb = new PatternPartNeuron(m, "B", false);
         PatternPartNeuron nc = new PatternPartNeuron(m, "C", false);
-        InhibitoryNeuron inhib = new InhibitoryNeuron(m, "I", PatternPartNeuron.type, false);
+        InhibitoryNeuron inhib = new PatternPartInhibitoryNeuron(m, "I", false);
 
         Neuron.init(na, 1.0,
                 new PatternPartSynapse.Builder()
