@@ -52,7 +52,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         this.model = model;
         this.n = n;
 
-        id = model.createId();
+        id = model.createNeuronId();
         synchronized (model.providers) {
             model.providers.put(id, new WeakReference<>(this));
 

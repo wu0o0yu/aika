@@ -23,8 +23,7 @@ import network.aika.Provider.SuspensionMode;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
 import network.aika.neuron.excitatory.patternpart.*;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
+import network.aika.neuron.inhibitory.*;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,17 +35,9 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-
 
 
 /**
- * The model consists of two layers. The first layer is the actual neural network consisting of neurons and synapses.
- * The second layer is a pattern lattice containing a boolean logic representation of all the neurons. Whenever the
- * synapse weights of a neuron are adjusted, then the underlying boolean logic representation of this neuron will be
- * updated too.
- * <p>
- * <p>The model supports parallel processing using a fixed number of threads.
  *
  * @author Lukas Molzberger
  */
@@ -65,12 +56,14 @@ public class Model {
         register(PatternPartNeuron.class);
         register(PatternPartSynapse.class);
 
-        register(InhibitoryNeuron.class);
+        register(PatternInhibitoryNeuron.class);
+        register(PatternPartInhibitoryNeuron.class);
         register(InhibitorySynapse.class);
+        register(PrimaryInhibitorySynapse.class);
     }
 
     private SuspensionHook suspensionHook;
-    private AtomicInteger currentId = new AtomicInteger(0);
+    private AtomicInteger currentNeuronId = new AtomicInteger(0);
 
     // Important: the id field needs to be referenced by the provider!
     public WeakHashMap<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new WeakHashMap<>();
@@ -86,8 +79,8 @@ public class Model {
         suspensionHook = sh;
     }
 
-    public int createId() {
-        return suspensionHook != null ? suspensionHook.getNewId() : currentId.addAndGet(1);
+    public int createNeuronId() {
+        return suspensionHook != null ? suspensionHook.getNewId() : currentNeuronId.addAndGet(1);
     }
 
     public void applyMovingAverage() {
