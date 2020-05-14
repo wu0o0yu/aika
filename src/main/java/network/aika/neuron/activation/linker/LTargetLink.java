@@ -38,45 +38,61 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
     public void follow(Mode m, Activation act, LNode from, Activation startAct) {
         Activation iAct = selectActivation(input, act, startAct);
         Activation oAct = selectActivation(output, act, startAct);
-        Neuron in = iAct.getNeuron();
         LNode to = getTo(from);
 
         if(oAct != null) {
-            if(iAct.outputLinks.get(oAct) != null) {
-                return;
-            }
+            followClosedLoop(m, iAct, oAct);
+        } else if(to.isOpenEnd()) {
+            followOpenEnd(m, iAct, to, startAct);
+        }
+    }
 
-            Neuron on = oAct.getNeuron();
-            Synapse s = in.getOutputSynapse(on, patternScope);
+    private void followClosedLoop(Mode m, Activation iAct, Activation oAct) {
+        Neuron in = iAct.getNeuron();
+        if(linkExists(iAct, oAct)) {
+            return;
+        }
 
-            if(s == null) {
-                if(m != Mode.INDUCTION) return;
-                s = createSynapse(in, on);
-            }
+        Neuron on = oAct.getNeuron();
+        Synapse s = in.getOutputSynapse(on, patternScope);
 
-            Link.link(s, iAct, oAct);
-        } else {
-            if(m == Mode.LINKING) {
-                in.getActiveOutputSynapses().stream()
-                        .filter(s -> checkSynapse(s))
-                        .forEach(s -> {
-                            Activation oa = to.follow(m, s.getOutput(), null, this, startAct);
-                            Link.link(s, iAct, oa);
-                        });
-            } else if(m == Mode.INDUCTION) {
-                boolean exists = !iAct.outputLinks.values().stream()
-                        .filter(l -> checkSynapse(l.getSynapse()))
-                        .filter(l -> to.checkNeuron(l.getOutput().getINeuron()))
-                        .findAny()
-                        .isEmpty();
+        if(s == null) {
+            if(m != Mode.INDUCTION) return;
+            s = createSynapse(in, on);
+        }
 
-                if(!exists) {
-                    oAct = to.follow(m, null, null, this, startAct);
-                    Synapse s = createSynapse(in, oAct.getNeuron());
-                    Link.link(s, iAct, oAct);
-                }
+        Link.link(s, iAct, oAct);
+    }
+
+    private void followOpenEnd(Mode m, Activation iAct, LNode to, Activation startAct) {
+        Activation oAct;
+        Neuron in = iAct.getNeuron();
+        if(m == Mode.LINKING) {
+            in.getActiveOutputSynapses().stream()
+                    .filter(s -> checkSynapse(s))
+                    .forEach(s -> {
+                        Activation oa = to.follow(m, s.getOutput(), null, this, startAct);
+                        Link.link(s, iAct, oa);
+                    });
+        } else if(m == Mode.INDUCTION) {
+            if(!linkExists(iAct, to)) {
+                oAct = to.follow(m, null, null, this, startAct);
+                Synapse s = createSynapse(in, oAct.getNeuron());
+                Link.link(s, iAct, oAct);
             }
         }
+    }
+
+    private boolean linkExists(Activation iAct, Activation oAct) {
+        return iAct.outputLinks.get(oAct) != null;
+    }
+
+    private boolean linkExists(Activation iAct, LNode to) {
+        return !iAct.outputLinks.values().stream()
+                .filter(l -> checkSynapse(l.getSynapse()))
+                .filter(l -> to.checkNeuron(l.getOutput().getINeuron()))
+                .findAny()
+                .isEmpty();
     }
 
     private Activation selectActivation(LNode n, Activation... acts) {

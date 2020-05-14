@@ -44,6 +44,10 @@ public abstract class LNode<N extends INeuron> {
         this.label = label;
     }
 
+    public boolean isOpenEnd() {
+        return links.size() <= 1;
+    }
+
     public boolean checkNeuron(INeuron n) {
         if(neuronClass != null && !n.getClass().equals(neuronClass)) {
             return false;

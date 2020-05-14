@@ -138,7 +138,7 @@ public class SyllableExperiment {
 
     @Test
     public void testTraining() throws IOException {
-        for(String word: Util.loadExamplesAsWords(new File("/Users/lukas.molzberger/aika-ws/maerchen"))) {
+        for(String word: Util.loadExamplesAsWords(new File("C:\\ws\\aika-syllables\\src\\main\\resources\\text\\maerchen"))) {
             train( word + " ");
         }
 
