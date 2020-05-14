@@ -20,6 +20,7 @@ import network.aika.neuron.INeuron;
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Link;
 
 import static network.aika.neuron.activation.Direction.INPUT;
@@ -54,12 +55,13 @@ public class LMatchingLink<S extends Synapse> extends LLink<S> {
 
     public void follow(Link l, LNode from, Activation startAct) {
         LNode to = getTo(from);
+        Direction dir = getDirection(from);
         if(!checkSynapse(l.getSynapse())) {
             return;
         }
 
-        Activation act = getToActivation(l, to);
-        INeuron n = getToNeuron(l.getSynapse(), to);
+        INeuron n = l.getSynapse().getNeuron(dir);
+        Activation act = l.getActivation(dir);
         to.follow(n, act, this, startAct);
     }
 

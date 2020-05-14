@@ -19,6 +19,7 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Thought;
 import network.aika.Writable;
+import network.aika.neuron.activation.Direction;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -89,6 +90,17 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
     public O getOutput() {
         return (O) output.get();
+    }
+
+    public INeuron getNeuron(Direction dir) {
+        switch(dir) {
+            case INPUT:
+                return getInput();
+            case OUTPUT:
+                return getOutput();
+        }
+
+        return null;
     }
 
     public double getWeight() {

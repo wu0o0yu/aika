@@ -52,6 +52,17 @@ public class Link {
         return output;
     }
 
+    public Activation getActivation(Direction dir) {
+        switch(dir) {
+            case INPUT:
+                return getInput();
+            case OUTPUT:
+                return getOutput();
+        }
+
+        return null;
+    }
+
     public boolean isNegative() {
         return synapse.isNegative();
     }
