@@ -36,7 +36,7 @@ public abstract class LNode<N extends INeuron> {
 
     Class<N> neuronClass;
 
-    public abstract Activation follow(Mode m, INeuron n, Activation act, LLink from, Activation startAct);
+    public abstract Activation follow(INeuron n, Activation act, LLink from, Activation startAct);
 
     public LNode(Class<N> neuronClass, Boolean isMature, String label) {
         this.neuronClass = neuronClass;

@@ -29,7 +29,6 @@ import java.util.function.Function;
 
 import static network.aika.neuron.Synapse.OUTPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
-import static network.aika.neuron.activation.linker.Mode.LINKING;
 
 /**
  *
@@ -152,7 +151,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     public abstract double propagateRangeCoverage(Activation iAct);
 
     public void linkForwards(Activation act) {
-        LinkGraphs.propagateT.input.follow(LINKING, this, act, null, act);
+        LinkGraphs.propagateT.input.follow(this, act, null, act);
     }
 
     public abstract void linkBackwards(Link l);
@@ -187,6 +186,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     public void train(Activation act) {
         induceStructure(act);
+        act.getThought().processLinks();
     }
 
     public double getP() {

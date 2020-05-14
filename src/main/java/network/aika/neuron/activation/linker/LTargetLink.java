@@ -22,6 +22,8 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 
+import static network.aika.Phase.INDUCTION;
+
 public class LTargetLink<S extends Synapse> extends LLink<S> {
 
     Boolean isRecurrent;
@@ -35,19 +37,19 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
         this.isPropagate = isPropagate;
     }
 
-    public void follow(Mode m, Activation act, LNode from, Activation startAct) {
+    public void follow(Activation act, LNode from, Activation startAct) {
         Activation iAct = selectActivation(input, act, startAct);
         Activation oAct = selectActivation(output, act, startAct);
         LNode to = getTo(from);
 
         if(oAct != null) {
-            followClosedLoop(m, iAct, oAct);
+            followClosedLoop(iAct, oAct);
         } else if(to.isOpenEnd()) {
-            followOpenEnd(m, iAct, to, startAct);
+            followOpenEnd(iAct, to, startAct);
         }
     }
 
-    private void followClosedLoop(Mode m, Activation iAct, Activation oAct) {
+    private void followClosedLoop(Activation iAct, Activation oAct) {
         Neuron in = iAct.getNeuron();
         if(linkExists(iAct, oAct)) {
             return;
@@ -57,26 +59,26 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
         Synapse s = in.getOutputSynapse(on, patternScope);
 
         if(s == null) {
-            if(m != Mode.INDUCTION) return;
+            if(iAct.getThought().getPhase() == INDUCTION) return;
             s = createSynapse(in, on);
         }
 
         Link.link(s, iAct, oAct);
     }
 
-    private void followOpenEnd(Mode m, Activation iAct, LNode to, Activation startAct) {
+    private void followOpenEnd(Activation iAct, LNode to, Activation startAct) {
         Activation oAct;
         Neuron in = iAct.getNeuron();
-        if(m == Mode.LINKING) {
+        if(iAct.getThought().getPhase() != INDUCTION) {
             in.getActiveOutputSynapses().stream()
                     .filter(s -> checkSynapse(s))
                     .forEach(s -> {
-                        Activation oa = to.follow(m, s.getOutput(), null, this, startAct);
+                        Activation oa = to.follow(s.getOutput(), null, this, startAct);
                         Link.link(s, iAct, oa);
                     });
-        } else if(m == Mode.INDUCTION) {
+        } else {
             if(!linkExists(iAct, to)) {
-                oAct = to.follow(m, null, null, this, startAct);
+                oAct = to.follow(null, null, this, startAct);
                 Synapse s = createSynapse(in, oAct.getNeuron());
                 Link.link(s, iAct, oAct);
             }

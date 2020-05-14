@@ -25,9 +25,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+import static network.aika.Phase.*;
 import static network.aika.neuron.Synapse.INPUT_COMPARATOR;
-import static network.aika.neuron.activation.LinkingMode.FINAL;
-import static network.aika.neuron.activation.LinkingMode.PRELIMINARY;
 
 
 public abstract class Thought {
@@ -48,7 +47,7 @@ public abstract class Thought {
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
-    private LinkingMode linkingMode = PRELIMINARY;
+    private Phase phase = PRELIMINARY_LINKING;
 
     public Thought() {
     }
@@ -56,7 +55,7 @@ public abstract class Thought {
     public abstract int length();
 
     public void process() {
-        linkingMode = FINAL;
+        phase = FINAL_LINKING;
         activationsById
                 .values()
                 .stream()
@@ -105,8 +104,8 @@ public abstract class Thought {
         return activationIdCounter++;
     }
 
-    public LinkingMode getLinkingMode() {
-        return linkingMode;
+    public Phase getPhase() {
+        return phase;
     }
 
     public void addActivation(Activation act) {
@@ -138,6 +137,8 @@ public abstract class Thought {
     }
 
     public void train(Model m) {
+        phase = INDUCTION;
+
         if(m.getTrainingConfig().getAlpha() != null) {
             Set<INeuron> activatedNeurons = new TreeSet<>();
             getActivations()

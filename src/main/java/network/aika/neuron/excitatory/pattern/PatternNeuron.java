@@ -35,8 +35,6 @@ import java.util.TreeSet;
 import static network.aika.neuron.Synapse.INPUT_COMPARATOR;
 import static network.aika.neuron.activation.linker.LinkGraphs.inducePPInhibitoryNeuron;
 import static network.aika.neuron.activation.linker.LinkGraphs.inducePatternPart;
-import static network.aika.neuron.activation.linker.Mode.INDUCTION;
-import static network.aika.neuron.activation.linker.Mode.LINKING;
 
 /**
  *
@@ -95,7 +93,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     @Override
     public void linkBackwards(Link l) {
-        LinkGraphs.patternInputLinkI.followBackwards(LINKING, l);
+        LinkGraphs.patternInputLinkI.followBackwards(l);
     }
 
     @Override
@@ -103,7 +101,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     public void induceStructure(Activation act) {
-        inducePatternPart.input.follow(INDUCTION, act.getINeuron(), act, null, act);
-        inducePPInhibitoryNeuron.input.follow(INDUCTION, act.getINeuron(), act, null, act);
+        inducePatternPart.input.follow(act.getINeuron(), act, null, act);
+        inducePPInhibitoryNeuron.input.follow(act.getINeuron(), act, null, act);
     }
 }

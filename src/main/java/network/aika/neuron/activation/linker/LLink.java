@@ -46,10 +46,10 @@ public abstract class LLink<S extends Synapse> {
         output.addLink(this);
     }
 
-    public abstract void follow(Mode m, Activation act, LNode from, Activation startAct);
+    public abstract void follow(Activation act, LNode from, Activation startAct);
 
-    public void followForwards(Mode m, Activation act) {
-        input.follow(m, act.getINeuron(), act, this, act);
+    public void followForwards(Activation act) {
+        input.follow(act.getINeuron(), act, this, act);
     }
 
     protected boolean checkSynapse(Synapse s) {

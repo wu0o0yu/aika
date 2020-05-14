@@ -30,7 +30,7 @@ public class LMatchingNode<N extends INeuron> extends LNode<N> {
         super(neuronClass, isMature, label);
     }
 
-    public Activation follow(Mode m, INeuron n, Activation act, LLink from, Activation startAct) {
+    public Activation follow(INeuron n, Activation act, LLink from, Activation startAct) {
         if(!checkNeuron(n)) {
             return null;
         }
@@ -41,7 +41,7 @@ public class LMatchingNode<N extends INeuron> extends LNode<N> {
 
         links.stream()
                 .filter(nl -> nl != from)
-                .forEach(nl -> nl.follow(m, act, this, startAct));
+                .forEach(nl -> nl.follow(act, this, startAct));
 
         act.lNode = null;
 

@@ -21,9 +21,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 
-import static network.aika.neuron.activation.linker.LinkGraphs.inducePPInhibInputSynapse;
-import static network.aika.neuron.activation.linker.Mode.INDUCTION;
-
 /**
  *
  * @author Lukas Molzberger

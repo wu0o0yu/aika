@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation.linker;
+package network.aika;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public enum Mode {
-    LINKING,
+public enum Phase {
+    PRELIMINARY_LINKING,
+    FINAL_LINKING,
     INDUCTION
 }

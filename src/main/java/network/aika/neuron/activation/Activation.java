@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 import static network.aika.neuron.InputKey.INPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
-import static network.aika.neuron.activation.LinkingMode.PRELIMINARY;
+import static network.aika.Phase.PRELIMINARY_LINKING;
 
 /**
  *
@@ -72,7 +72,7 @@ public class Activation implements Comparable<Activation> {
         this.id = id;
         this.thought = thought;
         this.neuron = n;
-        this.assumePosRecLinks = n.hasPositiveRecurrentSynapses() && thought.getLinkingMode() == PRELIMINARY;
+        this.assumePosRecLinks = n.hasPositiveRecurrentSynapses() && thought.getPhase() == PRELIMINARY_LINKING;
         this.net = n.getTotalBias(this.assumePosRecLinks, CURRENT);
 
         thought.addActivation(this);

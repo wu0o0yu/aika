@@ -29,8 +29,6 @@ import org.slf4j.LoggerFactory;
 import static network.aika.neuron.PatternScope.INPUT_PATTERN;
 import static network.aika.neuron.PatternScope.SAME_PATTERN;
 import static network.aika.neuron.activation.linker.LinkGraphs.*;
-import static network.aika.neuron.activation.linker.Mode.LINKING;
-import static network.aika.neuron.activation.linker.Mode.INDUCTION;
 
 /**
  * @author Lukas Molzberger
@@ -70,29 +68,29 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     public void linkForwards(Activation act) {
         super.linkForwards(act);
 
-        sameInputLinkT.followForwards(LINKING, act);
-        relatedInputLinkT.followForwards(LINKING, act);
-        patternInputLinkT.followForwards(LINKING, act);
+        sameInputLinkT.followForwards(act);
+        relatedInputLinkT.followForwards(act);
+        patternInputLinkT.followForwards(act);
     }
 
     @Override
     public void linkBackwards(Link l) {
-        sameInputLinkI.followBackwards(LINKING, l);
-        relatedInputLinkI.followBackwards(LINKING, l);
-        inhibitoryLinkI.followBackwards(LINKING, l);
+        sameInputLinkI.followBackwards(l);
+        relatedInputLinkI.followBackwards(l);
+        inhibitoryLinkI.followBackwards(l);
     }
 
     @Override
     public void linkPosRecSynapses(Activation act) {
-        posRecLinkT.output.follow(LINKING, act.getINeuron(), act, LinkGraphs.posRecLinkT, act);
+        posRecLinkT.output.follow(act.getINeuron(), act, LinkGraphs.posRecLinkT, act);
     }
 
     @Override
     public void induceStructure(Activation act) {
-        sameInputLinkT.output.follow(INDUCTION, act.getINeuron(), act, sameInputLinkT, act);
-        relatedInputLinkT.output.follow(INDUCTION, act.getINeuron(), act, relatedInputLinkT, act);
+        sameInputLinkT.output.follow(act.getINeuron(), act, sameInputLinkT, act);
+        relatedInputLinkT.output.follow(act.getINeuron(), act, relatedInputLinkT, act);
 
-        inducePPInhibInputSynapse.input.follow(INDUCTION, act.getINeuron(), act, inducePPInhibInputSynapse, act);
+        inducePPInhibInputSynapse.input.follow(act.getINeuron(), act, inducePPInhibInputSynapse, act);
     }
 
     public double getCost(Sign s) {
