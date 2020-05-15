@@ -50,7 +50,7 @@ public class MutualExclusionTest {
         PatternPartNeuron nc = new PatternPartNeuron(m, "C", false);
         InhibitoryNeuron inhib = new PatternPartInhibitoryNeuron(m, "I", false);
 
-        Neuron.init(na, 1.0,
+        na.link(1.0,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
@@ -66,7 +66,7 @@ public class MutualExclusionTest {
                         .setWeight(-100.0)
         );
 
-        Neuron.init(nb, 1.5,
+        nb.link(1.5,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
@@ -82,7 +82,7 @@ public class MutualExclusionTest {
                         .setWeight(-100.0)
         );
 
-        Neuron.init(nc, 1.2,
+        nc.link(1.2,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
@@ -98,7 +98,7 @@ public class MutualExclusionTest {
                         .setWeight(-100.0)
         );
 
-        Neuron.init(inhib, 0.0,
+        inhib.link(0.0,
                 new InhibitorySynapse.Builder()
                         .setNeuron(na)
                         .setWeight(1.0),

@@ -71,20 +71,15 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
         setModified();
     }
 
-    public static NeuronProvider init(Neuron<?> n, double bias, Synapse.Builder... inputs) {
-        return init(null, n, bias, inputs);
+    public void link(double bias, Synapse.Builder... inputs) {
+        link(null, bias, inputs);
     }
 
-    public static NeuronProvider init(Thought t, Neuron<?> n, double bias, Synapse.Builder... inputs) {
-        n.init(t, bias, Arrays.asList(inputs));
-        return n.getProvider();
+    public void link(Thought t, double bias, Synapse.Builder... inputs) {
+        link(t, bias, Arrays.asList(inputs));
     }
 
-    public static NeuronProvider init(Thought t, NeuronProvider n, double bias, Synapse.Builder... inputs) {
-        return init(t, n, bias, inputs);
-    }
-
-    public void init(Thought t, Double bias, Collection<Synapse.Builder> synapseBuilders) {
+    public void link(Thought t, Double bias, Collection<Synapse.Builder> synapseBuilders) {
         if(bias != null) {
             setBias(bias);
         }

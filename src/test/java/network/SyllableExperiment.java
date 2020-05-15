@@ -19,7 +19,6 @@ package network;
 import network.aika.Config;
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
@@ -63,7 +62,7 @@ public class SyllableExperiment {
         inputInhibN = new PatternInhibitoryNeuron(model, "Input-Inhib", true);
         relN = new PatternPartNeuron(model, "Char-Relation", true);
 
-        Neuron.init(relN, 1.0,
+        relN.link(1.0,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
@@ -83,7 +82,7 @@ public class SyllableExperiment {
         return inputLetters.computeIfAbsent(character, c -> {
             PatternNeuron n = new PatternNeuron(model, "" + c, true);
 
-            Neuron.init(inputInhibN, 0.0,
+            inputInhibN.link(0.0,
                     new InhibitorySynapse.Builder()
                             .setNeuron(n)
                             .setWeight(1.0)
