@@ -179,7 +179,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public Activation createBranch() {
-        Activation clonedAct = new Activation(thought.getNewActivationId(), thought, neuron);
+        Activation clonedAct = new Activation(thought.createActivationId(), thought, neuron);
         clonedAct.setRound(round + 1);
         branches.add(clonedAct);
         clonedAct.mainBranch = this;

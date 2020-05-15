@@ -40,7 +40,7 @@ public class LTargetNode<N extends Neuron> extends LNode<N> {
 
         if(act == null) {
             Thought doc = startAct.getThought();
-            act = new Activation(doc.getNewActivationId(), doc, n);
+            act = new Activation(doc.createActivationId(), doc, n);
         }
 
         return act;

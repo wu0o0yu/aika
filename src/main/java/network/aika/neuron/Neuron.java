@@ -149,11 +149,11 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
     /**
      * Propagate an input activation into the network.
      *
-     * @param doc   The current document
+     * @param t   The current document
      * @param input
      */
-    public Activation propagate(Thought doc, Activation.Builder input) {
-        Activation act = new Activation(doc.getNewActivationId(), doc, this);
+    public Activation propagate(Thought t, Activation.Builder input) {
+        Activation act = new Activation(t.createActivationId(), t, this);
         act.initInputActivation(input);
         return act;
     }

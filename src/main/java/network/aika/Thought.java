@@ -98,7 +98,7 @@ public abstract class Thought {
         }
     }
 
-    public int getNewActivationId() {
+    public int createActivationId() {
         return activationIdCounter++;
     }
 
