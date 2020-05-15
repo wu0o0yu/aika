@@ -54,7 +54,7 @@ public class Activation implements Comparable<Activation> {
     Map<InputKey, Link> inputLinks;
     NavigableMap<Activation, Link> outputLinks;
 
-    public boolean assumePosRecLinks;
+    private boolean assumePosRecLinks;
     private boolean requiresFullUpdate = false;
     private boolean isFinal;
 
@@ -63,8 +63,8 @@ public class Activation implements Comparable<Activation> {
     private int round; // Nur als Abbruchbedingung
     private Activation lastRound;
 
-    public Set<Activation> branches = new TreeSet<>();
-    public Activation mainBranch;
+    private Set<Activation> branches = new TreeSet<>();
+    private Activation mainBranch;
 
     private Reference groundRef;
 
@@ -396,6 +396,14 @@ public class Activation implements Comparable<Activation> {
                 return inputLinks.values().stream();
         }
         return null;
+    }
+
+    public boolean assumePosRecLinks() {
+        return assumePosRecLinks;
+    }
+
+    public boolean hasBranches() {
+        return branches.isEmpty();
     }
 
     public static class Builder {

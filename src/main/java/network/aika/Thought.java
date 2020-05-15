@@ -57,7 +57,7 @@ public abstract class Thought {
         activationsById
                 .values()
                 .stream()
-                .filter(act -> act.assumePosRecLinks)
+                .filter(act -> act.assumePosRecLinks())
                 .forEach(act ->
                         act.getNeuron().linkPosRecSynapses(act)
                 );
@@ -68,7 +68,7 @@ public abstract class Thought {
         activationsById
                 .values()
                 .stream()
-                .filter(act -> !act.branches.isEmpty())
+                .filter(act -> !act.hasBranches())
                 .forEach(act -> act.computeP());
 
         processActivations();
