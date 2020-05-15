@@ -48,12 +48,12 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
     protected TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(OUTPUT_COMP);
 
-    public final ReadWriteLock lock = new ReadWriteLock();
+    protected final ReadWriteLock lock = new ReadWriteLock();
 
-    public double binaryFrequency;
-    public double frequency;
-    public double coveredFactorSum;
-    public double coveredFactorCount;
+    protected double binaryFrequency;
+    protected double frequency;
+    protected double coveredFactorSum;
+    protected double coveredFactorCount;
 
     protected boolean isInputNeuron; // Input Neurons won't be trained!
 
@@ -195,6 +195,10 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
     public abstract void induceStructure(Activation act);
 
+    public ReadWriteLock getLock() {
+        return lock;
+    }
+
     public int compareTo(Neuron n) {
         if (this == n) return 0;
         return Integer.compare(getId(), n.getId());
@@ -231,6 +235,14 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
     public double getN() {
         double coveredFactor = coveredFactorSum / coveredFactorCount;
         return getModel().getN() / coveredFactor;
+    }
+
+    public double getFrequency() {
+        return frequency;
+    }
+
+    public void setBinaryFrequency(int f) {
+        binaryFrequency = f;
     }
 
     private double getCoverage(Activation seedAct) {

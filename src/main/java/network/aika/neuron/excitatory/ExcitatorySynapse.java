@@ -41,36 +41,36 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
     protected void link(Neuron in, Neuron out) {
         if(isPropagate()) {
             boolean dir = in.getId() < out.getId();
-            (dir ? in : out).lock.acquireWriteLock();
-            (dir ? out : in).lock.acquireWriteLock();
+            (dir ? in : out).getLock().acquireWriteLock();
+            (dir ? out : in).getLock().acquireWriteLock();
 
             out.addInputSynapse(this);
             in.addOutputSynapse(this);
 
-            (dir ? in : out).lock.releaseWriteLock();
-            (dir ? out : in).lock.releaseWriteLock();
+            (dir ? in : out).getLock().releaseWriteLock();
+            (dir ? out : in).getLock().releaseWriteLock();
         } else {
-            out.lock.acquireWriteLock();
+            out.getLock().acquireWriteLock();
             out.addInputSynapse(this);
-            out.lock.releaseWriteLock();
+            out.getLock().releaseWriteLock();
         }
     }
 
     protected void unlink(Neuron in, Neuron out) {
         if(isPropagate()) {
             boolean dir = in.getId() < out.getId();
-            (dir ? in : out).lock.acquireWriteLock();
-            (dir ? out : in).lock.acquireWriteLock();
+            (dir ? in : out).getLock().acquireWriteLock();
+            (dir ? out : in).getLock().acquireWriteLock();
 
             out.removeInputSynapse(this);
             in.removeOutputSynapse(this);
 
-            (dir ? in : out).lock.releaseWriteLock();
-            (dir ? out : in).lock.releaseWriteLock();
+            (dir ? in : out).getLock().releaseWriteLock();
+            (dir ? out : in).getLock().releaseWriteLock();
         } else {
-            out.lock.acquireWriteLock();
+            out.getLock().acquireWriteLock();
             out.removeInputSynapse(this);
-            out.lock.releaseWriteLock();
+            out.getLock().releaseWriteLock();
         }
     }
 }

@@ -16,7 +16,6 @@
  */
 package network.aika;
 
-
 /**
  *
  * @author Lukas Molzberger

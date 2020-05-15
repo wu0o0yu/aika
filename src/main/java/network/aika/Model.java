@@ -66,8 +66,7 @@ public class Model {
     private AtomicInteger currentNeuronId = new AtomicInteger(0);
 
     // Important: the id field needs to be referenced by the provider!
-    public WeakHashMap<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new WeakHashMap<>();
-    public Map<Integer, Provider<? extends AbstractNode>> activeProviders = new TreeMap<>();
+    private WeakHashMap<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new WeakHashMap<>();
 
     private Config trainingConfig = new Config();
 
@@ -144,17 +143,6 @@ public class Model {
         return N;
     }
 
-    public Collection<NeuronProvider> getActiveNeurons() {
-        List<NeuronProvider> tmp = new ArrayList<>();
-        for(Provider<?> p: activeProviders.values()) {
-            if(p instanceof NeuronProvider) {
-                tmp.add((NeuronProvider) p);
-            }
-        }
-
-        return tmp;
-    }
-
     public NeuronProvider lookupNeuron(int id) {
         synchronized (providers) {
             WeakReference<Provider<? extends AbstractNode>> wr = providers.get(id);
@@ -169,15 +157,9 @@ public class Model {
         }
     }
 
-    public void register(Provider p) {
-        synchronized (activeProviders) {
-            activeProviders.put(p.id, p);
-        }
-    }
-
-    public void unregister(Provider p) {
-        synchronized (activeProviders) {
-            activeProviders.remove(p.id);
+    public void registerProvider(int id, Provider p) {
+        synchronized (providers) {
+            providers.put(id, new WeakReference<>(p));
         }
     }
 
@@ -191,19 +173,8 @@ public class Model {
     }
 
     public void removeProvider(Provider p) {
-        synchronized (activeProviders) {
-            activeProviders.remove(p.id);
-        }
         synchronized (providers) {
             providers.remove(p.id);
         }
-    }
-
-    public void dumpStat() {
-        for(NeuronProvider n: getActiveNeurons()) {
-            Neuron tn = n.get();
-            tn.dumpStat();
-        }
-        System.out.println();
     }
 }

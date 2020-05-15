@@ -26,9 +26,9 @@ import java.io.DataInput;
  */
 public abstract class AbstractNode<P extends Provider<? extends AbstractNode>> implements Writable {
 
-    public volatile int lastUsedDocumentId = 0;
+    protected volatile int lastUsedDocumentId = 0;
 
-    public volatile boolean modified;
+    protected volatile boolean modified;
 
     protected P provider;
 

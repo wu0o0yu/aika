@@ -17,7 +17,6 @@
 package network.aika;
 
 import java.io.*;
-import java.lang.ref.WeakReference;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -42,9 +41,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         this.id = id;
 
         if(model != null) {
-            synchronized (model.providers) {
-                model.providers.put(this.id, new WeakReference<>(this));
-            }
+            model.registerProvider(id, this);
         }
     }
 
@@ -53,13 +50,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         this.n = n;
 
         id = model.createNeuronId();
-        synchronized (model.providers) {
-            model.providers.put(id, new WeakReference<>(this));
-
-            if(n != null) {
-                model.register(this);
-            }
-        }
+        model.registerProvider(id, this);
     }
 
     public Integer getId() {
@@ -90,7 +81,6 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         if(n == null) return;
         assert model.getSuspensionHook() != null;
         n.suspend();
-        model.unregister(this);
 
         if(sm == SuspensionMode.SAVE) {
             save();
@@ -130,8 +120,6 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         }
 
         n.reactivate();
-
-        model.register(this);
     }
 
     @Override

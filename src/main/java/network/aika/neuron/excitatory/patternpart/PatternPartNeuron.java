@@ -96,9 +96,9 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         Neuron primaryInput = getPrimaryInput();
         Neuron patternInput = getPatternInput();
 
-        double fz = primaryInput.frequency;
+        double fz = primaryInput.getFrequency();
         double Nz = primaryInput.getN();
-        double fy = patternInput.frequency;
+        double fy = patternInput.getFrequency();
         double Ny = patternInput.getN();
 
         double pXi = fz / Nz;

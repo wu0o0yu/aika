@@ -18,7 +18,7 @@ public class InductionTest {
         );
 
         PatternNeuron in = new PatternNeuron(m, "IN", true);
-        in.binaryFrequency = 12;
+        in.setBinaryFrequency(12);
 
         Document doc = new Document("");
 

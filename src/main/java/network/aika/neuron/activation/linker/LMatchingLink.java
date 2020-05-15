@@ -38,16 +38,16 @@ public class LMatchingLink<S extends Synapse> extends LLink<S> {
         this.dir = dir;
     }
 
-    protected void follow(Activation act, LNode from, Activation startAct) {
-        act.getLinks(getDirection(from))
-                .forEach(l -> follow(l, from, startAct));
-    }
-
     public void followBackwards(Link l) {
         Activation startAct = l.getOutput();
         startAct.setLNode(output);
         follow(l, output, startAct);
         startAct.setLNode(null);
+    }
+
+    protected void follow(Activation act, LNode from, Activation startAct) {
+        act.getLinks(getDirection(from))
+                .forEach(l -> follow(l, from, startAct));
     }
 
     protected void follow(Link l, LNode from, Activation startAct) {

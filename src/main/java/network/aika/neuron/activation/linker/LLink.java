@@ -70,8 +70,6 @@ public abstract class LLink<S extends Synapse> {
         return true;
     }
 
-    public abstract String getTypeStr();
-
     protected Direction getDirection(LNode from) {
         if(from == input) {
             return OUTPUT;
@@ -91,6 +89,8 @@ public abstract class LLink<S extends Synapse> {
         }
         return null;
     }
+
+    public abstract String getTypeStr();
 
     public String toString() {
         return getTypeStr() + " " + label + " " + (patternScope != null ? patternScope : "X") + " " + input.label  + " -> " + output.label;
