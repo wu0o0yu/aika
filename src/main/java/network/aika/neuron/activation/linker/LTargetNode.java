@@ -35,7 +35,7 @@ public class LTargetNode<N extends Neuron> extends LNode<N> {
 
     protected Activation follow(Neuron n, Activation act, LLink from, Activation startAct) {
         if(n == null && startAct.getThought().getPhase() == Phase.INDUCTION) {
-            n = createNeuron(startAct.getNeuron().getModel(), "");
+            n = createNeuron(startAct.getNeuronProvider().getModel(), "");
         }
 
         if(act == null) {

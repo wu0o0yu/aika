@@ -77,7 +77,7 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
             sum = il.getOutput()
                     .getLinks(OUTPUT)
                     .map(ol ->
-                            ol.getOutput().getINeuron().computeGradient(ol, depth + 1, l -> g * il.getSynapse().getWeight())
+                            ol.getOutput().getNeuron().computeGradient(ol, depth + 1, l -> g * il.getSynapse().getWeight())
                     )
                     .reduce(sum, Double::sum);
         }

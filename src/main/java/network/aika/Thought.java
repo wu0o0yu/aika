@@ -59,7 +59,7 @@ public abstract class Thought {
                 .stream()
                 .filter(act -> act.assumePosRecLinks)
                 .forEach(act ->
-                        act.getINeuron().linkPosRecSynapses(act)
+                        act.getNeuron().linkPosRecSynapses(act)
                 );
 
         processLinks();
@@ -125,7 +125,7 @@ public abstract class Thought {
                 .filter(act -> act.isActive())
                 .forEach(act -> {
                     Set<Activation> acts = results.computeIfAbsent(
-                            act.getINeuron(),
+                            act.getNeuron(),
                             n -> new TreeSet<>()
                     );
                     acts.add(act);
@@ -142,7 +142,7 @@ public abstract class Thought {
             getActivations()
                 .stream()
                 .filter(act -> act.isActive())
-                .forEach(act -> activatedNeurons.add(act.getINeuron()));
+                .forEach(act -> activatedNeurons.add(act.getNeuron()));
 
             m.applyMovingAverage();
             activatedNeurons.forEach(n ->
@@ -157,7 +157,7 @@ public abstract class Thought {
 
         new ArrayList<>(getActivations())
                 .forEach(act ->
-                        act.getINeuron().train(act)
+                        act.getNeuron().train(act)
                 );
 
 //        process();

@@ -53,12 +53,12 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
     }
 
     private void followClosedLoop(Activation iAct, Activation oAct) {
-        Neuron<?> in = iAct.getINeuron();
+        Neuron<?> in = iAct.getNeuron();
         if(iAct.outputLinkExists(oAct)) {
             return;
         }
 
-        NeuronProvider on = oAct.getNeuron();
+        NeuronProvider on = oAct.getNeuronProvider();
         Synapse s = in.getOutputSynapse(on, patternScope);
 
         if(s == null) {
@@ -71,7 +71,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
 
     private void followOpenEnd(Activation iAct, LNode to, Activation startAct) {
         Activation oAct;
-        Neuron<?> in = iAct.getINeuron();
+        Neuron<?> in = iAct.getNeuron();
         if(iAct.getThought().getPhase() != INDUCTION) {
             in.getOutputSynapses()
                     .filter(s -> checkSynapse(s))
@@ -82,7 +82,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
         } else {
             if(!outputLinkExists(iAct, to)) {
                 oAct = to.follow(null, null, this, startAct);
-                Synapse s = createSynapse(in.getProvider(), oAct.getNeuron());
+                Synapse s = createSynapse(in.getProvider(), oAct.getNeuronProvider());
                 Link.link(s, iAct, oAct);
             }
         }
@@ -91,7 +91,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
     private boolean outputLinkExists(Activation iAct, LNode to) {
         return !iAct.getLinks(OUTPUT)
                 .filter(l -> checkSynapse(l.getSynapse()))
-                .filter(l -> to.checkNeuron(l.getOutput().getINeuron()))
+                .filter(l -> to.checkNeuron(l.getOutput().getNeuron()))
                 .findAny()
                 .isEmpty();
     }

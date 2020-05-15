@@ -85,7 +85,7 @@ public class Activation implements Comparable<Activation> {
 
         inputLinks = new TreeMap<>(INPUT_COMP);
         outputLinks = new TreeMap<>(Comparator
-                .<Activation, NeuronProvider>comparing(act -> act.getNeuron())
+                .<Activation, NeuronProvider>comparing(act -> act.getNeuronProvider())
                 .thenComparing(act -> act)
         );
     }
@@ -115,7 +115,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public String getLabel() {
-        return getINeuron().getLabel();
+        return getNeuron().getLabel();
     }
 
     public Reference getGroundRef() {
@@ -142,11 +142,11 @@ public class Activation implements Comparable<Activation> {
         return lastRound;
     }
 
-    public <N extends Neuron> N getINeuron() {
+    public <N extends Neuron> N getNeuron() {
         return (N) neuron;
     }
 
-    public NeuronProvider getNeuron() {
+    public NeuronProvider getNeuronProvider() {
         return neuron.getProvider();
     }
 
@@ -154,11 +154,11 @@ public class Activation implements Comparable<Activation> {
         return outputLinks
                 .values()
                 .stream()
-                .filter(l -> l.getOutput().getNeuron().getId() == n.getId())
+                .filter(l -> l.getOutput().getNeuronProvider().getId() == n.getId())
                 .filter(l -> l.getSynapse().getPatternScope() == ps);
     }
 
-    public void initInputActivation(Activation.Builder input) {
+    public void propagate(Activation.Builder input) {
         setValue(input.value);
         setFired(new Fired(input.inputTimestamp, input.fired));
         setRangeCoverage(input.rangeCoverage);
@@ -166,10 +166,13 @@ public class Activation implements Comparable<Activation> {
         input.getInputLinks()
                 .entrySet()
                 .stream()
-                .forEach(me -> {
-                    Synapse s = getINeuron().getInputSynapse(me.getKey().getPInput(), me.getKey().getPatternScope());
-                    addLink(new Link(s, me.getValue(), this));
-                });
+                .map(me -> new Link(
+                        getNeuron().getInputSynapse(me.getKey().getPInput(), me.getKey().getPatternScope()),
+                        me.getValue(),
+                        this
+                        )
+                )
+                .forEach(l -> addLink(l));
 
         isFinal = true;
         assumePosRecLinks = false;
@@ -248,7 +251,7 @@ public class Activation implements Comparable<Activation> {
             lastRound = null;
         }
 
-        getINeuron().linkForwards(this);
+        getNeuron().linkForwards(this);
         thought.processLinks();
     }
 
@@ -284,7 +287,7 @@ public class Activation implements Comparable<Activation> {
     public void sumUpLink(Link l) {
         double w = l.getSynapse().getWeight();
         net += l.getInput().value * w;
-        rangeCoverage += getINeuron().propagateRangeCoverage(l.getInput());
+        rangeCoverage += getNeuron().propagateRangeCoverage(l.getInput());
 
         checkIfFired(l);
     }
@@ -356,7 +359,7 @@ public class Activation implements Comparable<Activation> {
 
     public void count() {
         if(!isActive()) return;
-        getINeuron().count(this);
+        getNeuron().count(this);
     }
 
     public boolean equals(Activation act) {
@@ -365,7 +368,7 @@ public class Activation implements Comparable<Activation> {
 
     public String toString() {
         return getId() + " " +
-                getINeuron().getClass().getSimpleName() + ":" + getLabel() +
+                getNeuron().getClass().getSimpleName() + ":" + getLabel() +
                 " value:" + Utils.round(value) +
                 " net:" + Utils.round(net) +
                 " p:" + Utils.round(p) +
@@ -425,7 +428,7 @@ public class Activation implements Comparable<Activation> {
             InputKey ik = new InputKey() {
                 @Override
                 public NeuronProvider getPInput() {
-                    return iAct.getNeuron();
+                    return iAct.getNeuronProvider();
                 }
 
                 @Override

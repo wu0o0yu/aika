@@ -149,7 +149,7 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
      */
     public Activation propagate(Thought t, Activation.Builder input) {
         Activation act = new Activation(t.createActivationId(), t, this);
-        act.initInputActivation(input);
+        act.propagate(input);
         return act;
     }
 
@@ -245,7 +245,7 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
     private static double getCoverage(Link ol) {
         Activation oAct = ol.getOutput();
-        Neuron n = oAct.getINeuron();
+        Neuron n = oAct.getNeuron();
         return Math.min(Math.max(0.0, oAct.getNet()), Math.max(0.0, ol.getInput().getValue() * ol.getSynapse().getWeight())) / n.getBias();
     }
 

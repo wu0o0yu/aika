@@ -61,7 +61,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     public double propagateRangeCoverage(Activation iAct) {
-        return getPrimaryInput() == iAct.getINeuron() ? iAct.rangeCoverage : 0.0;
+        return getPrimaryInput() == iAct.getNeuron() ? iAct.rangeCoverage : 0.0;
     }
 
     @Override
