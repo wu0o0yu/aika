@@ -72,9 +72,9 @@ public abstract class Synapse<I extends Neuron, O extends Neuron> implements Wri
 
     public abstract PatternScope getPatternScope();
 
-    protected abstract void addLinkInternal(Neuron in, Neuron out);
+    protected abstract void link(Neuron in, Neuron out);
 
-    protected abstract void removeLinkInternal(Neuron in, Neuron out);
+    protected abstract void unlink(Neuron in, Neuron out);
 
     public NeuronProvider getPInput() {
         return input;
@@ -123,30 +123,14 @@ public abstract class Synapse<I extends Neuron, O extends Neuron> implements Wri
         Neuron in = input.get();
         Neuron out = output.get();
 
-        boolean dir = in.getId() < out.getId();
-
-        (dir ? in : out).lock.acquireWriteLock();
-        (dir ? out : in).lock.acquireWriteLock();
-
-        addLinkInternal(in, out);
-
-        (dir ? in : out).lock.releaseWriteLock();
-        (dir ? out : in).lock.releaseWriteLock();
+        link(in, out);
     }
 
     public void unlink() {
         Neuron in = input.get();
         Neuron out = output.get();
 
-        boolean dir = input.getId() < out.getId();
-
-        (dir ? in : out).lock.acquireWriteLock();
-        (dir ? out : in).lock.acquireWriteLock();
-
-        removeLinkInternal(in, out);
-
-        (dir ? in : out).lock.releaseWriteLock();
-        (dir ? out : in).lock.releaseWriteLock();
+        unlink(in, out);
     }
 
     public void commit() {

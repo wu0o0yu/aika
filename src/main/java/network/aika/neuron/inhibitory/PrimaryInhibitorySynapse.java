@@ -56,11 +56,11 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
         return true;
     }
 
-    protected void addLinkInternal(Neuron in, Neuron out) {
+    protected void link(Neuron in, Neuron out) {
         in.addOutputSynapse(this);
     }
 
-    protected void removeLinkInternal(Neuron in, Neuron out) {
+    protected void unlink(Neuron in, Neuron out) {
         in.removeOutputSynapse(this);
     }
 

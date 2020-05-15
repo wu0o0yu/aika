@@ -38,17 +38,39 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
         return propagate;
     }
 
-    protected void addLinkInternal(Neuron in, Neuron out) {
-        out.addInputSynapse(this);
+    protected void link(Neuron in, Neuron out) {
         if(isPropagate()) {
+            boolean dir = in.getId() < out.getId();
+            (dir ? in : out).lock.acquireWriteLock();
+            (dir ? out : in).lock.acquireWriteLock();
+
+            out.addInputSynapse(this);
             in.addOutputSynapse(this);
+
+            (dir ? in : out).lock.releaseWriteLock();
+            (dir ? out : in).lock.releaseWriteLock();
+        } else {
+            out.lock.acquireWriteLock();
+            out.addInputSynapse(this);
+            out.lock.releaseWriteLock();
         }
     }
 
-    protected void removeLinkInternal(Neuron in, Neuron out) {
-        out.removeInputSynapse(this);
+    protected void unlink(Neuron in, Neuron out) {
         if(isPropagate()) {
+            boolean dir = in.getId() < out.getId();
+            (dir ? in : out).lock.acquireWriteLock();
+            (dir ? out : in).lock.acquireWriteLock();
+
+            out.removeInputSynapse(this);
             in.removeOutputSynapse(this);
+
+            (dir ? in : out).lock.releaseWriteLock();
+            (dir ? out : in).lock.releaseWriteLock();
+        } else {
+            out.lock.acquireWriteLock();
+            out.removeInputSynapse(this);
+            out.lock.releaseWriteLock();
         }
     }
 }

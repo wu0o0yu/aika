@@ -66,12 +66,16 @@ public class InhibitorySynapse extends Synapse<Neuron, InhibitoryNeuron> {
         return true;
     }
 
-    protected void addLinkInternal(Neuron in, Neuron out) {
+    protected void link(Neuron in, Neuron out) {
+        in.lock.acquireWriteLock();
         in.addOutputSynapse(this);
+        in.lock.releaseWriteLock();
     }
 
-    protected void removeLinkInternal(Neuron in, Neuron out) {
+    protected void unlink(Neuron in, Neuron out) {
+        in.lock.acquireWriteLock();
         in.removeOutputSynapse(this);
+        in.lock.releaseWriteLock();
     }
 
     public static class Builder extends Synapse.Builder {

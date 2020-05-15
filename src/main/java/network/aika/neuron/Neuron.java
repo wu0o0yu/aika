@@ -16,7 +16,6 @@
  */
 package network.aika.neuron;
 
-
 import network.aika.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.OutputKey.PureOutputKey;
@@ -48,7 +47,7 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
     protected TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(OUTPUT_COMP);
 
-    protected ReadWriteLock lock = new ReadWriteLock();
+    public ReadWriteLock lock = new ReadWriteLock();
 
     public double binaryFrequency;
     public double frequency;
