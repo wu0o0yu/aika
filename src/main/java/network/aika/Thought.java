@@ -166,16 +166,14 @@ public abstract class Thought {
         m.addToN(length());
     }
 
-
     public void notifyWeightModified(Synapse synapse) {
-        Set<Synapse> is = modifiedWeights.get(synapse.getOutput());
-        if(is == null) {
-            is = new TreeSet<>(INPUT_COMPARATOR);
-            modifiedWeights.put(synapse.getOutput(), is);
-        }
-        is.add(synapse);
+        modifiedWeights
+                .computeIfAbsent(
+                        synapse.getOutput(),
+                        s -> new TreeSet<>(INPUT_COMPARATOR)
+                )
+                .add(synapse);
     }
-
 
     public Map<Neuron, Set<Synapse>> getModifiedWeights() {
         return modifiedWeights;
@@ -191,7 +189,6 @@ public abstract class Thought {
         );
         modifiedWeights.clear();
     }
-
 
     public String activationsToString() {
         StringBuilder sb = new StringBuilder();

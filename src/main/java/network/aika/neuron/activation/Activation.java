@@ -407,11 +407,11 @@ public class Activation implements Comparable<Activation> {
     }
 
     public static class Builder {
-        public double value = 1.0;
-        public int inputTimestamp;
-        public int fired;
-        public Map<InputKey, Activation> inputLinks = new TreeMap<>(INPUT_COMP);
-        public double rangeCoverage;
+        private double value = 1.0;
+        private int inputTimestamp;
+        private int fired;
+        private Map<InputKey, Activation> inputLinks = new TreeMap<>(INPUT_COMP);
+        private double rangeCoverage;
 
         public Builder setValue(double value) {
             this.value = value;
