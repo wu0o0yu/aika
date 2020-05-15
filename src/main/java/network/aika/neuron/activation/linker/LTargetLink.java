@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation.linker;
 
+import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
@@ -24,6 +25,7 @@ import network.aika.neuron.activation.Link;
 
 import static network.aika.Phase.INDUCTION;
 import static network.aika.neuron.activation.Direction.OUTPUT;
+
 
 public class LTargetLink<S extends Synapse> extends LLink<S> {
 
@@ -51,7 +53,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
     }
 
     private void followClosedLoop(Activation iAct, Activation oAct) {
-        Neuron in = iAct.getNeuron();
+        INeuron<?> in = iAct.getINeuron();
         if(iAct.outputLinkExists(oAct)) {
             return;
         }
@@ -61,7 +63,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
 
         if(s == null) {
             if(iAct.getThought().getPhase() == INDUCTION) return;
-            s = createSynapse(in, on);
+            s = createSynapse(in.getProvider(), on);
         }
 
         Link.link(s, iAct, oAct);
@@ -69,9 +71,9 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
 
     private void followOpenEnd(Activation iAct, LNode to, Activation startAct) {
         Activation oAct;
-        Neuron in = iAct.getNeuron();
+        INeuron<?> in = iAct.getINeuron();
         if(iAct.getThought().getPhase() != INDUCTION) {
-            in.getActiveOutputSynapses().stream()
+            in.getOutputSynapses()
                     .filter(s -> checkSynapse(s))
                     .forEach(s -> {
                         Activation oa = to.follow(s.getOutput(), null, this, startAct);
@@ -80,7 +82,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
         } else {
             if(!outputLinkExists(iAct, to)) {
                 oAct = to.follow(null, null, this, startAct);
-                Synapse s = createSynapse(in, oAct.getNeuron());
+                Synapse s = createSynapse(in.getProvider(), oAct.getNeuron());
                 Link.link(s, iAct, oAct);
             }
         }

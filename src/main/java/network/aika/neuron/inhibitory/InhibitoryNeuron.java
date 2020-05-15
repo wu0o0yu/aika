@@ -19,6 +19,7 @@ package network.aika.neuron.inhibitory;
 import network.aika.ActivationFunction;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
@@ -46,6 +47,11 @@ public abstract class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
 
     public InhibitoryNeuron(Model model, String label, Boolean isInputNeuron) {
         super(model, label, isInputNeuron);
+    }
+
+    @Override
+    public Synapse getInputSynapse(Neuron n, PatternScope ps) {
+        throw new UnsupportedOperationException();
     }
 
     public double propagateRangeCoverage(Activation iAct) {
@@ -78,7 +84,6 @@ public abstract class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
         return s.getWeight(state) < -getBias();
     }
 
-
     public double getTotalBias(boolean assumePosRecLinks, Synapse.State state) {
         return getBias(state);
     }
@@ -93,15 +98,15 @@ public abstract class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
     }
 
     @Override
-    public void addInputSynapse(InhibitorySynapse inhibitorySynapse) {
+    public void addInputSynapse(InhibitorySynapse s) {
     }
 
     @Override
-    public void addOutputSynapse(Synapse synapse) {
+    public void addOutputSynapse(Synapse s) {
     }
 
     @Override
-    public void removeInputSynapse(InhibitorySynapse inhibitorySynapse) {
+    public void removeInputSynapse(InhibitorySynapse s) {
     }
 
     @Override

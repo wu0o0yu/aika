@@ -19,12 +19,14 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.OutputKey.PureOutputKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.Synapse.OUTPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
@@ -48,7 +50,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     protected TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(OUTPUT_COMP);
 
-    ReadWriteLock lock = new ReadWriteLock();
+    protected ReadWriteLock lock = new ReadWriteLock();
 
     public double binaryFrequency;
     public double frequency;
@@ -78,13 +80,26 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
 
     public abstract boolean isWeak(Synapse synapse, Synapse.State state);
 
+    public abstract Synapse getInputSynapse(Neuron n, PatternScope ps);
+
+    public Synapse getOutputSynapse(Neuron n, PatternScope ps) {
+        lock.acquireReadLock();
+        Synapse s = outputSynapses.get(new PureOutputKey(n, ps));
+        lock.releaseReadLock();
+        return s;
+    }
+
+    public Stream<Synapse> getOutputSynapses() {
+        return outputSynapses.values().stream();
+    }
+
     public abstract void addInputSynapse(S s);
+
+    public abstract void addOutputSynapse(Synapse synapse);
 
     public abstract void removeInputSynapse(S s);
 
     public abstract void removeOutputSynapse(Synapse s);
-
-    public abstract void addOutputSynapse(Synapse synapse);
 
     public abstract void commit(Collection<? extends Synapse> modifiedSynapses);
 
@@ -269,22 +284,6 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     }
 
     public abstract String typeToString();
-
-    public String toStringWithSynapses() {
-        SortedSet<Synapse> is = new TreeSet<>(Comparator.comparing(Synapse::getPInput));
-
-        is.addAll(getProvider().getActiveInputSynapses());
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(toDetailedString());
-        sb.append("\n");
-        for (Synapse s : is) {
-            sb.append("  ");
-            sb.append(s.toString());
-            sb.append("\n");
-        }
-        return sb.toString();
-    }
 
     public String freqToString() {
         StringBuilder sb = new StringBuilder();

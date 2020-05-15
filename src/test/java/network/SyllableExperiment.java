@@ -19,7 +19,6 @@ package network;
 import network.aika.Config;
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
@@ -142,7 +141,7 @@ public class SyllableExperiment {
             train( word + " ");
         }
 
-        model.dumpModel();
+//        model.dumpModel();
         System.out.println();
     }
 }

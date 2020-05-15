@@ -167,7 +167,7 @@ public class Activation implements Comparable<Activation> {
                 .entrySet()
                 .stream()
                 .forEach(me -> {
-                    Synapse s = getNeuron().getInputSynapse(me.getKey().getPInput(), me.getKey().getPatternScope());
+                    Synapse s = getINeuron().getInputSynapse(me.getKey().getPInput(), me.getKey().getPatternScope());
                     addLink(new Link(s, me.getValue(), this));
                 });
 

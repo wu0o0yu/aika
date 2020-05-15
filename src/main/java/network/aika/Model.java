@@ -206,14 +206,4 @@ public class Model {
         }
         System.out.println();
     }
-
-    public void dumpModel() {
-        System.out.println();
-        System.out.println("Dump Model:");
-        for(Neuron n: getActiveNeurons()) {
-            INeuron tn = n.get();
-            System.out.println(tn.toStringWithSynapses());
-            System.out.println();
-        }
-    }
 }

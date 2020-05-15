@@ -11,4 +11,24 @@ public interface InputKey {
     Neuron getPInput();
 
     PatternScope getPatternScope();
+
+    class PureInputKey implements InputKey {
+        private Neuron input;
+        private PatternScope ps;
+
+        public PureInputKey(Neuron input, PatternScope ps) {
+            this.input = input;
+            this.ps = ps;
+        }
+
+        @Override
+        public Neuron getPInput() {
+            return input;
+        }
+
+        @Override
+        public PatternScope getPatternScope() {
+            return ps;
+        }
+    }
 }

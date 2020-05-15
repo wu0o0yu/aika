@@ -19,6 +19,7 @@ package network.aika.neuron.excitatory;
 import network.aika.ActivationFunction;
 import network.aika.Model;
 import network.aika.neuron.*;
+import network.aika.neuron.InputKey.PureInputKey;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
@@ -111,17 +112,17 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends INeuron<S> {
 
     @Override
     public void suspend() {
-        for (Synapse s : inputSynapses.values()) {
-            s.getPInput().removeActiveOutputSynapse(s);
-        }
-
-        for (Synapse s : outputSynapses.values()) {
-            s.getPOutput().removeActiveInputSynapse(s);
-        }
     }
 
     @Override
     public void reactivate() {
+    }
+
+    public Synapse getInputSynapse(Neuron n, PatternScope ps) {
+        lock.acquireReadLock();
+        Synapse s = inputSynapses.get(new PureInputKey(n, ps));
+        lock.releaseReadLock();
+        return s;
     }
 
     public void addInputSynapse(S s) {
@@ -213,6 +214,18 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends INeuron<S> {
         }
 
         setModified();
+    }
+
+    public String toStringWithSynapses() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(toDetailedString());
+        sb.append("\n");
+        for (Synapse s : inputSynapses.values()) {
+            sb.append("  ");
+            sb.append(s.toString());
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 
     public String typeToString() {

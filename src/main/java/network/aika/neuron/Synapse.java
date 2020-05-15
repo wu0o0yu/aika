@@ -128,9 +128,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         (dir ? in : out).lock.acquireWriteLock();
         (dir ? out : in).lock.acquireWriteLock();
 
-        input.addActiveOutputSynapse(this);
-        output.addActiveInputSynapse(this);
-
         addLinkInternal(in, out);
 
         (dir ? in : out).lock.releaseWriteLock();
@@ -145,9 +142,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
         (dir ? in : out).lock.acquireWriteLock();
         (dir ? out : in).lock.acquireWriteLock();
-
-        input.removeActiveOutputSynapse(this);
-        output.removeActiveInputSynapse(this);
 
         removeLinkInternal(in, out);
 
@@ -205,9 +199,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         output = m.lookupNeuron(in.readInt());
 
         weight = in.readDouble();
-
-        output.addActiveInputSynapse(this);
-        input.addActiveOutputSynapse(this);
     }
 
     public String toString() {

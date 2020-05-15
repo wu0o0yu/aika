@@ -21,9 +21,6 @@ import network.aika.neuron.activation.Activation;
 
 import java.util.*;
 
-import static network.aika.neuron.Synapse.INPUT_COMP;
-import static network.aika.neuron.Synapse.OUTPUT_COMP;
-
 /**
  * The {@code Neuron} class is a proxy implementation for the real neuron implementation in the class {@code INeuron}.
  * Aika uses the provider pattern to store and reload rarely used neurons or logic nodes.
@@ -34,12 +31,6 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
 
     public static final Neuron MIN_NEURON = new Neuron(null, Integer.MIN_VALUE);
     public static final Neuron MAX_NEURON = new Neuron(null, Integer.MAX_VALUE);
-
-    ReadWriteLock lock = new ReadWriteLock();
-
-    NavigableMap<InputKey, Synapse> activeInputSynapses = new TreeMap<>(INPUT_COMP);
-    NavigableMap<OutputKey, Synapse> activeOutputSynapses = new TreeMap<>(OUTPUT_COMP);
-
 
     public Neuron(Model m, int id) {
         super(m, id);
@@ -131,88 +122,11 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
         n.commit(modifiedSynapses);
     }
 
-    public Synapse getInputSynapse(Neuron n, PatternScope ps) {
-        lock.acquireReadLock();
-        InputKey ik = new InputKey() {
-            @Override
-            public Neuron getPInput() {
-                return n;
-            }
-
-            @Override
-            public PatternScope getPatternScope() {
-                return ps;
-            }
-        };
-
-        Synapse s = activeInputSynapses.get(ik);
-
-        lock.releaseReadLock();
-        return s;
-    }
-
-    public Synapse getOutputSynapse(Neuron n, PatternScope ps) {
-        lock.acquireReadLock();
-        OutputKey ok = new OutputKey() {
-            @Override
-            public Neuron getPOutput() {
-                return n;
-            }
-
-            @Override
-            public PatternScope getPatternScope() {
-                return ps;
-            }
-        };
-
-        Synapse s = activeOutputSynapses.get(ok);
-
-        lock.releaseReadLock();
-        return s;
-    }
-
-    public void addActiveInputSynapse(Synapse s) {
-        lock.acquireWriteLock();
-        activeInputSynapses.put(s, s);
-        lock.releaseWriteLock();
-    }
-
-    public void removeActiveInputSynapse(Synapse s) {
-        lock.acquireWriteLock();
-        activeInputSynapses.remove(s);
-        lock.releaseWriteLock();
-    }
-
-    public void addActiveOutputSynapse(Synapse s) {
-        lock.acquireWriteLock();
-        activeOutputSynapses.put(s, s);
-        lock.releaseWriteLock();
-    }
-
-    public void removeActiveOutputSynapse(Synapse s) {
-        lock.acquireWriteLock();
-        activeOutputSynapses.remove(s);
-        lock.releaseWriteLock();
-    }
-
     public String toString() {
         if(this == MIN_NEURON) return "MIN_NEURON";
         if(this == MAX_NEURON) return "MAX_NEURON";
 
         return super.toString();
-    }
-
-    /**
-     * Active input synapses are those synapses that are currently available in the main memory.
-     *
-     * @return
-     */
-    public Collection<Synapse> getActiveInputSynapses() {
-        return activeInputSynapses.values();
-    }
-
-    public Collection<Synapse> getActiveOutputSynapses() {
-        return activeOutputSynapses.values();
     }
 
     private static Collection<Synapse.Builder> getSynapseBuilders(Collection<Synapse.Builder> builders) {
