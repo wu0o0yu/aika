@@ -104,7 +104,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try (
                     GZIPOutputStream gzipos = new GZIPOutputStream(baos);
-                    DataOutputStream dos = new DataOutputStream(gzipos);) {
+                    DataOutputStream dos = new DataOutputStream(gzipos)) {
 
                 n.write(dos);
             } catch (IOException e) {

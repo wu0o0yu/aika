@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.excitatory.patternpart;
 
-import network.aika.Config;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
@@ -28,6 +27,8 @@ import org.slf4j.LoggerFactory;
 
 import static network.aika.neuron.PatternScope.INPUT_PATTERN;
 import static network.aika.neuron.PatternScope.SAME_PATTERN;
+import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.linker.LinkGraphs.*;
 
 /**
@@ -68,9 +69,9 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     public void linkForwards(Activation act) {
         super.linkForwards(act);
 
-        sameInputLinkT.followForwards(act);
-        relatedInputLinkT.followForwards(act);
-        patternInputLinkT.followForwards(act);
+        sameInputLinkT.follow(act, INPUT, true);
+        relatedInputLinkT.follow(act, INPUT, true);
+        patternInputLinkT.follow(act, INPUT, true);
     }
 
     @Override
@@ -82,15 +83,14 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public void linkPosRecSynapses(Activation act) {
-        posRecLinkT.output.follow(act.getINeuron(), act, LinkGraphs.posRecLinkT, act);
+        posRecLinkT.follow(act, OUTPUT, true);
     }
 
     @Override
     public void induceStructure(Activation act) {
-        sameInputLinkT.output.follow(act.getINeuron(), act, sameInputLinkT, act);
-        relatedInputLinkT.output.follow(act.getINeuron(), act, relatedInputLinkT, act);
-
-        inducePPInhibInputSynapse.input.follow(act.getINeuron(), act, inducePPInhibInputSynapse, act);
+        sameInputLinkT.follow(act, OUTPUT, true);
+        relatedInputLinkT.follow(act, OUTPUT, true);
+        inducePPInhibInputSynapse.follow(act, INPUT, true);
     }
 
     public double getCost(Sign s) {

@@ -50,15 +50,15 @@ public class Activation implements Comparable<Activation> {
 
     private double p = 1.0;
 
-    public TreeMap<Link, Link> inputLinksFiredOrder;
-    public Map<InputKey, Link> inputLinks;
-    public NavigableMap<Activation, Link> outputLinks;
+    TreeMap<Link, Link> inputLinksFiredOrder;
+    Map<InputKey, Link> inputLinks;
+    NavigableMap<Activation, Link> outputLinks;
 
     public boolean assumePosRecLinks;
     private boolean requiresFullUpdate = false;
     private boolean isFinal;
 
-    public LNode lNode;
+    private LNode lNode;
 
     private int round; // Nur als Abbruchbedingung
     private Activation lastRound;
@@ -124,6 +124,14 @@ public class Activation implements Comparable<Activation> {
 
     public void setGroundRef(Reference groundRef) {
         this.groundRef = groundRef;
+    }
+
+    public LNode getLNode() {
+        return lNode;
+    }
+
+    public void setLNode(LNode lNode) {
+        this.lNode = lNode;
     }
 
     public void setLastRound(Activation lrAct) {
@@ -259,6 +267,14 @@ public class Activation implements Comparable<Activation> {
         }else{
             sumUpLink(l);
         }
+    }
+
+    public boolean inputLinkExists(Synapse s) {
+        return inputLinks.containsKey(s);
+    }
+
+    public boolean outputLinkExists(Activation oAct) {
+        return outputLinks.containsKey(oAct);
     }
 
     private boolean isLastLink(Link l) {

@@ -22,6 +22,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 
+import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.linker.LinkGraphs.inducePPInhibInputSynapse;
 
 /**
@@ -51,7 +52,7 @@ public class PatternPartInhibitoryNeuron extends InhibitoryNeuron {
 
     @Override
     public void induceStructure(Activation act) {
-        inducePPInhibInputSynapse.input.follow(act.getINeuron(), act, null, act);
+        inducePPInhibInputSynapse.follow(act, OUTPUT, true);
     }
 
     public String typeToString() {

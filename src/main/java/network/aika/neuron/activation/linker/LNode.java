@@ -28,13 +28,13 @@ import java.util.List;
  */
 public abstract class LNode<N extends INeuron> {
 
-    String label;
+    protected String label;
 
-    Boolean isMature;
+    protected Boolean isMature;
 
-    List<LLink> links = new ArrayList<>();
+    protected List<LLink> links = new ArrayList<>();
 
-    Class<N> neuronClass;
+    protected Class<N> neuronClass;
 
     public abstract Activation follow(INeuron n, Activation act, LLink from, Activation startAct);
 

@@ -23,9 +23,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Link;
 
-import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Direction.OUTPUT;
-
 
 /**
  *
@@ -33,7 +30,7 @@ import static network.aika.neuron.activation.Direction.OUTPUT;
  */
 public class LMatchingLink<S extends Synapse> extends LLink<S> {
 
-    boolean dir;
+    private boolean dir;
 
     public LMatchingLink(LNode input, LNode output, PatternScope patternScope, Class<S> synapseClass, String label, boolean dir) {
         super(input, output, patternScope, synapseClass, label);
@@ -42,23 +39,24 @@ public class LMatchingLink<S extends Synapse> extends LLink<S> {
     }
 
     public void follow(Activation act, LNode from, Activation startAct) {
-        act.getLinks(from == input ? OUTPUT : INPUT)
+        act.getLinks(getDirection(from))
                 .forEach(l -> follow(l, from, startAct));
     }
 
     public void followBackwards(Link l) {
         Activation startAct = l.getOutput();
-        startAct.lNode = output;
+        startAct.setLNode(output);
         follow(l, output, startAct);
-        startAct.lNode = null;
+        startAct.setLNode(null);
     }
 
     public void follow(Link l, LNode from, Activation startAct) {
-        LNode to = getTo(from);
-        Direction dir = getDirection(from);
         if(!checkSynapse(l.getSynapse())) {
             return;
         }
+
+        LNode to = getTo(from);
+        Direction dir = getDirection(from);
 
         INeuron n = l.getSynapse().getNeuron(dir);
         Activation act = l.getActivation(dir);

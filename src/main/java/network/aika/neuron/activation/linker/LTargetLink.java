@@ -23,12 +23,13 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 
 import static network.aika.Phase.INDUCTION;
+import static network.aika.neuron.activation.Direction.OUTPUT;
 
 public class LTargetLink<S extends Synapse> extends LLink<S> {
 
-    Boolean isRecurrent;
-    Boolean isNegative;
-    Boolean isPropagate;
+    private Boolean isRecurrent;
+    private Boolean isNegative;
+    private Boolean isPropagate;
 
     public LTargetLink(LNode input, LNode output, PatternScope patternScope, Class<S> synapseClass, String label, Boolean isRecurrent, Boolean isNegative, Boolean isPropagate) {
         super(input, output, patternScope, synapseClass, label);
@@ -51,7 +52,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
 
     private void followClosedLoop(Activation iAct, Activation oAct) {
         Neuron in = iAct.getNeuron();
-        if(linkExists(iAct, oAct)) {
+        if(iAct.outputLinkExists(oAct)) {
             return;
         }
 
@@ -77,7 +78,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
                         Link.link(s, iAct, oa);
                     });
         } else {
-            if(!linkExists(iAct, to)) {
+            if(!outputLinkExists(iAct, to)) {
                 oAct = to.follow(null, null, this, startAct);
                 Synapse s = createSynapse(in, oAct.getNeuron());
                 Link.link(s, iAct, oAct);
@@ -85,12 +86,8 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
         }
     }
 
-    private boolean linkExists(Activation iAct, Activation oAct) {
-        return iAct.outputLinks.get(oAct) != null;
-    }
-
-    private boolean linkExists(Activation iAct, LNode to) {
-        return !iAct.outputLinks.values().stream()
+    private boolean outputLinkExists(Activation iAct, LNode to) {
+        return !iAct.getLinks(OUTPUT)
                 .filter(l -> checkSynapse(l.getSynapse()))
                 .filter(l -> to.checkNeuron(l.getOutput().getINeuron()))
                 .findAny()
@@ -99,7 +96,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
 
     private Activation selectActivation(LNode n, Activation... acts) {
         for(Activation act : acts) {
-            if(act.lNode == n) {
+            if(act.getLNode() == n) {
                 return act;
             }
         }

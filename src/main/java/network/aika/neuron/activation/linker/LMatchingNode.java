@@ -31,19 +31,17 @@ public class LMatchingNode<N extends INeuron> extends LNode<N> {
     }
 
     public Activation follow(INeuron n, Activation act, LLink from, Activation startAct) {
-        if(!checkNeuron(n)) {
+        if(!checkNeuron(n) || act.isConflicting()) {
             return null;
         }
 
-        if(act.isConflicting()) return null;
-
-        act.lNode = this;
+        act.setLNode(this);
 
         links.stream()
                 .filter(nl -> nl != from)
                 .forEach(nl -> nl.follow(act, this, startAct));
 
-        act.lNode = null;
+        act.setLNode(null);
 
         return act;
     }

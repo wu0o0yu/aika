@@ -29,10 +29,10 @@ import static network.aika.neuron.activation.Direction.OUTPUT;
  * @author Lukas Molzberger
  */
 public abstract class LLink<S extends Synapse> {
-    public String label;
+    protected  String label;
 
-    public LNode input;
-    public LNode output;
+    protected  LNode input;
+    protected  LNode output;
 
     protected PatternScope patternScope;
     protected Class<S> synapseClass;
@@ -50,8 +50,12 @@ public abstract class LLink<S extends Synapse> {
 
     public abstract void follow(Activation act, LNode from, Activation startAct);
 
-    public void followForwards(Activation act) {
-        input.follow(act.getINeuron(), act, this, act);
+    public void follow(Activation act, Direction dir, boolean closedCycle) {
+        getNode(dir).follow(act.getINeuron(), act, closedCycle ? this : null, act);
+    }
+
+    protected LNode getNode(Direction dir) {
+        return dir == INPUT ? input : output;
     }
 
     protected boolean checkSynapse(Synapse s) {

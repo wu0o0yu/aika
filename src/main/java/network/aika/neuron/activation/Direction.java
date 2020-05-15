@@ -2,5 +2,20 @@ package network.aika.neuron.activation;
 
 public enum Direction {
     INPUT,
-    OUTPUT
+    OUTPUT;
+
+    static {
+        INPUT.setInverted(OUTPUT);
+        OUTPUT.setInverted(INPUT);
+    }
+
+    private Direction inverted;
+
+    public void setInverted(Direction inverted) {
+        this.inverted = inverted;
+    }
+
+    public Direction getInverted() {
+        return inverted;
+    }
 }

@@ -32,8 +32,6 @@ import static network.aika.neuron.Synapse.INPUT_COMPARATOR;
 public abstract class Thought {
     private static final Logger log = LoggerFactory.getLogger(Thought.class);
 
-    public static int MAX_ROUND = 20;
-
     private int activationIdCounter = 0;
 
     private final TreeSet<Activation> activationsQueue = new TreeSet<>(

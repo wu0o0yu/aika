@@ -57,7 +57,6 @@ public class ReadWriteLock {
         }
     }
 
-
     public synchronized void acquireReadLock() {
         try {
             waitForReadLock++;
@@ -70,7 +69,6 @@ public class ReadWriteLock {
             e.printStackTrace();
         }
     }
-
 
     public void releaseWriteLock() {
         synchronized (writeLock) {
@@ -89,7 +87,6 @@ public class ReadWriteLock {
             }
         }
     }
-
 
     public synchronized void releaseReadLock() {
         readers--;

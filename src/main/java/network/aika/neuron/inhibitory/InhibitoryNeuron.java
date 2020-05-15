@@ -28,6 +28,9 @@ import network.aika.neuron.activation.linker.LinkGraphs;
 
 import java.util.Collection;
 
+import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.linker.LinkGraphs.inhibitoryLinkT;
+
 /**
  *
  * @author Lukas Molzberger
@@ -54,7 +57,7 @@ public abstract class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
     public void linkForwards(Activation act) {
         super.linkForwards(act);
 
-        LinkGraphs.inhibitoryLinkT.followForwards(act);
+        inhibitoryLinkT.follow(act, INPUT, true);
     }
 
     @Override

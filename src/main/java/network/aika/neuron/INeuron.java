@@ -29,6 +29,9 @@ import java.util.function.Function;
 
 import static network.aika.neuron.Synapse.OUTPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
+import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
+import static network.aika.neuron.activation.linker.LinkGraphs.propagateT;
 
 /**
  *
@@ -151,7 +154,7 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     public abstract double propagateRangeCoverage(Activation iAct);
 
     public void linkForwards(Activation act) {
-        LinkGraphs.propagateT.input.follow(this, act, null, act);
+        propagateT.follow(act, INPUT, false);
     }
 
     public abstract void linkBackwards(Link l);
@@ -203,12 +206,10 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
     }
 
     private double getCoverage(Activation seedAct) {
-        double maxCoverage = 0.0;
-        for(Map.Entry<Activation, Link> me: seedAct.outputLinks.entrySet()) {
-            maxCoverage = Math.max(maxCoverage, getCoverage(me.getValue()));
-        }
-
-        return maxCoverage;
+        return seedAct.getLinks(OUTPUT)
+                .map(l -> getCoverage(l))
+                .max(Comparator.comparingDouble(c -> c))
+                .orElse(0.0);
     }
 
     private static double getCoverage(Link ol) {

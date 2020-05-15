@@ -17,7 +17,6 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.ActivationFunction;
-import network.aika.Config;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
@@ -33,6 +32,8 @@ import java.util.*;
 import java.util.function.Function;
 
 import static network.aika.neuron.InputKey.INPUT_COMP;
+import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
 
 /**
  *
@@ -71,9 +72,13 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends INeuron<S> {
         double sum = 0.0;
         for (Sign s : Sign.values()) {
             sum += s.getSign() * getCost(s) * g;
-            for (Link ol : il.getOutput().outputLinks.values()) {
-                sum += ol.getOutput().getINeuron().computeGradient(ol, depth + 1, l -> g * il.getSynapse().getWeight());
-            }
+
+            sum = il.getOutput()
+                    .getLinks(OUTPUT)
+                    .map(ol ->
+                            ol.getOutput().getINeuron().computeGradient(ol, depth + 1, l -> g * il.getSynapse().getWeight())
+                    )
+                    .reduce(sum, Double::sum);
         }
 
         return sum;
@@ -87,7 +92,7 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends INeuron<S> {
             return;
 
         double learnRate = getModel().getTrainingConfig().getLearnRate();
-        act.inputLinks.values()
+        act.getLinks(INPUT)
                 .forEach(l ->
                         l.getSynapse().update(
                                 act.getThought(),
@@ -100,7 +105,7 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends INeuron<S> {
         inputSynapses
                 .values()
                 .stream()
-                .filter(s -> !act.inputLinks.containsKey(s))
+                .filter(s -> !act.inputLinkExists(s))
                 .forEach(s -> new Link(s, null, act).link());
     }
 
