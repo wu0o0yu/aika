@@ -39,8 +39,6 @@ import static network.aika.neuron.activation.linker.LinkGraphs.propagateT;
  */
 public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvider> implements Comparable<Neuron> {
 
-    public static double RELIABILITY_THRESHOLD = 10.0;
-
     private static final Logger log = LoggerFactory.getLogger(Neuron.class);
 
     private String label;
@@ -242,10 +240,6 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
     public double getN() {
         double coveredFactor = coveredFactorSum / coveredFactorCount;
         return getModel().getN() / coveredFactor;
-    }
-
-    public double getReliability() {
-        return binaryFrequency >= RELIABILITY_THRESHOLD ? Math.log(binaryFrequency - (RELIABILITY_THRESHOLD - 1.0)) : 0.0;
     }
 
     private double getCoverage(Activation seedAct) {
