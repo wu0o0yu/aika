@@ -17,10 +17,6 @@
 package network.aika.neuron;
 
 import network.aika.*;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.Synapse.Builder;
-
-import java.util.*;
 
 /**
  * The {@code NeuronProvider} class is a proxy implementation for the real neuron implementation in the class {@code Neuron}.
@@ -43,29 +39,6 @@ public class NeuronProvider extends Provider<Neuron<? extends Synapse>> {
 
     public String getLabel() {
         return get().getLabel();
-    }
-
-    /**
-     * Propagate an input activation into the network.
-     *
-     * @param t   The current document
-     * @param inputAct
-     */
-    public Activation propagateInput(Thought t, Activation.Builder inputAct) {
-        return get().addInputActivation(t, inputAct);
-    }
-
-    public static NeuronProvider init(Neuron<?> n, double bias, Builder... inputs) {
-        return init(null, n, bias, inputs);
-    }
-
-    public static NeuronProvider init(Thought t, Neuron<?> n, double bias, Builder... inputs) {
-        n.init(t, bias, Arrays.asList(inputs));
-        return n.getProvider();
-    }
-
-    public static NeuronProvider init(Thought t, NeuronProvider n, double bias, Builder... inputs) {
-        return init(t, n, bias, inputs);
     }
 
     public String toString() {

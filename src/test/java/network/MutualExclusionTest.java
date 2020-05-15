@@ -19,7 +19,6 @@ package network;
 import network.aika.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
@@ -51,7 +50,7 @@ public class MutualExclusionTest {
         PatternPartNeuron nc = new PatternPartNeuron(m, "C", false);
         InhibitoryNeuron inhib = new PatternPartInhibitoryNeuron(m, "I", false);
 
-        NeuronProvider.init(na, 1.0,
+        Neuron.init(na, 1.0,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
@@ -67,7 +66,7 @@ public class MutualExclusionTest {
                         .setWeight(-100.0)
         );
 
-        NeuronProvider.init(nb, 1.5,
+        Neuron.init(nb, 1.5,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
@@ -83,7 +82,7 @@ public class MutualExclusionTest {
                         .setWeight(-100.0)
         );
 
-        NeuronProvider.init(nc, 1.2,
+        Neuron.init(nc, 1.2,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
@@ -99,7 +98,7 @@ public class MutualExclusionTest {
                         .setWeight(-100.0)
         );
 
-        NeuronProvider.init(inhib, 0.0,
+        Neuron.init(inhib, 0.0,
                 new InhibitorySynapse.Builder()
                         .setNeuron(na)
                         .setWeight(1.0),
@@ -114,7 +113,7 @@ public class MutualExclusionTest {
 
         Document doc = new Document("test");
 
-        Activation inAct = in.addInputActivation(doc,
+        Activation inAct = in.propagate(doc,
                 new Activation.Builder()
                     .setValue(1.0)
                     .setInputTimestamp(0)

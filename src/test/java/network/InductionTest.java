@@ -22,7 +22,7 @@ public class InductionTest {
 
         Document doc = new Document("");
 
-        in.addInputActivation(doc,
+        in.propagate(doc,
                 new Activation.Builder()
                         .setValue(1.0)
                         .setInputTimestamp(0)

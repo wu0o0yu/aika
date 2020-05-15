@@ -18,7 +18,7 @@ package network;
 
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.*;
@@ -47,7 +47,7 @@ public class PatternTest {
 
 
         InhibitoryNeuron inputInhibN = new PatternInhibitoryNeuron(m, "INPUT INHIB", true);
-        NeuronProvider.init(inputInhibN, 0.0,
+        Neuron.init(inputInhibN, 0.0,
                 new InhibitorySynapse.Builder()
                         .setNeuron(inA)
                         .setWeight(1.0),
@@ -60,7 +60,7 @@ public class PatternTest {
         );
 
         PatternPartNeuron relN = new PatternPartNeuron(m, "Rel", true);
-        NeuronProvider.init(relN, 1.0,
+        Neuron.init(relN, 1.0,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
@@ -83,7 +83,7 @@ public class PatternTest {
         PatternNeuron out = new PatternNeuron(m, "OUT", false);
 
 
-        NeuronProvider.init(eA, 4.0,
+        Neuron.init(eA, 4.0,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
@@ -99,7 +99,7 @@ public class PatternTest {
                         .setWeight(10.0)
         );
 
-        NeuronProvider.init(eB, 4.0,
+        Neuron.init(eB, 4.0,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
@@ -127,7 +127,7 @@ public class PatternTest {
                         .setWeight(10.0)
         );
 
-        NeuronProvider.init(eC, 4.0,
+        Neuron.init(eC, 4.0,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
@@ -155,7 +155,7 @@ public class PatternTest {
                         .setWeight(10.0)
         );
 
-        NeuronProvider.init(out, 4.0,
+        Neuron.init(out, 4.0,
                 new PatternSynapse.Builder()
                         .setNeuron(eA)
                         .setPropagate(true)
@@ -171,7 +171,7 @@ public class PatternTest {
 
         Document doc = new Document("ABC");
 
-        Activation actA = inA.addInputActivation(doc,
+        Activation actA = inA.propagate(doc,
                 new Activation.Builder()
                         .setValue(1.0)
                         .setInputTimestamp(0)
@@ -183,7 +183,7 @@ public class PatternTest {
                 .map(l -> l.getOutput())
                 .orElse(null);
 
-        Activation actB = inB.addInputActivation(doc,
+        Activation actB = inB.propagate(doc,
                 new Activation.Builder()
                         .setValue(1.0)
                         .setInputTimestamp(1)
@@ -195,7 +195,7 @@ public class PatternTest {
                 .map(l -> l.getOutput())
                 .orElse(null);
 
-        relN.addInputActivation(doc,
+        relN.propagate(doc,
                 new Activation.Builder()
                         .setValue(1.0)
                         .setInputTimestamp(1)
@@ -204,7 +204,7 @@ public class PatternTest {
                         .addInputLink(SAME_PATTERN, inInhibB)
         );
 
-        Activation actC = inC.addInputActivation(doc,
+        Activation actC = inC.propagate(doc,
                 new Activation.Builder()
                         .setValue(1.0)
                         .setInputTimestamp(2)
@@ -217,7 +217,7 @@ public class PatternTest {
                 .orElse(null);
 
 
-        relN.addInputActivation(doc,
+        relN.propagate(doc,
                 new Activation.Builder()
                         .setValue(1.0)
                         .setInputTimestamp(2)

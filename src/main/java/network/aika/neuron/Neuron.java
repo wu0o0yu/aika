@@ -74,6 +74,19 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
         setModified();
     }
 
+    public static NeuronProvider init(Neuron<?> n, double bias, Synapse.Builder... inputs) {
+        return init(null, n, bias, inputs);
+    }
+
+    public static NeuronProvider init(Thought t, Neuron<?> n, double bias, Synapse.Builder... inputs) {
+        n.init(t, bias, Arrays.asList(inputs));
+        return n.getProvider();
+    }
+
+    public static NeuronProvider init(Thought t, NeuronProvider n, double bias, Synapse.Builder... inputs) {
+        return init(t, n, bias, inputs);
+    }
+
     public void init(Thought t, Double bias, Collection<Synapse.Builder> synapseBuilders) {
         if(bias != null) {
             setBias(bias);
@@ -142,7 +155,7 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
      * @param doc   The current document
      * @param input
      */
-    public Activation addInputActivation(Thought doc, Activation.Builder input) {
+    public Activation propagate(Thought doc, Activation.Builder input) {
         Activation act = new Activation(doc.getNewActivationId(), doc, this);
         act.initInputActivation(input);
         return act;
