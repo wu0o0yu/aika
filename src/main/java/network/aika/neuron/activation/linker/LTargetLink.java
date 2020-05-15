@@ -38,7 +38,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
         this.isPropagate = isPropagate;
     }
 
-    public void follow(Activation act, LNode from, Activation startAct) {
+    protected void follow(Activation act, LNode from, Activation startAct) {
         Activation iAct = selectActivation(input, act, startAct);
         Activation oAct = selectActivation(output, act, startAct);
         LNode to = getTo(from);

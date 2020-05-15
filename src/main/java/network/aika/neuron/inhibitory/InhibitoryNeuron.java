@@ -24,11 +24,10 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.INeuron;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.linker.LinkGraphs;
 
 import java.util.Collection;
 
-import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.linker.LinkGraphs.inhibitoryLinkT;
 
 /**
@@ -57,7 +56,7 @@ public abstract class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
     public void linkForwards(Activation act) {
         super.linkForwards(act);
 
-        inhibitoryLinkT.follow(act, INPUT, true);
+        inhibitoryLinkT.follow(act, OUTPUT, true);
     }
 
     @Override

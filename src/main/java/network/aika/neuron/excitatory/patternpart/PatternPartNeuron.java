@@ -19,7 +19,6 @@ package network.aika.neuron.excitatory.patternpart;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.activation.linker.*;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import org.slf4j.Logger;
@@ -69,9 +68,9 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     public void linkForwards(Activation act) {
         super.linkForwards(act);
 
-        sameInputLinkT.follow(act, INPUT, true);
-        relatedInputLinkT.follow(act, INPUT, true);
-        patternInputLinkT.follow(act, INPUT, true);
+        sameInputLinkT.follow(act, OUTPUT, true);
+        relatedInputLinkT.follow(act, OUTPUT, true);
+        patternInputLinkT.follow(act, OUTPUT, true);
     }
 
     @Override
@@ -83,14 +82,14 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public void linkPosRecSynapses(Activation act) {
-        posRecLinkT.follow(act, OUTPUT, true);
+        posRecLinkT.follow(act, INPUT, true);
     }
 
     @Override
     public void induceStructure(Activation act) {
-        sameInputLinkT.follow(act, OUTPUT, true);
-        relatedInputLinkT.follow(act, OUTPUT, true);
-        inducePPInhibInputSynapse.follow(act, INPUT, true);
+        sameInputLinkT.follow(act, INPUT, true);
+        relatedInputLinkT.follow(act, INPUT, true);
+        inducePPInhibInputSynapse.follow(act, OUTPUT, true);
     }
 
     public double getCost(Sign s) {

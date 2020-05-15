@@ -30,7 +30,7 @@ public class LMatchingNode<N extends INeuron> extends LNode<N> {
         super(neuronClass, isMature, label);
     }
 
-    public Activation follow(INeuron n, Activation act, LLink from, Activation startAct) {
+    protected Activation follow(INeuron n, Activation act, LLink from, Activation startAct) {
         if(!checkNeuron(n) || act.isConflicting()) {
             return null;
         }

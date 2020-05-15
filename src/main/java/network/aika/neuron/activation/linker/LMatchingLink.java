@@ -38,7 +38,7 @@ public class LMatchingLink<S extends Synapse> extends LLink<S> {
         this.dir = dir;
     }
 
-    public void follow(Activation act, LNode from, Activation startAct) {
+    protected void follow(Activation act, LNode from, Activation startAct) {
         act.getLinks(getDirection(from))
                 .forEach(l -> follow(l, from, startAct));
     }
@@ -50,7 +50,7 @@ public class LMatchingLink<S extends Synapse> extends LLink<S> {
         startAct.setLNode(null);
     }
 
-    public void follow(Link l, LNode from, Activation startAct) {
+    protected void follow(Link l, LNode from, Activation startAct) {
         if(!checkSynapse(l.getSynapse())) {
             return;
         }

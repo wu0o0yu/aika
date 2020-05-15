@@ -48,10 +48,10 @@ public abstract class LLink<S extends Synapse> {
         output.addLink(this);
     }
 
-    public abstract void follow(Activation act, LNode from, Activation startAct);
+    protected abstract void follow(Activation act, LNode from, Activation startAct);
 
     public void follow(Activation act, Direction dir, boolean closedCycle) {
-        getNode(dir).follow(act.getINeuron(), act, closedCycle ? this : null, act);
+        getNode(dir.getInverted()).follow(act.getINeuron(), act, closedCycle ? this : null, act);
     }
 
     protected LNode getNode(Direction dir) {

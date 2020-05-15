@@ -33,7 +33,7 @@ import java.util.Comparator;
 import java.util.TreeSet;
 
 import static network.aika.neuron.Synapse.INPUT_COMPARATOR;
-import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.linker.LinkGraphs.inducePPInhibitoryNeuron;
 import static network.aika.neuron.activation.linker.LinkGraphs.inducePatternPart;
 
@@ -102,7 +102,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     public void induceStructure(Activation act) {
-        inducePatternPart.follow(act, INPUT, false);
-        inducePPInhibitoryNeuron.follow(act, INPUT, false);
+        inducePatternPart.follow(act, OUTPUT, false);
+        inducePPInhibitoryNeuron.follow(act, OUTPUT, false);
     }
 }

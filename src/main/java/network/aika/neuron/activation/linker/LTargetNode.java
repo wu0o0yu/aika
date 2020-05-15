@@ -33,7 +33,7 @@ public class LTargetNode<N extends INeuron> extends LNode<N> {
         super(neuronClass, isMature, label);
     }
 
-    public Activation follow(INeuron n, Activation act, LLink from, Activation startAct) {
+    protected Activation follow(INeuron n, Activation act, LLink from, Activation startAct) {
         if(n == null && startAct.getThought().getPhase() == Phase.INDUCTION) {
             n = createNeuron(startAct.getNeuron().getModel(), "");
         }
