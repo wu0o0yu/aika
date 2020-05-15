@@ -103,7 +103,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
         return null;
     }
 
-    public Synapse createSynapse(Neuron in, Neuron on) {
+    private Synapse createSynapse(Neuron in, Neuron on) {
         try {
             Synapse s = synapseClass.getConstructor().newInstance();
             s.init(patternScope, isRecurrent, isNegative, isPropagate);
