@@ -95,11 +95,10 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
         double learnRate = getModel().getTrainingConfig().getLearnRate();
         act.getLinks(INPUT)
                 .forEach(l ->
-                        l.getSynapse().update(
-                                act.getThought(),
-                                learnRate * computeWeightGradient(l)
-                        )
+                        l.getSynapse().update(learnRate * computeWeightGradient(l))
                 );
+
+        commit(inputSynapses.values());
     }
 
     protected void addDummyLinks(Activation act) {

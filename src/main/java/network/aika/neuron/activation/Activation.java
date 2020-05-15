@@ -366,20 +366,6 @@ public class Activation implements Comparable<Activation> {
         return Math.abs(value - act.value) <= TOLERANCE;
     }
 
-    public String toString() {
-        return getId() + " " +
-                getNeuron().getClass().getSimpleName() + ":" + getLabel() +
-                " value:" + Utils.round(value) +
-                " net:" + Utils.round(net) +
-                " p:" + Utils.round(p) +
-                " round:" + round;
-    }
-
-    @Override
-    public int compareTo(Activation act) {
-        return Integer.compare(id, act.id);
-    }
-
     private Activation getMostRecentFinalActivation() {
         if(!isFinal && lastRound != null) {
             return lastRound;
@@ -404,6 +390,20 @@ public class Activation implements Comparable<Activation> {
 
     public boolean hasBranches() {
         return branches.isEmpty();
+    }
+
+    public String toString() {
+        return getId() + " " +
+                getNeuron().getClass().getSimpleName() + ":" + getLabel() +
+                " value:" + Utils.round(value) +
+                " net:" + Utils.round(net) +
+                " p:" + Utils.round(p) +
+                " round:" + round;
+    }
+
+    @Override
+    public int compareTo(Activation act) {
+        return Integer.compare(id, act.id);
     }
 
     public static class Builder {

@@ -28,10 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.TreeSet;
 
-import static network.aika.neuron.Synapse.INPUT_COMPARATOR;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.linker.LinkGraphs.inducePPInhibitoryNeuron;
 import static network.aika.neuron.activation.linker.LinkGraphs.inducePatternPart;
@@ -77,13 +74,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     public void commit(Collection<? extends Synapse> modifiedSynapses) {
         super.commit(modifiedSynapses);
-
-        TreeSet<PatternSynapse> sortedSynapses = new TreeSet<>(
-                Comparator.<Synapse>comparingDouble(s -> s.getWeight()).reversed()
-                        .thenComparing(INPUT_COMPARATOR)
-        );
-
-        sortedSynapses.addAll(inputSynapses.values());
     }
 
     @Override

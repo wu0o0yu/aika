@@ -19,7 +19,7 @@ package network.aika;
 
 /**
  *
- * The suspension hook is used to suspend neurons and logic nodes to an external storage in order to reduce the memory footprint.
+ * The suspension hook is used to suspend neurons to an external storage in order to reduce the memory footprint.
  *
  * !!! Important: When using the suspension hook, all references to a neuron need to occur through a
  * provider. Otherwise the reference might be outdated.
@@ -28,11 +28,9 @@ package network.aika;
  */
 public interface SuspensionHook {
 
-
-    int getNewId();
+    int createId();
 
     void store(int id, byte[] data);
 
     byte[] retrieve(int id);
-
 }

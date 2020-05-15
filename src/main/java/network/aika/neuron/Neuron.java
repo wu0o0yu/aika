@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.Synapse.OUTPUT_COMP;
@@ -47,7 +48,7 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
     protected TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(OUTPUT_COMP);
 
-    public ReadWriteLock lock = new ReadWriteLock();
+    public final ReadWriteLock lock = new ReadWriteLock();
 
     public double binaryFrequency;
     public double frequency;
@@ -72,28 +73,24 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
     }
 
     public void link(double bias, Synapse.Builder... inputs) {
-        link(null, bias, inputs);
+        link(bias, Arrays.asList(inputs));
     }
 
-    public void link(Thought t, double bias, Synapse.Builder... inputs) {
-        link(t, bias, Arrays.asList(inputs));
-    }
-
-    public void link(Thought t, Double bias, Collection<Synapse.Builder> synapseBuilders) {
+    public void link(Double bias, Collection<Synapse.Builder> synapseBuilders) {
         if(bias != null) {
             setBias(bias);
         }
 
-        ArrayList<Synapse> modifiedSynapses = new ArrayList<>();
-        synapseBuilders.forEach(input -> {
-            Synapse s = input.getSynapse(getProvider());
-            s.link();
-            s.update(t, input.weight);
-            modifiedSynapses.add(s);
-        });
-
-        modifiedSynapses.forEach(s -> s.link());
-        commit(modifiedSynapses);
+        commit(
+                synapseBuilders
+                        .stream()
+                        .map(input -> {
+                            Synapse s = input.getSynapse(getProvider());
+                            s.link();
+                            s.update(input.weight);
+                            return s;
+                        }).collect(Collectors.toList())
+        );
     }
 
     public abstract ActivationFunction getActivationFunction();

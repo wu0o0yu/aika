@@ -116,9 +116,7 @@ public abstract class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     public void commit(Collection<? extends Synapse> modifiedSynapses) {
         commitBias();
 
-        for (Synapse s : modifiedSynapses) {
-            s.commit();
-        }
+        modifiedSynapses.forEach(s -> s.commit());
 
         setModified();
     }

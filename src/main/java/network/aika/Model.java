@@ -80,7 +80,7 @@ public class Model {
     }
 
     public int createNeuronId() {
-        return suspensionHook != null ? suspensionHook.getNewId() : currentNeuronId.addAndGet(1);
+        return suspensionHook != null ? suspensionHook.createId() : currentNeuronId.addAndGet(1);
     }
 
     public void applyMovingAverage() {

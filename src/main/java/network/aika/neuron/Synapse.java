@@ -151,20 +151,12 @@ public abstract class Synapse<I extends Neuron, O extends Neuron> implements Wri
         return output.get().isWeak(this, state);
     }
 
-    public void updateDelta(Thought doc, double weightDelta) {
+    public void updateDelta(double weightDelta) {
         this.weightDelta += weightDelta;
-
-        if(doc != null) {
-            doc.notifyWeightModified(this);
-        }
     }
 
-    public void update(Thought t, double weight) {
+    public void update(double weight) {
         this.weightDelta = weight - this.weight;
-
-        if(t != null) {
-            t.notifyWeightModified(this);
-        }
     }
 
     @Override

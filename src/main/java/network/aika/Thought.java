@@ -41,8 +41,6 @@ public abstract class Thought {
 
     private final Deque<Link> linkQueue = new ArrayDeque<>();
 
-    private TreeMap<Neuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
-
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
     private Phase phase = PRELIMINARY_LINKING;
@@ -161,33 +159,8 @@ public abstract class Thought {
                 );
 
 //        process();
-        commit();
 
         m.addToN(length());
-    }
-
-    public void notifyWeightModified(Synapse synapse) {
-        modifiedWeights
-                .computeIfAbsent(
-                        synapse.getOutput(),
-                        s -> new TreeSet<>(INPUT_COMPARATOR)
-                )
-                .add(synapse);
-    }
-
-    public Map<Neuron, Set<Synapse>> getModifiedWeights() {
-        return modifiedWeights;
-    }
-
-    /**
-     * Updates the model after the training step.
-     * It applies the weight and bias delta values and reflects the changes in the logic node structure.
-     */
-    public void commit() {
-        modifiedWeights.forEach((n, inputSyns) ->
-            n.commit(inputSyns)
-        );
-        modifiedWeights.clear();
     }
 
     public String activationsToString() {
