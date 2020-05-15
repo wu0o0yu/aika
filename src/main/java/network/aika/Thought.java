@@ -17,7 +17,7 @@
 package network.aika;
 
 
-import network.aika.neuron.INeuron;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import org.slf4j.Logger;
@@ -41,7 +41,7 @@ public abstract class Thought {
 
     private final Deque<Link> linkQueue = new ArrayDeque<>();
 
-    private TreeMap<INeuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
+    private TreeMap<Neuron, Set<Synapse>> modifiedWeights = new TreeMap<>();
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
@@ -118,8 +118,8 @@ public abstract class Thought {
         return activationsById.size();
     }
 
-    public Map<INeuron, SortedSet<Activation>> getActivationsPerNeuron() {
-        Map<INeuron, SortedSet<Activation>> results = new TreeMap<>();
+    public Map<Neuron, SortedSet<Activation>> getActivationsPerNeuron() {
+        Map<Neuron, SortedSet<Activation>> results = new TreeMap<>();
 
         activationsById.values().stream()
                 .filter(act -> act.isActive())
@@ -138,7 +138,7 @@ public abstract class Thought {
         phase = INDUCTION;
 
         if(m.getTrainingConfig().getAlpha() != null) {
-            Set<INeuron> activatedNeurons = new TreeSet<>();
+            Set<Neuron> activatedNeurons = new TreeSet<>();
             getActivations()
                 .stream()
                 .filter(act -> act.isActive())
@@ -177,7 +177,7 @@ public abstract class Thought {
     }
 
 
-    public Map<INeuron, Set<Synapse>> getModifiedWeights() {
+    public Map<Neuron, Set<Synapse>> getModifiedWeights() {
         return modifiedWeights;
     }
 

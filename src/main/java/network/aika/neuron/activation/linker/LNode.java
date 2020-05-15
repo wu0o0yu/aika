@@ -16,7 +16,7 @@
  */
 package network.aika.neuron.activation.linker;
 
-import network.aika.neuron.INeuron;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author Lukas Molzberger
  */
-public abstract class LNode<N extends INeuron> {
+public abstract class LNode<N extends Neuron> {
 
     protected String label;
 
@@ -36,7 +36,7 @@ public abstract class LNode<N extends INeuron> {
 
     protected Class<N> neuronClass;
 
-    protected abstract Activation follow(INeuron n, Activation act, LLink from, Activation startAct);
+    protected abstract Activation follow(Neuron n, Activation act, LLink from, Activation startAct);
 
     public LNode(Class<N> neuronClass, Boolean isMature, String label) {
         this.neuronClass = neuronClass;
@@ -48,7 +48,7 @@ public abstract class LNode<N extends INeuron> {
         return links.size() <= 1;
     }
 
-    public boolean checkNeuron(INeuron n) {
+    public boolean checkNeuron(Neuron n) {
         if(neuronClass != null && !n.getClass().equals(neuronClass)) {
             return false;
         }

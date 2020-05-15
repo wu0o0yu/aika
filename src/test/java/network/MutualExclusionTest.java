@@ -18,8 +18,8 @@ package network;
 
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
@@ -51,7 +51,7 @@ public class MutualExclusionTest {
         PatternPartNeuron nc = new PatternPartNeuron(m, "C", false);
         InhibitoryNeuron inhib = new PatternPartInhibitoryNeuron(m, "I", false);
 
-        Neuron.init(na, 1.0,
+        NeuronProvider.init(na, 1.0,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
@@ -67,7 +67,7 @@ public class MutualExclusionTest {
                         .setWeight(-100.0)
         );
 
-        Neuron.init(nb, 1.5,
+        NeuronProvider.init(nb, 1.5,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
@@ -83,7 +83,7 @@ public class MutualExclusionTest {
                         .setWeight(-100.0)
         );
 
-        Neuron.init(nc, 1.2,
+        NeuronProvider.init(nc, 1.2,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)
@@ -99,7 +99,7 @@ public class MutualExclusionTest {
                         .setWeight(-100.0)
         );
 
-        Neuron.init(inhib, 0.0,
+        NeuronProvider.init(inhib, 0.0,
                 new InhibitorySynapse.Builder()
                         .setNeuron(na)
                         .setWeight(1.0),
@@ -125,7 +125,7 @@ public class MutualExclusionTest {
 
         System.out.println(doc.activationsToString());
 
-        Map<INeuron, SortedSet<Activation>> results = doc.getActivationsPerNeuron();
+        Map<Neuron, SortedSet<Activation>> results = doc.getActivationsPerNeuron();
 
         SortedSet<Activation> nbActs = results.get(nb);
         Activation nbAct = nbActs.first();

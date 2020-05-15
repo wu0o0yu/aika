@@ -22,7 +22,7 @@ import network.aika.neuron.*;
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatorySynapse<I extends INeuron, O extends ExcitatoryNeuron> extends Synapse<I, O> {
+public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNeuron> extends Synapse<I, O> {
 
     protected boolean propagate;
 
@@ -30,7 +30,7 @@ public abstract class ExcitatorySynapse<I extends INeuron, O extends ExcitatoryN
         super();
     }
 
-    public ExcitatorySynapse(Neuron input, Neuron output) {
+    public ExcitatorySynapse(NeuronProvider input, NeuronProvider output) {
         super(input, output);
     }
 
@@ -38,14 +38,14 @@ public abstract class ExcitatorySynapse<I extends INeuron, O extends ExcitatoryN
         return propagate;
     }
 
-    protected void addLinkInternal(INeuron in, INeuron out) {
+    protected void addLinkInternal(Neuron in, Neuron out) {
         out.addInputSynapse(this);
         if(isPropagate()) {
             in.addOutputSynapse(this);
         }
     }
 
-    protected void removeLinkInternal(INeuron in, INeuron out) {
+    protected void removeLinkInternal(Neuron in, Neuron out) {
         out.removeInputSynapse(this);
         if(isPropagate()) {
             in.removeOutputSynapse(this);

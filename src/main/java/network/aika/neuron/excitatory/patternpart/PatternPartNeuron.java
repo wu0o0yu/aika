@@ -38,7 +38,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     public static byte type;
 
-    public PatternPartNeuron(Neuron p) {
+    public PatternPartNeuron(NeuronProvider p) {
         super(p);
     }
 
@@ -93,8 +93,8 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     public double getCost(Sign s) {
-        INeuron primaryInput = getPrimaryInput();
-        INeuron patternInput = getPatternInput();
+        Neuron primaryInput = getPrimaryInput();
+        Neuron patternInput = getPatternInput();
 
         double fz = primaryInput.frequency;
         double Nz = primaryInput.getN();
@@ -114,7 +114,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         }
     }
 
-    private Synapse<INeuron, INeuron> getPatternSynapse(PatternScope ps) {
+    private Synapse<Neuron, Neuron> getPatternSynapse(PatternScope ps) {
         return inputSynapses
                 .values()
                 .stream()
@@ -124,11 +124,11 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
                 .orElse(null);
     }
 
-    public INeuron getPrimaryInput() {
+    public Neuron getPrimaryInput() {
         return getPatternSynapse(INPUT_PATTERN).getInput();
     }
 
-    public INeuron getPatternInput() {
+    public Neuron getPatternInput() {
         return getPatternSynapse(SAME_PATTERN).getInput();
     }
 

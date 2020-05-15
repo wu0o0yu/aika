@@ -45,7 +45,7 @@ public class Activation implements Comparable<Activation> {
     public double rangeCoverage;
 
     private int id;
-    private INeuron<?> neuron;
+    private Neuron<?> neuron;
     private Thought thought;
 
     private double p = 1.0;
@@ -68,7 +68,7 @@ public class Activation implements Comparable<Activation> {
 
     private Reference groundRef;
 
-    public Activation(int id, Thought thought, INeuron<?> n) {
+    public Activation(int id, Thought thought, Neuron<?> n) {
         this.id = id;
         this.thought = thought;
         this.neuron = n;
@@ -85,7 +85,7 @@ public class Activation implements Comparable<Activation> {
 
         inputLinks = new TreeMap<>(INPUT_COMP);
         outputLinks = new TreeMap<>(Comparator
-                .<Activation, Neuron>comparing(act -> act.getNeuron())
+                .<Activation, NeuronProvider>comparing(act -> act.getNeuron())
                 .thenComparing(act -> act)
         );
     }
@@ -142,15 +142,15 @@ public class Activation implements Comparable<Activation> {
         return lastRound;
     }
 
-    public <N extends INeuron> N getINeuron() {
+    public <N extends Neuron> N getINeuron() {
         return (N) neuron;
     }
 
-    public Neuron getNeuron() {
+    public NeuronProvider getNeuron() {
         return neuron.getProvider();
     }
 
-    public Stream<Link> getOutputLinks(Neuron n, PatternScope ps) {
+    public Stream<Link> getOutputLinks(NeuronProvider n, PatternScope ps) {
         return outputLinks
                 .values()
                 .stream()
@@ -424,7 +424,7 @@ public class Activation implements Comparable<Activation> {
         public Builder addInputLink(PatternScope ps, Activation iAct) {
             InputKey ik = new InputKey() {
                 @Override
-                public Neuron getPInput() {
+                public NeuronProvider getPInput() {
                     return iAct.getNeuron();
                 }
 

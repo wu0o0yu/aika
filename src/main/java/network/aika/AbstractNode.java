@@ -16,7 +16,7 @@
  */
 package network.aika;
 
-import network.aika.neuron.Neuron;
+import network.aika.neuron.NeuronProvider;
 
 import java.io.DataInput;
 
@@ -45,6 +45,6 @@ public abstract class AbstractNode<P extends Provider<? extends AbstractNode>> i
     public void reactivate() {}
 
     public static <P extends Provider> AbstractNode read(DataInput in, P p) throws Exception {
-        return p.getModel().readNeuron(in, (Neuron) p);
+        return p.getModel().readNeuron(in, (NeuronProvider) p);
     }
 }

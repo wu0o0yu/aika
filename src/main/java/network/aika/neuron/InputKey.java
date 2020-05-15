@@ -5,24 +5,24 @@ import java.util.Comparator;
 public interface InputKey {
 
     Comparator<InputKey> INPUT_COMP = Comparator
-            .<InputKey, Neuron>comparing(s -> s.getPInput())
+            .<InputKey, NeuronProvider>comparing(s -> s.getPInput())
             .thenComparing(s -> s.getPatternScope());
 
-    Neuron getPInput();
+    NeuronProvider getPInput();
 
     PatternScope getPatternScope();
 
     class PureInputKey implements InputKey {
-        private Neuron input;
+        private NeuronProvider input;
         private PatternScope ps;
 
-        public PureInputKey(Neuron input, PatternScope ps) {
+        public PureInputKey(NeuronProvider input, PatternScope ps) {
             this.input = input;
             this.ps = ps;
         }
 
         @Override
-        public Neuron getPInput() {
+        public NeuronProvider getPInput() {
             return input;
         }
 

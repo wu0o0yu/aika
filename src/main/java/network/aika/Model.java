@@ -17,8 +17,8 @@
 package network.aika;
 
 
-import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.NeuronProvider;
 import network.aika.Provider.SuspensionMode;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
@@ -119,9 +119,9 @@ public class Model {
         this.suspensionHook = suspensionHook;
     }
 
-    public INeuron readNeuron(DataInput in, Neuron p) throws Exception {
-        Constructor c = typeRegistry.get(in.readByte()).getDeclaredConstructor(Neuron.class);
-        INeuron n = (INeuron) c.newInstance(p);
+    public Neuron readNeuron(DataInput in, NeuronProvider p) throws Exception {
+        Constructor c = typeRegistry.get(in.readByte()).getDeclaredConstructor(NeuronProvider.class);
+        Neuron n = (Neuron) c.newInstance(p);
         n.readFields(in, this);
         return n;
     }
@@ -144,28 +144,28 @@ public class Model {
         return N;
     }
 
-    public Collection<Neuron> getActiveNeurons() {
-        List<Neuron> tmp = new ArrayList<>();
+    public Collection<NeuronProvider> getActiveNeurons() {
+        List<NeuronProvider> tmp = new ArrayList<>();
         for(Provider<?> p: activeProviders.values()) {
-            if(p instanceof Neuron) {
-                tmp.add((Neuron) p);
+            if(p instanceof NeuronProvider) {
+                tmp.add((NeuronProvider) p);
             }
         }
 
         return tmp;
     }
 
-    public Neuron lookupNeuron(int id) {
+    public NeuronProvider lookupNeuron(int id) {
         synchronized (providers) {
             WeakReference<Provider<? extends AbstractNode>> wr = providers.get(id);
             if(wr != null) {
-                Neuron n = (Neuron) wr.get();
+                NeuronProvider n = (NeuronProvider) wr.get();
                 if (n != null) {
                     return n;
                 }
             }
 
-            return new Neuron(this, id);
+            return new NeuronProvider(this, id);
         }
     }
 
@@ -200,8 +200,8 @@ public class Model {
     }
 
     public void dumpStat() {
-        for(Neuron n: getActiveNeurons()) {
-            INeuron tn = n.get();
+        for(NeuronProvider n: getActiveNeurons()) {
+            Neuron tn = n.get();
             tn.dumpStat();
         }
         System.out.println();

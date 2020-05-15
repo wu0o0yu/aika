@@ -1,12 +1,12 @@
 package network.aika.neuron.excitatory.patternpart;
 
-import network.aika.neuron.Neuron;
+import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.INeuron;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 
-public class PatternPartSynapse<I extends INeuron> extends ExcitatorySynapse<I, PatternPartNeuron> {
+public class PatternPartSynapse<I extends Neuron> extends ExcitatorySynapse<I, PatternPartNeuron> {
 
     public static byte type;
 
@@ -17,7 +17,7 @@ public class PatternPartSynapse<I extends INeuron> extends ExcitatorySynapse<I, 
     public PatternPartSynapse() {
     }
 
-    public PatternPartSynapse(Neuron input, Neuron output, PatternScope patternScope, boolean isRecurrent, boolean isNegative, boolean propagate) {
+    public PatternPartSynapse(NeuronProvider input, NeuronProvider output, PatternScope patternScope, boolean isRecurrent, boolean isNegative, boolean propagate) {
         super(input, output);
         this.patternScope = patternScope;
         this.isRecurrent = isRecurrent;
@@ -81,7 +81,7 @@ public class PatternPartSynapse<I extends INeuron> extends ExcitatorySynapse<I, 
             return this;
         }
 
-        public Synapse getSynapse(Neuron outputNeuron) {
+        public Synapse getSynapse(NeuronProvider outputNeuron) {
             return new PatternPartSynapse(inputNeuron, outputNeuron, patternScope, isRecurrent, isNegative, propagate);
         }
     }

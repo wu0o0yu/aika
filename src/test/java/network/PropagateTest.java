@@ -18,7 +18,7 @@ package network;
 
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.neuron.Neuron;
+import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
@@ -40,7 +40,7 @@ public class PropagateTest {
         PatternNeuron in = new PatternNeuron(m, "IN", true);
         PatternPartNeuron na = new PatternPartNeuron(m, "A", false);
 
-        Neuron.init(na, 1.0,
+        NeuronProvider.init(na, 1.0,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)

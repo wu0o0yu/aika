@@ -1,7 +1,7 @@
 package network.aika.neuron.excitatory.pattern;
 
 import network.aika.Model;
-import network.aika.neuron.Neuron;
+import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
@@ -20,7 +20,7 @@ public class PatternSynapse extends ExcitatorySynapse<PatternPartNeuron, Pattern
     public PatternSynapse() {
     }
 
-    public PatternSynapse(Neuron input, Neuron output, boolean propagate) {
+    public PatternSynapse(NeuronProvider input, NeuronProvider output, boolean propagate) {
         super(input, output);
         this.propagate = propagate;
     }
@@ -66,7 +66,7 @@ public class PatternSynapse extends ExcitatorySynapse<PatternPartNeuron, Pattern
 
     public static class Builder extends Synapse.Builder {
 
-        public Synapse getSynapse(Neuron outputNeuron) {
+        public Synapse getSynapse(NeuronProvider outputNeuron) {
             return new PatternSynapse(inputNeuron, outputNeuron, propagate);
         }
     }

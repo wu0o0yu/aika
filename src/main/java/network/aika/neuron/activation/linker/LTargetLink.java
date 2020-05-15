@@ -16,8 +16,8 @@
  */
 package network.aika.neuron.activation.linker;
 
-import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -53,12 +53,12 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
     }
 
     private void followClosedLoop(Activation iAct, Activation oAct) {
-        INeuron<?> in = iAct.getINeuron();
+        Neuron<?> in = iAct.getINeuron();
         if(iAct.outputLinkExists(oAct)) {
             return;
         }
 
-        Neuron on = oAct.getNeuron();
+        NeuronProvider on = oAct.getNeuron();
         Synapse s = in.getOutputSynapse(on, patternScope);
 
         if(s == null) {
@@ -71,7 +71,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
 
     private void followOpenEnd(Activation iAct, LNode to, Activation startAct) {
         Activation oAct;
-        INeuron<?> in = iAct.getINeuron();
+        Neuron<?> in = iAct.getINeuron();
         if(iAct.getThought().getPhase() != INDUCTION) {
             in.getOutputSynapses()
                     .filter(s -> checkSynapse(s))
@@ -105,7 +105,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
         return null;
     }
 
-    private Synapse createSynapse(Neuron in, Neuron on) {
+    private Synapse createSynapse(NeuronProvider in, NeuronProvider on) {
         try {
             Synapse s = synapseClass.getConstructor().newInstance();
             s.init(patternScope, isRecurrent, isNegative, isPropagate);

@@ -16,7 +16,7 @@
  */
 package network.aika.neuron.activation.linker;
 
-import network.aika.neuron.INeuron;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -58,7 +58,7 @@ public class LMatchingLink<S extends Synapse> extends LLink<S> {
         LNode to = getTo(from);
         Direction dir = getDirection(from);
 
-        INeuron n = l.getSynapse().getNeuron(dir);
+        Neuron n = l.getSynapse().getNeuron(dir);
         Activation act = l.getActivation(dir);
         to.follow(n, act, this, startAct);
     }

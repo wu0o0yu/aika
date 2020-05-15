@@ -18,7 +18,7 @@ package network.aika.neuron.inhibitory;
 
 
 import network.aika.Model;
-import network.aika.neuron.Neuron;
+import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 
@@ -33,7 +33,7 @@ public class PatternPartInhibitoryNeuron extends InhibitoryNeuron {
 
     public static byte type;
 
-    public PatternPartInhibitoryNeuron(Neuron p) {
+    public PatternPartInhibitoryNeuron(NeuronProvider p) {
         super(p);
     }
 

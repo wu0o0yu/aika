@@ -40,7 +40,7 @@ import static network.aika.neuron.activation.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatoryNeuron<S extends Synapse> extends INeuron<S> {
+public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
 
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
 
@@ -53,7 +53,7 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends INeuron<S> {
         super();
     }
 
-    public ExcitatoryNeuron(Neuron p) {
+    public ExcitatoryNeuron(NeuronProvider p) {
         super(p);
     }
 
@@ -118,7 +118,7 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends INeuron<S> {
     public void reactivate() {
     }
 
-    public Synapse getInputSynapse(Neuron n, PatternScope ps) {
+    public Synapse getInputSynapse(NeuronProvider n, PatternScope ps) {
         lock.acquireReadLock();
         Synapse s = inputSynapses.get(new PureInputKey(n, ps));
         lock.releaseReadLock();

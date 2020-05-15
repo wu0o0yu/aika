@@ -24,7 +24,7 @@ import static network.aika.neuron.PatternScope.SAME_PATTERN;
  *
  * @author Lukas Molzberger
  */
-public class InhibitorySynapse extends Synapse<INeuron, InhibitoryNeuron> {
+public class InhibitorySynapse extends Synapse<Neuron, InhibitoryNeuron> {
 
     public static byte type;
 
@@ -32,7 +32,7 @@ public class InhibitorySynapse extends Synapse<INeuron, InhibitoryNeuron> {
         super();
     }
 
-    public InhibitorySynapse(Neuron input, Neuron output) {
+    public InhibitorySynapse(NeuronProvider input, NeuronProvider output) {
         super(input, output);
     }
 
@@ -66,17 +66,17 @@ public class InhibitorySynapse extends Synapse<INeuron, InhibitoryNeuron> {
         return true;
     }
 
-    protected void addLinkInternal(INeuron in, INeuron out) {
+    protected void addLinkInternal(Neuron in, Neuron out) {
         in.addOutputSynapse(this);
     }
 
-    protected void removeLinkInternal(INeuron in, INeuron out) {
+    protected void removeLinkInternal(Neuron in, Neuron out) {
         in.removeOutputSynapse(this);
     }
 
     public static class Builder extends Synapse.Builder {
         @Override
-        public Synapse getSynapse(Neuron outputNeuron) {
+        public Synapse getSynapse(NeuronProvider outputNeuron) {
             return new InhibitorySynapse(inputNeuron, outputNeuron);
         }
     }

@@ -18,12 +18,12 @@ package network.aika.neuron.inhibitory;
 
 import network.aika.ActivationFunction;
 import network.aika.Model;
-import network.aika.neuron.Neuron;
+import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
-import network.aika.neuron.INeuron;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Link;
 
 import java.util.Collection;
@@ -35,13 +35,13 @@ import static network.aika.neuron.activation.linker.LinkGraphs.inhibitoryLinkT;
  *
  * @author Lukas Molzberger
  */
-public abstract class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
+public abstract class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     protected InhibitoryNeuron() {
         super();
     }
 
-    public InhibitoryNeuron(Neuron p) {
+    public InhibitoryNeuron(NeuronProvider p) {
         super(p);
     }
 
@@ -50,7 +50,7 @@ public abstract class InhibitoryNeuron extends INeuron<InhibitorySynapse> {
     }
 
     @Override
-    public Synapse getInputSynapse(Neuron n, PatternScope ps) {
+    public Synapse getInputSynapse(NeuronProvider n, PatternScope ps) {
         throw new UnsupportedOperationException();
     }
 

@@ -17,9 +17,7 @@
 package network.aika.neuron.inhibitory;
 
 import network.aika.Model;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.PatternScope;
-import network.aika.neuron.Synapse;
+import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 
@@ -31,7 +29,7 @@ public class PatternInhibitoryNeuron extends InhibitoryNeuron {
 
     public static byte type;
 
-    public PatternInhibitoryNeuron(Neuron p) {
+    public PatternInhibitoryNeuron(NeuronProvider p) {
         super(p);
     }
 

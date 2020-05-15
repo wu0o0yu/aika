@@ -16,9 +16,8 @@
  */
 package network.aika.neuron.excitatory.pattern;
 
-import network.aika.Config;
 import network.aika.Model;
-import network.aika.neuron.Neuron;
+import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -46,7 +45,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     public static byte type;
 
-    public PatternNeuron(Neuron p) {
+    public PatternNeuron(NeuronProvider p) {
         super(p);
     }
 

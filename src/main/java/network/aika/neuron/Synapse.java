@@ -32,14 +32,14 @@ import static network.aika.neuron.Synapse.State.CURRENT;
  *
  * @author Lukas Molzberger
  */
-public abstract class Synapse<I extends INeuron, O extends INeuron> implements Writable, InputKey, OutputKey {
+public abstract class Synapse<I extends Neuron, O extends Neuron> implements Writable, InputKey, OutputKey {
 
     public static double TOLERANCE = 0.0000001;
 
     public static Comparator<Synapse> INPUT_COMPARATOR = Comparator.comparing(s -> s.getInput());
 
-    protected Neuron input;
-    protected Neuron output;
+    protected NeuronProvider input;
+    protected NeuronProvider output;
 
     private double weight;
     private double weightDelta;
@@ -47,16 +47,16 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     public Synapse() {
     }
 
-    public Synapse(Neuron input, Neuron output) {
+    public Synapse(NeuronProvider input, NeuronProvider output) {
         this.input = input;
         this.output = output;
     }
 
-    public void setInput(Neuron input) {
+    public void setInput(NeuronProvider input) {
         this.input = input;
     }
 
-    public void setOutput(Neuron output) {
+    public void setOutput(NeuronProvider output) {
         this.output = output;
     }
 
@@ -72,15 +72,15 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
 
     public abstract PatternScope getPatternScope();
 
-    protected abstract void addLinkInternal(INeuron in, INeuron out);
+    protected abstract void addLinkInternal(Neuron in, Neuron out);
 
-    protected abstract void removeLinkInternal(INeuron in, INeuron out);
+    protected abstract void removeLinkInternal(Neuron in, Neuron out);
 
-    public Neuron getPInput() {
+    public NeuronProvider getPInput() {
         return input;
     }
 
-    public Neuron getPOutput() {
+    public NeuronProvider getPOutput() {
         return output;
     }
 
@@ -92,7 +92,7 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         return (O) output.get();
     }
 
-    public INeuron getNeuron(Direction dir) {
+    public Neuron getNeuron(Direction dir) {
         switch(dir) {
             case INPUT:
                 return getInput();
@@ -120,8 +120,8 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     }
 
     public void link() {
-        INeuron in = input.get();
-        INeuron out = output.get();
+        Neuron in = input.get();
+        Neuron out = output.get();
 
         boolean dir = in.getId() < out.getId();
 
@@ -135,8 +135,8 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
     }
 
     public void unlink() {
-        INeuron in = input.get();
-        INeuron out = output.get();
+        Neuron in = input.get();
+        Neuron out = output.get();
 
         boolean dir = input.getId() < out.getId();
 
@@ -213,7 +213,7 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
      */
     public static abstract class Builder {
 
-        protected Neuron inputNeuron;
+        protected NeuronProvider inputNeuron;
         protected double weight;
         protected boolean propagate;
 
@@ -223,7 +223,7 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
          * @param inputNeuron
          * @return
          */
-        public Builder setNeuron(Neuron inputNeuron) {
+        public Builder setNeuron(NeuronProvider inputNeuron) {
             assert inputNeuron != null;
             this.inputNeuron = inputNeuron;
             return this;
@@ -235,7 +235,7 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
          * @param neuron
          * @return
          */
-        public Builder setNeuron(INeuron<?> neuron) {
+        public Builder setNeuron(Neuron<?> neuron) {
             assert neuron != null;
             this.inputNeuron = neuron.getProvider();
             return this;
@@ -257,6 +257,6 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
             return this;
         }
 
-        public abstract Synapse getSynapse(Neuron outputNeuron);
+        public abstract Synapse getSynapse(NeuronProvider outputNeuron);
     }
 }
