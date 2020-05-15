@@ -40,7 +40,7 @@ public class PropagateTest {
         PatternNeuron in = new PatternNeuron(m, "IN", true);
         PatternPartNeuron na = new PatternPartNeuron(m, "A", false);
 
-        Neuron.init(na.getProvider(), 1.0,
+        Neuron.init(na, 1.0,
                 new PatternPartSynapse.Builder()
                         .setPatternScope(INPUT_PATTERN)
                         .setRecurrent(false)

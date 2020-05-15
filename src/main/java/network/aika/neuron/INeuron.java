@@ -74,6 +74,23 @@ public abstract class INeuron<S extends Synapse> extends AbstractNode<Neuron> im
         setModified();
     }
 
+    public void init(Thought t, Double bias, Collection<Synapse.Builder> synapseBuilders) {
+        if(bias != null) {
+            setBias(bias);
+        }
+
+        ArrayList<Synapse> modifiedSynapses = new ArrayList<>();
+        synapseBuilders.forEach(input -> {
+            Synapse s = input.getSynapse(getProvider());
+            s.link();
+            s.update(t, input.weight);
+            modifiedSynapses.add(s);
+        });
+
+        modifiedSynapses.forEach(s -> s.link());
+        commit(modifiedSynapses);
+    }
+
     public abstract ActivationFunction getActivationFunction();
 
     public abstract Fired incrementFired(Fired f);

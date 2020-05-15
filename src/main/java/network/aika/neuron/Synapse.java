@@ -175,11 +175,11 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
         }
     }
 
-    public void update(Thought doc, double weight) {
+    public void update(Thought t, double weight) {
         this.weightDelta = weight - this.weight;
 
-        if(doc != null) {
-            doc.notifyWeightModified(this);
+        if(t != null) {
+            t.notifyWeightModified(this);
         }
     }
 
@@ -211,7 +211,7 @@ public abstract class Synapse<I extends INeuron, O extends INeuron> implements W
      *
      * @author Lukas Molzberger
      */
-    public static abstract class Builder implements Neuron.Builder {
+    public static abstract class Builder {
 
         protected Neuron inputNeuron;
         protected double weight;

@@ -18,6 +18,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.Synapse.Builder;
 
 import java.util.*;
 
@@ -47,79 +48,24 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
     /**
      * Propagate an input activation into the network.
      *
-     * @param doc   The current document
+     * @param t   The current document
      * @param inputAct
      */
-    public Activation addInput(Thought doc, Activation.Builder inputAct) {
-        return get().addInputActivation(doc, inputAct);
-    }
-
-    public static Neuron init(Neuron n, Builder... inputs) {
-        return init(null, n, inputs);
-    }
-
-    public static Neuron init(Thought doc, Neuron n, Builder... inputs) {
-        n.init(doc, null, getSynapseBuilders(inputs));
-        return n;
-    }
-
-    /**
-     * Creates a neuron with the given bias.
-     *
-     * @param n
-     * @param bias
-     * @param inputs
-     * @return
-     */
-    public static Neuron init(Neuron n, double bias, Builder... inputs) {
-        return init(n, bias, getSynapseBuilders(inputs));
+    public Activation propagateInput(Thought t, Activation.Builder inputAct) {
+        return get().addInputActivation(t, inputAct);
     }
 
     public static Neuron init(INeuron<?> n, double bias, Builder... inputs) {
-        return init(n.getProvider(), bias, inputs);
+        return init(null, n, bias, inputs);
     }
 
-    /**
-     * Creates a neuron with the given bias.
-     *
-     * @param n
-     * @param bias
-     * @param inputs
-     * @return
-     */
-    public static Neuron init(Thought doc, Neuron n, double bias, Builder... inputs) {
-        return init(doc, n, bias, getSynapseBuilders(inputs));
+    public static Neuron init(Thought t, INeuron<?> n, double bias, Builder... inputs) {
+        n.init(t, bias, Arrays.asList(inputs));
+        return n.getProvider();
     }
 
-    public static Neuron init(Neuron n, double bias, Collection<Synapse.Builder> inputs) {
-        n.init((Thought) null, bias, getSynapseBuilders(inputs));
-        return n;
-    }
-
-    public static Neuron init(Thought doc, Neuron n, double bias, Collection<Synapse.Builder> inputs) {
-        n.init(doc, bias, getSynapseBuilders(inputs));
-        return n;
-    }
-
-    private void init(Thought doc, Double bias, Collection<Synapse.Builder> synapseBuilders) {
-        INeuron n = get();
-
-        if(bias != null) {
-            n.setBias(bias);
-        }
-
-        ArrayList<Synapse> modifiedSynapses = new ArrayList<>();
-        // s.link requires an updated n.biasSumDelta value.
-        synapseBuilders.forEach(input -> {
-            Synapse s = input.getSynapse(this);
-            s.link();
-            s.update(doc, input.weight);
-            modifiedSynapses.add(s);
-        });
-
-        modifiedSynapses.forEach(s -> s.link());
-
-        n.commit(modifiedSynapses);
+    public static Neuron init(Thought t, Neuron n, double bias, Builder... inputs) {
+        return init(t, n, bias, inputs);
     }
 
     public String toString() {
@@ -127,28 +73,5 @@ public class Neuron extends Provider<INeuron<? extends Synapse>> {
         if(this == MAX_NEURON) return "MAX_NEURON";
 
         return super.toString();
-    }
-
-    private static Collection<Synapse.Builder> getSynapseBuilders(Collection<Synapse.Builder> builders) {
-        ArrayList<Synapse.Builder> result = new ArrayList<>();
-        for(Builder b: builders) {
-            if(b instanceof Synapse.Builder) {
-                result.add((Synapse.Builder) b);
-            }
-        }
-        return result;
-    }
-
-    private static Collection<Synapse.Builder> getSynapseBuilders(Builder... builders) {
-        ArrayList<Synapse.Builder> result = new ArrayList<>();
-        for(Builder b: builders) {
-            if(b instanceof Synapse.Builder) {
-                result.add((Synapse.Builder) b);
-            }
-        }
-        return result;
-    }
-
-    public interface Builder {
     }
 }
