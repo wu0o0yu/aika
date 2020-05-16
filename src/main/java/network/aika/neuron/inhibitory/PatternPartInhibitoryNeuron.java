@@ -18,6 +18,7 @@ package network.aika.neuron.inhibitory;
 
 
 import network.aika.Model;
+import network.aika.Phase;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
@@ -51,8 +52,10 @@ public class PatternPartInhibitoryNeuron extends InhibitoryNeuron {
     }
 
     @Override
-    public void induceStructure(Activation act) {
-        inducePPInhibInputSynapse.follow(act, INPUT, true);
+    public void link(Activation act) {
+        if (act.getThought().getPhase() == Phase.INDUCTION) {
+            inducePPInhibInputSynapse.follow(act, INPUT);
+        }
     }
 
     public String typeToString() {

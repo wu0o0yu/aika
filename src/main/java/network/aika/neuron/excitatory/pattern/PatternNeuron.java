@@ -17,12 +17,12 @@
 package network.aika.neuron.excitatory.pattern;
 
 import network.aika.Model;
+import network.aika.Phase;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.linker.*;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 
 import static network.aika.neuron.activation.Direction.OUTPUT;
-import static network.aika.neuron.activation.linker.LinkGraphs.inducePPInhibitoryNeuron;
-import static network.aika.neuron.activation.linker.LinkGraphs.inducePatternPart;
+import static network.aika.neuron.activation.linker.LinkGraphs.*;
 
 /**
  *
@@ -77,21 +76,17 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     @Override
-    public void linkForwards(Activation act) {
-        super.linkForwards(act);
+    public void link(Activation act) {
+        super.link(act);
+
+        if(act.getThought().getPhase() == Phase.INDUCTION) {
+            inducePatternPart.follow(act, OUTPUT);
+            inducePPInhibitoryNeuron.follow(act, OUTPUT);
+        }
     }
 
     @Override
-    public void linkBackwards(Link l) {
-        LinkGraphs.patternInputLinkI.followBackwards(l);
-    }
-
-    @Override
-    public void linkPosRecSynapses(Activation act) {
-    }
-
-    public void induceStructure(Activation act) {
-        inducePatternPart.follow(act, OUTPUT, false);
-        inducePPInhibitoryNeuron.follow(act, OUTPUT, false);
+    public void link(Link l) {
+        patternInputLinkI.followBackwards(l);
     }
 }

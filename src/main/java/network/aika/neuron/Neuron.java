@@ -185,15 +185,13 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
     public abstract double propagateRangeCoverage(Activation iAct);
 
-    public void linkForwards(Activation act) {
-        propagateT.follow(act, OUTPUT, false);
+    public void link(Activation act) {
+        if(act.getThought().getPhase() == Phase.PRELIMINARY_LINKING) {
+            propagateT.follow(act, OUTPUT);
+        }
     }
 
-    public abstract void linkBackwards(Link l);
-
-    public abstract void linkPosRecSynapses(Activation act);
-
-    public abstract void induceStructure(Activation act);
+    public abstract void link(Link l);
 
     public ReadWriteLock getLock() {
         return lock;
@@ -219,7 +217,7 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
     }
 
     public void train(Activation act) {
-        induceStructure(act);
+        link(act);
         act.getThought().processLinks();
     }
 

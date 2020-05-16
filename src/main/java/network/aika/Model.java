@@ -51,16 +51,16 @@ public class Model {
     private static Map<Byte, Class> typeRegistry = new HashMap<>();
 
     static {
-        register(PatternNeuron.class);
-        register(PatternSynapse.class);
+        registerType(PatternNeuron.class);
+        registerType(PatternSynapse.class);
 
-        register(PatternPartNeuron.class);
-        register(PatternPartSynapse.class);
+        registerType(PatternPartNeuron.class);
+        registerType(PatternPartSynapse.class);
 
-        register(PatternInhibitoryNeuron.class);
-        register(PatternPartInhibitoryNeuron.class);
-        register(InhibitorySynapse.class);
-        register(PrimaryInhibitorySynapse.class);
+        registerType(PatternInhibitoryNeuron.class);
+        registerType(PatternPartInhibitoryNeuron.class);
+        registerType(InhibitorySynapse.class);
+        registerType(PrimaryInhibitorySynapse.class);
     }
 
     private Config trainingConfig = new Config();
@@ -80,6 +80,21 @@ public class Model {
         suspensionHook = sh;
     }
 
+    public enum Element {
+        NODE,
+        LINK
+    }
+
+    private static class LinkingKey {
+        Phase phase;
+        Element element;
+
+        LinkingKey(Phase p, Element e) {
+            phase = p;
+            element = e;
+        }
+    }
+
     public long createNeuronId() {
         return suspensionHook != null ? suspensionHook.createId() : currentNeuronId.addAndGet(1);
     }
@@ -96,7 +111,7 @@ public class Model {
         }
     }
 
-    private static void register(Class clazz) {
+    private static void registerType(Class clazz) {
         byte type = (byte) typeRegistry.size();
         typeRegistry.put(type, clazz);
         try {

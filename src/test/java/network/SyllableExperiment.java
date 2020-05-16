@@ -101,13 +101,14 @@ public class SyllableExperiment {
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.charAt(i);
 
-            Activation currentAct = lookupChar(c).propagate(doc,
-                    new Activation.Builder()
-                            .setInputTimestamp(i)
-                            .setFired(0)
-                            .setValue(1.0)
-                            .setRangeCoverage(1.0)
-            );
+            Activation currentAct = lookupChar(c)
+                    .propagate(doc,
+                            new Activation.Builder()
+                                    .setInputTimestamp(i)
+                                    .setFired(0)
+                                    .setValue(1.0)
+                                    .setRangeCoverage(1.0)
+                    );
 
             Activation currentInInhibAct = currentAct.getOutputLinks(inputInhibN.getProvider(), SAME_PATTERN)
                     .findAny()

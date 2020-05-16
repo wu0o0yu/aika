@@ -55,7 +55,7 @@ public abstract class Thought {
                 .stream()
                 .filter(act -> act.assumePosRecLinks())
                 .forEach(act ->
-                        act.getNeuron().linkPosRecSynapses(act)
+                        act.getNeuron().link(act)
                 );
 
         processLinks();
@@ -68,6 +68,7 @@ public abstract class Thought {
                 .forEach(act -> act.computeP());
 
         processActivations();
+        phase = null;
     }
 
     public void add(Activation act) {
@@ -159,6 +160,8 @@ public abstract class Thought {
 //        process();
 
         m.addToN(length());
+
+        phase = null;
     }
 
     public String activationsToString() {

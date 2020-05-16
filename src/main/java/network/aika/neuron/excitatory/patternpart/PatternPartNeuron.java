@@ -17,6 +17,7 @@
 package network.aika.neuron.excitatory.patternpart;
 
 import network.aika.Model;
+import network.aika.Phase;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
@@ -65,31 +66,29 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     @Override
-    public void linkForwards(Activation act) {
-        super.linkForwards(act);
+    public void link(Activation act) {
+        super.link(act);
 
-        sameInputLinkT.follow(act, OUTPUT, true);
-        relatedInputLinkT.follow(act, OUTPUT, true);
-        patternInputLinkT.follow(act, OUTPUT, true);
+        if (act.getThought().getPhase() == Phase.PRELIMINARY_LINKING) {
+            sameInputLinkT.follow(act, OUTPUT);
+            relatedInputLinkT.follow(act, OUTPUT);
+            patternInputLinkT.follow(act, OUTPUT);
+        } else if (act.getThought().getPhase() == Phase.FINAL_LINKING) {
+            posRecLinkT.follow(act, INPUT);
+        } else if (act.getThought().getPhase() == Phase.INDUCTION) {
+            sameInputLinkT.follow(act, INPUT);
+            relatedInputLinkT.follow(act, INPUT);
+            inducePPInhibInputSynapse.follow(act, OUTPUT);
+        }
     }
 
     @Override
-    public void linkBackwards(Link l) {
-        sameInputLinkI.followBackwards(l);
-        relatedInputLinkI.followBackwards(l);
-        inhibitoryLinkI.followBackwards(l);
-    }
-
-    @Override
-    public void linkPosRecSynapses(Activation act) {
-        posRecLinkT.follow(act, INPUT, true);
-    }
-
-    @Override
-    public void induceStructure(Activation act) {
-        sameInputLinkT.follow(act, INPUT, true);
-        relatedInputLinkT.follow(act, INPUT, true);
-        inducePPInhibInputSynapse.follow(act, OUTPUT, true);
+    public void link(Link l) {
+        if (l.getInput().getThought().getPhase() == Phase.PRELIMINARY_LINKING) {
+            sameInputLinkI.followBackwards(l);
+            relatedInputLinkI.followBackwards(l);
+            inhibitoryLinkI.followBackwards(l);
+        }
     }
 
     public double getCost(Sign s) {
@@ -131,5 +130,4 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     public Neuron getPatternInput() {
         return getPatternSynapse(SAME_PATTERN).getInput();
     }
-
 }

@@ -18,6 +18,7 @@ package network.aika.neuron.inhibitory;
 
 import network.aika.ActivationFunction;
 import network.aika.Model;
+import network.aika.Phase;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
@@ -59,20 +60,17 @@ public abstract class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     @Override
-    public void linkForwards(Activation act) {
-        super.linkForwards(act);
+    public void link(Activation act) {
+        super.link(act);
 
-        inhibitoryLinkT.follow(act, OUTPUT, true);
+        if (act.getThought().getPhase() == Phase.PRELIMINARY_LINKING) {
+            inhibitoryLinkT.follow(act, OUTPUT);
+        }
     }
 
     @Override
-    public void linkBackwards(Link l) {
+    public void link(Link l) {
         // Nothing to do!
-    }
-
-    @Override
-    public void linkPosRecSynapses(Activation act) {
-
     }
 
     @Override
@@ -115,9 +113,7 @@ public abstract class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     public void commit(Collection<? extends Synapse> modifiedSynapses) {
         commitBias();
-
         modifiedSynapses.forEach(s -> s.commit());
-
         setModified();
     }
 

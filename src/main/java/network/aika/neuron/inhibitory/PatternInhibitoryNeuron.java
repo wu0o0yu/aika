@@ -46,9 +46,6 @@ public class PatternInhibitoryNeuron extends InhibitoryNeuron {
         return PatternNeuron.type;
     }
 
-    @Override
-    public void induceStructure(Activation act) {
-    }
 
     public String typeToString() {
         return "P-INHIBITORY";

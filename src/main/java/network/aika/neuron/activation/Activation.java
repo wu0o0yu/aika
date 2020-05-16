@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.Model;
 import network.aika.Thought;
 import network.aika.Utils;
 import network.aika.neuron.*;
@@ -146,6 +147,10 @@ public class Activation implements Comparable<Activation> {
         return (N) neuron;
     }
 
+    public Model getModel() {
+        return neuron.getModel();
+    }
+
     public NeuronProvider getNeuronProvider() {
         return neuron.getProvider();
     }
@@ -251,7 +256,7 @@ public class Activation implements Comparable<Activation> {
             lastRound = null;
         }
 
-        getNeuron().linkForwards(this);
+        getNeuron().link(this);
         thought.processLinks();
     }
 
