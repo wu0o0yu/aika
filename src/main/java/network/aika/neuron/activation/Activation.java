@@ -68,11 +68,11 @@ public class Activation implements Comparable<Activation> {
 
     private Reference groundRef;
 
-    public Activation(int id, Thought thought, Neuron<?> n) {
+    public Activation(int id, Thought t, Neuron<?> n) {
         this.id = id;
-        this.thought = thought;
+        this.thought = t;
         this.neuron = n;
-        this.assumePosRecLinks = n.hasPositiveRecurrentSynapses() && thought.getPhase() == PRELIMINARY_LINKING;
+        this.assumePosRecLinks = n.hasPositiveRecurrentSynapses() && t.getPhase() == PRELIMINARY_LINKING;
         this.net = n.getTotalBias(this.assumePosRecLinks, CURRENT);
 
         thought.addActivation(this);

@@ -26,10 +26,10 @@ import network.aika.*;
  */
 public class NeuronProvider extends Provider<Neuron<? extends Synapse>> {
 
-    public static final NeuronProvider MIN_NEURON = new NeuronProvider(null, Integer.MIN_VALUE);
-    public static final NeuronProvider MAX_NEURON = new NeuronProvider(null, Integer.MAX_VALUE);
+    public static final NeuronProvider MIN_NEURON = new NeuronProvider(null, Long.MIN_VALUE);
+    public static final NeuronProvider MAX_NEURON = new NeuronProvider(null, Long.MAX_VALUE);
 
-    public NeuronProvider(Model m, int id) {
+    public NeuronProvider(Model m, long id) {
         super(m, id);
     }
 

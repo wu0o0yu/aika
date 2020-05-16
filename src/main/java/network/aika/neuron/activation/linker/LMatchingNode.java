@@ -38,8 +38,8 @@ public class LMatchingNode<N extends Neuron> extends LNode<N> {
         act.setLNode(this);
 
         links.stream()
-                .filter(nl -> nl != from)
-                .forEach(nl -> nl.follow(act, this, startAct));
+                .filter(l -> l != from)
+                .forEach(l -> l.follow(act, this, startAct));
 
         act.setLNode(null);
 

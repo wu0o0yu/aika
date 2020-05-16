@@ -36,8 +36,6 @@ public abstract class Synapse<I extends Neuron, O extends Neuron> implements Wri
 
     public static double TOLERANCE = 0.0000001;
 
-    public static Comparator<Synapse> INPUT_COMPARATOR = Comparator.comparing(s -> s.getInput());
-
     protected NeuronProvider input;
     protected NeuronProvider output;
 
@@ -163,16 +161,16 @@ public abstract class Synapse<I extends Neuron, O extends Neuron> implements Wri
     public void write(DataOutput out) throws IOException {
         out.writeByte(getType());
 
-        out.writeInt(input.getId());
-        out.writeInt(output.getId());
+        out.writeLong(input.getId());
+        out.writeLong(output.getId());
 
         out.writeDouble(weight);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-        input = m.lookupNeuron(in.readInt());
-        output = m.lookupNeuron(in.readInt());
+        input = m.lookupNeuron(in.readLong());
+        output = m.lookupNeuron(in.readLong());
 
         weight = in.readDouble();
     }

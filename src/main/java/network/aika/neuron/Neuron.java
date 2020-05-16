@@ -37,7 +37,7 @@ import static network.aika.neuron.activation.linker.LinkGraphs.propagateT;
  *
  * @author Lukas Molzberger
  */
-public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvider> implements Comparable<Neuron> {
+public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvider> {
 
     private static final Logger log = LoggerFactory.getLogger(Neuron.class);
 
@@ -126,7 +126,7 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
     public abstract byte getOuterType();
 
-    public Integer getId() {
+    public Long getId() {
         return provider.getId();
     }
 
@@ -197,11 +197,6 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
     public ReadWriteLock getLock() {
         return lock;
-    }
-
-    public int compareTo(Neuron n) {
-        if (this == n) return 0;
-        return Integer.compare(getId(), n.getId());
     }
 
     public abstract boolean isMature();

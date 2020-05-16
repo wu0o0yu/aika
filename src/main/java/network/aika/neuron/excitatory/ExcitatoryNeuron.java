@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 
+import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 import static network.aika.neuron.InputKey.INPUT_COMP;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
@@ -106,7 +107,8 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
                 .values()
                 .stream()
                 .filter(s -> !act.inputLinkExists(s))
-                .forEach(s -> new Link(s, null, act).link());
+                .map(s -> new Link(s, null, act))
+                .forEach(l -> l.link());
     }
 
     @Override
@@ -151,7 +153,7 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
     }
 
     public ActivationFunction getActivationFunction() {
-        return ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+        return RECTIFIED_HYPERBOLIC_TANGENT;
     }
 
     @Override
@@ -176,6 +178,9 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
     public void write(DataOutput out) throws IOException {
         super.write(out);
 
+        out.writeDouble(directConjunctiveBias);
+        out.writeDouble(recurrentConjunctiveBias);
+
         for (Synapse s : inputSynapses.values()) {
             if (s.getInput() != null) {
                 out.writeBoolean(true);
@@ -188,6 +193,9 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
     @Override
     public void readFields(DataInput in, Model m) throws Exception {
         super.readFields(in, m);
+
+        directConjunctiveBias = in.readDouble();
+        recurrentConjunctiveBias = in.readDouble();
 
         while (in.readBoolean()) {
             S syn = (S) m.readSynapse(in);

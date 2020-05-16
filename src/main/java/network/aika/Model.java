@@ -34,7 +34,8 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
 
 
 /**
@@ -62,13 +63,14 @@ public class Model {
         register(PrimaryInhibitorySynapse.class);
     }
 
+    private Config trainingConfig = new Config();
+
     private SuspensionHook suspensionHook;
-    private AtomicInteger currentNeuronId = new AtomicInteger(0);
+    private AtomicLong currentNeuronId = new AtomicLong(0);
 
     // Important: the id field needs to be referenced by the provider!
-    private WeakHashMap<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new WeakHashMap<>();
+    private WeakHashMap<Long, WeakReference<Provider<? extends AbstractNode>>> providers = new WeakHashMap<>();
 
-    private Config trainingConfig = new Config();
 
     public Model() {
         this(null);
@@ -78,8 +80,14 @@ public class Model {
         suspensionHook = sh;
     }
 
-    public int createNeuronId() {
+    public long createNeuronId() {
         return suspensionHook != null ? suspensionHook.createId() : currentNeuronId.addAndGet(1);
+    }
+
+    public Stream<NeuronProvider> getAllNeurons() {
+        return suspensionHook
+                .getAllNeuronIds()
+                .map(id -> lookupNeuron(id));
     }
 
     public void applyMovingAverage() {
@@ -143,7 +151,7 @@ public class Model {
         return N;
     }
 
-    public NeuronProvider lookupNeuron(int id) {
+    public NeuronProvider lookupNeuron(Long id) {
         synchronized (providers) {
             WeakReference<Provider<? extends AbstractNode>> wr = providers.get(id);
             if(wr != null) {
@@ -157,12 +165,6 @@ public class Model {
         }
     }
 
-    public void registerProvider(int id, Provider p) {
-        synchronized (providers) {
-            providers.put(id, new WeakReference<>(p));
-        }
-    }
-
     private boolean suspend(int docId, Provider<? extends AbstractNode> p, SuspensionMode sm) {
         AbstractNode an = p.getIfNotSuspended();
         if (an != null && an.lastUsedDocumentId < docId) {
@@ -172,9 +174,15 @@ public class Model {
         return false;
     }
 
+    public void registerProvider(Provider p) {
+        synchronized (providers) {
+            providers.put(p.getId(), new WeakReference<>(p));
+        }
+    }
+
     public void removeProvider(Provider p) {
         synchronized (providers) {
-            providers.remove(p.id);
+            providers.remove(p.getId());
         }
     }
 }

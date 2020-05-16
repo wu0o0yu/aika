@@ -17,6 +17,8 @@
 package network.aika;
 
 
+import java.util.stream.Stream;
+
 /**
  *
  * The suspension hook is used to suspend neurons to an external storage in order to reduce the memory footprint.
@@ -28,9 +30,11 @@ package network.aika;
  */
 public interface SuspensionHook {
 
-    int createId();
+    long createId();
 
-    void store(int id, byte[] data);
+    void store(long id, byte[] data);
 
-    byte[] retrieve(int id);
+    byte[] retrieve(long id);
+
+    Stream<Long> getAllNeuronIds();
 }

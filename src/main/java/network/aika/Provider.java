@@ -26,8 +26,8 @@ import java.util.zip.GZIPOutputStream;
  */
 public class Provider<T extends AbstractNode> implements Comparable<Provider<?>> {
 
-    protected Model model;
-    protected Integer id;
+    private Model model;
+    private Long id;
 
     private volatile T n;
 
@@ -36,12 +36,12 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         DISCARD
     }
 
-    public Provider(Model model, int id) {
+    public Provider(Model model, long id) {
         this.model = model;
         this.id = id;
 
         if(model != null) {
-            model.registerProvider(id, this);
+            model.registerProvider(this);
         }
     }
 
@@ -50,10 +50,10 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         this.n = n;
 
         id = model.createNeuronId();
-        model.registerProvider(id, this);
+        model.registerProvider(this);
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
@@ -129,7 +129,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
 
     @Override
     public int hashCode() {
-        return id;
+        return id.hashCode();
     }
 
     public String toString() {
@@ -137,6 +137,6 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
     }
 
     public int compareTo(Provider<?> n) {
-        return Integer.compare(id, n.id);
+        return Long.compare(id, n.id);
     }
 }

@@ -34,13 +34,13 @@ public class LTargetNode<N extends Neuron> extends LNode<N> {
     }
 
     protected Activation follow(Neuron n, Activation act, LLink from, Activation startAct) {
-        if(n == null && startAct.getThought().getPhase() == Phase.INDUCTION) {
+        Thought t = startAct.getThought();
+        if(n == null && t.getPhase() == Phase.INDUCTION) {
             n = createNeuron(startAct.getNeuronProvider().getModel(), "");
         }
 
         if(act == null) {
-            Thought doc = startAct.getThought();
-            act = new Activation(doc.createActivationId(), doc, n);
+            act = new Activation(t.createActivationId(), t, n);
         }
 
         return act;
