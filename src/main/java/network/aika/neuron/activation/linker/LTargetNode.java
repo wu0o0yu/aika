@@ -30,14 +30,18 @@ import static network.aika.Phase.INDUCTION;
  */
 public class LTargetNode<N extends Neuron> extends LNode<N> {
 
-    public LTargetNode(Class<N> neuronClass, Boolean isMature, String label) {
+    private double initialBias;
+
+    public LTargetNode(Class<N> neuronClass, Boolean isMature, String label, double initialBias) {
         super(neuronClass, isMature, label);
+        this.initialBias = initialBias;
     }
 
     protected Activation follow(Neuron n, Activation act, LLink from, Activation startAct) {
         Thought t = startAct.getThought();
         if(n == null && t.getPhase() == INDUCTION) {
             n = createNeuron(startAct.getModel(), "");
+            n.setBias(initialBias);
         }
 
         if(act == null) {

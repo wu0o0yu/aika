@@ -33,11 +33,14 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
     private Boolean isNegative;
     private Boolean isPropagate;
 
-    public LTargetLink(LNode input, LNode output, PatternScope patternScope, Class<S> synapseClass, String label, Boolean isRecurrent, Boolean isNegative, Boolean isPropagate) {
+    private double initialWeight;
+
+    public LTargetLink(LNode input, LNode output, PatternScope patternScope, Class<S> synapseClass, String label, Boolean isRecurrent, Boolean isNegative, Boolean isPropagate, double initialWeight) {
         super(input, output, patternScope, synapseClass, label);
         this.isRecurrent = isRecurrent;
         this.isNegative = isNegative;
         this.isPropagate = isPropagate;
+        this.initialWeight = initialWeight;
     }
 
     protected void follow(Activation act, LNode from, Activation startAct) {
@@ -111,6 +114,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
             s.init(patternScope, isRecurrent, isNegative, isPropagate);
             s.setInput(in);
             s.setOutput(on);
+            s.update(initialWeight);
 
             s.link();
             return s;
