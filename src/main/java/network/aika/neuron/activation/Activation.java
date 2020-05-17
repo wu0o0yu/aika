@@ -20,7 +20,7 @@ import network.aika.Model;
 import network.aika.Thought;
 import network.aika.Utils;
 import network.aika.neuron.*;
-import network.aika.neuron.activation.linker.LNode;
+import network.aika.templates.LNode;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation.linker;
+package network.aika.templates;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
@@ -38,10 +38,22 @@ public abstract class LNode<N extends Neuron> {
 
     protected abstract Activation follow(Neuron n, Activation act, LLink from, Activation startAct);
 
-    public LNode(Class<N> neuronClass, Boolean isMature, String label) {
-        this.neuronClass = neuronClass;
-        this.isMature = isMature;
+    public LNode() {
+    }
+
+    public LNode setLabel(String label) {
         this.label = label;
+        return this;
+    }
+
+    public LNode setMature(Boolean mature) {
+        isMature = mature;
+        return this;
+    }
+
+    public LNode setNeuronClass(Class<N> neuronClass) {
+        this.neuronClass = neuronClass;
+        return this;
     }
 
     public boolean isOpenEnd() {

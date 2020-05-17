@@ -14,11 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation.linker;
+package network.aika.templates;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
@@ -35,12 +34,33 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
 
     private double initialWeight;
 
-    public LTargetLink(LNode input, LNode output, PatternScope patternScope, Class<S> synapseClass, String label, Boolean isRecurrent, Boolean isNegative, Boolean isPropagate, double initialWeight) {
-        super(input, output, patternScope, synapseClass, label);
-        this.isRecurrent = isRecurrent;
-        this.isNegative = isNegative;
-        this.isPropagate = isPropagate;
+    public LTargetLink() {
+        super();
+    }
+
+    public LTargetLink setRecurrent(Boolean recurrent) {
+        isRecurrent = recurrent;
+        return this;
+    }
+
+    public LTargetLink setNegative(Boolean negative) {
+        isNegative = negative;
+        return this;
+    }
+
+    public LTargetLink setPropagate(Boolean propagate) {
+        isPropagate = propagate;
+        return this;
+    }
+
+    public LTargetLink setInitialWeight(double initialWeight) {
         this.initialWeight = initialWeight;
+        return this;
+    }
+
+    @Override
+    public void followBackwards(Link l) {
+
     }
 
     protected void follow(Activation act, LNode from, Activation startAct) {

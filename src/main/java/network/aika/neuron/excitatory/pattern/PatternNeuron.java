@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 
 import static network.aika.neuron.activation.Direction.OUTPUT;
-import static network.aika.neuron.activation.linker.LinkGraphs.*;
+import static network.aika.templates.LinkGraphs.*;
 
 /**
  *

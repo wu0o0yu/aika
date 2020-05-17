@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation.linker;
+package network.aika.templates;
 
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
+import network.aika.neuron.activation.Link;
 
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
@@ -37,16 +38,41 @@ public abstract class LLink<S extends Synapse> {
     protected PatternScope patternScope;
     protected Class<S> synapseClass;
 
-    public LLink(LNode input, LNode output, PatternScope patternScope, Class<S> synapseClass, String label) {
-        this.input = input;
-        this.output = output;
-        this.patternScope = patternScope;
-        this.synapseClass = synapseClass;
-        this.label = label;
-
-        input.addLink(this);
-        output.addLink(this);
+    public LLink() {
     }
+
+    public LLink setLabel(String label) {
+        this.label = label;
+        return this;
+    }
+
+    public LLink setInput(LNode input) {
+        this.input = input;
+        input.addLink(this);
+        return this;
+    }
+
+    public LLink setOutput(LNode output) {
+        this.output = output;
+        output.addLink(this);
+        return this;
+    }
+
+    public LLink setPatternScope(PatternScope patternScope) {
+        this.patternScope = patternScope;
+        return this;
+    }
+
+    public LLink setSynapseClass(Class<S> synapseClass) {
+        this.synapseClass = synapseClass;
+        return this;
+    }
+
+    public LLink setDirection(boolean dir) {
+        return this;
+    }
+
+    public abstract void followBackwards(Link l);
 
     protected abstract void follow(Activation act, LNode from, Activation startAct);
 

@@ -14,10 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation.linker;
+package network.aika.templates;
 
 import network.aika.neuron.Neuron;
-import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
@@ -30,12 +29,8 @@ import network.aika.neuron.activation.Link;
  */
 public class LMatchingLink<S extends Synapse> extends LLink<S> {
 
-    private boolean dir;
-
-    public LMatchingLink(LNode input, LNode output, PatternScope patternScope, Class<S> synapseClass, String label, boolean dir) {
-        super(input, output, patternScope, synapseClass, label);
-
-        this.dir = dir;
+    public LMatchingLink() {
+        super();
     }
 
     public void followBackwards(Link l) {

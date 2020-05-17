@@ -29,7 +29,7 @@ import static network.aika.neuron.PatternScope.INPUT_PATTERN;
 import static network.aika.neuron.PatternScope.SAME_PATTERN;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
-import static network.aika.neuron.activation.linker.LinkGraphs.*;
+import static network.aika.templates.LinkGraphs.*;
 
 /**
  * @author Lukas Molzberger

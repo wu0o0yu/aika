@@ -30,7 +30,7 @@ import network.aika.neuron.activation.Link;
 import java.util.Collection;
 
 import static network.aika.neuron.activation.Direction.OUTPUT;
-import static network.aika.neuron.activation.linker.LinkGraphs.inhibitoryLinkT;
+import static network.aika.templates.LinkGraphs.inhibitoryLinkT;
 
 /**
  *

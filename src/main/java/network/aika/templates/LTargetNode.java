@@ -14,35 +14,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation.linker;
+package network.aika.templates;
 
+import network.aika.Thought;
+import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+
+import static network.aika.Phase.INDUCTION;
 
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class LMatchingNode<N extends Neuron> extends LNode<N> {
+public class LTargetNode<N extends Neuron> extends LNode<N> {
 
-    public LMatchingNode(Class<N> neuronClass, Boolean isMature, String label) {
-        super(neuronClass, isMature, label);
+    private double initialBias;
+
+    public LTargetNode() {
+        super();
+    }
+
+    public LTargetNode setInitialBias(double initialBias) {
+        this.initialBias = initialBias;
+        return this;
     }
 
     protected Activation follow(Neuron n, Activation act, LLink from, Activation startAct) {
-        if(!checkNeuron(n) || act.isConflicting()) {
-            return null;
+        Thought t = startAct.getThought();
+        if(n == null && t.getPhase() == INDUCTION) {
+            n = createNeuron(startAct.getModel(), "");
+            n.setBias(initialBias);
         }
 
-        act.setLNode(this);
-
-        links.stream()
-                .filter(l -> l != from)
-                .forEach(l -> l.follow(act, this, startAct));
-
-        act.setLNode(null);
+        if(act == null) {
+            act = new Activation(t.createActivationId(), t, n);
+        }
 
         return act;
+    }
+
+    private Neuron createNeuron(Model m, String label) {
+        Neuron n;
+        try {
+            n = neuronClass.getConstructor(Model.class, String.class, Boolean.class)
+                    .newInstance(m, label, false);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return n;
     }
 }
