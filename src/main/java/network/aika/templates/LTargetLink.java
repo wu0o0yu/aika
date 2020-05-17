@@ -134,7 +134,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
             s.init(patternScope, isRecurrent, isNegative, isPropagate);
             s.setInput(in);
             s.setOutput(on);
-            s.update(initialWeight);
+            s.setWeight(initialWeight);
 
             s.link();
             return s;

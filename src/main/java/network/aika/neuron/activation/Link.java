@@ -107,6 +107,5 @@ public class Link {
         }
 
         output.addLink(this);
-        output.getNeuron().link(this);
     }
 }

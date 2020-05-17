@@ -57,11 +57,27 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
     }
 
     protected void link(Neuron in, Neuron out) {
+        boolean dir = in.getId() < out.getId();
+        (dir ? in : out).getLock().acquireWriteLock();
+        (dir ? out : in).getLock().acquireWriteLock();
+
+        out.addInputSynapse(this);
         in.addOutputSynapse(this);
+
+        (dir ? in : out).getLock().releaseWriteLock();
+        (dir ? out : in).getLock().releaseWriteLock();
     }
 
     protected void unlink(Neuron in, Neuron out) {
+        boolean dir = in.getId() < out.getId();
+        (dir ? in : out).getLock().acquireWriteLock();
+        (dir ? out : in).getLock().acquireWriteLock();
+
+        out.removeInputSynapse(this);
         in.removeOutputSynapse(this);
+
+        (dir ? in : out).getLock().releaseWriteLock();
+        (dir ? out : in).getLock().releaseWriteLock();
     }
 
     public static class Builder extends Synapse.Builder {

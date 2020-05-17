@@ -275,6 +275,8 @@ public class Activation implements Comparable<Activation> {
         }else{
             sumUpLink(l);
         }
+
+        getNeuron().link(this);
     }
 
     public boolean inputLinkExists(Synapse s) {

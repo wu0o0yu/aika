@@ -17,14 +17,12 @@
 package network.aika.neuron;
 
 import network.aika.*;
-import network.aika.Thought;
 import network.aika.Writable;
 import network.aika.neuron.activation.Direction;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Comparator;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
 
@@ -147,6 +145,10 @@ public abstract class Synapse<I extends Neuron, O extends Neuron> implements Wri
 
     public boolean isWeak(State state) {
         return output.get().isWeak(this, state);
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
     }
 
     public void updateDelta(double weightDelta) {
