@@ -19,6 +19,8 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Writable;
 import network.aika.neuron.activation.Direction;
+import network.aika.neuron.excitatory.pattern.PatternSynapse;
+import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -33,6 +35,11 @@ import static network.aika.neuron.Synapse.State.CURRENT;
 public abstract class Synapse<I extends Neuron, O extends Neuron> implements Writable, InputKey, OutputKey {
 
     public static double TOLERANCE = 0.0000001;
+
+    protected boolean isRecurrent;
+    protected boolean isNegative;
+    protected boolean isPropagate;
+    PatternScope patternScope;
 
     protected NeuronProvider input;
     protected NeuronProvider output;
@@ -56,17 +63,39 @@ public abstract class Synapse<I extends Neuron, O extends Neuron> implements Wri
         this.output = output;
     }
 
-    public abstract void init(PatternScope patternScope, Boolean isRecurrent, Boolean isNegative, boolean propagate);
-
     public abstract byte getType();
 
-    public abstract boolean isPropagate();
+    public PatternScope getPatternScope() {
+        return patternScope;
+    }
 
-    public abstract boolean isRecurrent();
+    public void setPatternScope(PatternScope patternScope) {
+        this.patternScope = patternScope;
+    }
 
-    public abstract boolean isNegative();
+    public void setRecurrent(boolean recurrent) {
+        isRecurrent = recurrent;
+    }
 
-    public abstract PatternScope getPatternScope();
+    public boolean isRecurrent() {
+        return isRecurrent;
+    }
+
+    public void setNegative(boolean negative) {
+        isNegative = negative;
+    }
+
+    public boolean isNegative() {
+        return isNegative;
+    }
+
+    public void setPropagate(boolean propagate) {
+        isPropagate = propagate;
+    }
+
+    public boolean isPropagate() {
+        return isPropagate;
+    }
 
     protected abstract void link(Neuron in, Neuron out);
 
@@ -192,6 +221,9 @@ public abstract class Synapse<I extends Neuron, O extends Neuron> implements Wri
         protected NeuronProvider inputNeuron;
         protected double weight;
         protected boolean propagate;
+        protected PatternScope patternScope;
+        protected boolean isRecurrent;
+        protected boolean isNegative;
 
         /**
          * Determines the input neuron.
@@ -233,6 +265,30 @@ public abstract class Synapse<I extends Neuron, O extends Neuron> implements Wri
             return this;
         }
 
-        public abstract Synapse getSynapse(NeuronProvider outputNeuron);
+        public Builder setPatternScope(PatternScope ps) {
+            patternScope = ps;
+            return this;
+        }
+
+        public Builder setRecurrent(boolean recurrent) {
+            isRecurrent = recurrent;
+            return this;
+        }
+
+        public Builder setNegative(boolean negative) {
+            isNegative = negative;
+            return this;
+        }
+
+        public Synapse getSynapse(NeuronProvider outputNeuron) {
+            Synapse s = createSynapse(outputNeuron);
+            s.setPatternScope(patternScope);
+            s.setRecurrent(isRecurrent);
+            s.setNegative(isNegative);
+            s.setPropagate(propagate);
+            return s;
+        }
+
+        public abstract Synapse createSynapse(NeuronProvider outputNeuron);
     }
 }

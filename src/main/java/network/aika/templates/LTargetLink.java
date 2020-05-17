@@ -131,10 +131,14 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
     private Synapse createSynapse(NeuronProvider in, NeuronProvider on) {
         try {
             Synapse s = synapseClass.getConstructor().newInstance();
-            s.init(patternScope, isRecurrent, isNegative, isPropagate);
+
             s.setInput(in);
             s.setOutput(on);
             s.setWeight(initialWeight);
+            s.setPatternScope(patternScope);
+            s.setRecurrent(isRecurrent);
+            s.setNegative(isNegative);
+            s.setPropagate(isPropagate);
 
             s.link();
             return s;

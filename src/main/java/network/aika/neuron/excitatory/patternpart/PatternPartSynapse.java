@@ -17,72 +17,20 @@ public class PatternPartSynapse<I extends Neuron> extends ExcitatorySynapse<I, P
     public PatternPartSynapse() {
     }
 
-    public PatternPartSynapse(NeuronProvider input, NeuronProvider output, PatternScope patternScope, boolean isRecurrent, boolean isNegative, boolean propagate) {
+    public PatternPartSynapse(NeuronProvider input, NeuronProvider output) {
         super(input, output);
-        this.patternScope = patternScope;
-        this.isRecurrent = isRecurrent;
-        this.isNegative = isNegative;
-        this.propagate = propagate;
     }
 
-    @Override
-    public void init(PatternScope patternScope, Boolean isRecurrent, Boolean isNegative, boolean propagate) {
-        this.patternScope = patternScope;
-        this.isRecurrent = isRecurrent;
-        this.isNegative = isNegative;
-        this.propagate = propagate;
-    }
+
 
     @Override
     public byte getType() {
         return type;
     }
 
-    public PatternScope getPatternScope() {
-        return patternScope;
-    }
-
-    public void setPatternScope(PatternScope patternScope) {
-        this.patternScope = patternScope;
-    }
-
-    public void setRecurrent(boolean recurrent) {
-        isRecurrent = recurrent;
-    }
-
-    @Override
-    public boolean isRecurrent() {
-        return isRecurrent;
-    }
-
-    @Override
-    public boolean isNegative() {
-        return isNegative;
-    }
-
-
     public static class Builder extends Synapse.Builder {
-        private PatternScope patternScope;
-        private boolean isRecurrent;
-        private boolean isNegative;
-
-        public Builder setPatternScope(PatternScope ps) {
-            patternScope = ps;
-            return this;
-        }
-
-        public Builder setRecurrent(boolean recurrent) {
-            isRecurrent = recurrent;
-            return this;
-        }
-
-        public Builder setNegative(boolean negative) {
-            isNegative = negative;
-            return this;
-        }
-
-        public Synapse getSynapse(NeuronProvider outputNeuron) {
-            return new PatternPartSynapse(inputNeuron, outputNeuron, patternScope, isRecurrent, isNegative, propagate);
+        public Synapse createSynapse(NeuronProvider outputNeuron) {
+            return new PatternPartSynapse(inputNeuron, outputNeuron);
         }
     }
 }

@@ -18,8 +18,6 @@ package network.aika.neuron.inhibitory;
 
 import network.aika.neuron.*;
 
-import static network.aika.neuron.PatternScope.SAME_PATTERN;
-
 /**
  *
  * @author Lukas Molzberger
@@ -37,33 +35,8 @@ public class InhibitorySynapse extends Synapse<Neuron, InhibitoryNeuron> {
     }
 
     @Override
-    public void init(PatternScope patternScope, Boolean isRecurrent, Boolean isNegative, boolean propagate) {
-
-    }
-
-    @Override
     public byte getType() {
         return type;
-    }
-
-    @Override
-    public boolean isRecurrent() {
-        return false;
-    }
-
-    @Override
-    public boolean isNegative() {
-        return false;
-    }
-
-    @Override
-    public PatternScope getPatternScope() {
-        return SAME_PATTERN;
-    }
-
-    @Override
-    public boolean isPropagate() {
-        return true;
     }
 
     protected void link(Neuron in, Neuron out) {
@@ -80,7 +53,7 @@ public class InhibitorySynapse extends Synapse<Neuron, InhibitoryNeuron> {
 
     public static class Builder extends Synapse.Builder {
         @Override
-        public Synapse getSynapse(NeuronProvider outputNeuron) {
+        public Synapse createSynapse(NeuronProvider outputNeuron) {
             return new InhibitorySynapse(inputNeuron, outputNeuron);
         }
     }

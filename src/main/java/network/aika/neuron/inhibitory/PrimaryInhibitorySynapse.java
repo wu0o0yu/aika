@@ -82,7 +82,7 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
 
     public static class Builder extends Synapse.Builder {
         @Override
-        public Synapse getSynapse(NeuronProvider outputNeuron) {
+        public Synapse createSynapse(NeuronProvider outputNeuron) {
             return new PrimaryInhibitorySynapse(inputNeuron, outputNeuron);
         }
     }

@@ -34,10 +34,6 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
         super(input, output);
     }
 
-    public boolean isPropagate() {
-        return propagate;
-    }
-
     protected void link(Neuron in, Neuron out) {
         if(isPropagate()) {
             boolean dir = in.getId() < out.getId();
