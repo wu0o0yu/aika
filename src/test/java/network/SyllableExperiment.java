@@ -86,6 +86,8 @@ public class SyllableExperiment {
                     new InhibitorySynapse.Builder()
                             .setNeuron(n)
                             .setWeight(1.0)
+                            .setPatternScope(SAME_PATTERN)
+                            .setPropagate(true)
             );
 
             return n;
