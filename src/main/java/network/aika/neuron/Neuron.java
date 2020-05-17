@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.Synapse.OUTPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
+import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.templates.LinkGraphs.propagateT;
 
@@ -187,7 +188,7 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
     public void link(Activation act) {
         if(act.getThought().getPhase() == Phase.PRELIMINARY_LINKING) {
-            propagateT.follow(act, OUTPUT);
+            propagateT.follow(act, INPUT);
         }
     }
 
