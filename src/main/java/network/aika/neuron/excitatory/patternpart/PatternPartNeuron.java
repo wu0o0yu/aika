@@ -70,15 +70,15 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         super.link(act);
 
         if (act.getThought().getPhase() == Phase.PRELIMINARY_LINKING) {
-            sameInputLinkT.follow(act, OUTPUT);
-            relatedInputLinkT.follow(act, OUTPUT);
-            patternInputLinkT.follow(act, OUTPUT);
-        } else if (act.getThought().getPhase() == Phase.FINAL_LINKING) {
-            posRecLinkT.follow(act, INPUT);
-        } else if (act.getThought().getPhase() == Phase.INDUCTION) {
             sameInputLinkT.follow(act, INPUT);
             relatedInputLinkT.follow(act, INPUT);
-            inducePPInhibInputSynapse.follow(act, OUTPUT);
+            patternInputLinkT.follow(act, INPUT);
+        } else if (act.getThought().getPhase() == Phase.FINAL_LINKING) {
+            posRecLinkT.follow(act, OUTPUT);
+        } else if (act.getThought().getPhase() == Phase.INDUCTION) {
+            sameInputLinkT.follow(act, OUTPUT);
+            relatedInputLinkT.follow(act, OUTPUT);
+            inducePPInhibInputSynapse.follow(act, INPUT);
         }
     }
 
