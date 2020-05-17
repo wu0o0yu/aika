@@ -24,7 +24,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 
 import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.templates.LinkGraphs.inducePPInhibInputSynapse;
 
 /**
@@ -55,7 +54,7 @@ public class PatternPartInhibitoryNeuron extends InhibitoryNeuron {
     @Override
     public void link(Activation act) {
         if (act.getThought().getPhase() == Phase.INDUCTION) {
-            inducePPInhibInputSynapse.follow(act, OUTPUT);
+            inducePPInhibInputSynapse.follow(act, INPUT);
         }
     }
 

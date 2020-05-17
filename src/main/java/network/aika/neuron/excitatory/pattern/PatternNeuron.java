@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
-import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.templates.LinkGraphs.*;
 
@@ -81,8 +80,8 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         super.link(act);
 
         if(act.getThought().getPhase() == Phase.INDUCTION) {
-            inducePatternPart.follow(act, INPUT);
-            inducePPInhibitoryNeuron.follow(act, INPUT);
+            inducePatternPart.follow(act, OUTPUT);
+            inducePPInhibitoryNeuron.follow(act, OUTPUT);
         }
     }
 

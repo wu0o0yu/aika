@@ -29,7 +29,6 @@ import network.aika.neuron.activation.Link;
 
 import java.util.Collection;
 
-import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.templates.LinkGraphs.inhibitoryLinkT;
 
@@ -65,7 +64,7 @@ public abstract class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         super.link(act);
 
         if (act.getThought().getPhase() == Phase.PRELIMINARY_LINKING) {
-            inhibitoryLinkT.follow(act, INPUT);
+            inhibitoryLinkT.follow(act, OUTPUT);
         }
     }
 

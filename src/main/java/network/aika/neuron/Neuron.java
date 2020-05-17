@@ -188,7 +188,7 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
     public void link(Activation act) {
         if(act.getThought().getPhase() == Phase.PRELIMINARY_LINKING) {
-            propagateT.follow(act, OUTPUT);
+            propagateT.follow(act, INPUT);
         }
     }
 
