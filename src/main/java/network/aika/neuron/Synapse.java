@@ -205,7 +205,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron> implements Wri
     }
 
     public String toString() {
-        return "S (" + getClass().getSimpleName() + ")  w:" + Utils.round(getNewWeight()) + " " + input + "->" + output + " (" + getPatternScope() + ", rec:" + isRecurrent() + ", neg:" + isNegative() + ", prop:" + isPropagate() + ")";
+        return "S " + getClass().getSimpleName() + "  w:" + Utils.round(getNewWeight()) + " " + input + "->" + output + " (" + getPatternScope() + ", rec:" + isRecurrent() + ", neg:" + isNegative() + ", prop:" + isPropagate() + ")";
     }
 
     /**
