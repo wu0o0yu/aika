@@ -85,7 +85,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
         Synapse s = in.getOutputSynapse(on, patternScope);
 
         if(s == null) {
-            if(iAct.getThought().getPhase() == INDUCTION) return;
+            if(iAct.getThought().getPhase() != INDUCTION) return;
             s = createSynapse(in.getProvider(), on);
         }
 
