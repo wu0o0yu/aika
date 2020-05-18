@@ -141,6 +141,8 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
             s.setPropagate(isPropagate);
 
             s.link();
+
+            System.out.println(s.toString());
             return s;
         } catch (Exception e) {
             throw new RuntimeException(e);

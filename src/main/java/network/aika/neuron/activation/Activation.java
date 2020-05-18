@@ -89,6 +89,8 @@ public class Activation implements Comparable<Activation> {
                 .<Activation, NeuronProvider>comparing(act -> act.getNeuronProvider())
                 .thenComparing(act -> act)
         );
+
+        System.out.println(toString());
     }
 
     public int getId() {
@@ -400,7 +402,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public String toString() {
-        return getId() + " " +
+        return "A " + getId() + " " +
                 getNeuron().getClass().getSimpleName() + ":" + getLabel() +
                 " value:" + Utils.round(value) +
                 " net:" + Utils.round(net) +

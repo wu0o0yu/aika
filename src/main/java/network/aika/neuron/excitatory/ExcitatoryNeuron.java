@@ -234,8 +234,4 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
         }
         return sb.toString();
     }
-
-    public String typeToString() {
-        return "EXCITATORY";
-    }
 }

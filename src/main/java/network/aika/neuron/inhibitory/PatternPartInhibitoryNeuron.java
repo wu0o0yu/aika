@@ -57,8 +57,4 @@ public class PatternPartInhibitoryNeuron extends InhibitoryNeuron {
             inducePPInhibInputSynapse.follow(act, INPUT);
         }
     }
-
-    public String typeToString() {
-        return "PP-INHIBITORY";
-    }
 }

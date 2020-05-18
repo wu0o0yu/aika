@@ -46,6 +46,8 @@ public class LTargetNode<N extends Neuron> extends LNode<N> {
         if(n == null && t.getPhase() == INDUCTION) {
             n = createNeuron(startAct.getModel(), "");
             n.setBias(initialBias);
+
+            System.out.println(n.toDetailedString());
         }
 
         if(act == null) {

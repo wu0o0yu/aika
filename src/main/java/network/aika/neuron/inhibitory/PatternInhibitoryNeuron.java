@@ -45,9 +45,4 @@ public class PatternInhibitoryNeuron extends InhibitoryNeuron {
     public byte getOuterType() {
         return PatternNeuron.type;
     }
-
-
-    public String typeToString() {
-        return "P-INHIBITORY";
-    }
 }

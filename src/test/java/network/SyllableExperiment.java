@@ -132,7 +132,7 @@ public class SyllableExperiment {
             lastInInhibAct = currentInInhibAct;
         }
 
-        System.out.println(doc.activationsToString());
+//        System.out.println(doc.activationsToString());
 
         doc.train(model);
     }

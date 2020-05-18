@@ -296,14 +296,12 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
     }
 
     public String toString() {
-        return label;
+        return getId() + ":" + getLabel();
     }
 
-    protected String toDetailedString() {
-        return typeToString() + " " + label + " B:" + Utils.round(bias);
+    public String toDetailedString() {
+        return "N " + getClass().getSimpleName() + " " + toString() + " B:" + Utils.round(bias);
     }
-
-    public abstract String typeToString();
 
     public String freqToString() {
         StringBuilder sb = new StringBuilder();

@@ -19,8 +19,6 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Writable;
 import network.aika.neuron.activation.Direction;
-import network.aika.neuron.excitatory.pattern.PatternSynapse;
-import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -207,7 +205,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron> implements Wri
     }
 
     public String toString() {
-        return "S W:" + Utils.round(getNewWeight()) + " " + input + "->" + output;
+        return "S (" + getClass().getSimpleName() + ")  w:" + Utils.round(getNewWeight()) + " " + input + "->" + output + " (" + getPatternScope() + ", rec:" + isRecurrent() + ", neg:" + isNegative() + ", prop:" + isPropagate() + ")";
     }
 
     /**

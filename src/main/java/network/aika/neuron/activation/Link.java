@@ -37,6 +37,7 @@ public class Link {
 
     public static void link(Synapse s, Activation input, Activation output) {
         Link l = new Link(s, input, output);
+        System.out.println(l);
         input.getThought().add(l);
     }
 
@@ -96,7 +97,7 @@ public class Link {
     }
 
     public String toString() {
-        return synapse + ": " + input + " --> " + output;
+        return "L " + synapse.getClass().getSimpleName() + ": " + input + "-(" + input.getNeuron() + ") --> " + output + "-(" + output.getNeuron() + ")";
     }
 
     public void process() {
