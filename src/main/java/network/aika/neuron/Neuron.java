@@ -238,19 +238,6 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
         binaryFrequency = f;
     }
 
-    private double getCoverage(Activation seedAct) {
-        return seedAct.getLinks(OUTPUT)
-                .map(l -> getCoverage(l))
-                .max(Comparator.comparingDouble(c -> c))
-                .orElse(0.0);
-    }
-
-    private static double getCoverage(Link ol) {
-        Activation oAct = ol.getOutput();
-        Neuron n = oAct.getNeuron();
-        return Math.min(Math.max(0.0, oAct.getNet()), Math.max(0.0, ol.getInput().getValue() * ol.getSynapse().getWeight())) / n.getBias();
-    }
-
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeByte(getType());
