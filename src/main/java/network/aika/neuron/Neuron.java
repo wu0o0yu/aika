@@ -179,7 +179,12 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
         return 0.0;
     }
 
-    public double computeGradient(Link l, int depth, Function<Link, Double> f) {
+    public interface GradFunction {
+        double grad(Link l);
+    }
+
+
+    public double computeGradient(Link l, int depth, GradFunction f) {
         return 0.0;
     }
 

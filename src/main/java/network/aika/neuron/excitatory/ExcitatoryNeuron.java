@@ -66,10 +66,10 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
         return computeGradient(il, 0, l -> l.getInput().getValue());
     }
 
-    public double computeGradient(Link il, int depth, Function<Link, Double> f) {
+    public double computeGradient(Link il, int depth, GradFunction f) {
         if(depth > 2) return 0.0;
 
-        double g = f.apply(il) * getActivationFunction().outerGrad(il.getOutput().getNet());
+        double g = f.grad(il) * getActivationFunction().outerGrad(il.getOutput().getNet());
 
         double sum = 0.0;
         for (Sign s : Sign.values()) {
@@ -78,7 +78,11 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
             sum = il.getOutput()
                     .getLinks(OUTPUT)
                     .map(ol ->
-                            ol.getOutput().getNeuron().computeGradient(ol, depth + 1, l -> g * il.getSynapse().getWeight())
+                            ol.getOutput().getNeuron().computeGradient(
+                                    ol,
+                                    depth + 1,
+                                    l -> g * l.getSynapse().getWeight()
+                            )
                     )
                     .reduce(sum, Double::sum);
         }
