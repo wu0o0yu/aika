@@ -224,6 +224,12 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
     public void train(Activation act) {
         link(act);
         act.getThought().processLinks();
+
+        propagateCost(act);
+    }
+
+    protected void propagateCost(Activation act) {
+
     }
 
     public double getP() {

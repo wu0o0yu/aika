@@ -69,6 +69,8 @@ public class Activation implements Comparable<Activation> {
 
     private Reference groundRef;
 
+    private Gradient latestGradient;
+
     public Activation(int id, Thought t, Neuron<?> n) {
         this.id = id;
         this.thought = t;
@@ -322,6 +324,25 @@ public class Activation implements Comparable<Activation> {
         if(lastRound == null || !equals(lastRound)) {
             linkForward();
         }
+    }
+
+    public void processGradient() {
+        assert !latestGradient.isFixed;
+        latestGradient.isFixed = true;
+
+        double g = latestGradient.gradient * getNeuron().getActivationFunction().outerGrad(net);
+
+        inputLinks
+                .values()
+                .forEach(l -> l.propagateGradient(g));
+    }
+
+    public Gradient getMutableGradient() {
+        if(latestGradient == null || latestGradient.isFixed) {
+            latestGradient = new Gradient(latestGradient);
+            getThought().addToGradientQueue(this);
+        }
+        return latestGradient;
     }
 
     public void unlink() {

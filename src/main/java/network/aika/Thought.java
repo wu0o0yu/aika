@@ -39,6 +39,14 @@ public abstract class Thought {
 
     private final Deque<Link> linkQueue = new ArrayDeque<>();
 
+
+    private final TreeSet<Activation> gradientQueue = new TreeSet<>(
+            Comparator.<Activation, Fired>comparing(act -> act.getFired())
+                    .thenComparing(Activation::getId)
+                    .reversed()
+    );
+
+
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
     private Phase phase = PRELIMINARY_LINKING;
@@ -79,6 +87,11 @@ public abstract class Thought {
         linkQueue.add(l);
     }
 
+
+    public void addToGradientQueue(Activation act) {
+        gradientQueue.add(act);
+    }
+
     public void processActivations() {
         while (!activationsQueue.isEmpty()) {
             activationsQueue
@@ -92,6 +105,14 @@ public abstract class Thought {
             linkQueue
                     .pollFirst()
                     .process();
+        }
+    }
+
+    public void processGradients() {
+        while (!gradientQueue.isEmpty()) {
+            gradientQueue
+                    .pollFirst()
+                    .processGradient();
         }
     }
 
@@ -156,6 +177,8 @@ public abstract class Thought {
                 .forEach(act ->
                         act.getNeuron().train(act)
                 );
+
+        processGradients();
 
 //        process();
 

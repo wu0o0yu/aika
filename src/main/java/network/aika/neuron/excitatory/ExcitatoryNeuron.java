@@ -34,6 +34,9 @@ import java.util.function.Function;
 
 import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 import static network.aika.neuron.InputKey.INPUT_COMP;
+import static network.aika.neuron.Sign.NEG;
+import static network.aika.neuron.Sign.POS;
+import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 
@@ -61,7 +64,7 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
     public ExcitatoryNeuron(Model model, String label, Boolean isInputNeuron) {
         super(model, label, isInputNeuron);
     }
-
+/*
     public double computeWeightGradient(Link il) {
         return computeGradient(il, 0, l -> l.getInput().getValue());
     }
@@ -74,26 +77,28 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
         double sum = 0.0;
         for (Sign s : Sign.values()) {
             sum += s.getSign() * getCost(s) * g;
-
-            sum = il.getOutput()
-                    .getLinks(OUTPUT)
-                    .map(ol ->
-                            ol.getOutput().getNeuron().computeGradient(
-                                    ol,
-                                    depth + 1,
-                                    l -> g * l.getSynapse().getWeight()
-                            )
-                    )
-                    .reduce(sum, Double::sum);
         }
+
+        sum = il.getOutput()
+                .getLinks(OUTPUT)
+                .map(ol ->
+                        ol.getOutput().getNeuron().computeGradient(
+                                ol,
+                                depth + 1,
+                                l -> g * l.getSynapse().getWeight()
+                        )
+                )
+                .reduce(sum, Double::sum);
 
         return sum;
     }
+*/
 
     public void train(Activation act) {
         addDummyLinks(act);
         super.train(act);
 
+/*
         if(isInputNeuron)
             return;
 
@@ -104,6 +109,19 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
                 );
 
         commit(inputSynapses.values());
+ */
+    }
+
+    protected void propagateCost(Activation act) {
+        double cost =
+                (POS.getSign() * getCost(POS)) +
+                (NEG.getSign() * getCost(NEG));
+
+        if(Math.abs(cost) < TOLERANCE) {
+            return;
+        }
+
+        act.getMutableGradient().gradient += cost;
     }
 
     protected void addDummyLinks(Activation act) {

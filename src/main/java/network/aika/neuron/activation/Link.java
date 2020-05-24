@@ -18,6 +18,8 @@ package network.aika.neuron.activation;
 
 import network.aika.neuron.Synapse;
 
+import static network.aika.neuron.activation.Activation.TOLERANCE;
+
 /**
  *
  * @author Lukas Molzberger
@@ -33,6 +35,21 @@ public class Link {
         this.synapse = s;
         this.input = input;
         this.output = output;
+    }
+
+    public void propagateGradient(double g) {
+        synapse.update(getLearnRate() * input.getValue() * g);
+
+        double ig = synapse.getWeight() * g;
+        if(Math.abs(ig) < TOLERANCE) {
+            return;
+        }
+
+        input.getMutableGradient().gradient += ig;
+    }
+
+    private double getLearnRate() {
+        return output.getModel().getTrainingConfig().getLearnRate();
     }
 
     public static void link(Synapse s, Activation input, Activation output) {
