@@ -11,5 +11,4 @@ public class Gradient {
     public double gradient;
 
     public boolean isFixed;
-
 }

@@ -68,7 +68,6 @@ public class Activation implements Comparable<Activation> {
     private Activation mainBranch;
 
     private Reference groundRef;
-
     private Gradient latestGradient;
 
     public Activation(int id, Thought t, Neuron<?> n) {
@@ -332,9 +331,15 @@ public class Activation implements Comparable<Activation> {
 
         double g = latestGradient.gradient * getNeuron().getActivationFunction().outerGrad(net);
 
+        ArrayList<Synapse> modSyns = new ArrayList<>();
         inputLinks
                 .values()
-                .forEach(l -> l.propagateGradient(g));
+                .forEach(l -> {
+                    l.propagateGradient(g);
+                    modSyns.add(l.getSynapse());
+                });
+
+        getNeuron().commit(modSyns);
     }
 
     public Gradient getMutableGradient() {
