@@ -168,6 +168,7 @@ public abstract class Thought {
             );
         }
 
+        m.addToN(length());
         getActivations()
                 .forEach(act ->
                         act.count()
@@ -181,8 +182,6 @@ public abstract class Thought {
         processGradients();
 
 //        process();
-
-        m.addToN(length());
 
         phase = null;
     }

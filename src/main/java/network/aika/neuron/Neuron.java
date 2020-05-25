@@ -216,6 +216,10 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
         link(act);
         act.getThought().processLinks();
 
+        if(isInputNeuron) {
+            return;
+        }
+
         propagateCost(act);
     }
 
