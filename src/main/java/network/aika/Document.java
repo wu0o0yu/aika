@@ -1,5 +1,7 @@
 package network.aika;
 
+import network.aika.neuron.Neuron;
+import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 
 /**
@@ -48,7 +50,14 @@ public class Document extends Thought {
         }
     }
 
-    public String getText(Activation act) {
+    public static String getText(Activation act) {
         return ""; // TODO!
+    }
+
+    public Activation addInput(Neuron n, int begin, int end) {
+        return null;
+    }
+    public Activation addInput(NeuronProvider n, int begin, int end) {
+        return null;
     }
 }

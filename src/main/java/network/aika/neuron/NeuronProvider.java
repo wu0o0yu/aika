@@ -18,6 +18,8 @@ package network.aika.neuron;
 
 import network.aika.*;
 
+import java.util.Collection;
+
 /**
  * The {@code NeuronProvider} class is a proxy implementation for the real neuron implementation in the class {@code Neuron}.
  * Aika uses the provider pattern to store and reload rarely used neurons or logic nodes.
@@ -39,6 +41,14 @@ public class NeuronProvider extends Provider<Neuron<? extends Synapse>> {
 
     public String getLabel() {
         return get().getLabel();
+    }
+
+    public void link(double bias, Synapse.Builder... inputs) {
+        get().link(bias, inputs);
+    }
+
+    public void link(Double bias, Collection<Synapse.Builder> synapseBuilders) {
+        get().link(bias, synapseBuilders);
     }
 
     public String toString() {
