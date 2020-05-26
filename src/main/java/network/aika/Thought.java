@@ -18,6 +18,7 @@ package network.aika;
 
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,8 @@ public abstract class Thought {
 
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
+
+    private Map<Neuron, SortedSet<Activation>> actsPerNeuron = null;
 
     private Phase phase = PRELIMINARY_LINKING;
 
@@ -86,7 +89,6 @@ public abstract class Thought {
     public void add(Link l) {
         linkQueue.add(l);
     }
-
 
     public void addToGradientQueue(Activation act) {
         gradientQueue.add(act);
@@ -136,7 +138,21 @@ public abstract class Thought {
         return activationsById.size();
     }
 
-    public Map<Neuron, SortedSet<Activation>> getActivationsPerNeuron() {
+    public Set<Activation> getActivations(NeuronProvider n) {
+        return getActivations(n.get());
+    }
+
+    public Set<Activation> getActivations(Neuron n) {
+        phase = RESULTS;
+        if(actsPerNeuron == null) {
+            actsPerNeuron = getActivationsPerNeuron();
+        }
+
+        Set<Activation> acts = actsPerNeuron.get(n);
+        return acts != null ? acts : Collections.emptySet();
+    }
+
+    private Map<Neuron, SortedSet<Activation>> getActivationsPerNeuron() {
         Map<Neuron, SortedSet<Activation>> results = new TreeMap<>();
 
         activationsById.values().stream()

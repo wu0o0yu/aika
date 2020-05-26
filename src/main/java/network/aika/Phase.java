@@ -23,5 +23,6 @@ package network.aika;
 public enum Phase {
     PRELIMINARY_LINKING,
     FINAL_LINKING,
-    INDUCTION
+    INDUCTION,
+    RESULTS
 }
