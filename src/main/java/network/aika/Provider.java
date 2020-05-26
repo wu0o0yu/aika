@@ -73,7 +73,7 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         if (n == null) {
             reactivate();
         }
- //       n.lastUsedDocumentId = TODO!
+        n.retrievalCount = model.getCurrentRetrievalCount();
         return n;
     }
 
@@ -120,6 +120,8 @@ public class Provider<T extends AbstractNode> implements Comparable<Provider<?>>
         }
 
         n.reactivate();
+
+        model.incrementRetrievalCounter();
     }
 
     @Override

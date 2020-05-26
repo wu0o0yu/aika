@@ -67,6 +67,7 @@ public class Model {
 
     private SuspensionHook suspensionHook;
     private AtomicLong currentNeuronId = new AtomicLong(0);
+    private AtomicLong retrievalCounter = new AtomicLong(0);
 
     // Important: the id field needs to be referenced by the provider!
     private WeakHashMap<Long, WeakReference<Provider<? extends AbstractNode>>> providers = new WeakHashMap<>();
@@ -80,20 +81,19 @@ public class Model {
         suspensionHook = sh;
     }
 
+    public long getCurrentRetrievalCount() {
+        return retrievalCounter.longValue();
+    }
+
+    public void incrementRetrievalCounter() {
+        retrievalCounter.addAndGet(1);
+    }
+
     public enum Element {
         NODE,
         LINK
     }
 
-    private static class LinkingKey {
-        Phase phase;
-        Element element;
-
-        LinkingKey(Phase p, Element e) {
-            phase = p;
-            element = e;
-        }
-    }
 
     public long createNeuronId() {
         return suspensionHook != null ? suspensionHook.createId() : currentNeuronId.addAndGet(1);
@@ -180,9 +180,25 @@ public class Model {
         }
     }
 
-    private boolean suspend(int docId, Provider<? extends AbstractNode> p, SuspensionMode sm) {
+    public void suspendUnusedNeurons(long retrievalCount, SuspensionMode sm) {
+        synchronized (providers) {
+            providers
+                    .values()
+                    .stream()
+                    .filter(e -> !e.isEnqueued())
+                    .map(e -> e.get())
+                    .filter(n -> !n.isSuspended())
+                    .forEach(n -> suspend(retrievalCount, n, sm));
+        }
+    }
+
+    public void suspendAll(SuspensionMode sm) {
+        suspendUnusedNeurons(Integer.MAX_VALUE, sm);
+    }
+
+    private boolean suspend(long retrievalCount, Provider<? extends AbstractNode> p, SuspensionMode sm) {
         AbstractNode an = p.getIfNotSuspended();
-        if (an != null && an.lastUsedDocumentId < docId) {
+        if (an != null && an.retrievalCount < retrievalCount) {
             p.suspend(sm);
             return true;
         }
