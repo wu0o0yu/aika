@@ -39,7 +39,7 @@ public class Document extends Thought {
         return content.toString();
     }
 
-    public String getText(Integer begin, Integer end) {
+    private String getText(Integer begin, Integer end) {
         if(begin != null && end != null) {
             return content.substring(
                     Math.max(0, Math.min(begin, length())),
@@ -50,6 +50,10 @@ public class Document extends Thought {
         }
     }
 
+    public static int[] getRange(Activation act) {
+        return null;
+    }
+
     public static String getText(Activation act) {
         return ""; // TODO!
     }
@@ -57,6 +61,7 @@ public class Document extends Thought {
     public Activation addInput(Neuron n, int begin, int end) {
         return null;
     }
+
     public Activation addInput(NeuronProvider n, int begin, int end) {
         return null;
     }
