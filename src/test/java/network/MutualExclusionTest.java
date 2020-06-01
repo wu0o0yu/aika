@@ -29,6 +29,7 @@ import network.aika.neuron.inhibitory.PatternPartInhibitoryNeuron;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 
 import static network.aika.neuron.PatternScope.*;
@@ -124,10 +125,8 @@ public class MutualExclusionTest {
 
         System.out.println(doc.activationsToString());
 
-        Map<Neuron, SortedSet<Activation>> results = doc.getActivationsPerNeuron();
-
-        SortedSet<Activation> nbActs = results.get(nb);
-        Activation nbAct = nbActs.first();
+        Set<Activation> nbActs = doc.getActivations(nb);
+        Activation nbAct = nbActs.iterator().next();
 
         assertTrue(nbAct.getValue() > 0.38);
     }
