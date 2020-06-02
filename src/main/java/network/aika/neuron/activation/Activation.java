@@ -126,7 +126,7 @@ public class Activation implements Comparable<Activation> {
         return groundRef;
     }
 
-    public void setGroundRef(Reference groundRef) {
+    public void setReference(Reference groundRef) {
         this.groundRef = groundRef;
     }
 

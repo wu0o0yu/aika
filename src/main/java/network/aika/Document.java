@@ -3,6 +3,7 @@ package network.aika;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Reference;
 
 /**
  * The {@code Document} class represents a single document which may be either used for processing a text or as
@@ -55,14 +56,37 @@ public class Document extends Thought {
     }
 
     public static String getText(Activation act) {
-        return ""; // TODO!
+        int[] range = getRange(act);
+        return ((Document)act.getThought()).getText(range[0], range[1]);
     }
 
     public Activation addInput(Neuron n, int begin, int end) {
-        return null;
+        Activation act = n.propagate(this,
+                new Activation.Builder()
+        );
+        act.setReference(new GroundReference(begin, end));
+        return act;
     }
 
     public Activation addInput(NeuronProvider n, int begin, int end) {
-        return null;
+        return addInput(n.get(), begin, end);
+    }
+
+    public static class GroundReference implements Reference {
+        private int begin;
+        private int end;
+
+        public GroundReference(int begin, int end) {
+            this.begin = begin;
+            this.end = end;
+        }
+
+        public int getBegin() {
+            return begin;
+        }
+
+        public int getEnd() {
+            return end;
+        }
     }
 }
