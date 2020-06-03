@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.Config;
 import network.aika.neuron.Synapse;
 
 import static network.aika.neuron.activation.Activation.TOLERANCE;
@@ -37,8 +38,8 @@ public class Link {
         this.output = output;
     }
 
-    public void propagateGradient(double g) {
-        synapse.update(getLearnRate() * input.getValue() * g);
+    public void propagateGradient(double learnRate, double g) {
+        synapse.update(learnRate * input.getValue() * g);
 
         double ig = synapse.getWeight() * g;
         if(Math.abs(ig) < TOLERANCE) {
@@ -46,10 +47,6 @@ public class Link {
         }
 
         input.getMutableGradient().gradient += ig;
-    }
-
-    private double getLearnRate() {
-        return output.getModel().getTrainingConfig().getLearnRate();
     }
 
     public static void link(Synapse s, Activation input, Activation output) {

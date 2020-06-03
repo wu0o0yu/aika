@@ -335,7 +335,7 @@ public class Activation implements Comparable<Activation> {
         inputLinks
                 .values()
                 .forEach(l -> {
-                    l.propagateGradient(g);
+                    l.propagateGradient(thought.getTrainingConfig().getLearnRate(), g);
                     modSyns.add(l.getSynapse());
                 });
 

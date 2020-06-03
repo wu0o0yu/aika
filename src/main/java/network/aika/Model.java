@@ -63,8 +63,6 @@ public class Model {
         registerType(PrimaryInhibitorySynapse.class);
     }
 
-    private Config trainingConfig = new Config();
-
     private SuspensionHook suspensionHook;
     private AtomicLong currentNeuronId = new AtomicLong(0);
     private AtomicLong retrievalCounter = new AtomicLong(0);
@@ -105,7 +103,7 @@ public class Model {
                 .map(id -> lookupNeuron(id));
     }
 
-    public void applyMovingAverage() {
+    public void applyMovingAverage(Config trainingConfig) {
         if(trainingConfig.getAlpha() != null) {
             N *= trainingConfig.getAlpha();
         }
@@ -119,14 +117,6 @@ public class Model {
         } catch (Exception e) {
             log.error("Initialization error: ", e);
         }
-    }
-
-    public Config getTrainingConfig() {
-        return trainingConfig;
-    }
-
-    public void setTrainingConfig(Config trainingConfig) {
-        this.trainingConfig = trainingConfig;
     }
 
     public static Class getClassForType(byte type) {

@@ -67,10 +67,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         return iAct.rangeCoverage;
     }
 
-    public boolean isMature() {
-        return binaryFrequency >= getModel().getTrainingConfig().getMaturityThreshold();
-    }
-
     public void commit(Collection<? extends Synapse> modifiedSynapses) {
         super.commit(modifiedSynapses);
     }

@@ -16,6 +16,7 @@
  */
 package network.aika.templates;
 
+import network.aika.Phase;
 import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -77,6 +78,11 @@ public abstract class LLink<S extends Synapse> {
     protected abstract void follow(Activation act, LNode from, Activation startAct);
 
     public void follow(Activation act, Direction dir) {
+        if(act.getThought().getPhase() == Phase.INDUCTION &&
+                !act.getThought().getTrainingConfig().getMaturityCheck().test(act)) {
+            return;
+        }
+
         LNode n = getNode(dir.getInverted());
         n.follow(act.getNeuron(), act, n.isOpenEnd() ? null : this, act);
     }

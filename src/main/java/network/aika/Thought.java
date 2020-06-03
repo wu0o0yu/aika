@@ -54,7 +54,13 @@ public abstract class Thought {
 
     private Phase phase = PRELIMINARY_LINKING;
 
+    private Config trainingConfig;
+
     public Thought() {
+    }
+
+    public Thought(Config trainingConfig) {
+        this.trainingConfig = trainingConfig;
     }
 
     public abstract int length();
@@ -118,6 +124,14 @@ public abstract class Thought {
         }
     }
 
+    public Config getTrainingConfig() {
+        return trainingConfig;
+    }
+
+    public void setTrainingConfig(Config trainingConfig) {
+        this.trainingConfig = trainingConfig;
+    }
+
     public int createActivationId() {
         return activationIdCounter++;
     }
@@ -171,16 +185,16 @@ public abstract class Thought {
     public void train(Model m) {
         phase = INDUCTION;
 
-        if(m.getTrainingConfig().getAlpha() != null) {
+        if(trainingConfig.getAlpha() != null) {
             Set<Neuron> activatedNeurons = new TreeSet<>();
             getActivations()
                 .stream()
                 .filter(act -> act.isActive())
                 .forEach(act -> activatedNeurons.add(act.getNeuron()));
 
-            m.applyMovingAverage();
+            m.applyMovingAverage(trainingConfig);
             activatedNeurons.forEach(n ->
-                n.applyMovingAverage()
+                n.applyMovingAverage(trainingConfig)
             );
         }
 

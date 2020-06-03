@@ -193,8 +193,6 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
         return lock;
     }
 
-    public abstract boolean isMature();
-
     public void count(Activation act) {
         double v = act.getValue();
         frequency += v;
@@ -204,8 +202,8 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
         coveredFactorCount += 1.0;
     }
 
-    public void applyMovingAverage() {
-        Double alpha = getModel().getTrainingConfig().getAlpha();
+    public void applyMovingAverage(Config trainingConfig) {
+        Double alpha = trainingConfig.getAlpha();
         if(alpha != null) {
             frequency *= alpha;
             binaryFrequency *= alpha;

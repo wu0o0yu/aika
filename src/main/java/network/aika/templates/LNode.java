@@ -30,8 +30,6 @@ public abstract class LNode<N extends Neuron> {
 
     protected String label;
 
-    protected Boolean isMature;
-
     protected List<LLink> links = new ArrayList<>();
 
     protected Class<N> neuronClass;
@@ -46,11 +44,6 @@ public abstract class LNode<N extends Neuron> {
         return this;
     }
 
-    public LNode setMature(Boolean mature) {
-        isMature = mature;
-        return this;
-    }
-
     public LNode setNeuronClass(Class<N> neuronClass) {
         this.neuronClass = neuronClass;
         return this;
@@ -62,10 +55,6 @@ public abstract class LNode<N extends Neuron> {
 
     public boolean checkNeuron(Neuron n) {
         if(neuronClass != null && !n.getClass().equals(neuronClass)) {
-            return false;
-        }
-
-        if(isMature != null && isMature != n.isMature()) {
             return false;
         }
 

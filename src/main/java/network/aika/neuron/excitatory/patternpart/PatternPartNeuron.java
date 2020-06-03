@@ -57,10 +57,6 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         return type;
     }
 
-    public boolean isMature() {
-        return binaryFrequency >= getModel().getTrainingConfig().getMaturityThreshold();  // Sign.NEG, Sign.POS
-    }
-
     public double propagateRangeCoverage(Activation iAct) {
         return getPrimaryInput() == iAct.getNeuron() ? iAct.rangeCoverage : 0.0;
     }

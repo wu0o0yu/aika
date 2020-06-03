@@ -12,15 +12,12 @@ public class InductionTest {
     @Test
     public void testInduceFromMaturePattern() {
         Model m = new Model();
-        m.setTrainingConfig(
-                new Config()
-                        .setMaturityThreshold(10)
-        );
-
         PatternNeuron in = new PatternNeuron(m, "IN", true);
         in.setBinaryFrequency(12);
 
-        Document doc = new Document("");
+        Document doc = new Document("",
+                new Config()
+        );
 
         in.propagate(doc,
                 new Activation.Builder()

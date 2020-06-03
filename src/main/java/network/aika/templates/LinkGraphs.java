@@ -319,7 +319,6 @@ public class LinkGraphs {
 
             LNode input = new LMatchingNode()
                     .setNeuronClass(PatternNeuron.class)
-                    .setMature(true)
                     .setLabel("INPUT-input");
 
 
@@ -342,7 +341,6 @@ public class LinkGraphs {
 
             LNode input = new LMatchingNode()
                     .setNeuronClass(PatternNeuron.class)
-                    .setMature(true)
                     .setLabel("INPUT-input");
 
 
@@ -371,7 +369,6 @@ public class LinkGraphs {
 
             LNode inputPattern = new LMatchingNode()
                     .setNeuronClass(PatternNeuron.class)
-                    .setMature(true)
                     .setLabel("INPUT-input-pattern");
 
 

@@ -16,7 +16,11 @@ public class Document extends Thought {
     private final StringBuilder content;
 
     public Document(String content) {
-        super();
+        this(content, null);
+    }
+
+    public Document(String content, Config trainingConfig) {
+        super(trainingConfig);
         this.content = new StringBuilder(content);
     }
 
