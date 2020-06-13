@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Model;
+import network.aika.Phase;
 import network.aika.Thought;
 import network.aika.Utils;
 import network.aika.neuron.*;
@@ -26,10 +27,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.InputKey.INPUT_COMP;
+import static network.aika.Phase.FINAL_LINKING;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
-import static network.aika.Phase.PRELIMINARY_LINKING;
+import static network.aika.Phase.INITIAL_LINKING;
 
 /**
  *
@@ -40,7 +41,8 @@ public class Activation implements Comparable<Activation> {
     public static double TOLERANCE = 0.001;
 
     private double value;
-    private double net;
+    private double sum;
+    private double negSum;
     private Fired fired = NOT_FIRED;
 
     public double rangeCoverage;
@@ -52,16 +54,14 @@ public class Activation implements Comparable<Activation> {
     private double p = 1.0;
 
     TreeMap<Link, Link> inputLinksFiredOrder;
-    Map<InputKey, Link> inputLinks;
+    Map<NeuronProvider, Link> inputLinks;
     NavigableMap<Activation, Link> outputLinks;
 
-    private boolean assumePosRecLinks;
-    private boolean requiresFullUpdate = false;
     private boolean isFinal;
 
     private LNode lNode;
 
-    private int round; // Nur als Abbruchbedingung
+    private int round; // Only used as stopping criteria
     private Activation lastRound;
 
     private Set<Activation> branches = new TreeSet<>();
@@ -74,18 +74,15 @@ public class Activation implements Comparable<Activation> {
         this.id = id;
         this.thought = t;
         this.neuron = n;
-        this.assumePosRecLinks = n.hasPositiveRecurrentSynapses() && t.getPhase() == PRELIMINARY_LINKING;
-        this.net = n.getTotalBias(this.assumePosRecLinks, CURRENT);
 
         thought.addActivation(this);
 
         inputLinksFiredOrder = new TreeMap<>(Comparator
-                .<Link, Boolean>comparing(l -> !l.isRecurrent())
-                .thenComparing(l -> l.getInput().getFired())
+                .<Link, Fired>comparing(l -> l.getInput().getFired())
                 .thenComparing(l -> l.getInput())
         );
 
-        inputLinks = new TreeMap<>(INPUT_COMP);
+        inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>(Comparator
                 .<Activation, NeuronProvider>comparing(act -> act.getNeuronProvider())
                 .thenComparing(act -> act)
@@ -102,8 +99,8 @@ public class Activation implements Comparable<Activation> {
         return value;
     }
 
-    public double getNet() {
-        return net;
+    public double getNet(Phase p) {
+        return sum + (p == INITIAL_LINKING ? 0.0 : negSum) + getNeuron().getTotalBias(p, CURRENT);
     }
 
     public Fired getFired() {
@@ -158,12 +155,11 @@ public class Activation implements Comparable<Activation> {
         return neuron.getProvider();
     }
 
-    public Stream<Link> getOutputLinks(NeuronProvider n, PatternScope ps) {
+    public Stream<Link> getOutputLinks(NeuronProvider n) {
         return outputLinks
                 .values()
                 .stream()
-                .filter(l -> l.getOutput().getNeuronProvider().getId() == n.getId())
-                .filter(l -> l.getSynapse().getPatternScope() == ps);
+                .filter(l -> l.getOutput().getNeuronProvider().getId() == n.getId());
     }
 
     public void propagate(Activation.Builder input) {
@@ -172,18 +168,16 @@ public class Activation implements Comparable<Activation> {
         setRangeCoverage(input.rangeCoverage);
 
         input.getInputLinks()
-                .entrySet()
                 .stream()
-                .map(me -> new Link(
-                        getNeuron().getInputSynapse(me.getKey().getPInput(), me.getKey().getPatternScope()),
-                        me.getValue(),
+                .map(iAct -> new Link(
+                        getNeuron().getInputSynapse(iAct.getNeuronProvider()),
+                        iAct,
                         this
                         )
                 )
                 .forEach(l -> addLink(l));
 
         isFinal = true;
-        assumePosRecLinks = false;
 
         linkForward();
         thought.processActivations();
@@ -195,7 +189,6 @@ public class Activation implements Comparable<Activation> {
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
         linkClone(clonedAct);
-        clonedAct.requiresFullUpdate = true;
         return clonedAct;
     }
 
@@ -204,7 +197,6 @@ public class Activation implements Comparable<Activation> {
         clonedAct.setRound(round + 1);
         clonedAct.setLastRound(this);
         linkClone(clonedAct);
-        clonedAct.requiresFullUpdate = true;
         return clonedAct;
     }
 
@@ -222,7 +214,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void setValue(double v) {
-        this.value = v;
+        value = v;
     }
 
     public void setFired(Fired fired) {
@@ -243,7 +235,7 @@ public class Activation implements Comparable<Activation> {
 
     public boolean isConflicting() {
         return inputLinks.values().stream()
-                .filter(l -> l.isConflict() && !l.isSelfRef())
+                .filter(l -> l.isNegative() && !l.isSelfRef())
                 .flatMap(l -> l.getInput().inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
                 .anyMatch(l -> l.getInput().lNode == null);
     }
@@ -264,18 +256,11 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void addLink(Link l) {
-        if(l.getSynapse().isRecurrent() || !isLastLink(l)) {
-            requiresFullUpdate = true;
-        }
-
         l.link();
 
         if(isFinal) return;
 
-        if(requiresFullUpdate) {
-            compute();
-            requiresFullUpdate = false;
-        }else{
+        if(!l.isNegative()) {
             sumUpLink(l);
         }
 
@@ -296,29 +281,31 @@ public class Activation implements Comparable<Activation> {
 
     public void sumUpLink(Link l) {
         double w = l.getSynapse().getWeight();
-        net += l.getInput().value * w;
+        sum += l.getInput().value * w;
         rangeCoverage += getNeuron().propagateRangeCoverage(l.getInput());
 
         checkIfFired(l);
     }
 
-    public void compute() {
-        fired = NOT_FIRED;
-        net = neuron.getTotalBias(assumePosRecLinks, CURRENT);
-        for (Link l: inputLinksFiredOrder.values()) {
-            sumUpLink(l);
+    public void updateForFinalPhase() {
+        double initialNet = getNet(INITIAL_LINKING);
+        double finalNet = getNet(FINAL_LINKING);
+
+        if(Math.abs(finalNet - initialNet) > TOLERANCE) {
+            thought.add(this);
         }
     }
 
     public void checkIfFired(Link l) {
-        if(fired == NOT_FIRED && net > 0.0) {
+        if(fired == NOT_FIRED && getNet(getThought().getPhase()) > 0.0) {
             fired = neuron.incrementFired(l.getInput().fired);
             thought.add(this);
         }
     }
 
     public void process() {
-        value = p * neuron.getActivationFunction().f(net);
+        Phase phase = getThought().getPhase();
+        value = p * neuron.getActivationFunction().f(getNet(phase));
         isFinal = true;
         if(lastRound == null || !equals(lastRound)) {
             linkForward();
@@ -329,7 +316,7 @@ public class Activation implements Comparable<Activation> {
         assert !latestGradient.isFixed;
         latestGradient.isFixed = true;
 
-        double g = latestGradient.gradient * getNeuron().getActivationFunction().outerGrad(net);
+        double g = latestGradient.gradient * getNeuron().getActivationFunction().outerGrad(getNet(FINAL_LINKING));
 
         ArrayList<Synapse> modSyns = new ArrayList<>();
         inputLinks
@@ -359,10 +346,11 @@ public class Activation implements Comparable<Activation> {
     public void computeP() {
         if(!isActive()) return;
 
+        double net = getNet(getThought().getPhase());
         Set<Activation> conflictingActs = branches
                 .stream()
                 .flatMap(bAct -> bAct.inputLinks.values().stream())
-                .filter(l -> l.isConflict())
+                .filter(l -> l.isNegative())
                 .flatMap(l -> l.getInput().inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
                 .map(l -> l.getInput())
                 .collect(Collectors.toSet());
@@ -371,14 +359,14 @@ public class Activation implements Comparable<Activation> {
         conflictingActs
                 .stream()
                 .forEach(
-                        cAct -> offset[0] = Math.min(offset[0], cAct.net)
+                        cAct -> offset[0] = Math.min(offset[0], cAct.getNet(getThought().getPhase()))
                 );
 
         final double[] norm = new double[] {Math.exp(net - offset[0])};
         conflictingActs
                 .stream()
                 .forEach(
-                        cAct -> norm[0] += Math.exp(cAct.net - offset[0])
+                        cAct -> norm[0] += Math.exp(cAct.getNet(getThought().getPhase()) - offset[0])
                 );
 
         double p = Math.exp(net - offset[0]) / norm[0];
@@ -386,7 +374,8 @@ public class Activation implements Comparable<Activation> {
         if(Math.abs(p - getP()) <= TOLERANCE) return;
 
         Activation cAct = isFinal ? createUpdate() : this;
-        cAct.net = net;
+        cAct.sum = sum;
+        cAct.negSum = negSum;
         cAct.p = p;
 
         thought.add(cAct);
@@ -419,10 +408,6 @@ public class Activation implements Comparable<Activation> {
         return null;
     }
 
-    public boolean assumePosRecLinks() {
-        return assumePosRecLinks;
-    }
-
     public boolean hasBranches() {
         return branches.isEmpty();
     }
@@ -431,7 +416,7 @@ public class Activation implements Comparable<Activation> {
         return "A " + getId() + " " +
                 getNeuron().getClass().getSimpleName() + ":" + getLabel() +
                 " value:" + Utils.round(value) +
-                " net:" + Utils.round(net) +
+                " net:" + Utils.round(getNet(getThought().getPhase())) +
                 " p:" + Utils.round(p) +
                 " round:" + round;
     }
@@ -445,7 +430,7 @@ public class Activation implements Comparable<Activation> {
         private double value = 1.0;
         private int inputTimestamp;
         private int fired;
-        private Map<InputKey, Activation> inputLinks = new TreeMap<>(INPUT_COMP);
+        private Set<Activation> inputLinks = new TreeSet<>();
         private double rangeCoverage;
 
         public Builder setValue(double value) {
@@ -463,24 +448,12 @@ public class Activation implements Comparable<Activation> {
             return this;
         }
 
-        public Map<InputKey, Activation> getInputLinks() {
+        public Set<Activation> getInputLinks() {
             return this.inputLinks;
         }
 
-        public Builder addInputLink(PatternScope ps, Activation iAct) {
-            InputKey ik = new InputKey() {
-                @Override
-                public NeuronProvider getPInput() {
-                    return iAct.getNeuronProvider();
-                }
-
-                @Override
-                public PatternScope getPatternScope() {
-                    return ps;
-                }
-            };
-
-            inputLinks.put(ik, iAct);
+        public Builder addInputLink(Activation iAct) {
+            inputLinks.add(iAct);
             return this;
         }
 

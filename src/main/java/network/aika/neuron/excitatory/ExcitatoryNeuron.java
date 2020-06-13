@@ -18,8 +18,8 @@ package network.aika.neuron.excitatory;
 
 import network.aika.ActivationFunction;
 import network.aika.Model;
+import network.aika.Phase;
 import network.aika.neuron.*;
-import network.aika.neuron.InputKey.PureInputKey;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.util.*;
 
 import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
-import static network.aika.neuron.InputKey.INPUT_COMP;
 import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.activation.Activation.TOLERANCE;
@@ -48,7 +47,7 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
     private volatile double directConjunctiveBias;
     private volatile double recurrentConjunctiveBias;
 
-    protected TreeMap<InputKey, S> inputSynapses = new TreeMap<>(INPUT_COMP);
+    protected TreeMap<NeuronProvider, S> inputSynapses = new TreeMap<>();
 
     public ExcitatoryNeuron() {
         super();
@@ -96,15 +95,15 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
     public void reactivate() {
     }
 
-    public Synapse getInputSynapse(NeuronProvider n, PatternScope ps) {
+    public Synapse getInputSynapse(NeuronProvider n) {
         lock.acquireReadLock();
-        Synapse s = inputSynapses.get(new PureInputKey(n, ps));
+        Synapse s = inputSynapses.get(n);
         lock.releaseReadLock();
         return s;
     }
 
     public void addInputSynapse(S s) {
-        inputSynapses.put(s, s);
+        inputSynapses.put(s.getPInput(), s);
         setModified();
     }
 
@@ -115,7 +114,7 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
     }
 
     public void addOutputSynapse(Synapse s) {
-        outputSynapses.put(s, s);
+        outputSynapses.put(s.getPOutput(), s);
         setModified();
     }
 
@@ -142,13 +141,8 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
         return s.getWeight(state) < getBias();
     }
 
-    @Override
-    public boolean hasPositiveRecurrentSynapses() {
-        return recurrentConjunctiveBias != 0.0;
-    }
-
-    public double getTotalBias(boolean assumePosRecLinks, Synapse.State state) {
-        return getBias(state) - (directConjunctiveBias + (assumePosRecLinks ? 0.0 : recurrentConjunctiveBias));
+    public double getTotalBias(Phase p, Synapse.State state) {
+        return getBias(state) - (directConjunctiveBias + (p == Phase.INITIAL_LINKING ? 0.0 : recurrentConjunctiveBias));
     }
 
     @Override
@@ -176,25 +170,15 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
 
         while (in.readBoolean()) {
             S syn = (S) m.readSynapse(in);
-            inputSynapses.put(syn, syn);
+            inputSynapses.put(syn.getPInput(), syn);
         }
     }
 
     public void commit(Collection<? extends Synapse> modifiedSynapses) {
         commitBias();
 
-        directConjunctiveBias = 0.0;
-        recurrentConjunctiveBias = 0.0;
         for (Synapse s : inputSynapses.values()) {
             s.commit();
-
-            if(!s.isNegative()) {
-                if(!s.isRecurrent()) {
-                    directConjunctiveBias += s.getWeight();
-                } else  {
-                    recurrentConjunctiveBias += s.getWeight();
-                }
-            }
         }
 
         setModified();

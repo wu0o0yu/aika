@@ -33,9 +33,6 @@ import java.io.*;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static network.aika.neuron.PatternScope.INPUT_PATTERN;
-import static network.aika.neuron.PatternScope.SAME_PATTERN;
-
 /**
  *
  * @author Lukas Molzberger
@@ -57,14 +54,10 @@ public class SyllableExperiment {
 
         relN.link(1.0,
                 new PatternPartSynapse.Builder()
-                        .setPatternScope(INPUT_PATTERN)
-                        .setRecurrent(false)
                         .setNegative(false)
                         .setNeuron(inputInhibN)
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
-                        .setPatternScope(SAME_PATTERN)
-                        .setRecurrent(true)
                         .setNegative(false)
                         .setNeuron(inputInhibN)
                         .setWeight(10.0)
@@ -79,7 +72,6 @@ public class SyllableExperiment {
                     new InhibitorySynapse.Builder()
                             .setNeuron(n)
                             .setWeight(1.0)
-                            .setPatternScope(SAME_PATTERN)
                             .setPropagate(true)
             );
 
@@ -109,7 +101,7 @@ public class SyllableExperiment {
                                     .setRangeCoverage(1.0)
                     );
 
-            Activation currentInInhibAct = currentAct.getOutputLinks(inputInhibN.getProvider(), SAME_PATTERN)
+            Activation currentInInhibAct = currentAct.getOutputLinks(inputInhibN.getProvider())
                     .findAny()
                     .map(l -> l.getOutput())
                     .orElse(null);
@@ -120,8 +112,6 @@ public class SyllableExperiment {
                             .setInputTimestamp(i)
                             .setFired(0)
                             .setValue(1.0)
-                            .addInputLink(INPUT_PATTERN, lastInInhibAct)
-                            .addInputLink(SAME_PATTERN, currentInInhibAct)
                 );
             }
 

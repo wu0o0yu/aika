@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
-import static network.aika.neuron.PatternScope.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -53,15 +52,11 @@ public class MutualExclusionTest {
 
         na.link(1.0,
                 new PatternPartSynapse.Builder()
-                        .setPatternScope(INPUT_PATTERN)
-                        .setRecurrent(false)
                         .setNegative(false)
                         .setPropagate(true)
                         .setNeuron(in)
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
-                        .setPatternScope(CONFLICTING_PATTERN)
-                        .setRecurrent(true)
                         .setNegative(true)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
@@ -69,15 +64,11 @@ public class MutualExclusionTest {
 
         nb.link(1.5,
                 new PatternPartSynapse.Builder()
-                        .setPatternScope(INPUT_PATTERN)
-                        .setRecurrent(false)
                         .setNegative(false)
                         .setPropagate(true)
                         .setNeuron(in)
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
-                        .setPatternScope(CONFLICTING_PATTERN)
-                        .setRecurrent(true)
                         .setNegative(true)
                         .setNeuron(inhib)
                         .setWeight(-100.0)
@@ -85,15 +76,11 @@ public class MutualExclusionTest {
 
         nc.link(1.2,
                 new PatternPartSynapse.Builder()
-                        .setPatternScope(INPUT_PATTERN)
-                        .setRecurrent(false)
                         .setNegative(false)
                         .setPropagate(true)
                         .setNeuron(in)
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
-                        .setPatternScope(CONFLICTING_PATTERN)
-                        .setRecurrent(true)
                         .setNegative(true)
                         .setNeuron(inhib)
                         .setWeight(-100.0)

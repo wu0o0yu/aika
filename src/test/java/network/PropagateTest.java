@@ -24,8 +24,6 @@ import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
 import org.junit.jupiter.api.Test;
 
-import static network.aika.neuron.PatternScope.INPUT_PATTERN;
-
 /**
  *
  * @author Lukas Molzberger
@@ -41,8 +39,6 @@ public class PropagateTest {
 
         na.link(1.0,
                 new PatternPartSynapse.Builder()
-                        .setPatternScope(INPUT_PATTERN)
-                        .setRecurrent(false)
                         .setNegative(false)
                         .setPropagate(true)
                         .setNeuron(in)

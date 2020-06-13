@@ -21,8 +21,6 @@ import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
 import network.aika.neuron.inhibitory.*;
 
-import static network.aika.neuron.PatternScope.*;
-
 /**
  *
  * @author Lukas Molzberger
@@ -71,17 +69,14 @@ public class LinkGraphs {
 
 
             patternInputLinkT = new LTargetLink()
-                    .setRecurrent(false)
                     .setNegative(false)
                     .setInput(inputB)
                     .setOutput(target)
-                    .setPatternScope(SAME_PATTERN)
                     .setLabel("inputLink");
 
             patternInputLinkI = new LMatchingLink()
                     .setInput(inputA)
                     .setOutput(target)
-                    .setPatternScope(SAME_PATTERN)
                     .setLabel("l2")
                     .setDirection(true);
 
@@ -89,7 +84,6 @@ public class LinkGraphs {
             new LMatchingLink()
                     .setInput(inputA)
                     .setOutput(inputB)
-                    .setPatternScope(SAME_PATTERN)
                     .setLabel("l1")
                     .setDirection(false);
         }
@@ -114,38 +108,32 @@ public class LinkGraphs {
 
 
             sameInputLinkT = new LTargetLink()
-                    .setRecurrent(false)
                     .setNegative(false)
                     .setInput(inputRel)
                     .setOutput(target)
-                    .setPatternScope(INPUT_PATTERN)
                     .setLabel("sameInputLink");
 
             sameInputLinkI = new LMatchingLink()
                     .setInput(inputPattern)
                     .setOutput(target)
-                    .setPatternScope(INPUT_PATTERN)
                     .setLabel("inputPatternLink")
                     .setDirection(true);
 
             new LMatchingLink()
                     .setInput(inputPattern)
                     .setOutput(inputRel)
-                    .setPatternScope(SAME_PATTERN)
                     .setLabel("l1")
                     .setDirection(false);
 
             new LMatchingLink()
                     .setInput(inhib)
                     .setOutput(inputRel)
-                    .setPatternScope(SAME_PATTERN)
                     .setLabel("l2")
                     .setDirection(false);
 
             new LMatchingLink()
                     .setInput(inputPattern)
                     .setOutput(inhib)
-                    .setPatternScope(SAME_PATTERN)
                     .setLabel("inhibLink")
                     .setDirection(false);
 
@@ -174,45 +162,38 @@ public class LinkGraphs {
                     .setLabel("INPUT-inhib");
 
             relatedInputLinkT = new LTargetLink()
-                    .setRecurrent(false)
                     .setNegative(false)
                     .setInput(samePatternPP)
                     .setOutput(target)
-                    .setPatternScope(SAME_PATTERN)
                     .setLabel("relatedInputLink");
 
             relatedInputLinkI = new LMatchingLink()
                     .setInput(inputRel)
                     .setOutput(target)
-                    .setPatternScope(INPUT_PATTERN)
                     .setLabel("inputRelLink")
                     .setDirection(false);
 
             new LMatchingLink()
                     .setInput(relPattern)
                     .setOutput(inputRel)
-                    .setPatternScope(INPUT_PATTERN)
                     .setLabel("relPatternLink1")
                     .setDirection(false);
 
             new LMatchingLink()
                     .setInput(relPattern)
                     .setOutput(samePatternPP)
-                    .setPatternScope(INPUT_PATTERN)
                     .setLabel("relPatternLink2")
                     .setDirection(false);
 
             new LMatchingLink()
                     .setInput(relPattern)
                     .setOutput(inhib)
-                    .setPatternScope(SAME_PATTERN)
                     .setLabel("inhibLink")
                     .setDirection(false);
 
             new LMatchingLink()
                     .setInput(inhib)
                     .setOutput(inputRel)
-                    .setPatternScope(INPUT_PATTERN)
                     .setLabel("relPatternLink3")
                     .setDirection(true);
         }
@@ -237,31 +218,26 @@ public class LinkGraphs {
 
 
             inhibitoryLinkT = new LTargetLink()
-                    .setRecurrent(true)
                     .setNegative(true)
                     .setInput(inhib)
                     .setOutput(target)
-                    .setPatternScope(CONFLICTING_PATTERN)
                     .setLabel("inhibLink");
 
             inhibitoryLinkI = new LMatchingLink()
                     .setInput(input)
                     .setOutput(target)
-                    .setPatternScope(INPUT_PATTERN)
                     .setLabel("l1")
                     .setDirection(true);
 
             new LMatchingLink()
                     .setInput(input)
                     .setOutput(patternpart)
-                    .setPatternScope(INPUT_PATTERN)
                     .setLabel("l2")
                     .setDirection(false);
 
             new LMatchingLink()
                     .setInput(patternpart)
                     .setOutput(inhib)
-                    .setPatternScope(SAME_PATTERN)
                     .setLabel("l3")
                     .setDirection(false);
         }
@@ -278,17 +254,14 @@ public class LinkGraphs {
 
 
             posRecLinkT = new LTargetLink()
-                    .setRecurrent(true)
                     .setNegative(false)
                     .setInput(pattern)
                     .setOutput(target)
-                    .setPatternScope(SAME_PATTERN)
                     .setLabel("posRecLink");
 
             posRecLinkI = new LMatchingLink()
                     .setInput(target)
                     .setOutput(pattern)
-                    .setPatternScope(SAME_PATTERN)
                     .setLabel("patternLink")
                     .setDirection(true);
 
@@ -325,10 +298,8 @@ public class LinkGraphs {
             inducePatternPart = new LTargetLink()
                     .setPropagate(true)
                     .setNegative(false)
-                    .setRecurrent(false)
                     .setInput(input)
                     .setOutput(target)
-                    .setPatternScope(INPUT_PATTERN)
                     .setLabel("inducePatternPart")
                     .setSynapseClass(PatternPartSynapse.class);
         }
@@ -347,11 +318,9 @@ public class LinkGraphs {
             inducePPInhibitoryNeuron = new LTargetLink()
                     .setPropagate(true)
                     .setNegative(false)
-                    .setRecurrent(false)
                     .setInitialWeight(1.0)
                     .setInput(input)
                     .setOutput(target)
-                    .setPatternScope(INPUT_PATTERN)
                     .setLabel("induceInhibitoryNeuron")
                     .setSynapseClass(PrimaryInhibitorySynapse.class);
 
@@ -375,17 +344,14 @@ public class LinkGraphs {
             inducePPInhibInputSynapse = new LTargetLink()
                     .setPropagate(true)
                     .setNegative(false)
-                    .setRecurrent(false)
                     .setInput(input)
                     .setOutput(target)
-                    .setPatternScope(SAME_PATTERN)
                     .setLabel("induceInhibitorySynapse")
                     .setSynapseClass(InhibitorySynapse.class);
 
             new LMatchingLink()
                     .setInput(inputPattern)
                     .setOutput(input)
-                    .setPatternScope(INPUT_PATTERN)
                     .setLabel("pp-input-syn")
                     .setSynapseClass(PatternPartSynapse.class)
                     .setDirection(false);
@@ -393,7 +359,6 @@ public class LinkGraphs {
             new LMatchingLink()
                     .setInput(inputPattern)
                     .setOutput(target)
-                    .setPatternScope(INPUT_PATTERN)
                     .setLabel("primary-inhib-syn")
                     .setSynapseClass(PrimaryInhibitorySynapse.class)
                     .setDirection(true);
@@ -412,17 +377,14 @@ public class LinkGraphs {
 
             induceNegativePPInputSynapse = new LTargetLink()
                     .setNegative(true)
-                    .setRecurrent(true)
                     .setInput(input)
                     .setOutput(target)
-                    .setPatternScope(SAME_PATTERN)
                     .setLabel("induce pp-input-syn")
                     .setSynapseClass(PatternPartSynapse.class);
 
             new LMatchingLink()
                     .setInput(target)
                     .setOutput(input)
-                    .setPatternScope(SAME_PATTERN)
                     .setLabel("pp-inhib-syn")
                     .setSynapseClass(InhibitorySynapse.class)
                     .setDirection(false);

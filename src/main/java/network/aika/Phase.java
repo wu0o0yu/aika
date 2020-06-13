@@ -21,7 +21,7 @@ package network.aika;
  * @author Lukas Molzberger
  */
 public enum Phase {
-    PRELIMINARY_LINKING,
+    INITIAL_LINKING,
     FINAL_LINKING,
     INDUCTION,
     RESULTS

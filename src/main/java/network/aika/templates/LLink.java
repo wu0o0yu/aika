@@ -17,7 +17,6 @@
 package network.aika.templates;
 
 import network.aika.Phase;
-import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
@@ -36,7 +35,6 @@ public abstract class LLink<S extends Synapse> {
     protected  LNode input;
     protected  LNode output;
 
-    protected PatternScope patternScope;
     protected Class<S> synapseClass;
 
     public LLink() {
@@ -56,11 +54,6 @@ public abstract class LLink<S extends Synapse> {
     public LLink setOutput(LNode output) {
         this.output = output;
         output.addLink(this);
-        return this;
-    }
-
-    public LLink setPatternScope(PatternScope patternScope) {
-        this.patternScope = patternScope;
         return this;
     }
 
@@ -96,10 +89,6 @@ public abstract class LLink<S extends Synapse> {
             return false;
         }
 
-        if(patternScope != null && patternScope != s.getPatternScope()) {
-            return false;
-        }
-
         return true;
     }
 
@@ -126,6 +115,6 @@ public abstract class LLink<S extends Synapse> {
     public abstract String getTypeStr();
 
     public String toString() {
-        return getTypeStr() + " " + label + " " + (patternScope != null ? patternScope : "X") + " " + input.label  + " -> " + output.label;
+        return getTypeStr() + " " + label + " " + input.label  + " -> " + output.label;
     }
 }

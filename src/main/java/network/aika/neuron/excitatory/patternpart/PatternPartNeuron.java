@@ -25,8 +25,6 @@ import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static network.aika.neuron.PatternScope.INPUT_PATTERN;
-import static network.aika.neuron.PatternScope.SAME_PATTERN;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.templates.LinkGraphs.*;
@@ -58,14 +56,14 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     public double propagateRangeCoverage(Activation iAct) {
-        return getPrimaryInput() == iAct.getNeuron() ? iAct.rangeCoverage : 0.0;
+        return 0.0; //getPrimaryInput() == iAct.getNeuron() ? iAct.rangeCoverage : 0.0;
     }
 
     @Override
     public void link(Activation act) {
         super.link(act);
 
-        if (act.getThought().getPhase() == Phase.PRELIMINARY_LINKING) {
+        if (act.getThought().getPhase() == Phase.INITIAL_LINKING) {
             sameInputLinkT.follow(act, OUTPUT);
             relatedInputLinkT.follow(act, OUTPUT);
             patternInputLinkT.follow(act, OUTPUT);
@@ -80,24 +78,39 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public void link(Link l) {
-        if (l.getInput().getThought().getPhase() == Phase.PRELIMINARY_LINKING) {
+        if (l.getInput().getThought().getPhase() == Phase.INITIAL_LINKING) {
             sameInputLinkI.followBackwards(l);
             relatedInputLinkI.followBackwards(l);
             inhibitoryLinkI.followBackwards(l);
         }
     }
 
+    private double getInputProbability() {
+        return inputSynapses
+                .values()
+                .stream()
+                .map(s -> s.getInput())
+                .filter(n -> n instanceof PatternNeuron)
+                .mapToDouble(n -> n.getP())
+                .max()
+                .getAsDouble();
+    }
+
+
+    private double getPatternProbability() {
+        return outputSynapses
+                .values()
+                .stream()
+                .map(s -> s.getOutput())
+                .filter(n -> n instanceof PatternNeuron)
+                .mapToDouble(n -> n.getP())
+                .average()
+                .getAsDouble();
+    }
+
     public double getCost(Sign s) {
-        Neuron primaryInput = getPrimaryInput();
-        Neuron patternInput = getPatternInput();
-
-        double fz = primaryInput.getFrequency();
-        double Nz = primaryInput.getN();
-        double fy = patternInput.getFrequency();
-        double Ny = patternInput.getN();
-
-        double pXi = fz / Nz;
-        double pXo = fy / Ny;
+        double pXi = getInputProbability();
+        double pXo = getPatternProbability();
 
         double pXio = frequency / getN();
         double pXioIndep = pXi * pXo;
@@ -107,23 +120,5 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         } else {
             return Math.log(1.0 - pXio) - Math.log(1.0 - pXioIndep);
         }
-    }
-
-    private Synapse<Neuron, Neuron> getPatternSynapse(PatternScope ps) {
-        return inputSynapses
-                .values()
-                .stream()
-                .filter(s -> ps == s.getPatternScope())
-                .filter(s -> s.getInput().getOuterType() == PatternNeuron.type)
-                .findFirst()
-                .orElse(null);
-    }
-
-    public Neuron getPrimaryInput() {
-        return getPatternSynapse(INPUT_PATTERN).getInput();
-    }
-
-    public Neuron getPatternInput() {
-        return getPatternSynapse(SAME_PATTERN).getInput();
     }
 }

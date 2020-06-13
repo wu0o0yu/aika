@@ -28,7 +28,6 @@ import static network.aika.neuron.activation.Direction.OUTPUT;
 
 public class LTargetLink<S extends Synapse> extends LLink<S> {
 
-    private Boolean isRecurrent;
     private Boolean isNegative;
     private Boolean isPropagate;
 
@@ -36,11 +35,6 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
 
     public LTargetLink() {
         super();
-    }
-
-    public LTargetLink setRecurrent(Boolean recurrent) {
-        isRecurrent = recurrent;
-        return this;
     }
 
     public LTargetLink setNegative(Boolean negative) {
@@ -82,7 +76,7 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
         }
 
         NeuronProvider on = oAct.getNeuronProvider();
-        Synapse s = in.getOutputSynapse(on, patternScope);
+        Synapse s = in.getOutputSynapse(on);
 
         if(s == null) {
             if(iAct.getThought().getPhase() != INDUCTION) return;
@@ -135,8 +129,6 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
             s.setInput(in);
             s.setOutput(on);
             s.setWeight(initialWeight);
-            s.setPatternScope(patternScope);
-            s.setRecurrent(isRecurrent);
             s.setNegative(isNegative);
             s.setPropagate(isPropagate);
 
@@ -151,10 +143,6 @@ public class LTargetLink<S extends Synapse> extends LLink<S> {
 
     protected boolean checkSynapse(Synapse s) {
         super.checkSynapse(s);
-
-        if(isRecurrent != null && isRecurrent.booleanValue() != s.isRecurrent()) {
-            return false;
-        }
 
         if(isNegative != null && isNegative.booleanValue() != s.isNegative()) {
             return false;

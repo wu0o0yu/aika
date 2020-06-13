@@ -82,14 +82,6 @@ public class Link {
         return synapse.isNegative();
     }
 
-    public boolean isRecurrent() {
-        return synapse != null && synapse.isRecurrent();
-    }
-
-    public boolean isConflict() {
-        return isRecurrent() && isNegative();
-    }
-
     public boolean isSelfRef() {
         return output == input.inputLinksFiredOrder.firstEntry().getValue().input;
     }
@@ -99,7 +91,7 @@ public class Link {
             input.outputLinks.put(output, this);
             output.inputLinksFiredOrder.put(this, this);
         }
-        Link ol = output.inputLinks.put(synapse, this);
+        Link ol = output.inputLinks.put(getSynapse().getPInput(), this);
         if(ol != null && ol != this) {
             output.inputLinksFiredOrder.remove(ol);
             ol.input.outputLinks.remove(ol.output);
@@ -116,7 +108,7 @@ public class Link {
 
     public void process() {
         if (output.isFinal() && !isSelfRef()) {
-            output = isConflict() ?
+            output = isNegative() ?
                     output.createBranch() :
                     output.createUpdate();
         }

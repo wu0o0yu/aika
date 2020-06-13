@@ -42,11 +42,6 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
     }
 
     @Override
-    public boolean isRecurrent() {
-        return false;
-    }
-
-    @Override
     public boolean isNegative() {
         return false;
     }

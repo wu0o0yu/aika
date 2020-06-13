@@ -18,17 +18,14 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.OutputKey.PureOutputKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.Synapse.OUTPUT_COMP;
 import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.templates.LinkGraphs.propagateT;
@@ -46,7 +43,7 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
     private volatile double bias;
     private volatile double biasDelta;
 
-    protected TreeMap<Synapse, Synapse> outputSynapses = new TreeMap<>(OUTPUT_COMP);
+    protected TreeMap<NeuronProvider, Synapse> outputSynapses = new TreeMap<>();
 
     protected final ReadWriteLock lock = new ReadWriteLock();
 
@@ -99,11 +96,11 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
     public abstract boolean isWeak(Synapse synapse, Synapse.State state);
 
-    public abstract Synapse getInputSynapse(NeuronProvider n, PatternScope ps);
+    public abstract Synapse getInputSynapse(NeuronProvider n);
 
-    public Synapse getOutputSynapse(NeuronProvider n, PatternScope ps) {
+    public Synapse getOutputSynapse(NeuronProvider n) {
         lock.acquireReadLock();
-        Synapse s = outputSynapses.get(new PureOutputKey(n, ps));
+        Synapse s = outputSynapses.get(n);
         lock.releaseReadLock();
         return s;
     }
@@ -163,9 +160,7 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
         this.biasDelta += biasDelta;
     }
 
-    public abstract double getTotalBias(boolean assumePosRecLinks, Synapse.State state);
-
-    public abstract boolean hasPositiveRecurrentSynapses();
+    public abstract double getTotalBias(Phase p, Synapse.State state);
 
     public double getBias() {
         return bias;
@@ -182,7 +177,7 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
     public abstract double propagateRangeCoverage(Activation iAct);
 
     public void link(Activation act) {
-        if(act.getThought().getPhase() == Phase.PRELIMINARY_LINKING) {
+        if(act.getThought().getPhase() == Phase.INITIAL_LINKING) {
             propagateT.follow(act, OUTPUT);
         }
     }
@@ -277,7 +272,7 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
         while (in.readBoolean()) {
             Synapse syn = m.readSynapse(in);
-            outputSynapses.put(syn, syn);
+            outputSynapses.put(syn.getPOutput(), syn);
         }
 
         frequency = in.readDouble();

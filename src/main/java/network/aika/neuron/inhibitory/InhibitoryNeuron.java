@@ -20,7 +20,6 @@ import network.aika.ActivationFunction;
 import network.aika.Model;
 import network.aika.Phase;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.PatternScope;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
@@ -51,7 +50,7 @@ public abstract class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     @Override
-    public Synapse getInputSynapse(NeuronProvider n, PatternScope ps) {
+    public Synapse getInputSynapse(NeuronProvider n) {
         throw new UnsupportedOperationException();
     }
 
@@ -63,7 +62,7 @@ public abstract class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     public void link(Activation act) {
         super.link(act);
 
-        if (act.getThought().getPhase() == Phase.PRELIMINARY_LINKING) {
+        if (act.getThought().getPhase() == Phase.INITIAL_LINKING) {
             inhibitoryLinkT.follow(act, OUTPUT);
         }
     }
@@ -82,13 +81,8 @@ public abstract class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         return s.getWeight(state) < -getBias();
     }
 
-    public double getTotalBias(boolean assumePosRecLinks, Synapse.State state) {
+    public double getTotalBias(Phase p, Synapse.State state) {
         return getBias(state);
-    }
-
-    @Override
-    public boolean hasPositiveRecurrentSynapses() {
-        return false;
     }
 
     public ActivationFunction getActivationFunction() {

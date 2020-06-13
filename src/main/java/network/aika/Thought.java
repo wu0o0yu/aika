@@ -52,7 +52,7 @@ public abstract class Thought {
 
     private Map<Neuron, SortedSet<Activation>> actsPerNeuron = null;
 
-    private Phase phase = PRELIMINARY_LINKING;
+    private Phase phase = INITIAL_LINKING;
 
     private Config trainingConfig;
 
@@ -69,13 +69,10 @@ public abstract class Thought {
         phase = FINAL_LINKING;
         activationsById
                 .values()
-                .stream()
-                .filter(act -> act.assumePosRecLinks())
                 .forEach(act ->
-                        act.getNeuron().link(act)
+                        act.updateForFinalPhase()
                 );
 
-        processLinks();
         processActivations();
 
         activationsById
