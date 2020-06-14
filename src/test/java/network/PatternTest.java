@@ -71,7 +71,7 @@ public class PatternTest {
                 new PatternPartSynapse.Builder()
                         .setNegative(false)
                         .setPropagate(true)
-                        .setNeuron(inB)
+                        .setNeuron(inputB[0])
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
                         .setNegative(false)
@@ -79,7 +79,7 @@ public class PatternTest {
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
                         .setNegative(false)
-                        .setNeuron(relN)
+                        .setNeuron(inputB[1])
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
                         .setNegative(false)
@@ -91,7 +91,7 @@ public class PatternTest {
                 new PatternPartSynapse.Builder()
                         .setNegative(false)
                         .setPropagate(true)
-                        .setNeuron(inC)
+                        .setNeuron(inputC[0])
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
                         .setNegative(false)
@@ -99,7 +99,7 @@ public class PatternTest {
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
                         .setNegative(false)
-                        .setNeuron(relN)
+                        .setNeuron(inputC[1])
                         .setWeight(10.0),
                 new PatternPartSynapse.Builder()
                         .setNegative(false)
@@ -123,64 +123,35 @@ public class PatternTest {
 
         Document doc = new Document("ABC");
 
-        Activation actA = inA.propagate(doc,
+        Activation[] wordAActs = addWordActivation(doc, inputA, prevWordInhib, nextWordInhib, null);
+        Activation[] wordBActs = addWordActivation(doc, inputB, prevWordInhib, nextWordInhib, wordAActs[0]);
+        Activation[] wordCActs = addWordActivation(doc, inputC, prevWordInhib, nextWordInhib, wordBActs[0]);
+
+        doc.process();
+
+        System.out.println(doc.activationsToString());
+    }
+
+    private Activation[] addWordActivation(Document doc, Neuron[] n, InhibitoryNeuron prevWordInhib, InhibitoryNeuron nextWordInhib, Activation previousPatternAct) {
+        Activation patternAct = n[0].propagate(doc,
                 new Activation.Builder()
                         .setValue(1.0)
                         .setInputTimestamp(0)
                         .setFired(0)
         );
 
-        Activation inInhibA = actA.getOutputLinks(inputInhibN.getProvider())
+        Activation inhibNWAct = lookupInhibRelAct(nextWordInhib, previousNextWordAct);
+        Activation inhibPWAct = lookupInhibRelAct(prevWordInhib, previousNextWordAct);
+    }
+
+    private Activation lookupInhibRelAct(InhibitoryNeuron inhiN, Activation relPPAct) {
+        if(relPPAct == null) {
+            return null;
+        }
+        return relPPAct.getOutputLinks(inhiN.getProvider())
                 .findAny()
                 .map(l -> l.getOutput())
                 .orElse(null);
-
-        Activation actB = inB.propagate(doc,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(1)
-                        .setFired(0)
-        );
-
-        Activation inInhibB = actB.getOutputLinks(inputInhibN.getProvider())
-                .findAny()
-                .map(l -> l.getOutput())
-                .orElse(null);
-
-        relN.propagate(doc,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(1)
-                        .setFired(0)
-                        .addInputLink(inInhibA)
-                        .addInputLink(inInhibB)
-        );
-
-        Activation actC = inC.propagate(doc,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(2)
-                        .setFired(0)
-        );
-
-        Activation inInhibC = actC.getOutputLinks(inputInhibN.getProvider())
-                .findAny()
-                .map(l -> l.getOutput())
-                .orElse(null);
-
-
-        relN.propagate(doc,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(2)
-                        .setFired(0)
-                        .addInputLink(inInhibB)
-                        .addInputLink(inInhibC)
-        );
-
-        doc.process();
-
-        System.out.println(doc.activationsToString());
     }
 
     private Neuron[] initInput(Model m, InhibitoryNeuron prevWordInhib, InhibitoryNeuron nextWordInhib, String label) {
