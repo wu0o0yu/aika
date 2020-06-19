@@ -21,13 +21,11 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
-import network.aika.neuron.inhibitory.PatternInhibitoryNeuron;
 import org.junit.jupiter.api.Test;
 
 
@@ -41,8 +39,8 @@ public class PatternTest {
     public void testPattern() {
         Model m = new Model();
 
-        InhibitoryNeuron prevWordInhib = new PatternInhibitoryNeuron(m, "INPUT PW INHIB", true);
-        InhibitoryNeuron nextWordInhib = new PatternInhibitoryNeuron(m, "INPUT NW INHIB", true);
+        InhibitoryNeuron prevWordInhib = new InhibitoryNeuron(m, "INPUT PW INHIB", true);
+        InhibitoryNeuron nextWordInhib = new InhibitoryNeuron(m, "INPUT NW INHIB", true);
 
         Neuron[] inputA = initInput(m, prevWordInhib, nextWordInhib, "A");
         Neuron[] inputB = initInput(m, prevWordInhib, nextWordInhib, "B");
@@ -55,72 +53,116 @@ public class PatternTest {
 
         PatternNeuron out = new PatternNeuron(m, "OUT", false);
 
+        {
+            {
+                PatternPartSynapse s = new PatternPartSynapse(inputA[0], eA);
+                s.setPropagate(true);
 
-        eA.link(4.0,
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setPropagate(true)
-                        .setNeuron(inputA[0])
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setNeuron(out)
-                        .setWeight(10.0)
-        );
+                s.link();
+                s.update(10.0);
+            }
 
-        eB.link(4.0,
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setPropagate(true)
-                        .setNeuron(inputB[0])
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setNeuron(eA)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setNeuron(inputB[1])
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setNeuron(out)
-                        .setWeight(10.0)
-        );
+            {
+                PatternPartSynapse s = new PatternPartSynapse(out, eA);
 
-        eC.link(4.0,
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setPropagate(true)
-                        .setNeuron(inputC[0])
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setNeuron(eB)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setNeuron(inputC[1])
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setNeuron(out)
-                        .setWeight(10.0)
-        );
+                s.link();
+                s.update(10.0);
+            }
+            eA.setBias(4.0);
+            eA.commit();
+        }
 
-        out.link(4.0,
-                new PatternSynapse.Builder()
-                        .setNeuron(eA)
-                        .setPropagate(true)
-                        .setWeight(10.0),
-                new PatternSynapse.Builder()
-                        .setNeuron(eB)
-                        .setWeight(10.0),
-                new PatternSynapse.Builder()
-                        .setNeuron(eC)
-                        .setWeight(10.0)
-        );
+        {
+            {
+                PatternPartSynapse s = new PatternPartSynapse(inputB[0], eB);
+                s.setPropagate(true);
 
+                s.link();
+                s.update(10.0);
+            }
+
+            {
+                PatternPartSynapse s = new PatternPartSynapse(eA, eB);
+
+                s.link();
+                s.update(10.0);
+            }
+
+            {
+                PatternPartSynapse s = new PatternPartSynapse(inputB[1], eB);
+
+                s.link();
+                s.update(10.0);
+            }
+
+            {
+                PatternPartSynapse s = new PatternPartSynapse(out, eB);
+
+                s.link();
+                s.update(10.0);
+            }
+            eB.setBias(4.0);
+            eB.commit();
+        }
+
+        {
+            {
+                PatternPartSynapse s = new PatternPartSynapse(inputC[0], eC);
+                s.setPropagate(true);
+
+                s.link();
+                s.update(10.0);
+            }
+
+            {
+                PatternPartSynapse s = new PatternPartSynapse(eA, eC);
+
+                s.link();
+                s.update(10.0);
+            }
+
+            {
+                PatternPartSynapse s = new PatternPartSynapse(inputC[1], eC);
+
+                s.link();
+                s.update(10.0);
+            }
+
+            {
+                PatternPartSynapse s = new PatternPartSynapse(out, eC);
+
+                s.link();
+                s.update(10.0);
+            }
+            eC.setBias(4.0);
+            eC.commit();
+        }
+
+        {
+            {
+                PatternSynapse s = new PatternSynapse(eA, out);
+                s.setPropagate(true);
+
+                s.link();
+                s.update(10.0);
+            }
+            {
+                PatternSynapse s = new PatternSynapse(eB, out);
+                s.setPropagate(true);
+
+                s.link();
+                s.update(10.0);
+            }
+            {
+                PatternSynapse s = new PatternSynapse(eC, out);
+                s.setPropagate(true);
+
+                s.link();
+                s.update(10.0);
+            }
+            eC.setBias(4.0);
+            eC.commit();
+        }
 
         Document doc = new Document("ABC");
 
@@ -131,6 +173,68 @@ public class PatternTest {
         doc.process();
 
         System.out.println(doc.activationsToString());
+    }
+
+
+    private Neuron[] initInput(Model m, InhibitoryNeuron prevWordInhib, InhibitoryNeuron nextWordInhib, String label) {
+        PatternNeuron in = new PatternNeuron(m, label, true);
+        PatternPartNeuron inRelPW = new PatternPartNeuron(m, label + "Rel Prev. Word", true);
+        PatternPartNeuron inRelNW = new PatternPartNeuron(m, label + "Rel Next Word", true);
+
+        {
+            {
+                PatternPartSynapse s = new PatternPartSynapse(in, inRelPW);
+                s.setPropagate(true);
+
+                s.link();
+                s.update(10.0);
+            }
+
+            {
+                PatternPartSynapse s = new PatternPartSynapse(nextWordInhib, inRelPW);
+
+                s.link();
+                s.update(10.0);
+            }
+            inRelPW.setBias(4.0);
+            inRelPW.commit();
+        }
+        {
+            {
+                PatternPartSynapse s = new PatternPartSynapse(in, inRelNW);
+                s.setPropagate(true);
+
+                s.link();
+                s.update(10.0);
+            }
+
+            {
+                PatternPartSynapse s = new PatternPartSynapse(prevWordInhib, inRelNW);
+
+                s.link();
+                s.update(10.0);
+            }
+            inRelNW.setBias(4.0);
+            inRelNW.commit();
+        }
+
+        {
+            InhibitorySynapse s = new InhibitorySynapse(inRelPW, prevWordInhib);
+
+            s.link();
+            s.update(1.0);
+            s.commit();
+        }
+
+        {
+            InhibitorySynapse s = new InhibitorySynapse(inRelNW, nextWordInhib);
+
+            s.link();
+            s.update(1.0);
+            s.commit();
+        }
+
+        return new Neuron[] {in, inRelPW, inRelNW};
     }
 
     private Activation addWordActivation(Document doc, Neuron[] n, InhibitoryNeuron prevWordInhib, InhibitoryNeuron nextWordInhib, Activation previousPatternAct) {
@@ -191,50 +295,5 @@ public class PatternTest {
                 .findAny()
                 .map(l -> l.getOutput())
                 .orElse(null);
-    }
-
-    private Neuron[] initInput(Model m, InhibitoryNeuron prevWordInhib, InhibitoryNeuron nextWordInhib, String label) {
-        PatternNeuron in = new PatternNeuron(m, label, true);
-        PatternPartNeuron inRelPW = new PatternPartNeuron(m, label + "Rel Prev. Word", true);
-        PatternPartNeuron iARelNW = new PatternPartNeuron(m, label + "Rel Next Word", true);
-
-        inRelPW.link(4.0,
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setPropagate(true)
-                        .setNeuron(in)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setNeuron(nextWordInhib)
-                        .setWeight(10.0)
-        );
-
-        iARelNW.link(4.0,
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setPropagate(true)
-                        .setNeuron(in)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setNeuron(prevWordInhib)
-                        .setWeight(10.0)
-        );
-
-
-        prevWordInhib.link(0.0,
-                new InhibitorySynapse.Builder()
-                        .setNeuron(inRelPW)
-                        .setWeight(1.0)
-        );
-
-        nextWordInhib.link(0.0,
-                new InhibitorySynapse.Builder()
-                        .setNeuron(iARelNW)
-                        .setWeight(1.0)
-        );
-
-        return new Neuron[] {in, inRelPW, iARelNW};
     }
 }

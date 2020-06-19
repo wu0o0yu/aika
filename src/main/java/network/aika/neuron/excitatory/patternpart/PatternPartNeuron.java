@@ -17,17 +17,12 @@
 package network.aika.neuron.excitatory.patternpart;
 
 import network.aika.Model;
-import network.aika.Phase;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Direction.OUTPUT;
-import static network.aika.templates.LinkGraphs.*;
 
 /**
  * @author Lukas Molzberger
@@ -50,39 +45,16 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         return type;
     }
 
-    @Override
-    public byte getOuterType() {
-        return type;
-    }
-
     public double propagateRangeCoverage(Activation iAct) {
         return 0.0; //getPrimaryInput() == iAct.getNeuron() ? iAct.rangeCoverage : 0.0;
     }
 
-    @Override
-    public void link(Activation act) {
-        super.link(act);
-
-        if (act.getThought().getPhase() == Phase.INITIAL_LINKING) {
-            sameInputLinkT.follow(act, OUTPUT);
-            relatedInputLinkT.follow(act, OUTPUT);
-            patternInputLinkT.follow(act, OUTPUT);
-        } else if (act.getThought().getPhase() == Phase.FINAL_LINKING) {
-            posRecLinkT.follow(act, INPUT);
-        } else if (act.getThought().getPhase() == Phase.INDUCTION) {
-            sameInputLinkT.follow(act, INPUT);
-            relatedInputLinkT.follow(act, INPUT);
-            inducePPInhibInputSynapse.follow(act, OUTPUT);
-        }
+    public Neuron induceNeuron(Activation act) {
+        return new PatternNeuron(getModel(), "", false);
     }
 
-    @Override
-    public void link(Link l) {
-        if (l.getInput().getThought().getPhase() == Phase.INITIAL_LINKING) {
-            sameInputLinkI.followBackwards(l);
-            relatedInputLinkI.followBackwards(l);
-            inhibitoryLinkI.followBackwards(l);
-        }
+    public Synapse induceSynapse(Activation iAct, Activation oAct) {
+        return new PatternPartSynapse(iAct.getNeuron(), oAct.getNeuron());
     }
 
     private double getInputProbability() {

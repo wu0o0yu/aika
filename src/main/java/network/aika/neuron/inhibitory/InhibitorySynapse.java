@@ -22,7 +22,7 @@ import network.aika.neuron.*;
  *
  * @author Lukas Molzberger
  */
-public class InhibitorySynapse extends Synapse<Neuron, InhibitoryNeuron> {
+public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
     public static byte type;
 
@@ -30,8 +30,9 @@ public class InhibitorySynapse extends Synapse<Neuron, InhibitoryNeuron> {
         super();
     }
 
-    public InhibitorySynapse(NeuronProvider input, NeuronProvider output) {
+    public InhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
         super(input, output);
+        setPropagate(true);
     }
 
     @Override
@@ -49,12 +50,5 @@ public class InhibitorySynapse extends Synapse<Neuron, InhibitoryNeuron> {
         in.getLock().acquireWriteLock();
         in.removeOutputSynapse(this);
         in.getLock().releaseWriteLock();
-    }
-
-    public static class Builder extends Synapse.Builder {
-        @Override
-        public Synapse createSynapse(NeuronProvider outputNeuron) {
-            return new InhibitorySynapse(inputNeuron, outputNeuron);
-        }
     }
 }

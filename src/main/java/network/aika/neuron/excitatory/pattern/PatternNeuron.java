@@ -17,20 +17,17 @@
 package network.aika.neuron.excitatory.pattern;
 
 import network.aika.Model;
-import network.aika.Phase;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-
-import static network.aika.neuron.activation.Direction.OUTPUT;
-import static network.aika.templates.LinkGraphs.*;
 
 /**
  *
@@ -54,11 +51,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         return type;
     }
 
-    @Override
-    public byte getOuterType() {
-        return type;
-    }
-
     public double getCost(Sign s) {
         return Math.log(s.getP(this));
     }
@@ -71,18 +63,12 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         super.commit(modifiedSynapses);
     }
 
-    @Override
-    public void link(Activation act) {
-        super.link(act);
-
-        if(act.getThought().getPhase() == Phase.INDUCTION) {
-            inducePatternPart.follow(act, OUTPUT);
-            inducePPInhibitoryNeuron.follow(act, OUTPUT);
-        }
+    public Neuron induceNeuron(Activation act) {
+        // Should induce Pattern Part and Inihib. Neuron through primary inhib. Synapse
+        return new PatternPartNeuron(getModel(), "", false);
     }
 
-    @Override
-    public void link(Link l) {
-        patternInputLinkI.followBackwards(l);
+    public Synapse induceSynapse(Activation iAct, Activation oAct) {
+        return new PatternSynapse(iAct.getNeuron(), oAct.getNeuron());
     }
 }

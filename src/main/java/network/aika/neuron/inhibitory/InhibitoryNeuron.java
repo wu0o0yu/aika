@@ -24,18 +24,18 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.excitatory.pattern.PatternNeuron;
+import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 
 import java.util.Collection;
-
-import static network.aika.neuron.activation.Direction.OUTPUT;
-import static network.aika.templates.LinkGraphs.inhibitoryLinkT;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
+public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
+
+    public static byte type;
 
     protected InhibitoryNeuron() {
         super();
@@ -50,6 +50,11 @@ public abstract class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     @Override
+    public byte getType() {
+        return type;
+    }
+
+    @Override
     public Synapse getInputSynapse(NeuronProvider n) {
         throw new UnsupportedOperationException();
     }
@@ -58,18 +63,17 @@ public abstract class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         return iAct.rangeCoverage;
     }
 
-    @Override
-    public void link(Activation act) {
-        super.link(act);
-
-        if (act.getThought().getPhase() == Phase.INITIAL_LINKING) {
-            inhibitoryLinkT.follow(act, OUTPUT);
-        }
+    public Neuron induceNeuron(Activation act) {
+        return null;
     }
 
-    @Override
-    public void link(Link l) {
-        // Nothing to do!
+    public Synapse induceSynapse(Activation iAct, Activation oAct) {
+        if(iAct.getNeuron() instanceof PatternPartNeuron) {
+            return new InhibitorySynapse(iAct.getNeuron(), oAct.getNeuron());
+        } else if(iAct.getNeuron() instanceof PatternNeuron) {
+            return new PrimaryInhibitorySynapse(iAct.getNeuron(), oAct.getNeuron());
+        }
+        return null;
     }
 
     @Override
@@ -109,10 +113,6 @@ public abstract class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         commitBias();
         modifiedSynapses.forEach(s -> s.commit());
         setModified();
-    }
-
-    public boolean isMature() {
-        return true;
     }
 
     @Override

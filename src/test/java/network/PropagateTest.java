@@ -37,14 +37,14 @@ public class PropagateTest {
         PatternNeuron in = new PatternNeuron(m, "IN", true);
         PatternPartNeuron na = new PatternPartNeuron(m, "A", false);
 
-        na.link(1.0,
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setPropagate(true)
-                        .setNeuron(in)
-                        .setWeight(10.0)
-                );
+        PatternPartSynapse s = new PatternPartSynapse(in, na);
+        s.setPropagate(true);
 
+        s.link();
+        s.update(10.0);
+
+        na.setBias(1.0);
+        na.commit(s);
 
         Document doc = new Document("test");
 

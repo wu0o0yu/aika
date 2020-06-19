@@ -61,6 +61,10 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
         super(model, label, isInputNeuron);
     }
 
+    public void commit() {
+        commit(inputSynapses.values());
+    }
+
     public void train(Activation act) {
         addDummyLinks(act);
         super.train(act);
@@ -172,16 +176,6 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
             S syn = (S) m.readSynapse(in);
             inputSynapses.put(syn.getPInput(), syn);
         }
-    }
-
-    public void commit(Collection<? extends Synapse> modifiedSynapses) {
-        commitBias();
-
-        for (Synapse s : inputSynapses.values()) {
-            s.commit();
-        }
-
-        setModified();
     }
 
     public String toStringWithSynapses() {

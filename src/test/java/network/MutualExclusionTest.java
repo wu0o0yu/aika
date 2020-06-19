@@ -18,19 +18,16 @@ package network;
 
 import network.aika.Document;
 import network.aika.Model;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
-import network.aika.neuron.inhibitory.PatternPartInhibitoryNeuron;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
+
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -48,55 +45,94 @@ public class MutualExclusionTest {
         PatternPartNeuron na = new PatternPartNeuron(m, "A", false);
         PatternPartNeuron nb = new PatternPartNeuron(m, "B", false);
         PatternPartNeuron nc = new PatternPartNeuron(m, "C", false);
-        InhibitoryNeuron inhib = new PatternPartInhibitoryNeuron(m, "I", false);
+        InhibitoryNeuron inhib = new InhibitoryNeuron(m, "I", false);
 
-        na.link(1.0,
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setPropagate(true)
-                        .setNeuron(in)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setNegative(true)
-                        .setNeuron(inhib)
-                        .setWeight(-100.0)
-        );
+        {
+            {
+                PatternPartSynapse s = new PatternPartSynapse(in, na);
+                s.setPropagate(true);
 
-        nb.link(1.5,
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setPropagate(true)
-                        .setNeuron(in)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setNegative(true)
-                        .setNeuron(inhib)
-                        .setWeight(-100.0)
-        );
+                s.link();
+                s.update(10.0);
+            }
 
-        nc.link(1.2,
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setPropagate(true)
-                        .setNeuron(in)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setNegative(true)
-                        .setNeuron(inhib)
-                        .setWeight(-100.0)
-        );
+            {
+                PatternPartSynapse s = new PatternPartSynapse(inhib, na);
+                s.setNegative(true);
 
-        inhib.link(0.0,
-                new InhibitorySynapse.Builder()
-                        .setNeuron(na)
-                        .setWeight(1.0),
-                new InhibitorySynapse.Builder()
-                        .setNeuron(nb)
-                        .setWeight(1.0),
-                new InhibitorySynapse.Builder()
-                        .setNeuron(nc)
-                        .setWeight(1.0)
-                );
+                s.link();
+                s.update(-100.0);
+            }
+
+            na.setBias(1.0);
+            na.commit();
+        }
+
+        {
+            {
+                PatternPartSynapse s = new PatternPartSynapse(in, nb);
+                s.setPropagate(true);
+
+                s.link();
+                s.update(10.0);
+            }
+
+            {
+                PatternPartSynapse s = new PatternPartSynapse(inhib, nb);
+                s.setNegative(true);
+
+                s.link();
+                s.update(-100.0);
+            }
+            na.setBias(1.5);
+            na.commit();
+        }
+
+
+        {
+            {
+                PatternPartSynapse s = new PatternPartSynapse(in, nc);
+                s.setPropagate(true);
+
+                s.link();
+                s.update(10.0);
+            }
+
+            {
+                PatternPartSynapse s = new PatternPartSynapse(inhib, nc);
+                s.setNegative(true);
+
+                s.link();
+                s.update(-100.0);
+            }
+
+            na.setBias(1.2);
+            na.commit();
+        }
+
+        {
+            {
+                InhibitorySynapse s = new InhibitorySynapse(na, inhib);
+                s.link();
+                s.update(1.0);
+                s.commit();
+            }
+            {
+                InhibitorySynapse s = new InhibitorySynapse(nb, inhib);
+                s.link();
+                s.update(1.0);
+                s.commit();
+            }
+            {
+                InhibitorySynapse s = new InhibitorySynapse(nc, inhib);
+                s.link();
+                s.update(1.0);
+                s.commit();
+            }
+
+            inhib.setBias(0.0);
+            inhib.commitBias();
+        }
 
 
         Document doc = new Document("test");

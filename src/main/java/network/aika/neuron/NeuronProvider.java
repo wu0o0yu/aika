@@ -43,14 +43,6 @@ public class NeuronProvider extends Provider<Neuron<? extends Synapse>> {
         return get().getLabel();
     }
 
-    public void link(double bias, Synapse.Builder... inputs) {
-        get().link(bias, inputs);
-    }
-
-    public void link(Double bias, Collection<Synapse.Builder> synapseBuilders) {
-        get().link(bias, synapseBuilders);
-    }
-
     public String toString() {
         if(this == MIN_NEURON) return "MIN_NEURON";
         if(this == MAX_NEURON) return "MAX_NEURON";

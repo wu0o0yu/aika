@@ -25,7 +25,6 @@ import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
-import network.aika.neuron.inhibitory.PatternInhibitoryNeuron;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +37,7 @@ import java.util.TreeMap;
  * @author Lukas Molzberger
  */
 public class SyllableExperiment {
-
+/*
     private Model model;
 
     private Map<Character, PatternNeuron> inputLetters = new TreeMap<>();
@@ -49,7 +48,7 @@ public class SyllableExperiment {
     public void init() {
         model = new Model();
 
-        inputInhibN = new PatternInhibitoryNeuron(model, "Input-Inhib", true);
+        inputInhibN = new InhibitoryNeuron(model, "Input-Inhib", true);
         relN = new PatternPartNeuron(model, "Char-Relation", true);
 
         relN.link(1.0,
@@ -133,4 +132,6 @@ public class SyllableExperiment {
 //        model.dumpModel();
         System.out.println();
     }
+
+ */
 }

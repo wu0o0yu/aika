@@ -57,8 +57,7 @@ public class Model {
         registerType(PatternPartNeuron.class);
         registerType(PatternPartSynapse.class);
 
-        registerType(PatternInhibitoryNeuron.class);
-        registerType(PatternPartInhibitoryNeuron.class);
+        registerType(InhibitoryNeuron.class);
         registerType(InhibitorySynapse.class);
         registerType(PrimaryInhibitorySynapse.class);
     }
@@ -86,12 +85,6 @@ public class Model {
     public void incrementRetrievalCounter() {
         retrievalCounter.addAndGet(1);
     }
-
-    public enum Element {
-        NODE,
-        LINK
-    }
-
 
     public long createNeuronId() {
         return suspensionHook != null ? suspensionHook.createId() : currentNeuronId.addAndGet(1);

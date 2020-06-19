@@ -23,12 +23,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.Synapse.State.CURRENT;
-import static network.aika.neuron.activation.Direction.OUTPUT;
-import static network.aika.templates.LinkGraphs.propagateT;
 
 /**
  *
@@ -69,27 +66,6 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
         setModified();
     }
 
-    public void link(double bias, Synapse.Builder... inputs) {
-        link(bias, Arrays.asList(inputs));
-    }
-
-    public void link(Double bias, Collection<Synapse.Builder> synapseBuilders) {
-        if(bias != null) {
-            setBias(bias);
-        }
-
-        commit(
-                synapseBuilders
-                        .stream()
-                        .map(input -> {
-                            Synapse s = input.getSynapse(getProvider());
-                            s.link();
-                            s.update(input.weight);
-                            return s;
-                        }).collect(Collectors.toList())
-        );
-    }
-
     public abstract ActivationFunction getActivationFunction();
 
     public abstract Fired incrementFired(Fired f);
@@ -97,6 +73,20 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
     public abstract boolean isWeak(Synapse synapse, Synapse.State state);
 
     public abstract Synapse getInputSynapse(NeuronProvider n);
+
+    public void commit(Synapse... modifiedSynapses) {
+        commit(Arrays.asList(modifiedSynapses));
+    }
+
+    public void commit(Collection<? extends Synapse> modifiedSynapses) {
+        commitBias();
+
+        for (Synapse s : modifiedSynapses) {
+            s.commit();
+        }
+
+        setModified();
+    }
 
     public Synapse getOutputSynapse(NeuronProvider n) {
         lock.acquireReadLock();
@@ -117,11 +107,7 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
     public abstract void removeOutputSynapse(Synapse s);
 
-    public abstract void commit(Collection<? extends Synapse> modifiedSynapses);
-
     public abstract byte getType();
-
-    public abstract byte getOuterType();
 
     public Long getId() {
         return provider.getId();
@@ -176,14 +162,6 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
     public abstract double propagateRangeCoverage(Activation iAct);
 
-    public void link(Activation act) {
-        if(act.getThought().getPhase() == Phase.INITIAL_LINKING) {
-            propagateT.follow(act, OUTPUT);
-        }
-    }
-
-    public abstract void link(Link l);
-
     public ReadWriteLock getLock() {
         return lock;
     }
@@ -205,8 +183,12 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
         }
     }
 
+    public abstract Neuron induceNeuron(Activation act);
+
+    public abstract Synapse induceSynapse(Activation iAct, Activation oAct);
+
     public void train(Activation act) {
-        link(act);
+        act.propagate();
         act.getThought().processLinks();
 
         if(isInputNeuron) {

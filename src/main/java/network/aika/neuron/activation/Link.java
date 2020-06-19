@@ -38,6 +38,10 @@ public class Link {
         this.output = output;
     }
 
+    public void propagate() {
+        input.followDown(input.getThought().createVisitedId(), output);
+    }
+
     public void propagateGradient(double learnRate, double g) {
         synapse.update(learnRate * input.getValue() * g);
 

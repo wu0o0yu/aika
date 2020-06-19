@@ -30,7 +30,7 @@ import static network.aika.neuron.Synapse.State.CURRENT;
  *
  * @author Lukas Molzberger
  */
-public abstract class Synapse<I extends Neuron, O extends Neuron> implements Writable {
+public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implements Writable {
 
     public static double TOLERANCE = 0.0000001;
 
@@ -46,17 +46,17 @@ public abstract class Synapse<I extends Neuron, O extends Neuron> implements Wri
     public Synapse() {
     }
 
-    public Synapse(NeuronProvider input, NeuronProvider output) {
-        this.input = input;
-        this.output = output;
+    public Synapse(I input, O output) {
+        this.input = input.getProvider();
+        this.output = output.getProvider();
     }
 
-    public void setInput(NeuronProvider input) {
-        this.input = input;
+    public void setInput(I input) {
+        this.input = input.getProvider();
     }
 
-    public void setOutput(NeuronProvider output) {
-        this.output = output;
+    public void setOutput(O output) {
+        this.output = output.getProvider();
     }
 
     public abstract byte getType();
@@ -188,73 +188,5 @@ public abstract class Synapse<I extends Neuron, O extends Neuron> implements Wri
 
     public String toString() {
         return "S " + getClass().getSimpleName() + "  w:" + Utils.round(getNewWeight()) + " " + input + "->" + output + " (neg:" + isNegative() + ", prop:" + isPropagate() + ")";
-    }
-
-    /**
-     * The {@code Builder} class is just a helper class which is used to initialize a neuron. Most of the parameters of this class
-     * will be mapped to a input synapse for this neuron.
-     *
-     * @author Lukas Molzberger
-     */
-    public static abstract class Builder {
-
-        protected NeuronProvider inputNeuron;
-        protected double weight;
-        protected boolean propagate;
-        protected boolean isNegative;
-
-        /**
-         * Determines the input neuron.
-         *
-         * @param inputNeuron
-         * @return
-         */
-        public Builder setNeuron(NeuronProvider inputNeuron) {
-            assert inputNeuron != null;
-            this.inputNeuron = inputNeuron;
-            return this;
-        }
-
-        /**
-         * Determines the input neuron.
-         *
-         * @param neuron
-         * @return
-         */
-        public Builder setNeuron(Neuron<?> neuron) {
-            assert neuron != null;
-            this.inputNeuron = neuron.getProvider();
-            return this;
-        }
-
-        public Builder setPropagate(boolean propagate) {
-            this.propagate = propagate;
-            return this;
-        }
-
-        /**
-         * The synapse weight of this input.
-         *
-         * @param weight
-         * @return
-         */
-        public Builder setWeight(double weight) {
-            this.weight = weight;
-            return this;
-        }
-
-        public Builder setNegative(boolean negative) {
-            isNegative = negative;
-            return this;
-        }
-
-        public Synapse getSynapse(NeuronProvider outputNeuron) {
-            Synapse s = createSynapse(outputNeuron);
-            s.setNegative(isNegative);
-            s.setPropagate(propagate);
-            return s;
-        }
-
-        public abstract Synapse createSynapse(NeuronProvider outputNeuron);
     }
 }

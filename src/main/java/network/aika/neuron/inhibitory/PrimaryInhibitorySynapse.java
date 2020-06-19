@@ -17,8 +17,6 @@
 package network.aika.neuron.inhibitory;
 
 import network.aika.neuron.Neuron;
-import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Synapse;
 
 /**
  *
@@ -32,7 +30,7 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
         super();
     }
 
-    public PrimaryInhibitorySynapse(NeuronProvider input, NeuronProvider output) {
+    public PrimaryInhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
         super(input, output);
     }
 
@@ -73,12 +71,5 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
 
         (dir ? in : out).getLock().releaseWriteLock();
         (dir ? out : in).getLock().releaseWriteLock();
-    }
-
-    public static class Builder extends Synapse.Builder {
-        @Override
-        public Synapse createSynapse(NeuronProvider outputNeuron) {
-            return new PrimaryInhibitorySynapse(inputNeuron, outputNeuron);
-        }
     }
 }
