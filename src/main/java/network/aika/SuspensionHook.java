@@ -32,9 +32,11 @@ public interface SuspensionHook {
 
     long createId();
 
-    void store(long id, byte[] data);
+    void store(Long id, String label, byte[] data);
 
     byte[] retrieve(long id);
 
-    Stream<Long> getAllNeuronIds();
+    Long getIdByLabel(String label);
+
+    Stream<Long> getAllIds();
 }

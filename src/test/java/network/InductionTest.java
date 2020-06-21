@@ -1,7 +1,7 @@
 package network;
 
 import network.aika.Config;
-import network.aika.Document;
+import network.aika.text.Document;
 import network.aika.Model;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
@@ -19,12 +19,8 @@ public class InductionTest {
                 new Config()
         );
 
-        in.propagate(doc,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(0)
-                        .setFired(0)
-        );
+        Activation act = new Activation(doc, in);
+        act.propagateInput();
 
         doc.train(m);
 

@@ -36,6 +36,10 @@ public abstract class AbstractNode<P extends Provider<? extends AbstractNode>> i
         return provider;
     }
 
+    public String getLabel() {
+        return null;
+    }
+
     public void setModified() {
         modified = true;
     }

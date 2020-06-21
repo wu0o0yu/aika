@@ -45,6 +45,14 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         return type;
     }
 
+
+    public void inputLinking(Activation originAct) {
+        inputSynapses
+                .values()
+                .stream()
+                .forEach(s -> getModel().linkInputRelations(s, originAct));
+    }
+
     public double propagateRangeCoverage(Activation iAct) {
         return 0.0; //getPrimaryInput() == iAct.getNeuron() ? iAct.rangeCoverage : 0.0;
     }

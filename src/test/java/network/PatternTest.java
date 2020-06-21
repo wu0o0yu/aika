@@ -16,16 +16,16 @@
  */
 package network;
 
-import network.aika.Document;
+import network.aika.text.Document;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
+import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
 
@@ -37,7 +37,7 @@ public class PatternTest {
 
     @Test
     public void testPattern() {
-        Model m = new Model();
+        TextModel m = new TextModel();
 
         InhibitoryNeuron prevWordInhib = new InhibitoryNeuron(m, "INPUT PW INHIB", true);
         InhibitoryNeuron nextWordInhib = new InhibitoryNeuron(m, "INPUT NW INHIB", true);
@@ -166,9 +166,9 @@ public class PatternTest {
 
         Document doc = new Document("ABC");
 
-        Activation wordAAct = addWordActivation(doc, inputA, prevWordInhib, nextWordInhib, null);
-        Activation wordBAct = addWordActivation(doc, inputB, prevWordInhib, nextWordInhib, wordAAct);
-        Activation wordCAct = addWordActivation(doc, inputC, prevWordInhib, nextWordInhib, wordBAct);
+        Activation wordAAct = doc.addTokenActivation(m,  "A", null);
+        Activation wordBAct = doc.addTokenActivation(m,  "B", wordAAct);
+        Activation wordCAct = doc.addTokenActivation(m,  "C", wordBAct);
 
         doc.process();
 
@@ -176,124 +176,4 @@ public class PatternTest {
     }
 
 
-    private Neuron[] initInput(Model m, InhibitoryNeuron prevWordInhib, InhibitoryNeuron nextWordInhib, String label) {
-        PatternNeuron in = new PatternNeuron(m, label, true);
-        PatternPartNeuron inRelPW = new PatternPartNeuron(m, label + "Rel Prev. Word", true);
-        PatternPartNeuron inRelNW = new PatternPartNeuron(m, label + "Rel Next Word", true);
-
-        {
-            {
-                PatternPartSynapse s = new PatternPartSynapse(in, inRelPW);
-                s.setPropagate(true);
-
-                s.link();
-                s.update(10.0);
-            }
-
-            {
-                PatternPartSynapse s = new PatternPartSynapse(nextWordInhib, inRelPW);
-
-                s.link();
-                s.update(10.0);
-            }
-            inRelPW.setBias(4.0);
-            inRelPW.commit();
-        }
-        {
-            {
-                PatternPartSynapse s = new PatternPartSynapse(in, inRelNW);
-                s.setPropagate(true);
-
-                s.link();
-                s.update(10.0);
-            }
-
-            {
-                PatternPartSynapse s = new PatternPartSynapse(prevWordInhib, inRelNW);
-
-                s.link();
-                s.update(10.0);
-            }
-            inRelNW.setBias(4.0);
-            inRelNW.commit();
-        }
-
-        {
-            InhibitorySynapse s = new InhibitorySynapse(inRelPW, prevWordInhib);
-
-            s.link();
-            s.update(1.0);
-            s.commit();
-        }
-
-        {
-            InhibitorySynapse s = new InhibitorySynapse(inRelNW, nextWordInhib);
-
-            s.link();
-            s.update(1.0);
-            s.commit();
-        }
-
-        return new Neuron[] {in, inRelPW, inRelNW};
-    }
-
-    private Activation addWordActivation(Document doc, Neuron[] n, InhibitoryNeuron prevWordInhib, InhibitoryNeuron nextWordInhib, Activation previousPatternAct) {
-        Activation patternAct = n[0].propagate(doc,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(0)
-                        .setFired(0)
-        );
-
-        Activation prevRelAct = n[1].propagate(doc,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(0)
-                        .setFired(0)
-                        .addInputLink(patternAct)
-        );
-
-        Activation nextRelAct = n[2].propagate(doc,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(0)
-                        .setFired(0)
-                        .addInputLink(previousPatternAct)
-        );
-
-        Activation inhibNWAct = lookupInhibRelAct(nextWordInhib, nextRelAct);
-        Activation inhibPWAct = lookupInhibRelAct(prevWordInhib, prevRelAct);
-
-        prevRelAct.addLink(
-                new Link(
-                        prevRelAct.getNeuron().getInputSynapse(inhibNWAct.getNeuronProvider()),
-                        inhibNWAct,
-                        prevRelAct
-                )
-        );
-        prevRelAct.linkForward();
-
-        nextRelAct.addLink(
-                new Link(
-                        prevRelAct.getNeuron().getInputSynapse(inhibNWAct.getNeuronProvider()),
-                        inhibPWAct,
-                        nextRelAct
-                )
-        );
-        nextRelAct.linkForward();
-
-        doc.processActivations();
-
-        return patternAct;
-    }
-
-    private Activation lookupInhibRelAct(InhibitoryNeuron inhiN, Activation relPPAct) {
-        if(relPPAct == null) {
-            return null;
-        }
-        return relPPAct.getOutputLinks(inhiN.getProvider())
-                .findAny()
-                .map(l -> l.getOutput())
-                .orElse(null);
-    }
 }

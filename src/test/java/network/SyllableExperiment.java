@@ -16,22 +16,6 @@
  */
 package network;
 
-import network.aika.Config;
-import network.aika.Document;
-import network.aika.Model;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.excitatory.pattern.PatternNeuron;
-import network.aika.neuron.excitatory.patternpart.*;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.io.*;
-import java.util.Map;
-import java.util.TreeMap;
-
 /**
  *
  * @author Lukas Molzberger

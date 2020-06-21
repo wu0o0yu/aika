@@ -21,6 +21,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.Provider.SuspensionMode;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
 import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.inhibitory.*;
@@ -42,7 +43,7 @@ import java.util.stream.Stream;
  *
  * @author Lukas Molzberger
  */
-public class Model {
+public abstract class Model {
 
     private static final Logger log = LoggerFactory.getLogger(Model.class);
 
@@ -63,20 +64,21 @@ public class Model {
     }
 
     private SuspensionHook suspensionHook;
-    private AtomicLong currentNeuronId = new AtomicLong(0);
     private AtomicLong retrievalCounter = new AtomicLong(0);
 
     // Important: the id field needs to be referenced by the provider!
     private WeakHashMap<Long, WeakReference<Provider<? extends AbstractNode>>> providers = new WeakHashMap<>();
 
-
     public Model() {
-        this(null);
+        this(new InMemorySuspensionHook());
     }
 
     public Model(SuspensionHook sh) {
         suspensionHook = sh;
     }
+
+
+    public abstract void linkInputRelations(PatternPartSynapse s, Activation originAct);
 
     public long getCurrentRetrievalCount() {
         return retrievalCounter.longValue();
@@ -87,12 +89,18 @@ public class Model {
     }
 
     public long createNeuronId() {
-        return suspensionHook != null ? suspensionHook.createId() : currentNeuronId.addAndGet(1);
+        return suspensionHook.createId();
+    }
+
+    public NeuronProvider getNeuron(String label) {
+        Long id = suspensionHook.getIdByLabel(label);
+        if(id == null) return null;
+        return lookupNeuron(id);
     }
 
     public Stream<NeuronProvider> getAllNeurons() {
         return suspensionHook
-                .getAllNeuronIds()
+                .getAllIds()
                 .map(id -> lookupNeuron(id));
     }
 
@@ -110,10 +118,6 @@ public class Model {
         } catch (Exception e) {
             log.error("Initialization error: ", e);
         }
-    }
-
-    public static Class getClassForType(byte type) {
-        return typeRegistry.get(type);
     }
 
     public SuspensionHook getSuspensionHook() {

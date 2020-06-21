@@ -88,6 +88,9 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
         setModified();
     }
 
+    public void inputLinking(Activation originAct) {
+    }
+
     public Synapse getOutputSynapse(NeuronProvider n) {
         lock.acquireReadLock();
         Synapse s = outputSynapses.get(n);
@@ -119,18 +122,6 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
     public Model getModel() {
         return provider.getModel();
-    }
-
-    /**
-     * Propagate an input activation into the network.
-     *
-     * @param t   The current document
-     * @param input
-     */
-    public Activation propagate(Thought t, Activation.Builder input) {
-        Activation act = new Activation(t.createActivationId(), t, this);
-        act.propagate(input);
-        return act;
     }
 
     public void commitBias() {

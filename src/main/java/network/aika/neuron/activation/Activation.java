@@ -70,12 +70,16 @@ public class Activation implements Comparable<Activation> {
     private Reference groundRef;
     private Gradient latestGradient;
 
+    public Activation(Thought t, Neuron<?> n) {
+        this(t.createActivationId(), t, n);
+    }
+
     private Activation(int id, Neuron<?> n) {
         this.id = id;
         this.neuron = n;
     }
 
-    public Activation(int id, Thought t, Neuron<?> n) {
+    private Activation(int id, Thought t, Neuron<?> n) {
         this.id = id;
         this.thought = t;
         this.neuron = n;
@@ -159,21 +163,7 @@ public class Activation implements Comparable<Activation> {
                 .filter(l -> l.getOutput().getNeuronProvider().getId() == n.getId());
     }
 
-    public void propagate(Activation.Builder input) {
-        setValue(input.value);
-        setFired(new Fired(input.inputTimestamp, input.fired));
-        setRangeCoverage(input.rangeCoverage);
-
-        input.getInputLinks()
-                .stream()
-                .map(iAct -> new Link(
-                        getNeuron().getInputSynapse(iAct.getNeuronProvider()),
-                        iAct,
-                        this
-                        )
-                )
-                .forEach(l -> addLink(l));
-
+    public void propagateInput() {
         isFinal = true;
 
         linkForward();
@@ -255,6 +245,7 @@ public class Activation implements Comparable<Activation> {
 
     public void propagate() {
         followDown(thought.createVisitedId(), this);
+        getNeuron().inputLinking(this);
 
         Phase p = thought.getPhase();
         if(p == INITIAL_LINKING || p == FINAL_LINKING) {
@@ -283,10 +274,10 @@ public class Activation implements Comparable<Activation> {
         return new Activation(thought.createActivationId(), thought, n);
     }
 
-    public void addLink(Link l) {
+    public Link addLink(Link l) {
         l.link();
 
-        if(isFinal) return;
+        if(isFinal) return l;
 
         if(!l.isNegative()) {
             sumUpLink(l);
@@ -294,6 +285,7 @@ public class Activation implements Comparable<Activation> {
 
         l.propagate();
         propagate();
+        return l;
     }
 
     public boolean inputLinkExists(Synapse s) {
@@ -498,42 +490,5 @@ public class Activation implements Comparable<Activation> {
     @Override
     public int compareTo(Activation act) {
         return Integer.compare(id, act.id);
-    }
-
-    public static class Builder {
-        private double value = 1.0;
-        private int inputTimestamp;
-        private int fired;
-        private Set<Activation> inputLinks = new TreeSet<>();
-        private double rangeCoverage;
-
-        public Builder setValue(double value) {
-            this.value = value;
-            return this;
-        }
-
-        public Builder setInputTimestamp(int inputTimestamp) {
-            this.inputTimestamp = inputTimestamp;
-            return this;
-        }
-
-        public Builder setFired(int fired) {
-            this.fired = fired;
-            return this;
-        }
-
-        public Set<Activation> getInputLinks() {
-            return this.inputLinks;
-        }
-
-        public Builder addInputLink(Activation iAct) {
-            inputLinks.add(iAct);
-            return this;
-        }
-
-        public Builder setRangeCoverage(double rangeCoverage) {
-            this.rangeCoverage = rangeCoverage;
-            return this;
-        }
     }
 }
