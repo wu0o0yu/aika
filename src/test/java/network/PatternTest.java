@@ -17,14 +17,12 @@
 package network;
 
 import network.aika.text.Document;
-import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
 import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
@@ -42,7 +40,7 @@ public class PatternTest {
         InhibitoryNeuron prevWordInhib = new InhibitoryNeuron(m, "INPUT PW INHIB", true);
         InhibitoryNeuron nextWordInhib = new InhibitoryNeuron(m, "INPUT NW INHIB", true);
 
-        Neuron[] inputA = initInput(m, prevWordInhib, nextWordInhib, "A");
+        m.initToken("A");
         Neuron[] inputB = initInput(m, prevWordInhib, nextWordInhib, "B");
         Neuron[] inputC = initInput(m, prevWordInhib, nextWordInhib, "C");
 
@@ -166,9 +164,9 @@ public class PatternTest {
 
         Document doc = new Document("ABC");
 
-        Activation wordAAct = doc.addTokenActivation(m,  "A", null);
-        Activation wordBAct = doc.addTokenActivation(m,  "B", wordAAct);
-        Activation wordCAct = doc.addTokenActivation(m,  "C", wordBAct);
+        doc.processToken(m,  "A");
+        doc.processToken(m,  "B");
+        doc.processToken(m,  "C");
 
         doc.process();
 

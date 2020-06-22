@@ -4,5 +4,5 @@ import network.aika.neuron.activation.Activation;
 
 public class Cursor {
 
-    Activation previousPatternAct;
+    public Activation previousNextTokenAct;
 }

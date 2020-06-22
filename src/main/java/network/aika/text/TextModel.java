@@ -3,6 +3,7 @@ package network.aika.text;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
@@ -11,19 +12,29 @@ import network.aika.neuron.inhibitory.InhibitorySynapse;
 
 public class TextModel extends Model {
 
-    private InhibitoryNeuron prevTokenInhib;
-    private InhibitoryNeuron nextTokenInhib;
+    public InhibitoryNeuron prevTokenInhib;
+    public InhibitoryNeuron nextTokenInhib;
 
 
     @Override
     public void linkInputRelations(PatternPartSynapse s, Activation originAct) {
+        if(s.getInput() != nextTokenInhib) {
+            return;
+        }
 
+        Document doc = (Document) originAct.getThought();
+        Cursor c = doc.getCursor();
+
+        if(c.previousNextTokenAct != null) {
+            Link l = new Link(s, c.previousNextTokenAct, originAct);
+            doc.add(l);
+        }
     }
 
-    private Neuron[] initInput(Model m, InhibitoryNeuron prevWordInhib, InhibitoryNeuron nextWordInhib, String label) {
-        PatternNeuron in = new PatternNeuron(m, label, true);
-        PatternPartNeuron inRelPW = new PatternPartNeuron(m, label + "Rel Prev. Word", true);
-        PatternPartNeuron inRelNW = new PatternPartNeuron(m, label + "Rel Next Word", true);
+    public void initToken(String label) {
+        PatternNeuron in = new PatternNeuron(this, label, true);
+        PatternPartNeuron inRelPW = new PatternPartNeuron(this, label + "Rel Prev. Word", true);
+        PatternPartNeuron inRelNW = new PatternPartNeuron(this, label + "Rel Next Word", true);
 
         {
             {
@@ -35,7 +46,7 @@ public class TextModel extends Model {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(nextWordInhib, inRelPW);
+                PatternPartSynapse s = new PatternPartSynapse(nextTokenInhib, inRelPW);
 
                 s.link();
                 s.update(10.0);
@@ -53,7 +64,7 @@ public class TextModel extends Model {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(prevWordInhib, inRelNW);
+                PatternPartSynapse s = new PatternPartSynapse(prevTokenInhib, inRelNW);
 
                 s.link();
                 s.update(10.0);
@@ -63,7 +74,7 @@ public class TextModel extends Model {
         }
 
         {
-            InhibitorySynapse s = new InhibitorySynapse(inRelPW, prevWordInhib);
+            InhibitorySynapse s = new InhibitorySynapse(inRelPW, prevTokenInhib);
 
             s.link();
             s.update(1.0);
@@ -71,16 +82,13 @@ public class TextModel extends Model {
         }
 
         {
-            InhibitorySynapse s = new InhibitorySynapse(inRelNW, nextWordInhib);
+            InhibitorySynapse s = new InhibitorySynapse(inRelNW, nextTokenInhib);
 
             s.link();
             s.update(1.0);
             s.commit();
         }
-
-        return new Neuron[] {in, inRelPW, inRelNW};
     }
-
 
     public InhibitoryNeuron getPrevTokenInhib() {
         return prevTokenInhib;
@@ -88,9 +96,5 @@ public class TextModel extends Model {
 
     public InhibitoryNeuron getNextTokenInhib() {
         return nextTokenInhib;
-    }
-
-    public PatternNeuron lookupTokenNeuron(String tokenLabel) {
-        return null;
     }
 }

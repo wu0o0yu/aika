@@ -20,6 +20,8 @@ public class Document extends Thought {
 
     private final StringBuilder content;
 
+    private Cursor cursor = new Cursor();
+
     public Document(String content) {
         this(content, null);
     }
@@ -27,6 +29,15 @@ public class Document extends Thought {
     public Document(String content, Config trainingConfig) {
         super(trainingConfig);
         this.content = new StringBuilder(content);
+    }
+
+    public void add(Activation act) {
+        super.add(act);
+
+        TextModel tm = (TextModel) act.getNeuron().getModel();
+        if(act.getNeuron() == tm.nextTokenInhib) {
+            cursor.previousNextTokenAct = act;
+        }
     }
 
     public void append(String txt) {
@@ -97,86 +108,22 @@ public class Document extends Thought {
         return addInput(n.get(), begin, end);
     }
 
-
-    public Activation addTokenActivation(TextModel m, Cursor c, String tokenLabel) {
-        PatternNeuron tokenN = m.lookupTokenNeuron(tokenLabel);
+    public Activation processToken(TextModel m, String tokenLabel) {
+        Neuron tokenN = m.getNeuron(tokenLabel).get();
 
         Activation tokenPatternAct = new Activation(this, tokenN);
         tokenPatternAct.setValue(1.0);
         tokenPatternAct.setFired(new Fired(0, 0)); // TODO
         tokenPatternAct.propagateInput();
 
-        Activation prevRelAct = null;
-        if(c.previousPatternAct != null) {
-            PatternPartNeuron prevTokenN = m.;
-            prevRelAct = new Activation(this, prevTokenN);
-
-            prevRelAct.setValue(1.0);
-            prevRelAct.setFired(new Fired(0, 0)); // TODO
-
-            prevRelAct.addLink(
-                    new Link(
-                            prevRelAct.getNeuron().getInputSynapse(inhibNTAct.getNeuronProvider()),
-                            inhibNTAct,
-                            prevRelAct
-                    )
-            );
-
-            prevRelAct.propagateInput();
-        }
-
-        Activation prevRelAct = n[1].propagate(this,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(0)
-                        .setFired(0)
-                        .addInputLink(tokenPatternAct)
-        );
-
-        Activation nextRelAct = n[2].propagate(this,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(0)
-                        .setFired(0)
-                        .addInputLink(previousPatternAct)
-        );
-
-        Activation inhibNTAct = lookupInhibRelAct(m.getNextTokenInhib(), nextRelAct);
-        Activation inhibPTAct = lookupInhibRelAct(m.getPrevTokenInhib(), prevRelAct);
-
-        prevRelAct.addLink(
-                new Link(
-                        prevRelAct.getNeuron().getInputSynapse(inhibNTAct.getNeuronProvider()),
-                        inhibNTAct,
-                        prevRelAct
-                )
-        );
-        prevRelAct.linkForward();
-
-        nextRelAct.addLink(
-                new Link(
-                        prevRelAct.getNeuron().getInputSynapse(inhibNTAct.getNeuronProvider()),
-                        inhibPTAct,
-                        nextRelAct
-                )
-        );
-        nextRelAct.linkForward();
-
         processActivations();
 
         return tokenPatternAct;
     }
 
-    private Activation lookupInhibRelAct(InhibitoryNeuron inhibN, Activation relPPAct) {
-        if(relPPAct == null) {
-            return null;
-        }
-        return relPPAct.getOutputLinks(inhibN.getProvider())
-                .findAny()
-                .map(l -> l.getOutput())
-                .orElse(null);
+    public Cursor getCursor() {
+        return cursor;
     }
-
 
     public static class GroundReference implements Reference {
         private int begin;
