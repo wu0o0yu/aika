@@ -252,7 +252,7 @@ public class Activation implements Comparable<Activation> {
             getNeuron()
                     .getOutputSynapses()
                     .filter(s -> s.isPropagate())
-                    .filter(s -> outputLinkExists(s))
+                    .filter(s -> !outputLinkExists(s))
                     .map(s -> {
                         Activation oAct = createActivation(s.getOutput());
                         return new Link(s, this, oAct);
@@ -289,7 +289,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public boolean inputLinkExists(Synapse s) {
-        return inputLinks.containsKey(s);
+        return inputLinks.containsKey(s.getPInput());
     }
 
     private boolean outputLinkExists(Synapse s) {
