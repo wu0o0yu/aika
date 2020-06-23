@@ -2,6 +2,7 @@ package network.aika.text;
 
 import network.aika.Model;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
@@ -31,7 +32,12 @@ public class TextModel extends Model {
         }
     }
 
-    public void initToken(String label) {
+    public PatternNeuron initToken(String label) {
+        NeuronProvider inProv = getNeuron(label);
+        if(inProv != null) {
+            return (PatternNeuron) inProv.get();
+        }
+
         PatternNeuron in = new PatternNeuron(this, label, true);
         PatternPartNeuron inRelPW = new PatternPartNeuron(this, label + "Rel Prev. Word", true);
         PatternPartNeuron inRelNW = new PatternPartNeuron(this, label + "Rel Next Word", true);
@@ -88,6 +94,8 @@ public class TextModel extends Model {
             s.update(1.0);
             s.commit();
         }
+
+        return in;
     }
 
     public InhibitoryNeuron getPrevTokenInhib() {

@@ -16,6 +16,7 @@
  */
 package network;
 
+import network.aika.neuron.NeuronProvider;
 import network.aika.text.Document;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
@@ -37,13 +38,9 @@ public class PatternTest {
     public void testPattern() {
         TextModel m = new TextModel();
 
-        InhibitoryNeuron prevWordInhib = new InhibitoryNeuron(m, "INPUT PW INHIB", true);
-        InhibitoryNeuron nextWordInhib = new InhibitoryNeuron(m, "INPUT NW INHIB", true);
-
-        m.initToken("A");
-        Neuron[] inputB = initInput(m, prevWordInhib, nextWordInhib, "B");
-        Neuron[] inputC = initInput(m, prevWordInhib, nextWordInhib, "C");
-
+        PatternNeuron nA = m.initToken("A");
+        PatternNeuron nB = m.initToken("B");
+        PatternNeuron nC = m.initToken("C");
 
         PatternPartNeuron eA = new PatternPartNeuron(m, "E A", false);
         PatternPartNeuron eB = new PatternPartNeuron(m, "E B", false);
@@ -53,7 +50,7 @@ public class PatternTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(inputA[0], eA);
+                PatternPartSynapse s = new PatternPartSynapse(nA, eA);
                 s.setPropagate(true);
 
                 s.link();
@@ -72,7 +69,7 @@ public class PatternTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(inputB[0], eB);
+                PatternPartSynapse s = new PatternPartSynapse(nB, eB);
                 s.setPropagate(true);
 
                 s.link();
@@ -87,7 +84,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(inputB[1], eB);
+                PatternPartSynapse s = new PatternPartSynapse(lookupPPPT(m, nB), eB);
 
                 s.link();
                 s.update(10.0);
@@ -105,7 +102,7 @@ public class PatternTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(inputC[0], eC);
+                PatternPartSynapse s = new PatternPartSynapse(nC, eC);
                 s.setPropagate(true);
 
                 s.link();
@@ -120,7 +117,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(inputC[1], eC);
+                PatternPartSynapse s = new PatternPartSynapse(lookupPPPT(m, nC), eC);
 
                 s.link();
                 s.update(10.0);
@@ -171,6 +168,20 @@ public class PatternTest {
         doc.process();
 
         System.out.println(doc.activationsToString());
+    }
+
+    public PatternPartNeuron lookupPPPT(TextModel tm, PatternNeuron pn) {
+        return (PatternPartNeuron) pn.getOutputSynapses()
+                .map(s -> s.getOutput())
+                .filter(n -> isPTNeuron(tm, n))
+                .findAny()
+                .orElse(null);
+    }
+
+    private boolean isPTNeuron(TextModel tm, Neuron<?> n) {
+        return n.getOutputSynapses()
+                .map(s -> s.getOutput())
+                .anyMatch(in -> in == tm.getPrevTokenInhib());
     }
 
 

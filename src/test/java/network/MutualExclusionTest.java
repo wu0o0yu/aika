@@ -24,6 +24,7 @@ import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
+import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -39,7 +40,7 @@ public class MutualExclusionTest {
 
     @Test
     public void testPropagation() {
-        Model m = new Model();
+        Model m = new TextModel();
 
         PatternNeuron in = new PatternNeuron(m, "IN", true);
         PatternPartNeuron na = new PatternPartNeuron(m, "A", false);

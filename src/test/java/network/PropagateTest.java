@@ -22,6 +22,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
+import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,7 +33,7 @@ public class PropagateTest {
 
     @Test
     public void testPropagation() {
-        Model m = new Model();
+        Model m = new TextModel();
 
         PatternNeuron in = new PatternNeuron(m, "IN", true);
         PatternPartNeuron na = new PatternPartNeuron(m, "A", false);
