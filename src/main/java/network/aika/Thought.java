@@ -32,7 +32,7 @@ public abstract class Thought {
     private static final Logger log = LoggerFactory.getLogger(Thought.class);
 
     private int activationIdCounter = 0;
-    private long visitedIdCounter;
+    private long visitedIdCounter = 1;
 
     private final TreeSet<Activation> activationsQueue = new TreeSet<>(
             Comparator.<Activation, Fired>comparing(act -> act.getFired())

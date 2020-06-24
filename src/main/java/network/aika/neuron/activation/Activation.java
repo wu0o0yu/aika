@@ -58,8 +58,7 @@ public class Activation implements Comparable<Activation> {
 
     private boolean isFinal;
 
-    private long visitedDown;
-    private long visitedUp;
+    private long visited;
 
     private int round; // Only used as stopping criteria
     private Activation lastRound;
@@ -96,8 +95,6 @@ public class Activation implements Comparable<Activation> {
                 .<Activation, NeuronProvider>comparing(act -> act.getNeuronProvider())
                 .thenComparing(act -> act)
         );
-
-        System.out.println(toString());
     }
 
     public int getId() {
@@ -224,7 +221,7 @@ public class Activation implements Comparable<Activation> {
         return inputLinks.values().stream()
                 .filter(l -> l.isNegative() && !l.isSelfRef())
                 .flatMap(l -> l.getInput().inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
-                .anyMatch(l -> l.getInput().visitedDown != v);
+                .anyMatch(l -> l.getInput().visited != v);
     }
 
     public void linkForward() {
@@ -244,7 +241,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void propagate() {
-        followDown(thought.createVisitedId(), this);
+        followDown(thought.createVisitedId(), this, true);
         getNeuron().inputLinking(this);
 
         Phase p = thought.getPhase();
@@ -434,52 +431,56 @@ public class Activation implements Comparable<Activation> {
         return branches.isEmpty();
     }
 
-    public void followDown(long v, Activation originAct) {
-        if(visitedDown == v) return;
-        visitedDown = v;
+    public void followDown(long v, Activation originAct, boolean dir) {
+        if(visited == v) return;
 
-        inputLinks
-                .values()
-                .stream()
-                .map(l -> l.getInput())
-                .forEach(act -> {
-                    if(!(act.getNeuron() instanceof PatternNeuron)) {
-                        act.followDown(v, originAct);
-                    }
-                    act.followUp(v, originAct);
-                });
+        followUp(v, originAct, dir);
+
+        if(!(getNeuron() instanceof PatternNeuron)) {
+            inputLinks
+                    .values()
+                    .stream()
+                    .map(l -> l.getInput())
+                    .forEach(act -> {
+                        act.followDown(v, originAct, dir);
+                    });
+        }
     }
 
-    public void followUp(long v, Activation originAct) {
-        if(visitedUp == v) return;
-        visitedUp = v;
+    public void followUp(long v, Activation originAct, boolean dir) {
+        if(visited == v) return;
+        visited = v;
 
-        if(isConflicting(v)) return;
+        if(this == originAct || isConflicting(v)) return;
 
-        tryToLink(originAct);
+        Activation iAct = dir ? originAct : this;
+        Activation oAct = dir ? this : originAct;
+
+        iAct.tryToLink(oAct);
 
         outputLinks
                 .values()
                 .stream()
                 .map(l -> l.getOutput())
-                .forEach(act -> act.followUp(v, originAct));
+                .forEach(act -> act.followUp(v, originAct, dir));
     }
 
-    private void tryToLink(Activation originAct) {
+    private void tryToLink(Activation oAct) {
         Phase p = thought.getPhase();
         if(p == INITIAL_LINKING || p == FINAL_LINKING) {
             getNeuron()
                     .getOutputSynapses()
-                    .filter(s -> !originAct.inputLinkExists(s))
-                    .forEach(s -> Link.link(s, originAct, this));
+                    .filter(s -> s.getOutput() == oAct.getNeuron())
+                    .filter(s -> !oAct.inputLinkExists(s))
+                    .forEach(s -> Link.link(s, this, oAct));
         } else if(p == INDUCTION) {
             getNeuron()
-                    .induceSynapse(this, originAct);
+                    .induceSynapse(this, oAct);
         }
     }
 
     public String toString() {
-        return "A " + getId() + " " +
+        return "Act id:" + getId() + " " +
                 getNeuron().getClass().getSimpleName() + ":" + getLabel() +
                 " value:" + Utils.round(value) +
                 " net:" + Utils.round(getNet(getThought().getPhase())) +

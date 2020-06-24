@@ -39,7 +39,7 @@ public class Link {
     }
 
     public void propagate() {
-        input.followDown(input.getThought().createVisitedId(), output);
+        input.followDown(input.getThought().createVisitedId(), output, false);
     }
 
     public void propagateGradient(double learnRate, double g) {
