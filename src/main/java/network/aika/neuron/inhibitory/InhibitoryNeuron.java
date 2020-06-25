@@ -81,13 +81,11 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         return f;
     }
 
+    /*
     public boolean isWeak(Synapse s, Synapse.State state) {
         return s.getWeight(state) < -getBias();
     }
-
-    public double getTotalBias(Phase p, Synapse.State state) {
-        return getBias(state);
-    }
+*/
 
     public ActivationFunction getActivationFunction() {
         return ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;

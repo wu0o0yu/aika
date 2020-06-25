@@ -55,6 +55,7 @@ public class MutualExclusionTest {
 
                 s.link();
                 s.update(10.0);
+                na.updateDirectConjunctiveBiasDelta(-10.0);
             }
 
             {
@@ -76,6 +77,7 @@ public class MutualExclusionTest {
 
                 s.link();
                 s.update(10.0);
+                nb.updateDirectConjunctiveBiasDelta(-10.0);
             }
 
             {
@@ -85,8 +87,8 @@ public class MutualExclusionTest {
                 s.link();
                 s.update(-100.0);
             }
-            na.setBias(1.5);
-            na.commit();
+            nb.setBias(1.5);
+            nb.commit();
         }
 
 
@@ -97,6 +99,7 @@ public class MutualExclusionTest {
 
                 s.link();
                 s.update(10.0);
+                nc.updateDirectConjunctiveBiasDelta(-10.0);
             }
 
             {
@@ -107,8 +110,8 @@ public class MutualExclusionTest {
                 s.update(-100.0);
             }
 
-            na.setBias(1.2);
-            na.commit();
+            nc.setBias(1.2);
+            nc.commit();
         }
 
         {
@@ -139,6 +142,8 @@ public class MutualExclusionTest {
         Document doc = new Document("test");
 
         Activation act = new Activation(doc, in);
+        act.setValue(1.0);
+
         act.propagateInput();
 
         doc.process();

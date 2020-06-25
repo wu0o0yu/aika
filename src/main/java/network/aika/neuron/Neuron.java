@@ -70,8 +70,6 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
     public abstract Fired incrementFired(Fired f);
 
-    public abstract boolean isWeak(Synapse synapse, Synapse.State state);
-
     public abstract Synapse getInputSynapse(NeuronProvider n);
 
     public void commit(Synapse... modifiedSynapses) {
@@ -137,13 +135,11 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
         this.biasDelta += biasDelta;
     }
 
-    public abstract double getTotalBias(Phase p, Synapse.State state);
-
-    public double getBias() {
-        return bias;
+    public double getBias(Phase p) {
+        return getBias(p, CURRENT);
     }
 
-    protected double getBias(Synapse.State state) {
+    public double getBias(Phase p, Synapse.State state) {
         return state == CURRENT ? bias : bias + biasDelta;
     }
 

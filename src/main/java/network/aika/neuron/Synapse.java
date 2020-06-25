@@ -151,11 +151,11 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         NEXT,
         CURRENT
     }
-
+/*
     public boolean isWeak(State state) {
         return output.get().isWeak(this, state);
     }
-
+*/
     public void setWeight(double weight) {
         this.weight = weight;
     }

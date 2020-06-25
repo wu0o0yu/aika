@@ -109,7 +109,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public double getNet(Phase p) {
-        return sum + (p == INITIAL_LINKING ? 0.0 : negSum) + getNeuron().getTotalBias(p, CURRENT);
+        return sum + (p == INITIAL_LINKING ? 0.0 : negSum) + getNeuron().getBias(p);
     }
 
     public Fired getFired() {
