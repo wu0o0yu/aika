@@ -16,10 +16,11 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.Config;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.inhibitory.InhibitorySynapse;
 
 import static network.aika.neuron.activation.Activation.TOLERANCE;
+import static network.aika.neuron.activation.Direction.INPUT;
 
 /**
  *
@@ -39,7 +40,9 @@ public class Link {
     }
 
     public void propagate() {
-        input.followDown(input.getThought().createVisitedId(), output, false);
+        if(!(synapse instanceof InhibitorySynapse)) {
+            input.followDown(input.getThought().createVisitedId(), output, INPUT);
+        }
     }
 
     public void propagateGradient(double learnRate, double g) {
@@ -54,9 +57,7 @@ public class Link {
     }
 
     public static void link(Synapse s, Activation input, Activation output) {
-        Link l = new Link(s, input, output);
-        System.out.println(l);
-        input.getThought().add(l);
+        input.getThought().add(new Link(s, input, output));
     }
 
     public Synapse getSynapse() {
@@ -69,17 +70,6 @@ public class Link {
 
     public Activation getOutput() {
         return output;
-    }
-
-    public Activation getActivation(Direction dir) {
-        switch(dir) {
-            case INPUT:
-                return getInput();
-            case OUTPUT:
-                return getOutput();
-        }
-
-        return null;
     }
 
     public boolean isNegative() {

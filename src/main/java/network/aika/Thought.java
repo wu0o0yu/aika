@@ -51,7 +51,7 @@ public abstract class Thought {
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
-    private Map<Neuron, SortedSet<Activation>> actsPerNeuron = null;
+    private Map<NeuronProvider, SortedSet<Activation>> actsPerNeuron = null;
 
     private Phase phase = INITIAL_LINKING;
 
@@ -160,18 +160,18 @@ public abstract class Thought {
             actsPerNeuron = getActivationsPerNeuron();
         }
 
-        Set<Activation> acts = actsPerNeuron.get(n);
+        Set<Activation> acts = actsPerNeuron.get(n.getProvider());
         return acts != null ? acts : Collections.emptySet();
     }
 
-    private Map<Neuron, SortedSet<Activation>> getActivationsPerNeuron() {
-        Map<Neuron, SortedSet<Activation>> results = new TreeMap<>();
+    private Map<NeuronProvider, SortedSet<Activation>> getActivationsPerNeuron() {
+        Map<NeuronProvider, SortedSet<Activation>> results = new TreeMap<>();
 
         activationsById.values().stream()
                 .filter(act -> act.isActive())
                 .forEach(act -> {
                     Set<Activation> acts = results.computeIfAbsent(
-                            act.getNeuron(),
+                            act.getNeuronProvider(),
                             n -> new TreeSet<>()
                     );
                     acts.add(act);

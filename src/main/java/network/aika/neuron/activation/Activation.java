@@ -29,6 +29,8 @@ import java.util.stream.Stream;
 
 import static network.aika.Phase.*;
 import static network.aika.neuron.Synapse.State.CURRENT;
+import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 
 /**
@@ -59,6 +61,7 @@ public class Activation implements Comparable<Activation> {
     private boolean isFinal;
 
     private long visited;
+    private long visitedDown;
 
     private int round; // Only used as stopping criteria
     private Activation lastRound;
@@ -220,8 +223,8 @@ public class Activation implements Comparable<Activation> {
     public boolean isConflicting(long v) {
         return inputLinks.values().stream()
                 .filter(l -> l.isNegative() && !l.isSelfRef())
-                .flatMap(l -> l.getInput().inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
-                .anyMatch(l -> l.getInput().visited != v);
+                .flatMap(l -> l.getInput().getLinks(INPUT))  // Walk through to the inhib. Activation.
+                .anyMatch(l -> l.getInput().visitedDown != v);
     }
 
     public void linkForward() {
@@ -236,34 +239,39 @@ public class Activation implements Comparable<Activation> {
         }
 
         propagate();
-
         thought.processLinks();
     }
 
     public void propagate() {
-        followDown(thought.createVisitedId(), this, true);
+        followDown(thought.createVisitedId(), this, OUTPUT);
         getNeuron().inputLinking(this);
 
         Phase p = thought.getPhase();
+        Neuron<?> n = getNeuron();
+
         if(p == INITIAL_LINKING || p == FINAL_LINKING) {
-            getNeuron()
-                    .getOutputSynapses()
+            n.getOutputSynapses()
                     .filter(s -> s.isPropagate())
                     .filter(s -> !outputLinkExists(s))
-                    .map(s -> {
-                        Activation oAct = createActivation(s.getOutput());
-                        return new Link(s, this, oAct);
-                    })
-                    .forEach(l -> thought.add(l));
+                    .forEach(s ->
+                            Link.link(
+                                    s,
+                                    this,
+                                    createActivation(s.getOutput())
+                            )
+                    );
         } else if(p == INDUCTION) {
             // Todo: check if the outgoing link already exists.
 
-            Neuron n = getNeuron().induceNeuron(this);
-            if(n == null) return;
-            Activation oAct = createActivation(n);
-            Synapse s = n.induceSynapse(this, oAct);
-            Link l = new Link(s, this, oAct);
-            thought.add(l);
+            Neuron on = n.induceNeuron(this);
+            if(on == null) return;
+
+            Activation oAct = createActivation(on);
+            Link.link(
+                    on.induceSynapse(this, oAct),
+                    this,
+                    oAct
+            );
         }
     }
 
@@ -281,7 +289,6 @@ public class Activation implements Comparable<Activation> {
         }
 
         l.propagate();
-        propagate();
         return l;
     }
 
@@ -431,8 +438,9 @@ public class Activation implements Comparable<Activation> {
         return branches.isEmpty();
     }
 
-    public void followDown(long v, Activation originAct, boolean dir) {
+    public void followDown(long v, Activation originAct, Direction dir) {
         if(visited == v) return;
+        visitedDown = v;
 
         followUp(v, originAct, dir);
 
@@ -441,20 +449,18 @@ public class Activation implements Comparable<Activation> {
                     .values()
                     .stream()
                     .map(l -> l.getInput())
-                    .forEach(act -> {
-                        act.followDown(v, originAct, dir);
-                    });
+                    .forEach(act -> act.followDown(v, originAct, dir));
         }
     }
 
-    public void followUp(long v, Activation originAct, boolean dir) {
+    public void followUp(long v, Activation originAct, Direction dir) {
         if(visited == v) return;
         visited = v;
 
         if(this == originAct || isConflicting(v)) return;
 
-        Activation iAct = dir ? originAct : this;
-        Activation oAct = dir ? this : originAct;
+        Activation iAct = dir == INPUT ? this : originAct;
+        Activation oAct = dir == OUTPUT ? this : originAct;
 
         iAct.tryToLink(oAct);
 
@@ -467,15 +473,14 @@ public class Activation implements Comparable<Activation> {
 
     private void tryToLink(Activation oAct) {
         Phase p = thought.getPhase();
+        Neuron<?> n = getNeuron();
         if(p == INITIAL_LINKING || p == FINAL_LINKING) {
-            getNeuron()
-                    .getOutputSynapses()
+            n.getOutputSynapses()
                     .filter(s -> s.getOutput() == oAct.getNeuron())
                     .filter(s -> !oAct.inputLinkExists(s))
                     .forEach(s -> Link.link(s, this, oAct));
         } else if(p == INDUCTION) {
-            getNeuron()
-                    .induceSynapse(this, oAct);
+            n.induceSynapse(this, oAct);
         }
     }
 
