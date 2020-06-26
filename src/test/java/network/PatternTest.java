@@ -16,14 +16,11 @@
  */
 package network;
 
-import network.aika.neuron.NeuronProvider;
 import network.aika.text.Document;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.*;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
@@ -55,6 +52,7 @@ public class PatternTest {
 
                 s.link();
                 s.update(10.0);
+                eA.updateDirectConjunctiveBiasDelta(-10.0);
             }
 
             {
@@ -62,6 +60,7 @@ public class PatternTest {
 
                 s.link();
                 s.update(10.0);
+                eA.updateRecurrentConjunctiveBiasDelta(-10.0);
             }
             eA.setBias(4.0);
             eA.commit();
@@ -74,6 +73,7 @@ public class PatternTest {
 
                 s.link();
                 s.update(10.0);
+                eB.updateDirectConjunctiveBiasDelta(-10.0);
             }
 
             {
@@ -81,6 +81,7 @@ public class PatternTest {
 
                 s.link();
                 s.update(10.0);
+                eB.updateDirectConjunctiveBiasDelta(-10.0);
             }
 
             {
@@ -88,6 +89,7 @@ public class PatternTest {
 
                 s.link();
                 s.update(10.0);
+                eB.updateDirectConjunctiveBiasDelta(-10.0);
             }
 
             {
@@ -95,6 +97,7 @@ public class PatternTest {
 
                 s.link();
                 s.update(10.0);
+                eB.updateRecurrentConjunctiveBiasDelta(-10.0);
             }
             eB.setBias(4.0);
             eB.commit();
@@ -107,6 +110,7 @@ public class PatternTest {
 
                 s.link();
                 s.update(10.0);
+                eC.updateDirectConjunctiveBiasDelta(-10.0);
             }
 
             {
@@ -114,6 +118,7 @@ public class PatternTest {
 
                 s.link();
                 s.update(10.0);
+                eC.updateDirectConjunctiveBiasDelta(-10.0);
             }
 
             {
@@ -121,6 +126,7 @@ public class PatternTest {
 
                 s.link();
                 s.update(10.0);
+                eC.updateDirectConjunctiveBiasDelta(-10.0);
             }
 
             {
@@ -128,6 +134,7 @@ public class PatternTest {
 
                 s.link();
                 s.update(10.0);
+                eC.updateRecurrentConjunctiveBiasDelta(-10.0);
             }
             eC.setBias(4.0);
             eC.commit();
@@ -140,6 +147,7 @@ public class PatternTest {
 
                 s.link();
                 s.update(10.0);
+                out.updateDirectConjunctiveBiasDelta(-10.0);
             }
             {
                 PatternSynapse s = new PatternSynapse(eB, out);
@@ -147,6 +155,7 @@ public class PatternTest {
 
                 s.link();
                 s.update(10.0);
+                out.updateDirectConjunctiveBiasDelta(-10.0);
             }
             {
                 PatternSynapse s = new PatternSynapse(eC, out);
@@ -154,6 +163,7 @@ public class PatternTest {
 
                 s.link();
                 s.update(10.0);
+                out.updateDirectConjunctiveBiasDelta(-10.0);
             }
             eC.setBias(4.0);
             eC.commit();
@@ -183,6 +193,4 @@ public class PatternTest {
                 .map(s -> s.getOutput())
                 .anyMatch(in -> in == tm.getPrevTokenInhib());
     }
-
-
 }
