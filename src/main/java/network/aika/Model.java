@@ -19,7 +19,7 @@ package network.aika;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.Provider.SuspensionMode;
+import network.aika.neuron.NeuronProvider.SuspensionMode;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.pattern.PatternSynapse;
@@ -67,7 +67,7 @@ public abstract class Model {
     private AtomicLong retrievalCounter = new AtomicLong(0);
 
     // Important: the id field needs to be referenced by the provider!
-    private WeakHashMap<Long, WeakReference<Provider<? extends AbstractNode>>> providers = new WeakHashMap<>();
+    private WeakHashMap<Long, WeakReference<NeuronProvider>> providers = new WeakHashMap<>();
 
     public Model() {
         this(new InMemorySuspensionHook());
@@ -76,7 +76,6 @@ public abstract class Model {
     public Model(SuspensionHook sh) {
         suspensionHook = sh;
     }
-
 
     public abstract void linkInputRelations(PatternPartSynapse s, Activation originAct);
 
@@ -155,7 +154,7 @@ public abstract class Model {
 
     public NeuronProvider lookupNeuron(Long id) {
         synchronized (providers) {
-            WeakReference<Provider<? extends AbstractNode>> wr = providers.get(id);
+            WeakReference<NeuronProvider> wr = providers.get(id);
             if(wr != null) {
                 NeuronProvider n = (NeuronProvider) wr.get();
                 if (n != null) {
@@ -183,22 +182,22 @@ public abstract class Model {
         suspendUnusedNeurons(Integer.MAX_VALUE, sm);
     }
 
-    private boolean suspend(long retrievalCount, Provider<? extends AbstractNode> p, SuspensionMode sm) {
-        AbstractNode an = p.getIfNotSuspended();
-        if (an != null && an.retrievalCount < retrievalCount) {
+    private boolean suspend(long retrievalCount, NeuronProvider p, SuspensionMode sm) {
+        Neuron an = p.getIfNotSuspended();
+        if (an != null && an.getRetrievalCount() < retrievalCount) {
             p.suspend(sm);
             return true;
         }
         return false;
     }
 
-    public void registerProvider(Provider p) {
+    public void registerProvider(NeuronProvider p) {
         synchronized (providers) {
             providers.put(p.getId(), new WeakReference<>(p));
         }
     }
 
-    public void removeProvider(Provider p) {
+    public void removeProvider(NeuronProvider p) {
         synchronized (providers) {
             providers.remove(p.getId());
         }

@@ -151,7 +151,7 @@ public abstract class Thought {
     }
 
     public Set<Activation> getActivations(NeuronProvider n) {
-        return getActivations(n.get());
+        return getActivations(n.getNeuron());
     }
 
     public Set<Activation> getActivations(Neuron n) {

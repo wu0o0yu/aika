@@ -124,23 +124,23 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
 
     public void addInputSynapse(S s) {
         inputSynapses.put(s.getPInput(), s);
-        setModified();
+        setModified(true);
     }
 
     public void removeInputSynapse(S s) {
         if(inputSynapses.remove(s) != null) {
-            setModified();
+            setModified(true);
         }
     }
 
     public void addOutputSynapse(Synapse s) {
         outputSynapses.put(s.getPOutput(), s);
-        setModified();
+        setModified(true);
     }
 
     public void removeOutputSynapse(Synapse s) {
         if(outputSynapses.remove(s) != null) {
-            setModified();
+            setModified(true);
         }
     }
 

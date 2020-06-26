@@ -90,11 +90,11 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public I getInput() {
-        return (I) input.get();
+        return (I) input.getNeuron();
     }
 
     public O getOutput() {
-        return (O) output.get();
+        return (O) output.getNeuron();
     }
 
     public Neuron getNeuron(Direction dir) {
@@ -125,15 +125,15 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void link() {
-        Neuron in = input.get();
-        Neuron out = output.get();
+        Neuron in = input.getNeuron();
+        Neuron out = output.getNeuron();
 
         link(in, out);
     }
 
     public void unlink() {
-        Neuron in = input.get();
-        Neuron out = output.get();
+        Neuron in = input.getNeuron();
+        Neuron out = output.getNeuron();
 
         unlink(in, out);
     }

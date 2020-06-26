@@ -110,7 +110,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     public void commit(Collection<? extends Synapse> modifiedSynapses) {
         commitBias();
         modifiedSynapses.forEach(s -> s.commit());
-        setModified();
+        setModified(true);
     }
 
     @Override

@@ -31,9 +31,15 @@ import static network.aika.neuron.Synapse.State.CURRENT;
  *
  * @author Lukas Molzberger
  */
-public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvider> {
+public abstract class Neuron<S extends Synapse> implements Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Neuron.class);
+
+    volatile long retrievalCount = 0;
+
+    private volatile boolean modified;
+
+    private NeuronProvider provider;
 
     private String label;
 
@@ -63,7 +69,7 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
         this.label = label;
         this.isInputNeuron = isInputNeuron;
         provider = new NeuronProvider(m, this);
-        setModified();
+        modified = true;
     }
 
     public abstract ActivationFunction getActivationFunction();
@@ -71,6 +77,10 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
     public abstract Fired incrementFired(Fired f);
 
     public abstract Synapse getInputSynapse(NeuronProvider n);
+
+    public NeuronProvider getProvider() {
+        return provider;
+    }
 
     public void commit(Synapse... modifiedSynapses) {
         commit(Arrays.asList(modifiedSynapses));
@@ -83,7 +93,7 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
             s.commit();
         }
 
-        setModified();
+        modified = true;
     }
 
     public void inputLinking(Activation originAct) {
@@ -120,6 +130,18 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
     public Model getModel() {
         return provider.getModel();
+    }
+
+    public long getRetrievalCount() {
+        return retrievalCount;
+    }
+
+    public boolean isModified() {
+        return modified;
+    }
+
+    public void setModified(boolean modified) {
+        this.modified = modified;
     }
 
     public void commitBias() {
@@ -204,6 +226,12 @@ public abstract class Neuron<S extends Synapse> extends AbstractNode<NeuronProvi
 
     public void setBinaryFrequency(int f) {
         binaryFrequency = f;
+    }
+
+    public void reactivate() {
+    }
+
+    public void suspend() {
     }
 
     @Override
