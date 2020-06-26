@@ -22,6 +22,7 @@ import network.aika.Thought;
 import network.aika.Utils;
 import network.aika.neuron.*;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -472,6 +473,8 @@ public class Activation implements Comparable<Activation> {
     }
 
     private void tryToLink(Activation oAct) {
+        if(oAct.getNeuron() instanceof InhibitoryNeuron) return;
+
         Phase p = thought.getPhase();
         Neuron<?> n = getNeuron();
         if(p == INITIAL_LINKING || p == FINAL_LINKING) {
