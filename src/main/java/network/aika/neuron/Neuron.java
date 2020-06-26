@@ -99,16 +99,11 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public void inputLinking(Activation originAct) {
     }
 
-    public Synapse getOutputSynapse(NeuronProvider n) {
-        lock.acquireReadLock();
-        Synapse s = outputSynapses.get(n);
-        lock.releaseReadLock();
-        return s;
-    }
-
     public Stream<Synapse> getOutputSynapses() {
         return outputSynapses.values().stream();
     }
+
+    public abstract void tryToLink(Activation iAct, Activation oAct);
 
     public abstract void addInputSynapse(S s);
 
@@ -208,7 +203,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     protected void propagateCost(Activation act) {
-
     }
 
     public double getP() {

@@ -129,6 +129,10 @@ public class Activation implements Comparable<Activation> {
         return getNeuron().getLabel();
     }
 
+    public Phase getPhase() {
+        return thought.getPhase();
+    }
+
     public Reference getGroundRef() {
         return groundRef;
     }
@@ -463,28 +467,13 @@ public class Activation implements Comparable<Activation> {
         Activation iAct = dir == INPUT ? this : originAct;
         Activation oAct = dir == OUTPUT ? this : originAct;
 
-        iAct.tryToLink(oAct);
+        oAct.getNeuron().tryToLink(iAct, oAct);
 
         outputLinks
                 .values()
                 .stream()
                 .map(l -> l.getOutput())
                 .forEach(act -> act.followUp(v, originAct, dir));
-    }
-
-    private void tryToLink(Activation oAct) {
-        if(oAct.getNeuron() instanceof InhibitoryNeuron) return;
-
-        Phase p = thought.getPhase();
-        Neuron<?> n = getNeuron();
-        if(p == INITIAL_LINKING || p == FINAL_LINKING) {
-            n.getOutputSynapses()
-                    .filter(s -> s.getOutput() == oAct.getNeuron())
-                    .filter(s -> !oAct.inputLinkExists(s))
-                    .forEach(s -> Link.link(s, this, oAct));
-        } else if(p == INDUCTION) {
-            n.induceSynapse(this, oAct);
-        }
     }
 
     public String toString() {

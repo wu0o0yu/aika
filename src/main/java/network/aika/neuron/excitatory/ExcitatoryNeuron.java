@@ -61,6 +61,20 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
         super(model, label, isInputNeuron);
     }
 
+    public void tryToLink(Activation iAct, Activation oAct) {
+        switch(iAct.getPhase()) {
+            case INITIAL_LINKING:
+            case FINAL_LINKING:
+                Synapse s = getInputSynapse(iAct.getNeuronProvider());
+                if (oAct.inputLinkExists(s)) return;
+                Link.link(s, iAct, oAct);
+                break;
+            case INDUCTION:
+                induceSynapse(iAct, oAct);
+                break;
+        }
+    }
+
     public void commit() {
         commit(inputSynapses.values());
     }
@@ -105,14 +119,6 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
                 .filter(s -> !act.inputLinkExists(s))
                 .map(s -> new Link(s, null, act))
                 .forEach(l -> l.link());
-    }
-
-    @Override
-    public void suspend() {
-    }
-
-    @Override
-    public void reactivate() {
     }
 
     public Synapse getInputSynapse(NeuronProvider n) {

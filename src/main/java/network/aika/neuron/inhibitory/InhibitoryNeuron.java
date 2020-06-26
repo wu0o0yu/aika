@@ -18,7 +18,6 @@ package network.aika.neuron.inhibitory;
 
 import network.aika.ActivationFunction;
 import network.aika.Model;
-import network.aika.Phase;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -47,6 +46,9 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     public InhibitoryNeuron(Model model, String label, Boolean isInputNeuron) {
         super(model, label, isInputNeuron);
+    }
+
+    public void tryToLink(Activation iAct, Activation oAct) {
     }
 
     @Override
@@ -111,9 +113,5 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         commitBias();
         modifiedSynapses.forEach(s -> s.commit());
         setModified(true);
-    }
-
-    @Override
-    public void dumpStat() {
     }
 }
