@@ -85,7 +85,7 @@ public class Link {
             input.outputLinks.put(output, this);
             output.inputLinksFiredOrder.put(this, this);
         }
-        Link ol = output.inputLinks.put(getSynapse().getPInput(), this);
+        Link ol = output.inputLinks.put(synapse.getPInput(), this);
         if(ol != null && ol != this) {
             output.inputLinksFiredOrder.remove(ol);
             ol.input.outputLinks.remove(ol.output);

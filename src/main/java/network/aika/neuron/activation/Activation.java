@@ -301,6 +301,10 @@ public class Activation implements Comparable<Activation> {
         return inputLinks.containsKey(s.getPInput());
     }
 
+    public boolean outputLinkExists(Activation oAct) {
+        return outputLinks.containsKey(oAct);
+    }
+
     private boolean outputLinkExists(Synapse s) {
         return !outputLinks
                 .subMap(
