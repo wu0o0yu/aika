@@ -22,7 +22,6 @@ import network.aika.Thought;
 import network.aika.Utils;
 import network.aika.neuron.*;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -110,6 +109,10 @@ public class Activation implements Comparable<Activation> {
 
     public double getNet(Phase p) {
         return sum + (p == INITIAL_LINKING ? 0.0 : negSum) + getNeuron().getBias(p);
+    }
+
+    public double getNet() {
+        return getNet(thought.getPhase());
     }
 
     public Fired getFired() {
@@ -332,7 +335,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void checkIfFired(Link l) {
-        if(fired == NOT_FIRED && getNet(getThought().getPhase()) > 0.0) {
+        if(fired == NOT_FIRED && getNet() > 0.0) {
             fired = neuron.incrementFired(l.getInput().fired);
             thought.add(this);
         }
@@ -341,7 +344,7 @@ public class Activation implements Comparable<Activation> {
     public void process() {
         value = p *
                 neuron.getActivationFunction().f(
-                        getNet(getThought().getPhase())
+                        getNet()
                 );
         isFinal = true;
         if (lastRound == null || !equals(lastRound)) {
@@ -355,7 +358,7 @@ public class Activation implements Comparable<Activation> {
 
         double g = latestGradient.gradient *
                 getNeuron().getActivationFunction().outerGrad(
-                        getNet(FINAL_LINKING)
+                        getNet()
                 );
 
         inputLinks
@@ -382,7 +385,7 @@ public class Activation implements Comparable<Activation> {
     public void computeP() {
         if(!isActive()) return;
 
-        double net = getNet(getThought().getPhase());
+        double net = getNet();
         Set<Activation> conflictingActs = branches
                 .stream()
                 .flatMap(bAct -> bAct.inputLinks.values().stream())
@@ -393,14 +396,14 @@ public class Activation implements Comparable<Activation> {
 
         double offset = conflictingActs
                 .stream()
-                .mapToDouble(cAct -> cAct.getNet(getThought().getPhase()))
+                .mapToDouble(cAct -> cAct.getNet())
                 .min()
                 .getAsDouble();
 
         double norm = Math.exp(net - offset);
         norm += conflictingActs
                 .stream()
-                .mapToDouble(cAct -> Math.exp(cAct.getNet(getThought().getPhase()) - offset))
+                .mapToDouble(cAct -> Math.exp(cAct.getNet() - offset))
                 .sum();
 
         double p = Math.exp(net - offset) / norm;
@@ -483,7 +486,7 @@ public class Activation implements Comparable<Activation> {
         return "Act id:" + getId() + " " +
                 getNeuron().getClass().getSimpleName() + ":" + getLabel() +
                 " value:" + Utils.round(value) +
-                " net:" + Utils.round(getNet(getThought().getPhase())) +
+                " net:" + Utils.round(getNet()) +
                 " p:" + Utils.round(p) +
                 " round:" + round;
     }
