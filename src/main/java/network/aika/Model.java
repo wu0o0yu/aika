@@ -91,10 +91,15 @@ public abstract class Model {
         return suspensionHook.createId();
     }
 
-    public NeuronProvider getNeuron(String label) {
+    public NeuronProvider getNeuronProvider(String label) {
         Long id = suspensionHook.getIdByLabel(label);
         if(id == null) return null;
         return lookupNeuron(id);
+    }
+
+    public Neuron getNeuron(String label) {
+        NeuronProvider np = getNeuronProvider(label);
+        return np != null ? np.getNeuron() : null;
     }
 
     public Stream<NeuronProvider> getAllNeurons() {

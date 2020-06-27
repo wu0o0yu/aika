@@ -121,7 +121,7 @@ public class Document extends Thought {
     }
 
     public Activation processToken(TextModel m, String tokenLabel) {
-        Neuron tokenN = m.getNeuron(tokenLabel).getNeuron();
+        Neuron tokenN = m.lookupToken(tokenLabel);
 
         Activation tokenPatternAct = new Activation(this, tokenN);
         tokenPatternAct.setValue(1.0);

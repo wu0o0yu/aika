@@ -17,6 +17,8 @@
 package network.aika.text;
 
 import network.aika.Model;
+import network.aika.SuspensionHook;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
@@ -35,6 +37,20 @@ public class TextModel extends Model {
     public InhibitoryNeuron prevTokenInhib;
     public InhibitoryNeuron nextTokenInhib;
 
+    public TextModel() {
+        super();
+        init();
+    }
+
+    public TextModel(SuspensionHook sh) {
+        super(sh);
+        init();
+    }
+
+    private void init() {
+        prevTokenInhib = new InhibitoryNeuron(this, "Prev. Token", false);
+        nextTokenInhib = new InhibitoryNeuron(this, "Next Token", false);
+    }
 
     @Override
     public void linkInputRelations(PatternPartSynapse s, Activation originAct) {
@@ -51,15 +67,15 @@ public class TextModel extends Model {
         }
     }
 
-    public PatternNeuron initToken(String label) {
-        NeuronProvider inProv = getNeuron(label);
+    public PatternNeuron lookupToken(String label) {
+        Neuron inProv = getNeuron(label);
         if(inProv != null) {
-            return (PatternNeuron) inProv.getNeuron();
+            return (PatternNeuron) inProv;
         }
 
         PatternNeuron in = new PatternNeuron(this, label, true);
-        PatternPartNeuron inRelPW = new PatternPartNeuron(this, label + "Rel Prev. Word", true);
-        PatternPartNeuron inRelNW = new PatternPartNeuron(this, label + "Rel Next Word", true);
+        PatternPartNeuron inRelPW = new PatternPartNeuron(this, label + " Rel Prev. Word", true);
+        PatternPartNeuron inRelNW = new PatternPartNeuron(this, label + " Rel Next Word", true);
 
         {
             {

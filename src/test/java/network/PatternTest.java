@@ -35,9 +35,9 @@ public class PatternTest {
     public void testPattern() {
         TextModel m = new TextModel();
 
-        PatternNeuron nA = m.initToken("A");
-        PatternNeuron nB = m.initToken("B");
-        PatternNeuron nC = m.initToken("C");
+        PatternNeuron nA = m.lookupToken("A");
+        PatternNeuron nB = m.lookupToken("B");
+        PatternNeuron nC = m.lookupToken("C");
 
         PatternPartNeuron eA = new PatternPartNeuron(m, "E A", false);
         PatternPartNeuron eB = new PatternPartNeuron(m, "E B", false);
