@@ -386,25 +386,23 @@ public class Activation implements Comparable<Activation> {
                 .stream()
                 .flatMap(bAct -> bAct.inputLinks.values().stream())
                 .filter(l -> l.isNegative())
-                .flatMap(l -> l.getInput().inputLinks.values().stream())  // Hangle dich durch die inhib. Activation.
+                .flatMap(l -> l.getInput().inputLinks.values().stream())  // Walk through to the inhib. Activation.
                 .map(l -> l.getInput())
                 .collect(Collectors.toSet());
 
-        final double[] offset = new double[] {net};
-        conflictingActs
+        double offset = conflictingActs
                 .stream()
-                .forEach(
-                        cAct -> offset[0] = Math.min(offset[0], cAct.getNet(getThought().getPhase()))
-                );
+                .mapToDouble(cAct -> cAct.getNet(getThought().getPhase()))
+                .min()
+                .getAsDouble();
 
-        final double[] norm = new double[] {Math.exp(net - offset[0])};
-        conflictingActs
+        double norm = Math.exp(net - offset);
+        norm += conflictingActs
                 .stream()
-                .forEach(
-                        cAct -> norm[0] += Math.exp(cAct.getNet(getThought().getPhase()) - offset[0])
-                );
+                .mapToDouble(cAct -> Math.exp(cAct.getNet(getThought().getPhase()) - offset))
+                .sum();
 
-        double p = Math.exp(net - offset[0]) / norm[0];
+        double p = Math.exp(net - offset) / norm;
 
         if(Math.abs(p - getP()) <= TOLERANCE) return;
 
