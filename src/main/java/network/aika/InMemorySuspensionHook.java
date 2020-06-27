@@ -20,8 +20,12 @@ public class InMemorySuspensionHook implements SuspensionHook {
     }
 
     @Override
-    public void store(Long id, String label, byte[] data) {
+    public void store(Long id, byte[] data) {
         storage.put(id, data);
+    }
+
+    @Override
+    public void storeLabel(String label, Long id) {
         labels.put(label, id);
     }
 

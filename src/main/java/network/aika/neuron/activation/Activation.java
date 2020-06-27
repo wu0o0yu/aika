@@ -428,10 +428,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     private Activation getMostRecentFinalActivation() {
-        if(!isFinal && lastRound != null) {
-            return lastRound;
-        }
-        return this;
+        return !isFinal && lastRound != null ? lastRound : this;
     }
 
     public Stream<Link> getLinks(Direction dir) {

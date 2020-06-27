@@ -32,9 +32,11 @@ public interface SuspensionHook {
 
     long createId();
 
-    void store(Long id, String label, byte[] data);
+    void store(Long id, byte[] data);
 
     byte[] retrieve(long id);
+
+    void storeLabel(String label, Long id);
 
     Long getIdByLabel(String label);
 
