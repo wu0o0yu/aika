@@ -232,7 +232,9 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void linkForward() {
-        if(lastRound != null) {
+        if(lastRound == null) {
+            propagate();
+        } else {
             lastRound.outputLinks
                     .values()
                     .forEach(l ->
@@ -242,7 +244,6 @@ public class Activation implements Comparable<Activation> {
             lastRound = null;
         }
 
-        propagate();
         thought.processLinks();
     }
 
