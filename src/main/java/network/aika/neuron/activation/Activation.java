@@ -358,13 +358,11 @@ public class Activation implements Comparable<Activation> {
                         getNet(FINAL_LINKING)
                 );
 
-        ArrayList<Synapse> modSyns = new ArrayList<>();
         inputLinks
                 .values()
-                .forEach(l -> {
-                    l.propagateGradient(thought.getTrainingConfig().getLearnRate(), g);
-                    modSyns.add(l.getSynapse());
-                });
+                .forEach(l ->
+                        l.propagateGradient(thought.getTrainingConfig().getLearnRate(), g)
+                );
     }
 
     public Gradient getMutableGradient() {

@@ -72,7 +72,6 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
         return getNeuron().getLabel();
     }
 
-
     public Long getId() {
         return id;
     }
@@ -146,14 +145,14 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
         return id.hashCode();
     }
 
+    public int compareTo(NeuronProvider np) {
+        return Long.compare(id, np.id);
+    }
+
     public String toString() {
         if(this == MIN_NEURON) return "MIN_NEURON";
         if(this == MAX_NEURON) return "MAX_NEURON";
 
         return "p(" + id + ":" + (neuron != null ? neuron.toString() : "SUSPENDED") + ")";
-    }
-
-    public int compareTo(NeuronProvider np) {
-        return Long.compare(id, np.id);
     }
 }

@@ -42,6 +42,9 @@ public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends Excitator
 
     public void updateWeight(double weightDelta) {
         super.updateWeight(weightDelta);
+
+        getOutput().updateDirectConjunctiveBias(weightDelta);
+
         if(isPropagate()) {
             input.getNeuron().setModified(true);
         }
