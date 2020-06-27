@@ -54,8 +54,8 @@ public class MutualExclusionTest {
                 s.setPropagate(true);
 
                 s.link();
-                s.update(10.0);
-                na.updateDirectConjunctiveBiasDelta(-10.0);
+                s.setWeight(10.0);
+                na.setDirectConjunctiveBias(-10.0);
             }
 
             {
@@ -63,11 +63,10 @@ public class MutualExclusionTest {
                 s.setNegative(true);
 
                 s.link();
-                s.update(-100.0);
+                s.setWeight(-100.0);
             }
 
             na.setBias(1.0);
-            na.commit();
         }
 
         {
@@ -76,8 +75,8 @@ public class MutualExclusionTest {
                 s.setPropagate(true);
 
                 s.link();
-                s.update(10.0);
-                nb.updateDirectConjunctiveBiasDelta(-10.0);
+                s.setWeight(10.0);
+                nb.setDirectConjunctiveBias(-10.0);
             }
 
             {
@@ -85,10 +84,9 @@ public class MutualExclusionTest {
                 s.setNegative(true);
 
                 s.link();
-                s.update(-100.0);
+                s.updateWeight(-100.0);
             }
             nb.setBias(1.5);
-            nb.commit();
         }
 
 
@@ -98,8 +96,8 @@ public class MutualExclusionTest {
                 s.setPropagate(true);
 
                 s.link();
-                s.update(10.0);
-                nc.updateDirectConjunctiveBiasDelta(-10.0);
+                s.setWeight(10.0);
+                nc.setDirectConjunctiveBias(-10.0);
             }
 
             {
@@ -107,35 +105,30 @@ public class MutualExclusionTest {
                 s.setNegative(true);
 
                 s.link();
-                s.update(-100.0);
+                s.setWeight(-100.0);
             }
 
             nc.setBias(1.2);
-            nc.commit();
         }
 
         {
             {
                 InhibitorySynapse s = new InhibitorySynapse(na, inhib);
                 s.link();
-                s.update(1.0);
-                s.commit();
+                s.setWeight(1.0);
             }
             {
                 InhibitorySynapse s = new InhibitorySynapse(nb, inhib);
                 s.link();
-                s.update(1.0);
-                s.commit();
+                s.setWeight(1.0);
             }
             {
                 InhibitorySynapse s = new InhibitorySynapse(nc, inhib);
                 s.link();
-                s.update(1.0);
-                s.commit();
+                s.setWeight(1.0);
             }
 
             inhib.setBias(0.0);
-            inhib.commitBias();
         }
 
 

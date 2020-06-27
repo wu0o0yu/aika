@@ -46,9 +46,12 @@ public class Link {
     }
 
     public void propagateGradient(double learnRate, double g) {
-        synapse.update(learnRate * input.getValue() * g);
+        synapse.updateWeight(
+                learnRate * input.getValue() * g
+        );
 
         double ig = synapse.getWeight() * g;
+
         if(Math.abs(ig) < TOLERANCE) {
             return;
         }
@@ -57,7 +60,9 @@ public class Link {
     }
 
     public static void link(Synapse s, Activation input, Activation output) {
-        input.getThought().add(new Link(s, input, output));
+        input.getThought().add(
+                new Link(s, input, output)
+        );
     }
 
     public Synapse getSynapse() {

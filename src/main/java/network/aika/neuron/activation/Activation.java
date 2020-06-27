@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.Phase.*;
-import static network.aika.neuron.Synapse.State.CURRENT;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
@@ -339,10 +338,12 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void process() {
-        Phase phase = getThought().getPhase();
-        value = p * neuron.getActivationFunction().f(getNet(phase));
+        value = p *
+                neuron.getActivationFunction().f(
+                        getNet(getThought().getPhase())
+                );
         isFinal = true;
-        if(lastRound == null || !equals(lastRound)) {
+        if (lastRound == null || !equals(lastRound)) {
             linkForward();
         }
     }
@@ -351,7 +352,10 @@ public class Activation implements Comparable<Activation> {
         assert !latestGradient.isFixed;
         latestGradient.isFixed = true;
 
-        double g = latestGradient.gradient * getNeuron().getActivationFunction().outerGrad(getNet(FINAL_LINKING));
+        double g = latestGradient.gradient *
+                getNeuron().getActivationFunction().outerGrad(
+                        getNet(FINAL_LINKING)
+                );
 
         ArrayList<Synapse> modSyns = new ArrayList<>();
         inputLinks
@@ -360,8 +364,6 @@ public class Activation implements Comparable<Activation> {
                     l.propagateGradient(thought.getTrainingConfig().getLearnRate(), g);
                     modSyns.add(l.getSynapse());
                 });
-
-        getNeuron().commit(modSyns);
     }
 
     public Gradient getMutableGradient() {

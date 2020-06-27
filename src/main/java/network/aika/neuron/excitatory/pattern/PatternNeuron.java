@@ -59,10 +59,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         return iAct.rangeCoverage;
     }
 
-    public void commit(Collection<? extends Synapse> modifiedSynapses) {
-        super.commit(modifiedSynapses);
-    }
-
     public Neuron induceNeuron(Activation act) {
         // Should induce Pattern Part and Inihib. Neuron through primary inhib. Synapse
         return new PatternPartNeuron(getModel(), "", false);

@@ -40,6 +40,16 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         return type;
     }
 
+    public void setWeight(double weight) {
+        super.setWeight(weight);
+        input.getNeuron().setModified(true);
+    }
+
+    public void updateWeight(double weightDelta) {
+        super.updateWeight(weightDelta);
+        input.getNeuron().setModified(true);
+    }
+
     protected void link(Neuron in, Neuron out) {
         in.getLock().acquireWriteLock();
         in.addOutputSynapse(this);

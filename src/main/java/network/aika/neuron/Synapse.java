@@ -18,13 +18,10 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Writable;
-import network.aika.neuron.activation.Direction;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-
-import static network.aika.neuron.Synapse.State.CURRENT;
 
 /**
  *
@@ -41,7 +38,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     protected NeuronProvider output;
 
     private double weight;
-    private double weightDelta;
 
     public Synapse() {
     }
@@ -97,31 +93,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return (O) output.getNeuron();
     }
 
-    public Neuron getNeuron(Direction dir) {
-        switch(dir) {
-            case INPUT:
-                return getInput();
-            case OUTPUT:
-                return getOutput();
-        }
-
-        return null;
-    }
-
     public double getWeight() {
         return weight;
-    }
-
-    public double getNewWeight() {
-        return weight + weightDelta;
-    }
-
-    public double getWeight(State s) {
-        return s == CURRENT ? weight : getNewWeight();
-    }
-
-    public double getWeightDelta() {
-        return weightDelta;
     }
 
     public void link() {
@@ -138,19 +111,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         unlink(in, out);
     }
 
-    public void commit() {
-        weight += weightDelta;
-        weightDelta = 0.0;
-    }
-
     public boolean isZero() {
         return Math.abs(weight) < TOLERANCE;
     }
 
-    public enum State {
-        NEXT,
-        CURRENT
-    }
 /*
     public boolean isWeak(State state) {
         return output.get().isWeak(this, state);
@@ -160,12 +124,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         this.weight = weight;
     }
 
-    public void updateDelta(double weightDelta) {
-        this.weightDelta += weightDelta;
-    }
-
-    public void update(double weight) {
-        this.weightDelta = weight - this.weight;
+    public void updateWeight(double weightDelta) {
+        this.weight += weightDelta;
     }
 
     @Override
@@ -187,6 +147,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public String toString() {
-        return "S " + getClass().getSimpleName() + "  w:" + Utils.round(getNewWeight()) + " " + input + "->" + output + " (neg:" + isNegative() + ", prop:" + isPropagate() + ")";
+        return "S " + getClass().getSimpleName() + "  w:" + Utils.round(getWeight()) + " " + input + "->" + output + " (neg:" + isNegative() + ", prop:" + isPropagate() + ")";
     }
 }

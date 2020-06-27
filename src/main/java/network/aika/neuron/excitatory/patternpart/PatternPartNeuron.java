@@ -45,7 +45,6 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         return type;
     }
 
-
     public void inputLinking(Activation originAct) {
         inputSynapses
                 .values()

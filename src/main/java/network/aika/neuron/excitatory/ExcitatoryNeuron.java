@@ -75,24 +75,20 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
         }
     }
 
-    public void commit() {
-        commit(inputSynapses.values());
-    }
-
     public void setDirectConjunctiveBias(double b) {
-        directConjunctiveBias = b - directConjunctiveBias;
+        directConjunctiveBias = b;
     }
 
-    public void updateDirectConjunctiveBiasDelta(double directConjunctiveBias) {
-        this.directConjunctiveBias += directConjunctiveBias;
+    public void updateDirectConjunctiveBias(double b) {
+        directConjunctiveBias += b;
     }
 
     public void setRecurrentConjunctiveBias(double b) {
-        recurrentConjunctiveBias = b - recurrentConjunctiveBias;
+        recurrentConjunctiveBias = b;
     }
 
-    public void updateRecurrentConjunctiveBiasDelta(double recurrentConjunctiveBias) {
-        this.recurrentConjunctiveBias += recurrentConjunctiveBias;
+    public void updateRecurrentConjunctiveBias(double b) {
+        recurrentConjunctiveBias += b;
     }
 
     public void train(Activation act) {
@@ -169,8 +165,8 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
     }
 */
 
-    public double getBias(Phase p, Synapse.State state) {
-        return super.getBias(p, state) + (directConjunctiveBias + (p == Phase.INITIAL_LINKING ? 0.0 : recurrentConjunctiveBias));
+    public double getBias(Phase p) {
+        return super.getBias(p) + (directConjunctiveBias + (p == Phase.INITIAL_LINKING ? 0.0 : recurrentConjunctiveBias));
     }
 
     @Override

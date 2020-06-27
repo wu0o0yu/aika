@@ -26,7 +26,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
 
-import java.util.Collection;
 
 /**
  *
@@ -107,11 +106,5 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     @Override
     public void removeOutputSynapse(Synapse s) {
-    }
-
-    public void commit(Collection<? extends Synapse> modifiedSynapses) {
-        commitBias();
-        modifiedSynapses.forEach(s -> s.commit());
-        setModified(true);
     }
 }

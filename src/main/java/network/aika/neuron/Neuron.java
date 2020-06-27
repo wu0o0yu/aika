@@ -25,8 +25,6 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.Synapse.State.CURRENT;
-
 /**
  *
  * @author Lukas Molzberger
@@ -44,7 +42,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     private String label;
 
     private volatile double bias;
-    private volatile double biasDelta;
 
     protected TreeMap<NeuronProvider, Synapse> outputSynapses = new TreeMap<>();
 
@@ -80,20 +77,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public NeuronProvider getProvider() {
         return provider;
-    }
-
-    public void commit(Synapse... modifiedSynapses) {
-        commit(Arrays.asList(modifiedSynapses));
-    }
-
-    public void commit(Collection<? extends Synapse> modifiedSynapses) {
-        commitBias();
-
-        for (Synapse s : modifiedSynapses) {
-            s.commit();
-        }
-
-        modified = true;
     }
 
     public void inputLinking(Activation originAct) {
@@ -139,25 +122,18 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         this.modified = modified;
     }
 
-    public void commitBias() {
-        bias += biasDelta;
-        biasDelta = 0.0;
-    }
-
     public void setBias(double b) {
-        biasDelta = b - bias;
+        bias += b;
+        modified = true;
     }
 
-    public void updateBiasDelta(double biasDelta) {
-        this.biasDelta += biasDelta;
+    public void updateBias(double biasDelta) {
+        bias += biasDelta;
+        modified = true;
     }
 
     public double getBias(Phase p) {
-        return getBias(p, CURRENT);
-    }
-
-    public double getBias(Phase p, Synapse.State state) {
-        return state == CURRENT ? bias : bias + biasDelta;
+        return bias;
     }
 
     public double getCost(Sign s) {

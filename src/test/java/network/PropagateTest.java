@@ -36,16 +36,15 @@ public class PropagateTest {
         Model m = new TextModel();
 
         PatternNeuron in = new PatternNeuron(m, "IN", true);
-        PatternPartNeuron na = new PatternPartNeuron(m, "A", false);
+        PatternPartNeuron out = new PatternPartNeuron(m, "OUT", false);
 
-        PatternPartSynapse s = new PatternPartSynapse(in, na);
+        PatternPartSynapse s = new PatternPartSynapse(in, out);
         s.setPropagate(true);
 
         s.link();
-        s.update(10.0);
-
-        na.setBias(1.0);
-        na.commit(s);
+        s.updateWeight(10.0);
+        out.setDirectConjunctiveBias(-10.0);
+        out.setBias(1.0);
 
         Document doc = new Document("test");
 

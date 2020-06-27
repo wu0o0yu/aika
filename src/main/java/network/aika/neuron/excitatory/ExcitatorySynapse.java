@@ -24,14 +24,28 @@ import network.aika.neuron.*;
  */
 public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron<?>> extends Synapse<I, O> {
 
-    protected boolean propagate;
-
     public ExcitatorySynapse() {
         super();
     }
 
     public ExcitatorySynapse(I input, O output) {
         super(input, output);
+    }
+
+    public void setWeight(double weight) {
+        super.setWeight(weight);
+        if(isPropagate()) {
+            input.getNeuron().setModified(true);
+        }
+        output.getNeuron().setModified(true);
+    }
+
+    public void updateWeight(double weightDelta) {
+        super.updateWeight(weightDelta);
+        if(isPropagate()) {
+            input.getNeuron().setModified(true);
+        }
+        output.getNeuron().setModified(true);
     }
 
     protected void link(Neuron in, Neuron out) {

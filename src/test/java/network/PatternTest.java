@@ -51,19 +51,18 @@ public class PatternTest {
                 s.setPropagate(true);
 
                 s.link();
-                s.update(10.0);
-                eA.updateDirectConjunctiveBiasDelta(-10.0);
+                s.setWeight(10.0);
+                eA.setDirectConjunctiveBias(-10.0);
             }
 
             {
                 PatternPartSynapse s = new PatternPartSynapse(out, eA);
 
                 s.link();
-                s.update(10.0);
-                eA.updateRecurrentConjunctiveBiasDelta(-10.0);
+                s.setWeight(10.0);
+                eA.setRecurrentConjunctiveBias(-10.0);
             }
             eA.setBias(4.0);
-            eA.commit();
         }
 
         {
@@ -72,35 +71,34 @@ public class PatternTest {
                 s.setPropagate(true);
 
                 s.link();
-                s.update(10.0);
-                eB.updateDirectConjunctiveBiasDelta(-10.0);
+                s.setWeight(10.0);
+                eB.setDirectConjunctiveBias(-10.0);
             }
 
             {
                 PatternPartSynapse s = new PatternPartSynapse(eA, eB);
 
                 s.link();
-                s.update(10.0);
-                eB.updateDirectConjunctiveBiasDelta(-10.0);
+                s.setWeight(10.0);
+                eB.setDirectConjunctiveBias(-10.0);
             }
 
             {
                 PatternPartSynapse s = new PatternPartSynapse(lookupPPPT(m, nB), eB);
 
                 s.link();
-                s.update(10.0);
-                eB.updateDirectConjunctiveBiasDelta(-10.0);
+                s.setWeight(10.0);
+                eB.setDirectConjunctiveBias(-10.0);
             }
 
             {
                 PatternPartSynapse s = new PatternPartSynapse(out, eB);
 
                 s.link();
-                s.update(10.0);
-                eB.updateRecurrentConjunctiveBiasDelta(-10.0);
+                s.setWeight(10.0);
+                eB.setRecurrentConjunctiveBias(-10.0);
             }
             eB.setBias(4.0);
-            eB.commit();
         }
 
         {
@@ -109,35 +107,34 @@ public class PatternTest {
                 s.setPropagate(true);
 
                 s.link();
-                s.update(10.0);
-                eC.updateDirectConjunctiveBiasDelta(-10.0);
+                s.setWeight(10.0);
+                eC.setDirectConjunctiveBias(-10.0);
             }
 
             {
                 PatternPartSynapse s = new PatternPartSynapse(eA, eC);
 
                 s.link();
-                s.update(10.0);
-                eC.updateDirectConjunctiveBiasDelta(-10.0);
+                s.setWeight(10.0);
+                eC.setDirectConjunctiveBias(-10.0);
             }
 
             {
                 PatternPartSynapse s = new PatternPartSynapse(lookupPPPT(m, nC), eC);
 
                 s.link();
-                s.update(10.0);
-                eC.updateDirectConjunctiveBiasDelta(-10.0);
+                s.setWeight(10.0);
+                eC.setDirectConjunctiveBias(-10.0);
             }
 
             {
                 PatternPartSynapse s = new PatternPartSynapse(out, eC);
 
                 s.link();
-                s.update(10.0);
-                eC.updateRecurrentConjunctiveBiasDelta(-10.0);
+                s.setWeight(10.0);
+                eC.setRecurrentConjunctiveBias(-10.0);
             }
             eC.setBias(4.0);
-            eC.commit();
         }
 
         {
@@ -146,27 +143,26 @@ public class PatternTest {
                 s.setPropagate(true);
 
                 s.link();
-                s.update(10.0);
-                out.updateDirectConjunctiveBiasDelta(-10.0);
+                s.setWeight(10.0);
+                out.setDirectConjunctiveBias(-10.0);
             }
             {
                 PatternSynapse s = new PatternSynapse(eB, out);
                 s.setPropagate(true);
 
                 s.link();
-                s.update(10.0);
-                out.updateDirectConjunctiveBiasDelta(-10.0);
+                s.setWeight(10.0);
+                out.setDirectConjunctiveBias(-10.0);
             }
             {
                 PatternSynapse s = new PatternSynapse(eC, out);
                 s.setPropagate(true);
 
                 s.link();
-                s.update(10.0);
-                out.updateDirectConjunctiveBiasDelta(-10.0);
+                s.setWeight(10.0);
+                out.setDirectConjunctiveBias(-10.0);
             }
             eC.setBias(4.0);
-            eC.commit();
         }
 
         Document doc = new Document("ABC");

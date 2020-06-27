@@ -67,17 +67,16 @@ public class TextModel extends Model {
                 s.setPropagate(true);
 
                 s.link();
-                s.update(10.0);
+                s.setWeight(10.0);
             }
 
             {
                 PatternPartSynapse s = new PatternPartSynapse(nextTokenInhib, inRelPW);
 
                 s.link();
-                s.update(10.0);
+                s.setWeight(10.0);
             }
             inRelPW.setBias(4.0);
-            inRelPW.commit();
         }
         {
             {
@@ -85,33 +84,30 @@ public class TextModel extends Model {
                 s.setPropagate(true);
 
                 s.link();
-                s.update(10.0);
+                s.setWeight(10.0);
             }
 
             {
                 PatternPartSynapse s = new PatternPartSynapse(prevTokenInhib, inRelNW);
 
                 s.link();
-                s.update(10.0);
+                s.setWeight(10.0);
             }
             inRelNW.setBias(4.0);
-            inRelNW.commit();
         }
 
         {
             InhibitorySynapse s = new InhibitorySynapse(inRelPW, prevTokenInhib);
 
             s.link();
-            s.update(1.0);
-            s.commit();
+            s.setWeight(1.0);
         }
 
         {
             InhibitorySynapse s = new InhibitorySynapse(inRelNW, nextTokenInhib);
 
             s.link();
-            s.update(1.0);
-            s.commit();
+            s.setWeight(1.0);
         }
 
         return in;
