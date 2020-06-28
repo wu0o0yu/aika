@@ -21,7 +21,7 @@ import network.aika.Phase;
 import network.aika.Thought;
 import network.aika.Utils;
 import network.aika.neuron.*;
-import network.aika.neuron.excitatory.pattern.PatternNeuron;
+import network.aika.neuron.excitatory.PatternNeuron;
 
 import java.util.*;
 import java.util.stream.Collectors;

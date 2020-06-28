@@ -14,20 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory.patternpart;
+package network.aika.neuron.excitatory;
 
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.excitatory.pattern.PatternNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Lukas Molzberger
  */
-public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
+public class PatternPartNeuron extends ExcitatoryNeuron<ExcitatorySynapse> {
     private static final Logger log = LoggerFactory.getLogger(PatternPartNeuron.class);
 
     public static byte type;
@@ -49,6 +47,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         inputSynapses
                 .values()
                 .stream()
+                .filter(s -> s.isInput())
                 .forEach(s -> getModel().linkInputRelations(s, originAct));
     }
 
@@ -61,7 +60,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     public Synapse induceSynapse(Activation iAct, Activation oAct) {
-        return new PatternPartSynapse(iAct.getNeuron(), oAct.getNeuron());
+        return new ExcitatorySynapse(iAct.getNeuron(), oAct.getNeuron());
     }
 
     private double getInputProbability() {

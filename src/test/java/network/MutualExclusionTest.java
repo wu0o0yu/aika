@@ -16,14 +16,14 @@
  */
 package network;
 
+import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.text.Document;
 import network.aika.Model;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.excitatory.pattern.PatternNeuron;
-import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
+import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
-import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
+import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +50,7 @@ public class MutualExclusionTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(in, na);
+                ExcitatorySynapse s = new ExcitatorySynapse(in, na);
                 s.setPropagate(true);
 
                 s.link();
@@ -59,7 +59,7 @@ public class MutualExclusionTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(inhib, na);
+                ExcitatorySynapse s = new ExcitatorySynapse(inhib, na);
                 s.setNegative(true);
 
                 s.link();
@@ -71,7 +71,7 @@ public class MutualExclusionTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(in, nb);
+                ExcitatorySynapse s = new ExcitatorySynapse(in, nb);
                 s.setPropagate(true);
 
                 s.link();
@@ -80,7 +80,7 @@ public class MutualExclusionTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(inhib, nb);
+                ExcitatorySynapse s = new ExcitatorySynapse(inhib, nb);
                 s.setNegative(true);
 
                 s.link();
@@ -92,7 +92,7 @@ public class MutualExclusionTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(in, nc);
+                ExcitatorySynapse s = new ExcitatorySynapse(in, nc);
                 s.setPropagate(true);
 
                 s.link();
@@ -101,7 +101,7 @@ public class MutualExclusionTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(inhib, nc);
+                ExcitatorySynapse s = new ExcitatorySynapse(inhib, nc);
                 s.setNegative(true);
 
                 s.link();

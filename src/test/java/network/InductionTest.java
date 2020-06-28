@@ -4,7 +4,7 @@ import network.aika.Config;
 import network.aika.text.Document;
 import network.aika.Model;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.excitatory.pattern.PatternNeuron;
+import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 

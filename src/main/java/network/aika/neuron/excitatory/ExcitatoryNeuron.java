@@ -66,7 +66,7 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
             case INITIAL_LINKING:
             case FINAL_LINKING:
                 Synapse s = getInputSynapse(iAct.getNeuronProvider());
-                if (s == null || iAct.outputLinkExists(oAct)) return;
+                if (s == null || s.isInput() || iAct.outputLinkExists(oAct)) return;
                 Link.link(s, iAct, oAct);
                 break;
             case INDUCTION:

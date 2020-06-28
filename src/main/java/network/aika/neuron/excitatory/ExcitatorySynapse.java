@@ -22,14 +22,21 @@ import network.aika.neuron.*;
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron<?>> extends Synapse<I, O> {
+public class ExcitatorySynapse extends Synapse<Neuron<?>, ExcitatoryNeuron<?>> {
+
+    public static byte type;
 
     public ExcitatorySynapse() {
         super();
     }
 
-    public ExcitatorySynapse(I input, O output) {
+    public ExcitatorySynapse(Neuron<?> input, ExcitatoryNeuron<?> output) {
         super(input, output);
+    }
+
+    @Override
+    public byte getType() {
+        return type;
     }
 
     public void setWeight(double weight) {

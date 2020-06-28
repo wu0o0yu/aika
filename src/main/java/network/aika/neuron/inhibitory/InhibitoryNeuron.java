@@ -23,8 +23,8 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.excitatory.pattern.PatternNeuron;
-import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
+import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.excitatory.PatternPartNeuron;
 
 
 /**

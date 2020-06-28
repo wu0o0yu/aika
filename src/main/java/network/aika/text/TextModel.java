@@ -19,12 +19,11 @@ package network.aika.text;
 import network.aika.Model;
 import network.aika.SuspensionHook;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.excitatory.pattern.PatternNeuron;
-import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
-import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
+import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 
@@ -53,7 +52,7 @@ public class TextModel extends Model {
     }
 
     @Override
-    public void linkInputRelations(PatternPartSynapse s, Activation originAct) {
+    public void linkInputRelations(ExcitatorySynapse s, Activation originAct) {
         if(s.getInput() != nextTokenInhib) {
             return;
         }
@@ -81,35 +80,41 @@ public class TextModel extends Model {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(in, inRelPW);
+                ExcitatorySynapse s = new ExcitatorySynapse(in, inRelPW);
                 s.setPropagate(true);
 
                 s.link();
                 s.setWeight(10.0);
+                inRelPW.setDirectConjunctiveBias(-10.0);
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(nextTokenInhib, inRelPW);
+                ExcitatorySynapse s = new ExcitatorySynapse(nextTokenInhib, inRelPW);
+                s.setInput(true);
 
                 s.link();
                 s.setWeight(10.0);
+                inRelPW.setRecurrentConjunctiveBias(-10.0);
             }
             inRelPW.setBias(4.0);
         }
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(in, inRelNW);
+                ExcitatorySynapse s = new ExcitatorySynapse(in, inRelNW);
                 s.setPropagate(true);
 
                 s.link();
                 s.setWeight(10.0);
+                inRelNW.setDirectConjunctiveBias(-10.0);
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(prevTokenInhib, inRelNW);
+                ExcitatorySynapse s = new ExcitatorySynapse(prevTokenInhib, inRelNW);
+                s.setInput(true);
 
                 s.link();
                 s.setWeight(10.0);
+                inRelNW.setRecurrentConjunctiveBias(-10.0);
             }
             inRelNW.setBias(4.0);
         }

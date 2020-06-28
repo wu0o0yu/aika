@@ -33,6 +33,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     protected boolean isNegative;
     protected boolean isPropagate;
+    protected boolean isInput;
+
 
     protected NeuronProvider input;
     protected NeuronProvider output;
@@ -71,6 +73,14 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public boolean isPropagate() {
         return isPropagate;
+    }
+
+    public boolean isInput() {
+        return isInput;
+    }
+
+    public void setInput(boolean input) {
+        isInput = input;
     }
 
     protected abstract void link(Neuron in, Neuron out);
@@ -136,6 +146,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         out.writeLong(output.getId());
 
         out.writeDouble(weight);
+
+        out.writeBoolean(isNegative);
+        out.writeBoolean(isPropagate);
+        out.writeBoolean(isInput);
     }
 
     @Override
@@ -144,6 +158,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         output = m.lookupNeuron(in.readLong());
 
         weight = in.readDouble();
+
+        isNegative = in.readBoolean();
+        isPropagate = in.readBoolean();
+        isInput = in.readBoolean();
     }
 
     public String toString() {

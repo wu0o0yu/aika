@@ -22,10 +22,10 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.NeuronProvider.SuspensionMode;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.excitatory.pattern.PatternSynapse;
-import network.aika.neuron.excitatory.patternpart.*;
+import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.neuron.inhibitory.*;
-import network.aika.neuron.excitatory.pattern.PatternNeuron;
+import network.aika.neuron.excitatory.PatternNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,10 +53,8 @@ public abstract class Model {
 
     static {
         registerType(PatternNeuron.class);
-        registerType(PatternSynapse.class);
-
         registerType(PatternPartNeuron.class);
-        registerType(PatternPartSynapse.class);
+        registerType(ExcitatorySynapse.class);
 
         registerType(InhibitoryNeuron.class);
         registerType(InhibitorySynapse.class);
@@ -77,7 +75,7 @@ public abstract class Model {
         suspensionHook = sh;
     }
 
-    public abstract void linkInputRelations(PatternPartSynapse s, Activation originAct);
+    public abstract void linkInputRelations(ExcitatorySynapse s, Activation originAct);
 
     public long getCurrentRetrievalCount() {
         return retrievalCounter.longValue();

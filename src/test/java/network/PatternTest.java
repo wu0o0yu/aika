@@ -16,11 +16,11 @@
  */
 package network;
 
+import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.text.Document;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.excitatory.pattern.PatternNeuron;
-import network.aika.neuron.excitatory.patternpart.*;
-import network.aika.neuron.excitatory.pattern.PatternSynapse;
+import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +47,7 @@ public class PatternTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(nA, eA);
+                ExcitatorySynapse s = new ExcitatorySynapse(nA, eA);
                 s.setPropagate(true);
 
                 s.link();
@@ -56,7 +56,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(out, eA);
+                ExcitatorySynapse s = new ExcitatorySynapse(out, eA);
 
                 s.link();
                 s.setWeight(10.0);
@@ -67,7 +67,7 @@ public class PatternTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(nB, eB);
+                ExcitatorySynapse s = new ExcitatorySynapse(nB, eB);
                 s.setPropagate(true);
 
                 s.link();
@@ -76,7 +76,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(eA, eB);
+                ExcitatorySynapse s = new ExcitatorySynapse(eA, eB);
 
                 s.link();
                 s.setWeight(10.0);
@@ -84,7 +84,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(lookupPPPT(m, nB), eB);
+                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nB), eB);
 
                 s.link();
                 s.setWeight(10.0);
@@ -92,7 +92,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(out, eB);
+                ExcitatorySynapse s = new ExcitatorySynapse(out, eB);
 
                 s.link();
                 s.setWeight(10.0);
@@ -103,7 +103,7 @@ public class PatternTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(nC, eC);
+                ExcitatorySynapse s = new ExcitatorySynapse(nC, eC);
                 s.setPropagate(true);
 
                 s.link();
@@ -112,7 +112,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(eA, eC);
+                ExcitatorySynapse s = new ExcitatorySynapse(eA, eC);
 
                 s.link();
                 s.setWeight(10.0);
@@ -120,7 +120,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(lookupPPPT(m, nC), eC);
+                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nC), eC);
 
                 s.link();
                 s.setWeight(10.0);
@@ -128,7 +128,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(out, eC);
+                ExcitatorySynapse s = new ExcitatorySynapse(out, eC);
 
                 s.link();
                 s.setWeight(10.0);
@@ -139,7 +139,7 @@ public class PatternTest {
 
         {
             {
-                PatternSynapse s = new PatternSynapse(eA, out);
+                ExcitatorySynapse s = new ExcitatorySynapse(eA, out);
                 s.setPropagate(true);
 
                 s.link();
@@ -147,7 +147,7 @@ public class PatternTest {
                 out.setDirectConjunctiveBias(-10.0);
             }
             {
-                PatternSynapse s = new PatternSynapse(eB, out);
+                ExcitatorySynapse s = new ExcitatorySynapse(eB, out);
                 s.setPropagate(true);
 
                 s.link();
@@ -155,7 +155,7 @@ public class PatternTest {
                 out.setDirectConjunctiveBias(-10.0);
             }
             {
-                PatternSynapse s = new PatternSynapse(eC, out);
+                ExcitatorySynapse s = new ExcitatorySynapse(eC, out);
                 s.setPropagate(true);
 
                 s.link();

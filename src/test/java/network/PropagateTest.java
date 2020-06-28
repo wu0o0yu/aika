@@ -16,12 +16,12 @@
  */
 package network;
 
+import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.text.Document;
 import network.aika.Model;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.excitatory.pattern.PatternNeuron;
-import network.aika.neuron.excitatory.patternpart.PatternPartNeuron;
-import network.aika.neuron.excitatory.patternpart.PatternPartSynapse;
+import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +38,7 @@ public class PropagateTest {
         PatternNeuron in = new PatternNeuron(m, "IN", true);
         PatternPartNeuron out = new PatternPartNeuron(m, "OUT", false);
 
-        PatternPartSynapse s = new PatternPartSynapse(in, out);
+        ExcitatorySynapse s = new ExcitatorySynapse(in, out);
         s.setPropagate(true);
 
         s.link();
