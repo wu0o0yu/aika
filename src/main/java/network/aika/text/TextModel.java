@@ -19,8 +19,10 @@ package network.aika.text;
 import network.aika.Model;
 import network.aika.SuspensionHook;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
@@ -52,17 +54,34 @@ public class TextModel extends Model {
     }
 
     @Override
-    public void linkInputRelations(ExcitatorySynapse s, Activation originAct) {
-        if(s.getInput() != nextTokenInhib) {
-            return;
-        }
-
+    public void linkInputRelations(Activation originAct) {
         Document doc = (Document) originAct.getThought();
         Cursor c = doc.getCursor();
 
-        if(c.previousNextTokenAct != null) {
-            Link l = new Link(s, c.previousNextTokenAct, originAct);
-            doc.add(l);
+        if(originAct.getNeuron() == prevTokenInhib && c.previousNTPPAct != null) {
+            Synapse s = ((ExcitatoryNeuron) c.previousNTPPAct.getNeuron()).getInputSynapse();
+            doc.add(new Link(s, originAct, c.previousNTPPAct));
+        }
+
+        if(originAct.getNeuron() == nextTokenInhib && c.nextPTPPAct != null) {
+            Synapse s = ((ExcitatoryNeuron) c.nextPTPPAct.getNeuron()).getInputSynapse();
+            doc.add(new Link(s, originAct, c.nextPTPPAct));
+        }
+
+        {
+            Neuron n = originAct.getNeuron();
+            if(n instanceof ExcitatoryNeuron) {
+                Synapse s = ((ExcitatoryNeuron) n).getInputSynapse();
+
+                if (s != null) {
+                    if(s.getInput() == nextTokenInhib && c.previousNTIAct != null) {
+                        doc.add(new Link(s, c.previousNTIAct, originAct));
+                    }
+                    if(s.getInput() == nextTokenInhib && c.previousNTIAct != null) {
+                        doc.add(new Link(s, c.previousNTIAct, originAct));
+                    }
+                }
+            }
         }
     }
 

@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Lukas Molzberger
  */
-public class PatternPartNeuron extends ExcitatoryNeuron<ExcitatorySynapse> {
+public class PatternPartNeuron extends ExcitatoryNeuron {
     private static final Logger log = LoggerFactory.getLogger(PatternPartNeuron.class);
 
     public static byte type;
@@ -41,14 +41,6 @@ public class PatternPartNeuron extends ExcitatoryNeuron<ExcitatorySynapse> {
     @Override
     public byte getType() {
         return type;
-    }
-
-    public void inputLinking(Activation originAct) {
-        inputSynapses
-                .values()
-                .stream()
-                .filter(s -> s.isInput())
-                .forEach(s -> getModel().linkInputRelations(s, originAct));
     }
 
     public double propagateRangeCoverage(Activation iAct) {

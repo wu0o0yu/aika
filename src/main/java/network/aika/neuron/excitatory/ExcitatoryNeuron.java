@@ -40,14 +40,14 @@ import static network.aika.neuron.activation.Activation.TOLERANCE;
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
+public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
 
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
 
     private volatile double directConjunctiveBias;
     private volatile double recurrentConjunctiveBias;
 
-    protected TreeMap<NeuronProvider, S> inputSynapses = new TreeMap<>();
+    protected TreeMap<NeuronProvider, ExcitatorySynapse> inputSynapses = new TreeMap<>();
 
     public ExcitatoryNeuron() {
         super();
@@ -124,12 +124,12 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
         return s;
     }
 
-    public void addInputSynapse(S s) {
+    public void addInputSynapse(ExcitatorySynapse s) {
         inputSynapses.put(s.getPInput(), s);
         setModified(true);
     }
 
-    public void removeInputSynapse(S s) {
+    public void removeInputSynapse(ExcitatorySynapse s) {
         if(inputSynapses.remove(s) != null) {
             setModified(true);
         }
@@ -146,7 +146,16 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
         }
     }
 
-    public Collection<S> getInputSynapses() {
+    public ExcitatorySynapse getInputSynapse() {
+        return inputSynapses
+                .values()
+                .stream()
+                .filter(s -> s.isInput())
+                .findAny()
+                .orElse(null);
+    }
+
+    public Collection<ExcitatorySynapse> getInputSynapses() {
         return inputSynapses.values();
     }
 
@@ -193,7 +202,7 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends Neuron<S> {
         recurrentConjunctiveBias = in.readDouble();
 
         while (in.readBoolean()) {
-            S syn = (S) m.readSynapse(in);
+            ExcitatorySynapse syn = (ExcitatorySynapse) m.readSynapse(in);
             inputSynapses.put(syn.getPInput(), syn);
         }
     }

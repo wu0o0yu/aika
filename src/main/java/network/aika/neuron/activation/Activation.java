@@ -252,7 +252,7 @@ public class Activation implements Comparable<Activation> {
 
     public void propagate() {
         followDown(thought.createVisitedId(), this, OUTPUT);
-        getNeuron().inputLinking(this);
+        getModel().linkInputRelations(this);
 
         Phase p = thought.getPhase();
         Neuron<?> n = getNeuron();

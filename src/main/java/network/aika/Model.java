@@ -75,7 +75,7 @@ public abstract class Model {
         suspensionHook = sh;
     }
 
-    public abstract void linkInputRelations(ExcitatorySynapse s, Activation originAct);
+    public abstract void linkInputRelations(Activation originAct);
 
     public long getCurrentRetrievalCount() {
         return retrievalCounter.longValue();

@@ -48,7 +48,19 @@ public class Document extends Thought {
 
         TextModel tm = (TextModel) act.getNeuron().getModel();
         if(act.getNeuron() == tm.nextTokenInhib) {
-            cursor.previousNextTokenAct = act;
+            cursor.previousNTIAct = act;
+            cursor.previousNTPPAct = act.getLinks(Direction.INPUT)
+                    .findAny()
+                    .map(l -> l.getInput())
+                    .orElse(null);
+        }
+
+        if(act.getNeuron() == tm.prevTokenInhib) {
+            cursor.nextPTIAct = act;
+            cursor.nextPTPPAct = act.getLinks(Direction.INPUT)
+                    .findAny()
+                    .map(l -> l.getInput())
+                    .orElse(null);
         }
     }
 

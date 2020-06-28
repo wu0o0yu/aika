@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Lukas Molzberger
  */
-public class PatternNeuron extends ExcitatoryNeuron<ExcitatorySynapse> {
+public class PatternNeuron extends ExcitatoryNeuron {
     private static final Logger log = LoggerFactory.getLogger(PatternNeuron.class);
 
     public static byte type;
