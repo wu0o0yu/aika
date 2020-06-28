@@ -92,7 +92,7 @@ public class TextModel extends Model {
         }
 
         PatternNeuron in = new PatternNeuron(this, label, true);
-        getSuspensionHook().storeLabel(label, in.getId());
+        getSuspensionHook().putLabel(label, in.getId());
 
         PatternPartNeuron inRelPW = new PatternPartNeuron(this, label + " Rel Prev. Word", true);
         PatternPartNeuron inRelNW = new PatternPartNeuron(this, label + " Rel Next Word", true);

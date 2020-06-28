@@ -36,9 +36,11 @@ public interface SuspensionHook {
 
     byte[] retrieve(long id);
 
-    void storeLabel(String label, Long id);
+    Stream<Long> getAllIds();
+
+    void putLabel(String label, Long id);
 
     Long getIdByLabel(String label);
 
-    Stream<Long> getAllIds();
+    void storeAllLabels();
 }

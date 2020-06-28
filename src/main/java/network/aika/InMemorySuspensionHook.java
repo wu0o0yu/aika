@@ -25,7 +25,7 @@ public class InMemorySuspensionHook implements SuspensionHook {
     }
 
     @Override
-    public void storeLabel(String label, Long id) {
+    public void putLabel(String label, Long id) {
         labels.put(label, id);
     }
 
@@ -37,6 +37,10 @@ public class InMemorySuspensionHook implements SuspensionHook {
     @Override
     public Long getIdByLabel(String label) {
         return labels.get(label);
+    }
+
+    @Override
+    public void storeAllLabels() {
     }
 
     @Override
