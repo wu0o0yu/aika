@@ -45,8 +45,8 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         input.getNeuron().setModified(true);
     }
 
-    public void updateWeight(double weightDelta) {
-        super.updateWeight(weightDelta);
+    public void update(double weightDelta, boolean recurrent) {
+        super.update(weightDelta, recurrent);
         input.getNeuron().setModified(true);
     }
 

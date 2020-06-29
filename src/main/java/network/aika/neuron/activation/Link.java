@@ -46,8 +46,9 @@ public class Link {
     }
 
     public void propagateGradient(double learnRate, double g) {
-        synapse.updateWeight(
-                learnRate * input.getValue() * g
+        synapse.update(
+                learnRate * input.getValue() * g,
+                false // TODO !
         );
 
         double ig = synapse.getWeight() * g;

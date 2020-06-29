@@ -134,7 +134,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         this.weight = weight;
     }
 
-    public void updateWeight(double weightDelta) {
+    public void update(double weightDelta, boolean recurrent) {
         this.weight += weightDelta;
     }
 

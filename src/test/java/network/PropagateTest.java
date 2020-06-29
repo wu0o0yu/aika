@@ -42,8 +42,7 @@ public class PropagateTest {
         s.setPropagate(true);
 
         s.link();
-        s.updateWeight(10.0);
-        out.setDirectConjunctiveBias(-10.0);
+        s.update(10.0, false);
         out.setBias(1.0);
 
         Document doc = new Document("test");

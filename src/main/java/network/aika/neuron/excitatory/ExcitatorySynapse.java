@@ -47,10 +47,16 @@ public class ExcitatorySynapse extends Synapse<Neuron<?>, ExcitatoryNeuron> {
         output.getNeuron().setModified(true);
     }
 
-    public void updateWeight(double weightDelta) {
-        super.updateWeight(weightDelta);
+    public void update(double weightDelta, boolean recurrent) {
+        super.update(weightDelta, recurrent);
 
-        getOutput().updateDirectConjunctiveBias(weightDelta);
+        if(!isNegative) {
+            if (!recurrent) {
+                getOutput().updateDirectConjunctiveBias(-weightDelta);
+            } else {
+                getOutput().updateRecurrentConjunctiveBias(-weightDelta);
+            }
+        }
 
         if(isPropagate()) {
             input.getNeuron().setModified(true);
