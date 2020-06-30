@@ -56,16 +56,12 @@ public class TextModel extends Model {
     @Override
     public void linkInputRelations(Activation originAct) {
         Document doc = (Document) originAct.getThought();
-        Cursor c = doc.getCursor();
+        Cursor lc = doc.getLastCursor();
+        if(lc == null) return;
 
-        if(originAct.getNeuron() == prevTokenInhib && c.previousNTPPAct != null) {
-            Synapse s = ((ExcitatoryNeuron) c.previousNTPPAct.getNeuron()).getInputSynapse();
-            doc.add(new Link(s, originAct, c.previousNTPPAct));
-        }
-
-        if(originAct.getNeuron() == nextTokenInhib && c.nextPTPPAct != null) {
-            Synapse s = ((ExcitatoryNeuron) c.nextPTPPAct.getNeuron()).getInputSynapse();
-            doc.add(new Link(s, originAct, c.nextPTPPAct));
+        if(originAct.getNeuron() == prevTokenInhib && lc.nextTokenPPAct != null) {
+            Synapse s = ((ExcitatoryNeuron) lc.nextTokenPPAct.getNeuron()).getInputSynapse();
+            doc.add(new Link(s, originAct, lc.nextTokenPPAct));
         }
 
         {
@@ -74,11 +70,8 @@ public class TextModel extends Model {
                 Synapse s = ((ExcitatoryNeuron) n).getInputSynapse();
 
                 if (s != null) {
-                    if(s.getInput() == nextTokenInhib && c.previousNTIAct != null) {
-                        doc.add(new Link(s, c.previousNTIAct, originAct));
-                    }
-                    if(s.getInput() == nextTokenInhib && c.previousNTIAct != null) {
-                        doc.add(new Link(s, c.previousNTIAct, originAct));
+                    if(originAct.getOutputLinks(prevTokenInhib.getProvider()) != null && lc.nextTokenIAct != null) {
+                        doc.add(new Link(s, lc.nextTokenIAct, originAct));
                     }
                 }
             }

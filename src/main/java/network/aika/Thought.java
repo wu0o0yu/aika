@@ -86,6 +86,10 @@ public abstract class Thought {
         phase = null;
     }
 
+    public void addActivation(Activation act) {
+        activationsById.put(act.getId(), act);
+    }
+
     public void add(Activation act) {
         activationsQueue.add(act);
     }
@@ -136,10 +140,6 @@ public abstract class Thought {
 
     public Phase getPhase() {
         return phase;
-    }
-
-    public void addActivation(Activation act) {
-        activationsById.put(act.getId(), act);
     }
 
     public Collection<Activation> getActivations() {

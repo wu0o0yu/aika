@@ -24,9 +24,6 @@ import network.aika.neuron.activation.Activation;
  */
 public class Cursor {
 
-    public Activation previousNTPPAct;
-    public Activation previousNTIAct;
-
-    public Activation nextPTPPAct;
-    public Activation nextPTIAct;
+    public Activation nextTokenPPAct;
+    public Activation nextTokenIAct;
 }
