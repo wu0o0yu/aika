@@ -150,7 +150,7 @@ public class PatternTest {
                 s.link();
                 s.update(10.0, false);
             }
-            eC.setBias(4.0);
+            out.setBias(4.0);
         }
 
         Document doc = new Document("ABC");
