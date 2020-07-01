@@ -22,6 +22,7 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.NeuronProvider.SuspensionMode;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Direction;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.neuron.inhibitory.*;
@@ -75,7 +76,7 @@ public abstract class Model {
         suspensionHook = sh;
     }
 
-    public abstract void linkInputRelations(Activation originAct);
+    public abstract void linkInputRelations(Activation originAct, Direction dir);
 
     public long getCurrentRetrievalCount() {
         return retrievalCounter.longValue();

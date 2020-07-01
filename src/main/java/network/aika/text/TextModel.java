@@ -21,6 +21,7 @@ import network.aika.SuspensionHook;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
@@ -54,26 +55,31 @@ public class TextModel extends Model {
     }
 
     @Override
-    public void linkInputRelations(Activation originAct) {
+    public void linkInputRelations(Activation originAct, Direction dir) {
         Document doc = (Document) originAct.getThought();
         Cursor lc = doc.getLastCursor();
         if(lc == null) return;
 
-        if(originAct.getNeuron() == prevTokenInhib && lc.nextTokenPPAct != null) {
-            Synapse s = ((ExcitatoryNeuron) lc.nextTokenPPAct.getNeuron()).getInputSynapse();
-            doc.add(new Link(s, originAct, lc.nextTokenPPAct));
-        }
+        switch (dir) {
+            case OUTPUT:
+                if (originAct.getNeuron() == prevTokenInhib && lc.nextTokenPPAct != null) {
+                    Synapse s = ((ExcitatoryNeuron) lc.nextTokenPPAct.getNeuron()).getInputSynapse();
+                    doc.add(new Link(s, originAct, lc.nextTokenPPAct));
+                }
+                break;
 
-        {
-            Neuron n = originAct.getNeuron();
-            if(n instanceof ExcitatoryNeuron) {
-                Synapse s = ((ExcitatoryNeuron) n).getInputSynapse();
+            case INPUT: {
+                Neuron n = originAct.getNeuron();
+                if (n instanceof ExcitatoryNeuron) {
+                    Synapse s = ((ExcitatoryNeuron) n).getInputSynapse();
 
-                if (s != null) {
-                    if(originAct.getOutputLinks(prevTokenInhib.getProvider()) != null && lc.nextTokenIAct != null) {
-                        doc.add(new Link(s, lc.nextTokenIAct, originAct));
+                    if (s != null) {
+                        if (originAct.getOutputLinks(prevTokenInhib.getProvider()) != null && lc.nextTokenIAct != null) {
+                            doc.add(new Link(s, lc.nextTokenIAct, originAct));
+                        }
                     }
                 }
+                break;
             }
         }
     }
@@ -96,8 +102,7 @@ public class TextModel extends Model {
                 s.setPropagate(true);
 
                 s.link();
-                s.setWeight(10.0);
-                inRelPW.setDirectConjunctiveBias(-10.0);
+                s.update(10.0, false);
             }
 
             {
@@ -105,8 +110,7 @@ public class TextModel extends Model {
                 s.setInput(true);
 
                 s.link();
-                s.setWeight(10.0);
-                inRelPW.setRecurrentConjunctiveBias(-10.0);
+                s.update(10.0, false);
             }
             inRelPW.setBias(4.0);
         }
@@ -116,8 +120,7 @@ public class TextModel extends Model {
                 s.setPropagate(true);
 
                 s.link();
-                s.setWeight(10.0);
-                inRelNW.setDirectConjunctiveBias(-10.0);
+                s.update(10.0, false);
             }
 
             {
@@ -125,8 +128,7 @@ public class TextModel extends Model {
                 s.setInput(true);
 
                 s.link();
-                s.setWeight(10.0);
-                inRelNW.setRecurrentConjunctiveBias(-10.0);
+                s.update(10.0, true);
             }
             inRelNW.setBias(4.0);
         }
@@ -135,14 +137,14 @@ public class TextModel extends Model {
             InhibitorySynapse s = new InhibitorySynapse(inRelPW, prevTokenInhib);
 
             s.link();
-            s.setWeight(1.0);
+            s.update(1.0, false);
         }
 
         {
             InhibitorySynapse s = new InhibitorySynapse(inRelNW, nextTokenInhib);
 
             s.link();
-            s.setWeight(1.0);
+            s.update(1.0, false);
         }
 
         return in;

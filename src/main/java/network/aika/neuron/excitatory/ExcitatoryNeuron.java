@@ -62,6 +62,8 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
     }
 
     public void tryToLink(Activation iAct, Activation oAct) {
+        if(!iAct.isFinal()) return;
+
         switch(iAct.getPhase()) {
             case INITIAL_LINKING:
             case FINAL_LINKING:
