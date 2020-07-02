@@ -114,7 +114,7 @@ public class Link {
     }
 
     public void process() {
-/*        if(output.isFinal()) {
+        if(output.isFinal()) {
             if (isNegative()) {
                 if (!isSelfRef()) {
                     output = output.createBranch();
@@ -123,13 +123,13 @@ public class Link {
                 output = output.createUpdate();
             }
         }
-*/
+/*
         if (output.isFinal() && !isSelfRef()) {
             output = isNegative() ?
                     output.createBranch() :
                     output.createUpdate();
         }
-
+*/
         output.addLink(this);
     }
 }
