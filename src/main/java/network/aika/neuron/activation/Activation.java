@@ -455,7 +455,7 @@ public class Activation implements Comparable<Activation> {
 
         followUp(v, originAct, dir);
 
-        if(!(getNeuron() instanceof PatternNeuron)) {
+        if(this == originAct || !(getNeuron() instanceof PatternNeuron)) {
             inputLinks
                     .values()
                     .stream()
