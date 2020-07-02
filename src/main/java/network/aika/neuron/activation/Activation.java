@@ -53,7 +53,6 @@ public class Activation implements Comparable<Activation> {
 
     private double p = 1.0;
 
-    TreeMap<Link, Link> inputLinksFiredOrder;
     Map<NeuronProvider, Link> inputLinks;
     NavigableMap<Activation, Link> outputLinks;
 
@@ -86,11 +85,6 @@ public class Activation implements Comparable<Activation> {
         this.neuron = n;
 
         thought.addActivation(this);
-
-        inputLinksFiredOrder = new TreeMap<>(Comparator
-                .<Link, Fired>comparing(l -> l.getInput().getFired())
-                .thenComparing(l -> l.getInput())
-        );
 
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>(Comparator

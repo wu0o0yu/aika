@@ -106,7 +106,7 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eA, eC);
+                ExcitatorySynapse s = new ExcitatorySynapse(eB, eC);
 
                 s.link();
                 s.update(10.0, false);

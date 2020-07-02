@@ -16,9 +16,12 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.Phase;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 
+import static network.aika.Phase.FINAL_LINKING;
+import static network.aika.Phase.INITIAL_LINKING;
 import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Direction.INPUT;
 
@@ -83,17 +86,21 @@ public class Link {
     }
 
     public boolean isSelfRef() {
-        return output == input.inputLinksFiredOrder.firstEntry().getValue().input;
+        return output == input
+                .inputLinks
+                .values()
+                .stream()
+                .findAny()
+                .map(l -> l.input)
+                .orElse(null);
     }
 
     public void link() {
         if(input != null) {
             input.outputLinks.put(output, this);
-            output.inputLinksFiredOrder.put(this, this);
         }
         Link ol = output.inputLinks.put(synapse.getPInput(), this);
         if(ol != null && ol != this) {
-            output.inputLinksFiredOrder.remove(ol);
             ol.input.outputLinks.remove(ol.output);
         }
     }
@@ -107,6 +114,16 @@ public class Link {
     }
 
     public void process() {
+/*        if(output.isFinal()) {
+            if (isNegative()) {
+                if (!isSelfRef()) {
+                    output = output.createBranch();
+                }
+            } else if (output.getPhase() != INITIAL_LINKING) {
+                output = output.createUpdate();
+            }
+        }
+*/
         if (output.isFinal() && !isSelfRef()) {
             output = isNegative() ?
                     output.createBranch() :
