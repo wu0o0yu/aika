@@ -121,8 +121,8 @@ public class Activation implements Comparable<Activation> {
         return thought;
     }
 
-    public String getLabel() {
-        return getNeuron().getLabel();
+    public String getDescriptionLabel() {
+        return getNeuron().getDescriptionLabel();
     }
 
     public Phase getPhase() {
@@ -478,7 +478,7 @@ public class Activation implements Comparable<Activation> {
 
     public String toString() {
         return "Act id:" + getId() + " " +
-                getNeuron().getClass().getSimpleName() + ":" + getLabel() +
+                getNeuron().getClass().getSimpleName() + ":" + getDescriptionLabel() +
                 " value:" + Utils.round(value) +
                 " net:" + Utils.round(getNet()) +
                 " p:" + Utils.round(p) +

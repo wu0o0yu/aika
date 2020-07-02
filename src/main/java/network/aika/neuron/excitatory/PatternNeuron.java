@@ -25,6 +25,10 @@ import network.aika.neuron.activation.Activation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 /**
  *
  * @author Lukas Molzberger
@@ -34,12 +38,19 @@ public class PatternNeuron extends ExcitatoryNeuron {
 
     public static byte type;
 
+    private String tokenLabel;
+
     public PatternNeuron(NeuronProvider p) {
         super(p);
     }
 
-    public PatternNeuron(Model model, String label, Boolean isInputNeuron) {
-        super(model, label, isInputNeuron);
+    public PatternNeuron(Model model, String tokenLabel, String descriptionLabel, Boolean isInputNeuron) {
+        super(model, descriptionLabel, isInputNeuron);
+        this.tokenLabel = tokenLabel;
+    }
+
+    public String getTokenLabel() {
+        return tokenLabel;
     }
 
     @Override
@@ -63,4 +74,24 @@ public class PatternNeuron extends ExcitatoryNeuron {
     public Synapse induceSynapse(Activation iAct, Activation oAct) {
         return new ExcitatorySynapse(iAct.getNeuron(), oAct.getNeuron());
     }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+
+        out.writeBoolean(tokenLabel != null);
+        if(tokenLabel != null) {
+            out.writeUTF(tokenLabel);
+        }
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws Exception {
+        super.readFields(in, m);
+
+        if(in.readBoolean()) {
+            tokenLabel = in.readUTF();
+        }
+    }
+
 }

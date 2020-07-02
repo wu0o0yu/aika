@@ -68,8 +68,8 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
         return neuron;
     }
 
-    public String getLabel() {
-        return getNeuron().getLabel();
+    public String getDescriptionLabel() {
+        return getNeuron().getDescriptionLabel();
     }
 
     public Long getId() {

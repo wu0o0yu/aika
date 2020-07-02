@@ -43,8 +43,8 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         super(p);
     }
 
-    public InhibitoryNeuron(Model model, String label, Boolean isInputNeuron) {
-        super(model, label, isInputNeuron);
+    public InhibitoryNeuron(Model model, String descriptionLabel, Boolean isInputNeuron) {
+        super(model, descriptionLabel, isInputNeuron);
     }
 
     public void tryToLink(Activation iAct, Activation oAct) {

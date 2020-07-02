@@ -43,7 +43,7 @@ public class PatternTest {
         PatternPartNeuron eB = new PatternPartNeuron(m, "E B", false);
         PatternPartNeuron eC = new PatternPartNeuron(m, "E C", false);
 
-        PatternNeuron out = new PatternNeuron(m, "OUT", false);
+        PatternNeuron out = new PatternNeuron(m, "ABC", "OUT", false);
 
         {
             {

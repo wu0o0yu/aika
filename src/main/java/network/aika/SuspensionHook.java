@@ -40,7 +40,7 @@ public interface SuspensionHook {
 
     void putLabel(String label, Long id);
 
-    Long getIdByLabel(String label);
+    Long getIdByLabel(String tokenLabel);
 
     void storeAllLabels();
 }

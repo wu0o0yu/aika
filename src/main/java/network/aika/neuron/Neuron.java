@@ -39,7 +39,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     private NeuronProvider provider;
 
-    private String label;
+    private String descriptionLabel;
 
     private volatile double bias;
 
@@ -62,8 +62,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         provider = p;
     }
 
-    public Neuron(Model m, String label, Boolean isInputNeuron) {
-        this.label = label;
+    public Neuron(Model m, String descriptionLabel, Boolean isInputNeuron) {
+        this.descriptionLabel = descriptionLabel;
         this.isInputNeuron = isInputNeuron;
         provider = new NeuronProvider(m, this);
         modified = true;
@@ -99,8 +99,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return provider.getId();
     }
 
-    public String getLabel() {
-        return label;
+    public String getDescriptionLabel() {
+        return descriptionLabel;
     }
 
     public Model getModel() {
@@ -205,9 +205,9 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public void write(DataOutput out) throws IOException {
         out.writeByte(getType());
 
-        out.writeBoolean(label != null);
-        if(label != null) {
-            out.writeUTF(label);
+        out.writeBoolean(descriptionLabel != null);
+        if(descriptionLabel != null) {
+            out.writeUTF(descriptionLabel);
         }
 
         out.writeDouble(bias);
@@ -229,7 +229,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     @Override
     public void readFields(DataInput in, Model m) throws Exception {
         if(in.readBoolean()) {
-            label = in.readUTF();
+            descriptionLabel = in.readUTF();
         }
 
         bias = in.readDouble();
@@ -246,7 +246,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public String toString() {
-        return getId() + ":" + getLabel();
+        return getId() + ":" + getDescriptionLabel();
     }
 
     public String toDetailedString() {
@@ -268,6 +268,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public void dumpStat() {
-        System.out.println("OUT:  " + getLabel() + "  Freq:(" + freqToString() + ")  P(" + propToString() + ")");
+        System.out.println("OUT:  " + getDescriptionLabel() + "  Freq:(" + freqToString() + ")  P(" + propToString() + ")");
     }
 }

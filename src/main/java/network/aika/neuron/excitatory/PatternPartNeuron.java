@@ -48,7 +48,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
     }
 
     public Neuron induceNeuron(Activation act) {
-        return new PatternNeuron(getModel(), "", false);
+        return new PatternNeuron(getModel(), "", "", false);
     }
 
     public Synapse induceSynapse(Activation iAct, Activation oAct) {

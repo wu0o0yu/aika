@@ -42,7 +42,7 @@ public class MutualExclusionTest {
     public void testPropagation() {
         Model m = new TextModel();
 
-        PatternNeuron in = new PatternNeuron(m, "IN", true);
+        PatternNeuron in = new PatternNeuron(m, "I", "IN", true);
         PatternPartNeuron na = new PatternPartNeuron(m, "A", false);
         PatternPartNeuron nb = new PatternPartNeuron(m, "B", false);
         PatternPartNeuron nc = new PatternPartNeuron(m, "C", false);
@@ -55,7 +55,6 @@ public class MutualExclusionTest {
 
                 s.link();
                 s.update(10.0, false);
-                na.setDirectConjunctiveBias(-10.0);
             }
 
             {

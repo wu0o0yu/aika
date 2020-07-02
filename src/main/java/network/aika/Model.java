@@ -90,14 +90,14 @@ public abstract class Model {
         return suspensionHook.createId();
     }
 
-    public NeuronProvider getNeuronProvider(String label) {
-        Long id = suspensionHook.getIdByLabel(label);
+    public NeuronProvider getNeuronProvider(String tokenLabel) {
+        Long id = suspensionHook.getIdByLabel(tokenLabel);
         if(id == null) return null;
         return lookupNeuron(id);
     }
 
-    public Neuron getNeuron(String label) {
-        NeuronProvider np = getNeuronProvider(label);
+    public Neuron getNeuron(String tokenLabel) {
+        NeuronProvider np = getNeuronProvider(tokenLabel);
         return np != null ? np.getNeuron() : null;
     }
 

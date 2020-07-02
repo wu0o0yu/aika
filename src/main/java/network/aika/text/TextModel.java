@@ -84,17 +84,17 @@ public class TextModel extends Model {
         }
     }
 
-    public PatternNeuron lookupToken(String label) {
-        Neuron inProv = getNeuron(label);
+    public PatternNeuron lookupToken(String tokenLabel) {
+        Neuron inProv = getNeuron(tokenLabel);
         if(inProv != null) {
             return (PatternNeuron) inProv;
         }
 
-        PatternNeuron in = new PatternNeuron(this, label, true);
-        getSuspensionHook().putLabel(label, in.getId());
+        PatternNeuron in = new PatternNeuron(this, tokenLabel, tokenLabel, true);
+        getSuspensionHook().putLabel(tokenLabel, in.getId());
 
-        PatternPartNeuron inRelPW = new PatternPartNeuron(this, label + " Rel Prev. Word", true);
-        PatternPartNeuron inRelNW = new PatternPartNeuron(this, label + " Rel Next Word", true);
+        PatternPartNeuron inRelPW = new PatternPartNeuron(this, tokenLabel + " Rel Prev. Word", true);
+        PatternPartNeuron inRelNW = new PatternPartNeuron(this, tokenLabel + " Rel Next Word", true);
 
         {
             {

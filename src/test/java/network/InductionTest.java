@@ -13,7 +13,7 @@ public class InductionTest {
     @Test
     public void testInduceFromMaturePattern() {
         Model m = new TextModel();
-        PatternNeuron in = new PatternNeuron(m, "IN", true);
+        PatternNeuron in = new PatternNeuron(m, "A", "IN", true);
         in.setBinaryFrequency(12);
 
         Document doc = new Document("",
