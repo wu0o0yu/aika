@@ -42,7 +42,7 @@ public class Activation implements Comparable<Activation> {
 
     private double value;
     private double sum;
-    private double negSum;
+    private double lateSum;
     private Fired fired = NOT_FIRED;
 
     public double rangeCoverage;
@@ -102,7 +102,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public double getNet(Phase p) {
-        return sum + (p == INITIAL_LINKING ? 0.0 : negSum) + getNeuron().getBias(p);
+        return sum + (p == INITIAL_LINKING ? 0.0 : lateSum) + getNeuron().getBias(p);
     }
 
     public double getNet() {
@@ -137,10 +137,6 @@ public class Activation implements Comparable<Activation> {
         this.groundRef = groundRef;
     }
 
-    public void setLastRound(Activation lrAct) {
-        this.lastRound = lrAct;
-    }
-
     public Activation getLastRound() {
         return lastRound;
     }
@@ -173,32 +169,34 @@ public class Activation implements Comparable<Activation> {
 
     public Activation createBranch() {
         Activation clonedAct = new Activation(thought.createActivationId(), thought, neuron);
-        clonedAct.setRound(round + 1);
+        clonedAct.round = round + 1;
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
         linkClone(clonedAct);
         return clonedAct;
     }
 
-    public Activation createUpdate() {
+    public Activation getModifiable() {
+        if(!isFinal) return this;
+
         Activation clonedAct = new Activation(id, thought, neuron);
-        clonedAct.setRound(round + 1);
-        clonedAct.setLastRound(this);
+        clonedAct.round = round + 1;
+        clonedAct.lastRound = this;
+        clonedAct.value = value;
+        clonedAct.sum = sum;
+        clonedAct.lateSum = lateSum;
         linkClone(clonedAct);
+
         return clonedAct;
     }
 
     private void linkClone(Activation clonedAct) {
         inputLinks
                 .values()
-                .forEach(l -> {
-                    new Link(l.getSynapse(), l.getInput(), clonedAct)
-                            .link();
-                });
-    }
-
-    private void setRound(int r) {
-        this.round = r;
+                .forEach(l ->
+                        new Link(l.getSynapse(), l.getInput(), clonedAct)
+                            .link()
+                );
     }
 
     public void setValue(double v) {
@@ -287,12 +285,14 @@ public class Activation implements Comparable<Activation> {
     public Link addLink(Link l) {
         l.link();
 
+        sumUpLink(l);
+        /*
         if(isFinal) return l;
 
         if(!l.isNegative()) {
             sumUpLink(l);
         }
-
+*/
         l.propagate();
         return l;
     }
@@ -316,18 +316,25 @@ public class Activation implements Comparable<Activation> {
 
     public void sumUpLink(Link l) {
         double w = l.getSynapse().getWeight();
-        sum += l.getInput().value * w;
+        double s = l.getInput().value * w;
+
+        if(isFinal || l.isNegative()) {
+            lateSum += s;
+        } else {
+            sum += s;
+        }
+
         rangeCoverage += getNeuron().propagateRangeCoverage(l.getInput());
 
         checkIfFired(l);
     }
 
     public void updateForFinalPhase() {
-        double initialNet = getNet(INITIAL_LINKING);
-        double finalNet = getNet(FINAL_LINKING);
+        double initialValue = computeValue(INITIAL_LINKING);
+        double finalValue = computeValue(FINAL_LINKING);
 
-        if(Math.abs(finalNet - initialNet) > TOLERANCE) {
-            thought.add(this);
+        if(Math.abs(finalValue - initialValue) > TOLERANCE) {
+            thought.add(getModifiable());
         }
     }
 
@@ -339,14 +346,18 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void process() {
-        value = p *
-                neuron.getActivationFunction().f(
-                        getNet()
-                );
+        value = computeValue(thought.getPhase());
         isFinal = true;
         if (lastRound == null || !equals(lastRound)) {
             linkForward();
         }
+    }
+
+    private double computeValue(Phase phase) {
+        return p *
+                neuron.getActivationFunction().f(
+                        getNet(phase)
+                );
     }
 
     public void processGradient() {
@@ -403,13 +414,13 @@ public class Activation implements Comparable<Activation> {
                 .mapToDouble(cAct -> Math.exp(cAct.getNet() - offset))
                 .sum();
 
-        double p = Math.exp(net - offset) / norm;
+        updateP(Math.exp(net - offset) / norm);
+    }
 
+    private void updateP(double p) {
         if(Math.abs(p - getP()) <= TOLERANCE) return;
 
-        Activation cAct = isFinal ? createUpdate() : this;
-        cAct.sum = sum;
-        cAct.negSum = negSum;
+        Activation cAct = getModifiable();
         cAct.p = p;
 
         thought.add(cAct);

@@ -70,9 +70,7 @@ public abstract class Thought {
         phase = FINAL_LINKING;
         activationsById
                 .values()
-                .forEach(act ->
-                        act.updateForFinalPhase()
-                );
+                .forEach(act -> act.updateForFinalPhase());
 
         processActivations();
 
@@ -91,7 +89,9 @@ public abstract class Thought {
     }
 
     public void add(Activation act) {
-        activationsQueue.add(act);
+        if(!act.isFinal()) {
+            activationsQueue.add(act);
+        }
     }
 
     public void add(Link l) {

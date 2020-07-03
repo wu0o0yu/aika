@@ -16,11 +16,9 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.Phase;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 
-import static network.aika.Phase.FINAL_LINKING;
 import static network.aika.Phase.INITIAL_LINKING;
 import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Direction.INPUT;
@@ -106,30 +104,22 @@ public class Link {
     }
 
     public void unlink() {
-        input.outputLinks.remove(input);
+        input.outputLinks.remove(output);
+    }
+
+    public void process() {
+        if(output.isFinal() && isNegative() && !isSelfRef()) {
+            output = output.createBranch();
+        }
+
+        if (output.getPhase() != INITIAL_LINKING) {
+            output = output.getModifiable();
+        }
+
+        output.addLink(this);
     }
 
     public String toString() {
         return "L " + synapse.getClass().getSimpleName() + ": " + input + "-(" + input.getNeuron() + ") --> " + output + "-(" + output.getNeuron() + ")";
-    }
-
-    public void process() {
-        if(output.isFinal()) {
-            if (isNegative()) {
-                if (!isSelfRef()) {
-                    output = output.createBranch();
-                }
-            } else if (output.getPhase() != INITIAL_LINKING) {
-                output = output.createUpdate();
-            }
-        }
-/*
-        if (output.isFinal() && !isSelfRef()) {
-            output = isNegative() ?
-                    output.createBranch() :
-                    output.createUpdate();
-        }
-*/
-        output.addLink(this);
     }
 }

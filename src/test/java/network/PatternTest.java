@@ -32,7 +32,36 @@ import org.junit.jupiter.api.Test;
 public class PatternTest {
 
     @Test
-    public void testPattern() {
+    public void testPatternPos() {
+        TextModel m = initModel();
+
+        Document doc = new Document("ABC");
+
+        doc.processToken(m,  "A");
+        doc.processToken(m,  "B");
+        doc.processToken(m,  "C");
+
+        doc.process();
+
+        System.out.println(doc.activationsToString());
+    }
+
+
+    @Test
+    public void testPatternNeg() {
+        TextModel m = initModel();
+
+        Document doc = new Document("ABC");
+
+        doc.processToken(m,  "A");
+        doc.processToken(m,  "B");
+
+        doc.process();
+
+        System.out.println(doc.activationsToString());
+    }
+
+    public TextModel initModel() {
         TextModel m = new TextModel();
 
         PatternNeuron nA = m.lookupToken("A");
@@ -152,16 +181,7 @@ public class PatternTest {
             }
             out.setBias(4.0);
         }
-
-        Document doc = new Document("ABC");
-
-        doc.processToken(m,  "A");
-        doc.processToken(m,  "B");
-        doc.processToken(m,  "C");
-
-        doc.process();
-
-        System.out.println(doc.activationsToString());
+        return m;
     }
 
     public PatternPartNeuron lookupPPPT(TextModel tm, PatternNeuron pn) {
