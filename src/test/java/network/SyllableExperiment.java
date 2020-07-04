@@ -41,6 +41,7 @@ public class SyllableExperiment {
     private void train(String word) {
         Document doc = new Document(word,
                 new Config()
+                        .setAlpha(0.99)
                         .setLearnRate(0.025)
                         .setMetaThreshold(0.3)
         );
@@ -60,7 +61,8 @@ public class SyllableExperiment {
 
     @Test
     public void testTraining() throws IOException {
-        for(String word: Util.loadExamplesAsWords(new File("/Users/lukas.molzberger/aika-ws/maerchen"))) {
+        //"/Users/lukas.molzberger/aika-ws/maerchen"
+        for(String word: Util.loadExamplesAsWords(new File("C:\\ws\\aika-syllables\\src\\main\\resources\\text\\maerchen"))) {
             train( word + " ");
         }
 

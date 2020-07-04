@@ -72,7 +72,7 @@ public class PatternNeuron extends ExcitatoryNeuron {
     }
 
     public Synapse induceSynapse(Activation iAct, Activation oAct) {
-        return new ExcitatorySynapse(iAct.getNeuron(), oAct.getNeuron());
+        return new ExcitatorySynapse(iAct.getNeuron(), (ExcitatoryNeuron) oAct.getNeuron());
     }
 
     @Override

@@ -183,17 +183,17 @@ public abstract class Thought {
     public void train(Model m) {
         phase = INDUCTION;
 
+        long v = createVisitedId();
         if(trainingConfig.getAlpha() != null) {
             Set<Neuron> activatedNeurons = new TreeSet<>();
             getActivations()
                 .stream()
                 .filter(act -> act.isActive())
-                .forEach(act -> activatedNeurons.add(act.getNeuron()));
+                .map(act -> act.getNeuron())
+                .filter(n -> n.checkVisited(v))
+                .forEach(n -> n.applyMovingAverage(trainingConfig));
 
             m.applyMovingAverage(trainingConfig);
-            activatedNeurons.forEach(n ->
-                n.applyMovingAverage(trainingConfig)
-            );
         }
 
         m.addToN(length());

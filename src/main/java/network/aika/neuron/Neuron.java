@@ -54,6 +54,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     protected boolean isInputNeuron; // Input Neurons won't be trained!
 
+    private long visited;
+
 
     protected Neuron() {
     }
@@ -269,5 +271,11 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public void dumpStat() {
         System.out.println("OUT:  " + getDescriptionLabel() + "  Freq:(" + freqToString() + ")  P(" + propToString() + ")");
+    }
+
+    public boolean checkVisited(long v) {
+        boolean result = visited != v;
+        visited = v;
+        return result;
     }
 }

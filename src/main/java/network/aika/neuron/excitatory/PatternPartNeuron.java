@@ -52,7 +52,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
     }
 
     public Synapse induceSynapse(Activation iAct, Activation oAct) {
-        return new ExcitatorySynapse(iAct.getNeuron(), oAct.getNeuron());
+        return new ExcitatorySynapse(iAct.getNeuron(), (ExcitatoryNeuron) oAct.getNeuron());
     }
 
     private double getInputProbability() {

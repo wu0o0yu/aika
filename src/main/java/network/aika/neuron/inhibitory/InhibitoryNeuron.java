@@ -70,9 +70,9 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     public Synapse induceSynapse(Activation iAct, Activation oAct) {
         if(iAct.getNeuron() instanceof PatternPartNeuron) {
-            return new InhibitorySynapse(iAct.getNeuron(), oAct.getNeuron());
+            return new InhibitorySynapse(iAct.getNeuron(), (InhibitoryNeuron) oAct.getNeuron());
         } else if(iAct.getNeuron() instanceof PatternNeuron) {
-            return new PrimaryInhibitorySynapse(iAct.getNeuron(), oAct.getNeuron());
+            return new PrimaryInhibitorySynapse(iAct.getNeuron(), (InhibitoryNeuron) oAct.getNeuron());
         }
         return null;
     }

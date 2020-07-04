@@ -115,16 +115,6 @@ public class Document extends Thought {
         /*
         act.setFired(new Fired(input.inputTimestamp, input.fired));
         act.setRangeCoverage(input.rangeCoverage);
-
-        input.getInputLinks()
-                .stream()
-                .map(iAct -> new Link(
-                                getNeuron().getInputSynapse(iAct.getNeuronProvider()),
-                                iAct,
-                                this
-                        )
-                )
-                .forEach(l -> addLink(l));
 */
         act.propagateInput();
         return act;

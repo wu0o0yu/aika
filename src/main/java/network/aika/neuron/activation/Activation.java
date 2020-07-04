@@ -141,8 +141,8 @@ public class Activation implements Comparable<Activation> {
         return lastRound;
     }
 
-    public <N extends Neuron<?>> N getNeuron() {
-        return (N) neuron;
+    public Neuron getNeuron() {
+        return neuron;
     }
 
     public Model getModel() {
