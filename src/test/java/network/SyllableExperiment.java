@@ -16,50 +16,26 @@
  */
 package network;
 
+import network.aika.Config;
+import network.aika.text.Document;
+import network.aika.text.TextModel;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.io.IOException;
+
 /**
  *
  * @author Lukas Molzberger
  */
 public class SyllableExperiment {
-/*
-    private Model model;
 
-    private Map<Character, PatternNeuron> inputLetters = new TreeMap<>();
-    private InhibitoryNeuron inputInhibN;
-    private ExcitatoryNeuron relN;
+    private TextModel model;
 
     @BeforeEach
     public void init() {
-        model = new Model();
-
-        inputInhibN = new InhibitoryNeuron(model, "Input-Inhib", true);
-        relN = new PatternPartNeuron(model, "Char-Relation", true);
-
-        relN.link(1.0,
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setNeuron(inputInhibN)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setNegative(false)
-                        .setNeuron(inputInhibN)
-                        .setWeight(10.0)
-        );
-    }
-
-    public PatternNeuron lookupChar(Character character) {
-        return inputLetters.computeIfAbsent(character, c -> {
-            PatternNeuron n = new PatternNeuron(model, "" + c, true);
-
-            inputInhibN.link(0.0,
-                    new InhibitorySynapse.Builder()
-                            .setNeuron(n)
-                            .setWeight(1.0)
-                            .setPropagate(true)
-            );
-
-            return n;
-        });
+        model = new TextModel();
     }
 
     private void train(String word) {
@@ -70,39 +46,14 @@ public class SyllableExperiment {
         );
         System.out.println("  " + word);
 
-        Activation lastAct = null;
-        Activation lastInInhibAct = null;
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.charAt(i);
 
-            Activation currentAct = lookupChar(c)
-                    .propagate(doc,
-                            new Activation.Builder()
-                                    .setInputTimestamp(i)
-                                    .setFired(0)
-                                    .setValue(1.0)
-                                    .setRangeCoverage(1.0)
-                    );
-
-            Activation currentInInhibAct = currentAct.getOutputLinks(inputInhibN.getProvider())
-                    .findAny()
-                    .map(l -> l.getOutput())
-                    .orElse(null);
-
-            if(lastAct != null) {
-                relN.propagate(doc,
-                        new Activation.Builder()
-                            .setInputTimestamp(i)
-                            .setFired(0)
-                            .setValue(1.0)
-                );
-            }
-
-            lastAct = currentAct;
-            lastInInhibAct = currentInInhibAct;
+            doc.processToken(model, "" + c);
         }
+        doc.process();
 
-//        System.out.println(doc.activationsToString());
+        System.out.println(doc.activationsToString());
 
         doc.train(model);
     }
@@ -113,9 +64,6 @@ public class SyllableExperiment {
             train( word + " ");
         }
 
-//        model.dumpModel();
         System.out.println();
     }
-
- */
 }
