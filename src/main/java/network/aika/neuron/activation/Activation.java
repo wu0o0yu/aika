@@ -267,7 +267,7 @@ public class Activation implements Comparable<Activation> {
             Neuron on = n.induceNeuron(this);
             if(on == null) return;
 
-            Activation oAct = createActivation(on);
+            Activation oAct = new Activation(thought.createActivationId(), thought, on);
             Link.link(
                     on.induceSynapse(this, oAct),
                     this,

@@ -68,7 +68,7 @@ public class PatternNeuron extends ExcitatoryNeuron {
 
     public Neuron induceNeuron(Activation act) {
         // Should induce Pattern Part and Inihib. Neuron through primary inhib. Synapse
-        return new PatternPartNeuron(getModel(), "", false);
+        return new PatternPartNeuron(getModel(), "PP-" + act.getDescriptionLabel(), false);
     }
 
     public Synapse induceSynapse(Activation iAct, Activation oAct) {
