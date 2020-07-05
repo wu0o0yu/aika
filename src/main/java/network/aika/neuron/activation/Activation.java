@@ -464,6 +464,7 @@ public class Activation implements Comparable<Activation> {
             inputLinks
                     .values()
                     .stream()
+                    .filter(l -> l.getInput() != null)
                     .map(l -> l.getInput())
                     .forEach(act -> act.followDown(v, originAct, dir));
         }

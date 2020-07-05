@@ -54,9 +54,11 @@ public class SyllableExperiment {
         }
         doc.process();
 
-        System.out.println(doc.activationsToString());
+//        System.out.println(doc.activationsToString());
 
         doc.train(model);
+
+        System.out.println(); // doc.activationsToString()
     }
 
     @Test

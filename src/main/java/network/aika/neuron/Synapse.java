@@ -47,6 +47,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public Synapse(I input, O output) {
         this.input = input.getProvider();
         this.output = output.getProvider();
+
+        System.out.println(getClass().getSimpleName() + " IN:" + getInput().toString() + " -> OUT:" + getOutput().toString());
     }
 
     public void setInput(I input) {

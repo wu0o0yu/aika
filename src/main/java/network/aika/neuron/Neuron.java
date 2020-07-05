@@ -69,6 +69,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         this.isInputNeuron = isInputNeuron;
         provider = new NeuronProvider(m, this);
         modified = true;
+
+        System.out.println(getClass().getSimpleName() + " " + descriptionLabel);
     }
 
     public abstract ActivationFunction getActivationFunction();
