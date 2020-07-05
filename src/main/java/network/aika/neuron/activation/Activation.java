@@ -479,7 +479,9 @@ public class Activation implements Comparable<Activation> {
         Activation iAct = dir == INPUT ? this : originAct;
         Activation oAct = dir == OUTPUT ? this : originAct;
 
-        oAct.getNeuron().tryToLink(iAct, oAct);
+        if(!oAct.getNeuron().isBlocked()) {
+            oAct.getNeuron().tryToLink(iAct, oAct);
+        }
 
         outputLinks
                 .values()

@@ -56,6 +56,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     private long visited;
 
+    private boolean blocked; //Temporary workaround
+
 
     protected Neuron() {
     }
@@ -121,6 +123,14 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public void setModified(boolean modified) {
         this.modified = modified;
+    }
+
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
     }
 
     public void setBias(double b) {

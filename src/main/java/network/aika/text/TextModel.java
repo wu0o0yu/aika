@@ -51,7 +51,10 @@ public class TextModel extends Model {
 
     private void init() {
         prevTokenInhib = new InhibitoryNeuron(this, "Prev. Token", false);
+        prevTokenInhib.setBlocked(true);
+
         nextTokenInhib = new InhibitoryNeuron(this, "Next Token", false);
+        nextTokenInhib.setBlocked(true);
     }
 
     @Override
@@ -91,10 +94,15 @@ public class TextModel extends Model {
         }
 
         PatternNeuron in = new PatternNeuron(this, tokenLabel, tokenLabel, true);
+        in.setBlocked(true);
+
         getSuspensionHook().putLabel(tokenLabel, in.getId());
 
         PatternPartNeuron inRelPW = new PatternPartNeuron(this, tokenLabel + " Rel Prev. Word", true);
+        inRelPW.setBlocked(true);
+
         PatternPartNeuron inRelNW = new PatternPartNeuron(this, tokenLabel + " Rel Next Word", true);
+        inRelNW.setBlocked(true);
 
         {
             {
