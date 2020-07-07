@@ -18,6 +18,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.*;
+import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     protected final ReadWriteLock lock = new ReadWriteLock();
 
-    protected double binaryFrequency;
     protected double frequency;
     protected double coveredFactorSum;
     protected double coveredFactorCount;
@@ -158,9 +158,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public void count(Activation act) {
-        double v = act.getValue();
-        frequency += v;
-        binaryFrequency += (v > 0.0 ? 1.0 : 0.0);
+        frequency += act.isActive() ? 1.0 : 0.0;
 
         coveredFactorSum += act.rangeCoverage;
         coveredFactorCount += 1.0;
@@ -170,11 +168,10 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         Double alpha = trainingConfig.getAlpha();
         if(alpha != null) {
             frequency *= alpha;
-            binaryFrequency *= alpha;
         }
     }
 
-    public abstract Neuron induceNeuron(Activation act);
+    public abstract List<Neuron> induceNeuron(Activation act);
 
     public abstract Synapse induceSynapse(Activation iAct, Activation oAct);
 
@@ -196,6 +193,13 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return frequency / getN();
     }
 
+    public double getStandardDeviation() {
+        return Math.sqrt(
+                new BetaDistribution(frequency, getN() - frequency)
+                        .getNumericalVariance()
+        );
+    }
+
     public double getN() {
         double coveredFactor = coveredFactorSum / coveredFactorCount;
         return getModel().getN() / coveredFactor;
@@ -203,10 +207,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public double getFrequency() {
         return frequency;
-    }
-
-    public void setBinaryFrequency(int f) {
-        binaryFrequency = f;
     }
 
     public void reactivate() {
@@ -235,7 +235,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         out.writeBoolean(false);
 
         out.writeDouble(frequency);
-        out.writeDouble(binaryFrequency);
         out.writeDouble(coveredFactorSum);
         out.writeDouble(coveredFactorCount);
     }
@@ -254,7 +253,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         }
 
         frequency = in.readDouble();
-        binaryFrequency = in.readDouble();
         coveredFactorSum = in.readDouble();
         coveredFactorCount = in.readDouble();
     }

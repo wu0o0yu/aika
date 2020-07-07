@@ -14,7 +14,7 @@ public class InductionTest {
     public void testInduceFromMaturePattern() {
         Model m = new TextModel();
         PatternNeuron in = new PatternNeuron(m, "A", "IN", true);
-        in.setBinaryFrequency(12);
+//        in.setBinaryFrequency(12);
 
         Document doc = new Document("",
                 new Config()

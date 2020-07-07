@@ -262,17 +262,14 @@ public class Activation implements Comparable<Activation> {
                             )
                     );
         } else if(p == INDUCTION) {
-            // Todo: check if the outgoing link already exists.
-
-            Neuron on = n.induceNeuron(this);
-            if(on == null) return;
-
-            Activation oAct = new Activation(thought.createActivationId(), thought, on);
-            Link.link(
-                    on.induceSynapse(this, oAct),
-                    this,
-                    oAct
-            );
+            n.induceNeuron(this).forEach(on -> {
+                Activation oAct = new Activation(thought.createActivationId(), thought, on);
+                Link.link(
+                        on.induceSynapse(this, oAct),
+                        this,
+                        oAct
+                );
+            });
         }
     }
 

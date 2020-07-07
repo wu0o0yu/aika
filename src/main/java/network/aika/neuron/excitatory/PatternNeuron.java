@@ -22,12 +22,20 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.inhibitory.PrimaryInhibitorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static network.aika.neuron.activation.Direction.OUTPUT;
 
 /**
  *
@@ -66,9 +74,19 @@ public class PatternNeuron extends ExcitatoryNeuron {
         return iAct.rangeCoverage;
     }
 
-    public Neuron induceNeuron(Activation act) {
-        // Should induce Pattern Part and Inihib. Neuron through primary inhib. Synapse
-        return new PatternPartNeuron(getModel(), "PP-" + act.getDescriptionLabel(), false);
+    public List<Neuron> induceNeuron(Activation act) {
+        List<Neuron> results = new ArrayList<>();
+
+        if(getStandardDeviation() > 0.08) {
+            return results;
+        }
+
+        if(!act.getLinks(OUTPUT)
+                .anyMatch(l -> l.getSynapse() instanceof PrimaryInhibitorySynapse)) {
+            results.add(new InhibitoryNeuron(getModel(), "PP-" + act.getDescriptionLabel(), false));
+        }
+
+        return results;
     }
 
     public Synapse induceSynapse(Activation iAct, Activation oAct) {
@@ -93,5 +111,4 @@ public class PatternNeuron extends ExcitatoryNeuron {
             tokenLabel = in.readUTF();
         }
     }
-
 }
