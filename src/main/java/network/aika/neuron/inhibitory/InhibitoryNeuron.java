@@ -26,6 +26,7 @@ import network.aika.neuron.activation.Fired;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Link;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -72,7 +73,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     public List<Neuron> induceNeuron(Activation act) {
-        return null;
+        return Collections.EMPTY_LIST;
     }
 
     public Synapse induceSynapse(Activation iAct, Activation oAct) {
