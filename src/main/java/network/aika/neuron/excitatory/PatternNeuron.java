@@ -22,6 +22,7 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 import org.slf4j.Logger;
@@ -68,8 +69,8 @@ public class PatternNeuron extends ExcitatoryNeuron {
         return Math.log(s.getP(this));
     }
 
-    public double propagateRangeCoverage(Activation iAct) {
-        return iAct.rangeCoverage;
+    public double propagateRangeCoverage(Link l) {
+        return l.getInput().getRangeCoverage();
     }
 
     public List<Neuron> induceNeuron(Activation act) {

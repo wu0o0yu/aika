@@ -50,8 +50,12 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
         return type;
     }
 
-    public double propagateRangeCoverage(Activation iAct) {
-        return 0.0; //getPrimaryInput() == iAct.getNeuron() ? iAct.rangeCoverage : 0.0;
+    public double propagateRangeCoverage(Link l) {
+        // TODO: only propagate the input scope link
+        if(l.getInput().getNeuron() instanceof PatternNeuron) {
+            return l.getInput().getRangeCoverage();
+        }
+        return 0.0;
     }
 
     public List<Neuron> induceNeuron(Activation act) {

@@ -149,7 +149,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract double getCost(Sign s);
 
-    public abstract double propagateRangeCoverage(Activation iAct);
+    public abstract double propagateRangeCoverage(Link l);
 
     public ReadWriteLock getLock() {
         return lock;
@@ -158,7 +158,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public void count(Activation act) {
         frequency += act.isActive() ? 1.0 : 0.0;
 
-        coveredFactorSum += act.rangeCoverage;
+        coveredFactorSum += act.getRangeCoverage();
         coveredFactorCount += 1.0;
     }
 

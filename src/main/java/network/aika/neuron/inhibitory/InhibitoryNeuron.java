@@ -24,6 +24,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Link;
 
 import java.util.List;
 
@@ -66,8 +67,8 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         throw new UnsupportedOperationException();
     }
 
-    public double propagateRangeCoverage(Activation iAct) {
-        return iAct.rangeCoverage;
+    public double propagateRangeCoverage(Link l) {
+        return l.getInput().getRangeCoverage();
     }
 
     public List<Neuron> induceNeuron(Activation act) {

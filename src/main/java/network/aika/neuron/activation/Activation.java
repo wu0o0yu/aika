@@ -45,7 +45,7 @@ public class Activation implements Comparable<Activation> {
     private double lateSum;
     private Fired fired = NOT_FIRED;
 
-    public double rangeCoverage;
+    private double rangeCoverage;
 
     private int id;
     private Neuron<?> neuron;
@@ -211,6 +211,10 @@ public class Activation implements Comparable<Activation> {
         this.rangeCoverage = rangeCoverage;
     }
 
+    public double getRangeCoverage() {
+        return rangeCoverage;
+    }
+
     public boolean isActive() {
         return value > 0.0;
     }
@@ -321,7 +325,7 @@ public class Activation implements Comparable<Activation> {
             sum += s;
         }
 
-        rangeCoverage += getNeuron().propagateRangeCoverage(l.getInput());
+        rangeCoverage += getNeuron().propagateRangeCoverage(l);
 
         checkIfFired(l);
     }
