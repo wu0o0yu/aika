@@ -19,12 +19,13 @@ package network.aika.neuron.inhibitory;
 import network.aika.ActivationFunction;
 import network.aika.Model;
 import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.excitatory.PatternNeuron;
-import network.aika.neuron.excitatory.PatternPartNeuron;
+
+import java.util.List;
 
 
 /**
@@ -56,6 +57,11 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     @Override
+    public double getCost(Sign s) {
+        return 0;
+    }
+
+    @Override
     public Synapse getInputSynapse(NeuronProvider n) {
         throw new UnsupportedOperationException();
     }
@@ -64,17 +70,12 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         return iAct.rangeCoverage;
     }
 
-    public Neuron induceNeuron(Activation act) {
+    public List<Neuron> induceNeuron(Activation act) {
         return null;
     }
 
     public Synapse induceSynapse(Activation iAct, Activation oAct) {
-        if(iAct.getNeuron() instanceof PatternPartNeuron) {
-            return new InhibitorySynapse(iAct.getNeuron(), (InhibitoryNeuron) oAct.getNeuron());
-        } else if(iAct.getNeuron() instanceof PatternNeuron) {
-            return new PrimaryInhibitorySynapse(iAct.getNeuron(), (InhibitoryNeuron) oAct.getNeuron());
-        }
-        return null;
+        return new InhibitorySynapse(iAct.getNeuron(), (InhibitoryNeuron) oAct.getNeuron());
     }
 
     @Override

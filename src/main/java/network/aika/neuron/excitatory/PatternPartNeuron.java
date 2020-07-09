@@ -19,8 +19,15 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.inhibitory.InhibitorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static network.aika.neuron.activation.Direction.OUTPUT;
 
 /**
  * @author Lukas Molzberger
@@ -47,8 +54,19 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
         return 0.0; //getPrimaryInput() == iAct.getNeuron() ? iAct.rangeCoverage : 0.0;
     }
 
-    public Neuron induceNeuron(Activation act) {
-        return new PatternNeuron(getModel(), "", "", false);
+    public List<Neuron> induceNeuron(Activation act) {
+        List<Neuron> results = new ArrayList<>();
+
+        if(getStandardDeviation() > 0.08) {
+            return results;
+        }
+
+        if(!act.getLinks(OUTPUT)
+                .anyMatch(l -> l.getSynapse() instanceof InhibitorySynapse)) {
+            results.add(new PatternNeuron(getModel(), "", "", false));
+        }
+
+        return results;
     }
 
     public Synapse induceSynapse(Activation iAct, Activation oAct) {

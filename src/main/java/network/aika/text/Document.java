@@ -111,11 +111,9 @@ public class Document extends Thought {
         act.setReference(new GroundReference(begin, end));
 
         act.setValue(1.0);
+        act.setFired(new Fired(begin, 0));
+        act.setRangeCoverage(end - begin);
 
-        /*
-        act.setFired(new Fired(input.inputTimestamp, input.fired));
-        act.setRangeCoverage(input.rangeCoverage);
-*/
         act.propagateInput();
         return act;
     }
@@ -124,16 +122,11 @@ public class Document extends Thought {
         return addInput(n.getNeuron(), begin, end);
     }
 
-    public Activation processToken(TextModel m, String tokenLabel) {
+    public Activation processToken(TextModel m, int begin, int end, String tokenLabel) {
         moveCursor();
 
         Neuron tokenN = m.lookupToken(tokenLabel);
-
-        Activation tokenPatternAct = new Activation(this, tokenN);
-        tokenPatternAct.setValue(1.0);
-        tokenPatternAct.setFired(new Fired(0, 0)); // TODO
-        tokenPatternAct.propagateInput();
-
+        Activation tokenPatternAct = addInput(tokenN, begin, end);
         processActivations();
 
         return tokenPatternAct;

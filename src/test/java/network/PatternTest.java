@@ -37,9 +37,9 @@ public class PatternTest {
 
         Document doc = new Document("ABC");
 
-        doc.processToken(m,  "A");
-        doc.processToken(m,  "B");
-        doc.processToken(m,  "C");
+        doc.processToken(m, 0, 1,  "A");
+        doc.processToken(m, 1, 2,  "B");
+        doc.processToken(m, 2, 3,  "C");
 
         doc.process();
 
@@ -53,8 +53,8 @@ public class PatternTest {
 
         Document doc = new Document("ABC");
 
-        doc.processToken(m,  "A");
-        doc.processToken(m,  "B");
+        doc.processToken(m, 0, 1,  "A");
+        doc.processToken(m, 1, 2,  "B");
 
         doc.process();
 

@@ -59,7 +59,6 @@ public abstract class Model {
 
         registerType(InhibitoryNeuron.class);
         registerType(InhibitorySynapse.class);
-        registerType(PrimaryInhibitorySynapse.class);
     }
 
     private SuspensionHook suspensionHook;

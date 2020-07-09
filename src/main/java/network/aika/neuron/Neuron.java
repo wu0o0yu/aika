@@ -147,9 +147,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return bias;
     }
 
-    public double getCost(Sign s) {
-        return 0.0;
-    }
+    public abstract double getCost(Sign s);
 
     public abstract double propagateRangeCoverage(Activation iAct);
 

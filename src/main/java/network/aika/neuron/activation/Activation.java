@@ -424,7 +424,6 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void count() {
-        if(!isActive()) return;
         getNeuron().count(this);
     }
 

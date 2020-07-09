@@ -182,7 +182,7 @@ public abstract class Thought {
 
     public void train(Model m) {
         phase = INDUCTION;
-
+/*
         long v = createVisitedId();
         if(trainingConfig.getAlpha() != null) {
             Set<Neuron> activatedNeurons = new TreeSet<>();
@@ -195,7 +195,7 @@ public abstract class Thought {
 
             m.applyMovingAverage(trainingConfig);
         }
-
+*/
         m.addToN(length());
         getActivations()
                 .forEach(act ->
