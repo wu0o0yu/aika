@@ -98,6 +98,8 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         super.train(act);
     }
 
+    public abstract double getCost(Sign s);
+
     protected void propagateCost(Activation act) {
         double cost =
                 (POS.getSign() * getCost(POS)) +

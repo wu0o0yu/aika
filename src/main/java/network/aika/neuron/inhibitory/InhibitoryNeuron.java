@@ -22,12 +22,18 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Link;
 
 import java.util.Collections;
 import java.util.List;
+
+import static network.aika.neuron.Sign.NEG;
+import static network.aika.neuron.Sign.POS;
+import static network.aika.neuron.activation.Activation.TOLERANCE;
+import static network.aika.neuron.activation.Direction.INPUT;
 
 
 /**
@@ -58,9 +64,16 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         return type;
     }
 
-    @Override
-    public double getCost(Sign s) {
-        return 0;
+    protected void propagateCost(Activation act) {
+        double cost = 0.0;
+
+//        act.getLinks(INPUT).mapToDouble(l -> l.getInput().);
+
+        if(Math.abs(cost) < TOLERANCE) {
+            return;
+        }
+
+        act.getMutableGradient().gradient += cost;
     }
 
     @Override

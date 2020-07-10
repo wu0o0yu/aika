@@ -147,8 +147,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return bias;
     }
 
-    public abstract double getCost(Sign s);
-
     public abstract double propagateRangeCoverage(Link l);
 
     public ReadWriteLock getLock() {
@@ -184,8 +182,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         propagateCost(act);
     }
 
-    protected void propagateCost(Activation act) {
-    }
+    protected abstract void propagateCost(Activation act);
 
     public double getP() {
         return frequency / getN();
