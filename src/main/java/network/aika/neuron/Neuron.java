@@ -19,6 +19,7 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.neuron.activation.*;
 import org.apache.commons.math3.distribution.BetaDistribution;
+import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -190,7 +191,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public double getStandardDeviation() {
         return Math.sqrt(
-                new BetaDistribution(frequency, getN() - frequency)
+                new BetaDistribution(frequency + 1.0, (getN() - frequency) + 1.0)
                         .getNumericalVariance()
         );
     }

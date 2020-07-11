@@ -287,13 +287,7 @@ public class Activation implements Comparable<Activation> {
         l.link();
 
         sumUpLink(l);
-        /*
-        if(isFinal) return l;
 
-        if(!l.isNegative()) {
-            sumUpLink(l);
-        }
-*/
         l.propagate();
         return l;
     }
@@ -316,6 +310,8 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void sumUpLink(Link l) {
+        if(l.isNegative() && l.isSelfRef()) return;
+
         double w = l.getSynapse().getWeight();
         double s = l.getInput().value * w;
 
