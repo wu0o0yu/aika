@@ -61,10 +61,10 @@ public class Link {
         input.getMutableGradient().gradient += ig;
     }
 
-    public static void link(Synapse s, Activation input, Activation output) {
-        input.getThought().add(
-                new Link(s, input, output)
-        );
+    public static Link link(Synapse s, Activation input, Activation output) {
+        Link l = new Link(s, input, output);
+        input.getThought().add(l);
+        return l;
     }
 
     public Synapse getSynapse() {

@@ -23,6 +23,8 @@ import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.inhibitory.InhibitorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,7 @@ import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.activation.Activation.TOLERANCE;
+import static network.aika.neuron.activation.Direction.OUTPUT;
 
 /**
  *
@@ -110,6 +113,23 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         }
 
         act.getMutableGradient().gradient += cost;
+    }
+
+    public void induceNeuron(Activation act) {
+        if(getStandardDeviation() > 0.08) {
+            return;
+        }
+
+        if(!act.getLinks(OUTPUT)
+                .anyMatch(l -> l.getSynapse() instanceof InhibitorySynapse)) {
+            act.connectInducedNeuron(
+                    new InhibitoryNeuron(getModel(), "", false)
+            );
+        }
+    }
+
+    public Synapse induceSynapse(Activation iAct, Activation oAct) {
+        return new ExcitatorySynapse(iAct.getNeuron(), (ExcitatoryNeuron) oAct.getNeuron());
     }
 
     protected void addDummyLinks(Activation act) {

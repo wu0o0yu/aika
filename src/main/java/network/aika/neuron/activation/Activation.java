@@ -266,15 +266,17 @@ public class Activation implements Comparable<Activation> {
                             )
                     );
         } else if(p == INDUCTION) {
-            n.induceNeuron(this).forEach(on -> {
-                Activation oAct = new Activation(thought.createActivationId(), thought, on);
-                Link.link(
-                        on.induceSynapse(this, oAct),
-                        this,
-                        oAct
-                );
-            });
+            n.induceNeuron(this);
         }
+    }
+
+    public Link connectInducedNeuron(Neuron on) {
+        Activation oAct = new Activation(thought.createActivationId(), thought, on);
+        return Link.link(
+                on.induceSynapse(this, oAct),
+                this,
+                oAct
+        );
     }
 
     private Activation createActivation(Neuron n) {

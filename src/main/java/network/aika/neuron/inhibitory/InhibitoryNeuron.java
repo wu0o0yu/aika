@@ -85,12 +85,14 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         return l.getInput().getRangeCoverage();
     }
 
-    public List<Neuron> induceNeuron(Activation act) {
-        return Collections.EMPTY_LIST;
+    public void induceNeuron(Activation act) {
+        return;
     }
 
     public Synapse induceSynapse(Activation iAct, Activation oAct) {
-        return new InhibitorySynapse(iAct.getNeuron(), (InhibitoryNeuron) oAct.getNeuron());
+        InhibitorySynapse s = new InhibitorySynapse(iAct.getNeuron(), (InhibitoryNeuron) oAct.getNeuron());
+        s.setPropagate(true);
+        return s;
     }
 
     @Override

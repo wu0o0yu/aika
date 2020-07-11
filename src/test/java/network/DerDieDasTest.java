@@ -16,9 +16,10 @@ public class DerDieDasTest {
 
     @Test
     public void train() {
+        Random r = new Random();
         String[] trainData = {"der", "die", "das"};
         for(int i = 0; i < 1000; i++) {
-            charBasedTrainings.train(trainData[new Random().nextInt(3)]);
+            charBasedTrainings.train(trainData[r.nextInt(3)]);
         }
     }
 }

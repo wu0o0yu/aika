@@ -73,23 +73,19 @@ public class PatternNeuron extends ExcitatoryNeuron {
         return l.getInput().getRangeCoverage();
     }
 
-    public List<Neuron> induceNeuron(Activation act) {
-        List<Neuron> results = new ArrayList<>();
+    public void induceNeuron(Activation act) {
+        super.induceNeuron(act);
 
         if(getStandardDeviation() > 0.08) {
-            return results;
+            return;
         }
 
         if(!act.getLinks(OUTPUT)
-                .anyMatch(l -> l.getSynapse() instanceof InhibitorySynapse)) {
-            results.add(new InhibitoryNeuron(getModel(), "PP-" + act.getDescriptionLabel(), false));
+                .anyMatch(l -> l.getSynapse().getOutput() instanceof PatternPartNeuron)) {
+            act.connectInducedNeuron(
+                    new PatternPartNeuron(getModel(), "PP-" + act.getDescriptionLabel(), false)
+            );
         }
-
-        return results;
-    }
-
-    public Synapse induceSynapse(Activation iAct, Activation oAct) {
-        return new ExcitatorySynapse(iAct.getNeuron(), (ExcitatoryNeuron) oAct.getNeuron());
     }
 
     @Override

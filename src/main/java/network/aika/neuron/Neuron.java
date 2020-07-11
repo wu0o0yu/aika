@@ -168,7 +168,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         }
     }
 
-    public abstract List<Neuron> induceNeuron(Activation act);
+    public abstract void induceNeuron(Activation act);
 
     public abstract Synapse induceSynapse(Activation iAct, Activation oAct);
 
