@@ -129,7 +129,9 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
     }
 
     public Synapse induceSynapse(Activation iAct, Activation oAct) {
-        return new ExcitatorySynapse(iAct.getNeuron(), (ExcitatoryNeuron) oAct.getNeuron());
+        Synapse s = new ExcitatorySynapse(iAct.getNeuron(), (ExcitatoryNeuron) oAct.getNeuron());
+        s.link();
+        return s;
     }
 
     protected void addDummyLinks(Activation act) {

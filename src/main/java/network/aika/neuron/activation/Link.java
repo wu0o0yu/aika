@@ -19,6 +19,8 @@ package network.aika.neuron.activation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 
+import java.util.SortedMap;
+
 import static network.aika.Phase.INITIAL_LINKING;
 import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Direction.INPUT;
@@ -95,6 +97,14 @@ public class Link {
 
     public void link() {
         if(input != null) {
+            if(synapse.isPropagate()) {
+                SortedMap<Activation, Link> outLinks = input.getOutputLinks(synapse);
+                if(!outLinks.isEmpty()) {
+                    Activation oAct = outLinks.firstKey();
+                    assert oAct.getId() == output.getId();
+                }
+            }
+
             input.outputLinks.put(output, this);
         }
         Link ol = output.inputLinks.put(synapse.getPInput(), this);

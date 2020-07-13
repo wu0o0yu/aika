@@ -302,13 +302,18 @@ public class Activation implements Comparable<Activation> {
         return outputLinks.containsKey(oAct);
     }
 
-    private boolean outputLinkExists(Synapse s) {
-        return !outputLinks
+    public boolean outputLinkExists(Synapse s) {
+        return !getOutputLinks(s).isEmpty();
+    }
+
+    public SortedMap<Activation, Link> getOutputLinks(Synapse s) {
+        return outputLinks
                 .subMap(
                         new Activation(Integer.MIN_VALUE, s.getOutput()),
-                        new Activation(Integer.MAX_VALUE, s.getOutput())
-                )
-                .isEmpty();
+                        true,
+                        new Activation(Integer.MAX_VALUE, s.getOutput()),
+                        true
+                );
     }
 
     public void sumUpLink(Link l) {
