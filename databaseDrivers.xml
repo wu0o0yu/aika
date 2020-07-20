@@ -88,5 +88,6 @@
       <artifact name="Cassandra" use="true" />
       <option name="auto-sync" value="true" />
     </driver>
+    <driver id="com.dbschema.MongoJdbcDriver" name="com.dbschema.MongoJdbcDriver" driver-class="com.dbschema.MongoJdbcDriver" />
   </component>
 </application>
