@@ -16,262 +16,157 @@
  */
 package network.aika.neuron;
 
-
 import network.aika.*;
-import network.aika.Document;
 import network.aika.Writable;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Comparator;
-
-import static network.aika.neuron.Synapse.State.CURRENT;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class Synapse<I extends INeuron, O extends INeuron> implements Writable, InputKey, OutputKey {
+public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implements Writable {
 
     public static double TOLERANCE = 0.0000001;
 
-    protected Neuron input;
-    protected Neuron output;
+    protected boolean isNegative;
+    protected boolean isPropagate;
+    protected boolean isInput;
+
+
+    protected NeuronProvider input;
+    protected NeuronProvider output;
 
     private double weight;
-    private double weightDelta;
 
     public Synapse() {
     }
 
-    public Synapse(Neuron input, Neuron output) {
-        this.input = input;
-        this.output = output;
+    public Synapse(I input, O output) {
+        this.input = input.getProvider();
+        this.output = output.getProvider();
+
+        System.out.println(getClass().getSimpleName() + " IN:" + getInput().toString() + " -> OUT:" + getOutput().toString());
+    }
+
+    public void setInput(I input) {
+        this.input = input.getProvider();
+    }
+
+    public void setOutput(O output) {
+        this.output = output.getProvider();
     }
 
     public abstract byte getType();
 
-    public abstract boolean isPropagate();
+    public void setNegative(boolean negative) {
+        isNegative = negative;
+    }
 
-    public abstract boolean isRecurrent();
+    public boolean isNegative() {
+        return isNegative;
+    }
 
-    public abstract boolean isNegative();
+    public void setPropagate(boolean propagate) {
+        isPropagate = propagate;
+    }
 
-    public abstract PatternScope getPatternScope();
+    public boolean isPropagate() {
+        return isPropagate;
+    }
 
-    protected abstract void addLinkInternal(INeuron in, INeuron out);
+    public boolean isInput() {
+        return isInput;
+    }
 
-    protected abstract void removeLinkInternal(INeuron in, INeuron out);
+    public void setInput(boolean input) {
+        isInput = input;
+    }
 
-    public Neuron getPInput() {
+    protected abstract void link(Neuron in, Neuron out);
+
+    protected abstract void unlink(Neuron in, Neuron out);
+
+    public NeuronProvider getPInput() {
         return input;
     }
 
-    public Neuron getPOutput() {
+    public NeuronProvider getPOutput() {
         return output;
     }
 
     public I getInput() {
-        return (I) input.get();
+        return (I) input.getNeuron();
     }
 
     public O getOutput() {
-        return (O) output.get();
+        return (O) output.getNeuron();
     }
 
     public double getWeight() {
         return weight;
     }
 
-    public double getNewWeight() {
-        return weight + weightDelta;
-    }
-
-    public double getWeight(State s) {
-        return s == CURRENT ? weight : getNewWeight();
-    }
-
-    public double getWeightDelta() {
-        return weightDelta;
-    }
-
     public void link() {
-        INeuron in = input.get();
-        INeuron out = output.get();
+        Neuron in = input.getNeuron();
+        Neuron out = output.getNeuron();
 
-        boolean dir = in.getId() < out.getId();
-
-        (dir ? in : out).lock.acquireWriteLock();
-        (dir ? out : in).lock.acquireWriteLock();
-
-        input.lock.acquireWriteLock();
-        if(isPropagate()) {
-            in.addPropagateTarget(this);
-        }
-        input.activeOutputSynapses.put(this, this);
-        input.lock.releaseWriteLock();
-
-        output.lock.acquireWriteLock();
-        output.activeInputSynapses.put(this, this);
-        output.lock.releaseWriteLock();
-
-        addLinkInternal(in, out);
-
-        (dir ? in : out).lock.releaseWriteLock();
-        (dir ? out : in).lock.releaseWriteLock();
+        link(in, out);
     }
-
 
     public void unlink() {
-        INeuron in = input.get();
-        INeuron out = output.get();
+        Neuron in = input.getNeuron();
+        Neuron out = output.getNeuron();
 
-        boolean dir = input.getId() < out.getId();
-
-        (dir ? in : out).lock.acquireWriteLock();
-        (dir ? out : in).lock.acquireWriteLock();
-
-        input.lock.acquireWriteLock();
-        if(isPropagate()) {
-            in.removePropagateTarget(this);
-        }
-        input.activeOutputSynapses.remove(this);
-        input.lock.releaseWriteLock();
-
-        output.lock.acquireWriteLock();
-        output.activeInputSynapses.remove(this);
-        output.lock.releaseWriteLock();
-
-        removeLinkInternal(in, out);
-
-        (dir ? in : out).lock.releaseWriteLock();
-        (dir ? out : in).lock.releaseWriteLock();
-    }
-
-    public void commit() {
-        weight += weightDelta;
-        weightDelta = 0.0;
+        unlink(in, out);
     }
 
     public boolean isZero() {
         return Math.abs(weight) < TOLERANCE;
     }
 
-    public enum State {
-        NEXT,
-        CURRENT
-    }
-
+/*
     public boolean isWeak(State state) {
         return output.get().isWeak(this, state);
     }
-
-    public void updateDelta(Document doc, double weightDelta) {
-        this.weightDelta += weightDelta;
-
-        if(doc != null) {
-            doc.notifyWeightModified(this);
-        }
+*/
+    public void setWeight(double weight) {
+        this.weight = weight;
     }
 
-    public void update(Document doc, double weight) {
-        this.weightDelta = weight - this.weight;
-
-        if(doc != null) {
-            doc.notifyWeightModified(this);
-        }
+    public void update(double weightDelta, boolean recurrent) {
+        this.weight += weightDelta;
     }
-
 
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeByte(getType());
 
-        out.writeInt(input.getId());
-        out.writeInt(output.getId());
+        out.writeLong(input.getId());
+        out.writeLong(output.getId());
 
         out.writeDouble(weight);
+
+        out.writeBoolean(isNegative);
+        out.writeBoolean(isPropagate);
+        out.writeBoolean(isInput);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-        input = m.lookupNeuron(in.readInt());
-        output = m.lookupNeuron(in.readInt());
+        input = m.lookupNeuron(in.readLong());
+        output = m.lookupNeuron(in.readLong());
 
         weight = in.readDouble();
 
-        output.addActiveInputSynapse(this);
-        input.addActiveOutputSynapse(this);
-    }
-
-    public static Synapse createOrReplace(Neuron inputNeuron, Neuron outputNeuron, SynapseFactory synapseFactory) {
-        Synapse s = synapseFactory.createSynapse(inputNeuron, outputNeuron);
-        s.link();
-
-        return s;
+        isNegative = in.readBoolean();
+        isPropagate = in.readBoolean();
+        isInput = in.readBoolean();
     }
 
     public String toString() {
-        return "S W:" + Utils.round(getNewWeight()) + " " + input + "->" + output;
-    }
-
-    /**
-     * The {@code Builder} class is just a helper class which is used to initialize a neuron. Most of the parameters of this class
-     * will be mapped to a input synapse for this neuron.
-     *
-     * @author Lukas Molzberger
-     */
-    public static abstract class Builder implements Neuron.Builder {
-
-        private Neuron neuron;
-        double weight;
-
-
-        /**
-         * Determines the input neuron.
-         *
-         * @param neuron
-         * @return
-         */
-        public Builder setNeuron(Neuron neuron) {
-            assert neuron != null;
-            this.neuron = neuron;
-            return this;
-        }
-
-        /**
-         * Determines the input neuron.
-         *
-         * @param neuron
-         * @return
-         */
-        public Builder setNeuron(INeuron<?> neuron) {
-            assert neuron != null;
-            this.neuron = neuron.getProvider();
-            return this;
-        }
-
-        /**
-         * The synapse weight of this input.
-         *
-         * @param weight
-         * @return
-         */
-        public Builder setWeight(double weight) {
-            this.weight = weight;
-            return this;
-        }
-
-        public Synapse getSynapse(Neuron outputNeuron) {
-            return createOrReplace(neuron, outputNeuron, getSynapseFactory());
-        }
-
-        protected abstract SynapseFactory getSynapseFactory();
-    }
-
-    public interface SynapseFactory {
-        Synapse createSynapse(Neuron input, Neuron output);
+        return "S " + getClass().getSimpleName() + "  w:" + Utils.round(getWeight()) + " " + input + "->" + output + " (neg:" + isNegative() + ", prop:" + isPropagate() + ")";
     }
 }

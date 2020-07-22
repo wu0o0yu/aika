@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-
 /**
  *
  * @author Lukas Molzberger
@@ -33,7 +32,6 @@ public class Fired implements Comparable<Fired> {
         this.fired = fired;
     }
 
-
     public int getInputTimestamp() {
         return inputTimestamp;
     }
@@ -42,7 +40,6 @@ public class Fired implements Comparable<Fired> {
         return fired;
     }
 
-
     @Override
     public int compareTo(Fired f) {
         int r = Integer.compare(inputTimestamp, f.inputTimestamp);
@@ -50,7 +47,6 @@ public class Fired implements Comparable<Fired> {
 
         return Integer.compare(fired, f.fired);
     }
-
 
     public String toString() {
         return "[" + inputTimestamp + "," + fired + "]";

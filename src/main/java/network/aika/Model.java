@@ -17,16 +17,16 @@
 package network.aika;
 
 
-import network.aika.neuron.INeuron;
 import network.aika.neuron.Neuron;
-import network.aika.Provider.SuspensionMode;
+import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.NeuronProvider.SuspensionMode;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.TNeuron;
-import network.aika.neuron.excitatory.pattern.PatternSynapse;
-import network.aika.neuron.excitatory.patternpart.*;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
-import network.aika.neuron.excitatory.pattern.PatternNeuron;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Direction;
+import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.excitatory.PatternPartNeuron;
+import network.aika.neuron.inhibitory.*;
+import network.aika.neuron.excitatory.PatternNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,66 +36,83 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
+import java.util.stream.Stream;
 
 
 /**
- * The model consists of two layers. The first layer is the actual neural network consisting of neurons and synapses.
- * The second layer is a pattern lattice containing a boolean logic representation of all the neurons. Whenever the
- * synapse weights of a neuron are adjusted, then the underlying boolean logic representation of this neuron will be
- * updated too.
- * <p>
- * <p>The model supports parallel processing using a fixed number of threads.
  *
  * @author Lukas Molzberger
  */
-public class Model {
+public abstract class Model {
 
     private static final Logger log = LoggerFactory.getLogger(Model.class);
 
-    public static double ALPHA = 0.99;
+    private int N = 0; // needs to be stored
 
-    public int N = 0; // needs to be stored
-
-    public static Map<Byte, Class> typeRegistry = new HashMap<>();
+    private static Map<Byte, Class> typeRegistry = new HashMap<>();
 
     static {
-        register(PatternNeuron.class);
-        register(PatternSynapse.class);
+        registerType(PatternNeuron.class);
+        registerType(PatternPartNeuron.class);
+        registerType(ExcitatorySynapse.class);
 
-        register(PatternPartNeuron.class);
-        register(PatternPartSynapse.class);
-
-        register(InhibitoryNeuron.class);
-        register(InhibitorySynapse.class);
+        registerType(InhibitoryNeuron.class);
+        registerType(InhibitorySynapse.class);
     }
 
-    public SuspensionHook suspensionHook;
-
-    public AtomicInteger docIdCounter = new AtomicInteger(0);
-    public AtomicInteger currentId = new AtomicInteger(0);
+    private SuspensionHook suspensionHook;
+    private AtomicLong retrievalCounter = new AtomicLong(0);
 
     // Important: the id field needs to be referenced by the provider!
-    public WeakHashMap<Integer, WeakReference<Provider<? extends AbstractNode>>> providers = new WeakHashMap<>();
-    public Map<Integer, Provider<? extends AbstractNode>> activeProviders = new TreeMap<>();
-
-    public static AtomicLong visitedCounter = new AtomicLong(1);
+    private WeakHashMap<Long, WeakReference<NeuronProvider>> providers = new WeakHashMap<>();
 
     public Model() {
-        this(null);
+        this(new InMemorySuspensionHook());
     }
 
     public Model(SuspensionHook sh) {
         suspensionHook = sh;
     }
 
-    public void applyMovingAverage() {
-        N *= ALPHA;
+    public abstract void linkInputRelations(Activation originAct, Direction dir);
+
+    public long getCurrentRetrievalCount() {
+        return retrievalCounter.longValue();
     }
 
-    private static void register(Class clazz) {
+    public void incrementRetrievalCounter() {
+        retrievalCounter.addAndGet(1);
+    }
+
+    public long createNeuronId() {
+        return suspensionHook.createId();
+    }
+
+    public NeuronProvider getNeuronProvider(String tokenLabel) {
+        Long id = suspensionHook.getIdByLabel(tokenLabel);
+        if(id == null) return null;
+        return lookupNeuron(id);
+    }
+
+    public Neuron getNeuron(String tokenLabel) {
+        NeuronProvider np = getNeuronProvider(tokenLabel);
+        return np != null ? np.getNeuron() : null;
+    }
+
+    public Stream<NeuronProvider> getAllNeurons() {
+        return suspensionHook
+                .getAllIds()
+                .map(id -> lookupNeuron(id));
+    }
+
+    public void applyMovingAverage(Config trainingConfig) {
+        if(trainingConfig.getAlpha() != null) {
+            N *= trainingConfig.getAlpha();
+        }
+    }
+
+    private static void registerType(Class clazz) {
         byte type = (byte) typeRegistry.size();
         typeRegistry.put(type, clazz);
         try {
@@ -103,11 +120,6 @@ public class Model {
         } catch (Exception e) {
             log.error("Initialization error: ", e);
         }
-    }
-
-
-    public static Class getClassForType(byte type) {
-        return typeRegistry.get(type);
     }
 
     public SuspensionHook getSuspensionHook() {
@@ -118,9 +130,9 @@ public class Model {
         this.suspensionHook = suspensionHook;
     }
 
-    public INeuron readNeuron(DataInput in, Neuron p) throws Exception {
-        Constructor c = typeRegistry.get(in.readByte()).getDeclaredConstructor(Neuron.class);
-        INeuron n = (INeuron) c.newInstance(p);
+    public Neuron readNeuron(DataInput in, NeuronProvider p) throws Exception {
+        Constructor c = typeRegistry.get(in.readByte()).getDeclaredConstructor(NeuronProvider.class);
+        Neuron n = (Neuron) c.newInstance(p);
         n.readFields(in, this);
         return n;
     }
@@ -135,80 +147,62 @@ public class Model {
         s.write(out);
     }
 
-    public int getNewDocumentId() {
-        return docIdCounter.addAndGet(1);
+    public void addToN(int l) {
+        N += l;
     }
 
-    public Collection<Neuron> getActiveNeurons() {
-        List<Neuron> tmp = new ArrayList<>();
-        for(Provider<?> p: activeProviders.values()) {
-            if(p instanceof Neuron) {
-                tmp.add((Neuron) p);
-            }
-        }
-
-        return tmp;
+    public int getN() {
+        return N;
     }
 
-    public Neuron lookupNeuron(int id) {
+    public NeuronProvider lookupNeuron(Long id) {
         synchronized (providers) {
-            WeakReference<Provider<? extends AbstractNode>> wr = providers.get(id);
+            WeakReference<NeuronProvider> wr = providers.get(id);
             if(wr != null) {
-                Neuron n = (Neuron) wr.get();
+                NeuronProvider n = (NeuronProvider) wr.get();
                 if (n != null) {
                     return n;
                 }
             }
 
-            return new Neuron(this, id);
+            return new NeuronProvider(this, id);
         }
     }
 
-    public void register(Provider p) {
-        synchronized (activeProviders) {
-            activeProviders.put(p.id, p);
+    public void suspendUnusedNeurons(long retrievalCount, SuspensionMode sm) {
+        synchronized (providers) {
+            providers
+                    .values()
+                    .stream()
+                    .filter(e -> !e.isEnqueued())
+                    .map(e -> e.get())
+                    .filter(n -> !n.isSuspended())
+                    .forEach(n -> suspend(retrievalCount, n, sm));
         }
     }
 
-    public void unregister(Provider p) {
-        synchronized (activeProviders) {
-            activeProviders.remove(p.id);
-        }
+    public void suspendAll(SuspensionMode sm) {
+        suspendUnusedNeurons(Integer.MAX_VALUE, sm);
     }
 
-    private boolean suspend(int docId, Provider<? extends AbstractNode> p, SuspensionMode sm) {
-        AbstractNode an = p.getIfNotSuspended();
-        if (an != null && an.lastUsedDocumentId < docId) {
+    private boolean suspend(long retrievalCount, NeuronProvider p, SuspensionMode sm) {
+        Neuron an = p.getIfNotSuspended();
+        if (an != null && an.getRetrievalCount() < retrievalCount) {
             p.suspend(sm);
             return true;
         }
         return false;
     }
 
-    public void removeProvider(Provider p) {
-        synchronized (activeProviders) {
-            activeProviders.remove(p.id);
-        }
+    public void registerProvider(NeuronProvider p) {
         synchronized (providers) {
-            providers.remove(p.id);
+            providers.put(p.getId(), new WeakReference<>(p));
         }
     }
 
-    public void dumpStat() {
-        for(Neuron n: getActiveNeurons()) {
-            TNeuron tn = (TNeuron) n.get();
-            tn.dumpStat();
-        }
-        System.out.println();
-    }
-
-    public void dumpModel() {
-        System.out.println();
-        System.out.println("Dump Model:");
-        for(Neuron n: getActiveNeurons()) {
-            TNeuron tn = (TNeuron) n.get();
-            System.out.println(tn.toStringWithSynapses());
-            System.out.println();
+    public void removeProvider(NeuronProvider p) {
+        synchronized (providers) {
+            providers.remove(p.getId());
         }
     }
 }

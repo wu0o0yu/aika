@@ -17,13 +17,14 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.ActivationFunction;
-import network.aika.Config;
-import network.aika.Document;
 import network.aika.Model;
+import network.aika.Phase;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.inhibitory.InhibitorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,132 +32,161 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
 
-import static network.aika.neuron.InputKey.INPUT_COMP;
+import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+import static network.aika.neuron.Sign.NEG;
+import static network.aika.neuron.Sign.POS;
+import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatoryNeuron<S extends Synapse> extends TNeuron<S> {
+public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
 
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
 
     private volatile double directConjunctiveBias;
     private volatile double recurrentConjunctiveBias;
 
-    protected TreeMap<InputKey, S> inputSynapses = new TreeMap<>(INPUT_COMP);
+    protected TreeMap<NeuronProvider, ExcitatorySynapse> inputSynapses = new TreeMap<>();
 
     public ExcitatoryNeuron() {
         super();
     }
 
-    public ExcitatoryNeuron(Neuron p) {
+    public ExcitatoryNeuron(NeuronProvider p) {
         super(p);
     }
 
-    public ExcitatoryNeuron(Model model, String label) {
-        super(model, label);
+    public ExcitatoryNeuron(Model model, String label, Boolean isInputNeuron) {
+        super(model, label, isInputNeuron);
     }
 
-    public double computeWeightGradient(Link il) {
-        return computeGradient(il, 0, l -> l.getInput().value);
+    public void tryToLink(Activation iAct, Activation oAct) {
+        if(!iAct.isFinal()) return;
+
+        switch(iAct.getPhase()) {
+            case INITIAL_LINKING:
+            case FINAL_LINKING:
+                Synapse s = getInputSynapse(iAct.getNeuronProvider());
+                if (s == null || s.isInput() || iAct.outputLinkExists(oAct)) return;
+                Link.link(s, iAct, oAct);
+                break;
+            case INDUCTION:
+                induceSynapse(iAct, oAct);
+                break;
+        }
     }
 
-    public double computeGradient(Link il, int depth, Function<Link, Double> f) {
-        if(depth > 2) return 0.0;
+    public void setDirectConjunctiveBias(double b) {
+        directConjunctiveBias = b;
+    }
 
-        double g = f.apply(il) * getActivationFunction().outerGrad(il.getOutput().net);
+    public void updateDirectConjunctiveBias(double b) {
+        directConjunctiveBias += b;
+    }
 
-        double sum = 0.0;
-        for (Sign s : Sign.values()) {
-            sum += s.getSign() * getCost(s) * g;
-            for (Link ol : il.getOutput().outputLinks.values()) {
-                sum += ol.getOutput().getINeuron().computeGradient(ol, depth + 1, l -> g * il.getSynapse().getWeight());
-            }
+    public void setRecurrentConjunctiveBias(double b) {
+        recurrentConjunctiveBias = b;
+    }
+
+    public void updateRecurrentConjunctiveBias(double b) {
+        recurrentConjunctiveBias += b;
+    }
+
+    public void train(Activation act) {
+        addDummyLinks(act);
+        super.train(act);
+    }
+
+    public abstract double getCost(Sign s);
+
+    protected void propagateCost(Activation act) {
+        double cost =
+                (POS.getSign() * getCost(POS)) +
+                (NEG.getSign() * getCost(NEG));
+
+        if(Math.abs(cost) < TOLERANCE) {
+            return;
         }
 
-        return sum;
+        act.getMutableGradient().gradient += cost;
     }
 
-    protected abstract void createCandidateSynapse(Config c, Activation iAct, Activation targetAct);
+    public void induceNeuron(Activation act) {
+        if(getStandardDeviation() > 0.08) {
+            return;
+        }
 
-    public void train(Config c, Activation act) {
-        addDummyLinks(act);
-        createCandidateSynapses(c, act);
+        if(!act.getLinks(OUTPUT)
+                .anyMatch(l -> l.getSynapse() instanceof InhibitorySynapse)) {
+            act.connectInducedNeuron(
+                    new InhibitoryNeuron(getModel(), "", false)
+            );
+        }
+    }
+
+    public Synapse induceSynapse(Activation iAct, Activation oAct) {
+        Synapse s = new ExcitatorySynapse(iAct.getNeuron(), (ExcitatoryNeuron) oAct.getNeuron());
+        s.link();
+        return s;
     }
 
     protected void addDummyLinks(Activation act) {
         inputSynapses
                 .values()
                 .stream()
-                .filter(s -> !act.inputLinks.containsKey(s))
-                .forEach(s -> new Link(s, null, act).link());
+                .filter(s -> !act.inputLinkExists(s))
+                .map(s -> new Link(s, null, act))
+                .forEach(l -> l.link());
     }
 
-    private void createCandidateSynapses(Config c, Activation targetAct) {
-        Document doc = targetAct.getDocument();
-
-        if(log.isDebugEnabled()) {
-            log.debug("Created Synapses for Neuron: " + targetAct.getINeuron().getId() + ":" + targetAct.getINeuron().getLabel());
-        }
-
-        ArrayList<Activation> candidates = new ArrayList<>();
-
-        collectLinkingCandidates(targetAct, OUTPUT, (cAct, s) -> {
-            candidates.add(cAct);
-        });
-
-        candidates
-                .forEach(act -> createCandidateSynapse(c, act, targetAct));
+    public Synapse getInputSynapse(NeuronProvider n) {
+        lock.acquireReadLock();
+        Synapse s = inputSynapses.get(n);
+        lock.releaseReadLock();
+        return s;
     }
 
-
-    @Override
-    public void suspend() {
-        for (Synapse s : inputSynapses.values()) {
-            s.getPInput().removeActiveOutputSynapse(s);
-        }
-
-        for (Synapse s : outputSynapses.values()) {
-            s.getPOutput().removeActiveInputSynapse(s);
-        }
+    public void addInputSynapse(ExcitatorySynapse s) {
+        inputSynapses.put(s.getPInput(), s);
+        setModified(true);
     }
 
-    @Override
-    public void reactivate() {
-    }
-
-    public void addInputSynapse(S s) {
-        inputSynapses.put(s, s);
-        setModified();
-    }
-
-    public void removeInputSynapse(S s) {
+    public void removeInputSynapse(ExcitatorySynapse s) {
         if(inputSynapses.remove(s) != null) {
-            setModified();
+            setModified(true);
         }
     }
 
     public void addOutputSynapse(Synapse s) {
-        outputSynapses.put(s, s);
-        setModified();
+        outputSynapses.put(s.getPOutput(), s);
+        setModified(true);
     }
 
     public void removeOutputSynapse(Synapse s) {
         if(outputSynapses.remove(s) != null) {
-            setModified();
+            setModified(true);
         }
     }
 
-    public Collection<S> getInputSynapses() {
+    public ExcitatorySynapse getInputSynapse() {
+        return inputSynapses
+                .values()
+                .stream()
+                .filter(s -> s.isInput())
+                .findAny()
+                .orElse(null);
+    }
+
+    public Collection<ExcitatorySynapse> getInputSynapses() {
         return inputSynapses.values();
     }
 
     public ActivationFunction getActivationFunction() {
-        return ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+        return RECTIFIED_HYPERBOLIC_TANGENT;
     }
 
     @Override
@@ -164,17 +194,22 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends TNeuron<S> {
         return new Fired(f.getInputTimestamp(), f.getFired() + 1);
     }
 
+    /*
     public boolean isWeak(Synapse s, Synapse.State state) {
         return s.getWeight(state) < getBias();
     }
+*/
 
-    public double getTotalBias(boolean initialRound, Synapse.State state) {
-        return getBias(state) - (directConjunctiveBias + (initialRound ? 0.0 : recurrentConjunctiveBias));
+    public double getBias(Phase p) {
+        return super.getBias(p) + (directConjunctiveBias + (p == Phase.INITIAL_LINKING ? 0.0 : recurrentConjunctiveBias));
     }
 
     @Override
     public void write(DataOutput out) throws IOException {
         super.write(out);
+
+        out.writeDouble(directConjunctiveBias);
+        out.writeDouble(recurrentConjunctiveBias);
 
         for (Synapse s : inputSynapses.values()) {
             if (s.getInput() != null) {
@@ -189,33 +224,24 @@ public abstract class ExcitatoryNeuron<S extends Synapse> extends TNeuron<S> {
     public void readFields(DataInput in, Model m) throws Exception {
         super.readFields(in, m);
 
+        directConjunctiveBias = in.readDouble();
+        recurrentConjunctiveBias = in.readDouble();
+
         while (in.readBoolean()) {
-            S syn = (S) m.readSynapse(in);
-            inputSynapses.put(syn, syn);
+            ExcitatorySynapse syn = (ExcitatorySynapse) m.readSynapse(in);
+            inputSynapses.put(syn.getPInput(), syn);
         }
     }
 
-    public void commit(Collection<? extends Synapse> modifiedSynapses) {
-        commitBias();
-
-        directConjunctiveBias = 0.0;
-        recurrentConjunctiveBias = 0.0;
+    public String toStringWithSynapses() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(toDetailedString());
+        sb.append("\n");
         for (Synapse s : inputSynapses.values()) {
-            s.commit();
-
-            if(!s.isNegative()) {
-                if(!s.isRecurrent()) {
-                    directConjunctiveBias += s.getWeight();
-                } else  {
-                    recurrentConjunctiveBias += s.getWeight();
-                }
-            }
+            sb.append("  ");
+            sb.append(s.toString());
+            sb.append("\n");
         }
-
-        setModified();
-    }
-
-    public String typeToString() {
-        return "EXCITATORY";
+        return sb.toString();
     }
 }

@@ -1,211 +1,200 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package network;
 
-import network.aika.Document;
-import network.aika.Model;
+import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.excitatory.PatternPartNeuron;
+import network.aika.text.Document;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.PatternScope;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Direction;
-import network.aika.neuron.excitatory.pattern.PatternNeuron;
-import network.aika.neuron.excitatory.patternpart.*;
-import network.aika.neuron.excitatory.pattern.PatternSynapse;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
-import org.junit.Test;
+import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.text.TextModel;
+import org.junit.jupiter.api.Test;
 
-import static network.aika.neuron.PatternScope.INPUT_PATTERN;
-import static network.aika.neuron.PatternScope.SAME_PATTERN;
-import static network.aika.neuron.activation.Direction.OUTPUT;
 
+/**
+ *
+ * @author Lukas Molzberger
+ */
 public class PatternTest {
+
+    @Test
+    public void testPatternPos() {
+        TextModel m = initModel();
+
+        Document doc = new Document("ABC");
+
+        doc.processToken(m, 0, 1,  "A");
+        doc.processToken(m, 1, 2,  "B");
+        doc.processToken(m, 2, 3,  "C");
+
+        doc.process();
+
+        System.out.println(doc.activationsToString());
+    }
 
 
     @Test
-    public void testPattern() {
-        Model m = new Model();
+    public void testPatternNeg() {
+        TextModel m = initModel();
 
-        PatternNeuron inA = new PatternNeuron(m, "IN A");
-        PatternNeuron inB = new PatternNeuron(m, "IN B");
-        PatternNeuron inC = new PatternNeuron(m, "IN C");
+        Document doc = new Document("ABC");
 
+        doc.processToken(m, 0, 1,  "A");
+        doc.processToken(m, 1, 2,  "B");
 
-        InhibitoryNeuron inputInhibN = new InhibitoryNeuron(m, "INPUT INHIB", PatternNeuron.type);
-        Neuron.init(inputInhibN, 0.0,
-                new InhibitorySynapse.Builder()
-                        .setNeuron(inA)
-                        .setWeight(1.0),
-                new InhibitorySynapse.Builder()
-                        .setNeuron(inB)
-                        .setWeight(1.0),
-                new InhibitorySynapse.Builder()
-                        .setNeuron(inC)
-                        .setWeight(1.0)
-        );
-
-        PatternPartNeuron relN = new PatternPartNeuron(m, "Rel");
-        Neuron.init(relN, 1.0,
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(INPUT_PATTERN)
-                        .setRecurrent(false)
-                        .setNegative(false)
-                        .setNeuron(inputInhibN)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(SAME_PATTERN)
-                        .setRecurrent(true)
-                        .setNegative(false)
-                        .setNeuron(inputInhibN)
-                        .setWeight(10.0)
-        );
-
-
-        PatternPartNeuron eA = new PatternPartNeuron(m, "E A");
-        PatternPartNeuron eB = new PatternPartNeuron(m, "E B");
-        PatternPartNeuron eC = new PatternPartNeuron(m, "E C");
-
-        PatternNeuron out = new PatternNeuron(m, "OUT");
-
-
-        Neuron.init(eA, 1.0,
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(INPUT_PATTERN)
-                        .setRecurrent(false)
-                        .setNegative(false)
-                        .setNeuron(inA)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(SAME_PATTERN)
-                        .setRecurrent(true)
-                        .setNegative(false)
-                        .setNeuron(out)
-                        .setWeight(10.0)
-        );
-
-        Neuron.init(eB, 1.0,
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(INPUT_PATTERN)
-                        .setRecurrent(false)
-                        .setNegative(false)
-                        .setNeuron(inB)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(SAME_PATTERN)
-                        .setRecurrent(false)
-                        .setNegative(false)
-                        .setNeuron(eA)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(INPUT_PATTERN)
-                        .setRecurrent(false)
-                        .setNegative(false)
-                        .setNeuron(relN)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(SAME_PATTERN)
-                        .setRecurrent(true)
-                        .setNegative(false)
-                        .setNeuron(out)
-                        .setWeight(10.0)
-        );
-
-        Neuron.init(eC, 1.0,
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(INPUT_PATTERN)
-                        .setRecurrent(false)
-                        .setNegative(false)
-                        .setNeuron(inC)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(SAME_PATTERN)
-                        .setRecurrent(false)
-                        .setNegative(false)
-                        .setNeuron(eB)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(INPUT_PATTERN)
-                        .setRecurrent(false)
-                        .setNegative(false)
-                        .setNeuron(relN)
-                        .setWeight(10.0),
-                new PatternPartSynapse.Builder()
-                        .setPatternScope(SAME_PATTERN)
-                        .setRecurrent(true)
-                        .setNegative(false)
-                        .setNeuron(out)
-                        .setWeight(10.0)
-        );
-
-        Neuron.init(out, 1.0,
-                new PatternSynapse.Builder()
-                        .setNeuron(eA)
-                        .setWeight(10.0),
-                new PatternSynapse.Builder()
-                        .setNeuron(eB)
-                        .setWeight(10.0),
-                new PatternSynapse.Builder()
-                        .setNeuron(eC)
-                        .setWeight(10.0)
-        );
-
-
-        Document doc = new Document(m, "ABC");
-
-        Activation actA = inA.addInput(doc,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(0)
-                        .setFired(0)
-        );
-
-        Activation inInhibA = actA.getOutputLinks(inputInhibN.getProvider(), SAME_PATTERN)
-                .findAny()
-                .map(l -> l.getOutput())
-                .orElse(null);
-
-        Activation actB = inB.addInput(doc,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(1)
-                        .setFired(0)
-        );
-
-        Activation inInhibB = actB.getOutputLinks(inputInhibN.getProvider(), SAME_PATTERN)
-                .findAny()
-                .map(l -> l.getOutput())
-                .orElse(null);
-
-        relN.addInput(doc,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(1)
-                        .setFired(0)
-                        .addInputLink(INPUT_PATTERN, inInhibA)
-                        .addInputLink(SAME_PATTERN, inInhibB)
-        );
-
-        Activation actC = inC.addInput(doc,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(2)
-                        .setFired(0)
-        );
-
-        Activation inInhibC = actC.getOutputLinks(inputInhibN.getProvider(), SAME_PATTERN)
-                .findAny()
-                .map(l -> l.getOutput())
-                .orElse(null);
-
-
-        relN.addInput(doc,
-                new Activation.Builder()
-                        .setValue(1.0)
-                        .setInputTimestamp(2)
-                        .setFired(0)
-                        .addInputLink(INPUT_PATTERN, inInhibB)
-                        .addInputLink(SAME_PATTERN, inInhibC)
-        );
-
+        doc.process();
 
         System.out.println(doc.activationsToString());
+    }
+
+    public TextModel initModel() {
+        TextModel m = new TextModel();
+
+        PatternNeuron nA = m.lookupToken("A");
+        PatternNeuron nB = m.lookupToken("B");
+        PatternNeuron nC = m.lookupToken("C");
+
+        PatternPartNeuron eA = new PatternPartNeuron(m, "E A", false);
+        PatternPartNeuron eB = new PatternPartNeuron(m, "E B", false);
+        PatternPartNeuron eC = new PatternPartNeuron(m, "E C", false);
+
+        PatternNeuron out = new PatternNeuron(m, "ABC", "OUT", false);
+
+        {
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(nA, eA);
+                s.setPropagate(true);
+
+                s.link();
+                s.update(10.0, false);
+            }
+
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(out, eA);
+
+                s.link();
+                s.setWeight(10.0);
+                eA.setRecurrentConjunctiveBias(-10.0);
+            }
+            eA.setBias(4.0);
+        }
+
+        {
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(nB, eB);
+                s.setPropagate(true);
+
+                s.link();
+                s.update(10.0, false);
+            }
+
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(eA, eB);
+
+                s.link();
+                s.update(10.0, false);
+            }
+
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nB), eB);
+
+                s.link();
+                s.update(10.0, false);
+            }
+
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(out, eB);
+
+                s.link();
+                s.update(10.0, true);
+            }
+            eB.setBias(4.0);
+        }
+
+        {
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(nC, eC);
+                s.setPropagate(true);
+
+                s.link();
+                s.update(10.0, false);
+            }
+
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(eB, eC);
+
+                s.link();
+                s.update(10.0, false);
+            }
+
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nC), eC);
+
+                s.link();
+                s.update(10.0, false);
+            }
+
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(out, eC);
+
+                s.link();
+                s.update(10.0, true);
+            }
+            eC.setBias(4.0);
+        }
+
+        {
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(eA, out);
+                s.setPropagate(true);
+
+                s.link();
+                s.update(10.0, false);
+            }
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(eB, out);
+                s.setPropagate(true);
+
+                s.link();
+                s.update(10.0, false);
+            }
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(eC, out);
+                s.setPropagate(true);
+
+                s.link();
+                s.update(10.0, false);
+            }
+            out.setBias(4.0);
+        }
+        return m;
+    }
+
+    public PatternPartNeuron lookupPPPT(TextModel tm, PatternNeuron pn) {
+        return (PatternPartNeuron) pn.getOutputSynapses()
+                .map(s -> s.getOutput())
+                .filter(n -> isPTNeuron(tm, n))
+                .findAny()
+                .orElse(null);
+    }
+
+    private boolean isPTNeuron(TextModel tm, Neuron<?> n) {
+        return n.getOutputSynapses()
+                .map(s -> s.getOutput())
+                .anyMatch(in -> in == tm.getPrevTokenInhib());
     }
 }

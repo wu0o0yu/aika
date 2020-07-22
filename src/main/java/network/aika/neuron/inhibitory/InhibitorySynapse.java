@@ -16,18 +16,13 @@
  */
 package network.aika.neuron.inhibitory;
 
-
 import network.aika.neuron.*;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
-
-import static network.aika.neuron.PatternScope.SAME_PATTERN;
-
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class InhibitorySynapse extends Synapse<TNeuron, InhibitoryNeuron> {
+public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
     public static byte type;
 
@@ -35,8 +30,9 @@ public class InhibitorySynapse extends Synapse<TNeuron, InhibitoryNeuron> {
         super();
     }
 
-    public InhibitorySynapse(Neuron input, Neuron output) {
+    public InhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
         super(input, output);
+        setPropagate(true);
     }
 
     @Override
@@ -44,38 +40,25 @@ public class InhibitorySynapse extends Synapse<TNeuron, InhibitoryNeuron> {
         return type;
     }
 
-    @Override
-    public boolean isRecurrent() {
-        return false;
+    public void setWeight(double weight) {
+        super.setWeight(weight);
+        input.getNeuron().setModified(true);
     }
 
-    @Override
-    public boolean isNegative() {
-        return false;
+    public void update(double weightDelta, boolean recurrent) {
+        super.update(weightDelta, recurrent);
+        input.getNeuron().setModified(true);
     }
 
-    @Override
-    public PatternScope getPatternScope() {
-        return SAME_PATTERN;
-    }
-
-    @Override
-    public boolean isPropagate() {
-        return true;
-    }
-
-    protected void addLinkInternal(INeuron in, INeuron out) {
+    protected void link(Neuron in, Neuron out) {
+        in.getLock().acquireWriteLock();
         in.addOutputSynapse(this);
+        in.getLock().releaseWriteLock();
     }
 
-    protected void removeLinkInternal(INeuron in, INeuron out) {
+    protected void unlink(Neuron in, Neuron out) {
+        in.getLock().acquireWriteLock();
         in.removeOutputSynapse(this);
-    }
-
-
-    public static class Builder extends Synapse.Builder {
-        protected SynapseFactory getSynapseFactory() {
-            return (input, output) -> new InhibitorySynapse(input, output);
-        }
+        in.getLock().releaseWriteLock();
     }
 }

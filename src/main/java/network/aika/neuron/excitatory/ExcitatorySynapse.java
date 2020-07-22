@@ -22,21 +22,81 @@ import network.aika.neuron.*;
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatorySynapse<I extends TNeuron, O extends ExcitatoryNeuron> extends Synapse<I, O> {
+public class ExcitatorySynapse extends Synapse<Neuron<?>, ExcitatoryNeuron> {
+
+    public static byte type;
 
     public ExcitatorySynapse() {
         super();
     }
 
-    public ExcitatorySynapse(Neuron input, Neuron output) {
+    public ExcitatorySynapse(Neuron<?> input, ExcitatoryNeuron output) {
         super(input, output);
     }
 
-    protected void addLinkInternal(INeuron in, INeuron out) {
-        out.addInputSynapse(this);
+    @Override
+    public byte getType() {
+        return type;
     }
 
-    protected void removeLinkInternal(INeuron in, INeuron out) {
-        out.removeInputSynapse(this);
+    public void setWeight(double weight) {
+        super.setWeight(weight);
+        if(isPropagate()) {
+            input.getNeuron().setModified(true);
+        }
+        output.getNeuron().setModified(true);
+    }
+
+    public void update(double weightDelta, boolean recurrent) {
+        super.update(weightDelta, recurrent);
+
+        if(!isNegative) {
+            if (!recurrent) {
+                getOutput().updateDirectConjunctiveBias(-weightDelta);
+            } else {
+                getOutput().updateRecurrentConjunctiveBias(-weightDelta);
+            }
+        }
+
+        if(isPropagate()) {
+            input.getNeuron().setModified(true);
+        }
+        output.getNeuron().setModified(true);
+    }
+
+    protected void link(Neuron in, Neuron out) {
+        if(isPropagate()) {
+            boolean dir = in.getId() < out.getId();
+            (dir ? in : out).getLock().acquireWriteLock();
+            (dir ? out : in).getLock().acquireWriteLock();
+
+            out.addInputSynapse(this);
+            in.addOutputSynapse(this);
+
+            (dir ? in : out).getLock().releaseWriteLock();
+            (dir ? out : in).getLock().releaseWriteLock();
+        } else {
+            out.getLock().acquireWriteLock();
+            out.addInputSynapse(this);
+            out.getLock().releaseWriteLock();
+        }
+    }
+
+    protected void unlink(Neuron in, Neuron out) {
+        if(isPropagate()) {
+            boolean dir = in.getId() < out.getId();
+            (dir ? in : out).getLock().acquireWriteLock();
+            (dir ? out : in).getLock().acquireWriteLock();
+
+            out.removeInputSynapse(this);
+            in.removeOutputSynapse(this);
+
+            (dir ? in : out).getLock().releaseWriteLock();
+            (dir ? out : in).getLock().releaseWriteLock();
+        } else {
+            out.getLock().acquireWriteLock();
+            out.removeInputSynapse(this);
+            out.getLock().releaseWriteLock();
+        }
     }
 }

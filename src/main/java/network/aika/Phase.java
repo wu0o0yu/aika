@@ -14,35 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
-
-
-import java.util.Comparator;
-import java.util.TreeSet;
-
-import network.aika.neuron.activation.Activation.OscillatingActivationsException;
-
+package network.aika;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Queue {
-    private final TreeSet<Activation> queue = new TreeSet<>(
-            Comparator.<Activation, Fired>comparing(act -> act.fired)
-                    .thenComparing(Activation::getId)
-    );
-
-    public void add(Activation act) {
-        queue.add(act);
-    }
-
-    public void process(boolean processMode) throws OscillatingActivationsException {
-        while (!queue.isEmpty()) {
-            queue
-                    .pollFirst()
-                    .process(processMode);
-        }
-    }
+public enum Phase {
+    INITIAL_LINKING,
+    FINAL_LINKING,
+    INDUCTION,
+    RESULTS
 }
-

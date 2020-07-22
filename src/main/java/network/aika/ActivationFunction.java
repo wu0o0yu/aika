@@ -35,8 +35,8 @@ public enum ActivationFunction {
             x -> x >= 0.0 && x <= 1.0 ? 1.0 : 0.0
     );
 
-    Function f;
-    Function outerGrad;
+    private Function f;
+    private Function outerGrad;
 
     ActivationFunction(Function f, Function outerGrad) {
         this.f = f;

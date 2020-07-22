@@ -14,39 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.text;
 
-import network.aika.neuron.Neuron;
-
-import java.io.DataInput;
-import java.io.IOException;
+import network.aika.neuron.activation.Activation;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class AbstractNode<P extends Provider<? extends AbstractNode>> implements Writable {
+public class Cursor {
 
-    public volatile int lastUsedDocumentId = 0;
-
-    public volatile boolean modified;
-
-    protected P provider;
-
-    public P getProvider() {
-        return provider;
-    }
-
-    public void setModified() {
-        modified = true;
-    }
-
-    public void suspend() {}
-
-    public void reactivate() {}
-
-    public static <P extends Provider> AbstractNode read(DataInput in, P p) throws Exception {
-        return p.getModel().readNeuron(in, (Neuron) p);
-    }
-
+    public Activation nextTokenPPAct;
+    public Activation nextTokenIAct;
 }

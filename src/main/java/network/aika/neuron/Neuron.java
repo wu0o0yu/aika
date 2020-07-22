@@ -16,249 +16,272 @@
  */
 package network.aika.neuron;
 
-
 import network.aika.*;
-import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.*;
+import org.apache.commons.math3.distribution.BetaDistribution;
+import org.apache.commons.math3.distribution.BinomialDistribution;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.*;
 import java.util.*;
-
-import static network.aika.neuron.Synapse.INPUT_COMP;
-import static network.aika.neuron.Synapse.OUTPUT_COMP;
-
+import java.util.stream.Stream;
 
 /**
- * The {@code Neuron} class is a proxy implementation for the real neuron implementation in the class {@code INeuron}.
- * Aika uses the provider pattern to store and reload rarely used neurons or logic nodes.
  *
  * @author Lukas Molzberger
  */
-public class Neuron extends Provider<INeuron<? extends Synapse>> {
+public abstract class Neuron<S extends Synapse> implements Writable {
 
-    public static final Neuron MIN_NEURON = new Neuron(null, Integer.MIN_VALUE);
-    public static final Neuron MAX_NEURON = new Neuron(null, Integer.MAX_VALUE);
+    private static final Logger log = LoggerFactory.getLogger(Neuron.class);
+
+    volatile long retrievalCount = 0;
+
+    private volatile boolean modified;
+
+    private NeuronProvider provider;
+
+    private String descriptionLabel;
+
+    private volatile double bias;
+
+    protected TreeMap<NeuronProvider, Synapse> outputSynapses = new TreeMap<>();
+
+    protected final ReadWriteLock lock = new ReadWriteLock();
+
+    protected double frequency;
+    protected double coveredFactorSum;
+    protected double coveredFactorCount;
+
+    protected boolean isInputNeuron; // Input Neurons won't be trained!
+
+    private long visited;
+
+    private boolean blocked; //Temporary workaround
 
 
-    ReadWriteLock lock = new ReadWriteLock();
-
-    NavigableMap<InputKey, Synapse> activeInputSynapses = new TreeMap<>(INPUT_COMP);
-    NavigableMap<OutputKey, Synapse> activeOutputSynapses = new TreeMap<>(OUTPUT_COMP);
-
-
-    public Neuron(Model m, int id) {
-        super(m, id);
+    protected Neuron() {
     }
 
-
-    public Neuron(Model m, INeuron n) {
-        super(m, n);
+    public Neuron(NeuronProvider p) {
+        provider = p;
     }
 
+    public Neuron(Model m, String descriptionLabel, Boolean isInputNeuron) {
+        this.descriptionLabel = descriptionLabel;
+        this.isInputNeuron = isInputNeuron;
+        provider = new NeuronProvider(m, this);
+        modified = true;
 
-    public String getLabel() {
-        return get().getLabel();
+        System.out.println(getClass().getSimpleName() + " " + descriptionLabel);
     }
 
+    public abstract ActivationFunction getActivationFunction();
 
+    public abstract Fired incrementFired(Fired f);
 
-    /**
-     * Propagate an input activation into the network.
-     *
-     * @param doc   The current document
-     * @param inputAct
-     */
-    public Activation addInput(Document doc, Activation.Builder inputAct) {
-        return get(doc).addInput(doc, inputAct);
+    public abstract Synapse getInputSynapse(NeuronProvider n);
+
+    public NeuronProvider getProvider() {
+        return provider;
     }
 
-
-    public static Neuron init(Neuron n, Builder... inputs) {
-        return init(null, n, inputs);
+    public Stream<Synapse> getOutputSynapses() {
+        return outputSynapses.values().stream();
     }
 
+    public abstract void tryToLink(Activation iAct, Activation oAct);
 
-    public static Neuron init(Document doc, Neuron n, Builder... inputs) {
-        n.init(doc, null, getSynapseBuilders(inputs));
-        return n;
+    public abstract void addInputSynapse(S s);
+
+    public abstract void addOutputSynapse(Synapse synapse);
+
+    public abstract void removeInputSynapse(S s);
+
+    public abstract void removeOutputSynapse(Synapse s);
+
+    public abstract byte getType();
+
+    public Long getId() {
+        return provider.getId();
     }
 
-
-    /**
-     * Creates a neuron with the given bias.
-     *
-     * @param n
-     * @param bias
-     * @param inputs
-     * @return
-     */
-    public static Neuron init(Neuron n, double bias, Builder... inputs) {
-        return init(n, bias, getSynapseBuilders(inputs));
+    public String getDescriptionLabel() {
+        return descriptionLabel;
     }
 
-    public static Neuron init(INeuron<?> n, double bias, Builder... inputs) {
-        return init(n.getProvider(), bias, inputs);
+    public Model getModel() {
+        return provider.getModel();
     }
 
-    /**
-     * Creates a neuron with the given bias.
-     *
-     * @param n
-     * @param bias
-     * @param inputs
-     * @return
-     */
-    public static Neuron init(Document doc, Neuron n, double bias, Builder... inputs) {
-        return init(doc, n, bias, getSynapseBuilders(inputs));
+    public long getRetrievalCount() {
+        return retrievalCount;
     }
 
-
-
-    public static Neuron init(Neuron n, double bias, Collection<Synapse.Builder> inputs) {
-        n.init((Document) null, bias, getSynapseBuilders(inputs));
-        return n;
+    public boolean isModified() {
+        return modified;
     }
 
-
-    public static Neuron init(Document doc, Neuron n, double bias, Collection<Synapse.Builder> inputs) {
-        n.init(doc, bias, getSynapseBuilders(inputs));
-        return n;
+    public void setModified(boolean modified) {
+        this.modified = modified;
     }
 
+    public boolean isBlocked() {
+        return blocked;
+    }
 
-    private void init(Document doc, Double bias, Collection<Synapse.Builder> synapseBuilders) {
-        INeuron n = get();
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
+    }
 
-        if(bias != null) {
-            n.setBias(bias);
+    public void setBias(double b) {
+        bias += b;
+        modified = true;
+    }
+
+    public void updateBias(double biasDelta) {
+        bias += biasDelta;
+        modified = true;
+    }
+
+    public double getBias(Phase p) {
+        return bias;
+    }
+
+    public abstract double propagateRangeCoverage(Link l);
+
+    public ReadWriteLock getLock() {
+        return lock;
+    }
+
+    public void count(Activation act) {
+        frequency += act.isActive() ? 1.0 : 0.0;
+
+        coveredFactorSum += act.getRangeCoverage();
+        coveredFactorCount += 1.0;
+    }
+
+    public void applyMovingAverage(Config trainingConfig) {
+        Double alpha = trainingConfig.getAlpha();
+        if(alpha != null) {
+            frequency *= alpha;
+        }
+    }
+
+    public abstract void induceNeuron(Activation act);
+
+    public abstract Synapse induceSynapse(Activation iAct, Activation oAct);
+
+    public void train(Activation act) {
+        act.propagate();
+        act.getThought().processLinks();
+
+        if(isInputNeuron) {
+            return;
         }
 
-        ArrayList<Synapse> modifiedSynapses = new ArrayList<>();
-        // s.link requires an updated n.biasSumDelta value.
-        synapseBuilders.forEach(input -> {
-            Synapse s = input.getSynapse(this);
-            s.update(doc, input.weight);
-            modifiedSynapses.add(s);
-        });
-
-        modifiedSynapses.forEach(s -> s.link());
-
-        n.commit(modifiedSynapses);
+        propagateCost(act);
     }
 
-    public Synapse getInputSynapse(Neuron n, PatternScope ps) {
-        lock.acquireReadLock();
-        InputKey ik = new InputKey() {
-            @Override
-            public Neuron getPInput() {
-                return n;
+    protected abstract void propagateCost(Activation act);
+
+    public double getP() {
+        return frequency / getN();
+    }
+
+    public double getStandardDeviation() {
+        return Math.sqrt(
+                new BetaDistribution(frequency + 1.0, (getN() - frequency) + 1.0)
+                        .getNumericalVariance()
+        );
+    }
+
+    public double getN() {
+        double coveredFactor = coveredFactorSum / coveredFactorCount;
+        return getModel().getN() / coveredFactor;
+    }
+
+    public double getFrequency() {
+        return frequency;
+    }
+
+    public void reactivate() {
+    }
+
+    public void suspend() {
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        out.writeByte(getType());
+
+        out.writeBoolean(descriptionLabel != null);
+        if(descriptionLabel != null) {
+            out.writeUTF(descriptionLabel);
+        }
+
+        out.writeDouble(bias);
+
+        for (Synapse s : outputSynapses.values()) {
+            if (s.getOutput() != null) {
+                out.writeBoolean(true);
+                getModel().writeSynapse(s, out);
             }
+        }
+        out.writeBoolean(false);
 
-            @Override
-            public PatternScope getPatternScope() {
-                return ps;
-            }
-        };
-
-        Synapse s = activeInputSynapses.get(ik);
-
-        lock.releaseReadLock();
-        return s;
+        out.writeDouble(frequency);
+        out.writeDouble(coveredFactorSum);
+        out.writeDouble(coveredFactorCount);
     }
 
-    public Synapse getOutputSynapse(Neuron n, PatternScope ps) {
-        lock.acquireReadLock();
-        OutputKey ok = new OutputKey() {
-            @Override
-            public Neuron getPOutput() {
-                return n;
-            }
+    @Override
+    public void readFields(DataInput in, Model m) throws Exception {
+        if(in.readBoolean()) {
+            descriptionLabel = in.readUTF();
+        }
 
-            @Override
-            public PatternScope getPatternScope() {
-                return ps;
-            }
-        };
+        bias = in.readDouble();
 
-        Synapse s = activeOutputSynapses.get(ok);
+        while (in.readBoolean()) {
+            Synapse syn = m.readSynapse(in);
+            outputSynapses.put(syn.getPOutput(), syn);
+        }
 
-        lock.releaseReadLock();
-        return s;
+        frequency = in.readDouble();
+        coveredFactorSum = in.readDouble();
+        coveredFactorCount = in.readDouble();
     }
-
-
-    public void addActiveInputSynapse(Synapse s) {
-        lock.acquireWriteLock();
-        activeInputSynapses.put(s, s);
-        lock.releaseWriteLock();
-    }
-
-
-    public void removeActiveInputSynapse(Synapse s) {
-        lock.acquireWriteLock();
-        activeInputSynapses.remove(s);
-        lock.releaseWriteLock();
-    }
-
-
-    public void addActiveOutputSynapse(Synapse s) {
-        lock.acquireWriteLock();
-        activeOutputSynapses.put(s, s);
-        lock.releaseWriteLock();
-    }
-
-
-    public void removeActiveOutputSynapse(Synapse s) {
-        lock.acquireWriteLock();
-        activeOutputSynapses.remove(s);
-        lock.releaseWriteLock();
-    }
-
 
     public String toString() {
-        if(this == MIN_NEURON) return "MIN_NEURON";
-        if(this == MAX_NEURON) return "MAX_NEURON";
-
-        return super.toString();
+        return getId() + ":" + getDescriptionLabel();
     }
 
-
-    /**
-     * Active input synapses are those synapses that are currently available in the main memory.
-     *
-     * @return
-     */
-    public Collection<Synapse> getActiveInputSynapses() {
-        return activeInputSynapses.values();
+    public String toDetailedString() {
+        return "N " + getClass().getSimpleName() + " " + toString() + " B:" + Utils.round(bias);
     }
 
-
-    public Collection<Synapse> getActiveOutputSynapses() {
-        return activeOutputSynapses.values();
+    public String freqToString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Pos:" + Utils.round(frequency));
+        sb.append(" Neg:" + Utils.round(getN() - frequency));
+        return sb.toString();
     }
 
+    public String propToString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Pos:" + Utils.round(Sign.POS.getP(this)));
+        sb.append(" Neg:" + Utils.round(Sign.NEG.getP(this)));
+        return sb.toString();
+    }
 
-    private static Collection<Synapse.Builder> getSynapseBuilders(Collection<Synapse.Builder> builders) {
-        ArrayList<Synapse.Builder> result = new ArrayList<>();
-        for(Builder b: builders) {
-            if(b instanceof Synapse.Builder) {
-                result.add((Synapse.Builder) b);
-            }
-        }
+    public void dumpStat() {
+        System.out.println("OUT:  " + getDescriptionLabel() + "  Freq:(" + freqToString() + ")  P(" + propToString() + ")");
+    }
+
+    public boolean checkVisited(long v) {
+        boolean result = visited != v;
+        visited = v;
         return result;
     }
-
-
-    private static Collection<Synapse.Builder> getSynapseBuilders(Builder... builders) {
-        ArrayList<Synapse.Builder> result = new ArrayList<>();
-        for(Builder b: builders) {
-            if(b instanceof Synapse.Builder) {
-                result.add((Synapse.Builder) b);
-            }
-        }
-        return result;
-    }
-
-
-    public interface Builder {
-    }
-
 }
