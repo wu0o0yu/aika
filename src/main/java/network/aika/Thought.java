@@ -19,6 +19,7 @@ package network.aika;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,6 @@ public abstract class Thought {
     private static final Logger log = LoggerFactory.getLogger(Thought.class);
 
     private int activationIdCounter = 0;
-    private long visitedIdCounter = 1;
 
     private final TreeSet<Activation> activationsQueue = new TreeSet<>(
             Comparator.<Activation, Fired>comparing(act -> act.getFired())
@@ -41,13 +41,11 @@ public abstract class Thought {
 
     private final Deque<Link> linkQueue = new ArrayDeque<>();
 
-
     private final TreeSet<Activation> gradientQueue = new TreeSet<>(
             Comparator.<Activation, Fired>comparing(act -> act.getFired())
                     .thenComparing(Activation::getId)
                     .reversed()
     );
-
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
@@ -70,6 +68,8 @@ public abstract class Thought {
         phase = FINAL_LINKING;
         activationsById
                 .values()
+                .stream()
+                .filter(act -> !act.getNeuron().isInputNeuron())
                 .forEach(act -> act.updateForFinalPhase());
 
         processActivations();
@@ -84,17 +84,17 @@ public abstract class Thought {
         phase = null;
     }
 
-    public void addActivation(Activation act) {
+    public void registerActivation(Activation act) {
         activationsById.put(act.getId(), act);
     }
 
-    public void add(Activation act) {
+    public void addActivationToQueue(Activation act) {
         if(!act.isFinal()) {
             activationsQueue.add(act);
         }
     }
 
-    public void add(Link l) {
+    public void addLinkToQueue(Link l) {
         linkQueue.add(l);
     }
 
@@ -114,7 +114,7 @@ public abstract class Thought {
         while (!linkQueue.isEmpty()) {
             linkQueue
                     .pollFirst()
-                    .process();
+                    .propagate();
         }
     }
 
@@ -144,6 +144,14 @@ public abstract class Thought {
 
     public Collection<Activation> getActivations() {
         return activationsById.values();
+    }
+
+    public Activation getNextActivation(Activation act) {
+        Map.Entry<Integer, Activation> me = act == null ?
+                activationsById.firstEntry() :
+                activationsById.higherEntry(act.getId());
+
+        return me != null ? me.getValue() : null;
     }
 
     public int getNumberOfActivations() {
@@ -196,20 +204,28 @@ public abstract class Thought {
             m.applyMovingAverage(trainingConfig);
         }
 */
-        m.addToN(length());
         getActivations()
                 .forEach(act ->
                         act.count()
                 );
 
-        new ArrayList<>(getActivations())
-                .forEach(act ->
-                        act.getNeuron().train(act)
-                );
+        {
+            Activation act = null;
+            while ((act = getNextActivation(act)) != null) {
+                act.getNeuron().train(act);
+            }
+        }
 
         processGradients();
 
 //        process();
+
+        m.addToN(length());
+
+        getActivations()
+                .forEach(act ->
+                        act.getNeuronProvider().save()
+                );
 
         phase = null;
     }
@@ -242,7 +258,12 @@ public abstract class Thought {
         return sb.toString();
     }
 
-    public long createVisitedId() {
-        return visitedIdCounter++;
+    public String gradientsToString() {
+        StringBuilder sb = new StringBuilder();
+
+        activationsById.values()
+                .forEach(act -> sb.append(act.gradientsToString()));
+
+        return sb.toString();
     }
 }

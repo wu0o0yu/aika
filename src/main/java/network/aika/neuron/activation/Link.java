@@ -16,13 +16,18 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.Thought;
+import network.aika.Utils;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
+import network.aika.neuron.excitatory.NegativeRecurrentSynapse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.SortedMap;
+import java.util.Comparator;
 
 import static network.aika.Phase.INITIAL_LINKING;
-import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Direction.INPUT;
 
 /**
@@ -31,42 +36,134 @@ import static network.aika.neuron.activation.Direction.INPUT;
  */
 public class Link {
 
+    private static final Logger log = LoggerFactory.getLogger(Link.class);
+
+    public static Comparator<Link> SORTED_BY_FIRED = Comparator
+            .<Link, Fired>comparing(l -> l.getInput().getFired())
+            .thenComparing(l -> l.getInput());
+
     private final Synapse synapse;
 
     private Activation input;
     private Activation output;
 
-    public Link(Synapse s, Activation input, Activation output) {
+    private boolean isSelfRef;
+
+    private double gradient;
+    private double linkGradient;
+
+    public Link(Synapse s, Activation input, Activation output, boolean isSelfRef) {
         this.synapse = s;
         this.input = input;
         this.output = output;
+        this.isSelfRef = isSelfRef;
+    }
+
+    public double getGradient() {
+        return gradient;
+    }
+
+    public double getLinkGradient() {
+        return linkGradient;
+    }
+
+    public void count() {
+        if(synapse != null) {
+            synapse.count(this);
+        }
     }
 
     public void propagate() {
-        if(!(synapse instanceof InhibitorySynapse)) {
-            input.followDown(input.getThought().createVisitedId(), output, INPUT);
+        if(!output.getNeuron().isInputNeuron()) {
+            input.followDown(output, INPUT, true);
         }
     }
 
-    public void propagateGradient(double learnRate, double g) {
-        synapse.update(
-                learnRate * input.getValue() * g,
-                false // TODO !
+    public void computeGradient() {
+        if(isNegative()) return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
+
+        double s = getSynapse().getSurprisal(
+                Sign.getSign(input),
+                Sign.getSign(output)
         );
 
-        double ig = synapse.getWeight() * g;
+        s -= input.getNeuron().getSurprisal(
+                Sign.getSign(input)
+        );
 
-        if(Math.abs(ig) < TOLERANCE) {
+        s -= output.getNeuron().getSurprisal(
+                Sign.getSign(output)
+        );
+
+        gradient = s * output.getActFunctionDerivative();
+        linkGradient =  s * getActFunctionDerivative();
+        gradient -= linkGradient;
+    }
+
+    public void removeGradientDependencies() {
+        output.getInputLinks()
+                .filter(l -> l.input != null && l != this && input.isConnected(l.input))
+                .forEach(l -> {
+                    gradient -= l.gradient;
+                    linkGradient -= l.linkGradient;
+                });
+    }
+
+    public double getActFunctionDerivative() {
+        if(!output.getNeuron().isInitialized())
+            return 0.0;
+
+        return output.getNeuron()
+                .getActivationFunction()
+                .outerGrad(
+                        output.getNet() - (input.getValue() * synapse.getWeight())
+                );
+    }
+
+    public void propagateGradient(double g) {
+        Thought t = output.getThought();
+        Neuron on = output.getNeuron();
+
+        g += linkGradient;
+
+        if((synapse instanceof NegativeRecurrentSynapse) && !isSelfRef) {
             return;
         }
 
-        input.getMutableGradient().gradient += ig;
+        double learnRate = t.getTrainingConfig().getLearnRate();
+        double x = getInputValue();
+
+        double posWDelta = learnRate * x * g;
+        double negWDelta = learnRate * (1.0 - x) * g;
+        double biasDelta = learnRate * g;
+
+        synapse.addWeight(posWDelta - negWDelta);
+        on.addConjunctiveBias(negWDelta, isCausal());
+        on.addBias(biasDelta);
+
+        if(input == null) {
+            return;
+        }
+
+        input.addGradient(
+                synapse.getWeight() * g * input.getActFunctionDerivative()
+        );
     }
 
-    public static Link link(Synapse s, Activation input, Activation output) {
-        Link l = new Link(s, input, output);
-        input.getThought().add(l);
-        return l;
+    public boolean isCausal() {
+        return input == null || input.getFired().compareTo(output.getFired()) <= 0;
+    }
+
+    public double getInputValue() {
+        return input != null ? input.getValue() : 0.0;
+    }
+
+    public static Link link(Synapse s, Activation input, Activation output, boolean isSelfRef) {
+        if (output.getPhase() != INITIAL_LINKING && output.isFinal()) {
+            output = output.getModifiable(s);
+        }
+
+        return output.addLink(s, input, isSelfRef);
     }
 
     public Synapse getSynapse() {
@@ -82,54 +179,43 @@ public class Link {
     }
 
     public boolean isNegative() {
-        return synapse.isNegative();
+        return synapse instanceof NegativeRecurrentSynapse;
     }
 
     public boolean isSelfRef() {
-        return output == input
-                .inputLinks
-                .values()
-                .stream()
-                .findAny()
-                .map(l -> l.input)
-                .orElse(null);
+        return isSelfRef;
     }
 
     public void link() {
         if(input != null) {
-            if(synapse.isPropagate()) {
+/*            if(synapse.isPropagate()) {
                 SortedMap<Activation, Link> outLinks = input.getOutputLinks(synapse);
                 if(!outLinks.isEmpty()) {
                     Activation oAct = outLinks.firstKey();
-                    assert oAct.getId() == output.getId();
+//                    assert oAct.getId() == output.getId();
                 }
             }
-
+*/
             input.outputLinks.put(output, this);
         }
-        Link ol = output.inputLinks.put(synapse.getPInput(), this);
-        if(ol != null && ol != this) {
-            ol.input.outputLinks.remove(ol.output);
-        }
+        output.inputLinks.put(synapse.getPInput(), this);
     }
 
     public void unlink() {
         input.outputLinks.remove(output);
     }
 
-    public void process() {
-        if(output.isFinal() && isNegative() && !isSelfRef()) {
-            output = output.createBranch();
-        }
-
-        if (output.getPhase() != INITIAL_LINKING) {
-            output = output.getModifiable();
-        }
-
-        output.addLink(this);
+    public String toString() {
+        return "L " + synapse.getClass().getSimpleName() + ": " + getIdString() + " --> " + output.getIdString();
     }
 
-    public String toString() {
-        return "L " + synapse.getClass().getSimpleName() + ": " + input + "-(" + input.getNeuron() + ") --> " + output + "-(" + output.getNeuron() + ")";
+    public String getIdString() {
+        return (input != null ? input.getIdString() : "X:" + synapse.getInput());
+    }
+
+    public String gradientsToString() {
+        return "   " + getIdString() +
+                " x:" + Utils.round(getInputValue()) +
+                " w:" + Utils.round(getSynapse().getWeight());
     }
 }

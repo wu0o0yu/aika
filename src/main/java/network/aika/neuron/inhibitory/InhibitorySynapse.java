@@ -32,7 +32,16 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
     public InhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
         super(input, output);
-        setPropagate(true);
+    }
+
+    @Override
+    public boolean followSelfRef() {
+        return true;
+    }
+
+    @Override
+    public boolean checkRequiredSelfRef(boolean isSelfRef) {
+        return isSelfRef;
     }
 
     @Override
@@ -45,20 +54,8 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         input.getNeuron().setModified(true);
     }
 
-    public void update(double weightDelta, boolean recurrent) {
-        super.update(weightDelta, recurrent);
+    public void addWeight(double weightDelta) {
+        super.addWeight(weightDelta);
         input.getNeuron().setModified(true);
-    }
-
-    protected void link(Neuron in, Neuron out) {
-        in.getLock().acquireWriteLock();
-        in.addOutputSynapse(this);
-        in.getLock().releaseWriteLock();
-    }
-
-    protected void unlink(Neuron in, Neuron out) {
-        in.getLock().acquireWriteLock();
-        in.removeOutputSynapse(this);
-        in.getLock().releaseWriteLock();
     }
 }

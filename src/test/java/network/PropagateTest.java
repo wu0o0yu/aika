@@ -39,10 +39,11 @@ public class PropagateTest {
         PatternPartNeuron out = new PatternPartNeuron(m, "OUT", false);
 
         ExcitatorySynapse s = new ExcitatorySynapse(in, out);
-        s.setPropagate(true);
 
-        s.link();
-        s.update(10.0, false);
+        s.linkInput();
+        s.linkOutput();
+        s.addWeight(10.0);
+        out.addConjunctiveBias(-10.0, false);
         out.setBias(1.0);
 
         Document doc = new Document("test");

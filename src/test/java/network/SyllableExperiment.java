@@ -16,11 +16,14 @@
  */
 package network;
 
+import network.aika.neuron.Neuron;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+
+import static network.aika.neuron.Neuron.ADJUST_GRADIENT;
 
 /**
  *
@@ -41,8 +44,11 @@ public class SyllableExperiment {
 
     @Test
     public void testTraining() throws IOException {
+        ADJUST_GRADIENT = true;
         //"/Users/lukas.molzberger/aika-ws/maerchen"
-        for(String word: Util.loadExamplesAsWords(new File("C:\\ws\\aika-syllables\\src\\main\\resources\\text\\maerchen"))) {
+        // "C:\\ws\\aika-syllables\\src\\main\\resources\\text\\maerchen"
+        // "/Users/lukas/IdeaProjects/aika-bitbucket/test-data"
+        for(String word: Util.loadExamplesAsWords(new File("/Users/lukas.molzberger/aika-ws/maerchen"))) {
             train( word + " ");
         }
 

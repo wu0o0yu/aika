@@ -16,16 +16,9 @@
  */
 package network.aika;
 
-
-import network.aika.neuron.activation.Activation;
-
-import java.util.function.Predicate;
-
 public class Config {
     private Double alpha = null; //0.99;
     private double learnRate;
-    private double metaThreshold;
-    private Predicate<Activation> maturityCheck;
 
     public double getLearnRate() {
         return learnRate;
@@ -42,24 +35,6 @@ public class Config {
 
     public Config setAlpha(Double alpha) {
         this.alpha = alpha;
-        return this;
-    }
-
-    public double getMetaThreshold() {
-        return metaThreshold;
-    }
-
-    public Config setMetaThreshold(double metaThreshold) {
-        this.metaThreshold = metaThreshold;
-        return this;
-    }
-
-    public Predicate<Activation> getMaturityCheck() {
-        return maturityCheck;
-    }
-
-    public Config setMaturityCheck(Predicate<Activation> maturityCheck) {
-        this.maturityCheck = maturityCheck;
         return this;
     }
 }

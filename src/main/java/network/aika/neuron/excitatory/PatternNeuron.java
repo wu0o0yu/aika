@@ -19,22 +19,19 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
+import network.aika.neuron.activation.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
-import static network.aika.neuron.activation.Direction.OUTPUT;
+import static network.aika.neuron.Sign.POS;
 
 /**
  *
@@ -56,36 +53,51 @@ public class PatternNeuron extends ExcitatoryNeuron {
         this.tokenLabel = tokenLabel;
     }
 
-    public String getTokenLabel() {
-        return tokenLabel;
-    }
-
     @Override
     public byte getType() {
         return type;
     }
 
-    public double getCost(Sign s) {
-        return Math.log(s.getP(this));
+    @Override
+    public void updateReference(Link nl) {
+        Reference or = nl.getOutput().getReference();
+        Reference ir = nl.getInput().getReference();
+
+        nl.getOutput().setReference(or == null ? ir : or.add(ir));
     }
 
-    public double propagateRangeCoverage(Link l) {
-        return l.getInput().getRangeCoverage();
-    }
-
+    @Override
     public void induceNeuron(Activation act) {
-        super.induceNeuron(act);
+        double s = getSurprisal(POS);
 
-        if(getStandardDeviation() > 0.08) {
+        if(s < 2.0) {
+            System.out.println(act.getNeuron().getDescriptionLabel() + "  " + s + " below threshold");
             return;
         }
 
-        if(!act.getLinks(OUTPUT)
-                .anyMatch(l -> l.getSynapse().getOutput() instanceof PatternPartNeuron)) {
-            act.connectInducedNeuron(
-                    new PatternPartNeuron(getModel(), "PP-" + act.getDescriptionLabel(), false)
-            );
+        if(hasOutputPatternPartConsumer(act)) {
+            System.out.println(act.getNeuron().getDescriptionLabel() + "  " + s + " already exists");
+            return;
         }
+
+        Neuron n = new PatternPartNeuron(getModel(), "TP-" + getDescriptionLabel(), false);
+        n.getInstances().update(getModel(), act.getReference());
+
+        System.out.println(act.getNeuron().getDescriptionLabel() + "  " + s + "  --> " + n.getDescriptionLabel());
+
+        Activation oAct = act.createActivation(n);
+
+        n.induceSynapse(act, oAct);
+    }
+
+    private boolean hasOutputPatternPartConsumer(Activation act) {
+        return act.getOutputLinks()
+                .filter(l -> !(l.getSynapse() instanceof PositiveRecurrentSynapse))
+                .anyMatch(l -> l.getOutput().getNeuron() instanceof PatternPartNeuron);
+    }
+
+    public String getTokenLabel() {
+        return tokenLabel;
     }
 
     @Override

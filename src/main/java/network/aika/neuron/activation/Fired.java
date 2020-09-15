@@ -22,7 +22,7 @@ package network.aika.neuron.activation;
  */
 public class Fired implements Comparable<Fired> {
 
-    public static Fired NOT_FIRED = new Fired(Integer.MIN_VALUE, Integer.MIN_VALUE);
+    public static Fired NOT_FIRED = new Fired(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
     private final int inputTimestamp;
     private final int fired;

@@ -18,10 +18,15 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Writable;
+import network.aika.neuron.activation.Link;
+import org.apache.commons.math3.distribution.BetaDistribution;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+
+import static network.aika.neuron.Sign.NEG;
+import static network.aika.neuron.Sign.POS;
 
 /**
  *
@@ -31,15 +36,18 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public static double TOLERANCE = 0.0000001;
 
-    protected boolean isNegative;
-    protected boolean isPropagate;
-    protected boolean isInput;
-
-
     protected NeuronProvider input;
     protected NeuronProvider output;
 
     private double weight;
+
+    protected Instances instances;
+
+    protected double frequencyIPosOPos;
+    protected double frequencyIPosONeg;
+    protected double frequencyINegOPos;
+    private volatile boolean modified;
+
 
     public Synapse() {
     }
@@ -47,47 +55,60 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public Synapse(I input, O output) {
         this.input = input.getProvider();
         this.output = output.getProvider();
-
-        System.out.println(getClass().getSimpleName() + " IN:" + getInput().toString() + " -> OUT:" + getOutput().toString());
+        this.instances = new Instances();
     }
 
-    public void setInput(I input) {
-        this.input = input.getProvider();
-    }
+    public abstract boolean followSelfRef();
 
-    public void setOutput(O output) {
-        this.output = output.getProvider();
-    }
+    public abstract boolean checkRequiredSelfRef(boolean isSelfRef);
 
     public abstract byte getType();
 
-    public void setNegative(boolean negative) {
-        isNegative = negative;
+    public boolean isInputLinked() {
+        return getInput().containsOutputSynapse(this);
     }
 
-    public boolean isNegative() {
-        return isNegative;
+    public void linkInput() {
+        Neuron in = getInput();
+        in.getLock().acquireWriteLock();
+        in.addOutputSynapse(this);
+        in.getLock().releaseWriteLock();
     }
 
-    public void setPropagate(boolean propagate) {
-        isPropagate = propagate;
+    public void unlinkInput() {
+        Neuron in = getInput();
+        in.getLock().acquireWriteLock();
+        in.removeOutputSynapse(this);
+        in.getLock().releaseWriteLock();
     }
 
-    public boolean isPropagate() {
-        return isPropagate;
+    public void updateLink(boolean link) {
+        if(link) {
+            linkInput();
+        } else {
+            unlinkInput();
+        }
     }
 
-    public boolean isInput() {
-        return isInput;
+    public boolean isOutputLinked() {
+        return getOutput().containsInputSynapse(this);
     }
 
-    public void setInput(boolean input) {
-        isInput = input;
+    public void linkOutput() {
+        Neuron out = output.getNeuron();
+
+        out.getLock().acquireWriteLock();
+        out.addInputSynapse(this);
+        out.getLock().releaseWriteLock();
     }
 
-    protected abstract void link(Neuron in, Neuron out);
+    public void unlinkOutput() {
+        Neuron out = output.getNeuron();
 
-    protected abstract void unlink(Neuron in, Neuron out);
+        out.getLock().acquireWriteLock();
+        out.removeInputSynapse(this);
+        out.getLock().releaseWriteLock();
+    }
 
     public NeuronProvider getPInput() {
         return input;
@@ -105,22 +126,69 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return (O) output.getNeuron();
     }
 
+    public Instances getInstances() {
+        return instances;
+    }
+
+    public double getFrequency(Sign is, Sign os, double n) {
+        if(is == POS && os == POS) {
+            return frequencyIPosOPos;
+        } else if(is == POS && os == NEG) {
+            return frequencyIPosONeg;
+        } else if(is == NEG && os == POS) {
+            return frequencyINegOPos;
+        } else {
+            return n - (frequencyIPosOPos + frequencyIPosONeg + frequencyINegOPos);
+        }
+    }
+
+    public void setFrequency(Sign is, Sign os, double f) {
+        if(is == POS && os == POS) {
+            frequencyIPosOPos = f;
+        } else if(is == POS && os == NEG) {
+            frequencyIPosONeg = f;
+        } else if(is == NEG && os == POS) {
+            frequencyINegOPos = f;
+        } else {
+            throw new UnsupportedOperationException();
+        }
+        modified = true;
+    }
+
+    public void count(Link l) {
+        instances.update(getModel(), l.getInput().getReference());
+
+        if(l.getInput().isActive() && l.getOutput().isActive()) {
+            frequencyIPosOPos += 1.0;
+            modified = true;
+        } else if(l.getInput().isActive() && !l.getOutput().isActive()) {
+            frequencyIPosONeg += 1.0;
+            modified = true;
+        } else if(!l.getInput().isActive() && l.getOutput().isActive()) {
+            frequencyINegOPos += 1.0;
+            modified = true;
+        }
+    }
+
+    public Model getModel() {
+        return getPOutput().getModel();
+    }
+
+    public double getSurprisal(Sign si, Sign so) {
+        double p = getP(si, so, instances.getN());
+        return -Math.log(p);
+    }
+
+    public double getP(Sign si, Sign so, double n) {
+        BetaDistribution dist = new BetaDistribution(getFrequency(si, so, n) + 1, n + 1);
+
+        return dist.inverseCumulativeProbability(
+                getModel().getBetaThreshold()
+        );
+    }
+
     public double getWeight() {
         return weight;
-    }
-
-    public void link() {
-        Neuron in = input.getNeuron();
-        Neuron out = output.getNeuron();
-
-        link(in, out);
-    }
-
-    public void unlink() {
-        Neuron in = input.getNeuron();
-        Neuron out = output.getNeuron();
-
-        unlink(in, out);
     }
 
     public boolean isZero() {
@@ -136,7 +204,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         this.weight = weight;
     }
 
-    public void update(double weightDelta, boolean recurrent) {
+    public void addWeight(double weightDelta) {
         this.weight += weightDelta;
     }
 
@@ -149,9 +217,13 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         out.writeDouble(weight);
 
-        out.writeBoolean(isNegative);
-        out.writeBoolean(isPropagate);
-        out.writeBoolean(isInput);
+        out.writeDouble(frequencyIPosOPos);
+        out.writeDouble(frequencyIPosONeg);
+        out.writeDouble(frequencyINegOPos);
+
+        instances.write(out);
+
+        out.writeBoolean(modified);
     }
 
     @Override
@@ -161,12 +233,30 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         weight = in.readDouble();
 
-        isNegative = in.readBoolean();
-        isPropagate = in.readBoolean();
-        isInput = in.readBoolean();
+        frequencyIPosOPos = in.readDouble();
+        frequencyIPosONeg = in.readDouble();
+        frequencyINegOPos = in.readDouble();
+
+        instances = Instances.read(in, m);
+
+        modified = in.readBoolean();
     }
 
     public String toString() {
-        return "S " + getClass().getSimpleName() + "  w:" + Utils.round(getWeight()) + " " + input + "->" + output + " (neg:" + isNegative() + ", prop:" + isPropagate() + ")";
+        return "S " +
+                getClass().getSimpleName() +
+                "  w:" + Utils.round(getWeight()) +
+                " " + input + "(" + (isInputLinked() ? "+" : "-") + ")" +
+                "->" + output + "(" + (isOutputLinked() ? "+" : "-") + ")";
+    }
+
+    public String statToString() {
+        int n = getModel().getN();
+        return "f:" + Utils.round(getInput().getFrequency()) + " " +
+                "N:" + Utils.round(n) + " " +
+                "s(p,p):" + Utils.round(getSurprisal(POS, POS)) + " " +
+                "s(n,p):" + Utils.round(getSurprisal(NEG, POS)) + " " +
+                "s(p,n):" + Utils.round(getSurprisal(POS, NEG)) + " " +
+                "s(n,n):" + Utils.round(getSurprisal(NEG, NEG)) + " \n";
     }
 }

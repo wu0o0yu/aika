@@ -37,6 +37,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
@@ -49,6 +50,8 @@ public abstract class Model {
     private static final Logger log = LoggerFactory.getLogger(Model.class);
 
     private int N = 0; // needs to be stored
+
+    private double betaThreshold = 0.95;
 
     private static Map<Byte, Class> typeRegistry = new HashMap<>();
 
@@ -66,6 +69,7 @@ public abstract class Model {
 
     // Important: the id field needs to be referenced by the provider!
     private WeakHashMap<Long, WeakReference<NeuronProvider>> providers = new WeakHashMap<>();
+    public Map<Long, NeuronProvider> activeProviders = new TreeMap<>();
 
     public Model() {
         this(new InMemorySuspensionHook());
@@ -73,6 +77,14 @@ public abstract class Model {
 
     public Model(SuspensionHook sh) {
         suspensionHook = sh;
+    }
+
+    public double getBetaThreshold() {
+        return betaThreshold;
+    }
+
+    public void setBetaThreshold(double betaThreshold) {
+        this.betaThreshold = betaThreshold;
     }
 
     public abstract void linkInputRelations(Activation originAct, Direction dir);
@@ -87,6 +99,25 @@ public abstract class Model {
 
     public long createNeuronId() {
         return suspensionHook.createId();
+    }
+
+    public Collection<NeuronProvider> getActiveNeurons() {
+        return activeProviders
+                .values()
+                .stream()
+                .collect(Collectors.toList());
+    }
+
+    public NeuronProvider lookupNeuronProvider(String tokenLabel, NeuronProducer onNewCallback) {
+        Long id = suspensionHook.getIdByLabel(tokenLabel);
+        if (id == null) {
+            Neuron<?> n = onNewCallback.createNeuron(tokenLabel);
+            NeuronProvider p = n.getProvider();
+
+            suspensionHook.putLabel(tokenLabel, p.getId());
+            return p;
+        }
+        return lookupNeuron(id);
     }
 
     public NeuronProvider getNeuronProvider(String tokenLabel) {
@@ -155,11 +186,15 @@ public abstract class Model {
         return N;
     }
 
+    public void setN(int n) {
+        N = n;
+    }
+
     public NeuronProvider lookupNeuron(Long id) {
         synchronized (providers) {
             WeakReference<NeuronProvider> wr = providers.get(id);
             if(wr != null) {
-                NeuronProvider n = (NeuronProvider) wr.get();
+                NeuronProvider n = wr.get();
                 if (n != null) {
                     return n;
                 }
@@ -170,19 +205,19 @@ public abstract class Model {
     }
 
     public void suspendUnusedNeurons(long retrievalCount, SuspensionMode sm) {
-        synchronized (providers) {
-            providers
+        synchronized (activeProviders) {
+            activeProviders
                     .values()
                     .stream()
-                    .filter(e -> !e.isEnqueued())
-                    .map(e -> e.get())
                     .filter(n -> !n.isSuspended())
+                    .collect(Collectors.toList())
                     .forEach(n -> suspend(retrievalCount, n, sm));
         }
     }
 
     public void suspendAll(SuspensionMode sm) {
         suspendUnusedNeurons(Integer.MAX_VALUE, sm);
+        suspensionHook.suspendAll(sm);
     }
 
     private boolean suspend(long retrievalCount, NeuronProvider p, SuspensionMode sm) {
@@ -194,15 +229,35 @@ public abstract class Model {
         return false;
     }
 
-    public void registerProvider(NeuronProvider p) {
+    public void registerWeakReference(NeuronProvider p) {
         synchronized (providers) {
             providers.put(p.getId(), new WeakReference<>(p));
         }
     }
 
-    public void removeProvider(NeuronProvider p) {
-        synchronized (providers) {
-            providers.remove(p.getId());
+    public void register(NeuronProvider p) {
+        synchronized (activeProviders) {
+            activeProviders.put(p.getId(), p);
         }
+    }
+
+    public void unregister(NeuronProvider p) {
+        synchronized (activeProviders) {
+            activeProviders.remove(p.getId());
+        }
+    }
+
+    public String statToString() {
+        StringBuilder sb = new StringBuilder();
+        providers.values().stream()
+                .map(n -> n.get())
+                .map(n -> n.getNeuron())
+                .forEach(n -> sb.append(n.statToString() + "\n"));
+
+        return sb.toString();
+    }
+
+    public interface NeuronProducer {
+        Neuron createNeuron(String tokenLabel);
     }
 }

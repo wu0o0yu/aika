@@ -17,6 +17,8 @@
 package network.aika;
 
 
+import network.aika.neuron.NeuronProvider;
+
 import java.util.stream.Stream;
 
 /**
@@ -42,5 +44,5 @@ public interface SuspensionHook {
 
     Long getIdByLabel(String tokenLabel);
 
-    void storeAllLabels();
+    void suspendAll(NeuronProvider.SuspensionMode sm);
 }

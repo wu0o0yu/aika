@@ -41,7 +41,10 @@ public class Document extends Thought {
 
     public Document(String content, Config trainingConfig) {
         super(trainingConfig);
-        this.content = new StringBuilder(content);
+        this.content = new StringBuilder();
+        if(content != null) {
+            this.content.append(content);
+        }
     }
 
     public void moveCursor() {
@@ -49,17 +52,17 @@ public class Document extends Thought {
         cursor = new Cursor();
     }
 
-    public void addActivation(Activation act) {
-        super.addActivation(act);
+    public void registerActivation(Activation act) {
+        super.registerActivation(act);
     }
 
-    public void add(Activation act) {
-        super.add(act);
+    public void addActivationToQueue(Activation act) {
+        super.addActivationToQueue(act);
 
         TextModel tm = (TextModel) act.getNeuron().getModel();
-        if(act.getNeuron() == tm.nextTokenInhib) {
+        if(tm.nextTokenInhib.getId().equals(act.getNeuron().getId())) {
             cursor.nextTokenIAct = act;
-            cursor.nextTokenPPAct = act.getLinks(Direction.INPUT)
+            cursor.nextTokenPPAct = act.getInputLinks()
                     .findAny()
                     .map(l -> l.getInput())
                     .orElse(null);
@@ -86,7 +89,7 @@ public class Document extends Thought {
         return content.toString();
     }
 
-    private String getText(Integer begin, Integer end) {
+    private String getTextSegment(Integer begin, Integer end) {
         if(begin != null && end != null) {
             return content.substring(
                     Math.max(0, Math.min(begin, length())),
@@ -97,22 +100,16 @@ public class Document extends Thought {
         }
     }
 
-    public static int[] getRange(Activation act) {
-        return null;
-    }
-
     public static String getText(Activation act) {
-        int[] range = getRange(act);
-        return ((Document)act.getThought()).getText(range[0], range[1]);
+        return ((TextReference)act.getReference()).getText();
     }
 
     public Activation addInput(Neuron n, int begin, int end) {
         Activation act = new Activation(this, n);
-        act.setReference(new GroundReference(begin, end));
+        act.setReference(new TextReference(begin, end));
 
         act.setValue(1.0);
-        act.setFired(new Fired(begin, 0));
-        act.setRangeCoverage(end - begin);
+        act.setFired(begin);
 
         act.propagateInput();
         return act;
@@ -140,11 +137,11 @@ public class Document extends Thought {
         return cursor;
     }
 
-    public static class GroundReference implements Reference {
+    public class TextReference implements Reference {
         private int begin;
         private int end;
 
-        public GroundReference(int begin, int end) {
+        public TextReference(int begin, int end) {
             this.begin = begin;
             this.end = end;
         }
@@ -155,6 +152,32 @@ public class Document extends Thought {
 
         public int getEnd() {
             return end;
+        }
+
+        public String getText() {
+            return getTextSegment(begin, end);
+        }
+
+        @Override
+        public double length() {
+            return end - begin;
+        }
+
+        @Override
+        public Reference add(Reference ir) {
+            return new TextReference(
+                    Math.min(begin, ir.getBegin()),
+                    Math.max(end, ir.getEnd())
+            );
+        }
+
+        @Override
+        public Thought getThought() {
+            return Document.this;
+        }
+
+        public String toString() {
+            return "Ref(" + begin + "," + end + ")";
         }
     }
 }

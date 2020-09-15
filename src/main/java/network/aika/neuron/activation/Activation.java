@@ -21,7 +21,9 @@ import network.aika.Phase;
 import network.aika.Thought;
 import network.aika.Utils;
 import network.aika.neuron.*;
+import network.aika.neuron.excitatory.NegativeRecurrentSynapse;
 import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,6 +33,7 @@ import static network.aika.Phase.*;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
+import static network.aika.neuron.activation.Link.SORTED_BY_FIRED;
 
 /**
  *
@@ -45,8 +48,6 @@ public class Activation implements Comparable<Activation> {
     private double lateSum;
     private Fired fired = NOT_FIRED;
 
-    private double rangeCoverage;
-
     private int id;
     private Neuron<?> neuron;
     private Thought thought;
@@ -57,9 +58,7 @@ public class Activation implements Comparable<Activation> {
     NavigableMap<Activation, Link> outputLinks;
 
     private boolean isFinal;
-
-    private long visited;
-    private long visitedDown;
+    private boolean marked;
 
     private int round; // Only used as stopping criteria
     private Activation lastRound;
@@ -67,7 +66,7 @@ public class Activation implements Comparable<Activation> {
     private Set<Activation> branches = new TreeSet<>();
     private Activation mainBranch;
 
-    private Reference groundRef;
+    private Reference reference;
     private Gradient latestGradient;
 
     public Activation(Thought t, Neuron<?> n) {
@@ -84,7 +83,7 @@ public class Activation implements Comparable<Activation> {
         this.thought = t;
         this.neuron = n;
 
-        thought.addActivation(this);
+        thought.registerActivation(this);
 
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>(Comparator
@@ -113,6 +112,10 @@ public class Activation implements Comparable<Activation> {
         return fired;
     }
 
+    public void setFired(int inputTimestamp) {
+        this.fired = new Fired(inputTimestamp, 0);
+    }
+
     public boolean isFinal() {
         return isFinal;
     }
@@ -129,12 +132,12 @@ public class Activation implements Comparable<Activation> {
         return thought.getPhase();
     }
 
-    public Reference getGroundRef() {
-        return groundRef;
+    public Reference getReference() {
+        return reference;
     }
 
     public void setReference(Reference groundRef) {
-        this.groundRef = groundRef;
+        this.reference = groundRef;
     }
 
     public Activation getLastRound() {
@@ -153,13 +156,6 @@ public class Activation implements Comparable<Activation> {
         return neuron.getProvider();
     }
 
-    public Stream<Link> getOutputLinks(NeuronProvider n) {
-        return outputLinks
-                .values()
-                .stream()
-                .filter(l -> l.getOutput().getNeuronProvider().getId() == n.getId());
-    }
-
     public void propagateInput() {
         isFinal = true;
 
@@ -167,52 +163,47 @@ public class Activation implements Comparable<Activation> {
         thought.processActivations();
     }
 
-    public Activation createBranch() {
+    public Activation createBranch(Synapse excludedSyn) {
         Activation clonedAct = new Activation(thought.createActivationId(), thought, neuron);
         clonedAct.round = round + 1;
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
-        linkClone(clonedAct);
+        linkClone(clonedAct, excludedSyn);
         return clonedAct;
     }
 
-    public Activation getModifiable() {
+    public Activation getModifiable(Synapse excludedSyn) {
         if(!isFinal) return this;
 
         Activation clonedAct = new Activation(id, thought, neuron);
         clonedAct.round = round + 1;
         clonedAct.lastRound = this;
-        clonedAct.value = value;
-        clonedAct.sum = sum;
-        clonedAct.lateSum = lateSum;
-        linkClone(clonedAct);
+        linkClone(clonedAct, excludedSyn);
 
         return clonedAct;
     }
-
-    private void linkClone(Activation clonedAct) {
+/*
+    public Activation cloneToReplaceLink(Synapse excludedSyn) {
+        Activation clonedAct = new Activation(id, thought, neuron);
+        linkClone(clonedAct, excludedSyn);
+        return clonedAct;
+    }
+*/
+    private void linkClone(Activation clonedAct, Synapse excludedSyn) {
         inputLinks
                 .values()
-                .forEach(l ->
-                        new Link(l.getSynapse(), l.getInput(), clonedAct)
-                            .link()
+                .stream()
+                .filter(l -> l.getSynapse() != excludedSyn)
+                .forEach(l -> {
+                    Link nl = new Link(l.getSynapse(), l.getInput(), clonedAct, l.isSelfRef());
+                            nl.link();
+                            clonedAct.sumUpLink(null, nl);
+                        }
                 );
     }
 
     public void setValue(double v) {
         value = v;
-    }
-
-    public void setFired(Fired fired) {
-        this.fired = fired;
-    }
-
-    public void setRangeCoverage(double rangeCoverage) {
-        this.rangeCoverage = rangeCoverage;
-    }
-
-    public double getRangeCoverage() {
-        return rangeCoverage;
     }
 
     public boolean isActive() {
@@ -223,11 +214,33 @@ public class Activation implements Comparable<Activation> {
         return p;
     }
 
-    public boolean isConflicting(long v) {
-        return inputLinks.values().stream()
-                .filter(l -> l.isNegative() && !l.isSelfRef())
-                .flatMap(l -> l.getInput().getLinks(INPUT))  // Walk through to the inhib. Activation.
-                .anyMatch(l -> l.getInput().visitedDown != v);
+    public boolean isConflicting() {
+        return getConflictingMainBranches()
+                .anyMatch(act -> act.searchWithinBranch());
+    }
+
+    public boolean searchWithinBranch() {
+        if(marked) return true;
+
+        return outputLinks.values().stream()
+                .filter(l -> !(l.getSynapse() instanceof NegativeRecurrentSynapse) || l.isCausal())
+                .map(l -> l.getOutput())
+                .filter(act -> act.fired != NOT_FIRED && fired.compareTo(act.fired) == -1)
+                .anyMatch(act -> act.searchWithinBranch());
+    }
+
+    public Stream<Activation> getConflictingMainBranches() {
+        if(mainBranch != null) {
+            return Stream.of(mainBranch);
+        }
+
+        return branches.stream()
+                .flatMap(act -> act.getInputLinks())
+                .filter(l -> l.isNegative())
+                .map(l -> l.getInput())
+                .filter(act -> act.getNeuron() instanceof InhibitoryNeuron)
+                .flatMap(act -> act.getInputLinks())
+                .map(l -> l.getInput());
     }
 
     public void linkForward() {
@@ -237,7 +250,12 @@ public class Activation implements Comparable<Activation> {
             lastRound.outputLinks
                     .values()
                     .forEach(l ->
-                            Link.link(l.getSynapse(), this, l.getOutput())
+                            Link.link(
+                                    l.getSynapse(),
+                                    this,
+                                    l.getOutput(),
+                                    l.isSelfRef()
+                            )
                     );
             lastRound.unlink();
             lastRound = null;
@@ -247,51 +265,36 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void propagate() {
-        followDown(thought.createVisitedId(), this, OUTPUT);
+        followDown(this, OUTPUT, true);
         getModel().linkInputRelations(this, OUTPUT);
         thought.processLinks();
 
-        Phase p = thought.getPhase();
         Neuron<?> n = getNeuron();
 
-        if(p == INITIAL_LINKING || p == FINAL_LINKING) {
+        if(thought.getPhase() == INDUCTION) {
+            n.induceNeuron(this);
+        } else {
             n.getOutputSynapses()
-                    .filter(s -> s.isPropagate())
                     .filter(s -> !outputLinkExists(s))
                     .forEach(s ->
                             Link.link(
                                     s,
                                     this,
-                                    createActivation(s.getOutput())
+                                    createActivation(s.getOutput()),
+                                    false
                             )
                     );
-        } else if(p == INDUCTION) {
-            n.induceNeuron(this);
         }
     }
 
-    public Link connectInducedNeuron(Neuron on) {
-        Activation oAct = new Activation(thought.createActivationId(), thought, on);
-        return Link.link(
-                on.induceSynapse(this, oAct),
-                this,
-                oAct
-        );
-    }
-
-    private Activation createActivation(Neuron n) {
+    public Activation createActivation(Neuron n) {
         Activation act = new Activation(thought.createActivationId(), thought, n);
         getModel().linkInputRelations(act, INPUT);
         return act;
     }
 
-    public Link addLink(Link l) {
-        l.link();
-
-        sumUpLink(l);
-
-        l.propagate();
-        return l;
+    public Link getInputLink(Synapse s) {
+        return inputLinks.get(s.getPInput());
     }
 
     public boolean inputLinkExists(Synapse s) {
@@ -316,21 +319,37 @@ public class Activation implements Comparable<Activation> {
                 );
     }
 
-    public void sumUpLink(Link l) {
-        if(l.isNegative() && l.isSelfRef()) return;
+    public Link addLink(Synapse s, Activation input, boolean isSelfRef) {
+        Link ol = getInputLink(s);
+        Link nl = new Link(s, input, this, isSelfRef);
+        nl.link();
+        sumUpLink(ol, nl);
+        checkIfFired(nl);
 
-        double w = l.getSynapse().getWeight();
-        double s = l.getInput().value * w;
+        if(!(s instanceof NegativeRecurrentSynapse)) {
+            getThought().addLinkToQueue(nl);
+        }
+        return nl;
+    }
 
-        if(isFinal || l.isNegative()) {
+    public void sumUpLink(Link ol, Link nl) {
+        assert ol == null || !isFinal;
+
+        if(nl.isNegative() && nl.isSelfRef()) return;
+
+        double w = nl.getSynapse().getWeight();
+        double x = nl.getInput().value - (ol != null ? ol.getInput().value : 0.0);
+        double s = x * w;
+
+        if(isFinal) {
             lateSum += s;
         } else {
             sum += s;
         }
 
-        rangeCoverage += getNeuron().propagateRangeCoverage(l);
-
-        checkIfFired(l);
+        if(!isFinal) {
+            nl.getOutput().getNeuron().updateReference(nl);
+        }
     }
 
     public void updateForFinalPhase() {
@@ -338,21 +357,28 @@ public class Activation implements Comparable<Activation> {
         double finalValue = computeValue(FINAL_LINKING);
 
         if(Math.abs(finalValue - initialValue) > TOLERANCE) {
-            thought.add(getModifiable());
+            thought.addActivationToQueue(getModifiable(null));
         }
     }
 
-    public void checkIfFired(Link l) {
+    private void checkIfFired(Link l) {
         if(fired == NOT_FIRED && getNet() > 0.0) {
-            fired = neuron.incrementFired(l.getInput().fired);
-            thought.add(this);
+            fired = neuron.incrementFired(getLatestFired());
+            thought.addActivationToQueue(this);
         }
+    }
+
+    private Fired getLatestFired() {
+        return inputLinks.values().stream()
+                .map(il -> il.getInput().getFired())
+                .max(Fired::compareTo)
+                .orElse(null);
     }
 
     public void process() {
         value = computeValue(thought.getPhase());
         isFinal = true;
-        if (lastRound == null || !equals(lastRound)) {
+        if (!equals(lastRound)) {
             linkForward();
         }
     }
@@ -364,28 +390,82 @@ public class Activation implements Comparable<Activation> {
                 );
     }
 
-    public void processGradient() {
-        assert !latestGradient.isFixed;
-        latestGradient.isFixed = true;
-
-        double g = latestGradient.gradient *
-                getNeuron().getActivationFunction().outerGrad(
-                        getNet()
+    public double computeGradient() {
+        getInputLinksSortedByFired()
+                .forEach(l -> {
+                            l.computeGradient();
+                            l.removeGradientDependencies();
+                        }
                 );
 
-        inputLinks
-                .values()
+        double g = getActFunctionDerivative() *
+                getNeuron().getSurprisal(
+                        Sign.getSign(this)
+                );
+
+        g += getInputLinks()
+                .mapToDouble(l -> l.getGradient())
+                .sum();
+
+        if(Math.abs(g) < TOLERANCE) {
+            return 0.0;
+        }
+
+        return g / getN();
+    }
+
+    private SortedSet<Link> getInputLinksSortedByFired() {
+        SortedSet<Link> sortedByFired = new TreeSet<>(SORTED_BY_FIRED);
+        sortedByFired.addAll(inputLinks.values());
+        return sortedByFired;
+    }
+
+    public int getN() {
+        return getModel().getN() + reference.getEnd() - getNeuron().getInstances().getOffset();
+    }
+
+    public void processGradient() {
+        if(getNeuron().isInputNeuron())
+            return;
+
+        assert !latestGradient.isFixed();
+        latestGradient.setFixed();
+
+        double g = latestGradient.getGradient();
+
+        inputLinks.values()
                 .forEach(l ->
-                        l.propagateGradient(thought.getTrainingConfig().getLearnRate(), g)
+                        l.propagateGradient(g)
+                );
+
+        getNeuron().updatePropagateFlag();
+    }
+
+    public double getActFunctionDerivative() {
+        if(!getNeuron().isInitialized())
+            return 1.0;
+
+        return getNeuron()
+                .getActivationFunction()
+                .outerGrad(
+                        getNet()
                 );
     }
 
-    public Gradient getMutableGradient() {
-        if(latestGradient == null || latestGradient.isFixed) {
+    public void updateGradient() {
+        addGradient(
+                computeGradient()
+        );
+    }
+
+    public void addGradient(double g) {
+        if(Math.abs(g) < TOLERANCE) return;
+
+        if(latestGradient == null || latestGradient.isFixed()) {
             latestGradient = new Gradient(latestGradient);
             getThought().addToGradientQueue(this);
         }
-        return latestGradient;
+        latestGradient.addGradient(g);
     }
 
     public void unlink() {
@@ -424,86 +504,148 @@ public class Activation implements Comparable<Activation> {
     private void updateP(double p) {
         if(Math.abs(p - getP()) <= TOLERANCE) return;
 
-        Activation cAct = getModifiable();
+        Activation cAct = getModifiable(null);
         cAct.p = p;
 
-        thought.add(cAct);
+        thought.addActivationToQueue(cAct);
     }
 
     public void count() {
         getNeuron().count(this);
+
+        getInputLinks()
+                .forEach(l -> l.count());
+
+        getOutputLinks()
+                .forEach(l -> l.count());
     }
 
     public boolean equals(Activation act) {
-        return Math.abs(value - act.value) <= TOLERANCE;
+        return act != null && Math.abs(value - act.value) <= TOLERANCE;
     }
 
     private Activation getMostRecentFinalActivation() {
         return !isFinal && lastRound != null ? lastRound : this;
     }
 
-    public Stream<Link> getLinks(Direction dir) {
-        switch(dir) {
-            case OUTPUT:
-                Activation act = getMostRecentFinalActivation();
-                return act.outputLinks.values().stream();
-            case INPUT:
-                return inputLinks.values().stream();
-        }
-        return null;
+    public Stream<Link> getInputLinks() {
+        return inputLinks.values().stream();
+    }
+
+    public Stream<Link> getOutputLinks() {
+        Activation act = getMostRecentFinalActivation();
+        return act.outputLinks.values().stream();
+    }
+
+    public boolean isConnected(Activation input) {
+        return inputLinks.values().stream()
+                .anyMatch(l -> l.getInput() == input);
     }
 
     public boolean hasBranches() {
         return branches.isEmpty();
     }
 
-    public void followDown(long v, Activation originAct, Direction dir) {
-        if(visited == v) return;
-        visitedDown = v;
+    public void followDown(Activation originAct, Direction dir, boolean isSelfRefDown) {
+        followUp(originAct, dir, isSelfRefDown, true);
 
-        followUp(v, originAct, dir);
+        marked = true;
 
         if(this == originAct || !(getNeuron() instanceof PatternNeuron)) {
-            inputLinks
-                    .values()
-                    .stream()
-                    .filter(l -> l.getInput() != null)
-                    .map(l -> l.getInput())
-                    .forEach(act -> act.followDown(v, originAct, dir));
+            inputLinks.values().stream()
+                    .filter(l ->
+                            !(l.getSynapse() instanceof NegativeRecurrentSynapse) &&
+                                    l.getInput() != null &&
+                                    !l.getInput().marked &&
+                                    l.isCausal()
+                    )
+                    .forEach(l -> l.getInput().followDown(
+                            originAct,
+                            dir,
+                            isSelfRefDown && l.getSynapse().followSelfRef()
+                            )
+                    );
         }
+
+        marked = false;
     }
 
-    public void followUp(long v, Activation originAct, Direction dir) {
-        if(visited == v) return;
-        visited = v;
+    public void followUp(Activation originAct, Direction dir, boolean isSelfRefDown, boolean isSelfRefUp) {
+        if(dir == INPUT && value == 0.0) return;
 
-        if(this == originAct || isConflicting(v)) return;
+        if(this == originAct || isConflicting()) return;
+
+        marked = true;
 
         Activation iAct = dir == INPUT ? this : originAct;
         Activation oAct = dir == OUTPUT ? this : originAct;
 
-        if(!oAct.getNeuron().isBlocked()) {
-            oAct.getNeuron().tryToLink(iAct, oAct);
+        Neuron on = oAct.getNeuron();
+        if(!on.isInputNeuron()) {
+            on.tryToLink(iAct, oAct, isSelfRefDown || isSelfRefUp);
         }
 
-        outputLinks
-                .values()
-                .stream()
-                .map(l -> l.getOutput())
-                .forEach(act -> act.followUp(v, originAct, dir));
+        outputLinks.values().stream()
+                .filter(l ->
+                        !(l.getSynapse() instanceof NegativeRecurrentSynapse) &&
+                                !l.getOutput().marked &&
+                                l.isCausal()
+                )
+                .collect(Collectors.toList())
+                .forEach(l ->
+                        l.getOutput().followUp(
+                                originAct,
+                                dir,
+                                isSelfRefDown,
+                                isSelfRefUp && l.getSynapse().followSelfRef()
+                        )
+                );
+
+        marked = false;
+    }
+
+    @Override
+    public int compareTo(Activation act) {
+        return Integer.compare(id, act.id);
     }
 
     public String toString() {
-        return "Act id:" + getId() + " " +
-                getNeuron().getClass().getSimpleName() + ":" + getDescriptionLabel() +
+        return "Act " +
+                getIdString() +
                 " value:" + Utils.round(value) +
                 " net:" + Utils.round(getNet()) +
                 " p:" + Utils.round(p) +
                 " round:" + round;
     }
 
-    @Override
-    public int compareTo(Activation act) {
-        return Integer.compare(id, act.id);
+    public String getIdString() {
+        return "id:" +
+                getId() + " " +
+                getNeuron();
+    }
+
+    public String gradientsToString() {
+        if(latestGradient == null) return "";
+
+        StringBuilder sb = new StringBuilder();
+
+        double og = latestGradient.getFinalGradient();
+
+        sb.append(toString() +
+                " - actRange:" + Utils.round(getReference().length()) +
+                " g:" + Utils.round(computeGradient()) +
+                " og:" + Utils.round(og) +
+                " \n"
+        );
+
+        inputLinks.values()
+                .forEach(l ->
+                        sb.append(
+                                l.gradientsToString() + " \n"
+                        )
+                );
+
+        sb.append("\n");
+        return sb.toString();
     }
 }

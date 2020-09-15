@@ -77,18 +77,20 @@ public class PatternTest {
         {
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(nA, eA);
-                s.setPropagate(true);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                eA.addConjunctiveBias(-10.0, false);
             }
 
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(out, eA);
 
-                s.link();
+                s.linkInput();
+                s.linkOutput();
                 s.setWeight(10.0);
-                eA.setRecurrentConjunctiveBias(-10.0);
+                eA.addConjunctiveBias(-10.0, true);
             }
             eA.setBias(4.0);
         }
@@ -96,31 +98,35 @@ public class PatternTest {
         {
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(nB, eB);
-                s.setPropagate(true);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                eB.addConjunctiveBias(-10.0, false);
             }
 
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(eA, eB);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkOutput();
+                s.addWeight(10.0);
+                eB.addConjunctiveBias(-10.0, false);
             }
 
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nB), eB);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkOutput();
+                s.addWeight(10.0);
+                eB.addConjunctiveBias(-10.0, false);
             }
 
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(out, eB);
 
-                s.link();
-                s.update(10.0, true);
+                s.linkOutput();
+                s.addWeight(10.0);
+                eB.addConjunctiveBias(-10.0, true);
             }
             eB.setBias(4.0);
         }
@@ -128,31 +134,35 @@ public class PatternTest {
         {
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(nC, eC);
-                s.setPropagate(true);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                eC.addConjunctiveBias(-10.0, false);
             }
 
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(eB, eC);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkOutput();
+                s.addWeight(10.0);
+                eC.addConjunctiveBias(-10.0, false);
             }
 
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nC), eC);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkOutput();
+                s.addWeight(10.0);
+                eC.addConjunctiveBias(-10.0, false);
             }
 
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(out, eC);
 
-                s.link();
-                s.update(10.0, true);
+                s.linkOutput();
+                s.addWeight(10.0);
+                eC.addConjunctiveBias(-10.0, true);
             }
             eC.setBias(4.0);
         }
@@ -160,24 +170,27 @@ public class PatternTest {
         {
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(eA, out);
-                s.setPropagate(true);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                out.addConjunctiveBias(-10.0, false);
             }
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(eB, out);
-                s.setPropagate(true);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                out.addConjunctiveBias(-10.0, false);
             }
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(eC, out);
-                s.setPropagate(true);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                out.addConjunctiveBias(-10.0, false);
             }
             out.setBias(4.0);
         }

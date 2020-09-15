@@ -16,14 +16,12 @@
  */
 package network;
 
-import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.excitatory.*;
 import network.aika.text.Document;
 import network.aika.Model;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
-import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
@@ -51,18 +49,18 @@ public class MutualExclusionTest {
         {
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(in, na);
-                s.setPropagate(true);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                na.addConjunctiveBias(-10.0, false);
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(inhib, na);
-                s.setNegative(true);
+                NegativeRecurrentSynapse s = new NegativeRecurrentSynapse(inhib, na);
 
-                s.link();
-                s.update(-100.0, true);
+                s.linkOutput();
+                s.addWeight(-100.0);
             }
 
             na.setBias(1.0);
@@ -71,18 +69,18 @@ public class MutualExclusionTest {
         {
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(in, nb);
-                s.setPropagate(true);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                nb.addConjunctiveBias(-10.0, false);
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(inhib, nb);
-                s.setNegative(true);
+                NegativeRecurrentSynapse s = new NegativeRecurrentSynapse(inhib, nb);
 
-                s.link();
-                s.update(-100.0, true);
+                s.linkOutput();
+                s.addWeight(-100.0);
             }
             nb.setBias(1.5);
         }
@@ -91,18 +89,18 @@ public class MutualExclusionTest {
         {
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(in, nc);
-                s.setPropagate(true);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                nc.addConjunctiveBias(-10.0, false);
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(inhib, nc);
-                s.setNegative(true);
+                NegativeRecurrentSynapse s = new NegativeRecurrentSynapse(inhib, nc);
 
-                s.link();
-                s.update(-100.0, true);
+                s.linkOutput();
+                s.addWeight(-100.0);
             }
 
             nc.setBias(1.2);
@@ -111,18 +109,108 @@ public class MutualExclusionTest {
         {
             {
                 InhibitorySynapse s = new InhibitorySynapse(na, inhib);
-                s.link();
-                s.update(1.0, false);
+                s.linkInput();
+                s.addWeight(1.0);
             }
             {
                 InhibitorySynapse s = new InhibitorySynapse(nb, inhib);
-                s.link();
-                s.update(1.0, false);
+                s.linkInput();
+                s.addWeight(1.0);
             }
             {
                 InhibitorySynapse s = new InhibitorySynapse(nc, inhib);
-                s.link();
-                s.update(1.0, false);
+                s.linkInput();
+                s.addWeight(1.0);
+            }
+
+            inhib.setBias(0.0);
+        }
+
+
+        Document doc = new Document("test");
+
+        Activation act = new Activation(doc, in);
+        act.setValue(1.0);
+        act.setFired(0);
+
+        act.propagateInput();
+
+        doc.process();
+
+        System.out.println(doc.activationsToString());
+
+        Set<Activation> nbActs = doc.getActivations(nb);
+        Activation nbAct = nbActs.iterator().next();
+
+        assertTrue(nbAct.getValue() > 0.38);
+    }
+
+
+
+    @Test
+    public void testPropagationWithPrimaryLink() {
+        Model m = new TextModel();
+
+        PatternNeuron in = new PatternNeuron(m, "I", "IN", true);
+        PatternPartNeuron na = new PatternPartNeuron(m, "A", false);
+        PatternPartNeuron nb = new PatternPartNeuron(m, "B", false);
+        InhibitoryNeuron inhib = new InhibitoryNeuron(m, "I", false);
+
+        {
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(in, na);
+
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                na.addConjunctiveBias(-10.0, false);
+            }
+
+            {
+                NegativeRecurrentSynapse s = new NegativeRecurrentSynapse(inhib, na);
+
+                s.linkOutput();
+                s.addWeight(-100.0);
+            }
+
+            na.setBias(1.0);
+        }
+
+        {
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(in, nb);
+
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                nb.addConjunctiveBias(-10.0, false);
+            }
+
+            {
+                NegativeRecurrentSynapse s = new NegativeRecurrentSynapse(inhib, nb);
+
+                s.linkOutput();
+                s.addWeight(-100.0);
+            }
+            nb.setBias(1.5);
+        }
+
+        {
+/*            {
+                InhibitorySynapse s = new InhibitorySynapse(in, inhib);
+                s.linkInput();
+                s.addWeight(1.0);
+            }
+*/
+            {
+                InhibitorySynapse s = new InhibitorySynapse(na, inhib);
+                s.linkInput();
+                s.addWeight(1.0);
+            }
+            {
+                InhibitorySynapse s = new InhibitorySynapse(nb, inhib);
+                s.linkInput();
+                s.addWeight(1.0);
             }
 
             inhib.setBias(0.0);
@@ -139,10 +227,6 @@ public class MutualExclusionTest {
         doc.process();
 
         System.out.println(doc.activationsToString());
-
-        Set<Activation> nbActs = doc.getActivations(nb);
-        Activation nbAct = nbActs.iterator().next();
-
-        assertTrue(nbAct.getValue() > 0.38);
+        System.out.println();
     }
 }

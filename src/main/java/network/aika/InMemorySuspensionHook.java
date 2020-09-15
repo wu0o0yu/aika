@@ -1,5 +1,7 @@
 package network.aika;
 
+import network.aika.neuron.NeuronProvider;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -40,7 +42,7 @@ public class InMemorySuspensionHook implements SuspensionHook {
     }
 
     @Override
-    public void storeAllLabels() {
+    public void suspendAll(NeuronProvider.SuspensionMode sm) {
     }
 
     @Override

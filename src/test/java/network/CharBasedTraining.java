@@ -6,19 +6,21 @@ import network.aika.text.TextModel;
 
 public class CharBasedTraining {
 
-
     private TextModel model;
 
     public void init() {
         model = new TextModel();
     }
 
+    public TextModel getModel() {
+        return model;
+    }
+
     public void train(String word) {
         Document doc = new Document(word,
                 new Config()
                         .setAlpha(0.99)
-                        .setLearnRate(0.025)
-                        .setMetaThreshold(0.3)
+                        .setLearnRate(-0.1)
         );
         System.out.println("  " + word);
 
@@ -33,7 +35,8 @@ public class CharBasedTraining {
 
         doc.train(model);
 
+//        System.out.println(doc.gradientsToString());
+
         System.out.println(); // doc.activationsToString()
     }
-
 }

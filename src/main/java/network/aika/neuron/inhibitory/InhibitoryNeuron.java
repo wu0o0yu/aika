@@ -19,22 +19,13 @@ package network.aika.neuron.inhibitory;
 import network.aika.ActivationFunction;
 import network.aika.Model;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Link;
 
-import java.util.Collections;
-import java.util.List;
-
-import static network.aika.neuron.Sign.NEG;
-import static network.aika.neuron.Sign.POS;
-import static network.aika.neuron.activation.Activation.TOLERANCE;
-import static network.aika.neuron.activation.Direction.INPUT;
-
+import java.util.Collection;
 
 /**
  *
@@ -56,45 +47,34 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         super(model, descriptionLabel, isInputNeuron);
     }
 
-    public void tryToLink(Activation iAct, Activation oAct) {
-    }
-
     @Override
     public byte getType() {
         return type;
     }
 
-    protected void propagateCost(Activation act) {
-        double cost = 0.0;
-
-//        act.getLinks(INPUT).mapToDouble(l -> l.getInput().);
-
-        if(Math.abs(cost) < TOLERANCE) {
-            return;
-        }
-
-        act.getMutableGradient().gradient += cost;
+    @Override
+    public void updateReference(Link nl) {
+        nl.getOutput().setReference(nl.getInput().getReference());
     }
 
     @Override
-    public Synapse getInputSynapse(NeuronProvider n) {
-        throw new UnsupportedOperationException();
+    public void induceNeuron(Activation activation) {
+
     }
 
-    public double propagateRangeCoverage(Link l) {
-        return l.getInput().getRangeCoverage();
-    }
-
-    public void induceNeuron(Activation act) {
-        return;
-    }
-
-    public Synapse induceSynapse(Activation iAct, Activation oAct) {
+    public Link induceSynapse(Activation iAct, Activation oAct) {
         InhibitorySynapse s = new InhibitorySynapse(iAct.getNeuron(), (InhibitoryNeuron) oAct.getNeuron());
-        s.setPropagate(true);
         s.setWeight(1.0);
-        s.link();
-        return s;
+
+        Link l = new Link(s, iAct, oAct, false);
+
+        l.computeGradient();
+        l.removeGradientDependencies();
+
+        s.linkInput();
+        l.link();
+
+        return l;
     }
 
     @Override
@@ -112,8 +92,24 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         return ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
     }
 
+
+    @Override
+    public Synapse getInputSynapse(NeuronProvider n) {
+        return n.getNeuron().getOutputSynapse(getProvider());
+    }
+
+    @Override
+    public boolean containsInputSynapse(Synapse s) {
+        return false;
+    }
+
     @Override
     public void addInputSynapse(InhibitorySynapse s) {
+    }
+
+    @Override
+    public boolean containsOutputSynapse(Synapse synapse) {
+        return false;
     }
 
     @Override
