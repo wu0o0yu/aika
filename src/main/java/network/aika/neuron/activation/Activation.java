@@ -547,11 +547,8 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void followDown(Activation originAct, Direction dir, boolean isSelfRefDown) {
-        followUp(originAct, dir, isSelfRefDown, true);
-
-        marked = true;
-
         if(this == originAct || !(getNeuron() instanceof PatternNeuron)) {
+            marked = true;
             inputLinks.values().stream()
                     .filter(l ->
                             !(l.getSynapse() instanceof NegativeRecurrentSynapse) &&
@@ -565,9 +562,10 @@ public class Activation implements Comparable<Activation> {
                             isSelfRefDown && l.getSynapse().followSelfRef()
                             )
                     );
+            marked = false;
+        } else {
+            followUp(originAct, dir, isSelfRefDown, true);
         }
-
-        marked = false;
     }
 
     public void followUp(Activation originAct, Direction dir, boolean isSelfRefDown, boolean isSelfRefUp) {
