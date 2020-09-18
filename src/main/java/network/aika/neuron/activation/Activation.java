@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation;
 
+import com.sun.source.tree.Scope;
 import network.aika.Model;
 import network.aika.Phase;
 import network.aika.Thought;
@@ -58,7 +59,7 @@ public class Activation implements Comparable<Activation> {
     NavigableMap<Activation, Link> outputLinks;
 
     private boolean isFinal;
-    private boolean marked;
+    public boolean marked;
 
     private int round; // Only used as stopping criteria
     private Activation lastRound;
@@ -546,37 +547,59 @@ public class Activation implements Comparable<Activation> {
         return branches.isEmpty();
     }
 
-    public void followDown(Activation originAct, Direction dir, boolean isSelfRefDown) {
-        followUp(originAct, dir, isSelfRefDown, true);
+    public Stream<Link> getLinks(Direction dir) {
+        return (dir == INPUT ? inputLinks : outputLinks)
+                .values()
+                .stream();
+    }
+
+    public void followDown(Activation originAct, Direction downUp, Direction dir, Scope scope, boolean isSelfRefDown) {
+        if(this == originAct || !(getNeuron() instanceof PatternNeuron)) {
+            marked = true;
+            getLinks(downUp)
+                    .filter(l -> l.follow(downUp))
+                    .forEach(l ->
+                            l.getActivation(downUp).followDown(
+                                    originAct,
+                                    downUp,
+                                    dir,
+                                    l.getSynapse().transition(scope, downUp),
+                                    isSelfRefDown && l.getSynapse().followSelfRef()
+                            )
+                    );
+            marked = false;
+        } else {
+            followUp(originAct, downUp.invert(), dir, scope, isSelfRefDown, true);
+        }
+    }
+
+    public void followUp(Activation originAct, Direction downUp, Direction dir, Scope scope, boolean isSelfRefDown, boolean isSelfRefUp) {
+        if(dir == INPUT && value == 0.0) return; // <--
+
+        if(this == originAct || isConflicting()) return; // <--
+
+        tryToLink(originAct, dir, isSelfRefDown, isSelfRefUp); // <--
 
         marked = true;
 
-        if(this == originAct || !(getNeuron() instanceof PatternNeuron)) {
-            inputLinks.values().stream()
-                    .filter(l ->
-                            !(l.getSynapse() instanceof NegativeRecurrentSynapse) &&
-                                    l.getInput() != null &&
-                                    !l.getInput().marked &&
-                                    l.isCausal()
-                    )
-                    .forEach(l -> l.getInput().followDown(
-                            originAct,
-                            dir,
-                            isSelfRefDown && l.getSynapse().followSelfRef()
-                            )
-                    );
-        }
+        getLinks(downUp)
+                .filter(l -> l.follow(downUp))
+                .collect(Collectors.toList()) // <--
+                .forEach(l ->
+                        l.getActivation(downUp).followUp(
+                                originAct,
+                                downUp,
+                                dir,
+                                l.getSynapse().transition(scope, downUp),
+                                isSelfRefDown, // <--
+                                isSelfRefUp && l.getSynapse().followSelfRef() // <--
+                        )
+                );
 
         marked = false;
     }
 
-    public void followUp(Activation originAct, Direction dir, boolean isSelfRefDown, boolean isSelfRefUp) {
-        if(dir == INPUT && value == 0.0) return;
-
-        if(this == originAct || isConflicting()) return;
-
-        marked = true;
-
+    public void tryToLink(Activation originAct, Direction dir, boolean isSelfRefDown, boolean isSelfRefUp) {
         Activation iAct = dir == INPUT ? this : originAct;
         Activation oAct = dir == OUTPUT ? this : originAct;
 
@@ -584,24 +607,6 @@ public class Activation implements Comparable<Activation> {
         if(!on.isInputNeuron()) {
             on.tryToLink(iAct, oAct, isSelfRefDown || isSelfRefUp);
         }
-
-        outputLinks.values().stream()
-                .filter(l ->
-                        !(l.getSynapse() instanceof NegativeRecurrentSynapse) &&
-                                !l.getOutput().marked &&
-                                l.isCausal()
-                )
-                .collect(Collectors.toList())
-                .forEach(l ->
-                        l.getOutput().followUp(
-                                originAct,
-                                dir,
-                                isSelfRefDown,
-                                isSelfRefUp && l.getSynapse().followSelfRef()
-                        )
-                );
-
-        marked = false;
     }
 
     @Override

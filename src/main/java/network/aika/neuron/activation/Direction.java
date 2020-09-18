@@ -15,7 +15,7 @@ public enum Direction {
         this.inverted = inverted;
     }
 
-    public Direction getInverted() {
+    public Direction invert() {
         return inverted;
     }
 }

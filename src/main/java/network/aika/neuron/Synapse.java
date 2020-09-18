@@ -16,8 +16,10 @@
  */
 package network.aika.neuron;
 
+import com.sun.source.tree.Scope;
 import network.aika.*;
 import network.aika.Writable;
+import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Link;
 import org.apache.commons.math3.distribution.BetaDistribution;
 
@@ -58,11 +60,17 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         this.instances = new Instances();
     }
 
+    public abstract Scope transition(Scope s, Direction dir);
+
     public abstract boolean followSelfRef();
 
     public abstract boolean checkRequiredSelfRef(boolean isSelfRef);
 
     public abstract byte getType();
+
+    public boolean isNegative() {
+        return false;
+    }
 
     public boolean isInputLinked() {
         return getInput().containsOutputSynapse(this);

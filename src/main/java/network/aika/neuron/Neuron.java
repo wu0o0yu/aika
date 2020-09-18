@@ -116,7 +116,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
                         iAct.outputLinkExists(oAct)
                 ) return;
 
-                if(s instanceof NegativeRecurrentSynapse && !isSelfRef) {
+                if(s.isNegative() && !isSelfRef) {
                     oAct = oAct.createBranch(s);
                 }
 

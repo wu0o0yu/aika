@@ -15,6 +15,11 @@ public class NegativeRecurrentSynapse extends ExcitatorySynapse<InhibitoryNeuron
     }
 
     @Override
+    public boolean isNegative() {
+        return true;
+    }
+
+    @Override
     public byte getType() {
         return type;
     }
