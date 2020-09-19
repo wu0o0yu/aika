@@ -16,11 +16,11 @@
  */
 package network.aika.neuron;
 
-import com.sun.source.tree.Scope;
 import network.aika.*;
 import network.aika.Writable;
 import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Scope;
 import org.apache.commons.math3.distribution.BetaDistribution;
 
 import java.io.DataInput;

@@ -22,7 +22,7 @@ import network.aika.neuron.*;
  *
  * @author Lukas Molzberger
  */
-public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> extends Synapse<I, O> {
+public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> extends Synapse<I, O> {
 
     public static byte type;
 
