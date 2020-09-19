@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-import com.sun.source.tree.Scope;
 import network.aika.Model;
 import network.aika.Phase;
 import network.aika.Thought;
@@ -35,6 +34,7 @@ import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.Link.SORTED_BY_FIRED;
+import static network.aika.neuron.activation.Scope.SAME;
 
 /**
  *
@@ -266,7 +266,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void propagate() {
-        followDown(this, OUTPUT, true);
+        followDown(this, INPUT, OUTPUT, SAME, true);
         getModel().linkInputRelations(this, OUTPUT);
         thought.processLinks();
 

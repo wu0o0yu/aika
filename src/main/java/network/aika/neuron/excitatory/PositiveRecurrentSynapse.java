@@ -1,6 +1,7 @@
 package network.aika.neuron.excitatory;
 
 
+
 public class PositiveRecurrentSynapse extends ExcitatorySynapse<PatternNeuron, PatternPartNeuron> {
 
     public static byte type;

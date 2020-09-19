@@ -60,7 +60,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         this.instances = new Instances();
     }
 
-    public abstract Scope transition(Scope s, Direction dir);
+    public Scope transition(Scope s, Direction dir) {
+        return s;
+    }
 
     public abstract boolean followSelfRef();
 

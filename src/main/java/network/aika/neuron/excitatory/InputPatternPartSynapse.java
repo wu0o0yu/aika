@@ -3,7 +3,6 @@ package network.aika.neuron.excitatory;
 import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Scope;
 
-import static network.aika.neuron.activation.Direction.INPUT;
 
 public class InputPatternPartSynapse extends ExcitatorySynapse<PatternPartNeuron, PatternPartNeuron> {
 
@@ -24,14 +23,6 @@ public class InputPatternPartSynapse extends ExcitatorySynapse<PatternPartNeuron
 
     @Override
     public Scope transition(Scope s, Direction dir) {
-        if(dir == INPUT) {
-            switch(s) {
-                case SAME: return Scope.INPUT;
-                case INPUT: return Scope.RELATED;
-                default: throw new UnsupportedOperationException();
-            }
-        } else {
-
-        }
+        return s.getNext(dir);
     }
 }
