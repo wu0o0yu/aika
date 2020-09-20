@@ -92,10 +92,9 @@ public class TextModel extends Model {
         }
     }
 
-    private ExcitatorySynapse getRelSynapse(Neuron n) {
-        return ((ExcitatoryNeuron) n).getInputSynapses()
-                .stream()
-                .filter(s -> !(s instanceof PositiveRecurrentSynapse))
+    private Synapse getRelSynapse(Neuron<?> n) {
+        return n.getInputSynapses()
+                .filter(s -> s.isInputScope())
                 .findAny()
                 .orElse(null);
     }
@@ -119,7 +118,7 @@ public class TextModel extends Model {
 
         {
             {
-                PositiveRecurrentSynapse s = new PositiveRecurrentSynapse(in, inRelPW);
+                ExcitatorySynapse s = new ExcitatorySynapse(in, inRelPW, false, true, false, false);
 
                 s.linkInput();
                 s.linkOutput();
@@ -128,7 +127,7 @@ public class TextModel extends Model {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(getNextTokenInhib(), inRelPW);
+                ExcitatorySynapse s = new ExcitatorySynapse(getNextTokenInhib(), inRelPW, false, false, true, false);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -138,7 +137,7 @@ public class TextModel extends Model {
         }
         {
             {
-                PositiveRecurrentSynapse s = new PositiveRecurrentSynapse(in, inRelNW);
+                ExcitatorySynapse s = new ExcitatorySynapse(in, inRelPW, false, true, false, false);
 
                 s.linkInput();
                 s.linkOutput();
@@ -147,7 +146,7 @@ public class TextModel extends Model {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(getPrevTokenInhib(), inRelNW);
+                ExcitatorySynapse s = new ExcitatorySynapse(getPrevTokenInhib(), inRelNW, false, false, true, false);
 
                 s.linkOutput();
                 s.addWeight(10.0);

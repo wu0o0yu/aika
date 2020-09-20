@@ -102,7 +102,7 @@ public class PatternNeuron extends ExcitatoryNeuron {
 
     private boolean hasOutputPatternPartConsumer(Activation act) {
         return act.getOutputLinks()
-                .filter(l -> !(l.getSynapse() instanceof PositiveRecurrentSynapse))
+                .filter(l -> l.getSynapse().isInputLinked())
                 .anyMatch(l -> l.getOutput().getNeuron() instanceof PatternPartNeuron);
     }
 

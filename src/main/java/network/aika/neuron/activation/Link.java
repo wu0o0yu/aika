@@ -21,7 +21,6 @@ import network.aika.Utils;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.excitatory.NegativeRecurrentSynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

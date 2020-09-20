@@ -21,6 +21,7 @@ import network.aika.Model;
 import network.aika.Phase;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Context;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
@@ -31,6 +32,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 
@@ -80,7 +82,7 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         super.train(act);
     }
 
-    public Link induceSynapse(Activation iAct, Activation oAct) {
+    public Link induceSynapse(Activation iAct, Activation oAct, Context c) {
         if(oAct.getNeuron().isInputNeuron())
             return null;
 
@@ -159,8 +161,8 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         }
     }
 
-    public Collection<ExcitatorySynapse> getInputSynapses() {
-        return inputSynapses.values();
+    public Stream<? extends Synapse> getInputSynapses() {
+        return inputSynapses.values().stream();
     }
 
     public ActivationFunction getActivationFunction() {

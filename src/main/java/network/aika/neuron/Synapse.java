@@ -67,6 +67,18 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return false;
     }
 
+    public boolean isRecurrent() {
+        return false;
+    }
+
+    public boolean isInputScope() {
+        return false;
+    }
+
+    public boolean isRelated() {
+        return false;
+    }
+
     public boolean isInputLinked() {
         return getInput().containsOutputSynapse(this);
     }

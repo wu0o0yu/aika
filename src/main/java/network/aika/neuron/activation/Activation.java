@@ -21,7 +21,6 @@ import network.aika.Phase;
 import network.aika.Thought;
 import network.aika.Utils;
 import network.aika.neuron.*;
-import network.aika.neuron.excitatory.NegativeRecurrentSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.util.*;
@@ -325,7 +324,7 @@ public class Activation implements Comparable<Activation> {
         sumUpLink(ol, nl);
         checkIfFired(nl);
 
-        if(!(s instanceof NegativeRecurrentSynapse)) {
+        if(!s.isNegative()) {
             getThought().addLinkToQueue(nl);
         }
         return nl;
@@ -584,7 +583,7 @@ public class Activation implements Comparable<Activation> {
 
         Neuron on = oAct.getNeuron();
         if (!on.isInputNeuron()) {
-            on.tryToLink(iAct, oAct, c.selfRef);
+            on.tryToLink(iAct, oAct, c);
         }
     }
 

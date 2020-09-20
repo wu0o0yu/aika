@@ -17,26 +17,59 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.*;
+import network.aika.neuron.activation.Context;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> extends Synapse<I, O> {
+public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> extends Synapse<I, O> {
 
     public static byte type;
+
+    public boolean isNegative;
+    public boolean isRecurrent;
+    public boolean inputScope;
+    public boolean isRelated;
 
     public ExcitatorySynapse() {
         super();
     }
 
-    public ExcitatorySynapse(I input, O output) {
+    public ExcitatorySynapse(I input, O output, boolean isNegative, boolean isRecurrent, boolean isInputScope, boolean isRelated) {
         super(input, output);
+
+        this.isNegative = isNegative;
+        this.isRecurrent = isRecurrent;
+        this.inputScope = isInputScope;
+        this.isRelated = isRelated;
+    }
+
+    @Override
+    public Context transition(Context c) {
+        return null;
     }
 
     @Override
     public byte getType() {
         return type;
+    }
+
+
+    public boolean isNegative() {
+        return isNegative;
+    }
+
+    public boolean isRecurrent() {
+        return isRecurrent;
+    }
+
+    public boolean isInputScope() {
+        return inputScope;
+    }
+
+    public boolean isRelated() {
+        return isRelated;
     }
 
     public void setWeight(double weight) {
