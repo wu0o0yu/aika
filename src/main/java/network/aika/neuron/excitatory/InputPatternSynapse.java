@@ -1,7 +1,7 @@
 package network.aika.neuron.excitatory;
 
+import network.aika.neuron.activation.Context;
 import network.aika.neuron.activation.Direction;
-import network.aika.neuron.activation.Scope;
 
 public class InputPatternSynapse extends ExcitatorySynapse<PatternNeuron, PatternPartNeuron> {
 
@@ -20,8 +20,7 @@ public class InputPatternSynapse extends ExcitatorySynapse<PatternNeuron, Patter
         return type;
     }
 
-    @Override
-    public Scope transition(Scope s, Direction dir) {
-        return s.getNext(dir);
+    public Context transition(Context c) {
+        return new Context(c, true);
     }
 }

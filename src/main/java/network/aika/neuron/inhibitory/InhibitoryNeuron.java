@@ -21,6 +21,7 @@ import network.aika.Model;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Context;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Link;
@@ -50,6 +51,10 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     @Override
     public byte getType() {
         return type;
+    }
+
+    public Context transition(Context c) {
+        return new Context(c, false);
     }
 
     @Override

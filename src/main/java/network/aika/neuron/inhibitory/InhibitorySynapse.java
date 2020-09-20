@@ -17,6 +17,7 @@
 package network.aika.neuron.inhibitory;
 
 import network.aika.neuron.*;
+import network.aika.neuron.activation.Context;
 
 /**
  *
@@ -35,16 +36,6 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     }
 
     @Override
-    public boolean followSelfRef() {
-        return true;
-    }
-
-    @Override
-    public boolean checkRequiredSelfRef(boolean isSelfRef) {
-        return isSelfRef;
-    }
-
-    @Override
     public byte getType() {
         return type;
     }
@@ -57,5 +48,9 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     public void addWeight(double weightDelta) {
         super.addWeight(weightDelta);
         input.getNeuron().setModified(true);
+    }
+
+    public Context transition(Context c) {
+        return new Context(c, true);
     }
 }

@@ -79,6 +79,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract Synapse getInputSynapse(NeuronProvider n);
 
+    public abstract Context transition(Context c);
+
     public Synapse getOutputSynapse(NeuronProvider n) {
         lock.acquireReadLock();
         Synapse s = outputSynapses.get(n);

@@ -20,9 +20,7 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Reference;
+import network.aika.neuron.activation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +30,8 @@ import java.io.IOException;
 import java.util.Collection;
 
 import static network.aika.neuron.Sign.POS;
+import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
 
 /**
  *
@@ -56,6 +56,16 @@ public class PatternNeuron extends ExcitatoryNeuron {
     @Override
     public byte getType() {
         return type;
+    }
+
+    @Override
+    public Context transition(Context c) {
+        Context nc = new Context(c, false);
+        if(c.downUpDir == INPUT) {
+            c.downUpDir = OUTPUT;
+            c.sameDirSteps = 0;
+        }
+        return nc;
     }
 
     @Override

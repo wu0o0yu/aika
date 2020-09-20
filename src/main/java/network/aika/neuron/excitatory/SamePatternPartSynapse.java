@@ -1,7 +1,7 @@
 package network.aika.neuron.excitatory;
 
-import network.aika.neuron.activation.Direction;
-import network.aika.neuron.activation.Scope;
+
+import network.aika.neuron.activation.Context;
 
 public class SamePatternPartSynapse extends ExcitatorySynapse<PatternPartNeuron, PatternPartNeuron> {
 
@@ -18,5 +18,9 @@ public class SamePatternPartSynapse extends ExcitatorySynapse<PatternPartNeuron,
     @Override
     public byte getType() {
         return type;
+    }
+
+    public Context transition(Context c) {
+        return new Context(c, true);
     }
 }

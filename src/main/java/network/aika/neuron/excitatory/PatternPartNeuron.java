@@ -60,7 +60,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
 
     }
 
-    public void collectInductedNeurons(Collection<Class<? extends Synapse>> syns) {
-        syns.add(PatternSynapse.class);
+    public Context transition(Context c) {
+        return new Context(c, false);
     }
 }

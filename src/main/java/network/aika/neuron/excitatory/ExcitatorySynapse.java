@@ -39,16 +39,6 @@ public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends Excitator
         return type;
     }
 
-    @Override
-    public boolean followSelfRef() {
-        return false;
-    }
-
-    @Override
-    public boolean checkRequiredSelfRef(boolean isSelfRef) {
-        return true;
-    }
-
     public void setWeight(double weight) {
         super.setWeight(weight);
         output.getNeuron().setModified(true);

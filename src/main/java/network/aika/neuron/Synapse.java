@@ -18,9 +18,8 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Writable;
-import network.aika.neuron.activation.Direction;
+import network.aika.neuron.activation.Context;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Scope;
 import org.apache.commons.math3.distribution.BetaDistribution;
 
 import java.io.DataInput;
@@ -60,13 +59,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         this.instances = new Instances();
     }
 
-    public Scope transition(Scope s, Direction dir) {
-        return s;
-    }
-
-    public abstract boolean followSelfRef();
-
-    public abstract boolean checkRequiredSelfRef(boolean isSelfRef);
+    public abstract Context transition(Context c);
 
     public abstract byte getType();
 

@@ -29,7 +29,6 @@ import java.util.Comparator;
 
 import static network.aika.Phase.INITIAL_LINKING;
 import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Scope.SAME;
 
 /**
  *
@@ -76,7 +75,7 @@ public class Link {
 
     public void propagate() {
         if(!output.getNeuron().isInputNeuron()) {
-            input.followDown(output, INPUT, INPUT, SAME, true);
+            input.follow(new Context(output, INPUT));
         }
     }
 

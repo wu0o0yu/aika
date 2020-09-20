@@ -1,6 +1,7 @@
 package network.aika.neuron.excitatory;
 
 
+import network.aika.neuron.activation.Context;
 
 public class PositiveRecurrentSynapse extends ExcitatorySynapse<PatternNeuron, PatternPartNeuron> {
 
@@ -17,5 +18,9 @@ public class PositiveRecurrentSynapse extends ExcitatorySynapse<PatternNeuron, P
     @Override
     public byte getType() {
         return type;
+    }
+
+    public Context transition(Context c) {
+        return new Context(c, true);
     }
 }

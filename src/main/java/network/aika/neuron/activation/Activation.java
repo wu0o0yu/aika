@@ -22,7 +22,6 @@ import network.aika.Thought;
 import network.aika.Utils;
 import network.aika.neuron.*;
 import network.aika.neuron.excitatory.NegativeRecurrentSynapse;
-import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.util.*;
@@ -34,7 +33,6 @@ import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.Link.SORTED_BY_FIRED;
-import static network.aika.neuron.activation.Scope.SAME;
 
 /**
  *
@@ -223,8 +221,8 @@ public class Activation implements Comparable<Activation> {
     public boolean searchWithinBranch() {
         if(marked) return true;
 
-        return outputLinks.values().stream()
-                .filter(l -> !(l.getSynapse() instanceof NegativeRecurrentSynapse) || l.isCausal())
+        return getLinks(OUTPUT)
+                .filter(l -> !l.isNegative() || l.isCausal())
                 .map(l -> l.getOutput())
                 .filter(act -> act.fired != NOT_FIRED && fired.compareTo(act.fired) == -1)
                 .anyMatch(act -> act.searchWithinBranch());
@@ -266,7 +264,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void propagate() {
-        followDown(this, INPUT, OUTPUT, SAME, true);
+        follow(new Context(this, OUTPUT));
         getModel().linkInputRelations(this, OUTPUT);
         thought.processLinks();
 
@@ -553,59 +551,40 @@ public class Activation implements Comparable<Activation> {
                 .stream();
     }
 
-    public void followDown(Activation originAct, Direction downUp, Direction dir, Scope scope, boolean isSelfRefDown) {
-        if(this == originAct || !(getNeuron() instanceof PatternNeuron)) {
-            marked = true;
-            getLinks(downUp)
-                    .filter(l -> l.follow(downUp))
-                    .forEach(l ->
-                            l.getActivation(downUp).followDown(
-                                    originAct,
-                                    downUp,
-                                    dir,
-                                    l.getSynapse().transition(scope, downUp),
-                                    isSelfRefDown && l.getSynapse().followSelfRef()
-                            )
-                    );
-            marked = false;
-        } else {
-            followUp(originAct, downUp.invert(), dir, scope, isSelfRefDown, true);
+    public void follow(Context c) {
+        if (c.downUpDir == OUTPUT) {
+            if (c.startDir == INPUT && value == 0.0) return; // <--
+            if (this == c.origin || isConflicting()) return; // <--
+            tryToLink(c);
         }
-    }
-
-    public void followUp(Activation originAct, Direction downUp, Direction dir, Scope scope, boolean isSelfRefDown, boolean isSelfRefUp) {
-        if(dir == INPUT && value == 0.0) return; // <--
-
-        if(this == originAct || isConflicting()) return; // <--
-
-        tryToLink(originAct, dir, isSelfRefDown, isSelfRefUp); // <--
 
         marked = true;
+        Stream<Link> s = getLinks(c.downUpDir)
+                .filter(l -> l.follow(c.downUpDir));
 
-        getLinks(downUp)
-                .filter(l -> l.follow(downUp))
-                .collect(Collectors.toList()) // <--
-                .forEach(l ->
-                        l.getActivation(downUp).followUp(
-                                originAct,
-                                downUp,
-                                dir,
-                                l.getSynapse().transition(scope, downUp),
-                                isSelfRefDown, // <--
-                                isSelfRefUp && l.getSynapse().followSelfRef() // <--
-                        )
-                );
+        if (c.downUpDir == OUTPUT) {
+            s = s.collect(Collectors.toList()).stream();
+        }
 
+        s.forEach(l -> {
+                    Activation nextAct = l.getActivation(c.downUpDir);
+                    nextAct.follow(
+                            nextAct.getNeuron().transition(
+                                    l.getSynapse().transition(c)
+                            )
+                    );
+                }
+        );
         marked = false;
     }
 
-    public void tryToLink(Activation originAct, Direction dir, boolean isSelfRefDown, boolean isSelfRefUp) {
-        Activation iAct = dir == INPUT ? this : originAct;
-        Activation oAct = dir == OUTPUT ? this : originAct;
+    public void tryToLink(Context c) {
+        Activation iAct = c.startDir == INPUT ? this : c.origin;
+        Activation oAct = c.startDir == OUTPUT ? this : c.origin;
 
         Neuron on = oAct.getNeuron();
-        if(!on.isInputNeuron()) {
-            on.tryToLink(iAct, oAct, isSelfRefDown || isSelfRefUp);
+        if (!on.isInputNeuron()) {
+            on.tryToLink(iAct, oAct, c.selfRef);
         }
     }
 
