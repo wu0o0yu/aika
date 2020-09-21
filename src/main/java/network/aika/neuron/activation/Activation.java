@@ -550,7 +550,6 @@ public class Activation implements Comparable<Activation> {
         return (dir == INPUT ? inputLinks : outputLinks)
                 .values()
                 .stream();
-        }
     }
 
     @Override
