@@ -22,11 +22,6 @@ import network.aika.neuron.activation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-import java.util.Collection;
-
-import static network.aika.neuron.activation.Direction.OUTPUT;
-
 /**
  * @author Lukas Molzberger
  */
@@ -56,11 +51,11 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
     }
 
     @Override
-    public void induceNeuron(Activation activation) {
+    public void induceNeuron(Activation act) {
 
     }
 
-    public void collectInductedNeurons(Collection<Class<? extends Synapse>> syns) {
-        syns.add(PatternSynapse.class);
+    public Visitor transition(Visitor v) {
+        return new Visitor(v, false);
     }
 }

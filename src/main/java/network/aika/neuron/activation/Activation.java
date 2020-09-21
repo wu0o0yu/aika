@@ -21,8 +21,6 @@ import network.aika.Phase;
 import network.aika.Thought;
 import network.aika.Utils;
 import network.aika.neuron.*;
-import network.aika.neuron.excitatory.NegativeRecurrentSynapse;
-import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.util.*;
@@ -58,7 +56,7 @@ public class Activation implements Comparable<Activation> {
     NavigableMap<Activation, Link> outputLinks;
 
     private boolean isFinal;
-    private boolean marked;
+    public boolean marked;
 
     private int round; // Only used as stopping criteria
     private Activation lastRound;
@@ -222,8 +220,8 @@ public class Activation implements Comparable<Activation> {
     public boolean searchWithinBranch() {
         if(marked) return true;
 
-        return outputLinks.values().stream()
-                .filter(l -> !(l.getSynapse() instanceof NegativeRecurrentSynapse) || l.isCausal())
+        return getLinks(OUTPUT)
+                .filter(l -> !l.isNegative() || l.isCausal())
                 .map(l -> l.getOutput())
                 .filter(act -> act.fired != NOT_FIRED && fired.compareTo(act.fired) == -1)
                 .anyMatch(act -> act.searchWithinBranch());
@@ -265,7 +263,9 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void propagate() {
-        followDown(this, OUTPUT, true);
+        new Visitor(this, OUTPUT)
+                .follow(this);
+
         getModel().linkInputRelations(this, OUTPUT);
         thought.processLinks();
 
@@ -326,7 +326,7 @@ public class Activation implements Comparable<Activation> {
         sumUpLink(ol, nl);
         checkIfFired(nl);
 
-        if(!(s instanceof NegativeRecurrentSynapse)) {
+        if(!s.isNegative()) {
             getThought().addLinkToQueue(nl);
         }
         return nl;
@@ -546,60 +546,11 @@ public class Activation implements Comparable<Activation> {
         return branches.isEmpty();
     }
 
-    public void followDown(Activation originAct, Direction dir, boolean isSelfRefDown) {
-        if(this == originAct || !(getNeuron() instanceof PatternNeuron)) {
-            marked = true;
-            inputLinks.values().stream()
-                    .filter(l ->
-                            !(l.getSynapse() instanceof NegativeRecurrentSynapse) &&
-                                    l.getInput() != null &&
-                                    !l.getInput().marked &&
-                                    l.isCausal()
-                    )
-                    .forEach(l -> l.getInput().followDown(
-                            originAct,
-                            dir,
-                            isSelfRefDown && l.getSynapse().followSelfRef()
-                            )
-                    );
-            marked = false;
-        } else {
-            followUp(originAct, dir, isSelfRefDown, true);
+    public Stream<Link> getLinks(Direction dir) {
+        return (dir == INPUT ? inputLinks : outputLinks)
+                .values()
+                .stream();
         }
-    }
-
-    public void followUp(Activation originAct, Direction dir, boolean isSelfRefDown, boolean isSelfRefUp) {
-        if(dir == INPUT && value == 0.0) return;
-
-        if(this == originAct || isConflicting()) return;
-
-        marked = true;
-
-        Activation iAct = dir == INPUT ? this : originAct;
-        Activation oAct = dir == OUTPUT ? this : originAct;
-
-        Neuron on = oAct.getNeuron();
-        if(!on.isInputNeuron()) {
-            on.tryToLink(iAct, oAct, isSelfRefDown || isSelfRefUp);
-        }
-
-        outputLinks.values().stream()
-                .filter(l ->
-                        !(l.getSynapse() instanceof NegativeRecurrentSynapse) &&
-                                !l.getOutput().marked &&
-                                l.isCausal()
-                )
-                .collect(Collectors.toList())
-                .forEach(l ->
-                        l.getOutput().followUp(
-                                originAct,
-                                dir,
-                                isSelfRefDown,
-                                isSelfRefUp && l.getSynapse().followSelfRef()
-                        )
-                );
-
-        marked = false;
     }
 
     @Override

@@ -18,6 +18,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Writable;
+import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Link;
 import org.apache.commons.math3.distribution.BetaDistribution;
 
@@ -58,11 +59,25 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         this.instances = new Instances();
     }
 
-    public abstract boolean followSelfRef();
-
-    public abstract boolean checkRequiredSelfRef(boolean isSelfRef);
+    public abstract Visitor transition(Visitor v);
 
     public abstract byte getType();
+
+    public boolean isNegative() {
+        return false;
+    }
+
+    public boolean isRecurrent() {
+        return false;
+    }
+
+    public boolean isInputScope() {
+        return false;
+    }
+
+    public boolean isRelated() {
+        return false;
+    }
 
     public boolean isInputLinked() {
         return getInput().containsOutputSynapse(this);

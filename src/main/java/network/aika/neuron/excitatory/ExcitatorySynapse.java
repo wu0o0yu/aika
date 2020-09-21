@@ -17,6 +17,9 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.*;
+import network.aika.neuron.activation.Visitor;
+
+import static network.aika.neuron.activation.Direction.INPUT;
 
 /**
  *
@@ -26,12 +29,41 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
 
     public static byte type;
 
+    public boolean isNegative;
+    public boolean isRecurrent;
+    public boolean inputScope;
+    public boolean isRelated;
+
     public ExcitatorySynapse() {
         super();
     }
 
-    public ExcitatorySynapse(I input, O output) {
+    public ExcitatorySynapse(I input, O output, boolean isNegative, boolean isRecurrent, boolean isInputScope, boolean isRelated) {
         super(input, output);
+
+        this.isNegative = isNegative;
+        this.isRecurrent = isRecurrent;
+        this.inputScope = isInputScope;
+        this.isRelated = isRelated;
+    }
+
+    @Override
+    public Visitor transition(Visitor v) {
+        Visitor nc = new Visitor(v, true);
+        if(v.downUpDir == INPUT) {
+            if(isInputScope()) {
+                if (v.input) {
+                    nc.related = true;
+                } else {
+                    nc.input = true;
+                }
+            }
+        } else {
+            if(isInputScope()) {
+                nc.input = false;
+            }
+        }
+        return nc;
     }
 
     @Override
@@ -39,14 +71,21 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
         return type;
     }
 
-    @Override
-    public boolean followSelfRef() {
-        return false;
+
+    public boolean isNegative() {
+        return isNegative;
     }
 
-    @Override
-    public boolean checkRequiredSelfRef(boolean isSelfRef) {
-        return true;
+    public boolean isRecurrent() {
+        return isRecurrent;
+    }
+
+    public boolean isInputScope() {
+        return inputScope;
+    }
+
+    public boolean isRelated() {
+        return isRelated;
     }
 
     public void setWeight(double weight) {

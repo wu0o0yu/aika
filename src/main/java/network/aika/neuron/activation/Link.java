@@ -21,7 +21,6 @@ import network.aika.Utils;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.excitatory.NegativeRecurrentSynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +74,8 @@ public class Link {
 
     public void propagate() {
         if(!output.getNeuron().isInputNeuron()) {
-            input.followDown(output, INPUT, true);
+            new Visitor(output, INPUT)
+                    .follow(input);
         }
     }
 
@@ -126,19 +126,20 @@ public class Link {
 
         g += linkGradient;
 
-        if((synapse instanceof NegativeRecurrentSynapse) && !isSelfRef) {
+        boolean causal = isCausal();
+        double x = getInputValue();
+        double learnRate = t.getTrainingConfig().getLearnRate();
+
+        if(isNegative() && !isSelfRef) {
             return;
         }
-
-        double learnRate = t.getTrainingConfig().getLearnRate();
-        double x = getInputValue();
 
         double posWDelta = learnRate * x * g;
         double negWDelta = learnRate * (1.0 - x) * g;
         double biasDelta = learnRate * g;
 
         synapse.addWeight(posWDelta - negWDelta);
-        on.addConjunctiveBias(negWDelta, isCausal());
+        on.addConjunctiveBias(negWDelta, causal);
         on.addBias(biasDelta);
 
         if(input == null) {
@@ -148,6 +149,13 @@ public class Link {
         input.addGradient(
                 synapse.getWeight() * g * input.getActFunctionDerivative()
         );
+    }
+
+    public boolean follow(Direction dir) {
+        return !isNegative() &&
+                getActivation(dir) != null &&
+                !getActivation(dir).marked &&
+                isCausal();
     }
 
     public boolean isCausal() {
@@ -178,8 +186,13 @@ public class Link {
         return output;
     }
 
+    public Activation getActivation(Direction dir) {
+        assert dir != null;
+        return dir == INPUT ? input : output;
+    }
+
     public boolean isNegative() {
-        return synapse instanceof NegativeRecurrentSynapse;
+        return synapse.isNegative();
     }
 
     public boolean isSelfRef() {

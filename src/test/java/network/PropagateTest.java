@@ -38,7 +38,7 @@ public class PropagateTest {
         PatternNeuron in = new PatternNeuron(m, "A", "IN", true);
         PatternPartNeuron out = new PatternPartNeuron(m, "OUT", false);
 
-        ExcitatorySynapse s = new ExcitatorySynapse(in, out);
+        ExcitatorySynapse s = new ExcitatorySynapse(in, out, false, false, true, false);
 
         s.linkInput();
         s.linkOutput();

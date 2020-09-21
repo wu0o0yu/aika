@@ -18,7 +18,6 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.excitatory.NegativeRecurrentSynapse;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +78,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract Synapse getInputSynapse(NeuronProvider n);
 
+    public abstract Visitor transition(Visitor v);
+
     public Synapse getOutputSynapse(NeuronProvider n) {
         lock.acquireReadLock();
         Synapse s = outputSynapses.get(n);
@@ -94,6 +95,10 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return provider;
     }
 
+    public Stream<? extends Synapse> getInputSynapses() {
+        throw new UnsupportedOperationException();
+    }
+
     public Stream<Synapse> getOutputSynapses() {
         return outputSynapses.values().stream();
     }
@@ -102,7 +107,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return isInputNeuron;
     }
 
-    public void tryToLink(Activation iAct, Activation oAct, boolean isSelfRef) {
+    public void tryToLink(Activation iAct, Activation oAct, Visitor c) {
         if(!iAct.isActive()) return;
 
         Synapse s = getInputSynapse(iAct.getNeuronProvider());
@@ -112,11 +117,11 @@ public abstract class Neuron<S extends Synapse> implements Writable {
             case FINAL_LINKING:
                 if (s == null ||
                         s.getOutput().isInputNeuron() ||
-                        !s.checkRequiredSelfRef(isSelfRef) ||
+                        (!s.isRecurrent() || c.selfRef) ||
                         iAct.outputLinkExists(oAct)
                 ) return;
 
-                if(s instanceof NegativeRecurrentSynapse && !isSelfRef) {
+                if(s.isNegative() && !c.selfRef) {
                     oAct = oAct.createBranch(s);
                 }
 
@@ -127,12 +132,12 @@ public abstract class Neuron<S extends Synapse> implements Writable {
                     break;
                 }
 
-                Link.link(s, iAct, oAct, isSelfRef);
+                Link.link(s, iAct, oAct, c.selfRef);
                 break;
             case INDUCTION:
                 if(s != null) return;
 
-                induceSynapse(iAct, oAct);
+                induceSynapse(iAct, oAct, c);
                 break;
         }
     }
@@ -226,7 +231,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract void induceNeuron(Activation act);
 
-    public abstract Link induceSynapse(Activation iAct, Activation oAct);
+    public abstract Link induceSynapse(Activation iAct, Activation oAct, Visitor c);
 
     public static boolean ADJUST_GRADIENT = false;
 

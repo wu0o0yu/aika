@@ -39,7 +39,7 @@ public class DerDieDasTest {
             initPP(c, inN, ppN, prevPPN, out);
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(ppN, out);
+                ExcitatorySynapse s = new ExcitatorySynapse(ppN, out, false, false, false, false);
 
                 s.linkInput();
                 s.linkOutput();
@@ -65,14 +65,14 @@ public class DerDieDasTest {
         }
 
         {
-            NegativeRecurrentSynapse s = new NegativeRecurrentSynapse(inhibN, ppN);
+            ExcitatorySynapse s = new ExcitatorySynapse(inhibN, ppN, true, true, false, false);
 
             s.linkOutput();
             s.addWeight(-100.0);
         }
 
         {
-            ExcitatorySynapse s = new ExcitatorySynapse(inN, ppN);
+            ExcitatorySynapse s = new ExcitatorySynapse(inN, ppN, false, false, true, false);
 
             s.linkInput();
             s.addWeight(0.1);
@@ -80,7 +80,7 @@ public class DerDieDasTest {
         }
 
         if(prevPP != null) {
-            ExcitatorySynapse s = new ExcitatorySynapse(prevPP, ppN);
+            ExcitatorySynapse s = new ExcitatorySynapse(prevPP, ppN, false, false, true, false);
 
             s.linkOutput();
             s.addWeight(0.1);
@@ -88,7 +88,7 @@ public class DerDieDasTest {
         }
 
         if(prevPP != null) {
-            ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(inN), ppN);
+            ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(inN), ppN, false, false, true, false);
 
             s.linkOutput();
             s.addWeight(0.1);
@@ -96,7 +96,7 @@ public class DerDieDasTest {
         }
 
         {
-            PositiveRecurrentSynapse s = new PositiveRecurrentSynapse(out, ppN);
+            ExcitatorySynapse s = new ExcitatorySynapse(out, ppN, false, true, false, false);
 
             s.linkOutput();
             s.addWeight(0.1);

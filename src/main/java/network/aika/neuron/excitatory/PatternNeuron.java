@@ -19,19 +19,17 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Reference;
+import network.aika.neuron.activation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Collection;
 
 import static network.aika.neuron.Sign.POS;
+import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
 
 /**
  *
@@ -56,6 +54,16 @@ public class PatternNeuron extends ExcitatoryNeuron {
     @Override
     public byte getType() {
         return type;
+    }
+
+    @Override
+    public Visitor transition(Visitor v) {
+        Visitor nv = new Visitor(v, false);
+        if(v.downUpDir == INPUT) {
+            v.downUpDir = OUTPUT;
+            v.sameDirSteps = 0;
+        }
+        return nv;
     }
 
     @Override
@@ -87,12 +95,12 @@ public class PatternNeuron extends ExcitatoryNeuron {
 
         Activation oAct = act.createActivation(n);
 
-        n.induceSynapse(act, oAct);
+        n.induceSynapse(act, oAct, new Visitor(act, true, false));
     }
 
     private boolean hasOutputPatternPartConsumer(Activation act) {
         return act.getOutputLinks()
-                .filter(l -> !(l.getSynapse() instanceof PositiveRecurrentSynapse))
+                .filter(l -> l.getSynapse().isInputLinked())
                 .anyMatch(l -> l.getOutput().getNeuron() instanceof PatternPartNeuron);
     }
 

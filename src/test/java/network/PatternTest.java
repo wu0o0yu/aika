@@ -76,7 +76,7 @@ public class PatternTest {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(nA, eA);
+                ExcitatorySynapse s = new ExcitatorySynapse(nA, eA, false, false, true, false);
 
                 s.linkInput();
                 s.linkOutput();
@@ -85,7 +85,7 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(out, eA);
+                ExcitatorySynapse s = new ExcitatorySynapse(out, eA, false, true, false, false);
 
                 s.linkInput();
                 s.linkOutput();
@@ -97,7 +97,7 @@ public class PatternTest {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(nB, eB);
+                ExcitatorySynapse s = new ExcitatorySynapse(nB, eB, false, false, true, false);
 
                 s.linkInput();
                 s.linkOutput();
@@ -106,7 +106,7 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eA, eB);
+                ExcitatorySynapse s = new ExcitatorySynapse(eA, eB, false, false, false, true);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -114,7 +114,7 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nB), eB);
+                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nB), eB, false, false, true, false);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -122,7 +122,7 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(out, eB);
+                ExcitatorySynapse s = new ExcitatorySynapse(out, eB, false, true, false, false);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -133,7 +133,7 @@ public class PatternTest {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(nC, eC);
+                ExcitatorySynapse s = new ExcitatorySynapse(nC, eC, false, false, true, false);
 
                 s.linkInput();
                 s.linkOutput();
@@ -142,7 +142,7 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eB, eC);
+                ExcitatorySynapse s = new ExcitatorySynapse(eB, eC, false, false, false, true);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -150,7 +150,7 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nC), eC);
+                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nC), eC, false, false, true, false);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -158,7 +158,7 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(out, eC);
+                ExcitatorySynapse s = new ExcitatorySynapse(out, eC, false, true, false, false);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -169,7 +169,7 @@ public class PatternTest {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eA, out);
+                ExcitatorySynapse s = new ExcitatorySynapse(eA, out, false, false, false, false);
 
                 s.linkInput();
                 s.linkOutput();
@@ -177,7 +177,7 @@ public class PatternTest {
                 out.addConjunctiveBias(-10.0, false);
             }
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eB, out);
+                ExcitatorySynapse s = new ExcitatorySynapse(eB, out, false, false, false, false);
 
                 s.linkInput();
                 s.linkOutput();
@@ -185,7 +185,7 @@ public class PatternTest {
                 out.addConjunctiveBias(-10.0, false);
             }
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eC, out);
+                ExcitatorySynapse s = new ExcitatorySynapse(eC, out, false, false, false, false);
 
                 s.linkInput();
                 s.linkOutput();

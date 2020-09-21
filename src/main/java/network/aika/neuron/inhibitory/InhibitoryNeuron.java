@@ -21,11 +21,10 @@ import network.aika.Model;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Link;
-
-import java.util.Collection;
 
 /**
  *
@@ -52,6 +51,10 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         return type;
     }
 
+    public Visitor transition(Visitor v) {
+        return new Visitor(v, false);
+    }
+
     @Override
     public void updateReference(Link nl) {
         nl.getOutput().setReference(nl.getInput().getReference());
@@ -62,7 +65,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     }
 
-    public Link induceSynapse(Activation iAct, Activation oAct) {
+    public Link induceSynapse(Activation iAct, Activation oAct, Visitor c) {
         InhibitorySynapse s = new InhibitorySynapse(iAct.getNeuron(), (InhibitoryNeuron) oAct.getNeuron());
         s.setWeight(1.0);
 
