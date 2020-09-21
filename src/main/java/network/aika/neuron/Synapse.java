@@ -18,7 +18,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Writable;
-import network.aika.neuron.activation.Context;
+import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Link;
 import org.apache.commons.math3.distribution.BetaDistribution;
 
@@ -59,7 +59,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         this.instances = new Instances();
     }
 
-    public abstract Context transition(Context c);
+    public abstract Visitor transition(Visitor v);
 
     public abstract byte getType();
 

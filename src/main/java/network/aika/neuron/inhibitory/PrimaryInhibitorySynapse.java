@@ -1,10 +1,10 @@
 package network.aika.neuron.inhibitory;
 
-import network.aika.neuron.activation.Context;
+import network.aika.neuron.activation.Visitor;
 
 public class PrimaryInhibitorySynapse extends InhibitorySynapse {
 
-    public Context transition(Context c) {
-        return new Context(c, true);
+    public Visitor transition(Visitor v) {
+        return new Visitor(v, true);
     }
 }

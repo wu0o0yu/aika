@@ -17,7 +17,7 @@
 package network.aika.neuron.inhibitory;
 
 import network.aika.neuron.*;
-import network.aika.neuron.activation.Context;
+import network.aika.neuron.activation.Visitor;
 
 /**
  *
@@ -50,7 +50,7 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         input.getNeuron().setModified(true);
     }
 
-    public Context transition(Context c) {
-        return new Context(c, true);
+    public Visitor transition(Visitor v) {
+        return new Visitor(v, true);
     }
 }

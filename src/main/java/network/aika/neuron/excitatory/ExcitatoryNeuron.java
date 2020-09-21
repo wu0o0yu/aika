@@ -21,7 +21,7 @@ import network.aika.Model;
 import network.aika.Phase;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Context;
+import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
@@ -83,7 +83,7 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         super.train(act);
     }
 
-    public Link induceSynapse(Activation iAct, Activation oAct, Context c) {
+    public Link induceSynapse(Activation iAct, Activation oAct, Visitor c) {
         if(oAct.getNeuron().isInputNeuron())
             return null;
 

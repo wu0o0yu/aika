@@ -17,8 +17,7 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.*;
-import network.aika.neuron.activation.Context;
-import network.aika.neuron.activation.Direction;
+import network.aika.neuron.activation.Visitor;
 
 import static network.aika.neuron.activation.Direction.INPUT;
 
@@ -49,11 +48,11 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
     }
 
     @Override
-    public Context transition(Context c) {
-        Context nc = new Context(c, true);
-        if(c.downUpDir == INPUT) {
+    public Visitor transition(Visitor v) {
+        Visitor nc = new Visitor(v, true);
+        if(v.downUpDir == INPUT) {
             if(isInputScope()) {
-                if (c.input) {
+                if (v.input) {
                     nc.related = true;
                 } else {
                     nc.input = true;

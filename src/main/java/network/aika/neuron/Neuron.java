@@ -78,7 +78,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract Synapse getInputSynapse(NeuronProvider n);
 
-    public abstract Context transition(Context c);
+    public abstract Visitor transition(Visitor v);
 
     public Synapse getOutputSynapse(NeuronProvider n) {
         lock.acquireReadLock();
@@ -107,7 +107,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return isInputNeuron;
     }
 
-    public void tryToLink(Activation iAct, Activation oAct, Context c) {
+    public void tryToLink(Activation iAct, Activation oAct, Visitor c) {
         if(!iAct.isActive()) return;
 
         Synapse s = getInputSynapse(iAct.getNeuronProvider());
@@ -231,7 +231,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract void induceNeuron(Activation act);
 
-    public abstract Link induceSynapse(Activation iAct, Activation oAct, Context c);
+    public abstract Link induceSynapse(Activation iAct, Activation oAct, Visitor c);
 
     public static boolean ADJUST_GRADIENT = false;
 

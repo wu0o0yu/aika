@@ -263,7 +263,9 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void propagate() {
-        follow(new Context(this, OUTPUT));
+        new Visitor(this, OUTPUT)
+                .follow(this);
+
         getModel().linkInputRelations(this, OUTPUT);
         thought.processLinks();
 
@@ -548,43 +550,6 @@ public class Activation implements Comparable<Activation> {
         return (dir == INPUT ? inputLinks : outputLinks)
                 .values()
                 .stream();
-    }
-
-    public void follow(Context c) {
-        if (c.downUpDir == OUTPUT) {
-            if (c.startDir == INPUT && value == 0.0) return; // <--
-            if (this == c.origin || isConflicting()) return; // <--
-            tryToLink(c);
-        }
-
-        marked = true;
-        Stream<Link> s = getLinks(c.downUpDir)
-                .filter(l -> l.follow(c.downUpDir));
-
-        if (c.downUpDir == OUTPUT) {
-            s = s.collect(Collectors.toList()).stream();
-        }
-
-        s.forEach(l -> {
-                    Activation nextAct = l.getActivation(c.downUpDir);
-                    nextAct.follow(
-                            nextAct.getNeuron().transition(
-                                    l.getSynapse().transition(c)
-                            )
-                    );
-                }
-        );
-        marked = false;
-    }
-
-    public void tryToLink(Context c) {
-        Activation iAct = c.startDir == INPUT ? this : c.origin;
-        Activation oAct = c.startDir == OUTPUT ? this : c.origin;
-
-        Neuron on = oAct.getNeuron();
-        if (!on.isInputNeuron()) {
-            on.tryToLink(iAct, oAct, c);
-        }
     }
 
     @Override

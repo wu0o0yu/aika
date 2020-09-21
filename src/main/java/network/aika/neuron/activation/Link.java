@@ -74,7 +74,8 @@ public class Link {
 
     public void propagate() {
         if(!output.getNeuron().isInputNeuron()) {
-            input.follow(new Context(output, INPUT));
+            new Visitor(output, INPUT)
+                    .follow(input);
         }
     }
 
@@ -186,6 +187,7 @@ public class Link {
     }
 
     public Activation getActivation(Direction dir) {
+        assert dir != null;
         return dir == INPUT ? input : output;
     }
 
