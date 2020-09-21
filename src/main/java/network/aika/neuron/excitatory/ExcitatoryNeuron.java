@@ -24,6 +24,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Context;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +87,15 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         if(oAct.getNeuron().isInputNeuron())
             return null;
 
-        Synapse s = new ExcitatorySynapse(iAct.getNeuron(), (ExcitatoryNeuron) oAct.getNeuron());
+        Synapse s = new ExcitatorySynapse(
+                iAct.getNeuron(),
+                (ExcitatoryNeuron) oAct.getNeuron(),
+                c.selfRef && iAct.getNeuron() instanceof InhibitoryNeuron,
+                c.selfRef && !c.input && !(iAct.getNeuron() instanceof PatternPartNeuron),
+                c.input,
+                c.related
+        );
+
         s.getInstances().update(getModel(), iAct.getReference());
 
         Link l = new Link(s, iAct, oAct, false);

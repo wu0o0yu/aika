@@ -97,7 +97,7 @@ public class PatternNeuron extends ExcitatoryNeuron {
 
         Activation oAct = act.createActivation(n);
 
-        n.induceSynapse(act, oAct);
+        n.induceSynapse(act, oAct, new Context(act, true, false));
     }
 
     private boolean hasOutputPatternPartConsumer(Activation act) {

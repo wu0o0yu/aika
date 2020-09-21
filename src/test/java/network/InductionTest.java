@@ -44,14 +44,14 @@ public class InductionTest {
         targetN.setDirectConjunctiveBias(0.0);
         targetN.setRecurrentConjunctiveBias(0.0);
 
-        ExcitatorySynapse sA = new ExcitatorySynapse(inA, targetN);
+        ExcitatorySynapse sA = new ExcitatorySynapse(inA, targetN, false, false, true, false);
 
         sA.linkInput();
         sA.linkOutput();
         sA.setWeight(0.1);
         targetN.addConjunctiveBias(-0.1, false);
 
-        ExcitatorySynapse sB = new ExcitatorySynapse(inB, targetN);
+        ExcitatorySynapse sB = new ExcitatorySynapse(inB, targetN, false, false, true, false);
 
         sB.linkInput();
         sB.linkOutput();

@@ -28,4 +28,14 @@ public class Context {
         this.selfRef = true;
         this.sameDirSteps = 0;
     }
+
+
+    public Context(Activation origin, boolean input, boolean related) {
+        this.origin = origin;
+        this.startDir = null;
+        this.selfRef = false;
+        this.input = input;
+        this.related = related;
+        this.sameDirSteps = 0;
+    }
 }
