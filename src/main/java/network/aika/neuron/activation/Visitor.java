@@ -35,7 +35,7 @@ public class Visitor {
     public Direction startDir;
 
     public boolean related;
-    public boolean input;
+    public Direction scope;
     public boolean selfRef;
 
     public int sameDirSteps;
@@ -45,7 +45,7 @@ public class Visitor {
         this.downUpDir = c.downUpDir;
         this.startDir = c.startDir;
         this.related = c.related;
-        this.input = c.input;
+        this.scope = c.scope;
         this.selfRef = c.selfRef;
         this.sameDirSteps = incr ? c.sameDirSteps++ : c.sameDirSteps;
     }
@@ -58,12 +58,12 @@ public class Visitor {
         this.sameDirSteps = 0;
     }
 
-    public Visitor(Activation origin, boolean input, boolean related) {
+    public Visitor(Activation origin, Direction scope, boolean related) {
         this.origin = origin;
         this.startDir = null;
         this.downUpDir = null;
         this.selfRef = false;
-        this.input = input;
+        this.scope = scope;
         this.related = related;
         this.sameDirSteps = 0;
     }
