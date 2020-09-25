@@ -78,6 +78,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract Synapse getInputSynapse(NeuronProvider n);
 
+    public abstract Activation getSamePattern(Activation act);
+
     public abstract Visitor transition(Visitor v);
 
     public Synapse getOutputSynapse(NeuronProvider n) {

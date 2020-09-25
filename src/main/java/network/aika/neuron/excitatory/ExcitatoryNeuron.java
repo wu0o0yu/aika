@@ -36,6 +36,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+import static network.aika.neuron.activation.Direction.INPUT;
 
 /**
  *
@@ -83,17 +84,17 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         super.train(act);
     }
 
-    public Link induceSynapse(Activation iAct, Activation oAct, Visitor c) {
+    public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
         if(oAct.getNeuron().isInputNeuron())
             return null;
 
         Synapse s = new ExcitatorySynapse(
                 iAct.getNeuron(),
                 (ExcitatoryNeuron) oAct.getNeuron(),
-                c.selfRef && iAct.getNeuron() instanceof InhibitoryNeuron,
-                c.selfRef && !c.input && !(iAct.getNeuron() instanceof PatternPartNeuron),
-                c.input,
-                c.related
+                v.selfRef && iAct.getNeuron() instanceof InhibitoryNeuron,
+                v.selfRef && v.scope != INPUT && !(iAct.getNeuron() instanceof PatternPartNeuron),
+                v.scope == INPUT,
+                v.related
         );
 
         s.getInstances().update(getModel(), iAct.getReference());

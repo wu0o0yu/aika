@@ -52,19 +52,27 @@ public class PatternNeuron extends ExcitatoryNeuron {
     }
 
     @Override
+    public Visitor transition(Visitor v) {
+        Visitor nv = new Visitor(v, false);
+        if(nv.downUpDir == OUTPUT) {
+            return null;
+        }
+
+        nv.downUpDir = OUTPUT;
+        return nv;
+    }
+
+    @Override
+    public Activation getSamePattern(Activation act) {
+        assert act.getNeuron() == this;
+        return act;
+    }
+
+    @Override
     public byte getType() {
         return type;
     }
 
-    @Override
-    public Visitor transition(Visitor v) {
-        Visitor nv = new Visitor(v, false);
-        if(v.downUpDir == INPUT) {
-            v.downUpDir = OUTPUT;
-            v.sameDirSteps = 0;
-        }
-        return nv;
-    }
 
     @Override
     public void updateReference(Link nl) {
@@ -95,7 +103,7 @@ public class PatternNeuron extends ExcitatoryNeuron {
 
         Activation oAct = act.createActivation(n);
 
-        n.induceSynapse(act, oAct, new Visitor(act, true, false));
+        n.induceSynapse(act, oAct, new Visitor(act, INPUT, false));
     }
 
     private boolean hasOutputPatternPartConsumer(Activation act) {

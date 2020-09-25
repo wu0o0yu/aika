@@ -20,6 +20,7 @@ import network.aika.neuron.*;
 import network.aika.neuron.activation.Visitor;
 
 import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
 
 /**
  *
@@ -49,21 +50,68 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
 
     @Override
     public Visitor transition(Visitor v) {
-        Visitor nc = new Visitor(v, true);
-        if(v.downUpDir == INPUT) {
-            if(isInputScope()) {
-                if (v.input) {
-                    nc.related = true;
-                } else {
-                    nc.input = true;
-                }
-            }
-        } else {
-            if(isInputScope()) {
-                nc.input = false;
-            }
+        Visitor nv = new Visitor(v, true);
+        if (v.downUpDir == INPUT && getInput() instanceof PatternNeuron && isInputScope() && v.startDir == INPUT && v.scope == null && !v.related) {
+//            nv.downUpDir = OUTPUT;
+            nv.sameDirSteps = 0;
+            nv.scope = INPUT;
+            return nv;
+        } else if (v.downUpDir == OUTPUT && getInput() instanceof PatternNeuron && !isInputScope() && v.startDir == INPUT && v.scope == INPUT && !v.related) {
+            nv.tryToLink = true;
+            return nv;
+        } else if (v.downUpDir == INPUT && getInput() instanceof PatternNeuron && !isInputScope() && v.startDir == OUTPUT && v.scope == null && !v.related) {
+//            nv.downUpDir = OUTPUT;
+            nv.sameDirSteps = 0;
+            return nv;
+        } else if(v.downUpDir == OUTPUT && getInput() instanceof PatternNeuron && isInputScope() && v.startDir == OUTPUT && v.scope == null && !v.related) {
+            nv.scope = OUTPUT;
+            nv.tryToLink = true;
+            return nv;
         }
-        return nc;
+
+        if(v.downUpDir == INPUT && !(getInput() instanceof PatternNeuron) && isInputScope() && v.startDir == INPUT && v.scope == null && !v.related) {
+            nv.scope = INPUT;
+            return nv;
+        } else if(v.downUpDir == INPUT && !(getInput() instanceof PatternNeuron) && isInputScope() && v.startDir == INPUT && v.scope == INPUT && !v.related) {
+            nv.related = true;
+            return nv;
+        } else if(v.downUpDir == INPUT && getInput() instanceof PatternNeuron && !isInputScope() && v.startDir == INPUT && v.scope == INPUT && v.related) {
+//            nv.downUpDir = OUTPUT;
+            nv.sameDirSteps = 0;
+            return nv;
+        } else if(v.downUpDir == OUTPUT && getInput() instanceof PatternNeuron && isInputScope() && v.startDir == INPUT && v.scope == INPUT && v.related) {
+            nv.scope = null;
+            nv.tryToLink = true;
+            return nv;
+        } else if(v.downUpDir == INPUT && getInput() instanceof PatternNeuron && isInputScope() && v.startDir == OUTPUT && v.scope == null && !v.related) {
+            nv.scope = INPUT;
+//            nv.downUpDir = OUTPUT;
+            nv.sameDirSteps = 0;
+            return nv;
+        } else if(v.downUpDir == OUTPUT && getInput() instanceof PatternNeuron && !isInputScope() && v.startDir == OUTPUT && v.scope == INPUT && !v.related) {
+            return nv;
+        } else if(v.downUpDir == OUTPUT && !(getInput() instanceof PatternNeuron) && isInputScope() && v.startDir == OUTPUT && v.scope == INPUT && !v.related) {
+            nv.related = true;
+            return nv;
+        } else if(v.downUpDir == OUTPUT && !(getInput() instanceof PatternNeuron) && isInputScope() && v.startDir == OUTPUT && v.scope == INPUT && v.related) {
+            nv.scope = null;
+            nv.tryToLink = true;
+            return nv;
+        }
+
+        if(v.downUpDir == OUTPUT && getInput() instanceof PatternNeuron && !isInputScope() && v.startDir == INPUT && v.scope == null && !v.related) {
+            return nv;
+        } else if(v.downUpDir == OUTPUT && !(getInput() instanceof PatternNeuron) && !isInputScope() && v.startDir == INPUT && v.scope == null && v.related) {
+            nv.tryToLink = true;
+            return nv;
+        } else if(v.downUpDir == INPUT && !(getInput() instanceof PatternNeuron) && !isInputScope() && v.startDir == OUTPUT && v.scope == null && v.related) {
+            nv.tryToLink = true;
+            return nv;
+        } else if(v.downUpDir == INPUT && getInput() instanceof PatternNeuron && !isInputScope() && v.startDir == OUTPUT && v.scope == null && !v.related) {
+            return nv;
+        }
+
+        return null;
     }
 
     @Override

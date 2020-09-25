@@ -40,6 +40,8 @@ public class Visitor {
 
     public int sameDirSteps;
 
+    public boolean tryToLink = false;
+
     public Visitor(Visitor c, boolean incr) {
         this.origin = c.origin;
         this.downUpDir = c.downUpDir;
@@ -69,12 +71,17 @@ public class Visitor {
     }
 
     public void follow(Activation act) {
-        if (downUpDir == OUTPUT) {
-            if (startDir == INPUT && !act.isActive()) return; // <--
-            if (act == origin || act.isConflicting()) return; // <--
+        if (downUpDir == OUTPUT && tryToLink) {
             tryToLink(act);
+            return;
         }
 
+        act.getNeuron()
+                .transition(this)
+                .followLinks(act);
+    }
+
+    public void followLinks(Activation act) {
         act.marked = true;
         Stream<Link> s = act.getLinks(downUpDir)
                 .filter(l -> l.follow(downUpDir));
@@ -85,9 +92,8 @@ public class Visitor {
 
         s.forEach(l -> {
                     Activation nextAct = l.getActivation(downUpDir);
-                    Visitor nv = l.getSynapse().transition(this);
-                    nv = nextAct.getNeuron().transition(nv);
-                    nv.follow(nextAct);
+                    l.getSynapse()
+                            .transition(this).follow(nextAct);
                 }
         );
         act.marked = false;
@@ -97,9 +103,20 @@ public class Visitor {
         Activation iAct = startDir == INPUT ? act : origin;
         Activation oAct = startDir == OUTPUT ? act : origin;
 
+        if (scope == null && !checkSamePattern(iAct, oAct)) return;
+        if (startDir == INPUT && !act.isActive()) return; // <--
+        if (act == origin || act.isConflicting()) return; // <--
+
         Neuron on = oAct.getNeuron();
         if (!on.isInputNeuron()) {
             on.tryToLink(iAct, oAct, this);
         }
+    }
+
+    public boolean checkSamePattern(Activation in, Activation out) {
+        Activation inPattern = in.getNeuron().getSamePattern(in);
+        Activation outPattern = out.getNeuron().getSamePattern(out);
+
+        return inPattern == null || outPattern == null || inPattern == outPattern;
     }
 }
