@@ -42,7 +42,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
 
     @Override
     public Visitor transition(Visitor v) {
-        return new Visitor(v, false);
+        return v;
     }
 
     @Override

@@ -21,8 +21,7 @@ import network.aika.neuron.Neuron;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Direction.OUTPUT;
+import static network.aika.neuron.activation.Direction.*;
 
 /**
  *
@@ -35,12 +34,10 @@ public class Visitor {
     public Direction startDir;
 
     public boolean related;
-    public Direction scope;
-    public boolean selfRef;
+    public Direction scope = NEUTRAL;
 
-    public int sameDirSteps;
-
-    public boolean tryToLink = false;
+    public int downSteps;
+    public int upSteps;
 
     public Visitor(Visitor c, boolean incr) {
         this.origin = c.origin;
@@ -48,40 +45,54 @@ public class Visitor {
         this.startDir = c.startDir;
         this.related = c.related;
         this.scope = c.scope;
-        this.selfRef = c.selfRef;
-        this.sameDirSteps = incr ? c.sameDirSteps++ : c.sameDirSteps;
+
+        if(incr) {
+            if (downUpDir == INPUT) {
+                this.downSteps++;
+            } else {
+                this.upSteps++;
+            }
+        }
     }
 
     public Visitor(Activation origin, Direction startDir) {
         this.origin = origin;
         this.startDir = startDir;
         this.downUpDir = INPUT;
-        this.selfRef = true;
-        this.sameDirSteps = 0;
+        this.downSteps = 0;
+        this.upSteps = 0;
     }
 
     public Visitor(Activation origin, Direction scope, boolean related) {
         this.origin = origin;
         this.startDir = null;
         this.downUpDir = null;
-        this.selfRef = false;
         this.scope = scope;
         this.related = related;
-        this.sameDirSteps = 0;
+        this.downSteps = 0;
+        this.upSteps = 0;
+    }
+
+    public boolean getSelfRef() {
+        return downSteps == 0 || upSteps == 0;
+    }
+
+    public int numSteps() {
+        return downSteps + upSteps;
     }
 
     public void follow(Activation act) {
-        if (downUpDir == OUTPUT && tryToLink) {
-            tryToLink(act);
-            return;
-        }
-
         act.getNeuron()
                 .transition(this)
                 .followLinks(act);
     }
 
     public void followLinks(Activation act) {
+        if (downUpDir == OUTPUT && numSteps() > 1) {
+            tryToLink(act);
+//            return;
+        }
+
         act.marked = true;
         Stream<Link> s = act.getLinks(downUpDir)
                 .filter(l -> l.follow(downUpDir));

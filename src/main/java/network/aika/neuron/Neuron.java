@@ -119,11 +119,11 @@ public abstract class Neuron<S extends Synapse> implements Writable {
             case FINAL_LINKING:
                 if (s == null ||
                         s.getOutput().isInputNeuron() ||
-                        (!s.isRecurrent() || c.selfRef) ||
+                        (!s.isRecurrent() || c.getSelfRef()) ||
                         iAct.outputLinkExists(oAct)
                 ) return;
 
-                if(s.isNegative() && !c.selfRef) {
+                if(s.isNegative() && !c.getSelfRef()) {
                     oAct = oAct.createBranch(s);
                 }
 
@@ -134,7 +134,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
                     break;
                 }
 
-                Link.link(s, iAct, oAct, c.selfRef);
+                Link.link(s, iAct, oAct, c.getSelfRef());
                 break;
             case INDUCTION:
                 if(s != null) return;

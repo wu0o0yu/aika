@@ -91,8 +91,8 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         Synapse s = new ExcitatorySynapse(
                 iAct.getNeuron(),
                 (ExcitatoryNeuron) oAct.getNeuron(),
-                v.selfRef && iAct.getNeuron() instanceof InhibitoryNeuron,
-                v.selfRef && v.scope != INPUT && !(iAct.getNeuron() instanceof PatternPartNeuron),
+                v.getSelfRef() && iAct.getNeuron() instanceof InhibitoryNeuron,
+                v.getSelfRef() && v.scope != INPUT && !(iAct.getNeuron() instanceof PatternPartNeuron),
                 v.scope == INPUT,
                 v.related
         );

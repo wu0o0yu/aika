@@ -51,9 +51,26 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
     @Override
     public Visitor transition(Visitor v) {
         Visitor nv = new Visitor(v, true);
+
+        // check related change
+        if(v.downUpDir == v.startDir && v.scope == INPUT && isInputScope() && !v.related) {
+            nv.related = true;
+            return nv;
+        }
+
+        // toggle related
+        if(isRelated()) {
+            nv.related = !v.related;
+        }
+
+        // switch scope
+        if(isInputScope()) {
+            nv.scope = v.scope.getNext(v.downUpDir);
+        }
+/*
         if (v.downUpDir == INPUT && getInput() instanceof PatternNeuron && isInputScope() && v.startDir == INPUT && v.scope == null && !v.related) {
 //            nv.downUpDir = OUTPUT;
-            nv.sameDirSteps = 0;
+//            nv.sameDirSteps = 0;
             nv.scope = INPUT;
             return nv;
         } else if (v.downUpDir == OUTPUT && getInput() instanceof PatternNeuron && !isInputScope() && v.startDir == INPUT && v.scope == INPUT && !v.related) {
@@ -61,7 +78,7 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
             return nv;
         } else if (v.downUpDir == INPUT && getInput() instanceof PatternNeuron && !isInputScope() && v.startDir == OUTPUT && v.scope == null && !v.related) {
 //            nv.downUpDir = OUTPUT;
-            nv.sameDirSteps = 0;
+//            nv.sameDirSteps = 0;
             return nv;
         } else if(v.downUpDir == OUTPUT && getInput() instanceof PatternNeuron && isInputScope() && v.startDir == OUTPUT && v.scope == null && !v.related) {
             nv.scope = OUTPUT;
@@ -77,7 +94,7 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
             return nv;
         } else if(v.downUpDir == INPUT && getInput() instanceof PatternNeuron && !isInputScope() && v.startDir == INPUT && v.scope == INPUT && v.related) {
 //            nv.downUpDir = OUTPUT;
-            nv.sameDirSteps = 0;
+//            nv.sameDirSteps = 0;
             return nv;
         } else if(v.downUpDir == OUTPUT && getInput() instanceof PatternNeuron && isInputScope() && v.startDir == INPUT && v.scope == INPUT && v.related) {
             nv.scope = null;
@@ -86,7 +103,7 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
         } else if(v.downUpDir == INPUT && getInput() instanceof PatternNeuron && isInputScope() && v.startDir == OUTPUT && v.scope == null && !v.related) {
             nv.scope = INPUT;
 //            nv.downUpDir = OUTPUT;
-            nv.sameDirSteps = 0;
+//            nv.sameDirSteps = 0;
             return nv;
         } else if(v.downUpDir == OUTPUT && getInput() instanceof PatternNeuron && !isInputScope() && v.startDir == OUTPUT && v.scope == INPUT && !v.related) {
             return nv;
@@ -110,7 +127,7 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
         } else if(v.downUpDir == INPUT && getInput() instanceof PatternNeuron && !isInputScope() && v.startDir == OUTPUT && v.scope == null && !v.related) {
             return nv;
         }
-
+*/
         return null;
     }
 
@@ -118,7 +135,6 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
     public byte getType() {
         return type;
     }
-
 
     public boolean isNegative() {
         return isNegative;

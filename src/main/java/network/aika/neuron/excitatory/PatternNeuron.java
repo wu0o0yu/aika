@@ -59,6 +59,7 @@ public class PatternNeuron extends ExcitatoryNeuron {
         }
 
         nv.downUpDir = OUTPUT;
+
         return nv;
     }
 
@@ -72,7 +73,6 @@ public class PatternNeuron extends ExcitatoryNeuron {
     public byte getType() {
         return type;
     }
-
 
     @Override
     public void updateReference(Link nl) {
