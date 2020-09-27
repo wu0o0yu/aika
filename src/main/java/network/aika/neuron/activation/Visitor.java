@@ -39,12 +39,14 @@ public class Visitor {
     public int downSteps;
     public int upSteps;
 
-    public Visitor(Visitor c, boolean incr) {
-        this.origin = c.origin;
-        this.downUpDir = c.downUpDir;
-        this.startDir = c.startDir;
-        this.related = c.related;
-        this.scope = c.scope;
+    public Visitor(Visitor v, boolean incr) {
+        this.origin = v.origin;
+        this.downUpDir = v.downUpDir;
+        this.startDir = v.startDir;
+        this.related = v.related;
+        this.scope = v.scope;
+        this.upSteps = v.upSteps;
+        this.downSteps = v.downSteps;
 
         if(incr) {
             if (downUpDir == INPUT) {
@@ -59,7 +61,7 @@ public class Visitor {
         this.origin = origin;
         this.startDir = startDir;
         this.downUpDir = INPUT;
-        this.downSteps = 0;
+        this.downSteps = startDir == INPUT ? 1 : 0;
         this.upSteps = 0;
     }
 
@@ -82,9 +84,12 @@ public class Visitor {
     }
 
     public void follow(Activation act) {
-        act.getNeuron()
-                .transition(this)
-                .followLinks(act);
+        Visitor v = act.getNeuron()
+                .transition(this);
+
+        if(v != null) {
+            v.followLinks(act);
+        }
     }
 
     public void followLinks(Activation act) {
@@ -103,8 +108,11 @@ public class Visitor {
 
         s.forEach(l -> {
                     Activation nextAct = l.getActivation(downUpDir);
-                    l.getSynapse()
-                            .transition(this).follow(nextAct);
+                    Visitor v = l.getSynapse()
+                            .transition(this);
+                    if(v != null) {
+                        v.follow(nextAct);
+                    }
                 }
         );
         act.marked = false;
@@ -114,7 +122,7 @@ public class Visitor {
         Activation iAct = startDir == INPUT ? act : origin;
         Activation oAct = startDir == OUTPUT ? act : origin;
 
-        if (scope == null && !checkSamePattern(iAct, oAct)) return;
+        if (scope == NEUTRAL && !checkSamePattern(iAct, oAct)) return;
         if (startDir == INPUT && !act.isActive()) return; // <--
         if (act == origin || act.isConflicting()) return; // <--
 

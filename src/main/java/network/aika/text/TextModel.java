@@ -137,7 +137,7 @@ public class TextModel extends Model {
         }
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(in, inRelPW, false, true, false, false);
+                ExcitatorySynapse s = new ExcitatorySynapse(in, inRelNW, false, true, false, false);
 
                 s.linkInput();
                 s.linkOutput();

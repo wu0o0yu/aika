@@ -41,6 +41,8 @@ public class PatternTest {
         doc.processToken(m, 1, 2,  "B");
         doc.processToken(m, 2, 3,  "C");
 
+        System.out.println(doc.activationsToString());
+
         doc.process();
 
         System.out.println(doc.activationsToString());

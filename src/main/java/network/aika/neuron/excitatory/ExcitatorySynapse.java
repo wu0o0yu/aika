@@ -53,20 +53,22 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
         Visitor nv = new Visitor(v, true);
 
         // check related change
-        if(v.downUpDir == v.startDir && v.scope == INPUT && isInputScope() && !v.related) {
+        if (v.downUpDir == v.startDir && v.scope == INPUT && isInputScope() && !v.related) {
             nv.related = true;
-            return nv;
         }
 
         // toggle related
-        if(isRelated()) {
+        if (isRelated()) {
             nv.related = !v.related;
         }
 
         // switch scope
-        if(isInputScope()) {
+        if (isInputScope()) {
             nv.scope = v.scope.getNext(v.downUpDir);
         }
+
+        return nv;
+    }
 /*
         if (v.downUpDir == INPUT && getInput() instanceof PatternNeuron && isInputScope() && v.startDir == INPUT && v.scope == null && !v.related) {
 //            nv.downUpDir = OUTPUT;
@@ -128,8 +130,6 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
             return nv;
         }
 */
-        return null;
-    }
 
     @Override
     public byte getType() {
