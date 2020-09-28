@@ -52,7 +52,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     public Visitor transition(Visitor v) {
-        return new Visitor(v, false);
+        return v;
     }
 
     @Override

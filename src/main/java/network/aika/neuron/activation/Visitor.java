@@ -36,33 +36,15 @@ public class Visitor {
     public boolean related;
     public Direction scope = NEUTRAL;
 
-    public int downSteps;
-    public int upSteps;
+    public int downSteps = 0;
+    public int upSteps = 0;
 
-    public Visitor(Visitor v, boolean incr) {
-        this.origin = v.origin;
-        this.downUpDir = v.downUpDir;
-        this.startDir = v.startDir;
-        this.related = v.related;
-        this.scope = v.scope;
-        this.upSteps = v.upSteps;
-        this.downSteps = v.downSteps;
-
-        if(incr) {
-            if (downUpDir == INPUT) {
-                this.downSteps++;
-            } else {
-                this.upSteps++;
-            }
-        }
-    }
+    private Visitor() {}
 
     public Visitor(Activation origin, Direction startDir) {
         this.origin = origin;
         this.startDir = startDir;
         this.downUpDir = INPUT;
-        this.downSteps = startDir == INPUT ? 1 : 0;
-        this.upSteps = 0;
     }
 
     public Visitor(Activation origin, Direction scope, boolean related) {
@@ -71,8 +53,26 @@ public class Visitor {
         this.downUpDir = null;
         this.scope = scope;
         this.related = related;
-        this.downSteps = 0;
-        this.upSteps = 0;
+    }
+
+    public Visitor copy() {
+        Visitor nv = new Visitor();
+        nv.origin = origin;
+        nv.downUpDir = downUpDir;
+        nv.startDir = startDir;
+        nv.related = related;
+        nv.scope = scope;
+        nv.upSteps = upSteps;
+        nv.downSteps = downSteps;
+        return nv;
+    }
+
+    public void incrementPathLength() {
+        if (downUpDir == INPUT) {
+            this.downSteps++;
+        } else {
+            this.upSteps++;
+        }
     }
 
     public boolean getSelfRef() {
@@ -119,12 +119,13 @@ public class Visitor {
     }
 
     public void tryToLink(Activation act) {
-        Activation iAct = startDir == INPUT ? act : origin;
-        Activation oAct = startDir == OUTPUT ? act : origin;
 
-        if (scope == NEUTRAL && !checkSamePattern(iAct, oAct)) return;
+        if (scope == NEUTRAL && !checkSamePattern(origin, act)) return;
         if (startDir == INPUT && !act.isActive()) return; // <--
         if (act == origin || act.isConflicting()) return; // <--
+
+        Activation iAct = startDir == INPUT ? act : origin;
+        Activation oAct = startDir == OUTPUT ? act : origin;
 
         Neuron on = oAct.getNeuron();
         if (!on.isInputNeuron()) {

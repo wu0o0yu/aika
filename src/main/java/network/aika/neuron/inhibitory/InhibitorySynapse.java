@@ -51,6 +51,8 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     }
 
     public Visitor transition(Visitor v) {
-        return new Visitor(v, true);
+        Visitor nv = v.copy();
+        nv.incrementPathLength();
+        return nv;
     }
 }

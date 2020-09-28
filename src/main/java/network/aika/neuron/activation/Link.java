@@ -76,8 +76,9 @@ public class Link {
         if(!output.getNeuron().isInputNeuron()) {
             output.marked = true;
 
-            new Visitor(output, INPUT)
-                    .follow(input);
+            Visitor v = new Visitor(output, INPUT);
+            v = synapse.transition(v);
+            v.follow(input);
 
             output.marked = false;
         }

@@ -53,11 +53,11 @@ public class PatternNeuron extends ExcitatoryNeuron {
 
     @Override
     public Visitor transition(Visitor v) {
-        Visitor nv = new Visitor(v, false);
-        if(nv.downUpDir == OUTPUT) {
+        if(v.downUpDir == OUTPUT) {
             return null;
         }
 
+        Visitor nv = v.copy();
         nv.downUpDir = OUTPUT;
 
         return nv;

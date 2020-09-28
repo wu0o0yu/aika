@@ -50,7 +50,8 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
 
     @Override
     public Visitor transition(Visitor v) {
-        Visitor nv = new Visitor(v, true);
+        Visitor nv = v.copy();
+        nv.incrementPathLength();
 
         // check related change
         if (v.downUpDir == v.startDir && v.scope == INPUT && isInputScope() && !v.related) {
