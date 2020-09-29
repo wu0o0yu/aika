@@ -56,6 +56,11 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
         // check related change
         if (v.downUpDir == v.startDir && v.scope == INPUT && isInputScope() && !v.related) {
             nv.related = true;
+            return nv;
+        }
+
+        if(v.downUpDir == INPUT && v.scope == INPUT && isInputScope()) {
+            return null;
         }
 
         // toggle related

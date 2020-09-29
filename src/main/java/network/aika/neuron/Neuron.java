@@ -119,7 +119,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
             case FINAL_LINKING:
                 if (s == null ||
                         s.getOutput().isInputNeuron() ||
-                        (!s.isRecurrent() || c.getSelfRef()) ||
+                        (s.isRecurrent() && !c.getSelfRef()) ||
                         iAct.outputLinkExists(oAct)
                 ) return;
 
