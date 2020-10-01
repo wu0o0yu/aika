@@ -39,7 +39,7 @@ public class DerDieDasTest {
             initPP(c, inN, ppN, prevPPN, out);
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(ppN, out, false, false, false, false);
+                ExcitatorySynapse s = new ExcitatorySynapse(ppN, out, false, false, false, true);
 
                 s.linkInput();
                 s.linkOutput();

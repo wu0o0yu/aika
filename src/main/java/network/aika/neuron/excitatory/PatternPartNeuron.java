@@ -22,7 +22,7 @@ import network.aika.neuron.activation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static network.aika.neuron.activation.Direction.OUTPUT;
+import static network.aika.neuron.activation.Direction.*;
 
 /**
  * @author Lukas Molzberger
@@ -42,21 +42,21 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
 
     @Override
     public Visitor transition(Visitor v) {
+        if(v.samePattern) {
+            if(v.downUpDir == OUTPUT) {
+                return null;
+            }
+
+            Visitor nv = v.copy();
+            nv.downUpDir = OUTPUT;
+            return nv;
+        }
         return v;
     }
 
     @Override
     public byte getType() {
         return type;
-    }
-
-    @Override
-    public Activation getSamePattern(Activation act) {
-        return act.getLinks(OUTPUT)
-                .filter(l -> l.getSynapse().isRecurrent() && !l.isNegative())
-                .map(l -> l.getOutput())
-                .findFirst()
-                .orElse(null);
     }
 
     @Override

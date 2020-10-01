@@ -3,12 +3,12 @@ package network.aika.neuron.activation;
 public enum Direction {
     INPUT,
     OUTPUT,
-    NEUTRAL;
+    SAME;
 
     static {
-        INPUT.init(OUTPUT, NEUTRAL, null);
-        OUTPUT.init(INPUT, null, NEUTRAL);
-        NEUTRAL.init(NEUTRAL, OUTPUT, INPUT);
+        INPUT.init(OUTPUT, SAME, null);
+        OUTPUT.init(INPUT, null, SAME);
+        SAME.init(SAME, OUTPUT, INPUT);
     }
 
     private Direction inverted;

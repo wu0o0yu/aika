@@ -28,8 +28,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static network.aika.neuron.Sign.POS;
-import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Direction.OUTPUT;
+import static network.aika.neuron.activation.Direction.*;
 
 /**
  *
@@ -53,20 +52,15 @@ public class PatternNeuron extends ExcitatoryNeuron {
 
     @Override
     public Visitor transition(Visitor v) {
-        if(v.downUpDir == OUTPUT) {
-            return null;
+        if(!v.samePattern) {
+            if(v.downUpDir == OUTPUT) {
+                return null;
+            }
+            Visitor nv = v.copy();
+            nv.downUpDir = OUTPUT;
+            return nv;
         }
-
-        Visitor nv = v.copy();
-        nv.downUpDir = OUTPUT;
-
-        return nv;
-    }
-
-    @Override
-    public Activation getSamePattern(Activation act) {
-        assert act.getNeuron() == this;
-        return act;
+        return v;
     }
 
     @Override

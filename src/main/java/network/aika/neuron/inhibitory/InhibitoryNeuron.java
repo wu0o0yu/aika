@@ -56,11 +56,6 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     @Override
-    public Activation getSamePattern(Activation act) {
-        return null;
-    }
-
-    @Override
     public void updateReference(Link nl) {
         nl.getOutput().setReference(nl.getInput().getReference());
     }

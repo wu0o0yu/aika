@@ -67,19 +67,19 @@ public class Activation implements Comparable<Activation> {
     private Reference reference;
     private Gradient latestGradient;
 
-    public Activation(Thought t, Neuron<?> n) {
-        this(t.createActivationId(), t, n);
-    }
 
     private Activation(int id, Neuron<?> n) {
         this.id = id;
         this.neuron = n;
     }
 
+    public Activation(Thought t, Neuron<?> n) {
+        this(t.createActivationId(), t, n);
+    }
+
     private Activation(int id, Thought t, Neuron<?> n) {
-        this.id = id;
+        this(id, n);
         this.thought = t;
-        this.neuron = n;
 
         thought.registerActivation(this);
 

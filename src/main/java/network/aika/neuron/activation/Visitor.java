@@ -34,7 +34,8 @@ public class Visitor {
     public Direction startDir;
 
     public boolean related;
-    public Direction scope = NEUTRAL;
+    public Direction scope = SAME;
+    public boolean samePattern;
 
     public int downSteps = 0;
     public int upSteps = 0;
@@ -64,6 +65,7 @@ public class Visitor {
         nv.scope = scope;
         nv.upSteps = upSteps;
         nv.downSteps = downSteps;
+        nv.samePattern = samePattern;
         return nv;
     }
 
@@ -120,7 +122,6 @@ public class Visitor {
 
     public void tryToLink(Activation act) {
 
-        if (scope == NEUTRAL && !checkSamePattern(origin, act)) return;
         if (startDir == INPUT && !act.isActive()) return; // <--
         if (act == origin || act.isConflicting()) return; // <--
 
@@ -131,12 +132,5 @@ public class Visitor {
         if (!on.isInputNeuron()) {
             on.tryToLink(iAct, oAct, this);
         }
-    }
-
-    public boolean checkSamePattern(Activation in, Activation out) {
-        Activation inPattern = in.getNeuron().getSamePattern(in);
-        Activation outPattern = out.getNeuron().getSamePattern(out);
-
-        return inPattern == null || outPattern == null || inPattern == outPattern;
     }
 }

@@ -75,7 +75,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return false;
     }
 
-    public boolean isRelated() {
+    public boolean isSamePattern() {
         return false;
     }
 

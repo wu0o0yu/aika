@@ -19,8 +19,7 @@ package network.aika.neuron.excitatory;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Visitor;
 
-import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Direction.OUTPUT;
+import static network.aika.neuron.activation.Direction.*;
 
 /**
  *
@@ -33,19 +32,19 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
     public boolean isNegative;
     public boolean isRecurrent;
     public boolean inputScope;
-    public boolean isRelated;
+    public boolean isSamePattern;
 
     public ExcitatorySynapse() {
         super();
     }
 
-    public ExcitatorySynapse(I input, O output, boolean isNegative, boolean isRecurrent, boolean isInputScope, boolean isRelated) {
+    public ExcitatorySynapse(I input, O output, boolean isNegative, boolean isRecurrent, boolean isInputScope, boolean isSamePattern) {
         super(input, output);
 
         this.isNegative = isNegative;
         this.isRecurrent = isRecurrent;
         this.inputScope = isInputScope;
-        this.isRelated = isRelated;
+        this.isSamePattern = isSamePattern;
     }
 
     @Override
@@ -64,8 +63,9 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
         }
 
         // toggle related
-        if (isRelated()) {
+        if (isSamePattern()) {
             nv.related = !v.related;
+            nv.samePattern = true;
         }
 
         // switch scope
@@ -154,8 +154,8 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
         return inputScope;
     }
 
-    public boolean isRelated() {
-        return isRelated;
+    public boolean isSamePattern() {
+        return isSamePattern;
     }
 
     public void setWeight(double weight) {
