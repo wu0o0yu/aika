@@ -58,6 +58,10 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
             return nv;
         }
 
+        if(v.samePattern && isInputScope()) {
+            return null;
+        }
+
         if(v.downUpDir == INPUT && v.scope == INPUT && isInputScope()) {
             return null;
         }
@@ -75,67 +79,6 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
 
         return nv;
     }
-/*
-        if (v.downUpDir == INPUT && getInput() instanceof PatternNeuron && isInputScope() && v.startDir == INPUT && v.scope == null && !v.related) {
-//            nv.downUpDir = OUTPUT;
-//            nv.sameDirSteps = 0;
-            nv.scope = INPUT;
-            return nv;
-        } else if (v.downUpDir == OUTPUT && getInput() instanceof PatternNeuron && !isInputScope() && v.startDir == INPUT && v.scope == INPUT && !v.related) {
-            nv.tryToLink = true;
-            return nv;
-        } else if (v.downUpDir == INPUT && getInput() instanceof PatternNeuron && !isInputScope() && v.startDir == OUTPUT && v.scope == null && !v.related) {
-//            nv.downUpDir = OUTPUT;
-//            nv.sameDirSteps = 0;
-            return nv;
-        } else if(v.downUpDir == OUTPUT && getInput() instanceof PatternNeuron && isInputScope() && v.startDir == OUTPUT && v.scope == null && !v.related) {
-            nv.scope = OUTPUT;
-            nv.tryToLink = true;
-            return nv;
-        }
-
-        if(v.downUpDir == INPUT && !(getInput() instanceof PatternNeuron) && isInputScope() && v.startDir == INPUT && v.scope == null && !v.related) {
-            nv.scope = INPUT;
-            return nv;
-        } else if(v.downUpDir == INPUT && !(getInput() instanceof PatternNeuron) && isInputScope() && v.startDir == INPUT && v.scope == INPUT && !v.related) {
-            nv.related = true;
-            return nv;
-        } else if(v.downUpDir == INPUT && getInput() instanceof PatternNeuron && !isInputScope() && v.startDir == INPUT && v.scope == INPUT && v.related) {
-//            nv.downUpDir = OUTPUT;
-//            nv.sameDirSteps = 0;
-            return nv;
-        } else if(v.downUpDir == OUTPUT && getInput() instanceof PatternNeuron && isInputScope() && v.startDir == INPUT && v.scope == INPUT && v.related) {
-            nv.scope = null;
-            nv.tryToLink = true;
-            return nv;
-        } else if(v.downUpDir == INPUT && getInput() instanceof PatternNeuron && isInputScope() && v.startDir == OUTPUT && v.scope == null && !v.related) {
-            nv.scope = INPUT;
-//            nv.downUpDir = OUTPUT;
-//            nv.sameDirSteps = 0;
-            return nv;
-        } else if(v.downUpDir == OUTPUT && getInput() instanceof PatternNeuron && !isInputScope() && v.startDir == OUTPUT && v.scope == INPUT && !v.related) {
-            return nv;
-        } else if(v.downUpDir == OUTPUT && !(getInput() instanceof PatternNeuron) && isInputScope() && v.startDir == OUTPUT && v.scope == INPUT && !v.related) {
-            nv.related = true;
-            return nv;
-        } else if(v.downUpDir == OUTPUT && !(getInput() instanceof PatternNeuron) && isInputScope() && v.startDir == OUTPUT && v.scope == INPUT && v.related) {
-            nv.scope = null;
-            nv.tryToLink = true;
-            return nv;
-        }
-
-        if(v.downUpDir == OUTPUT && getInput() instanceof PatternNeuron && !isInputScope() && v.startDir == INPUT && v.scope == null && !v.related) {
-            return nv;
-        } else if(v.downUpDir == OUTPUT && !(getInput() instanceof PatternNeuron) && !isInputScope() && v.startDir == INPUT && v.scope == null && v.related) {
-            nv.tryToLink = true;
-            return nv;
-        } else if(v.downUpDir == INPUT && !(getInput() instanceof PatternNeuron) && !isInputScope() && v.startDir == OUTPUT && v.scope == null && v.related) {
-            nv.tryToLink = true;
-            return nv;
-        } else if(v.downUpDir == INPUT && getInput() instanceof PatternNeuron && !isInputScope() && v.startDir == OUTPUT && v.scope == null && !v.related) {
-            return nv;
-        }
-*/
 
     @Override
     public byte getType() {

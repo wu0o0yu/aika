@@ -264,7 +264,7 @@ public class Activation implements Comparable<Activation> {
 
     public void propagate() {
         new Visitor(this, OUTPUT)
-                .follow(this);
+                .followLinks(this);
 
         getModel().linkInputRelations(this, OUTPUT);
         thought.processLinks();

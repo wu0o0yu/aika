@@ -95,7 +95,7 @@ public class Visitor {
     }
 
     public void followLinks(Activation act) {
-        if (downUpDir == OUTPUT && numSteps() > 1) {
+        if (downUpDir == OUTPUT && numSteps() >= 1) {
             tryToLink(act);
 //            return;
         }
