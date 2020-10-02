@@ -49,6 +49,7 @@ public class PropagateTest {
         Document doc = new Document("test");
 
         Activation act = new Activation(doc, in);
+        act.setValue(1.0);
         act.propagateInput();
 
         System.out.println(doc.activationsToString());
