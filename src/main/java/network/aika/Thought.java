@@ -212,7 +212,9 @@ public abstract class Thought {
         {
             Activation act = null;
             while ((act = getNextActivation(act)) != null) {
-                act.getNeuron().train(act);
+                if(act.isActive()) {
+                    act.getNeuron().train(act);
+                }
             }
         }
 

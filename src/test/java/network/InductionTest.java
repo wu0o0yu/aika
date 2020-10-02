@@ -26,6 +26,9 @@ public class InductionTest {
         );
 
         Activation act = new Activation(doc, in);
+        act.setValue(1.0);
+        act.setReference(doc.new TextReference(0, 1));
+
         act.propagateInput();
 
         doc.train(m);
