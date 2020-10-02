@@ -22,9 +22,15 @@ public class Instances implements Writable {
     }
 
     public double getN() {
+        if(isUninitialized()) throw new RuntimeException("Not initialized!");
+
         double n = (currentPos - offset) / getCoveredFactor();
         assert n >= 0;
         return n;
+    }
+
+    private boolean isUninitialized() {
+        return offset == Integer.MAX_VALUE || currentPos == Integer.MIN_VALUE || coveredFactorSum == 0 || count == 0;
     }
 
     public int getOffset() {
@@ -33,6 +39,14 @@ public class Instances implements Writable {
 
     public void setOffset(int offset) {
         this.offset = offset;
+    }
+
+    public int getCurrentPos() {
+        return currentPos;
+    }
+
+    public void setCurrentPos(int currentPos) {
+        this.currentPos = currentPos;
     }
 
     public void update(Model m, Reference ref) {

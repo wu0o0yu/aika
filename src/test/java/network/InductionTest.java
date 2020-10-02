@@ -19,7 +19,12 @@ public class InductionTest {
     public void testInduceFromMaturePattern() {
         Model m = new TextModel();
         PatternNeuron in = new PatternNeuron(m, "A", "IN", true);
+
         in.setFrequency(12);
+
+        in.getInstances().setOffset(0);
+        in.getInstances().setCurrentPos(200);
+        m.setN(200);
 
         Document doc = new Document("",
                 new Config()
