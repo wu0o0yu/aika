@@ -16,8 +16,13 @@
  */
 package network.aika.neuron.excitatory;
 
+import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Visitor;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import static network.aika.neuron.activation.Direction.*;
 
@@ -109,5 +114,25 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
     public void addWeight(double weightDelta) {
         super.addWeight(weightDelta);
         output.getNeuron().setModified(true);
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+
+        out.writeBoolean(isNegative);
+        out.writeBoolean(isRecurrent);
+        out.writeBoolean(inputScope);
+        out.writeBoolean(isSamePattern);
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws IOException {
+        super.readFields(in, m);
+
+        isNegative = in.readBoolean();
+        isRecurrent = in.readBoolean();
+        inputScope = in.readBoolean();
+        isSamePattern = in.readBoolean();
     }
 }
