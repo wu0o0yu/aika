@@ -204,10 +204,7 @@ public abstract class Thought {
             m.applyMovingAverage(trainingConfig);
         }
 */
-        getActivations()
-                .forEach(act ->
-                        act.count()
-                );
+        count();
 
         {
             Activation act = null;
@@ -230,6 +227,13 @@ public abstract class Thought {
                 );
 
         phase = null;
+    }
+
+    public void count() {
+        getActivations()
+                .forEach(act ->
+                        act.count()
+                );
     }
 
     public String activationsToString() {
