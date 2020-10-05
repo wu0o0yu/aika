@@ -411,7 +411,9 @@ public class Activation implements Comparable<Activation> {
 
         selfGradient /= getN();
 
-        propagateGradient(selfGradient);
+        getInputLinks().forEach(l ->
+                l.computeSelfGradient(selfGradient)
+        );
     }
 
     private SortedSet<Link> getInputLinksSortedByFired() {
@@ -448,7 +450,7 @@ public class Activation implements Comparable<Activation> {
                         getNet()
                 );
     }
-    
+
     public void propagateGradient(double g) {
         unpropagatedGradient += g;
 

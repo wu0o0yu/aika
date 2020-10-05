@@ -124,6 +124,12 @@ public abstract class Thought {
                     .pollFirst()
                     .processGradient();
         }
+
+        activationsById
+                .values()
+                .stream()
+                .flatMap(act -> act.getInputLinks())
+                .forEach(l -> l.updateSynapse());
     }
 
     public Config getTrainingConfig() {
