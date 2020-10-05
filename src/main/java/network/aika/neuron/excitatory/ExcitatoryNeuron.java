@@ -104,7 +104,7 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         l.computeGradient();
         l.removeGradientDependencies();
 
-        if(l.getInitialGradient() > -1.6) {
+        if(l.getFinalGradient() > -1.6) {
             return null;
         }
 

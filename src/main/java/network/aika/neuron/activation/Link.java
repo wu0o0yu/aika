@@ -49,9 +49,8 @@ public class Link {
 
     private boolean isSelfRef;
 
-    private double gradient;
-    private double linkGradient;
-
+    private double initialGradient;
+    private double offsetGradient;
     private double selfGradient;
     private double finalGradient;
 
@@ -63,11 +62,19 @@ public class Link {
     }
 
     public double getInitialGradient() {
-        return gradient;
+        return initialGradient;
     }
 
-    public double getLinkGradient() {
-        return linkGradient;
+    public double getSelfGradient() {
+        return selfGradient;
+    }
+
+    public double getFinalGradient() {
+        return finalGradient;
+    }
+
+    public double getOffsetGradient() {
+        return offsetGradient;
     }
 
     public void count() {
@@ -104,17 +111,17 @@ public class Link {
                 Sign.getSign(output)
         );
 
-        gradient = s * output.getActFunctionDerivative();
-        linkGradient =  s * getActFunctionDerivative();
-        gradient -= linkGradient;
+        initialGradient = s * output.getActFunctionDerivative();
+        offsetGradient =  s * getActFunctionDerivative();
+        initialGradient -= offsetGradient;
     }
 
     public void removeGradientDependencies() {
         output.getInputLinks()
                 .filter(l -> l.input != null && l != this && input.isConnected(l.input))
                 .forEach(l -> {
-                    gradient -= l.gradient;
-                    linkGradient -= l.linkGradient;
+                    initialGradient -= l.initialGradient;
+                    offsetGradient -= l.offsetGradient;
                 });
     }
 
@@ -131,7 +138,7 @@ public class Link {
 
     public void computeSelfGradient(double g) {
         selfGradient = g;
-        selfGradient += linkGradient;
+        selfGradient += offsetGradient;
 
         propagateGradient(selfGradient);
     }
