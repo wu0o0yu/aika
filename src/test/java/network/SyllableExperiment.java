@@ -48,7 +48,7 @@ public class SyllableExperiment {
         //"/Users/lukas.molzberger/aika-ws/maerchen"
         // "C:\\ws\\aika-syllables\\src\\main\\resources\\text\\maerchen"
         // "/Users/lukas/IdeaProjects/aika-bitbucket/test-data"
-        for(String word: Util.loadExamplesAsWords(new File("/Users/lukas.molzberger/aika-ws/maerchen"))) {
+        for(String word: Util.loadExamplesAsWords(new File("C:\\ws\\aika-syllables\\src\\main\\resources\\text\\maerchen"))) {
             train( word + " ");
         }
 

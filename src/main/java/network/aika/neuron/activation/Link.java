@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Comparator;
 
 import static network.aika.Phase.INITIAL_LINKING;
+import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Direction.INPUT;
 
 /**
@@ -51,6 +52,9 @@ public class Link {
     private double gradient;
     private double linkGradient;
 
+    private double selfGradient;
+    private double finalGradient;
+
     public Link(Synapse s, Activation input, Activation output, boolean isSelfRef) {
         this.synapse = s;
         this.input = input;
@@ -58,7 +62,7 @@ public class Link {
         this.isSelfRef = isSelfRef;
     }
 
-    public double getGradient() {
+    public double getInitialGradient() {
         return gradient;
     }
 
@@ -125,35 +129,44 @@ public class Link {
                 );
     }
 
-    public void propagateGradient(double g) {
-        Thought t = output.getThought();
-        Neuron on = output.getNeuron();
+    public void computeSelfGradient(double g) {
+        selfGradient = g;
+        selfGradient += linkGradient;
 
-        g += linkGradient;
+        propagateGradient(selfGradient);
+    }
 
-        boolean causal = isCausal();
-        double x = getInputValue();
-        double learnRate = t.getTrainingConfig().getLearnRate();
-
-        if(isNegative() && !isSelfRef) {
+    public void propagateGradient(double unpropagatedGradient) {
+        if(Math.abs(unpropagatedGradient) < TOLERANCE) {
             return;
         }
 
-        double posWDelta = learnRate * x * g;
-        double negWDelta = learnRate * (1.0 - x) * g;
-        double biasDelta = learnRate * g;
-
-        synapse.addWeight(posWDelta - negWDelta);
-        on.addConjunctiveBias(negWDelta, causal);
-        on.addBias(biasDelta);
+        finalGradient += unpropagatedGradient;
 
         if(input == null) {
             return;
         }
 
-        input.addGradient(
-                synapse.getWeight() * g * input.getActFunctionDerivative()
+        input.propagateGradient(
+                synapse.getWeight() * unpropagatedGradient * input.getActFunctionDerivative()
         );
+    }
+
+    public void updateSynapse() {
+        Thought t = output.getThought();
+        Neuron on = output.getNeuron();
+
+        boolean causal = isCausal();
+        double x = getInputValue();
+        double learnRate = t.getTrainingConfig().getLearnRate();
+
+        double posWDelta = learnRate * x * finalGradient;
+        double negWDelta = learnRate * (1.0 - x) * finalGradient;
+        double biasDelta = learnRate * finalGradient;
+
+        synapse.addWeight(posWDelta - negWDelta);
+        on.addConjunctiveBias(negWDelta, causal);
+        on.addBias(biasDelta);
     }
 
     public boolean follow(Direction dir) {

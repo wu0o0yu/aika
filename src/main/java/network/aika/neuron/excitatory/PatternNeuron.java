@@ -102,8 +102,8 @@ public class PatternNeuron extends ExcitatoryNeuron {
 
     private boolean hasOutputPatternPartConsumer(Activation act) {
         return act.getOutputLinks()
-                .filter(l -> l.getSynapse().isInputLinked())
-                .anyMatch(l -> l.getOutput().getNeuron() instanceof PatternPartNeuron);
+                .map(l -> l.getSynapse())
+                .anyMatch(s -> s.isInputScope() && s.isInputLinked());
     }
 
     public String getTokenLabel() {

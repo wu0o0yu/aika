@@ -97,7 +97,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         in.getLock().releaseWriteLock();
     }
 
-    public void updateLink(boolean link) {
+    public void updateInputLink(boolean link) {
         if(link) {
             linkInput();
         } else {

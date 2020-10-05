@@ -104,7 +104,7 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         l.computeGradient();
         l.removeGradientDependencies();
 
-        if(l.getGradient() > -1.6) {
+        if(l.getInitialGradient() > -1.6) {
             return null;
         }
 
@@ -205,7 +205,7 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         double sum = getRawBias();
         for(Synapse s: sortedSynapses) {
 
-            s.updateLink(sum > 0.0);
+            s.updateInputLink(sum > 0.0);
 
             if(s.getWeight() < 0.0) break;
 

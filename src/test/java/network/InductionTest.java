@@ -96,7 +96,7 @@ public class InductionTest {
         Link.link(sA, actA, actTarget, false);
         Link.link(sB, actB, actTarget, false);
 
-        actTarget.updateGradient();
+        actTarget.computeSelfGradient();
         actTarget.processGradient();
 
         System.out.println(actTarget.gradientsToString());

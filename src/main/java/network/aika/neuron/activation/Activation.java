@@ -65,7 +65,9 @@ public class Activation implements Comparable<Activation> {
     private Activation mainBranch;
 
     private Reference reference;
-    private Gradient latestGradient;
+
+    private double selfGradient;
+    private double unpropagatedGradient;
 
 
     private Activation(int id, Neuron<?> n) {
@@ -390,7 +392,7 @@ public class Activation implements Comparable<Activation> {
                 );
     }
 
-    public double computeGradient() {
+    public void computeSelfGradient() {
         getInputLinksSortedByFired()
                 .forEach(l -> {
                             l.computeGradient();
@@ -398,20 +400,18 @@ public class Activation implements Comparable<Activation> {
                         }
                 );
 
-        double g = getActFunctionDerivative() *
+        selfGradient = getActFunctionDerivative() *
                 getNeuron().getSurprisal(
                         Sign.getSign(this)
                 );
 
-        g += getInputLinks()
-                .mapToDouble(l -> l.getGradient())
+        selfGradient += getInputLinks()
+                .mapToDouble(l -> l.getInitialGradient())
                 .sum();
 
-        if(Math.abs(g) < TOLERANCE) {
-            return 0.0;
-        }
+        selfGradient /= getN();
 
-        return g / getN();
+        propagateGradient(selfGradient);
     }
 
     private SortedSet<Link> getInputLinksSortedByFired() {
@@ -428,15 +428,12 @@ public class Activation implements Comparable<Activation> {
         if(getNeuron().isInputNeuron())
             return;
 
-        assert !latestGradient.isFixed();
-        latestGradient.setFixed();
-
-        double g = latestGradient.getGradient();
-
         inputLinks.values()
                 .forEach(l ->
-                        l.propagateGradient(g)
+                        l.propagateGradient(unpropagatedGradient)
                 );
+
+        unpropagatedGradient = 0.0;
 
         getNeuron().updatePropagateFlag();
     }
@@ -451,21 +448,11 @@ public class Activation implements Comparable<Activation> {
                         getNet()
                 );
     }
+    
+    public void propagateGradient(double g) {
+        unpropagatedGradient += g;
 
-    public void updateGradient() {
-        addGradient(
-                computeGradient()
-        );
-    }
-
-    public void addGradient(double g) {
-        if(Math.abs(g) < TOLERANCE) return;
-
-        if(latestGradient == null || latestGradient.isFixed()) {
-            latestGradient = new Gradient(latestGradient);
-            getThought().addToGradientQueue(this);
-        }
-        latestGradient.addGradient(g);
+        getThought().addToGradientQueue(this);
     }
 
     public void unlink() {
@@ -573,18 +560,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public String gradientsToString() {
-        if(latestGradient == null) return "";
-
         StringBuilder sb = new StringBuilder();
-
-        double og = latestGradient.getFinalGradient();
-
-        sb.append(toString() +
-                " - actRange:" + Utils.round(getReference().length()) +
-                " g:" + Utils.round(computeGradient()) +
-                " og:" + Utils.round(og) +
-                " \n"
-        );
 
         inputLinks.values()
                 .forEach(l ->
