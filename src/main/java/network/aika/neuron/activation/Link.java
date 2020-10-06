@@ -224,7 +224,7 @@ public class Link {
         return isSelfRef;
     }
 
-    public void link() {
+    public void linkInput() {
         if(input != null) {
 /*            if(synapse.isPropagate()) {
                 SortedMap<Activation, Link> outLinks = input.getOutputLinks(synapse);
@@ -236,6 +236,9 @@ public class Link {
 */
             input.outputLinks.put(output, this);
         }
+    }
+
+    public void linkOutput() {
         output.inputLinks.put(synapse.getPInput(), this);
     }
 

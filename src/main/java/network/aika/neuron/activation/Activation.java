@@ -196,7 +196,8 @@ public class Activation implements Comparable<Activation> {
                 .filter(l -> l.getSynapse() != excludedSyn)
                 .forEach(l -> {
                     Link nl = new Link(l.getSynapse(), l.getInput(), clonedAct, l.isSelfRef());
-                            nl.link();
+                            nl.linkInput();
+                            nl.linkOutput();
                             clonedAct.sumUpLink(null, nl);
                         }
                 );
@@ -207,7 +208,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public boolean isActive() {
-        return value > 0.0;
+        return value > 0.0 || !getNeuron().isInitialized();
     }
 
     public double getP() {
@@ -324,7 +325,9 @@ public class Activation implements Comparable<Activation> {
     public Link addLink(Synapse s, Activation input, boolean isSelfRef) {
         Link ol = getInputLink(s);
         Link nl = new Link(s, input, this, isSelfRef);
-        nl.link();
+        nl.linkInput();
+        nl.linkOutput();
+
         sumUpLink(ol, nl);
         checkIfFired(nl);
 
