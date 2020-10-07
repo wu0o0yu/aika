@@ -262,7 +262,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 getClass().getSimpleName() +
                 "  w:" + Utils.round(getWeight()) +
                 " " + input + "(" + (isInputLinked() ? "+" : "-") + ")" +
-                "->" + output + "(" + (isOutputLinked() ? "+" : "-") + ")";
+                " --> " + output + "(" + (isOutputLinked() ? "+" : "-") + ")";
     }
 
     public String statToString() {

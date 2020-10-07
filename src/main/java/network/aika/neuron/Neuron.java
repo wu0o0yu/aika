@@ -35,6 +35,8 @@ import static network.aika.neuron.Sign.POS;
  */
 public abstract class Neuron<S extends Synapse> implements Writable {
 
+    public static int debugId = 0;
+
     private static final Logger log = LoggerFactory.getLogger(Neuron.class);
 
     volatile long retrievalCount = 0;

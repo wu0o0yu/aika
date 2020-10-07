@@ -17,6 +17,7 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.Model;
+import network.aika.Utils;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
@@ -81,19 +82,19 @@ public class PatternNeuron extends ExcitatoryNeuron {
         double s = getSurprisal(POS);
 
         if(s < 2.0) {
-            System.out.println(act.getNeuron().getDescriptionLabel() + "  " + s + " below threshold");
+            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
             return;
         }
 
         if(hasOutputPatternPartConsumer(act)) {
-            System.out.println(act.getNeuron().getDescriptionLabel() + "  " + s + " already exists");
+            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " already exists");
             return;
         }
 
         Neuron n = new PatternPartNeuron(getModel(), "TP-" + getDescriptionLabel(), false);
         n.getInstances().update(getModel(), act.getReference());
 
-        System.out.println(act.getNeuron().getDescriptionLabel() + "  " + s + "  --> " + n.getDescriptionLabel());
+        System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + "  --> " + n.getDescriptionLabel());
 
         Activation oAct = act.createActivation(n);
 
