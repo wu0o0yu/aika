@@ -22,7 +22,7 @@ public class Instances implements Writable {
     }
 
     public double getN() {
-        if(isUninitialized()) throw new RuntimeException("Not initialized!");
+        if(isUninitialized()) throw new NotInitializedException();
 
         double n = (currentPos - offset) / getCoveredFactor();
         assert n >= 0;
@@ -76,5 +76,11 @@ public class Instances implements Writable {
         currentPos = in.readInt();
         count = in.readInt();
         coveredFactorSum = in.readInt();
+    }
+
+    public static class NotInitializedException extends RuntimeException {
+        public NotInitializedException() {
+            super("Not initialized!");
+        }
     }
 }
