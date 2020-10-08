@@ -92,13 +92,14 @@ public class PatternNeuron extends ExcitatoryNeuron {
         }
 
         Neuron n = new PatternPartNeuron(getModel(), "TP-" + getDescriptionLabel(), false);
-        n.getInstances().update(getModel(), act.getReference());
 
         System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + "  --> " + n.getDescriptionLabel());
 
         Activation oAct = act.createActivation(n);
 
         n.induceSynapse(act, oAct, new Visitor(act, INPUT, false));
+
+        n.getInstances().update(getModel(), act.getReference());
     }
 
     private boolean hasOutputPatternPartConsumer(Activation act) {

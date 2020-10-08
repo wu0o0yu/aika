@@ -95,7 +95,7 @@ public class Link {
         }
     }
 
-    public void computeGradient() {
+    public void computeInitialGradient() {
         if(isNegative()) return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
 
         double s = getSynapse().getSurprisal(

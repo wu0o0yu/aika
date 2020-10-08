@@ -98,12 +98,13 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
                 v.related
         );
 
-        s.getInstances().update(getModel(), iAct.getReference());
-
         Link l = new Link(s, iAct, oAct, false);
 
         l.linkOutput();
         oAct.sumUpLink(null, l);
+
+        l.computeInitialGradient();
+        l.removeGradientDependencies();
 
         oAct.computeSelfGradient();
 
@@ -120,6 +121,8 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         l.linkInput();
 
         l.propagate();
+
+        s.getInstances().update(getModel(), iAct.getReference());
 
         return l;
     }

@@ -243,10 +243,14 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         }
 
         if(!ADJUST_GRADIENT) return;
+
+        act.computeInitialLinkGradients();
         act.computeSelfGradient();
     }
 
     public double getSurprisal(Sign s) {
+        if(!instances.isInitialized()) return 0.0;
+
         double p = getP(s, instances.getN());
         return -Math.log(p);
     }

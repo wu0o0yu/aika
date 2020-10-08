@@ -395,14 +395,15 @@ public class Activation implements Comparable<Activation> {
                 );
     }
 
-    public void computeSelfGradient() {
-        getInputLinksSortedByFired()
-                .forEach(l -> {
-                            l.computeGradient();
-                            l.removeGradientDependencies();
-                        }
-                );
+    public void computeInitialLinkGradients() {
+        getInputLinks()
+                .forEach(l -> l.computeInitialGradient());
 
+        getInputLinks()
+                .forEach(l -> l.removeGradientDependencies());
+    }
+
+    public void computeSelfGradient() {
         selfGradient = getActFunctionDerivative() *
                 getNeuron().getSurprisal(
                         Sign.getSign(this)
@@ -417,12 +418,6 @@ public class Activation implements Comparable<Activation> {
         getInputLinks().forEach(l ->
                 l.computeSelfGradient(selfGradient)
         );
-    }
-
-    private SortedSet<Link> getInputLinksSortedByFired() {
-        SortedSet<Link> sortedByFired = new TreeSet<>(SORTED_BY_FIRED);
-        sortedByFired.addAll(inputLinks.values());
-        return sortedByFired;
     }
 
     public int getN() {
