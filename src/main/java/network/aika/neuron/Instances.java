@@ -22,15 +22,15 @@ public class Instances implements Writable {
     }
 
     public double getN() {
-        if(isUninitialized()) throw new NotInitializedException();
+        if(!isInitialized()) throw new NotInitializedException();
 
         double n = (currentPos - offset) / getCoveredFactor();
         assert n >= 0;
         return n;
     }
 
-    private boolean isUninitialized() {
-        return offset == Integer.MAX_VALUE || currentPos == Integer.MIN_VALUE || coveredFactorSum == 0 || count == 0;
+    public boolean isInitialized() {
+        return offset != Integer.MAX_VALUE && currentPos != Integer.MIN_VALUE && coveredFactorSum != 0 && count != 0;
     }
 
     public int getOffset() {

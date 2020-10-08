@@ -57,7 +57,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     protected Instances instances;
 
     protected boolean isInputNeuron; // Input Neurons won't be trained!
-    protected boolean isInitialized;
 
     protected Neuron() {
     }
@@ -190,17 +189,15 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public void setBias(double b) {
         bias += b;
         modified = true;
-        isInitialized = true;
     }
 
     public void addBias(double biasDelta) {
         bias += biasDelta;
         modified = true;
-        isInitialized = true;
     }
 
     public boolean isInitialized() {
-        return isInitialized;
+        return instances.isInitialized();
     }
 
     public double getBias(Phase p) {
