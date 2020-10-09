@@ -97,9 +97,9 @@
 						that are applied to the output of the network can be highly error-prone and can create a large distance between our training signal and the weights that we would like to adjust.
 						This is the reason for the huge number of training examples required for classical neural networks.
 						Hence we would like to train the network more locally from the patterns that occur in the input data without relying on supervised training labels. This is
-						where Shannon entropy comes in quite handy. Take, for example, a word whose input features are its individual letters. In this example, we can measure the information content
+						where Shannon entropy comes in quite handy. Take, for example, a word whose input features are its individual letters. In this example, we can measure the amount of information
 						of each letter by calculating the Shannon entropy. Then we can look at the word pattern neuron as a way of compressing the information given by the individual letter neurons.
-						The word neuron requires a lot less information content to communicate the same message as the sum of the individual letters.
+						The word neuron requires a lot less information to communicate the same message as the sum of the individual letters.
 						This compression, or information gain, can be formalized using the mutual information, which can then be used to derive an objective function for our training algorithm.
 					</li>
 					<li>
