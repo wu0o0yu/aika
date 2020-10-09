@@ -249,7 +249,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public double getSurprisal(Sign s) {
-        if(!instances.isInitialized()) return 0.0;
+        if(!instances.isInitialized())
+            return 0.0;
 
         double p = getP(s, instances.getN());
         return -Math.log(p);

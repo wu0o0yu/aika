@@ -39,6 +39,9 @@
 				<a href="inference.html">Inference</a>
 			</li>
 			<li>
+				<a href="training.html">Training</a>
+			</li>
+			<li>
 				<a href="usage.html">Examples</a>
 			</li>
 			<li>
@@ -51,12 +54,36 @@
 	</div>
 </div>
 	<div id="contents">
+		<div align="right"><span style='color: #FF0000;'>October 09, 2020</span></div>
 		<div class="features">
 			<h1>How it works</h1>
 			<p>
+			<h2>General Architecture</h2>
+			<p>
+				Neurons and their Activations need to be represented separately. Each neuron may have one or more activations. Activations correspond to some pattern that has been observed in the real world that is in the input data set. For example, if the input data set is a text and a neuron represents a specific word, then there might be several occurrences of this word and therefore several activations of this neuron. The human brain probably does this through the timing of activation spikes.
+				Activations are grounded in the input data set. This is where they derive their identity from.
+				Since we have a one-to-n relation between neurons and activations, we also need a one-to-n relation between the synapses and the links between the activations. Therefore we need a linking process to determine which activation is connected to each other. Roughly speaking activations can be linked iff they are grounded in the same input data.
+				A consequence of separating the neurons and their activations is that we can not rely on the network topology to give us the sequence in which each activation is processed. Therefore each activation needs a fired timestamp that describes the point in time when this activation becomes visible to other neurons.
+				Initially, the network starts out empty. Neurons and synapses are added during training. There is an underlying set of rules which determine when certain types of neurons or synapses are induced.
+			</p>
+			<h2>Neuron Types</h2>
+			<p>
+				Also, neurons need to be able to act more like formal logic. Sure their ability to integrate weak input signals is important, this is something that classical AI has great difficulties with, but there is also the need for strong conjunctive or disjunctive behavior. Surely, these things can be achieved by setting the synapse weights and the bias value appropriately, but still, these neurons are sufficiently different to justify the introduction of different types of neurons for these. I believe that the human brain does something very similar with its excitatory pyramidal neurons and its inhibitory stellate neurons.
+				Now to the part where I see the great similarity to your capsule networks. Basically, there are three types of neurons, pattern neurons, pattern part neurons, and inhibitory neurons. The pattern neurons and the pattern part neurons are both conjunctive in nature and the inhibitory neuron is disjunctive. The pattern part neurons kind of describe which lower-level patterns are part of the current pattern. Each pattern part neuron receives a positive feedback synapse from the pattern to which it belongs to. The pattern neuron on the other hand is only activated if the pattern as a whole is detected. For example, if we consider a word consisting of individual letters as lower-level patterns, then we have a corresponding pattern part neuron for each letter whose meaning is that this letter occurred as part of this word. The pattern part neurons also receive negative feedback synapses from the inhibitory neurons such that competing patterns are able to suppress each other.
+			</p>
+			<h2>Network Topology</h2>
+			<p>
+			<h2>Relations</h2>
+			<p>
+				It is easy to see that activations are able to represent real world objects, but that is not sufficient. We also need a way to represent relations between these objects. This can be achieved using a type of neurons whose synapses link two patterns together.
+			</p>
+			<h2>Positive and Negative Feedback Loops</h2>
+			<p>
+				Another crucial insight is the need for positive and negative feedback loops. These are synapses that ignore the causal sequence of fired activations. Especially the negative feedback synapses are interesting because they require the introduction of mutually shielded branches for the following activations. They create a kind of independent interpretation of parts of the input data set and only later on its decision which of these interpretations gets selected. It's very similar to what a parse tree does only that a parse tree is limited to syntactic information only. Another way to relate it to classical logic is to consider it as non-monotonic inference, which in classical AI could not be solved properly since classical logic is missing the weak influences that neural networks are able to capture.
+			</p>
 			<h2>The Artificial Neural Network</h2>
 			<p>
-				Aika is a neural network simulation algorithm, that uses neurons to represent a wide variety of
+				Aika is an artificial neural network, that uses neurons to represent a wide variety of
 				linguistic concepts and connects them via synapses. In contrast to most other neural
 				network architectures, Aika does not employ layers to structure its network. Synapses can connect arbitrary
 				neurons with each other, but the network is not fully connected either. <br/>
@@ -92,58 +119,10 @@
 			<p>
 				The advantage of having activation objects is that, through them, Aika is able to cope with the relational
 				structure of natural language text by making the activation relate to a specific segment of text. In a way
-				these activations can be seen as text annotations that specify their start and end character. </br>
-				Words, phrases and sentences are in a relation to each other through
-				their sequential order. The assignment of text ranges and word positions to activations is a simple yet
-				powerful representation of the relational structure of text and avoids some of the shortcomings of other
-				representations such as bag of words or sliding window.
-				Since the activations are propagated along through the network, synapses need to be able to manipulate
-				the text range and the word position while the activations are passed on to the next neuron.
+				these activations can be seen as text annotations, they are grounded in the input data set through their input links. </br>
 			</p>
 
-			<h2>Interpretations</h2>
-			<p>
-				One common problem when processing text is that of cyclic dependencies. In the example 'jackson cook' it
-				is impossible to decide which word has to be resolved first, the forename or the surname, since both
-				depend on each other. The word jackson can be recognized as a forename when the next word is a surname
-				and the word cook can be recognized as a surname when the previous word is a forename.
-				To tackle this problem Aika employs <a href="https://en.wikipedia.org/wiki/Non-monotonic_logic" rel="nofollow">non-monotonic logic</a>
-				and is therefore able to derive multiple interpretations that are mutually exclusive. These interpretations
-				are then weighted and only the strongest interpretation is returned as the result. <br/>
 
-				Consider the following network, which is able to determine whether a word, which has been recognized in a
-				text, is a forename, surname, city name, or profession. If for instance the word "jackson" has been
-				recognized in a text, it
-				will trigger further activations in the two jackson entity neurons. Since both are connected through the
-				inhibiting neuron only one of them can be active in the end. Aika will therefore generate two
-				interpretations. But these interpretations are not limited to a single neuron. For instance if the word
-				neuron cook gets activated too, the jackson forename entity and the cook surname entity will be
-				part of the same interpretation. The forename and surname category links in this example form a positive
-				feedback loop which reinforces this interpretation.
-			</p>
-
-			<div style="text-align:center; width:100%">
-				<img src="images/jackson-cook-diagram.svg" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
-			</div>
-
-			<p>
-				New interpretations are spawned if both input and output of a negative recurrent synapse get activated.
-				In this case a conflict is generated. An interpretation is a conflict free set of activations. Therefore,
-				if there are no conflicts during the processing of an input data set, only one interpretation will exist
-				and the search for the best interpretation will end immediately.
-				On the other hand, if there are conflicts between activations, a search needs to be
-				performed which selects or excludes individual activations and tests how these changes affect the
-				overall weights sum of all activations. This sum is also called the objective function \(f\) and can be
-                stated in the following way:
-
-				$$f = \sum\limits_{j \in Acts}{\min (-g_j, net_j)}$$
-
-				$$g_j = \sum\limits_{i = 0, w_{ij} < 0, w_{ij} \in Recurrent}^N{w_{ij}}$$
-
-				The value \(g_j\) is simply the sum of all negative feedback synapses.
-				The intention behind this objective function is to measure a neurons ability to overcome the inhibiting
-				input signals of other neurons.
-			</p>
 
             <h2>Synapses</h2>
             <p>

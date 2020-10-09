@@ -190,6 +190,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public double getSurprisal(Sign si, Sign so) {
+        if(!instances.isInitialized())
+            return 0.0;
+
         double p = getP(si, so, instances.getN());
         return -Math.log(p);
     }
