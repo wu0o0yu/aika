@@ -26,39 +26,40 @@
 <div id="header">
 	<div>
 		<div class="logo">
-			<a href="index.html"></a>
+			<a rel="canonical" href="https://aika.network"></a>
 		</div>
 		<ul id="navigation">
 			<li>
-				<a href="index.html">Overall idea</a>
+				<a rel="canonical" href="https://aika.network">Overall idea</a>
 			</li>
 			<li>
-				<a href="blog.html">Blog</a>
+				<a rel="canonical" href="blog.html">Blog</a>
 			</li>
 			<li class="active">
-				<a href="inference.html">Inference</a>
+				<a rel="canonical" href="inference.html">Inference</a>
 			</li>
 			<li>
-				<a href="training.html">Training</a>
+				<a rel="canonical" href="training.html">Training</a>
 			</li>
 			<li>
-				<a href="usage.html">Examples</a>
+				<a rel="canonical" href="usage.html">Examples</a>
 			</li>
 			<li>
-				<a href="resources.html">Resources</a>
+				<a rel="canonical" href="resources.html">Resources</a>
 			</li>
             <li>
-                <a href="https://github.com/aika-algorithm/aika">GitHub</a>
+                <a rel="canonical" href="https://github.com/aika-algorithm/aika">GitHub</a>
             </li>
 		</ul>
 	</div>
 </div>
 	<div id="contents">
 		<div align="right"><span style='color: #FF0000;'>October 09, 2020</span></div>
+		<div align="middle"><b><span style='color: #FF0000;'>Draft</span></b></div>
 		<div class="features">
-			<h1>How it works</h1>
+			<h1>How the network is trained</h1>
 			<p>
-			<h2>The Entropy framework</h2>
+			<h2>The entropy framework</h2>
 			<p>
 				Obviously, since the network contains a lot of cycles, the usual backpropagation algorithm won't work very well for this type of network. Also relying on handcrafted labels that are applied to the output of the network seems very error-prone and it creates a large distance between our training signal and the weights that we would like to adjust. Hence we would like to train our pattern more locally without the reliance on an external signal source. This is where Shannon entropy comes in quite handy. If we consider the word example again, we can measure the information content of each letter by calculating the Shannon entropy. We can look at the word pattern neuron as a way of compressing the information given by the individual letter neurons. This compression can be formalized using the mutual information which can then be used to derive an objective function for our training algorithm. The resulting derivative function exhibits a very interesting and unexpected behavior with regard to when the synapse weights and bias values are increased or decreased.
 

@@ -23,35 +23,36 @@
 <div id="header">
 	<div>
 		<div class="logo">
-			<a href="index.html"></a>
+			<a rel="canonical" href="https://aika.network"></a>
 		</div>
 		<ul id="navigation">
             <li>
-                <a href="index.html">Overall idea</a>
+                <a rel="canonical" href="https://aika.network">Overall idea</a>
             </li>
             <li>
-                <a href="blog.html">Blog</a>
+                <a rel="canonical" href="blog.html">Blog</a>
             </li>
             <li>
-                <a href="inference.html">Inference</a>
+                <a rel="canonical" href="inference.html">Inference</a>
             </li>
             <li>
-                <a href="training.html">Training</a>
+                <a rel="canonical" href="training.html">Training</a>
             </li>
 			<li class="active">
-				<a href="usage.html">Examples</a>
+				<a rel="canonical" href="usage.html">Examples</a>
 			</li>
 			<li>
-				<a href="resources.html">Resources</a>
+				<a rel="canonical" href="resources.html">Resources</a>
 			</li>
             <li>
-                <a href="https://github.com/aika-algorithm/aika">GitHub</a>
+                <a rel="canonical" href="https://github.com/aika-algorithm/aika">GitHub</a>
             </li>
 		</ul>
 	</div>
 </div>
 	<div id="contents">
         <div align="right"><span style='color: #FF0000;'>October 09, 2020</span></div>
+        <div align="middle"><b><span style='color: #FF0000;'>Draft</span></b></div>
 		<div class="features">
             <h1>Usage</h1>
 
@@ -65,237 +66,10 @@
                 &lt;dependency&gt;<br/>
                 &nbsp;&nbsp;&nbsp;&nbsp;&lt;groupId&gt;org.aika-software&lt;&#47;groupId&gt;<br/>
                 &nbsp;&nbsp;&nbsp;&nbsp;&lt;artifactId&gt;aika&lt;&#47;artifactId&gt;<br/>
-                &nbsp;&nbsp;&nbsp;&nbsp;&lt;version&gt;1.4.0&lt;&#47;version&gt;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&lt;version&gt;2.0.0-SNAPSHOT&lt;&#47;version&gt;<br/>
                 &lt;&#47;dependency&gt;<br/>
                 </b>
             </p>
-
-
-            <h3>Named Entity Recognition / Entity Resolution example</h3>
-            <p>
-                This example demonstrates the recognition of the words 'jackson cook' as forename and surname.
-                If these words would have occurred independently, they would have been recognized as city or
-                profession based on the example code. The complete code for this example can be found in the class <a href="https://github.com/aika-algorithm/aika/blob/master/src/test/java/org/aika/network/NamedEntityRecognitionTest.java">NamedEntityRecognitionTest</a>.
-                <br/>
-                Now, the first step is to create an empty model. The following map is used as a dictionary to look up the individual word input neurons.
-            </p>
-            <div class="prettyprint-code">
-            <pre class="prettyprint">
-				<code class="language-java">
-    Model m = new Model();
-
-    HashMap&lt;String, Neuron&gt; inputNeurons = new HashMap<>();
-
-    for(String word: new String[] {"jackson", "cook"}) {
-        Neuron in = m.createNeuron("W-" + word, INPUT);
-
-        inputNeurons.put(word, in);
-    }
-                </code>
-			</pre>
-            </div>
-            <p>
-                These three neurons are just placeholders that will be wired up later on.
-            </p>
-            <div class="prettyprint-code">
-            <pre class="prettyprint">
-				<code class="language-java">
-    Neuron forenameCategory = m.createNeuron("C-forename", INHIBITORY, LIMITED_RECTIFIED_LINEAR_UNIT);
-    Neuron surnameCategory = m.createNeuron("C-surname", INHIBITORY, LIMITED_RECTIFIED_LINEAR_UNIT);
-    Neuron inhibitingN = m.createNeuron("INHIB", INHIBITORY, LIMITED_RECTIFIED_LINEAR_UNIT);
-                </code>
-			</pre>
-            </div>
-
-            <p>
-                The following code snippet is the crucial section of this example. It shows how the first entity neuron is created and connected by its input synapses.
-                The entity neurons represent the concrete meanings of the input words. As can be seen here the individual inputs have a few more properties than we are used to from other
-                neural networks. The reason for this is that Aika not only propagates the input activation value to the next neuron but also the text range, the word position.
-                <br/>
-                This entity neuron has three inputs. The first one simply checks if the word 'cook' occurred in the text. The second one is a positive feedback loop and checks if the previous word
-                was a forename. The last one is a negative feedback loop. It makes sure that only one meaning is assigned to each word.
-                <br/>
-                The other entity neurons are created in a similar fashion which is therefore not shown here.
-            </p>
-            <div class="prettyprint-code">
-            <pre class="prettyprint">
-				<code class="language-java">
-    Neuron cookSurnameEntity = Neuron.init(
-            m.createNeuron("E-cook (surname)", EXCITATORY, RECTIFIED_HYPERBOLIC_TANGENT),
-            6.0, // adjusts the bias
-            new Synapse.Builder() // Requires the word to be recognized
-                    .setSynapseId(0)
-                    .setNeuron(inputNeurons.get("cook"))
-                    .setWeight(10.0)
-                    .setRecurrent(false),
-            new Synapse.Builder() // The previous word needs to be a forename
-                    .setSynapseId(1)
-                    .setNeuron(forenameCategory)
-                    .setWeight(10.0)
-                    .setRecurrent(true), // this input is a positive feedback loop
-
-                    // This neuron may be suppressed by the E-cook (profession) neuron, but there is no
-                    // self suppression taking place even though 'E-cook (surname)' is also contained
-                    // in the inhibitingN.
-            new Synapse.Builder()
-                    .setSynapseId(2)
-                    .setNeuron(inhibitingN)
-                    .setWeight(-100.0)
-                    .setRecurrent(true), // this input is a negative feedback loop
-            new Relation.Builder()  // references the previous word
-                    .setFrom(1)  // From Synpase Id
-                    .setTo(0)    // To Synapse Id
-                    .setRelation(END_TO_BEGIN_EQUALS),
-            new Relation.Builder()
-                    .setFrom(2)
-                    .setTo(0)
-                    .setRelation(OVERLAPS),
-            new Relation.Builder()
-                    .setFrom(0)
-                    .setTo(OUTPUT)
-                    .setRelation(EQUALS)
-    );
-                </code>
-			</pre>
-            </div>
-            <p>
-                The category neurons in this example only have input. For a real application there would be a long list of inputs.
-            </p>
-            <div class="prettyprint-code">
-            <pre class="prettyprint">
-				<code class="language-java">
-    Neuron.init(
-            forenameCategory,
-            0.0,
-            new Synapse.Builder() // In this example there is only one forename considered.
-                    .setSynapseId(0)
-                    .setNeuron(jacksonForenameEntity)
-                    .setWeight(1.0),
-            new Relation.Builder()
-                    .setFrom(0)
-                    .setTo(OUTPUT)
-                    .setRelation(EQUALS)
-    );
-    Neuron.init(
-            surnameCategory,
-            0.0,
-            new Synapse.Builder()
-                    .setSynapseId(0)
-                    .setNeuron(cookSurnameEntity)
-                    .setWeight(1.0),
-            new Relation.Builder()
-                    .setFrom(0)
-                    .setTo(OUTPUT)
-                    .setRelation(EQUALS)
-    );
-                </code>
-			</pre>
-            </div>
-            <p>
-                The last neuron is the suppressing neuron. It is used as a mediator in order to avoid having to connect all of these neurons with each other. Self suppression does not take place.
-            </p>
-            <div class="prettyprint-code">
-            <pre class="prettyprint">
-				<code class="language-java">
-    Neuron.init(
-            inhibitingN,
-            0.0,
-            new Synapse.Builder().setNeuron(cookProfessionEntity)
-                    .setSynapseId(0)
-                    .setWeight(1.0),
-            new Synapse.Builder()
-                    .setSynapseId(1)
-                    .setNeuron(cookSurnameEntity)
-                    .setWeight(1.0),
-            new Synapse.Builder()
-                    .setSynapseId(2)
-                    .setNeuron(jacksonCityEntity)
-                    .setWeight(1.0),
-            new Synapse.Builder()
-                    .setSynapseId(3)
-                    .setNeuron(jacksonForenameEntity)
-                    .setWeight(1.0),
-            new Relation.Builder()
-                    .setFrom(0)
-                    .setTo(OUTPUT)
-                    .setRelation(EQUALS),
-            new Relation.Builder()
-                    .setFrom(1)
-                    .setTo(OUTPUT)
-                    .setRelation(EQUALS),
-            new Relation.Builder()
-                    .setFrom(2)
-                    .setTo(OUTPUT)
-                    .setRelation(EQUALS),
-            new Relation.Builder()
-                    .setFrom(3)
-                    .setTo(OUTPUT)
-                    .setRelation(EQUALS)
-        );
-                </code>
-			</pre>
-            </div>
-            <p>
-                Now that the model is complete, we can start processing an actual text.
-            </p>
-            <div class="prettyprint-code">
-            <pre class="prettyprint">
-				<code class="language-java">
-    Document doc = m.createDocument("mr. jackson cook was born in new york ");
-
-    int i = 0;
-    for(String w: doc.getContent().split(" ")) {
-        int j = i + w.length();
-
-        // Feed the individual words as inputs into the network.
-        inputNeurons.get(w).addInput(doc, i, j);
-        i = j + 1;
-    }
-
-    // Search for the best interpretation of this text.
-    doc.process();
-
-    System.out.println(doc.activationsToString());
-
-    doc.clearActivations();
-                </code>
-			</pre>
-            </div>
-            <p>
-The output of this example looks as following. Each line in the table represents a neuron activation. In this example,
-slots simply specify the range begin (slot 0) and the range end (slot 1).
-            </p>
-            <div class="prettyprint-code">
-            <pre class="prettyprint">
-				<code class="language-java">
-
-Activation ID - Neuron Type - Final Decision - Slots (Ranges) | Identity - Neuron Label - Logic Layer - Upper Bound -
-Value | Sum | Weight - Input Value | Target Value
-
-0   INPUT      -          - (0:0, 1:4) "mr. " () - W-mr. - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
-4   INHIBITORY -          - (0:4, 1:12) "jackson " () - C-forename - V:1.0 UB:1.0 Net:1.0 W:0.0
-5   INHIBITORY -          - (0:4, 1:12) "jackson " () - INHIB - V:1.0 UB:1.0 Net:1.0 W:0.0
-1   INPUT      -          - (0:4, 1:12) "jackson " () - W-jackson - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
-2   EXCITATORY - SELECTED - (0:4, 1:12) "jackson " () - E-jackson (forename) - V:1.0 UB:1.0 Net:6.0 W:6.0
-3   EXCITATORY - EXCLUDED - (0:4, 1:12) "jackson " () - E-jackson (city) - V:0.0 UB:0.0 Net:-95.0 W:0.0
-9   INHIBITORY -          - (0:12, 1:17) "cook " () - C-surname - V:1.0 UB:1.0 Net:1.0 W:0.0
-10  INHIBITORY -          - (0:12, 1:17) "cook " () - INHIB - V:1.0 UB:1.0 Net:1.0 W:0.0
-6   INPUT      -          - (0:12, 1:17) "cook " () - W-cook - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
-7   EXCITATORY - SELECTED - (0:12, 1:17) "cook " () - E-cook (surname) - V:1.0 UB:1.0 Net:6.0 W:6.0
-8   EXCITATORY - EXCLUDED - (0:12, 1:17) "cook " () - E-cook (profession) - V:0.0 UB:0.0 Net:-95.0 W:0.0
-11  INPUT      -          - (0:17, 1:21) "was " () - W-was - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
-12  INPUT      -          - (0:21, 1:26) "born " () - W-born - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
-13  INPUT      -          - (0:26, 1:29) "in " () - W-in - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
-14  INPUT      -          - (0:29, 1:33) "new " () - W-new - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
-15  INPUT      -          - (0:33, 1:38) "york " () - W-york - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
-
- Final SearchNode:6  WeightSum:12.0
-                </code>
-			</pre>
-            </div>
-
-            <br/>
-            <br/>
 
             <h3>Mutual exclusion example</h3>
             <div style="text-align:center; width:100%">
@@ -307,265 +81,267 @@ Value | Sum | Weight - Input Value | Target Value
 				<code class="language-java">
     @Test
     public void testMutualExclusion() {
-        Model m = new Model();
+        Model m = new TextModel();
 
-        // Create the input neurons for the network.
-        Neuron inA = m.createNeuron("IN-A", INPUT);
-        Neuron inB = m.createNeuron("IN-B", INPUT);
-        Neuron inC = m.createNeuron("IN-C", INPUT);
+        PatternNeuron in = new PatternNeuron(m, "I", "IN", true);
+        PatternPartNeuron na = new PatternPartNeuron(m, "A", false);
+        PatternPartNeuron nb = new PatternPartNeuron(m, "B", false);
+        PatternPartNeuron nc = new PatternPartNeuron(m, "C", false);
+        InhibitoryNeuron inhib = new InhibitoryNeuron(m, "I", false);
 
-        // Instantiate the inhibitory neuron. Its inputs will be added later on.
-        Neuron inhibN = m.createNeuron("INHIB");
+        {
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(in, na, false, false, true, false);
 
-        // Create three neurons that might be suppressed by the inhibitory neuron.
-        Neuron pA = Neuron.init(
-                m.createNeuron("A", EXCITATORY),
-                3.0,
-                new Synapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(inA)
-                        .setWeight(10.0)
-                        .setRecurrent(false),
-                new Synapse.Builder()
-                        .setSynapseId(1)
-                        .setNeuron(inhibN)
-                        .setWeight(-100.0)
-                        .setRecurrent(true),
-                new Relation.Builder()
-                        .setFrom(1)
-                        .setTo(0)
-                        .setRelation(EQUALS),
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(OUTPUT)
-                        .setRelation(EQUALS)
-        );
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                na.addConjunctiveBias(-10.0, false);
+            }
 
-        Neuron pB = Neuron.init(
-                m.createNeuron("B", EXCITATORY),
-                5.0,
-                new Synapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(inB)
-                        .setWeight(10.0)
-                        .setRecurrent(false),
-                new Synapse.Builder()
-                        .setSynapseId(1)
-                        .setNeuron(inhibN)
-                        .setWeight(-100.0)
-                        .setRecurrent(true),
-                new Relation.Builder()
-                        .setFrom(1)
-                        .setTo(0)
-                        .setRelation(EQUALS),
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(OUTPUT)
-                        .setRelation(EQUALS)
-        );
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(inhib, na, true, true, false, false);
 
-        Neuron pC = Neuron.init(
-                m.createNeuron("C", EXCITATORY),
-                2.0,
-                new Synapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(inC)
-                        .setWeight(10.0)
-                        .setRecurrent(false),
-                new Synapse.Builder()
-                        .setSynapseId(1)
-                        .setNeuron(inhibN)
-                        .setWeight(-100.0)
-                        .setRecurrent(true),
-                new Relation.Builder()
-                        .setFrom(1)
-                        .setTo(0)
-                        .setRelation(EQUALS),
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(OUTPUT)
-                        .setRelation(EQUALS)
-        );
+                s.linkOutput();
+                s.addWeight(-100.0);
+            }
 
-        // Finally addInput all the inputs to the suppressing neuron.
-        Neuron.init(
-                inhibN,
-                0.0,
-                new Synapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(pA)
-                        .setWeight(1.0)
-                        .setRecurrent(false),
-                new Synapse.Builder()
-                        .setSynapseId(1)
-                        .setNeuron(pB)
-                        .setWeight(1.0)
-                        .setRecurrent(false),
-                new Synapse.Builder()
-                        .setSynapseId(2)
-                        .setNeuron(pC)
-                        .setWeight(1.0)
-                        .setRecurrent(false),
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(OUTPUT)
-                        .setRelation(EQUALS),
-                new Relation.Builder()
-                        .setFrom(1)
-                        .setTo(OUTPUT)
-                        .setRelation(EQUALS),
-                new Relation.Builder()
-                        .setFrom(2)
-                        .setTo(OUTPUT)
-                        .setRelation(EQUALS)
-        );
+            na.setBias(1.0);
+        }
 
-        Neuron outN = Neuron.init(
-                m.createNeuron("OUT", EXCITATORY),
-                0.0,
-                new Synapse.Builder()
-                         .setSynapseId(0)
-                        .setNeuron(pB)
-                        .setWeight(1.0)
-                        .setRecurrent(false),
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(OUTPUT)
-                        .setRelation(EQUALS)
-        );
+        {
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(in, nb, false, false, true, false);
 
-        // Now that the model is complete, apply it to a document.
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                nb.addConjunctiveBias(-10.0, false);
+            }
 
-        Document doc = m.createDocument("foobar", 0);
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(inhib, nb, true, true, false, false);
 
-        // Add input activations starting at char 0 and ending at char 1
-        // These inputs will be immediately propagated through the network.
-        inA.addInput(doc, 0, 1);
-        inB.addInput(doc, 0, 1);
-        inC.addInput(doc, 0, 1);
+                s.linkOutput();
+                s.addWeight(-100.0);
+            }
+            nb.setBias(1.5);
+        }
 
-        // Computes the best interpretation
+
+        {
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(in, nc, false, false, true, false);
+
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                nc.addConjunctiveBias(-10.0, false);
+            }
+
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(inhib, nc, true, true, false, false);
+
+                s.linkOutput();
+                s.addWeight(-100.0);
+            }
+
+            nc.setBias(1.2);
+        }
+
+        {
+            {
+                InhibitorySynapse s = new InhibitorySynapse(na, inhib);
+                s.linkInput();
+                s.addWeight(1.0);
+            }
+            {
+                InhibitorySynapse s = new InhibitorySynapse(nb, inhib);
+                s.linkInput();
+                s.addWeight(1.0);
+            }
+            {
+                InhibitorySynapse s = new InhibitorySynapse(nc, inhib);
+                s.linkInput();
+                s.addWeight(1.0);
+            }
+
+            inhib.setBias(0.0);
+        }
+
+        Document doc = new Document("test");
+
+        Activation act = new Activation(doc, in);
+        act.setValue(1.0);
+        act.setFired(0);
+
+        act.propagateInput();
+
         doc.process();
 
         System.out.println(doc.activationsToString());
 
-        Assert.assertEquals(0, pA.getActivations(doc, true).count());
-        Assert.assertEquals(1, pB.getActivations(doc, true).count());
-        Assert.assertEquals(0, pC.getActivations(doc, true).count());
+        Set<Activation> nbActs = doc.getActivations(nb);
+        Activation nbAct = nbActs.iterator().next();
 
-        Assert.assertEquals(1, outN.getActivations(doc, true).count());
-        doc.clearActivations();
+        assertTrue(nbAct.getValue() > 0.38);
     }
                 </code>
 			</pre>
 
-			<pre class="prettyprint">
-				<code class="language-java">
- Activation ID - Neuron Type - Final Decision - Slots | Identity - Neuron Label - Upper Bound -
- Value | Net | Weight - Input Value | Target Value
-
-0   INPUT      -          - (0:0, 1:1) "f" () - IN-A - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
-3   INPUT      -          - (0:0, 1:1) "f" () - IN-B - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
-6   INPUT      -          - (0:0, 1:1) "f" () - IN-C - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
-2   INHIBITORY -          - (0:0, 1:1) "f" () - INHIB - V:1.0 UB:1.0 Net:1.0 W:0.0
-1   EXCITATORY - EXCLUDED - (0:0, 1:1) "f" () - A - V:0.0 UB:0.0 Net:-97.0 W:0.0
-4   EXCITATORY - SELECTED - (0:0, 1:1) "f" () - B - V:1.0 UB:1.0 Net:5.0 W:5.0
-7   EXCITATORY - EXCLUDED - (0:0, 1:1) "f" () - C - V:0.0 UB:0.0 Net:-98.0 W:0.0
-5   INHIBITORY -          - (0:0, 1:1) "f" () - OUT - V:0.762 UB:0.762 Net:1.0 W:0.0
-
-Final SearchNode:10  WeightSum:5.0
-				</code>
-			</pre>
-            </div>
-
-            <br/>
-            <br/>
 
             <h3>Pattern matching example</h3>
             <div class="prettyprint-code">
 			<pre class="prettyprint">
 				<code class="language-java">
-    @Test
-    public void testPatternMatching() {
-        Model m = new Model();
+    public TextModel initModel() {
+        TextModel m = new TextModel();
 
-        Map&lt;Character, Neuron&gt; inputNeurons = new HashMap&lt;&gt;();
+        PatternNeuron nA = m.lookupToken("A");
+        PatternNeuron nB = m.lookupToken("B");
+        PatternNeuron nC = m.lookupToken("C");
 
-        // Create an input neuron for every letter in this example.
-        for(char c: new char[] {'a', 'b', 'c', 'd', 'e', 'f'}) {
-            Neuron in = m.createNeuron(c + "", INPUT);
+        PatternPartNeuron eA = new PatternPartNeuron(m, "E A", false);
+        PatternPartNeuron eB = new PatternPartNeuron(m, "E B", false);
+        PatternPartNeuron eC = new PatternPartNeuron(m, "E C", false);
 
-            inputNeurons.put(c, in);
-        }
+        PatternNeuron out = new PatternNeuron(m, "ABC", "OUT", false);
 
-        Neuron pattern = Neuron.init(
-                m.createNeuron("BCDE", EXCITATORY),
-                5.0,
-                new Synapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(inputNeurons.get('b'))
-                        .setWeight(10.0)
-                        .setRecurrent(false),
-                new Synapse.Builder()
-                        .setSynapseId(1)
-                        .setNeuron(inputNeurons.get('c'))
-                        .setWeight(10.0)
-                        .setRecurrent(false),
-                new Synapse.Builder()
-                        .setSynapseId(2)
-                        .setNeuron(inputNeurons.get('d'))
-                        .setWeight(10.0)
-                        .setRecurrent(false),
-                new Synapse.Builder()
-                        .setSynapseId(3)
-                        .setNeuron(inputNeurons.get('e'))
-                        .setWeight(10.0)
-                        .setRecurrent(false),
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(1)
-                        .setRelation(END_TO_BEGIN_EQUALS),
-                new Relation.Builder()
-                        .setFrom(1)
-                        .setTo(2)
-                        .setRelation(END_TO_BEGIN_EQUALS),
-                new Relation.Builder()
-                        .setFrom(2)
-                        .setTo(3)
-                        .setRelation(END_TO_BEGIN_EQUALS),
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(OUTPUT)
-                        .setRelation(BEGIN_EQUALS),
-                new Relation.Builder()
-                        .setFrom(3)
-                        .setTo(OUTPUT)
-                        .setRelation(END_EQUALS)
-        );
+        {
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(nA, eA, false, false, true, false);
 
-
-        // Create a simple text document.
-        Document doc = m.createDocument("a b c d e ");
-
-        // Then add the characters
-        for(int i = 0; i < doc.length(); i++) {
-            char c = doc.getContent().charAt(i);
-            if(c != ' ') {
-                inputNeurons.get(c).addInput(doc, i, i + 2);
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                eA.addConjunctiveBias(-10.0, false);
             }
+
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(out, eA, false, true, false, false);
+
+                s.linkInput();
+                s.linkOutput();
+                s.setWeight(10.0);
+                eA.addConjunctiveBias(-10.0, true);
+            }
+            eA.setBias(4.0);
         }
 
-        // Computes the best interpretation
-        doc.process();
+        {
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(nB, eB, false, false, true, false);
 
-        Assert.assertEquals(1, pattern.getActivations(doc, false).count());
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                eB.addConjunctiveBias(-10.0, false);
+            }
 
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(eA, eB, false, false, false, true);
 
-        System.out.println("All activations:");
-        System.out.println(doc.activationsToString());
-        System.out.println();
+                s.linkOutput();
+                s.addWeight(10.0);
+                eB.addConjunctiveBias(-10.0, false);
+            }
 
-        doc.clearActivations();
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nB), eB, false, false, true, false);
+
+                s.linkOutput();
+                s.addWeight(10.0);
+                eB.addConjunctiveBias(-10.0, false);
+            }
+
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(out, eB, false, true, false, false);
+
+                s.linkOutput();
+                s.addWeight(10.0);
+                eB.addConjunctiveBias(-10.0, true);
+            }
+            eB.setBias(4.0);
+        }
+
+        {
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(nC, eC, false, false, true, false);
+
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                eC.addConjunctiveBias(-10.0, false);
+            }
+
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(eB, eC, false, false, false, true);
+
+                s.linkOutput();
+                s.addWeight(10.0);
+                eC.addConjunctiveBias(-10.0, false);
+            }
+
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nC), eC, false, false, true, false);
+
+                s.linkOutput();
+                s.addWeight(10.0);
+                eC.addConjunctiveBias(-10.0, false);
+            }
+
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(out, eC, false, true, false, false);
+
+                s.linkOutput();
+                s.addWeight(10.0);
+                eC.addConjunctiveBias(-10.0, true);
+            }
+            eC.setBias(4.0);
+        }
+
+        {
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(eA, out, false, false, false, true);
+
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                out.addConjunctiveBias(-10.0, false);
+            }
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(eB, out, false, false, false, true);
+
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                out.addConjunctiveBias(-10.0, false);
+            }
+            {
+                ExcitatorySynapse s = new ExcitatorySynapse(eC, out, false, false, false, true);
+
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                out.addConjunctiveBias(-10.0, false);
+            }
+            out.setBias(4.0);
+        }
+        return m;
+    }
+
+    public PatternPartNeuron lookupPPPT(TextModel tm, PatternNeuron pn) {
+        return (PatternPartNeuron) pn.getOutputSynapses()
+                .map(s -> s.getOutput())
+                .filter(n -> isPTNeuron(tm, n))
+                .findAny()
+                .orElse(null);
+    }
+
+    private boolean isPTNeuron(TextModel tm, Neuron<?> n) {
+        return n.getOutputSynapses()
+                .map(s -> s.getOutput())
+                .anyMatch(in -> in == tm.getPrevTokenInhib());
     }
 				</code>
 			</pre>
