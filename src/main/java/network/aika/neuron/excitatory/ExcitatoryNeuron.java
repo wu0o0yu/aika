@@ -103,12 +103,11 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         l.linkOutput();
         oAct.sumUpLink(null, l);
 
-        oAct.initSelfGradient();
-
         l.computeInitialGradient();
         l.removeGradientDependencies();
+        oAct.addInitialLinkGradient(l.getInitialGradient());
 
-        oAct.updateSelfGradient();
+        l.updateSelfGradient();
 
         if(l.getFinalGradient() > -1.6) {
             System.out.println("dbg:" + (Neuron.debugId++) + " " + s + "   FG:" + Utils.round(l.getFinalGradient()) + " below threshold");

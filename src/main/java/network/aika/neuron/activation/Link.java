@@ -102,8 +102,6 @@ public class Link {
         initialGradient = s * output.getActFunctionDerivative();
         offsetGradient =  s * getActFunctionDerivative();
         initialGradient -= offsetGradient;
-
-        getOutput().addInitialLinkGradient(initialGradient);
     }
 
     public void removeGradientDependencies() {
@@ -113,6 +111,10 @@ public class Link {
                     initialGradient -= l.initialGradient;
                     offsetGradient -= l.offsetGradient;
                 });
+    }
+
+    public double getInitialGradient() {
+        return initialGradient;
     }
 
     public double getActFunctionDerivative() {

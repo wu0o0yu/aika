@@ -400,6 +400,9 @@ public class Activation implements Comparable<Activation> {
 
         getInputLinks()
                 .forEach(l -> l.removeGradientDependencies());
+
+        getInputLinks()
+                .forEach(l -> addInitialLinkGradient(l.getInitialGradient()));
     }
 
     public void initSelfGradient() {
