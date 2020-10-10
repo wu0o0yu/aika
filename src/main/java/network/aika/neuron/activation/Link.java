@@ -131,6 +131,8 @@ public class Link {
     public void updateSelfGradient() {
         selfGradient = getOutput().getNormSelfGradient();
         selfGradient += offsetGradient;
+
+        finalGradient += selfGradient;
     }
 
     public void updateAndPropagateSelfGradient() {

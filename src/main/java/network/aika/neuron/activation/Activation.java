@@ -423,6 +423,10 @@ public class Activation implements Comparable<Activation> {
     }
 
     public double getNormSelfGradient() {
+        if(!getNeuron().getInstances().isInitialized()) {
+            return selfGradient;
+        }
+
         return selfGradient / getN();
     }
 
