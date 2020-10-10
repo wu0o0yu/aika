@@ -1,7 +1,6 @@
 package network;
 
 import network.aika.Config;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.excitatory.PatternPartNeuron;
@@ -96,8 +95,9 @@ public class InductionTest {
         Link.link(sA, actA, actTarget, false);
         Link.link(sB, actB, actTarget, false);
 
+        actTarget.initSelfGradient();
         actTarget.computeInitialLinkGradients();
-        actTarget.computeSelfGradient();
+        actTarget.updateSelfGradient();
         actTarget.processGradient();
 
         System.out.println(actTarget.gradientsToString());

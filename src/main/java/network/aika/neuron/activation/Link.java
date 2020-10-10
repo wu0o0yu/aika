@@ -38,10 +38,6 @@ public class Link {
 
     private static final Logger log = LoggerFactory.getLogger(Link.class);
 
-    public static Comparator<Link> SORTED_BY_FIRED = Comparator
-            .<Link, Fired>comparing(l -> l.getInput().getFired())
-            .thenComparing(l -> l.getInput());
-
     private final Synapse synapse;
 
     private Activation input;
@@ -59,14 +55,6 @@ public class Link {
         this.input = input;
         this.output = output;
         this.isSelfRef = isSelfRef;
-    }
-
-    public double getInitialGradient() {
-        return initialGradient;
-    }
-
-    public double getSelfGradient() {
-        return selfGradient;
     }
 
     public double getFinalGradient() {
@@ -114,6 +102,8 @@ public class Link {
         initialGradient = s * output.getActFunctionDerivative();
         offsetGradient =  s * getActFunctionDerivative();
         initialGradient -= offsetGradient;
+
+        getOutput().addInitialLinkGradient(initialGradient);
     }
 
     public void removeGradientDependencies() {
@@ -136,10 +126,13 @@ public class Link {
                 );
     }
 
-    public void computeSelfGradient(double g) {
-        selfGradient = g;
+    public void updateSelfGradient() {
+        selfGradient = getOutput().getNormSelfGradient();
         selfGradient += offsetGradient;
+    }
 
+    public void updateAndPropagateSelfGradient() {
+        updateSelfGradient();
         propagateGradient(selfGradient);
     }
 

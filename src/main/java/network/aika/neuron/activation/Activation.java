@@ -31,7 +31,6 @@ import static network.aika.Phase.*;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
-import static network.aika.neuron.activation.Link.SORTED_BY_FIRED;
 
 /**
  *
@@ -403,21 +402,25 @@ public class Activation implements Comparable<Activation> {
                 .forEach(l -> l.removeGradientDependencies());
     }
 
-    public void computeSelfGradient() {
+    public void initSelfGradient() {
         selfGradient = getActFunctionDerivative() *
                 getNeuron().getSurprisal(
                         Sign.getSign(this)
                 );
+    }
 
-        selfGradient += getInputLinks()
-                .mapToDouble(l -> l.getInitialGradient())
-                .sum();
+    public void addInitialLinkGradient(double initialLinkGradient) {
+        selfGradient += initialLinkGradient;
+    }
 
-        selfGradient /= getN();
-
+    public void updateSelfGradient() {
         getInputLinks().forEach(l ->
-                l.computeSelfGradient(selfGradient)
+                l.updateAndPropagateSelfGradient()
         );
+    }
+
+    public double getNormSelfGradient() {
+        return selfGradient / getN();
     }
 
     public int getN() {
