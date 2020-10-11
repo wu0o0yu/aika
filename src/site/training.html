@@ -55,7 +55,7 @@
 </div>
 	<div id="contents">
 		<div align="right"><span style='color: #FF0000;'>October 11, 2020</span></div>
-		<div align="middle"><b><span style='color: #FF0000;'>Draft</span></b></div>
+		<div align="middle"><b><span style='color: #FF0000;'>Work in progress</span></b></div>
 		<div class="features">
 			<h1>How the network is trained</h1>
 			<p>
@@ -150,7 +150,7 @@
 
 				$$\alpha = f + 1$$
 				$$\beta = (N - f) + 1$$
-				The probability density function \(f(x;\alpha,\beta)\) of the beta-distribution the looks as follows:
+				The probability density function \(f(x;\alpha,\beta)\) of the beta-distribution then looks as follows:
 			</p>
 
 			<div style="text-align:center; width:100%">
@@ -166,10 +166,10 @@
 			</div>
 			<p>
 				If we invert this function and select a threshold, say 5%, than we can estimate an upper bound for our
-				true probability. In other words we are now 95% certain that the true distribution probability that we have measured is
+				true probability. In other words we are now 95% certain that the true probability distribution underlying the measurement is
 				lower than our estimate. Consequently, we are now able to compute a lower bound value for the surprisal value.
 			</p>
-			<h2>The optimization Problem</h2>
+			<h2>The optimization problem</h2>
 			<p>
 				Since we would like to optimize the compression rate within the network, we need to find a way to adjust the synapse weights and the neuron
 				biases such that the network requires less information to encode the message of the input data.
