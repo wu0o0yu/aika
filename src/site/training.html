@@ -133,29 +133,41 @@
 				cover a larger space within the document we need to divide the the total number of characters by the average
 				covered area of this neurons activations.
 
-				<b>TODO</b>
+				$$N_{chars} = \text{number of characters over all training examples}$$
+				$$c = \text{average space covered by activations of a neuron}$$
+				$$N = N_{chars} \cdot c$$
 
-				First the frequencies are counted by summing up the input activations
-
-
-				$$f(X_i, Y) = \sum\limits_{d=0}^N{Y_d \cdot X_{di}}$$
-
-				The probability distributions are then calculated by dividing the frequency through the number of trainings instances.
-
-				$$P(Y) = \dfrac{f(Y)}{N}$$
-
-				$$P(X_i,Y) = \dfrac{f(X_i,Y)}{N}$$
-
-				However, there are two problems with this simple form of frequency counting. The first one is that the
-				sample might be too small to be reliable. In this case the dirichlet distribution might help to estimate
-				how reliable the distribution is, but things are getting complicated here pretty quickly. The second problem
-				is, that the distribution is a moving target. Since we constantly adjust the weights of the excitatory neuron,
-				this of course also means that the probability distributions are changing as well. This problem
-				can be tackled by using a moving average to calculate the probabilities.
 			</p>
 			<h2>The Beta-Distribution</h2>
 			<p>
-				Then there is the problem that right after a new neuron is introduced there are very few training instances for this statistic yet we still want to adjust the weights of this neuron. Hence we need a conservative estimate of what we already know for certain about the probabilities. Since entropy is based on the surprisal (-log(p)) which gets large when the probability gets close to zero, we can use the cumulative beta distribution to determine what the maximum probability is that can be explained by the observed frequencies.
+				Another problem with estimating the probability distributions is that we might not have enough training instances for
+				for a reliable statistic after inducing a new neuron or a new synapse. Yet we still want to be able adjust the weights of this neuron.
+				Hence we need a conservative estimate of what we already know for certain about the distribution. Considering that
+				the surprisal (\(-log(p)\)) only gets large when the probability gets close to zero, we can use the cumulative beta-distribution
+				to determine what the maximum probability is that can be explained by the observed frequencies. Lets consider an example
+				where ein frequency \(f\) is 10 and our sample space \(N\) is 100. Then we need to choose the parameters \(\alpha\) and \(\beta\) in
+				the following manner.
+
+				$$\alpha = f + 1$$
+				$$\beta = (N - f) + 1$$
+				The probability density function \(f(x;\alpha,\beta)\) of the beta-distribution the looks as follows:
+			</p>
+
+			<div style="text-align:center; width:100%">
+				<img src="images/beta-dist.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+			</div>
+			<p>
+				Here we can see how likely each probability estimate is given our measured frequency. In order to choose a reliable
+				estimated probability we need to look at the cumulative distribution function:
+			</p>
+
+			<div style="text-align:center; width:100%">
+				<img src="images/cum-beta-dist.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+			</div>
+			<p>
+				If we invert this function and select a threshold, say 5%, than we can estimate an upper bound for our
+				true probability. In other words we are now 95% certain that the true distribution probability that we have measured is
+				lower than our estimate. Consequently, we are now able to compute a lower bound value for the surprisal value.
 			</p>
 			<h2>The optimization Problem</h2>
 			<p>
@@ -164,7 +176,8 @@
 			</p>
 			<h2>Concept Drift</h2>
 			<p>
-				Another problem is that of concept drift. Since we are using the distribution to adjust the synapse weights this will lead to changes in the activation patterns and therefore to changes in the distributions again.
+				Another problem is that of concept drift. Since we are using the distribution to adjust the synapse weights
+				this will lead to changes in the activation patterns and therefore to changes in the distributions again.
 
 				$$G = \sum  \limits _{ikl}{P(x_{ik},y_{l}) \cdot log \Big( \frac{P(x_{ik},y_{l})}{P(x_{ik}) \cdot P(y_{l})} \Big)}$$
 

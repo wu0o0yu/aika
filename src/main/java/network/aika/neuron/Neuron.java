@@ -258,7 +258,10 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public double getP(Sign s, double n) {
-        BetaDistribution dist = new BetaDistribution((s == POS ? frequency : n - frequency) + 1, n + 1);
+        BetaDistribution dist = new BetaDistribution(
+                getFrequency(s, n) + 1,
+                getFrequency(s.invert(), n) + 1
+        );
 
         double p = dist.inverseCumulativeProbability(
                 getModel().getBetaThreshold()
@@ -269,6 +272,10 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public double getFrequency() {
         return frequency;
+    }
+
+    public double getFrequency(Sign s, double n) {
+        return (s == POS ? frequency : n - frequency);
     }
 
     public void setFrequency(double f) {
