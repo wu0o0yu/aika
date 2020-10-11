@@ -35,10 +35,10 @@
 			<li>
 				<a rel="canonical" href="blog.html">Blog</a>
 			</li>
-			<li class="active">
+			<li>
 				<a rel="canonical" href="inference.html">Inference</a>
 			</li>
-			<li>
+			<li class="active">
 				<a rel="canonical" href="training.html">Training</a>
 			</li>
 			<li>
@@ -54,28 +54,72 @@
 	</div>
 </div>
 	<div id="contents">
-		<div align="right"><span style='color: #FF0000;'>October 09, 2020</span></div>
+		<div align="right"><span style='color: #FF0000;'>October 11, 2020</span></div>
 		<div align="middle"><b><span style='color: #FF0000;'>Draft</span></b></div>
 		<div class="features">
 			<h1>How the network is trained</h1>
 			<p>
 			<h2>The entropy framework</h2>
 			<p>
-				Obviously, since the network contains a lot of cycles, the usual backpropagation algorithm won't work very well for this type of network. Also relying on handcrafted labels that are applied to the output of the network seems very error-prone and it creates a large distance between our training signal and the weights that we would like to adjust. Hence we would like to train our pattern more locally without the reliance on an external signal source. This is where Shannon entropy comes in quite handy. If we consider the word example again, we can measure the information content of each letter by calculating the Shannon entropy. We can look at the word pattern neuron as a way of compressing the information given by the individual letter neurons. This compression can be formalized using the mutual information which can then be used to derive an objective function for our training algorithm. The resulting derivative function exhibits a very interesting and unexpected behavior with regard to when the synapse weights and bias values are increased or decreased.
+				Since the network contains a lot of cycles, the usual backpropagation algorithm won't work very well for this type of network.
+				Also relying on handcrafted labels that are applied to the output of the network is very error-prone and it creates a large
+				distance between our training signal and the weights that we would like to adjust. Hence we would like to train our pattern
+				more locally without the reliance on an external signal source. This is where the Shannon entropy framework comes in quite handy.
+				If we consider the example of a word pattern again, we can measure the amount information for each letter, that is the number of bits required
+				to represent this letter in a message, by calculating the Shannon entropy. We can then look at the word pattern neuron as a
+				way of compressing the information given by the individual letter neurons. This compression can be formalized using the mutual
+				information which can then be used to derive an objective function for our training algorithm. The resulting derivative function
+				exhibits a very interesting and unexpected behavior with regard to when the synapse weights and neuron bias values are increased or decreased.
 
-				When feeding a text or an image into a neural network there is a lot of hidden structure buried in the data that can
-				only insufficiently be captured by manually created labels. These structures consist of coinciding features within the data.
-				Now, if we use a single neuron to encode the information of such a cluster of features we would need much less information
-				to encode the same message that was given in the input data. In order to quantify these information we can utilize the
-				framework provided by the shannon entry. In other words, we can think of the neural network as a compression algorithm
-				that constantly tries to optimize its own compression rate.
+				Before we go on lets first have a look at the formula for calculating the entropy:
+
+				$$H(X) = -\sum_{i=1}^n {\mathrm{P}(x_i) \log \mathrm{P}(x_i)}$$
+
+				This formula is actually comprised of two parts, the Shannon information or information content or surprisal part:
+
+				$$I(x) = -\log_b{\left(P\right)}$$
+
+				and the calculation of the expected value of the surprisal:
+
+				$$\operatorname{E}[X] =\sum_{i=1}^n x_i\,p_i$$
+
+				The Shannon information can be interpreted as quantifying the level of "surprise" of a particular outcome. So events
+				with a very high probability have a low surprisal value and events with a low probability have high one.
+			</p>
+
+			<div style="text-align:center; width:100%">
+				<img src="images/entropy-graph.jpg" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+			</div>
+			<p>
+			    Now that we have an understanding of the basics of Shannon entropy we can go on and see what the information gain is
+			    and how it is calculated. The information gain quantifies the "amount of information" obtained about one random
+			    variable through observing another random variable. In our example, the observed random variable would be that of
+			    the letter and the other one that of the word. The formula for the information gain looks as follows:
 
 				$$I(X;Y) = \sum_{y \in \mathcal Y} \sum_{x \in \mathcal X}
 				{ p_{(X,Y)}(x, y) \log{ \left(\frac{p_{(X,Y)}(x, y)}{p_X(x)\,p_Y(y)} \right) }} $$
+
+				To get a better understanding of this formula we can take a closer look at the components its comprised of.
+				It actually uses the concept of the Kullback-Leibler divergence to calculate the divergence between the
+				joint distribution of \(X\) and \(Y\) and the product of the marginals.
+
+				$$D_\text{KL}(P \parallel Q) = \sum_{x\in\mathcal{X}} P(x) \log\left(\frac{P(x)}{Q(x)}\right)$$
+
+				In other words, we are using the KL divergence to compare the joint distribution of \(X\) and \(Y\) to the
+				special case where these occur independent of each other. <br/>
+
+				Before going forward we would like to introduce a slightly different notion of the information gain:
+
+				$$I(X;Y) = \sum_{y \in \mathcal Y} \sum_{x \in \mathcal X}
+				{ p_{(X,Y)}(x, y) \left( \log{p_{(X,Y)}(x, y)} - \log{p_X(x)} - \log{p_Y(y)} \right) } $$
+
+				As you can see, at the core of this formula are now the surprisal values of different probability distributions.
+				The outer part is actually just the calculation of the expected value of the inner part.
+				We will come back to that later on.
 			</p>
 			<h2>Counting Frequencies</h2>
 			<p>
-				Since the calculation of the entropy relies on probability distributions, we need to figure how these are determined.
+				Since the calculation of the entropy relies on probability distributions, we need to figure how we can determine these.
 				This part may sound easier than it actually is, since there are some pitfalls to consider. A simple way to estimate
 				the probability for a neuron would look like this:
 
@@ -85,9 +129,11 @@
 				space equal for all the neurons? The answer to that question is no. The size of the sample space depends on the space that the
 				activations cover in the input data set. For example an activation representing a single letter requires less space than
 				an activation representing a whole word. In the case of a neuron representing a single letter we could determine the
-				size of the sample space $N$ by summing up the number of characters of all the training documents. For neurons whose activations
+				size of the sample space \(N\) by summing up the number of characters of all the training documents. For neurons whose activations
 				cover a larger space within the document we need to divide the the total number of characters by the average
 				covered area of this neurons activations.
+
+				<b>TODO</b>
 
 				First the frequencies are counted by summing up the input activations
 
