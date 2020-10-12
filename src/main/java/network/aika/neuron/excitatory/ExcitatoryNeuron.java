@@ -162,7 +162,7 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
     }
 
     public void removeInputSynapse(ExcitatorySynapse s) {
-        if(inputSynapses.remove(s) != null) {
+        if(inputSynapses.remove(s.getPInput()) != null) {
             setModified(true);
         }
     }
@@ -175,7 +175,7 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
     }
 
     public void removeOutputSynapse(Synapse s) {
-        if(outputSynapses.remove(s) != null) {
+        if(outputSynapses.remove(s.getPOutput()) != null) {
             setModified(true);
         }
     }
