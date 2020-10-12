@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.excitatory;
 
+import network.aika.Config;
 import network.aika.Model;
 import network.aika.Utils;
 import network.aika.neuron.Neuron;
@@ -81,7 +82,9 @@ public class PatternNeuron extends ExcitatoryNeuron {
     public void induceNeuron(Activation act) {
         double s = getSurprisal(POS);
 
-        if(s < 2.0) {
+        Config c = act.getThought().getTrainingConfig();
+
+        if(s < c.getInductionThreshold()) {
             System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
             return;
         }

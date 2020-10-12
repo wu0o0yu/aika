@@ -16,10 +16,7 @@
  */
 package network.aika.neuron.excitatory;
 
-import network.aika.ActivationFunction;
-import network.aika.Model;
-import network.aika.Phase;
-import network.aika.Utils;
+import network.aika.*;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
@@ -109,7 +106,9 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
 
         l.updateSelfGradient();
 
-        if(l.getFinalGradient() > -1.6) {
+        Config c = oAct.getThought().getTrainingConfig();
+
+        if(l.getFinalGradient() > -c.getInductionThreshold()) {
             System.out.println("dbg:" + (Neuron.debugId++) + " " + s + "   FG:" + Utils.round(l.getFinalGradient()) + " below threshold");
             return null;
         }
@@ -121,7 +120,7 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         l.updateSynapse();
         l.linkInput();
 
-        l.propagate();
+        l.getOutput().getNeuron().updateReference(l);
 
         s.getInstances().update(getModel(), iAct.getReference());
 

@@ -122,6 +122,7 @@ public class Visitor {
 
     public void tryToLink(Activation act) {
 
+        if (scope == INPUT && related) return;
         if (startDir == INPUT && !act.isActive()) return; // <--
         if (act == origin || act.isConflicting()) return; // <--
 

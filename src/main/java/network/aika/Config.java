@@ -20,6 +20,9 @@ public class Config {
     private Double alpha = null; //0.99;
     private double learnRate;
 
+
+    private double inductionThreshold = 2.0;
+
     public double getLearnRate() {
         return learnRate;
     }
@@ -36,5 +39,13 @@ public class Config {
     public Config setAlpha(Double alpha) {
         this.alpha = alpha;
         return this;
+    }
+
+    public double getInductionThreshold() {
+        return inductionThreshold;
+    }
+
+    public void setInductionThreshold(double inductionThreshold) {
+        this.inductionThreshold = inductionThreshold;
     }
 }
