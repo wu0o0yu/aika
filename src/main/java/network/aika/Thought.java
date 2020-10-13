@@ -125,6 +125,10 @@ public abstract class Thought {
                     .processGradient();
         }
 
+        updateSynapseWeights();
+    }
+
+    public void updateSynapseWeights() {
         activationsById
                 .values()
                 .stream()

@@ -155,6 +155,10 @@ public class Link {
     }
 
     public void updateSynapse() {
+        if(Math.abs(finalGradient) < TOLERANCE) {
+            return;
+        }
+
         Thought t = output.getThought();
         Neuron on = output.getNeuron();
 

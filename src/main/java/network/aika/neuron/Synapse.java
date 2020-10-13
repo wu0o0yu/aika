@@ -220,10 +220,12 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 */
     public void setWeight(double weight) {
         this.weight = weight;
+        modified = true;
     }
 
     public void addWeight(double weightDelta) {
         this.weight += weightDelta;
+        modified = true;
     }
 
     @Override
