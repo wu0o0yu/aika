@@ -49,6 +49,8 @@ public class Fired implements Comparable<Fired> {
     }
 
     public String toString() {
+        if(this == NOT_FIRED) return "[NOT_FIRED]";
+
         return "[" + inputTimestamp + "," + fired + "]";
     }
 }
