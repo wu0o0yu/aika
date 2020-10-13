@@ -49,7 +49,7 @@ public class Activation implements Comparable<Activation> {
     private Neuron<?> neuron;
     private Thought thought;
 
-    private double p = 1.0;
+    private double branchProbability = 1.0;
 
     Map<NeuronProvider, Link> inputLinks;
     NavigableMap<Activation, Link> outputLinks;
@@ -210,8 +210,8 @@ public class Activation implements Comparable<Activation> {
         return value > 0.0 || !getNeuron().isInitialized();
     }
 
-    public double getP() {
-        return p;
+    public double getBranchProbability() {
+        return branchProbability;
     }
 
     public boolean isConflicting() {
@@ -388,7 +388,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     private double computeValue(Phase phase) {
-        return p *
+        return branchProbability *
                 neuron.getActivationFunction().f(
                         getNet(phase)
                 );
@@ -499,10 +499,10 @@ public class Activation implements Comparable<Activation> {
     }
 
     private void updateP(double p) {
-        if(Math.abs(p - getP()) <= TOLERANCE) return;
+        if(Math.abs(p - getBranchProbability()) <= TOLERANCE) return;
 
         Activation cAct = getModifiable(null);
-        cAct.p = p;
+        cAct.branchProbability = p;
 
         thought.addActivationToQueue(cAct);
     }
@@ -554,19 +554,10 @@ public class Activation implements Comparable<Activation> {
         return Integer.compare(id, act.id);
     }
 
-    public String toString() {
-        return "Act " +
-                getIdString() +
-                " value:" + Utils.round(value) +
-                " net:" + Utils.round(getNet()) +
-                " p:" + Utils.round(p) +
-                " round:" + round;
-    }
-
-    public String getIdString() {
+    public String getShortString() {
         return "id:" +
-                getId() + " " +
-                getNeuron();
+                getId() +
+                " neuron:[" + getNeuron() + "]";
     }
 
     public String gradientsToString() {
@@ -581,5 +572,14 @@ public class Activation implements Comparable<Activation> {
 
         sb.append("\n");
         return sb.toString();
+    }
+
+    public String toString() {
+        return "act " +
+                getShortString() +
+                " value:" + Utils.round(value) +
+                " net:" + Utils.round(getNet()) +
+                " bp:" + Utils.round(branchProbability) +
+                " round:" + round;
     }
 }

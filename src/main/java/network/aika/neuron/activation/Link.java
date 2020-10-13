@@ -24,8 +24,6 @@ import network.aika.neuron.Synapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Comparator;
-
 import static network.aika.Phase.INITIAL_LINKING;
 import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Direction.INPUT;
@@ -244,11 +242,11 @@ public class Link {
     }
 
     public String toString() {
-        return "L " + synapse.getClass().getSimpleName() + ": " + getIdString() + " --> " + output.getIdString();
+        return "L " + synapse.getClass().getSimpleName() + ": " + getIdString() + " --> " + output.getShortString();
     }
 
     public String getIdString() {
-        return (input != null ? input.getIdString() : "X:" + synapse.getInput());
+        return (input != null ? input.getShortString() : "X:" + synapse.getInput());
     }
 
     public String gradientsToString() {
