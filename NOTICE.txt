@@ -1,3 +1,3 @@
 AIKA
 
-Copyright 2015-2017 Lukas Molzberger
+Copyright 2015-2020 Lukas Molzberger
