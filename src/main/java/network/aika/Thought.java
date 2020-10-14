@@ -131,7 +131,9 @@ public abstract class Thought {
     public void updateSynapseWeights() {
         activationsById
                 .values()
-                .forEach(act -> act.updateSynapses());
+                .stream()
+                .flatMap(act -> act.getInputLinks())
+                .forEach(l -> l.updateSynapse());
     }
 
     public Config getTrainingConfig() {
