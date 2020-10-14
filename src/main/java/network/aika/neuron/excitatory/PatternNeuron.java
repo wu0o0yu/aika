@@ -80,6 +80,8 @@ public class PatternNeuron extends ExcitatoryNeuron {
 
     @Override
     public void induceNeuron(Activation act) {
+        // TODO: inhib. Neuron Induction!
+
         double s = getSurprisal(POS);
 
         Config c = act.getThought().getTrainingConfig();

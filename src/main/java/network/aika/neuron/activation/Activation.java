@@ -582,4 +582,9 @@ public class Activation implements Comparable<Activation> {
                 " bp:" + Utils.round(branchProbability) +
                 " round:" + round;
     }
+
+    public void updateSynapses() {
+        inputLinks.values().forEach(l -> );
+        l.updateSynapse()
+    }
 }
