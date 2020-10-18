@@ -252,7 +252,12 @@ public class Link {
     }
 
     public String toString() {
-        return "L " + synapse.getClass().getSimpleName() + ": " + getIdString() + " --> " + output.getShortString();
+        return "l " + synapse.getClass().getSimpleName() + ": " + getIdString() + " --> " + output.getShortString();
+    }
+
+    public String toDetailedString() {
+        return "l in:[" + input.getShortString() +
+                " v:" + Utils.round(input.getValue()) + "] - s:[" + synapse.toString() + "] - out:[" + input.getShortString() + " v:" + Utils.round(input.getValue()) + "]";
     }
 
     public String getIdString() {

@@ -36,6 +36,7 @@ import static network.aika.neuron.Sign.POS;
 public abstract class Neuron<S extends Synapse> implements Writable {
 
     public static int debugId = 0;
+    public static boolean debugOutput = false;
 
     private static final Logger log = LoggerFactory.getLogger(Neuron.class);
 
@@ -250,9 +251,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public double getSurprisal(Sign s) {
-        if(!instances.isInitialized())
-            return 0.0;
-
         double p = getP(s, instances.getN());
         return -Math.log(p);
     }
@@ -341,7 +339,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public String toDetailedString() {
-        return "N " + getClass().getSimpleName() + " " + toString() + " B:" + Utils.round(bias);
+        return "n " + getClass().getSimpleName() + " " + toString() + " b:" + Utils.round(bias);
     }
 
     public String statToString() {

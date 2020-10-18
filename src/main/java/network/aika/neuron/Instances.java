@@ -10,58 +10,42 @@ import java.io.IOException;
 
 public class Instances implements Writable {
 
-    protected int offset = Integer.MAX_VALUE;
-    protected int currentPos = Integer.MIN_VALUE;
-
-    protected int coveredFactorSum;
-    protected int count;
-
-    private double getCoveredFactor() {
-        if(coveredFactorSum == 0 || count == 0) return 1.0;
-        return coveredFactorSum / (double) count;
-    }
+    protected double N = 1;
+    protected int lastPos = Integer.MIN_VALUE;
 
     public double getN() {
         if(!isInitialized()) throw new NotInitializedException();
 
-        double n = (currentPos - offset) / getCoveredFactor();
-        assert n >= 0;
-        return n;
+        return N;
+    }
+
+    public void setN(int N) {
+        this.N = N;
     }
 
     public boolean isInitialized() {
-        return offset != Integer.MAX_VALUE && currentPos != Integer.MIN_VALUE && coveredFactorSum != 0 && count != 0;
+        return lastPos != Integer.MIN_VALUE;
     }
 
-    public int getOffset() {
-        return offset;
+    public int getLastPos() {
+        return lastPos;
     }
 
-    public void setOffset(int offset) {
-        this.offset = offset;
-    }
-
-    public int getCurrentPos() {
-        return currentPos;
-    }
-
-    public void setCurrentPos(int currentPos) {
-        this.currentPos = currentPos;
+    public void setLastPos(int lastPos) {
+        this.lastPos = lastPos;
     }
 
     public void update(Model m, Reference ref) {
-        offset = Math.min(offset, m.getN() + ref.getBegin());
-        currentPos = Math.max(currentPos, m.getN() + ref.getEnd());
-        coveredFactorSum += ref.length();
-        count++;
+        if(isInitialized()) {
+            N += (m.getN() - lastPos) / ref.length();
+        }
+        lastPos = m.getN();
     }
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeInt(offset);
-        out.writeInt(currentPos);
-        out.writeInt(count);
-        out.writeInt(coveredFactorSum);
+        out.writeDouble(N);
+        out.writeInt(lastPos);
     }
 
     public static Instances read(DataInput in, Model m) throws IOException {
@@ -72,10 +56,8 @@ public class Instances implements Writable {
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-        offset = in.readInt();
-        currentPos = in.readInt();
-        count = in.readInt();
-        coveredFactorSum = in.readInt();
+        N = in.readDouble();
+        lastPos = in.readInt();
     }
 
     public static class NotInitializedException extends RuntimeException {

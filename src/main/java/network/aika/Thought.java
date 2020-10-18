@@ -132,8 +132,7 @@ public abstract class Thought {
         activationsById
                 .values()
                 .stream()
-                .flatMap(act -> act.getInputLinks())
-                .forEach(l -> l.updateSynapse());
+                .forEach(act -> act.updateSynapseWeights());
     }
 
     public Config getTrainingConfig() {
@@ -247,8 +246,12 @@ public abstract class Thought {
     }
 
     public String activationsToString() {
-        StringBuilder sb = new StringBuilder();
+        return activationsToString(false);
+    }
 
+    public String activationsToString(boolean includeLink) {
+        StringBuilder sb = new StringBuilder();
+/*
         sb.append("Id -");
 
         sb.append(" Decision -");
@@ -261,13 +264,17 @@ public abstract class Thought {
         sb.append(" Input Value |");
         sb.append("\n");
         sb.append("\n");
-
+*/
         for(Activation act: activationsById.values()) {
 /*            if(!act.isActive()) {
                 continue;
             }
 */
-            sb.append(act.toString());
+            if(act.getNeuron().isInputNeuron()) {
+                continue;
+            }
+
+            sb.append(act.toString(includeLink));
             sb.append("\n");
         }
 

@@ -87,18 +87,18 @@ public class PatternNeuron extends ExcitatoryNeuron {
         Config c = act.getThought().getTrainingConfig();
 
         if(s < c.getInductionThreshold()) {
-            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
+//            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
             return;
         }
 
         if(hasOutputPatternPartConsumer(act)) {
-            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " already exists");
+ //           System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " already exists");
             return;
         }
 
         Neuron n = new PatternPartNeuron(getModel(), "TP-" + getDescriptionLabel(), false);
 
-        System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + "  --> " + n.getDescriptionLabel() + "               INDUCED!");
+//        System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + "  --> " + n.getDescriptionLabel() + "               INDUCED!");
 
         Activation oAct = act.createActivation(n);
 
@@ -107,6 +107,8 @@ public class PatternNeuron extends ExcitatoryNeuron {
         n.induceSynapse(act, oAct, new Visitor(act, INPUT, false));
 
         n.getInstances().update(getModel(), act.getReference());
+
+        oAct.process();
     }
 
     private boolean hasOutputPatternPartConsumer(Activation act) {

@@ -89,7 +89,7 @@ public class Document extends Thought {
         return content.toString();
     }
 
-    private String getTextSegment(Integer begin, Integer end) {
+    public String getTextSegment(Integer begin, Integer end) {
         if(begin != null && end != null) {
             return content.substring(
                     Math.max(0, Math.min(begin, length())),
@@ -106,7 +106,7 @@ public class Document extends Thought {
 
     public Activation addInput(Neuron n, int begin, int end) {
         Activation act = new Activation(this, n);
-        act.setReference(new TextReference(begin, end));
+        act.setReference(new TextReference(this, begin, end));
 
         act.setValue(1.0);
         act.setFired(begin);
@@ -135,49 +135,5 @@ public class Document extends Thought {
 
     public Cursor getCursor() {
         return cursor;
-    }
-
-    public class TextReference implements Reference {
-        private int begin;
-        private int end;
-
-        public TextReference(int begin, int end) {
-            this.begin = begin;
-            this.end = end;
-        }
-
-        public int getBegin() {
-            return begin;
-        }
-
-        public int getEnd() {
-            return end;
-        }
-
-        public String getText() {
-            return getTextSegment(begin, end);
-        }
-
-        @Override
-        public double length() {
-            return end - begin;
-        }
-
-        @Override
-        public Reference add(Reference ir) {
-            return new TextReference(
-                    Math.min(begin, ir.getBegin()),
-                    Math.max(end, ir.getEnd())
-            );
-        }
-
-        @Override
-        public Thought getThought() {
-            return Document.this;
-        }
-
-        public String toString() {
-            return "Ref(" + begin + "," + end + ")";
-        }
     }
 }

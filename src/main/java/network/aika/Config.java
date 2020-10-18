@@ -45,7 +45,8 @@ public class Config {
         return inductionThreshold;
     }
 
-    public void setInductionThreshold(double inductionThreshold) {
+    public Config setInductionThreshold(double inductionThreshold) {
         this.inductionThreshold = inductionThreshold;
+        return this;
     }
 }

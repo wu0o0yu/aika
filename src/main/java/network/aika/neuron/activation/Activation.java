@@ -172,7 +172,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public Activation getModifiable(Synapse excludedSyn) {
-        if(!isFinal) return this;
+        if (!isFinal) return this;
 
         Activation clonedAct = new Activation(id, thought, neuron);
         clonedAct.round = round + 1;
@@ -181,13 +181,14 @@ public class Activation implements Comparable<Activation> {
 
         return clonedAct;
     }
-/*
-    public Activation cloneToReplaceLink(Synapse excludedSyn) {
-        Activation clonedAct = new Activation(id, thought, neuron);
-        linkClone(clonedAct, excludedSyn);
-        return clonedAct;
-    }
-*/
+
+    /*
+        public Activation cloneToReplaceLink(Synapse excludedSyn) {
+            Activation clonedAct = new Activation(id, thought, neuron);
+            linkClone(clonedAct, excludedSyn);
+            return clonedAct;
+        }
+    */
     private void linkClone(Activation clonedAct, Synapse excludedSyn) {
         inputLinks
                 .values()
@@ -220,7 +221,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public boolean searchWithinBranch() {
-        if(marked) return true;
+        if (marked) return true;
 
         return getLinks(OUTPUT)
                 .filter(l -> !l.isNegative() || l.isCausal())
@@ -230,7 +231,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public Stream<Activation> getConflictingMainBranches() {
-        if(mainBranch != null) {
+        if (mainBranch != null) {
             return Stream.of(mainBranch);
         }
 
@@ -244,7 +245,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void linkForward() {
-        if(lastRound == null) {
+        if (lastRound == null) {
             propagate();
         } else {
             lastRound.outputLinks
@@ -273,7 +274,7 @@ public class Activation implements Comparable<Activation> {
 
         Neuron<?> n = getNeuron();
 
-        if(thought.getPhase() == INDUCTION) {
+        if (thought.getPhase() == INDUCTION) {
             n.induceNeuron(this);
         } else {
             n.getOutputSynapses()
@@ -330,7 +331,7 @@ public class Activation implements Comparable<Activation> {
         sumUpLink(ol, nl);
         checkIfFired(nl);
 
-        if(!s.isNegative()) {
+        if (!s.isNegative()) {
             getThought().addLinkToQueue(nl);
         }
         return nl;
@@ -339,19 +340,19 @@ public class Activation implements Comparable<Activation> {
     public void sumUpLink(Link ol, Link nl) {
         assert ol == null || !isFinal;
 
-        if(nl.isNegative() && nl.isSelfRef()) return;
+        if (nl.isNegative() && nl.isSelfRef()) return;
 
         double w = nl.getSynapse().getWeight();
         double x = nl.getInput().value - (ol != null ? ol.getInput().value : 0.0);
         double s = x * w;
 
-        if(isFinal) {
+        if (isFinal) {
             lateSum += s;
         } else {
             sum += s;
         }
 
-        if(!isFinal) {
+        if (!isFinal) {
             nl.getOutput().getNeuron().updateReference(nl);
         }
     }
@@ -360,13 +361,13 @@ public class Activation implements Comparable<Activation> {
         double initialValue = computeValue(INITIAL_LINKING);
         double finalValue = computeValue(FINAL_LINKING);
 
-        if(Math.abs(finalValue - initialValue) > TOLERANCE) {
+        if (Math.abs(finalValue - initialValue) > TOLERANCE) {
             thought.addActivationToQueue(getModifiable(null));
         }
     }
 
     private void checkIfFired(Link l) {
-        if(fired == NOT_FIRED && getNet() > 0.0) {
+        if (fired == NOT_FIRED && getNet() > 0.0) {
             fired = neuron.incrementFired(getLatestFired());
             thought.addActivationToQueue(this);
         }
@@ -423,19 +424,15 @@ public class Activation implements Comparable<Activation> {
     }
 
     public double getNormSelfGradient() {
-        if(!getNeuron().getInstances().isInitialized()) {
-            return selfGradient;
-        }
-
         return selfGradient / getN();
     }
 
-    public int getN() {
-        return getModel().getN() + reference.getEnd() - getNeuron().getInstances().getOffset();
+    public double getN() {
+        return getNeuron().getInstances().getN();
     }
 
     public void processGradient() {
-        if(getNeuron().isInputNeuron())
+        if (getNeuron().isInputNeuron())
             return;
 
         inputLinks.values()
@@ -444,12 +441,10 @@ public class Activation implements Comparable<Activation> {
                 );
 
         unpropagatedGradient = 0.0;
-
-        getNeuron().updatePropagateFlag();
     }
 
     public double getActFunctionDerivative() {
-        if(!getNeuron().isInitialized())
+        if (!getNeuron().isInitialized())
             return 1.0;
 
         return getNeuron()
@@ -472,7 +467,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void computeP() {
-        if(!isActive()) return;
+        if (!isActive()) return;
 
         double net = getNet();
         Set<Activation> conflictingActs = branches
@@ -499,7 +494,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     private void updateP(double p) {
-        if(Math.abs(p - getBranchProbability()) <= TOLERANCE) return;
+        if (Math.abs(p - getBranchProbability()) <= TOLERANCE) return;
 
         Activation cAct = getModifiable(null);
         cAct.branchProbability = p;
@@ -557,7 +552,7 @@ public class Activation implements Comparable<Activation> {
     public String getShortString() {
         return "id:" +
                 getId() +
-                " neuron:[" + getNeuron() + "]";
+                " n:[" + getNeuron() + "]";
     }
 
     public String gradientsToString() {
@@ -575,11 +570,33 @@ public class Activation implements Comparable<Activation> {
     }
 
     public String toString() {
-        return "act " +
+        return toString(false);
+    }
+
+    public String toString(boolean includeLink) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("act " +
                 getShortString() +
                 " value:" + Utils.round(value) +
                 " net:" + Utils.round(getNet()) +
                 " bp:" + Utils.round(branchProbability) +
-                " round:" + round;
+                " round:" + round);
+
+        if(includeLink) {
+            sb.append("\n");
+            getInputLinks().forEach(l ->
+                    sb.append("   " + l.toDetailedString() + "\n")
+            );
+            sb.append("\n");
+        }
+
+        return sb.toString();
+    }
+
+    public void updateSynapseWeights() {
+        getInputLinks()
+                .forEach(l -> l.updateSynapse());
+
+        getNeuron().updatePropagateFlag();
     }
 }

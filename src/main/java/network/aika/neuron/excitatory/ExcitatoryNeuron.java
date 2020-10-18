@@ -83,8 +83,13 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
     }
 
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
-        if(oAct.getNeuron().isInputNeuron())
+        if(oAct.getNeuron().isInputNeuron()) {
             return null;
+        }
+
+        if(iAct.getNeuron() instanceof InhibitoryNeuron) {
+            return null;
+        }
 
         Synapse s = new ExcitatorySynapse(
                 iAct.getNeuron(),
@@ -98,7 +103,6 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         Link l = new Link(s, iAct, oAct, false);
 
         l.linkOutput();
-        oAct.sumUpLink(null, l);
 
         l.computeInitialGradient();
         l.removeGradientDependencies();
@@ -109,18 +113,23 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         Config c = oAct.getThought().getTrainingConfig();
 
         if(l.getFinalGradient() > -c.getInductionThreshold()) {
-            System.out.println("dbg:" + (Neuron.debugId++) + " " + s + "   FG:" + Utils.round(l.getFinalGradient()) + " below threshold");
+            if(Neuron.debugOutput) {
+//                System.out.println("dbg:" + (Neuron.debugId++) + " " + s + "   FG:" + Utils.round(l.getFinalGradient()) + " below threshold");
+            }
             return null;
         }
 
-        System.out.println("dbg:" + (Neuron.debugId++) + " " + s + "   FG:" + Utils.round(l.getFinalGradient()) + "               INDUCED!");
+        if(Neuron.debugOutput) {
+//            System.out.println("dbg:" + (Neuron.debugId++) + " " + s + "   FG:" + Utils.round(l.getFinalGradient()) + "               INDUCED!");
+        }
 
         s.linkOutput();
 
         l.updateSynapse();
+        oAct.sumUpLink(null, l);
         l.linkInput();
 
-        l.getOutput().getNeuron().updateReference(l);
+//        l.getOutput().getNeuron().updateReference(l); // Sollte bereits in oAct.sumUpLink(null, l) enthalten sein.
 
         s.getInstances().update(getModel(), iAct.getReference());
 
@@ -213,7 +222,6 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
 
         double sum = getRawBias();
         for(Synapse s: sortedSynapses) {
-
             s.updateInputLink(sum > 0.0);
 
             if(s.getWeight() < 0.0) break;

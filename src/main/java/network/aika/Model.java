@@ -23,6 +23,7 @@ import network.aika.neuron.NeuronProvider.SuspensionMode;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
+import network.aika.neuron.activation.Reference;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.neuron.inhibitory.*;

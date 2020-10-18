@@ -10,6 +10,7 @@ import network.aika.Model;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.TextModel;
+import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
 
 public class InductionTest {
@@ -21,8 +22,7 @@ public class InductionTest {
 
         in.setFrequency(12);
 
-        in.getInstances().setOffset(0);
-        in.getInstances().setCurrentPos(200);
+        in.getInstances().setN(200);
         m.setN(200);
 
         Document doc = new Document("",
@@ -31,7 +31,7 @@ public class InductionTest {
 
         Activation act = new Activation(doc, in);
         act.setValue(1.0);
-        act.setReference(doc.new TextReference(0, 1));
+        act.setReference(new TextReference(doc, 0, 1));
 
         act.propagateInput();
 
@@ -69,7 +69,7 @@ public class InductionTest {
         inA.setFrequency(10.0);
         inB.setFrequency(10.0);
 
-        targetN.getInstances().setOffset(100 - 1);
+        targetN.getInstances().setN(100);
         targetN.setFrequency(0.0);
 
         System.out.println(targetN.statToString());
@@ -86,10 +86,10 @@ public class InductionTest {
         Activation actB = new Activation(doc, inB);
         Activation actTarget = new Activation(doc, targetN);
 
-        actA.setReference(doc.new TextReference(0, 1));
+        actA.setReference(new TextReference(doc, 0, 1));
         actA.setValue(1.0);
 
-        actB.setReference(doc.new TextReference(0, 1));
+        actB.setReference(new TextReference(doc, 0, 1));
         actB.setValue(1.0);
 
         Link.link(sA, actA, actTarget, false);
@@ -122,9 +122,9 @@ public class InductionTest {
 
         model.setN(1000);
         actDer.getNeuron().setFrequency(50);
-        actDer.getNeuron().getInstances().setOffset(0);
+        actDer.getNeuron().getInstances().setN(1000);
         actHund.getNeuron().setFrequency(10);
-        actHund.getNeuron().getInstances().setOffset(0);
+        actHund.getNeuron().getInstances().setN(1000);
 
         doc.process();
 
