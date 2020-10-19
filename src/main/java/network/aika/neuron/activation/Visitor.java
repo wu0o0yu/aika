@@ -30,7 +30,7 @@ import static network.aika.neuron.activation.Direction.*;
 public class Visitor {
     public Activation origin;
 
-    public Direction downUpDir;
+    public Direction downUpDir = INPUT;
     public Direction startDir;
 
     public boolean related;
@@ -45,13 +45,11 @@ public class Visitor {
     public Visitor(Activation origin, Direction startDir) {
         this.origin = origin;
         this.startDir = startDir;
-        this.downUpDir = INPUT;
     }
 
     public Visitor(Activation origin, Direction scope, boolean related) {
         this.origin = origin;
         this.startDir = null;
-        this.downUpDir = null;
         this.scope = scope;
         this.related = related;
     }
