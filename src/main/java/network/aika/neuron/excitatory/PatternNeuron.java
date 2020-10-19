@@ -109,6 +109,8 @@ public class PatternNeuron extends ExcitatoryNeuron {
         n.getInstances().update(getModel(), act.getReference());
 
         oAct.process();
+
+        oAct.propagate();
     }
 
     private boolean hasOutputPatternPartConsumer(Activation act) {

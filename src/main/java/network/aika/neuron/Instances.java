@@ -14,8 +14,6 @@ public class Instances implements Writable {
     protected int lastPos = Integer.MIN_VALUE;
 
     public double getN() {
-        if(!isInitialized()) throw new NotInitializedException();
-
         return N;
     }
 
