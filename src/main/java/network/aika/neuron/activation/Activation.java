@@ -444,9 +444,6 @@ public class Activation implements Comparable<Activation> {
     }
 
     public double getActFunctionDerivative() {
-        if (!getNeuron().isInitialized())
-            return 1.0;
-
         return getNeuron()
                 .getActivationFunction()
                 .outerGrad(
