@@ -223,9 +223,9 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
 
         double sum = getRawBias();
         for(Synapse s: sortedSynapses) {
-            s.updateInputLink(sum > 0.0);
+            if(s.getWeight() <= 0.0) break;
 
-            if(s.getWeight() < 0.0) break;
+            s.updateInputLink(sum > 0.0);
 
             sum -= s.getWeight();
         }
