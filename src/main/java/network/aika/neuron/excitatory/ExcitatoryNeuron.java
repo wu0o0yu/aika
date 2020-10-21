@@ -104,7 +104,7 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
 
         l.linkOutput();
 
-        l.computeInitialGradient();
+        l.computeOutputGradient();
         l.removeGradientDependencies();
         oAct.addInputGradient(l.getOutputGradient());
 

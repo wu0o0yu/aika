@@ -75,7 +75,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
         l.linkOutput();
 
-        l.computeInitialGradient();
+        l.computeOutputGradient();
         l.removeGradientDependencies();
         oAct.addInputGradient(l.getOutputGradient());
 

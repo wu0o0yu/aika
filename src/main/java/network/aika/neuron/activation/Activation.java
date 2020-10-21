@@ -397,7 +397,7 @@ public class Activation implements Comparable<Activation> {
 
     public void computeInitialLinkGradients() {
         getInputLinks()
-                .forEach(l -> l.computeInitialGradient());
+                .forEach(l -> l.computeOutputGradient());
 
         getInputLinks()
                 .forEach(l -> l.removeGradientDependencies());
