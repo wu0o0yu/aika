@@ -54,7 +54,7 @@
 	</div>
 </div>
 	<div id="contents">
-		<div align="right"><span style='color: #FF0000;'>October 11, 2020</span></div>
+		<div align="right"><span style='color: #FF0000;'>October 21, 2020</span></div>
 		<div align="middle"><b><span style='color: #FF0000;'>Work in progress</span></b></div>
 		<div class="features">
 			<h1>How the network is trained</h1>
@@ -172,15 +172,20 @@
 			<h2>The optimization problem</h2>
 			<p>
 				Since we would like to optimize the compression rate within the network, we need to find a way to adjust the synapse weights and the neuron
-				biases such that the network requires less information to encode the message of the input data.
+				biases such that the network requires less information to encode the message of the input data. To do so we will need an objective function
+				that we can convert to its first derivative. Now we are able to use the gradient decent method adjust our synapse weights and bias values.
+				To see how the objective function could look like, we need to take a closer look at a neuron and its input synapses. Let us consider the synapses
+				as information consumers and the neuron itself as an information producer. The synapses or information consumers can now be modeled using the
+				information gain and the neuron can be modeled using the entropy.
+
+				$$G = H(y) - \sum \limits _{i} I(y, x_i)$$
+
+
 			</p>
 			<h2>Concept Drift</h2>
 			<p>
 				Another problem is that of concept drift. Since we are using the distribution to adjust the synapse weights
 				this will lead to changes in the activation patterns and therefore to changes in the distributions again.
-
-				$$G = \sum  \limits _{ikl}{P(x_{ik},y_{l}) \cdot log \Big( \frac{P(x_{ik},y_{l})}{P(x_{ik}) \cdot P(y_{l})} \Big)}$$
-
 			</p>
         </div>
 	</div>
