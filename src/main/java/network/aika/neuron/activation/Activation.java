@@ -403,17 +403,17 @@ public class Activation implements Comparable<Activation> {
                 .forEach(l -> l.removeGradientDependencies());
 
         getInputLinks()
-                .forEach(l -> addInitialLinkGradient(l.getInitialGradient()));
+                .forEach(l -> addInputGradient(l.getOutputGradient()));
     }
 
     public void initSelfGradient() {
-        selfGradient = getActFunctionDerivative() *
+        selfGradient = (1 / getN()) * getActFunctionDerivative() *
                 getNeuron().getSurprisal(
                         Sign.getSign(this)
                 );
     }
 
-    public void addInitialLinkGradient(double initialLinkGradient) {
+    public void addInputGradient(double initialLinkGradient) {
         selfGradient += initialLinkGradient;
     }
 
@@ -423,8 +423,8 @@ public class Activation implements Comparable<Activation> {
         );
     }
 
-    public double getNormSelfGradient() {
-        return selfGradient / getN();
+    public double getSelfGradient() {
+        return selfGradient;
     }
 
     public double getN() {

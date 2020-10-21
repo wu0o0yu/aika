@@ -35,7 +35,6 @@ import java.util.stream.Stream;
 
 import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Direction.SAME;
 
 /**
  *
@@ -107,7 +106,7 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
 
         l.computeInitialGradient();
         l.removeGradientDependencies();
-        oAct.addInitialLinkGradient(l.getInitialGradient());
+        oAct.addInputGradient(l.getOutputGradient());
 
         l.updateSelfGradient();
 

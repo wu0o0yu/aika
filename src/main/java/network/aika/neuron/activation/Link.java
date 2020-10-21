@@ -44,7 +44,7 @@ public class Link {
 
     private boolean isSelfRef;
 
-    private double initialGradient;
+    private double outputGradient;
     private double offsetGradient;
     private double selfGradient;
     private double finalGradient;
@@ -98,28 +98,13 @@ public class Link {
                 Sign.getSign(output)
         );
 
-        initialGradient = s * output.getActFunctionDerivative();
-        offsetGradient =  s * getActFunctionDerivative();
-        initialGradient -= offsetGradient;
+        double f = s * getInputValue() / output.getN();
+
+        offsetGradient =  f * getActFunctionDerivative();
+        outputGradient = (f * output.getActFunctionDerivative()) - offsetGradient;
     }
 
-    public void removeGradientDependencies() {
-        output.getInputLinks()
-                .filter(l -> l.input != null && l != this && input.isConnected(l.input))
-                .forEach(l -> {
-                    initialGradient -= l.initialGradient;
-                    offsetGradient -= l.offsetGradient;
-                });
-    }
-
-    public double getInitialGradient() {
-        return initialGradient;
-    }
-
-    public double getActFunctionDerivative() {
-        if(!output.getNeuron().isInitialized())
-            return 0.0;
-
+    private double getActFunctionDerivative() {
         return output.getNeuron()
                 .getActivationFunction()
                 .outerGrad(
@@ -127,8 +112,21 @@ public class Link {
                 );
     }
 
+    public void removeGradientDependencies() {
+        output.getInputLinks()
+                .filter(l -> l.input != null && l != this && input.isConnected(l.input))
+                .forEach(l -> {
+                    outputGradient -= l.outputGradient;
+                    outputGradient = Math.min(0.0, outputGradient); // TODO: check if that's correct.
+                });
+    }
+
+    public double getOutputGradient() {
+        return outputGradient;
+    }
+
     public void updateSelfGradient() {
-        selfGradient = getOutput().getNormSelfGradient();
+        selfGradient = getOutput().getSelfGradient();
         selfGradient += offsetGradient;
 
         finalGradient += selfGradient;
