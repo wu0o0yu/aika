@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
+import static network.aika.neuron.activation.Direction.INPUT;
 
 /**
  *
@@ -230,6 +231,22 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public abstract void induceNeuron(Activation act);
+    
+    public void initInducedNeuron(Activation iAct) {
+//        System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + "  --> " + n.getDescriptionLabel() + "               INDUCED!");
+
+        Activation act = iAct.createActivation(this);
+
+        act.initSelfGradient();
+
+        induceSynapse(iAct, act, new Visitor(iAct, INPUT, false));
+
+        getInstances().update(getModel(), iAct.getReference());
+
+        act.process();
+
+        act.propagate();
+    }
 
     public abstract Link induceSynapse(Activation iAct, Activation oAct, Visitor c);
 

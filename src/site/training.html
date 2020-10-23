@@ -77,7 +77,7 @@
 
 				This formula is actually comprised of two parts, the Shannon information or information content or surprisal part:
 
-				$$I(x) = -\log_b{\left(P\right)}$$
+				$$S(x) = -\log_b{\left(P\right)}$$
 
 				and the calculation of the expected value of the surprisal:
 
@@ -173,12 +173,26 @@
 			<p>
 				Since we would like to optimize the compression rate within the network, we need to find a way to adjust the synapse weights and the neuron
 				biases such that the network requires less information to encode the message of the input data. To do so we will need an objective function
-				that we can convert to its first derivative. Now we are able to use the gradient decent method adjust our synapse weights and bias values.
-				To see how the objective function could look like, we need to take a closer look at a neuron and its input synapses. Let us consider the synapses
+				that we can convert to its first derivative. With this derivative function we are then able to use the gradient decent method to adjust the
+				synapse weights and bias values.
+				To figure out how the objective function may look like, we need to take a closer look at a neuron and its input synapses. Let us consider the synapses
 				as information consumers and the neuron itself as an information producer. The synapses or information consumers can now be modeled using the
-				information gain and the neuron can be modeled using the entropy.
+				information gain and the neuron itself can be modeled using the entropy.
 
-				$$G = H(y) - \sum \limits _{i} I(y, x_i)$$
+				$$G = H(Y) - \sum \limits _{i} I(X_i, Y)$$
+
+				Now, before we go on to calculate the derivative function, we need to make two simplifying assumptions. The first one is that we consider
+				the surprisal parts of the equation as constants. If we first look at the information gain part of the equation we can now split the equation
+
+				$$I(X;Y) = \sum_{y \in \mathcal Y} \sum_{x \in \mathcal X}
+				{ p_{(X,Y)}(x, y) \left( \log{p_{(X,Y)}(x, y)} - \log{p_X(x)} - \log{p_Y(y)} \right) } $$
+
+				and consider \(S(x, y)\) as constant later on.
+
+				$$S(x,y) = \log{p_{(X,Y)}(x, y)} - \log{p_X(x)} - \log{p_Y(y)} $$
+
+				$$I(X;Y) = \sum_{y \in \mathcal Y} \sum_{x \in \mathcal X}
+				{ p_{(X,Y)}(x, y) S(x, y) } $$
 
 
 			</p>

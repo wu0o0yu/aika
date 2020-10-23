@@ -24,6 +24,7 @@ import network.aika.neuron.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -320,6 +321,12 @@ public class Activation implements Comparable<Activation> {
                         new Activation(Integer.MAX_VALUE, s.getOutput()),
                         true
                 );
+    }
+
+    public boolean checkIfOutputLinkExists(Predicate<Synapse> f) {
+        return getOutputLinks()
+                .map(l -> l.getSynapse())
+                .anyMatch(f);
     }
 
     public Link addLink(Synapse s, Activation input, boolean isSelfRef) {

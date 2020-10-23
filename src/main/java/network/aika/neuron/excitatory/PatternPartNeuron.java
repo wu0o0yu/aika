@@ -16,12 +16,15 @@
  */
 package network.aika.neuron.excitatory;
 
+import network.aika.Config;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.activation.Direction.*;
 
 /**
@@ -38,6 +41,27 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
 
     public PatternPartNeuron(Model model, String label, Boolean isInputNeuron) {
         super(model, label, isInputNeuron);
+    }
+
+    @Override
+    public void induceNeuron(Activation act) {
+        double s = getSurprisal(POS);
+
+        Config c = act.getThought().getTrainingConfig();
+
+        if(s < c.getInductionThreshold()) {
+//            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
+            return;
+        }
+
+        PatternNeuron.induce(act);
+    }
+
+    public static void induce(Activation iAct) {
+        if (!iAct.checkIfOutputLinkExists(syn -> syn.isInputScope() && syn.isInputLinked())) {
+            Neuron n = new PatternPartNeuron(iAct.getModel(), "TP-" + iAct.getDescriptionLabel(), false);
+            n.initInducedNeuron(iAct);
+        }
     }
 
     @Override
@@ -64,9 +88,5 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
         if(nl.getInput().getNeuron() instanceof PatternNeuron) {
             nl.getOutput().setReference(nl.getInput().getReference());
         }
-    }
-
-    @Override
-    public void induceNeuron(Activation act) {
     }
 }

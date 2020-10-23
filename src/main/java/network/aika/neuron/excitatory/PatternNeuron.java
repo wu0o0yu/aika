@@ -18,10 +18,10 @@ package network.aika.neuron.excitatory;
 
 import network.aika.Config;
 import network.aika.Model;
-import network.aika.Utils;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,10 +78,15 @@ public class PatternNeuron extends ExcitatoryNeuron {
         nl.getOutput().setReference(or == null ? ir : or.add(ir));
     }
 
+    public static void induce(Activation iAct) {
+        if (!iAct.checkIfOutputLinkExists(syn -> syn.isSamePattern())) {
+            Neuron n = new PatternPartNeuron(iAct.getModel(), "P-" + iAct.getDescriptionLabel(), false);
+            n.initInducedNeuron(iAct);
+        }
+    }
+
     @Override
     public void induceNeuron(Activation act) {
-        // TODO: inhib. Neuron Induction!
-
         double s = getSurprisal(POS);
 
         Config c = act.getThought().getTrainingConfig();
@@ -91,32 +96,8 @@ public class PatternNeuron extends ExcitatoryNeuron {
             return;
         }
 
-        if(hasOutputPatternPartConsumer(act)) {
- //           System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " already exists");
-            return;
-        }
-
-        Neuron n = new PatternPartNeuron(getModel(), "TP-" + getDescriptionLabel(), false);
-
-//        System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + "  --> " + n.getDescriptionLabel() + "               INDUCED!");
-
-        Activation oAct = act.createActivation(n);
-
-        oAct.initSelfGradient();
-
-        n.induceSynapse(act, oAct, new Visitor(act, INPUT, false));
-
-        n.getInstances().update(getModel(), act.getReference());
-
-        oAct.process();
-
-        oAct.propagate();
-    }
-
-    private boolean hasOutputPatternPartConsumer(Activation act) {
-        return act.getOutputLinks()
-                .map(l -> l.getSynapse())
-                .anyMatch(s -> s.isInputScope() && s.isInputLinked());
+        PatternPartNeuron.induce(act);
+        InhibitoryNeuron.induce(act);
     }
 
     public String getTokenLabel() {

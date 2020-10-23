@@ -25,6 +25,7 @@ import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.excitatory.PatternPartNeuron;
 
 /**
  *
@@ -63,6 +64,13 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     @Override
     public void induceNeuron(Activation activation) {
 
+    }
+
+    public static void induce(Activation iAct) {
+        if (!iAct.checkIfOutputLinkExists(syn -> syn instanceof PrimaryInhibitorySynapse)) {
+            Neuron n = new InhibitoryNeuron(iAct.getModel(), "I-" + iAct.getDescriptionLabel(), false);
+            n.initInducedNeuron(iAct);
+        }
     }
 
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor c) {
