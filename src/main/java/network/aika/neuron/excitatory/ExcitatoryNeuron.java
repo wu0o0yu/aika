@@ -83,14 +83,6 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
     }
 
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
-        if(oAct.getNeuron().isInputNeuron()) {
-            return null;
-        }
-
-        if(iAct.getNeuron() instanceof InhibitoryNeuron) {
-            return null;
-        }
-
         Synapse s = new ExcitatorySynapse(
                 iAct.getNeuron(),
                 (ExcitatoryNeuron) oAct.getNeuron(),
@@ -100,40 +92,7 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
                 v.related
         );
 
-        Link l = new Link(s, iAct, oAct, false);
-
-        l.linkOutput();
-
-        l.computeOutputGradient();
-        l.removeGradientDependencies();
-        oAct.addInputGradient(l.getOutputGradient());
-
-        l.updateSelfGradient();
-
-        Config c = oAct.getThought().getTrainingConfig();
-
-        if(l.getFinalGradient() > -c.getInductionThreshold()) {
-            if(Neuron.debugOutput) {
-//                System.out.println("dbg:" + (Neuron.debugId++) + " " + s + "   FG:" + Utils.round(l.getFinalGradient()) + " below threshold");
-            }
-            return null;
-        }
-
-        if(Neuron.debugOutput) {
-//            System.out.println("dbg:" + (Neuron.debugId++) + " " + s + "   FG:" + Utils.round(l.getFinalGradient()) + "               INDUCED!");
-        }
-
-        s.linkOutput();
-
-        l.updateSynapse();
-        oAct.sumUpLink(null, l);
-        l.linkInput();
-
-//        l.getOutput().getNeuron().updateReference(l); // Sollte bereits in oAct.sumUpLink(null, l) enthalten sein.
-
-        s.getInstances().update(getModel(), iAct.getReference());
-
-        return l;
+        return s.initInducedSynapse(iAct, oAct, v);
     }
 
     protected void addDummyLinks(Activation act) {
@@ -201,12 +160,6 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
     public Fired incrementFired(Fired f) {
         return new Fired(f.getInputTimestamp(), f.getFired() + 1);
     }
-
-    /*
-    public boolean isWeak(Synapse s, Synapse.State state) {
-        return s.getWeight(state) < getBias();
-    }
-*/
 
     public double getBias(Phase p) {
         return super.getBias(p) + (directConjunctiveBias + (p == Phase.INITIAL_LINKING ? 0.0 : recurrentConjunctiveBias));

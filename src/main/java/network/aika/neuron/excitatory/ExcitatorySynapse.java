@@ -16,8 +16,11 @@
  */
 package network.aika.neuron.excitatory;
 
+import network.aika.Config;
 import network.aika.Model;
 import network.aika.neuron.*;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 
 import java.io.DataInput;
@@ -83,6 +86,17 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
         }
 
         return nv;
+    }
+
+    public static void induce(Activation iAct, Activation oAct, Visitor v) {
+
+    }
+
+    @Override
+    public boolean checkInductionThreshold(Link l) {
+        Config c = l.getOutput().getThought().getTrainingConfig();
+
+        return l.getFinalGradient() > -c.getInductionThreshold();
     }
 
     @Override

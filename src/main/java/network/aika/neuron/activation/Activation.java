@@ -16,10 +16,7 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.Model;
-import network.aika.Phase;
-import network.aika.Thought;
-import network.aika.Utils;
+import network.aika.*;
 import network.aika.neuron.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
@@ -29,6 +26,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.Phase.*;
+import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
@@ -154,6 +152,13 @@ public class Activation implements Comparable<Activation> {
 
     public NeuronProvider getNeuronProvider() {
         return neuron.getProvider();
+    }
+
+    public boolean checkInductionThreshold() {
+        double s = getNeuron().getSurprisal(POS);
+        Config c = getThought().getTrainingConfig();
+
+        return s < c.getInductionThreshold();
     }
 
     public void propagateInput() {

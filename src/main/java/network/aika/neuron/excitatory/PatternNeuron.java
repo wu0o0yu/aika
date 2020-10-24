@@ -79,8 +79,8 @@ public class PatternNeuron extends ExcitatoryNeuron {
     }
 
     public static void induce(Activation iAct) {
-        if (!iAct.checkIfOutputLinkExists(syn -> syn.isSamePattern())) {
-            Neuron n = new PatternPartNeuron(iAct.getModel(), "P-" + iAct.getDescriptionLabel(), false);
+        if (!iAct.getNeuron().isInputNeuron() && !iAct.checkIfOutputLinkExists(syn -> syn.isSamePattern())) {
+            Neuron n = new PatternNeuron(iAct.getModel(), null, "P-" + iAct.getNeuron().getId(), false);
             n.initInducedNeuron(iAct);
         }
     }

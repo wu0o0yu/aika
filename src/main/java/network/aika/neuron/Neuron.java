@@ -138,7 +138,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
                 Link.link(s, iAct, oAct, c.getSelfRef());
                 break;
             case INDUCTION:
-                if(s != null) return;
+                if(s != null || oAct.getNeuron().isInputNeuron()) return;
 
                 induceSynapse(iAct, oAct, c);
                 break;
@@ -231,7 +231,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public abstract void induceNeuron(Activation act);
-    
+
     public void initInducedNeuron(Activation iAct) {
 //        System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + "  --> " + n.getDescriptionLabel() + "               INDUCED!");
 

@@ -17,6 +17,7 @@
 package network.aika.neuron.inhibitory;
 
 import network.aika.ActivationFunction;
+import network.aika.Config;
 import network.aika.Model;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
@@ -25,7 +26,12 @@ import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.excitatory.PatternPartNeuron;
+
+import static network.aika.neuron.Sign.POS;
+import static network.aika.neuron.activation.Direction.INPUT;
 
 /**
  *
@@ -67,32 +73,22 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     public static void induce(Activation iAct) {
+        if(iAct.checkInductionThreshold()) {
+//            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
+            return;
+        }
+
         if (!iAct.checkIfOutputLinkExists(syn -> syn instanceof PrimaryInhibitorySynapse)) {
             Neuron n = new InhibitoryNeuron(iAct.getModel(), "I-" + iAct.getDescriptionLabel(), false);
             n.initInducedNeuron(iAct);
         }
     }
 
-    public Link induceSynapse(Activation iAct, Activation oAct, Visitor c) {
+    public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
         InhibitorySynapse s = new InhibitorySynapse(iAct.getNeuron(), (InhibitoryNeuron) oAct.getNeuron());
         s.setWeight(1.0);
 
-        // TODO: remove duplicate code
-
-        Link l = new Link(s, iAct, oAct, false);
-
-        l.linkOutput();
-
-        l.computeOutputGradient();
-        l.removeGradientDependencies();
-        oAct.addInputGradient(l.getOutputGradient());
-
-        l.updateSelfGradient();
-
-        s.linkInput();
-        l.linkInput();
-
-        return l;
+        return s.initInducedSynapse(iAct, oAct, v);
     }
 
     @Override
@@ -100,16 +96,9 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         return f;
     }
 
-    /*
-    public boolean isWeak(Synapse s, Synapse.State state) {
-        return s.getWeight(state) < -getBias();
-    }
-*/
-
     public ActivationFunction getActivationFunction() {
         return ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
     }
-
 
     @Override
     public Synapse getInputSynapse(NeuronProvider n) {

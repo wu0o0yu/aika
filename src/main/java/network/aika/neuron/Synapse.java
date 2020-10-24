@@ -18,6 +18,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Writable;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Link;
 import org.apache.commons.math3.distribution.BetaDistribution;
@@ -226,6 +227,39 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public void addWeight(double weightDelta) {
         this.weight += weightDelta;
         modified = true;
+    }
+
+    public abstract boolean checkInductionThreshold(Link l);
+
+    public Link initInducedSynapse(Activation iAct, Activation oAct, Visitor v) {
+
+        Link l = new Link(this, iAct, oAct, false);
+
+        l.linkOutput();
+
+        l.computeOutputGradient();
+        l.removeGradientDependencies();
+        oAct.addInputGradient(l.getOutputGradient());
+
+        l.updateSelfGradient();
+
+        if (checkInductionThreshold(l)) return null;
+
+        if(Neuron.debugOutput) {
+//            System.out.println("dbg:" + (Neuron.debugId++) + " " + s + "   FG:" + Utils.round(l.getFinalGradient()) + "               INDUCED!");
+        }
+
+        linkOutput();
+
+        l.updateSynapse();
+        oAct.sumUpLink(null, l);
+        l.linkInput();
+
+//        l.getOutput().getNeuron().updateReference(l); // Sollte bereits in oAct.sumUpLink(null, l) enthalten sein.
+
+        getInstances().update(getModel(), iAct.getReference());
+
+        return l;
     }
 
     @Override
