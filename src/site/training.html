@@ -182,7 +182,7 @@
 				$$G = H(Y) - \sum \limits _{i} I(X_i, Y)$$
 
 				Now, before we go on to calculate the derivative function, we need to make two simplifying assumptions. The first one is that we consider
-				the surprisal parts of the equation as constants. If we first look at the information gain part of the equation we can now split the equation
+				the surprisal parts of the equation as constants. If we first look at the information gain part of the equation we can split the equation
 
 				$$I(X;Y) = \sum_{y \in \mathcal Y} \sum_{x \in \mathcal X}
 				{ p_{(X,Y)}(x, y) \left( \log{p_{(X,Y)}(x, y)} - \log{p_X(x)} - \log{p_Y(y)} \right) } $$
@@ -193,6 +193,17 @@
 
 				$$I(X;Y) = \sum_{y \in \mathcal Y} \sum_{x \in \mathcal X}
 				{ p_{(X,Y)}(x, y) S(x, y) } $$
+
+				The only variable part that we need to consider while calculating the derivative is the probability \(p_{(X,Y)}(x, y)\). \(p_{(X,Y)}(x, y)\) can be computed using the
+				frequency \(f_{(X,Y)}(x, y)\) and the number of trainings instances \(H\).
+
+				$$p_{(X,Y)}(x, y) = \frac{f_{(X,Y)}(x, y)}{N}$$
+
+				Where the frequency \(f_{(X,Y)}(x, y)\) is just the sum of all activations.
+
+				$$ \(f_{(X,Y)}(x, y)\) = \frac{1}{N} \sum_{i}^N f(net_i)$$
+
+
 
 
 			</p>
