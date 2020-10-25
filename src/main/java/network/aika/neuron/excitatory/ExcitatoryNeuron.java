@@ -86,7 +86,7 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
         Synapse s = new ExcitatorySynapse(
                 iAct.getNeuron(),
-                (ExcitatoryNeuron) oAct.getNeuron(),
+                this,
                 v.getSelfRef() && iAct.getNeuron() instanceof InhibitoryNeuron,
                 v.getSelfRef() && v.scope != INPUT && !(iAct.getNeuron() instanceof PatternPartNeuron),
                 v.scope == v.downUpDir,

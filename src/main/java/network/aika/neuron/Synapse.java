@@ -57,7 +57,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public Synapse(I input, O output) {
         this.input = input.getProvider();
         this.output = output.getProvider();
-        this.instances = new Instances();
+        this.instances = new Instances(output.getModel());
     }
 
     public abstract Visitor transition(Visitor v);
@@ -191,9 +191,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public double getSurprisal(Sign si, Sign so) {
-        if(!instances.isInitialized())
-            return 0.0;
-
         double p = getP(si, so, instances.getN());
         return -Math.log(p);
     }
@@ -232,10 +229,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public abstract boolean checkInductionThreshold(Link l);
 
     public Link initInducedSynapse(Activation iAct, Activation oAct, Visitor v) {
-
         Link l = new Link(this, iAct, oAct, false);
 
         l.linkOutput();
+        linkOutput();
 
         l.computeOutputGradient();
         l.removeGradientDependencies();
@@ -243,13 +240,15 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         l.updateSelfGradient();
 
-        if (checkInductionThreshold(l)) return null;
-
-        if(Neuron.debugOutput) {
-//            System.out.println("dbg:" + (Neuron.debugId++) + " " + s + "   FG:" + Utils.round(l.getFinalGradient()) + "               INDUCED!");
+        if (checkInductionThreshold(l)) {
+            return null;
         }
 
-        linkOutput();
+/*
+        if(Neuron.debugOutput) {
+            System.out.println("dbg:" + (Neuron.debugId++) + " " + s + "   FG:" + Utils.round(l.getFinalGradient()) + "               INDUCED!");
+        }
+*/
 
         l.updateSynapse();
         oAct.sumUpLink(null, l);

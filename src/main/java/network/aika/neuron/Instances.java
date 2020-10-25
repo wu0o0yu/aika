@@ -10,8 +10,15 @@ import java.io.IOException;
 
 public class Instances implements Writable {
 
-    protected double N = 1;
-    protected int lastPos = Integer.MIN_VALUE;
+    protected double N = 0;
+    protected int lastPos;
+
+    private Instances() {
+    }
+
+    public Instances(Model m) {
+        this.lastPos = m.getN();
+    }
 
     public double getN() {
         return N;
@@ -21,23 +28,13 @@ public class Instances implements Writable {
         this.N = N;
     }
 
-    public boolean isInitialized() {
-        return lastPos != Integer.MIN_VALUE;
-    }
-
     public int getLastPos() {
         return lastPos;
     }
 
-    public void setLastPos(int lastPos) {
-        this.lastPos = lastPos;
-    }
-
     public void update(Model m, Reference ref) {
-        if(isInitialized()) {
-            N += (m.getN() - lastPos) / ref.length();
-        }
-        lastPos = m.getN();
+        N += 1 + ((m.getN() - lastPos) / ref.length());
+        lastPos = m.getN() + ref.getEnd();
     }
 
     @Override
@@ -58,9 +55,7 @@ public class Instances implements Writable {
         lastPos = in.readInt();
     }
 
-    public static class NotInitializedException extends RuntimeException {
-        public NotInitializedException() {
-            super("Not initialized!");
-        }
+    public String toString() {
+        return "N:" + N + " lastPos:" + lastPos;
     }
 }

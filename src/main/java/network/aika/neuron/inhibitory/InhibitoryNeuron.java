@@ -85,7 +85,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
-        InhibitorySynapse s = new InhibitorySynapse(iAct.getNeuron(), (InhibitoryNeuron) oAct.getNeuron());
+        InhibitorySynapse s = new InhibitorySynapse(iAct.getNeuron(), this);
         s.setWeight(1.0);
 
         return s.initInducedSynapse(iAct, oAct, v);

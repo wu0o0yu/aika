@@ -215,7 +215,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public boolean isActive() {
-        return value > 0.0 || !getNeuron().isInitialized();
+        return value > 0.0;
     }
 
     public double getBranchProbability() {

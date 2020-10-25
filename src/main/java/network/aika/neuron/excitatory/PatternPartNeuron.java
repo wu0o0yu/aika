@@ -16,15 +16,12 @@
  */
 package network.aika.neuron.excitatory;
 
-import network.aika.Config;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.activation.Direction.*;
 
 /**
