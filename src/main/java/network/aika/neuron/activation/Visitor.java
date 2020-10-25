@@ -127,9 +127,8 @@ public class Visitor {
         Activation iAct = startDir == INPUT ? act : origin;
         Activation oAct = startDir == OUTPUT ? act : origin;
 
-        Neuron on = oAct.getNeuron();
-        if (!on.isInputNeuron()) {
-            on.tryToLink(iAct, oAct, this);
+        if (!oAct.getNeuron().isInputNeuron()) {
+            iAct.getPhase().tryToLink(iAct, oAct, this);
         }
     }
 }

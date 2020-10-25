@@ -18,6 +18,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.phase.Phase;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,41 +109,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public boolean isInputNeuron() {
         return isInputNeuron;
-    }
-
-    public void tryToLink(Activation iAct, Activation oAct, Visitor c) {
-        if(!iAct.isActive()) return;
-
-        Synapse s = getInputSynapse(iAct.getNeuronProvider());
-
-        switch(iAct.getPhase()) {
-            case INITIAL_LINKING:
-            case FINAL_LINKING:
-                if (s == null ||
-                        s.getOutput().isInputNeuron() ||
-                        (s.isRecurrent() && !c.getSelfRef()) ||
-                        iAct.outputLinkExists(oAct)
-                ) return;
-
-                if(s.isNegative() && !c.getSelfRef()) {
-                    oAct = oAct.createBranch(s);
-                }
-
-                Link ol = oAct.getInputLink(s);
-                if(ol != null) {
-//                    oAct = oAct.cloneToReplaceLink(s);
-                    log.warn("Link already exists!  " + oAct.getThought());
-                    break;
-                }
-
-                Link.link(s, iAct, oAct, c.getSelfRef());
-                break;
-            case INDUCTION:
-                if(s != null || oAct.getNeuron().isInputNeuron()) return;
-
-                induceSynapse(iAct, oAct, c);
-                break;
-        }
     }
 
     public abstract boolean containsInputSynapse(Synapse s);

@@ -24,8 +24,8 @@ import network.aika.neuron.Synapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static network.aika.Phase.FINAL_LINKING;
-import static network.aika.Phase.INITIAL_LINKING;
+import static network.aika.neuron.phase.Phase.FINAL_LINKING;
+import static network.aika.neuron.phase.Phase.INITIAL_LINKING;
 import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Direction.INPUT;
 

@@ -19,14 +19,14 @@ package network.aika;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.phase.Phase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-import static network.aika.Phase.*;
+import static network.aika.neuron.phase.Phase.*;
 
 
 public abstract class Thought {
@@ -172,7 +172,7 @@ public abstract class Thought {
     }
 
     public Set<Activation> getActivations(Neuron n) {
-        phase = RESULTS;
+        phase = null;
         if(actsPerNeuron == null) {
             actsPerNeuron = getActivationsPerNeuron();
         }

@@ -19,17 +19,18 @@ package network.aika.neuron.activation;
 import network.aika.*;
 import network.aika.neuron.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.phase.Phase;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static network.aika.Phase.*;
 import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
+import static network.aika.neuron.phase.Phase.*;
 
 /**
  *
@@ -99,7 +100,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public double getNet(Phase p) {
-        return sum + (p == INITIAL_LINKING ? 0.0 : lateSum) + getNeuron().getBias(p);
+        return sum + (p.isFinal() ? lateSum : 0.0) + getNeuron().getBias(p);
     }
 
     public double getNet() {
@@ -142,7 +143,7 @@ public class Activation implements Comparable<Activation> {
         return lastRound;
     }
 
-    public Neuron getNeuron() {
+    public Neuron<?> getNeuron() {
         return neuron;
     }
 
@@ -278,22 +279,7 @@ public class Activation implements Comparable<Activation> {
         getModel().linkInputRelations(this, OUTPUT);
         thought.processLinks();
 
-        Neuron<?> n = getNeuron();
-
-        if (thought.getPhase() == INDUCTION) {
-            n.induceNeuron(this);
-        } else {
-            n.getOutputSynapses()
-                    .filter(s -> !outputLinkExists(s))
-                    .forEach(s ->
-                            Link.link(
-                                    s,
-                                    this,
-                                    createActivation(s.getOutput()),
-                                    false
-                            )
-                    );
-        }
+        thought.getPhase().propagate(this);
     }
 
     public Activation createActivation(Neuron n) {

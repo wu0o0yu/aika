@@ -14,15 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.neuron.phase;
+
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Visitor;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public enum Phase {
-    INITIAL_LINKING,
-    FINAL_LINKING,
-    INDUCTION,
-    RESULTS
+public abstract class Phase {
+    public static Phase INITIAL_LINKING = new LinkingPhase(false);
+    public static Phase FINAL_LINKING = new LinkingPhase(true);
+    public static Phase INDUCTION = new InductionPhase(true);
+
+    private boolean isFinal;
+
+    protected Phase(boolean isFinal) {
+        this.isFinal = isFinal;
+    }
+
+    public boolean isFinal() {
+        return isFinal;
+    }
+
+    public abstract void tryToLink(Activation iAct, Activation oAct, Visitor c);
+
+    public abstract void propagate(Activation act);
 }
