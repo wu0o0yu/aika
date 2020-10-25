@@ -80,6 +80,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
         if (!iAct.checkIfOutputLinkExists(syn -> syn instanceof PrimaryInhibitorySynapse)) {
             Neuron n = new InhibitoryNeuron(iAct.getModel(), "I-" + iAct.getDescriptionLabel(), false);
+            n.initInstance(iAct.getReference());
             n.initInducedNeuron(iAct);
         }
     }
@@ -87,6 +88,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
         InhibitorySynapse s = new InhibitorySynapse(iAct.getNeuron(), this);
         s.setWeight(1.0);
+        s.initInstance(iAct.getReference());
 
         return s.initInducedSynapse(iAct, oAct, v);
     }

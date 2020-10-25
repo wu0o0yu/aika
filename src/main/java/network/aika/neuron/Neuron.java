@@ -71,7 +71,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public Neuron(Model m, String descriptionLabel, Boolean isInputNeuron) {
         this.descriptionLabel = descriptionLabel;
         this.isInputNeuron = isInputNeuron;
-        this.instances = new Instances(m);
         provider = new NeuronProvider(m, this);
         modified = true;
     }
@@ -89,6 +88,10 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         Synapse s = outputSynapses.get(n);
         lock.releaseReadLock();
         return s;
+    }
+
+    public void initInstance(Reference ref) {
+        this.instances = new Instances(getModel(), ref);
     }
 
     public Instances getInstances() {

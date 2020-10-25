@@ -405,7 +405,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void initSelfGradient() {
-        selfGradient = (1 / getN()) * getActFunctionDerivative() *
+        selfGradient = getNorm() * getActFunctionDerivative() *
                 getNeuron().getSurprisal(
                         Sign.getSign(this)
                 );
@@ -425,8 +425,8 @@ public class Activation implements Comparable<Activation> {
         return selfGradient;
     }
 
-    public double getN() {
-        return getNeuron().getInstances().getN();
+    public double getNorm() {
+        return (1 / (1 + getNeuron().getInstances().getN()));
     }
 
     public void processGradient() {

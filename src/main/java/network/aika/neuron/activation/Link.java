@@ -85,10 +85,7 @@ public class Link {
     public void computeOutputGradient() {
         if(isNegative()) return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
 
-        double s = getSynapse().getSurprisal(
-                Sign.getSign(input),
-                Sign.getSign(output)
-        );
+        double s = 0.0;
 
         s -= input.getNeuron().getSurprisal(
                 Sign.getSign(input)
@@ -98,7 +95,12 @@ public class Link {
                 Sign.getSign(output)
         );
 
-        double f = s * getInputValue() / output.getN();
+        s += getSynapse().getSurprisal(
+                Sign.getSign(input),
+                Sign.getSign(output)
+        );
+
+        double f = s * getInputValue() * output.getNorm();
 
         offsetGradient =  f * getActFunctionDerivative();
         outputGradient = (f * output.getActFunctionDerivative()) - offsetGradient;
@@ -170,7 +172,7 @@ public class Link {
         double biasDelta = learnRate * finalGradient;
 
         synapse.addWeight(posWDelta - negWDelta);
-        on.addConjunctiveBias(negWDelta, causal);
+        on.addConjunctiveBias(negWDelta, !causal);
         on.addBias(biasDelta);
 
         double finalBias = on.getBias(FINAL_LINKING);

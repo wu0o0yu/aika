@@ -258,6 +258,10 @@ public abstract class Model {
         return sb.toString();
     }
 
+    public String toString() {
+        return "N:" + N;
+    }
+
     public interface NeuronProducer {
         Neuron createNeuron(String tokenLabel);
     }

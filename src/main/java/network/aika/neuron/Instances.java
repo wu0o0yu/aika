@@ -16,8 +16,8 @@ public class Instances implements Writable {
     private Instances() {
     }
 
-    public Instances(Model m) {
-        this.lastPos = m.getN();
+    public Instances(Model m, Reference ref) {
+        this.lastPos = getAbsoluteBegin(m, ref);
     }
 
     public double getN() {
@@ -33,8 +33,16 @@ public class Instances implements Writable {
     }
 
     public void update(Model m, Reference ref) {
-        N += 1 + ((m.getN() - lastPos) / ref.length());
-        lastPos = m.getN() + ref.getEnd();
+        N += 1 + ((getAbsoluteBegin(m, ref) - lastPos) / ref.length());
+        lastPos = getAbsoluteEnd(m, ref);
+    }
+
+    public int getAbsoluteBegin(Model m, Reference ref) {
+        return m.getN() + ref.getBegin();
+    }
+
+    public int getAbsoluteEnd(Model m, Reference ref) {
+        return m.getN() + ref.getEnd();
     }
 
     @Override

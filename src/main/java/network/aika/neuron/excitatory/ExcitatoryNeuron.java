@@ -18,10 +18,7 @@ package network.aika.neuron.excitatory;
 
 import network.aika.*;
 import network.aika.neuron.*;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.activation.Fired;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 import network.aika.neuron.phase.Phase;
@@ -92,6 +89,7 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
                 v.scope == v.downUpDir,
                 v.related
         );
+        s.initInstance(iAct.getReference());
 
         return s.initInducedSynapse(iAct, oAct, v);
     }

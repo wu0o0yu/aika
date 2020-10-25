@@ -89,7 +89,6 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
     }
 
     public static void induce(Activation iAct, Activation oAct, Visitor v) {
-
     }
 
     @Override

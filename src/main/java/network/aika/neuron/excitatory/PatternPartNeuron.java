@@ -53,6 +53,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
 
         if (!iAct.checkIfOutputLinkExists(syn -> syn.isInputScope() && syn.isInputLinked())) {
             Neuron n = new PatternPartNeuron(iAct.getModel(), "TP-" + iAct.getDescriptionLabel(), false);
+            n.initInstance(iAct.getReference());
             n.initInducedNeuron(iAct);
         }
     }

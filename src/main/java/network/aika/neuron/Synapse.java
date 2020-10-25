@@ -19,6 +19,7 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Writable;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Link;
 import org.apache.commons.math3.distribution.BetaDistribution;
@@ -57,7 +58,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public Synapse(I input, O output) {
         this.input = input.getProvider();
         this.output = output.getProvider();
-        this.instances = new Instances(output.getModel());
     }
 
     public abstract Visitor transition(Visitor v);
@@ -140,6 +140,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public O getOutput() {
         return (O) output.getNeuron();
+    }
+
+    public void initInstance(Reference ref) {
+        this.instances = new Instances(getModel(), ref);
     }
 
     public Instances getInstances() {
