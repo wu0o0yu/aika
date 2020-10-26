@@ -38,11 +38,11 @@ public class Instances implements Writable {
     }
 
     public int getAbsoluteBegin(Model m, Reference ref) {
-        return m.getN() + ref.getBegin();
+        return m.getN() + (ref != null ? ref.getBegin() : 0);
     }
 
     public int getAbsoluteEnd(Model m, Reference ref) {
-        return m.getN() + ref.getEnd();
+        return m.getN() + (ref != null ? ref.getEnd() : 0);
     }
 
     @Override

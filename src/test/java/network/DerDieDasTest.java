@@ -1,6 +1,7 @@
 package network;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Reference;
 import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
@@ -23,7 +24,7 @@ public class DerDieDasTest {
         charBasedTrainings.init();
     }
 
-    public void initToken(String token) {
+    public void initToken(Reference ref, String token) {
         TextModel m = charBasedTrainings.getModel();
         PatternNeuron out = new PatternNeuron(m, token, "P-" + token, false);
         out.setBias(0.1);
@@ -33,10 +34,10 @@ public class DerDieDasTest {
         for(int i = 0; i < token.length(); i++) {
             char c = token.charAt(i);
 
-            PatternNeuron inN = m.lookupToken("" + c);
+            PatternNeuron inN = m.lookupToken(ref, "" + c);
             PatternPartNeuron ppN = new PatternPartNeuron(m, "TP-" + c + "-(" + token + ")", false);
 
-            initPP(c, inN, ppN, prevPPN, out);
+            initPP(ref, c, inN, ppN, prevPPN, out);
 
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(ppN, out, false, false, false, true);
@@ -51,14 +52,19 @@ public class DerDieDasTest {
         }
     }
 
-    public void initPP(Character c, PatternNeuron inN, PatternPartNeuron ppN, PatternPartNeuron prevPP, PatternNeuron out) {
+    public void initPP(Reference ref, Character c, PatternNeuron inN, PatternPartNeuron ppN, PatternPartNeuron prevPP, PatternNeuron out) {
         InhibitoryNeuron inhibN = inhibNeurons.computeIfAbsent(c,
                 ch ->
-                        new InhibitoryNeuron(charBasedTrainings.getModel(), "I-" + ch, false)
+                {
+                    InhibitoryNeuron n = new InhibitoryNeuron(charBasedTrainings.getModel(), "I-" + ch, false);
+                    n.initInstance(ref);
+                    return n;
+                }
         );
 
         {
             InhibitorySynapse s = new InhibitorySynapse(ppN, inhibN);
+            s.initInstance(ref);
 
             s.linkInput();
             s.addWeight(0.1);
@@ -66,6 +72,7 @@ public class DerDieDasTest {
 
         {
             ExcitatorySynapse s = new ExcitatorySynapse(inhibN, ppN, true, true, false, false);
+            s.initInstance(ref);
 
             s.linkOutput();
             s.addWeight(-100.0);
@@ -73,6 +80,7 @@ public class DerDieDasTest {
 
         {
             ExcitatorySynapse s = new ExcitatorySynapse(inN, ppN, false, false, true, false);
+            s.initInstance(ref);
 
             s.linkInput();
             s.addWeight(0.1);
@@ -81,6 +89,7 @@ public class DerDieDasTest {
 
         if(prevPP != null) {
             ExcitatorySynapse s = new ExcitatorySynapse(prevPP, ppN, false, false, true, false);
+            s.initInstance(ref);
 
             s.linkOutput();
             s.addWeight(0.1);
@@ -89,6 +98,7 @@ public class DerDieDasTest {
 
         if(prevPP != null) {
             ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(inN), ppN, false, false, true, false);
+            s.initInstance(ref);
 
             s.linkOutput();
             s.addWeight(0.1);
@@ -97,6 +107,7 @@ public class DerDieDasTest {
 
         {
             ExcitatorySynapse s = new ExcitatorySynapse(out, ppN, false, true, false, false);
+            s.initInstance(ref);
 
             s.linkOutput();
             s.addWeight(0.1);
@@ -125,9 +136,9 @@ public class DerDieDasTest {
         String[] trainData = {"der", "die", "das"};
         for(int i = 0; i < 1000; i++) {
             if(i == 100) {
-                initToken("der");
-                initToken("die");
-                initToken("das");
+                initToken(null, "der");
+                initToken(null, "die");
+                initToken(null, "das");
             }
 
             if(i == 110) {

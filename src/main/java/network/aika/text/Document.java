@@ -104,26 +104,27 @@ public class Document extends Thought {
         return ((TextReference)act.getReference()).getText();
     }
 
-    public Activation addInput(Neuron n, int begin, int end) {
+    public Activation addInput(Neuron n, Reference ref) {
         Activation act = new Activation(this, n);
-        act.setReference(new TextReference(this, begin, end));
+        act.setReference(ref);
 
         act.setValue(1.0);
-        act.setFired(begin);
+        act.setFired(ref.getBegin());
 
         act.propagateInput();
         return act;
     }
 
-    public Activation addInput(NeuronProvider n, int begin, int end) {
-        return addInput(n.getNeuron(), begin, end);
+    public Activation addInput(NeuronProvider n, Reference ref) {
+        return addInput(n.getNeuron(), ref);
     }
 
     public Activation processToken(TextModel m, int begin, int end, String tokenLabel) {
         moveCursor();
 
-        Neuron tokenN = m.lookupToken(tokenLabel);
-        Activation tokenPatternAct = addInput(tokenN, begin, end);
+        Reference ref = new TextReference(this, begin, end);
+        Neuron tokenN = m.lookupToken(ref, tokenLabel);
+        Activation tokenPatternAct = addInput(tokenN, ref);
         processActivations();
 
         return tokenPatternAct;

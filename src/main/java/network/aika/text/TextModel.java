@@ -17,6 +17,7 @@
 package network.aika.text;
 
 import network.aika.Model;
+import network.aika.neuron.activation.Reference;
 import network.aika.neuron.phase.Phase;
 import network.aika.SuspensionHook;
 import network.aika.neuron.Neuron;
@@ -50,10 +51,12 @@ public class TextModel extends Model {
 
     private void init() {
         InhibitoryNeuron ptN = new InhibitoryNeuron(this, "Prev. Token", true);
+        ptN.initInstance(null);
         prevTokenInhib = ptN.getProvider();
         prevTokenInhib.save();
 
         InhibitoryNeuron ntN = new InhibitoryNeuron(this, "Next Token", true);
+        ntN.initInstance(null);
         nextTokenInhib = ntN.getProvider();
         nextTokenInhib.save();
     }
@@ -104,21 +107,26 @@ public class TextModel extends Model {
                 .anyMatch(s -> prevTokenInhib.getId().equals(s.getOutput().getId()));
     }
 
-    public PatternNeuron lookupToken(String tokenLabel) {
+    public PatternNeuron lookupToken(Reference ref, String tokenLabel) {
         Neuron inProv = getNeuron(tokenLabel);
         if(inProv != null) {
             return (PatternNeuron) inProv;
         }
 
         PatternNeuron in = new PatternNeuron(this, tokenLabel, tokenLabel, true);
+        in.initInstance(ref);
         getSuspensionHook().putLabel(tokenLabel, in.getId());
 
         PatternPartNeuron inRelPW = new PatternPartNeuron(this, tokenLabel + " Rel Prev. Word", true);
+        inRelPW.initInstance(ref);
+
         PatternPartNeuron inRelNW = new PatternPartNeuron(this, tokenLabel + " Rel Next Word", true);
+        inRelNW.initInstance(ref);
 
         {
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(in, inRelPW, false, true, false, false);
+                s.initInstance(ref);
 
                 s.linkInput();
                 s.linkOutput();
@@ -128,6 +136,7 @@ public class TextModel extends Model {
 
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(getNextTokenInhib(), inRelPW, false, false, true, false);
+                s.initInstance(ref);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -138,6 +147,7 @@ public class TextModel extends Model {
         {
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(in, inRelNW, false, true, false, false);
+                s.initInstance(ref);
 
                 s.linkInput();
                 s.linkOutput();
@@ -147,6 +157,7 @@ public class TextModel extends Model {
 
             {
                 ExcitatorySynapse s = new ExcitatorySynapse(getPrevTokenInhib(), inRelNW, false, false, true, false);
+                s.initInstance(ref);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -157,6 +168,7 @@ public class TextModel extends Model {
 
         {
             InhibitorySynapse s = new InhibitorySynapse(inRelPW, getPrevTokenInhib());
+            s.initInstance(ref);
 
             s.linkInput();
             s.addWeight(1.0);
@@ -164,6 +176,7 @@ public class TextModel extends Model {
 
         {
             InhibitorySynapse s = new InhibitorySynapse(inRelNW, getNextTokenInhib());
+            s.initInstance(ref);
 
             s.linkInput();
             s.addWeight(1.0);
