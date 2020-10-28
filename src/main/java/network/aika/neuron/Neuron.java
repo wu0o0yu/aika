@@ -114,6 +114,10 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return isInputNeuron;
     }
 
+    public boolean isInitialized() {
+        return getInputSynapses().count() > 1;
+    }
+
     public abstract boolean containsInputSynapse(Synapse s);
 
     public abstract void addInputSynapse(S s);

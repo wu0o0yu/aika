@@ -258,8 +258,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         oAct.sumUpLink(null, l);
         l.linkInput();
 
-//        l.getOutput().getNeuron().updateReference(l); // Sollte bereits in oAct.sumUpLink(null, l) enthalten sein.
-
         getInstances().update(getModel(), iAct.getReference());
 
         return l;

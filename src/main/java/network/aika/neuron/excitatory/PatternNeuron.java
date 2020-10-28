@@ -78,11 +78,16 @@ public class PatternNeuron extends ExcitatoryNeuron {
         nl.getOutput().setReference(or == null ? ir : or.add(ir));
     }
 
-    public static void induce(Activation iAct) {
-        if (!iAct.getNeuron().isInputNeuron() && !iAct.checkIfOutputLinkExists(syn -> syn.isSamePattern())) {
-            Neuron n = new PatternNeuron(iAct.getModel(), null, "P-" + iAct.getNeuron().getId(), false);
-            n.initInstance(iAct.getReference());
-            n.initInducedNeuron(iAct);
+    public static void induce(Activation act) {
+        if(act.getNeuron().isInputNeuron() || act.checkInductionThreshold()) {
+//            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
+            return;
+        }
+
+        if (!act.checkIfInputLinkExists(syn -> syn.isSamePattern())) {
+            Neuron n = new PatternNeuron(act.getModel(), null, "P-" + act.getNeuron().getId(), false);
+            n.initInstance(act.getReference());
+            n.initInducedNeuron(act);
         }
     }
 

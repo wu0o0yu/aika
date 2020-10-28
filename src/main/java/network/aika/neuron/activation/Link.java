@@ -107,6 +107,10 @@ public class Link {
     }
 
     private double getActFunctionDerivative() {
+        if(!output.getNeuron().isInitialized()) {
+            return 0.0;
+        }
+
         return output.getNeuron()
                 .getActivationFunction()
                 .outerGrad(
