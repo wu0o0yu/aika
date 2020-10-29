@@ -79,7 +79,11 @@ public class PatternNeuron extends ExcitatoryNeuron {
     }
 
     public static void induce(Activation act) {
-        if(act.getNeuron().isInputNeuron() || act.checkInductionThreshold()) {
+        if(act.getNeuron().isInputNeuron()) {
+//            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
+            return;
+        }
+        if(act.getThought().getTrainingConfig().checkGradientInductionThreshold(act)) {
 //            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
             return;
         }
@@ -97,7 +101,7 @@ public class PatternNeuron extends ExcitatoryNeuron {
 
         Config c = act.getThought().getTrainingConfig();
 
-        if(s < c.getInductionThreshold()) {
+        if(s < c.getSurprisalInductionThreshold()) {
 //            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
             return;
         }

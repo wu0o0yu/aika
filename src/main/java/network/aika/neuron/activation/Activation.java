@@ -155,13 +155,6 @@ public class Activation implements Comparable<Activation> {
         return neuron.getProvider();
     }
 
-    public boolean checkInductionThreshold() {
-        double s = getNeuron().getSurprisal(POS);
-        Config c = getThought().getTrainingConfig();
-
-        return s < c.getInductionThreshold();
-    }
-
     public void propagateInput() {
         isFinal = true;
 

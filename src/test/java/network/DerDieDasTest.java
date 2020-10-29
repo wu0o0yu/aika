@@ -96,8 +96,9 @@ public class DerDieDasTest {
             ppN.addConjunctiveBias(-0.1, false);
         }
 
-        if(prevPP != null) {
-            ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(inN), ppN, false, false, true, false);
+        PatternPartNeuron nextPP = lookupPPPT(inN);
+        if(nextPP != null) {
+            ExcitatorySynapse s = new ExcitatorySynapse(nextPP, ppN, false, false, true, false);
             s.initInstance(ref);
 
             s.linkOutput();

@@ -28,29 +28,27 @@ public class SimplePhraseTest {
     public void simplePhraseTest() {
         TextModel model = new TextModel();
 
+        ManuelInductionModel inductionModel = new ManuelInductionModel(model);
+
         Random r = new Random(1);
 
         for (int k = 0; k < 1000; k++) {
-            String p = phrases[r.nextInt(phrases.length)];
-            System.out.println("  " + p);
+            String phrase = phrases[r.nextInt(phrases.length)];
+            System.out.println("  " + phrase);
 
-            Neuron.debugOutput = p.equalsIgnoreCase("der Hund");
+            Neuron.debugOutput = phrase.equalsIgnoreCase("der Hund");
 
-            Document doc = new Document(p,
+            Document doc = new Document(phrase,
                     new Config()
                             .setAlpha(0.99)
                             .setLearnRate(-0.1)
-                            .setInductionThreshold(1.4)
+                            .setSurprisalInductionThreshold(0.0)
+                            .setGradientInductionThreshold(0.0)
+                            .setEnableInduction(false)
             );
 
-            int i = 0;
-            for (String w : p.split(" ")) {
-                int j = i + w.length() + 1;
-                j = Math.min(j, p.length());
+            inductionModel.initToken(doc);
 
-                doc.processToken(model, i, j, w);
-                i = j;
-            }
             doc.process();
 
             doc.train(model);

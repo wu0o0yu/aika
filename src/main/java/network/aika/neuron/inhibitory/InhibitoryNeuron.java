@@ -73,7 +73,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     public static void induce(Activation iAct) {
-        if(iAct.checkInductionThreshold()) {
+        if(iAct.getThought().getTrainingConfig().checkSurprisalInductionThreshold(iAct.getNeuron())) {
 //            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
             return;
         }
