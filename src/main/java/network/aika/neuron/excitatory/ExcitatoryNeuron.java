@@ -55,8 +55,8 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         super(p);
     }
 
-    public ExcitatoryNeuron(Model model, String label, Boolean isInputNeuron) {
-        super(model, label, isInputNeuron);
+    public ExcitatoryNeuron(Model model, Boolean isInputNeuron) {
+        super(model, isInputNeuron);
     }
 
     public void setDirectConjunctiveBias(double b) {
@@ -78,6 +78,10 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
     public void train(Activation act) {
         addDummyLinks(act);
         super.train(act);
+    }
+
+    public boolean isInitialized() {
+        return getInputSynapses().count() > 1;
     }
 
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {

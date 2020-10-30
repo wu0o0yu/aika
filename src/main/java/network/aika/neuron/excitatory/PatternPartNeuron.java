@@ -36,8 +36,8 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
         super(p);
     }
 
-    public PatternPartNeuron(Model model, String label, Boolean isInputNeuron) {
-        super(model, label, isInputNeuron);
+    public PatternPartNeuron(Model model, Boolean isInputNeuron) {
+        super(model, isInputNeuron);
     }
 
     @Override
@@ -46,13 +46,13 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
     }
 
     public static Activation induce(Activation iAct) {
-        if(iAct.getThought().getTrainingConfig().checkSurprisalInductionThreshold(iAct.getNeuron())) {
+        if(!iAct.getConfig().checkPatternPartNeuronInduction(iAct.getNeuron())) {
 //            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
             return null;
         }
 
         if (!iAct.checkIfOutputLinkExists(syn -> syn.isInputScope() && syn.isInputLinked())) {
-            Neuron n = new PatternPartNeuron(iAct.getModel(), "TP-" + iAct.getDescriptionLabel(), false);
+            Neuron n = new PatternPartNeuron(iAct.getModel(), false);
             n.initInstance(iAct.getReference());
             return n.initInducedNeuron(iAct);
         }

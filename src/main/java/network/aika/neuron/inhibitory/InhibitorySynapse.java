@@ -17,7 +17,6 @@
 package network.aika.neuron.inhibitory;
 
 import network.aika.neuron.*;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 
 /**
@@ -49,11 +48,6 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     public void addWeight(double weightDelta) {
         super.addWeight(weightDelta);
         input.getNeuron().setModified(true);
-    }
-
-    @Override
-    public boolean checkInductionThreshold(Link l) {
-        return true;
     }
 
     public Visitor transition(Visitor v) {

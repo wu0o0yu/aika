@@ -70,11 +70,15 @@ public class PatternTest {
         PatternNeuron nB = m.lookupToken(null, "B");
         PatternNeuron nC = m.lookupToken(null, "C");
 
-        PatternPartNeuron eA = new PatternPartNeuron(m, "E A", false);
-        PatternPartNeuron eB = new PatternPartNeuron(m, "E B", false);
-        PatternPartNeuron eC = new PatternPartNeuron(m, "E C", false);
+        PatternPartNeuron eA = new PatternPartNeuron(m, false);
+        eA.setDescriptionLabel("E A");
+        PatternPartNeuron eB = new PatternPartNeuron(m, false);
+        eB.setDescriptionLabel("E B");
+        PatternPartNeuron eC = new PatternPartNeuron(m, false);
+        eC.setDescriptionLabel("E C");
 
-        PatternNeuron out = new PatternNeuron(m, "ABC", "OUT", false);
+        PatternNeuron out = new PatternNeuron(m, "ABC", false);
+        out.setDescriptionLabel("OUT");
 
         {
             {

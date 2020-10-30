@@ -47,8 +47,8 @@ public class PatternNeuron extends ExcitatoryNeuron {
         super(p);
     }
 
-    public PatternNeuron(Model model, String tokenLabel, String descriptionLabel, Boolean isInputNeuron) {
-        super(model, descriptionLabel, isInputNeuron);
+    public PatternNeuron(Model model, String tokenLabel, Boolean isInputNeuron) {
+        super(model, isInputNeuron);
         this.tokenLabel = tokenLabel;
     }
 
@@ -83,13 +83,13 @@ public class PatternNeuron extends ExcitatoryNeuron {
 //            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
             return;
         }
-        if(act.getThought().getTrainingConfig().checkGradientInductionThreshold(act)) {
+        if(!act.getConfig().checkPatternNeuronInduction(act)) {
 //            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
             return;
         }
 
         if (!act.checkIfInputLinkExists(syn -> syn.isSamePattern())) {
-            Neuron n = new PatternNeuron(act.getModel(), null, "P-" + act.getNeuron().getId(), false);
+            Neuron n = new PatternNeuron(act.getModel(), null, false);
             n.initInstance(act.getReference());
             n.initInducedNeuron(act);
         }

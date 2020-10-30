@@ -18,6 +18,7 @@ package network.aika;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 
 import static network.aika.neuron.Sign.POS;
 
@@ -74,16 +75,33 @@ public class Config {
         return this;
     }
 
-    public boolean checkSurprisalInductionThreshold(Neuron n) {
+    public boolean checkPatternPartNeuronInduction(Neuron n) {
         double s = n.getSurprisal(POS);
 
         return s < getSurprisalInductionThreshold();
     }
 
-    public boolean checkGradientInductionThreshold(Activation act) {
+
+    public boolean checkInhibitoryNeuronInduction(Neuron n) {
+        double s = n.getSurprisal(POS);
+
+        return s < getSurprisalInductionThreshold();
+    }
+
+    public boolean checkPatternNeuronInduction(Activation act) {
         double s = act.getSelfGradient();
 
         return s < getGradientInductionThreshold();
+    }
+
+    public boolean checkSynapseInduction(Link l) {
+        Config c = l.getOutput().getThought().getTrainingConfig();
+
+        return (l.getFinalGradient() - l.getOutput().getSelfGradient()) > -c.getSurprisalInductionThreshold();
+    }
+
+    public String getLabel(Activation iAct, Neuron n) {
+        return "";
     }
 
     public String toString() {

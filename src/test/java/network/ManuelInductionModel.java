@@ -1,7 +1,9 @@
 package network;
 
+import network.aika.Config;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.excitatory.ExcitatorySynapse;
 import network.aika.neuron.excitatory.PatternNeuron;
@@ -19,103 +21,60 @@ public class ManuelInductionModel {
 
     public TextModel model;
 
-    Map<PatternNeuron, InhibitoryNeuron> inhibNeurons = new TreeMap<>(Comparator.comparing(n -> n.getId()));
-
     public ManuelInductionModel(TextModel model) {
         this.model = model;
     }
 
-    public void initToken(Document doc) {
-        String patternLabel = doc.getContent();
+    private String trimPrefix(String l) {
+        return l.substring(l.indexOf("-") + 1);
+    }
 
-        PatternPartNeuron prevPPN = null;
+    public void initToken(Document doc) {
+        doc.setTrainingConfig(new Config() {
+
+                    public boolean checkPatternPartNeuronInduction(Neuron n) {
+                        return n.isInputNeuron();
+                    }
+
+                    public boolean checkInhibitoryNeuronInduction(Neuron n) {
+                        return n.isInputNeuron() || n instanceof PatternNeuron;
+                    }
+
+                    public boolean checkPatternNeuronInduction(Activation act) {
+                        return true;
+                    }
+
+                    public boolean checkSynapseInduction(Link l) {
+                        Neuron n = l.getOutput().getNeuron();
+                        if(n instanceof InhibitoryNeuron) {
+                            return !n.isInputNeuron() || n instanceof PatternNeuron;
+                        }
+
+                        return true;
+                    }
+
+                    public String getLabel(Activation iAct, Neuron n) {
+                        if(n instanceof PatternPartNeuron) {
+                            return "TP-" + trimPrefix(iAct.getDescriptionLabel());
+                        } else if(n instanceof PatternNeuron) {
+                            return "P-" + doc.getContent();
+                        } else {
+                            return "I-" + trimPrefix(iAct.getDescriptionLabel());
+                        }
+                    }
+                }
+                        .setAlpha(0.99)
+                        .setLearnRate(-0.1)
+                        .setEnableInduction(true)
+        );
 
         int i = 0;
         for(String t: doc.getContent().split(" ")) {
             int j = i + t.length();
-            Activation tokenAct = doc.processToken(model, i, j, t);
+            doc.processToken(model, i, j, t);
 
-            PatternNeuron inputTokenPattern = (PatternNeuron) tokenAct.getNeuron();
-
-           // PatternPartNeuron ppN = new PatternPartNeuron(model, "TP-" + t + "-(" + patternLabel + ")", false);
-            Activation tpAct = PatternPartNeuron.induce(tokenAct);
-            PatternPartNeuron ppN = (PatternPartNeuron) tpAct.getNeuron();
-
-            initPP(tokenAct.getReference(), inputTokenPattern, ppN, prevPPN, out);
-
-            PatternNeuron.induce(tpAct);
-
-            prevPPN = ppN;
             i = j + 1;
         }
     }
 
-    public void initPP(Reference ref, PatternNeuron inputTokenPattern, PatternPartNeuron ppN, PatternPartNeuron prevPP, PatternNeuron out) {
-        InhibitoryNeuron inhibN = inhibNeurons.computeIfAbsent(inputTokenPattern,
-                ch ->
-                {
-                    InhibitoryNeuron n = new InhibitoryNeuron(model, "I-" + ch, false);
-                    n.initInstance(ref);
-                    return n;
-                }
-        );
-
-        {
-            InhibitorySynapse s = new InhibitorySynapse(ppN, inhibN);
-            s.initInstance(ref);
-
-            s.linkInput();
-        }
-
-        {
-            ExcitatorySynapse s = new ExcitatorySynapse(inhibN, ppN, true, true, false, false);
-            s.initInstance(ref);
-
-            s.linkOutput();
-            s.addWeight(-100.0);
-        }
-
-        {
-            ExcitatorySynapse s = new ExcitatorySynapse(inputTokenPattern, ppN, false, false, true, false);
-            s.initInstance(ref);
-
-            s.linkInput();
-        }
-
-        if(prevPP != null) {
-            ExcitatorySynapse s = new ExcitatorySynapse(prevPP, ppN, false, false, true, false);
-            s.initInstance(ref);
-
-            s.linkOutput();
-        }
-
-        PatternPartNeuron nextPP = lookupPPPT(inputTokenPattern);
-        if(nextPP != null) {
-            ExcitatorySynapse s = new ExcitatorySynapse(nextPP, ppN, false, false, true, false);
-            s.initInstance(ref);
-
-            s.linkOutput();
-        }
-
-        {
-            ExcitatorySynapse s = new ExcitatorySynapse(out, ppN, false, true, false, false);
-            s.initInstance(ref);
-
-            s.linkOutput();
-        }
-    }
-
-    public PatternPartNeuron lookupPPPT(PatternNeuron pn) {
-        return (PatternPartNeuron) pn.getOutputSynapses()
-                .map(s -> s.getOutput())
-                .filter(n -> isPTNeuron(n))
-                .findAny()
-                .orElse(null);
-    }
-
-    private boolean isPTNeuron(Neuron<?> n) {
-        return n.getOutputSynapses()
-                .map(s -> s.getOutput())
-                .anyMatch(in -> in == model.getPrevTokenInhib());
-    }
 }

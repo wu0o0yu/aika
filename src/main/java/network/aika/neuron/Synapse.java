@@ -230,8 +230,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         modified = true;
     }
 
-    public abstract boolean checkInductionThreshold(Link l);
-
     public Link initInducedSynapse(Activation iAct, Activation oAct, Visitor v) {
         Link l = new Link(this, iAct, oAct, false);
 
@@ -244,7 +242,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         l.updateSelfGradient();
 
-        if (checkInductionThreshold(l)) {
+        if (!oAct.getConfig().checkSynapseInduction(l)) {
             return null;
         }
 

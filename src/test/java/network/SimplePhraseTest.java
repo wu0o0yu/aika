@@ -38,14 +38,7 @@ public class SimplePhraseTest {
 
             Neuron.debugOutput = phrase.equalsIgnoreCase("der Hund");
 
-            Document doc = new Document(phrase,
-                    new Config()
-                            .setAlpha(0.99)
-                            .setLearnRate(-0.1)
-                            .setSurprisalInductionThreshold(0.0)
-                            .setGradientInductionThreshold(0.0)
-                            .setEnableInduction(false)
-            );
+            Document doc = new Document(phrase);
 
             inductionModel.initToken(doc);
 

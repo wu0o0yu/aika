@@ -68,8 +68,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         provider = p;
     }
 
-    public Neuron(Model m, String descriptionLabel, Boolean isInputNeuron) {
-        this.descriptionLabel = descriptionLabel;
+    public Neuron(Model m, Boolean isInputNeuron) {
         this.isInputNeuron = isInputNeuron;
         provider = new NeuronProvider(m, this);
         modified = true;
@@ -114,9 +113,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return isInputNeuron;
     }
 
-    public boolean isInitialized() {
-        return getInputSynapses().count() > 1;
-    }
+    public abstract boolean isInitialized();
 
     public abstract boolean containsInputSynapse(Synapse s);
 
@@ -140,6 +137,10 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public String getDescriptionLabel() {
         return descriptionLabel;
+    }
+
+    public void setDescriptionLabel(String label) {
+        this.descriptionLabel = label;
     }
 
     public Model getModel() {
@@ -203,6 +204,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public Activation initInducedNeuron(Activation iAct) {
 //        System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + "  --> " + n.getDescriptionLabel() + "               INDUCED!");
+        setDescriptionLabel(iAct.getConfig().getLabel(iAct, this));
 
         Activation act = iAct.createActivation(this);
 

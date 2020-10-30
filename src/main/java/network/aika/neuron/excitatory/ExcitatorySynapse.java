@@ -92,13 +92,6 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
     }
 
     @Override
-    public boolean checkInductionThreshold(Link l) {
-        Config c = l.getOutput().getThought().getTrainingConfig();
-
-        return (l.getFinalGradient() - l.getOutput().getSelfGradient()) > -c.getSurprisalInductionThreshold();
-    }
-
-    @Override
     public byte getType() {
         return type;
     }

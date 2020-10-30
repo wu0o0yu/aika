@@ -17,7 +17,6 @@
 package network.aika.neuron.inhibitory;
 
 import network.aika.ActivationFunction;
-import network.aika.Config;
 import network.aika.Model;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
@@ -26,12 +25,8 @@ import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
-
-import static network.aika.neuron.Sign.POS;
-import static network.aika.neuron.activation.Direction.INPUT;
 
 /**
  *
@@ -49,8 +44,8 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         super(p);
     }
 
-    public InhibitoryNeuron(Model model, String descriptionLabel, Boolean isInputNeuron) {
-        super(model, descriptionLabel, isInputNeuron);
+    public InhibitoryNeuron(Model model, Boolean isInputNeuron) {
+        super(model, isInputNeuron);
     }
 
     @Override
@@ -60,6 +55,10 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     public Visitor transition(Visitor v) {
         return v;
+    }
+
+    public boolean isInitialized() {
+        return false;
     }
 
     @Override
@@ -73,20 +72,27 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     public static void induce(Activation iAct) {
-        if(iAct.getThought().getTrainingConfig().checkSurprisalInductionThreshold(iAct.getNeuron())) {
+        if(!iAct.getConfig().checkInhibitoryNeuronInduction(iAct.getNeuron())) {
 //            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
             return;
         }
 
         if (!iAct.checkIfOutputLinkExists(syn -> syn instanceof PrimaryInhibitorySynapse)) {
-            Neuron n = new InhibitoryNeuron(iAct.getModel(), "I-" + iAct.getDescriptionLabel(), false);
+            Neuron n = new InhibitoryNeuron(iAct.getModel(), false);
             n.initInstance(iAct.getReference());
             n.initInducedNeuron(iAct);
         }
     }
 
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
-        InhibitorySynapse s = new InhibitorySynapse(iAct.getNeuron(), this);
+        InhibitorySynapse s = null;
+
+        if(iAct.getNeuron() instanceof PatternNeuron) {
+            s = new PrimaryInhibitorySynapse(iAct.getNeuron(), this);
+        } else if(iAct.getNeuron() instanceof PatternPartNeuron) {
+            s = new InhibitorySynapse(iAct.getNeuron(), this);
+        }
+
         s.setWeight(1.0);
         s.initInstance(iAct.getReference());
 

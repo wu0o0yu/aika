@@ -40,14 +40,14 @@ public class InductionPhase extends Phase {
 
         if (s != null || oAct.getNeuron().isInputNeuron()) return;
 
-        if(oAct.getThought().getTrainingConfig().isEnableInduction()) {
+        if(oAct.getConfig().isEnableInduction()) {
             n.induceSynapse(iAct, oAct, c);
         }
     }
 
     @Override
     public void propagate(Activation act) {
-        if(act.getThought().getTrainingConfig().isEnableInduction()) {
+        if(act.getConfig().isEnableInduction()) {
             act.getNeuron().induceNeuron(act);
         }
     }

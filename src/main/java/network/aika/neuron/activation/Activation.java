@@ -151,6 +151,10 @@ public class Activation implements Comparable<Activation> {
         return neuron.getModel();
     }
 
+    public Config getConfig() {
+        return getThought().getTrainingConfig();
+    }
+
     public NeuronProvider getNeuronProvider() {
         return neuron.getProvider();
     }
