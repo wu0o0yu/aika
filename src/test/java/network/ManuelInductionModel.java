@@ -27,7 +27,6 @@ public class ManuelInductionModel {
 
     public void initToken(Document doc) {
         String patternLabel = doc.getContent();
-        PatternNeuron out = new PatternNeuron(model, patternLabel, "P-" + patternLabel, false);
 
         PatternPartNeuron prevPPN = null;
 
@@ -44,12 +43,7 @@ public class ManuelInductionModel {
 
             initPP(tokenAct.getReference(), inputTokenPattern, ppN, prevPPN, out);
 
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(ppN, out, false, false, false, true);
-
-                s.linkInput();
-                s.linkOutput();
-            }
+            PatternNeuron.induce(tpAct);
 
             prevPPN = ppN;
             i = j + 1;
