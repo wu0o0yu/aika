@@ -46,13 +46,8 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
         super();
     }
 
-    public ExcitatorySynapse(I input, O output, boolean isNegative, boolean isRecurrent, boolean isInputScope, boolean isSamePattern) {
+    public ExcitatorySynapse(I input, O output) {
         super(input, output);
-
-        this.isNegative = isNegative;
-        this.isRecurrent = isRecurrent;
-        this.inputScope = isInputScope;
-        this.isSamePattern = isSamePattern;
     }
 
     @Override
@@ -110,6 +105,22 @@ public class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron> 
 
     public boolean isSamePattern() {
         return isSamePattern;
+    }
+
+    public void setNegative(boolean negative) {
+        isNegative = negative;
+    }
+
+    public void setRecurrent(boolean recurrent) {
+        isRecurrent = recurrent;
+    }
+
+    public void setInputScope(boolean inputScope) {
+        this.inputScope = inputScope;
+    }
+
+    public void setSamePattern(boolean samePattern) {
+        isSamePattern = samePattern;
     }
 
     public void setWeight(double weight) {

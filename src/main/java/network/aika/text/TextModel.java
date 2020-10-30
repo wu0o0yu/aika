@@ -130,7 +130,8 @@ public class TextModel extends Model {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(in, inRelPW, false, true, false, false);
+                ExcitatorySynapse s = new ExcitatorySynapse(in, inRelPW);
+                s.setRecurrent(true);
                 s.initInstance(ref);
 
                 s.linkInput();
@@ -140,7 +141,8 @@ public class TextModel extends Model {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(getNextTokenInhib(), inRelPW, false, false, true, false);
+                ExcitatorySynapse s = new ExcitatorySynapse(getNextTokenInhib(), inRelPW);
+                s.setInputScope(true);
                 s.initInstance(ref);
 
                 s.linkOutput();
@@ -151,7 +153,8 @@ public class TextModel extends Model {
         }
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(in, inRelNW, false, true, false, false);
+                ExcitatorySynapse s = new ExcitatorySynapse(in, inRelNW);
+                s.setRecurrent(true);
                 s.initInstance(ref);
 
                 s.linkInput();
@@ -161,7 +164,8 @@ public class TextModel extends Model {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(getPrevTokenInhib(), inRelNW, false, false, true, false);
+                ExcitatorySynapse s = new ExcitatorySynapse(getPrevTokenInhib(), inRelNW);
+                s.setInputScope(true);
                 s.initInstance(ref);
 
                 s.linkOutput();

@@ -41,6 +41,12 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
     }
 
     @Override
+    public void initOutgoingPPSynapse(ExcitatorySynapse s, Visitor v) {
+        s.setInputScope(v.scope == v.downUpDir);
+        s.setSamePattern(v.related);
+    }
+
+    @Override
     public void induceNeuron(Activation act) {
         PatternNeuron.induce(act);
     }

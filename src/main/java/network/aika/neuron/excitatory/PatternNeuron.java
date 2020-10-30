@@ -53,6 +53,11 @@ public class PatternNeuron extends ExcitatoryNeuron {
     }
 
     @Override
+    public void initOutgoingPPSynapse(ExcitatorySynapse s, Visitor v) {
+
+    }
+
+    @Override
     public Visitor transition(Visitor v) {
         if(!v.samePattern) {
             if(v.downUpDir == OUTPUT) {
