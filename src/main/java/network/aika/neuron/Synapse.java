@@ -64,24 +64,16 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract byte getType();
 
-    public boolean isNegative() {
-        return false;
-    }
-
-    public boolean isRecurrent() {
-        return false;
-    }
-
-    public boolean isInputScope() {
-        return false;
-    }
-
-    public boolean isSamePattern() {
-        return false;
-    }
-
     public boolean isInputLinked() {
         return getInput().containsOutputSynapse(this);
+    }
+
+    public Activation getOutputActivationToLink(Activation oAct, Visitor v) {
+        if (getOutput().isInputNeuron()) {
+            return null;
+        }
+
+        return oAct;
     }
 
     public void linkInput() {

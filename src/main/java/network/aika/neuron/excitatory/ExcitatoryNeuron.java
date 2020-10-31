@@ -19,7 +19,6 @@ package network.aika.neuron.excitatory;
 import network.aika.*;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 import network.aika.neuron.phase.Phase;
 import org.slf4j.Logger;
@@ -32,20 +31,19 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
-import static network.aika.neuron.activation.Direction.INPUT;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
+public abstract class ExcitatoryNeuron extends Neuron<PatternPartSynapse> {
 
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
 
     private volatile double directConjunctiveBias;
     private volatile double recurrentConjunctiveBias;
 
-    protected TreeMap<NeuronProvider, ExcitatorySynapse> inputSynapses = new TreeMap<>();
+    protected TreeMap<NeuronProvider, PatternPartSynapse> inputSynapses = new TreeMap<>();
 
     public ExcitatoryNeuron() {
         super();
@@ -84,14 +82,6 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         return getInputSynapses().count() > 1;
     }
 
-    public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
-        ExcitatorySynapse s = new ExcitatorySynapse(iAct.getNeuron(), this);
-        iAct.getNeuron().initOutgoingPPSynapse(s, v);
-        s.initInstance(iAct.getReference());
-
-        return s.initInducedSynapse(iAct, oAct, v);
-    }
-
     protected void addDummyLinks(Activation act) {
         inputSynapses
                 .values()
@@ -119,14 +109,14 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         return s;
     }
 
-    public void addInputSynapse(ExcitatorySynapse s) {
-        ExcitatorySynapse os = inputSynapses.put(s.getPInput(), s);
+    public void addInputSynapse(PatternPartSynapse s) {
+        PatternPartSynapse os = inputSynapses.put(s.getPInput(), s);
         if(os != s) {
             setModified(true);
         }
     }
 
-    public void removeInputSynapse(ExcitatorySynapse s) {
+    public void removeInputSynapse(PatternPartSynapse s) {
         if(inputSynapses.remove(s.getPInput()) != null) {
             setModified(true);
         }
@@ -204,7 +194,7 @@ public abstract class ExcitatoryNeuron extends Neuron<ExcitatorySynapse> {
         recurrentConjunctiveBias = in.readDouble();
 
         while (in.readBoolean()) {
-            ExcitatorySynapse syn = (ExcitatorySynapse) m.readSynapse(in);
+            PatternPartSynapse syn = (PatternPartSynapse) m.readSynapse(in);
             inputSynapses.put(syn.getPInput(), syn);
         }
     }

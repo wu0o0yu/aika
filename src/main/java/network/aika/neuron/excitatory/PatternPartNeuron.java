@@ -41,7 +41,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
     }
 
     @Override
-    public void initOutgoingPPSynapse(ExcitatorySynapse s, Visitor v) {
+    public void initOutgoingPPSynapse(PatternPartSynapse s, Visitor v) {
         s.setInputScope(v.scope == v.downUpDir);
         s.setSamePattern(v.related);
     }
@@ -64,6 +64,14 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
         }
 
         return null;
+    }
+
+    public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
+        PatternPartSynapse s = new PatternPartSynapse(iAct.getNeuron(), this);
+        iAct.getNeuron().initOutgoingPPSynapse(s, v);
+        s.initInstance(iAct.getReference());
+
+        return s.initInducedSynapse(iAct, oAct, v);
     }
 
     @Override

@@ -16,7 +16,7 @@
  */
 package network;
 
-import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.text.Document;
 import network.aika.Model;
 import network.aika.neuron.activation.Activation;
@@ -40,7 +40,7 @@ public class PropagateTest {
         PatternPartNeuron out = new PatternPartNeuron(m, false);
         out.setDescriptionLabel("OUT");
 
-        ExcitatorySynapse s = new ExcitatorySynapse(in, out);
+        PatternPartSynapse s = new PatternPartSynapse(in, out);
         s.setInputScope(true);
 
         s.linkInput();

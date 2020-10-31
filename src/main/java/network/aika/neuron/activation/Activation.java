@@ -273,9 +273,6 @@ public class Activation implements Comparable<Activation> {
         new Visitor(this, OUTPUT)
                 .followLinks(this);
 
-        getModel().linkInputRelations(this, OUTPUT);
-        thought.processLinks();
-
         thought.getPhase().propagate(this);
     }
 
@@ -332,7 +329,7 @@ public class Activation implements Comparable<Activation> {
         sumUpLink(ol, nl);
         checkIfFired(nl);
 
-        if (!s.isNegative()) {
+        if (s.getWeight() > 0.0) {
             getThought().addLinkToQueue(nl);
         }
         return nl;
@@ -341,9 +338,10 @@ public class Activation implements Comparable<Activation> {
     public void sumUpLink(Link ol, Link nl) {
         assert ol == null || !isFinal;
 
-        if (nl.isNegative() && nl.isSelfRef()) return;
-
         double w = nl.getSynapse().getWeight();
+
+        if (w <= 0.0 && nl.isSelfRef()) return;
+
         double x = nl.getInput().value - (ol != null ? ol.getInput().value : 0.0);
         double s = x * w;
 

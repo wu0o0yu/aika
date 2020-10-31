@@ -18,7 +18,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.phase.Phase;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
@@ -224,7 +224,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract Link induceSynapse(Activation iAct, Activation oAct, Visitor c);
 
-    public abstract void initOutgoingPPSynapse(ExcitatorySynapse s, Visitor v);
+    public abstract void initOutgoingPPSynapse(PatternPartSynapse s, Visitor v);
 
     public static boolean ADJUST_GRADIENT = false;
 

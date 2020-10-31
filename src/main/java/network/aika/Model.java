@@ -23,9 +23,9 @@ import network.aika.neuron.NeuronProvider.SuspensionMode;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
-import network.aika.neuron.activation.Reference;
-import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.excitatory.PatternPartNeuron;
+import network.aika.neuron.excitatory.PatternSynapse;
 import network.aika.neuron.inhibitory.*;
 import network.aika.neuron.excitatory.PatternNeuron;
 import org.slf4j.Logger;
@@ -59,7 +59,8 @@ public abstract class Model {
     static {
         registerType(PatternNeuron.class);
         registerType(PatternPartNeuron.class);
-        registerType(ExcitatorySynapse.class);
+        registerType(PatternSynapse.class);
+        registerType(PatternPartSynapse.class);
 
         registerType(InhibitoryNeuron.class);
         registerType(InhibitorySynapse.class);

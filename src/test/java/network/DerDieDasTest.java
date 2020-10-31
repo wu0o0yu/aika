@@ -42,7 +42,7 @@ public class DerDieDasTest {
             initPP(ref, c, inN, ppN, prevPPN, out);
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(ppN, out);
+                PatternPartSynapse s = new PatternPartSynapse(ppN, out);
                 s.setSamePattern(true);
 
                 s.linkInput();
@@ -75,7 +75,7 @@ public class DerDieDasTest {
         }
 
         {
-            ExcitatorySynapse s = new ExcitatorySynapse(inhibN, ppN);
+            PatternPartSynapse s = new PatternPartSynapse(inhibN, ppN);
             s.setNegative(true);
             s.setRecurrent(true);
             s.initInstance(ref);
@@ -85,7 +85,7 @@ public class DerDieDasTest {
         }
 
         {
-            ExcitatorySynapse s = new ExcitatorySynapse(inN, ppN);
+            PatternPartSynapse s = new PatternPartSynapse(inN, ppN);
             s.setSamePattern(true);
             s.initInstance(ref);
 
@@ -95,7 +95,7 @@ public class DerDieDasTest {
         }
 
         if(prevPP != null) {
-            ExcitatorySynapse s = new ExcitatorySynapse(prevPP, ppN);
+            PatternPartSynapse s = new PatternPartSynapse(prevPP, ppN);
             s.setInputScope(true);
             s.initInstance(ref);
 
@@ -106,7 +106,7 @@ public class DerDieDasTest {
 
         PatternPartNeuron nextPP = lookupPPPT(inN);
         if(nextPP != null) {
-            ExcitatorySynapse s = new ExcitatorySynapse(nextPP, ppN);
+            PatternPartSynapse s = new PatternPartSynapse(nextPP, ppN);
             s.setInputScope(true);
             s.initInstance(ref);
 
@@ -116,7 +116,7 @@ public class DerDieDasTest {
         }
 
         {
-            ExcitatorySynapse s = new ExcitatorySynapse(out, ppN);
+            PatternPartSynapse s = new PatternPartSynapse(out, ppN);
             s.setRecurrent(true);
             s.initInstance(ref);
 

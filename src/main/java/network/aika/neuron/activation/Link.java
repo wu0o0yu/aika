@@ -225,10 +225,6 @@ public class Link {
         return dir == INPUT ? input : output;
     }
 
-    public boolean isNegative() {
-        return synapse.isNegative();
-    }
-
     public boolean isSelfRef() {
         return isSelfRef;
     }
@@ -272,5 +268,9 @@ public class Link {
         return "   " + getIdString() +
                 " x:" + Utils.round(getInputValue()) +
                 " w:" + Utils.round(getSynapse().getWeight());
+    }
+
+    public boolean isNegative() {
+        return synapse.getWeight() < 0.0;
     }
 }

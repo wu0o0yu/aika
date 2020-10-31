@@ -66,9 +66,6 @@ public class TextModel extends Model {
     @Override
     public void linkInputRelations(Activation originAct, Direction dir) {
         Document doc = (Document) originAct.getThought();
-        if(doc.getPhase() == Phase.INDUCTION) {
-            return;
-        }
 
         Cursor lc = doc.getLastCursor();
         if(lc == null) return;
@@ -130,7 +127,7 @@ public class TextModel extends Model {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(in, inRelPW);
+                PatternPartSynapse s = new PatternPartSynapse(in, inRelPW);
                 s.setRecurrent(true);
                 s.initInstance(ref);
 
@@ -141,7 +138,7 @@ public class TextModel extends Model {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(getNextTokenInhib(), inRelPW);
+                PatternPartSynapse s = new PatternPartSynapse(getNextTokenInhib(), inRelPW);
                 s.setInputScope(true);
                 s.initInstance(ref);
 
@@ -153,7 +150,7 @@ public class TextModel extends Model {
         }
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(in, inRelNW);
+                PatternPartSynapse s = new PatternPartSynapse(in, inRelNW);
                 s.setRecurrent(true);
                 s.initInstance(ref);
 
@@ -164,7 +161,7 @@ public class TextModel extends Model {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(getPrevTokenInhib(), inRelNW);
+                PatternPartSynapse s = new PatternPartSynapse(getPrevTokenInhib(), inRelNW);
                 s.setInputScope(true);
                 s.initInstance(ref);
 

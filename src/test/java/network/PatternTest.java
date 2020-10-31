@@ -16,7 +16,7 @@
  */
 package network;
 
-import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.text.Document;
 import network.aika.neuron.Neuron;
@@ -82,7 +82,7 @@ public class PatternTest {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(nA, eA);
+                PatternPartSynapse s = new PatternPartSynapse(nA, eA);
                 s.setInputScope(true);
 
                 s.linkInput();
@@ -92,7 +92,7 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(out, eA);
+                PatternPartSynapse s = new PatternPartSynapse(out, eA);
                 s.setRecurrent(true);
 
                 s.linkInput();
@@ -105,7 +105,7 @@ public class PatternTest {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(nB, eB);
+                PatternPartSynapse s = new PatternPartSynapse(nB, eB);
                 s.setInputScope(true);
 
                 s.linkInput();
@@ -115,7 +115,7 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eA, eB);
+                PatternPartSynapse s = new PatternPartSynapse(eA, eB);
                 s.setSamePattern(true);
 
                 s.linkOutput();
@@ -124,7 +124,7 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nB), eB);
+                PatternPartSynapse s = new PatternPartSynapse(lookupPPPT(m, nB), eB);
                 s.setInputScope(true);
 
                 s.linkOutput();
@@ -133,7 +133,7 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(out, eB);
+                PatternPartSynapse s = new PatternPartSynapse(out, eB);
                 s.setRecurrent(true);
 
                 s.linkOutput();
@@ -145,7 +145,7 @@ public class PatternTest {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(nC, eC);
+                PatternPartSynapse s = new PatternPartSynapse(nC, eC);
                 s.setInputScope(true);
 
                 s.linkInput();
@@ -155,7 +155,7 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eB, eC);
+                PatternPartSynapse s = new PatternPartSynapse(eB, eC);
                 s.setSamePattern(true);
 
                 s.linkOutput();
@@ -164,7 +164,7 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nC), eC);
+                PatternPartSynapse s = new PatternPartSynapse(lookupPPPT(m, nC), eC);
                 s.setInputScope(true);
 
                 s.linkOutput();
@@ -173,7 +173,7 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(out, eC);
+                PatternPartSynapse s = new PatternPartSynapse(out, eC);
                 s.setRecurrent(true);
 
                 s.linkOutput();
@@ -185,7 +185,7 @@ public class PatternTest {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eA, out);
+                PatternPartSynapse s = new PatternPartSynapse(eA, out);
                 s.setSamePattern(true);
 
                 s.linkInput();
@@ -194,7 +194,7 @@ public class PatternTest {
                 out.addConjunctiveBias(-10.0, false);
             }
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eB, out);
+                PatternPartSynapse s = new PatternPartSynapse(eB, out);
                 s.setSamePattern(true);
 
                 s.linkInput();
@@ -203,7 +203,7 @@ public class PatternTest {
                 out.addConjunctiveBias(-10.0, false);
             }
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eC, out);
+                PatternPartSynapse s = new PatternPartSynapse(eC, out);
                 s.setSamePattern(true);
 
                 s.linkInput();

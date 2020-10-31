@@ -2,7 +2,7 @@ package network;
 
 import network.aika.Config;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.text.Document;
 
@@ -55,7 +55,7 @@ public class InductionTest {
         targetN.setDirectConjunctiveBias(0.0);
         targetN.setRecurrentConjunctiveBias(0.0);
 
-        ExcitatorySynapse sA = new ExcitatorySynapse(inA, targetN);
+        PatternPartSynapse sA = new PatternPartSynapse(inA, targetN);
         sA.setInputScope(true);
 
         sA.linkInput();
@@ -63,7 +63,7 @@ public class InductionTest {
         sA.setWeight(0.1);
         targetN.addConjunctiveBias(-0.1, false);
 
-        ExcitatorySynapse sB = new ExcitatorySynapse(inB, targetN);
+        PatternPartSynapse sB = new PatternPartSynapse(inB, targetN);
         sB.setInputScope(true);
 
         sB.linkInput();

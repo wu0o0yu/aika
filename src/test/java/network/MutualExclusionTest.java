@@ -53,7 +53,7 @@ public class MutualExclusionTest {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(in, na);
+                PatternPartSynapse s = new PatternPartSynapse(in, na);
                 s.setInputScope(true);
 
                 s.linkInput();
@@ -63,7 +63,7 @@ public class MutualExclusionTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(inhib, na);
+                PatternPartSynapse s = new PatternPartSynapse(inhib, na);
                 s.setNegative(true);
                 s.setRecurrent(true);
 
@@ -76,7 +76,7 @@ public class MutualExclusionTest {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(in, nb);
+                PatternPartSynapse s = new PatternPartSynapse(in, nb);
                 s.setInputScope(true);
 
                 s.linkInput();
@@ -86,7 +86,7 @@ public class MutualExclusionTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(inhib, nb);
+                PatternPartSynapse s = new PatternPartSynapse(inhib, nb);
                 s.setNegative(true);
                 s.setRecurrent(true);
 
@@ -99,7 +99,7 @@ public class MutualExclusionTest {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(in, nc);
+                PatternPartSynapse s = new PatternPartSynapse(in, nc);
                 s.setInputScope(true);
 
                 s.linkInput();
@@ -109,7 +109,7 @@ public class MutualExclusionTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(inhib, nc);
+                PatternPartSynapse s = new PatternPartSynapse(inhib, nc);
                 s.setNegative(true);
                 s.setRecurrent(true);
 
@@ -176,7 +176,7 @@ public class MutualExclusionTest {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(in, na);
+                PatternPartSynapse s = new PatternPartSynapse(in, na);
                 s.setInputScope(true);
 
                 s.linkInput();
@@ -186,7 +186,7 @@ public class MutualExclusionTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(inhib, na);
+                PatternPartSynapse s = new PatternPartSynapse(inhib, na);
                 s.setRecurrent(true);
                 s.setNegative(true);
 
@@ -199,7 +199,7 @@ public class MutualExclusionTest {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(in, nb);
+                PatternPartSynapse s = new PatternPartSynapse(in, nb);
                 s.setInputScope(true);
 
                 s.linkInput();
@@ -209,7 +209,7 @@ public class MutualExclusionTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(inhib, nb);
+                PatternPartSynapse s = new PatternPartSynapse(inhib, nb);
                 s.setNegative(true);
                 s.setRecurrent(true);
 

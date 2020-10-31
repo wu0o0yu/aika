@@ -23,6 +23,8 @@ import network.aika.neuron.activation.Visitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static network.aika.neuron.activation.Direction.OUTPUT;
+
 
 /**
  *
@@ -36,22 +38,23 @@ public class LinkingPhase extends Phase {
     }
 
     @Override
-    public void tryToLink(Activation iAct, Activation oAct, Visitor c) {
-        if(!iAct.isActive()) return;
+    public void tryToLink(Activation iAct, Activation oAct, Visitor v) {
+        if(!iAct.isActive()) {
+            return;
+        }
 
         Synapse s = oAct.getNeuron()
                 .getInputSynapse(
                         iAct.getNeuronProvider()
                 );
 
-        if (s == null ||
-                s.getOutput().isInputNeuron() ||
-                (s.isRecurrent() && !c.getSelfRef()) ||
-                iAct.outputLinkExists(oAct)
-        ) return;
+        if(s == null || iAct.outputLinkExists(oAct)) {
+            return;
+        }
 
-        if (s.isNegative() && !c.getSelfRef()) {
-            oAct = oAct.createBranch(s);
+        oAct = s.getOutputActivationToLink(oAct, v);
+        if (oAct == null) {
+            return;
         }
 
         Link ol = oAct.getInputLink(s);
@@ -61,11 +64,15 @@ public class LinkingPhase extends Phase {
             return;
         }
 
-        Link.link(s, iAct, oAct, c.getSelfRef());
+        Link.link(s, iAct, oAct, v.getSelfRef());
     }
+
 
     @Override
     public void propagate(Activation act) {
+        act.getModel().linkInputRelations(act, OUTPUT);
+        act.getThought().processLinks();
+
         act.getNeuron().getOutputSynapses()
                 .filter(s -> !act.outputLinkExists(s))
                 .forEach(s ->

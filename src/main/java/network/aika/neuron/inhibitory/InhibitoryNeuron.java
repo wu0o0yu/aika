@@ -25,11 +25,9 @@ import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
-
-import static network.aika.neuron.activation.Direction.INPUT;
 
 /**
  *
@@ -53,7 +51,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
 
     @Override
-    public void initOutgoingPPSynapse(ExcitatorySynapse s, Visitor v) {
+    public void initOutgoingPPSynapse(PatternPartSynapse s, Visitor v) {
         s.setNegative(v.getSelfRef());
         s.setRecurrent(true);
     }
