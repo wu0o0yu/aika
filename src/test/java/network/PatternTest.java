@@ -82,7 +82,8 @@ public class PatternTest {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(nA, eA, false, false, true, false);
+                ExcitatorySynapse s = new ExcitatorySynapse(nA, eA);
+                s.setInputScope(true);
 
                 s.linkInput();
                 s.linkOutput();
@@ -91,7 +92,8 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(out, eA, false, true, false, false);
+                ExcitatorySynapse s = new ExcitatorySynapse(out, eA);
+                s.setRecurrent(true);
 
                 s.linkInput();
                 s.linkOutput();
@@ -103,7 +105,8 @@ public class PatternTest {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(nB, eB, false, false, true, false);
+                ExcitatorySynapse s = new ExcitatorySynapse(nB, eB);
+                s.setInputScope(true);
 
                 s.linkInput();
                 s.linkOutput();
@@ -112,7 +115,8 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eA, eB, false, false, false, true);
+                ExcitatorySynapse s = new ExcitatorySynapse(eA, eB);
+                s.setSamePattern(true);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -120,7 +124,8 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nB), eB, false, false, true, false);
+                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nB), eB);
+                s.setInputScope(true);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -128,7 +133,8 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(out, eB, false, true, false, false);
+                ExcitatorySynapse s = new ExcitatorySynapse(out, eB);
+                s.setRecurrent(true);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -139,7 +145,8 @@ public class PatternTest {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(nC, eC, false, false, true, false);
+                ExcitatorySynapse s = new ExcitatorySynapse(nC, eC);
+                s.setInputScope(true);
 
                 s.linkInput();
                 s.linkOutput();
@@ -148,7 +155,8 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eB, eC, false, false, false, true);
+                ExcitatorySynapse s = new ExcitatorySynapse(eB, eC);
+                s.setSamePattern(true);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -156,7 +164,8 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nC), eC, false, false, true, false);
+                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nC), eC);
+                s.setInputScope(true);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -164,7 +173,8 @@ public class PatternTest {
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(out, eC, false, true, false, false);
+                ExcitatorySynapse s = new ExcitatorySynapse(out, eC);
+                s.setRecurrent(true);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -175,7 +185,8 @@ public class PatternTest {
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eA, out, false, false, false, true);
+                ExcitatorySynapse s = new ExcitatorySynapse(eA, out);
+                s.setSamePattern(true);
 
                 s.linkInput();
                 s.linkOutput();
@@ -183,7 +194,8 @@ public class PatternTest {
                 out.addConjunctiveBias(-10.0, false);
             }
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eB, out, false, false, false, true);
+                ExcitatorySynapse s = new ExcitatorySynapse(eB, out);
+                s.setSamePattern(true);
 
                 s.linkInput();
                 s.linkOutput();
@@ -191,7 +203,8 @@ public class PatternTest {
                 out.addConjunctiveBias(-10.0, false);
             }
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eC, out, false, false, false, true);
+                ExcitatorySynapse s = new ExcitatorySynapse(eC, out);
+                s.setSamePattern(true);
 
                 s.linkInput();
                 s.linkOutput();
