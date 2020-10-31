@@ -16,6 +16,11 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
     }
 
     @Override
+    public boolean inductionRequired(Class<? extends Neuron> type) {
+        return false;
+    }
+
+    @Override
     public Visitor transition(Visitor v) {
         Visitor nv = v.copy();
         nv.incrementPathLength();

@@ -57,13 +57,19 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
             return null;
         }
 
-        if (!iAct.checkIfOutputLinkExists(syn -> syn.isInputScope() && syn.isInputLinked())) {
+        Activation act = iAct.getOutputLinks()
+                .filter(l -> l.getSynapse().inductionRequired(PatternPartNeuron.class))
+                .map(l -> l.getOutput())
+                .findAny()
+                .orElse(null);
+
+        if (act == null) {
             Neuron n = new PatternPartNeuron(iAct.getModel(), false);
             n.initInstance(iAct.getReference());
-            return n.initInducedNeuron(iAct);
+            act = n.initInducedNeuron(iAct);
         }
 
-        return null;
+        return act;
     }
 
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {

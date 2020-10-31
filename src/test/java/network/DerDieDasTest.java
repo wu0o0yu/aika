@@ -42,8 +42,7 @@ public class DerDieDasTest {
             initPP(ref, c, inN, ppN, prevPPN, out);
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(ppN, out);
-                s.setSamePattern(true);
+                PatternSynapse s = new PatternSynapse(ppN, out);
 
                 s.linkInput();
                 s.linkOutput();

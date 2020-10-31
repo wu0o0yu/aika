@@ -13,4 +13,9 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
     public PrimaryInhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
         super(input, output);
     }
+
+    @Override
+    public boolean inductionRequired(Class<? extends Neuron> type) {
+        return type == InhibitoryNeuron.class;
+    }
 }

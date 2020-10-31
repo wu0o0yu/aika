@@ -308,18 +308,6 @@ public class Activation implements Comparable<Activation> {
                 );
     }
 
-    public boolean checkIfInputLinkExists(Predicate<Synapse> f) {
-        return getInputLinks()
-                .map(l -> l.getSynapse())
-                .anyMatch(f);
-    }
-
-    public boolean checkIfOutputLinkExists(Predicate<Synapse> f) {
-        return getOutputLinks()
-                .map(l -> l.getSynapse())
-                .anyMatch(f);
-    }
-
     public Link addLink(Synapse s, Activation input, boolean isSelfRef) {
         Link ol = getInputLink(s);
         Link nl = new Link(s, input, this, isSelfRef);

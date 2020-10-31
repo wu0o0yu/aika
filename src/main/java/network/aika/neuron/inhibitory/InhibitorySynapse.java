@@ -36,6 +36,11 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     }
 
     @Override
+    public boolean inductionRequired(Class<? extends Neuron> type) {
+        return false;
+    }
+
+    @Override
     public byte getType() {
         return type;
     }

@@ -83,21 +83,30 @@ public class PatternNeuron extends ExcitatoryNeuron {
         nl.getOutput().setReference(or == null ? ir : or.add(ir));
     }
 
-    public static void induce(Activation act) {
+    public static Activation induce(Activation act) {
         if(act.getNeuron().isInputNeuron()) {
 //            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
-            return;
+            return null;
         }
         if(!act.getConfig().checkPatternNeuronInduction(act)) {
 //            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
-            return;
+            return null;
         }
 
-        if (!act.checkIfInputLinkExists(syn -> syn.isSamePattern())) {
+
+        Activation oAct = act.getInputLinks()
+                .filter(l -> l.getSynapse().inductionRequired(PatternNeuron.class))
+                .map(l -> l.getInput())
+                .findAny()
+                .orElse(null);
+
+        if (oAct == null) {
             Neuron n = new PatternNeuron(act.getModel(), null, false);
             n.initInstance(act.getReference());
-            n.initInducedNeuron(act);
+            oAct = n.initInducedNeuron(act);
         }
+
+        return oAct;
     }
 
     @Override

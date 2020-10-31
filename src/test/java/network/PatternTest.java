@@ -18,6 +18,7 @@ package network;
 
 import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.excitatory.PatternPartNeuron;
+import network.aika.neuron.excitatory.PatternSynapse;
 import network.aika.text.Document;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.excitatory.PatternNeuron;
@@ -185,8 +186,7 @@ public class PatternTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(eA, out);
-                s.setSamePattern(true);
+                PatternSynapse s = new PatternSynapse(eA, out);
 
                 s.linkInput();
                 s.linkOutput();
@@ -194,8 +194,7 @@ public class PatternTest {
                 out.addConjunctiveBias(-10.0, false);
             }
             {
-                PatternPartSynapse s = new PatternPartSynapse(eB, out);
-                s.setSamePattern(true);
+                PatternSynapse s = new PatternSynapse(eB, out);
 
                 s.linkInput();
                 s.linkOutput();
@@ -203,8 +202,7 @@ public class PatternTest {
                 out.addConjunctiveBias(-10.0, false);
             }
             {
-                PatternPartSynapse s = new PatternPartSynapse(eC, out);
-                s.setSamePattern(true);
+                PatternSynapse s = new PatternSynapse(eC, out);
 
                 s.linkInput();
                 s.linkOutput();

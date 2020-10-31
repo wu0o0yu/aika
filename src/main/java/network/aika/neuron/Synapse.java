@@ -22,6 +22,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.excitatory.PatternPartNeuron;
 import org.apache.commons.math3.distribution.BetaDistribution;
 
 import java.io.DataInput;
@@ -59,6 +60,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         this.input = input.getProvider();
         this.output = output.getProvider();
     }
+
+    public abstract boolean inductionRequired(Class<? extends Neuron> type);
 
     public abstract Visitor transition(Visitor v);
 

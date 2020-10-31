@@ -80,17 +80,25 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     }
 
-    public static void induce(Activation iAct) {
+    public static Activation induce(Activation iAct) {
         if(!iAct.getConfig().checkInhibitoryNeuronInduction(iAct.getNeuron())) {
 //            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
-            return;
+            return null;
         }
 
-        if (!iAct.checkIfOutputLinkExists(syn -> syn instanceof PrimaryInhibitorySynapse)) {
+        Activation act = iAct.getOutputLinks()
+                .filter(l -> l.getSynapse().inductionRequired(InhibitoryNeuron.class))
+                .map(l -> l.getOutput())
+                .findAny()
+                .orElse(null);
+
+        if (act == null) {
             Neuron n = new InhibitoryNeuron(iAct.getModel(), false);
             n.initInstance(iAct.getReference());
-            n.initInducedNeuron(iAct);
+            act = n.initInducedNeuron(iAct);
         }
+
+        return act;
     }
 
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
