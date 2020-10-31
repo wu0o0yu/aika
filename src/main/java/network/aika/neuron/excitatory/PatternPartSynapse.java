@@ -104,9 +104,6 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         return nv;
     }
 
-    public static void induce(Activation iAct, Activation oAct, Visitor v) {
-    }
-
     @Override
     public byte getType() {
         return type;
