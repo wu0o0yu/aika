@@ -42,7 +42,8 @@ public class DerDieDasTest {
             initPP(ref, c, inN, ppN, prevPPN, out);
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(ppN, out, false, false, false, true);
+                ExcitatorySynapse s = new ExcitatorySynapse(ppN, out);
+                s.setSamePattern(true);
 
                 s.linkInput();
                 s.linkOutput();
@@ -74,7 +75,9 @@ public class DerDieDasTest {
         }
 
         {
-            ExcitatorySynapse s = new ExcitatorySynapse(inhibN, ppN, true, true, false, false);
+            ExcitatorySynapse s = new ExcitatorySynapse(inhibN, ppN);
+            s.setNegative(true);
+            s.setRecurrent(true);
             s.initInstance(ref);
 
             s.linkOutput();
@@ -82,7 +85,8 @@ public class DerDieDasTest {
         }
 
         {
-            ExcitatorySynapse s = new ExcitatorySynapse(inN, ppN, false, false, true, false);
+            ExcitatorySynapse s = new ExcitatorySynapse(inN, ppN);
+            s.setSamePattern(true);
             s.initInstance(ref);
 
             s.linkInput();
@@ -91,7 +95,8 @@ public class DerDieDasTest {
         }
 
         if(prevPP != null) {
-            ExcitatorySynapse s = new ExcitatorySynapse(prevPP, ppN, false, false, true, false);
+            ExcitatorySynapse s = new ExcitatorySynapse(prevPP, ppN);
+            s.setInputScope(true);
             s.initInstance(ref);
 
             s.linkOutput();
@@ -101,7 +106,8 @@ public class DerDieDasTest {
 
         PatternPartNeuron nextPP = lookupPPPT(inN);
         if(nextPP != null) {
-            ExcitatorySynapse s = new ExcitatorySynapse(nextPP, ppN, false, false, true, false);
+            ExcitatorySynapse s = new ExcitatorySynapse(nextPP, ppN);
+            s.setInputScope(true);
             s.initInstance(ref);
 
             s.linkOutput();
@@ -110,7 +116,8 @@ public class DerDieDasTest {
         }
 
         {
-            ExcitatorySynapse s = new ExcitatorySynapse(out, ppN, false, true, false, false);
+            ExcitatorySynapse s = new ExcitatorySynapse(out, ppN);
+            s.setRecurrent(true);
             s.initInstance(ref);
 
             s.linkOutput();
