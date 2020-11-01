@@ -49,13 +49,16 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         super(model, isInputNeuron);
     }
 
-
     @Override
     public void initOutgoingPPSynapse(PatternPartSynapse s, Visitor v) {
         s.setNegative(v.getSelfRef());
         s.setRecurrent(true);
     }
 
+    @Override
+    public InhibitorySynapse induceOutgoingInhibitorySynapse(InhibitoryNeuron outN) {
+        return null;
+    }
 
     @Override
     public byte getType() {
@@ -102,12 +105,10 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
-        InhibitorySynapse s = null;
+        InhibitorySynapse s = iAct.getNeuron().induceOutgoingInhibitorySynapse(this);
 
-        if(iAct.getNeuron() instanceof PatternNeuron) {
-            s = new PrimaryInhibitorySynapse(iAct.getNeuron(), this);
-        } else if(iAct.getNeuron() instanceof PatternPartNeuron) {
-            s = new InhibitorySynapse(iAct.getNeuron(), this);
+        if(s == null) {
+            return null;
         }
 
         s.setWeight(1.0);

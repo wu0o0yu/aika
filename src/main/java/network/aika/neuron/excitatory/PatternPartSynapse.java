@@ -51,9 +51,9 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     @Override
     public boolean inductionRequired(Class<? extends Neuron> type) {
         if (type == PatternPartNeuron.class) {
-            return !(isInputScope() && isInputLinked());
+            return isInputScope() && isInputLinked();
         } else if (type == PatternNeuron.class) {
-            return !isSamePattern();
+            return isSamePattern();
         }
         return false;
     }

@@ -38,9 +38,10 @@ public class ManuelInductionModel {
                     }
 
                     public boolean checkSynapseInduction(Link l) {
-                        Neuron n = l.getOutput().getNeuron();
-                        if(n instanceof InhibitoryNeuron) {
-                            return !n.isInputNeuron() || n instanceof PatternNeuron;
+                        Neuron outN = l.getOutput().getNeuron();
+                        Neuron inN = l.getInput().getNeuron();
+                        if(outN instanceof InhibitoryNeuron) {
+                            return !outN.isInputNeuron() && inN instanceof PatternNeuron;
                         }
 
                         return true;

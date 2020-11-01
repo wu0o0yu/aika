@@ -36,14 +36,14 @@ import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatoryNeuron extends Neuron<PatternPartSynapse> {
+public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neuron<S> {
 
     private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
 
     private volatile double directConjunctiveBias;
     private volatile double recurrentConjunctiveBias;
 
-    protected TreeMap<NeuronProvider, PatternPartSynapse> inputSynapses = new TreeMap<>();
+    protected TreeMap<NeuronProvider, S> inputSynapses = new TreeMap<>();
 
     public ExcitatoryNeuron() {
         super();
@@ -109,14 +109,14 @@ public abstract class ExcitatoryNeuron extends Neuron<PatternPartSynapse> {
         return s;
     }
 
-    public void addInputSynapse(PatternPartSynapse s) {
-        PatternPartSynapse os = inputSynapses.put(s.getPInput(), s);
+    public void addInputSynapse(S s) {
+        S os = inputSynapses.put(s.getPInput(), s);
         if(os != s) {
             setModified(true);
         }
     }
 
-    public void removeInputSynapse(PatternPartSynapse s) {
+    public void removeInputSynapse(S s) {
         if(inputSynapses.remove(s.getPInput()) != null) {
             setModified(true);
         }
@@ -194,7 +194,7 @@ public abstract class ExcitatoryNeuron extends Neuron<PatternPartSynapse> {
         recurrentConjunctiveBias = in.readDouble();
 
         while (in.readBoolean()) {
-            PatternPartSynapse syn = (PatternPartSynapse) m.readSynapse(in);
+            S syn = (S) m.readSynapse(in);
             inputSynapses.put(syn.getPInput(), syn);
         }
     }

@@ -19,6 +19,8 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.inhibitory.InhibitorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +29,7 @@ import static network.aika.neuron.activation.Direction.*;
 /**
  * @author Lukas Molzberger
  */
-public class PatternPartNeuron extends ExcitatoryNeuron {
+public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     private static final Logger log = LoggerFactory.getLogger(PatternPartNeuron.class);
 
     public static byte type;
@@ -44,6 +46,11 @@ public class PatternPartNeuron extends ExcitatoryNeuron {
     public void initOutgoingPPSynapse(PatternPartSynapse s, Visitor v) {
         s.setInputScope(v.scope == v.downUpDir);
         s.setSamePattern(v.related);
+    }
+
+    @Override
+    public InhibitorySynapse induceOutgoingInhibitorySynapse(InhibitoryNeuron outN) {
+        return new InhibitorySynapse(this, outN);
     }
 
     @Override
