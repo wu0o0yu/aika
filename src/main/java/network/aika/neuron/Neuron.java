@@ -219,7 +219,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
         act.process();
 
-        act.propagate();
+//        act.propagate();
 
         return act;
     }

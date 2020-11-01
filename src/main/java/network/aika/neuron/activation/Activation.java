@@ -311,13 +311,17 @@ public class Activation implements Comparable<Activation> {
     public Link addLink(Synapse s, Activation input, boolean isSelfRef) {
         Link ol = getInputLink(s);
         Link nl = new Link(s, input, this, isSelfRef);
+        return addLink(ol, nl);
+    }
+
+    public Link addLink(Link ol, Link nl) {
         nl.linkInput();
         nl.linkOutput();
 
         sumUpLink(ol, nl);
         checkIfFired(nl);
 
-        if (s.getWeight() > 0.0) {
+        if (nl.getSynapse().getWeight() > 0.0) {
             getThought().addLinkToQueue(nl);
         }
         return nl;

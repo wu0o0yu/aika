@@ -60,6 +60,8 @@ public class ManuelInductionModel {
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
                         .setEnableInduction(true)
+                        .setSurprisalInductionThreshold(0.0)
+                        .setGradientInductionThreshold(0.0)
         );
 
         int i = 0;
