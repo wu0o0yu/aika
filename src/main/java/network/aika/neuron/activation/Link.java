@@ -241,7 +241,10 @@ public class Link {
                 }
             }
 */
-            input.outputLinks.put(output, this);
+            input.outputLinks.put(
+                    new OutputKey(output.getNeuronProvider(), output.getId()),
+                    this
+            );
         }
     }
 
@@ -250,7 +253,8 @@ public class Link {
     }
 
     public void unlink() {
-        input.outputLinks.remove(output);
+        OutputKey ok = new OutputKey(output.getNeuronProvider(), output.getId());
+        input.outputLinks.remove(ok, this);
     }
 
     public String toString() {

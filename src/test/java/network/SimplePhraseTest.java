@@ -43,7 +43,12 @@ public class SimplePhraseTest {
 
             doc.process();
 
-            doc.train(model);
+            if(k < 100) {
+                doc.count();
+                model.addToN(doc.length());
+            } else {
+                doc.train(model);
+            }
 
             if (Neuron.debugOutput) {
                 System.out.println(doc.activationsToString(true));

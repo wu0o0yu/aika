@@ -51,7 +51,7 @@ public class Activation implements Comparable<Activation> {
     private double branchProbability = 1.0;
 
     Map<NeuronProvider, Link> inputLinks;
-    NavigableMap<Activation, Link> outputLinks;
+    NavigableMap<OutputKey, Link> outputLinks;
 
     private boolean isFinal;
     public boolean marked;
@@ -84,10 +84,7 @@ public class Activation implements Comparable<Activation> {
         thought.registerActivation(this);
 
         inputLinks = new TreeMap<>();
-        outputLinks = new TreeMap<>(Comparator
-                .<Activation, NeuronProvider>comparing(act -> act.getNeuronProvider())
-                .thenComparing(act -> act)
-        );
+        outputLinks = new TreeMap<>();
     }
 
     public int getId() {
@@ -298,12 +295,12 @@ public class Activation implements Comparable<Activation> {
         return !getOutputLinks(s).isEmpty();
     }
 
-    public SortedMap<Activation, Link> getOutputLinks(Synapse s) {
+    public SortedMap<OutputKey, Link> getOutputLinks(Synapse s) {
         return outputLinks
                 .subMap(
-                        new Activation(Integer.MIN_VALUE, s.getOutput()),
+                        new OutputKey(s.getOutput().getProvider(), Integer.MIN_VALUE),
                         true,
-                        new Activation(Integer.MAX_VALUE, s.getOutput()),
+                        new OutputKey(s.getOutput().getProvider(), Integer.MAX_VALUE),
                         true
                 );
     }
@@ -538,6 +535,13 @@ public class Activation implements Comparable<Activation> {
                 .stream();
     }
 
+    public void updateSynapseWeights() {
+        getInputLinks()
+                .forEach(l -> l.updateSynapse());
+
+        getNeuron().updatePropagateFlag();
+    }
+
     @Override
     public int compareTo(Activation act) {
         return Integer.compare(id, act.id);
@@ -585,12 +589,5 @@ public class Activation implements Comparable<Activation> {
         }
 
         return sb.toString();
-    }
-
-    public void updateSynapseWeights() {
-        getInputLinks()
-                .forEach(l -> l.updateSynapse());
-
-        getNeuron().updatePropagateFlag();
     }
 }
