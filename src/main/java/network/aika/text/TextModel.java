@@ -50,13 +50,15 @@ public class TextModel extends Model {
     }
 
     private void init() {
-        InhibitoryNeuron ptN = new InhibitoryNeuron(this, true);
+        InhibitoryNeuron ptN = new InhibitoryNeuron(this);
+        ptN.setInputNeuron(true);
         ptN.setDescriptionLabel("Prev. Token");
         ptN.initInstance(null);
         prevTokenInhib = ptN.getProvider();
         prevTokenInhib.save();
 
-        InhibitoryNeuron ntN = new InhibitoryNeuron(this, true);
+        InhibitoryNeuron ntN = new InhibitoryNeuron(this);
+        ntN.setInputNeuron(true);
         ntN.setDescriptionLabel("Next Token");
         ntN.initInstance(null);
         nextTokenInhib = ntN.getProvider();
@@ -114,16 +116,19 @@ public class TextModel extends Model {
             return (PatternNeuron) inProv;
         }
 
-        PatternNeuron in = new PatternNeuron(this, tokenLabel, true);
+        PatternNeuron in = new PatternNeuron(this, tokenLabel);
+        in.setInputNeuron(true);
         in.setDescriptionLabel("P-" + tokenLabel);
         in.initInstance(ref);
         getSuspensionHook().putLabel(tokenLabel, in.getId());
 
-        PatternPartNeuron inRelPW = new PatternPartNeuron(this, true);
+        PatternPartNeuron inRelPW = new PatternPartNeuron(this);
+        inRelPW.setInputNeuron(true);
         inRelPW.setDescriptionLabel(tokenLabel + " Rel Prev. Word");
         inRelPW.initInstance(ref);
 
-        PatternPartNeuron inRelNW = new PatternPartNeuron(this, true);
+        PatternPartNeuron inRelNW = new PatternPartNeuron(this);
+        inRelNW.setInputNeuron(true);
         inRelNW.setDescriptionLabel(tokenLabel + " Rel Next Word");
         inRelNW.initInstance(ref);
 

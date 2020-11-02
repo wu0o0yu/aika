@@ -23,7 +23,6 @@ public class SimplePhraseTest {
             "der Jaguar"
     };
 
-
     @Test
     public void simplePhraseTest() {
         TextModel model = new TextModel();

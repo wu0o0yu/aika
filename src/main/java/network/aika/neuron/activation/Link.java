@@ -71,15 +71,17 @@ public class Link {
     }
 
     public void propagate() {
-        if(!output.getNeuron().isInputNeuron()) {
-            output.marked = true;
-
-            Visitor v = new Visitor(output, INPUT);
-            v = synapse.transition(v);
-            v.follow(input);
-
-            output.marked = false;
+        if (output.getNeuron().isInputNeuron()) {
+            return;
         }
+
+        output.marked = true;
+
+        Visitor v = new Visitor(output, INPUT);
+        v = synapse.transition(v);
+        v.follow(input);
+
+        output.marked = false;
     }
 
     public void computeOutputGradient() {

@@ -38,8 +38,8 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         super(p);
     }
 
-    public PatternPartNeuron(Model model, Boolean isInputNeuron) {
-        super(model, isInputNeuron);
+    public PatternPartNeuron(Model model) {
+        super(model);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
                 .orElse(null);
 
         if (act == null) {
-            Neuron n = new PatternPartNeuron(iAct.getModel(), false);
+            Neuron n = new PatternPartNeuron(iAct.getModel());
             n.initInstance(iAct.getReference());
             act = n.initInducedNeuron(iAct);
         }

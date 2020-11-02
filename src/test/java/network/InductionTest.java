@@ -18,7 +18,8 @@ public class InductionTest {
     @Test
     public void testInduceFromMaturePattern() {
         Model m = new TextModel();
-        PatternNeuron in = new PatternNeuron(m, "A", true);
+        PatternNeuron in = new PatternNeuron(m, "A");
+        in.setInputNeuron(true);
         in.setDescriptionLabel("IN");
 
         in.setFrequency(12);
@@ -44,11 +45,13 @@ public class InductionTest {
     @Test
     public void initialGradientTest() {
         Model m = new TextModel();
-        PatternNeuron inA = new PatternNeuron(m, "A", true);
+        PatternNeuron inA = new PatternNeuron(m, "A");
+        inA.setInputNeuron(true);
         inA.setDescriptionLabel("IN-A");
-        PatternNeuron inB = new PatternNeuron(m, "B", true);
+        PatternNeuron inB = new PatternNeuron(m, "B");
+        inB.setInputNeuron(true);
         inB.setDescriptionLabel("IN-B");
-        PatternPartNeuron targetN = new PatternPartNeuron(m, false);
+        PatternPartNeuron targetN = new PatternPartNeuron(m);
         targetN.setDescriptionLabel("OUT-Target");
 
         targetN.setBias(0.0);

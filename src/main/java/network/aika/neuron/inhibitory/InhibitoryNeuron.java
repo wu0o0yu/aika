@@ -45,8 +45,8 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         super(p);
     }
 
-    public InhibitoryNeuron(Model model, Boolean isInputNeuron) {
-        super(model, isInputNeuron);
+    public InhibitoryNeuron(Model model) {
+        super(model);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
                 .orElse(null);
 
         if (act == null) {
-            Neuron n = new InhibitoryNeuron(iAct.getModel(), false);
+            Neuron n = new InhibitoryNeuron(iAct.getModel());
             n.initInstance(iAct.getReference());
             act = n.initInducedNeuron(iAct);
         }
@@ -124,36 +124,5 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     public ActivationFunction getActivationFunction() {
         return ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
-    }
-
-    @Override
-    public Synapse getInputSynapse(NeuronProvider n) {
-        return n.getNeuron().getOutputSynapse(getProvider());
-    }
-
-    @Override
-    public boolean containsInputSynapse(Synapse s) {
-        return false;
-    }
-
-    @Override
-    public void addInputSynapse(InhibitorySynapse s) {
-    }
-
-    @Override
-    public boolean containsOutputSynapse(Synapse synapse) {
-        return false;
-    }
-
-    @Override
-    public void addOutputSynapse(Synapse s) {
-    }
-
-    @Override
-    public void removeInputSynapse(InhibitorySynapse s) {
-    }
-
-    @Override
-    public void removeOutputSynapse(Synapse s) {
     }
 }

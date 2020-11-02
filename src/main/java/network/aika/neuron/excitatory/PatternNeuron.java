@@ -49,8 +49,8 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         super(p);
     }
 
-    public PatternNeuron(Model model, String tokenLabel, Boolean isInputNeuron) {
-        super(model, isInputNeuron);
+    public PatternNeuron(Model model, String tokenLabel) {
+        super(model);
         this.tokenLabel = tokenLabel;
     }
 
@@ -108,7 +108,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
                 .orElse(null);
 
         if (oAct == null) {
-            Neuron n = new PatternNeuron(act.getModel(), null, false);
+            Neuron n = new PatternNeuron(act.getModel(), null);
             n.initInstance(act.getReference());
             oAct = n.initInducedNeuron(act);
         }

@@ -55,6 +55,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     private volatile double bias;
 
+    protected TreeMap<NeuronProvider, S> inputSynapses = new TreeMap<>();
+
     protected TreeMap<NeuronProvider, Synapse> outputSynapses = new TreeMap<>();
 
     protected final ReadWriteLock lock = new ReadWriteLock();
@@ -71,8 +73,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         provider = p;
     }
 
-    public Neuron(Model m, Boolean isInputNeuron) {
-        this.isInputNeuron = isInputNeuron;
+    public Neuron(Model m) {
         provider = new NeuronProvider(m, this);
         modified = true;
     }
@@ -81,9 +82,11 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract Fired incrementFired(Fired f);
 
-    public abstract Synapse getInputSynapse(NeuronProvider n);
-
     public abstract Visitor transition(Visitor v);
+
+    public abstract byte getType();
+
+    public abstract void updateReference(Link nl);
 
     public Synapse getOutputSynapse(NeuronProvider n) {
         lock.acquireReadLock();
@@ -112,27 +115,56 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return outputSynapses.values().stream();
     }
 
+    public void setInputNeuron(boolean inputNeuron) {
+        isInputNeuron = inputNeuron;
+    }
+
     public boolean isInputNeuron() {
         return isInputNeuron;
     }
 
     public abstract boolean isInitialized();
 
-    public abstract boolean containsInputSynapse(Synapse s);
+    public boolean containsInputSynapse(Synapse s) {
+        return inputSynapses.containsKey(s.getPInput());
+    }
 
-    public abstract void addInputSynapse(S s);
+    public boolean containsOutputSynapse(Synapse s) {
+        return outputSynapses.containsKey(s.getPOutput());
+    }
 
-    public abstract boolean containsOutputSynapse(Synapse synapse);
+    public Synapse getInputSynapse(NeuronProvider n) {
+        lock.acquireReadLock();
+        Synapse s = inputSynapses.get(n);
+        lock.releaseReadLock();
+        return s;
+    }
 
-    public abstract void addOutputSynapse(Synapse synapse);
+    public void addInputSynapse(S s) {
+        S os = inputSynapses.put(s.getPInput(), s);
+        if(os != s) {
+            setModified(true);
+        }
+    }
 
-    public abstract void removeInputSynapse(S s);
+    public void removeInputSynapse(S s) {
+        if(inputSynapses.remove(s.getPInput()) != null) {
+            setModified(true);
+        }
+    }
 
-    public abstract void removeOutputSynapse(Synapse s);
+    public void addOutputSynapse(Synapse s) {
+        Synapse os = outputSynapses.put(s.getPOutput(), s);
+        if(os != s) {
+            setModified(true);
+        }
+    }
 
-    public abstract byte getType();
-
-    public abstract void updateReference(Link nl);
+    public void removeOutputSynapse(Synapse s) {
+        if(outputSynapses.remove(s.getPOutput()) != null) {
+            setModified(true);
+        }
+    }
 
     public Long getId() {
         return provider.getId();
@@ -298,6 +330,14 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
         out.writeDouble(bias);
 
+        for (Synapse s : inputSynapses.values()) {
+            if (s.getInput() != null) {
+                out.writeBoolean(true);
+                getModel().writeSynapse(s, out);
+            }
+        }
+        out.writeBoolean(false);
+
         for (Synapse s : outputSynapses.values()) {
             if (s.getOutput() != null) {
                 out.writeBoolean(true);
@@ -319,6 +359,11 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         }
 
         bias = in.readDouble();
+
+        while (in.readBoolean()) {
+            S syn = (S) m.readSynapse(in);
+            inputSynapses.put(syn.getPInput(), syn);
+        }
 
         while (in.readBoolean()) {
             Synapse syn = m.readSynapse(in);

@@ -22,11 +22,9 @@ import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.phase.Phase;
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
@@ -44,6 +42,7 @@ public class Activation implements Comparable<Activation> {
     private double sum;
     private double lateSum;
     private Fired fired = NOT_FIRED;
+    private boolean fixed;
 
     private int id;
     private Neuron<?> neuron;
@@ -209,6 +208,7 @@ public class Activation implements Comparable<Activation> {
 
     public void setValue(double v) {
         value = v;
+        fixed = true;
     }
 
     public boolean isActive() {
@@ -349,6 +349,10 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void updateForFinalPhase() {
+        if(fixed) {
+            return;
+        }
+
         double initialValue = computeValue(INITIAL_LINKING);
         double finalValue = computeValue(FINAL_LINKING);
 
@@ -372,7 +376,9 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void process() {
-        value = computeValue(thought.getPhase());
+        if(!fixed) {
+            value = computeValue(thought.getPhase());
+        }
         isFinal = true;
         if (!equals(lastRound)) {
             linkForward();

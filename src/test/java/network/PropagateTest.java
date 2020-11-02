@@ -35,9 +35,10 @@ public class PropagateTest {
     public void testPropagation() {
         Model m = new TextModel();
 
-        PatternNeuron in = new PatternNeuron(m, "A", true);
+        PatternNeuron in = new PatternNeuron(m, "A");
+        in.setInputNeuron(true);
         in.setDescriptionLabel("IN");
-        PatternPartNeuron out = new PatternPartNeuron(m, false);
+        PatternPartNeuron out = new PatternPartNeuron(m);
         out.setDescriptionLabel("OUT");
 
         PatternPartSynapse s = new PatternPartSynapse(in, out);

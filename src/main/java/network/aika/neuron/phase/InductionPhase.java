@@ -33,21 +33,21 @@ public class InductionPhase extends Phase {
 
     @Override
     public void tryToLink(Activation iAct, Activation oAct, Visitor c) {
-        if(!iAct.isActive()) return;
+        if(!iAct.isActive() ||
+                oAct.getNeuron().isInputNeuron() ||
+                !oAct.getConfig().isEnableInduction()) return;
 
         Neuron n = oAct.getNeuron();
         Synapse s = n.getInputSynapse(iAct.getNeuronProvider());
 
-        if (s != null || oAct.getNeuron().isInputNeuron()) return;
+        if (s != null) return;
 
-        if(oAct.getConfig().isEnableInduction()) {
-            n.induceSynapse(iAct, oAct, c);
-        }
+        n.induceSynapse(iAct, oAct, c);
     }
 
     @Override
     public void propagate(Activation act) {
-        if(act.getConfig().isEnableInduction()) {
+        if(act.getConfig().isEnableInduction() && act.isActive()) {
             act.getNeuron().induceNeuron(act);
         }
     }

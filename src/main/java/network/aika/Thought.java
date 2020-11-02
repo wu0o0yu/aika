@@ -69,7 +69,6 @@ public abstract class Thought {
         activationsById
                 .values()
                 .stream()
-                .filter(act -> !act.getNeuron().isInputNeuron())
                 .forEach(act -> act.updateForFinalPhase());
 
         processActivations();

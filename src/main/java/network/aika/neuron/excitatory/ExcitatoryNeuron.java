@@ -43,8 +43,6 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
     private volatile double directConjunctiveBias;
     private volatile double recurrentConjunctiveBias;
 
-    protected TreeMap<NeuronProvider, S> inputSynapses = new TreeMap<>();
-
     public ExcitatoryNeuron() {
         super();
     }
@@ -53,8 +51,8 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         super(p);
     }
 
-    public ExcitatoryNeuron(Model model, Boolean isInputNeuron) {
-        super(model, isInputNeuron);
+    public ExcitatoryNeuron(Model model) {
+        super(model);
     }
 
     public void setDirectConjunctiveBias(double b) {
@@ -90,49 +88,6 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
                 .forEach(s ->
                         new Link(s, null, act, false)
                 );
-    }
-
-    @Override
-    public boolean containsInputSynapse(Synapse s) {
-        return inputSynapses.containsKey(s.getPInput());
-    }
-
-    @Override
-    public boolean containsOutputSynapse(Synapse s) {
-        return outputSynapses.containsKey(s.getPOutput());
-    }
-
-    public Synapse getInputSynapse(NeuronProvider n) {
-        lock.acquireReadLock();
-        Synapse s = inputSynapses.get(n);
-        lock.releaseReadLock();
-        return s;
-    }
-
-    public void addInputSynapse(S s) {
-        S os = inputSynapses.put(s.getPInput(), s);
-        if(os != s) {
-            setModified(true);
-        }
-    }
-
-    public void removeInputSynapse(S s) {
-        if(inputSynapses.remove(s.getPInput()) != null) {
-            setModified(true);
-        }
-    }
-
-    public void addOutputSynapse(Synapse s) {
-        Synapse os = outputSynapses.put(s.getPOutput(), s);
-        if(os != s) {
-            setModified(true);
-        }
-    }
-
-    public void removeOutputSynapse(Synapse s) {
-        if(outputSynapses.remove(s.getPOutput()) != null) {
-            setModified(true);
-        }
     }
 
     public Stream<? extends Synapse> getInputSynapses() {
@@ -176,14 +131,6 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
 
         out.writeDouble(directConjunctiveBias);
         out.writeDouble(recurrentConjunctiveBias);
-
-        for (Synapse s : inputSynapses.values()) {
-            if (s.getInput() != null) {
-                out.writeBoolean(true);
-                getModel().writeSynapse(s, out);
-            }
-        }
-        out.writeBoolean(false);
     }
 
     @Override
@@ -192,11 +139,6 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
 
         directConjunctiveBias = in.readDouble();
         recurrentConjunctiveBias = in.readDouble();
-
-        while (in.readBoolean()) {
-            S syn = (S) m.readSynapse(in);
-            inputSynapses.put(syn.getPInput(), syn);
-        }
     }
 
     public String toStringWithSynapses() {
