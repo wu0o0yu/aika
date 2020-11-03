@@ -208,7 +208,17 @@
 
 				$$ f_{(X,Y)}(x, y)' = \varphi (net') \varphi' (net)$$
 
+				Since the activation function \(\varphi (x)\) is given by
+				\[\varphi(x) = \Bigg \{ {0 \atop \tanh(x)} {: x \leq 0 \atop : x > 0}\]
 
+				the derivative of it is
+
+				\[\varphi(x)' = \Bigg \{ {0 \atop 1 - \tanh^2(x)} {: x \leq 0 \atop : x > 0}\]
+
+				To get a better understanding the following graph shows the outer derivative of the activation function.
+			<div style="text-align:center; width:100%">
+				<img src="images/deriv-actf.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+			</div>
 
 			</p>
 			<h2>Concept Drift</h2>
