@@ -44,7 +44,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public void prepareInitialSynapseInduction(Activation iAct, Activation newAct) {
-        newAct.getNeuron().induceSynapse(iAct, newAct, new Visitor(iAct, SAME, null, INPUT, false));
+        newAct.getNeuron().induceSynapse(iAct, newAct, new Visitor(iAct, INPUT, null, INPUT, false));
     }
 
     @Override
