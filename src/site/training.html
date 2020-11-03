@@ -54,7 +54,7 @@
 	</div>
 </div>
 	<div id="contents">
-		<div align="right"><span style='color: #FF0000;'>October 21, 2020</span></div>
+		<div align="right"><span style='color: #FF0000;'>November 3, 2020</span></div>
 		<div align="middle"><b><span style='color: #FF0000;'>Work in progress</span></b></div>
 		<div class="features">
 			<h1>How the network is trained</h1>
@@ -194,15 +194,19 @@
 				$$I(X;Y) = \sum_{y \in \mathcal Y} \sum_{x \in \mathcal X}
 				{ p_{(X,Y)}(x, y) S(x, y) } $$
 
-				The only variable part that we need to consider while calculating the derivative is the probability \(p_{(X,Y)}(x, y)\). \(p_{(X,Y)}(x, y)\) can be computed using the
+				The only variable part left that we need to consider while calculating the derivative is the probability \(p_{(X,Y)}(x, y)\). \(p_{(X,Y)}(x, y)\) can be computed using the
 				frequency \(f_{(X,Y)}(x, y)\) and the number of trainings instances \(H\).
 
 				$$p_{(X,Y)}(x, y) = \frac{f_{(X,Y)}(x, y)}{N}$$
 
-				Where the frequency \(f_{(X,Y)}(x, y)\) is just the sum of all activations.
+				Where the frequency \(f_{(X,Y)}(x, y)\) is just the sum of all fired activations.
 
-				$$ \(f_{(X,Y)}(x, y)\) = \frac{1}{N} \sum_{i}^N f(net_i)$$
+				$$ f_{(X,Y)}(x, y) = \sum_{i}^N \varphi (net_i)$$
 
+				The second assumption that we need to make is that only the most recent training example is considered as variable. All other training examples are considered as constants
+				and since they are part of a summation, they can be simply removed from the equation. Hence the derivative function of \(f_{(X, Y)}\) looks as follows:
+
+				$$ f_{(X,Y)}(x, y)' = \varphi (net') \varphi' (net)$$
 
 
 
