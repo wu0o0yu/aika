@@ -245,7 +245,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
         act.initSelfGradient();
 
-        act.getNeuron().induceSynapse(iAct, act, new Visitor(iAct, INPUT, false));
+        prepareInitialSynapseInduction(iAct, act);
 
         getInstances().update(getModel(), iAct.getReference());
 
@@ -255,6 +255,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
         return act;
     }
+
+    public abstract void prepareInitialSynapseInduction(Activation iAct, Activation newAct);
 
     public abstract Link induceSynapse(Activation iAct, Activation oAct, Visitor c);
 

@@ -29,6 +29,9 @@ import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 
+import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.SAME;
+
 /**
  *
  * @author Lukas Molzberger
@@ -47,6 +50,11 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     public InhibitoryNeuron(Model model) {
         super(model);
+    }
+
+    @Override
+    public void prepareInitialSynapseInduction(Activation iAct, Activation newAct) {
+        newAct.getNeuron().induceSynapse(iAct, newAct, new Visitor(iAct, SAME, null, INPUT, false));
     }
 
     @Override

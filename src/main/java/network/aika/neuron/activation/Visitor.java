@@ -47,9 +47,10 @@ public class Visitor {
         this.startDir = startDir;
     }
 
-    public Visitor(Activation origin, Direction scope, boolean related) {
+    public Visitor(Activation origin, Direction scope, Direction startDir, Direction downUpDir, boolean related) {
         this.origin = origin;
-        this.startDir = null;
+        this.startDir = startDir;
+        this.downUpDir = downUpDir;
         this.scope = scope;
         this.related = related;
     }

@@ -55,6 +55,11 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     @Override
+    public void prepareInitialSynapseInduction(Activation iAct, Activation newAct) {
+        iAct.getNeuron().induceSynapse(newAct, iAct, new Visitor(iAct, SAME, null, INPUT, false));
+    }
+
+    @Override
     public void initOutgoingPPSynapse(PatternPartSynapse s, Visitor v) {
         s.setInputScope(v.scope == v.downUpDir);
     }
