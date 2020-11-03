@@ -1,6 +1,8 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.Visitor;
 
 public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, PatternNeuron> {

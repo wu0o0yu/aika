@@ -65,6 +65,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Visitor transition(Visitor v);
 
+    public Reference getReference(Link l) {
+        return l.getInput().getReference();
+    }
+
     public abstract byte getType();
 
     public boolean isInputLinked() {
@@ -253,7 +257,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         oAct.addLink(null, l);
 
-        getInstances().update(getModel(), iAct.getReference());
+        getInstances().update(getModel(), getReference(l));
 
         return l;
     }

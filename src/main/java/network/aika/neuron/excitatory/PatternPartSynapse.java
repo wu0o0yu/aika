@@ -19,6 +19,8 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.Visitor;
 
 import java.io.DataInput;
@@ -102,6 +104,12 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         }
 
         return nv;
+    }
+
+    @Override
+    public Reference getReference(Link l) {
+        return (isRecurrent ? l.getOutput() : l.getInput())
+                .getReference();
     }
 
     @Override
