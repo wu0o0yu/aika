@@ -62,6 +62,8 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     @Override
     public void initOutgoingPPSynapse(PatternPartSynapse s, Visitor v) {
         s.setInputScope(v.scope == v.downUpDir);
+        s.setRecurrent(v.scope == SAME);
+        s.setSamePattern(v.scope == SAME);
     }
 
     @Override
