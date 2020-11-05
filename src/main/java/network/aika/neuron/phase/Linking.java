@@ -39,9 +39,8 @@ public class Linking implements Phase {
     }
 
     @Override
-    public boolean transition(Activation act) {
-        act.setPhase(FINAL_LINKING);
-        return true;
+    public Phase nextPhase() {
+        return FINAL_LINKING;
     }
 
     public boolean isFinal() {

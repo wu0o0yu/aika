@@ -125,7 +125,6 @@ public class Document extends Thought {
         Reference ref = new TextReference(this, begin, end);
         Neuron tokenN = m.lookupToken(ref, tokenLabel);
         Activation tokenPatternAct = addInput(tokenN, ref);
-        processActivations();
 
         return tokenPatternAct;
     }

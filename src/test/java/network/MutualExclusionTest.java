@@ -150,7 +150,7 @@ public class MutualExclusionTest {
 
         act.propagateInput();
 
-        doc.process();
+        doc.process(m);
 
         System.out.println(doc.activationsToString());
 
@@ -250,7 +250,7 @@ public class MutualExclusionTest {
 
         act.propagateInput();
 
-        doc.process();
+        doc.process(m);
 
         System.out.println(doc.activationsToString());
         System.out.println();

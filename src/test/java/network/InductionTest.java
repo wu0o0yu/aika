@@ -37,7 +37,7 @@ public class InductionTest {
 
         act.propagateInput();
 
-        doc.train(m);
+        doc.process(m);
 
         System.out.println(doc.activationsToString());
     }
@@ -135,12 +135,9 @@ public class InductionTest {
         actHund.getNeuron().setFrequency(10);
         actHund.getNeuron().getInstances().setN(1000);
 
-        doc.process();
+        doc.process(model);
 
         System.out.println(doc.activationsToString());
-
-        doc.train(model);
-
         System.out.println(doc.gradientsToString());
 
         System.out.println(); // doc.activationsToString()

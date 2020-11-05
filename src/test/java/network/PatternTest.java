@@ -44,7 +44,7 @@ public class PatternTest {
 
         System.out.println(doc.activationsToString());
 
-        doc.process();
+        doc.process(m);
 
         System.out.println(doc.activationsToString());
     }
@@ -59,7 +59,7 @@ public class PatternTest {
         doc.processToken(m, 0, 1,  "A");
         doc.processToken(m, 1, 2,  "B");
 
-        doc.process();
+        doc.process(m);
 
         System.out.println(doc.activationsToString());
     }

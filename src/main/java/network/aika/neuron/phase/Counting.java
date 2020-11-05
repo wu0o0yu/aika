@@ -10,9 +10,8 @@ public class Counting implements Phase {
     }
 
     @Override
-    public boolean transition(Activation act) {
-        act.setPhase(INDUCTION);
-        return true;
+    public Phase nextPhase() {
+        return INDUCTION;
     }
 
     @Override

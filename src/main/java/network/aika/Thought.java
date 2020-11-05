@@ -72,12 +72,13 @@ public abstract class Thought {
         linkQueue.add(l);
     }
 
-    public void processActivations() {
+    public void process(Model m) {
         while (!activationsQueue.isEmpty()) {
             activationsQueue
                     .pollFirst()
                     .process();
         }
+        m.addToN(length());
     }
 
     public void processLinks() {

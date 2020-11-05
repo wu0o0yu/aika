@@ -10,9 +10,8 @@ public class Softmax implements Phase {
     }
 
     @Override
-    public boolean transition(Activation act) {
-        act.setPhase(COUNTING);
-        return true;
+    public Phase nextPhase() {
+        return COUNTING;
     }
 
     @Override

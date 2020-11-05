@@ -11,9 +11,8 @@ public class FinalLinking extends Linking {
     }
 
     @Override
-    public boolean transition(Activation act) {
-        act.setPhase(SOFTMAX);
-        return true;
+    public Phase nextPhase() {
+        return SOFTMAX;
     }
 
     @Override

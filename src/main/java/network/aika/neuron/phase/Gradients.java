@@ -10,9 +10,8 @@ public class Gradients implements Phase {
     }
 
     @Override
-    public boolean transition(Activation act) {
-        act.setPhase(UPDATE_WEIGHTS);
-        return false;
+    public Phase nextPhase() {
+        return UPDATE_WEIGHTS;
     }
 
     @Override

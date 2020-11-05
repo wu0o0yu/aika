@@ -29,13 +29,7 @@ public class CharBasedTraining {
 
             doc.processToken(model, i, i + 1, "" + c);
         }
-        doc.process();
-
-//        System.out.println(doc.activationsToString());
-
-        doc.train(model);
-
-//        System.out.println(doc.gradientsToString());
+        doc.process(model);
 
         System.out.println(); // doc.activationsToString()
     }

@@ -41,8 +41,8 @@ public class SimplePhraseTest {
 
             inductionModel.initToken(doc);
 
-            doc.process();
-
+            doc.process(model);
+/*
             if(k < 100) {
                 doc.count();
                 model.addToN(doc.length());
@@ -50,7 +50,7 @@ public class SimplePhraseTest {
                 doc.train(model);
                 m.addToN(length());
             }
-
+*/
             if (Neuron.debugOutput) {
                 System.out.println(doc.activationsToString(true));
 

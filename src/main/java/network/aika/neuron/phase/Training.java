@@ -34,9 +34,8 @@ public class Training implements Phase {
     }
 
     @Override
-    public boolean transition(Activation act) {
-        act.setPhase(GRADIENTS);
-        return true;
+    public Phase nextPhase() {
+        return GRADIENTS;
     }
 
     @Override

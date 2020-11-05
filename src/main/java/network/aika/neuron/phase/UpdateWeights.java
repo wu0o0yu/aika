@@ -11,9 +11,8 @@ public class UpdateWeights implements Phase {
     }
 
     @Override
-    public boolean transition(Activation act) {
-        act.setPhase(null);
-        return false;
+    public Phase nextPhase() {
+        return null;
     }
 
     @Override

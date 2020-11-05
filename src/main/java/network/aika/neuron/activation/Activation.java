@@ -167,7 +167,6 @@ public class Activation implements Comparable<Activation> {
         isFinal = true;
 
         linkForward();
-        thought.processActivations();
     }
 
     public Activation createBranch(Synapse excludedSyn) {
