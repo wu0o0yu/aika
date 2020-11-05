@@ -30,11 +30,22 @@ import static network.aika.neuron.activation.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class LinkingPhase extends Phase {
-    private static final Logger log = LoggerFactory.getLogger(LinkingPhase.class);
+public class Linking implements Phase {
+    private static final Logger log = LoggerFactory.getLogger(Linking.class);
 
-    public LinkingPhase(boolean isFinal) {
-        super(isFinal);
+    @Override
+    public void process(Activation act) {
+        act.process();
+    }
+
+    @Override
+    public boolean transition(Activation act) {
+        act.setPhase(FINAL_LINKING);
+        return true;
+    }
+
+    public boolean isFinal() {
+        return false;
     }
 
     @Override

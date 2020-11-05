@@ -23,22 +23,21 @@ import network.aika.neuron.activation.Visitor;
  *
  * @author Lukas Molzberger
  */
-public abstract class Phase {
-    public static Phase INITIAL_LINKING = new LinkingPhase(false);
-    public static Phase FINAL_LINKING = new LinkingPhase(true);
-    public static Phase INDUCTION = new InductionPhase(true);
+public interface Phase {
+    Phase INITIAL_LINKING = new Linking();
+    Phase FINAL_LINKING = new FinalLinking();
+    Phase SOFTMAX = new Softmax();
+    Phase COUNTING = new Counting();
+    Phase INDUCTION = new Training();
 
-    private boolean isFinal;
 
-    protected Phase(boolean isFinal) {
-        this.isFinal = isFinal;
-    }
+    void process(Activation act);
 
-    public boolean isFinal() {
-        return isFinal;
-    }
+    boolean transition(Activation act);
 
-    public abstract void tryToLink(Activation iAct, Activation oAct, Visitor c);
+    boolean isFinal();
 
-    public abstract void propagate(Activation act);
+    void tryToLink(Activation iAct, Activation oAct, Visitor c);
+
+    void propagate(Activation act);
 }

@@ -25,10 +25,23 @@ import network.aika.neuron.activation.Visitor;
  *
  * @author Lukas Molzberger
  */
-public class InductionPhase extends Phase {
+public class Training implements Phase {
 
-    public InductionPhase(boolean isFinal) {
-        super(isFinal);
+
+    @Override
+    public void process(Activation act) {
+
+    }
+
+    @Override
+    public boolean transition(Activation act) {
+        act.setPhase(null);
+        return false;
+    }
+
+    @Override
+    public boolean isFinal() {
+        return true;
     }
 
     @Override

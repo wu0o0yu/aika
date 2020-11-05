@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.Neuron.ADJUST_GRADIENT;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
@@ -38,6 +39,7 @@ public class Activation implements Comparable<Activation> {
 
     public static double TOLERANCE = 0.001;
 
+    private Phase phase;
     private double value;
     private double sum;
     private double lateSum;
@@ -100,7 +102,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public double getNet() {
-        return getNet(thought.getPhase());
+        return getNet(phase);
     }
 
     public Fired getFired() {
@@ -123,8 +125,13 @@ public class Activation implements Comparable<Activation> {
         return getNeuron().getDescriptionLabel();
     }
 
+
+    public void setPhase(Phase phase) {
+        this.phase = phase;
+    }
+
     public Phase getPhase() {
-        return thought.getPhase();
+        return phase;
     }
 
     public Reference getReference() {
@@ -245,32 +252,65 @@ public class Activation implements Comparable<Activation> {
                 .map(l -> l.getInput());
     }
 
+
+    public void process() {
+        if(!fixed) {
+            value = computeValue(phase);
+        }
+        isFinal = true;
+        if (!equals(lastRound)) {
+            linkForward();
+        }
+    }
+
+    public void train() {
+        if(!isActive()) {
+            return;
+        }
+
+        linkForward();
+
+        if(getNeuron().isInputNeuron()) {
+            return;
+        }
+
+        if(!ADJUST_GRADIENT) return;
+
+        initSelfGradient();
+        computeInitialLinkGradients();
+        updateSelfGradient();
+    }
+
     public void linkForward() {
-        if (lastRound == null) {
+        if (lastRound == null || getPhase() == INDUCTION) {
             propagate();
         } else {
-            lastRound.outputLinks
-                    .values()
-                    .forEach(l ->
-                            Link.link(
-                                    l.getSynapse(),
-                                    this,
-                                    l.getOutput(),
-                                    l.isSelfRef()
-                            )
-                    );
-            lastRound.unlink();
-            lastRound = null;
+            updateOutgoingLinks();
         }
 
         thought.processLinks();
+    }
+
+    private void updateOutgoingLinks() {
+        lastRound.outputLinks
+                .values()
+                .forEach(l ->
+                        Link.link(
+                                l.getSynapse(),
+                                this,
+                                l.getOutput(),
+                                l.isSelfRef()
+                        )
+                );
+        lastRound.unlink();
+        lastRound = null;
     }
 
     public void propagate() {
         new Visitor(this, OUTPUT)
                 .followLinks(this);
 
-        thought.getPhase().propagate(this);
+        phase.propagate(this);
     }
 
     public Activation createActivation(Neuron n) {
@@ -372,16 +412,6 @@ public class Activation implements Comparable<Activation> {
                 .orElse(null);
     }
 
-    public void process() {
-        if(!fixed) {
-            value = computeValue(thought.getPhase());
-        }
-        isFinal = true;
-        if (!equals(lastRound)) {
-            linkForward();
-        }
-    }
-
     private double computeValue(Phase phase) {
         return branchProbability *
                 neuron.getActivationFunction().f(
@@ -457,15 +487,15 @@ public class Activation implements Comparable<Activation> {
                 .forEach(l -> l.unlink());
     }
 
-    public void computeP() {
+    public void computeBranchProbability() {
         if (!isActive()) return;
 
         double net = getNet();
         Set<Activation> conflictingActs = branches
                 .stream()
-                .flatMap(bAct -> bAct.inputLinks.values().stream())
+                .flatMap(bAct -> bAct.getInputLinks())
                 .filter(l -> l.isNegative())
-                .flatMap(l -> l.getInput().inputLinks.values().stream())  // Walk through to the inhib. Activation.
+                .flatMap(l -> l.getInput().getInputLinks())  // Walk through to the inhib. Activation.
                 .map(l -> l.getInput())
                 .collect(Collectors.toSet());
 
@@ -481,16 +511,14 @@ public class Activation implements Comparable<Activation> {
                 .mapToDouble(cAct -> Math.exp(cAct.getNet() - offset))
                 .sum();
 
-        updateP(Math.exp(net - offset) / norm);
-    }
+        double p = Math.exp(net - offset) / norm;
 
-    private void updateP(double p) {
         if (Math.abs(p - getBranchProbability()) <= TOLERANCE) return;
 
         Activation cAct = getModifiable(null);
         cAct.branchProbability = p;
 
-        thought.addActivationToQueue(cAct);
+        thought.addActivationToQueue(cAct); // Linking
     }
 
     public void count() {

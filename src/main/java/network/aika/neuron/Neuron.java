@@ -78,6 +78,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         modified = true;
     }
 
+    public abstract void addDummyLinks(Activation act);
+
     public abstract ActivationFunction getActivationFunction();
 
     public abstract Fired incrementFired(Fired f);
@@ -220,6 +222,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public void count(Activation act) {
+        addDummyLinks(act);
+
         if(act.isActive()) {
             instances.update(getModel(), act.getReference());
             frequency += 1.0;
@@ -249,10 +253,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
         getInstances().update(getModel(), iAct.getReference());
 
-        act.process();
-
-//        act.propagate();
-
         return act;
     }
 
@@ -265,21 +265,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public abstract InhibitorySynapse induceOutgoingInhibitorySynapse(InhibitoryNeuron outN);
 
     public static boolean ADJUST_GRADIENT = false;
-
-    public void train(Activation act) {
-        act.propagate();
-        act.getThought().processLinks();
-
-        if(isInputNeuron) {
-            return;
-        }
-
-        if(!ADJUST_GRADIENT) return;
-
-        act.initSelfGradient();
-        act.computeInitialLinkGradients();
-        act.updateSelfGradient();
-    }
 
     public double getSurprisal(Sign s) {
         double p = getP(s, instances.getN());

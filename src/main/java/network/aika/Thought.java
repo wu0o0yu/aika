@@ -51,8 +51,6 @@ public abstract class Thought {
 
     private Map<NeuronProvider, SortedSet<Activation>> actsPerNeuron = null;
 
-    private Phase phase = INITIAL_LINKING;
-
     private Config trainingConfig;
 
     public Thought() {
@@ -77,7 +75,7 @@ public abstract class Thought {
                 .values()
                 .stream()
                 .filter(act -> !act.hasBranches())
-                .forEach(act -> act.computeP());
+                .forEach(act -> act.computeBranchProbability());
 
         processActivations();
         phase = null;
@@ -146,20 +144,8 @@ public abstract class Thought {
         return activationIdCounter++;
     }
 
-    public Phase getPhase() {
-        return phase;
-    }
-
     public Collection<Activation> getActivations() {
         return activationsById.values();
-    }
-
-    public Activation getNextActivation(Activation act) {
-        Map.Entry<Integer, Activation> me = act == null ?
-                activationsById.firstEntry() :
-                activationsById.higherEntry(act.getId());
-
-        return me != null ? me.getValue() : null;
     }
 
     public int getNumberOfActivations() {
@@ -171,7 +157,6 @@ public abstract class Thought {
     }
 
     public Set<Activation> getActivations(Neuron n) {
-        phase = null;
         if(actsPerNeuron == null) {
             actsPerNeuron = getActivationsPerNeuron();
         }
@@ -214,14 +199,8 @@ public abstract class Thought {
 */
         count();
 
-        {
-            Activation act = null;
-            while ((act = getNextActivation(act)) != null) {
-                if(act.isActive()) {
-                    act.getNeuron().train(act);
-                }
-            }
-        }
+        activationsQueue.addAll(activationsById.values());
+        processActivations();
 
         processGradients();
 

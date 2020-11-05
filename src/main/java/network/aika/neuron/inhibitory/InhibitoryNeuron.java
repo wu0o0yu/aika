@@ -53,6 +53,11 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     @Override
+    public void addDummyLinks(Activation act) {
+
+    }
+
+    @Override
     public void prepareInitialSynapseInduction(Activation iAct, Activation newAct) {
         newAct.getNeuron().induceSynapse(iAct, newAct, new Visitor(iAct, SAME, null, INPUT, false));
     }

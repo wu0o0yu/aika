@@ -71,16 +71,11 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         }
     }
 
-    public void train(Activation act) {
-        addDummyLinks(act);
-        super.train(act);
-    }
-
     public boolean isInitialized() {
         return getInputSynapses().count() > 1;
     }
 
-    protected void addDummyLinks(Activation act) {
+    public void addDummyLinks(Activation act) {
         inputSynapses
                 .values()
                 .stream()
