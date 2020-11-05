@@ -35,8 +35,8 @@ public class Training implements Phase {
 
     @Override
     public boolean transition(Activation act) {
-        act.setPhase(null);
-        return false;
+        act.setPhase(GRADIENTS);
+        return true;
     }
 
     @Override
@@ -63,5 +63,10 @@ public class Training implements Phase {
         if(act.getConfig().isEnableInduction() && act.isActive()) {
             act.getNeuron().induceNeuron(act);
         }
+    }
+
+    @Override
+    public int getRank() {
+        return 4;
     }
 }

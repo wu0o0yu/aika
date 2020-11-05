@@ -126,8 +126,9 @@ public class Activation implements Comparable<Activation> {
     }
 
 
-    public void setPhase(Phase phase) {
+    public void addToQueue(Phase phase) {
         this.phase = phase;
+        thought.addActivationToQueue(this);
     }
 
     public Phase getPhase() {
@@ -394,7 +395,9 @@ public class Activation implements Comparable<Activation> {
         double finalValue = computeValue(FINAL_LINKING);
 
         if (Math.abs(finalValue - initialValue) > TOLERANCE) {
-            thought.addActivationToQueue(getModifiable(null));
+            getModifiable(null).addToQueue(FINAL_LINKING);
+        } else {
+            addToQueue(FINAL_LINKING.nextPhase());
         }
     }
 
@@ -478,7 +481,7 @@ public class Activation implements Comparable<Activation> {
     public void propagateGradient(double g) {
         unpropagatedGradient += g;
 
-        getThought().addToGradientQueue(this);
+        getThought().addActivationToQueue(this);
     }
 
     public void unlink() {
@@ -488,7 +491,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void computeBranchProbability() {
-        if (!isActive()) return;
+        if (!isActive() || !hasBranches()) return;
 
         double net = getNet();
         Set<Activation> conflictingActs = branches

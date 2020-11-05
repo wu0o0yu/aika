@@ -12,12 +12,17 @@ public class FinalLinking extends Linking {
 
     @Override
     public boolean transition(Activation act) {
-        act.setPhase(FINAL_LINKING);
+        act.setPhase(SOFTMAX);
         return true;
     }
 
     @Override
     public boolean isFinal() {
         return true;
+    }
+
+    @Override
+    public int getRank() {
+        return 1;
     }
 }

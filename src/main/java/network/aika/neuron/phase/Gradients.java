@@ -3,16 +3,16 @@ package network.aika.neuron.phase;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 
-public class Counting implements Phase {
+public class Gradients implements Phase {
     @Override
     public void process(Activation act) {
-        act.count();
+        act.processGradient();
     }
 
     @Override
     public boolean transition(Activation act) {
-        act.setPhase(INDUCTION);
-        return true;
+        act.setPhase(UPDATE_WEIGHTS);
+        return false;
     }
 
     @Override
@@ -32,6 +32,6 @@ public class Counting implements Phase {
 
     @Override
     public int getRank() {
-        return 3;
+        return 5;
     }
 }

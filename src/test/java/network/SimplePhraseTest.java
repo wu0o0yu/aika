@@ -48,6 +48,7 @@ public class SimplePhraseTest {
                 model.addToN(doc.length());
             } else {
                 doc.train(model);
+                m.addToN(length());
             }
 
             if (Neuron.debugOutput) {

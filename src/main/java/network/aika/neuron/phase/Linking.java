@@ -96,4 +96,9 @@ public class Linking implements Phase {
                 );
     }
 
+    @Override
+    public int getRank() {
+        return 0;
+    }
+
 }

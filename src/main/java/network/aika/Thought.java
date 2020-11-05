@@ -35,17 +35,13 @@ public abstract class Thought {
     private int activationIdCounter = 0;
 
     private final TreeSet<Activation> activationsQueue = new TreeSet<>(
-            Comparator.<Activation, Fired>comparing(act -> act.getFired())
+            Comparator.<Activation, Integer>comparing(act -> act.getPhase().getRank())
+                    .thenComparing(act -> act.getFired())
                     .thenComparing(Activation::getId)
     );
 
     private final Deque<Link> linkQueue = new ArrayDeque<>();
 
-    private final TreeSet<Activation> gradientQueue = new TreeSet<>(
-            Comparator.<Activation, Fired>comparing(act -> act.getFired())
-                    .thenComparing(Activation::getId)
-                    .reversed()
-    );
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
@@ -62,25 +58,6 @@ public abstract class Thought {
 
     public abstract int length();
 
-    public void process() {
-        phase = FINAL_LINKING;
-        activationsById
-                .values()
-                .stream()
-                .forEach(act -> act.updateForFinalPhase());
-
-        processActivations();
-
-        activationsById
-                .values()
-                .stream()
-                .filter(act -> !act.hasBranches())
-                .forEach(act -> act.computeBranchProbability());
-
-        processActivations();
-        phase = null;
-    }
-
     public void registerActivation(Activation act) {
         activationsById.put(act.getId(), act);
     }
@@ -93,10 +70,6 @@ public abstract class Thought {
 
     public void addLinkToQueue(Link l) {
         linkQueue.add(l);
-    }
-
-    public void addToGradientQueue(Activation act) {
-        gradientQueue.add(act);
     }
 
     public void processActivations() {
@@ -113,23 +86,6 @@ public abstract class Thought {
                     .pollFirst()
                     .propagate();
         }
-    }
-
-    public void processGradients() {
-        while (!gradientQueue.isEmpty()) {
-            gradientQueue
-                    .pollFirst()
-                    .processGradient();
-        }
-
-        updateSynapseWeights();
-    }
-
-    public void updateSynapseWeights() {
-        activationsById
-                .values()
-                .stream()
-                .forEach(act -> act.updateSynapseWeights());
     }
 
     public Config getTrainingConfig() {
@@ -179,48 +135,6 @@ public abstract class Thought {
                 });
 
         return results;
-    }
-
-    public void train(Model m) {
-        phase = INDUCTION;
-/*
-        long v = createVisitedId();
-        if(trainingConfig.getAlpha() != null) {
-            Set<Neuron> activatedNeurons = new TreeSet<>();
-            getActivations()
-                .stream()
-                .filter(act -> act.isActive())
-                .map(act -> act.getNeuron())
-                .filter(n -> n.checkVisited(v))
-                .forEach(n -> n.applyMovingAverage(trainingConfig));
-
-            m.applyMovingAverage(trainingConfig);
-        }
-*/
-        count();
-
-        activationsQueue.addAll(activationsById.values());
-        processActivations();
-
-        processGradients();
-
-//        process();
-
-        m.addToN(length());
-
-        getActivations()
-                .forEach(act ->
-                        act.getNeuronProvider().save()
-                );
-
-        phase = null;
-    }
-
-    public void count() {
-        getActivations()
-                .forEach(act ->
-                        act.count()
-                );
     }
 
     public String activationsToString() {

@@ -29,15 +29,19 @@ public interface Phase {
     Phase SOFTMAX = new Softmax();
     Phase COUNTING = new Counting();
     Phase INDUCTION = new Training();
+    Phase GRADIENTS = new Gradients();
+    Phase UPDATE_WEIGHTS = new UpdateWeights();
 
 
     void process(Activation act);
 
-    boolean transition(Activation act);
+    Phase nextPhase();
 
     boolean isFinal();
 
     void tryToLink(Activation iAct, Activation oAct, Visitor c);
 
     void propagate(Activation act);
+
+    int getRank();
 }
