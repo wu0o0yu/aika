@@ -35,7 +35,8 @@ public class Linking implements Phase {
 
     @Override
     public void process(Activation act) {
-        act.process();
+        act.getThought().linkInputRelations(act);
+        act.updateValueAndPropagate();
     }
 
     @Override
@@ -100,4 +101,8 @@ public class Linking implements Phase {
         return 0;
     }
 
+    @Override
+    public int compare(Activation act1, Activation act2) {
+        return act1.getFired().compareTo(act2.getFired());
+    }
 }

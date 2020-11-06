@@ -39,7 +39,9 @@ public class Activation implements Comparable<Activation> {
 
     public static double TOLERANCE = 0.001;
 
-    private Phase phase;
+    private Phase phase = INITIAL_LINKING;
+    private boolean isQueued;
+
     private double value;
     private double sum;
     private double lateSum;
@@ -89,6 +91,16 @@ public class Activation implements Comparable<Activation> {
         outputLinks = new TreeMap<>();
     }
 
+    public void initInput(Reference ref) {
+        setReference(ref);
+
+        setValue(1.0);
+        setFired(ref.getBegin());
+
+        isFinal = true;
+        addToQueue(INITIAL_LINKING);
+    }
+
     public int getId() {
         return id;
     }
@@ -125,10 +137,27 @@ public class Activation implements Comparable<Activation> {
         return getNeuron().getDescriptionLabel();
     }
 
+    public void addToQueue(Phase p) {
+        if(isQueued) {
+            if(phase.getRank() <= p.getRank()) {
+                return;
+            }
+            thought.removeActivationFromQueue(this);
+        }
 
-    public void addToQueue(Phase phase) {
-        this.phase = phase;
+        phase = p;
+
+        isQueued = true;
         thought.addActivationToQueue(this);
+    }
+
+    public void process() {
+        isQueued = false;
+        phase.process(this);
+
+        if(!isQueued) {
+            addToQueue(phase.nextPhase());
+        }
     }
 
     public Phase getPhase() {
@@ -161,12 +190,6 @@ public class Activation implements Comparable<Activation> {
 
     public NeuronProvider getNeuronProvider() {
         return neuron.getProvider();
-    }
-
-    public void propagateInput() {
-        isFinal = true;
-
-        linkForward();
     }
 
     public Activation createBranch(Synapse excludedSyn) {
@@ -252,8 +275,7 @@ public class Activation implements Comparable<Activation> {
                 .map(l -> l.getInput());
     }
 
-
-    public void process() {
+    public void updateValueAndPropagate() {
         if(!fixed) {
             value = computeValue(phase);
         }
@@ -356,11 +378,10 @@ public class Activation implements Comparable<Activation> {
         nl.linkOutput();
 
         sumUpLink(ol, nl);
-        checkIfFired(nl);
+        checkIfFired();
 
-        if (nl.getSynapse().getWeight() > 0.0) {
-            getThought().addLinkToQueue(nl);
-        }
+        nl.addToQueue();
+
         return nl;
     }
 
@@ -395,15 +416,13 @@ public class Activation implements Comparable<Activation> {
 
         if (Math.abs(finalValue - initialValue) > TOLERANCE) {
             getModifiable(null).addToQueue(FINAL_LINKING);
-        } else {
-            addToQueue(FINAL_LINKING.nextPhase());
         }
     }
 
-    private void checkIfFired(Link l) {
+    private void checkIfFired() {
         if (fired == NOT_FIRED && getNet() > 0.0) {
             fired = neuron.incrementFired(getLatestFired());
-            thought.addActivationToQueue(this);
+            addToQueue(getPhase());
         }
     }
 
@@ -480,7 +499,7 @@ public class Activation implements Comparable<Activation> {
     public void propagateGradient(double g) {
         unpropagatedGradient += g;
 
-        getThought().addActivationToQueue(this);
+        addToQueue(GRADIENTS);
     }
 
     public void unlink() {
@@ -574,13 +593,18 @@ public class Activation implements Comparable<Activation> {
 
     @Override
     public int compareTo(Activation act) {
-        return Integer.compare(id, act.id);
+        int r = Integer.compare(getPhase().getRank(), act.getPhase().getRank());
+        if(r != 0) return r;
+        r = getPhase().compare(this, act);
+        if(r != 0) return r;
+        return Integer.compare(getId(), act.getId());
     }
 
     public String getShortString() {
         return "id:" +
                 getId() +
-                " n:[" + getNeuron() + "]";
+                " n:[" + getNeuron() + "]" +
+                " (" + (phase != null ? phase.getClass().getSimpleName() : "X") + ")";
     }
 
     public String gradientsToString() {

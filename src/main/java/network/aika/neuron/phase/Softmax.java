@@ -33,4 +33,9 @@ public class Softmax implements Phase {
     public int getRank() {
         return 2;
     }
+
+    @Override
+    public int compare(Activation act1, Activation act2) {
+        return 0;
+    }
 }

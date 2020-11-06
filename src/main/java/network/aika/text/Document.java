@@ -22,6 +22,8 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
 
+import static network.aika.neuron.phase.Phase.INITIAL_LINKING;
+
 /**
  * The {@code Document} class represents a single document which may be either used for processing a text or as
  * training input. A document consists of the raw text, the interpretations and the activations.
@@ -56,9 +58,8 @@ public class Document extends Thought {
         super.registerActivation(act);
     }
 
-    public void addActivationToQueue(Activation act) {
-        super.addActivationToQueue(act);
-
+    @Override
+    public void linkInputRelations(Activation act) {
         TextModel tm = (TextModel) act.getNeuron().getModel();
         if(tm.nextTokenInhib.getId().equals(act.getNeuron().getId())) {
             cursor.nextTokenIAct = act;
@@ -106,12 +107,8 @@ public class Document extends Thought {
 
     public Activation addInput(Neuron n, Reference ref) {
         Activation act = new Activation(this, n);
-        act.setReference(ref);
+        act.initInput(ref);
 
-        act.setValue(1.0);
-        act.setFired(ref.getBegin());
-
-        act.propagateInput();
         return act;
     }
 

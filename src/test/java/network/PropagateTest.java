@@ -23,6 +23,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.text.TextModel;
+import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -53,8 +54,7 @@ public class PropagateTest {
         Document doc = new Document("test");
 
         Activation act = new Activation(doc, in);
-        act.setValue(1.0);
-        act.propagateInput();
+        act.initInput(new TextReference(doc, 0, 4));
 
         System.out.println(doc.activationsToString());
     }

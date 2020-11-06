@@ -210,6 +210,12 @@ public class Link {
         return output.addLink(s, input, isSelfRef);
     }
 
+    public void addToQueue() {
+        if (synapse.getWeight() > 0.0) {
+            output.getThought().addLinkToQueue(this);
+        }
+    }
+
     public Synapse getSynapse() {
         return synapse;
     }

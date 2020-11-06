@@ -68,4 +68,9 @@ public class Training implements Phase {
     public int getRank() {
         return 4;
     }
+
+    @Override
+    public int compare(Activation act1, Activation act2) {
+        return 0;
+    }
 }

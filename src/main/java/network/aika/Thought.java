@@ -34,11 +34,7 @@ public abstract class Thought {
 
     private int activationIdCounter = 0;
 
-    private final TreeSet<Activation> activationsQueue = new TreeSet<>(
-            Comparator.<Activation, Integer>comparing(act -> act.getPhase().getRank())
-                    .thenComparing(act -> act.getFired())
-                    .thenComparing(Activation::getId)
-    );
+    private final TreeSet<Activation> activationsQueue = new TreeSet<>();
 
     private final Deque<Link> linkQueue = new ArrayDeque<>();
 
@@ -63,10 +59,14 @@ public abstract class Thought {
     }
 
     public void addActivationToQueue(Activation act) {
-        if(!act.isFinal()) {
-            activationsQueue.add(act);
-        }
+        activationsQueue.add(act);
     }
+
+    public void removeActivationFromQueue(Activation act) {
+        activationsQueue.remove(act);
+    }
+
+    public abstract void linkInputRelations(Activation act);
 
     public void addLinkToQueue(Link l) {
         linkQueue.add(l);

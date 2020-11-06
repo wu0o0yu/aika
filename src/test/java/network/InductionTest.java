@@ -32,10 +32,7 @@ public class InductionTest {
         );
 
         Activation act = new Activation(doc, in);
-        act.setValue(1.0);
-        act.setReference(new TextReference(doc, 0, 1));
-
-        act.propagateInput();
+        act.initInput(new TextReference(doc, 0, 1));
 
         doc.process(m);
 

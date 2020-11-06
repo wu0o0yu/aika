@@ -33,4 +33,9 @@ public class Gradients implements Phase {
     public int getRank() {
         return 5;
     }
+
+    @Override
+    public int compare(Activation act1, Activation act2) {
+        return act2.getFired().compareTo(act1.getFired());
+    }
 }

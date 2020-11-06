@@ -4,6 +4,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 
 public class UpdateWeights implements Phase {
+
     @Override
     public void process(Activation act) {
         act.updateSynapseWeights();
@@ -33,5 +34,10 @@ public class UpdateWeights implements Phase {
     @Override
     public int getRank() {
         return 6;
+    }
+
+    @Override
+    public int compare(Activation act1, Activation act2) {
+        return 0;
     }
 }

@@ -23,6 +23,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 import network.aika.text.TextModel;
+import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -148,7 +149,7 @@ public class MutualExclusionTest {
         act.setValue(1.0);
         act.setFired(0);
 
-        act.propagateInput();
+        act.initInput(new TextReference(doc, 0, 4));
 
         doc.process(m);
 
@@ -246,9 +247,7 @@ public class MutualExclusionTest {
         Document doc = new Document("test");
 
         Activation act = new Activation(doc, in);
-        act.setValue(1.0);
-
-        act.propagateInput();
+        act.initInput(new TextReference(doc, 0, 4));
 
         doc.process(m);
 
