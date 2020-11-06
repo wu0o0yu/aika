@@ -123,8 +123,8 @@ public class InductionTest {
         );
         System.out.println("  " + phrase);
 
-        Activation actDer = doc.processToken(model, 0, 4, "der");
-        Activation actHund = doc.processToken(model, 4, 8, "Hund");
+        Activation actDer = doc.processToken(model, null, 0, 4, "der");
+        Activation actHund = doc.processToken(model, actDer.getReference(), 4, 8, "Hund");
 
         model.setN(1000);
         actDer.getNeuron().setFrequency(50);

@@ -88,7 +88,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     @Override
     public void updateReference(Link nl) {
-        nl.getOutput().setReference(nl.getInput().getReference());
+        nl.getOutput().propagateReference(nl.getInput().getReference());
     }
 
     @Override

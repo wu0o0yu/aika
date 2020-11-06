@@ -164,12 +164,17 @@ public class Activation implements Comparable<Activation> {
         return phase;
     }
 
-    public Reference getReference() {
-        return reference;
+    public <R extends Reference> R getReference() {
+        return (R) reference;
     }
 
-    public void setReference(Reference groundRef) {
-        this.reference = groundRef;
+    public void propagateReference(Reference ref) {
+        setReference(ref);
+        getModel().linkInputRelations(this, INPUT);
+    }
+
+    public void setReference(Reference ref) {
+        this.reference = ref;
     }
 
     public Activation getLastRound() {
@@ -336,9 +341,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public Activation createActivation(Neuron n) {
-        Activation act = new Activation(thought.createActivationId(), thought, n);
-        getModel().linkInputRelations(act, INPUT);
-        return act;
+        return new Activation(thought.createActivationId(), thought, n);
     }
 
     public Link getInputLink(Synapse s) {

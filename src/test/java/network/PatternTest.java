@@ -16,6 +16,7 @@
  */
 package network;
 
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.neuron.excitatory.PatternSynapse;
@@ -23,6 +24,7 @@ import network.aika.text.Document;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.TextModel;
+import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
 
 
@@ -38,9 +40,9 @@ public class PatternTest {
 
         Document doc = new Document("ABC");
 
-        doc.processToken(m, 0, 1,  "A");
-        doc.processToken(m, 1, 2,  "B");
-        doc.processToken(m, 2, 3,  "C");
+        TextReference refA = doc.processToken(m, null, 0, 1,  "A").getReference();
+        TextReference refB = doc.processToken(m, refA, 1, 2,  "B").getReference();
+        TextReference refC = doc.processToken(m, refB, 2, 3,  "C").getReference();
 
         System.out.println(doc.activationsToString());
 
@@ -56,8 +58,8 @@ public class PatternTest {
 
         Document doc = new Document("ABC");
 
-        doc.processToken(m, 0, 1,  "A");
-        doc.processToken(m, 1, 2,  "B");
+        TextReference refA = doc.processToken(m, null, 0, 1,  "A").getReference();
+        TextReference refB = doc.processToken(m, refA, 1, 2,  "B").getReference();
 
         doc.process(m);
 

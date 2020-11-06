@@ -67,16 +67,15 @@ public class TextModel extends Model {
 
     @Override
     public void linkInputRelations(Activation originAct, Direction dir) {
-        Document doc = (Document) originAct.getThought();
-
-        Cursor lc = doc.getLastCursor();
-        if(lc == null) return;
+        TextReference ref = originAct.getReference();
+        TextReference lastRef = ref.getPrevious();
+        if(lastRef == null) return;
 
         switch (dir) {
             case OUTPUT:
-                if (prevTokenInhib.getId().equals(originAct.getNeuron().getId()) && lc.nextTokenPPAct != null) {
-                    Synapse s = getRelSynapse(lc.nextTokenPPAct.getNeuron());
-                    lc.nextTokenPPAct.addLink(s, originAct, false);
+                if (prevTokenInhib.getId().equals(originAct.getNeuron().getId()) && lastRef.nextTokenPPAct != null) {
+                    Synapse s = getRelSynapse(lastRef.nextTokenPPAct.getNeuron());
+                    lastRef.nextTokenPPAct.addLink(s, originAct, false);
                 }
                 break;
 
@@ -86,8 +85,8 @@ public class TextModel extends Model {
                     Synapse s = getRelSynapse(n);
 
                     if (s != null) {
-                        if (isPrevTokenPatternPart(originAct.getNeuron()) && lc.nextTokenIAct != null) {
-                            originAct.addLink(s, lc.nextTokenIAct, false);
+                        if (isPrevTokenPatternPart(originAct.getNeuron()) && lastRef.nextTokenIAct != null) {
+                            originAct.addLink(s, lastRef.nextTokenIAct, false);
                         }
                     }
                 }

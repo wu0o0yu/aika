@@ -94,7 +94,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         Reference or = nl.getOutput().getReference();
         Reference ir = nl.getInput().getReference();
 
-        nl.getOutput().setReference(or == null ? ir : or.add(ir));
+        nl.getOutput().propagateReference(or == null ? ir : or.add(ir));
     }
 
     public static Activation induce(Activation act) {

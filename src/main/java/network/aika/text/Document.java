@@ -34,9 +34,6 @@ public class Document extends Thought {
 
     private final StringBuilder content;
 
-    private Cursor lastCursor = null;
-    private Cursor cursor = null;
-
     public Document(String content) {
         this(content, null);
     }
@@ -49,21 +46,17 @@ public class Document extends Thought {
         }
     }
 
-    public void moveCursor() {
-        lastCursor = cursor;
-        cursor = new Cursor();
-    }
-
     public void registerActivation(Activation act) {
         super.registerActivation(act);
     }
 
     @Override
     public void linkInputRelations(Activation act) {
+        TextReference ref = act.getReference();
         TextModel tm = (TextModel) act.getNeuron().getModel();
         if(tm.nextTokenInhib.getId().equals(act.getNeuron().getId())) {
-            cursor.nextTokenIAct = act;
-            cursor.nextTokenPPAct = act.getInputLinks()
+            ref.nextTokenIAct = act;
+            ref.nextTokenPPAct = act.getInputLinks()
                     .findAny()
                     .map(l -> l.getInput())
                     .orElse(null);
@@ -116,21 +109,16 @@ public class Document extends Thought {
         return addInput(n.getNeuron(), ref);
     }
 
-    public Activation processToken(TextModel m, int begin, int end, String tokenLabel) {
-        moveCursor();
-
-        Reference ref = new TextReference(this, begin, end);
+    public Activation processToken(TextModel m, TextReference lastRef, int begin, int end, String tokenLabel) {
+        TextReference ref = new TextReference(this, begin, end);
         Neuron tokenN = m.lookupToken(ref, tokenLabel);
         Activation tokenPatternAct = addInput(tokenN, ref);
 
+        if(lastRef != null) {
+            lastRef.setNext(ref);
+            ref.setPrevious(lastRef);
+        }
+
         return tokenPatternAct;
-    }
-
-    public Cursor getLastCursor() {
-        return lastCursor;
-    }
-
-    public Cursor getCursor() {
-        return cursor;
     }
 }

@@ -9,6 +9,7 @@ import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
+import network.aika.text.TextReference;
 
 public class ManuelInductionModel {
 
@@ -65,9 +66,10 @@ public class ManuelInductionModel {
         );
 
         int i = 0;
+        TextReference lastRef = null;
         for(String t: doc.getContent().split(" ")) {
             int j = i + t.length();
-            doc.processToken(model, i, j, t);
+            lastRef = doc.processToken(model, lastRef, i, j, t).getReference();
 
             i = j + 1;
         }

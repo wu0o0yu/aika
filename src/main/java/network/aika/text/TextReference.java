@@ -18,6 +18,7 @@ package network.aika.text;
 
 
 import network.aika.Thought;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Reference;
 
 /**
@@ -29,6 +30,12 @@ public class TextReference implements Reference {
     private Document doc;
     private int begin;
     private int end;
+
+    private TextReference previous;
+    private TextReference next;
+
+    public Activation nextTokenPPAct;
+    public Activation nextTokenIAct;
 
     public TextReference(Document doc, int begin, int end) {
         this.doc = doc;
@@ -46,6 +53,22 @@ public class TextReference implements Reference {
 
     public String getText() {
         return doc.getTextSegment(begin, end);
+    }
+
+    public TextReference getPrevious() {
+        return previous;
+    }
+
+    public void setPrevious(TextReference previous) {
+        this.previous = previous;
+    }
+
+    public TextReference getNext() {
+        return next;
+    }
+
+    public void setNext(TextReference next) {
+        this.next = next;
     }
 
     @Override
