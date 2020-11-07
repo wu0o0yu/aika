@@ -607,7 +607,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public boolean hasBranches() {
-        return branches.isEmpty();
+        return !branches.isEmpty();
     }
 
     public Stream<Link> getLinks(Direction dir) {
