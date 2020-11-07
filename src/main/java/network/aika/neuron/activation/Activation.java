@@ -352,6 +352,21 @@ public class Activation implements Comparable<Activation> {
         phase.propagate(this);
     }
 
+    public void propagateIntern() {
+        getThought().processLinks();
+
+        getNeuron().getOutputSynapses()
+                .filter(s -> !outputLinkExists(s))
+                .forEach(s ->
+                        Link.link(
+                                s,
+                                this,
+                                createActivation(s.getOutput()),
+                                false
+                        )
+                );
+    }
+
     public Activation createActivation(Neuron n) {
         Activation act = new Activation(thought.createActivationId(), thought, n);
         act.isQueued = new boolean[1];

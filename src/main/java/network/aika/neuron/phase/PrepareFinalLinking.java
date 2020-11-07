@@ -3,20 +3,21 @@ package network.aika.neuron.phase;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 
-public class Softmax implements Phase {
+public class PrepareFinalLinking implements Phase {
+
     @Override
     public void process(Activation act) {
-        act.computeBranchProbability();
+        act.updateForFinalPhase();
     }
 
     @Override
     public Phase nextPhase() {
-        return COUNTING;
+        return FINAL_LINKING;
     }
 
     @Override
     public boolean isFinal() {
-        return false;
+        return true;
     }
 
     @Override
@@ -31,11 +32,11 @@ public class Softmax implements Phase {
 
     @Override
     public int getRank() {
-        return 3;
+        return 1;
     }
 
     @Override
-    public int compare(Activation act1, Activation act2) {
+    public int compare(Activation o1, Activation o2) {
         return 0;
     }
 }

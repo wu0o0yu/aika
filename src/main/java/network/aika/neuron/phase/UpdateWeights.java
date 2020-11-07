@@ -33,7 +33,7 @@ public class UpdateWeights implements Phase {
 
     @Override
     public int getRank() {
-        return 6;
+        return 7;
     }
 
     @Override

@@ -31,7 +31,7 @@ public class Counting implements Phase {
 
     @Override
     public int getRank() {
-        return 3;
+        return 4;
     }
 
     @Override

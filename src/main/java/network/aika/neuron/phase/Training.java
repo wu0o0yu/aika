@@ -66,7 +66,7 @@ public class Training implements Phase {
 
     @Override
     public int getRank() {
-        return 4;
+        return 5;
     }
 
     @Override

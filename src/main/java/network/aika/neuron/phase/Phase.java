@@ -27,6 +27,7 @@ import java.util.Comparator;
  */
 public interface Phase extends Comparator<Activation> {
     Phase INITIAL_LINKING = new Linking();
+    Phase PREPARE_FINAL_LINKING = new PrepareFinalLinking();
     Phase FINAL_LINKING = new FinalLinking();
     Phase SOFTMAX = new Softmax();
     Phase COUNTING = new Counting();

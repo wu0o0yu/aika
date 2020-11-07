@@ -2,25 +2,26 @@ package network.aika.neuron.phase;
 
 import network.aika.neuron.activation.Activation;
 
-public class FinalLinking extends Linking {
+import static network.aika.neuron.activation.Direction.OUTPUT;
 
-    @Override
-    public void process(Activation act) {
-        act.updateForFinalPhase();
-    }
+public class FinalLinking extends Linking {
 
     @Override
     public Phase nextPhase() {
         return SOFTMAX;
     }
 
-    @Override
     public boolean isFinal() {
         return true;
     }
 
     @Override
+    public void propagate(Activation act) {
+        act.propagateIntern();
+    }
+
+    @Override
     public int getRank() {
-        return 1;
+        return 2;
     }
 }

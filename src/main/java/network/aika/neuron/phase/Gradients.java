@@ -31,7 +31,7 @@ public class Gradients implements Phase {
 
     @Override
     public int getRank() {
-        return 5;
+        return 6;
     }
 
     @Override

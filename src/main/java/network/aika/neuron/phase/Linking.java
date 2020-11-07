@@ -41,7 +41,7 @@ public class Linking implements Phase {
 
     @Override
     public Phase nextPhase() {
-        return FINAL_LINKING;
+        return PREPARE_FINAL_LINKING;
     }
 
     public boolean isFinal() {
@@ -82,18 +82,7 @@ public class Linking implements Phase {
     @Override
     public void propagate(Activation act) {
         act.getModel().linkInputRelations(act, OUTPUT);
-        act.getThought().processLinks();
-
-        act.getNeuron().getOutputSynapses()
-                .filter(s -> !act.outputLinkExists(s))
-                .forEach(s ->
-                        Link.link(
-                                s,
-                                act,
-                                act.createActivation(s.getOutput()),
-                                false
-                        )
-                );
+        act.propagateIntern();
     }
 
     @Override
