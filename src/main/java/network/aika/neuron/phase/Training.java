@@ -30,7 +30,7 @@ public class Training implements Phase {
 
     @Override
     public void process(Activation act) {
-
+        act.train();
     }
 
     @Override

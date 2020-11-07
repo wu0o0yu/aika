@@ -303,12 +303,6 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void train() {
-        if(!isActive()) {
-            return;
-        }
-
-        linkForward();
-
         if(getNeuron().isInputNeuron()) {
             return;
         }
