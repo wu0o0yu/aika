@@ -7,7 +7,6 @@ public class FinalLinking extends Linking {
     @Override
     public void process(Activation act) {
         act.updateForFinalPhase();
-        act.process();
     }
 
     @Override

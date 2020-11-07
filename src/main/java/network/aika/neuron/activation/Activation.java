@@ -40,7 +40,7 @@ public class Activation implements Comparable<Activation> {
     public static double TOLERANCE = 0.001;
 
     private Phase phase = INITIAL_LINKING;
-    private boolean isQueued;
+    private boolean[] isQueued;
 
     private double value;
     private double sum;
@@ -92,6 +92,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void initInput(Reference ref) {
+        isQueued = new boolean[1];
         setReference(ref);
 
         setValue(1.0);
@@ -138,7 +139,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void addToQueue(Phase p) {
-        if(isQueued) {
+        if(isQueued[0]) {
             if(phase.getRank() <= p.getRank()) {
                 return;
             }
@@ -147,22 +148,31 @@ public class Activation implements Comparable<Activation> {
 
         phase = p;
 
-        isQueued = true;
+        setQueued(true);
         thought.addActivationToQueue(this);
     }
 
     public void process() {
-        isQueued = false;
+        setQueued(false);
         phase.process(this);
 
-        if(!isQueued) {
+        if(!isQueued()) {
             addToQueue(phase.nextPhase());
         }
+    }
+
+    public boolean isQueued() {
+        return isQueued[0];
+    }
+
+    private void setQueued(boolean isQueued) {
+        this.isQueued[0] = isQueued;
     }
 
     public Phase getPhase() {
         return phase;
     }
+
 
     public <R extends Reference> R getReference() {
         return (R) reference;
@@ -199,6 +209,7 @@ public class Activation implements Comparable<Activation> {
 
     public Activation createBranch(Synapse excludedSyn) {
         Activation clonedAct = new Activation(thought.createActivationId(), thought, neuron);
+        clonedAct.isQueued = isQueued;
         clonedAct.round = round + 1;
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
@@ -210,6 +221,7 @@ public class Activation implements Comparable<Activation> {
         if (!isFinal) return this;
 
         Activation clonedAct = new Activation(id, thought, neuron);
+        clonedAct.isQueued = isQueued;
         clonedAct.round = round + 1;
         clonedAct.lastRound = this;
         linkClone(clonedAct, excludedSyn);
@@ -341,7 +353,9 @@ public class Activation implements Comparable<Activation> {
     }
 
     public Activation createActivation(Neuron n) {
-        return new Activation(thought.createActivationId(), thought, n);
+        Activation act = new Activation(thought.createActivationId(), thought, n);
+        act.isQueued = new boolean[1];
+        return act;
     }
 
     public Link getInputLink(Synapse s) {
@@ -607,7 +621,8 @@ public class Activation implements Comparable<Activation> {
         return "id:" +
                 getId() +
                 " n:[" + getNeuron() + "]" +
-                " (" + (phase != null ? phase.getClass().getSimpleName() : "X") + ")";
+                " (" + (phase != null ? phase.getClass().getSimpleName() : "X") +
+                (isQueued() ? "+" : "-") + ")";
     }
 
     public String gradientsToString() {

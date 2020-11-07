@@ -180,8 +180,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         this.descriptionLabel = label;
     }
 
-    public Model getModel() {
-        return provider.getModel();
+    public <M extends Model> M getModel() {
+        return (M) provider.getModel();
     }
 
     public long getRetrievalCount() {

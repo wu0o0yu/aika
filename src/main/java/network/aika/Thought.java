@@ -38,7 +38,6 @@ public abstract class Thought {
 
     private final Deque<Link> linkQueue = new ArrayDeque<>();
 
-
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
     private Map<NeuronProvider, SortedSet<Activation>> actsPerNeuron = null;
