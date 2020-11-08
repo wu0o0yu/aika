@@ -26,17 +26,17 @@ import network.aika.neuron.activation.Visitor;
  *
  * @author Lukas Molzberger
  */
-public class Training implements Phase {
+public class Induction implements Phase {
 
 
     @Override
     public void process(Activation act) {
-        act.train();
+        act.updateValueAndPropagate();
     }
 
     @Override
     public Phase nextPhase(Config c) {
-        return GRADIENTS;
+        return FINAL;
     }
 
     @Override
@@ -46,15 +46,27 @@ public class Training implements Phase {
 
     @Override
     public void tryToLink(Activation iAct, Activation oAct, Visitor c) {
+        if(!iAct.isActive() ||
+                oAct.getNeuron().isInputNeuron()) return;
+
+        Neuron n = oAct.getNeuron();
+        Synapse s = n.getInputSynapse(iAct.getNeuronProvider());
+
+        if (s != null) return;
+
+        n.induceSynapse(iAct, oAct, c);
     }
 
     @Override
     public void propagate(Activation act) {
+        if(act.isActive()) {
+            act.getNeuron().induceNeuron(act);
+        }
     }
 
     @Override
     public int getRank() {
-        return 5;
+        return 8;
     }
 
     @Override

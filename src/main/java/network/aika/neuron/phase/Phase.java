@@ -35,6 +35,7 @@ public interface Phase extends Comparator<Activation> {
     Phase TRAINING = new Training();
     Phase GRADIENTS = new Gradients();
     Phase UPDATE_WEIGHTS = new UpdateWeights();
+    Phase INDUCTION = new Induction();
     Phase FINAL = new Final();
 
     void process(Activation act);

@@ -32,7 +32,7 @@ public class Final implements Phase {
 
     @Override
     public int getRank() {
-        return 8;
+        return 9;
     }
 
     @Override
