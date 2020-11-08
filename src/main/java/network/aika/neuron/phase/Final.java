@@ -3,17 +3,15 @@ package network.aika.neuron.phase;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 
-public class UpdateWeights implements Phase {
-
+public class Final implements Phase {
     @Override
     public void process(Activation act) {
-        act.updateSynapseWeights();
-        act.getNeuronProvider().save();
+
     }
 
     @Override
     public Phase nextPhase() {
-        return FINAL;
+        return null;
     }
 
     @Override
@@ -33,11 +31,11 @@ public class UpdateWeights implements Phase {
 
     @Override
     public int getRank() {
-        return 7;
+        return 8;
     }
 
     @Override
-    public int compare(Activation act1, Activation act2) {
+    public int compare(Activation o1, Activation o2) {
         return 0;
     }
 }

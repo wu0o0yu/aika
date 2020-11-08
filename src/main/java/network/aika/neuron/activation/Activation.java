@@ -138,11 +138,19 @@ public class Activation implements Comparable<Activation> {
         return getNeuron().getDescriptionLabel();
     }
 
-    public void addToQueue(Phase p) {
+    public void updateQueue(Activation oldAct) {
         if(isQueued[0]) {
-            if(phase.getRank() <= p.getRank()) {
-                return;
-            }
+            thought.removeActivationFromQueue(oldAct);
+            thought.addActivationToQueue(this);
+        }
+    }
+
+    public void addToQueue(Phase p) {
+        if(p == null) {
+            return;
+        }
+
+        if(isQueued[0] && phase.getRank() <= p.getRank()) {
             thought.removeActivationFromQueue(this);
         }
 
@@ -156,7 +164,7 @@ public class Activation implements Comparable<Activation> {
         setQueued(false);
         phase.process(this);
 
-        if(!isQueued()) {
+        if(isActive() && !isQueued()) {
             addToQueue(phase.nextPhase());
         }
     }
@@ -224,6 +232,7 @@ public class Activation implements Comparable<Activation> {
         clonedAct.isQueued = isQueued;
         clonedAct.round = round + 1;
         clonedAct.lastRound = this;
+        clonedAct.updateQueue(this);
         linkClone(clonedAct, excludedSyn);
 
         return clonedAct;
