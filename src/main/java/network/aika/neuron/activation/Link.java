@@ -259,7 +259,7 @@ public class Link {
     }
 
     public void unlink() {
-        OutputKey ok = new OutputKey(output.getNeuronProvider(), output.getId());
+        OutputKey ok = output.getOutputKey();
         input.outputLinks.remove(ok, this);
     }
 

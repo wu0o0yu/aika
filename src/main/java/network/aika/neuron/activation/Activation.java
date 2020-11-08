@@ -133,6 +133,10 @@ public class Activation implements Comparable<Activation> {
         return thought;
     }
 
+    public OutputKey getOutputKey() {
+        return new OutputKey(getNeuronProvider(), getId());
+    }
+
     public String getDescriptionLabel() {
         return getNeuron().getDescriptionLabel();
     }
@@ -185,13 +189,13 @@ public class Activation implements Comparable<Activation> {
         return (R) reference;
     }
 
+    public void setReference(Reference ref) {
+        this.reference = ref;
+    }
+
     public void propagateReference(Reference ref) {
         setReference(ref);
         getModel().linkInputRelations(this, INPUT);
-    }
-
-    public void setReference(Reference ref) {
-        this.reference = ref;
     }
 
     public Activation getLastRound() {
@@ -382,7 +386,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public boolean outputLinkExists(Activation oAct) {
-        return outputLinks.containsKey(oAct);
+        return outputLinks.containsKey(oAct.getOutputKey());
     }
 
     public boolean outputLinkExists(Synapse s) {
