@@ -264,8 +264,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract InhibitorySynapse induceOutgoingInhibitorySynapse(InhibitoryNeuron outN);
 
-    public static boolean ADJUST_GRADIENT = false;
-
     public double getSurprisal(Sign s) {
         double p = getP(s, instances.getN());
         return -Math.log(p);

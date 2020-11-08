@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.phase;
 
+import network.aika.Config;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -34,7 +35,7 @@ public class Training implements Phase {
     }
 
     @Override
-    public Phase nextPhase() {
+    public Phase nextPhase(Config c) {
         return GRADIENTS;
     }
 

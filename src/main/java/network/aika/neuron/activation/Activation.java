@@ -25,7 +25,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.Neuron.ADJUST_GRADIENT;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
@@ -165,7 +164,7 @@ public class Activation implements Comparable<Activation> {
         phase.process(this);
 
         if(isActive() && !isQueued()) {
-            addToQueue(phase.nextPhase());
+            addToQueue(phase.nextPhase(getConfig()));
         }
     }
 
@@ -316,15 +315,13 @@ public class Activation implements Comparable<Activation> {
             return;
         }
 
-        if(!ADJUST_GRADIENT) return;
-
         initSelfGradient();
         computeInitialLinkGradients();
         updateSelfGradient();
     }
 
     public void linkForward() {
-        if (lastRound == null || getPhase() == INDUCTION) {
+        if (lastRound == null || getPhase() == TRAINING) {
             propagate();
         } else {
             updateOutgoingLinks();

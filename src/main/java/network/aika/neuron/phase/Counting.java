@@ -1,5 +1,6 @@
 package network.aika.neuron.phase;
 
+import network.aika.Config;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 
@@ -10,8 +11,8 @@ public class Counting implements Phase {
     }
 
     @Override
-    public Phase nextPhase() {
-        return INDUCTION;
+    public Phase nextPhase(Config c) {
+        return c.isEnableTraining() ? TRAINING : FINAL;
     }
 
     @Override

@@ -152,7 +152,6 @@ public class DerDieDasTest {
             }
 
             if(i == 110) {
-                Neuron.ADJUST_GRADIENT = true;
                 System.out.println(charBasedTrainings.getModel().statToString());
             }
 

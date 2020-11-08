@@ -1,5 +1,6 @@
 package network.aika.neuron.phase;
 
+import network.aika.Config;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 
@@ -11,7 +12,7 @@ public class PrepareFinalLinking implements Phase {
     }
 
     @Override
-    public Phase nextPhase() {
+    public Phase nextPhase(Config c) {
         return FINAL_LINKING;
     }
 

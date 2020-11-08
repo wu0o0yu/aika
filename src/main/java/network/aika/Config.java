@@ -26,6 +26,7 @@ public class Config {
     private Double alpha = null; //0.99;
     private double learnRate;
 
+    public boolean enableTraining;
     public boolean enableInduction;
     private double surprisalInductionThreshold = 2.0;
     private double gradientInductionThreshold = 2.0;
@@ -45,6 +46,15 @@ public class Config {
 
     public Config setAlpha(Double alpha) {
         this.alpha = alpha;
+        return this;
+    }
+
+    public boolean isEnableTraining() {
+        return enableTraining;
+    }
+
+    public Config setEnableTraining(boolean enableTraining) {
+        this.enableTraining = enableTraining;
         return this;
     }
 

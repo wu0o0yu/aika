@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.phase;
 
+import network.aika.Config;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 
@@ -31,14 +32,14 @@ public interface Phase extends Comparator<Activation> {
     Phase FINAL_LINKING = new FinalLinking();
     Phase SOFTMAX = new Softmax();
     Phase COUNTING = new Counting();
-    Phase INDUCTION = new Training();
+    Phase TRAINING = new Training();
     Phase GRADIENTS = new Gradients();
     Phase UPDATE_WEIGHTS = new UpdateWeights();
     Phase FINAL = new Final();
 
     void process(Activation act);
 
-    Phase nextPhase();
+    Phase nextPhase(Config c);
 
     boolean isFinal();
 

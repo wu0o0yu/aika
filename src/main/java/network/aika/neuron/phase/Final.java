@@ -1,5 +1,6 @@
 package network.aika.neuron.phase;
 
+import network.aika.Config;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 
@@ -10,7 +11,7 @@ public class Final implements Phase {
     }
 
     @Override
-    public Phase nextPhase() {
+    public Phase nextPhase(Config c) {
         return null;
     }
 
