@@ -39,7 +39,7 @@ public class Activation implements Comparable<Activation> {
     public static double TOLERANCE = 0.001;
 
     private Phase phase = INITIAL_LINKING;
-    private boolean[] isQueued;
+    private QueueState queueState;
 
     private double value;
     private double sum;
@@ -90,8 +90,13 @@ public class Activation implements Comparable<Activation> {
         outputLinks = new TreeMap<>();
     }
 
+    public void setPhase(Phase p) {
+        phase = p;
+    }
+
     public void initInput(Reference ref) {
-        isQueued = new boolean[1];
+        queueState = new QueueState(this);
+
         setReference(ref);
 
         setValue(1.0);
@@ -99,6 +104,8 @@ public class Activation implements Comparable<Activation> {
 
         isFinal = true;
         addToQueue(INITIAL_LINKING);
+
+        queueState.process();
     }
 
     public int getId() {
@@ -141,44 +148,22 @@ public class Activation implements Comparable<Activation> {
         return getNeuron().getDescriptionLabel();
     }
 
-    public void updateQueue(Activation oldAct) {
-        if(isQueued[0]) {
-            thought.removeActivationFromQueue(oldAct);
-            thought.addActivationToQueue(this);
-        }
-    }
-
     public void addToQueue(Phase p) {
         if(p == null) {
             return;
         }
 
-        if(isQueued[0] && phase.getRank() <= p.getRank()) {
-            thought.removeActivationFromQueue(this);
-        }
-
-        phase = p;
-
-        setQueued(true);
-        thought.addActivationToQueue(this);
+        queueState.addPhase(this, p);
     }
 
     public void process() {
-        setQueued(false);
         phase.process(this);
 
-        if(isActive() && !isQueued()) {
-            addToQueue(phase.nextPhase(getConfig()));
+        if(isActive()) {
+            queueState.process();
         }
     }
 
-    public boolean isQueued() {
-        return isQueued[0];
-    }
-
-    private void setQueued(boolean isQueued) {
-        this.isQueued[0] = isQueued;
-    }
 
     public Phase getPhase() {
         return phase;
@@ -211,7 +196,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public Config getConfig() {
-        return getThought().getTrainingConfig();
+        return getThought().getConfig();
     }
 
     public NeuronProvider getNeuronProvider() {
@@ -220,7 +205,7 @@ public class Activation implements Comparable<Activation> {
 
     public Activation createBranch(Synapse excludedSyn) {
         Activation clonedAct = new Activation(thought.createActivationId(), thought, neuron);
-        clonedAct.isQueued = isQueued;
+        clonedAct.queueState = queueState.copy(clonedAct);
         clonedAct.round = round + 1;
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
@@ -232,10 +217,10 @@ public class Activation implements Comparable<Activation> {
         if (!isFinal) return this;
 
         Activation clonedAct = new Activation(id, thought, neuron);
-        clonedAct.isQueued = isQueued;
+        queueState.setActToQueue(clonedAct);
+        clonedAct.queueState = queueState;
         clonedAct.round = round + 1;
         clonedAct.lastRound = this;
-        clonedAct.updateQueue(this);
         linkClone(clonedAct, excludedSyn);
 
         return clonedAct;
@@ -373,7 +358,7 @@ public class Activation implements Comparable<Activation> {
 
     public Activation createActivation(Neuron n) {
         Activation act = new Activation(thought.createActivationId(), thought, n);
-        act.isQueued = new boolean[1];
+        act.queueState = new QueueState(act);
         return act;
     }
 
@@ -574,8 +559,6 @@ public class Activation implements Comparable<Activation> {
 
         Activation cAct = getModifiable(null);
         cAct.branchProbability = p;
-
-        thought.addActivationToQueue(cAct); // Linking
     }
 
     public void count() {
@@ -640,8 +623,7 @@ public class Activation implements Comparable<Activation> {
         return "id:" +
                 getId() +
                 " n:[" + getNeuron() + "]" +
-                " (" + (phase != null ? phase.getClass().getSimpleName() : "X") +
-                (isQueued() ? "+" : "-") + ")";
+                " (" + (phase != null ? phase.getClass().getSimpleName() : "X") + ")";
     }
 
     public String gradientsToString() {
