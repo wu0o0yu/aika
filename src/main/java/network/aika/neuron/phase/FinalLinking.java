@@ -7,11 +7,6 @@ import static network.aika.neuron.activation.Direction.OUTPUT;
 
 public class FinalLinking extends Linking {
 
-    @Override
-    public Phase nextPhase(Config c) {
-        return SOFTMAX;
-    }
-
     public boolean isFinal() {
         return true;
     }

@@ -11,11 +11,6 @@ public class Final implements Phase {
     }
 
     @Override
-    public Phase nextPhase(Config c) {
-        return null;
-    }
-
-    @Override
     public boolean isFinal() {
         return false;
     }

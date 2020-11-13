@@ -11,11 +11,6 @@ public class Softmax implements Phase {
     }
 
     @Override
-    public Phase nextPhase(Config c) {
-        return COUNTING;
-    }
-
-    @Override
     public boolean isFinal() {
         return false;
     }

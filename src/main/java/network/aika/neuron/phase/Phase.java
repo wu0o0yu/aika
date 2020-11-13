@@ -40,8 +40,6 @@ public interface Phase extends Comparator<Activation> {
 
     void process(Activation act);
 
-    Phase nextPhase(Config c);
-
     boolean isFinal();
 
     void tryToLink(Activation iAct, Activation oAct, Visitor c);

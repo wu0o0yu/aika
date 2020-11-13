@@ -1,12 +1,14 @@
 package network;
 
-import network.aika.Config;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.phase.Phase;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
+
+import static network.aika.neuron.phase.Phase.*;
 
 public class SimplePhraseTest {
 
@@ -42,7 +44,18 @@ public class SimplePhraseTest {
             inductionModel.initToken(doc);
 
             if(k > 100) {
-                doc.getTrainingConfig().setEnableTraining(true);
+                doc.setConfig(doc.getConfig().setPhases(
+                        INITIAL_LINKING,
+                        PREPARE_FINAL_LINKING,
+                        FINAL_LINKING,
+                        SOFTMAX,
+                        COUNTING,
+                        TRAINING,
+                        GRADIENTS,
+                        UPDATE_WEIGHTS,
+                        INDUCTION,
+                        FINAL
+                ));
             }
 
             doc.process(model);

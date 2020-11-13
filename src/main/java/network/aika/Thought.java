@@ -61,10 +61,6 @@ public abstract class Thought {
         activationsQueue.add(act);
     }
 
-    public void removeActivationFromQueue(Activation act) {
-        activationsQueue.remove(act);
-    }
-
     public abstract void linkInputRelations(Activation act);
 
     public void addLinkToQueue(Link l) {
@@ -88,11 +84,11 @@ public abstract class Thought {
         }
     }
 
-    public Config getTrainingConfig() {
+    public Config getConfig() {
         return trainingConfig;
     }
 
-    public void setTrainingConfig(Config trainingConfig) {
+    public void setConfig(Config trainingConfig) {
         this.trainingConfig = trainingConfig;
     }
 

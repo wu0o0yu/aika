@@ -11,11 +11,6 @@ public class Counting implements Phase {
     }
 
     @Override
-    public Phase nextPhase(Config c) {
-        return c.isEnableTraining() ? TRAINING : FINAL;
-    }
-
-    @Override
     public boolean isFinal() {
         return false;
     }

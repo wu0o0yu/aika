@@ -35,11 +35,6 @@ public class Induction implements Phase {
     }
 
     @Override
-    public Phase nextPhase(Config c) {
-        return FINAL;
-    }
-
-    @Override
     public boolean isFinal() {
         return true;
     }

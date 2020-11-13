@@ -127,7 +127,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     public void induceNeuron(Activation act) {
         double s = getSurprisal(POS);
 
-        Config c = act.getThought().getTrainingConfig();
+        Config c = act.getThought().getConfig();
 
         if(s < c.getSurprisalInductionThreshold()) {
 //            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");

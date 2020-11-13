@@ -40,11 +40,6 @@ public class Linking implements Phase {
         act.updateValueAndPropagate();
     }
 
-    @Override
-    public Phase nextPhase(Config c) {
-        return PREPARE_FINAL_LINKING;
-    }
-
     public boolean isFinal() {
         return false;
     }

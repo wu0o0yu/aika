@@ -12,11 +12,6 @@ public class PrepareFinalLinking implements Phase {
     }
 
     @Override
-    public Phase nextPhase(Config c) {
-        return FINAL_LINKING;
-    }
-
-    @Override
     public boolean isFinal() {
         return true;
     }

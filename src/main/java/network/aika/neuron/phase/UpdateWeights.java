@@ -13,11 +13,6 @@ public class UpdateWeights implements Phase {
     }
 
     @Override
-    public Phase nextPhase(Config c) {
-        return c.isEnableInduction() ? INDUCTION : FINAL;
-    }
-
-    @Override
     public boolean isFinal() {
         return false;
     }

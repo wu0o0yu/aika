@@ -19,6 +19,11 @@ package network.aika;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.phase.Phase;
+
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static network.aika.neuron.Sign.POS;
 
@@ -26,10 +31,21 @@ public class Config {
     private Double alpha = null; //0.99;
     private double learnRate;
 
-    public boolean enableTraining;
-    public boolean enableInduction;
+    private Set<Phase> phases = new TreeSet<>(Comparator.comparing(p -> p.getRank()));
+
     private double surprisalInductionThreshold = 2.0;
     private double gradientInductionThreshold = 2.0;
+
+    public Set<Phase> getPhases() {
+        return phases;
+    }
+
+    public Config setPhases(Phase... phases) {
+        for(Phase p: phases) {
+            this.phases.add(p);
+        }
+        return this;
+    }
 
     public double getLearnRate() {
         return learnRate;
@@ -46,24 +62,6 @@ public class Config {
 
     public Config setAlpha(Double alpha) {
         this.alpha = alpha;
-        return this;
-    }
-
-    public boolean isEnableTraining() {
-        return enableTraining;
-    }
-
-    public Config setEnableTraining(boolean enableTraining) {
-        this.enableTraining = enableTraining;
-        return this;
-    }
-
-    public boolean isEnableInduction() {
-        return enableInduction;
-    }
-
-    public Config setEnableInduction(boolean enableInduction) {
-        this.enableInduction = enableInduction;
         return this;
     }
 
@@ -105,7 +103,7 @@ public class Config {
     }
 
     public boolean checkSynapseInduction(Link l) {
-        Config c = l.getOutput().getThought().getTrainingConfig();
+        Config c = l.getOutput().getThought().getConfig();
 
         return (l.getFinalGradient() - l.getOutput().getSelfGradient()) > -c.getSurprisalInductionThreshold();
     }

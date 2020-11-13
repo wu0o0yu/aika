@@ -11,11 +11,6 @@ public class Gradients implements Phase {
     }
 
     @Override
-    public Phase nextPhase(Config c) {
-        return UPDATE_WEIGHTS;
-    }
-
-    @Override
     public boolean isFinal() {
         return false;
     }

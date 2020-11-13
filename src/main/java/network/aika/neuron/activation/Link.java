@@ -171,7 +171,7 @@ public class Link {
 
         boolean causal = isCausal();
         double x = getInputValue();
-        double learnRate = t.getTrainingConfig().getLearnRate();
+        double learnRate = t.getConfig().getLearnRate();
 
         double posWDelta = learnRate * x * finalGradient;
         double negWDelta = learnRate * (1.0 - x) * finalGradient;

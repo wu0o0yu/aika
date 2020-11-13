@@ -11,6 +11,9 @@ import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
 
+import static network.aika.neuron.phase.Phase.*;
+import static network.aika.neuron.phase.Phase.FINAL;
+
 public class ManuelInductionModel {
 
     public TextModel model;
@@ -24,7 +27,7 @@ public class ManuelInductionModel {
     }
 
     public void initToken(Document doc) {
-        doc.setTrainingConfig(new Config() {
+        doc.setConfig(new Config() {
 
                     public boolean checkPatternPartNeuronInduction(Neuron n) {
                         return n.isInputNeuron();
@@ -51,7 +54,7 @@ public class ManuelInductionModel {
                     public String getLabel(Activation iAct, Neuron n) {
                         if(n instanceof PatternPartNeuron) {
                             return "TP-" + trimPrefix(iAct.getDescriptionLabel());
-                        } else if(n instanceof PatternNeuron) {
+                        } else if (n instanceof PatternNeuron) {
                             return "P-" + doc.getContent();
                         } else {
                             return "I-" + trimPrefix(iAct.getDescriptionLabel());
@@ -60,9 +63,16 @@ public class ManuelInductionModel {
                 }
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
-                        .setEnableInduction(true)
                         .setSurprisalInductionThreshold(0.0)
                         .setGradientInductionThreshold(0.0)
+                        .setPhases(
+                                INITIAL_LINKING,
+                                PREPARE_FINAL_LINKING,
+                                FINAL_LINKING,
+                                SOFTMAX,
+                                COUNTING,
+                                FINAL
+                        )
         );
 
         int i = 0;

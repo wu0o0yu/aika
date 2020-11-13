@@ -35,11 +35,6 @@ public class Training implements Phase {
     }
 
     @Override
-    public Phase nextPhase(Config c) {
-        return GRADIENTS;
-    }
-
-    @Override
     public boolean isFinal() {
         return true;
     }
