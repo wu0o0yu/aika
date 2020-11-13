@@ -103,9 +103,7 @@ public class Activation implements Comparable<Activation> {
         setFired(ref.getBegin());
 
         isFinal = true;
-        addToQueue(INITIAL_LINKING);
-
-        queueState.process();
+        addToQueue(INITIAL_LINKING, true);
     }
 
     public int getId() {
@@ -148,12 +146,15 @@ public class Activation implements Comparable<Activation> {
         return getNeuron().getDescriptionLabel();
     }
 
-    public void addToQueue(Phase p) {
+    public void addToQueue(Phase p, boolean tq) {
         if(p == null) {
             return;
         }
 
         queueState.addPhase(this, p);
+        if(tq) {
+            queueState.process();
+        }
     }
 
     public void process() {
@@ -436,14 +437,14 @@ public class Activation implements Comparable<Activation> {
         double finalValue = computeValue(FINAL_LINKING);
 
         if (Math.abs(finalValue - initialValue) > TOLERANCE) {
-            getModifiable(null).addToQueue(FINAL_LINKING);
+            getModifiable(null).addToQueue(FINAL_LINKING, false);
         }
     }
 
     private void checkIfFired() {
         if (fired == NOT_FIRED && getNet() > 0.0) {
             fired = neuron.incrementFired(getLatestFired());
-            addToQueue(getPhase());
+            addToQueue(getPhase(), true);
         }
     }
 
@@ -520,7 +521,7 @@ public class Activation implements Comparable<Activation> {
     public void propagateGradient(double g) {
         unpropagatedGradient += g;
 
-        addToQueue(GRADIENTS);
+        addToQueue(GRADIENTS, true);
     }
 
     public void unlink() {
