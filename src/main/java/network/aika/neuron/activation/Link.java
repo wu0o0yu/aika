@@ -78,8 +78,7 @@ public class Link {
         output.marked = true;
 
         Visitor v = new Visitor(output, INPUT);
-        v = synapse.transition(v);
-        v.follow(input);
+        synapse.transition(v, input);
 
         output.marked = false;
     }

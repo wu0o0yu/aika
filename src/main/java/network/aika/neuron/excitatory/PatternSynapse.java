@@ -1,6 +1,7 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 
 public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, PatternNeuron> {
@@ -21,11 +22,11 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
     }
 
     @Override
-    public Visitor transition(Visitor v) {
+    public void transition(Visitor v, Activation nextAct) {
         Visitor nv = v.prepareNextStep();
         nv.incrementPathLength();
 
-        return nv;
+        nv.follow(nextAct);;
     }
 
     @Override

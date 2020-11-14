@@ -28,6 +28,7 @@ import org.apache.commons.math3.distribution.BetaDistribution;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.List;
 
 import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
@@ -63,7 +64,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract boolean inductionRequired(Class<? extends Neuron> type);
 
-    public abstract Visitor transition(Visitor v);
+    public abstract void transition(Visitor v, Activation nextAct);
 
     public Reference getReference(Link l) {
         return l.getInput().getReference();

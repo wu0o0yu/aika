@@ -99,12 +99,8 @@ public class Visitor {
         current = act;
         transition = ACT;
 
-        Visitor v = act.getNeuron()
-                .transition(this);
-
-        if(v != null) {
-            v.followLinks(act);
-        }
+        act.getNeuron()
+                .transition(this, act);
     }
 
     public void followLinks(Activation act) {
@@ -124,14 +120,12 @@ public class Visitor {
             s = s.collect(Collectors.toList()).stream();
         }
 
-        s.forEach(l -> {
-                    Activation nextAct = l.getActivation(downUpDir);
-                    Visitor v = l.getSynapse()
-                            .transition(this);
-                    if(v != null) {
-                        v.follow(nextAct);
-                    }
-                }
+        s.forEach(l ->
+                l.getSynapse()
+                        .transition(
+                                this,
+                                l.getActivation(downUpDir)
+                        )
         );
         act.marked = false;
     }

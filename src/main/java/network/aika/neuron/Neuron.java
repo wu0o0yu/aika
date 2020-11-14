@@ -84,7 +84,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract Fired incrementFired(Fired f);
 
-    public abstract Visitor transition(Visitor v);
+    public abstract void transition(Visitor v, Activation act);
 
     public abstract byte getType();
 
