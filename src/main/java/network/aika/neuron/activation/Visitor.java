@@ -151,7 +151,7 @@ public class Visitor {
         }
 
         sb.append("Origin:" + origin.getShortString() + ", ");
-        sb.append("Current:" + current.getShortString() + ", ");
+        sb.append("Current:" + (current != null ? current.getShortString() : "X") + ", ");
 
         sb.append("DownUp:" + downUpDir + ", ");
         sb.append("StartDir:" + startDir + ", ");

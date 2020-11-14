@@ -79,10 +79,13 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         nv.incrementPathLength();
 
         // check related change
-        if (v.downUpDir == v.startDir && v.scope == INPUT && isInputScope() && !v.related) {
+        if (v.scope == INPUT && isInputScope() && !v.related) {
             nv.related = true;
             nv.follow(nextAct);
-            return;
+
+            if(v.downUpDir == INPUT) {
+                return;
+            }
         }
 
         if(v.samePattern && isInputScope()) {
