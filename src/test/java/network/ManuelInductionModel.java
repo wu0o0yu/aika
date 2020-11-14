@@ -4,6 +4,7 @@ import network.aika.Config;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
@@ -63,7 +64,10 @@ public class ManuelInductionModel {
                         return true;
                     }
 
-                    public boolean checkSynapseInduction(Link l) {
+                    public boolean checkSynapseInduction(Link l, Visitor v) {
+                        System.out.println(v);
+                        System.out.println();
+
                         Neuron outN = l.getOutput().getNeuron();
                         Neuron inN = l.getInput().getNeuron();
                         if(outN instanceof InhibitoryNeuron) {

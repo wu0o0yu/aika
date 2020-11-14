@@ -75,7 +75,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
 
     @Override
     public Visitor transition(Visitor v) {
-        Visitor nv = v.copy();
+        Visitor nv = v.prepareNextStep();
         nv.incrementPathLength();
 
         // check related change

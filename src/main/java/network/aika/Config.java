@@ -19,6 +19,7 @@ package network.aika;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.phase.Phase;
 
 import java.util.Comparator;
@@ -102,7 +103,7 @@ public class Config {
         return s < getGradientInductionThreshold();
     }
 
-    public boolean checkSynapseInduction(Link l) {
+    public boolean checkSynapseInduction(Link l, Visitor v) {
         Config c = l.getOutput().getThought().getConfig();
 
         return (l.getFinalGradient() - l.getOutput().getSelfGradient()) > -c.getSurprisalInductionThreshold();

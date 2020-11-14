@@ -16,12 +16,12 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.Neuron;
-
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Direction.*;
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
+import static network.aika.neuron.activation.Visitor.Transition.LINK;
 
 /**
  *
@@ -29,6 +29,14 @@ import static network.aika.neuron.activation.Direction.*;
  */
 public class Visitor {
     public Activation origin;
+    public Activation current; // Just debug code
+    public Transition transition; // Just debug code
+    public Visitor previousStep;
+
+    enum Transition {  // Just debug code
+        ACT,
+        LINK
+    }
 
     public Direction downUpDir = INPUT;
     public Direction startDir;
@@ -44,19 +52,22 @@ public class Visitor {
 
     public Visitor(Activation origin, Direction startDir) {
         this.origin = origin;
+        this.current = origin;
         this.startDir = startDir;
     }
 
-    public Visitor(Activation origin, Direction scope, Direction startDir, Direction downUpDir, boolean related) {
+    public Visitor(Activation origin, Activation current, Direction scope, Direction startDir, Direction downUpDir, boolean related) {
         this.origin = origin;
+        this.current = current;
         this.startDir = startDir;
         this.downUpDir = downUpDir;
         this.scope = scope;
         this.related = related;
     }
 
-    public Visitor copy() {
+    public Visitor prepareNextStep() {
         Visitor nv = new Visitor();
+        nv.previousStep = this;
         nv.origin = origin;
         nv.downUpDir = downUpDir;
         nv.startDir = startDir;
@@ -85,6 +96,9 @@ public class Visitor {
     }
 
     public void follow(Activation act) {
+        current = act;
+        transition = ACT;
+
         Visitor v = act.getNeuron()
                 .transition(this);
 
@@ -94,6 +108,9 @@ public class Visitor {
     }
 
     public void followLinks(Activation act) {
+        current = act;
+        transition = LINK;
+
         if (downUpDir == OUTPUT && numSteps() >= 1) {
             tryToLink(act);
 //            return;
@@ -130,5 +147,28 @@ public class Visitor {
         if (!oAct.getNeuron().isInputNeuron()) {
             iAct.getPhase().tryToLink(iAct, oAct, this);
         }
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        if(previousStep != null) {
+            sb.append(previousStep + "\n");
+        }
+
+        sb.append("Origin:" + origin.getShortString() + ", ");
+        sb.append("Current:" + current.getShortString() + ", ");
+
+        sb.append("DownUp:" + downUpDir + ", ");
+        sb.append("StartDir:" + startDir + ", ");
+
+        sb.append("Related:" + related + ", ");
+        sb.append("Scope:" + scope + ", ");
+        sb.append("SamePattern:" + samePattern + ", ");
+
+        sb.append("DownSteps:" + downSteps + ", ");
+        sb.append("UpSteps:" + upSteps + "");
+
+        return sb.toString();
     }
 }

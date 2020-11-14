@@ -40,7 +40,7 @@ public class Induction implements Phase {
     }
 
     @Override
-    public void tryToLink(Activation iAct, Activation oAct, Visitor c) {
+    public void tryToLink(Activation iAct, Activation oAct, Visitor v) {
         if(!iAct.isActive() ||
                 oAct.getNeuron().isInputNeuron()) return;
 
@@ -49,7 +49,7 @@ public class Induction implements Phase {
 
         if (s != null) return;
 
-        n.induceSynapse(iAct, oAct, c);
+        n.induceSynapse(iAct, oAct, v);
     }
 
     @Override

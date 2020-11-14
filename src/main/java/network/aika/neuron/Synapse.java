@@ -241,7 +241,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         l.updateSelfGradient();
 
-        if (!oAct.getConfig().checkSynapseInduction(l)) {
+        if (!oAct.getConfig().checkSynapseInduction(l, v)) {
             return null;
         }
 
