@@ -10,6 +10,7 @@ public class QueueState {
 
     private TreeSet<Phase> pendingPhases = new TreeSet<>(Comparator.comparing(p -> p.getRank()));;
     private Activation actToQueue;
+    private Activation queuedAct;
 
     private QueueState() {
     }
@@ -26,16 +27,26 @@ public class QueueState {
     public void addPhase(Activation act, Phase p) {
         actToQueue = act;
         pendingPhases.add(p);
+
+        updateThoughtQueue();
     }
 
-    public void process() {
-        Phase nextPhase = pendingPhases.pollFirst();
-        if(nextPhase == null) {
+    public void updateThoughtQueue() {
+        if(pendingPhases.isEmpty())
             return;
-        }
 
-        actToQueue.setPhase(nextPhase);
-        actToQueue.getThought().addActivationToQueue(actToQueue);
+        Thought t = actToQueue.getThought();
+        if(queuedAct != null) {
+            t.removeActivationFromQueue(queuedAct);
+        }
+        actToQueue.setPhase(pendingPhases.first());
+        t.addActivationToQueue(actToQueue);
+        queuedAct = actToQueue;
+    }
+
+    public void removePendingPhase() {
+        queuedAct = null;
+        pendingPhases.pollFirst();
     }
 
     public QueueState copy(Activation newAct) {

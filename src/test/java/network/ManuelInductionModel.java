@@ -7,6 +7,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.phase.Phase;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
@@ -26,7 +27,28 @@ public class ManuelInductionModel {
         return l.substring(l.indexOf("-") + 1);
     }
 
-    public void initToken(Document doc) {
+    public void initToken(Document doc, boolean activateInduction) {
+        Phase[] phaseswT = new Phase[]{
+                INITIAL_LINKING,
+                PREPARE_FINAL_LINKING,
+                FINAL_LINKING,
+                SOFTMAX,
+                COUNTING,
+                TRAINING,
+                GRADIENTS,
+                UPDATE_WEIGHTS,
+                INDUCTION,
+                FINAL
+        };
+        Phase[] phaseswoT = new Phase[]{
+                INITIAL_LINKING,
+                PREPARE_FINAL_LINKING,
+                FINAL_LINKING,
+                SOFTMAX,
+                COUNTING,
+                FINAL
+        };
+
         doc.setConfig(new Config() {
 
                     public boolean checkPatternPartNeuronInduction(Neuron n) {
@@ -65,14 +87,7 @@ public class ManuelInductionModel {
                         .setLearnRate(-0.1)
                         .setSurprisalInductionThreshold(0.0)
                         .setGradientInductionThreshold(0.0)
-                        .setPhases(
-                                INITIAL_LINKING,
-                                PREPARE_FINAL_LINKING,
-                                FINAL_LINKING,
-                                SOFTMAX,
-                                COUNTING,
-                                FINAL
-                        )
+                        .setPhases(activateInduction ? phaseswT : phaseswoT)
         );
 
         int i = 0;

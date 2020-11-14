@@ -103,7 +103,7 @@ public class Activation implements Comparable<Activation> {
         setFired(ref.getBegin());
 
         isFinal = true;
-        addToQueue(INITIAL_LINKING, true);
+        addToQueue(INITIAL_LINKING);
     }
 
     public int getId() {
@@ -146,30 +146,17 @@ public class Activation implements Comparable<Activation> {
         return getNeuron().getDescriptionLabel();
     }
 
-    public void addToQueue(Phase p, boolean tq) {
+    public void addToQueue(Phase p) {
         if(p == null) {
             return;
         }
 
         queueState.addPhase(this, p);
-        if(tq) {
-            queueState.process();
-        }
     }
-
-    public void process() {
-        phase.process(this);
-
-        if(isActive()) {
-            queueState.process();
-        }
-    }
-
 
     public Phase getPhase() {
         return phase;
     }
-
 
     public <R extends Reference> R getReference() {
         return (R) reference;
@@ -198,6 +185,16 @@ public class Activation implements Comparable<Activation> {
 
     public Config getConfig() {
         return getThought().getConfig();
+    }
+
+    public void process() {
+        queueState.removePendingPhase();
+
+        phase.process(this);
+
+        if(isActive()) {
+            queueState.updateThoughtQueue();
+        }
     }
 
     public NeuronProvider getNeuronProvider() {
@@ -437,14 +434,14 @@ public class Activation implements Comparable<Activation> {
         double finalValue = computeValue(FINAL_LINKING);
 
         if (Math.abs(finalValue - initialValue) > TOLERANCE) {
-            getModifiable(null).addToQueue(FINAL_LINKING, false);
+            getModifiable(null).addToQueue(FINAL_LINKING);
         }
     }
 
     private void checkIfFired() {
         if (fired == NOT_FIRED && getNet() > 0.0) {
             fired = neuron.incrementFired(getLatestFired());
-            addToQueue(getPhase(), true);
+            addToQueue(getPhase());
         }
     }
 
@@ -521,7 +518,7 @@ public class Activation implements Comparable<Activation> {
     public void propagateGradient(double g) {
         unpropagatedGradient += g;
 
-        addToQueue(GRADIENTS, true);
+        addToQueue(GRADIENTS);
     }
 
     public void unlink() {

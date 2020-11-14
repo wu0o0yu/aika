@@ -61,6 +61,10 @@ public abstract class Thought {
         activationsQueue.add(act);
     }
 
+    public void removeActivationFromQueue(Activation act) {
+        activationsQueue.remove(act);
+    }
+
     public abstract void linkInputRelations(Activation act);
 
     public void addLinkToQueue(Link l) {

@@ -40,23 +40,7 @@ public class SimplePhraseTest {
             Neuron.debugOutput = phrase.equalsIgnoreCase("der Hund");
 
             Document doc = new Document(phrase);
-
-            inductionModel.initToken(doc);
-
-            if(k > 100) {
-                doc.setConfig(doc.getConfig().setPhases(
-                        INITIAL_LINKING,
-                        PREPARE_FINAL_LINKING,
-                        FINAL_LINKING,
-                        SOFTMAX,
-                        COUNTING,
-                        TRAINING,
-                        GRADIENTS,
-                        UPDATE_WEIGHTS,
-                        INDUCTION,
-                        FINAL
-                ));
-            }
+            inductionModel.initToken(doc, k > 100);
 
             doc.process(model);
 
