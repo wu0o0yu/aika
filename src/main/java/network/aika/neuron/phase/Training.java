@@ -31,6 +31,10 @@ public class Training implements Phase {
 
     @Override
     public void process(Activation act) {
+        if(act.getNeuron().isInputNeuron()) {
+            return;
+        }
+
         act.train();
     }
 

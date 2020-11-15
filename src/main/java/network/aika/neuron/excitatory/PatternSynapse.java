@@ -21,6 +21,14 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
         return false;
     }
 
+    public Activation getOutputActivationToLink(Activation oAct, Visitor v) {
+        if (getOutput().isInputNeuron()) {
+            return null;
+        }
+
+        return oAct;
+    }
+
     @Override
     public void transition(Visitor v, Activation nextAct) {
         Visitor nv = v.prepareNextStep();

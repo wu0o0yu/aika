@@ -20,6 +20,8 @@ import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 
+import static network.aika.neuron.activation.Direction.INPUT;
+
 /**
  *
  * @author Lukas Molzberger
@@ -46,6 +48,11 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         return type;
     }
 
+    @Override
+    public Activation getOutputActivationToLink(Activation oAct, Visitor v) {
+        return oAct;
+    }
+
     public void setWeight(double weight) {
         super.setWeight(weight);
         input.getNeuron().setModified(true);
@@ -57,6 +64,10 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     }
 
     public void transition(Visitor v, Activation nextAct) {
+        if(v.downUpDir == INPUT && v.origin.getNeuron() == getOutput()) {
+            return;
+        }
+
         Visitor nv = v.prepareNextStep();
         nv.incrementPathLength();
         nv.follow(nextAct);;

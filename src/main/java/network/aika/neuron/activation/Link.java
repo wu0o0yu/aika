@@ -71,10 +71,6 @@ public class Link {
     }
 
     public void propagate() {
-        if (output.getNeuron().isInputNeuron()) {
-            return;
-        }
-
         output.marked = true;
 
         Visitor v = new Visitor(output, INPUT);

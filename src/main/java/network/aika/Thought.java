@@ -162,10 +162,6 @@ public abstract class Thought {
                 continue;
             }
 */
-            if(act.getNeuron().isInputNeuron()) {
-                continue;
-            }
-
             sb.append(act.toString(includeLink));
             sb.append("\n");
         }

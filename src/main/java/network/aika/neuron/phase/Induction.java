@@ -41,12 +41,12 @@ public class Induction implements Phase {
 
     @Override
     public void tryToLink(Activation iAct, Activation oAct, Visitor v) {
-        if(!iAct.isActive() ||
-                oAct.getNeuron().isInputNeuron()) return;
-
         Neuron n = oAct.getNeuron();
-        Synapse s = n.getInputSynapse(iAct.getNeuronProvider());
 
+        if(!iAct.isActive() ||
+                n.isInputNeuron()) return;
+
+        Synapse s = n.getInputSynapse(iAct.getNeuronProvider());
         if (s != null) return;
 
         n.induceSynapse(iAct, oAct, v);

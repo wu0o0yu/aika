@@ -3,11 +3,13 @@ package network;
 import network.aika.Config;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.inhibitory.PrimaryInhibitorySynapse;
 import network.aika.neuron.phase.Phase;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
@@ -70,8 +72,10 @@ public class ManuelInductionModel {
 
                         Neuron outN = l.getOutput().getNeuron();
                         Neuron inN = l.getInput().getNeuron();
+
                         if(outN instanceof InhibitoryNeuron) {
-                            return !outN.isInputNeuron() && inN instanceof PatternNeuron;
+                            return l.getSynapse() instanceof PrimaryInhibitorySynapse || v.scope == Direction.SAME;
+//                            return !outN.isInputNeuron() && inN instanceof PatternNeuron;
                         }
 
                         return true;

@@ -298,10 +298,6 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void train() {
-        if(getNeuron().isInputNeuron()) {
-            return;
-        }
-
         initSelfGradient();
         computeInitialLinkGradients();
         updateSelfGradient();

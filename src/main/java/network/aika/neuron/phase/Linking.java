@@ -77,9 +77,7 @@ public class Linking implements Phase {
 
     @Override
     public void propagate(Activation act) {
-        if(act.getNeuron().isInputNeuron()) {
-            act.getModel().linkInputRelations(act, OUTPUT);
-        }
+        act.getModel().linkInputRelations(act, OUTPUT);
         act.propagateIntern();
     }
 

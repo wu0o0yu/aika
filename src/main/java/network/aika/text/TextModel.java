@@ -73,7 +73,7 @@ public class TextModel extends Model {
 
         switch (dir) {
             case OUTPUT:
-                if (prevTokenInhib.getId().equals(originAct.getNeuron().getId()) && lastRef.nextTokenPPAct != null) {
+                if (originAct.getNeuron().isInputNeuron() && prevTokenInhib.getId().equals(originAct.getNeuron().getId()) && lastRef.nextTokenPPAct != null) {
                     Synapse s = getRelSynapse(lastRef.nextTokenPPAct.getNeuron());
                     lastRef.nextTokenPPAct.addLink(s, originAct, false);
                 }

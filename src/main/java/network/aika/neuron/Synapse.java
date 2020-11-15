@@ -76,13 +76,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return getInput().containsOutputSynapse(this);
     }
 
-    public Activation getOutputActivationToLink(Activation oAct, Visitor v) {
-        if (getOutput().isInputNeuron()) {
-            return null;
-        }
-
-        return oAct;
-    }
+    public abstract Activation getOutputActivationToLink(Activation oAct, Visitor v);
 
     public void linkInput() {
         Neuron in = getInput();

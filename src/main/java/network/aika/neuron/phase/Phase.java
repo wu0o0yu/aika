@@ -42,7 +42,7 @@ public interface Phase extends Comparator<Activation> {
 
     boolean isFinal();
 
-    void tryToLink(Activation iAct, Activation oAct, Visitor c);
+    void tryToLink(Activation iAct, Activation oAct, Visitor v);
 
     void propagate(Activation act);
 
