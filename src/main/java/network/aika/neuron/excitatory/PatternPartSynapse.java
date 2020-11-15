@@ -75,11 +75,10 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
 
     @Override
     public void transition(Visitor v, Activation nextAct) {
-        Visitor nv = v.prepareNextStep();
-        nv.incrementPathLength();
-
-        // check related change
         if (v.scope == INPUT && isInputScope() && !v.related) {
+            Visitor nv = v.prepareNextStep();
+            nv.incrementPathLength();
+
             nv.related = true;
             nv.follow(nextAct);
 
@@ -87,6 +86,9 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
                 return;
             }
         }
+
+        Visitor nv = v.prepareNextStep();
+        nv.incrementPathLength();
 
         if(v.samePattern && isInputScope()) {
             return;
@@ -105,7 +107,12 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         // switch scope
         if (isInputScope()) {
             nv.scope = v.scope.getNext(v.downUpDir);
+
+            if (!nv.related && nv.scope == SAME) {
+                return;
+            }
         }
+
 
         nv.follow(nextAct);
     }
