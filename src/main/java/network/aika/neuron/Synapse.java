@@ -136,8 +136,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return (O) output.getNeuron();
     }
 
-    public void initInstance(Reference ref) {
-        this.instances = new Instances(getModel(), ref);
+    public void initInstance(Reference ref, Object event) {
+        this.instances = new Instances(getModel(), ref, event);
     }
 
     public Instances getInstances() {
@@ -170,7 +170,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void count(Link l) {
-        instances.update(getModel(), l.getInput().getReference());
+        instances.update(getModel(), l.getInput().getReference(), l);
 
         if(l.getInput().isActive() && l.getOutput().isActive()) {
             frequencyIPosOPos += 1.0;
@@ -209,11 +209,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return Math.abs(weight) < TOLERANCE;
     }
 
-/*
-    public boolean isWeak(State state) {
-        return output.get().isWeak(this, state);
-    }
-*/
     public void setWeight(double weight) {
         this.weight = weight;
         modified = true;
@@ -240,19 +235,11 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
             return null;
         }
 
-/*
-        if(Neuron.debugOutput) {
-            System.out.println("dbg:" + (Neuron.debugId++) + " " + s + "   FG:" + Utils.round(l.getFinalGradient()) + "               INDUCED!");
-        }
-*/
-
         l.updateSynapse();
-//        oAct.sumUpLink(null, l);
-//        l.linkInput();
 
         oAct.addLink(null, l);
 
-        getInstances().update(getModel(), getReference(l));
+        getInstances().update(getModel(), getReference(l), l);
 
         return l;
     }

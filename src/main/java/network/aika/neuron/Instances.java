@@ -10,14 +10,18 @@ import java.io.IOException;
 
 public class Instances implements Writable {
 
-    protected double N = 0;
-    protected int lastPos;
+    private double N = 0;
+    private int lastPos;
+    private Object lastEvent;
+    private Reference lastRef;
 
     private Instances() {
     }
 
-    public Instances(Model m, Reference ref) {
+    public Instances(Model m, Reference ref, Object event) {
         this.lastPos = getAbsoluteBegin(m, ref);
+        this.lastEvent = event;
+        this.lastRef = ref;
     }
 
     public double getN() {
@@ -32,9 +36,15 @@ public class Instances implements Writable {
         return lastPos;
     }
 
-    public void update(Model m, Reference ref) {
-        N += 1 + ((getAbsoluteBegin(m, ref) - lastPos) / ref.length());
+    public void update(Model m, Reference ref, Object event) {
+        int n = getAbsoluteBegin(m, ref) - lastPos;
+        assert n >= 0;
+
+        N += 1 + n / ref.length();
         lastPos = getAbsoluteEnd(m, ref);
+
+        lastEvent = event;
+        lastRef = ref;
     }
 
     public int getAbsoluteBegin(Model m, Reference ref) {

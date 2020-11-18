@@ -111,7 +111,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
         if (act == null) {
             Neuron n = new InhibitoryNeuron(iAct.getModel());
-            n.initInstance(iAct.getReference());
+            n.initInstance(iAct.getReference(), iAct);
             act = n.initInducedNeuron(iAct);
         }
 
@@ -126,7 +126,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         }
 
         s.setWeight(1.0);
-        s.initInstance(iAct.getReference());
+        s.initInstance(iAct.getReference(), iAct);
 
         return s.initInducedSynapse(iAct, oAct, v);
     }

@@ -65,7 +65,6 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     public static Activation induce(Activation iAct) {
         if(!iAct.getConfig().checkPatternPartNeuronInduction(iAct.getNeuron())) {
-//            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
             return null;
         }
 
@@ -77,7 +76,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
         if (act == null) {
             Neuron n = new PatternPartNeuron(iAct.getModel());
-            n.initInstance(iAct.getReference());
+            n.initInstance(iAct.getReference(), iAct);
             act = n.initInducedNeuron(iAct);
         }
 
@@ -87,7 +86,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
         PatternPartSynapse s = new PatternPartSynapse(iAct.getNeuron(), this);
         iAct.getNeuron().initOutgoingPPSynapse(s, v);
-        s.initInstance(iAct.getReference());
+        s.initInstance(iAct.getReference(), iAct);
 
         return s.initInducedSynapse(iAct, oAct, v);
     }
@@ -114,8 +113,6 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public void updateReference(Link nl) {
-        if(nl.getInput().getNeuron() instanceof PatternNeuron) {
-            nl.getOutput().propagateReference(nl.getInput().getReference());
-        }
+        nl.getOutput().propagateReference(nl.getInput().getReference());
     }
 }

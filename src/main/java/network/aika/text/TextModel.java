@@ -53,14 +53,14 @@ public class TextModel extends Model {
         InhibitoryNeuron ptN = new InhibitoryNeuron(this);
         ptN.setInputNeuron(true);
         ptN.setDescriptionLabel("Prev. Token");
-        ptN.initInstance(null);
+        ptN.initInstance(null, this);
         prevTokenInhib = ptN.getProvider();
         prevTokenInhib.save();
 
         InhibitoryNeuron ntN = new InhibitoryNeuron(this);
         ntN.setInputNeuron(true);
         ntN.setDescriptionLabel("Next Token");
-        ntN.initInstance(null);
+        ntN.initInstance(null, this);
         nextTokenInhib = ntN.getProvider();
         nextTokenInhib.save();
     }
@@ -118,24 +118,24 @@ public class TextModel extends Model {
         PatternNeuron in = new PatternNeuron(this, tokenLabel);
         in.setInputNeuron(true);
         in.setDescriptionLabel("P-" + tokenLabel);
-        in.initInstance(ref);
+        in.initInstance(ref, this);
         getSuspensionHook().putLabel(tokenLabel, in.getId());
 
         PatternPartNeuron inRelPW = new PatternPartNeuron(this);
         inRelPW.setInputNeuron(true);
         inRelPW.setDescriptionLabel(tokenLabel + " Rel Prev. Word");
-        inRelPW.initInstance(ref);
+        inRelPW.initInstance(ref, this);
 
         PatternPartNeuron inRelNW = new PatternPartNeuron(this);
         inRelNW.setInputNeuron(true);
         inRelNW.setDescriptionLabel(tokenLabel + " Rel Next Word");
-        inRelNW.initInstance(ref);
+        inRelNW.initInstance(ref, this);
 
         {
             {
                 PatternPartSynapse s = new PatternPartSynapse(in, inRelPW);
                 s.setRecurrent(true);
-                s.initInstance(ref);
+                s.initInstance(ref, this);
 
                 s.linkInput();
                 s.linkOutput();
@@ -146,7 +146,7 @@ public class TextModel extends Model {
             {
                 PatternPartSynapse s = new PatternPartSynapse(getNextTokenInhib(), inRelPW);
                 s.setInputScope(true);
-                s.initInstance(ref);
+                s.initInstance(ref, this);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -158,7 +158,7 @@ public class TextModel extends Model {
             {
                 PatternPartSynapse s = new PatternPartSynapse(in, inRelNW);
                 s.setRecurrent(true);
-                s.initInstance(ref);
+                s.initInstance(ref, this);
 
                 s.linkInput();
                 s.linkOutput();
@@ -169,7 +169,7 @@ public class TextModel extends Model {
             {
                 PatternPartSynapse s = new PatternPartSynapse(getPrevTokenInhib(), inRelNW);
                 s.setInputScope(true);
-                s.initInstance(ref);
+                s.initInstance(ref, this);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -180,7 +180,7 @@ public class TextModel extends Model {
 
         {
             InhibitorySynapse s = new InhibitorySynapse(inRelPW, getPrevTokenInhib());
-            s.initInstance(ref);
+            s.initInstance(ref, this);
 
             s.linkInput();
             s.addWeight(1.0);
@@ -188,7 +188,7 @@ public class TextModel extends Model {
 
         {
             InhibitorySynapse s = new InhibitorySynapse(inRelNW, getNextTokenInhib());
-            s.initInstance(ref);
+            s.initInstance(ref, this);
 
             s.linkInput();
             s.addWeight(1.0);

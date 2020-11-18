@@ -97,8 +97,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return s;
     }
 
-    public void initInstance(Reference ref) {
-        this.instances = new Instances(getModel(), ref);
+    public void initInstance(Reference ref, Object event) {
+        this.instances = new Instances(getModel(), ref, event);
     }
 
     public Instances getInstances() {
@@ -225,7 +225,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         addDummyLinks(act);
 
         if(act.isActive()) {
-            instances.update(getModel(), act.getReference());
+            instances.update(getModel(), act.getReference(), act);
             frequency += 1.0;
             modified = true;
         }
@@ -251,7 +251,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
         prepareInitialSynapseInduction(iAct, act);
 
-        getInstances().update(getModel(), iAct.getReference());
+        getInstances().update(getModel(), iAct.getReference(), act);
 
         return act;
     }
