@@ -233,8 +233,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         oAct.addLink(null, l);
 
-        getInstances().update(getModel(), getReference(l));
-
         return l;
     }
 

@@ -488,7 +488,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public double getNorm() {
-        return (1 / (1 + getNeuron().getInstances().getN()));
+        return (1 / (1 + getNeuron().getSampleSpace().getN()));
     }
 
     public void processGradient() {

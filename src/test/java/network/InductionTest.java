@@ -24,7 +24,7 @@ public class InductionTest {
 
         in.setFrequency(12);
 
-        in.getInstances().setN(200);
+        in.getSampleSpace().setN(200);
         m.setN(200);
 
         Document doc = new Document("",
@@ -75,7 +75,7 @@ public class InductionTest {
         inA.setFrequency(10.0);
         inB.setFrequency(10.0);
 
-        targetN.getInstances().setN(100);
+        targetN.getSampleSpace().setN(100);
         targetN.setFrequency(0.0);
 
         System.out.println(targetN.statToString());
@@ -128,9 +128,9 @@ public class InductionTest {
 
         model.setN(1000);
         actDer.getNeuron().setFrequency(50);
-        actDer.getNeuron().getInstances().setN(1000);
+        actDer.getNeuron().getSampleSpace().setN(1000);
         actHund.getNeuron().setFrequency(10);
-        actHund.getNeuron().getInstances().setN(1000);
+        actHund.getNeuron().getSampleSpace().setN(1000);
 
         doc.process(model);
 

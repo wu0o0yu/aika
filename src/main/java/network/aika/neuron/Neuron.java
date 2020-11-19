@@ -95,7 +95,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return s;
     }
 
-    public SampleSpace getInstances() {
+    public SampleSpace getSampleSpace() {
         return sampleSpace;
     }
 
@@ -236,7 +236,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public abstract void induceNeuron(Activation act);
 
     public Activation initInducedNeuron(Activation iAct) {
-//        System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + "  --> " + n.getDescriptionLabel() + "               INDUCED!");
         setDescriptionLabel(iAct.getConfig().getLabel(iAct, this));
 
         Activation act = iAct.createActivation(this);
@@ -244,8 +243,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         act.initSelfGradient();
 
         prepareInitialSynapseInduction(iAct, act);
-
-        getInstances().update(getModel(), iAct.getReference());
 
         return act;
     }

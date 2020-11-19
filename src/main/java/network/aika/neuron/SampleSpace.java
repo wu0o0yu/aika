@@ -13,6 +13,8 @@ public class SampleSpace implements Writable {
     private double N = 0;
     private Integer lastPos;
     private Reference lastRef;
+    private int lastDbg;
+    private static int dbgCounter = 0;
 
     public double getN() {
         return N;
@@ -41,6 +43,9 @@ public class SampleSpace implements Writable {
 
         lastPos = newPos;
         lastRef = ref;
+        lastDbg = dbgCounter++;
+
+        System.out.print("");
     }
 
     public int getAbsoluteBegin(Model m, Reference ref) {
