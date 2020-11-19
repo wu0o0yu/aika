@@ -60,14 +60,12 @@ public class DerDieDasTest {
                 {
                     InhibitoryNeuron n = new InhibitoryNeuron(charBasedTrainings.getModel());
                     n.setDescriptionLabel("I-" + ch);
-                    n.initInstance(ref, this);
                     return n;
                 }
         );
 
         {
             InhibitorySynapse s = new InhibitorySynapse(ppN, inhibN);
-            s.initInstance(ref, this);
 
             s.linkInput();
             s.addWeight(0.1);
@@ -77,7 +75,6 @@ public class DerDieDasTest {
             PatternPartSynapse s = new PatternPartSynapse(inhibN, ppN);
             s.setNegative(true);
             s.setRecurrent(true);
-            s.initInstance(ref, this);
 
             s.linkOutput();
             s.addWeight(-100.0);
@@ -86,7 +83,6 @@ public class DerDieDasTest {
         {
             PatternPartSynapse s = new PatternPartSynapse(inN, ppN);
             s.setSamePattern(true);
-            s.initInstance(ref, this);
 
             s.linkInput();
             s.addWeight(0.1);
@@ -96,7 +92,6 @@ public class DerDieDasTest {
         if(prevPP != null) {
             PatternPartSynapse s = new PatternPartSynapse(prevPP, ppN);
             s.setInputScope(true);
-            s.initInstance(ref, this);
 
             s.linkOutput();
             s.addWeight(0.1);
@@ -107,7 +102,6 @@ public class DerDieDasTest {
         if(nextPP != null) {
             PatternPartSynapse s = new PatternPartSynapse(nextPP, ppN);
             s.setInputScope(true);
-            s.initInstance(ref, this);
 
             s.linkOutput();
             s.addWeight(0.1);
@@ -117,7 +111,6 @@ public class DerDieDasTest {
         {
             PatternPartSynapse s = new PatternPartSynapse(out, ppN);
             s.setRecurrent(true);
-            s.initInstance(ref, this);
 
             s.linkOutput();
             s.addWeight(0.1);

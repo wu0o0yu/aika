@@ -22,13 +22,11 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.excitatory.PatternPartNeuron;
 import org.apache.commons.math3.distribution.BetaDistribution;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.List;
 
 import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
@@ -46,7 +44,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     private double weight;
 
-    protected Instances instances;
+    protected SampleSpace sampleSpace = new SampleSpace();
 
     protected double frequencyIPosOPos;
     protected double frequencyIPosONeg;
@@ -136,12 +134,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return (O) output.getNeuron();
     }
 
-    public void initInstance(Reference ref, Object event) {
-        this.instances = new Instances(getModel(), ref, event);
-    }
-
-    public Instances getInstances() {
-        return instances;
+    public SampleSpace getInstances() {
+        return sampleSpace;
     }
 
     public double getFrequency(Sign is, Sign os, double n) {
@@ -170,7 +164,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void count(Link l) {
-        instances.update(getModel(), l.getInput().getReference(), l);
+        sampleSpace.update(getModel(), l.getInput().getReference());
 
         if(l.getInput().isActive() && l.getOutput().isActive()) {
             frequencyIPosOPos += 1.0;
@@ -189,7 +183,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public double getSurprisal(Sign si, Sign so) {
-        double p = getP(si, so, instances.getN());
+        double p = getP(si, so, sampleSpace.getN());
         return -Math.log(p);
     }
 
@@ -239,7 +233,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         oAct.addLink(null, l);
 
-        getInstances().update(getModel(), getReference(l), l);
+        getInstances().update(getModel(), getReference(l));
 
         return l;
     }
@@ -257,7 +251,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         out.writeDouble(frequencyIPosONeg);
         out.writeDouble(frequencyINegOPos);
 
-        instances.write(out);
+        sampleSpace.write(out);
 
         out.writeBoolean(modified);
     }
@@ -273,7 +267,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         frequencyIPosONeg = in.readDouble();
         frequencyINegOPos = in.readDouble();
 
-        instances = Instances.read(in, m);
+        sampleSpace = SampleSpace.read(in, m);
 
         modified = in.readBoolean();
     }

@@ -560,9 +560,6 @@ public class Activation implements Comparable<Activation> {
 
         getInputLinks()
                 .forEach(l -> l.count());
-
-        getOutputLinks()
-                .forEach(l -> l.count());
     }
 
     public boolean equals(Activation act) {

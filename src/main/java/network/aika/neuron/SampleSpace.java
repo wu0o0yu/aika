@@ -8,21 +8,11 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class Instances implements Writable {
+public class SampleSpace implements Writable {
 
     private double N = 0;
-    private int lastPos;
-    private Object lastEvent;
+    private Integer lastPos;
     private Reference lastRef;
-
-    private Instances() {
-    }
-
-    public Instances(Model m, Reference ref, Object event) {
-        this.lastPos = getAbsoluteBegin(m, ref);
-        this.lastEvent = event;
-        this.lastRef = ref;
-    }
 
     public double getN() {
         return N;
@@ -36,14 +26,20 @@ public class Instances implements Writable {
         return lastPos;
     }
 
-    public void update(Model m, Reference ref, Object event) {
-        int n = getAbsoluteBegin(m, ref) - lastPos;
+    public void update(Model m, Reference ref) {
+        int n = 0;
+
+        if(lastPos != null) {
+            n = getAbsoluteBegin(m, ref) - lastPos;
+        }
         assert n >= 0;
 
         N += 1 + n / ref.length();
-        lastPos = getAbsoluteEnd(m, ref);
 
-        lastEvent = event;
+        Integer newPos = getAbsoluteEnd(m, ref);
+        assert lastPos == null || newPos > lastPos;
+
+        lastPos = newPos;
         lastRef = ref;
     }
 
@@ -58,19 +54,24 @@ public class Instances implements Writable {
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeDouble(N);
-        out.writeInt(lastPos);
+        out.writeBoolean(lastPos != null);
+        if(lastPos != null) {
+            out.writeInt(lastPos);
+        }
     }
 
-    public static Instances read(DataInput in, Model m) throws IOException {
-        Instances instances = new Instances();
-        instances.readFields(in, m);
-        return instances;
+    public static SampleSpace read(DataInput in, Model m) throws IOException {
+        SampleSpace sampleSpace = new SampleSpace();
+        sampleSpace.readFields(in, m);
+        return sampleSpace;
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         N = in.readDouble();
-        lastPos = in.readInt();
+        if(in.readBoolean()) {
+            lastPos = in.readInt();
+        }
     }
 
     public String toString() {

@@ -127,7 +127,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
         if (oAct == null) {
             Neuron n = new PatternNeuron(act.getModel(), null);
-            n.initInstance(act.getReference(), act);
             oAct = n.initInducedNeuron(act);
         }
 
@@ -151,9 +150,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
         PatternSynapse s = new PatternSynapse(iAct.getNeuron(), this);
-
-        s.initInstance(iAct.getReference(), iAct);
-
         return s.initInducedSynapse(iAct, oAct, v);
     }
 

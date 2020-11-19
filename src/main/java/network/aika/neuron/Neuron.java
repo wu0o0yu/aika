@@ -32,7 +32,6 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
-import static network.aika.neuron.activation.Direction.INPUT;
 
 /**
  *
@@ -56,13 +55,12 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     private volatile double bias;
 
     protected TreeMap<NeuronProvider, S> inputSynapses = new TreeMap<>();
-
     protected TreeMap<NeuronProvider, Synapse> outputSynapses = new TreeMap<>();
 
     protected final ReadWriteLock lock = new ReadWriteLock();
 
     protected double frequency;
-    protected Instances instances;
+    protected SampleSpace sampleSpace = new SampleSpace();
 
     protected boolean isInputNeuron; // Input Neurons won't be trained!
 
@@ -97,12 +95,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return s;
     }
 
-    public void initInstance(Reference ref, Object event) {
-        this.instances = new Instances(getModel(), ref, event);
-    }
-
-    public Instances getInstances() {
-        return instances;
+    public SampleSpace getInstances() {
+        return sampleSpace;
     }
 
     public NeuronProvider getProvider() {
@@ -225,7 +219,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         addDummyLinks(act);
 
         if(act.isActive()) {
-            instances.update(getModel(), act.getReference(), act);
+            sampleSpace.update(getModel(), act.getReference());
             frequency += 1.0;
             modified = true;
         }
@@ -251,7 +245,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
         prepareInitialSynapseInduction(iAct, act);
 
-        getInstances().update(getModel(), iAct.getReference(), act);
+        getInstances().update(getModel(), iAct.getReference());
 
         return act;
     }
@@ -265,7 +259,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public abstract InhibitorySynapse induceOutgoingInhibitorySynapse(InhibitoryNeuron outN);
 
     public double getSurprisal(Sign s) {
-        double p = getP(s, instances.getN());
+        double p = getP(s, sampleSpace.getN());
         return -Math.log(p);
     }
 
@@ -332,7 +326,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         out.writeBoolean(false);
 
         out.writeDouble(frequency);
-        instances.write(out);
+        sampleSpace.write(out);
 
         out.writeBoolean(isInputNeuron);
     }
@@ -356,7 +350,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         }
 
         frequency = in.readDouble();
-        instances = Instances.read(in, m);
+        sampleSpace = SampleSpace.read(in, m);
 
         isInputNeuron = in.readBoolean();
     }
@@ -373,8 +367,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return getClass().getSimpleName() + " " +
                 getId() + ":" + getDescriptionLabel() + " " +
                 "f:" + Utils.round(frequency) + " " +
-                "N:" + Utils.round(instances.getN()) + " " +
-                "p:" + Utils.round(getP(POS, instances.getN())) + " " +
+                "N:" + Utils.round(sampleSpace.getN()) + " " +
+                "p:" + Utils.round(getP(POS, sampleSpace.getN())) + " " +
                 "s(p):" + Utils.round(getSurprisal(POS)) + " " +
                 "s(n):" + Utils.round(getSurprisal(NEG)) + " " +
                 "\n";
