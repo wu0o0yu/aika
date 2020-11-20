@@ -57,7 +57,6 @@ public class Activation implements Comparable<Activation> {
     NavigableMap<OutputKey, Link> outputLinks;
 
     private boolean isFinal;
-    public boolean marked;
 
     private int round; // Only used as stopping criteria
     private Activation lastRound;
@@ -92,6 +91,14 @@ public class Activation implements Comparable<Activation> {
 
     public void setPhase(Phase p) {
         phase = p;
+    }
+
+    public boolean isMarked() {
+        return queueState.isMarked();
+    }
+
+    public void setMarked(boolean marked) {
+        queueState.setMarked(marked);
     }
 
     public void initInput(Reference ref) {
@@ -264,7 +271,7 @@ public class Activation implements Comparable<Activation> {
     }
 
     public boolean searchWithinBranch() {
-        if (marked) return true;
+        if (queueState.isMarked()) return true;
 
         return getLinks(OUTPUT)
                 .filter(l -> !l.isNegative() || l.isCausal())

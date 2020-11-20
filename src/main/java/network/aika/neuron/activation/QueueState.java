@@ -11,6 +11,7 @@ public class QueueState {
     private TreeSet<Phase> pendingPhases = new TreeSet<>(Comparator.comparing(p -> p.getRank()));;
     private Activation actToQueue;
     private Activation queuedAct;
+    private boolean marked;
 
     private QueueState() {
     }
@@ -18,6 +19,14 @@ public class QueueState {
     public QueueState(Activation act) {
         actToQueue = act;
         pendingPhases.addAll(act.getThought().getConfig().getPhases());
+    }
+
+    public boolean isMarked() {
+        return marked;
+    }
+
+    public void setMarked(boolean marked) {
+        this.marked = marked;
     }
 
     public void setActToQueue(Activation actToQueue) {

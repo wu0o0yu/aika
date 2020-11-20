@@ -71,12 +71,12 @@ public class Link {
     }
 
     public void propagate() {
-        output.marked = true;
+        output.setMarked(true);
 
         Visitor v = new Visitor(output, INPUT);
         synapse.transition(v, input);
 
-        output.marked = false;
+        output.setMarked(false);
     }
 
     public void computeOutputGradient() {
@@ -183,9 +183,10 @@ public class Link {
     }
 
     public boolean follow(Direction dir) {
+        Activation nextAct = getActivation(dir);
         return !isNegative() &&
-                getActivation(dir) != null &&
-                !getActivation(dir).marked &&
+                nextAct != null &&
+                !nextAct.isMarked() &&
                 isCausal();
     }
 

@@ -112,7 +112,7 @@ public class Visitor {
 //            return;
         }
 
-        act.marked = true;
+        act.setMarked(true);
         Stream<Link> s = act.getLinks(downUpDir)
                 .filter(l -> l.follow(downUpDir));
 
@@ -127,7 +127,7 @@ public class Visitor {
                                 l.getActivation(downUpDir)
                         )
         );
-        act.marked = false;
+        act.setMarked(false);
     }
 
     public void tryToLink(Activation act) {

@@ -58,6 +58,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public Synapse(I input, O output) {
         this.input = input.getProvider();
         this.output = output.getProvider();
+
+        assert input.getId() != output.getId();
     }
 
     public abstract boolean inductionRequired(Class<? extends Neuron> type);
