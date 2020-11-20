@@ -22,6 +22,9 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 
+import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
+
 /**
  *
  * @author Lukas Molzberger
@@ -31,6 +34,9 @@ public class Induction implements Phase {
 
     @Override
     public void process(Activation act) {
+        new Visitor(act, INPUT)
+                .followLinks(act);
+
         act.updateValueAndPropagate();
     }
 
