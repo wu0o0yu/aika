@@ -32,11 +32,12 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
     }
 
     @Override
-    public void transition(Visitor v, Activation nextAct, boolean create) {
+    public void transition(Visitor v, Activation fromAct, Activation nextAct, boolean create) {
         Visitor nv = v.prepareNextStep();
         nv.incrementPathLength();
 
-        nv.follow(nextAct);;
+        next(null, nextAct, nv, create);
+//        nv.follow(nextAct);
     }
 
     @Override

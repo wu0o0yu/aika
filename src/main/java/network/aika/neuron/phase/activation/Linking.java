@@ -64,7 +64,7 @@ public class Linking implements ActivationPhase {
             return;
         }
 
-        s.transition(v, v.downUpDir == INPUT ? iAct : oAct, true);
+        s.transition(v, v.downUpDir == INPUT ? oAct : iAct, v.downUpDir == INPUT ? iAct : oAct, true);
 
 /*
 In transition verlagern
@@ -83,7 +83,7 @@ In transition verlagern
     @Override
     public void propagate(Activation act, Visitor v) {
         act.getModel().linkInputRelations(act, OUTPUT);
-        act.propagateIntern();
+        act.propagateIntern(v);
     }
 
     @Override

@@ -63,7 +63,7 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         input.getNeuron().setModified(true);
     }
 
-    public void transition(Visitor v, Activation nextAct, boolean create) {
+    public void transition(Visitor v, Activation fromAct, Activation nextAct, boolean create) {
         if(v.downUpDir == INPUT && v.origin.getNeuron() == getOutput()) {
             return;
         }

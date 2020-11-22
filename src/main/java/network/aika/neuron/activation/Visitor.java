@@ -124,6 +124,7 @@ public class Visitor {
                 l.getSynapse()
                         .transition(
                                 this,
+                                act,
                                 l.getActivation(downUpDir),
                                 false
                         )

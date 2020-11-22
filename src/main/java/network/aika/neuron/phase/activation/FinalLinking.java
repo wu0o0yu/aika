@@ -12,11 +12,11 @@ public class FinalLinking extends Linking {
 
     @Override
     public void propagate(Activation act, Visitor v) {
-        act.propagateIntern();
+        act.propagateIntern(v);
     }
 
     @Override
     public int getRank() {
-        return 2;
+        return 3;
     }
 }

@@ -74,7 +74,7 @@ public class Induction implements ActivationPhase {
                     templateSynapses.remove(l.getSynapse().getTemplate())
             );
 
-            templateSynapses.forEach(s -> s.transition(v, null, true));
+            templateSynapses.forEach(s -> s.transition(v, act, null, true));
 /*
             if (oAct == null) {
                 Neuron n = new PatternPartNeuron(act.getModel());

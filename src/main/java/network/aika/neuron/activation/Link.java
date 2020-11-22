@@ -75,7 +75,7 @@ public class Link extends QueueEntry {
         output.setMarked(true);
 
         Visitor v = new Visitor(output, INPUT);
-        synapse.transition(v, input, true);
+        synapse.transition(v, output, input, false);
 
         output.setMarked(false);
     }

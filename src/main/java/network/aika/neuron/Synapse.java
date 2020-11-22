@@ -70,7 +70,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
 //    public abstract boolean inductionRequired(Class<? extends Neuron> type);
 
-    public abstract void transition(Visitor v, Activation nextAct, boolean create);
+    public abstract void transition(Visitor v, Activation currentAct, Activation nextAct, boolean create);
 
     public Reference getReference(Link l) {
         return l.getInput().getReference();
@@ -83,6 +83,22 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public abstract Activation getOutputActivationToLink(Activation oAct, Visitor v);
+
+    public void next(Activation fromAct, Activation nextAct, Visitor v, boolean create) {
+        if(create) {
+            if (nextAct == null) {
+                nextAct = fromAct.createActivation(getOutput());
+            }
+            Link.link(
+                    this,
+                    fromAct,
+                    nextAct,
+                    false
+            );
+        } else {
+            v.follow(nextAct);
+        }
+    }
 
     public void linkInput() {
         Neuron in = getInput();

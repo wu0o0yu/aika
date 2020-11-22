@@ -11,7 +11,7 @@ public class Linking implements LinkPhase {
 
     @Override
     public int getRank() {
-        return 0;
+        return 1;
     }
 
     @Override

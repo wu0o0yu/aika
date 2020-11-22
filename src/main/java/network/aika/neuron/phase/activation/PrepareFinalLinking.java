@@ -27,7 +27,7 @@ public class PrepareFinalLinking implements ActivationPhase {
 
     @Override
     public int getRank() {
-        return 1;
+        return 2;
     }
 
     @Override

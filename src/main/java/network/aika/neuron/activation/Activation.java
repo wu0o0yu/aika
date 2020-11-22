@@ -313,12 +313,13 @@ public class Activation extends QueueEntry<ActivationPhase> implements Comparabl
         phase.propagate(this, v);
     }
 
-    public void propagateIntern() {
+    public void propagateIntern(Visitor v) {
 //        getThought().processLinks();
 
         getNeuron().getOutputSynapses()
                 .filter(s -> !outputLinkExists(s))
-                .forEach(s ->
+                .forEach(s -> s.transition(v, this, null, true));
+/*                .forEach(s ->
                         Link.link(
                                 s,
                                 this,
@@ -326,6 +327,8 @@ public class Activation extends QueueEntry<ActivationPhase> implements Comparabl
                                 false
                         )
                 );
+
+ */
     }
 
     public Activation createActivation(Neuron n) {
