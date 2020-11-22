@@ -1,9 +1,8 @@
-package network.aika.neuron.phase;
+package network.aika.neuron.phase.activation;
 
-import network.aika.Config;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Visitor;
 
-import static network.aika.neuron.activation.Direction.OUTPUT;
 
 public class FinalLinking extends Linking {
 
@@ -12,7 +11,7 @@ public class FinalLinking extends Linking {
     }
 
     @Override
-    public void propagate(Activation act) {
+    public void propagate(Activation act, Visitor v) {
         act.propagateIntern();
     }
 

@@ -20,6 +20,7 @@ import network.aika.Config;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.activation.Direction.*;
@@ -52,6 +54,11 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     public PatternNeuron(Model model, String tokenLabel) {
         super(model);
         this.tokenLabel = tokenLabel;
+    }
+
+    @Override
+    public Stream<Synapse> getTemplateSynapses() {
+        return null;
     }
 
     @Override
@@ -82,7 +89,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     @Override
-    public void transition(Visitor v, Activation act) {
+    public void transition(Visitor v, Activation act, boolean create) {
         if(!v.samePattern) {
             if(v.downUpDir == OUTPUT) {
                 return;
@@ -108,13 +115,13 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         nl.getOutput().propagateReference(or == null ? ir : or.add(ir));
     }
 
+
+    /*
     public static Activation induce(Activation act) {
         if(act.getNeuron().isInputNeuron()) {
-//            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
             return null;
         }
         if(!act.getConfig().checkPatternNeuronInduction(act)) {
-//            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
             return null;
         }
 
@@ -132,7 +139,8 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
         return oAct;
     }
-
+*/
+/*
     @Override
     public void induceNeuron(Activation act) {
         double s = getSurprisal(POS);
@@ -147,6 +155,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         PatternPartNeuron.induce(act);
         InhibitoryNeuron.induce(act);
     }
+*/
 
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
         PatternSynapse s = new PatternSynapse(iAct.getNeuron(), this);

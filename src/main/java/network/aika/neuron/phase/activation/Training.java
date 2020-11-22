@@ -14,30 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase;
+package network.aika.neuron.phase.activation;
 
-import network.aika.Config;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
-
-import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Direction.OUTPUT;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Induction implements Phase {
+public class Training implements ActivationPhase {
 
 
     @Override
     public void process(Activation act) {
-        new Visitor(act, INPUT)
-                .followLinks(act);
+        if(act.getNeuron().isInputNeuron()) {
+            return;
+        }
 
-        act.updateValueAndPropagate();
+        act.train();
     }
 
     @Override
@@ -47,27 +42,15 @@ public class Induction implements Phase {
 
     @Override
     public void tryToLink(Activation iAct, Activation oAct, Visitor v) {
-        Neuron n = oAct.getNeuron();
-
-        if(!iAct.isActive() ||
-                n.isInputNeuron()) return;
-
-        Synapse s = n.getInputSynapse(iAct.getNeuronProvider());
-        if (s != null) return;
-
-        n.induceSynapse(iAct, oAct, v);
     }
 
     @Override
-    public void propagate(Activation act) {
-        if(act.isActive()) {
-            act.getNeuron().induceNeuron(act);
-        }
+    public void propagate(Activation act, Visitor v) {
     }
 
     @Override
     public int getRank() {
-        return 8;
+        return 5;
     }
 
     @Override

@@ -22,8 +22,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
 
-import static network.aika.neuron.phase.Phase.INITIAL_LINKING;
-
 /**
  * The {@code Document} class represents a single document which may be either used for processing a text or as
  * training input. A document consists of the raw text, the interpretations and the activations.

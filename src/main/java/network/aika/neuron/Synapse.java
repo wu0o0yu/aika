@@ -42,6 +42,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     protected NeuronProvider input;
     protected NeuronProvider output;
 
+    private Synapse template;
+
     private double weight;
 
     protected SampleSpace sampleSpace = new SampleSpace();
@@ -62,9 +64,13 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         assert input.getId() != output.getId();
     }
 
-    public abstract boolean inductionRequired(Class<? extends Neuron> type);
+    public Synapse getTemplate() {
+        return template;
+    }
 
-    public abstract void transition(Visitor v, Activation nextAct);
+//    public abstract boolean inductionRequired(Class<? extends Neuron> type);
+
+    public abstract void transition(Visitor v, Activation nextAct, boolean create);
 
     public Reference getReference(Link l) {
         return l.getInput().getReference();

@@ -24,6 +24,8 @@ import network.aika.neuron.inhibitory.InhibitorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.stream.Stream;
+
 import static network.aika.neuron.activation.Direction.*;
 
 /**
@@ -43,6 +45,11 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     @Override
+    public Stream<Synapse> getTemplateSynapses() {
+        return null;
+    }
+
+    @Override
     public void prepareInitialSynapseInduction(Activation iAct, Activation newAct) {
         newAct.getNeuron().induceSynapse(iAct, newAct, new Visitor(iAct, newAct, INPUT, null, INPUT, false));
     }
@@ -57,12 +64,14 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     public InhibitorySynapse induceOutgoingInhibitorySynapse(InhibitoryNeuron outN) {
         return new InhibitorySynapse(this, outN);
     }
-
+/*
     @Override
     public void induceNeuron(Activation act) {
         PatternNeuron.induce(act);
     }
+*/
 
+    /*
     public static Activation induce(Activation iAct) {
         if(!iAct.getConfig().checkPatternPartNeuronInduction(iAct.getNeuron())) {
             return null;
@@ -81,6 +90,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
         return act;
     }
+*/
 
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
         PatternPartSynapse s = new PatternPartSynapse(iAct.getNeuron(), this);
@@ -90,7 +100,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     @Override
-    public void transition(Visitor v, Activation act) {
+    public void transition(Visitor v, Activation act, boolean create) {
         if(v.samePattern) {
             if(v.downUpDir == OUTPUT) {
                 return;

@@ -100,7 +100,7 @@ public class Visitor {
         transition = ACT;
 
         act.getNeuron()
-                .transition(this, act);
+                .transition(this, act, false);
     }
 
     public void followLinks(Activation act) {
@@ -124,11 +124,13 @@ public class Visitor {
                 l.getSynapse()
                         .transition(
                                 this,
-                                l.getActivation(downUpDir)
+                                l.getActivation(downUpDir),
+                                false
                         )
         );
         act.setMarked(false);
     }
+
 
     public void tryToLink(Activation act) {
         if (scope == INPUT && related) return;
@@ -140,6 +142,7 @@ public class Visitor {
 
         iAct.getPhase().tryToLink(iAct, oAct, this);
     }
+
 
     public String toString() {
         StringBuilder sb = new StringBuilder();

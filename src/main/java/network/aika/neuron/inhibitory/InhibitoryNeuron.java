@@ -29,6 +29,8 @@ import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 
+import java.util.stream.Stream;
+
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.SAME;
 
@@ -50,6 +52,11 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     public InhibitoryNeuron(Model model) {
         super(model);
+    }
+
+    @Override
+    public Stream<Synapse> getTemplateSynapses() {
+        return null;
     }
 
     @Override
@@ -85,7 +92,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     @Override
-    public void transition(Visitor v, Activation act) {
+    public void transition(Visitor v, Activation act, boolean create) {
         v.followLinks(act);
     }
 
@@ -97,12 +104,13 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     public void updateReference(Link nl) {
         nl.getOutput().propagateReference(nl.getInput().getReference());
     }
-
+/*
     @Override
     public void induceNeuron(Activation activation) {
 
     }
-
+*/
+    /*
     public static Activation induce(Activation iAct) {
         if(!iAct.getConfig().checkInhibitoryNeuronInduction(iAct.getNeuron())) {
 //            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
@@ -122,6 +130,8 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
         return act;
     }
+
+     */
 
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
         InhibitorySynapse s = iAct.getNeuron().induceOutgoingInhibitorySynapse(this);

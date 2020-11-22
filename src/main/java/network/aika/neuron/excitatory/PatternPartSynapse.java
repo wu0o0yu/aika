@@ -50,6 +50,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         super(input, output);
     }
 
+    /*
     @Override
     public boolean inductionRequired(Class<? extends Neuron> type) {
         if (type == PatternPartNeuron.class) {
@@ -59,7 +60,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         }
         return false;
     }
-
+*/
     @Override
     public Activation getOutputActivationToLink(Activation oAct, Visitor v) {
         if (getOutput().isInputNeuron() ||
@@ -74,7 +75,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     }
 
     @Override
-    public void transition(Visitor v, Activation nextAct) {
+    public void transition(Visitor v, Activation nextAct, boolean create) {
         if (v.startDir == INPUT && output.getNeuron().isInputNeuron() && output.getNeuron() == v.origin.getNeuron()) { //X
             return;
         }

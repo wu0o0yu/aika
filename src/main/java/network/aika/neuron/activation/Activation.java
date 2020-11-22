@@ -20,6 +20,7 @@ import network.aika.*;
 import network.aika.neuron.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.activation.ActivationPhase;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,18 +29,15 @@ import java.util.stream.Stream;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
-import static network.aika.neuron.phase.Phase.*;
+import static network.aika.neuron.phase.activation.ActivationPhase.*;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Activation implements Comparable<Activation> {
+public class Activation extends QueueEntry<ActivationPhase> implements Comparable<Activation> {
 
     public static double TOLERANCE = 0.001;
-
-    private Phase phase = INITIAL_LINKING;
-    private QueueState queueState;
 
     private double value;
     private double sum;
@@ -89,18 +87,6 @@ public class Activation implements Comparable<Activation> {
         outputLinks = new TreeMap<>();
     }
 
-    public void setPhase(Phase p) {
-        phase = p;
-    }
-
-    public boolean isMarked() {
-        return queueState.isMarked();
-    }
-
-    public void setMarked(boolean marked) {
-        queueState.setMarked(marked);
-    }
-
     public void initInput(Reference ref) {
         queueState = new QueueState(this);
 
@@ -121,7 +107,7 @@ public class Activation implements Comparable<Activation> {
         return value;
     }
 
-    public double getNet(Phase p) {
+    public double getNet(ActivationPhase p) {
         return sum + (p.isFinal() ? lateSum : 0.0) + getNeuron().getBias(p);
     }
 
@@ -153,16 +139,12 @@ public class Activation implements Comparable<Activation> {
         return getNeuron().getDescriptionLabel();
     }
 
-    public void addToQueue(Phase p) {
+    public void addToQueue(ActivationPhase p) {
         if(p == null) {
             return;
         }
 
         queueState.addPhase(this, p);
-    }
-
-    public Phase getPhase() {
-        return phase;
     }
 
     public <R extends Reference> R getReference() {
@@ -192,16 +174,6 @@ public class Activation implements Comparable<Activation> {
 
     public Config getConfig() {
         return getThought().getConfig();
-    }
-
-    public void process() {
-        queueState.removePendingPhase();
-
-        phase.process(this);
-
-        if(isActive()) {
-            queueState.updateThoughtQueue();
-        }
     }
 
     public NeuronProvider getNeuronProvider() {
@@ -317,7 +289,7 @@ public class Activation implements Comparable<Activation> {
             updateOutgoingLinks();
         }
 
-        thought.processLinks();
+//        thought.processLinks();
     }
 
     private void updateOutgoingLinks() {
@@ -336,14 +308,13 @@ public class Activation implements Comparable<Activation> {
     }
 
     public void propagate() {
-        new Visitor(this, OUTPUT)
-                .followLinks(this);
-
-        phase.propagate(this);
+        Visitor v = new Visitor(this, OUTPUT);
+        v.followLinks(this);
+        phase.propagate(this, v);
     }
 
     public void propagateIntern() {
-        getThought().processLinks();
+//        getThought().processLinks();
 
         getNeuron().getOutputSynapses()
                 .filter(s -> !outputLinkExists(s))
@@ -455,7 +426,7 @@ public class Activation implements Comparable<Activation> {
                 .orElse(null);
     }
 
-    private double computeValue(Phase phase) {
+    private double computeValue(ActivationPhase phase) {
         return branchProbability *
                 neuron.getActivationFunction().f(
                         getNet(phase)
@@ -621,7 +592,7 @@ public class Activation implements Comparable<Activation> {
         return "id:" +
                 getId() +
                 " n:[" + getNeuron() + "]" +
-                " (" + (phase != null ? phase.getClass().getSimpleName() : "X") + ")";
+                Phase.toString(phase);
     }
 
     public String gradientsToString() {

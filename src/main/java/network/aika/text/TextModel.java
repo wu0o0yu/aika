@@ -18,7 +18,6 @@ package network.aika.text;
 
 import network.aika.Model;
 import network.aika.neuron.activation.Reference;
-import network.aika.neuron.phase.Phase;
 import network.aika.SuspensionHook;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;

@@ -1,14 +1,14 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.activation.ActivationPhase;
 
 import java.util.Comparator;
 import java.util.TreeSet;
 
 public class QueueState {
 
-    private TreeSet<Phase> pendingPhases = new TreeSet<>(Comparator.comparing(p -> p.getRank()));;
+    private TreeSet<ActivationPhase> pendingPhases = new TreeSet<>(Comparator.comparing(p -> p.getRank()));;
     private Activation actToQueue;
     private Activation queuedAct;
     private boolean marked;
@@ -33,7 +33,7 @@ public class QueueState {
         this.actToQueue = actToQueue;
     }
 
-    public void addPhase(Activation act, Phase p) {
+    public void addPhase(Activation act, ActivationPhase p) {
         actToQueue = act;
         pendingPhases.add(p);
 
@@ -49,7 +49,7 @@ public class QueueState {
             t.removeActivationFromQueue(queuedAct);
         }
         actToQueue.setPhase(pendingPhases.first());
-        t.addActivationToQueue(actToQueue);
+        t.addToQueue(actToQueue);
         queuedAct = actToQueue;
     }
 

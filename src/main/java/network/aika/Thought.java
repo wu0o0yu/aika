@@ -20,13 +20,10 @@ package network.aika;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.phase.Phase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-
-import static network.aika.neuron.phase.Phase.*;
 
 
 public abstract class Thought {
@@ -34,9 +31,7 @@ public abstract class Thought {
 
     private int activationIdCounter = 0;
 
-    private final TreeSet<Activation> activationsQueue = new TreeSet<>();
-
-    private final Deque<Link> linkQueue = new ArrayDeque<>();
+    private final TreeSet<QueueEntry> queue = new TreeSet<>();
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
@@ -57,35 +52,23 @@ public abstract class Thought {
         activationsById.put(act.getId(), act);
     }
 
-    public void addActivationToQueue(Activation act) {
-        activationsQueue.add(act);
+    public void addToQueue(QueueEntry qe) {
+        queue.add(qe);
     }
 
-    public void removeActivationFromQueue(Activation act) {
-        activationsQueue.remove(act);
+    public void removeActivationFromQueue(QueueEntry qe) {
+        queue.remove(qe);
     }
 
     public abstract void linkInputRelations(Activation act);
 
-    public void addLinkToQueue(Link l) {
-        linkQueue.add(l);
-    }
-
     public void process(Model m) {
-        while (!activationsQueue.isEmpty()) {
-            activationsQueue
+        while (!queue.isEmpty()) {
+            queue
                     .pollFirst()
                     .process();
         }
         m.addToN(length());
-    }
-
-    public void processLinks() {
-        while (!linkQueue.isEmpty()) {
-            linkQueue
-                    .pollFirst()
-                    .propagate();
-        }
     }
 
     public Config getConfig() {
@@ -143,20 +126,6 @@ public abstract class Thought {
 
     public String activationsToString(boolean includeLink) {
         StringBuilder sb = new StringBuilder();
-/*
-        sb.append("Id -");
-
-        sb.append(" Decision -");
-
-        sb.append(" Range | Text Snippet");
-        sb.append(" | Identity -");
-        sb.append(" Neuron Label -");
-        sb.append(" Upper Bound -");
-        sb.append(" Value | Net | Weight -");
-        sb.append(" Input Value |");
-        sb.append("\n");
-        sb.append("\n");
-*/
         for(Activation act: activationsById.values()) {
 /*            if(!act.isActive()) {
                 continue;

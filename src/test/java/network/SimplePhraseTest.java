@@ -1,14 +1,11 @@
 package network;
 
 import network.aika.neuron.Neuron;
-import network.aika.neuron.phase.Phase;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
-
-import static network.aika.neuron.phase.Phase.*;
 
 public class SimplePhraseTest {
 

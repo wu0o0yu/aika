@@ -1,10 +1,9 @@
-package network.aika.neuron.phase;
+package network.aika.neuron.phase.activation;
 
-import network.aika.Config;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 
-public class UpdateWeights implements Phase {
+public class UpdateWeights implements ActivationPhase {
 
     @Override
     public void process(Activation act) {
@@ -18,12 +17,12 @@ public class UpdateWeights implements Phase {
     }
 
     @Override
-    public void tryToLink(Activation iAct, Activation oAct, Visitor c) {
+    public void tryToLink(Activation iAct, Activation oAct, Visitor v) {
 
     }
 
     @Override
-    public void propagate(Activation act) {
+    public void propagate(Activation act, Visitor v) {
 
     }
 

@@ -37,12 +37,12 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     public InhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
         super(input, output);
     }
-
+/*
     @Override
     public boolean inductionRequired(Class<? extends Neuron> type) {
         return false;
     }
-
+*/
     @Override
     public byte getType() {
         return type;
@@ -63,13 +63,13 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         input.getNeuron().setModified(true);
     }
 
-    public void transition(Visitor v, Activation nextAct) {
+    public void transition(Visitor v, Activation nextAct, boolean create) {
         if(v.downUpDir == INPUT && v.origin.getNeuron() == getOutput()) {
             return;
         }
 
         Visitor nv = v.prepareNextStep();
         nv.incrementPathLength();
-        nv.follow(nextAct);;
+        nv.follow(nextAct);
     }
 }

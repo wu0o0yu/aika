@@ -1,13 +1,12 @@
-package network.aika.neuron.phase;
+package network.aika.neuron.phase.activation;
 
-import network.aika.Config;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 
-public class Softmax implements Phase {
+public class Final implements ActivationPhase {
     @Override
     public void process(Activation act) {
-        act.computeBranchProbability();
+
     }
 
     @Override
@@ -16,22 +15,22 @@ public class Softmax implements Phase {
     }
 
     @Override
-    public void tryToLink(Activation iAct, Activation oAct, Visitor c) {
+    public void tryToLink(Activation iAct, Activation oAct, Visitor v) {
 
     }
 
     @Override
-    public void propagate(Activation act) {
+    public void propagate(Activation act, Visitor v) {
 
     }
 
     @Override
     public int getRank() {
-        return 3;
+        return 9;
     }
 
     @Override
-    public int compare(Activation act1, Activation act2) {
+    public int compare(Activation o1, Activation o2) {
         return 0;
     }
 }

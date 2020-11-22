@@ -15,13 +15,13 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
     public PrimaryInhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
         super(input, output);
     }
-
+/*
     @Override
     public boolean inductionRequired(Class<? extends Neuron> type) {
         return type == InhibitoryNeuron.class;
     }
-
-    public void transition(Visitor v, Activation nextAct) {
+*/
+    public void transition(Visitor v, Activation nextAct, boolean create) {
         Visitor nv = v.prepareNextStep();
         nv.incrementPathLength();
 

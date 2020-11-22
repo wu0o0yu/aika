@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase;
+package network.aika.neuron.phase.activation;
 
-import network.aika.Config;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
@@ -24,6 +23,7 @@ import network.aika.neuron.activation.Visitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 
 
@@ -31,7 +31,7 @@ import static network.aika.neuron.activation.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Linking implements Phase {
+public class Linking implements ActivationPhase {
     private static final Logger log = LoggerFactory.getLogger(Linking.class);
 
     @Override
@@ -64,6 +64,10 @@ public class Linking implements Phase {
             return;
         }
 
+        s.transition(v, v.downUpDir == INPUT ? iAct : oAct, true);
+
+/*
+In transition verlagern
         Link ol = oAct.getInputLink(s);
         if (ol != null) {
 //                    oAct = oAct.cloneToReplaceLink(s);
@@ -72,11 +76,12 @@ public class Linking implements Phase {
         }
 
         Link.link(s, iAct, oAct, v.getSelfRef());
+ */
     }
 
 
     @Override
-    public void propagate(Activation act) {
+    public void propagate(Activation act, Visitor v) {
         act.getModel().linkInputRelations(act, OUTPUT);
         act.propagateIntern();
     }

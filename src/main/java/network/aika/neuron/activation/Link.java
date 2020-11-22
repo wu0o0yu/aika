@@ -21,11 +21,12 @@ import network.aika.Utils;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.phase.Phase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static network.aika.neuron.phase.Phase.FINAL_LINKING;
-import static network.aika.neuron.phase.Phase.INITIAL_LINKING;
+import static network.aika.neuron.phase.activation.ActivationPhase.FINAL_LINKING;
+import static network.aika.neuron.phase.activation.ActivationPhase.INITIAL_LINKING;
 import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Direction.INPUT;
 
@@ -33,7 +34,7 @@ import static network.aika.neuron.activation.Direction.INPUT;
  *
  * @author Lukas Molzberger
  */
-public class Link {
+public class Link extends QueueEntry {
 
     private static final Logger log = LoggerFactory.getLogger(Link.class);
 
@@ -74,7 +75,7 @@ public class Link {
         output.setMarked(true);
 
         Visitor v = new Visitor(output, INPUT);
-        synapse.transition(v, input);
+        synapse.transition(v, input, true);
 
         output.setMarked(false);
     }
@@ -208,7 +209,7 @@ public class Link {
 
     public void addToQueue() {
         if (synapse.getWeight() > 0.0) {
-            output.getThought().addLinkToQueue(this);
+            output.getThought().addToQueue(this);
         }
     }
 
@@ -260,11 +261,14 @@ public class Link {
     }
 
     public String toString() {
-        return "l " + synapse.getClass().getSimpleName() + ": " + getIdString() + " --> " + output.getShortString();
+        return synapse.getClass().getSimpleName() +
+                ": " + getIdString() +
+                " --> " + output.getShortString() +
+                Phase.toString(phase);
     }
 
     public String toDetailedString() {
-        return "l in:[" + input.getShortString() +
+        return "in:[" + input.getShortString() +
                 " v:" + Utils.round(input.getValue()) + "] - s:[" + synapse.toString() + "] - out:[" + input.getShortString() + " v:" + Utils.round(input.getValue()) + "]";
     }
 
@@ -280,5 +284,10 @@ public class Link {
 
     public boolean isNegative() {
         return synapse.getWeight() < 0.0;
+    }
+
+    @Override
+    public boolean isActive() {
+        return true;
     }
 }

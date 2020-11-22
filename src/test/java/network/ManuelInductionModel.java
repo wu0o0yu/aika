@@ -10,13 +10,13 @@ import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.PrimaryInhibitorySynapse;
-import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.activation.ActivationPhase;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
 
-import static network.aika.neuron.phase.Phase.*;
-import static network.aika.neuron.phase.Phase.FINAL;
+import static network.aika.neuron.phase.activation.ActivationPhase.*;
+import static network.aika.neuron.phase.activation.ActivationPhase.FINAL;
 
 public class ManuelInductionModel {
 
@@ -31,7 +31,7 @@ public class ManuelInductionModel {
     }
 
     public void initToken(Document doc, boolean activateInduction) {
-        Phase[] phaseswT = new Phase[]{
+        ActivationPhase[] phaseswT = new ActivationPhase[]{
                 INITIAL_LINKING,
                 PREPARE_FINAL_LINKING,
                 FINAL_LINKING,
@@ -43,7 +43,7 @@ public class ManuelInductionModel {
                 INDUCTION,
                 FINAL
         };
-        Phase[] phaseswoT = new Phase[]{
+        ActivationPhase[] phaseswoT = new ActivationPhase[]{
                 INITIAL_LINKING,
                 PREPARE_FINAL_LINKING,
                 FINAL_LINKING,
@@ -53,7 +53,7 @@ public class ManuelInductionModel {
         };
 
         doc.setConfig(new Config() {
-
+/*
                     public boolean checkPatternPartNeuronInduction(Neuron n) {
                         return n.isInputNeuron();
                     }
@@ -61,8 +61,13 @@ public class ManuelInductionModel {
                     public boolean checkInhibitoryNeuronInduction(Neuron n) {
                         return n.isInputNeuron() || n instanceof PatternNeuron;
                     }
+*/
+                    public boolean checkNeuronInduction(Activation act) {
 
-                    public boolean checkPatternNeuronInduction(Activation act) {
+                        if(act.getNeuron().isInputNeuron()) {
+                            return false;
+                        }
+
                         return true;
                     }
 

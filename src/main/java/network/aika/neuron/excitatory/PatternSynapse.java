@@ -16,10 +16,12 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
         super(input, output);
     }
 
+    /*
     @Override
     public boolean inductionRequired(Class<? extends Neuron> type) {
         return false;
     }
+*/
 
     public Activation getOutputActivationToLink(Activation oAct, Visitor v) {
         if (getOutput().isInputNeuron()) {
@@ -30,7 +32,7 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
     }
 
     @Override
-    public void transition(Visitor v, Activation nextAct) {
+    public void transition(Visitor v, Activation nextAct, boolean create) {
         Visitor nv = v.prepareNextStep();
         nv.incrementPathLength();
 

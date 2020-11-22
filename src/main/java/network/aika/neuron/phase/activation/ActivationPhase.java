@@ -14,50 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase;
+package network.aika.neuron.phase.activation;
 
-import network.aika.Config;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.phase.Phase;
+
+import java.util.Comparator;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Training implements Phase {
+public interface ActivationPhase extends Phase<Activation> {
+    ActivationPhase INITIAL_LINKING = new Linking();
+    ActivationPhase PREPARE_FINAL_LINKING = new PrepareFinalLinking();
+    ActivationPhase FINAL_LINKING = new FinalLinking();
+    ActivationPhase SOFTMAX = new Softmax();
+    ActivationPhase COUNTING = new Counting();
+    ActivationPhase TRAINING = new Training();
+    ActivationPhase GRADIENTS = new Gradients();
+    ActivationPhase UPDATE_WEIGHTS = new UpdateWeights();
+    ActivationPhase INDUCTION = new Induction();
+    ActivationPhase FINAL = new Final();
 
+    void process(Activation act);
 
-    @Override
-    public void process(Activation act) {
-        if(act.getNeuron().isInputNeuron()) {
-            return;
-        }
+    boolean isFinal();
 
-        act.train();
-    }
+    void tryToLink(Activation iAct, Activation oAct, Visitor v);
 
-    @Override
-    public boolean isFinal() {
-        return true;
-    }
-
-    @Override
-    public void tryToLink(Activation iAct, Activation oAct, Visitor c) {
-    }
-
-    @Override
-    public void propagate(Activation act) {
-    }
-
-    @Override
-    public int getRank() {
-        return 5;
-    }
-
-    @Override
-    public int compare(Activation act1, Activation act2) {
-        return 0;
-    }
+    void propagate(Activation act, Visitor v);
 }

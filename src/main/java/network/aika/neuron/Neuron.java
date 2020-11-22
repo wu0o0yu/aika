@@ -21,7 +21,7 @@ import network.aika.neuron.activation.*;
 import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
-import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.activation.ActivationPhase;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +82,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract Fired incrementFired(Fired f);
 
-    public abstract void transition(Visitor v, Activation act);
+    public abstract void transition(Visitor v, Activation act, boolean create);
 
     public abstract byte getType();
 
@@ -203,7 +203,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         modified = true;
     }
 
-    public double getBias(Phase p) {
+    public double getBias(ActivationPhase p) {
         return bias;
     }
 
@@ -233,7 +233,9 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         }
     }
 
-    public abstract void induceNeuron(Activation act);
+    public abstract Stream<Synapse> getTemplateSynapses();
+
+//    public abstract void induceNeuron(Activation act);
 
     public Activation initInducedNeuron(Activation iAct) {
         setDescriptionLabel(iAct.getConfig().getLabel(iAct, this));

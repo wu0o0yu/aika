@@ -20,7 +20,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.activation.ActivationPhase;
 
 import java.util.Comparator;
 import java.util.Set;
@@ -32,17 +32,17 @@ public class Config {
     private Double alpha = null; //0.99;
     private double learnRate;
 
-    private Set<Phase> phases = new TreeSet<>(Comparator.comparing(p -> p.getRank()));
+    private Set<ActivationPhase> phases = new TreeSet<>(Comparator.comparing(p -> p.getRank()));
 
     private double surprisalInductionThreshold = 2.0;
     private double gradientInductionThreshold = 2.0;
 
-    public Set<Phase> getPhases() {
+    public Set<ActivationPhase> getPhases() {
         return phases;
     }
 
-    public Config setPhases(Phase... phases) {
-        for(Phase p: phases) {
+    public Config setPhases(ActivationPhase... phases) {
+        for(ActivationPhase p: phases) {
             this.phases.add(p);
         }
         return this;
@@ -83,7 +83,7 @@ public class Config {
         this.gradientInductionThreshold = gradientInductionThreshold;
         return this;
     }
-
+/*
     public boolean checkPatternPartNeuronInduction(Neuron n) {
         double s = n.getSurprisal(POS);
 
@@ -96,8 +96,8 @@ public class Config {
 
         return s < getSurprisalInductionThreshold();
     }
-
-    public boolean checkPatternNeuronInduction(Activation act) {
+*/
+    public boolean checkNeuronInduction(Activation act) {
         double s = act.getSelfGradient();
 
         return s < getGradientInductionThreshold();

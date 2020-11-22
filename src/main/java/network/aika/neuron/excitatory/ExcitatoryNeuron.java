@@ -20,7 +20,7 @@ import network.aika.*;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
-import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.activation.ActivationPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,8 +98,8 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         return new Fired(f.getInputTimestamp(), f.getFired() + 1);
     }
 
-    public double getBias(Phase p) {
-        return super.getBias(p) + (directConjunctiveBias + (p == Phase.INITIAL_LINKING ? 0.0 : recurrentConjunctiveBias));
+    public double getBias(ActivationPhase p) {
+        return super.getBias(p) + (directConjunctiveBias + (p == ActivationPhase.INITIAL_LINKING ? 0.0 : recurrentConjunctiveBias));
     }
 
     public void updatePropagateFlag() {
