@@ -132,18 +132,13 @@ public class Visitor {
         act.setMarked(false);
     }
 
-
     public void tryToLink(Activation act) {
         if (scope == INPUT && related) return;
         if (startDir == INPUT && !act.isActive()) return; // <--
         if (act == origin || act.isConflicting()) return; // <--
 
-        Activation iAct = startDir == INPUT ? act : origin;
-        Activation oAct = startDir == OUTPUT ? act : origin;
-
-        iAct.getPhase().tryToLink(iAct, oAct, this);
+        origin.getPhase().tryToLink(act, this);
     }
-
 
     public String toString() {
         StringBuilder sb = new StringBuilder();

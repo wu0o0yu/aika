@@ -260,6 +260,16 @@ public class Link extends QueueEntry {
         input.outputLinks.remove(ok, this);
     }
 
+    @Override
+    public boolean isActive() {
+        return true;
+    }
+
+    @Override
+    public Thought getThought() {
+        return output.getThought();
+    }
+
     public String toString() {
         return synapse.getClass().getSimpleName() +
                 ": " + getIdString() +
@@ -284,10 +294,5 @@ public class Link extends QueueEntry {
 
     public boolean isNegative() {
         return synapse.getWeight() < 0.0;
-    }
-
-    @Override
-    public boolean isActive() {
-        return true;
     }
 }

@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
 
 /**
  *
@@ -49,7 +50,10 @@ public class Induction implements ActivationPhase {
     }
 
     @Override
-    public void tryToLink(Activation iAct, Activation oAct, Visitor v) {
+    public void tryToLink(Activation act, Visitor v) {
+        Activation iAct = v.startDir == INPUT ? act : v.origin;
+        Activation oAct = v.startDir == OUTPUT ? act : v.origin;
+
         Neuron n = oAct.getNeuron();
 
         if(!iAct.isActive() ||

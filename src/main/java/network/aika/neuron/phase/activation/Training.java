@@ -41,7 +41,7 @@ public class Training implements ActivationPhase {
     }
 
     @Override
-    public void tryToLink(Activation iAct, Activation oAct, Visitor v) {
+    public void tryToLink(Activation act, Visitor v) {
     }
 
     @Override
@@ -50,7 +50,7 @@ public class Training implements ActivationPhase {
 
     @Override
     public int getRank() {
-        return 5;
+        return 8;
     }
 
     @Override

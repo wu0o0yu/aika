@@ -45,7 +45,10 @@ public class Linking implements ActivationPhase {
     }
 
     @Override
-    public void tryToLink(Activation iAct, Activation oAct, Visitor v) {
+    public void tryToLink(Activation act, Visitor v) {
+        Activation iAct = v.startDir == INPUT ? act : v.origin;
+        Activation oAct = v.startDir == OUTPUT ? act : v.origin;
+
         if(!iAct.isActive()) {
             return;
         }
@@ -64,7 +67,7 @@ public class Linking implements ActivationPhase {
             return;
         }
 
-        s.transition(v, v.downUpDir == INPUT ? oAct : iAct, v.downUpDir == INPUT ? iAct : oAct, true);
+        s.transition(v, act, v.origin, true);
 
 /*
 In transition verlagern

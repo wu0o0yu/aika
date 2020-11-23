@@ -42,7 +42,7 @@ public interface ActivationPhase extends Phase<Activation> {
 
     boolean isFinal();
 
-    void tryToLink(Activation iAct, Activation oAct, Visitor v);
+    void tryToLink(Activation act, Visitor v);
 
     void propagate(Activation act, Visitor v);
 }

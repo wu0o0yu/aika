@@ -16,7 +16,7 @@ public class PrepareFinalLinking implements ActivationPhase {
     }
 
     @Override
-    public void tryToLink(Activation iAct, Activation oAct, Visitor v) {
+    public void tryToLink(Activation act, Visitor v) {
 
     }
 

@@ -15,7 +15,7 @@ public class Softmax implements ActivationPhase {
     }
 
     @Override
-    public void tryToLink(Activation iAct, Activation oAct, Visitor v) {
+    public void tryToLink(Activation act, Visitor v) {
 
     }
 
@@ -26,7 +26,7 @@ public class Softmax implements ActivationPhase {
 
     @Override
     public int getRank() {
-        return 3;
+        return 5;
     }
 
     @Override

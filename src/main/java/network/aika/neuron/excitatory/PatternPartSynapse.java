@@ -75,7 +75,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     }
 
     @Override
-    public void transition(Visitor v, Activation fromAct, Activation nextAct, boolean create) {
+    public void transition(Visitor v, Activation fromAct, Activation toAct, boolean create) {
         if (v.startDir == INPUT && output.getNeuron().isInputNeuron() && output.getNeuron() == v.origin.getNeuron()) { //X
             return;
         }
@@ -86,8 +86,8 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
 
             nv.related = true;
 
-            next(null, nextAct, nv, create);
-//            nv.follow(nextAct);
+            next(fromAct, toAct, nv, create);
+//            nv.follow(toAct);
 
             if(v.downUpDir == INPUT) {
                 return;
@@ -120,8 +120,8 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
             }
         }
 
-        //nv.follow(nextAct);
-        next(null, nextAct, nv, create);
+        //nv.follow(toAct);
+        next(fromAct, toAct, nv, create);
     }
 
     @Override

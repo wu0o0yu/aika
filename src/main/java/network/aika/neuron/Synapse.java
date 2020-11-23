@@ -86,6 +86,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public void next(Activation fromAct, Activation nextAct, Visitor v, boolean create) {
         if(create) {
+            if(getOutput().isInputNeuron())
+                return;
+
             if (nextAct == null) {
                 nextAct = fromAct.createActivation(getOutput());
             }

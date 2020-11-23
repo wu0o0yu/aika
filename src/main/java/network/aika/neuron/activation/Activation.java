@@ -21,6 +21,7 @@ import network.aika.neuron.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.activation.ActivationPhase;
+import network.aika.neuron.phase.link.LinkPhase;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -88,7 +89,7 @@ public class Activation extends QueueEntry<ActivationPhase> implements Comparabl
     }
 
     public void initInput(Reference ref) {
-        queueState = new QueueState(this);
+        queueState = new QueueState(this, getThought().getConfig().getPhases());
 
         setReference(ref);
 
@@ -139,14 +140,6 @@ public class Activation extends QueueEntry<ActivationPhase> implements Comparabl
         return getNeuron().getDescriptionLabel();
     }
 
-    public void addToQueue(ActivationPhase p) {
-        if(p == null) {
-            return;
-        }
-
-        queueState.addPhase(this, p);
-    }
-
     public <R extends Reference> R getReference() {
         return (R) reference;
     }
@@ -194,7 +187,7 @@ public class Activation extends QueueEntry<ActivationPhase> implements Comparabl
         if (!isFinal) return this;
 
         Activation clonedAct = new Activation(id, thought, neuron);
-        queueState.setActToQueue(clonedAct);
+        queueState.setEntryToQueue(clonedAct);
         clonedAct.queueState = queueState;
         clonedAct.round = round + 1;
         clonedAct.lastRound = this;
@@ -333,7 +326,7 @@ public class Activation extends QueueEntry<ActivationPhase> implements Comparabl
 
     public Activation createActivation(Neuron n) {
         Activation act = new Activation(thought.createActivationId(), thought, n);
-        act.queueState = new QueueState(act);
+        act.queueState = new QueueState(act, getThought().getConfig().getPhases());
         return act;
     }
 
@@ -539,8 +532,12 @@ public class Activation extends QueueEntry<ActivationPhase> implements Comparabl
     public void count() {
         getNeuron().count(this);
 
-        getInputLinks()
-                .forEach(l -> l.count());
+        addLinksToQueue(INPUT, LinkPhase.COUNTING);
+    }
+
+    public void addLinksToQueue(Direction dir, LinkPhase... phases) {
+        (dir == INPUT ? getInputLinks() : getOutputLinks())
+                .forEach(l -> l.addToQueue(phases));
     }
 
     public boolean equals(Activation act) {

@@ -4,6 +4,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 
 public class Counting implements ActivationPhase {
+
     @Override
     public void process(Activation act) {
         act.count();
@@ -15,7 +16,7 @@ public class Counting implements ActivationPhase {
     }
 
     @Override
-    public void tryToLink(Activation iAct, Activation oAct, Visitor v) {
+    public void tryToLink(Activation act, Visitor v) {
 
     }
 

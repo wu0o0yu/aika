@@ -1,24 +1,31 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.neuron.phase.activation.ActivationPhase;
+import network.aika.neuron.phase.Phase;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.TreeSet;
 
-public class QueueState {
+public class QueueState<P extends Phase> {
 
-    private TreeSet<ActivationPhase> pendingPhases = new TreeSet<>(Comparator.comparing(p -> p.getRank()));;
-    private Activation actToQueue;
-    private Activation queuedAct;
+    private TreeSet<P> pendingPhases = new TreeSet<>(Comparator.comparing(p -> p.getRank()));;
+    private QueueEntry<P> entryToQueue;
+    private QueueEntry<P> queuedAct;
     private boolean marked;
 
     private QueueState() {
     }
 
-    public QueueState(Activation act) {
-        actToQueue = act;
-        pendingPhases.addAll(act.getThought().getConfig().getPhases());
+    public QueueState(QueueEntry<P> entry, P... initialPhases) {
+        entryToQueue = entry;
+        pendingPhases.addAll(Arrays.asList(initialPhases));
+    }
+
+    public QueueState(QueueEntry<P> entry, Collection<P> initialPhases) {
+        entryToQueue = entry;
+        pendingPhases.addAll(initialPhases);
     }
 
     public boolean isMarked() {
@@ -29,13 +36,13 @@ public class QueueState {
         this.marked = marked;
     }
 
-    public void setActToQueue(Activation actToQueue) {
-        this.actToQueue = actToQueue;
+    public void setEntryToQueue(QueueEntry<P>  entryToQueue) {
+        this.entryToQueue = entryToQueue;
     }
 
-    public void addPhase(Activation act, ActivationPhase p) {
-        actToQueue = act;
-        pendingPhases.add(p);
+    public void addPhase(QueueEntry<P>  act, P... p) {
+        entryToQueue = act;
+        pendingPhases.addAll(Arrays.asList(p));
 
         updateThoughtQueue();
     }
@@ -44,13 +51,13 @@ public class QueueState {
         if(pendingPhases.isEmpty())
             return;
 
-        Thought t = actToQueue.getThought();
+        Thought t = entryToQueue.getThought();
         if(queuedAct != null) {
             t.removeActivationFromQueue(queuedAct);
         }
-        actToQueue.setPhase(pendingPhases.first());
-        t.addToQueue(actToQueue);
-        queuedAct = actToQueue;
+        entryToQueue.setPhase(pendingPhases.first());
+        t.addToQueue(entryToQueue);
+        queuedAct = entryToQueue;
     }
 
     public void removePendingPhase() {
@@ -61,7 +68,7 @@ public class QueueState {
     public QueueState copy(Activation newAct) {
         QueueState qs = new QueueState();
         qs.pendingPhases.addAll(pendingPhases);
-        qs.actToQueue = newAct;
+        qs.entryToQueue = newAct;
         return qs;
     }
 
