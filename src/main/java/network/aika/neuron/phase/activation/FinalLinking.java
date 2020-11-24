@@ -17,6 +17,6 @@ public class FinalLinking extends Linking {
 
     @Override
     public int getRank() {
-        return 3;
+        return 4;
     }
 }

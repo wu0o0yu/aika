@@ -68,18 +68,6 @@ public class Linking implements ActivationPhase {
         }
 
         s.transition(v, act, v.origin, true);
-
-/*
-In transition verlagern
-        Link ol = oAct.getInputLink(s);
-        if (ol != null) {
-//                    oAct = oAct.cloneToReplaceLink(s);
-            log.warn("Link already exists!  " + oAct.getThought());
-            return;
-        }
-
-        Link.link(s, iAct, oAct, v.getSelfRef());
- */
     }
 
 
@@ -91,7 +79,7 @@ In transition verlagern
 
     @Override
     public int getRank() {
-        return 0;
+        return 1;
     }
 
     @Override

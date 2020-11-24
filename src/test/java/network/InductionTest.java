@@ -102,7 +102,7 @@ public class InductionTest {
         Link.link(sB, actB, actTarget, false);
 
         actTarget.initSelfGradient();
-        actTarget.computeInitialLinkGradients();
+ //       actTarget.computeInitialLinkGradients();
         actTarget.updateSelfGradient();
         actTarget.processGradient();
 

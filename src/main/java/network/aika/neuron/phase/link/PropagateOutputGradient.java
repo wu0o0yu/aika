@@ -2,20 +2,20 @@ package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.Link;
 
-public class Linking implements LinkPhase {
+public class PropagateOutputGradient implements LinkPhase {
 
     @Override
     public void process(Link l) {
-        l.propagate();
+        l.getOutput().addInputGradient(l.getOutputGradient());
     }
 
     @Override
     public int getRank() {
-        return 0;
+        return 11;
     }
 
     @Override
-    public int compare(Link l1, Link l2) {
+    public int compare(Link o1, Link o2) {
         return 0;
     }
 }

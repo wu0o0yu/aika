@@ -27,7 +27,7 @@ public class Counting implements ActivationPhase {
 
     @Override
     public int getRank() {
-        return 4;
+        return 6;
     }
 
     @Override

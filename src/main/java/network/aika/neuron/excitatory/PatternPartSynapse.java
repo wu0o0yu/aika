@@ -87,7 +87,6 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
             nv.related = true;
 
             next(fromAct, toAct, nv, create);
-//            nv.follow(toAct);
 
             if(v.downUpDir == INPUT) {
                 return;
@@ -120,7 +119,6 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
             }
         }
 
-        //nv.follow(toAct);
         next(fromAct, toAct, nv, create);
     }
 

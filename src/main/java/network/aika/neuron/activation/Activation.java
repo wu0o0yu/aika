@@ -22,6 +22,7 @@ import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.activation.ActivationPhase;
 import network.aika.neuron.phase.link.LinkPhase;
+import network.aika.neuron.phase.link.PropagateGradient;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,6 +32,9 @@ import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
+import static network.aika.neuron.phase.activation.ActivationPhase.FINAL_LINKING;
+import static network.aika.neuron.phase.activation.ActivationPhase.INITIAL_LINKING;
+import static network.aika.neuron.phase.link.LinkPhase.*;
 
 /**
  *
@@ -278,8 +282,14 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
     public void train() {
         initSelfGradient();
-        computeInitialLinkGradients();
-        updateSelfGradient();
+
+        addLinksToQueue(
+                INPUT,
+                OUTPUT_GRADIENT,
+                GRADIENT_DEPENDENCIES,
+                PROPAGATE_OUTPUT_GRADIENT,
+                PROPAGATE_SELF_GRADIENT
+        );
     }
 
     public void linkForward() {
@@ -422,17 +432,6 @@ public class Activation extends QueueEntry<ActivationPhase> {
                 );
     }
 
-    public void computeInitialLinkGradients() {
-        getInputLinks()
-                .forEach(l -> l.computeOutputGradient());
-
-        getInputLinks()
-                .forEach(l -> l.removeGradientDependencies());
-
-        getInputLinks()
-                .forEach(l -> addInputGradient(l.getOutputGradient()));
-    }
-
     public void initSelfGradient() {
         selfGradient = getNorm() * getActFunctionDerivative() *
                 getNeuron().getSurprisal(
@@ -445,9 +444,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void updateSelfGradient() {
-        getInputLinks().forEach(l ->
-                l.updateAndPropagateSelfGradient()
-        );
+
     }
 
     public double getSelfGradient() {
@@ -462,10 +459,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
         if (getNeuron().isInputNeuron())
             return;
 
-        inputLinks.values()
-                .forEach(l ->
-                        l.propagateGradient(unpropagatedGradient)
-                );
+        addLinksToQueue(INPUT, new PropagateGradient(unpropagatedGradient));
 
         unpropagatedGradient = 0.0;
     }

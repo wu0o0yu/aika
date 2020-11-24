@@ -2,16 +2,16 @@ package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.Link;
 
-public class Linking implements LinkPhase {
+public class PropagateSelfGradient implements LinkPhase {
 
     @Override
     public void process(Link l) {
-        l.propagate();
+        l.updateAndPropagateSelfGradient();
     }
 
     @Override
     public int getRank() {
-        return 0;
+        return 12;
     }
 
     @Override

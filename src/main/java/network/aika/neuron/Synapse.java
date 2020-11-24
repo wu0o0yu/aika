@@ -23,6 +23,8 @@ import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Link;
 import org.apache.commons.math3.distribution.BetaDistribution;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -36,6 +38,8 @@ import static network.aika.neuron.Sign.POS;
  * @author Lukas Molzberger
  */
 public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implements Writable {
+
+    private static final Logger log = LoggerFactory.getLogger(Synapse.class);
 
     public static double TOLERANCE = 0.0000001;
 
@@ -84,19 +88,27 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Activation getOutputActivationToLink(Activation oAct, Visitor v);
 
-    public void next(Activation fromAct, Activation nextAct, Visitor v, boolean create) {
+    public void next(Activation fromAct, Activation toAct, Visitor v, boolean create) {
         if(create) {
-            if (nextAct == null) {
-                nextAct = fromAct.createActivation(getOutput());
+            // Richtung prüfen
+            if (toAct == null) {
+                toAct = fromAct.createActivation(getOutput());
+            } else {
+                Link ol = toAct.getInputLink(this);
+                if (ol != null) {
+//                    toAct = oAct.cloneToReplaceLink(s);
+                    log.warn("Link already exists!  " + toAct.getThought());
+                    return;
+                }
             }
             Link.link(
                     this,
                     fromAct,
-                    nextAct,
-                    false
+                    toAct,
+                    v.getSelfRef()
             );
         } else {
-            v.follow(nextAct);
+            v.follow(toAct);
         }
     }
 
