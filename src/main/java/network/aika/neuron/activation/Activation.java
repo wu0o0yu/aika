@@ -36,7 +36,7 @@ import static network.aika.neuron.phase.activation.ActivationPhase.*;
  *
  * @author Lukas Molzberger
  */
-public class Activation extends QueueEntry<ActivationPhase> implements Comparable<Activation> {
+public class Activation extends QueueEntry<ActivationPhase> {
 
     public static double TOLERANCE = 0.001;
 
@@ -86,6 +86,8 @@ public class Activation extends QueueEntry<ActivationPhase> implements Comparabl
 
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>();
+
+        phase = INITIAL_LINKING;
     }
 
     public void initInput(Reference ref) {
@@ -130,6 +132,11 @@ public class Activation extends QueueEntry<ActivationPhase> implements Comparabl
 
     public Thought getThought() {
         return thought;
+    }
+
+    @Override
+    protected int innerCompareTo(QueueEntry<ActivationPhase> qe) {
+        return Integer.compare(getId(), ((Activation) qe).getId());
     }
 
     public OutputKey getOutputKey() {
@@ -281,8 +288,6 @@ public class Activation extends QueueEntry<ActivationPhase> implements Comparabl
         } else {
             updateOutgoingLinks();
         }
-
-//        thought.processLinks();
     }
 
     private void updateOutgoingLinks() {
@@ -307,21 +312,9 @@ public class Activation extends QueueEntry<ActivationPhase> implements Comparabl
     }
 
     public void propagateIntern(Visitor v) {
-//        getThought().processLinks();
-
         getNeuron().getOutputSynapses()
                 .filter(s -> !outputLinkExists(s))
                 .forEach(s -> s.transition(v, this, null, true));
-/*                .forEach(s ->
-                        Link.link(
-                                s,
-                                this,
-                                createActivation(s.getOutput()),
-                                false
-                        )
-                );
-
- */
     }
 
     public Activation createActivation(Neuron n) {
@@ -577,15 +570,6 @@ public class Activation extends QueueEntry<ActivationPhase> implements Comparabl
                 .forEach(l -> l.updateSynapse());
 
         getNeuron().updatePropagateFlag();
-    }
-
-    @Override
-    public int compareTo(Activation act) {
-        int r = Integer.compare(getPhase().getRank(), act.getPhase().getRank());
-        if(r != 0) return r;
-        r = getPhase().compare(this, act);
-        if(r != 0) return r;
-        return Integer.compare(getId(), act.getId());
     }
 
     public String getShortString() {

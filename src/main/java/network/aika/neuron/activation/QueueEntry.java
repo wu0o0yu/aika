@@ -4,9 +4,9 @@ import network.aika.Thought;
 import network.aika.neuron.phase.Phase;
 
 
-public abstract class QueueEntry<P extends Phase> {
+public abstract class QueueEntry<P extends Phase> implements Comparable<QueueEntry<P>> {
 
-    protected P phase; // = INITIAL_LINKING;
+    protected P phase;
     protected QueueState<P> queueState;
 
 
@@ -47,4 +47,15 @@ public abstract class QueueEntry<P extends Phase> {
             queueState.updateThoughtQueue();
         }
     }
+
+    @Override
+    public int compareTo(QueueEntry<P> qe) {
+        int r = Integer.compare(getPhase().getRank(), qe.getPhase().getRank());
+        if(r != 0) return r;
+        r = getPhase().compare(this, qe);
+        if(r != 0) return r;
+        return innerCompareTo(qe);
+    }
+
+    protected abstract int innerCompareTo(QueueEntry<P> qe);
 }

@@ -15,7 +15,7 @@ public class QueueState<P extends Phase> {
     private QueueEntry<P> queuedAct;
     private boolean marked;
 
-    private QueueState() {
+    public QueueState() {
     }
 
     public QueueState(QueueEntry<P> entry, P... initialPhases) {

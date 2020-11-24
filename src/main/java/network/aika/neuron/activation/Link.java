@@ -22,6 +22,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.link.LinkPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,7 @@ import static network.aika.neuron.activation.Direction.INPUT;
  *
  * @author Lukas Molzberger
  */
-public class Link extends QueueEntry {
+public class Link extends QueueEntry<LinkPhase> {
 
     private static final Logger log = LoggerFactory.getLogger(Link.class);
 
@@ -55,6 +56,7 @@ public class Link extends QueueEntry {
         this.input = input;
         this.output = output;
         this.isSelfRef = isSelfRef;
+        this.queueState = new QueueState();
     }
 
     public double getFinalGradient() {
@@ -209,7 +211,7 @@ public class Link extends QueueEntry {
 
     public void addToQueue() {
         if (synapse.getWeight() > 0.0) {
-            output.getThought().addToQueue(this);
+            addToQueue(LinkPhase.INITIAL_LINKING);
         }
     }
 
@@ -270,6 +272,15 @@ public class Link extends QueueEntry {
         return output.getThought();
     }
 
+    @Override
+    protected int innerCompareTo(QueueEntry<LinkPhase> qe) {
+        Link l = ((Link) qe);
+        int r = output.innerCompareTo(l.output);
+        if(r != 0) return r;
+
+        return input.innerCompareTo(l.input);
+    }
+
     public String toString() {
         return synapse.getClass().getSimpleName() +
                 ": " + getIdString() +
@@ -295,4 +306,5 @@ public class Link extends QueueEntry {
     public boolean isNegative() {
         return synapse.getWeight() < 0.0;
     }
+
 }
