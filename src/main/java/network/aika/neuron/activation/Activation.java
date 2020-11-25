@@ -372,7 +372,9 @@ public class Activation extends QueueEntry<ActivationPhase> {
         sumUpLink(ol, nl);
         checkIfFired();
 
-        nl.addToQueue();
+        if (nl.getSynapse().getWeight() > 0.0) {
+            nl.addToQueue(LinkPhase.LINKING);
+        }
 
         return nl;
     }

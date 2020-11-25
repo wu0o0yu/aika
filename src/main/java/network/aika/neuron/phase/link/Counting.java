@@ -11,7 +11,7 @@ public class Counting implements LinkPhase {
 
     @Override
     public int getRank() {
-        return 7;
+        return 6;
     }
 
     @Override

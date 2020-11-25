@@ -22,6 +22,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
+import network.aika.neuron.phase.link.LinkPhase;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -90,7 +91,7 @@ public class Induction implements ActivationPhase {
 
     @Override
     public int getRank() {
-        return 8;
+        return 15;
     }
 
     @Override

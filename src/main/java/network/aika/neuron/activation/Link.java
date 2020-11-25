@@ -209,12 +209,6 @@ public class Link extends QueueEntry<LinkPhase> {
         return output.addLink(s, input, isSelfRef);
     }
 
-    public void addToQueue() {
-        if (synapse.getWeight() > 0.0) {
-            addToQueue(LinkPhase.INITIAL_LINKING);
-        }
-    }
-
     public Synapse getSynapse() {
         return synapse;
     }
