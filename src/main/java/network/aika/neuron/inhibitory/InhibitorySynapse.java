@@ -19,6 +19,8 @@ package network.aika.neuron.inhibitory;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.excitatory.PatternSynapse;
 
 import static network.aika.neuron.activation.Direction.INPUT;
 
@@ -37,12 +39,12 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     public InhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
         super(input, output);
     }
-/*
+
     @Override
-    public boolean inductionRequired(Class<? extends Neuron> type) {
-        return false;
+    public Synapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
+        return null;
     }
-*/
+
     @Override
     public byte getType() {
         return type;

@@ -22,6 +22,8 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.inhibitory.PrimaryInhibitorySynapse;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -38,6 +40,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     public static byte type;
 
     public boolean isNegative;
+
     public boolean isRecurrent;
     public boolean inputScope;
     public boolean isSamePattern;
@@ -50,17 +53,21 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         super(input, output);
     }
 
-    /*
-    @Override
-    public boolean inductionRequired(Class<? extends Neuron> type) {
-        if (type == PatternPartNeuron.class) {
-            return isInputScope() && isInputLinked();
-        } else if (type == PatternNeuron.class) {
-            return isSamePattern();
-        }
-        return false;
+    public PatternPartSynapse(I input, PatternPartNeuron output, boolean isNegative, boolean isRecurrent, boolean inputScope, boolean isSamePattern) {
+        super(input, output);
+        this.isNegative = isNegative;
+        this.isRecurrent = isRecurrent;
+        this.inputScope = inputScope;
+        this.isSamePattern = isSamePattern;
     }
-*/
+
+    public Synapse instantiateTemplate(I input, PatternPartNeuron output) {
+        if(getInput() != input.getTemplate()) {
+            return null;
+        }
+        return new PatternPartSynapse(input, output, isNegative, isRecurrent, inputScope, isSamePattern);
+    }
+
     @Override
     public Activation getOutputActivationToLink(Activation oAct, Visitor v) {
         if (getOutput().isInputNeuron() ||

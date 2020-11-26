@@ -29,6 +29,7 @@ import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Direction.INPUT;
@@ -41,6 +42,12 @@ import static network.aika.neuron.activation.Direction.SAME;
 public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     public static byte type;
+
+    public static InhibitoryNeuron THIS_TEMPLATE = new InhibitoryNeuron();
+
+    public static InhibitorySynapse PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE = new InhibitorySynapse(PatternNeuron.THIS_TEMPLATE, THIS_TEMPLATE);
+    public static InhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE = new InhibitorySynapse(PatternPartNeuron.THIS_TEMPLATE, THIS_TEMPLATE);
+
 
     protected InhibitoryNeuron() {
         super();
@@ -55,15 +62,23 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     @Override
-    public Stream<Synapse> getTemplateSynapses() {
-        return null;
+    public Neuron<?> getTemplate() {
+        return THIS_TEMPLATE;
+    }
+
+    @Override
+    public Stream<InhibitorySynapse> getTemplateSynapses() {
+        return Arrays.asList(
+                PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE,
+                INHIBITORY_SYNAPSE_TEMPLATE
+        ).stream();
     }
 
     @Override
     public void addDummyLinks(Activation act) {
 
     }
-
+/*
     @Override
     public void prepareInitialSynapseInduction(Activation iAct, Activation newAct) {
         newAct
@@ -75,16 +90,14 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
                 );
     }
 
+ */
+/*
     @Override
     public void initOutgoingPPSynapse(PatternPartSynapse s, Visitor v) {
         s.setNegative(v.getSelfRef());
         s.setRecurrent(true);
     }
-
-    @Override
-    public InhibitorySynapse induceOutgoingInhibitorySynapse(InhibitoryNeuron outN) {
-        return null;
-    }
+*/
 
     @Override
     public byte getType() {
@@ -104,35 +117,8 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     public void updateReference(Link nl) {
         nl.getOutput().propagateReference(nl.getInput().getReference());
     }
-/*
-    @Override
-    public void induceNeuron(Activation activation) {
 
-    }
-*/
     /*
-    public static Activation induce(Activation iAct) {
-        if(!iAct.getConfig().checkInhibitoryNeuronInduction(iAct.getNeuron())) {
-//            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
-            return null;
-        }
-
-        Activation act = iAct.getOutputLinks()
-                .filter(l -> l.getSynapse().inductionRequired(InhibitoryNeuron.class))
-                .map(l -> l.getOutput())
-                .findAny()
-                .orElse(null);
-
-        if (act == null) {
-            Neuron n = new InhibitoryNeuron(iAct.getModel());
-            act = n.initInducedNeuron(iAct);
-        }
-
-        return act;
-    }
-
-     */
-
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
         InhibitorySynapse s = iAct.getNeuron().induceOutgoingInhibitorySynapse(this);
 
@@ -144,6 +130,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
         return s.initInducedSynapse(iAct, oAct, v);
     }
+     */
 
     @Override
     public Fired incrementFired(Fired f) {

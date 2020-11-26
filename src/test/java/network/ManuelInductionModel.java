@@ -63,8 +63,9 @@ public class ManuelInductionModel {
                     }
 */
                     public boolean checkNeuronInduction(Activation act) {
+                        Neuron n = act.getNeuron();
 
-                        if(act.getNeuron().isInputNeuron()) {
+                        if(n instanceof PatternPartNeuron && n.isInputNeuron()) {
                             return false;
                         }
 

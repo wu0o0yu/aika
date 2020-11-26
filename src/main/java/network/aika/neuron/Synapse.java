@@ -72,7 +72,11 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return template;
     }
 
-//    public abstract boolean inductionRequired(Class<? extends Neuron> type);
+    protected void setTemplate(Synapse template) {
+        this.template = template;
+    }
+
+    public abstract Synapse instantiateTemplate(I input, O output);
 
     public abstract void transition(Visitor v, Activation currentAct, Activation nextAct, boolean create);
 

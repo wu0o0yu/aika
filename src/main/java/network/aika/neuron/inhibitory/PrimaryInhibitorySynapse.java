@@ -2,6 +2,7 @@ package network.aika.neuron.inhibitory;
 
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 
@@ -15,12 +16,16 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
     public PrimaryInhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
         super(input, output);
     }
-/*
+
     @Override
-    public boolean inductionRequired(Class<? extends Neuron> type) {
-        return type == InhibitoryNeuron.class;
+    public Synapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
+        if(getInput() != input.getTemplate()) {
+            return null;
+        }
+
+        return new PrimaryInhibitorySynapse(input, output);
     }
-*/
+
     public void transition(Visitor v, Activation nextAct, boolean create) {
         Visitor nv = v.prepareNextStep();
         nv.incrementPathLength();

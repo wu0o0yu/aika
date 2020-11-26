@@ -16,24 +16,19 @@
  */
 package network.aika.neuron.excitatory;
 
-import network.aika.Config;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
-import network.aika.neuron.inhibitory.PrimaryInhibitorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.activation.Direction.*;
 
 /**
@@ -45,7 +40,16 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     public static byte type;
 
+    public static PatternNeuron THIS_TEMPLATE = new PatternNeuron();
+
+    public static PatternSynapse PATTERN_SYNAPSE_TEMPLATE = new PatternSynapse(PatternPartNeuron.THIS_TEMPLATE, THIS_TEMPLATE);
+
+
     private String tokenLabel;
+
+    private PatternNeuron() {
+        super();
+    }
 
     public PatternNeuron(NeuronProvider p) {
         super(p);
@@ -57,35 +61,13 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     @Override
-    public Stream<Synapse> getTemplateSynapses() {
-        return null;
+    public Neuron<?> getTemplate() {
+        return THIS_TEMPLATE;
     }
 
     @Override
-    public void prepareInitialSynapseInduction(Activation iAct, Activation newAct) {
-        iAct.getNeuron().induceSynapse(
-                newAct,
-                iAct,
-                new Visitor(iAct, newAct, SAME, null, INPUT, false)
-        );
-
-        induceSynapse(
-                iAct,
-                newAct,
-                new Visitor(newAct, iAct, SAME, null, INPUT, false)
-        );
-    }
-
-    @Override
-    public void initOutgoingPPSynapse(PatternPartSynapse s, Visitor v) {
-        s.setInputScope(v.scope == v.downUpDir);
-        s.setRecurrent(v.scope == SAME);
-        s.setSamePattern(v.scope == SAME);
-    }
-
-    @Override
-    public InhibitorySynapse induceOutgoingInhibitorySynapse(InhibitoryNeuron outN) {
-        return new PrimaryInhibitorySynapse(this, outN);
+    public Stream<PatternSynapse> getTemplateSynapses() {
+        return Arrays.asList(PATTERN_SYNAPSE_TEMPLATE).stream();
     }
 
     @Override
@@ -114,48 +96,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
         nl.getOutput().propagateReference(or == null ? ir : or.add(ir));
     }
-
-
-    /*
-    public static Activation induce(Activation act) {
-        if(act.getNeuron().isInputNeuron()) {
-            return null;
-        }
-        if(!act.getConfig().checkPatternNeuronInduction(act)) {
-            return null;
-        }
-
-
-        Activation oAct = act.getInputLinks()
-                .filter(l -> l.getSynapse().inductionRequired(PatternNeuron.class))
-                .map(l -> l.getInput())
-                .findAny()
-                .orElse(null);
-
-        if (oAct == null) {
-            Neuron n = new PatternNeuron(act.getModel(), null);
-            oAct = n.initInducedNeuron(act);
-        }
-
-        return oAct;
-    }
-*/
-/*
-    @Override
-    public void induceNeuron(Activation act) {
-        double s = getSurprisal(POS);
-
-        Config c = act.getThought().getConfig();
-
-        if(s < c.getSurprisalInductionThreshold()) {
-//            System.out.println("N  " + "dbg:" + (Neuron.debugId++) + " " + act.getNeuron().getDescriptionLabel() + "  " + Utils.round(s) + " below threshold");
-            return;
-        }
-
-        PatternPartNeuron.induce(act);
-        InhibitoryNeuron.induce(act);
-    }
-*/
 
     public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
         PatternSynapse s = new PatternSynapse(iAct.getNeuron(), this);

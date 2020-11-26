@@ -76,6 +76,9 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         modified = true;
     }
 
+
+    public abstract Neuron<?> getTemplate();
+
     public abstract void addDummyLinks(Activation act);
 
     public abstract ActivationFunction getActivationFunction();
@@ -233,29 +236,11 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         }
     }
 
-    public abstract Stream<Synapse> getTemplateSynapses();
+    public abstract Stream<S> getTemplateSynapses();
 
-//    public abstract void induceNeuron(Activation act);
+    public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
 
-    public Activation initInducedNeuron(Activation iAct) {
-        setDescriptionLabel(iAct.getConfig().getLabel(iAct, this));
-
-        Activation act = iAct.createActivation(this);
-
-        act.initSelfGradient();
-
-        prepareInitialSynapseInduction(iAct, act);
-
-        return act;
     }
-
-    public abstract void prepareInitialSynapseInduction(Activation iAct, Activation newAct);
-
-    public abstract Link induceSynapse(Activation iAct, Activation oAct, Visitor c);
-
-    public abstract void initOutgoingPPSynapse(PatternPartSynapse s, Visitor v);
-
-    public abstract InhibitorySynapse induceOutgoingInhibitorySynapse(InhibitoryNeuron outN);
 
     public double getSurprisal(Sign s) {
         double p = getP(s, sampleSpace.getN());
