@@ -73,14 +73,6 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         ).stream();
     }
 
-/*
-    public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
-        PatternPartSynapse s = new PatternPartSynapse(iAct.getNeuron(), this);
-        iAct.getNeuron().initOutgoingPPSynapse(s, v);
-
-        return s.initInducedSynapse(iAct, oAct, v);
-    }
-*/
     @Override
     public void transition(Visitor v, Activation act, boolean create) {
         if(v.samePattern) {

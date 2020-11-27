@@ -78,26 +78,6 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     public void addDummyLinks(Activation act) {
 
     }
-/*
-    @Override
-    public void prepareInitialSynapseInduction(Activation iAct, Activation newAct) {
-        newAct
-                .getNeuron()
-                .induceSynapse(
-                        iAct,
-                        newAct,
-                        new Visitor(iAct, newAct, SAME, null, INPUT, false)
-                );
-    }
-
- */
-/*
-    @Override
-    public void initOutgoingPPSynapse(PatternPartSynapse s, Visitor v) {
-        s.setNegative(v.getSelfRef());
-        s.setRecurrent(true);
-    }
-*/
 
     @Override
     public byte getType() {
@@ -117,20 +97,6 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     public void updateReference(Link nl) {
         nl.getOutput().propagateReference(nl.getInput().getReference());
     }
-
-    /*
-    public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
-        InhibitorySynapse s = iAct.getNeuron().induceOutgoingInhibitorySynapse(this);
-
-        if(s == null) {
-            return null;
-        }
-
-        s.setWeight(1.0);
-
-        return s.initInducedSynapse(iAct, oAct, v);
-    }
-     */
 
     @Override
     public Fired incrementFired(Fired f) {
