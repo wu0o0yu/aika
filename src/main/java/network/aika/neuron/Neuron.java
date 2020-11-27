@@ -105,6 +105,10 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return provider;
     }
 
+    public void setProvider(NeuronProvider p) {
+        this.provider = p;
+    }
+
     public Stream<? extends Synapse> getInputSynapses() {
         throw new UnsupportedOperationException();
     }
@@ -234,8 +238,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
             modified = true;
         }
     }
-
-    public abstract Stream<S> getTemplateSynapses();
 
     public double getSurprisal(Sign s) {
         double p = getP(s, sampleSpace.getN());

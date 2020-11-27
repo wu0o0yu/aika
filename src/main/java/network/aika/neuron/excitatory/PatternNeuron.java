@@ -19,6 +19,7 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,14 +41,9 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     public static byte type;
 
-    public static PatternNeuron THIS_TEMPLATE = new PatternNeuron(new NeuronProvider(-1));
-
-    public static PatternSynapse PATTERN_SYNAPSE_TEMPLATE = new PatternSynapse(PatternPartNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null);
-
-
     private String tokenLabel;
 
-    private PatternNeuron() {
+    public PatternNeuron() {
         super();
     }
 
@@ -62,12 +58,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     @Override
     public Neuron<?> getTemplate() {
-        return THIS_TEMPLATE;
-    }
-
-    @Override
-    public Stream<PatternSynapse> getTemplateSynapses() {
-        return Arrays.asList(PATTERN_SYNAPSE_TEMPLATE).stream();
+        return Templates.getTemplates().PATTERN_TEMPLATE;
     }
 
     @Override

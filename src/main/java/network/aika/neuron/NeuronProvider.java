@@ -71,8 +71,14 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
         if (neuron == null) {
             reactivate();
         }
-        neuron.retrievalCount = model.getCurrentRetrievalCount();
+        if(model != null) {
+            neuron.retrievalCount = model.getCurrentRetrievalCount();
+        }
         return neuron;
+    }
+
+    public void setNeuron(Neuron<?> n) {
+        this.neuron = n;
     }
 
     public String getDescriptionLabel() {

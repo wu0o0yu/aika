@@ -37,15 +37,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     public static byte type;
 
-    public static PatternPartNeuron THIS_TEMPLATE = new PatternPartNeuron(new NeuronProvider(-2));
-
-    public static PatternPartSynapse PRIMARY_INPUT_SYNAPSE_TEMPLATE = new PatternPartSynapse(PatternNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null, false, false, true, false);
-    public static PatternPartSynapse RELATED_INPUT_SYNAPSE_TEMPLATE = new PatternPartSynapse(PatternPartNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null, false, false, true, false);
-    public static PatternPartSynapse SAME_PATTERN_SYNAPSE_TEMPLATE = new PatternPartSynapse(PatternPartNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null, false, false, false, true);
-    public static PatternPartSynapse RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE = new PatternPartSynapse(PatternNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null, false, true, false, true);
-    public static PatternPartSynapse NEGATIVE_SYNAPSE_TEMPLATE = new PatternPartSynapse(InhibitoryNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null, true, true, false, false);
-
-    private PatternPartNeuron() {
+    public PatternPartNeuron() {
         super();
     }
 
@@ -59,18 +51,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public Neuron<?> getTemplate() {
-        return THIS_TEMPLATE;
-    }
-
-    @Override
-    public Stream<PatternPartSynapse> getTemplateSynapses() {
-        return Arrays.asList(
-                PRIMARY_INPUT_SYNAPSE_TEMPLATE,
-                RELATED_INPUT_SYNAPSE_TEMPLATE,
-                SAME_PATTERN_SYNAPSE_TEMPLATE,
-                RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE,
-                NEGATIVE_SYNAPSE_TEMPLATE
-        ).stream();
+        return Templates.getTemplates().PATTERN_PART_TEMPLATE;
     }
 
     @Override

@@ -20,6 +20,7 @@ import network.aika.ActivationFunction;
 import network.aika.Model;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Fired;
@@ -43,13 +44,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     public static byte type;
 
-    public static InhibitoryNeuron THIS_TEMPLATE = new InhibitoryNeuron(new NeuronProvider(-3));
-
-    public static InhibitorySynapse PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE = new InhibitorySynapse(PatternNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null);
-    public static InhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE = new InhibitorySynapse(PatternPartNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null);
-
-
-    protected InhibitoryNeuron() {
+    public InhibitoryNeuron() {
         super();
     }
 
@@ -63,15 +58,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     @Override
     public Neuron<?> getTemplate() {
-        return THIS_TEMPLATE;
-    }
-
-    @Override
-    public Stream<InhibitorySynapse> getTemplateSynapses() {
-        return Arrays.asList(
-                PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE,
-                INHIBITORY_SYNAPSE_TEMPLATE
-        ).stream();
+        return Templates.getTemplates().INHIBITORY_TEMPLATE;
     }
 
     @Override
