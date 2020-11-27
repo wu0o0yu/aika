@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.Templates.PATTERN_PART_TEMPLATE;
 import static network.aika.neuron.activation.Direction.*;
 
 /**
@@ -51,7 +52,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public Neuron<?> getTemplate() {
-        return Templates.getTemplates().PATTERN_PART_TEMPLATE;
+        return PATTERN_PART_TEMPLATE;
     }
 
     @Override

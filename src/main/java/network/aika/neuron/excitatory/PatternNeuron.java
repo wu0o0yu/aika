@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.Templates.PATTERN_TEMPLATE;
 import static network.aika.neuron.activation.Direction.*;
 
 /**
@@ -58,7 +59,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     @Override
     public Neuron<?> getTemplate() {
-        return Templates.getTemplates().PATTERN_TEMPLATE;
+        return PATTERN_TEMPLATE;
     }
 
     @Override

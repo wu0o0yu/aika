@@ -61,7 +61,8 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         this.isSamePattern = isSamePattern;
     }
 
-    public Synapse instantiateTemplate(I input, PatternPartNeuron output) {
+    @Override
+    public PatternPartSynapse instantiateTemplate(I input, PatternPartNeuron output) {
         if(getInput() != input.getTemplate()) {
             return null;
         }

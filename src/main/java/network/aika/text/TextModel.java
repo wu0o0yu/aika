@@ -17,6 +17,7 @@
 package network.aika.text;
 
 import network.aika.Model;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Reference;
 import network.aika.SuspensionHook;
 import network.aika.neuron.Neuron;
@@ -27,6 +28,8 @@ import network.aika.neuron.activation.Direction;
 import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
+
+import static network.aika.neuron.Templates.*;
 
 
 /**
@@ -127,7 +130,7 @@ public class TextModel extends Model {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(in, inRelPT, null);
+                PatternPartSynapse s = RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(in, inRelPT);
                 s.setRecurrent(true);
 
                 s.linkInput();
@@ -137,7 +140,7 @@ public class TextModel extends Model {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(getNextTokenInhib(), inRelPT, null);
+                PatternPartSynapse s = RELATED_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(getNextTokenInhib(), inRelPT);
                 s.setInputScope(true);
 
                 s.linkOutput();
@@ -148,7 +151,7 @@ public class TextModel extends Model {
         }
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(in, inRelNT, null);
+                PatternPartSynapse s = RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(in, inRelNT);
                 s.setRecurrent(true);
 
                 s.linkInput();
@@ -158,7 +161,7 @@ public class TextModel extends Model {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(getPrevTokenInhib(), inRelNT, null);
+                PatternPartSynapse s = RELATED_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(getPrevTokenInhib(), inRelNT);
                 s.setInputScope(true);
 
                 s.linkOutput();
@@ -169,14 +172,14 @@ public class TextModel extends Model {
         }
 
         {
-            InhibitorySynapse s = new InhibitorySynapse(inRelPT, getPrevTokenInhib(), null);
+            InhibitorySynapse s = INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(inRelPT, getPrevTokenInhib());
 
             s.linkInput();
             s.addWeight(1.0);
         }
 
         {
-            InhibitorySynapse s = new InhibitorySynapse(inRelNT, getNextTokenInhib(), null);
+            InhibitorySynapse s = INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(inRelNT, getNextTokenInhib());
 
             s.linkInput();
             s.addWeight(1.0);

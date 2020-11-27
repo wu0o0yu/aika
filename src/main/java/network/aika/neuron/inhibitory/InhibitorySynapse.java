@@ -41,7 +41,7 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     }
 
     @Override
-    public Synapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
+    public InhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
         return null;
     }
 

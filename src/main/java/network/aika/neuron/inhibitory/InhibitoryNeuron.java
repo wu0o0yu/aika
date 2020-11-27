@@ -33,6 +33,7 @@ import network.aika.neuron.excitatory.PatternPartNeuron;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.Templates.INHIBITORY_TEMPLATE;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.SAME;
 
@@ -58,7 +59,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     @Override
     public Neuron<?> getTemplate() {
-        return Templates.getTemplates().INHIBITORY_TEMPLATE;
+        return INHIBITORY_TEMPLATE;
     }
 
     @Override
