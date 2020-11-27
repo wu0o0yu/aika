@@ -276,7 +276,9 @@ public class Activation extends QueueEntry<ActivationPhase> {
         }
         isFinal = true;
         if (!equals(lastRound)) {
-            linkForward();
+            phase.propagate(this,
+                    new Visitor(this, OUTPUT)
+            );
         }
     }
 
@@ -292,15 +294,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
         );
     }
 
-    public void linkForward() {
-        if (lastRound == null || getPhase() == TRAINING) {
-            propagate();
-        } else {
-            updateOutgoingLinks();
-        }
-    }
-
-    private void updateOutgoingLinks() {
+    public void updateOutgoingLinks() {
         lastRound.outputLinks
                 .values()
                 .forEach(l ->
@@ -315,16 +309,20 @@ public class Activation extends QueueEntry<ActivationPhase> {
         lastRound = null;
     }
 
-    public void propagate() {
-        Visitor v = new Visitor(this, OUTPUT);
-        v.followLinks(this);
-        phase.propagate(this, v);
-    }
+    public void propagate(Visitor v) {
+        if (lastRound == null) {
+            v.followLinks(this);
 
-    public void propagateIntern(Visitor v) {
-        getNeuron().getOutputSynapses()
-                .filter(s -> !outputLinkExists(s))
-                .forEach(s -> s.transition(v, this, null, true));
+            getModel().linkInputRelations(this, OUTPUT);
+
+            getNeuron().getOutputSynapses()
+                    .filter(s -> !outputLinkExists(s))
+                    .forEach(s ->
+                            s.transition(v, this, null, true)
+                    );
+        } else {
+            updateOutgoingLinks();
+        }
     }
 
     public Activation createActivation(Neuron n) {

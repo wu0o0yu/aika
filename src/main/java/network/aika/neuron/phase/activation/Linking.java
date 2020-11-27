@@ -18,9 +18,7 @@ package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.phase.link.LinkPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,11 +69,9 @@ public class Linking implements ActivationPhase {
         s.transition(v, act, v.origin, true);
     }
 
-
     @Override
     public void propagate(Activation act, Visitor v) {
-        act.getModel().linkInputRelations(act, OUTPUT);
-        act.propagateIntern(v);
+        act.propagate(v);
     }
 
     @Override

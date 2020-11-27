@@ -43,7 +43,7 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
 
     private volatile Neuron neuron;
 
-    private NeuronProvider(long id) {
+    public NeuronProvider(long id) {
         this.id = id;
     }
 

@@ -37,7 +37,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     public static byte type;
 
-    public static PatternPartNeuron THIS_TEMPLATE = new PatternPartNeuron();
+    public static PatternPartNeuron THIS_TEMPLATE = new PatternPartNeuron(new NeuronProvider(-2));
 
     public static PatternPartSynapse PRIMARY_INPUT_SYNAPSE_TEMPLATE = new PatternPartSynapse(PatternNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null, false, false, true, false);
     public static PatternPartSynapse RELATED_INPUT_SYNAPSE_TEMPLATE = new PatternPartSynapse(PatternPartNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null, false, false, true, false);

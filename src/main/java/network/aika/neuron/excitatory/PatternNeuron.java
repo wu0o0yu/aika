@@ -40,7 +40,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     public static byte type;
 
-    public static PatternNeuron THIS_TEMPLATE = new PatternNeuron();
+    public static PatternNeuron THIS_TEMPLATE = new PatternNeuron(new NeuronProvider(-1));
 
     public static PatternSynapse PATTERN_SYNAPSE_TEMPLATE = new PatternSynapse(PatternPartNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null);
 
