@@ -10,8 +10,6 @@ import network.aika.neuron.inhibitory.PrimaryInhibitorySynapse;
 
 public class Templates {
 
- //   private static Templates templates = new Templates();
-
     public static final PatternPartNeuron PATTERN_PART_TEMPLATE = init(new PatternPartNeuron(), -1);
     public static final PatternNeuron PATTERN_TEMPLATE = init(new PatternNeuron(), -2);
     public static final InhibitoryNeuron INHIBITORY_TEMPLATE = init(new InhibitoryNeuron(), -3);
