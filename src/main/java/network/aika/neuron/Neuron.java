@@ -76,7 +76,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         modified = true;
     }
 
-
     public abstract Neuron<?> getTemplate();
 
     public abstract void addDummyLinks(Activation act);
@@ -237,10 +236,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public abstract Stream<S> getTemplateSynapses();
-
-    public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
-
-    }
 
     public double getSurprisal(Sign s) {
         double p = getP(s, sampleSpace.getN());

@@ -39,11 +39,11 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     public static PatternPartNeuron THIS_TEMPLATE = new PatternPartNeuron();
 
-    public static PatternPartSynapse PRIMARY_INPUT_SYNAPSE_TEMPLATE = new PatternPartSynapse(PatternNeuron.THIS_TEMPLATE, THIS_TEMPLATE, false, false, true, false);
-    public static PatternPartSynapse RELATED_INPUT_SYNAPSE_TEMPLATE = new PatternPartSynapse(PatternPartNeuron.THIS_TEMPLATE, THIS_TEMPLATE, false, false, true, false);
-    public static PatternPartSynapse SAME_PATTERN_SYNAPSE_TEMPLATE = new PatternPartSynapse(PatternPartNeuron.THIS_TEMPLATE, THIS_TEMPLATE, false, false, false, true);
-    public static PatternPartSynapse RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE = new PatternPartSynapse(PatternNeuron.THIS_TEMPLATE, THIS_TEMPLATE, false, true, false, true);
-    public static PatternPartSynapse NEGATIVE_SYNAPSE_TEMPLATE = new PatternPartSynapse(InhibitoryNeuron.THIS_TEMPLATE, THIS_TEMPLATE, true, true, false, false);
+    public static PatternPartSynapse PRIMARY_INPUT_SYNAPSE_TEMPLATE = new PatternPartSynapse(PatternNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null, false, false, true, false);
+    public static PatternPartSynapse RELATED_INPUT_SYNAPSE_TEMPLATE = new PatternPartSynapse(PatternPartNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null, false, false, true, false);
+    public static PatternPartSynapse SAME_PATTERN_SYNAPSE_TEMPLATE = new PatternPartSynapse(PatternPartNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null, false, false, false, true);
+    public static PatternPartSynapse RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE = new PatternPartSynapse(PatternNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null, false, true, false, true);
+    public static PatternPartSynapse NEGATIVE_SYNAPSE_TEMPLATE = new PatternPartSynapse(InhibitoryNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null, true, true, false, false);
 
     private PatternPartNeuron() {
         super();

@@ -36,8 +36,8 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         super();
     }
 
-    public InhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
-        super(input, output);
+    public InhibitorySynapse(Neuron<?> input, InhibitoryNeuron output, Synapse template) {
+        super(input, output, template);
     }
 
     @Override

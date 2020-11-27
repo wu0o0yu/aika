@@ -42,7 +42,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     public static PatternNeuron THIS_TEMPLATE = new PatternNeuron();
 
-    public static PatternSynapse PATTERN_SYNAPSE_TEMPLATE = new PatternSynapse(PatternPartNeuron.THIS_TEMPLATE, THIS_TEMPLATE);
+    public static PatternSynapse PATTERN_SYNAPSE_TEMPLATE = new PatternSynapse(PatternPartNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null);
 
 
     private String tokenLabel;
@@ -95,11 +95,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         Reference ir = nl.getInput().getReference();
 
         nl.getOutput().propagateReference(or == null ? ir : or.add(ir));
-    }
-
-    public Link induceSynapse(Activation iAct, Activation oAct, Visitor v) {
-        PatternSynapse s = new PatternSynapse(iAct.getNeuron(), this);
-        return s.initInducedSynapse(iAct, oAct, v);
     }
 
     public String getTokenLabel() {

@@ -49,12 +49,12 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         super();
     }
 
-    public PatternPartSynapse(I input, PatternPartNeuron output) {
-        super(input, output);
+    public PatternPartSynapse(I input, PatternPartNeuron output, Synapse template) {
+        super(input, output, template);
     }
 
-    public PatternPartSynapse(I input, PatternPartNeuron output, boolean isNegative, boolean isRecurrent, boolean inputScope, boolean isSamePattern) {
-        super(input, output);
+    public PatternPartSynapse(I input, PatternPartNeuron output, Synapse template, boolean isNegative, boolean isRecurrent, boolean inputScope, boolean isSamePattern) {
+        super(input, output, template);
         this.isNegative = isNegative;
         this.isRecurrent = isRecurrent;
         this.inputScope = inputScope;
@@ -65,7 +65,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         if(getInput() != input.getTemplate()) {
             return null;
         }
-        return new PatternPartSynapse(input, output, isNegative, isRecurrent, inputScope, isSamePattern);
+        return new PatternPartSynapse(input, output, this, isNegative, isRecurrent, inputScope, isSamePattern);
     }
 
     @Override

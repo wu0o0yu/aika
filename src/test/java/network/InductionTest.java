@@ -55,7 +55,7 @@ public class InductionTest {
         targetN.setDirectConjunctiveBias(0.0);
         targetN.setRecurrentConjunctiveBias(0.0);
 
-        PatternPartSynapse sA = new PatternPartSynapse(inA, targetN);
+        PatternPartSynapse sA = new PatternPartSynapse(inA, targetN, null);
         sA.setInputScope(true);
 
         sA.linkInput();
@@ -63,7 +63,7 @@ public class InductionTest {
         sA.setWeight(0.1);
         targetN.addConjunctiveBias(-0.1, false);
 
-        PatternPartSynapse sB = new PatternPartSynapse(inB, targetN);
+        PatternPartSynapse sB = new PatternPartSynapse(inB, targetN, null);
         sB.setInputScope(true);
 
         sB.linkInput();

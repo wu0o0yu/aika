@@ -85,7 +85,7 @@ public class PatternTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(nA, eA);
+                PatternPartSynapse s = new PatternPartSynapse(nA, eA, null);
                 s.setInputScope(true);
 
                 s.linkInput();
@@ -95,7 +95,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(out, eA);
+                PatternPartSynapse s = new PatternPartSynapse(out, eA, null);
                 s.setRecurrent(true);
 
                 s.linkInput();
@@ -108,7 +108,7 @@ public class PatternTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(nB, eB);
+                PatternPartSynapse s = new PatternPartSynapse(nB, eB, null);
                 s.setInputScope(true);
 
                 s.linkInput();
@@ -118,7 +118,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(eA, eB);
+                PatternPartSynapse s = new PatternPartSynapse(eA, eB, null);
                 s.setSamePattern(true);
 
                 s.linkOutput();
@@ -127,7 +127,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(lookupPPPT(m, nB), eB);
+                PatternPartSynapse s = new PatternPartSynapse(lookupPPPT(m, nB), eB, null);
                 s.setInputScope(true);
 
                 s.linkOutput();
@@ -136,7 +136,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(out, eB);
+                PatternPartSynapse s = new PatternPartSynapse(out, eB, null);
                 s.setRecurrent(true);
 
                 s.linkOutput();
@@ -148,7 +148,7 @@ public class PatternTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(nC, eC);
+                PatternPartSynapse s = new PatternPartSynapse(nC, eC, null);
                 s.setInputScope(true);
 
                 s.linkInput();
@@ -158,7 +158,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(eB, eC);
+                PatternPartSynapse s = new PatternPartSynapse(eB, eC, null);
                 s.setSamePattern(true);
 
                 s.linkOutput();
@@ -167,7 +167,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(lookupPPPT(m, nC), eC);
+                PatternPartSynapse s = new PatternPartSynapse(lookupPPPT(m, nC), eC, null);
                 s.setInputScope(true);
 
                 s.linkOutput();
@@ -176,7 +176,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(out, eC);
+                PatternPartSynapse s = new PatternPartSynapse(out, eC, null);
                 s.setRecurrent(true);
 
                 s.linkOutput();
@@ -188,7 +188,7 @@ public class PatternTest {
 
         {
             {
-                PatternSynapse s = new PatternSynapse(eA, out);
+                PatternSynapse s = new PatternSynapse(eA, out, null);
 
                 s.linkInput();
                 s.linkOutput();
@@ -196,7 +196,7 @@ public class PatternTest {
                 out.addConjunctiveBias(-10.0, false);
             }
             {
-                PatternSynapse s = new PatternSynapse(eB, out);
+                PatternSynapse s = new PatternSynapse(eB, out, null);
 
                 s.linkInput();
                 s.linkOutput();
@@ -204,7 +204,7 @@ public class PatternTest {
                 out.addConjunctiveBias(-10.0, false);
             }
             {
-                PatternSynapse s = new PatternSynapse(eC, out);
+                PatternSynapse s = new PatternSynapse(eC, out, null);
 
                 s.linkInput();
                 s.linkOutput();

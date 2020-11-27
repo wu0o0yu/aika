@@ -34,7 +34,7 @@ import static network.aika.neuron.activation.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Induction implements ActivationPhase {
+public class Template implements ActivationPhase {
 
 
     @Override
@@ -57,36 +57,44 @@ public class Induction implements ActivationPhase {
 
         Neuron n = oAct.getNeuron();
 
-        if(!iAct.isActive() ||
-                n.isInputNeuron()) return;
+        if(!iAct.isActive() || n.isInputNeuron())
+            return;
 
-        Synapse s = n.getInputSynapse(iAct.getNeuronProvider());
-        if (s != null) return;
+        {
+            Synapse s = n.getInputSynapse(iAct.getNeuronProvider());
+            if (s != null)
+                return;
+        }
 
-        n.induceSynapse(iAct, oAct, v);
+        oAct.getNeuron()
+                .getTemplateSynapses()
+                .filter(s -> iAct.getNeuron().getTemplate() == s.getInput())
+                .forEach(s ->
+                        s.transition(v, act, v.origin, true)
+                );
     }
 
     @Override
     public void propagate(Activation act, Visitor v) {
-        if(act.isActive()) {
-            if(!act.getConfig().checkNeuronInduction(act)) {
-                return;
-            }
+        if(!act.isActive())
+            return;
 
-            Set<Synapse> templateSynapses = act.getNeuron().getTemplateSynapses().collect(Collectors.toSet());
-
-            act.getOutputLinks().forEach(l ->
-                    templateSynapses.remove(l.getSynapse().getTemplate())
-            );
-
-            templateSynapses.forEach(s -> s.transition(v, act, null, true));
-/*
-            if (oAct == null) {
-                Neuron n = new PatternPartNeuron(act.getModel());
-                oAct = n.initInducedNeuron(act);
-            }
- */
+        if (!act.getConfig().checkNeuronInduction(act)) {
+            return;
         }
+
+        Set<Synapse> templateSynapses = act.getNeuron()
+                .getTemplateSynapses()
+                .collect(Collectors.toSet());
+
+        act.getOutputLinks()
+                .forEach(l ->
+                        templateSynapses.remove(l.getSynapse().getTemplate())
+                );
+
+        templateSynapses.forEach(s ->
+                s.transition(v, act, null, true)
+        );
     }
 
     @Override

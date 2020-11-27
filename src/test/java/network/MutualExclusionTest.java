@@ -55,7 +55,7 @@ public class MutualExclusionTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(in, na);
+                PatternPartSynapse s = new PatternPartSynapse(in, na, null);
                 s.setInputScope(true);
 
                 s.linkInput();
@@ -65,7 +65,7 @@ public class MutualExclusionTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(inhib, na);
+                PatternPartSynapse s = new PatternPartSynapse(inhib, na, null);
                 s.setNegative(true);
                 s.setRecurrent(true);
 
@@ -78,7 +78,7 @@ public class MutualExclusionTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(in, nb);
+                PatternPartSynapse s = new PatternPartSynapse(in, nb, null);
                 s.setInputScope(true);
 
                 s.linkInput();
@@ -88,7 +88,7 @@ public class MutualExclusionTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(inhib, nb);
+                PatternPartSynapse s = new PatternPartSynapse(inhib, nb, null);
                 s.setNegative(true);
                 s.setRecurrent(true);
 
@@ -101,7 +101,7 @@ public class MutualExclusionTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(in, nc);
+                PatternPartSynapse s = new PatternPartSynapse(in, nc, null);
                 s.setInputScope(true);
 
                 s.linkInput();
@@ -111,7 +111,7 @@ public class MutualExclusionTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(inhib, nc);
+                PatternPartSynapse s = new PatternPartSynapse(inhib, nc, null);
                 s.setNegative(true);
                 s.setRecurrent(true);
 
@@ -124,17 +124,17 @@ public class MutualExclusionTest {
 
         {
             {
-                InhibitorySynapse s = new InhibitorySynapse(na, inhib);
+                InhibitorySynapse s = new InhibitorySynapse(na, inhib, null);
                 s.linkInput();
                 s.addWeight(1.0);
             }
             {
-                InhibitorySynapse s = new InhibitorySynapse(nb, inhib);
+                InhibitorySynapse s = new InhibitorySynapse(nb, inhib, null);
                 s.linkInput();
                 s.addWeight(1.0);
             }
             {
-                InhibitorySynapse s = new InhibitorySynapse(nc, inhib);
+                InhibitorySynapse s = new InhibitorySynapse(nc, inhib, null);
                 s.linkInput();
                 s.addWeight(1.0);
             }
@@ -179,7 +179,7 @@ public class MutualExclusionTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(in, na);
+                PatternPartSynapse s = new PatternPartSynapse(in, na, null);
                 s.setInputScope(true);
 
                 s.linkInput();
@@ -189,7 +189,7 @@ public class MutualExclusionTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(inhib, na);
+                PatternPartSynapse s = new PatternPartSynapse(inhib, na, null);
                 s.setRecurrent(true);
                 s.setNegative(true);
 
@@ -202,7 +202,7 @@ public class MutualExclusionTest {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(in, nb);
+                PatternPartSynapse s = new PatternPartSynapse(in, nb, null);
                 s.setInputScope(true);
 
                 s.linkInput();
@@ -212,7 +212,7 @@ public class MutualExclusionTest {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(inhib, nb);
+                PatternPartSynapse s = new PatternPartSynapse(inhib, nb, null);
                 s.setNegative(true);
                 s.setRecurrent(true);
 
@@ -230,12 +230,12 @@ public class MutualExclusionTest {
             }
 */
             {
-                InhibitorySynapse s = new InhibitorySynapse(na, inhib);
+                InhibitorySynapse s = new InhibitorySynapse(na, inhib, null);
                 s.linkInput();
                 s.addWeight(1.0);
             }
             {
-                InhibitorySynapse s = new InhibitorySynapse(nb, inhib);
+                InhibitorySynapse s = new InhibitorySynapse(nb, inhib, null);
                 s.linkInput();
                 s.addWeight(1.0);
             }

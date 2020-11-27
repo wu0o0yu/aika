@@ -127,7 +127,7 @@ public class TextModel extends Model {
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(in, inRelPW);
+                PatternPartSynapse s = new PatternPartSynapse(in, inRelPW, null);
                 s.setRecurrent(true);
 
                 s.linkInput();
@@ -137,7 +137,7 @@ public class TextModel extends Model {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(getNextTokenInhib(), inRelPW);
+                PatternPartSynapse s = new PatternPartSynapse(getNextTokenInhib(), inRelPW, null);
                 s.setInputScope(true);
 
                 s.linkOutput();
@@ -148,7 +148,7 @@ public class TextModel extends Model {
         }
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(in, inRelNW);
+                PatternPartSynapse s = new PatternPartSynapse(in, inRelNW, null);
                 s.setRecurrent(true);
 
                 s.linkInput();
@@ -158,7 +158,7 @@ public class TextModel extends Model {
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(getPrevTokenInhib(), inRelNW);
+                PatternPartSynapse s = new PatternPartSynapse(getPrevTokenInhib(), inRelNW, null);
                 s.setInputScope(true);
 
                 s.linkOutput();
@@ -169,14 +169,14 @@ public class TextModel extends Model {
         }
 
         {
-            InhibitorySynapse s = new InhibitorySynapse(inRelPW, getPrevTokenInhib());
+            InhibitorySynapse s = new InhibitorySynapse(inRelPW, getPrevTokenInhib(), null);
 
             s.linkInput();
             s.addWeight(1.0);
         }
 
         {
-            InhibitorySynapse s = new InhibitorySynapse(inRelNW, getNextTokenInhib());
+            InhibitorySynapse s = new InhibitorySynapse(inRelNW, getNextTokenInhib(), null);
 
             s.linkInput();
             s.addWeight(1.0);

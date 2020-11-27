@@ -42,7 +42,7 @@ public class PropagateTest {
         PatternPartNeuron out = new PatternPartNeuron(m);
         out.setDescriptionLabel("OUT");
 
-        PatternPartSynapse s = new PatternPartSynapse(in, out);
+        PatternPartSynapse s = new PatternPartSynapse(in, out, null);
         s.setInputScope(true);
 
         s.linkInput();

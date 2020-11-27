@@ -42,7 +42,7 @@ public class DerDieDasTest {
             initPP(ref, c, inN, ppN, prevPPN, out);
 
             {
-                PatternSynapse s = new PatternSynapse(ppN, out);
+                PatternSynapse s = new PatternSynapse(ppN, out, null);
 
                 s.linkInput();
                 s.linkOutput();
@@ -65,14 +65,14 @@ public class DerDieDasTest {
         );
 
         {
-            InhibitorySynapse s = new InhibitorySynapse(ppN, inhibN);
+            InhibitorySynapse s = new InhibitorySynapse(ppN, inhibN, null);
 
             s.linkInput();
             s.addWeight(0.1);
         }
 
         {
-            PatternPartSynapse s = new PatternPartSynapse(inhibN, ppN);
+            PatternPartSynapse s = new PatternPartSynapse(inhibN, ppN, null);
             s.setNegative(true);
             s.setRecurrent(true);
 
@@ -81,7 +81,7 @@ public class DerDieDasTest {
         }
 
         {
-            PatternPartSynapse s = new PatternPartSynapse(inN, ppN);
+            PatternPartSynapse s = new PatternPartSynapse(inN, ppN, null);
             s.setSamePattern(true);
 
             s.linkInput();
@@ -90,7 +90,7 @@ public class DerDieDasTest {
         }
 
         if(prevPP != null) {
-            PatternPartSynapse s = new PatternPartSynapse(prevPP, ppN);
+            PatternPartSynapse s = new PatternPartSynapse(prevPP, ppN, null);
             s.setInputScope(true);
 
             s.linkOutput();
@@ -100,7 +100,7 @@ public class DerDieDasTest {
 
         PatternPartNeuron nextPP = lookupPPPT(inN);
         if(nextPP != null) {
-            PatternPartSynapse s = new PatternPartSynapse(nextPP, ppN);
+            PatternPartSynapse s = new PatternPartSynapse(nextPP, ppN, null);
             s.setInputScope(true);
 
             s.linkOutput();
@@ -109,7 +109,7 @@ public class DerDieDasTest {
         }
 
         {
-            PatternPartSynapse s = new PatternPartSynapse(out, ppN);
+            PatternPartSynapse s = new PatternPartSynapse(out, ppN, null);
             s.setRecurrent(true);
 
             s.linkOutput();

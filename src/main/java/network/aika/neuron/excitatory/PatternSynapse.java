@@ -13,15 +13,15 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
         super();
     }
 
-    public PatternSynapse(I input, PatternNeuron output) {
-        super(input, output);
+    public PatternSynapse(I input, PatternNeuron output, Synapse template) {
+        super(input, output, template);
     }
 
     public Synapse instantiateTemplate(I input, PatternNeuron output) {
         if(getInput() != input.getTemplate()) {
             return null;
         }
-        return new PatternSynapse(input, output);
+        return new PatternSynapse(input, output, this);
     }
 
     public Activation getOutputActivationToLink(Activation oAct, Visitor v) {

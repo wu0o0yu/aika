@@ -13,8 +13,8 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
         super();
     }
 
-    public PrimaryInhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
-        super(input, output);
+    public PrimaryInhibitorySynapse(Neuron<?> input, InhibitoryNeuron output, Synapse template) {
+        super(input, output, template);
     }
 
     @Override
@@ -23,7 +23,7 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
             return null;
         }
 
-        return new PrimaryInhibitorySynapse(input, output);
+        return new PrimaryInhibitorySynapse(input, output, this);
     }
 
     public void transition(Visitor v, Activation nextAct, boolean create) {
@@ -32,6 +32,6 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
 
         nv.scope = v.scope.getNext(v.downUpDir);
 
-        nv.follow(nextAct);;
+        nv.follow(nextAct);
     }
 }

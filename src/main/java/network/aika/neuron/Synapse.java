@@ -61,19 +61,16 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public Synapse() {
     }
 
-    public Synapse(I input, O output) {
+    public Synapse(I input, O output, Synapse template) {
         this.input = input.getProvider();
         this.output = output.getProvider();
+        this.template = template;
 
         assert input.getId() != output.getId();
     }
 
     public Synapse getTemplate() {
         return template;
-    }
-
-    protected void setTemplate(Synapse template) {
-        this.template = template;
     }
 
     public abstract Synapse instantiateTemplate(I input, O output);

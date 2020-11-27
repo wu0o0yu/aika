@@ -45,8 +45,8 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     public static InhibitoryNeuron THIS_TEMPLATE = new InhibitoryNeuron();
 
-    public static InhibitorySynapse PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE = new InhibitorySynapse(PatternNeuron.THIS_TEMPLATE, THIS_TEMPLATE);
-    public static InhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE = new InhibitorySynapse(PatternPartNeuron.THIS_TEMPLATE, THIS_TEMPLATE);
+    public static InhibitorySynapse PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE = new InhibitorySynapse(PatternNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null);
+    public static InhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE = new InhibitorySynapse(PatternPartNeuron.THIS_TEMPLATE, THIS_TEMPLATE, null);
 
 
     protected InhibitoryNeuron() {
