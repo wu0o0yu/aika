@@ -89,7 +89,7 @@ public class ManuelInductionModel {
 
                     public String getLabel(Activation iAct, Neuron n) {
                         if(n instanceof PatternPartNeuron) {
-                            return "TP-" + trimPrefix(iAct.getDescriptionLabel());
+                            return "PP-" + trimPrefix(iAct.getDescriptionLabel());
                         } else if (n instanceof PatternNeuron) {
                             return "P-" + doc.getContent();
                         } else {

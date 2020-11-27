@@ -117,74 +117,74 @@ public class TextModel extends Model {
         in.setDescriptionLabel("P-" + tokenLabel);
         getSuspensionHook().putLabel(tokenLabel, in.getId());
 
-        PatternPartNeuron inRelPW = new PatternPartNeuron(this);
-        inRelPW.setInputNeuron(true);
-        inRelPW.setDescriptionLabel(tokenLabel + " Rel Prev. Word");
+        PatternPartNeuron inRelPT = new PatternPartNeuron(this);
+        inRelPT.setInputNeuron(true);
+        inRelPT.setDescriptionLabel(tokenLabel + " Rel Prev. Token");
 
-        PatternPartNeuron inRelNW = new PatternPartNeuron(this);
-        inRelNW.setInputNeuron(true);
-        inRelNW.setDescriptionLabel(tokenLabel + " Rel Next Word");
+        PatternPartNeuron inRelNT = new PatternPartNeuron(this);
+        inRelNT.setInputNeuron(true);
+        inRelNT.setDescriptionLabel(tokenLabel + " Rel Next Token");
 
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(in, inRelPW, null);
+                PatternPartSynapse s = new PatternPartSynapse(in, inRelPT, null);
                 s.setRecurrent(true);
 
                 s.linkInput();
                 s.linkOutput();
                 s.setWeight(11.0);
-                inRelPW.addConjunctiveBias(-11.0, false);
+                inRelPT.addConjunctiveBias(-11.0, false);
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(getNextTokenInhib(), inRelPW, null);
+                PatternPartSynapse s = new PatternPartSynapse(getNextTokenInhib(), inRelPT, null);
                 s.setInputScope(true);
 
                 s.linkOutput();
                 s.addWeight(10.0);
-                inRelPW.addConjunctiveBias(-10.0, false);
+                inRelPT.addConjunctiveBias(-10.0, false);
             }
-            inRelPW.setBias(4.0);
+            inRelPT.setBias(4.0);
         }
         {
             {
-                PatternPartSynapse s = new PatternPartSynapse(in, inRelNW, null);
+                PatternPartSynapse s = new PatternPartSynapse(in, inRelNT, null);
                 s.setRecurrent(true);
 
                 s.linkInput();
                 s.linkOutput();
                 s.addWeight(11.0);
-                inRelNW.addConjunctiveBias(-11.0, false);
+                inRelNT.addConjunctiveBias(-11.0, false);
             }
 
             {
-                PatternPartSynapse s = new PatternPartSynapse(getPrevTokenInhib(), inRelNW, null);
+                PatternPartSynapse s = new PatternPartSynapse(getPrevTokenInhib(), inRelNT, null);
                 s.setInputScope(true);
 
                 s.linkOutput();
                 s.addWeight(10.0);
-                inRelNW.addConjunctiveBias(-10.0, true);
+                inRelNT.addConjunctiveBias(-10.0, true);
             }
-            inRelNW.setBias(4.0);
+            inRelNT.setBias(4.0);
         }
 
         {
-            InhibitorySynapse s = new InhibitorySynapse(inRelPW, getPrevTokenInhib(), null);
+            InhibitorySynapse s = new InhibitorySynapse(inRelPT, getPrevTokenInhib(), null);
 
             s.linkInput();
             s.addWeight(1.0);
         }
 
         {
-            InhibitorySynapse s = new InhibitorySynapse(inRelNW, getNextTokenInhib(), null);
+            InhibitorySynapse s = new InhibitorySynapse(inRelNT, getNextTokenInhib(), null);
 
             s.linkInput();
             s.addWeight(1.0);
         }
 
         in.getProvider().save();
-        inRelPW.getProvider().save();
-        inRelNW.getProvider().save();
+        inRelPT.getProvider().save();
+        inRelNT.getProvider().save();
 
         return in;
     }

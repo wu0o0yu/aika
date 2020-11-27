@@ -66,7 +66,7 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     }
 
     public void transition(Visitor v, Activation fromAct, Activation toAct, boolean create) {
-        if(v.downUpDir == INPUT && v.origin.getNeuron() == getOutput()) {
+        if(v.downUpDir == INPUT & v.startDir == INPUT && v.origin.getNeuron() == getOutput()) {
             return;
         }
 
