@@ -1,6 +1,7 @@
 package network;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
@@ -12,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
+
+import static network.aika.neuron.Templates.*;
 
 public class DerDieDasTest {
 
@@ -42,7 +45,7 @@ public class DerDieDasTest {
             initPP(ref, c, inN, ppN, prevPPN, out);
 
             {
-                PatternSynapse s = new PatternSynapse(ppN, out, null);
+                PatternSynapse s = PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(ppN, out);
 
                 s.linkInput();
                 s.linkOutput();
@@ -72,17 +75,14 @@ public class DerDieDasTest {
         }
 
         {
-            PatternPartSynapse s = new PatternPartSynapse(inhibN, ppN, null);
-            s.setNegative(true);
-            s.setRecurrent(true);
+            PatternPartSynapse s = NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhibN, ppN);
 
             s.linkOutput();
             s.addWeight(-100.0);
         }
 
         {
-            PatternPartSynapse s = new PatternPartSynapse(inN, ppN, null);
-            s.setSamePattern(true);
+            PatternPartSynapse s = SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(inN, ppN);
 
             s.linkInput();
             s.addWeight(0.1);
@@ -90,8 +90,7 @@ public class DerDieDasTest {
         }
 
         if(prevPP != null) {
-            PatternPartSynapse s = new PatternPartSynapse(prevPP, ppN, null);
-            s.setInputScope(true);
+            PatternPartSynapse s = RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(prevPP, ppN);
 
             s.linkOutput();
             s.addWeight(0.1);
@@ -100,8 +99,7 @@ public class DerDieDasTest {
 
         PatternPartNeuron nextPP = lookupPPPT(inN);
         if(nextPP != null) {
-            PatternPartSynapse s = new PatternPartSynapse(nextPP, ppN, null);
-            s.setInputScope(true);
+            PatternPartSynapse s = RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(nextPP, ppN);
 
             s.linkOutput();
             s.addWeight(0.1);
@@ -109,8 +107,7 @@ public class DerDieDasTest {
         }
 
         {
-            PatternPartSynapse s = new PatternPartSynapse(out, ppN, null);
-            s.setRecurrent(true);
+            PatternPartSynapse s = RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, ppN);
 
             s.linkOutput();
             s.addWeight(0.1);

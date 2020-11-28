@@ -16,6 +16,7 @@
  */
 package network;
 
+import network.aika.neuron.Templates;
 import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.text.Document;
 import network.aika.Model;
@@ -25,6 +26,8 @@ import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
+
+import static network.aika.neuron.Templates.PRIMARY_INPUT_SYNAPSE_TEMPLATE;
 
 /**
  *
@@ -42,8 +45,7 @@ public class PropagateTest {
         PatternPartNeuron out = new PatternPartNeuron(m);
         out.setDescriptionLabel("OUT");
 
-        PatternPartSynapse s = new PatternPartSynapse(in, out, null);
-        s.setInputScope(true);
+        PatternPartSynapse s = PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, out);
 
         s.linkInput();
         s.linkOutput();

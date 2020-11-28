@@ -1,6 +1,7 @@
 package network;
 
 import network.aika.Config;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.excitatory.PatternPartNeuron;
@@ -12,6 +13,8 @@ import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
+
+import static network.aika.neuron.Templates.PRIMARY_INPUT_SYNAPSE_TEMPLATE;
 
 public class InductionTest {
 
@@ -55,16 +58,14 @@ public class InductionTest {
         targetN.setDirectConjunctiveBias(0.0);
         targetN.setRecurrentConjunctiveBias(0.0);
 
-        PatternPartSynapse sA = new PatternPartSynapse(inA, targetN, null);
-        sA.setInputScope(true);
+        PatternPartSynapse sA = PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inA, targetN);
 
         sA.linkInput();
         sA.linkOutput();
         sA.setWeight(0.1);
         targetN.addConjunctiveBias(-0.1, false);
 
-        PatternPartSynapse sB = new PatternPartSynapse(inB, targetN, null);
-        sB.setInputScope(true);
+        PatternPartSynapse sB = PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inB, targetN);
 
         sB.linkInput();
         sB.linkOutput();

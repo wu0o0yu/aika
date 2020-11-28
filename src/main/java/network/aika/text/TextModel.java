@@ -131,7 +131,6 @@ public class TextModel extends Model {
         {
             {
                 PatternPartSynapse s = RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(in, inRelPT);
-                s.setRecurrent(true);
 
                 s.linkInput();
                 s.linkOutput();
@@ -140,8 +139,7 @@ public class TextModel extends Model {
             }
 
             {
-                PatternPartSynapse s = RELATED_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(getNextTokenInhib(), inRelPT);
-                s.setInputScope(true);
+                PatternPartSynapse s = RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE.instantiateTemplate(getNextTokenInhib(), inRelPT);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -152,7 +150,6 @@ public class TextModel extends Model {
         {
             {
                 PatternPartSynapse s = RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(in, inRelNT);
-                s.setRecurrent(true);
 
                 s.linkInput();
                 s.linkOutput();
@@ -161,8 +158,7 @@ public class TextModel extends Model {
             }
 
             {
-                PatternPartSynapse s = RELATED_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(getPrevTokenInhib(), inRelNT);
-                s.setInputScope(true);
+                PatternPartSynapse s = RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE.instantiateTemplate(getPrevTokenInhib(), inRelNT);
 
                 s.linkOutput();
                 s.addWeight(10.0);

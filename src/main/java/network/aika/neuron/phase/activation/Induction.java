@@ -2,12 +2,16 @@ package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.phase.link.LinkPhase;
 
-public class Final implements ActivationPhase {
+public class Induction implements ActivationPhase {
     @Override
     public void process(Activation act) {
 
+    }
+
+    @Override
+    public int getRank() {
+        return 16;
     }
 
     @Override
@@ -23,11 +27,6 @@ public class Final implements ActivationPhase {
     @Override
     public void propagate(Activation act, Visitor v) {
 
-    }
-
-    @Override
-    public int getRank() {
-        return 17;
     }
 
     @Override

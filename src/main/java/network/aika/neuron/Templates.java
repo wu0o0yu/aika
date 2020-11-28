@@ -15,7 +15,8 @@ public class Templates {
     public static final InhibitoryNeuron INHIBITORY_TEMPLATE = init(new InhibitoryNeuron(), -3);
 
     public static final PatternPartSynapse PRIMARY_INPUT_SYNAPSE_TEMPLATE = init(new PatternPartSynapse(PATTERN_TEMPLATE, PATTERN_PART_TEMPLATE, null, false, false, true, false));
-    public static final PatternPartSynapse RELATED_INPUT_SYNAPSE_TEMPLATE = init(new PatternPartSynapse(PATTERN_PART_TEMPLATE, PATTERN_PART_TEMPLATE, null, false, false, true, false));
+    public static final PatternPartSynapse RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE = init(new PatternPartSynapse(PATTERN_PART_TEMPLATE, PATTERN_PART_TEMPLATE, null, false, false, true, false));
+    public static final PatternPartSynapse RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE = init(new PatternPartSynapse(INHIBITORY_TEMPLATE, PATTERN_PART_TEMPLATE, null, false, false, true, false));
     public static final PatternPartSynapse SAME_PATTERN_SYNAPSE_TEMPLATE = init(new PatternPartSynapse(PATTERN_PART_TEMPLATE, PATTERN_PART_TEMPLATE, null, false, false, false, true));
     public static final PatternPartSynapse RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE = init(new PatternPartSynapse(PATTERN_TEMPLATE, PATTERN_PART_TEMPLATE, null, false, true, false, true));
     public static final PatternPartSynapse NEGATIVE_SYNAPSE_TEMPLATE = init(new PatternPartSynapse(INHIBITORY_TEMPLATE, PATTERN_PART_TEMPLATE, null, true, true, false, false));

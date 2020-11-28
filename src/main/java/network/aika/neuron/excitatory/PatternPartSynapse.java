@@ -157,22 +157,6 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         return isSamePattern;
     }
 
-    public void setNegative(boolean negative) {
-        isNegative = negative;
-    }
-
-    public void setRecurrent(boolean recurrent) {
-        isRecurrent = recurrent;
-    }
-
-    public void setInputScope(boolean inputScope) {
-        this.inputScope = inputScope;
-    }
-
-    public void setSamePattern(boolean samePattern) {
-        isSamePattern = samePattern;
-    }
-
     public void setWeight(double weight) {
         super.setWeight(weight);
         output.getNeuron().setModified(true);
