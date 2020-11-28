@@ -119,7 +119,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public double getNet() {
-        return getNet(phase);
+        return getNet(getPhase());
     }
 
     public Fired getFired() {
@@ -272,11 +272,11 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
     public void updateValueAndPropagate() {
         if(!fixed) {
-            value = computeValue(phase);
+            value = computeValue(getPhase());
         }
         isFinal = true;
         if (!equals(lastRound)) {
-            phase.propagate(this,
+            getPhase().propagate(this,
                     new Visitor(this, OUTPUT)
             );
         }
@@ -570,7 +570,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
         return "id:" +
                 getId() +
                 " n:[" + getNeuron() + "]" +
-                Phase.toString(phase);
+                Phase.toString(getPhase());
     }
 
     public String gradientsToString() {

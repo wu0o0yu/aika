@@ -77,6 +77,10 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public void updateReference(Link nl) {
-        nl.getOutput().propagateReference(nl.getInput().getReference());
+        // TODO: find a better solution.
+        Synapse ts = nl.getSynapse().getTemplate();
+        if(ts != Templates.RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE && ts != Templates.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE) {
+            nl.getOutput().propagateReference(nl.getInput().getReference());
+        }
     }
 }

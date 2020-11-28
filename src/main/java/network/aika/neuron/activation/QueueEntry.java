@@ -41,7 +41,7 @@ public abstract class QueueEntry<P extends Phase> implements Comparable<QueueEnt
     public void process() {
         queueState.removePendingPhase();
 
-        phase.process(this);
+        getPhase().process(this);
 
         if(isActive()) {
             queueState.updateThoughtQueue();

@@ -279,7 +279,7 @@ public class Link extends QueueEntry<LinkPhase> {
         return synapse.getClass().getSimpleName() +
                 ": " + getIdString() +
                 " --> " + output.getShortString() +
-                Phase.toString(phase);
+                Phase.toString(getPhase());
     }
 
     public String toDetailedString() {
