@@ -71,6 +71,7 @@ public class Linking implements ActivationPhase {
 
     @Override
     public void propagate(Activation act, Visitor v) {
+        act.getModel().linkInputRelations(act, OUTPUT);
         act.propagate(v);
     }
 

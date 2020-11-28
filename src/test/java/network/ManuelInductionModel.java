@@ -34,7 +34,6 @@ public class ManuelInductionModel {
         ActivationPhase[] phaseswT = new ActivationPhase[]{
                 INITIAL_LINKING,
                 PREPARE_FINAL_LINKING,
-                FINAL_LINKING,
                 SOFTMAX,
                 COUNTING,
                 TRAINING,
@@ -46,7 +45,6 @@ public class ManuelInductionModel {
         ActivationPhase[] phaseswoT = new ActivationPhase[]{
                 INITIAL_LINKING,
                 PREPARE_FINAL_LINKING,
-                FINAL_LINKING,
                 SOFTMAX,
                 COUNTING,
                 FINAL

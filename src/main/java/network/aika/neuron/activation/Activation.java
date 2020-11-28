@@ -310,19 +310,13 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void propagate(Visitor v) {
-        if (lastRound == null) {
-            v.followLinks(this);
+        v.followLinks(this);
 
-            getModel().linkInputRelations(this, OUTPUT);
-
-            getNeuron().getOutputSynapses()
-                    .filter(s -> !outputLinkExists(s))
-                    .forEach(s ->
-                            s.transition(v, this, null, true)
-                    );
-        } else {
-            updateOutgoingLinks();
-        }
+        getNeuron().getOutputSynapses()
+                .filter(s -> !outputLinkExists(s))
+                .forEach(s ->
+                        s.transition(v, this, null, true)
+                );
     }
 
     public Activation createActivation(Neuron n) {
