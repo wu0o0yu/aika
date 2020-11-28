@@ -20,6 +20,7 @@ import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.excitatory.PatternSynapse;
 
 import static network.aika.neuron.activation.Direction.INPUT;
@@ -42,7 +43,10 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
     @Override
     public InhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
-        return null;
+        if(getInput() != input.getTemplate()) {
+            return null;
+        }
+        return new InhibitorySynapse(input, output, this);
     }
 
     @Override
