@@ -1,7 +1,6 @@
 package network;
 
 import network.aika.Config;
-import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.excitatory.PatternPartNeuron;
@@ -23,7 +22,7 @@ public class InductionTest {
         Model m = new TextModel();
         PatternNeuron in = new PatternNeuron(m, "A");
         in.setInputNeuron(true);
-        in.setDescriptionLabel("IN");
+        in.setLabel("IN");
 
         in.setFrequency(12);
 
@@ -47,12 +46,12 @@ public class InductionTest {
         Model m = new TextModel();
         PatternNeuron inA = new PatternNeuron(m, "A");
         inA.setInputNeuron(true);
-        inA.setDescriptionLabel("IN-A");
+        inA.setLabel("IN-A");
         PatternNeuron inB = new PatternNeuron(m, "B");
         inB.setInputNeuron(true);
-        inB.setDescriptionLabel("IN-B");
+        inB.setLabel("IN-B");
         PatternPartNeuron targetN = new PatternPartNeuron(m);
-        targetN.setDescriptionLabel("OUT-Target");
+        targetN.setLabel("OUT-Target");
 
         targetN.setBias(0.0);
         targetN.setDirectConjunctiveBias(0.0);

@@ -17,7 +17,6 @@
 package network.aika.text;
 
 import network.aika.Model;
-import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Reference;
 import network.aika.SuspensionHook;
 import network.aika.neuron.Neuron;
@@ -54,13 +53,13 @@ public class TextModel extends Model {
     private void init() {
         InhibitoryNeuron ptN = new InhibitoryNeuron(this);
         ptN.setInputNeuron(true);
-        ptN.setDescriptionLabel("Prev. Token");
+        ptN.setLabel("Prev. Token");
         prevTokenInhib = ptN.getProvider();
         prevTokenInhib.save();
 
         InhibitoryNeuron ntN = new InhibitoryNeuron(this);
         ntN.setInputNeuron(true);
-        ntN.setDescriptionLabel("Next Token");
+        ntN.setLabel("Next Token");
         nextTokenInhib = ntN.getProvider();
         nextTokenInhib.save();
     }
@@ -117,16 +116,16 @@ public class TextModel extends Model {
 
         PatternNeuron in = new PatternNeuron(this, tokenLabel);
         in.setInputNeuron(true);
-        in.setDescriptionLabel("P-" + tokenLabel);
+        in.setLabel("P-" + tokenLabel);
         getSuspensionHook().putLabel(tokenLabel, in.getId());
 
         PatternPartNeuron inRelPT = new PatternPartNeuron(this);
         inRelPT.setInputNeuron(true);
-        inRelPT.setDescriptionLabel(tokenLabel + " Rel Prev. Token");
+        inRelPT.setLabel(tokenLabel + " Rel Prev. Token");
 
         PatternPartNeuron inRelNT = new PatternPartNeuron(this);
         inRelNT.setInputNeuron(true);
-        inRelNT.setDescriptionLabel(tokenLabel + " Rel Next Token");
+        inRelNT.setLabel(tokenLabel + " Rel Next Token");
 
         {
             {

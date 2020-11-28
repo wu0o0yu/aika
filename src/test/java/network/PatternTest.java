@@ -16,8 +16,6 @@
  */
 package network;
 
-import network.aika.neuron.Templates;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.neuron.excitatory.PatternSynapse;
@@ -77,14 +75,14 @@ public class PatternTest {
         PatternNeuron nC = m.lookupToken(null, "C");
 
         PatternPartNeuron eA = new PatternPartNeuron(m);
-        eA.setDescriptionLabel("E A");
+        eA.setLabel("E A");
         PatternPartNeuron eB = new PatternPartNeuron(m);
-        eB.setDescriptionLabel("E B");
+        eB.setLabel("E B");
         PatternPartNeuron eC = new PatternPartNeuron(m);
-        eC.setDescriptionLabel("E C");
+        eC.setLabel("E C");
 
         PatternNeuron out = new PatternNeuron(m, "ABC");
-        out.setDescriptionLabel("OUT");
+        out.setLabel("OUT");
 
         {
             {

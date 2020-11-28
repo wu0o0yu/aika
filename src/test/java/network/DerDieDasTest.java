@@ -1,7 +1,6 @@
 package network;
 
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
@@ -30,7 +29,7 @@ public class DerDieDasTest {
     public void initToken(Reference ref, String token) {
         TextModel m = charBasedTrainings.getModel();
         PatternNeuron out = new PatternNeuron(m, token);
-        out.setDescriptionLabel("P-" + token);
+        out.setLabel("P-" + token);
         out.setBias(0.1);
 
         PatternPartNeuron prevPPN = null;
@@ -40,7 +39,7 @@ public class DerDieDasTest {
 
             PatternNeuron inN = m.lookupToken(ref, "" + c);
             PatternPartNeuron ppN = new PatternPartNeuron(m);
-            ppN.setDescriptionLabel("TP-" + c + "-(" + token + ")");
+            ppN.setLabel("TP-" + c + "-(" + token + ")");
 
             initPP(ref, c, inN, ppN, prevPPN, out);
 
@@ -62,7 +61,7 @@ public class DerDieDasTest {
                 ch ->
                 {
                     InhibitoryNeuron n = new InhibitoryNeuron(charBasedTrainings.getModel());
-                    n.setDescriptionLabel("I-" + ch);
+                    n.setLabel("I-" + ch);
                     return n;
                 }
         );

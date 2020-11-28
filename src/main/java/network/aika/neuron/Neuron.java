@@ -176,7 +176,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return descriptionLabel;
     }
 
-    public void setDescriptionLabel(String label) {
+    public void setLabel(String label) {
         this.descriptionLabel = label;
     }
 

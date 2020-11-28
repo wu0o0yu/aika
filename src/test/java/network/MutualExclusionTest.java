@@ -16,7 +16,6 @@
  */
 package network;
 
-import network.aika.neuron.Templates;
 import network.aika.neuron.excitatory.*;
 import network.aika.text.Document;
 import network.aika.Model;
@@ -45,15 +44,15 @@ public class MutualExclusionTest {
 
         PatternNeuron in = new PatternNeuron(m, "I");
         in.setInputNeuron(true);
-        in.setDescriptionLabel("IN");
+        in.setLabel("IN");
         PatternPartNeuron na = new PatternPartNeuron(m);
-        na.setDescriptionLabel("A");
+        na.setLabel("A");
         PatternPartNeuron nb = new PatternPartNeuron(m);
-        nb.setDescriptionLabel("B");
+        nb.setLabel("B");
         PatternPartNeuron nc = new PatternPartNeuron(m);
-        nc.setDescriptionLabel("C");
+        nc.setLabel("C");
         InhibitoryNeuron inhib = new InhibitoryNeuron(m);
-        inhib.setDescriptionLabel("I");
+        inhib.setLabel("I");
 
         {
             {
@@ -162,13 +161,13 @@ public class MutualExclusionTest {
 
         PatternNeuron in = new PatternNeuron(m, "I");
         in.setInputNeuron(true);
-        in.setDescriptionLabel("IN");
+        in.setLabel("IN");
         PatternPartNeuron na = new PatternPartNeuron(m);
-        na.setDescriptionLabel("A");
+        na.setLabel("A");
         PatternPartNeuron nb = new PatternPartNeuron(m);
-        nb.setDescriptionLabel("B");
+        nb.setLabel("B");
         InhibitoryNeuron inhib = new InhibitoryNeuron(m);
-        inhib.setDescriptionLabel("I");
+        inhib.setLabel("I");
 
         {
             {

@@ -16,7 +16,6 @@
  */
 package network;
 
-import network.aika.neuron.Templates;
 import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.text.Document;
 import network.aika.Model;
@@ -41,9 +40,9 @@ public class PropagateTest {
 
         PatternNeuron in = new PatternNeuron(m, "A");
         in.setInputNeuron(true);
-        in.setDescriptionLabel("IN");
+        in.setLabel("IN");
         PatternPartNeuron out = new PatternPartNeuron(m);
-        out.setDescriptionLabel("OUT");
+        out.setLabel("OUT");
 
         PatternPartSynapse s = PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, out);
 
