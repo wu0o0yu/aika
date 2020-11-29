@@ -76,6 +76,11 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         modified = true;
     }
 
+
+    public boolean isTemplate() {
+        return getId() < 0;
+    }
+
     public abstract Neuron<?> getTemplate();
 
     public abstract void addDummyLinks(Activation act);

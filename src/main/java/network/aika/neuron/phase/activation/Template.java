@@ -77,7 +77,7 @@ public class Template implements ActivationPhase {
 
     @Override
     public void propagate(Activation act, Visitor v) {
-        if(!act.isActive())
+        if(!act.isActive() || act.getNeuron().isTemplate())
             return;
 
         if (!act.getConfig().checkNeuronInduction(act)) {

@@ -69,6 +69,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         assert input.getId() < 0 || input.getId() != output.getId();
     }
 
+    public boolean isTemplate() {
+        return template == null;
+    }
+
     public Synapse getTemplate() {
         return template;
     }
