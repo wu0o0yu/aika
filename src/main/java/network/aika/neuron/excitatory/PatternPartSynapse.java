@@ -30,6 +30,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static network.aika.neuron.activation.Direction.*;
+import static network.aika.neuron.phase.activation.ActivationPhase.TEMPLATE;
 
 /**
  *
@@ -59,6 +60,11 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         this.isRecurrent = isRecurrent;
         this.inputScope = inputScope;
         this.isSamePattern = isSamePattern;
+    }
+
+    @Override
+    protected boolean checkOnCreate(Activation fromAct, Activation toAct, Visitor v) {
+        return fromAct.getPhase() != TEMPLATE || !isRecurrent || v.getSelfRef();
     }
 
     @Override

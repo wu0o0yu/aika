@@ -79,4 +79,9 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
         next(fromAct, toAct, nv, create);
     }
+
+    @Override
+    protected boolean checkOnCreate(Activation fromAct, Activation toAct, Visitor v) {
+        return true;
+    }
 }

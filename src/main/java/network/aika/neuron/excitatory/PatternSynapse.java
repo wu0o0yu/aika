@@ -18,6 +18,11 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
     }
 
     @Override
+    protected boolean checkOnCreate(Activation fromAct, Activation toAct, Visitor v) {
+        return true;
+    }
+
+    @Override
     public PatternSynapse instantiateTemplate(I input, PatternNeuron output) {
         if(getInput() != input.getTemplate()) {
             return null;

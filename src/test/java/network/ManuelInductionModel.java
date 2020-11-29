@@ -39,7 +39,7 @@ public class ManuelInductionModel {
                 TRAINING,
                 GRADIENTS,
                 UPDATE_WEIGHTS,
-                INDUCTION,
+                TEMPLATE,
                 FINAL
         };
         ActivationPhase[] phaseswoT = new ActivationPhase[]{

@@ -16,8 +16,8 @@ public class Templates {
 
     public static final PatternPartSynapse PRIMARY_INPUT_SYNAPSE_TEMPLATE =
             init(
-            new PatternPartSynapse(PATTERN_TEMPLATE, PATTERN_PART_TEMPLATE, null, false, false, true, false),
-            true,
+                    new PatternPartSynapse(PATTERN_TEMPLATE, PATTERN_PART_TEMPLATE, null, false, false, true, false),
+                    true,
                     true
             );
 
@@ -64,7 +64,8 @@ public class Templates {
             );
 
     public static final PrimaryInhibitorySynapse PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE =
-            init(new PrimaryInhibitorySynapse(PATTERN_TEMPLATE, INHIBITORY_TEMPLATE, null),
+            init(
+                    new PrimaryInhibitorySynapse(PATTERN_TEMPLATE, INHIBITORY_TEMPLATE, null),
                     true,
                     true
             );

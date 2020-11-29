@@ -81,6 +81,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract void transition(Visitor v, Activation currentAct, Activation nextAct, boolean create);
 
+    protected abstract boolean checkOnCreate(Activation fromAct, Activation toAct, Visitor v);
+
     public Reference getReference(Link l) {
         return l.getInput().getReference();
     }
@@ -95,6 +97,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public void next(Activation fromAct, Activation toAct, Visitor v, boolean create) {
         if(create) {
+            if(!checkOnCreate(fromAct, toAct, v)) {
+                return;
+            }
+
             // Richtung prüfen
             if (toAct == null) {
                 toAct = fromAct.createActivation(getOutput());
