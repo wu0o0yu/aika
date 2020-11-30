@@ -51,13 +51,13 @@ public class TextModel extends Model {
     }
 
     private void init() {
-        InhibitoryNeuron ptN = new InhibitoryNeuron(this);
+        InhibitoryNeuron ptN = INHIBITORY_TEMPLATE.instantiateTemplate(this);
         ptN.setInputNeuron(true);
         ptN.setLabel("Prev. Token");
         prevTokenInhib = ptN.getProvider();
         prevTokenInhib.save();
 
-        InhibitoryNeuron ntN = new InhibitoryNeuron(this);
+        InhibitoryNeuron ntN = INHIBITORY_TEMPLATE.instantiateTemplate(this);
         ntN.setInputNeuron(true);
         ntN.setLabel("Next Token");
         nextTokenInhib = ntN.getProvider();

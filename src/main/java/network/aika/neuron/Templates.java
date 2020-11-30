@@ -12,8 +12,8 @@ public class Templates {
 
     public static final PatternPartNeuron PATTERN_PART_TEMPLATE = init(new PatternPartNeuron(), -1, "Template Patter Part Neuron");
     public static final PatternNeuron INPUT_PATTERN_TEMPLATE = init(new PatternNeuron(), -2, "Input Template Patter Neuron");
-    public static final PatternNeuron SAME_PATTERN_TEMPLATE = init(new PatternNeuron(), -2, "Same Template Patter Neuron");
-    public static final InhibitoryNeuron INHIBITORY_TEMPLATE = init(new InhibitoryNeuron(), -3, "Template Inhibitory Neuron");
+    public static final PatternNeuron SAME_PATTERN_TEMPLATE = init(new PatternNeuron(), -3, "Same Template Patter Neuron");
+    public static final InhibitoryNeuron INHIBITORY_TEMPLATE = init(new InhibitoryNeuron(), -4, "Template Inhibitory Neuron");
 
     static {
         INPUT_PATTERN_TEMPLATE.getTemplates().add(SAME_PATTERN_TEMPLATE);

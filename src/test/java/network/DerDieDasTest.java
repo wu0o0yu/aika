@@ -61,7 +61,7 @@ public class DerDieDasTest {
         InhibitoryNeuron inhibN = inhibNeurons.computeIfAbsent(c,
                 ch ->
                 {
-                    InhibitoryNeuron n = new InhibitoryNeuron(charBasedTrainings.getModel());
+                    InhibitoryNeuron n = INHIBITORY_TEMPLATE.instantiateTemplate(charBasedTrainings.getModel());
                     n.setLabel("I-" + ch);
                     return n;
                 }

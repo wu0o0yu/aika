@@ -64,7 +64,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     protected boolean isInputNeuron; // Input Neurons won't be trained!
 
-    private Set<Neuron<?>> templates = new TreeSet<>();
+    private Set<Neuron<?>> templates = new TreeSet<>(Comparator.comparing(n -> n.getId()));
 
     protected Neuron() {
     }

@@ -50,13 +50,13 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         super(p);
     }
 
-    public PatternNeuron(Model model) {
+    private PatternNeuron(Model model) {
         super(model);
     }
 
     @Override
     public PatternNeuron instantiateTemplate(Model m) {
-        PatternNeuron n = new PatternNeuron();
+        PatternNeuron n = new PatternNeuron(m);
         n.getTemplates().add(this);
         n.getTemplates().addAll(getTemplates());
         return n;
