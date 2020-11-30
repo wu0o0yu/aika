@@ -64,6 +64,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     protected boolean isInputNeuron; // Input Neurons won't be trained!
 
+    private Set<Neuron<?>> templates = new TreeSet<>();
+
     protected Neuron() {
     }
 
@@ -81,7 +83,11 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return getId() < 0;
     }
 
-    public abstract Neuron<?> getTemplate();
+    public Set<Neuron<?>> getTemplates() {
+        return templates;
+    }
+
+    public abstract Neuron<?> instantiateTemplate(Model m);
 
     public abstract void addDummyLinks(Activation act);
 

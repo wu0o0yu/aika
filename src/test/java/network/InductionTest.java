@@ -13,14 +13,15 @@ import network.aika.text.TextModel;
 import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
 
-import static network.aika.neuron.Templates.PRIMARY_INPUT_SYNAPSE_TEMPLATE;
+import static network.aika.neuron.Templates.*;
 
 public class InductionTest {
 
     @Test
     public void testInduceFromMaturePattern() {
         Model m = new TextModel();
-        PatternNeuron in = new PatternNeuron(m, "A");
+        PatternNeuron in = INPUT_PATTERN_TEMPLATE.instantiateTemplate(m);
+        in.setTokenLabel("A");
         in.setInputNeuron(true);
         in.setLabel("IN");
 
@@ -44,13 +45,15 @@ public class InductionTest {
     @Test
     public void initialGradientTest() {
         Model m = new TextModel();
-        PatternNeuron inA = new PatternNeuron(m, "A");
+        PatternNeuron inA = INPUT_PATTERN_TEMPLATE.instantiateTemplate(m);
+        inA.setTokenLabel("A");
         inA.setInputNeuron(true);
         inA.setLabel("IN-A");
-        PatternNeuron inB = new PatternNeuron(m, "B");
+        PatternNeuron inB = INPUT_PATTERN_TEMPLATE.instantiateTemplate(m);
+        inB.setTokenLabel("B");
         inB.setInputNeuron(true);
         inB.setLabel("IN-B");
-        PatternPartNeuron targetN = new PatternPartNeuron(m);
+        PatternPartNeuron targetN = PATTERN_PART_TEMPLATE.instantiateTemplate(m);
         targetN.setLabel("OUT-Target");
 
         targetN.setBias(0.0);

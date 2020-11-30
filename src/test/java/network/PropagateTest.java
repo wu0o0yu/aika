@@ -26,7 +26,7 @@ import network.aika.text.TextModel;
 import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
 
-import static network.aika.neuron.Templates.PRIMARY_INPUT_SYNAPSE_TEMPLATE;
+import static network.aika.neuron.Templates.*;
 
 /**
  *
@@ -38,10 +38,11 @@ public class PropagateTest {
     public void testPropagation() {
         Model m = new TextModel();
 
-        PatternNeuron in = new PatternNeuron(m, "A");
+        PatternNeuron in = INPUT_PATTERN_TEMPLATE.instantiateTemplate(m);
+        in.setTokenLabel("A");
         in.setInputNeuron(true);
         in.setLabel("IN");
-        PatternPartNeuron out = new PatternPartNeuron(m);
+        PatternPartNeuron out = PATTERN_PART_TEMPLATE.instantiateTemplate(m);
         out.setLabel("OUT");
 
         PatternPartSynapse s = PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, out);

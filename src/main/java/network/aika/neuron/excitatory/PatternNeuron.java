@@ -27,10 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.stream.Stream;
 
-import static network.aika.neuron.Templates.PATTERN_TEMPLATE;
 import static network.aika.neuron.activation.Direction.*;
 
 /**
@@ -38,6 +35,7 @@ import static network.aika.neuron.activation.Direction.*;
  * @author Lukas Molzberger
  */
 public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
+
     private static final Logger log = LoggerFactory.getLogger(PatternNeuron.class);
 
     public static byte type;
@@ -52,14 +50,16 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         super(p);
     }
 
-    public PatternNeuron(Model model, String tokenLabel) {
+    public PatternNeuron(Model model) {
         super(model);
-        this.tokenLabel = tokenLabel;
     }
 
     @Override
-    public Neuron<?> getTemplate() {
-        return PATTERN_TEMPLATE;
+    public PatternNeuron instantiateTemplate(Model m) {
+        PatternNeuron n = new PatternNeuron();
+        n.getTemplates().add(this);
+        n.getTemplates().addAll(getTemplates());
+        return n;
     }
 
     @Override
@@ -87,6 +87,11 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         Reference ir = nl.getInput().getReference();
 
         nl.getOutput().propagateReference(or == null ? ir : or.add(ir));
+    }
+
+
+    public void setTokenLabel(String tokenLabel) {
+        this.tokenLabel = tokenLabel;
     }
 
     public String getTokenLabel() {

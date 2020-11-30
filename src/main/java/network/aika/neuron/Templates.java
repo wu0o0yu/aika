@@ -11,12 +11,18 @@ import network.aika.neuron.inhibitory.PrimaryInhibitorySynapse;
 public class Templates {
 
     public static final PatternPartNeuron PATTERN_PART_TEMPLATE = init(new PatternPartNeuron(), -1, "Template Patter Part Neuron");
-    public static final PatternNeuron PATTERN_TEMPLATE = init(new PatternNeuron(), -2, "Template Patter Neuron");
+    public static final PatternNeuron INPUT_PATTERN_TEMPLATE = init(new PatternNeuron(), -2, "Input Template Patter Neuron");
+    public static final PatternNeuron SAME_PATTERN_TEMPLATE = init(new PatternNeuron(), -2, "Same Template Patter Neuron");
     public static final InhibitoryNeuron INHIBITORY_TEMPLATE = init(new InhibitoryNeuron(), -3, "Template Inhibitory Neuron");
+
+    static {
+        INPUT_PATTERN_TEMPLATE.getTemplates().add(SAME_PATTERN_TEMPLATE);
+        SAME_PATTERN_TEMPLATE.getTemplates().add(INPUT_PATTERN_TEMPLATE);
+    }
 
     public static final PatternPartSynapse PRIMARY_INPUT_SYNAPSE_TEMPLATE =
             init(
-                    new PatternPartSynapse(PATTERN_TEMPLATE, PATTERN_PART_TEMPLATE, null, false, false, true, false),
+                    new PatternPartSynapse(INPUT_PATTERN_TEMPLATE, PATTERN_PART_TEMPLATE, null, false, false, true, false),
                     true,
                     true
             );
@@ -44,7 +50,7 @@ public class Templates {
 
     public static final PatternPartSynapse RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE =
             init(
-                    new PatternPartSynapse(PATTERN_TEMPLATE, PATTERN_PART_TEMPLATE, null, false, true, false, true),
+                    new PatternPartSynapse(SAME_PATTERN_TEMPLATE, PATTERN_PART_TEMPLATE, null, false, true, false, true),
                     true,
                     true
             );
@@ -58,14 +64,14 @@ public class Templates {
 
     public static final PatternSynapse PATTERN_SYNAPSE_TEMPLATE =
             init(
-                    new PatternSynapse(PATTERN_PART_TEMPLATE, PATTERN_TEMPLATE, null),
+                    new PatternSynapse(PATTERN_PART_TEMPLATE, SAME_PATTERN_TEMPLATE, null),
                     true,
                     true
             );
 
     public static final PrimaryInhibitorySynapse PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE =
             init(
-                    new PrimaryInhibitorySynapse(PATTERN_TEMPLATE, INHIBITORY_TEMPLATE, null),
+                    new PrimaryInhibitorySynapse(INPUT_PATTERN_TEMPLATE, INHIBITORY_TEMPLATE, null),
                     true,
                     true
             );

@@ -42,16 +42,17 @@ public class MutualExclusionTest {
     public void testPropagation() {
         Model m = new TextModel();
 
-        PatternNeuron in = new PatternNeuron(m, "I");
+        PatternNeuron in = INPUT_PATTERN_TEMPLATE.instantiateTemplate(m);
+        in.setTokenLabel("I");
         in.setInputNeuron(true);
         in.setLabel("IN");
-        PatternPartNeuron na = new PatternPartNeuron(m);
+        PatternPartNeuron na = PATTERN_PART_TEMPLATE.instantiateTemplate(m);
         na.setLabel("A");
-        PatternPartNeuron nb = new PatternPartNeuron(m);
+        PatternPartNeuron nb = PATTERN_PART_TEMPLATE.instantiateTemplate(m);
         nb.setLabel("B");
-        PatternPartNeuron nc = new PatternPartNeuron(m);
+        PatternPartNeuron nc = PATTERN_PART_TEMPLATE.instantiateTemplate(m);
         nc.setLabel("C");
-        InhibitoryNeuron inhib = new InhibitoryNeuron(m);
+        InhibitoryNeuron inhib = INHIBITORY_TEMPLATE.instantiateTemplate(m);
         inhib.setLabel("I");
 
         {
@@ -159,14 +160,15 @@ public class MutualExclusionTest {
     public void testPropagationWithPrimaryLink() {
         Model m = new TextModel();
 
-        PatternNeuron in = new PatternNeuron(m, "I");
+        PatternNeuron in = INPUT_PATTERN_TEMPLATE.instantiateTemplate(m);
+        in.setTokenLabel("I");
         in.setInputNeuron(true);
         in.setLabel("IN");
-        PatternPartNeuron na = new PatternPartNeuron(m);
+        PatternPartNeuron na = PATTERN_PART_TEMPLATE.instantiateTemplate(m);
         na.setLabel("A");
-        PatternPartNeuron nb = new PatternPartNeuron(m);
+        PatternPartNeuron nb = PATTERN_PART_TEMPLATE.instantiateTemplate(m);
         nb.setLabel("B");
-        InhibitoryNeuron inhib = new InhibitoryNeuron(m);
+        InhibitoryNeuron inhib = INHIBITORY_TEMPLATE.instantiateTemplate(m);
         inhib.setLabel("I");
 
         {

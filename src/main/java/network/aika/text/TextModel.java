@@ -114,16 +114,17 @@ public class TextModel extends Model {
             return (PatternNeuron) inProv;
         }
 
-        PatternNeuron in = new PatternNeuron(this, tokenLabel);
+        PatternNeuron in = INPUT_PATTERN_TEMPLATE.instantiateTemplate(this);
+        in.setTokenLabel(tokenLabel);
         in.setInputNeuron(true);
         in.setLabel("P-" + tokenLabel);
         getSuspensionHook().putLabel(tokenLabel, in.getId());
 
-        PatternPartNeuron inRelPT = new PatternPartNeuron(this);
+        PatternPartNeuron inRelPT = PATTERN_PART_TEMPLATE.instantiateTemplate(this);
         inRelPT.setInputNeuron(true);
         inRelPT.setLabel(tokenLabel + " Rel Prev. Token");
 
-        PatternPartNeuron inRelNT = new PatternPartNeuron(this);
+        PatternPartNeuron inRelNT = PATTERN_PART_TEMPLATE.instantiateTemplate(this);
         inRelNT.setInputNeuron(true);
         inRelNT.setLabel(tokenLabel + " Rel Next Token");
 

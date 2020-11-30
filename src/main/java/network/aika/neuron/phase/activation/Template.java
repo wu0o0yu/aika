@@ -67,9 +67,10 @@ public class Template implements ActivationPhase {
         }
 
         oAct.getNeuron()
-                .getTemplate()
-                .getInputSynapses()
-                .filter(s -> iAct.getNeuron().getTemplate() == s.getInput())
+                .getTemplates()
+                .stream()
+                .flatMap(tn -> tn.getInputSynapses())
+                .filter(s -> iAct.getNeuron().getTemplates().contains(s.getInput()))
                 .forEach(s ->
                         s.transition(v, act, v.origin, true)
                 );
@@ -84,9 +85,11 @@ public class Template implements ActivationPhase {
             return;
         }
 
-        Set<Synapse> templateSynapses = act.getNeuron()
-                .getTemplate()
-                .getOutputSynapses()
+        Set<Synapse> templateSynapses = act
+                .getNeuron()
+                .getTemplates()
+                .stream()
+                .flatMap(tn -> tn.getOutputSynapses())
                 .collect(Collectors.toSet());
 
         act.getOutputLinks()
