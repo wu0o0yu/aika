@@ -60,11 +60,8 @@ public class Template implements ActivationPhase {
         if(!iAct.isActive() || n.isInputNeuron())
             return;
 
-        {
-            Synapse s = n.getInputSynapse(iAct.getNeuronProvider());
-            if (s != null)
-                return;
-        }
+        if (n.getInputSynapse(iAct.getNeuronProvider()) != null)
+            return;
 
         oAct.getNeuron()
                 .getTemplates()

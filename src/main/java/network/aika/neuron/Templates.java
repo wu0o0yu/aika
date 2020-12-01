@@ -58,7 +58,7 @@ public class Templates {
     public static final PatternPartSynapse NEGATIVE_SYNAPSE_TEMPLATE =
             init(
                     new PatternPartSynapse(INHIBITORY_TEMPLATE, PATTERN_PART_TEMPLATE, null, true, true, false, false),
-                    true,
+                    false,
                     true
             );
 
