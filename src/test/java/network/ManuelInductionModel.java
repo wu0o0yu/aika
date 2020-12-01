@@ -15,6 +15,11 @@ import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
+
 import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
 import static network.aika.neuron.phase.activation.ActivationPhase.FINAL;
@@ -33,7 +38,6 @@ public class ManuelInductionModel {
 
     public void initToken(Document doc, boolean activateInduction) {
         ActivationPhase[] phaseswT = new ActivationPhase[]{
-                INITIAL_LINKING,
                 PREPARE_FINAL_LINKING,
                 SOFTMAX,
                 COUNTING,
@@ -44,14 +48,34 @@ public class ManuelInductionModel {
                 FINAL
         };
         ActivationPhase[] phaseswoT = new ActivationPhase[]{
-                INITIAL_LINKING,
                 PREPARE_FINAL_LINKING,
                 SOFTMAX,
                 COUNTING,
                 FINAL
         };
 
+        ActivationPhase[] phasesInducedAct = new ActivationPhase[] {
+                PREPARE_FINAL_LINKING,
+                SOFTMAX,
+                COUNTING,
+                TRAINING,
+                UPDATE_WEIGHTS,
+                INDUCTION,
+                FINAL
+        };
+
         doc.setConfig(new Config() {
+
+                    public Set<ActivationPhase> getPhases(ActivationPhase startPhase) {
+                        TreeSet<ActivationPhase> phases = new TreeSet<>(Comparator.comparing(p -> p.getRank()));
+                        if(startPhase != TEMPLATE) {
+                            phases.addAll(Arrays.asList(activateInduction ? phaseswT : phaseswoT));
+                        } else {
+                            phases.addAll(Arrays.asList(phasesInducedAct));
+                        }
+
+                        return phases;
+                    }
 
                     public boolean checkNeuronInduction(Activation act) {
                         Neuron n = act.getNeuron();
@@ -96,7 +120,6 @@ public class ManuelInductionModel {
                         .setLearnRate(-0.1)
                         .setSurprisalInductionThreshold(0.0)
                         .setGradientInductionThreshold(0.0)
-                        .setPhases(activateInduction ? phaseswT : phaseswoT)
         );
 
         int i = 0;

@@ -6,7 +6,7 @@ import network.aika.neuron.activation.Visitor;
 public class Induction implements ActivationPhase {
     @Override
     public void process(Activation act) {
-
+        System.out.println();
     }
 
     @Override
@@ -26,7 +26,7 @@ public class Induction implements ActivationPhase {
 
     @Override
     public void propagate(Activation act, Visitor v) {
-
+        System.out.println();
     }
 
     @Override

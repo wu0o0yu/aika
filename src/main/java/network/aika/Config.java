@@ -32,20 +32,11 @@ public class Config {
     private Double alpha = null; //0.99;
     private double learnRate;
 
-    private Set<ActivationPhase> phases = new TreeSet<>(Comparator.comparing(p -> p.getRank()));
-
     private double surprisalInductionThreshold = 2.0;
     private double gradientInductionThreshold = 2.0;
 
-    public Set<ActivationPhase> getPhases() {
-        return phases;
-    }
-
-    public Config setPhases(ActivationPhase... phases) {
-        for(ActivationPhase p: phases) {
-            this.phases.add(p);
-        }
-        return this;
+    public Set<ActivationPhase> getPhases(ActivationPhase startPhase) {
+        return null;
     }
 
     public double getLearnRate() {

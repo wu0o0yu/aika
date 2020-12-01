@@ -97,30 +97,34 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public void next(Activation fromAct, Activation toAct, Visitor v, boolean create) {
         if(create) {
-            if(!checkOnCreate(fromAct, toAct, v)) {
-                return;
-            }
-
-            // Richtung prüfen
-            if (toAct == null) {
-                toAct = fromAct.createActivation(getOutput());
-            } else {
-                Link ol = toAct.getInputLink(this);
-                if (ol != null) {
-//                    toAct = oAct.cloneToReplaceLink(s);
-                    log.warn("Link already exists!  " + toAct.getThought());
-                    return;
-                }
-            }
-            Link.link(
-                    this,
-                    fromAct,
-                    toAct,
-                    v.getSelfRef()
-            );
+            createOutgoingLink(fromAct, toAct, v);
         } else {
             v.follow(toAct);
         }
+    }
+
+    public void createOutgoingLink(Activation fromAct, Activation toAct, Visitor v) {
+        if(!checkOnCreate(fromAct, toAct, v)) {
+            return;
+        }
+
+        // TODO: Check direction
+        if (toAct == null) {
+            toAct = fromAct.createActivation(getOutput());
+        } else {
+            Link ol = toAct.getInputLink(this);
+            if (ol != null) {
+//                    toAct = oAct.cloneToReplaceLink(s);
+                log.warn("Link already exists!  " + toAct.getThought());
+                return;
+            }
+        }
+        Link.link(
+                this,
+                fromAct,
+                toAct,
+                v.getSelfRef()
+        );
     }
 
     public void linkInput() {

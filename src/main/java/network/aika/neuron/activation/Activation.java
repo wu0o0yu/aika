@@ -95,7 +95,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void initInput(Reference ref) {
-        queueState = new QueueState(this, getThought().getConfig().getPhases());
+        queueState = new QueueState(this, getThought().getConfig().getPhases(getPhase()));
 
         setReference(ref);
 
@@ -321,7 +321,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
     public Activation createActivation(Neuron n) {
         Activation act = new Activation(thought.createActivationId(), thought, n);
-        act.queueState = new QueueState(act, getThought().getConfig().getPhases());
+        act.queueState = new QueueState(act, getThought().getConfig().getPhases(getPhase()));
         return act;
     }
 

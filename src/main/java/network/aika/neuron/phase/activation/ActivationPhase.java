@@ -34,6 +34,7 @@ public interface ActivationPhase extends Phase<Activation> {
     ActivationPhase GRADIENTS = new Gradients();
     ActivationPhase UPDATE_WEIGHTS = new UpdateWeights();
     ActivationPhase TEMPLATE = new Template();
+    ActivationPhase INDUCTION = new Induction();
     ActivationPhase FINAL = new Final();
 
     void process(Activation act);
