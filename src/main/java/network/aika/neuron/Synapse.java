@@ -260,29 +260,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         modified = true;
     }
 
-    public Link initInducedSynapse(Activation iAct, Activation oAct, Visitor v) {
-        Link l = new Link(this, iAct, oAct, false);
-
-        l.linkOutput();
-        linkOutput();
-
-        l.computeOutputGradient();
-        l.removeGradientDependencies();
-        oAct.addInputGradient(l.getOutputGradient());
-
-        l.updateSelfGradient();
-
-        if (!oAct.getConfig().checkSynapseInduction(l, v)) {
-            return null;
-        }
-
-        l.updateSynapse();
-
-        oAct.addLink(null, l);
-
-        return l;
-    }
-
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeByte(getType());

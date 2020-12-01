@@ -15,6 +15,7 @@ import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
 
+import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
 import static network.aika.neuron.phase.activation.ActivationPhase.FINAL;
 
@@ -51,19 +52,15 @@ public class ManuelInductionModel {
         };
 
         doc.setConfig(new Config() {
-/*
-                    public boolean checkPatternPartNeuronInduction(Neuron n) {
-                        return n.isInputNeuron();
-                    }
 
-                    public boolean checkInhibitoryNeuronInduction(Neuron n) {
-                        return n.isInputNeuron() || n instanceof PatternNeuron;
-                    }
-*/
                     public boolean checkNeuronInduction(Activation act) {
                         Neuron n = act.getNeuron();
 
                         if(n instanceof PatternPartNeuron && n.isInputNeuron()) {
+                            return false;
+                        }
+
+                        if(n instanceof PatternNeuron && n.getSurprisal(POS) < 1.4) {
                             return false;
                         }
 
