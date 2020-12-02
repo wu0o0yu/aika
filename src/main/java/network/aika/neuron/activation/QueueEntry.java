@@ -18,6 +18,10 @@ public abstract class QueueEntry<P extends Phase> implements Comparable<QueueEnt
         queueState.addPhase(this, p);
     }
 
+    public void updateThoughtQueue() {
+        queueState.updateThoughtQueue();
+    }
+
     public P getPhase() {
         return phase;
     }

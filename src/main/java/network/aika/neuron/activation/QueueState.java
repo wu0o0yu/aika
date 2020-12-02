@@ -10,9 +10,9 @@ import java.util.TreeSet;
 
 public class QueueState<P extends Phase> {
 
-    private TreeSet<P> pendingPhases = new TreeSet<>(Comparator.comparing(p -> p.getRank()));;
+    private TreeSet<P> pendingPhases = new TreeSet<>(Comparator.comparing(p -> p.getRank()));
     private QueueEntry<P> entryToQueue;
-    private QueueEntry<P> queuedAct;
+    private QueueEntry<P> queuedEntry;
     private boolean marked;
 
     public QueueState() {
@@ -40,8 +40,8 @@ public class QueueState<P extends Phase> {
         this.entryToQueue = entryToQueue;
     }
 
-    public void addPhase(QueueEntry<P>  act, P... p) {
-        entryToQueue = act;
+    public void addPhase(QueueEntry<P>  e, P... p) {
+        entryToQueue = e;
         pendingPhases.addAll(Arrays.asList(p));
 
         updateThoughtQueue();
@@ -51,24 +51,28 @@ public class QueueState<P extends Phase> {
         if(pendingPhases.isEmpty())
             return;
 
+        P nextPhase = pendingPhases.first();
         Thought t = entryToQueue.getThought();
-        if(queuedAct != null) {
-            t.removeActivationFromQueue(queuedAct);
+        if(queuedEntry != null) {
+            if(queuedEntry.getPhase() == nextPhase)
+                return;
+
+            t.removeActivationFromQueue(queuedEntry);
         }
-        entryToQueue.setPhase(pendingPhases.first());
+        entryToQueue.setPhase(nextPhase);
         t.addToQueue(entryToQueue);
-        queuedAct = entryToQueue;
+        queuedEntry = entryToQueue;
     }
 
     public void removePendingPhase() {
-        queuedAct = null;
+        queuedEntry = null;
         pendingPhases.pollFirst();
     }
 
-    public QueueState copy(Activation newAct) {
+    public QueueState copy(QueueEntry<P> newEntry) {
         QueueState qs = new QueueState();
         qs.pendingPhases.addAll(pendingPhases);
-        qs.entryToQueue = newAct;
+        qs.entryToQueue = newEntry;
         return qs;
     }
 

@@ -98,8 +98,8 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         return new Fired(f.getInputTimestamp(), f.getFired() + 1);
     }
 
-    public double getBias(ActivationPhase p) {
-        return super.getBias(p) + (directConjunctiveBias + (p == ActivationPhase.INITIAL_LINKING ? 0.0 : recurrentConjunctiveBias));
+    public double getBias(boolean isFinal) {
+        return super.getBias(isFinal) + (directConjunctiveBias + (isFinal ? recurrentConjunctiveBias : 0.0));
     }
 
     public void updatePropagateFlag() {

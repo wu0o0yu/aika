@@ -220,7 +220,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         modified = true;
     }
 
-    public double getBias(ActivationPhase p) {
+    public double getBias(boolean isFinal) {
         return bias;
     }
 

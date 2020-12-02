@@ -44,4 +44,8 @@ public interface ActivationPhase extends Phase<Activation> {
     void tryToLink(Activation act, Visitor v);
 
     void propagate(Activation act, Visitor v);
+
+    static boolean isFinal(ActivationPhase ap) {
+        return ap != null && ap.isFinal();
+    }
 }

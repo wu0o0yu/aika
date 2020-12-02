@@ -179,7 +179,7 @@ public class Link extends QueueEntry<LinkPhase> {
         on.addConjunctiveBias(negWDelta, !causal);
         on.addBias(biasDelta);
 
-        double finalBias = on.getBias(FINAL_LINKING);
+        double finalBias = on.getBias(true);
         if(finalBias > 0.0) {
             on.addConjunctiveBias(-finalBias, false);
         }

@@ -125,6 +125,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 toAct,
                 v.getSelfRef()
         );
+
+        toAct.updateThoughtQueue();
     }
 
     public void linkInput() {

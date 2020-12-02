@@ -90,8 +90,6 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>();
-
-        phase = INITIAL_LINKING;
     }
 
     public void initInput(Reference ref) {
@@ -114,12 +112,12 @@ public class Activation extends QueueEntry<ActivationPhase> {
         return value;
     }
 
-    public double getNet(ActivationPhase p) {
-        return sum + (p.isFinal() ? lateSum : 0.0) + getNeuron().getBias(p);
+    public double getNet(boolean isFinal) {
+        return sum + (isFinal ? lateSum : 0.0) + getNeuron().getBias(isFinal);
     }
 
     public double getNet() {
-        return getNet(getPhase());
+        return getNet(ActivationPhase.isFinal(getPhase()));
     }
 
     public Fired getFired() {
@@ -272,7 +270,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
     public void updateValueAndPropagate() {
         if(!fixed) {
-            value = computeValue(getPhase());
+            value = computeValue(ActivationPhase.isFinal(getPhase()));
         }
         isFinal = true;
         if (!equals(lastRound)) {
@@ -321,6 +319,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
     public Activation createActivation(Neuron n) {
         Activation act = new Activation(thought.createActivationId(), thought, n);
+        act.toString();
         act.queueState = new QueueState(act, getThought().getConfig().getPhases(getPhase()));
         return act;
     }
@@ -397,8 +396,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
             return;
         }
 
-        double initialValue = computeValue(INITIAL_LINKING);
-        double finalValue = computeValue(FINAL_LINKING);
+        double initialValue = computeValue(false);
+        double finalValue = computeValue(true);
 
         if (Math.abs(finalValue - initialValue) > TOLERANCE) {
             getModifiable(null).addToQueue(FINAL_LINKING);
@@ -419,10 +418,10 @@ public class Activation extends QueueEntry<ActivationPhase> {
                 .orElse(null);
     }
 
-    private double computeValue(ActivationPhase phase) {
+    private double computeValue(boolean isFinal) {
         return branchProbability *
                 neuron.getActivationFunction().f(
-                        getNet(phase)
+                        getNet(isFinal)
                 );
     }
 
