@@ -38,11 +38,11 @@ public class PropagateTest {
     public void testPropagation() {
         Model m = new TextModel();
 
-        PatternNeuron in = INPUT_PATTERN_TEMPLATE.instantiateTemplate(m);
+        PatternNeuron in = INPUT_PATTERN_TEMPLATE.instantiateTemplate();
         in.setTokenLabel("A");
         in.setInputNeuron(true);
         in.setLabel("IN");
-        PatternPartNeuron out = PATTERN_PART_TEMPLATE.instantiateTemplate(m);
+        PatternPartNeuron out = PATTERN_PART_TEMPLATE.instantiateTemplate();
         out.setLabel("OUT");
 
         PatternPartSynapse s = PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, out);

@@ -78,7 +78,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         modified = true;
     }
 
-
     public boolean isTemplate() {
         return getId() < 0;
     }
@@ -87,7 +86,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return templates;
     }
 
-    public abstract Neuron<?> instantiateTemplate(Model m);
+    public abstract Neuron<?> instantiateTemplate();
 
     public abstract void addDummyLinks(Activation act);
 
@@ -251,6 +250,9 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public double getSurprisal(Sign s) {
+        if(isTemplate())
+            return 0.0;
+
         double p = getP(s, sampleSpace.getN());
         return -Math.log(p);
     }

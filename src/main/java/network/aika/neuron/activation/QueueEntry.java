@@ -47,9 +47,7 @@ public abstract class QueueEntry<P extends Phase> implements Comparable<QueueEnt
 
         getPhase().process(this);
 
-        if(isActive()) {
-            queueState.updateThoughtQueue();
-        }
+        queueState.updateThoughtQueue();
     }
 
     @Override

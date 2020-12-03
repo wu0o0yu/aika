@@ -58,8 +58,8 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     @Override
-    public InhibitoryNeuron instantiateTemplate(Model m) {
-        InhibitoryNeuron n = new InhibitoryNeuron(m);
+    public InhibitoryNeuron instantiateTemplate() {
+        InhibitoryNeuron n = new InhibitoryNeuron(getModel());
         n.getTemplates().add(this);
         n.getTemplates().addAll(getTemplates());
         return n;

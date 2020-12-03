@@ -8,7 +8,9 @@ public class PrepareFinalLinking implements ActivationPhase {
 
     @Override
     public void process(Activation act) {
-        act.updateForFinalPhase();
+        if(act.isActive()) {
+            act.updateForFinalPhase();
+        }
     }
 
     @Override

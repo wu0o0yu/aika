@@ -8,7 +8,9 @@ public class Counting implements ActivationPhase {
 
     @Override
     public void process(Activation act) {
-        act.count();
+        if(act.isActive()) {
+            act.count();
+        }
     }
 
     @Override

@@ -1,12 +1,17 @@
 package network.aika.neuron.phase.activation;
 
+import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 
 public class Induction implements ActivationPhase {
     @Override
     public void process(Activation act) {
-        System.out.println();
+        assert act.getNeuron().isTemplate();
+
+        Neuron inducedNeuron = act.getNeuron().instantiateTemplate();
+
+        act.setNeuron(inducedNeuron);
     }
 
     @Override
@@ -26,7 +31,6 @@ public class Induction implements ActivationPhase {
 
     @Override
     public void propagate(Activation act, Visitor v) {
-        System.out.println();
     }
 
     @Override

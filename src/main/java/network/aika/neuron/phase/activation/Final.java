@@ -27,7 +27,7 @@ public class Final implements ActivationPhase {
 
     @Override
     public int getRank() {
-        return 17;
+        return 18;
     }
 
     @Override

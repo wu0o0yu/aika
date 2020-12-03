@@ -170,6 +170,10 @@ public class Activation extends QueueEntry<ActivationPhase> {
         return neuron;
     }
 
+    public void setNeuron(Neuron n) {
+        this.neuron = n;
+    }
+
     public Model getModel() {
         return neuron.getModel();
     }
@@ -281,7 +285,9 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void train() {
-        initSelfGradient();
+        if(!getNeuron().isTemplate()) {
+            initSelfGradient();
+        }
 
         addLinksToQueue(
                 INPUT,
@@ -407,7 +413,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     private void checkIfFired() {
         if (fired == NOT_FIRED && getNet() > 0.0) {
             fired = neuron.incrementFired(getLatestFired());
-            addToQueue(getPhase());
+            addToQueue(INITIAL_LINKING);
         }
     }
 

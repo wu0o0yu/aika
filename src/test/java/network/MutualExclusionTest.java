@@ -42,17 +42,17 @@ public class MutualExclusionTest {
     public void testPropagation() {
         Model m = new TextModel();
 
-        PatternNeuron in = INPUT_PATTERN_TEMPLATE.instantiateTemplate(m);
+        PatternNeuron in = INPUT_PATTERN_TEMPLATE.instantiateTemplate();
         in.setTokenLabel("I");
         in.setInputNeuron(true);
         in.setLabel("IN");
-        PatternPartNeuron na = PATTERN_PART_TEMPLATE.instantiateTemplate(m);
+        PatternPartNeuron na = PATTERN_PART_TEMPLATE.instantiateTemplate();
         na.setLabel("A");
-        PatternPartNeuron nb = PATTERN_PART_TEMPLATE.instantiateTemplate(m);
+        PatternPartNeuron nb = PATTERN_PART_TEMPLATE.instantiateTemplate();
         nb.setLabel("B");
-        PatternPartNeuron nc = PATTERN_PART_TEMPLATE.instantiateTemplate(m);
+        PatternPartNeuron nc = PATTERN_PART_TEMPLATE.instantiateTemplate();
         nc.setLabel("C");
-        InhibitoryNeuron inhib = INHIBITORY_TEMPLATE.instantiateTemplate(m);
+        InhibitoryNeuron inhib = INHIBITORY_TEMPLATE.instantiateTemplate();
         inhib.setLabel("I");
 
         {
@@ -160,15 +160,15 @@ public class MutualExclusionTest {
     public void testPropagationWithPrimaryLink() {
         Model m = new TextModel();
 
-        PatternNeuron in = INPUT_PATTERN_TEMPLATE.instantiateTemplate(m);
+        PatternNeuron in = INPUT_PATTERN_TEMPLATE.instantiateTemplate();
         in.setTokenLabel("I");
         in.setInputNeuron(true);
         in.setLabel("IN");
-        PatternPartNeuron na = PATTERN_PART_TEMPLATE.instantiateTemplate(m);
+        PatternPartNeuron na = PATTERN_PART_TEMPLATE.instantiateTemplate();
         na.setLabel("A");
-        PatternPartNeuron nb = PATTERN_PART_TEMPLATE.instantiateTemplate(m);
+        PatternPartNeuron nb = PATTERN_PART_TEMPLATE.instantiateTemplate();
         nb.setLabel("B");
-        InhibitoryNeuron inhib = INHIBITORY_TEMPLATE.instantiateTemplate(m);
+        InhibitoryNeuron inhib = INHIBITORY_TEMPLATE.instantiateTemplate();
         inhib.setLabel("I");
 
         {

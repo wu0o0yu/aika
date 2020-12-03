@@ -1,5 +1,6 @@
 package network.aika.neuron;
 
+import network.aika.Model;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.neuron.excitatory.PatternPartSynapse;
@@ -15,7 +16,13 @@ public class Templates {
     public static final PatternNeuron SAME_PATTERN_TEMPLATE = init(new PatternNeuron(), -3, "Same Template Patter Neuron");
     public static final InhibitoryNeuron INHIBITORY_TEMPLATE = init(new InhibitoryNeuron(), -4, "Template Inhibitory Neuron");
 
-    static {
+    public void init(Model m) {
+        PATTERN_PART_TEMPLATE.setProvider();
+                INPUT_PATTERN_TEMPLAT
+        SAME_PATTERN_TEMPLATE
+                INHIBITORY_TEMPLATE
+
+
         INPUT_PATTERN_TEMPLATE.getTemplates().add(SAME_PATTERN_TEMPLATE);
         SAME_PATTERN_TEMPLATE.getTemplates().add(INPUT_PATTERN_TEMPLATE);
     }

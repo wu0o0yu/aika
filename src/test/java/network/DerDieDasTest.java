@@ -28,7 +28,7 @@ public class DerDieDasTest {
 
     public void initToken(Reference ref, String token) {
         TextModel m = charBasedTrainings.getModel();
-        PatternNeuron out = SAME_PATTERN_TEMPLATE.instantiateTemplate(m);
+        PatternNeuron out = SAME_PATTERN_TEMPLATE.instantiateTemplate();
         out.setTokenLabel(token);
         out.setLabel("P-" + token);
         out.setBias(0.1);
@@ -39,7 +39,7 @@ public class DerDieDasTest {
             char c = token.charAt(i);
 
             PatternNeuron inN = m.lookupToken(ref, "" + c);
-            PatternPartNeuron ppN = PATTERN_PART_TEMPLATE.instantiateTemplate(m);
+            PatternPartNeuron ppN = PATTERN_PART_TEMPLATE.instantiateTemplate();
             ppN.setLabel("TP-" + c + "-(" + token + ")");
 
             initPP(ref, c, inN, ppN, prevPPN, out);
@@ -61,7 +61,7 @@ public class DerDieDasTest {
         InhibitoryNeuron inhibN = inhibNeurons.computeIfAbsent(c,
                 ch ->
                 {
-                    InhibitoryNeuron n = INHIBITORY_TEMPLATE.instantiateTemplate(charBasedTrainings.getModel());
+                    InhibitoryNeuron n = INHIBITORY_TEMPLATE.instantiateTemplate();
                     n.setLabel("I-" + ch);
                     return n;
                 }

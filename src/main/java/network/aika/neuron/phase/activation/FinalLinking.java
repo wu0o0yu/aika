@@ -13,7 +13,9 @@ public class FinalLinking extends Linking {
 
     @Override
     public void propagate(Activation act, Visitor v) {
-        act.updateOutgoingLinks();
+        if(act.isActive()) {
+            act.updateOutgoingLinks();
+        }
     }
 
     @Override
