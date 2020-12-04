@@ -39,7 +39,7 @@ public class Link extends QueueEntry<LinkPhase> {
 
     private static final Logger log = LoggerFactory.getLogger(Link.class);
 
-    private final Synapse synapse;
+    private Synapse synapse;
 
     private Activation input;
     private Activation output;
@@ -211,6 +211,10 @@ public class Link extends QueueEntry<LinkPhase> {
 
     public Synapse getSynapse() {
         return synapse;
+    }
+
+    public void setSynapse(Synapse synapse) {
+        this.synapse = synapse;
     }
 
     public Activation getInput() {

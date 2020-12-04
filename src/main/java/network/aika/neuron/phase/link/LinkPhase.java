@@ -12,5 +12,6 @@ public interface LinkPhase extends Phase<Link> {
     LinkPhase GRADIENT_DEPENDENCIES = new GradientDependencies();
     LinkPhase PROPAGATE_OUTPUT_GRADIENT = new PropagateOutputGradient();
     LinkPhase PROPAGATE_SELF_GRADIENT = new PropagateSelfGradient();
+    LinkPhase INDUCTION = new Induction();
 
 }

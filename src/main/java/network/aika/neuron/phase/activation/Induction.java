@@ -31,6 +31,7 @@ public class Induction implements ActivationPhase {
 
     @Override
     public void propagate(Activation act, Visitor v) {
+        System.out.println();
     }
 
     @Override

@@ -16,8 +16,14 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.*;
-import network.aika.neuron.*;
+import network.aika.Config;
+import network.aika.Model;
+import network.aika.Thought;
+import network.aika.Utils;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.Sign;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.activation.ActivationPhase;
@@ -32,12 +38,9 @@ import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
-import static network.aika.neuron.phase.activation.ActivationPhase.FINAL_LINKING;
-import static network.aika.neuron.phase.activation.ActivationPhase.INITIAL_LINKING;
 import static network.aika.neuron.phase.link.LinkPhase.*;
 
 /**
- *
  * @author Lukas Molzberger
  */
 public class Activation extends QueueEntry<ActivationPhase> {
@@ -273,7 +276,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void updateValueAndPropagate() {
-        if(!fixed) {
+        if (!fixed) {
             value = computeValue(ActivationPhase.isFinal(getPhase()));
         }
         isFinal = true;
@@ -285,7 +288,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void train() {
-        if(!getNeuron().isTemplate()) {
+        if (!getNeuron().isTemplate()) {
             initSelfGradient();
         }
 
@@ -369,6 +372,10 @@ public class Activation extends QueueEntry<ActivationPhase> {
         sumUpLink(ol, nl);
         checkIfFired();
 
+        if (nl.getSynapse().isTemplate()) {
+            nl.addToQueue(LinkPhase.INDUCTION);
+        }
+
         if (nl.getSynapse().getWeight() > 0.0) {
             nl.addToQueue(LinkPhase.LINKING);
         }
@@ -398,7 +405,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void updateForFinalPhase() {
-        if(fixed) {
+        if (fixed) {
             return;
         }
 
@@ -599,7 +606,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
                 " bp:" + Utils.round(branchProbability) +
                 " round:" + round);
 
-        if(includeLink) {
+        if (includeLink) {
             sb.append("\n");
             getInputLinks().forEach(l ->
                     sb.append("   " + l.toDetailedString() + "\n")
