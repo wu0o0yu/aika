@@ -55,8 +55,6 @@ public abstract class Model {
 
     private double betaThreshold = 0.95;
 
-    private Templates templates = new Templates(this);
-
     private static Map<Byte, Class> typeRegistry = new HashMap<>();
 
     static {
@@ -75,6 +73,8 @@ public abstract class Model {
     // Important: the id field needs to be referenced by the provider!
     private WeakHashMap<Long, WeakReference<NeuronProvider>> providers = new WeakHashMap<>();
     public Map<Long, NeuronProvider> activeProviders = new TreeMap<>();
+
+    private Templates templates = new Templates(this);
 
     public Model() {
         this(new InMemorySuspensionHook());
