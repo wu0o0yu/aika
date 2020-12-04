@@ -248,7 +248,7 @@ public class Link extends QueueEntry<LinkPhase> {
     }
 
     public void linkOutput() {
-        output.inputLinks.put(synapse.getPInput(), this);
+        output.inputLinks.put(input.getNeuronProvider(), this);
     }
 
     public void unlink() {
