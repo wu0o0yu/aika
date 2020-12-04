@@ -13,10 +13,10 @@ public class Templates {
 
     private Model model;
 
-    public PatternPartNeuron PATTERN_PART_TEMPLATE = new PatternPartNeuron(); //, -1, "Template Patter Part Neuron");
-    public PatternNeuron INPUT_PATTERN_TEMPLATE = new PatternNeuron(); //, -2, "Input Template Patter Neuron");
-    public PatternNeuron SAME_PATTERN_TEMPLATE = new PatternNeuron(); //, -3, "Same Template Patter Neuron");
-    public InhibitoryNeuron INHIBITORY_TEMPLATE = new InhibitoryNeuron(); //, -4, "Template Inhibitory Neuron");
+    public PatternPartNeuron PATTERN_PART_TEMPLATE = new PatternPartNeuron();
+    public PatternNeuron INPUT_PATTERN_TEMPLATE = new PatternNeuron();
+    public PatternNeuron SAME_PATTERN_TEMPLATE = new PatternNeuron();
+    public InhibitoryNeuron INHIBITORY_TEMPLATE = new InhibitoryNeuron();
 
     public PatternPartSynapse PRIMARY_INPUT_SYNAPSE_TEMPLATE;
     public PatternPartSynapse RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE;
@@ -32,9 +32,9 @@ public class Templates {
     public Templates(Model m) {
         model = m;
 
-        init(PATTERN_PART_TEMPLATE, -1, "Template Patter Part Neuron");
-        init(INPUT_PATTERN_TEMPLATE, -2, "Input Template Patter Neuron");
-        init(SAME_PATTERN_TEMPLATE, -3, "Same Template Patter Neuron");
+        init(PATTERN_PART_TEMPLATE, -1, "Template Pattern Part Neuron");
+        init(INPUT_PATTERN_TEMPLATE, -2, "Input Template Pattern Neuron");
+        init(SAME_PATTERN_TEMPLATE, -3, "Same Template Pattern Neuron");
         init(INHIBITORY_TEMPLATE, -4, "Template Inhibitory Neuron");
 
         INPUT_PATTERN_TEMPLATE.getTemplates().add(SAME_PATTERN_TEMPLATE);
