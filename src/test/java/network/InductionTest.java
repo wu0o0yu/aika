@@ -1,6 +1,7 @@
 package network;
 
 import network.aika.Config;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.excitatory.PatternPartNeuron;
@@ -20,7 +21,9 @@ public class InductionTest {
     @Test
     public void testInduceFromMaturePattern() {
         Model m = new TextModel();
-        PatternNeuron in = INPUT_PATTERN_TEMPLATE.instantiateTemplate();
+        Templates t = new Templates(m);
+
+        PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate();
         in.setTokenLabel("A");
         in.setInputNeuron(true);
         in.setLabel("IN");
@@ -45,29 +48,31 @@ public class InductionTest {
     @Test
     public void initialGradientTest() {
         Model m = new TextModel();
-        PatternNeuron inA = INPUT_PATTERN_TEMPLATE.instantiateTemplate();
+        Templates t = new Templates(m);
+
+        PatternNeuron inA = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate();
         inA.setTokenLabel("A");
         inA.setInputNeuron(true);
         inA.setLabel("IN-A");
-        PatternNeuron inB = INPUT_PATTERN_TEMPLATE.instantiateTemplate();
+        PatternNeuron inB = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate();
         inB.setTokenLabel("B");
         inB.setInputNeuron(true);
         inB.setLabel("IN-B");
-        PatternPartNeuron targetN = PATTERN_PART_TEMPLATE.instantiateTemplate();
+        PatternPartNeuron targetN = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
         targetN.setLabel("OUT-Target");
 
         targetN.setBias(0.0);
         targetN.setDirectConjunctiveBias(0.0);
         targetN.setRecurrentConjunctiveBias(0.0);
 
-        PatternPartSynapse sA = PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inA, targetN);
+        PatternPartSynapse sA = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inA, targetN);
 
         sA.linkInput();
         sA.linkOutput();
         sA.setWeight(0.1);
         targetN.addConjunctiveBias(-0.1, false);
 
-        PatternPartSynapse sB = PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inB, targetN);
+        PatternPartSynapse sB = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inB, targetN);
 
         sB.linkInput();
         sB.linkOutput();

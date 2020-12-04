@@ -21,6 +21,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.NeuronProvider.SuspensionMode;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Direction;
 import network.aika.neuron.excitatory.PatternPartSynapse;
@@ -53,6 +54,8 @@ public abstract class Model {
     private int N = 0; // needs to be stored
 
     private double betaThreshold = 0.95;
+
+    private Templates templates = new Templates(this);
 
     private static Map<Byte, Class> typeRegistry = new HashMap<>();
 
@@ -101,6 +104,10 @@ public abstract class Model {
 
     public long createNeuronId() {
         return suspensionHook.createId();
+    }
+
+    public Templates getTemplates() {
+        return templates;
     }
 
     public Collection<NeuronProvider> getActiveNeurons() {

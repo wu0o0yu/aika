@@ -26,16 +26,6 @@ import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.excitatory.PatternPartSynapse;
-import network.aika.neuron.excitatory.PatternNeuron;
-import network.aika.neuron.excitatory.PatternPartNeuron;
-
-import java.util.Arrays;
-import java.util.stream.Stream;
-
-import static network.aika.neuron.Templates.INHIBITORY_TEMPLATE;
-import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Direction.SAME;
 
 /**
  *

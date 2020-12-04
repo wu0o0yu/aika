@@ -19,15 +19,9 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.stream.Stream;
-
-import static network.aika.neuron.Templates.PATTERN_PART_TEMPLATE;
 import static network.aika.neuron.activation.Direction.*;
 
 /**
@@ -82,7 +76,8 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     public void updateReference(Link nl) {
         // TODO: find a better solution.
         Synapse ts = nl.getSynapse().getTemplate();
-        if(ts != Templates.RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE && ts != Templates.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE) {
+        Templates t = getModel().getTemplates();
+        if(ts != t.RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE && ts != t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE) {
             nl.getOutput().propagateReference(nl.getInput().getReference());
         }
     }

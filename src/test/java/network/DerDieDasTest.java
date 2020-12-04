@@ -1,6 +1,7 @@
 package network;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
@@ -28,7 +29,9 @@ public class DerDieDasTest {
 
     public void initToken(Reference ref, String token) {
         TextModel m = charBasedTrainings.getModel();
-        PatternNeuron out = SAME_PATTERN_TEMPLATE.instantiateTemplate();
+        Templates t = m.getTemplates();
+
+        PatternNeuron out = t.SAME_PATTERN_TEMPLATE.instantiateTemplate();
         out.setTokenLabel(token);
         out.setLabel("P-" + token);
         out.setBias(0.1);
@@ -39,13 +42,13 @@ public class DerDieDasTest {
             char c = token.charAt(i);
 
             PatternNeuron inN = m.lookupToken(ref, "" + c);
-            PatternPartNeuron ppN = PATTERN_PART_TEMPLATE.instantiateTemplate();
+            PatternPartNeuron ppN = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
             ppN.setLabel("TP-" + c + "-(" + token + ")");
 
             initPP(ref, c, inN, ppN, prevPPN, out);
 
             {
-                PatternSynapse s = PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(ppN, out);
+                PatternSynapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(ppN, out);
 
                 s.linkInput();
                 s.linkOutput();
@@ -58,10 +61,13 @@ public class DerDieDasTest {
     }
 
     public void initPP(Reference ref, Character c, PatternNeuron inN, PatternPartNeuron ppN, PatternPartNeuron prevPP, PatternNeuron out) {
+        TextModel m = charBasedTrainings.getModel();
+        Templates t = m.getTemplates();
+
         InhibitoryNeuron inhibN = inhibNeurons.computeIfAbsent(c,
                 ch ->
                 {
-                    InhibitoryNeuron n = INHIBITORY_TEMPLATE.instantiateTemplate();
+                    InhibitoryNeuron n = t.INHIBITORY_TEMPLATE.instantiateTemplate();
                     n.setLabel("I-" + ch);
                     return n;
                 }
@@ -75,14 +81,14 @@ public class DerDieDasTest {
         }
 
         {
-            PatternPartSynapse s = NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhibN, ppN);
+            PatternPartSynapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhibN, ppN);
 
             s.linkOutput();
             s.addWeight(-100.0);
         }
 
         {
-            PatternPartSynapse s = SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(inN, ppN);
+            PatternPartSynapse s = t.SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(inN, ppN);
 
             s.linkInput();
             s.addWeight(0.1);
@@ -90,7 +96,7 @@ public class DerDieDasTest {
         }
 
         if(prevPP != null) {
-            PatternPartSynapse s = RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(prevPP, ppN);
+            PatternPartSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(prevPP, ppN);
 
             s.linkOutput();
             s.addWeight(0.1);
@@ -99,7 +105,7 @@ public class DerDieDasTest {
 
         PatternPartNeuron nextPP = lookupPPPT(inN);
         if(nextPP != null) {
-            PatternPartSynapse s = RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(nextPP, ppN);
+            PatternPartSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(nextPP, ppN);
 
             s.linkOutput();
             s.addWeight(0.1);
@@ -107,7 +113,7 @@ public class DerDieDasTest {
         }
 
         {
-            PatternPartSynapse s = RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, ppN);
+            PatternPartSynapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, ppN);
 
             s.linkOutput();
             s.addWeight(0.1);

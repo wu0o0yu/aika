@@ -16,6 +16,7 @@
  */
 package network;
 
+import network.aika.neuron.Templates;
 import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.neuron.excitatory.PatternSynapse;
@@ -69,25 +70,26 @@ public class PatternTest {
 
     public TextModel initModel() {
         TextModel m = new TextModel();
+        Templates t = new Templates(m);
 
         PatternNeuron nA = m.lookupToken(null, "A");
         PatternNeuron nB = m.lookupToken(null, "B");
         PatternNeuron nC = m.lookupToken(null, "C");
 
-        PatternPartNeuron eA = PATTERN_PART_TEMPLATE.instantiateTemplate();
+        PatternPartNeuron eA = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
         eA.setLabel("E A");
-        PatternPartNeuron eB = PATTERN_PART_TEMPLATE.instantiateTemplate();
+        PatternPartNeuron eB = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
         eB.setLabel("E B");
-        PatternPartNeuron eC = PATTERN_PART_TEMPLATE.instantiateTemplate();
+        PatternPartNeuron eC = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
         eC.setLabel("E C");
 
-        PatternNeuron out = SAME_PATTERN_TEMPLATE.instantiateTemplate();
+        PatternNeuron out = t.SAME_PATTERN_TEMPLATE.instantiateTemplate();
         out.setTokenLabel("ABC");
         out.setLabel("OUT");
 
         {
             {
-                PatternPartSynapse s = PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nA, eA);
+                PatternPartSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nA, eA);
 
                 s.linkInput();
                 s.linkOutput();
@@ -96,7 +98,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eA);
+                PatternPartSynapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eA);
 
                 s.linkInput();
                 s.linkOutput();
@@ -108,7 +110,7 @@ public class PatternTest {
 
         {
             {
-                PatternPartSynapse s = PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nB, eB);
+                PatternPartSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nB, eB);
 
                 s.linkInput();
                 s.linkOutput();
@@ -117,7 +119,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eA, eB);
+                PatternPartSynapse s = t.SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eA, eB);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -125,7 +127,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(lookupPPPT(m, nB), eB);
+                PatternPartSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(lookupPPPT(m, nB), eB);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -133,7 +135,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eB);
+                PatternPartSynapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eB);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -144,7 +146,7 @@ public class PatternTest {
 
         {
             {
-                PatternPartSynapse s = PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nC, eC);
+                PatternPartSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nC, eC);
 
                 s.linkInput();
                 s.linkOutput();
@@ -153,7 +155,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eB, eC);
+                PatternPartSynapse s = t.SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eB, eC);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -161,7 +163,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(lookupPPPT(m, nC), eC);
+                PatternPartSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(lookupPPPT(m, nC), eC);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -169,7 +171,7 @@ public class PatternTest {
             }
 
             {
-                PatternPartSynapse s = RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eC);
+                PatternPartSynapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eC);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -180,7 +182,7 @@ public class PatternTest {
 
         {
             {
-                PatternSynapse s = PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eA, out);
+                PatternSynapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eA, out);
 
                 s.linkInput();
                 s.linkOutput();
@@ -188,7 +190,7 @@ public class PatternTest {
                 out.addConjunctiveBias(-10.0, false);
             }
             {
-                PatternSynapse s = PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eB, out);
+                PatternSynapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eB, out);
 
                 s.linkInput();
                 s.linkOutput();
@@ -196,7 +198,7 @@ public class PatternTest {
                 out.addConjunctiveBias(-10.0, false);
             }
             {
-                PatternSynapse s = PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eC, out);
+                PatternSynapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eC, out);
 
                 s.linkInput();
                 s.linkOutput();
