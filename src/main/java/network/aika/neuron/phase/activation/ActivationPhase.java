@@ -32,7 +32,7 @@ public interface ActivationPhase extends Phase<Activation> {
     ActivationPhase COUNTING = new Counting();
     ActivationPhase TRAINING = new Training();
     ActivationPhase GRADIENTS = new Gradients();
-    ActivationPhase UPDATE_WEIGHTS = new UpdateWeights();
+    ActivationPhase UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks();
     ActivationPhase TEMPLATE = new Template();
     ActivationPhase INDUCTION = new Induction();
     ActivationPhase FINAL = new Final();

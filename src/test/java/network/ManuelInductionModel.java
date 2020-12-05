@@ -43,7 +43,7 @@ public class ManuelInductionModel {
                 COUNTING,
                 TRAINING,
                 GRADIENTS,
-                UPDATE_WEIGHTS,
+                UPDATE_SYNAPSE_INPUT_LINKS,
                 TEMPLATE,
                 FINAL
         };
@@ -58,9 +58,10 @@ public class ManuelInductionModel {
                 PREPARE_FINAL_LINKING,
                 SOFTMAX,
                 COUNTING,
-                TRAINING,
-                UPDATE_WEIGHTS,
+//                TRAINING,
                 INDUCTION,
+                GRADIENTS,
+                UPDATE_SYNAPSE_INPUT_LINKS,
                 FINAL
         };
 

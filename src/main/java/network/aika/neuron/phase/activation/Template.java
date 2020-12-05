@@ -101,7 +101,7 @@ public class Template implements ActivationPhase {
 
     @Override
     public int getRank() {
-        return 15;
+        return 14;
     }
 
     @Override

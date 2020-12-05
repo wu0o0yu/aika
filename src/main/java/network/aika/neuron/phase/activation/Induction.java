@@ -16,7 +16,7 @@ public class Induction implements ActivationPhase {
 
     @Override
     public int getRank() {
-        return 16;
+        return 15;
     }
 
     @Override

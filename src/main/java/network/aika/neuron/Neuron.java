@@ -289,7 +289,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public void suspend() {
     }
 
-    public void updatePropagateFlag() {
+    public void updateSynapseInputLinks() {
     }
 
     @Override

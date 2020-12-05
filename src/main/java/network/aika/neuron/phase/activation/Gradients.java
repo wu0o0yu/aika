@@ -27,7 +27,7 @@ public class Gradients implements ActivationPhase {
 
     @Override
     public int getRank() {
-        return 14;
+        return 17;
     }
 
     @Override

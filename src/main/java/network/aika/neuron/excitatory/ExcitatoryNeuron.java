@@ -102,7 +102,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         return super.getBias(isFinal) + (directConjunctiveBias + (isFinal ? recurrentConjunctiveBias : 0.0));
     }
 
-    public void updatePropagateFlag() {
+    public void updateSynapseInputLinks() {
         TreeSet<Synapse> sortedSynapses = new TreeSet<>(
                 Comparator.<Synapse>comparingDouble(s -> s.getWeight()).reversed()
                         .thenComparing(s -> s.getPInput())

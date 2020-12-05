@@ -39,6 +39,7 @@ import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
 import static network.aika.neuron.phase.link.LinkPhase.*;
+import static network.aika.neuron.phase.link.LinkPhase.UPDATE_WEIGHTS;
 
 /**
  * @author Lukas Molzberger
@@ -297,7 +298,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
                 OUTPUT_GRADIENT,
                 GRADIENT_DEPENDENCIES,
                 PROPAGATE_OUTPUT_GRADIENT,
-                PROPAGATE_SELF_GRADIENT
+                PROPAGATE_SELF_GRADIENT,
+                UPDATE_WEIGHTS
         );
     }
 
@@ -563,13 +565,6 @@ public class Activation extends QueueEntry<ActivationPhase> {
         return (dir == INPUT ? inputLinks : outputLinks)
                 .values()
                 .stream();
-    }
-
-    public void updateSynapseWeights() {
-        getInputLinks()
-                .forEach(l -> l.updateSynapse());
-
-        getNeuron().updatePropagateFlag();
     }
 
     public String getShortString() {

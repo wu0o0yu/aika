@@ -2,13 +2,12 @@ package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.phase.link.LinkPhase;
 
-public class UpdateWeights implements ActivationPhase {
+public class UpdateSynapseInputLinks implements ActivationPhase {
 
     @Override
     public void process(Activation act) {
-        act.updateSynapseWeights();
+        act.getNeuron().updateSynapseInputLinks();
         act.getNeuronProvider().save();
     }
 
@@ -29,7 +28,7 @@ public class UpdateWeights implements ActivationPhase {
 
     @Override
     public int getRank() {
-        return 7;
+        return 19;
     }
 
     @Override

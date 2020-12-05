@@ -6,17 +6,21 @@ import network.aika.neuron.activation.Link;
 public class Induction implements LinkPhase {
 
     @Override
-    public void process(Link link) {
-        assert link.getSynapse().isTemplate();
+    public void process(Link l) {
+        assert l.getSynapse().isTemplate();
 
-        Synapse inducedSynapse = link.getSynapse().instantiateTemplate(link.getInput().getNeuron(), link.getOutput().getNeuron());
+        Synapse inducedSynapse = l.getSynapse()
+                .instantiateTemplate(
+                        l.getInput().getNeuron(),
+                        l.getOutput().getNeuron()
+                );
 
-        link.setSynapse(inducedSynapse);
+        l.setSynapse(inducedSynapse);
     }
 
     @Override
     public int getRank() {
-        return 17;
+        return 16;
     }
 
     @Override
