@@ -28,6 +28,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.activation.Direction.*;
 
 /**
@@ -52,6 +53,23 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     private PatternNeuron(Model model) {
         super(model);
+    }
+
+
+    @Override
+    public boolean checkTemplate(Activation act) {
+        Neuron n = act.getNeuron();
+
+        if(n.getSurprisal(POS) < 1.4) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean checkInduction(Activation act) {
+        return true;
     }
 
     @Override

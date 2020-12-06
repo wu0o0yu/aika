@@ -22,6 +22,7 @@ import network.aika.neuron.activation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.activation.Direction.*;
 
 /**
@@ -42,6 +43,23 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     public PatternPartNeuron(Model model) {
         super(model);
+    }
+
+
+    @Override
+    public boolean checkTemplate(Activation act) {
+        Neuron n = act.getNeuron();
+
+        if(n.isInputNeuron()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean checkInduction(Activation act) {
+        return true;
     }
 
     @Override

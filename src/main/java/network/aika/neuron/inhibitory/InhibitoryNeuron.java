@@ -47,6 +47,17 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         super(model);
     }
 
+
+    @Override
+    public boolean checkTemplate(Activation act) {
+        return true;
+    }
+
+    @Override
+    public boolean checkInduction(Activation act) {
+        return true;
+    }
+
     @Override
     public InhibitoryNeuron instantiateTemplate() {
         InhibitoryNeuron n = new InhibitoryNeuron(getModel());

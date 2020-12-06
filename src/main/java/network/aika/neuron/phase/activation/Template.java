@@ -16,13 +16,12 @@
  */
 package network.aika.neuron.phase.activation;
 
+import network.aika.Config;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.excitatory.PatternNeuron;
-import network.aika.neuron.excitatory.PatternPartNeuron;
-import network.aika.neuron.phase.link.LinkPhase;
+import network.aika.neuron.phase.Phase;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,6 +35,19 @@ import static network.aika.neuron.activation.Direction.OUTPUT;
  */
 public class Template implements ActivationPhase {
 
+    @Override
+    public Phase[] getNextPhases(Config c) {
+        return new ActivationPhase[] {
+                PREPARE_FINAL_LINKING,
+                SOFTMAX,
+                COUNTING,
+//                TRAINING,
+                INDUCTION,
+                GRADIENTS,
+                UPDATE_SYNAPSE_INPUT_LINKS,
+                FINAL
+        };
+    }
 
     @Override
     public void process(Activation act) {
@@ -78,7 +90,7 @@ public class Template implements ActivationPhase {
         if(!act.isActive() || act.getNeuron().isTemplate())
             return;
 
-        if (!act.getConfig().checkNeuronInduction(act)) {
+        if (!act.getNeuron().checkTemplate(act)) {
             return;
         }
 
@@ -101,7 +113,7 @@ public class Template implements ActivationPhase {
 
     @Override
     public int getRank() {
-        return 14;
+        return 15;
     }
 
     @Override

@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.phase.activation;
 
+import network.aika.Config;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.phase.Phase;
@@ -30,7 +31,7 @@ public interface ActivationPhase extends Phase<Activation> {
     ActivationPhase FINAL_LINKING = new FinalLinking();
     ActivationPhase SOFTMAX = new Softmax();
     ActivationPhase COUNTING = new Counting();
-    ActivationPhase TRAINING = new Training();
+    ActivationPhase SELF_GRADIENT = new SelfGradient();
     ActivationPhase GRADIENTS = new Gradients();
     ActivationPhase UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks();
     ActivationPhase TEMPLATE = new Template();
@@ -45,7 +46,29 @@ public interface ActivationPhase extends Phase<Activation> {
 
     void propagate(Activation act, Visitor v);
 
+    Phase[] getNextPhases(Config c);
+
     static boolean isFinal(ActivationPhase ap) {
         return ap != null && ap.isFinal();
+    }
+
+    static ActivationPhase[] getInitialPhases(Config c) {
+        return c.isEnableTraining() ?
+                new ActivationPhase[]{
+                        PREPARE_FINAL_LINKING,
+                        SOFTMAX,
+                        COUNTING,
+                        SELF_GRADIENT,
+                        GRADIENTS,
+                        UPDATE_SYNAPSE_INPUT_LINKS,
+                        TEMPLATE,
+                        FINAL
+                } :
+                new ActivationPhase[] {
+                        PREPARE_FINAL_LINKING,
+                        SOFTMAX,
+                        COUNTING,
+                        FINAL
+                };
     }
 }

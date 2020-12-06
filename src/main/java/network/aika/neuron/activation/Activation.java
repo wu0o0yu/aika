@@ -38,8 +38,6 @@ import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
-import static network.aika.neuron.phase.link.LinkPhase.*;
-import static network.aika.neuron.phase.link.LinkPhase.UPDATE_WEIGHTS;
 
 /**
  * @author Lukas Molzberger
@@ -97,7 +95,10 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void initInput(Reference ref) {
-        queueState = new QueueState(this, getThought().getConfig().getPhases(getPhase()));
+        queueState = new QueueState(
+                this,
+                getInitialPhases(getThought().getConfig())
+        );
 
         setReference(ref);
 
@@ -288,21 +289,6 @@ public class Activation extends QueueEntry<ActivationPhase> {
         }
     }
 
-    public void train() {
-        if (!getNeuron().isTemplate()) {
-            initSelfGradient();
-        }
-
-        addLinksToQueue(
-                INPUT,
-                OUTPUT_GRADIENT,
-                GRADIENT_DEPENDENCIES,
-                PROPAGATE_OUTPUT_GRADIENT,
-                PROPAGATE_SELF_GRADIENT,
-                UPDATE_WEIGHTS
-        );
-    }
-
     public void updateOutgoingLinks() {
         lastRound.outputLinks
                 .values()
@@ -331,7 +317,11 @@ public class Activation extends QueueEntry<ActivationPhase> {
     public Activation createActivation(Neuron n) {
         Activation act = new Activation(thought.createActivationId(), thought, n);
         act.toString();
-        act.queueState = new QueueState(act, getThought().getConfig().getPhases(getPhase()));
+        act.queueState = new QueueState(act,
+                getPhase().getNextPhases(
+                        getThought().getConfig()
+                )
+        );
         return act;
     }
 
@@ -451,10 +441,6 @@ public class Activation extends QueueEntry<ActivationPhase> {
         selfGradient += initialLinkGradient;
     }
 
-    public void updateSelfGradient() {
-
-    }
-
     public double getSelfGradient() {
         return selfGradient;
     }
@@ -465,6 +451,9 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
     public void processGradient() {
         if (getNeuron().isInputNeuron())
+            return;
+
+        if(Math.abs(unpropagatedGradient) < TOLERANCE)
             return;
 
         addLinksToQueue(INPUT, new PropagateGradient(unpropagatedGradient));

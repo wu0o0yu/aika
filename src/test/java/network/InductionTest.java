@@ -111,7 +111,6 @@ public class InductionTest {
 
         actTarget.initSelfGradient();
  //       actTarget.computeInitialLinkGradients();
-        actTarget.updateSelfGradient();
         actTarget.processGradient();
 
         System.out.println(actTarget.gradientsToString());

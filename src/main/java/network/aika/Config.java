@@ -35,9 +35,7 @@ public class Config {
     private double surprisalInductionThreshold = 2.0;
     private double gradientInductionThreshold = 2.0;
 
-    public Set<ActivationPhase> getPhases(ActivationPhase startPhase) {
-        return null;
-    }
+    private boolean enableTraining;
 
     public double getLearnRate() {
         return learnRate;
@@ -74,33 +72,17 @@ public class Config {
         this.gradientInductionThreshold = gradientInductionThreshold;
         return this;
     }
-/*
-    public boolean checkPatternPartNeuronInduction(Neuron n) {
-        double s = n.getSurprisal(POS);
 
-        return s < getSurprisalInductionThreshold();
+    public boolean isEnableTraining() {
+        return enableTraining;
     }
 
-
-    public boolean checkInhibitoryNeuronInduction(Neuron n) {
-        double s = n.getSurprisal(POS);
-
-        return s < getSurprisalInductionThreshold();
-    }
-*/
-    public boolean checkNeuronInduction(Activation act) {
-        double s = act.getSelfGradient();
-
-        return s < getGradientInductionThreshold();
+    public Config setEnableTraining(boolean enableTraining) {
+        this.enableTraining = enableTraining;
+        return this;
     }
 
-    public boolean checkSynapseInduction(Link l, Visitor v) {
-        Config c = l.getOutput().getThought().getConfig();
-
-        return (l.getFinalGradient() - l.getOutput().getSelfGradient()) > -c.getSurprisalInductionThreshold();
-    }
-
-    public String getLabel(Activation iAct, Neuron n) {
+    public String getLabel(Activation act) {
         return "";
     }
 

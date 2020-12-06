@@ -3,6 +3,7 @@ package network.aika.neuron.excitatory;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 
 public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, PatternNeuron> {
@@ -15,6 +16,16 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
 
     public PatternSynapse(I input, PatternNeuron output, Synapse template) {
         super(input, output, template);
+    }
+
+    @Override
+    public boolean checkTemplate(Link l, Visitor v) {
+        return true;
+    }
+
+    @Override
+    public boolean checkInduction(Link l) {
+        return true;
     }
 
     @Override

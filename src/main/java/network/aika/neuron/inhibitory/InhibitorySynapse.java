@@ -18,6 +18,7 @@ package network.aika.neuron.inhibitory;
 
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartSynapse;
@@ -39,6 +40,16 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
     public InhibitorySynapse(Neuron<?> input, InhibitoryNeuron output, Synapse template) {
         super(input, output, template);
+    }
+
+    @Override
+    public boolean checkTemplate(Link l, Visitor v) {
+        return true;
+    }
+
+    @Override
+    public boolean checkInduction(Link l) {
+        return true;
     }
 
     @Override
