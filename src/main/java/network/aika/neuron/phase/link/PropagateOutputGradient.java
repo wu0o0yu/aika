@@ -17,6 +17,7 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.phase.activation.ActivationPhase;
 
 /**
  *
@@ -27,6 +28,7 @@ public class PropagateOutputGradient implements LinkPhase {
     @Override
     public void process(Link l) {
         l.getOutput().addInputGradient(l.getOutputGradient());
+        l.getOutput().addToQueue(ActivationPhase.GRADIENTS);
     }
 
     @Override

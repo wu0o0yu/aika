@@ -22,6 +22,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.activation.ActivationPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -214,6 +215,11 @@ public class Link extends QueueEntry<LinkPhase> {
 
     public void setSynapse(Synapse synapse) {
         this.synapse = synapse;
+    }
+
+
+    public ActivationPhase getStartPhase() {
+        return getOutput().getPhase() != null ? getOutput().getPhase() : getInput().getPhase();
     }
 
     public Activation getInput() {

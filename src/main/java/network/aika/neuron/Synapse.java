@@ -83,7 +83,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     protected abstract boolean checkOnCreate(Activation fromAct, Activation toAct, Visitor v);
 
-    public abstract boolean checkTemplate(Link l, Visitor v);
+    public abstract boolean checkTemplate(Activation iAct, Activation oAct, Visitor v);
 
     public abstract boolean checkInduction(Link l);
 

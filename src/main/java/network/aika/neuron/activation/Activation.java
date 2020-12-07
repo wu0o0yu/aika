@@ -316,9 +316,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
     public Activation createActivation(Neuron n) {
         Activation act = new Activation(thought.createActivationId(), thought, n);
-        act.toString();
         act.queueState = new QueueState(act,
-                getPhase().getNextPhases(
+                getPhase().getNextActivationPhases(
                         getThought().getConfig()
                 )
         );
@@ -364,12 +363,10 @@ public class Activation extends QueueEntry<ActivationPhase> {
         sumUpLink(ol, nl);
         checkIfFired();
 
-        if (nl.getSynapse().isTemplate()) {
-            nl.addToQueue(LinkPhase.INDUCTION);
-        }
-
-        if (nl.getSynapse().getWeight() > 0.0) {
-            nl.addToQueue(LinkPhase.LINKING);
+        if (nl.getSynapse().getWeight() > 0.0 || nl.getSynapse().isTemplate()) {
+            nl.addToQueue(
+                    nl.getStartPhase().getNextLinkPhases(getConfig())
+            );
         }
 
         return nl;

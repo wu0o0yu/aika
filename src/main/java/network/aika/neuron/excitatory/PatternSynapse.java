@@ -19,7 +19,7 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
     }
 
     @Override
-    public boolean checkTemplate(Link l, Visitor v) {
+    public boolean checkTemplate(Activation iAct, Activation oAct, Visitor v) {
         return true;
     }
 

@@ -20,6 +20,7 @@ import network.aika.Config;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.link.LinkPhase;
 
 /**
  *
@@ -46,7 +47,9 @@ public interface ActivationPhase extends Phase<Activation> {
 
     void propagate(Activation act, Visitor v);
 
-    Phase[] getNextPhases(Config c);
+    ActivationPhase[] getNextActivationPhases(Config c);
+
+    LinkPhase[] getNextLinkPhases(Config c);
 
     static boolean isFinal(ActivationPhase ap) {
         return ap != null && ap.isFinal();

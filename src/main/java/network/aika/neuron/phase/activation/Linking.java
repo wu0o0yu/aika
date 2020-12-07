@@ -21,6 +21,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.link.LinkPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +37,15 @@ public class Linking implements ActivationPhase {
     private static final Logger log = LoggerFactory.getLogger(Linking.class);
 
     @Override
-    public Phase[] getNextPhases(Config c) {
+    public ActivationPhase[] getNextActivationPhases(Config c) {
         return ActivationPhase.getInitialPhases(c);
+    }
+
+    @Override
+    public LinkPhase[] getNextLinkPhases(Config c) {
+        return new LinkPhase[] {
+                LinkPhase.LINKING
+        };
     }
 
     @Override

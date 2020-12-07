@@ -33,21 +33,26 @@ import static network.aika.neuron.phase.link.LinkPhase.*;
 public class SelfGradient implements ActivationPhase {
 
     @Override
-    public Phase[] getNextPhases(Config c) {
-        return new Phase[0];
+    public ActivationPhase[] getNextActivationPhases(Config c) {
+        return new ActivationPhase[0];
+    }
+
+    @Override
+    public LinkPhase[] getNextLinkPhases(Config c) {
+        return new LinkPhase[0];
     }
 
     @Override
     public void process(Activation act) {
         Neuron n = act.getNeuron();
 
-        if(n.isInputNeuron())
-            return;
-
-        if (n.isTemplate())
+        if(n.isTemplate())
             return;
 
         act.initSelfGradient();
+
+        if(n.isInputNeuron())
+            return;
 
         act.addLinksToQueue(
                 INPUT,

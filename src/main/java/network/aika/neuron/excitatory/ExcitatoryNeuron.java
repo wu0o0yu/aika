@@ -72,7 +72,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
     }
 
     public boolean isInitialized() {
-        return getInputSynapses().count() > 1;
+        return !isTemplate();
     }
 
     public void addDummyLinks(Activation act) {

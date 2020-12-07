@@ -22,6 +22,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.link.LinkPhase;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,7 +37,7 @@ import static network.aika.neuron.activation.Direction.OUTPUT;
 public class Template implements ActivationPhase {
 
     @Override
-    public Phase[] getNextPhases(Config c) {
+    public ActivationPhase[] getNextActivationPhases(Config c) {
         return new ActivationPhase[] {
                 PREPARE_FINAL_LINKING,
                 SOFTMAX,
@@ -46,6 +47,18 @@ public class Template implements ActivationPhase {
                 GRADIENTS,
                 UPDATE_SYNAPSE_INPUT_LINKS,
                 FINAL
+        };
+    }
+
+    @Override
+    public LinkPhase[] getNextLinkPhases(Config c) {
+        return new LinkPhase[] {
+                LinkPhase.OUTPUT_GRADIENT,
+                LinkPhase.GRADIENT_DEPENDENCIES,
+                LinkPhase.PROPAGATE_OUTPUT_GRADIENT,
+                LinkPhase.PROPAGATE_SELF_GRADIENT,
+                LinkPhase.INDUCTION,
+                LinkPhase.UPDATE_WEIGHTS
         };
     }
 
@@ -79,6 +92,7 @@ public class Template implements ActivationPhase {
                 .getTemplates()
                 .stream()
                 .flatMap(tn -> tn.getInputSynapses())
+                .filter(ts -> ts.checkTemplate(iAct, oAct, v))
                 .filter(s -> iAct.getNeuron().getTemplates().contains(s.getInput()))
                 .forEach(s ->
                         s.transition(v, act, v.origin, true)

@@ -43,7 +43,7 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     }
 
     @Override
-    public boolean checkTemplate(Link l, Visitor v) {
+    public boolean checkTemplate(Activation iAct, Activation oAct, Visitor v) {
         return true;
     }
 

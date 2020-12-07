@@ -29,8 +29,13 @@ import network.aika.neuron.phase.link.LinkPhase;
 public class PrepareFinalLinking implements ActivationPhase {
 
     @Override
-    public Phase[] getNextPhases(Config c) {
-        return new Phase[0];
+    public ActivationPhase[] getNextActivationPhases(Config c) {
+        return new ActivationPhase[0];
+    }
+
+    @Override
+    public LinkPhase[] getNextLinkPhases(Config c) {
+        return new LinkPhase[0];
     }
 
     @Override

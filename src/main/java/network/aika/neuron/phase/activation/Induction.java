@@ -21,6 +21,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.link.LinkPhase;
 
 /**
  *
@@ -29,8 +30,13 @@ import network.aika.neuron.phase.Phase;
 public class Induction implements ActivationPhase {
 
     @Override
-    public Phase[] getNextPhases(Config c) {
-        return new Phase[0];
+    public ActivationPhase[] getNextActivationPhases(Config c) {
+        return new ActivationPhase[0];
+    }
+
+    @Override
+    public LinkPhase[] getNextLinkPhases(Config c) {
+        return new LinkPhase[0];
     }
 
     @Override
