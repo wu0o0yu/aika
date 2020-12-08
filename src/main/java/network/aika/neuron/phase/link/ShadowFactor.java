@@ -22,19 +22,19 @@ import network.aika.neuron.activation.Link;
  *
  * @author Lukas Molzberger
  */
-public class GradientDependencies implements LinkPhase {
+public class ShadowFactor implements LinkPhase {
     @Override
     public void process(Link l) {
-        l.removeGradientDependencies();
+    //    l.removeGradientDependencies();
     }
 
     @Override
     public int getRank() {
-        return 10;
+        return 9;
     }
 
     @Override
-    public int compare(Link o1, Link o2) {
+    public int compare(Link l1, Link l2) {
         return 0;
     }
 }

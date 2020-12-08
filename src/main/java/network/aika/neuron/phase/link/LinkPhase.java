@@ -28,10 +28,10 @@ public interface LinkPhase extends Phase<Link> {
 
     LinkPhase LINKING = new Linking();
     LinkPhase COUNTING = new Counting();
-    LinkPhase OUTPUT_GRADIENT = new OutputGradient();
-    LinkPhase GRADIENT_DEPENDENCIES = new GradientDependencies();
-    LinkPhase PROPAGATE_OUTPUT_GRADIENT = new PropagateOutputGradient();
-    LinkPhase PROPAGATE_SELF_GRADIENT = new PropagateSelfGradient();
+    LinkPhase SHADOW_FACTOR = new ShadowFactor();
+    LinkPhase SELF_GRADIENT = new SelfGradient();
+//    LinkPhase PROPAGATE_OUTPUT_GRADIENT = new PropagateOutputGradient();
+//    LinkPhase PROPAGATE_SELF_GRADIENT = new PropagateSelfGradient();
     LinkPhase INDUCTION = new Induction();
     LinkPhase UPDATE_WEIGHTS = new UpdateWeight();
 

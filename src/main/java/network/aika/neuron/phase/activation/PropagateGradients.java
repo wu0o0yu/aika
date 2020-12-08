@@ -26,7 +26,7 @@ import network.aika.neuron.phase.link.LinkPhase;
  *
  * @author Lukas Molzberger
  */
-public class Gradients implements ActivationPhase {
+public class PropagateGradients implements ActivationPhase {
 
     @Override
     public ActivationPhase[] getNextActivationPhases(Config c) {

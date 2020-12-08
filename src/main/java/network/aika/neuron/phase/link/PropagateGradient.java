@@ -41,7 +41,7 @@ public class PropagateGradient implements LinkPhase {
     }
 
     @Override
-    public int compare(Link o1, Link o2) {
+    public int compare(Link l1, Link l2) {
         return 0;
     }
 }

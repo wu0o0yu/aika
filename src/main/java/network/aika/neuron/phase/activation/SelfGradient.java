@@ -20,7 +20,6 @@ import network.aika.Config;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.link.LinkPhase;
 
 import static network.aika.neuron.activation.Direction.INPUT;
@@ -56,10 +55,10 @@ public class SelfGradient implements ActivationPhase {
 
         act.addLinksToQueue(
                 INPUT,
-                OUTPUT_GRADIENT,
-                GRADIENT_DEPENDENCIES,
-                PROPAGATE_OUTPUT_GRADIENT,
-                PROPAGATE_SELF_GRADIENT,
+                LinkPhase.SELF_GRADIENT,
+                SHADOW_FACTOR,
+//                PROPAGATE_OUTPUT_GRADIENT,
+//                PROPAGATE_SELF_GRADIENT,
                 UPDATE_WEIGHTS
         );
     }

@@ -71,8 +71,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
     private Reference reference;
 
-    private double selfGradient;
-    private double unpropagatedGradient;
+//    private double selfGradient;
+    private double gradient;
 
 
     private Activation(int id, Neuron<?> n) {
@@ -428,18 +428,10 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void initSelfGradient() {
-        selfGradient = getNorm() * getActFunctionDerivative() *
+        gradient += getNorm() * getActFunctionDerivative() *
                 getNeuron().getSurprisal(
                         Sign.getSign(this)
                 );
-    }
-
-    public void addInputGradient(double initialLinkGradient) {
-        selfGradient += initialLinkGradient;
-    }
-
-    public double getSelfGradient() {
-        return selfGradient;
     }
 
     public double getNorm() {
@@ -450,12 +442,12 @@ public class Activation extends QueueEntry<ActivationPhase> {
         if (getNeuron().isInputNeuron())
             return;
 
-        if(Math.abs(unpropagatedGradient) < TOLERANCE)
+        if(Math.abs(gradient) < TOLERANCE)
             return;
 
-        addLinksToQueue(INPUT, new PropagateGradient(unpropagatedGradient));
+        addLinksToQueue(INPUT, new PropagateGradient(gradient));
 
-        unpropagatedGradient = 0.0;
+        gradient = 0.0;
     }
 
     public double getActFunctionDerivative() {
@@ -467,7 +459,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void propagateGradient(double g) {
-        unpropagatedGradient += g;
+        gradient += g;
 
         addToQueue(GRADIENTS);
     }

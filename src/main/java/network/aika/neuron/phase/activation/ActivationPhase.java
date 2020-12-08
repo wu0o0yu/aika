@@ -33,7 +33,7 @@ public interface ActivationPhase extends Phase<Activation> {
     ActivationPhase SOFTMAX = new Softmax();
     ActivationPhase COUNTING = new Counting();
     ActivationPhase SELF_GRADIENT = new SelfGradient();
-    ActivationPhase GRADIENTS = new Gradients();
+    ActivationPhase GRADIENTS = new PropagateGradients();
     ActivationPhase UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks();
     ActivationPhase TEMPLATE = new Template();
     ActivationPhase INDUCTION = new Induction();

@@ -46,10 +46,12 @@ public class Link extends QueueEntry<LinkPhase> {
 
     private boolean isSelfRef;
 
-    private double outputGradient;
+    private double gradient;
+/*    private double outputGradient;
     private double offsetGradient;
     private double selfGradient;
     private double finalGradient;
+*/
 
     public Link(Synapse s, Activation input, Activation output, boolean isSelfRef) {
         this.synapse = s;
@@ -57,14 +59,6 @@ public class Link extends QueueEntry<LinkPhase> {
         this.output = output;
         this.isSelfRef = isSelfRef;
         this.queueState = new QueueState();
-    }
-
-    public double getFinalGradient() {
-        return finalGradient;
-    }
-
-    public double getOffsetGradient() {
-        return offsetGradient;
     }
 
     public void count() {
@@ -82,7 +76,7 @@ public class Link extends QueueEntry<LinkPhase> {
         output.setMarked(false);
     }
 
-    public void computeOutputGradient() {
+    public void computeSelfGradient() {
         if(isNegative()) return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
 
         double s = 0.0;
@@ -102,8 +96,11 @@ public class Link extends QueueEntry<LinkPhase> {
 
         double f = s * getInputValue() * output.getNorm();
 
-        offsetGradient =  f * getActFunctionDerivative();
-        outputGradient = (f * output.getActFunctionDerivative()) - offsetGradient;
+        double offsetGradient =  f * getActFunctionDerivative();
+        double outputGradient = (f * output.getActFunctionDerivative()) - offsetGradient;
+
+        gradient += offsetGradient;
+        getOutput().propagateGradient(outputGradient);
     }
 
     private double getActFunctionDerivative() {
@@ -117,7 +114,7 @@ public class Link extends QueueEntry<LinkPhase> {
                         output.getNet() - (input.getValue() * synapse.getWeight())
                 );
     }
-
+/*
     public void removeGradientDependencies() {
         output.getInputLinks()
                 .filter(l -> l.input != null && l != this && input.isConnected(l.input))
@@ -125,10 +122,6 @@ public class Link extends QueueEntry<LinkPhase> {
                     outputGradient -= l.outputGradient;
                     outputGradient = Math.min(0.0, outputGradient); // TODO: check if that's correct.
                 });
-    }
-
-    public double getOutputGradient() {
-        return outputGradient;
     }
 
     public void updateSelfGradient() {
@@ -142,25 +135,26 @@ public class Link extends QueueEntry<LinkPhase> {
         updateSelfGradient();
         propagateGradient(selfGradient);
     }
+*/
 
-    public void propagateGradient(double unpropagatedGradient) {
-        if(Math.abs(unpropagatedGradient) < TOLERANCE) {
+    public void propagateGradient(double g) {
+        if(Math.abs(g) < TOLERANCE) {
             return;
         }
 
-        finalGradient += unpropagatedGradient;
+        gradient += g;
 
         if(input == null) {
             return;
         }
 
         input.propagateGradient(
-                synapse.getWeight() * unpropagatedGradient * input.getActFunctionDerivative()
+                synapse.getWeight() * g * input.getActFunctionDerivative()
         );
     }
 
     public void updateSynapse() {
-        if(Math.abs(finalGradient) < TOLERANCE) {
+        if(Math.abs(gradient) < TOLERANCE) {
             return;
         }
 
@@ -171,9 +165,11 @@ public class Link extends QueueEntry<LinkPhase> {
         double x = getInputValue();
         double learnRate = t.getConfig().getLearnRate();
 
-        double posWDelta = learnRate * x * finalGradient;
-        double negWDelta = learnRate * (1.0 - x) * finalGradient;
-        double biasDelta = learnRate * finalGradient;
+        double posWDelta = learnRate * x * gradient;
+        double negWDelta = learnRate * (1.0 - x) * gradient;
+        double biasDelta = learnRate * gradient;
+
+        gradient = 0.0;
 
         synapse.addWeight(posWDelta - negWDelta);
         on.addConjunctiveBias(negWDelta, !causal);
