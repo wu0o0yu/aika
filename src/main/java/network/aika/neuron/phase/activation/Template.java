@@ -41,7 +41,7 @@ public class Template implements ActivationPhase {
                 PREPARE_FINAL_LINKING,
                 SOFTMAX,
                 COUNTING,
-//                TRAINING,
+//                TEMPLATE,
                 INDUCTION,
                 PROPAGATE_GRADIENT,
                 UPDATE_SYNAPSE_INPUT_LINKS,

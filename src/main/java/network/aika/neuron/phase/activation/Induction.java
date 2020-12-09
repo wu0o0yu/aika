@@ -51,6 +51,8 @@ public class Induction implements ActivationPhase {
         inducedNeuron.setLabel(act.getConfig().getLabel(act));
 
         act.setNeuron(inducedNeuron);
+
+        act.addToQueue(TEMPLATE);
     }
 
     @Override
