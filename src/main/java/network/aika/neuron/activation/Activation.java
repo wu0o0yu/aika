@@ -461,7 +461,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     public void propagateGradient(double g) {
         gradient += g;
 
-        addToQueue(GRADIENTS);
+        addToQueue(PROPAGATE_GRADIENT);
     }
 
     public void unlink() {

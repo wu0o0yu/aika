@@ -43,7 +43,7 @@ public class Template implements ActivationPhase {
                 COUNTING,
 //                TRAINING,
                 INDUCTION,
-                GRADIENTS,
+                PROPAGATE_GRADIENT,
                 UPDATE_SYNAPSE_INPUT_LINKS,
                 FINAL
         };
