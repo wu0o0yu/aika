@@ -44,6 +44,7 @@ public class Induction extends RankedImpl implements LinkPhase {
                 );
 
         l.setSynapse(inducedSynapse);
+        inducedSynapse.linkOutput();
     }
 
     @Override

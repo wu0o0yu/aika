@@ -27,6 +27,7 @@ import network.aika.neuron.phase.link.LinkPhase;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 
@@ -105,7 +106,7 @@ public class Template extends RankedImpl implements ActivationPhase {
 
     @Override
     public void propagate(Activation act, Visitor v) {
-        if(!act.isActive() || act.getNeuron().isTemplate())
+        if (Math.abs(act.getGradient()) <= TOLERANCE)
             return;
 
         if (!act.getNeuron().checkTemplate(act)) {

@@ -590,4 +590,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
         return sb.toString();
     }
+
+    public double getGradient() {
+        return gradient;
+    }
 }
