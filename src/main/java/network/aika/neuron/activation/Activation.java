@@ -38,6 +38,7 @@ import static network.aika.neuron.activation.Direction.INPUT;
 import static network.aika.neuron.activation.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
+import static network.aika.neuron.phase.link.LinkPhase.PROPAGATE_GRADIENT_RANK;
 
 /**
  * @author Lukas Molzberger
@@ -445,7 +446,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
         if(Math.abs(gradient) < TOLERANCE)
             return;
 
-        addLinksToQueue(INPUT, new PropagateGradient(gradient));
+        addLinksToQueue(INPUT, new PropagateGradient(PROPAGATE_GRADIENT_RANK, gradient));
 
         gradient = 0.0;
     }

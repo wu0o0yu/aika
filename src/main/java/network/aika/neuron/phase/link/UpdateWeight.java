@@ -17,20 +17,21 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.phase.RankedImpl;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class UpdateWeight implements LinkPhase {
-    @Override
-    public void process(Link l) {
-        l.updateSynapse();
+public class UpdateWeight extends RankedImpl implements LinkPhase {
+
+    public UpdateWeight(int rank) {
+        super(rank);
     }
 
     @Override
-    public int getRank() {
-        return 18;
+    public void process(Link l) {
+        l.updateSynapse();
     }
 
     @Override

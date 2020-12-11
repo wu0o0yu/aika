@@ -17,20 +17,21 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.phase.RankedImpl;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class SelfGradient implements LinkPhase {
-    @Override
-    public void process(Link l) {
-        l.computeSelfGradient();
+public class SelfGradient extends RankedImpl implements LinkPhase {
+
+    public SelfGradient(int rank) {
+        super(rank);
     }
 
     @Override
-    public int getRank() {
-        return 10;
+    public void process(Link l) {
+        l.computeSelfGradient();
     }
 
     @Override

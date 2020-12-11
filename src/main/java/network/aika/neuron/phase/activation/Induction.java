@@ -21,13 +21,18 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.link.LinkPhase;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Induction implements ActivationPhase {
+public class Induction extends RankedImpl implements ActivationPhase {
+
+    public Induction(int rank) {
+        super(rank);
+    }
 
     @Override
     public ActivationPhase[] getNextActivationPhases(Config c) {
@@ -53,11 +58,6 @@ public class Induction implements ActivationPhase {
         act.setNeuron(inducedNeuron);
 
         act.addToQueue(TEMPLATE);
-    }
-
-    @Override
-    public int getRank() {
-        return 16;
     }
 
     @Override

@@ -21,6 +21,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.link.LinkPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +34,12 @@ import static network.aika.neuron.activation.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Linking implements ActivationPhase {
+public class Linking extends RankedImpl implements ActivationPhase {
     private static final Logger log = LoggerFactory.getLogger(Linking.class);
+
+    public Linking(int rank) {
+        super(rank);
+    }
 
     @Override
     public ActivationPhase[] getNextActivationPhases(Config c) {
@@ -88,11 +93,6 @@ public class Linking implements ActivationPhase {
     public void propagate(Activation act, Visitor v) {
         act.getModel().linkInputRelations(act, OUTPUT);
         act.propagate(v);
-    }
-
-    @Override
-    public int getRank() {
-        return 1;
     }
 
     @Override

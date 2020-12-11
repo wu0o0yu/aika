@@ -24,11 +24,9 @@ import java.util.Comparator;
  *
  * @author Lukas Molzberger
  */
-public interface Phase<E extends QueueEntry> extends Comparator<E> {
+public interface Phase<E extends QueueEntry> extends Ranked, Comparator<E> {
 
     void process(E e);
-
-    int getRank();
 
     static String toString(Phase p) {
         return " (" + (p != null ? p.getClass().getSimpleName() : "X") + ")";

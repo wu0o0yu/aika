@@ -17,20 +17,21 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.phase.RankedImpl;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class ShadowFactor implements LinkPhase {
-    @Override
-    public void process(Link l) {
-    //    l.removeGradientDependencies();
+public class ShadowFactor extends RankedImpl implements LinkPhase {
+
+    public ShadowFactor(int rank) {
+        super(rank);
     }
 
     @Override
-    public int getRank() {
-        return 9;
+    public void process(Link l) {
+    //    l.removeGradientDependencies();
     }
 
     @Override

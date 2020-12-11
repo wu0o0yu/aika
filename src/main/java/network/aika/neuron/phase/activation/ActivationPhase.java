@@ -27,17 +27,17 @@ import network.aika.neuron.phase.link.LinkPhase;
  * @author Lukas Molzberger
  */
 public interface ActivationPhase extends Phase<Activation> {
-    ActivationPhase INITIAL_LINKING = new Linking();
-    ActivationPhase PREPARE_FINAL_LINKING = new PrepareFinalLinking();
-    ActivationPhase FINAL_LINKING = new FinalLinking();
-    ActivationPhase SOFTMAX = new Softmax();
-    ActivationPhase COUNTING = new Counting();
-    ActivationPhase SELF_GRADIENT = new SelfGradient();
-    ActivationPhase PROPAGATE_GRADIENT = new PropagateGradients();
-    ActivationPhase UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks();
-    ActivationPhase TEMPLATE = new Template();
-    ActivationPhase INDUCTION = new Induction();
-    ActivationPhase FINAL = new Final();
+    ActivationPhase INDUCTION = new Induction(0);
+    ActivationPhase INITIAL_LINKING = new Linking(3);
+    ActivationPhase PREPARE_FINAL_LINKING = new PrepareFinalLinking(4);
+    ActivationPhase FINAL_LINKING = new FinalLinking(5);
+    ActivationPhase SOFTMAX = new Softmax(6);
+    ActivationPhase COUNTING = new Counting(7);
+    ActivationPhase SELF_GRADIENT = new SelfGradient(10);
+    ActivationPhase PROPAGATE_GRADIENT = new PropagateGradients(13);
+    ActivationPhase UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks(15);
+    ActivationPhase TEMPLATE = new Template(16);
+    ActivationPhase FINAL = new Final(17);
 
     void process(Activation act);
 

@@ -18,12 +18,17 @@ package network.aika.neuron.phase.link;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.phase.RankedImpl;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Induction implements LinkPhase {
+public class Induction extends RankedImpl implements LinkPhase {
+
+    public Induction(int rank) {
+        super(rank);
+    }
 
     @Override
     public void process(Link l) {
@@ -39,11 +44,6 @@ public class Induction implements LinkPhase {
                 );
 
         l.setSynapse(inducedSynapse);
-    }
-
-    @Override
-    public int getRank() {
-        return 17;
     }
 
     @Override

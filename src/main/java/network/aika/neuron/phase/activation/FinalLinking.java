@@ -18,12 +18,17 @@ package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.phase.RankedImpl;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public class FinalLinking extends Linking {
+
+    public FinalLinking(int rank) {
+        super(rank);
+    }
 
     public boolean isFinal() {
         return true;
@@ -34,10 +39,5 @@ public class FinalLinking extends Linking {
         if(act.isActive()) {
             act.updateOutgoingLinks();
         }
-    }
-
-    @Override
-    public int getRank() {
-        return 4;
     }
 }

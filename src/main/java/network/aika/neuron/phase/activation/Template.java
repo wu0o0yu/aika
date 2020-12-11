@@ -21,6 +21,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.link.LinkPhase;
 
 import java.util.Set;
@@ -33,7 +34,11 @@ import static network.aika.neuron.activation.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Template implements ActivationPhase {
+public class Template extends RankedImpl implements ActivationPhase {
+
+    public Template(int rank) {
+        super(rank);
+    }
 
     @Override
     public ActivationPhase[] getNextActivationPhases(Config c) {
@@ -122,11 +127,6 @@ public class Template implements ActivationPhase {
         templateSynapses.forEach(s ->
                 s.transition(v, act, null, true)
         );
-    }
-
-    @Override
-    public int getRank() {
-        return 15;
     }
 
     @Override

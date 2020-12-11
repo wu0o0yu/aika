@@ -17,21 +17,21 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.phase.RankedImpl;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Counting implements LinkPhase {
+public class Counting extends RankedImpl implements LinkPhase {
+
+    public Counting(int rank) {
+        super(rank);
+    }
 
     @Override
     public void process(Link l) {
         l.count();
-    }
-
-    @Override
-    public int getRank() {
-        return 6;
     }
 
     @Override

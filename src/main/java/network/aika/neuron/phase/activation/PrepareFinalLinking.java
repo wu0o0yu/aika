@@ -20,13 +20,18 @@ import network.aika.Config;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.link.LinkPhase;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PrepareFinalLinking implements ActivationPhase {
+public class PrepareFinalLinking extends RankedImpl implements ActivationPhase {
+
+    public PrepareFinalLinking(int rank) {
+        super(rank);
+    }
 
     @Override
     public ActivationPhase[] getNextActivationPhases(Config c) {
@@ -58,11 +63,6 @@ public class PrepareFinalLinking implements ActivationPhase {
     @Override
     public void propagate(Activation act, Visitor v) {
 
-    }
-
-    @Override
-    public int getRank() {
-        return 2;
     }
 
     @Override

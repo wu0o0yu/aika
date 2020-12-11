@@ -26,13 +26,12 @@ import network.aika.neuron.phase.Phase;
  */
 public interface LinkPhase extends Phase<Link> {
 
-    LinkPhase LINKING = new Linking();
-    LinkPhase COUNTING = new Counting();
-    LinkPhase SHADOW_FACTOR = new ShadowFactor();
-    LinkPhase SELF_GRADIENT = new SelfGradient();
-//    LinkPhase PROPAGATE_OUTPUT_GRADIENT = new PropagateOutputGradient();
-//    LinkPhase PROPAGATE_SELF_GRADIENT = new PropagateSelfGradient();
-    LinkPhase INDUCTION = new Induction();
-    LinkPhase UPDATE_WEIGHTS = new UpdateWeight();
+    LinkPhase INDUCTION = new Induction(1);
+    LinkPhase LINKING = new Linking(2);
+    LinkPhase COUNTING = new Counting(8);
+    LinkPhase SHADOW_FACTOR = new ShadowFactor(9);
+    LinkPhase SELF_GRADIENT = new SelfGradient(11);
+    int PROPAGATE_GRADIENT_RANK = 12;
+    LinkPhase UPDATE_WEIGHTS = new UpdateWeight(14);
 
 }
