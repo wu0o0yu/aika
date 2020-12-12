@@ -20,11 +20,9 @@ import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.excitatory.PatternNeuron;
-import network.aika.neuron.excitatory.PatternPartSynapse;
-import network.aika.neuron.excitatory.PatternSynapse;
 
 import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
 
 /**
  *
@@ -40,6 +38,13 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
     public InhibitorySynapse(Neuron<?> input, InhibitoryNeuron output, Synapse template) {
         super(input, output, template);
+    }
+
+    @Override
+    public void updateReference(Link l) {
+        l.getOutput().propagateReference(
+                l.getInput().getReference()
+        );
     }
 
     @Override
@@ -85,10 +90,10 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
             return;
         }
 
-        Visitor nv = v.prepareNextStep();
+        Visitor nv = v.prepareNextStep(toAct, ACT);
         nv.incrementPathLength();
 
-        next(fromAct, toAct, nv, create);
+        follow(fromAct, toAct, nv, create);
     }
 
     @Override

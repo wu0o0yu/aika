@@ -69,8 +69,9 @@ public class Template extends RankedImpl implements ActivationPhase {
 
     @Override
     public void process(Activation act) {
-        new Visitor(act, INPUT)
-                .followLinks(act);
+        act.followLinks(
+                new Visitor(act, INPUT)
+        );
 
         act.updateValueAndPropagate();
     }

@@ -94,8 +94,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract byte getType();
 
-    public abstract void updateReference(Link nl);
-
     public abstract boolean checkTemplate(Activation act);
 
     public abstract boolean checkInduction(Activation act);

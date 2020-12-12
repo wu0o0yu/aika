@@ -54,11 +54,11 @@ public class SimplePhraseTest {
                                     .orElse(null);
 
                             if(n instanceof PatternPartNeuron) {
-                                return "PP-" + trimPrefix(iAct.getDescriptionLabel());
+                                return "PP-" + trimPrefix(iAct.getLabel());
                             } else if (n instanceof PatternNeuron) {
                                 return "P-" + doc.getContent();
                             } else {
-                                return "I-" + trimPrefix(iAct.getDescriptionLabel());
+                                return "I-" + trimPrefix(iAct.getLabel());
                             }
                         }
                     }

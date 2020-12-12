@@ -24,6 +24,12 @@ import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
+
+/**
+ *
+ * @author Lukas Molzberger
+ */
 public class PrimaryInhibitorySynapse extends InhibitorySynapse {
 
 
@@ -54,12 +60,13 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
         return new PrimaryInhibitorySynapse(input, output, this);
     }
 
-    public void transition(Visitor v, Activation nextAct, boolean create) {
-        Visitor nv = v.prepareNextStep();
+    @Override
+    public void transition(Visitor v, Activation fromAct, Activation toAct, boolean create) {
+        Visitor nv = v.prepareNextStep(toAct, ACT);
         nv.incrementPathLength();
 
         nv.scope = v.scope.getNext(v.downUpDir);
 
-        nv.follow(nextAct);
+        follow(fromAct, toAct, nv, create);
     }
 }

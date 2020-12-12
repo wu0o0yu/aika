@@ -22,14 +22,13 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.PrimaryInhibitorySynapse;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
 import static network.aika.neuron.activation.Direction.*;
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.phase.activation.ActivationPhase.TEMPLATE;
 
 /**
@@ -60,6 +59,21 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         this.isRecurrent = isRecurrent;
         this.inputScope = inputScope;
         this.isSamePattern = isSamePattern;
+    }
+
+
+    @Override
+    public void updateReference(Link l) {
+        if(isNegative) {
+            return;
+        }
+
+        // TODO: find a better solution.
+        Synapse ts = l.getSynapse().getTemplate();
+        Templates t = getModel().getTemplates();
+        if(ts != t.RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE && ts != t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE) {
+            l.getOutput().propagateReference(l.getInput().getReference());
+        }
     }
 
     @Override
@@ -105,19 +119,19 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         }
 
         if (v.scope == INPUT && isInputScope() && !v.related) {
-            Visitor nv = v.prepareNextStep();
+            Visitor nv = v.prepareNextStep(toAct, ACT);
             nv.incrementPathLength();
 
             nv.related = true;
 
-            next(fromAct, toAct, nv, create);
+            follow(fromAct, toAct, nv, create);
 
             if(v.downUpDir == INPUT) {
                 return;
             }
         }
 
-        Visitor nv = v.prepareNextStep();
+        Visitor nv = v.prepareNextStep(toAct, ACT);
         nv.incrementPathLength();
 
         if(v.samePattern && isInputScope()) {
@@ -143,7 +157,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
             }
         }
 
-        next(fromAct, toAct, nv, create);
+        follow(fromAct, toAct, nv, create);
     }
 
     @Override

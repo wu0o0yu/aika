@@ -33,7 +33,7 @@ public class Visitor {
     public Transition transition; // Just debug code
     public Visitor previousStep;
 
-    enum Transition {  // Just debug code
+    public enum Transition {  // Just debug code
         ACT,
         LINK
     }
@@ -53,6 +53,7 @@ public class Visitor {
     public Visitor(Activation origin, Direction startDir) {
         this.origin = origin;
         this.current = origin;
+        this.transition = LINK;
         this.startDir = startDir;
     }
 
@@ -65,8 +66,10 @@ public class Visitor {
         this.related = related;
     }
 
-    public Visitor prepareNextStep() {
+    public Visitor prepareNextStep(Activation current, Transition t) {
         Visitor nv = new Visitor();
+        nv.current = current;
+        nv.transition = t;
         nv.previousStep = this;
         nv.origin = origin;
         nv.downUpDir = downUpDir;
@@ -95,44 +98,8 @@ public class Visitor {
         return downSteps + upSteps;
     }
 
-    public void follow(Activation act) {
-        current = act;
-        transition = ACT;
-
-        act.getNeuron()
-                .transition(this, act, false);
-    }
-
-    public void followLinks(Activation act) {
-        current = act;
-        transition = LINK;
-
-        if (downUpDir == OUTPUT && numSteps() >= 1) {
-            tryToLink(act);
-//            return;
-        }
-
-        act.setMarked(true);
-        Stream<Link> s = act.getLinks(downUpDir)
-                .filter(l -> l.follow(downUpDir));
-
-        if (downUpDir == OUTPUT) {
-            s = s.collect(Collectors.toList()).stream();
-        }
-
-        s.forEach(l ->
-                l.getSynapse()
-                        .transition(
-                                this,
-                                act,
-                                l.getActivation(downUpDir),
-                                false
-                        )
-        );
-        act.setMarked(false);
-    }
-
     public void tryToLink(Activation act) {
+        if (downUpDir != OUTPUT || numSteps() < 1) return;
         if (scope == INPUT && related) return;
         if (startDir == INPUT && !act.isActive()) return; // <--
         if (act == origin || act.isConflicting()) return; // <--

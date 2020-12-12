@@ -99,7 +99,7 @@ public class Link extends QueueEntry<LinkPhase> {
     }
 
     private double getActFunctionDerivative() {
-        if(!output.getNeuron().isInitialized()) {
+        if(output.getNet() == 0.0) {
             return 0.0;
         }
 
@@ -120,7 +120,6 @@ public class Link extends QueueEntry<LinkPhase> {
     }
 */
 
-
     public void propagateGradient(double g) {
         gradient += g;
 
@@ -129,7 +128,9 @@ public class Link extends QueueEntry<LinkPhase> {
         }
 
         input.propagateGradient(
-                synapse.getWeight() * g * input.getActFunctionDerivative()
+                synapse.getWeight() *
+                        g *
+                        input.getActFunctionDerivative()
         );
     }
 

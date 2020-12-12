@@ -4,7 +4,10 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.Visitor;
+
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
 
 public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, PatternNeuron> {
 
@@ -16,6 +19,15 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
 
     public PatternSynapse(I input, PatternNeuron output, Synapse template) {
         super(input, output, template);
+    }
+
+
+    @Override
+    public void updateReference(Link l) {
+        Reference or = l.getOutput().getReference();
+        Reference ir = l.getInput().getReference();
+
+        l.getOutput().propagateReference(or == null ? ir : or.add(ir));
     }
 
     @Override
@@ -50,11 +62,11 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
     }
 
     @Override
-    public void transition(Visitor v, Activation fromAct, Activation nextAct, boolean create) {
-        Visitor nv = v.prepareNextStep();
+    public void transition(Visitor v, Activation fromAct, Activation toAct, boolean create) {
+        Visitor nv = v.prepareNextStep(toAct, ACT);
         nv.incrementPathLength();
 
-        next(null, nextAct, nv, create);
+        follow(null, toAct, nv, create);
     }
 
     @Override

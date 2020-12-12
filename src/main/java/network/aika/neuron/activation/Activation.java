@@ -151,7 +151,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
         return new OutputKey(getNeuronProvider(), getId());
     }
 
-    public String getDescriptionLabel() {
+    public String getLabel() {
         return getNeuron().getLabel();
     }
 
@@ -306,7 +306,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void propagate(Visitor v) {
-        v.followLinks(this);
+        followLinks(v);
 
         getNeuron().getOutputSynapses()
                 .filter(s -> !outputLinkExists(s))
@@ -323,6 +323,27 @@ public class Activation extends QueueEntry<ActivationPhase> {
                 )
         );
         return act;
+    }
+
+    public void followLinks(Visitor v) {
+        v.tryToLink(this);
+
+        Direction dir = v.downUpDir;
+
+        setMarked(true);
+        getLinks(dir)
+                .filter(l -> l.follow(dir))
+                .collect(Collectors.toList()).stream()
+                .forEach(l ->
+                        l.getSynapse()
+                                .transition(
+                                        v,
+                                        this,
+                                        l.getActivation(dir),
+                                        false
+                                )
+                );
+        setMarked(false);
     }
 
     public Link getInputLink(Synapse s) {
@@ -390,7 +411,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
         }
 
         if (!isFinal) {
-            nl.getOutput().getNeuron().updateReference(nl);
+            nl.getSynapse().updateReference(nl);
         }
     }
 
@@ -403,7 +424,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
         double finalValue = computeValue(true);
 
         if (Math.abs(finalValue - initialValue) > TOLERANCE) {
-            getModifiable(null).addToQueue(FINAL_LINKING);
+            getModifiable(null)
+                    .addToQueue(FINAL_LINKING);
         }
     }
 

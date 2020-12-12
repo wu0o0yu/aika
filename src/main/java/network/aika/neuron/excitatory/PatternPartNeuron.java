@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.activation.Direction.*;
+import static network.aika.neuron.activation.Visitor.Transition.LINK;
 
 /**
  * @author Lukas Molzberger
@@ -77,12 +78,11 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
                 return;
             }
 
-            Visitor nv = v.prepareNextStep();
-            nv.downUpDir = OUTPUT;
-            nv.followLinks(act);
-        } else {
-            v.followLinks(act);
+            v = v.prepareNextStep(act, LINK);
+            v.downUpDir = OUTPUT;
         }
+
+        act.followLinks(v);
     }
 
     @Override
@@ -90,13 +90,4 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         return type;
     }
 
-    @Override
-    public void updateReference(Link nl) {
-        // TODO: find a better solution.
-        Synapse ts = nl.getSynapse().getTemplate();
-        Templates t = getModel().getTemplates();
-        if(ts != t.RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE && ts != t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE) {
-            nl.getOutput().propagateReference(nl.getInput().getReference());
-        }
-    }
 }

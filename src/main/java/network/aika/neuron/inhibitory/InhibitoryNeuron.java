@@ -50,7 +50,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     @Override
     public boolean checkTemplate(Activation act) {
-        return true;
+        return false;
     }
 
     @Override
@@ -78,16 +78,11 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     @Override
     public void transition(Visitor v, Activation act, boolean create) {
-        v.followLinks(act);
+        act.followLinks(v);
     }
 
     public boolean isInitialized() {
         return false;
-    }
-
-    @Override
-    public void updateReference(Link nl) {
-        nl.getOutput().propagateReference(nl.getInput().getReference());
     }
 
     @Override

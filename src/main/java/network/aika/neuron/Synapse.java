@@ -89,6 +89,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract byte getType();
 
+    public abstract void updateReference(Link l);
+
     public Reference getReference(Link l) {
         return l.getInput().getReference();
     }
@@ -99,11 +101,12 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Activation getOutputActivationToLink(Activation oAct, Visitor v);
 
-    public void next(Activation fromAct, Activation toAct, Visitor v, boolean create) {
+    public void follow(Activation fromAct, Activation toAct, Visitor v, boolean create) {
         if(create) {
             createOutgoingLink(fromAct, toAct, v);
         } else {
-            v.follow(toAct);
+            toAct.getNeuron()
+                    .transition(v, toAct, false);
         }
     }
 

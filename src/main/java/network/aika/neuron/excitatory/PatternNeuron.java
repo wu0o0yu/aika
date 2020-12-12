@@ -19,7 +19,6 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Templates;
 import network.aika.neuron.activation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +29,7 @@ import java.io.IOException;
 
 import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.activation.Direction.*;
+import static network.aika.neuron.activation.Visitor.Transition.LINK;
 
 /**
  *
@@ -86,27 +86,17 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
             if(v.downUpDir == OUTPUT) {
                 return;
             }
-            Visitor nv = v.prepareNextStep();
-            nv.downUpDir = OUTPUT;
-            nv.followLinks(act);
-        } else {
-            v.followLinks(act);
+            v = v.prepareNextStep(act, LINK);
+            v.downUpDir = OUTPUT;
         }
+
+        act.followLinks(v);
     }
 
     @Override
     public byte getType() {
         return type;
     }
-
-    @Override
-    public void updateReference(Link nl) {
-        Reference or = nl.getOutput().getReference();
-        Reference ir = nl.getInput().getReference();
-
-        nl.getOutput().propagateReference(or == null ? ir : or.add(ir));
-    }
-
 
     public void setTokenLabel(String tokenLabel) {
         this.tokenLabel = tokenLabel;
