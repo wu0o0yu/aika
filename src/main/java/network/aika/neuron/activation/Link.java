@@ -47,11 +47,6 @@ public class Link extends QueueEntry<LinkPhase> {
     private boolean isSelfRef;
 
     private double gradient;
-/*    private double outputGradient;
-    private double offsetGradient;
-    private double selfGradient;
-    private double finalGradient;
-*/
 
     public Link(Synapse s, Activation input, Activation output, boolean isSelfRef) {
         this.synapse = s;
@@ -123,25 +118,10 @@ public class Link extends QueueEntry<LinkPhase> {
                     outputGradient = Math.min(0.0, outputGradient); // TODO: check if that's correct.
                 });
     }
-
-    public void updateSelfGradient() {
-        selfGradient = getOutput().getSelfGradient();
-        selfGradient += offsetGradient;
-
-        finalGradient += selfGradient;
-    }
-
-    public void updateAndPropagateSelfGradient() {
-        updateSelfGradient();
-        propagateGradient(selfGradient);
-    }
 */
 
-    public void propagateGradient(double g) {
-        if(Math.abs(g) < TOLERANCE) {
-            return;
-        }
 
+    public void propagateGradient(double g) {
         gradient += g;
 
         if(input == null) {
@@ -153,10 +133,13 @@ public class Link extends QueueEntry<LinkPhase> {
         );
     }
 
+    public boolean gradientIsZero() {
+        return Math.abs(gradient) < TOLERANCE;
+    }
+
     public void updateSynapse() {
-        if(Math.abs(gradient) < TOLERANCE) {
+        if(gradientIsZero())
             return;
-        }
 
         Thought t = output.getThought();
         Neuron on = output.getNeuron();

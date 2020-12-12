@@ -20,7 +20,6 @@ import network.aika.*;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
-import network.aika.neuron.phase.activation.ActivationPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -162,7 +161,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
     public String inStatToString() {
         StringBuilder sb = new StringBuilder();
         inputSynapses.values().forEach(s ->
-                sb.append("  in " + s.getInput().getId() + ":" + s.getInput().getDescriptionLabel() + " " + s.statToString())
+                sb.append("  in " + s.getInput().getId() + ":" + s.getInput().getLabel() + " " + s.statToString())
         );
         return sb.toString();
     }
@@ -172,7 +171,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         outputSynapses.values().stream()
                 .filter(s -> s instanceof InhibitorySynapse)
                 .forEach(s ->
-                        sb.append("  out " + s.getOutput().getId() + ":" + s.getOutput().getDescriptionLabel() + " " + " " + s.statToString())
+                        sb.append("  out " + s.getOutput().getId() + ":" + s.getOutput().getLabel() + " " + " " + s.statToString())
         );
         return sb.toString();
     }

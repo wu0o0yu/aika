@@ -152,7 +152,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public String getDescriptionLabel() {
-        return getNeuron().getDescriptionLabel();
+        return getNeuron().getLabel();
     }
 
     public <R extends Reference> R getReference() {
@@ -439,11 +439,15 @@ public class Activation extends QueueEntry<ActivationPhase> {
         return (1 / (1 + getNeuron().getSampleSpace().getN()));
     }
 
+    public boolean gradientIsZero() {
+        return Math.abs(gradient) < TOLERANCE;
+    }
+
     public void processGradient() {
         if (getNeuron().isInputNeuron())
             return;
 
-        if(Math.abs(gradient) < TOLERANCE)
+        if(gradientIsZero())
             return;
 
         addLinksToQueue(INPUT, new PropagateGradient(PROPAGATE_GRADIENT_RANK, gradient));

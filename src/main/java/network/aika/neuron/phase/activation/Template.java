@@ -106,7 +106,7 @@ public class Template extends RankedImpl implements ActivationPhase {
 
     @Override
     public void propagate(Activation act, Visitor v) {
-        if (Math.abs(act.getGradient()) <= TOLERANCE)
+        if (act.gradientIsZero())
             return;
 
         if (!act.getNeuron().checkTemplate(act)) {

@@ -18,10 +18,6 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.excitatory.PatternPartSynapse;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
-import network.aika.neuron.phase.activation.ActivationPhase;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +46,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     private NeuronProvider provider;
 
-    private String descriptionLabel;
+    private String label;
 
     private volatile double bias;
 
@@ -187,12 +183,12 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return provider.getId();
     }
 
-    public String getDescriptionLabel() {
-        return descriptionLabel;
+    public String getLabel() {
+        return label;
     }
 
     public void setLabel(String label) {
-        this.descriptionLabel = label;
+        this.label = label;
     }
 
     public <M extends Model> M getModel() {
@@ -301,9 +297,9 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public void write(DataOutput out) throws IOException {
         out.writeByte(getType());
 
-        out.writeBoolean(descriptionLabel != null);
-        if(descriptionLabel != null) {
-            out.writeUTF(descriptionLabel);
+        out.writeBoolean(label != null);
+        if(label != null) {
+            out.writeUTF(label);
         }
 
         out.writeDouble(bias);
@@ -333,7 +329,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     @Override
     public void readFields(DataInput in, Model m) throws Exception {
         if(in.readBoolean()) {
-            descriptionLabel = in.readUTF();
+            label = in.readUTF();
         }
 
         bias = in.readDouble();
@@ -355,7 +351,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public String toString() {
-        return getId() + ":" + getDescriptionLabel();
+        return getId() + ":" + getLabel();
     }
 
     public String toDetailedString() {
@@ -364,7 +360,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public String statToString() {
         return getClass().getSimpleName() + " " +
-                getId() + ":" + getDescriptionLabel() + " " +
+                getId() + ":" + getLabel() + " " +
                 "f:" + Utils.round(frequency) + " " +
                 "N:" + Utils.round(sampleSpace.getN()) + " " +
                 "p:" + Utils.round(getP(POS, sampleSpace.getN())) + " " +
