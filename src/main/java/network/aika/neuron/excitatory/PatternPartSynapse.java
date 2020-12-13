@@ -87,6 +87,11 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     }
 
     @Override
+    public boolean checkTemplatePropagate(Visitor v) {
+        return true;
+    }
+
+    @Override
     protected boolean checkOnCreate(Activation fromAct, Activation toAct, Visitor v) {
         return fromAct.getPhase() != TEMPLATE || !isRecurrent || v.getSelfRef();
     }

@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
+import static network.aika.neuron.activation.Direction.INPUT;
 
 /**
  *
@@ -124,6 +125,11 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public Stream<Synapse> getOutputSynapses() {
         return outputSynapses.values().stream();
+    }
+
+
+    public Stream<? extends Synapse> getSynapses(Direction dir) {
+        return dir == INPUT ? getInputSynapses() : getOutputSynapses();
     }
 
     public void setInputNeuron(boolean inputNeuron) {

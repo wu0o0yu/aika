@@ -16,11 +16,9 @@
  */
 package network.aika.neuron.activation;
 
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import network.aika.neuron.phase.VisitorPhase;
 
 import static network.aika.neuron.activation.Direction.*;
-import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.Visitor.Transition.LINK;
 
 /**
@@ -32,6 +30,7 @@ public class Visitor {
     public Activation current; // Just debug code
     public Transition transition; // Just debug code
     public Visitor previousStep;
+    public VisitorPhase phase;
 
     public enum Transition {  // Just debug code
         ACT,
@@ -50,7 +49,8 @@ public class Visitor {
 
     private Visitor() {}
 
-    public Visitor(Activation origin, Direction startDir) {
+    public Visitor(VisitorPhase vp, Activation origin, Direction startDir) {
+        this.phase = vp;
         this.origin = origin;
         this.current = origin;
         this.transition = LINK;
@@ -68,6 +68,7 @@ public class Visitor {
 
     public Visitor prepareNextStep(Activation current, Transition t) {
         Visitor nv = new Visitor();
+        nv.phase = phase;
         nv.current = current;
         nv.transition = t;
         nv.previousStep = this;
@@ -80,6 +81,10 @@ public class Visitor {
         nv.downSteps = downSteps;
         nv.samePattern = samePattern;
         return nv;
+    }
+
+    public VisitorPhase getPhase() {
+        return phase;
     }
 
     public void incrementPathLength() {
@@ -104,7 +109,7 @@ public class Visitor {
         if (startDir == INPUT && !act.isActive()) return; // <--
         if (act == origin || act.isConflicting()) return; // <--
 
-        origin.getPhase().tryToLink(act, this);
+        phase.tryToLink(act, this);
     }
 
     public String toString() {

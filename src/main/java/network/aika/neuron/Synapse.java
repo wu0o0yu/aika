@@ -18,10 +18,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Writable;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Reference;
-import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.*;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,6 +84,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract boolean checkInduction(Link l);
 
+    public abstract boolean checkTemplatePropagate(Visitor v);
+
     public abstract byte getType();
 
     public abstract void updateReference(Link l);
@@ -115,9 +114,15 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
             return;
         }
 
+        Config c = fromAct.getConfig();
+
         // TODO: Check direction
         if (toAct == null) {
             toAct = fromAct.createActivation(getOutput());
+
+            toAct.addToQueue(
+                    v.getPhase().getNextActivationPhases(c)
+            );
         } else {
             Link ol = toAct.getInputLink(this);
             if (ol != null) {
@@ -126,14 +131,18 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 return;
             }
         }
-        Link.link(
+        Link nl = Link.link(
                 this,
                 fromAct,
                 toAct,
                 v.getSelfRef()
         );
 
-        toAct.updateThoughtQueue();
+        if (nl.getSynapse().getWeight() > 0.0 || nl.getSynapse().isTemplate()) {
+            nl.addToQueue(
+                    v.getPhase().getNextLinkPhases(c)
+            );
+        }
     }
 
     public void linkInput() {

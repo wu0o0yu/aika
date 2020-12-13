@@ -28,7 +28,7 @@ import network.aika.neuron.phase.link.LinkPhase;
  */
 public interface ActivationPhase extends Phase<Activation> {
     ActivationPhase INDUCTION = new Induction(0);
-    ActivationPhase INITIAL_LINKING = new Linking(3);
+    Linking INITIAL_LINKING = new Linking(3);
     ActivationPhase PREPARE_FINAL_LINKING = new PrepareFinalLinking(4);
     ActivationPhase FINAL_LINKING = new FinalLinking(5);
     ActivationPhase SOFTMAX = new Softmax(6);
@@ -42,14 +42,6 @@ public interface ActivationPhase extends Phase<Activation> {
     void process(Activation act);
 
     boolean isFinal();
-
-    void tryToLink(Activation act, Visitor v);
-
-    void propagate(Activation act, Visitor v);
-
-    ActivationPhase[] getNextActivationPhases(Config c);
-
-    LinkPhase[] getNextLinkPhases(Config c);
 
     static boolean isFinal(ActivationPhase ap) {
         return ap != null && ap.isFinal();

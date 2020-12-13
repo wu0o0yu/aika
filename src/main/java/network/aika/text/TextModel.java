@@ -17,6 +17,7 @@
 package network.aika.text;
 
 import network.aika.Model;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
 import network.aika.SuspensionHook;
 import network.aika.neuron.Neuron;
@@ -27,8 +28,10 @@ import network.aika.neuron.activation.Direction;
 import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
+import network.aika.neuron.phase.activation.ActivationPhase;
 
 import static network.aika.neuron.Templates.*;
+import static network.aika.neuron.phase.activation.ActivationPhase.INITIAL_LINKING;
 
 
 /**
@@ -74,7 +77,7 @@ public class TextModel extends Model {
             case OUTPUT:
                 if (originAct.getNeuron().isInputNeuron() && prevTokenInhib.getId().equals(originAct.getNeuron().getId()) && lastRef.nextTokenPPAct != null) {
                     Synapse s = getRelSynapse(lastRef.nextTokenPPAct.getNeuron());
-                    lastRef.nextTokenPPAct.addLink(s, originAct, false);
+                    addLink(s, originAct, lastRef.nextTokenPPAct);
                 }
                 break;
 
@@ -85,13 +88,21 @@ public class TextModel extends Model {
 
                     if (s != null) {
                         if (isPrevTokenPatternPart(originAct.getNeuron()) && lastRef.nextTokenIAct != null) {
-                            originAct.addLink(s, lastRef.nextTokenIAct, false);
+                            addLink(s, lastRef.nextTokenIAct, originAct);
                         }
                     }
                 }
                 break;
             }
         }
+    }
+
+    private static void addLink(Synapse s, Activation iAct, Activation oAct) {
+        Link nl = oAct.addLink(s, iAct, false);
+
+        nl.addToQueue(
+                INITIAL_LINKING.getNextLinkPhases(oAct.getConfig())
+        );
     }
 
     private Synapse getRelSynapse(Neuron<?> n) {

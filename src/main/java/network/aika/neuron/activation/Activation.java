@@ -72,7 +72,6 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
     private Reference reference;
 
-//    private double selfGradient;
     private double gradient;
 
 
@@ -278,16 +277,12 @@ public class Activation extends QueueEntry<ActivationPhase> {
                 .map(l -> l.getInput());
     }
 
-    public void updateValueAndPropagate() {
+    public boolean updateValue() {
         if (!fixed) {
             value = computeValue(ActivationPhase.isFinal(getPhase()));
         }
         isFinal = true;
-        if (!equals(lastRound)) {
-            getPhase().propagate(this,
-                    new Visitor(this, OUTPUT)
-            );
-        }
+        return !equals(lastRound);
     }
 
     public void updateOutgoingLinks() {
@@ -317,11 +312,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
     public Activation createActivation(Neuron n) {
         Activation act = new Activation(thought.createActivationId(), thought, n);
-        act.queueState = new QueueState(act,
-                getPhase().getNextActivationPhases(
-                        getThought().getConfig()
-                )
-        );
+        act.queueState = new QueueState(act);
+
         return act;
     }
 
@@ -375,21 +367,12 @@ public class Activation extends QueueEntry<ActivationPhase> {
     public Link addLink(Synapse s, Activation input, boolean isSelfRef) {
         Link ol = getInputLink(s);
         Link nl = new Link(s, input, this, isSelfRef);
-        return addLink(ol, nl);
-    }
 
-    public Link addLink(Link ol, Link nl) {
         nl.linkInput();
         nl.linkOutput();
 
         sumUpLink(ol, nl);
         checkIfFired();
-
-        if (nl.getSynapse().getWeight() > 0.0 || nl.getSynapse().isTemplate()) {
-            nl.addToQueue(
-                    nl.getStartPhase().getNextLinkPhases(getConfig())
-            );
-        }
 
         return nl;
     }

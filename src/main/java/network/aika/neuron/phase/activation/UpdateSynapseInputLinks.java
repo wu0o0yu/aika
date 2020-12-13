@@ -34,16 +34,6 @@ public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPha
     }
 
     @Override
-    public ActivationPhase[] getNextActivationPhases(Config c) {
-        return new ActivationPhase[0];
-    }
-
-    @Override
-    public LinkPhase[] getNextLinkPhases(Config c) {
-        return new LinkPhase[0];
-    }
-
-    @Override
     public void process(Activation act) {
         act.getNeuron().updateSynapseInputLinks();
         act.getNeuronProvider().save();
@@ -52,16 +42,6 @@ public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPha
     @Override
     public boolean isFinal() {
         return false;
-    }
-
-    @Override
-    public void tryToLink(Activation act, Visitor v) {
-
-    }
-
-    @Override
-    public void propagate(Activation act, Visitor v) {
-
     }
 
     @Override

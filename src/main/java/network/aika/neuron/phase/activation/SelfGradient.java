@@ -16,10 +16,8 @@
  */
 package network.aika.neuron.phase.activation;
 
-import network.aika.Config;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.link.LinkPhase;
 
@@ -34,16 +32,6 @@ public class SelfGradient extends RankedImpl implements ActivationPhase {
 
     public SelfGradient(int rank) {
         super(rank);
-    }
-
-    @Override
-    public ActivationPhase[] getNextActivationPhases(Config c) {
-        return new ActivationPhase[0];
-    }
-
-    @Override
-    public LinkPhase[] getNextLinkPhases(Config c) {
-        return new LinkPhase[0];
     }
 
     @Override
@@ -62,8 +50,6 @@ public class SelfGradient extends RankedImpl implements ActivationPhase {
                 INPUT,
                 LinkPhase.SELF_GRADIENT,
                 SHADOW_FACTOR,
-//                PROPAGATE_OUTPUT_GRADIENT,
-//                PROPAGATE_SELF_GRADIENT,
                 UPDATE_WEIGHTS
         );
     }
@@ -71,14 +57,6 @@ public class SelfGradient extends RankedImpl implements ActivationPhase {
     @Override
     public boolean isFinal() {
         return true;
-    }
-
-    @Override
-    public void tryToLink(Activation act, Visitor v) {
-    }
-
-    @Override
-    public void propagate(Activation act, Visitor v) {
     }
 
     @Override

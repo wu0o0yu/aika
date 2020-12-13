@@ -16,8 +16,13 @@
  */
 package network.aika.neuron.phase.link;
 
+import network.aika.Config;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.phase.RankedImpl;
+import network.aika.neuron.phase.VisitorPhase;
+import network.aika.neuron.phase.activation.ActivationPhase;
 
 /**
  *
@@ -38,4 +43,5 @@ public class Linking extends RankedImpl implements LinkPhase {
     public int compare(Link l1, Link l2) {
         return 0;
     }
+
 }

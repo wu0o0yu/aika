@@ -20,8 +20,10 @@ import network.aika.Config;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.phase.RankedImpl;
+import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 
 import java.util.Set;
@@ -35,7 +37,7 @@ import static network.aika.neuron.activation.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Template extends RankedImpl implements ActivationPhase {
+public class Template extends RankedImpl implements VisitorPhase, ActivationPhase {
 
     public Template(int rank) {
         super(rank);
@@ -60,8 +62,6 @@ public class Template extends RankedImpl implements ActivationPhase {
         return new LinkPhase[] {
                 LinkPhase.SELF_GRADIENT,
                 LinkPhase.SHADOW_FACTOR,
-//                LinkPhase.PROPAGATE_OUTPUT_GRADIENT,
-//                LinkPhase.PROPAGATE_SELF_GRADIENT,
                 LinkPhase.INDUCTION,
                 LinkPhase.UPDATE_WEIGHTS
         };
@@ -70,10 +70,12 @@ public class Template extends RankedImpl implements ActivationPhase {
     @Override
     public void process(Activation act) {
         act.followLinks(
-                new Visitor(act, INPUT)
+                new Visitor(this, act, INPUT)
         );
 
-        act.updateValueAndPropagate();
+        propagate(act,
+                new Visitor(this, act, OUTPUT)
+        );
     }
 
     @Override
@@ -118,10 +120,11 @@ public class Template extends RankedImpl implements ActivationPhase {
                 .getNeuron()
                 .getTemplates()
                 .stream()
-                .flatMap(tn -> tn.getOutputSynapses())
+                .flatMap(tn -> tn.getSynapses(v.startDir))
+                .filter(ts -> ts.checkTemplatePropagate(v))
                 .collect(Collectors.toSet());
 
-        act.getOutputLinks()
+        act.getLinks(v.startDir)
                 .forEach(l ->
                         templateSynapses.remove(l.getSynapse().getTemplate())
                 );

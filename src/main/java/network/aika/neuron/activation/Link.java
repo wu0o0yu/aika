@@ -65,7 +65,7 @@ public class Link extends QueueEntry<LinkPhase> {
     public void propagate() {
         output.setMarked(true);
 
-        Visitor v = new Visitor(output, INPUT);
+        Visitor v = new Visitor(INITIAL_LINKING, output, INPUT);
         synapse.transition(v, output, input, false);
 
         output.setMarked(false);
@@ -182,7 +182,7 @@ public class Link extends QueueEntry<LinkPhase> {
     }
 
     public static Link link(Synapse s, Activation input, Activation output, boolean isSelfRef) {
-        if (output.getPhase() != INITIAL_LINKING && output.isFinal()) {
+        if (!ActivationPhase.isFinal(output.getPhase()) && output.isFinal()) {
             output = output.getModifiable(s);
         }
 
@@ -195,11 +195,6 @@ public class Link extends QueueEntry<LinkPhase> {
 
     public void setSynapse(Synapse synapse) {
         this.synapse = synapse;
-    }
-
-
-    public ActivationPhase getStartPhase() {
-        return getOutput().getPhase() != null ? getOutput().getPhase() : getInput().getPhase();
     }
 
     public Activation getInput() {

@@ -34,17 +34,6 @@ public class Final extends RankedImpl implements ActivationPhase {
     }
 
     @Override
-    public ActivationPhase[] getNextActivationPhases(Config c) {
-        return new ActivationPhase[0];
-    }
-
-    @Override
-    public LinkPhase[] getNextLinkPhases(Config c) {
-        return new LinkPhase[0];
-    }
-
-
-    @Override
     public void process(Activation act) {
 
     }
@@ -52,16 +41,6 @@ public class Final extends RankedImpl implements ActivationPhase {
     @Override
     public boolean isFinal() {
         return false;
-    }
-
-    @Override
-    public void tryToLink(Activation act, Visitor v) {
-
-    }
-
-    @Override
-    public void propagate(Activation act, Visitor v) {
-
     }
 
     @Override
