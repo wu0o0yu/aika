@@ -29,6 +29,8 @@ import java.io.IOException;
 
 import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
+import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.Direction.OUTPUT;
 
 /**
  *
@@ -102,14 +104,17 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public void follow(Activation fromAct, Activation toAct, Visitor v, boolean create) {
         if(create) {
-            createOutgoingLink(fromAct, toAct, v);
+            createLinkAndActivation(fromAct, toAct, v);
         } else {
             toAct.getNeuron()
                     .transition(v, toAct, false);
         }
     }
 
-    public void createOutgoingLink(Activation fromAct, Activation toAct, Visitor v) {
+    public void createLinkAndActivation(Activation fromAct, Activation toAct, Visitor v) {
+        Activation iAct = v.startDir == INPUT ? toAct : fromAct;
+        Activation oAct = v.startDir == OUTPUT ? fromAct : toAct;
+
         if(!checkOnCreate(fromAct, toAct, v)) {
             return;
         }
@@ -118,23 +123,23 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         // TODO: Check direction
         if (toAct == null) {
-            toAct = fromAct.createActivation(getOutput());
+            toAct = iAct.createActivation(v.startDir == OUTPUT ? getOutput() : getInput());
 
             toAct.addToQueue(
                     v.getPhase().getNextActivationPhases(c)
             );
         } else {
-            Link ol = toAct.getInputLink(this);
+            Link ol = oAct.getInputLink(this);
             if (ol != null) {
 //                    toAct = oAct.cloneToReplaceLink(s);
-                log.warn("Link already exists!  " + toAct.getThought());
+                log.warn("Link already exists!  " + oAct.getThought());
                 return;
             }
         }
         Link nl = Link.link(
                 this,
-                fromAct,
-                toAct,
+                iAct,
+                oAct,
                 v.getSelfRef()
         );
 

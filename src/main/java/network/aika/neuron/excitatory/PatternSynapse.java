@@ -68,7 +68,7 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
         Visitor nv = v.prepareNextStep(toAct, ACT);
         nv.incrementPathLength();
 
-        follow(null, toAct, nv, create);
+        follow(fromAct, toAct, nv, create);
     }
 
     @Override

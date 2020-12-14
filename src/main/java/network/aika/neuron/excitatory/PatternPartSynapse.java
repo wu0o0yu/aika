@@ -84,7 +84,11 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     }
 
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        return v.startDir != Direction.INPUT || !act.getNeuron().isInputNeuron();
+        if (v.startDir == Direction.INPUT) {
+            return !act.getNeuron().isInputNeuron() && this == act.getModel().getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE;
+        } else {
+            return true;
+        }
     }
 
     @Override
