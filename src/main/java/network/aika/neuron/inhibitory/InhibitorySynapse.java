@@ -18,6 +18,7 @@ package network.aika.neuron.inhibitory;
 
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 
@@ -47,9 +48,8 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         );
     }
 
-    @Override
-    public boolean checkTemplatePropagate(Visitor v) {
-        return true;
+    public boolean checkTemplatePropagate(Visitor v, Activation act) {
+        return false;
     }
 
     @Override

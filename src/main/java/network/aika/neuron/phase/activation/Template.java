@@ -74,6 +74,9 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
         );
 
         propagate(act,
+                new Visitor(this, act, INPUT)
+        );
+        propagate(act,
                 new Visitor(this, act, OUTPUT)
         );
     }
@@ -109,7 +112,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
 
     @Override
     public void propagate(Activation act, Visitor v) {
-        if (act.gradientIsZero())
+        if (act.gradientSumIsZero())
             return;
 
         if (!act.getNeuron().checkTemplate(act)) {
@@ -121,7 +124,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
                 .getTemplates()
                 .stream()
                 .flatMap(tn -> tn.getSynapses(v.startDir))
-                .filter(ts -> ts.checkTemplatePropagate(v))
+                .filter(ts -> ts.checkTemplatePropagate(v, act))
                 .collect(Collectors.toSet());
 
         act.getLinks(v.startDir)

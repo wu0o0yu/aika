@@ -73,6 +73,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     private Reference reference;
 
     private double gradient;
+    private double gradientSum;
 
 
     private Activation(int id, Neuron<?> n) {
@@ -115,6 +116,10 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
     public double getValue() {
         return value;
+    }
+
+    public double getGradient() {
+        return gradient;
     }
 
     public double getNet(boolean isFinal) {
@@ -448,7 +453,14 @@ public class Activation extends QueueEntry<ActivationPhase> {
         return Math.abs(gradient) < TOLERANCE;
     }
 
+    public boolean gradientSumIsZero() {
+        return Math.abs(gradientSum) < TOLERANCE;
+    }
+
     public void processGradient() {
+        gradientSum += gradient;
+        gradient = 0.0;
+
         if (getNeuron().isInputNeuron())
             return;
 
@@ -456,8 +468,6 @@ public class Activation extends QueueEntry<ActivationPhase> {
             return;
 
         addLinksToQueue(INPUT, new PropagateGradient(PROPAGATE_GRADIENT_RANK, gradient));
-
-        gradient = 0.0;
     }
 
     public double getActFunctionDerivative() {
@@ -598,9 +608,5 @@ public class Activation extends QueueEntry<ActivationPhase> {
         }
 
         return sb.toString();
-    }
-
-    public double getGradient() {
-        return gradient;
     }
 }

@@ -84,7 +84,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract boolean checkInduction(Link l);
 
-    public abstract boolean checkTemplatePropagate(Visitor v);
+    public abstract boolean checkTemplatePropagate(Visitor v, Activation act);
 
     public abstract byte getType();
 
