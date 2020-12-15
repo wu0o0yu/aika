@@ -309,8 +309,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         out.writeDouble(frequencyINegOPos);
 
         sampleSpace.write(out);
-
-        out.writeBoolean(modified);
     }
 
     @Override
@@ -325,8 +323,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         frequencyINegOPos = in.readDouble();
 
         sampleSpace = SampleSpace.read(in, m);
-
-        modified = in.readBoolean();
     }
 
     public String toString() {

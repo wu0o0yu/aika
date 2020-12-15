@@ -106,11 +106,11 @@ public abstract class Thought {
         return results;
     }
 
-    public String activationsToString() {
-        return activationsToString(false);
+    public String toString() {
+        return toString(false);
     }
 
-    public String activationsToString(boolean includeLink) {
+    public String toString(boolean includeLink) {
         StringBuilder sb = new StringBuilder();
         for(Activation act: activationsById.values()) {
 /*            if(!act.isActive()) {

@@ -75,7 +75,10 @@ public class Document extends Thought {
     }
 
     public String toString() {
-        return content.toString();
+        StringBuilder sb = new StringBuilder(content);
+        sb.append("\n");
+        sb.append(super.toString());
+        return sb.toString();
     }
 
     public String getTextSegment(Integer begin, Integer end) {
