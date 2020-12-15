@@ -21,6 +21,7 @@ import network.aika.Utils;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.activation.ActivationPhase;
 import network.aika.neuron.phase.link.LinkPhase;
@@ -28,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static network.aika.neuron.activation.Activation.TOLERANCE;
-import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.INITIAL_LINKING;
 
 /**
@@ -166,7 +167,7 @@ public class Link extends QueueEntry<LinkPhase> {
     }
 
     public boolean follow(Direction dir) {
-        Activation nextAct = getActivation(dir);
+        Activation nextAct = dir.getActivation(this);
         return !isNegative() &&
                 nextAct != null &&
                 !nextAct.isMarked() &&
@@ -203,11 +204,6 @@ public class Link extends QueueEntry<LinkPhase> {
 
     public Activation getOutput() {
         return output;
-    }
-
-    public Activation getActivation(Direction dir) {
-        assert dir != null;
-        return dir == INPUT ? input : output;
     }
 
     public boolean isSelfRef() {

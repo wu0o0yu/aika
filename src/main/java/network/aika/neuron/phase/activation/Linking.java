@@ -26,8 +26,8 @@ import network.aika.neuron.phase.link.LinkPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Direction.OUTPUT;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 
 /**

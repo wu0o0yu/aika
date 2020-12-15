@@ -3,6 +3,7 @@ package network.aika.neuron.excitatory;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.direction.Direction;
 
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 

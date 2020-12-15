@@ -19,13 +19,15 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.direction.Direction;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static network.aika.neuron.activation.Direction.*;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.SAME;
 import static network.aika.neuron.phase.activation.ActivationPhase.TEMPLATE;
 
 /**
@@ -84,7 +86,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     }
 
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        if (v.startDir == Direction.INPUT) {
+        if (v.startDir == INPUT) {
             return !act.getNeuron().isInputNeuron() && this == act.getModel().getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE;
         } else {
             return true;

@@ -28,8 +28,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static network.aika.neuron.Sign.POS;
-import static network.aika.neuron.activation.Direction.*;
 import static network.aika.neuron.activation.Visitor.Transition.LINK;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *

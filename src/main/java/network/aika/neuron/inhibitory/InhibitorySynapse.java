@@ -18,11 +18,10 @@ package network.aika.neuron.inhibitory;
 
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Direction;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 
-import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 
 /**

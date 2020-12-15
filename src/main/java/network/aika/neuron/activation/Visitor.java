@@ -16,10 +16,11 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.VisitorPhase;
 
-import static network.aika.neuron.activation.Direction.*;
 import static network.aika.neuron.activation.Visitor.Transition.LINK;
+import static network.aika.neuron.activation.direction.Direction.*;
 
 /**
  *

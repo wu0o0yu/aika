@@ -19,6 +19,7 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.Writable;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.direction.Direction;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +30,8 @@ import java.io.IOException;
 
 import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
-import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Direction.OUTPUT;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
@@ -112,34 +113,38 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void createLinkAndActivation(Activation fromAct, Activation toAct, Visitor v) {
-        Activation iAct = v.startDir == INPUT ? toAct : fromAct;
-        Activation oAct = v.startDir == OUTPUT ? fromAct : toAct;
-
         if(!checkOnCreate(fromAct, toAct, v)) {
             return;
         }
 
-        Config c = fromAct.getConfig();
+        Thought t = fromAct.getThought();
+        Config c = t.getConfig();
 
         // TODO: Check direction
         if (toAct == null) {
-            toAct = iAct.createActivation(v.startDir == OUTPUT ? getOutput() : getInput());
+            toAct = Activation.createActivation(
+                    t,
+                    v.startDir.getNeuron(this)
+            );
 
             toAct.addToQueue(
                     v.getPhase().getNextActivationPhases(c)
             );
         } else {
-            Link ol = oAct.getInputLink(this);
+            Link ol = v.startDir
+                    .getOutput(fromAct, toAct)
+                    .getInputLink(this);
             if (ol != null) {
 //                    toAct = oAct.cloneToReplaceLink(s);
-                log.warn("Link already exists!  " + oAct.getThought());
+                log.warn("Link already exists!  " + t);
                 return;
             }
         }
+
         Link nl = Link.link(
                 this,
-                iAct,
-                oAct,
+                v.startDir.getInput(fromAct, toAct),
+                v.startDir.getOutput(fromAct, toAct),
                 v.getSelfRef()
         );
 

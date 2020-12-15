@@ -18,6 +18,7 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.direction.Direction;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
-import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
  *
@@ -127,11 +128,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return outputSynapses.values().stream();
     }
 
-
-    public Stream<? extends Synapse> getSynapses(Direction dir) {
-        return dir == INPUT ? getInputSynapses() : getOutputSynapses();
-    }
-
     public void setInputNeuron(boolean inputNeuron) {
         isInputNeuron = inputNeuron;
     }
@@ -139,8 +135,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public boolean isInputNeuron() {
         return isInputNeuron;
     }
-
-    public abstract boolean isInitialized();
 
     public boolean containsInputSynapse(Synapse s) {
         return inputSynapses.containsKey(s.getPInput());

@@ -20,7 +20,7 @@ package network.aika.neuron.inhibitory;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Direction;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 

@@ -24,13 +24,13 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Direction;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
-import network.aika.neuron.phase.activation.ActivationPhase;
 
-import static network.aika.neuron.Templates.*;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.INITIAL_LINKING;
 
 
@@ -73,26 +73,21 @@ public class TextModel extends Model {
         TextReference lastRef = ref.getPrevious();
         if(lastRef == null) return;
 
-        switch (dir) {
-            case OUTPUT:
-                if (originAct.getNeuron().isInputNeuron() && prevTokenInhib.getId().equals(originAct.getNeuron().getId()) && lastRef.nextTokenPPAct != null) {
-                    Synapse s = getRelSynapse(lastRef.nextTokenPPAct.getNeuron());
-                    addLink(s, originAct, lastRef.nextTokenPPAct);
-                }
-                break;
+        if (dir == OUTPUT) {
+            if (originAct.getNeuron().isInputNeuron() && prevTokenInhib.getId().equals(originAct.getNeuron().getId()) && lastRef.nextTokenPPAct != null) {
+                Synapse s = getRelSynapse(lastRef.nextTokenPPAct.getNeuron());
+                addLink(s, originAct, lastRef.nextTokenPPAct);
+            }
+        } else if (dir == INPUT) {
+            Neuron n = originAct.getNeuron();
+            if (n instanceof ExcitatoryNeuron) {
+                Synapse s = getRelSynapse(n);
 
-            case INPUT: {
-                Neuron n = originAct.getNeuron();
-                if (n instanceof ExcitatoryNeuron) {
-                    Synapse s = getRelSynapse(n);
-
-                    if (s != null) {
-                        if (isPrevTokenPatternPart(originAct.getNeuron()) && lastRef.nextTokenIAct != null) {
-                            addLink(s, lastRef.nextTokenIAct, originAct);
-                        }
+                if (s != null) {
+                    if (isPrevTokenPatternPart(originAct.getNeuron()) && lastRef.nextTokenIAct != null) {
+                        addLink(s, lastRef.nextTokenIAct, originAct);
                     }
                 }
-                break;
             }
         }
     }

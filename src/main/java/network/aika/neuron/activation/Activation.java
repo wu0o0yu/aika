@@ -24,6 +24,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.activation.ActivationPhase;
@@ -34,8 +35,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.activation.Direction.INPUT;
-import static network.aika.neuron.activation.Direction.OUTPUT;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
 import static network.aika.neuron.phase.link.LinkPhase.PROPAGATE_GRADIENT_RANK;
@@ -261,7 +262,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     public boolean searchWithinBranch() {
         if (queueState.isMarked()) return true;
 
-        return getLinks(OUTPUT)
+        return getOutputLinks()
                 .filter(l -> !l.isNegative() || l.isCausal())
                 .map(l -> l.getOutput())
                 .filter(act -> act.fired != NOT_FIRED && fired.compareTo(act.fired) == -1)
@@ -315,8 +316,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
                 );
     }
 
-    public Activation createActivation(Neuron n) {
-        Activation act = new Activation(thought.createActivationId(), thought, n);
+    public static Activation createActivation(Thought t, Neuron n) {
+        Activation act = new Activation(t.createActivationId(), t, n);
         act.queueState = new QueueState(act);
 
         return act;
@@ -328,7 +329,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
         Direction dir = v.downUpDir;
 
         setMarked(true);
-        getLinks(dir)
+        dir.getLinks(this)
                 .filter(l -> l.follow(dir))
                 .collect(Collectors.toList()).stream()
                 .forEach(l ->
@@ -336,7 +337,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
                                 .transition(
                                         v,
                                         this,
-                                        l.getActivation(dir),
+                                        dir.getActivation(l),
                                         false
                                 )
                 );
@@ -529,8 +530,10 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void addLinksToQueue(Direction dir, LinkPhase... phases) {
-        (dir == INPUT ? getInputLinks() : getOutputLinks())
-                .forEach(l -> l.addToQueue(phases));
+        dir.getLinks(this)
+                .forEach(l ->
+                        l.addToQueue(phases)
+                );
     }
 
     public boolean equals(Activation act) {
@@ -550,19 +553,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
         return act.outputLinks.values().stream();
     }
 
-    public boolean isConnected(Activation input) {
-        return inputLinks.values().stream()
-                .anyMatch(l -> l.getInput() == input);
-    }
-
     public boolean hasBranches() {
         return !branches.isEmpty();
-    }
-
-    public Stream<Link> getLinks(Direction dir) {
-        return (dir == INPUT ? inputLinks : outputLinks)
-                .values()
-                .stream();
     }
 
     public String getShortString() {

@@ -21,7 +21,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.link.LinkPhase;
 
-import static network.aika.neuron.activation.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.link.LinkPhase.*;
 
 /**
