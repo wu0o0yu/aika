@@ -81,7 +81,7 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
         this.neuron = n;
     }
 
-    public String getDescriptionLabel() {
+    public String getLabel() {
         return getNeuron().getLabel();
     }
 
