@@ -50,6 +50,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     private String label;
 
+    private Writable customData;
+
     private volatile double bias;
 
     protected TreeMap<NeuronProvider, S> inputSynapses = new TreeMap<>();
@@ -189,8 +191,20 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         this.label = label;
     }
 
+    public Writable getCustomData() {
+        return customData;
+    }
+
+    public void setCustomData(Writable customData) {
+        this.customData = customData;
+    }
+
     public <M extends Model> M getModel() {
         return (M) provider.getModel();
+    }
+
+    public Config getConfig() {
+        return getModel().getConfig();
     }
 
     public long getRetrievalCount() {
@@ -263,7 +277,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         );
 
         double p = dist.inverseCumulativeProbability(
-                getModel().getBetaThreshold()
+                getModel().getConfig().getBetaThreshold()
         );
 
         return p;

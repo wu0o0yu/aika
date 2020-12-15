@@ -33,9 +33,7 @@ public class InductionTest {
         in.getSampleSpace().setN(200);
         m.setN(200);
 
-        Document doc = new Document("",
-                new Config()
-        );
+        Document doc = new Document("");
 
         Activation act = new Activation(doc, in);
         act.initInput(new TextReference(doc, 0, 1));
@@ -48,6 +46,11 @@ public class InductionTest {
     @Test
     public void initialGradientTest() {
         Model m = new TextModel();
+        m.setConfig(
+                new Config()
+                        .setLearnRate(-0.1)
+        );
+
         Templates t = new Templates(m);
 
         PatternNeuron inA = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate();
@@ -91,10 +94,7 @@ public class InductionTest {
 
         // -----------------------------------------
 
-        Document doc = new Document("",
-                new Config()
-                        .setLearnRate(-0.1)
-        );
+        Document doc = new Document("");
 
         Activation actA = new Activation(doc, inA);
         Activation actB = new Activation(doc, inB);
@@ -116,18 +116,18 @@ public class InductionTest {
         System.out.println(actTarget.gradientsToString());
     }
 
-
     @Test
     public void inductionTest() {
         TextModel model = new TextModel();
-
-        String phrase = "der Hund";
-
-        Document doc = new Document(phrase,
+        model.setConfig(
                 new Config()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
         );
+
+        String phrase = "der Hund";
+
+        Document doc = new Document(phrase);
         System.out.println("  " + phrase);
 
         Activation actDer = doc.processToken(model, null, 0, 4, "der");

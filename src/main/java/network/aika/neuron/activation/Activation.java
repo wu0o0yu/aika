@@ -99,7 +99,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     public void initInput(Reference ref) {
         queueState = new QueueState(
                 this,
-                getInitialPhases(getThought().getConfig())
+                getInitialPhases(getConfig())
         );
 
         setReference(ref);
@@ -190,7 +190,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public Config getConfig() {
-        return getThought().getConfig();
+        return getNeuron().getConfig();
     }
 
     public NeuronProvider getNeuronProvider() {

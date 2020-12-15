@@ -53,8 +53,6 @@ public abstract class Model {
 
     private int N = 0; // needs to be stored
 
-    private double betaThreshold = 0.95;
-
     private static Map<Byte, Class> typeRegistry = new HashMap<>();
 
     static {
@@ -76,6 +74,8 @@ public abstract class Model {
 
     private Templates templates = new Templates(this);
 
+    private Config config;
+
     public Model() {
         this(new InMemorySuspensionHook());
     }
@@ -84,12 +84,12 @@ public abstract class Model {
         suspensionHook = sh;
     }
 
-    public double getBetaThreshold() {
-        return betaThreshold;
+    public Config getConfig() {
+        return config;
     }
 
-    public void setBetaThreshold(double betaThreshold) {
-        this.betaThreshold = betaThreshold;
+    public void setConfig(Config config) {
+        this.config = config;
     }
 
     public abstract void linkInputRelations(Activation originAct, Direction dir);

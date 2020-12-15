@@ -143,12 +143,11 @@ public class Link extends QueueEntry<LinkPhase> {
         if(gradientIsZero())
             return;
 
-        Thought t = output.getThought();
         Neuron on = output.getNeuron();
 
         boolean causal = isCausal();
         double x = getInputValue();
-        double learnRate = t.getConfig().getLearnRate();
+        double learnRate = on.getConfig().getLearnRate();
 
         double posWDelta = learnRate * x * gradient;
         double negWDelta = learnRate * (1.0 - x) * gradient;
@@ -241,6 +240,10 @@ public class Link extends QueueEntry<LinkPhase> {
         return true;
     }
 
+    public boolean isNegative() {
+        return synapse.getWeight() < 0.0;
+    }
+
     @Override
     public Thought getThought() {
         return output.getThought();
@@ -276,9 +279,4 @@ public class Link extends QueueEntry<LinkPhase> {
                 " x:" + Utils.round(getInputValue()) +
                 " w:" + Utils.round(getSynapse().getWeight());
     }
-
-    public boolean isNegative() {
-        return synapse.getWeight() < 0.0;
-    }
-
 }

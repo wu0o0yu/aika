@@ -34,6 +34,30 @@ public class SimplePhraseTest {
     @Test
     public void simplePhraseTest() {
         TextModel model = new TextModel();
+        model.setConfig(
+                new Config() {
+                    public String getLabel(Activation act) {
+                        Neuron n = act.getNeuron();
+                        Activation iAct = act.getInputLinks()
+                                .findFirst()
+                                .map(l -> l.getInput())
+                                .orElse(null);
+
+                        if(n instanceof PatternPartNeuron) {
+                            return "PP-" + trimPrefix(iAct.getLabel());
+                        } else if (n instanceof PatternNeuron) {
+                            return "P-" + ((Document)act.getThought()).getContent();
+                        } else {
+                            return "I-" + trimPrefix(iAct.getLabel());
+                        }
+                    }
+                }
+                        .setAlpha(0.99)
+                        .setLearnRate(-0.1)
+                        .setEnableTraining(false)
+                        .setSurprisalInductionThreshold(0.0)
+                        .setGradientInductionThreshold(0.0)
+        );
 
         Random r = new Random(1);
 
@@ -45,30 +69,6 @@ public class SimplePhraseTest {
 
             Document doc = new Document(phrase);
 
-            doc.setConfig(new Config() {
-                        public String getLabel(Activation act) {
-                            Neuron n = act.getNeuron();
-                            Activation iAct = act.getInputLinks()
-                                    .findFirst()
-                                    .map(l -> l.getInput())
-                                    .orElse(null);
-
-                            if(n instanceof PatternPartNeuron) {
-                                return "PP-" + trimPrefix(iAct.getLabel());
-                            } else if (n instanceof PatternNeuron) {
-                                return "P-" + doc.getContent();
-                            } else {
-                                return "I-" + trimPrefix(iAct.getLabel());
-                            }
-                        }
-                    }
-                            .setAlpha(0.99)
-                            .setLearnRate(-0.1)
-                            .setEnableTraining(k > 100)
-                            .setSurprisalInductionThreshold(0.0)
-                            .setGradientInductionThreshold(0.0)
-            );
-
             int i = 0;
             TextReference lastRef = null;
             for(String t: doc.getContent().split(" ")) {
@@ -77,6 +77,8 @@ public class SimplePhraseTest {
 
                 i = j + 1;
             }
+
+            model.getConfig().setEnableTraining(k > 100);
 
             doc.process(model);
 

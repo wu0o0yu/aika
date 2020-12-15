@@ -37,13 +37,7 @@ public abstract class Thought {
 
     private Map<NeuronProvider, SortedSet<Activation>> actsPerNeuron = null;
 
-    private Config trainingConfig;
-
     public Thought() {
-    }
-
-    public Thought(Config trainingConfig) {
-        this.trainingConfig = trainingConfig;
     }
 
     public abstract int length();
@@ -69,14 +63,6 @@ public abstract class Thought {
                     .process();
         }
         m.addToN(length());
-    }
-
-    public Config getConfig() {
-        return trainingConfig;
-    }
-
-    public void setConfig(Config trainingConfig) {
-        this.trainingConfig = trainingConfig;
     }
 
     public int createActivationId() {

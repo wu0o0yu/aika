@@ -25,6 +25,7 @@ import network.aika.neuron.phase.activation.ActivationPhase;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Supplier;
 
 import static network.aika.neuron.Sign.POS;
 
@@ -32,10 +33,15 @@ public class Config {
     private Double alpha = null; //0.99;
     private double learnRate;
 
+    private double betaThreshold = 0.95;
+
     private double surprisalInductionThreshold = 2.0;
     private double gradientInductionThreshold = 2.0;
 
     private boolean enableTraining;
+
+    private Supplier<Writable> customDataInstanceSupplier;
+
 
     public double getLearnRate() {
         return learnRate;
@@ -84,6 +90,24 @@ public class Config {
 
     public String getLabel(Activation act) {
         return "";
+    }
+
+    public double getBetaThreshold() {
+        return betaThreshold;
+    }
+
+    public Config setBetaThreshold(double betaThreshold) {
+        this.betaThreshold = betaThreshold;
+        return this;
+    }
+
+    public Supplier<Writable> getCustomDataInstanceSupplier() {
+        return customDataInstanceSupplier;
+    }
+
+    public Config setCustomDataInstanceSupplier(Supplier<Writable> customDataInstanceSupplier) {
+        this.customDataInstanceSupplier = customDataInstanceSupplier;
+        return this;
     }
 
     public String toString() {

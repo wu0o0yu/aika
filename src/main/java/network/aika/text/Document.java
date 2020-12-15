@@ -32,12 +32,9 @@ public class Document extends Thought {
 
     private final StringBuilder content;
 
-    public Document(String content) {
-        this(content, null);
-    }
 
-    public Document(String content, Config trainingConfig) {
-        super(trainingConfig);
+    public Document(String content) {
+        super();
         this.content = new StringBuilder();
         if(content != null) {
             this.content.append(content);

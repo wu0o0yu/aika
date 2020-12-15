@@ -11,6 +11,11 @@ public class CharBasedTraining {
 
     public void init() {
         model = new TextModel();
+        model.setConfig(
+                new Config()
+                        .setAlpha(0.99)
+                        .setLearnRate(-0.1)
+        );
     }
 
     public TextModel getModel() {
@@ -18,11 +23,7 @@ public class CharBasedTraining {
     }
 
     public void train(String word) {
-        Document doc = new Document(word,
-                new Config()
-                        .setAlpha(0.99)
-                        .setLearnRate(-0.1)
-        );
+        Document doc = new Document(word);
         System.out.println("  " + word);
 
         TextReference lastRef = null;

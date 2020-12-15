@@ -118,7 +118,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         }
 
         Thought t = fromAct.getThought();
-        Config c = t.getConfig();
+        Config c = fromAct.getConfig();
 
         // TODO: Check direction
         if (toAct == null) {
@@ -273,7 +273,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         BetaDistribution dist = new BetaDistribution(getFrequency(si, so, n) + 1, n + 1);
 
         return dist.inverseCumulativeProbability(
-                getModel().getBetaThreshold()
+                getModel().getConfig().getBetaThreshold()
         );
     }
 
