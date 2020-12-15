@@ -336,6 +336,11 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         sampleSpace.write(out);
 
         out.writeBoolean(isInputNeuron);
+
+        out.writeBoolean(customData != null);
+        if(customData != null) {
+            customData.write(out);
+        }
     }
 
     @Override
@@ -360,6 +365,11 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         sampleSpace = SampleSpace.read(in, m);
 
         isInputNeuron = in.readBoolean();
+
+        if(in.readBoolean()) {
+            customData = m.getConfig().getCustomDataInstanceSupplier().get();
+            customData.readFields(in, m);
+        }
     }
 
     public String toString() {
