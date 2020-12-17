@@ -59,9 +59,11 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
         boolean hasChanged = act.updateValue();
 
         if(hasChanged) {
-            propagate(act,
-                    new Visitor(this, act, OUTPUT)
-            );
+            Visitor v = new Visitor(this, act, OUTPUT);
+
+            act.getNeuron().transition(v, act, false);
+
+            propagate(act, v);
         }
     }
 
@@ -71,8 +73,8 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
 
     @Override
     public void tryToLink(Activation act, Visitor v) {
-        Activation iAct = v.startDir == INPUT ? act : v.origin;
-        Activation oAct = v.startDir == OUTPUT ? act : v.origin;
+        Activation iAct = v.startDir.getInput(v.origin, act);
+        Activation oAct = v.startDir.getOutput(v.origin, act);
 
         if(!iAct.isActive()) {
             return;

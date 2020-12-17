@@ -62,6 +62,8 @@ public class SimplePhraseTest {
         Random r = new Random(1);
 
         for (int k = 0; k < 1000; k++) {
+            model.getConfig().setEnableTraining(k > 100);
+
             String phrase = phrases[r.nextInt(phrases.length)];
             System.out.println("  " + phrase);
 
@@ -78,12 +80,10 @@ public class SimplePhraseTest {
                 i = j + 1;
             }
 
-            model.getConfig().setEnableTraining(k > 100);
-
             doc.process(model);
 
             if (Neuron.debugOutput) {
-                System.out.println(doc.activationsToString(true));
+                System.out.println(doc.toString(true));
             }
         }
     }

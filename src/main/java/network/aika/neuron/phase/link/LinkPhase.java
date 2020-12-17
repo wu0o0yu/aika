@@ -33,5 +33,6 @@ public interface LinkPhase extends Phase<Link> {
     LinkPhase SELF_GRADIENT = new SelfGradient(11);
     int PROPAGATE_GRADIENT_RANK = 12;
     LinkPhase UPDATE_WEIGHTS = new UpdateWeight(14);
+    LinkPhase TEMPLATE = new Template(17);
 
 }

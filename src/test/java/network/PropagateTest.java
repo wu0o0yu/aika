@@ -60,6 +60,6 @@ public class PropagateTest {
         Activation act = new Activation(doc, in);
         act.initInput(new TextReference(doc, 0, 4));
 
-        System.out.println(doc.activationsToString());
+        System.out.println(doc);
     }
 }

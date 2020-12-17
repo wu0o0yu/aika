@@ -148,7 +148,7 @@ public class MutualExclusionTest {
 
         doc.process(m);
 
-        System.out.println(doc.activationsToString());
+        System.out.println(doc);
 
         Set<Activation> nbActs = doc.getActivations(nb);
         Activation nbAct = nbActs.iterator().next();
@@ -242,7 +242,7 @@ public class MutualExclusionTest {
 
         doc.process(m);
 
-        System.out.println(doc.activationsToString());
+        System.out.println(doc);
         System.out.println();
     }
 }

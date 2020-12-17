@@ -23,6 +23,7 @@ import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.activation.ActivationPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 import org.slf4j.Logger;
@@ -63,10 +64,10 @@ public class Link extends QueueEntry<LinkPhase> {
         }
     }
 
-    public void propagate() {
+    public void propagate(VisitorPhase p) {
         output.setMarked(true);
 
-        Visitor v = new Visitor(INITIAL_LINKING, output, INPUT);
+        Visitor v = new Visitor(p, output, INPUT);
         synapse.transition(v, output, input, false);
 
         output.setMarked(false);

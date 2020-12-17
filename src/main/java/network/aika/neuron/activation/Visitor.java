@@ -58,15 +58,6 @@ public class Visitor {
         this.startDir = startDir;
     }
 
-    public Visitor(Activation origin, Activation current, Direction scope, Direction startDir, Direction downUpDir, boolean related) {
-        this.origin = origin;
-        this.current = current;
-        this.startDir = startDir;
-        this.downUpDir = downUpDir;
-        this.scope = scope;
-        this.related = related;
-    }
-
     public Visitor prepareNextStep(Activation current, Transition t) {
         Visitor nv = new Visitor();
         nv.phase = phase;

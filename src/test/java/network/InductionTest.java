@@ -40,7 +40,7 @@ public class InductionTest {
 
         doc.process(m);
 
-        System.out.println(doc.activationsToString());
+        System.out.println(doc);
     }
 
     @Test
@@ -141,7 +141,7 @@ public class InductionTest {
 
         doc.process(model);
 
-        System.out.println(doc.activationsToString());
+        System.out.println(doc);
         System.out.println(doc.gradientsToString());
 
         System.out.println(); // doc.activationsToString()

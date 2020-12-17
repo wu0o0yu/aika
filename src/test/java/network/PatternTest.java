@@ -46,11 +46,11 @@ public class PatternTest {
         TextReference refB = doc.processToken(m, refA, 1, 2,  "B").getReference();
         TextReference refC = doc.processToken(m, refB, 2, 3,  "C").getReference();
 
-        System.out.println(doc.activationsToString());
+        System.out.println(doc);
 
         doc.process(m);
 
-        System.out.println(doc.activationsToString());
+        System.out.println(doc);
     }
 
 
@@ -65,7 +65,7 @@ public class PatternTest {
 
         doc.process(m);
 
-        System.out.println(doc.activationsToString());
+        System.out.println(doc);
     }
 
     public TextModel initModel() {

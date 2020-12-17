@@ -20,6 +20,9 @@ import network.aika.Config;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Phase;
 
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+
 /**
  *
  * @author Lukas Molzberger
@@ -34,8 +37,8 @@ public interface ActivationPhase extends Phase<Activation> {
     ActivationPhase SELF_GRADIENT = new SelfGradient(10);
     ActivationPhase PROPAGATE_GRADIENT = new PropagateGradients(13);
     ActivationPhase UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks(15);
-    ActivationPhase TEMPLATE = new Template(16);
-    ActivationPhase FINAL = new Final(17);
+    Template TEMPLATE = new Template(16);
+    ActivationPhase FINAL = new Final(18);
 
     void process(Activation act);
 

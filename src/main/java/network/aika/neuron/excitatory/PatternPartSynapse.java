@@ -19,7 +19,6 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.activation.direction.Direction;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -28,7 +27,7 @@ import java.io.IOException;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.SAME;
-import static network.aika.neuron.phase.activation.ActivationPhase.TEMPLATE;
+import static network.aika.neuron.phase.activation.ActivationPhase.*;
 
 /**
  *

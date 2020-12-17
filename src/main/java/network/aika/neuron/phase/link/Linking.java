@@ -19,6 +19,8 @@ package network.aika.neuron.phase.link;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.RankedImpl;
 
+import static network.aika.neuron.phase.activation.ActivationPhase.INITIAL_LINKING;
+
 /**
  *
  * @author Lukas Molzberger
@@ -31,7 +33,7 @@ public class Linking extends RankedImpl implements LinkPhase {
 
     @Override
     public void process(Link l) {
-        l.propagate();
+        l.propagate(INITIAL_LINKING);
     }
 
     @Override

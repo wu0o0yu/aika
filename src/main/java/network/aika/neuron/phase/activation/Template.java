@@ -21,6 +21,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
@@ -68,7 +69,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     @Override
     public void process(Activation act) {
         act.followLinks(
-                new Visitor(this, act, INPUT)
+                new Visitor(this, act, OUTPUT)
         );
 
         propagate(act,

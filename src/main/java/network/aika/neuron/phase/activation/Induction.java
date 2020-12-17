@@ -43,7 +43,9 @@ public class Induction extends RankedImpl implements ActivationPhase {
 
         act.setNeuron(inducedNeuron);
 
-        act.addToQueue(TEMPLATE);
+        act.addToQueue(
+                TEMPLATE
+        );
     }
 
     @Override
