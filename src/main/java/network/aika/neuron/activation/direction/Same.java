@@ -48,4 +48,8 @@ public class Same implements Direction {
     public Stream<? extends Synapse> getSynapses(Neuron n) {
         return null;
     }
+
+    public String toString() {
+        return "SAME";
+    }
 }

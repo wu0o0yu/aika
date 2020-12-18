@@ -16,9 +16,9 @@
  */
 package network.aika.neuron.phase.link;
 
+import network.aika.Config;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.Phase;
-
 
 /**
  *
@@ -34,5 +34,23 @@ public interface LinkPhase extends Phase<Link> {
     int PROPAGATE_GRADIENT_RANK = 12;
     LinkPhase UPDATE_WEIGHTS = new UpdateWeight(14);
     LinkPhase TEMPLATE = new Template(17);
+    LinkPhase FINAL = new Final(20);
 
+
+    static LinkPhase[] getInitialPhases(Config c) {
+        return c.isEnableTraining() ?
+                new LinkPhase[] {
+                        LINKING,
+                        COUNTING,
+                        SHADOW_FACTOR,
+                        SELF_GRADIENT,
+                        UPDATE_WEIGHTS,
+                        TEMPLATE,
+                        FINAL
+                } :
+                new LinkPhase[] {
+                        COUNTING,
+                        FINAL
+                };
+    }
 }

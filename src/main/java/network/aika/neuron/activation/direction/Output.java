@@ -45,4 +45,9 @@ public class Output implements Direction {
     public Stream<? extends Synapse> getSynapses(Neuron n) {
         return n.getOutputSynapses();
     }
+
+
+    public String toString() {
+        return "OUTPUT";
+    }
 }

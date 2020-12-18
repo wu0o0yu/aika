@@ -48,4 +48,8 @@ public class Input implements Direction {
     public Stream<? extends Synapse> getSynapses(Neuron n) {
         return n.getInputSynapses();
     }
+
+    public String toString() {
+        return "INPUT";
+    }
 }

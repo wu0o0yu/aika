@@ -48,9 +48,7 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
 
     @Override
     public LinkPhase[] getNextLinkPhases(Config c) {
-        return new LinkPhase[] {
-                LinkPhase.LINKING
-        };
+        return LinkPhase.getInitialPhases(c);
     }
 
     @Override
