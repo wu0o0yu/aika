@@ -82,13 +82,11 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     @Override
     public void transition(Visitor v, Activation act, boolean create) {
-        if(!v.samePattern) {
-            if(v.downUpDir == OUTPUT) {
-                return;
-            }
-            v = v.prepareNextStep(act, LINK);
-            v.downUpDir = OUTPUT;
+        if (v.downUpDir == OUTPUT) {
+            return;
         }
+        v = v.prepareNextStep(act, LINK);
+        v.downUpDir = OUTPUT;
 
         act.followLinks(v);
     }
