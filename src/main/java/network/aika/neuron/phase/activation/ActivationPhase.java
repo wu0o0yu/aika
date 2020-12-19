@@ -37,8 +37,9 @@ public interface ActivationPhase extends Phase<Activation> {
     ActivationPhase SELF_GRADIENT = new SelfGradient(10);
     ActivationPhase PROPAGATE_GRADIENT = new PropagateGradients(13);
     ActivationPhase UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks(15);
-    Template TEMPLATE = new Template(16);
-    ActivationPhase FINAL = new Final(18);
+    Template TEMPLATE_INPUT = new Template(17, INPUT);
+    Template TEMPLATE_OUTPUT = new Template(18, OUTPUT);
+    ActivationPhase FINAL = new Final(19);
 
     void process(Activation act);
 
@@ -57,7 +58,8 @@ public interface ActivationPhase extends Phase<Activation> {
                         SELF_GRADIENT,
                         PROPAGATE_GRADIENT,
                         UPDATE_SYNAPSE_INPUT_LINKS,
-                        TEMPLATE,
+                        TEMPLATE_INPUT,
+                        TEMPLATE_OUTPUT,
                         FINAL
                 } :
                 new ActivationPhase[] {

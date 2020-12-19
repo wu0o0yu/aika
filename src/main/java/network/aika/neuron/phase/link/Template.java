@@ -33,7 +33,7 @@ public class Template extends RankedImpl implements LinkPhase {
 
     @Override
     public void process(Link l) {
-        l.propagate(ActivationPhase.TEMPLATE);
+        l.propagate(ActivationPhase.TEMPLATE_INPUT);
     }
 
     @Override

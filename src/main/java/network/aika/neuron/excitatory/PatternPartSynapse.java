@@ -94,7 +94,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
 
     @Override
     protected boolean checkOnCreate(Activation fromAct, Activation toAct, Visitor v) {
-        return fromAct.getPhase() != TEMPLATE || !isRecurrent || v.getSelfRef();
+        return (fromAct.getPhase() != TEMPLATE_INPUT && fromAct.getPhase() != TEMPLATE_OUTPUT) || !isRecurrent || v.getSelfRef();
     }
 
     @Override
