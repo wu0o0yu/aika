@@ -23,8 +23,14 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.Scope;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
+import static network.aika.neuron.activation.Scope.SAME;
 
 /**
  *
@@ -47,7 +53,7 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
 
     @Override
     public boolean checkTemplate(Activation iAct, Activation oAct, Visitor v) {
-        return v.scope == Direction.SAME;
+        return v.getScopes().contains(SAME);
     }
 
     @Override
@@ -64,13 +70,23 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
         return new PrimaryInhibitorySynapse(input, output, this);
     }
 
+    /*
     @Override
     public void transition(Visitor v, Activation fromAct, Activation toAct, boolean create) {
         Visitor nv = v.prepareNextStep(toAct, ACT);
         nv.incrementPathLength();
 
-        nv.scope = v.scope.getNext(v.downUpDir);
+        nv.scopes = v.scopes
+                .stream()
+                .map(s -> transition(s, v.downUpDir))
+                .collect(Collectors.toList());
 
         follow(fromAct, toAct, nv, create);
+    }
+*/
+
+    @Override
+    public Collection<Scope> transition(Scope s, Direction dir) {
+        return Collections.singleton(s);
     }
 }

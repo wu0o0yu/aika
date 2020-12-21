@@ -10,11 +10,8 @@ import java.util.stream.Stream;
 public interface Direction {
     Direction INPUT = new Input();
     Direction OUTPUT = new Output();
-    Direction SAME = new Same();
 
     Direction invert();
-
-    Direction getNext(Direction dir);
 
     Activation getInput(Activation fromAct, Activation toAct);
 

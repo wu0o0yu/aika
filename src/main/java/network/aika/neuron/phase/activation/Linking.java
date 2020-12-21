@@ -19,6 +19,7 @@ package network.aika.neuron.phase.activation;
 import network.aika.Config;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Scope;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
@@ -57,7 +58,7 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
         boolean hasChanged = act.updateValue();
 
         if(hasChanged) {
-            Visitor v = new Visitor(this, act, OUTPUT);
+            Visitor v = new Visitor(this, act, OUTPUT, Scope.SAME, Scope.INPUT);
 
             act.getNeuron().transition(v, act, false);
 

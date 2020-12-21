@@ -52,6 +52,7 @@ public interface ActivationPhase extends Phase<Activation> {
     static ActivationPhase[] getInitialPhases(Config c) {
         return c.isEnableTraining() ?
                 new ActivationPhase[]{
+                        INITIAL_LINKING,
                         PREPARE_FINAL_LINKING,
                         SOFTMAX,
                         COUNTING,
@@ -63,6 +64,7 @@ public interface ActivationPhase extends Phase<Activation> {
                         FINAL
                 } :
                 new ActivationPhase[] {
+                        INITIAL_LINKING,
                         PREPARE_FINAL_LINKING,
                         SOFTMAX,
                         COUNTING,

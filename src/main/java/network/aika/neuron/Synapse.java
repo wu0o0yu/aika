@@ -20,6 +20,7 @@ import network.aika.*;
 import network.aika.Writable;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.Scope;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,11 +28,12 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
 
 /**
  *
@@ -79,7 +81,24 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Synapse instantiateTemplate(I input, O output);
 
-    public abstract void transition(Visitor v, Activation currentAct, Activation nextAct, boolean create);
+ //   public abstract void transition(Visitor v, Activation currentAct, Activation nextAct, boolean create);
+
+    public void transition(Visitor v, Activation fromAct, Activation toAct, boolean create) {
+        Visitor nv = v.prepareNextStep(
+                toAct,
+                v.getScopes()
+                        .stream()
+                        .flatMap(s -> transition(s, v.downUpDir).stream())
+                        .collect(Collectors.toList()),
+                ACT
+        );
+
+        nv.incrementPathLength();
+
+        follow(fromAct, toAct, nv, create);
+    }
+
+    public abstract Collection<Scope> transition(Scope s, Direction dir);
 
     protected abstract boolean checkOnCreate(Activation fromAct, Activation toAct, Visitor v);
 

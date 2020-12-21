@@ -19,14 +19,19 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.Scope;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.SAME;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
 
 /**
@@ -118,8 +123,10 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         return oAct;
     }
 
+    /*
     @Override
     public void transition(Visitor v, Activation fromAct, Activation toAct, boolean create) {
+
         if (v.startDir == INPUT && output.getNeuron().isInputNeuron() && output.getNeuron() == v.origin.getNeuron()) { //X
             return;
         }
@@ -139,6 +146,12 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
 
         Visitor nv = v.prepareNextStep(toAct, ACT);
         nv.incrementPathLength();
+
+        nv.scopes = v.scopes
+                .stream()
+                .flatMap(s -> transition(s, v.downUpDir).stream())
+                .collect(Collectors.toList());
+
 
         if(v.samePattern && isInputScope()) {
             return;
@@ -164,6 +177,38 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         }
 
         follow(fromAct, toAct, nv, create);
+    }
+*/
+
+    @Override
+    public Collection<Scope> transition(Scope s, Direction dir) {
+        if(inputScope) {
+            if(dir == INPUT) {
+                switch (s) {
+                    case SAME:
+                        return Collections.singleton(Scope.INPUT);
+                    case RELATED_SAME:
+                    case INPUT:
+                        return Collections.singleton(Scope.RELATED_INPUT);
+                }
+            } else {
+                switch (s) {
+                    case INPUT:
+                        return Arrays.asList(Scope.SAME, Scope.RELATED_INPUT);
+                    case RELATED_INPUT:
+                        return Collections.singleton(Scope.SAME);
+                }
+            }
+        }
+
+        if(isSamePattern) {
+            if(s == Scope.SAME) {
+                return Collections.singleton(Scope.RELATED_SAME);
+            }
+        }
+
+
+        return Collections.emptyList();
     }
 
     @Override

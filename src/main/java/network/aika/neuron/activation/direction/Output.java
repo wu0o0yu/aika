@@ -15,11 +15,6 @@ public class Output implements Direction {
     }
 
     @Override
-    public Direction getNext(Direction dir) {
-        return dir == INPUT ? SAME : null;
-    }
-
-    @Override
     public Activation getInput(Activation fromAct, Activation toAct) {
         return fromAct;
     }
