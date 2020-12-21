@@ -22,10 +22,6 @@ package network.aika;
  */
 public enum ActivationFunction {
 
-    NULL_FUNCTION(
-            x -> 0.0,
-            x -> 0.0
-    ),
     RECTIFIED_HYPERBOLIC_TANGENT(
             x -> Math.max(0.0, Math.tanh(x)),
             x -> x >= 0.0 ? 1.0 - Math.pow(Math.tanh(x), 2.0) : 0.0

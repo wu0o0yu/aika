@@ -16,14 +16,18 @@
  */
 package network;
 
-import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.Templates;
+import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.text.Document;
 import network.aika.Model;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.text.TextModel;
+import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
+
+import static network.aika.neuron.Templates.*;
 
 /**
  *
@@ -34,22 +38,28 @@ public class PropagateTest {
     @Test
     public void testPropagation() {
         Model m = new TextModel();
+        Templates t = new Templates(m);
 
-        PatternNeuron in = new PatternNeuron(m, "A", "IN", true);
-        PatternPartNeuron out = new PatternPartNeuron(m, "OUT", false);
+        PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate();
+        in.setTokenLabel("A");
+        in.setInputNeuron(true);
+        in.setLabel("IN");
+        PatternPartNeuron out = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
+        out.setLabel("OUT");
 
-        ExcitatorySynapse s = new ExcitatorySynapse(in, out);
-        s.setPropagate(true);
+        PatternPartSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, out);
 
-        s.link();
-        s.update(10.0, false);
+        s.linkInput();
+        s.linkOutput();
+        s.addWeight(10.0);
+        out.addConjunctiveBias(-10.0, false);
         out.setBias(1.0);
 
         Document doc = new Document("test");
 
         Activation act = new Activation(doc, in);
-        act.propagateInput();
+        act.initInput(new TextReference(doc, 0, 4));
 
-        System.out.println(doc.activationsToString());
+        System.out.println(doc);
     }
 }

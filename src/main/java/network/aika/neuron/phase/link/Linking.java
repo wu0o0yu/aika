@@ -14,15 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.neuron.phase.link;
+
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.phase.RankedImpl;
+
+import static network.aika.neuron.phase.activation.ActivationPhase.INITIAL_LINKING;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public enum Phase {
-    INITIAL_LINKING,
-    FINAL_LINKING,
-    INDUCTION,
-    RESULTS
+public class Linking extends RankedImpl implements LinkPhase {
+
+    public Linking(int rank) {
+        super(rank);
+    }
+
+    @Override
+    public void process(Link l) {
+        l.propagate(INITIAL_LINKING);
+    }
+
+    @Override
+    public int compare(Link l1, Link l2) {
+        return 0;
+    }
+
 }

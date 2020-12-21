@@ -32,34 +32,26 @@ public class Document extends Thought {
 
     private final StringBuilder content;
 
-    private Cursor lastCursor = null;
-    private Cursor cursor = null;
 
     public Document(String content) {
-        this(content, null);
+        super();
+        this.content = new StringBuilder();
+        if(content != null) {
+            this.content.append(content);
+        }
     }
 
-    public Document(String content, Config trainingConfig) {
-        super(trainingConfig);
-        this.content = new StringBuilder(content);
+    public void registerActivation(Activation act) {
+        super.registerActivation(act);
     }
 
-    public void moveCursor() {
-        lastCursor = cursor;
-        cursor = new Cursor();
-    }
-
-    public void addActivation(Activation act) {
-        super.addActivation(act);
-    }
-
-    public void add(Activation act) {
-        super.add(act);
-
-        TextModel tm = (TextModel) act.getNeuron().getModel();
-        if(act.getNeuron() == tm.nextTokenInhib) {
-            cursor.nextTokenIAct = act;
-            cursor.nextTokenPPAct = act.getLinks(Direction.INPUT)
+    @Override
+    public void linkInputRelations(Activation act) {
+        TextReference ref = act.getReference();
+        TextModel tm = act.getNeuron().getModel();
+        if(tm.nextTokenInhib.getId().equals(act.getNeuron().getId())) {
+            ref.nextTokenIAct = act;
+            ref.nextTokenPPAct = act.getInputLinks()
                     .findAny()
                     .map(l -> l.getInput())
                     .orElse(null);
@@ -83,10 +75,13 @@ public class Document extends Thought {
     }
 
     public String toString() {
-        return content.toString();
+        StringBuilder sb = new StringBuilder(content);
+        sb.append("\n");
+        sb.append(super.toString());
+        return sb.toString();
     }
 
-    private String getText(Integer begin, Integer end) {
+    public String getTextSegment(Integer begin, Integer end) {
         if(begin != null && end != null) {
             return content.substring(
                     Math.max(0, Math.min(begin, length())),
@@ -97,64 +92,31 @@ public class Document extends Thought {
         }
     }
 
-    public static int[] getRange(Activation act) {
-        return null;
-    }
-
     public static String getText(Activation act) {
-        int[] range = getRange(act);
-        return ((Document)act.getThought()).getText(range[0], range[1]);
+        return ((TextReference)act.getReference()).getText();
     }
 
-    public Activation addInput(Neuron n, int begin, int end) {
+    public Activation addInput(Neuron n, Reference ref) {
         Activation act = new Activation(this, n);
-        act.setReference(new GroundReference(begin, end));
+        act.initInput(ref);
 
-        act.setValue(1.0);
-        act.setFired(new Fired(begin, 0));
-        act.setRangeCoverage(end - begin);
-
-        act.propagateInput();
         return act;
     }
 
-    public Activation addInput(NeuronProvider n, int begin, int end) {
-        return addInput(n.getNeuron(), begin, end);
+    public Activation addInput(NeuronProvider n, Reference ref) {
+        return addInput(n.getNeuron(), ref);
     }
 
-    public Activation processToken(TextModel m, int begin, int end, String tokenLabel) {
-        moveCursor();
+    public Activation processToken(TextModel m, TextReference lastRef, int begin, int end, String tokenLabel) {
+        TextReference ref = new TextReference(this, begin, end);
+        Neuron tokenN = m.lookupToken(ref, tokenLabel);
+        Activation tokenPatternAct = addInput(tokenN, ref);
 
-        Neuron tokenN = m.lookupToken(tokenLabel);
-        Activation tokenPatternAct = addInput(tokenN, begin, end);
-        processActivations();
+        if(lastRef != null) {
+            lastRef.setNext(ref);
+            ref.setPrevious(lastRef);
+        }
 
         return tokenPatternAct;
-    }
-
-    public Cursor getLastCursor() {
-        return lastCursor;
-    }
-
-    public Cursor getCursor() {
-        return cursor;
-    }
-
-    public static class GroundReference implements Reference {
-        private int begin;
-        private int end;
-
-        public GroundReference(int begin, int end) {
-            this.begin = begin;
-            this.end = end;
-        }
-
-        public int getBegin() {
-            return begin;
-        }
-
-        public int getEnd() {
-            return end;
-        }
     }
 }

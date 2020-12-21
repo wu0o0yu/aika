@@ -17,6 +17,17 @@
 package network.aika.neuron.inhibitory;
 
 import network.aika.neuron.*;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.Scope;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.stream.Collectors;
+
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
 
 /**
  *
@@ -30,9 +41,37 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         super();
     }
 
-    public InhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
-        super(input, output);
-        setPropagate(true);
+    public InhibitorySynapse(Neuron<?> input, InhibitoryNeuron output, Synapse template) {
+        super(input, output, template);
+    }
+
+    @Override
+    public void updateReference(Link l) {
+        l.getOutput().propagateReference(
+                l.getInput().getReference()
+        );
+    }
+
+    public boolean checkTemplatePropagate(Visitor v, Activation act) {
+        return false;
+    }
+
+    @Override
+    public boolean checkTemplate(Activation iAct, Activation oAct, Visitor v) {
+        return true;
+    }
+
+    @Override
+    public boolean checkInduction(Link l) {
+        return true;
+    }
+
+    @Override
+    public InhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
+        if(!input.getTemplates().contains(getInput())) {
+            return null;
+        }
+        return new InhibitorySynapse(input, output, this);
     }
 
     @Override
@@ -40,25 +79,46 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         return type;
     }
 
+    @Override
+    public Activation getOutputActivationToLink(Activation oAct, Visitor v) {
+        return oAct;
+    }
+
     public void setWeight(double weight) {
         super.setWeight(weight);
         input.getNeuron().setModified(true);
     }
 
-    public void update(double weightDelta, boolean recurrent) {
-        super.update(weightDelta, recurrent);
+    public void addWeight(double weightDelta) {
+        super.addWeight(weightDelta);
         input.getNeuron().setModified(true);
     }
 
-    protected void link(Neuron in, Neuron out) {
-        in.getLock().acquireWriteLock();
-        in.addOutputSynapse(this);
-        in.getLock().releaseWriteLock();
+/*
+    public void transition(Visitor v, Activation fromAct, Activation toAct, boolean create) {
+        if(v.downUpDir == INPUT & v.startDir == INPUT && v.origin.getNeuron() == getOutput()) {
+            return;
+        }
+
+        Visitor nv = v.prepareNextStep(toAct, ACT);
+        nv.incrementPathLength();
+
+        nv.scopes = v.scopes
+                .stream()
+                .map(s -> transition(s, v.downUpDir))
+                .collect(Collectors.toList());
+
+        follow(fromAct, toAct, nv, create);
+    }
+*/
+
+    @Override
+    public Collection<Scope> transition(Scope s, Direction dir) {
+        return Collections.singleton(s);
     }
 
-    protected void unlink(Neuron in, Neuron out) {
-        in.getLock().acquireWriteLock();
-        in.removeOutputSynapse(this);
-        in.getLock().releaseWriteLock();
+    @Override
+    protected boolean checkOnCreate(Activation fromAct, Activation toAct, Visitor v) {
+        return true;
     }
 }

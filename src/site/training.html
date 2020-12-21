@@ -1,0 +1,232 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Inference - Aika</title>
+	<link rel="stylesheet" href="css/style.css" type="text/css">
+	<link rel="shortcut icon" href="images/favicon.png" />
+
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+					(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-77552310-1', 'auto');
+		ga('send', 'pageview');
+
+	</script>
+	<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+	<script type="text/javascript" async
+			src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+	</script>
+</head>
+<body>
+<div id="header">
+	<div>
+		<div class="logo">
+			<a rel="canonical" href="https://aika.network"></a>
+		</div>
+		<ul id="navigation">
+			<li>
+				<a rel="canonical" href="https://aika.network">Overall idea</a>
+			</li>
+			<li>
+				<a rel="canonical" href="blog.html">Blog</a>
+			</li>
+			<li>
+				<a rel="canonical" href="inference.html">Inference</a>
+			</li>
+			<li class="active">
+				<a rel="canonical" href="training.html">Training</a>
+			</li>
+			<li>
+				<a rel="canonical" href="usage.html">Examples</a>
+			</li>
+			<li>
+				<a rel="canonical" href="resources.html">Resources</a>
+			</li>
+            <li>
+                <a rel="canonical" href="https://github.com/aika-algorithm/aika">GitHub</a>
+            </li>
+		</ul>
+	</div>
+</div>
+	<div id="contents">
+		<div align="right"><span style='color: #FF0000;'>November 3, 2020</span></div>
+		<div align="middle"><b><span style='color: #FF0000;'>Work in progress</span></b></div>
+		<div class="features">
+			<h1>How the network is trained</h1>
+			<p>
+			<h2>The entropy framework</h2>
+			<p>
+				Since the network contains a lot of cycles, the usual backpropagation algorithm won't work very well for this type of network.
+				Also relying on handcrafted labels that are applied to the output of the network is very error-prone and it creates a large
+				distance between our training signal and the weights that we would like to adjust. Hence we would like to train our neurons
+				more locally without the reliance on an external signal source. This is where the Shannon entropy framework comes in quite handy.
+				If we consider the example of a word pattern again, we can measure the amount information for each letter, that is the number of bits required
+				to represent this letter in a message, by calculating the Shannon entropy. We can then look at the word pattern neuron as a
+				way of compressing the information given by the individual letter neurons. This compression can be formalized using the mutual
+				information which can then be used to derive an objective function for our training algorithm. The resulting derivative function
+				exhibits a very interesting and unexpected behavior with regard to when the synapse weights and neuron bias values are increased or decreased.
+
+				Before we go on lets first have a look at the formula for calculating the entropy:
+
+				$$H(X) = -\sum_{i=1}^n {\mathrm{P}(x_i) \log \mathrm{P}(x_i)}$$
+
+				This formula is actually comprised of two parts, the Shannon information or information content or surprisal part:
+
+				$$S(x) = -\log_b{\left(P\right)}$$
+
+				and the calculation of the expected value of the surprisal:
+
+				$$\operatorname{E}[X] =\sum_{i=1}^n x_i\,p_i$$
+
+				The Shannon information can be interpreted as quantifying the level of "surprise" of a particular outcome. So events
+				with a very high probability have a low surprisal value and events with a low probability have high one.
+			</p>
+
+			<div style="text-align:center; width:100%">
+				<img src="images/entropy-graph.jpg" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+			</div>
+			<p>
+			    Now that we have an understanding of the basics of Shannon entropy we can go on and see what the information gain is
+			    and how it is calculated. The information gain quantifies the "amount of information" obtained about one random
+			    variable through observing another random variable. In our example, the observed random variable would be that of
+			    the letter and the other one that of the word. The formula for the information gain looks as follows:
+
+				$$I(X;Y) = \sum_{y \in \mathcal Y} \sum_{x \in \mathcal X}
+				{ p_{(X,Y)}(x, y) \log{ \left(\frac{p_{(X,Y)}(x, y)}{p_X(x)\,p_Y(y)} \right) }} $$
+
+				To get a better understanding of this formula we can take a closer look at the components its comprised of.
+				It actually uses the concept of the Kullback-Leibler divergence to calculate the divergence between the
+				joint distribution of \(X\) and \(Y\) and the product of the marginals.
+
+				$$D_\text{KL}(P \parallel Q) = \sum_{x\in\mathcal{X}} P(x) \log\left(\frac{P(x)}{Q(x)}\right)$$
+
+				In other words, we are using the KL divergence to compare the joint distribution of \(X\) and \(Y\) to the
+				special case where these occur independent of each other. <br/>
+
+				Before going forward we would like to introduce a slightly different notion of the information gain:
+
+				$$I(X;Y) = \sum_{y \in \mathcal Y} \sum_{x \in \mathcal X}
+				{ p_{(X,Y)}(x, y) \left( \log{p_{(X,Y)}(x, y)} - \log{p_X(x)} - \log{p_Y(y)} \right) } $$
+
+				As you can see, at the core of this formula are now the surprisal values of different probability distributions.
+				The outer part is actually just the calculation of the expected value of the inner part.
+				We will come back to that later on.
+			</p>
+			<h2>Counting Frequencies</h2>
+			<p>
+				Since the calculation of the entropy relies on probability distributions, we need to figure how we can determine these.
+				This part may sound easier than it actually is, since there are some pitfalls to consider. A simple way to estimate
+				the probability for a neuron would look like this:
+
+				$$P(neuron) = \frac{\text{number of fired activations}}{\text{size of the sample space}}$$
+
+				Counting the number of fired activations for a neuron is easy but how do we determine the sample space and is the sample
+				space equal for all the neurons? The answer to that question is no. The size of the sample space depends on the space that the
+				activations cover in the input data set. For example an activation representing a single letter requires less space than
+				an activation representing a whole word. In the case of a neuron representing a single letter we could determine the
+				size of the sample space \(N\) by summing up the number of characters of all the training documents. For neurons whose activations
+				cover a larger space within the document we need to divide the the total number of characters by the average
+				covered area of this neurons activations.
+
+				$$N_{chars} = \text{number of characters over all training examples}$$
+				$$c = \text{average space covered by activations of a neuron}$$
+				$$N = N_{chars} \cdot c$$
+
+			</p>
+			<h2>The Beta-Distribution</h2>
+			<p>
+				Another problem with estimating the probability distributions is that we might not have enough training instances for
+				for a reliable statistic after inducing a new neuron or a new synapse. Yet we still want to be able adjust the weights of this neuron.
+				Hence we need a conservative estimate of what we already know for certain about the distribution. Considering that
+				the surprisal (\(-log(p)\)) only gets large when the probability gets close to zero, we can use the cumulative beta-distribution
+				to determine what the maximum probability is that can be explained by the observed frequencies. Lets consider an example
+				where ein frequency \(f\) is 10 and our sample space \(N\) is 100. Then we need to choose the parameters \(\alpha\) and \(\beta\) in
+				the following manner.
+
+				$$\alpha = f + 1$$
+				$$\beta = (N - f) + 1$$
+				The probability density function \(f(x;\alpha,\beta)\) of the beta-distribution then looks as follows:
+			</p>
+
+			<div style="text-align:center; width:100%">
+				<img src="images/beta-dist.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+			</div>
+			<p>
+				Here we can see how likely each probability estimate is given our measured frequency. In order to choose a reliable
+				estimated probability we need to look at the cumulative distribution function:
+			</p>
+
+			<div style="text-align:center; width:100%">
+				<img src="images/cum-beta-dist.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+			</div>
+			<p>
+				If we invert this function and select a threshold, say 5%, than we can estimate an upper bound for our
+				true probability. In other words we are now 95% certain that the true probability distribution underlying the measurement is
+				lower than our estimate. Consequently, we are now able to compute a lower bound value for the surprisal value.
+			</p>
+			<h2>The optimization problem</h2>
+			<p>
+				Since we would like to optimize the compression rate within the network, we need to find a way to adjust the synapse weights and the neuron
+				biases such that the network requires less information to encode the message of the input data. To do so we will need an objective function
+				that we can convert to its first derivative. With this derivative function we are then able to use the gradient decent method to adjust the
+				synapse weights and bias values.
+				To figure out how the objective function may look like, we need to take a closer look at a neuron and its input synapses. Let us consider the synapses
+				as information consumers and the neuron itself as an information producer. The synapses or information consumers can now be modeled using the
+				information gain and the neuron itself can be modeled using the entropy.
+
+				$$G = H(Y) - \sum \limits _{i} I(X_i, Y)$$
+
+				Now, before we go on to calculate the derivative function, we need to make two simplifying assumptions. The first one is that we consider
+				the surprisal parts of the equation as constants. If we first look at the information gain part of the equation we can split the equation
+
+				$$I(X;Y) = \sum_{y \in \mathcal Y} \sum_{x \in \mathcal X}
+				{ p_{(X,Y)}(x, y) \left( \log{p_{(X,Y)}(x, y)} - \log{p_X(x)} - \log{p_Y(y)} \right) } $$
+
+				and consider \(S(x, y)\) as constant later on.
+
+				$$S(x,y) = \log{p_{(X,Y)}(x, y)} - \log{p_X(x)} - \log{p_Y(y)} $$
+
+				$$I(X;Y) = \sum_{y \in \mathcal Y} \sum_{x \in \mathcal X}
+				{ p_{(X,Y)}(x, y) S(x, y) } $$
+
+				The only variable part left that we need to consider while calculating the derivative is the probability \(p_{(X,Y)}(x, y)\). \(p_{(X,Y)}(x, y)\) can be computed using the
+				frequency \(f_{(X,Y)}(x, y)\) and the number of trainings instances \(H\).
+
+				$$p_{(X,Y)}(x, y) = \frac{f_{(X,Y)}(x, y)}{N}$$
+
+				Where the frequency \(f_{(X,Y)}(x, y)\) is just the sum of all fired activations.
+
+				$$ f_{(X,Y)}(x, y) = \sum_{i}^N \varphi (net_i)$$
+
+				The second assumption that we need to make is that only the most recent training example is considered as variable. All other training examples are considered as constants
+				and since they are part of a summation, they can be simply removed from the equation. Hence the derivative function of \(f_{(X, Y)}\) looks as follows:
+
+				$$ f_{(X,Y)}(x, y)' = \varphi (net') \varphi' (net)$$
+
+				Since the activation function \(\varphi (x)\) is given by
+				\[\varphi(x) = \Bigg \{ {0 \atop \tanh(x)} {: x \leq 0 \atop : x > 0}\]
+
+				the derivative of it is
+
+				\[\varphi(x)' = \Bigg \{ {0 \atop 1 - \tanh^2(x)} {: x \leq 0 \atop : x > 0}\]
+
+				To get a better understanding the following graph shows the outer derivative of the activation function.
+			<div style="text-align:center; width:100%">
+				<img src="images/deriv-actf.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+			</div>
+
+			</p>
+			<h2>Concept Drift</h2>
+			<p>
+				Another problem is that of concept drift. Since we are using the distribution to adjust the synapse weights
+				this will lead to changes in the activation patterns and therefore to changes in the distributions again.
+			</p>
+        </div>
+	</div>
+</body>
+</html>

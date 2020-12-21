@@ -16,13 +16,18 @@
  */
 package network;
 
-import network.aika.neuron.excitatory.ExcitatorySynapse;
+import network.aika.neuron.Templates;
+import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.excitatory.PatternPartNeuron;
+import network.aika.neuron.excitatory.PatternSynapse;
 import network.aika.text.Document;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.TextModel;
+import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
+
+import static network.aika.neuron.Templates.*;
 
 
 /**
@@ -37,13 +42,15 @@ public class PatternTest {
 
         Document doc = new Document("ABC");
 
-        doc.processToken(m, 0, 1,  "A");
-        doc.processToken(m, 1, 2,  "B");
-        doc.processToken(m, 2, 3,  "C");
+        TextReference refA = doc.processToken(m, null, 0, 1,  "A").getReference();
+        TextReference refB = doc.processToken(m, refA, 1, 2,  "B").getReference();
+        TextReference refC = doc.processToken(m, refB, 2, 3,  "C").getReference();
 
-        doc.process();
+        System.out.println(doc);
 
-        System.out.println(doc.activationsToString());
+        doc.process(m);
+
+        System.out.println(doc);
     }
 
 
@@ -53,131 +60,150 @@ public class PatternTest {
 
         Document doc = new Document("ABC");
 
-        doc.processToken(m, 0, 1,  "A");
-        doc.processToken(m, 1, 2,  "B");
+        TextReference refA = doc.processToken(m, null, 0, 1,  "A").getReference();
+        TextReference refB = doc.processToken(m, refA, 1, 2,  "B").getReference();
 
-        doc.process();
+        doc.process(m);
 
-        System.out.println(doc.activationsToString());
+        System.out.println(doc);
     }
 
     public TextModel initModel() {
         TextModel m = new TextModel();
+        Templates t = new Templates(m);
 
-        PatternNeuron nA = m.lookupToken("A");
-        PatternNeuron nB = m.lookupToken("B");
-        PatternNeuron nC = m.lookupToken("C");
+        PatternNeuron nA = m.lookupToken(null, "A");
+        PatternNeuron nB = m.lookupToken(null, "B");
+        PatternNeuron nC = m.lookupToken(null, "C");
 
-        PatternPartNeuron eA = new PatternPartNeuron(m, "E A", false);
-        PatternPartNeuron eB = new PatternPartNeuron(m, "E B", false);
-        PatternPartNeuron eC = new PatternPartNeuron(m, "E C", false);
+        PatternPartNeuron eA = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
+        eA.setLabel("E A");
+        PatternPartNeuron eB = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
+        eB.setLabel("E B");
+        PatternPartNeuron eC = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
+        eC.setLabel("E C");
 
-        PatternNeuron out = new PatternNeuron(m, "ABC", "OUT", false);
+        PatternNeuron out = t.SAME_PATTERN_TEMPLATE.instantiateTemplate();
+        out.setTokenLabel("ABC");
+        out.setLabel("OUT");
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(nA, eA);
-                s.setPropagate(true);
+                PatternPartSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nA, eA);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                eA.addConjunctiveBias(-10.0, false);
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(out, eA);
+                PatternPartSynapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eA);
 
-                s.link();
+                s.linkInput();
+                s.linkOutput();
                 s.setWeight(10.0);
-                eA.setRecurrentConjunctiveBias(-10.0);
+                eA.addConjunctiveBias(-10.0, true);
             }
             eA.setBias(4.0);
         }
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(nB, eB);
-                s.setPropagate(true);
+                PatternPartSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nB, eB);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                eB.addConjunctiveBias(-10.0, false);
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eA, eB);
+                PatternPartSynapse s = t.SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eA, eB);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkOutput();
+                s.addWeight(10.0);
+                eB.addConjunctiveBias(-10.0, false);
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nB), eB);
+                PatternPartSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(lookupPPPT(m, nB), eB);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkOutput();
+                s.addWeight(10.0);
+                eB.addConjunctiveBias(-10.0, false);
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(out, eB);
+                PatternPartSynapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eB);
 
-                s.link();
-                s.update(10.0, true);
+                s.linkOutput();
+                s.addWeight(10.0);
+                eB.addConjunctiveBias(-10.0, true);
             }
             eB.setBias(4.0);
         }
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(nC, eC);
-                s.setPropagate(true);
+                PatternPartSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nC, eC);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                eC.addConjunctiveBias(-10.0, false);
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eB, eC);
+                PatternPartSynapse s = t.SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eB, eC);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkOutput();
+                s.addWeight(10.0);
+                eC.addConjunctiveBias(-10.0, false);
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nC), eC);
+                PatternPartSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(lookupPPPT(m, nC), eC);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkOutput();
+                s.addWeight(10.0);
+                eC.addConjunctiveBias(-10.0, false);
             }
 
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(out, eC);
+                PatternPartSynapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eC);
 
-                s.link();
-                s.update(10.0, true);
+                s.linkOutput();
+                s.addWeight(10.0);
+                eC.addConjunctiveBias(-10.0, true);
             }
             eC.setBias(4.0);
         }
 
         {
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eA, out);
-                s.setPropagate(true);
+                PatternSynapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eA, out);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                out.addConjunctiveBias(-10.0, false);
             }
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eB, out);
-                s.setPropagate(true);
+                PatternSynapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eB, out);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                out.addConjunctiveBias(-10.0, false);
             }
             {
-                ExcitatorySynapse s = new ExcitatorySynapse(eC, out);
-                s.setPropagate(true);
+                PatternSynapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eC, out);
 
-                s.link();
-                s.update(10.0, false);
+                s.linkInput();
+                s.linkOutput();
+                s.addWeight(10.0);
+                out.addConjunctiveBias(-10.0, false);
             }
             out.setBias(4.0);
         }

@@ -18,10 +18,22 @@ package network.aika.neuron;
 
 import network.aika.*;
 import network.aika.Writable;
+import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.Scope;
+import org.apache.commons.math3.distribution.BetaDistribution;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+import static network.aika.neuron.Sign.NEG;
+import static network.aika.neuron.Sign.POS;
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
 
 /**
  *
@@ -29,65 +41,180 @@ import java.io.IOException;
  */
 public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implements Writable {
 
+    private static final Logger log = LoggerFactory.getLogger(Synapse.class);
+
     public static double TOLERANCE = 0.0000001;
-
-    protected boolean isNegative;
-    protected boolean isPropagate;
-    protected boolean isInput;
-
 
     protected NeuronProvider input;
     protected NeuronProvider output;
 
+    private Synapse template;
+
     private double weight;
+
+    protected SampleSpace sampleSpace = new SampleSpace();
+
+    protected double frequencyIPosOPos;
+    protected double frequencyIPosONeg;
+    protected double frequencyINegOPos;
+    private volatile boolean modified;
+
 
     public Synapse() {
     }
 
-    public Synapse(I input, O output) {
+    public Synapse(I input, O output, Synapse template) {
         this.input = input.getProvider();
         this.output = output.getProvider();
+        this.template = template;
 
-        System.out.println(getClass().getSimpleName() + " IN:" + getInput().toString() + " -> OUT:" + getOutput().toString());
+        assert input.getId() < 0 || input.getId() != output.getId();
     }
 
-    public void setInput(I input) {
-        this.input = input.getProvider();
+    public boolean isTemplate() {
+        return template == null;
     }
 
-    public void setOutput(O output) {
-        this.output = output.getProvider();
+    public Synapse getTemplate() {
+        return template;
     }
+
+    public abstract Synapse instantiateTemplate(I input, O output);
+
+ //   public abstract void transition(Visitor v, Activation currentAct, Activation nextAct, boolean create);
+
+    public void transition(Visitor v, Activation fromAct, Activation toAct, boolean create) {
+        Visitor nv = v.prepareNextStep(
+                toAct,
+                v.getScopes()
+                        .stream()
+                        .flatMap(s -> transition(s, v.downUpDir).stream())
+                        .collect(Collectors.toList()),
+                ACT
+        );
+
+        nv.incrementPathLength();
+
+        follow(fromAct, toAct, nv, create);
+    }
+
+    public abstract Collection<Scope> transition(Scope s, Direction dir);
+
+    protected abstract boolean checkOnCreate(Activation fromAct, Activation toAct, Visitor v);
+
+    public abstract boolean checkTemplate(Activation iAct, Activation oAct, Visitor v);
+
+    public abstract boolean checkInduction(Link l);
+
+    public abstract boolean checkTemplatePropagate(Visitor v, Activation act);
 
     public abstract byte getType();
 
-    public void setNegative(boolean negative) {
-        isNegative = negative;
+    public abstract void updateReference(Link l);
+
+    public Reference getReference(Link l) {
+        return l.getInput().getReference();
     }
 
-    public boolean isNegative() {
-        return isNegative;
+    public boolean isInputLinked() {
+        return getInput().containsOutputSynapse(this);
     }
 
-    public void setPropagate(boolean propagate) {
-        isPropagate = propagate;
+    public abstract Activation getOutputActivationToLink(Activation oAct, Visitor v);
+
+    public void follow(Activation fromAct, Activation toAct, Visitor v, boolean create) {
+        if(create) {
+            createLinkAndActivation(fromAct, toAct, v);
+        } else {
+            toAct.getNeuron()
+                    .transition(v, toAct, false);
+        }
     }
 
-    public boolean isPropagate() {
-        return isPropagate;
+    public void createLinkAndActivation(Activation fromAct, Activation toAct, Visitor v) {
+        if(!checkOnCreate(fromAct, toAct, v)) {
+            return;
+        }
+
+        Thought t = fromAct.getThought();
+        Config c = fromAct.getConfig();
+
+        // TODO: Check direction
+        if (toAct == null) {
+            toAct = Activation.createActivation(
+                    t,
+                    v.startDir.getNeuron(this)
+            );
+
+            toAct.addToQueue(
+                    v.getPhase().getNextActivationPhases(c)
+            );
+        } else {
+            Link ol = v.startDir
+                    .getOutput(fromAct, toAct)
+                    .getInputLink(this);
+            if (ol != null) {
+//                    toAct = oAct.cloneToReplaceLink(s);
+                log.warn("Link already exists!  " + t);
+                return;
+            }
+        }
+
+        Link nl = Link.link(
+                this,
+                v.startDir.getInput(fromAct, toAct),
+                v.startDir.getOutput(fromAct, toAct),
+                v.getSelfRef()
+        );
+
+        if (nl.getSynapse().getWeight() > 0.0 || nl.getSynapse().isTemplate()) {
+            nl.addToQueue(
+                    v.getPhase().getNextLinkPhases(c)
+            );
+        }
     }
 
-    public boolean isInput() {
-        return isInput;
+    public void linkInput() {
+        Neuron in = getInput();
+        in.getLock().acquireWriteLock();
+        in.addOutputSynapse(this);
+        in.getLock().releaseWriteLock();
     }
 
-    public void setInput(boolean input) {
-        isInput = input;
+    public void unlinkInput() {
+        Neuron in = getInput();
+        in.getLock().acquireWriteLock();
+        in.removeOutputSynapse(this);
+        in.getLock().releaseWriteLock();
     }
 
-    protected abstract void link(Neuron in, Neuron out);
+    public void updateInputLink(boolean link) {
+        if(link) {
+            linkInput();
+        } else {
+            unlinkInput();
+        }
+    }
 
-    protected abstract void unlink(Neuron in, Neuron out);
+    public boolean isOutputLinked() {
+        return getOutput().containsInputSynapse(this);
+    }
+
+    public void linkOutput() {
+        Neuron out = output.getNeuron();
+
+        out.getLock().acquireWriteLock();
+        out.addInputSynapse(this);
+        out.getLock().releaseWriteLock();
+    }
+
+    public void unlinkOutput() {
+        Neuron out = output.getNeuron();
+
+        out.getLock().acquireWriteLock();
+        out.removeInputSynapse(this);
+        out.getLock().releaseWriteLock();
+    }
 
     public NeuronProvider getPInput() {
         return input;
@@ -105,39 +232,86 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return (O) output.getNeuron();
     }
 
+    public SampleSpace getInstances() {
+        return sampleSpace;
+    }
+
+    public double getFrequency(Sign is, Sign os, double n) {
+        if(is == POS && os == POS) {
+            return frequencyIPosOPos;
+        } else if(is == POS && os == NEG) {
+            return frequencyIPosONeg;
+        } else if(is == NEG && os == POS) {
+            return frequencyINegOPos;
+        } else {
+            return n - (frequencyIPosOPos + frequencyIPosONeg + frequencyINegOPos);
+        }
+    }
+
+    public void setFrequency(Sign is, Sign os, double f) {
+        if(is == POS && os == POS) {
+            frequencyIPosOPos = f;
+        } else if(is == POS && os == NEG) {
+            frequencyIPosONeg = f;
+        } else if(is == NEG && os == POS) {
+            frequencyINegOPos = f;
+        } else {
+            throw new UnsupportedOperationException();
+        }
+        modified = true;
+    }
+
+    public void count(Link l) {
+        sampleSpace.update(getModel(), l.getInput().getReference());
+
+        if(l.getInput().isActive() && l.getOutput().isActive()) {
+            frequencyIPosOPos += 1.0;
+            modified = true;
+        } else if(l.getInput().isActive() && !l.getOutput().isActive()) {
+            frequencyIPosONeg += 1.0;
+            modified = true;
+        } else if(!l.getInput().isActive() && l.getOutput().isActive()) {
+            frequencyINegOPos += 1.0;
+            modified = true;
+        }
+    }
+
+    public Model getModel() {
+        return getPOutput().getModel();
+    }
+
+    public double getSurprisal(Sign si, Sign so) {
+        if(isTemplate())
+            return 0.0;
+
+        double p = getP(si, so, sampleSpace.getN());
+        return -Math.log(p);
+    }
+
+    public double getP(Sign si, Sign so, double n) {
+        BetaDistribution dist = new BetaDistribution(getFrequency(si, so, n) + 1, n + 1);
+
+        return dist.inverseCumulativeProbability(
+                getModel().getConfig().getBetaThreshold()
+        );
+    }
+
     public double getWeight() {
         return weight;
-    }
-
-    public void link() {
-        Neuron in = input.getNeuron();
-        Neuron out = output.getNeuron();
-
-        link(in, out);
-    }
-
-    public void unlink() {
-        Neuron in = input.getNeuron();
-        Neuron out = output.getNeuron();
-
-        unlink(in, out);
     }
 
     public boolean isZero() {
         return Math.abs(weight) < TOLERANCE;
     }
 
-/*
-    public boolean isWeak(State state) {
-        return output.get().isWeak(this, state);
-    }
-*/
     public void setWeight(double weight) {
         this.weight = weight;
+        modified = true;
     }
 
-    public void update(double weightDelta, boolean recurrent) {
+    public void addWeight(double weightDelta) {
         this.weight += weightDelta;
+        modified = true;
     }
 
     @Override
@@ -149,9 +323,11 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         out.writeDouble(weight);
 
-        out.writeBoolean(isNegative);
-        out.writeBoolean(isPropagate);
-        out.writeBoolean(isInput);
+        out.writeDouble(frequencyIPosOPos);
+        out.writeDouble(frequencyIPosONeg);
+        out.writeDouble(frequencyINegOPos);
+
+        sampleSpace.write(out);
     }
 
     @Override
@@ -161,12 +337,28 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         weight = in.readDouble();
 
-        isNegative = in.readBoolean();
-        isPropagate = in.readBoolean();
-        isInput = in.readBoolean();
+        frequencyIPosOPos = in.readDouble();
+        frequencyIPosONeg = in.readDouble();
+        frequencyINegOPos = in.readDouble();
+
+        sampleSpace = SampleSpace.read(in, m);
     }
 
     public String toString() {
-        return "S " + getClass().getSimpleName() + "  w:" + Utils.round(getWeight()) + " " + input + "->" + output + " (neg:" + isNegative() + ", prop:" + isPropagate() + ")";
+        return "S " +
+                getClass().getSimpleName() +
+                "  w:" + Utils.round(getWeight()) +
+                " in:[" + input.getNeuron() + "](" + (isInputLinked() ? "+" : "-") + ")" +
+                " --> out:[" + output.getNeuron() + "](" + (isOutputLinked() ? "+" : "-") + ")";
+    }
+
+    public String statToString() {
+        int n = getModel().getN();
+        return "f:" + Utils.round(getInput().getFrequency()) + " " +
+                "N:" + Utils.round(n) + " " +
+                "s(p,p):" + Utils.round(getSurprisal(POS, POS)) + " " +
+                "s(n,p):" + Utils.round(getSurprisal(NEG, POS)) + " " +
+                "s(p,n):" + Utils.round(getSurprisal(POS, NEG)) + " " +
+                "s(n,n):" + Utils.round(getSurprisal(NEG, NEG)) + " \n";
     }
 }

@@ -1,30 +1,28 @@
 package network.aika.neuron;
 
-import java.util.function.Function;
+import network.aika.neuron.activation.Activation;
+
 
 public enum Sign {
-    POS(
-            n -> n.getP(),
-            1.0
-    ),
-    NEG(
-            n -> 1.0 - n.getP(),
-            -1.0
-    );
+    POS,
+    NEG;
 
-    private Function<Neuron, Double> neuronF;
-    private double sign;
-
-    Sign(Function<Neuron, Double> neuronF, double sign) {
-        this.neuronF = neuronF;
-        this.sign = sign;
+    static {
+        POS.init(NEG);
+        NEG.init(POS);
     }
 
-    public double getP(Neuron n) {
-        return neuronF.apply(n);
+    private Sign inverted;
+
+    private void init(Sign inverted) {
+        this.inverted = inverted;
     }
 
-    public double getSign() {
-        return sign;
+    public Sign invert() {
+        return inverted;
+    }
+
+    public static Sign getSign(Activation act) {
+        return act.isActive() ? POS : NEG;
     }
 }

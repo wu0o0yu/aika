@@ -19,22 +19,13 @@ package network.aika.neuron.inhibitory;
 import network.aika.ActivationFunction;
 import network.aika.Model;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Direction;
+import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Link;
-
-import java.util.Collections;
-import java.util.List;
-
-import static network.aika.neuron.Sign.NEG;
-import static network.aika.neuron.Sign.POS;
-import static network.aika.neuron.activation.Activation.TOLERANCE;
-import static network.aika.neuron.activation.Direction.INPUT;
-
 
 /**
  *
@@ -44,7 +35,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     public static byte type;
 
-    protected InhibitoryNeuron() {
+    public InhibitoryNeuron() {
         super();
     }
 
@@ -52,11 +43,32 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         super(p);
     }
 
-    public InhibitoryNeuron(Model model, String descriptionLabel, Boolean isInputNeuron) {
-        super(model, descriptionLabel, isInputNeuron);
+    private InhibitoryNeuron(Model model) {
+        super(model);
     }
 
-    public void tryToLink(Activation iAct, Activation oAct) {
+
+    @Override
+    public boolean checkTemplate(Activation act) {
+        return false;
+    }
+
+    @Override
+    public boolean checkInduction(Activation act) {
+        return true;
+    }
+
+    @Override
+    public InhibitoryNeuron instantiateTemplate() {
+        InhibitoryNeuron n = new InhibitoryNeuron(getModel());
+        n.getTemplates().add(this);
+        n.getTemplates().addAll(getTemplates());
+        return n;
+    }
+
+    @Override
+    public void addDummyLinks(Activation act) {
+
     }
 
     @Override
@@ -64,37 +76,13 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         return type;
     }
 
-    protected void propagateCost(Activation act) {
-        double cost = 0.0;
-
-//        act.getLinks(INPUT).mapToDouble(l -> l.getInput().);
-
-        if(Math.abs(cost) < TOLERANCE) {
-            return;
-        }
-
-        act.getMutableGradient().gradient += cost;
-    }
-
     @Override
-    public Synapse getInputSynapse(NeuronProvider n) {
-        throw new UnsupportedOperationException();
+    public void transition(Visitor v, Activation act, boolean create) {
+        act.followLinks(v);
     }
 
-    public double propagateRangeCoverage(Link l) {
-        return l.getInput().getRangeCoverage();
-    }
-
-    public void induceNeuron(Activation act) {
-        return;
-    }
-
-    public Synapse induceSynapse(Activation iAct, Activation oAct) {
-        InhibitorySynapse s = new InhibitorySynapse(iAct.getNeuron(), (InhibitoryNeuron) oAct.getNeuron());
-        s.setPropagate(true);
-        s.setWeight(1.0);
-        s.link();
-        return s;
+    public boolean isInitialized() {
+        return false;
     }
 
     @Override
@@ -102,29 +90,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         return f;
     }
 
-    /*
-    public boolean isWeak(Synapse s, Synapse.State state) {
-        return s.getWeight(state) < -getBias();
-    }
-*/
-
     public ActivationFunction getActivationFunction() {
         return ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
-    }
-
-    @Override
-    public void addInputSynapse(InhibitorySynapse s) {
-    }
-
-    @Override
-    public void addOutputSynapse(Synapse s) {
-    }
-
-    @Override
-    public void removeInputSynapse(InhibitorySynapse s) {
-    }
-
-    @Override
-    public void removeOutputSynapse(Synapse s) {
     }
 }

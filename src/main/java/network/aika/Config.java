@@ -16,16 +16,32 @@
  */
 package network.aika;
 
-
+import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.phase.activation.ActivationPhase;
 
-import java.util.function.Predicate;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Supplier;
+
+import static network.aika.neuron.Sign.POS;
 
 public class Config {
     private Double alpha = null; //0.99;
     private double learnRate;
-    private double metaThreshold;
-    private Predicate<Activation> maturityCheck;
+
+    private double betaThreshold = 0.95;
+
+    private double surprisalInductionThreshold = 2.0;
+    private double gradientInductionThreshold = 2.0;
+
+    private boolean enableTraining;
+
+    private Supplier<Writable> customDataInstanceSupplier;
+
 
     public double getLearnRate() {
         return learnRate;
@@ -45,21 +61,59 @@ public class Config {
         return this;
     }
 
-    public double getMetaThreshold() {
-        return metaThreshold;
+    public double getSurprisalInductionThreshold() {
+        return surprisalInductionThreshold;
     }
 
-    public Config setMetaThreshold(double metaThreshold) {
-        this.metaThreshold = metaThreshold;
+    public Config setSurprisalInductionThreshold(double surprisalInductionThreshold) {
+        this.surprisalInductionThreshold = surprisalInductionThreshold;
         return this;
     }
 
-    public Predicate<Activation> getMaturityCheck() {
-        return maturityCheck;
+    public double getGradientInductionThreshold() {
+        return gradientInductionThreshold;
     }
 
-    public Config setMaturityCheck(Predicate<Activation> maturityCheck) {
-        this.maturityCheck = maturityCheck;
+    public Config setGradientInductionThreshold(double gradientInductionThreshold) {
+        this.gradientInductionThreshold = gradientInductionThreshold;
         return this;
+    }
+
+    public boolean isEnableTraining() {
+        return enableTraining;
+    }
+
+    public Config setEnableTraining(boolean enableTraining) {
+        this.enableTraining = enableTraining;
+        return this;
+    }
+
+    public String getLabel(Activation act) {
+        return "";
+    }
+
+    public double getBetaThreshold() {
+        return betaThreshold;
+    }
+
+    public Config setBetaThreshold(double betaThreshold) {
+        this.betaThreshold = betaThreshold;
+        return this;
+    }
+
+    public Supplier<Writable> getCustomDataInstanceSupplier() {
+        return customDataInstanceSupplier;
+    }
+
+    public Config setCustomDataInstanceSupplier(Supplier<Writable> customDataInstanceSupplier) {
+        this.customDataInstanceSupplier = customDataInstanceSupplier;
+        return this;
+    }
+
+    public String toString() {
+        return "Alpha: " + alpha + "\n" +
+                "LearnRate" + learnRate + "\n" +
+                "SurprisalInductionThreshold" + surprisalInductionThreshold + "\n" +
+                "GradientInductionThreshold" + gradientInductionThreshold + "\n\n";
     }
 }

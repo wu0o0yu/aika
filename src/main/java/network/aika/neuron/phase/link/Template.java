@@ -14,16 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.text;
+package network.aika.neuron.phase.link;
 
-import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.phase.RankedImpl;
+
+import network.aika.neuron.phase.activation.ActivationPhase;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Cursor {
+public class Template extends RankedImpl implements LinkPhase {
 
-    public Activation nextTokenPPAct;
-    public Activation nextTokenIAct;
+    public Template(int rank) {
+        super(rank);
+    }
+
+    @Override
+    public void process(Link l) {
+        l.propagate(ActivationPhase.TEMPLATE_INPUT);
+    }
+
+    @Override
+    public int compare(Link l1, Link l2) {
+        return 0;
+    }
 }

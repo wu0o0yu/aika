@@ -26,193 +26,102 @@
 <div id="header">
 	<div>
 		<div class="logo">
-			<a href="index.html"></a>
+			<a rel="canonical" href="https://aika.network"></a>
 		</div>
 		<ul id="navigation">
 			<li>
-				<a href="index.html">Overall idea</a>
+				<a rel="canonical" href="https://aika.network">Overall idea</a>
 			</li>
 			<li>
-				<a href="blog.html">Blog</a>
+				<a rel="canonical" href="blog.html">Blog</a>
 			</li>
 			<li class="active">
-				<a href="inference.html">Inference</a>
+				<a rel="canonical" href="inference.html">Inference</a>
 			</li>
 			<li>
-				<a href="usage.html">Examples</a>
+				<a rel="canonical" href="training.html">Training</a>
 			</li>
 			<li>
-				<a href="resources.html">Resources</a>
+				<a rel="canonical" href="usage.html">Examples</a>
+			</li>
+			<li>
+				<a rel="canonical" href="resources.html">Resources</a>
 			</li>
             <li>
-                <a href="https://github.com/aika-algorithm/aika">GitHub</a>
+                <a rel="canonical" href="https://github.com/aika-algorithm/aika">GitHub</a>
             </li>
 		</ul>
 	</div>
 </div>
 	<div id="contents">
+		<div align="right"><span style='color: #FF0000;'>October 09, 2020</span></div>
+		<div align="middle"><b><span style='color: #FF0000;'>Work in progress</span></b></div>
 		<div class="features">
-			<h1>How it works</h1>
+			<h1>How information is propagated through the network</h1>
 			<p>
-			<h2>The Artificial Neural Network</h2>
+			<h2>General Architecture</h2>
 			<p>
-				Aika is a neural network simulation algorithm, that uses neurons to represent a wide variety of
-				linguistic concepts and connects them via synapses. In contrast to most other neural
-				network architectures, Aika does not employ layers to structure its network. Synapses can connect arbitrary
-				neurons with each other, but the network is not fully connected either. <br/>
-				Like other artificial neural networks (ANN) the synapses are weighted. By choosing the weights and the threshold
-				(i.e. the bias) accordingly, neurons can take on the characteristics of boolean logic gates such as an
-				and-gate or an or-gate. To compute the activation value of a neuron, the weighted sum over its input
+				In the Aika neural network neurons and their Activations are represented separately. Thus each neuron may have an arbitrary number of activations.
+				For example, if the input data set is a text and a neuron represents a specific word, then there might be several occurrences of this word and therefore
+				several activations of this neuron. The human brain probably does something similar through the timing of activation spikes.<br/>
+				These activations represent the information that the neural network was able to infer about the input data set. Every activation is directly or
+				indirectly grounded in the input data set. That is by following the input links of an activation down to the input layer of the network one can determine
+				the atomic input information this activation is referring to, similar to an annotation.<br/>
+				Since we have a one-to-many relation between neurons and activations, we also need a one-to-many relation between the synapses and the links between the
+				activations. Therefore we need a linking process to determine which activation are going to be connected which others. Roughly speaking activations can be linked if
+				they are grounded in the same input data. <br/>
+				A consequence of separating the neurons and their activations is that we can not rely on the network topology to give us the chronological sequence in which each
+				activation is processed. Therefore each activation needs a fired timestamp information that describes the point in time when this activation becomes visible to other neurons.
+				In contrast to conventional neural networks, with their predefined layered architecture, the Aika network starts out empty. Neurons and synapses are added during training.
+				There is an underlying set of rules which determine when certain types of neurons or synapses are induced. <br/>
+				For the network to be able to scale to a sufficient number of neurons and still be computed efficiently, we need to restrict the number of synapses that are
+				induced or even considered to be induced.
+			</p>
+
+			<h2>The weighted sum and the activation function</h2>
+			<p>
+				Like other artificial neural networks the synapses are weighted. To compute the activation value
+				of a neuron, the weighted sum over its input
 				synapses is computed. Then the bias value \(b\) is added to this sum and the result is
 				sent through an activation function \(\varphi\).
-            </p>
-            <div style="text-align:center; width:100%">
-                <img src="images/neuron.svg" width="60%" height="60%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
-            </div>
-            <p>
+			</p>
+			<div style="text-align:center; width:100%">
+				<img src="images/neuron.svg" width="60%" height="60%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+			</div>
+			<p>
 				$$net_j = {b_j + \sum\limits_{i=0}^N{x_i w_{ij}}}$$
 				$$y_j = \varphi (net_j)$$
 
 				Depending on the type of neuron, different activation functions are used. One commonly used activation function
-				in Aika is the <a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks)">rectified</a>
+				in the Aika network is the <a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks)">rectified</a>
 				hyperbolic tangent function, which is basically the positive half of the \(\tanh()\) function.
 
 				\[\varphi(x) = \Bigg \{ {0 \atop \tanh(x)} {: x \leq 0 \atop : x > 0}\]
-            </p>
-            <div style="text-align:center; width:100%">
-                <img src="images/tanh-diagram.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
-            </div>
-            <p>
-				The activation functions are chosen in a way that they clearly distinguish between active
-				and inactive neurons. Only activated neurons are processed. These activations are expressed not only by a real
-				valued number but also by an activation object.
 			</p>
-
-			<h2>Activations</h2>
-			<p>
-				The advantage of having activation objects is that, through them, Aika is able to cope with the relational
-				structure of natural language text by making the activation relate to a specific segment of text. In a way
-				these activations can be seen as text annotations that specify their start and end character. </br>
-				Words, phrases and sentences are in a relation to each other through
-				their sequential order. The assignment of text ranges and word positions to activations is a simple yet
-				powerful representation of the relational structure of text and avoids some of the shortcomings of other
-				representations such as bag of words or sliding window.
-				Since the activations are propagated along through the network, synapses need to be able to manipulate
-				the text range and the word position while the activations are passed on to the next neuron.
-			</p>
-
-			<h2>Interpretations</h2>
-			<p>
-				One common problem when processing text is that of cyclic dependencies. In the example 'jackson cook' it
-				is impossible to decide which word has to be resolved first, the forename or the surname, since both
-				depend on each other. The word jackson can be recognized as a forename when the next word is a surname
-				and the word cook can be recognized as a surname when the previous word is a forename.
-				To tackle this problem Aika employs <a href="https://en.wikipedia.org/wiki/Non-monotonic_logic" rel="nofollow">non-monotonic logic</a>
-				and is therefore able to derive multiple interpretations that are mutually exclusive. These interpretations
-				are then weighted and only the strongest interpretation is returned as the result. <br/>
-
-				Consider the following network, which is able to determine whether a word, which has been recognized in a
-				text, is a forename, surname, city name, or profession. If for instance the word "jackson" has been
-				recognized in a text, it
-				will trigger further activations in the two jackson entity neurons. Since both are connected through the
-				inhibiting neuron only one of them can be active in the end. Aika will therefore generate two
-				interpretations. But these interpretations are not limited to a single neuron. For instance if the word
-				neuron cook gets activated too, the jackson forename entity and the cook surname entity will be
-				part of the same interpretation. The forename and surname category links in this example form a positive
-				feedback loop which reinforces this interpretation.
-			</p>
-
 			<div style="text-align:center; width:100%">
-				<img src="images/jackson-cook-diagram.svg" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+				<img src="images/tanh-diagram.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
 			</div>
-
 			<p>
-				New interpretations are spawned if both input and output of a negative recurrent synapse get activated.
-				In this case a conflict is generated. An interpretation is a conflict free set of activations. Therefore,
-				if there are no conflicts during the processing of an input data set, only one interpretation will exist
-				and the search for the best interpretation will end immediately.
-				On the other hand, if there are conflicts between activations, a search needs to be
-				performed which selects or excludes individual activations and tests how these changes affect the
-				overall weights sum of all activations. This sum is also called the objective function \(f\) and can be
-                stated in the following way:
-
-				$$f = \sum\limits_{j \in Acts}{\min (-g_j, net_j)}$$
-
-				$$g_j = \sum\limits_{i = 0, w_{ij} < 0, w_{ij} \in Recurrent}^N{w_{ij}}$$
-
-				The value \(g_j\) is simply the sum of all negative feedback synapses.
-				The intention behind this objective function is to measure a neurons ability to overcome the inhibiting
-				input signals of other neurons.
+				The activation functions are chosen in a way that they clearly distinguish between active
+				and inactive neurons. Only activated neurons are processed and are thus visible to other neurons. These
+				activations are expressed not only by a real valued number but also by an activation object.
 			</p>
 
-            <h2>Synapses</h2>
-            <p>
-                Synapses in Aika consist not just of a weight value but also properties that specify relations between
-				synapses. These relations can either be used to imply an constrained on the matching input text ranges or
-				the dependency structure of the input activations. Biological neurons seem to achieve such a relation
-				matching through the timing of the firing patterns of their action potentials. <br/>
-				The complete list of synapse properties looks as follows:
-            </p>
+			<h2>Neuron Types</h2>
+			<p>
+				By choosing the weights and the threshold
+				(i.e. the bias) accordingly, neurons can take on the characteristics of boolean logic gates such as an
+				and-gate or an or-gate.
 
-                <div class="prettyprint-code">
-                    <pre class="prettyprint">
-				        <code class="language-java">
-                new Synapse.Builder()
-                        .setSynapseId(0)
-                        .setNeuron(inputNeuronA)
-                        .setWeight(10.0)
-                        .setRecurrent(false)
-                new Synapse.Builder()
-                        .setSynapseId(1)
-                        .setNeuron(inputNeuronB)
-                        .setWeight(10.0)
-                        .setRecurrent(false)
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(1)
-                        .setRelation(new Equals(END, BEGIN)),
-                new Relation.Builder()
-                        .setFrom(0)
-                        .setTo(OUTPUT)
-                        .setRelation(new Equals(BEGIN, BEGIN)),
-                new Relation.Builder()
-                        .setFrom(1)
-                        .setTo(OUTPUT)
-                        .setRelation(new Equals(END, END))
-                        </code>
-			        </pre>
-                </div>
-            <p>
-                Unlike other ANNs, Aika allows to specify a bias value per synapse. These bias values are simply summed
-                up and added to the neurons bias value. <br/>
-                The property recurrent states whether this synapse is a feedback loop or not. Depending on the weight
-                of this synapse such a feedback loop might either be positive or negative. This property is an important
-                indicator for the interpretation search. <br/>
-                Range relations define a relation either to another synapse or to the output range of this activation.
-				The range relations consist of four comparison operations between the between the begin and end of the
-				current synapses input activation and the linked synapses input activation.
-            </p>
-
-            <div style="text-align:center; width:100%">
-                <img src="images/range-match.svg" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
-            </div>
-            <p>
-                The next property is the range output which consists of two boolean values. If these are set to true,
-                the range begin and the range end are propagated to the output activation. <br/>
-
-				The last two properties are used to establish a dependency structure among activations. The instance
-				relation here defines whether this synapse and the linked synapse have a common ancestor or are
-				depending on each other in either direction. During the evaluation of this relation only those synapses
-				are followed which are marked with the identity flag.
-
-				Depending on the weight of the synapse and the bias sum of the outgoing neuron, Aika distinguishes two
-				types synapses: conjunctive synapses and disjunctive synapses. Conjunctive synapses are stored in the
-				output neuron as inputs and disjunctive synapses are stored in the input neuron as outputs. The reason
-				for this is that disjunctive neurons like the inhibitory neuron or the category neurons may have a huge
-				number of input synapses, which makes it expensive to load them from disk. By storing those synapses on
-				the input neuron side, only those synapses need to stay in memory, that are needed by an currently
-				activated input neuron.
-            </p>
+				Also, neurons need to be able to act more like formal logic. Sure their ability to integrate weak input signals is important, this is something that classical AI has great difficulties with, but there is also the need for strong conjunctive or disjunctive behavior. Surely, these things can be achieved by setting the synapse weights and the bias value appropriately, but still, these neurons are sufficiently different to justify the introduction of different types of neurons for these. I believe that the human brain does something very similar with its excitatory pyramidal neurons and its inhibitory stellate neurons.
+				Now to the part where I see the great similarity to your capsule networks. Basically, there are three types of neurons, pattern neurons, pattern part neurons, and inhibitory neurons. The pattern neurons and the pattern part neurons are both conjunctive in nature and the inhibitory neuron is disjunctive. The pattern part neurons kind of describe which lower-level patterns are part of the current pattern. Each pattern part neuron receives a positive feedback synapse from the pattern to which it belongs to. The pattern neuron on the other hand is only activated if the pattern as a whole is detected. For example, if we consider a word consisting of individual letters as lower-level patterns, then we have a corresponding pattern part neuron for each letter whose meaning is that this letter occurred as part of this word. The pattern part neurons also receive negative feedback synapses from the inhibitory neurons such that competing patterns are able to suppress each other.
+			</p>
+			<h2>Network Topology</h2>
+			<p>
+			<h2>Positive and Negative Feedback Loops</h2>
+			<p>
+				Another crucial insight is the need for positive and negative feedback loops. These are synapses that ignore the causal sequence of fired activations. Especially the negative feedback synapses are interesting because they require the introduction of mutually shielded branches for the following activations. They create a kind of independent interpretation of parts of the input data set and only later on its decision which of these interpretations gets selected. It's very similar to what a parse tree does only that a parse tree is limited to syntactic information only. Another way to relate it to classical logic is to consider it as non-monotonic inference, which in classical AI could not be solved properly since classical logic is missing the weak influences that neural networks are able to capture.
+			</p>
 
 			<h2>Neuron Types</h2>
 			<p>

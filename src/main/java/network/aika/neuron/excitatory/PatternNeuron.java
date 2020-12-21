@@ -19,45 +19,76 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Sign;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
+import network.aika.neuron.activation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-import static network.aika.neuron.activation.Direction.OUTPUT;
+import static network.aika.neuron.Sign.POS;
+import static network.aika.neuron.activation.Visitor.Transition.LINK;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PatternNeuron extends ExcitatoryNeuron {
+public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
+
     private static final Logger log = LoggerFactory.getLogger(PatternNeuron.class);
 
     public static byte type;
 
     private String tokenLabel;
 
+    public PatternNeuron() {
+        super();
+    }
+
     public PatternNeuron(NeuronProvider p) {
         super(p);
     }
 
-    public PatternNeuron(Model model, String tokenLabel, String descriptionLabel, Boolean isInputNeuron) {
-        super(model, descriptionLabel, isInputNeuron);
-        this.tokenLabel = tokenLabel;
+    private PatternNeuron(Model model) {
+        super(model);
     }
 
-    public String getTokenLabel() {
-        return tokenLabel;
+
+    @Override
+    public boolean checkTemplate(Activation act) {
+        Neuron n = act.getNeuron();
+
+        if(n.getSurprisal(POS) < 1.4) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean checkInduction(Activation act) {
+        return true;
+    }
+
+    @Override
+    public PatternNeuron instantiateTemplate() {
+        PatternNeuron n = new PatternNeuron(getModel());
+        n.getTemplates().add(this);
+        n.getTemplates().addAll(getTemplates());
+        return n;
+    }
+
+    @Override
+    public void transition(Visitor v, Activation act, boolean create) {
+        if (v.downUpDir == OUTPUT) {
+            return;
+        }
+        v = v.prepareNextStep(act, v.getScopes(), LINK);
+        v.downUpDir = OUTPUT;
+
+        act.followLinks(v);
     }
 
     @Override
@@ -65,27 +96,12 @@ public class PatternNeuron extends ExcitatoryNeuron {
         return type;
     }
 
-    public double getCost(Sign s) {
-        return Math.log(s.getP(this));
+    public void setTokenLabel(String tokenLabel) {
+        this.tokenLabel = tokenLabel;
     }
 
-    public double propagateRangeCoverage(Link l) {
-        return l.getInput().getRangeCoverage();
-    }
-
-    public void induceNeuron(Activation act) {
-        super.induceNeuron(act);
-
-        if(getStandardDeviation() > 0.08) {
-            return;
-        }
-
-        if(!act.getLinks(OUTPUT)
-                .anyMatch(l -> l.getSynapse().getOutput() instanceof PatternPartNeuron)) {
-            act.connectInducedNeuron(
-                    new PatternPartNeuron(getModel(), "PP-" + act.getDescriptionLabel(), false)
-            );
-        }
+    public String getTokenLabel() {
+        return tokenLabel;
     }
 
     @Override

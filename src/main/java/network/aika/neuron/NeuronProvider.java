@@ -30,8 +30,8 @@ import java.util.zip.GZIPOutputStream;
  */
 public class NeuronProvider implements Comparable<NeuronProvider> {
 
-    public static final NeuronProvider MIN_NEURON = new NeuronProvider(null, Long.MIN_VALUE);
-    public static final NeuronProvider MAX_NEURON = new NeuronProvider(null, Long.MAX_VALUE);
+    public static final NeuronProvider MIN_NEURON = new NeuronProvider(Long.MIN_VALUE);
+    public static final NeuronProvider MAX_NEURON = new NeuronProvider(Long.MAX_VALUE);
 
     public enum SuspensionMode {
         SAVE,
@@ -43,33 +43,46 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
 
     private volatile Neuron neuron;
 
+    public NeuronProvider(long id) {
+        this.id = id;
+    }
+
     public NeuronProvider(Model model, long id) {
+        assert model != null;
+
         this.model = model;
         this.id = id;
 
-        if(model != null) {
-            model.registerProvider(this);
-        }
+        model.registerWeakReference(this);
     }
 
     public NeuronProvider(Model model, Neuron n) {
+        assert model != null && n != null;
+
         this.model = model;
         this.neuron = n;
 
         id = model.createNeuronId();
-        model.registerProvider(this);
+        model.registerWeakReference(this);
+        model.register(this);
     }
 
     public Neuron getNeuron() {
         if (neuron == null) {
             reactivate();
         }
-        neuron.retrievalCount = model.getCurrentRetrievalCount();
+        if(model != null) {
+            neuron.retrievalCount = model.getCurrentRetrievalCount();
+        }
         return neuron;
     }
 
-    public String getDescriptionLabel() {
-        return getNeuron().getDescriptionLabel();
+    public void setNeuron(Neuron<?> n) {
+        this.neuron = n;
+    }
+
+    public String getLabel() {
+        return getNeuron().getLabel();
     }
 
     public Long getId() {
@@ -92,6 +105,8 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
         if(neuron == null) return;
         assert model.getSuspensionHook() != null;
         neuron.suspend();
+
+        model.unregister(this);
 
         if(sm == SuspensionMode.SAVE) {
             save();
@@ -125,12 +140,13 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
         try (
                 GZIPInputStream gzipis = new GZIPInputStream(bais);
                 DataInputStream dis = new DataInputStream(gzipis);) {
-            getModel().readNeuron(dis, this);
+            neuron = getModel().readNeuron(dis, this);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
         neuron.reactivate();
+        model.register(this);
 
         model.incrementRetrievalCounter();
     }
@@ -153,6 +169,6 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
         if(this == MIN_NEURON) return "MIN_NEURON";
         if(this == MAX_NEURON) return "MAX_NEURON";
 
-        return "p(" + id + ":" + (neuron != null ? neuron.toString() : "SUSPENDED") + ")";
+        return "p(" + (neuron != null ? neuron : id + ":" + "SUSPENDED") + ")";
     }
 }
