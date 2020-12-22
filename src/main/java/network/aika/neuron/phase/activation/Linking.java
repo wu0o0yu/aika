@@ -27,7 +27,6 @@ import network.aika.neuron.phase.link.LinkPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 
@@ -58,11 +57,20 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
         boolean hasChanged = act.updateValue();
 
         if(hasChanged) {
-            Visitor v = new Visitor(this, act, OUTPUT, Scope.SAME, Scope.INPUT);
+            Visitor v = new Visitor(
+                    this,
+                    act,
+                    OUTPUT,
+                    Scope.SAME,
+                    Scope.INPUT
+            );
 
-            act.getNeuron().transition(v, act, false);
+//            act.getNeuron().transition(v, act, false);
+            act.followLinks(v);
 
-            propagate(act, v);
+            act.getModel().linkInputRelations(act, OUTPUT);
+
+            act.propagate(v);
         }
     }
 
@@ -94,12 +102,6 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
         }
 
         s.transition(v, act, v.origin, true);
-    }
-
-    @Override
-    public void propagate(Activation act, Visitor v) {
-        act.getModel().linkInputRelations(act, OUTPUT);
-        act.propagate(v);
     }
 
     @Override
