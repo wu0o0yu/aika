@@ -52,16 +52,26 @@ public class QueueState<P extends Phase> {
             return;
 
         P nextPhase = pendingPhases.first();
-        Thought t = entryToQueue.getThought();
-        if(queuedEntry != null) {
-            if(queuedEntry.getPhase() == nextPhase)
-                return;
 
-            t.removeActivationFromQueue(queuedEntry);
-        }
+        removeFromQueue();
+        addToQueue(nextPhase);
+    }
+
+    public void addToQueue(P nextPhase) {
         entryToQueue.setPhase(nextPhase);
-        t.addToQueue(entryToQueue);
+        getThought().addToQueue(entryToQueue);
         queuedEntry = entryToQueue;
+    }
+
+    public void removeFromQueue() {
+        if(queuedEntry != null) {
+            getThought().removeActivationFromQueue(queuedEntry);
+            queuedEntry = null;
+        }
+    }
+
+    public Thought getThought() {
+        return entryToQueue.getThought();
     }
 
     public void removePendingPhase() {
