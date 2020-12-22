@@ -18,12 +18,14 @@ package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.phase.RankedImpl;
+import network.aika.neuron.phase.VisitorPhase;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class FinalLinking extends Linking {
+public class FinalLinking extends RankedImpl implements ActivationPhase {
 
     public FinalLinking(int rank) {
         super(rank);
@@ -34,9 +36,12 @@ public class FinalLinking extends Linking {
     }
 
     @Override
-    public void propagate(Activation act, Visitor v) {
-        if(act.isActive()) {
-            act.updateOutgoingLinks();
-        }
+    public void process(Activation act) {
+        act.updateOutgoingLinks();
+    }
+
+    @Override
+    public int compare(Activation act1, Activation act2) {
+        return act1.getFired().compareTo(act2.getFired());
     }
 }

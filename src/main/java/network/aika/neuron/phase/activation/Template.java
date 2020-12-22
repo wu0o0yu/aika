@@ -107,8 +107,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
                 );
     }
 
-    @Override
-    public void propagate(Activation act, Visitor v) {
+    private void propagate(Activation act, Visitor v) {
         if (act.gradientSumIsZero())
             return;
 

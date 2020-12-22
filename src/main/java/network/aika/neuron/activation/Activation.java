@@ -307,8 +307,6 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void propagate(Visitor v) {
-        followLinks(v);
-
         getNeuron().getOutputSynapses()
                 .filter(s -> !outputLinkExists(s))
                 .forEach(s ->
@@ -413,8 +411,12 @@ public class Activation extends QueueEntry<ActivationPhase> {
         double finalValue = computeValue(true);
 
         if (Math.abs(finalValue - initialValue) > TOLERANCE) {
-            getModifiable(null)
-                    .addToQueue(FINAL_LINKING);
+            boolean hasChanged = updateValue();
+
+            if (hasChanged) {
+                getModifiable(null)
+                        .addToQueue(FINAL_LINKING);
+            }
         }
     }
 

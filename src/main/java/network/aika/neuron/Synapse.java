@@ -93,6 +93,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 ACT
         );
 
+        if(nv == null)
+            return;
+
         nv.incrementPathLength();
 
         follow(fromAct, toAct, nv, create);

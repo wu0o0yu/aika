@@ -65,6 +65,9 @@ public class Visitor {
     }
 
     public Visitor prepareNextStep(Activation current, List<Scope> scopes, Transition t) {
+        if(scopes.isEmpty())
+            return null;
+
         Visitor nv = new Visitor();
         nv.phase = phase;
         nv.current = current;

@@ -10,8 +10,6 @@ public interface VisitorPhase {
 
     void tryToLink(Activation act, Visitor v);
 
-    void propagate(Activation act, Visitor v);
-
     ActivationPhase[] getNextActivationPhases(Config c);
 
     LinkPhase[] getNextLinkPhases(Config c);
