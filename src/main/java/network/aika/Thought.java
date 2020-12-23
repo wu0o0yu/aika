@@ -51,7 +51,8 @@ public abstract class Thought {
     }
 
     public void removeActivationFromQueue(QueueEntry qe) {
-        queue.remove(qe);
+        boolean isRemoved = queue.remove(qe);
+        assert isRemoved;
     }
 
     public abstract void linkInputRelations(Activation act);

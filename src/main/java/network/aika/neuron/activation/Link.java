@@ -56,7 +56,6 @@ public class Link extends QueueEntry<LinkPhase> {
         this.input = input;
         this.output = output;
         this.isSelfRef = isSelfRef;
-        this.queueState = new QueueState();
     }
 
     public void count() {
