@@ -60,12 +60,9 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
             Visitor v = new Visitor(
                     this,
                     act,
-                    OUTPUT,
-                    Scope.SAME,
-                    Scope.INPUT
+                    OUTPUT
             );
 
-//            act.getNeuron().transition(v, act, false);
             act.followLinks(v);
 
             act.getModel().linkInputRelations(act, OUTPUT);

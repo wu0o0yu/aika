@@ -21,8 +21,6 @@ import network.aika.neuron.phase.VisitorPhase;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Visitor.Transition.LINK;
 import static network.aika.neuron.activation.direction.Direction.*;
@@ -46,22 +44,22 @@ public class Visitor {
     public Direction downUpDir = INPUT;
     public Direction startDir;
 
-//    public boolean related;
     private List<Scope> scopes;
-//    public boolean samePattern;
 
     public int downSteps = 0;
     public int upSteps = 0;
 
     private Visitor() {}
 
-    public Visitor(VisitorPhase vp, Activation origin, Direction startDir, Scope... s) {
+    public Visitor(VisitorPhase vp, Activation origin, Direction startDir) {
         this.phase = vp;
         this.origin = origin;
         this.current = origin;
         this.transition = LINK;
         this.startDir = startDir;
-        this.scopes = Arrays.asList(s);
+        this.scopes = Arrays.asList(
+                origin.getNeuron().getInitialScopes(startDir)
+        );
     }
 
     public Visitor prepareNextStep(Activation current, List<Scope> scopes, Transition t) {
@@ -76,11 +74,9 @@ public class Visitor {
         nv.origin = origin;
         nv.downUpDir = downUpDir;
         nv.startDir = startDir;
-//        nv.related = related;
         nv.upSteps = upSteps;
         nv.downSteps = downSteps;
         nv.scopes = scopes;
-//        nv.samePattern = samePattern;
         return nv;
     }
 
@@ -111,7 +107,7 @@ public class Visitor {
 
     public void tryToLink(Activation act) {
         if (downUpDir != OUTPUT || numSteps() < 1) return;
-        if (scopes.contains(Scope.RELATED_INPUT)) return;
+        if (scopes.contains(Scope.PP_RELATED_INPUT)) return;
         if (startDir == INPUT && !act.isActive()) return; // <--
         if (act == origin || act.isConflicting()) return; // <--
 
@@ -131,10 +127,7 @@ public class Visitor {
         sb.append("DownUp:" + downUpDir + ", ");
         sb.append("StartDir:" + startDir + ", ");
 
-//        sb.append("Related:" + related + ", ");
         sb.append("Scopes:" + scopes + ", ");
-//        sb.append("SamePattern:" + samePattern + ", ");
-
         sb.append("DownSteps:" + downSteps + ", ");
         sb.append("UpSteps:" + upSteps + "");
 

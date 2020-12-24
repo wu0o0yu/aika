@@ -102,6 +102,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract boolean checkInduction(Activation act);
 
+    public abstract Scope[] getInitialScopes(Direction dir);
+
 
     public Synapse getOutputSynapse(NeuronProvider n) {
         lock.acquireReadLock();

@@ -12,17 +12,11 @@ import java.util.function.Supplier;
 public abstract class QueueEntry<P extends Phase> implements Comparable<QueueEntry<P>> {
 
     protected P phase;
-//    protected QueueState<P> queueState;
-
 
     private TreeSet<P> pendingPhases = new TreeSet<>(Comparator.comparing(p -> p.getRank()));
     private boolean isQueued;
     private boolean marked;
-/*
-    public QueueState(P... initialPhases) {
-        pendingPhases.addAll(Arrays.asList(initialPhases));
-    }
-*/
+
     public void initPhases(P... initialPhases) {
         pendingPhases.addAll(Arrays.asList(initialPhases));
     }
@@ -42,8 +36,10 @@ public abstract class QueueEntry<P extends Phase> implements Comparable<QueueEnt
     }
 
     public void queueNextPhase(QueueEntry<P> e) {
-        if(pendingPhases.isEmpty())
+        if(pendingPhases.isEmpty()) {
+            e.setPhase(null);
             return;
+        }
 
         updateQueueEntry(() -> {
             e.setPhase(pendingPhases.first());

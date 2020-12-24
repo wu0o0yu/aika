@@ -25,12 +25,12 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Scope;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.stream.Collectors;
 
-import static network.aika.neuron.activation.Visitor.Transition.ACT;
-import static network.aika.neuron.activation.Scope.SAME;
+import static network.aika.neuron.activation.Scope.PP_SAME;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
  *
@@ -53,7 +53,7 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
 
     @Override
     public boolean checkTemplate(Activation iAct, Activation oAct, Visitor v) {
-        return v.getScopes().contains(SAME);
+        return v.getScopes().contains(PP_SAME);
     }
 
     @Override
@@ -70,23 +70,19 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
         return new PrimaryInhibitorySynapse(input, output, this);
     }
 
-    /*
-    @Override
-    public void transition(Visitor v, Activation fromAct, Activation toAct, boolean create) {
-        Visitor nv = v.prepareNextStep(toAct, ACT);
-        nv.incrementPathLength();
-
-        nv.scopes = v.scopes
-                .stream()
-                .map(s -> transition(s, v.downUpDir))
-                .collect(Collectors.toList());
-
-        follow(fromAct, toAct, nv, create);
-    }
-*/
-
     @Override
     public Collection<Scope> transition(Scope s, Direction dir) {
-        return Collections.singleton(s);
+        if (dir == INPUT) {
+            switch (s) {
+                case I_SAME:
+                    return Collections.singleton(Scope.I_INPUT);
+            }
+        } else {
+            switch (s) {
+                case I_INPUT:
+                    return Collections.singleton(Scope.I_SAME);
+            }
+        }
+        return Collections.emptyList();
     }
 }

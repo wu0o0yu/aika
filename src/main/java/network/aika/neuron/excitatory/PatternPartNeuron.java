@@ -19,6 +19,7 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.direction.Direction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +48,15 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
 
     @Override
+    public Scope[] getInitialScopes(Direction dir) {
+        if(dir == Direction.INPUT) {
+            return new Scope[]{ Scope.PP_SAME };
+        } else {
+            return new Scope[]{ Scope.PP_SAME, Scope.PP_INPUT };
+        }
+    }
+
+    @Override
     public boolean checkTemplate(Activation act) {
         Neuron n = act.getNeuron();
 
@@ -72,15 +82,6 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public void transition(Visitor v, Activation act, boolean create) {
-/*        if(v.samePattern) {
-            if(v.downUpDir == OUTPUT) {
-                return;
-            }
-
-            v = v.prepareNextStep(act, LINK);
-            v.downUpDir = OUTPUT;
-        }
-*/
         act.followLinks(v);
     }
 
@@ -88,5 +89,4 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     public byte getType() {
         return type;
     }
-
 }

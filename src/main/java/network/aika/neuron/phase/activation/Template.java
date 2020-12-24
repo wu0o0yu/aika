@@ -20,7 +20,6 @@ import network.aika.Config;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Scope;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.RankedImpl;
@@ -52,8 +51,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
 //                TEMPLATE,
                 INDUCTION,
                 PROPAGATE_GRADIENT,
-                UPDATE_SYNAPSE_INPUT_LINKS,
-                FINAL
+                UPDATE_SYNAPSE_INPUT_LINKS
         };
     }
 
@@ -70,11 +68,19 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     @Override
     public void process(Activation act) {
         act.followLinks( // Sollte durch die Link phase erfolgen
-                new Visitor(this, act, direction, Scope.SAME, Scope.INPUT)
+                new Visitor(
+                        this,
+                        act,
+                        direction
+                )
         );
 
         propagate(act,
-                new Visitor(this, act, direction, Scope.SAME, Scope.INPUT)
+                new Visitor(
+                        this,
+                        act,
+                        direction
+                )
         );
     }
 

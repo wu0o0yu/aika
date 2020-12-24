@@ -21,11 +21,9 @@ import network.aika.Model;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.activation.Fired;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.direction.Direction;
 
 /**
  *
@@ -56,6 +54,15 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     @Override
     public boolean checkInduction(Activation act) {
         return true;
+    }
+
+    @Override
+    public Scope[] getInitialScopes(Direction dir) {
+        if(dir == Direction.INPUT) {
+            return new Scope[]{ Scope.I_SAME };
+        } else {
+            return new Scope[]{ Scope.I_SAME, Scope.PP_INPUT };
+        }
     }
 
     @Override

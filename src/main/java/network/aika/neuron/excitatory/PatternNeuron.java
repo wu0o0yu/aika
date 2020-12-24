@@ -20,6 +20,7 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.direction.Direction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +56,15 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         super(model);
     }
 
+
+    @Override
+    public Scope[] getInitialScopes(Direction dir) {
+        if(dir == Direction.INPUT) {
+            return new Scope[]{ Scope.P_SAME };
+        } else {
+            return new Scope[]{ Scope.PP_SAME, Scope.PP_INPUT, Scope.I_INPUT };
+        }
+    }
 
     @Override
     public boolean checkTemplate(Activation act) {
