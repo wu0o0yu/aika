@@ -150,6 +150,8 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
             switch (s) {
                 case PP_SAME:
                     return Collections.singleton(Scope.PP_RELATED_SAME);
+                case PP_INPUT:
+                    return Collections.singleton(Scope.PP_INPUT);
                 case P_SAME:
                     return Collections.singleton(Scope.P_SAME);
             }
