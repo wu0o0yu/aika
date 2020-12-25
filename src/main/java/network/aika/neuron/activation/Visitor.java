@@ -30,8 +30,8 @@ import static network.aika.neuron.activation.direction.Direction.*;
  * @author Lukas Molzberger
  */
 public class Visitor {
-    public Activation origin;
-    public Activation current; // Just debug code
+    public Visitor origin;
+    public Activation act; // Just debug code
     public Transition transition; // Just debug code
     public Visitor previousStep;
     public VisitorPhase phase;
@@ -51,14 +51,14 @@ public class Visitor {
 
     private Visitor() {}
 
-    public Visitor(VisitorPhase vp, Activation origin, Direction startDir) {
+    public Visitor(VisitorPhase vp, Activation act, Direction startDir) {
         this.phase = vp;
-        this.origin = origin;
-        this.current = origin;
+        this.origin = this;
+        this.act = act;
         this.transition = LINK;
         this.startDir = startDir;
         this.scopes = Arrays.asList(
-                origin.getNeuron().getInitialScopes(startDir)
+                act.getNeuron().getInitialScopes(startDir)
         );
     }
 
@@ -68,7 +68,7 @@ public class Visitor {
 
         Visitor nv = new Visitor();
         nv.phase = phase;
-        nv.current = current;
+        nv.act = current;
         nv.transition = t;
         nv.previousStep = this;
         nv.origin = origin;
@@ -89,12 +89,24 @@ public class Visitor {
         return phase;
     }
 
+    public Activation getOriginAct() {
+        return origin.act;
+    }
+
     public void incrementPathLength() {
         if (downUpDir == INPUT) {
             this.downSteps++;
         } else {
             this.upSteps++;
         }
+    }
+
+    public boolean isClosedCycle() {
+        return act == origin.act &&
+                scopes.stream()
+                        .anyMatch(s ->
+                                origin.scopes.contains(s)
+                        );
     }
 
     public boolean getSelfRef() {
@@ -109,7 +121,7 @@ public class Visitor {
         if (downUpDir != OUTPUT || numSteps() < 1) return;
         if (scopes.contains(Scope.PP_RELATED_INPUT)) return;
         if (startDir == INPUT && !act.isActive()) return; // <--
-        if (act == origin || act.isConflicting()) return; // <--
+        if (act == origin.act || act.isConflicting()) return; // <--
 
         phase.tryToLink(act, this);
     }
@@ -121,8 +133,8 @@ public class Visitor {
             sb.append(previousStep + "\n");
         }
 
-        sb.append("Origin:" + origin.getShortString() + ", ");
-        sb.append("Current:" + (current != null ? current.getShortString() : "X") + ", ");
+        sb.append("Origin:" + origin.act.getShortString() + ", ");
+        sb.append("Current:" + (act != null ? act.getShortString() : "X") + ", ");
 
         sb.append("DownUp:" + downUpDir + ", ");
         sb.append("StartDir:" + startDir + ", ");

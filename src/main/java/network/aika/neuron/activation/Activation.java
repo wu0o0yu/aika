@@ -27,6 +27,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.activation.ActivationPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 import network.aika.neuron.phase.link.PropagateGradient;
@@ -317,13 +318,6 @@ public class Activation extends QueueEntry<ActivationPhase> {
         lastRound = null;
     }
 
-    public void propagate(Visitor v) {
-        getNeuron().getOutputSynapses()
-                .filter(s -> !outputLinkExists(s))
-                .forEach(s ->
-                        s.transition(v, this, null, true)
-                );
-    }
 
     public static Activation createActivation(Thought t, Neuron n) {
         Activation act = new Activation(
@@ -333,6 +327,12 @@ public class Activation extends QueueEntry<ActivationPhase> {
         );
 
         return act;
+    }
+
+    public void addNextActivationPhases(VisitorPhase p) {
+        addToQueue(
+                p.getNextActivationPhases(getConfig())
+        );
     }
 
     public void followLinks(Visitor v) {
@@ -345,13 +345,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
                 .filter(l -> l.follow(dir))
                 .collect(Collectors.toList()).stream()
                 .forEach(l ->
-                        l.getSynapse()
-                                .transition(
-                                        v,
-                                        this,
-                                        dir.getActivation(l),
-                                        false
-                                )
+                        l.follow(this, v)
                 );
         setMarked(false);
     }

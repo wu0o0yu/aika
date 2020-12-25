@@ -90,11 +90,12 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     }
 
     @Override
-    public void tryToLink(Activation act, Visitor v) {
-        Activation iAct = v.startDir.getInput(v.origin, act);
-        Activation oAct = v.startDir.getOutput(v.origin, act);
+    public void tryToLink(Activation fromAct, Visitor v) {
+        Direction dir = v.startDir;
+        Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());
+        Activation oAct = dir.getCycleOutput(fromAct, v.getOriginAct());
 
-        Neuron n = oAct.getNeuron();
+        Neuron<?> n = fromAct.getNeuron();
 
         if(!iAct.isActive() || n.isInputNeuron())
             return;
@@ -109,7 +110,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
                 .filter(ts -> ts.checkTemplate(iAct, oAct, v))
                 .filter(s -> iAct.getNeuron().getTemplates().contains(s.getInput()))
                 .forEach(s ->
-                        s.transition(v, act, v.origin, true)
+                        s.closeCycle(fromAct, v, iAct, oAct)
                 );
     }
 
@@ -135,7 +136,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
                 );
 
         templateSynapses.forEach(s ->
-                s.transition(v, act, null, true)
+                s.propagate(act, v)
         );
     }
 

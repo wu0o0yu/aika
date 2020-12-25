@@ -45,7 +45,6 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         super(model);
     }
 
-
     @Override
     public boolean checkTemplate(Activation act) {
         return false;
@@ -81,15 +80,6 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     @Override
     public byte getType() {
         return type;
-    }
-
-    @Override
-    public void transition(Visitor v, Activation act, boolean create) {
-        act.followLinks(v);
-    }
-
-    public boolean isInitialized() {
-        return false;
     }
 
     @Override

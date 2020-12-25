@@ -81,11 +81,6 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     @Override
-    public void transition(Visitor v, Activation act, boolean create) {
-        act.followLinks(v);
-    }
-
-    @Override
     public byte getType() {
         return type;
     }

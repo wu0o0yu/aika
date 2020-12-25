@@ -94,7 +94,9 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract Fired incrementFired(Fired f);
 
-    public abstract void transition(Visitor v, Activation act, boolean create);
+    public void transition(Visitor v, Activation act) {
+        act.followLinks(v);
+    }
 
     public abstract byte getType();
 

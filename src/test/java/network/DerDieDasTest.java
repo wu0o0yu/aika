@@ -42,7 +42,7 @@ public class DerDieDasTest {
             char c = token.charAt(i);
 
             PatternNeuron inN = m.lookupToken(ref, "" + c);
-            PatternPartNeuron ppN = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
+            PatternPartNeuron ppN = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
             ppN.setLabel("TP-" + c + "-(" + token + ")");
 
             initPP(ref, c, inN, ppN, prevPPN, out);

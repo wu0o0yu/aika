@@ -48,11 +48,11 @@ public class MutualExclusionTest {
         in.setTokenLabel("I");
         in.setInputNeuron(true);
         in.setLabel("IN");
-        PatternPartNeuron na = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
+        PatternPartNeuron na = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
         na.setLabel("A");
-        PatternPartNeuron nb = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
+        PatternPartNeuron nb = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
         nb.setLabel("B");
-        PatternPartNeuron nc = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
+        PatternPartNeuron nc = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
         nc.setLabel("C");
         InhibitoryNeuron inhib = t.INHIBITORY_TEMPLATE.instantiateTemplate();
         inhib.setLabel("I");
@@ -167,9 +167,9 @@ public class MutualExclusionTest {
         in.setTokenLabel("I");
         in.setInputNeuron(true);
         in.setLabel("IN");
-        PatternPartNeuron na = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
+        PatternPartNeuron na = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
         na.setLabel("A");
-        PatternPartNeuron nb = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
+        PatternPartNeuron nb = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
         nb.setLabel("B");
         InhibitoryNeuron inhib = t.INHIBITORY_TEMPLATE.instantiateTemplate();
         inhib.setLabel("I");

@@ -44,7 +44,7 @@ public class PropagateTest {
         in.setTokenLabel("A");
         in.setInputNeuron(true);
         in.setLabel("IN");
-        PatternPartNeuron out = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
+        PatternPartNeuron out = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
         out.setLabel("OUT");
 
         PatternPartSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, out);

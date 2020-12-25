@@ -62,17 +62,26 @@ public class Link extends QueueEntry<LinkPhase> {
         }
     }
 
-    public void propagate(VisitorPhase p) {
+    public void follow(VisitorPhase p) {
         output.setMarked(true);
 
-        synapse.transition(
+        Visitor nv = synapse.transition(
                 new Visitor(p, output, INPUT),
-                output,
-                input,
-                false
+                output
         );
+        synapse.follow(input, nv);
 
         output.setMarked(false);
+    }
+
+    public void follow(Activation fromAct, Visitor v) {
+        Visitor nv = synapse.transition(v, fromAct);
+        if(nv != null) {
+            synapse.follow(
+                    v.downUpDir.getActivation(this),
+                    nv
+            );
+        }
     }
 
     public void computeSelfGradient() {
@@ -236,6 +245,13 @@ public class Link extends QueueEntry<LinkPhase> {
     public void unlink() {
         OutputKey ok = output.getOutputKey();
         input.outputLinks.remove(ok, this);
+    }
+
+
+    public void addNextLinkPhases(VisitorPhase p) {
+        addToQueue(
+                p.getNextLinkPhases(output.getConfig())
+        );
     }
 
     @Override

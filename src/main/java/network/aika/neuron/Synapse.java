@@ -81,9 +81,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Synapse instantiateTemplate(I input, O output);
 
- //   public abstract void transition(Visitor v, Activation currentAct, Activation nextAct, boolean create);
-
-    public void transition(Visitor v, Activation fromAct, Activation toAct, boolean create) {
+    public Visitor transition(Visitor v, Activation toAct) {
         Visitor nv = v.prepareNextStep(
                 toAct,
                 v.getScopes()
@@ -93,17 +91,15 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 ACT
         );
 
-        if(nv == null)
-            return;
+        if(nv != null)
+            nv.incrementPathLength();
 
-        nv.incrementPathLength();
-
-        follow(fromAct, toAct, nv, create);
+        return nv;
     }
 
     public abstract Collection<Scope> transition(Scope s, Direction dir);
 
-    protected abstract boolean checkOnCreate(Activation fromAct, Activation toAct, Visitor v);
+    protected abstract boolean checkOnCreate(Activation iAct, Activation oAct, Visitor v);
 
     public abstract boolean checkTemplate(Activation iAct, Activation oAct, Visitor v);
 
@@ -125,55 +121,70 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Activation getOutputActivationToLink(Activation oAct, Visitor v);
 
-    public void follow(Activation fromAct, Activation toAct, Visitor v, boolean create) {
-        if(create) {
-            createLinkAndActivation(fromAct, toAct, v);
-        } else {
-            toAct.getNeuron()
-                    .transition(v, toAct, false);
+    public void follow(Activation toAct, Visitor v) {
+        toAct.getNeuron()
+                .transition(v, toAct);
+    }
+
+    public void propagate(Activation fromAct, Visitor v) {
+        Visitor nv = transition(v, fromAct);
+        if(nv == null)
+            return;
+
+        Direction dir = nv.startDir;
+        Activation toAct = createActivation(nv, fromAct);
+
+        createLink(
+                dir.getPropagateInput(fromAct, toAct),
+                dir.getPropagateOutput(fromAct, toAct),
+                nv
+        );
+    }
+
+    public Activation createActivation(Visitor v, Activation fromAct) {
+        Activation toAct = Activation.createActivation(
+                fromAct.getThought(),
+                v.startDir.getNeuron(this)
+        );
+
+        toAct.addNextActivationPhases(v.getPhase());
+        return toAct;
+    }
+
+    public void closeCycle(Activation fromAct, Visitor v, Activation iAct, Activation oAct) {
+        Visitor nv = transition(v, fromAct);
+        if (checkLinkInvalidOrExists(v, oAct)) {
+            createLink(iAct, oAct, nv);
         }
     }
 
-    public void createLinkAndActivation(Activation fromAct, Activation toAct, Visitor v) {
-        if(!checkOnCreate(fromAct, toAct, v)) {
-            return;
-        }
+    public boolean checkLinkInvalidOrExists(Visitor v, Activation oAct) {
+        if(!v.isClosedCycle())
+            return false;
 
-        Thought t = fromAct.getThought();
-        Config c = fromAct.getConfig();
-
-        // TODO: Check direction
-        if (toAct == null) {
-            toAct = Activation.createActivation(
-                    t,
-                    v.startDir.getNeuron(this)
-            );
-
-            toAct.addToQueue(
-                    v.getPhase().getNextActivationPhases(c)
-            );
-        } else {
-            Link ol = v.startDir
-                    .getOutput(fromAct, toAct)
-                    .getInputLink(this);
-            if (ol != null) {
+        Link ol = oAct.getInputLink(this);
+        if (ol != null) {
 //                    toAct = oAct.cloneToReplaceLink(s);
-                log.warn("Link already exists!  " + t);
-                return;
-            }
+            log.warn("Link already exists! ");
+            return false;
+        }
+        return true;
+    }
+
+    public void createLink(Activation iAct, Activation oAct, Visitor v) {
+        if(!checkOnCreate(iAct, oAct, v)) {
+            return;
         }
 
         Link nl = Link.link(
                 this,
-                v.startDir.getInput(fromAct, toAct),
-                v.startDir.getOutput(fromAct, toAct),
+                iAct,
+                oAct,
                 v.getSelfRef()
         );
 
         if (nl.getSynapse().getWeight() > 0.0 || nl.getSynapse().isTemplate()) {
-            nl.addToQueue(
-                    v.getPhase().getNextLinkPhases(c)
-            );
+            nl.addNextLinkPhases(v.getPhase());
         }
     }
 

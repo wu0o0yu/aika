@@ -33,7 +33,7 @@ public class Linking extends RankedImpl implements LinkPhase {
 
     @Override
     public void process(Link l) {
-        l.propagate(INITIAL_LINKING);
+        l.follow(INITIAL_LINKING);
     }
 
     @Override

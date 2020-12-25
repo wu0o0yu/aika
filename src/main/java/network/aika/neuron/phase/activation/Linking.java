@@ -19,8 +19,8 @@ package network.aika.neuron.phase.activation;
 import network.aika.Config;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Scope;
 import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
@@ -67,7 +67,7 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
 
             act.getModel().linkInputRelations(act, OUTPUT);
 
-            act.propagate(v);
+            propagate(act, v);
         }
     }
 
@@ -76,11 +76,12 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
     }
 
     @Override
-    public void tryToLink(Activation act, Visitor v) {
-        Activation iAct = v.startDir.getInput(v.origin, act);
-        Activation oAct = v.startDir.getOutput(v.origin, act);
+    public void tryToLink(Activation fromAct, Visitor v) {
+        Direction dir = v.startDir;
+        Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());
+        Activation oAct = dir.getCycleOutput(fromAct, v.getOriginAct());
 
-        if(!iAct.isActive()) {
+        if (!iAct.isActive()) {
             return;
         }
 
@@ -89,7 +90,7 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
                         iAct.getNeuronProvider()
                 );
 
-        if(s == null || iAct.outputLinkExists(oAct)) {
+        if (s == null || iAct.outputLinkExists(oAct)) {
             return;
         }
 
@@ -98,7 +99,15 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
             return;
         }
 
-        s.transition(v, act, v.origin, true);
+        s.closeCycle(fromAct, v, iAct, oAct);
+    }
+
+    public void propagate(Activation act, Visitor v) {
+        act.getNeuron().getOutputSynapses()
+                .filter(s -> !act.outputLinkExists(s))
+                .forEach(s ->
+                        s.propagate(act, v)
+                );
     }
 
     @Override
