@@ -242,11 +242,16 @@ public class Link extends QueueEntry<LinkPhase> {
         output.inputLinks.put(input.getNeuronProvider(), this);
     }
 
-    public void unlink() {
+    public void unlinkInput() {
         OutputKey ok = output.getOutputKey();
-        input.outputLinks.remove(ok, this);
+        boolean successful = input.outputLinks.remove(ok, this);
+        assert successful;
     }
 
+    public void unlinkOutput() {
+        boolean successful = output.inputLinks.remove(input.getNeuronProvider(), this);
+        assert successful;
+    }
 
     public void addNextLinkPhases(VisitorPhase p) {
         addToQueue(

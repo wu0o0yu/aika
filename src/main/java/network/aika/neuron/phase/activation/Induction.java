@@ -41,7 +41,11 @@ public class Induction extends RankedImpl implements ActivationPhase {
         Neuron inducedNeuron = act.getNeuron().instantiateTemplate();
         inducedNeuron.setLabel(act.getConfig().getLabel(act));
 
+        act.unlink();
+
         act.setNeuron(inducedNeuron);
+
+        act.link();
 
         act.addToQueue(
                 TEMPLATE_INPUT,

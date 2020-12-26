@@ -314,7 +314,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
                                 l.isSelfRef()
                         )
                 );
-        lastRound.unlink();
+//        lastRound.unlinkInputs();
         lastRound = null;
     }
 
@@ -495,10 +495,38 @@ public class Activation extends QueueEntry<ActivationPhase> {
         addToQueue(PROPAGATE_GRADIENT);
     }
 
-    public void unlink() {
+    public void linkInputs() {
         inputLinks
                 .values()
-                .forEach(l -> l.unlink());
+                .forEach(l -> l.linkInput());
+    }
+
+    public void unlinkInputs() {
+        inputLinks
+                .values()
+                .forEach(l -> l.unlinkInput());
+    }
+
+    public void linkOutputs() {
+        outputLinks
+                .values()
+                .forEach(l -> l.linkOutput());
+    }
+
+    public void unlinkOutputs() {
+        outputLinks
+                .values()
+                .forEach(l -> l.unlinkOutput());
+    }
+
+    public void link() {
+        linkInputs();
+        linkOutputs();
+    }
+
+    public void unlink() {
+        unlinkInputs();
+        unlinkOutputs();
     }
 
     public void computeBranchProbability() {
