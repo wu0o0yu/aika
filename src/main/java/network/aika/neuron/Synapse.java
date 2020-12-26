@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
+import static network.aika.neuron.activation.Visitor.Transition.LINK;
 
 /**
  *
@@ -81,14 +82,15 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Synapse instantiateTemplate(I input, O output);
 
-    public Visitor transition(Visitor v, Activation toAct) {
+    public Visitor transition(Visitor v, Link l) {
         Visitor nv = v.prepareNextStep(
-                toAct,
+                null,
+                l,
                 v.getScopes()
                         .stream()
                         .flatMap(s -> transition(s, v.downUpDir).stream())
                         .collect(Collectors.toList()),
-                ACT
+                LINK
         );
 
         if(nv != null)
@@ -127,7 +129,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void propagate(Activation fromAct, Visitor v) {
-        Visitor nv = transition(v, fromAct);
+        Visitor nv = transition(v, null);
         if(nv == null)
             return;
 
@@ -152,14 +154,14 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void closeCycle(Activation fromAct, Visitor v, Activation iAct, Activation oAct) {
-        Visitor nv = transition(v, fromAct);
-        if (checkLinkInvalidOrExists(v, oAct)) {
+        Visitor nv = transition(v, null);
+        if (checkLinkInvalidOrExists(nv, oAct)) {
             createLink(iAct, oAct, nv);
         }
     }
 
     public boolean checkLinkInvalidOrExists(Visitor v, Activation oAct) {
-        if(!v.isClosedCycle())
+        if(v == null || !v.isClosedCycle())
             return false;
 
         Link ol = oAct.getInputLink(this);
@@ -182,6 +184,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 oAct,
                 v.getSelfRef()
         );
+
+        v.link = nl;
 
         if (nl.getSynapse().getWeight() > 0.0 || nl.getSynapse().isTemplate()) {
             nl.addNextLinkPhases(v.getPhase());

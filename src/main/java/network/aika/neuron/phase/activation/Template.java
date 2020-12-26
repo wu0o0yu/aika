@@ -95,7 +95,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
         Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());
         Activation oAct = dir.getCycleOutput(fromAct, v.getOriginAct());
 
-        Neuron<?> n = fromAct.getNeuron();
+        Neuron<?> n = oAct.getNeuron();
 
         if(!iAct.isActive() || n.isInputNeuron())
             return;

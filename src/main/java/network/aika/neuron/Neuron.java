@@ -29,6 +29,8 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
+import static network.aika.neuron.activation.Visitor.Transition.LINK;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
@@ -95,7 +97,12 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public abstract Fired incrementFired(Fired f);
 
     public void transition(Visitor v, Activation act) {
-        act.followLinks(v);
+        Visitor nv = v.prepareNextStep(act, null, v.getScopes(), ACT);
+
+        if(nv == null)
+            return;
+
+        act.followLinks(nv);
     }
 
     public abstract byte getType();

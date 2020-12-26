@@ -345,7 +345,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
                 .filter(l -> l.follow(dir))
                 .collect(Collectors.toList()).stream()
                 .forEach(l ->
-                        l.follow(this, v)
+                        l.follow(v)
                 );
         setMarked(false);
     }

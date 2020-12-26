@@ -29,6 +29,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static network.aika.neuron.Sign.POS;
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.Visitor.Transition.LINK;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
@@ -95,7 +96,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         if (v.downUpDir == OUTPUT)
             return;
 
-        Visitor nv = v.prepareNextStep(act, v.getScopes(), LINK);
+        Visitor nv = v.prepareNextStep(act, null, v.getScopes(), ACT);
 
         if(nv == null)
             return;

@@ -67,15 +67,15 @@ public class Link extends QueueEntry<LinkPhase> {
 
         Visitor nv = synapse.transition(
                 new Visitor(p, output, INPUT),
-                output
+                this
         );
         synapse.follow(input, nv);
 
         output.setMarked(false);
     }
 
-    public void follow(Activation fromAct, Visitor v) {
-        Visitor nv = synapse.transition(v, fromAct);
+    public void follow(Visitor v) {
+        Visitor nv = synapse.transition(v, this);
         if(nv != null) {
             synapse.follow(
                     v.downUpDir.getActivation(this),

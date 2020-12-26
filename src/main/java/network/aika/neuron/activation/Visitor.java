@@ -32,6 +32,7 @@ import static network.aika.neuron.activation.direction.Direction.*;
 public class Visitor {
     public Visitor origin;
     public Activation act; // Just debug code
+    public Link link; // Just debug code
     public Transition transition; // Just debug code
     public Visitor previousStep;
     public VisitorPhase phase;
@@ -62,13 +63,14 @@ public class Visitor {
         );
     }
 
-    public Visitor prepareNextStep(Activation current, List<Scope> scopes, Transition t) {
+    public Visitor prepareNextStep(Activation currentAct, Link currentLink, List<Scope> scopes, Transition t) {
         if(scopes.isEmpty())
             return null;
 
         Visitor nv = new Visitor();
         nv.phase = phase;
-        nv.act = current;
+        nv.act = currentAct;
+        nv.link = currentLink;
         nv.transition = t;
         nv.previousStep = this;
         nv.origin = origin;
@@ -102,8 +104,7 @@ public class Visitor {
     }
 
     public boolean isClosedCycle() {
-        return act == origin.act &&
-                scopes.stream()
+        return scopes.stream()
                         .anyMatch(s ->
                                 origin.scopes.contains(s)
                         );
@@ -134,7 +135,12 @@ public class Visitor {
         }
 
         sb.append("Origin:" + origin.act.getShortString() + ", ");
-        sb.append("Current:" + (act != null ? act.getShortString() : "X") + ", ");
+
+        if(act != null) {
+            sb.append("Current:" + act.getShortString() + ", ");
+        } else if(link != null) {
+            sb.append("Current:" + link.toString() + ", ");
+        }
 
         sb.append("DownUp:" + downUpDir + ", ");
         sb.append("StartDir:" + startDir + ", ");
