@@ -153,7 +153,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return toAct;
     }
 
-    public void closeCycle(Activation fromAct, Visitor v, Activation iAct, Activation oAct) {
+    public void closeCycle(Visitor v, Activation iAct, Activation oAct) {
         Visitor nv = transition(v, null);
         if (checkLinkInvalidOrExists(nv, oAct)) {
             createLink(iAct, oAct, nv);

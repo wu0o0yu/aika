@@ -61,7 +61,8 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
                 LinkPhase.SELF_GRADIENT,
                 LinkPhase.SHADOW_FACTOR,
                 LinkPhase.INDUCTION,
-                LinkPhase.UPDATE_WEIGHTS
+                LinkPhase.UPDATE_WEIGHTS,
+                LinkPhase.TEMPLATE
         };
     }
 
@@ -110,7 +111,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
                 .filter(ts -> ts.checkTemplate(iAct, oAct, v))
                 .filter(s -> iAct.getNeuron().getTemplates().contains(s.getInput()))
                 .forEach(s ->
-                        s.closeCycle(fromAct, v, iAct, oAct)
+                        s.closeCycle(v, iAct, oAct)
                 );
     }
 

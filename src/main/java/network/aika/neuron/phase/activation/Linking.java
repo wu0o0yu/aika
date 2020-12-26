@@ -99,7 +99,7 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
             return;
         }
 
-        s.closeCycle(fromAct, v, iAct, oAct);
+        s.closeCycle(v, iAct, oAct);
     }
 
     public void propagate(Activation act, Visitor v) {
