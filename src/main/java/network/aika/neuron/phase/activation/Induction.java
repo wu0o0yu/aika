@@ -34,10 +34,6 @@ public class Induction extends RankedImpl implements ActivationPhase {
     public void process(Activation act) {
         assert act.getNeuron().isTemplate();
 
-        if (!act.getNeuron().checkInduction(act)) {
-            return;
-        }
-
         Neuron inducedNeuron = act.getNeuron().instantiateTemplate();
         inducedNeuron.setLabel(act.getConfig().getLabel(act));
 

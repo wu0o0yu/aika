@@ -46,13 +46,10 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     @Override
-    public boolean checkTemplate(Activation act) {
+    public boolean checkGradientThreshold(Activation act) {
+/*        if(act.gradientSumIsZero())
+            return false;*/
         return false;
-    }
-
-    @Override
-    public boolean checkInduction(Activation act) {
-        return true;
     }
 
     @Override

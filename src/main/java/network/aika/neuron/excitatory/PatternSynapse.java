@@ -39,17 +39,7 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
     }
 
     @Override
-    public boolean checkTemplate(Activation iAct, Activation oAct, Visitor v) {
-        return true;
-    }
-
-    @Override
-    public boolean checkInduction(Link l) {
-        return true;
-    }
-
-    @Override
-    protected boolean checkOnCreate(Activation fromAct, Activation toAct, Visitor v) {
+    protected boolean canBeLinked(Activation fromAct, Activation toAct, Visitor v) {
         return true;
     }
 
@@ -61,28 +51,13 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
         return new PatternSynapse(input, output, this);
     }
 
-    public Activation getOutputActivationToLink(Activation oAct, Visitor v) {
+    public Activation branchIfNecessary(Activation oAct, Visitor v) {
         if (getOutput().isInputNeuron()) {
             return null;
         }
 
         return oAct;
     }
-
-    /*
-    @Override
-    public void transition(Visitor v, Activation fromAct, Activation toAct, boolean create) {
-        Visitor nv = v.prepareNextStep(toAct, ACT);
-        nv.incrementPathLength();
-
-        nv.scopes = v.scopes
-                .stream()
-                .flatMap(s -> transition(s, v.downUpDir).stream())
-                .collect(Collectors.toList());
-
-        follow(fromAct, toAct, nv, create);
-    }
-    */
 
     @Override
     public Collection<Scope> transition(Scope s, Direction dir) {

@@ -20,6 +20,7 @@ import network.aika.Config;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.RankedImpl;
@@ -68,14 +69,14 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
 
     @Override
     public void process(Activation act) {
-        act.followLinks( // Sollte durch die Link phase erfolgen
+/*        act.followLinks( // Sollte durch die Link phase erfolgen
                 new Visitor(
                         this,
                         act,
                         direction
                 )
         );
-
+*/
         propagate(act,
                 new Visitor(
                         this,
@@ -93,33 +94,30 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     @Override
     public void tryToLink(Activation fromAct, Visitor v) {
         Direction dir = v.startDir;
+
         Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());
         Activation oAct = dir.getCycleOutput(fromAct, v.getOriginAct());
 
-        Neuron<?> n = oAct.getNeuron();
-
-        if(!iAct.isActive() || n.isInputNeuron())
+        if(!iAct.isActive() || oAct.getNeuron().isInputNeuron())
             return;
 
-        if (n.getInputSynapse(iAct.getNeuronProvider()) != null)
+        if (Link.synapseExists(iAct, oAct))
             return;
+
+        Set<Neuron<?>> inputTemplates = iAct.getNeuron().getTemplates();
 
         oAct.getNeuron()
                 .getTemplates()
                 .stream()
-                .flatMap(tn -> tn.getInputSynapses())
-                .filter(ts -> ts.checkTemplate(iAct, oAct, v))
-                .filter(s -> iAct.getNeuron().getTemplates().contains(s.getInput()))
-                .forEach(s ->
-                        s.closeCycle(v, iAct, oAct)
+                .flatMap(tn -> tn.getInputSynapses()) // TODO!
+                .filter(ts -> inputTemplates.contains(ts.getInput()))
+                .forEach(ts ->
+                        ts.closeCycle(v, iAct, oAct)
                 );
     }
 
     private void propagate(Activation act, Visitor v) {
-        if (act.gradientSumIsZero())
-            return;
-
-        if (!act.getNeuron().checkTemplate(act)) {
+        if (!act.getNeuron().checkGradientThreshold(act)) {
             return;
         }
 

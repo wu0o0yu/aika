@@ -77,16 +77,6 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         }
     }
 
-    @Override
-    public boolean checkTemplate(Activation iAct, Activation oAct, Visitor v) {
-        return true;
-    }
-
-    @Override
-    public boolean checkInduction(Link l) {
-        return true;
-    }
-
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
         if (v.startDir == INPUT) {
             return !act.getNeuron().isInputNeuron() && this == act.getModel().getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE;
@@ -96,7 +86,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     }
 
     @Override
-    protected boolean checkOnCreate(Activation fromAct, Activation toAct, Visitor v) {
+    protected boolean canBeLinked(Activation fromAct, Activation toAct, Visitor v) {
         return (fromAct.getPhase() != TEMPLATE_INPUT && fromAct.getPhase() != TEMPLATE_OUTPUT) || !isRecurrent || v.getSelfRef();
     }
 
@@ -109,7 +99,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     }
 
     @Override
-    public Activation getOutputActivationToLink(Activation oAct, Visitor v) {
+    public Activation branchIfNecessary(Activation oAct, Visitor v) {
         if (getOutput().isInputNeuron() ||
                 (isRecurrent() && !v.getSelfRef())) {
             return null;
@@ -139,7 +129,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
                     case PP_INPUT:
                         return Arrays.asList(Scope.PP_SAME, Scope.PP_RELATED_INPUT);
                     case PP_RELATED_INPUT:
-                        return Collections.singleton(Scope.PP_SAME);
+                        return Collections.singleton(Scope.PP_RELATED_SAME);
                     case I_INPUT:
                         return Collections.singleton(Scope.I_SAME);
                 }
@@ -150,10 +140,10 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
             switch (s) {
                 case PP_SAME:
                     return Collections.singleton(Scope.PP_RELATED_SAME);
+                case PP_RELATED_INPUT:
                 case PP_INPUT:
-                    return Collections.singleton(Scope.PP_INPUT);
                 case P_SAME:
-                    return Collections.singleton(Scope.P_SAME);
+                    return Collections.singleton(s);
             }
         }
 

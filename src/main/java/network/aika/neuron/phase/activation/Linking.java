@@ -19,6 +19,7 @@ package network.aika.neuron.phase.activation;
 import network.aika.Config;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.RankedImpl;
@@ -54,21 +55,21 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
     @Override
     public void process(Activation act) {
         act.getThought().linkInputRelations(act);
-        boolean hasChanged = act.updateValue();
 
-        if(hasChanged) {
-            Visitor v = new Visitor(
-                    this,
-                    act,
-                    OUTPUT
-            );
+        if(!act.updateValue())
+            return;
 
-            act.followLinks(v);
+        Visitor v = new Visitor(
+                this,
+                act,
+                OUTPUT
+        );
 
-            act.getModel().linkInputRelations(act, OUTPUT);
+        act.followLinks(v);
 
-            propagate(act, v);
-        }
+        act.getModel().linkInputRelations(act, OUTPUT);
+
+        propagate(act, v);
     }
 
     public boolean isFinal() {
@@ -81,29 +82,26 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
         Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());
         Activation oAct = dir.getCycleOutput(fromAct, v.getOriginAct());
 
-        if (!iAct.isActive()) {
+        if(!iAct.isActive())
             return;
-        }
 
-        Synapse s = oAct.getNeuron()
-                .getInputSynapse(
-                        iAct.getNeuronProvider()
-                );
-
-        if (s == null || iAct.outputLinkExists(oAct)) {
+        Synapse s = Link.getSynapse(iAct, oAct);
+        if(s == null)
             return;
-        }
 
-        oAct = s.getOutputActivationToLink(oAct, v);
-        if (oAct == null) {
+        if (Link.linkExists(iAct, oAct))
             return;
-        }
+
+        oAct = s.branchIfNecessary(oAct, v);
+        if (oAct == null)
+            return;
 
         s.closeCycle(v, iAct, oAct);
     }
 
     public void propagate(Activation act, Visitor v) {
-        act.getNeuron().getOutputSynapses()
+        act.getNeuron()
+                .getOutputSynapses()
                 .filter(s -> !act.outputLinkExists(s))
                 .forEach(s ->
                         s.propagate(act, v)

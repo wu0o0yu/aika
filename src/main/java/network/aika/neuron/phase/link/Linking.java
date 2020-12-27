@@ -17,6 +17,7 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.RankedImpl;
 
 import static network.aika.neuron.phase.activation.ActivationPhase.INITIAL_LINKING;

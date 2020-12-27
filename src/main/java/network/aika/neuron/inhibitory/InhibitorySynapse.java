@@ -57,16 +57,6 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     }
 
     @Override
-    public boolean checkTemplate(Activation iAct, Activation oAct, Visitor v) {
-        return true;
-    }
-
-    @Override
-    public boolean checkInduction(Link l) {
-        return true;
-    }
-
-    @Override
     public InhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
         if(!input.getTemplates().contains(getInput())) {
             return null;
@@ -80,7 +70,7 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     }
 
     @Override
-    public Activation getOutputActivationToLink(Activation oAct, Visitor v) {
+    public Activation branchIfNecessary(Activation oAct, Visitor v) {
         return oAct;
     }
 
@@ -118,7 +108,7 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     }
 
     @Override
-    protected boolean checkOnCreate(Activation fromAct, Activation toAct, Visitor v) {
+    protected boolean canBeLinked(Activation fromAct, Activation toAct, Visitor v) {
         return true;
     }
 }

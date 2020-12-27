@@ -52,16 +52,6 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
     }
 
     @Override
-    public boolean checkTemplate(Activation iAct, Activation oAct, Visitor v) {
-        return v.getScopes().contains(PP_SAME);
-    }
-
-    @Override
-    public boolean checkInduction(Link l) {
-        return true;
-    }
-
-    @Override
     public PrimaryInhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
         if(!input.getTemplates().contains(getInput())) {
             return null;

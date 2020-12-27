@@ -34,9 +34,6 @@ public class Induction extends RankedImpl implements LinkPhase {
     public void process(Link l) {
         assert l.getSynapse().isTemplate();
 
-        if(!l.getSynapse().checkInduction(l))
-            return;
-
         Synapse inducedSynapse = l.getSynapse()
                 .instantiateTemplate(
                         l.getInput().getNeuron(),

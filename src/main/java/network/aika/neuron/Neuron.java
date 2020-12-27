@@ -107,12 +107,9 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract byte getType();
 
-    public abstract boolean checkTemplate(Activation act);
-
-    public abstract boolean checkInduction(Activation act);
+    public abstract boolean checkGradientThreshold(Activation act);
 
     public abstract Scope[] getInitialScopes(Direction dir);
-
 
     public Synapse getOutputSynapse(NeuronProvider n) {
         lock.acquireReadLock();

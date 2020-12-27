@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 
 import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
-import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.Visitor.Transition.LINK;
 
 /**
@@ -72,6 +71,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         assert input.getId() < 0 || input.getId() != output.getId();
     }
 
+    public static boolean synapseExists(Neuron iN, Neuron oN) {
+        return oN.getInputSynapse(iN.getProvider()) != null;
+    }
+
     public boolean isTemplate() {
         return template == null;
     }
@@ -101,11 +104,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Collection<Scope> transition(Scope s, Direction dir);
 
-    protected abstract boolean checkOnCreate(Activation iAct, Activation oAct, Visitor v);
-
-    public abstract boolean checkTemplate(Activation iAct, Activation oAct, Visitor v);
-
-    public abstract boolean checkInduction(Link l);
+    protected abstract boolean canBeLinked(Activation iAct, Activation oAct, Visitor v);
 
     public abstract boolean checkTemplatePropagate(Visitor v, Activation act);
 
@@ -121,7 +120,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return getInput().containsOutputSynapse(this);
     }
 
-    public abstract Activation getOutputActivationToLink(Activation oAct, Visitor v);
+    public abstract Activation branchIfNecessary(Activation oAct, Visitor v);
 
     public void follow(Activation toAct, Visitor v) {
         toAct.getNeuron()
@@ -174,9 +173,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void createLink(Activation iAct, Activation oAct, Visitor v) {
-        if(!checkOnCreate(iAct, oAct, v)) {
+        if(!canBeLinked(iAct, oAct, v))
             return;
-        }
 
         Link nl = Link.link(
                 this,

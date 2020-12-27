@@ -120,9 +120,9 @@ public class Visitor {
 
     public void tryToLink(Activation act) {
         if (downUpDir != OUTPUT || numSteps() < 1) return;
-        if (scopes.contains(Scope.PP_RELATED_INPUT)) return;
-        if (startDir == INPUT && !act.isActive()) return; // <--
         if (act == origin.act || act.isConflicting()) return; // <--
+
+        if (scopes.contains(Scope.PP_RELATED_INPUT)) return; // TODO
 
         phase.tryToLink(act, this);
     }
