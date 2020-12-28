@@ -65,9 +65,8 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
 
     @Override
     public void updateReference(Link l) {
-        if(isNegative) {
+        if(isNegative)
             return;
-        }
 
         // TODO: find a better solution.
         Synapse ts = l.getSynapse().getTemplate();
@@ -86,24 +85,30 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     }
 
     @Override
-    protected boolean canBeLinked(Activation fromAct, Activation toAct, Visitor v) {
-        return (fromAct.getPhase() != TEMPLATE_INPUT && fromAct.getPhase() != TEMPLATE_OUTPUT) || !isRecurrent || v.getSelfRef();
+    protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
+        if(!isRecurrent) {
+            return fromAct.getFired().compareTo(toAct.getFired()) < 0;
+        } else {
+            return v.getSelfRef();
+        }
+        // (fromAct.getPhase() != TEMPLATE_INPUT && fromAct.getPhase() != TEMPLATE_OUTPUT) || Should not depend on the phase.
     }
 
     @Override
     public PatternPartSynapse instantiateTemplate(I input, PatternPartNeuron output) {
-        if(!input.getTemplates().contains(getInput())) {
+        if(!input.getTemplates().contains(getInput()))
             return null;
-        }
+
         return new PatternPartSynapse(input, output, this, isNegative, isRecurrent, inputScope, isSamePattern);
     }
 
     @Override
     public Activation branchIfNecessary(Activation oAct, Visitor v) {
-        if (getOutput().isInputNeuron() ||
-                (isRecurrent() && !v.getSelfRef())) {
+        if (getOutput().isInputNeuron())
             return null;
-        }
+
+        if(isRecurrent() && !v.getSelfRef())
+            return null;
 
         if (isNegative() && !v.getSelfRef()) {
             oAct = oAct.createBranch(this);
@@ -152,8 +157,11 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
 
     @Override
     public Reference getReference(Link l) {
-        return (isRecurrent ? l.getOutput() : l.getInput())
-                .getReference();
+        return (
+                isRecurrent ?
+                        l.getOutput() :
+                        l.getInput()
+        ).getReference();
     }
 
     @Override

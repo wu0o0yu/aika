@@ -49,11 +49,9 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public Scope[] getInitialScopes(Direction dir) {
-        if(dir == Direction.INPUT) {
-            return new Scope[]{ Scope.PP_SAME };
-        } else {
-            return new Scope[]{ Scope.PP_SAME, Scope.PP_INPUT };
-        }
+        return dir == Direction.INPUT ?
+                new Scope[]{ Scope.PP_SAME } :
+                new Scope[]{ Scope.PP_SAME, Scope.PP_INPUT };
     }
 
     @Override

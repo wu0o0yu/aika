@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
+import static network.aika.neuron.activation.Link.linkExists;
 import static network.aika.neuron.activation.Visitor.Transition.LINK;
 
 /**
@@ -104,7 +105,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Collection<Scope> transition(Scope s, Direction dir);
 
-    protected abstract boolean canBeLinked(Activation iAct, Activation oAct, Visitor v);
+    protected abstract boolean checkCausality(Activation iAct, Activation oAct, Visitor v);
 
     public abstract boolean checkTemplatePropagate(Visitor v, Activation act);
 
@@ -133,6 +134,13 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
             return;
 
         Direction dir = nv.startDir;
+/*
+        if(!checkCausality(
+                dir.getPropagateInput(fromAct, null),
+                dir.getPropagateOutput(fromAct, null),
+                v)
+        ) return;
+*/
         Activation toAct = createActivation(nv, fromAct);
 
         createLink(
@@ -154,28 +162,22 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public void closeCycle(Visitor v, Activation iAct, Activation oAct) {
         Visitor nv = transition(v, null);
-        if (checkLinkInvalidOrExists(nv, oAct)) {
-            createLink(iAct, oAct, nv);
-        }
-    }
+        if(nv == null)
+            return;
 
-    public boolean checkLinkInvalidOrExists(Visitor v, Activation oAct) {
-        if(v == null || !v.isClosedCycle())
-            return false;
+        if(!nv.isClosedCycle())
+            return;
 
-        Link ol = oAct.getInputLink(this);
-        if (ol != null) {
-//                    toAct = oAct.cloneToReplaceLink(s);
-            log.warn("Link already exists! ");
-            return false;
-        }
-        return true;
+        if (!linkExists(this, oAct))
+            return;
+
+        if (!checkCausality(iAct, oAct, v))
+            return;
+
+        createLink(iAct, oAct, nv);
     }
 
     public void createLink(Activation iAct, Activation oAct, Visitor v) {
-        if(!canBeLinked(iAct, oAct, v))
-            return;
-
         Link nl = Link.link(
                 this,
                 iAct,
@@ -185,7 +187,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         v.link = nl;
 
-        if (nl.getSynapse().getWeight() > 0.0 || nl.getSynapse().isTemplate()) {
+        if (
+                nl.getSynapse().getWeight() > 0.0 ||
+                nl.getSynapse().isTemplate()
+        ) {
             nl.addNextLinkPhases(v.getPhase());
         }
     }
@@ -259,9 +264,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
             return frequencyIPosONeg;
         } else if(is == NEG && os == POS) {
             return frequencyINegOPos;
-        } else {
-            return n - (frequencyIPosOPos + frequencyIPosONeg + frequencyINegOPos);
         }
+
+        return n - (frequencyIPosOPos + frequencyIPosONeg + frequencyINegOPos);
     }
 
     public void setFrequency(Sign is, Sign os, double f) {
@@ -305,7 +310,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public double getP(Sign si, Sign so, double n) {
-        BetaDistribution dist = new BetaDistribution(getFrequency(si, so, n) + 1, n + 1);
+        BetaDistribution dist = new BetaDistribution(
+                getFrequency(si, so, n) + 1,
+                n + 1
+        );
 
         return dist.inverseCumulativeProbability(
                 getModel().getConfig().getBetaThreshold()

@@ -64,6 +64,16 @@ public class Link extends QueueEntry<LinkPhase> {
         return iAct.outputLinkExists(oAct);
     }
 
+    public static boolean linkExists(Synapse s, Activation oAct) {
+        Link ol = oAct.getInputLink(s);
+        if (ol != null) {
+//                    toAct = oAct.cloneToReplaceLink(s);
+            log.warn("Link already exists! ");
+            return false;
+        }
+        return true;
+    }
+
     public static Synapse getSynapse(Activation iAct, Activation oAct) {
         return oAct.getNeuron()
                 .getInputSynapse(

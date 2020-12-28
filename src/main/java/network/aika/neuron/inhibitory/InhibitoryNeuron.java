@@ -71,7 +71,6 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     @Override
     public void addDummyLinks(Activation act) {
-
     }
 
     @Override

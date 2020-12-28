@@ -58,9 +58,9 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
     @Override
     public InhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
-        if(!input.getTemplates().contains(getInput())) {
+        if(!input.getTemplates().contains(getInput()))
             return null;
-        }
+
         return new InhibitorySynapse(input, output, this);
     }
 
@@ -108,7 +108,7 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     }
 
     @Override
-    protected boolean canBeLinked(Activation fromAct, Activation toAct, Visitor v) {
+    protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
         return true;
     }
 }

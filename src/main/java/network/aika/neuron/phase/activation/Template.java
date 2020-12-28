@@ -49,7 +49,6 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
                 PREPARE_FINAL_LINKING,
                 SOFTMAX,
                 COUNTING,
-//                TEMPLATE,
                 INDUCTION,
                 PROPAGATE_GRADIENT,
                 UPDATE_SYNAPSE_INPUT_LINKS
@@ -98,7 +97,10 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
         Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());
         Activation oAct = dir.getCycleOutput(fromAct, v.getOriginAct());
 
-        if(!iAct.isActive() || oAct.getNeuron().isInputNeuron())
+        if(oAct.getNeuron().isInputNeuron())
+            return;
+
+        if(!iAct.isActive())
             return;
 
         if (Link.synapseExists(iAct, oAct))
@@ -117,9 +119,8 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     }
 
     private void propagate(Activation act, Visitor v) {
-        if (!act.getNeuron().checkGradientThreshold(act)) {
+        if (!act.getNeuron().checkGradientThreshold(act))
             return;
-        }
 
         Set<Synapse> templateSynapses = act
                 .getNeuron()

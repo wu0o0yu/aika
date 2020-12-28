@@ -114,9 +114,8 @@ public abstract class Thought {
     public String toString(boolean includeLink) {
         StringBuilder sb = new StringBuilder();
         for(Activation act: activationsById.values()) {
-/*            if(!act.isActive()) {
+/*            if(!act.isActive())
                 continue;
-            }
 */
             sb.append(act.toString(includeLink));
             sb.append("\n");

@@ -53,9 +53,8 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
 
     @Override
     public PrimaryInhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
-        if(!input.getTemplates().contains(getInput())) {
+        if(!input.getTemplates().contains(getInput()))
             return null;
-        }
 
         return new PrimaryInhibitorySynapse(input, output, this);
     }

@@ -30,7 +30,11 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
         Reference or = l.getOutput().getReference();
         Reference ir = l.getInput().getReference();
 
-        l.getOutput().propagateReference(or == null ? ir : or.add(ir));
+        l.getOutput().propagateReference(
+                or == null ?
+                        ir :
+                        or.add(ir)
+        );
     }
 
     @Override
@@ -39,24 +43,22 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
     }
 
     @Override
-    protected boolean canBeLinked(Activation fromAct, Activation toAct, Visitor v) {
+    protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
         return true;
     }
 
     @Override
     public PatternSynapse instantiateTemplate(I input, PatternNeuron output) {
-        if(!input.getTemplates().contains(getInput())) {
+        if(!input.getTemplates().contains(getInput()))
             return null;
-        }
+
         return new PatternSynapse(input, output, this);
     }
 
     public Activation branchIfNecessary(Activation oAct, Visitor v) {
-        if (getOutput().isInputNeuron()) {
-            return null;
-        }
-
-        return oAct;
+        return getOutput().isInputNeuron() ?
+                null :
+                oAct;
     }
 
     @Override

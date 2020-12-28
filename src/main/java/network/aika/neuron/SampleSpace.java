@@ -12,7 +12,6 @@ public class SampleSpace implements Writable {
 
     private double N = 0;
     private Integer lastPos;
-    private Reference lastRef;
 
     public double getN() {
         return N;
@@ -40,7 +39,6 @@ public class SampleSpace implements Writable {
         assert lastPos == null || newPos > lastPos;
 
         lastPos = newPos;
-        lastRef = ref;
     }
 
     public int getAbsoluteBegin(Model m, Reference ref) {
