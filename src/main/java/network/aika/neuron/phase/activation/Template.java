@@ -91,7 +91,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     }
 
     @Override
-    public void tryToLink(Activation fromAct, Visitor v) {
+    public void closeCycle(Activation fromAct, Visitor v) {
         Direction dir = v.startDir;
 
         Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());

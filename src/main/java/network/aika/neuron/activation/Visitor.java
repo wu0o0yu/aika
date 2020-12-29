@@ -124,7 +124,7 @@ public class Visitor {
 
         if (scopes.contains(Scope.PP_RELATED_INPUT)) return; // TODO
 
-        phase.tryToLink(act, this);
+        phase.closeCycle(act, this);
     }
 
     public String toString() {

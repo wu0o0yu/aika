@@ -59,9 +59,9 @@ public abstract class Thought {
 
     public void process(Model m) {
         while (!queue.isEmpty()) {
-            queue
-                    .pollFirst()
-                    .process();
+            QueueEntry<?> qe = queue.pollFirst();
+
+            qe.process();
         }
         m.addToN(length());
     }

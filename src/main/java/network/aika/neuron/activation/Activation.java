@@ -411,9 +411,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void updateForFinalPhase() {
-        if (fixed) {
+        if (fixed)
             return;
-        }
 
         double initialValue = computeValue(false);
         double finalValue = computeValue(true);
@@ -559,12 +558,6 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
         Activation cAct = getModifiable(null);
         cAct.branchProbability = p;
-    }
-
-    public void count() {
-        getNeuron().count(this);
-
-        addLinksToQueue(INPUT, LinkPhase.COUNTING);
     }
 
     public void addLinksToQueue(Direction dir, LinkPhase... phases) {
