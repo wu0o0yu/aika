@@ -19,7 +19,8 @@ package network.aika;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.QueueEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,11 +58,14 @@ public abstract class Thought {
 
     public abstract void linkInputRelations(Activation act);
 
+    protected void processEntry(QueueEntry queueEntry) {
+        queueEntry.process();
+    }
+
     public void process(Model m) {
         while (!queue.isEmpty()) {
             QueueEntry<?> qe = queue.pollFirst();
-
-            qe.process();
+            processEntry(qe);
         }
         m.addToN(length());
     }

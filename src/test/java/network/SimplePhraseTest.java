@@ -8,6 +8,8 @@ import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
+import network.aika.text.VisualizedDocument;
+import org.graphstream.graph.Graph;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -34,6 +36,7 @@ public class SimplePhraseTest {
     @Test
     public void simplePhraseTest() {
         TextModel model = new TextModel();
+        System.setProperty("org.graphstream.ui", "swing");
         model.setConfig(
                 new Config() {
                     public String getLabel(Activation act) {
@@ -43,7 +46,7 @@ public class SimplePhraseTest {
                                 .map(l -> l.getInput())
                                 .orElse(null);
 
-                        if(n instanceof PatternPartNeuron) {
+                        if (n instanceof PatternPartNeuron) {
                             return "PP-" + trimPrefix(iAct.getLabel());
                         } else if (n instanceof PatternNeuron) {
                             return "P-" + ((Document)act.getThought()).getContent();
@@ -69,11 +72,14 @@ public class SimplePhraseTest {
 
             Neuron.debugOutput = phrase.equalsIgnoreCase("der Hund");
 
-            Document doc = new Document(phrase);
+            VisualizedDocument doc = new VisualizedDocument(phrase);
+            Graph graph = doc.getGraph();
+            graph.setAutoCreate(true);
+            graph.display();
 
             int i = 0;
             TextReference lastRef = null;
-            for(String t: doc.getContent().split(" ")) {
+            for (String t : doc.getContent().split(" ")) {
                 int j = i + t.length();
                 lastRef = doc.processToken(model, lastRef, i, j, t).getReference();
 
