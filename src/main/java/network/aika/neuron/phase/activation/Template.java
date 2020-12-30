@@ -86,6 +86,11 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     }
 
     @Override
+    public String getColor() {
+        return "green";
+    }
+
+    @Override
     public boolean isFinal() {
         return true;
     }

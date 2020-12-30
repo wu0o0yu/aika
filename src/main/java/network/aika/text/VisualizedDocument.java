@@ -3,6 +3,7 @@ package network.aika.text;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.phase.Phase;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
@@ -47,6 +48,9 @@ public class VisualizedDocument extends Document {
                 node = graph.addNode(id);
             }
             node.setAttribute("ui.label", activation.getLabel());
+            Phase phase = queueEntry.getPhase();
+            String color = phase == null ? "gray" : phase.getColor();
+            node.setAttribute("ui.style", "fill-color: " + color + ";");
         }
 
         try {

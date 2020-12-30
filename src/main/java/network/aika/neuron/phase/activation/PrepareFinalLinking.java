@@ -45,4 +45,9 @@ public class PrepareFinalLinking extends RankedImpl implements ActivationPhase {
     public int compare(Activation o1, Activation o2) {
         return 0;
     }
+
+    @Override
+    public String getColor() {
+        return "blue";
+    }
 }
