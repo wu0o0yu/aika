@@ -5,12 +5,11 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
-import network.aika.text.*;
-import org.graphstream.graph.Graph;
-import org.graphstream.ui.view.Viewer;
+import network.aika.text.Document;
+import network.aika.text.TextModel;
+import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
 
-import javax.swing.*;
 import java.util.Random;
 
 public class SimplePhraseTest {
@@ -33,9 +32,8 @@ public class SimplePhraseTest {
     }
 
     @Test
-    public void simplePhraseTest() throws InterruptedException {
+    public void simplePhraseTest() {
         TextModel model = new TextModel();
-        System.setProperty("org.graphstream.ui", "swing");
         model.setConfig(
                 new Config() {
                     public String getLabel(Activation act) {
@@ -45,7 +43,7 @@ public class SimplePhraseTest {
                                 .map(l -> l.getInput())
                                 .orElse(null);
 
-                        if (n instanceof PatternPartNeuron) {
+                        if(n instanceof PatternPartNeuron) {
                             return "PP-" + trimPrefix(iAct.getLabel());
                         } else if (n instanceof PatternNeuron) {
                             return "P-" + ((Document)act.getThought()).getContent();
@@ -61,38 +59,32 @@ public class SimplePhraseTest {
                         .setGradientInductionThreshold(0.0)
         );
 
+        Random r = new Random(1);
 
+        for (int k = 0; k < 1000; k++) {
+            model.getConfig().setEnableTraining(k > 100);
 
+            String phrase = phrases[r.nextInt(phrases.length)];
+            System.out.println("  " + phrase);
 
-//        Random r = new Random(1);
+            Neuron.debugOutput = phrase.equalsIgnoreCase("der Hund");
 
-//        for (int k = 0; k < 1000; k++) {
-//            model.getConfig().setEnableTraining(k > 100);
+            Document doc = new Document(phrase);
 
-        String phrase = "der Vogel"; //phrases[r.nextInt(phrases.length)];
-        System.out.println("  " + phrase);
+            int i = 0;
+            TextReference lastRef = null;
+            for(String t: doc.getContent().split(" ")) {
+                int j = i + t.length();
+                lastRef = doc.processToken(model, lastRef, i, j, t).getReference();
 
-        Neuron.debugOutput = phrase.equalsIgnoreCase("der Hund");
-
-
-        Document doc = new Document(phrase);
-
-        int i = 0;
-        TextReference lastRef = null;
-        for (String t : doc.getContent().split(" ")) {
-            int j = i + t.length();
-            lastRef = doc.processToken(model, lastRef, i, j, t).getReference();
-
-            i = j + 1;
-        }
+                i = j + 1;
+            }
 
             doc.process(model);
-
-            Thread.sleep(10000000);
 
             if (Neuron.debugOutput) {
                 System.out.println(doc.toString(true));
             }
-//        }
+        }
     }
 }
