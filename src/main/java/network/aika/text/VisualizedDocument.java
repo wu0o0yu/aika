@@ -48,5 +48,11 @@ public class VisualizedDocument extends Document {
             }
             node.setAttribute("ui.label", activation.getLabel());
         }
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

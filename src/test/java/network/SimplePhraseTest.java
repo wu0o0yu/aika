@@ -34,7 +34,7 @@ public class SimplePhraseTest {
     }
 
     @Test
-    public void simplePhraseTest() {
+    public void simplePhraseTest() throws InterruptedException {
         TextModel model = new TextModel();
         System.setProperty("org.graphstream.ui", "swing");
         model.setConfig(
@@ -87,6 +87,8 @@ public class SimplePhraseTest {
             }
 
             doc.process(model);
+
+            Thread.sleep(10000000);
 
             if (Neuron.debugOutput) {
                 System.out.println(doc.toString(true));
