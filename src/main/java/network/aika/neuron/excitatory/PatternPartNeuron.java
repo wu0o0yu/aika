@@ -49,7 +49,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
 
     @Override
     public void updateAttributes(Node node) {
-        node.setAttribute("ui.style", "fill-color: rgb(100,255,100);");
+        node.setAttribute("ui.style", "fill-color: rgb(0,205,0);");
     }
 
     @Override

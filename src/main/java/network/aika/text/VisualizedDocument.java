@@ -47,6 +47,7 @@ public class VisualizedDocument extends Document implements ViewerListener {
                 "}\n" +
                 "\n" +
                 "edge {\n" +
+                "\tsize: 2px;\n" +
                 "\tshape: cubic-curve;\n" +
                 "\tz-index: 0;\n" +
 //                "\tfill-color: #222;\n" +
