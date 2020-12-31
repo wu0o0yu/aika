@@ -59,6 +59,12 @@ public class Link extends QueueEntry<LinkPhase> {
         this.isSelfRef = isSelfRef;
     }
 
+
+    @Override
+    public void onProcessEvent() {
+        getThought().onLinkEvent(this);
+    }
+
     public static boolean synapseExists(Activation iAct, Activation oAct) {
         return Synapse.synapseExists(iAct.getNeuron(), oAct.getNeuron());
     }
@@ -308,25 +314,6 @@ public class Link extends QueueEntry<LinkPhase> {
         if(r != 0) return r;
 
         return input.innerCompareTo(l.input);
-    }
-
-    @Override
-    public void updateGraphStreamElement() {
-        VisualizedDocument doc = (VisualizedDocument) getThought();
-        Graph g = doc.getGraph();
-
-        String inputId = "" + getInput().getId();
-        String outputId = "" + getOutput().getId();
-        String edgeId = inputId + "-" + outputId;
-        Edge edge = g.getEdge(edgeId);
-        if (edge == null) {
-            edge = g.addEdge(edgeId, inputId, outputId, true);
-            getSynapse().updateAttributes(edge);
-        }
-        LinkPhase phase = getPhase();
-        if(phase != null) {
-            phase.updateAttributes(edge);
-        }
     }
 
     public String toString() {

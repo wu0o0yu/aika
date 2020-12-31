@@ -2,9 +2,9 @@ package network.aika.text;
 
 import network.aika.Model;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
-import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.activation.ActivationPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 import org.graphstream.graph.Edge;
@@ -14,6 +14,8 @@ import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.view.ViewerListener;
 import org.graphstream.ui.view.ViewerPipe;
+
+import static network.aika.neuron.activation.Fired.NOT_FIRED;
 
 public class VisualizedDocument extends Document implements ViewerListener {
 
@@ -45,7 +47,7 @@ public class VisualizedDocument extends Document implements ViewerListener {
                 "}\n" +
                 "\n" +
                 "edge {\n" +
-                "\tshape: line;\n" +
+                "\tshape: cubic-curve;\n" +
                 "\tz-index: 0;\n" +
 //                "\tfill-color: #222;\n" +
                 "\tarrow-size: 8px, 5px;\n" +
@@ -85,12 +87,53 @@ public class VisualizedDocument extends Document implements ViewerListener {
     private void processEntry(QueueEntry queueEntry) {
         queueEntry.process();
 
-        queueEntry.updateGraphStreamElement();
+        queueEntry.onProcessEvent();
 
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void onActivationEvent(Activation act) {
+        Graph g = getGraph();
+        String id = "" + act.getId();
+        Node node = g.getNode(id);
+
+        if (node == null) {
+            node = g.addNode(id);
+        }
+
+        node.setAttribute("ui.label", act.getLabel());
+        if(act.getFired() != NOT_FIRED) {
+            Fired f = act.getFired();
+            node.setAttribute("x", f.getInputTimestamp());
+            node.setAttribute("y", f.getFired());
+        }
+
+        ActivationPhase phase = act.getPhase();
+        if(phase != null) {
+            phase.updateAttributes(node);
+            act.getNeuron().updateAttributes(node);
+        } else {
+            node.setAttribute("ui.style", "stroke-color: gray;");
+        }
+    }
+
+    @Override
+    public void onLinkEvent(Link l) {
+        String inputId = "" + l.getInput().getId();
+        String outputId = "" + l.getOutput().getId();
+        String edgeId = inputId + "-" + outputId;
+        Edge edge = graph.getEdge(edgeId);
+        if (edge == null) {
+            edge = graph.addEdge(edgeId, inputId, outputId, true);
+            l.getSynapse().updateAttributes(edge);
+        }
+        LinkPhase phase = l.getPhase();
+        if(phase != null) {
+            phase.updateAttributes(edge);
         }
     }
 

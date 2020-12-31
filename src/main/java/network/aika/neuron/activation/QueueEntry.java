@@ -18,7 +18,7 @@ public abstract class QueueEntry<P extends Phase> implements Comparable<QueueEnt
     private boolean isQueued;
     private boolean marked;
 
-    public abstract void updateGraphStreamElement();
+    public abstract void onProcessEvent();
 
     public void initPhases(P... initialPhases) {
         pendingPhases.addAll(Arrays.asList(initialPhases));

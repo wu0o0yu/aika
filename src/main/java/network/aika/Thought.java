@@ -20,6 +20,7 @@ package network.aika;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,10 @@ public abstract class Thought {
 
     public Thought() {
     }
+
+    public abstract void onActivationEvent(Activation act);
+
+    public abstract void onLinkEvent(Link l);
 
     public abstract int length();
 

@@ -23,7 +23,6 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.Scope;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.graphstream.graph.Edge;
-import org.graphstream.graph.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -190,7 +189,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 v.getSelfRef()
         );
 
-        nl.updateGraphStreamElement();
+        nl.getThought().onLinkEvent(nl);
 
         v.link = nl;
 
