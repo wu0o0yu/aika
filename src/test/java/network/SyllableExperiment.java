@@ -35,12 +35,12 @@ public class SyllableExperiment {
         charBasedTrainings.init();
     }
 
-    private void train(String word) {
+    private void train(String word) throws InterruptedException {
         charBasedTrainings.train(word);
     }
 
     @Test
-    public void testTraining() throws IOException {
+    public void testTraining() throws IOException, InterruptedException {
         //"/Users/lukas.molzberger/aika-ws/maerchen"
         // "C:\\ws\\aika-syllables\\src\\main\\resources\\text\\maerchen"
         // "/Users/lukas/IdeaProjects/aika-bitbucket/test-data"

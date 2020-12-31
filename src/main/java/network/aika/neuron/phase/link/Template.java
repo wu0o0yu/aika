@@ -20,6 +20,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.RankedImpl;
 
 import network.aika.neuron.phase.activation.ActivationPhase;
+import org.graphstream.graph.Edge;
 
 /**
  *
@@ -34,6 +35,11 @@ public class Template extends RankedImpl implements LinkPhase {
     @Override
     public void process(Link l) {
         l.follow(ActivationPhase.TEMPLATE_INPUT);
+    }
+
+    @Override
+    public void updateAttributes(Edge e) {
+
     }
 
     @Override

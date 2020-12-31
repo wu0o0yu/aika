@@ -20,6 +20,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
+import org.graphstream.graph.Node;
 
 /**
  *
@@ -38,6 +39,11 @@ public class FinalLinking extends RankedImpl implements ActivationPhase {
     @Override
     public void process(Activation act) {
         act.updateOutgoingLinks();
+    }
+
+    @Override
+    public void updateAttributes(Node node) {
+        node.setAttribute("ui.style", "stroke-color: orange;");
     }
 
     @Override

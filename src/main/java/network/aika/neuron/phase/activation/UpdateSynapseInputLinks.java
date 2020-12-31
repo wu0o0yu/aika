@@ -18,6 +18,7 @@ package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.RankedImpl;
+import org.graphstream.graph.Node;
 
 /**
  *
@@ -33,6 +34,11 @@ public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPha
     public void process(Activation act) {
         act.getNeuron().updateSynapseInputLinks();
         act.getNeuronProvider().save();
+    }
+
+    @Override
+    public void updateAttributes(Node node) {
+        node.setAttribute("ui.style", "stroke-color: light green;");
     }
 
     @Override

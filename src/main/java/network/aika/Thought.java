@@ -32,7 +32,7 @@ public abstract class Thought {
 
     private int activationIdCounter = 0;
 
-    private final TreeSet<QueueEntry> queue = new TreeSet<>();
+    protected final TreeSet<QueueEntry> queue = new TreeSet<>();
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
@@ -58,14 +58,11 @@ public abstract class Thought {
 
     public abstract void linkInputRelations(Activation act);
 
-    protected void processEntry(QueueEntry queueEntry) {
-        queueEntry.process();
-    }
 
-    public void process(Model m) {
+    public void process(Model m) throws InterruptedException {
         while (!queue.isEmpty()) {
             QueueEntry<?> qe = queue.pollFirst();
-            processEntry(qe);
+            qe.process();
         }
         m.addToN(length());
     }

@@ -22,7 +22,7 @@ public class CharBasedTraining {
         return model;
     }
 
-    public void train(String word) {
+    public void train(String word) throws InterruptedException {
         Document doc = new Document(word);
         System.out.println("  " + word);
 

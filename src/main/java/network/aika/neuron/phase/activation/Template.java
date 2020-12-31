@@ -26,6 +26,7 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
+import org.graphstream.graph.Node;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -67,6 +68,11 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     }
 
     @Override
+    public void updateAttributes(Node node) {
+        node.setAttribute("ui.style", "stroke-color: green;");
+    }
+
+    @Override
     public void process(Activation act) {
 /*        act.followLinks( // Sollte durch die Link phase erfolgen
                 new Visitor(
@@ -83,11 +89,6 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
                         direction
                 )
         );
-    }
-
-    @Override
-    public String getColor() {
-        return "green";
     }
 
     @Override

@@ -18,6 +18,7 @@ package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.RankedImpl;
+import org.graphstream.graph.Node;
 
 /**
  *
@@ -32,6 +33,11 @@ public class PropagateGradients extends RankedImpl implements ActivationPhase {
     @Override
     public void process(Activation act) {
         act.processGradient();
+    }
+
+    @Override
+    public void updateAttributes(Node node) {
+        node.setAttribute("ui.style", "stroke-color: blue;");
     }
 
     @Override

@@ -137,7 +137,7 @@ public class DerDieDasTest {
     }
 
     @Test
-    public void train() {
+    public void train() throws InterruptedException {
         Random r = new Random(0);
         String[] trainData = {"der", "die", "das"};
         for(int i = 0; i < 1000; i++) {

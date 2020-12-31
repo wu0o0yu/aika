@@ -21,6 +21,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import org.graphstream.graph.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +56,11 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     private PatternNeuron(Model model) {
         super(model);
+    }
+
+    @Override
+    public void updateAttributes(Node node) {
+
     }
 
 

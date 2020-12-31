@@ -18,6 +18,7 @@ package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.RankedImpl;
+import org.graphstream.graph.Node;
 
 /**
  *
@@ -34,6 +35,11 @@ public class Counting extends RankedImpl implements ActivationPhase {
         if(act.isActive()) {
             act.getNeuron().count(act);
         }
+    }
+
+    @Override
+    public void updateAttributes(Node node) {
+        node.setAttribute("ui.style", "stroke-color: pink;");
     }
 
     @Override

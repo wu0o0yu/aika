@@ -37,7 +37,7 @@ import static network.aika.neuron.Templates.*;
 public class PatternTest {
 
     @Test
-    public void testPatternPos() {
+    public void testPatternPos() throws InterruptedException {
         TextModel m = initModel();
 
         Document doc = new Document("ABC");
@@ -55,7 +55,7 @@ public class PatternTest {
 
 
     @Test
-    public void testPatternNeg() {
+    public void testPatternNeg() throws InterruptedException {
         TextModel m = initModel();
 
         Document doc = new Document("ABC");

@@ -20,6 +20,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.link.LinkPhase;
+import org.graphstream.graph.Node;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.link.LinkPhase.*;
@@ -52,6 +53,11 @@ public class SelfGradient extends RankedImpl implements ActivationPhase {
                 SHADOW_FACTOR,
                 UPDATE_WEIGHTS
         );
+    }
+
+    @Override
+    public void updateAttributes(Node node) {
+        node.setAttribute("ui.style", "stroke-color: light blue;");
     }
 
     @Override

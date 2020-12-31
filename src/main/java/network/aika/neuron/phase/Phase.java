@@ -27,10 +27,6 @@ public interface Phase<E extends QueueEntry> extends Ranked, Comparator<E> {
 
     void process(E e);
 
-    default String getColor() {
-        return "black";
-    }
-
     static String toString(Phase p) {
         return " (" + (p != null ? p.getClass().getSimpleName() : "X") + ")";
     }

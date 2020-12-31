@@ -18,6 +18,7 @@ package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.RankedImpl;
+import org.graphstream.graph.Node;
 
 /**
  *
@@ -47,7 +48,7 @@ public class PrepareFinalLinking extends RankedImpl implements ActivationPhase {
     }
 
     @Override
-    public String getColor() {
-        return "blue";
+    public void updateAttributes(Node node) {
+        node.setAttribute("ui.style", "stroke-color: brown;");
     }
 }

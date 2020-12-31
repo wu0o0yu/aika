@@ -20,6 +20,7 @@ import network.aika.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import org.apache.commons.math3.distribution.BetaDistribution;
+import org.graphstream.graph.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +80,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         provider = new NeuronProvider(m, this);
         modified = true;
     }
+
+    public abstract void updateAttributes(Node node);
 
     public boolean isTemplate() {
         return getId() < 0;

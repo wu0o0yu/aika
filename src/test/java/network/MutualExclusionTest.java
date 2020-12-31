@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MutualExclusionTest {
 
     @Test
-    public void testPropagation() {
+    public void testPropagation() throws InterruptedException {
         Model m = new TextModel();
         Templates t = new Templates(m);
 
@@ -159,7 +159,7 @@ public class MutualExclusionTest {
 
 
     @Test
-    public void testPropagationWithPrimaryLink() {
+    public void testPropagationWithPrimaryLink() throws InterruptedException {
         Model m = new TextModel();
         Templates t = new Templates(m);
 

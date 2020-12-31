@@ -19,6 +19,7 @@ package network.aika.neuron.phase.activation;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.RankedImpl;
+import org.graphstream.graph.Node;
 
 /**
  *
@@ -47,6 +48,11 @@ public class Induction extends RankedImpl implements ActivationPhase {
                 TEMPLATE_INPUT,
                 TEMPLATE_OUTPUT
         );
+    }
+
+    @Override
+    public void updateAttributes(Node node) {
+        node.setAttribute("ui.style", "stroke-color: yellow;");
     }
 
     @Override

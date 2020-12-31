@@ -10,6 +10,7 @@ import network.aika.text.TextModel;
 import network.aika.text.TextReference;
 import network.aika.text.VisualizedDocument;
 import org.graphstream.graph.Graph;
+import org.graphstream.ui.view.Viewer;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -74,8 +75,6 @@ public class SimplePhraseTest {
 
             VisualizedDocument doc = new VisualizedDocument(phrase);
             Graph graph = doc.getGraph();
-            graph.setAutoCreate(true);
-            graph.display();
 
             int i = 0;
             TextReference lastRef = null;
