@@ -21,6 +21,7 @@ import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.Scope;
+import org.graphstream.graph.Edge;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -52,6 +53,11 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
 
     public PatternPartSynapse(I input, PatternPartNeuron output, Synapse template) {
         super(input, output, template);
+    }
+
+    @Override
+    public void updateAttributes(Edge edge) {
+
     }
 
     public PatternPartSynapse(I input, PatternPartNeuron output, Synapse template, boolean isNegative, boolean isRecurrent, boolean inputScope, boolean isSamePattern) {

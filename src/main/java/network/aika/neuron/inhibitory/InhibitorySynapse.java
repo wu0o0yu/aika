@@ -22,6 +22,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.Scope;
+import org.graphstream.graph.Edge;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -43,6 +44,11 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
     public InhibitorySynapse(Neuron<?> input, InhibitoryNeuron output, Synapse template) {
         super(input, output, template);
+    }
+
+    @Override
+    public void updateAttributes(Edge edge) {
+
     }
 
     @Override

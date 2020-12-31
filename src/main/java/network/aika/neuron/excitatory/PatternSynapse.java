@@ -5,6 +5,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.Scope;
+import org.graphstream.graph.Edge;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -24,6 +25,10 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
         super(input, output, template);
     }
 
+    @Override
+    public void updateAttributes(Edge edge) {
+
+    }
 
     @Override
     public void updateReference(Link l) {

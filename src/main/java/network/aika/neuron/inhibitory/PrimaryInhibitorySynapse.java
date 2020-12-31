@@ -24,6 +24,7 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Scope;
+import org.graphstream.graph.Edge;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -49,6 +50,11 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
 
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
         return v.startDir != Direction.INPUT;
+    }
+
+    @Override
+    public void updateAttributes(Edge edge) {
+
     }
 
     @Override

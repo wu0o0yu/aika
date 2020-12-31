@@ -84,35 +84,8 @@ public class VisualizedDocument extends Document implements ViewerListener {
 
     private void processEntry(QueueEntry queueEntry) {
         queueEntry.process();
-        if (queueEntry instanceof Link) {
-            Link link = (Link) queueEntry;
-            String inputId = "" + link.getInput().getId();
-            String outputId = "" + link.getOutput().getId();
-            String edgeId = inputId + "-" + outputId;
-            Edge edge = graph.getEdge(edgeId);
-            if (edge == null) {
-                edge = graph.addEdge(edgeId, inputId, outputId, true);
-            }
-            LinkPhase phase = link.getPhase();
-            if(phase != null) {
-                phase.updateAttributes(edge);
-            }
-        } else if (queueEntry instanceof Activation) {
-            Activation act = (Activation) queueEntry;
-            String id = "" + act.getId();
-            Node node = graph.getNode(id);
 
-            if (node == null) {
-                node = graph.addNode(id);
-            }
-            node.setAttribute("ui.label", act.getLabel());
-            ActivationPhase phase = act.getPhase();
-            if(phase != null) {
-                phase.updateAttributes(node);
-            } else {
-                node.setAttribute("ui.style", "stroke-color: gray;");
-            }
-        }
+        queueEntry.updateGraphStreamElement();
 
         try {
             Thread.sleep(100);

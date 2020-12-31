@@ -31,6 +31,9 @@ import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.activation.ActivationPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 import network.aika.neuron.phase.link.PropagateGradient;
+import network.aika.text.VisualizedDocument;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -90,10 +93,32 @@ public class Activation extends QueueEntry<ActivationPhase> {
         this(id, n);
         this.thought = t;
 
+        updateGraphStreamElement();
+
         thought.registerActivation(this);
 
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>();
+    }
+
+    @Override
+    public void updateGraphStreamElement() {
+        VisualizedDocument doc = (VisualizedDocument) getThought();
+        Graph g = doc.getGraph();
+        String id = "" + getId();
+        Node node = g.getNode(id);
+
+        if (node == null) {
+            node = g.addNode(id);
+        }
+        node.setAttribute("ui.label", getLabel());
+        ActivationPhase phase = getPhase();
+        if(phase != null) {
+            phase.updateAttributes(node);
+            getNeuron().updateAttributes(node);
+        } else {
+            node.setAttribute("ui.style", "stroke-color: gray;");
+        }
     }
 
     public void initInput(Reference ref) {

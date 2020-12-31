@@ -24,6 +24,7 @@ import network.aika.neuron.Templates;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.direction.Direction;
+import org.graphstream.graph.Node;
 
 /**
  *
@@ -43,6 +44,11 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     private InhibitoryNeuron(Model model) {
         super(model);
+    }
+    
+    @Override
+    public void updateAttributes(Node node) {
+        node.setAttribute("ui.style", "fill-color: rgb(100,100,255);");
     }
 
     @Override

@@ -161,6 +161,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         );
 
         toAct.addNextActivationPhases(v.getPhase());
+
         return toAct;
     }
 
@@ -188,6 +189,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 oAct,
                 v.getSelfRef()
         );
+
+        nl.updateGraphStreamElement();
 
         v.link = nl;
 

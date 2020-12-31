@@ -26,6 +26,9 @@ import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.activation.ActivationPhase;
 import network.aika.neuron.phase.link.LinkPhase;
+import network.aika.text.VisualizedDocument;
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -305,6 +308,25 @@ public class Link extends QueueEntry<LinkPhase> {
         if(r != 0) return r;
 
         return input.innerCompareTo(l.input);
+    }
+
+    @Override
+    public void updateGraphStreamElement() {
+        VisualizedDocument doc = (VisualizedDocument) getThought();
+        Graph g = doc.getGraph();
+
+        String inputId = "" + getInput().getId();
+        String outputId = "" + getOutput().getId();
+        String edgeId = inputId + "-" + outputId;
+        Edge edge = g.getEdge(edgeId);
+        if (edge == null) {
+            edge = g.addEdge(edgeId, inputId, outputId, true);
+            getSynapse().updateAttributes(edge);
+        }
+        LinkPhase phase = getPhase();
+        if(phase != null) {
+            phase.updateAttributes(edge);
+        }
     }
 
     public String toString() {
