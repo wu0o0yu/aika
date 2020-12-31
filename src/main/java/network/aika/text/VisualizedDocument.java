@@ -11,6 +11,9 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.graphicGraph.stylesheet.Style;
+import org.graphstream.ui.graphicGraph.stylesheet.StyleConstants;
+import org.graphstream.ui.graphicGraph.stylesheet.Values;
 import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.view.ViewerListener;
 import org.graphstream.ui.view.ViewerPipe;
@@ -56,7 +59,7 @@ public class VisualizedDocument extends Document implements ViewerListener {
 
         graph.setAttribute("ui.antialias");
         graph.setAutoCreate(true);
-        Viewer viewer = graph.display();
+        viewer = graph.display();
        //  Viewer viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_SWING_THREAD)
 
         viewer.getDefaultView().enableMouseOptions();
@@ -109,8 +112,11 @@ public class VisualizedDocument extends Document implements ViewerListener {
         node.setAttribute("ui.label", act.getLabel());
         if(act.getFired() != NOT_FIRED) {
             Fired f = act.getFired();
-            node.setAttribute("x", f.getInputTimestamp());
-            node.setAttribute("y", f.getFired());
+
+            if(act.getNeuron().isInputNeuron()) {
+//                node.setAttribute("layout.frozen");
+            }
+            node.setAttribute("xy", new Values(Style.Units.PERCENTS, (f.getInputTimestamp() / 5f) * 100, (f.getFired() / 5) * 100));
         }
 
         ActivationPhase phase = act.getPhase();
