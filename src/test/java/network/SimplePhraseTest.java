@@ -5,14 +5,12 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
-import network.aika.text.Document;
-import network.aika.text.TextModel;
-import network.aika.text.TextReference;
-import network.aika.text.VisualizedDocument;
+import network.aika.text.*;
 import org.graphstream.graph.Graph;
 import org.graphstream.ui.view.Viewer;
 import org.junit.jupiter.api.Test;
 
+import javax.swing.*;
 import java.util.Random;
 
 public class SimplePhraseTest {
@@ -63,35 +61,38 @@ public class SimplePhraseTest {
                         .setGradientInductionThreshold(0.0)
         );
 
-        Random r = new Random(1);
 
-        for (int k = 0; k < 1000; k++) {
-            model.getConfig().setEnableTraining(k > 100);
 
-            String phrase = phrases[r.nextInt(phrases.length)];
-            System.out.println("  " + phrase);
 
-            Neuron.debugOutput = phrase.equalsIgnoreCase("der Hund");
+//        Random r = new Random(1);
 
-            VisualizedDocument doc = new VisualizedDocument(phrase);
-            Graph graph = doc.getGraph();
+//        for (int k = 0; k < 1000; k++) {
+//            model.getConfig().setEnableTraining(k > 100);
 
-            int i = 0;
-            TextReference lastRef = null;
-            for (String t : doc.getContent().split(" ")) {
-                int j = i + t.length();
-                lastRef = doc.processToken(model, lastRef, i, j, t).getReference();
+        String phrase = "der Vogel"; //phrases[r.nextInt(phrases.length)];
+        System.out.println("  " + phrase);
 
-                i = j + 1;
-            }
+        Neuron.debugOutput = phrase.equalsIgnoreCase("der Hund");
 
-            doc.process(model);
+
+        VisualizedDocument doc = new VisualizedDocument(phrase);
+
+        int i = 0;
+        TextReference lastRef = null;
+        for (String t : doc.getContent().split(" ")) {
+            int j = i + t.length();
+            lastRef = doc.processToken(model, lastRef, i, j, t).getReference();
+
+            i = j + 1;
+        }
+
+    //        doc.process(model);
 
             Thread.sleep(10000000);
 
             if (Neuron.debugOutput) {
                 System.out.println(doc.toString(true));
             }
-        }
+//        }
     }
 }

@@ -14,9 +14,15 @@ import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.graphicGraph.stylesheet.Style;
 import org.graphstream.ui.graphicGraph.stylesheet.StyleConstants;
 import org.graphstream.ui.graphicGraph.stylesheet.Values;
+import org.graphstream.ui.swing_viewer.ViewPanel;
+import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.view.ViewerListener;
 import org.graphstream.ui.view.ViewerPipe;
+import org.graphstream.ui.view.camera.Camera;
+
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 
@@ -36,33 +42,89 @@ public class VisualizedDocument extends Document implements ViewerListener {
 
     public VisualizedDocument(String content) {
         super(content);
+
+//        System.setProperty("org.graphstream.ui", "org.graphstream.ui.swing.util.Display");
+
         graph = new SingleGraph("0");
 
         graph.setAttribute("ui.stylesheet",
-                "node {\n" +
-                "\tsize: 20px;\n" +
-//                "\tfill-color: #777;\n" +
-//                "\ttext-mode: hidden;\n" +
-                "\tz-index: 1;\n" +
-//                "\tshadow-mode: gradient-radial; shadow-width: 2px; shadow-color: #999, white; shadow-offset: 3px, -3px;\n" +
-                "\tstroke-mode: plain; stroke-width: 2px;\n" +
-                "\ttext-size: 20px;\n" +
-                "}\n" +
-                "\n" +
-                "edge {\n" +
-                "\tsize: 2px;\n" +
-                "\tshape: cubic-curve;\n" +
-                "\tz-index: 0;\n" +
-//                "\tfill-color: #222;\n" +
-                "\tarrow-size: 8px, 5px;\n" +
+                "node {" +
+                    "size: 20px;" +
+//                  "fill-color: #777;" +
+//                  "text-mode: hidden;" +
+                    "z-index: 1;" +
+//                  "shadow-mode: gradient-radial; shadow-width: 2px; shadow-color: #999, white; shadow-offset: 3px, -3px;" +
+                    "stroke-mode: plain; stroke-width: 2px;" +
+                    "text-size: 20px;" +
+                "}" +
+                " edge {" +
+                    "size: 2px;" +
+                    "shape: cubic-curve;" +
+                    "z-index: 0;" +
+//                  "fill-color: #222;" +
+                    "arrow-size: 8px, 5px;" +
                 "}");
 
         graph.setAttribute("ui.antialias");
         graph.setAutoCreate(true);
-        viewer = graph.display();
+
+        /*
+                viewer = new SwingViewer(graph, SwingViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+
+        add((DefaultView)viewer.addDefaultView(false, new SwingGraphRenderer()), BorderLayout.CENTER);
+
+
+      //  viewer = graph.display(false);
+//        viewer = new Viewer(graph,Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+//        viewer.disableAutoLayout();
+        viewer.enableAutoLayout(new AikaLayout());
+
+        //Viewer viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+
+        viewer.getDefaultView().enableMouseOptions();
+*/
+
+        viewer = graph.display(false);
        //  Viewer viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_SWING_THREAD)
 
         viewer.getDefaultView().enableMouseOptions();
+
+        viewer.computeGraphMetrics();
+
+        ViewPanel view = (ViewPanel) viewer.getDefaultView();
+
+        view.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(!queue.isEmpty()) {
+                    QueueEntry<?> qe = queue.pollFirst();
+                    qe.process();
+
+                    fromViewer.pump();
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                System.out.println();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                System.out.println();
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
+        Camera cam = view.getCamera();
 
         // The default action when closing the view is to quit
         // the program.
@@ -77,6 +139,8 @@ public class VisualizedDocument extends Document implements ViewerListener {
         fromViewer.addSink(graph);
     }
 
+
+    /*
     public void process(Model m) throws InterruptedException {
         while (!queue.isEmpty()) {
             fromViewer.pump(); // or fromViewer.blockingPump(); in the nightly builds
@@ -86,7 +150,7 @@ public class VisualizedDocument extends Document implements ViewerListener {
         }
         m.addToN(length());
     }
-
+*/
 
     private void processEntry(QueueEntry queueEntry) {
         queueEntry.process();
@@ -116,7 +180,8 @@ public class VisualizedDocument extends Document implements ViewerListener {
             if(act.getNeuron().isInputNeuron()) {
 //                node.setAttribute("layout.frozen");
             }
-            node.setAttribute("xy", new Values(Style.Units.PERCENTS, (f.getInputTimestamp() / 5f) * 100, (f.getFired() / 5) * 100));
+            node.setAttribute("x", f.getInputTimestamp());
+            node.setAttribute("y", f.getFired());
         }
 
         ActivationPhase phase = act.getPhase();
