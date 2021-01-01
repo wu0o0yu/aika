@@ -76,6 +76,11 @@ public abstract class Thought {
         return activationIdCounter++;
     }
 
+
+    public Activation getActivation(Integer id) {
+        return activationsById.get(id);
+    }
+
     public Collection<Activation> getActivations() {
         return activationsById.values();
     }

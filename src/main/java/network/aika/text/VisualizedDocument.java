@@ -5,6 +5,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.phase.activation.ActivationPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 import org.graphstream.graph.Edge;
@@ -80,18 +81,20 @@ public class VisualizedDocument extends Document implements ViewerListener {
         viewer.enableAutoLayout(new AikaLayout());
 
         //Viewer viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+       //  Viewer viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_SWING_THREAD)
 
         viewer.getDefaultView().enableMouseOptions();
 */
 
         viewer = graph.display(false);
-       //  Viewer viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_SWING_THREAD)
 
-        viewer.getDefaultView().enableMouseOptions();
+        viewer.enableAutoLayout(new AikaLayout(this));
 
-        viewer.computeGraphMetrics();
+ //       viewer.computeGraphMetrics();
 
         ViewPanel view = (ViewPanel) viewer.getDefaultView();
+
+        view.enableMouseOptions();
 
         view.addMouseListener(new MouseListener() {
             @Override
@@ -124,7 +127,7 @@ public class VisualizedDocument extends Document implements ViewerListener {
 
             }
         });
-        Camera cam = view.getCamera();
+   //     Camera cam = view.getCamera();
 
         // The default action when closing the view is to quit
         // the program.
@@ -139,8 +142,6 @@ public class VisualizedDocument extends Document implements ViewerListener {
         fromViewer.addSink(graph);
     }
 
-
-    /*
     public void process(Model m) throws InterruptedException {
         while (!queue.isEmpty()) {
             fromViewer.pump(); // or fromViewer.blockingPump(); in the nightly builds
@@ -150,7 +151,7 @@ public class VisualizedDocument extends Document implements ViewerListener {
         }
         m.addToN(length());
     }
-*/
+
 
     private void processEntry(QueueEntry queueEntry) {
         queueEntry.process();
@@ -173,15 +174,17 @@ public class VisualizedDocument extends Document implements ViewerListener {
             node = g.addNode(id);
         }
 
+        node.setAttribute("aika.id", act.getId());
         node.setAttribute("ui.label", act.getLabel());
+
+        if(act.getNeuron().isInputNeuron() && act.getNeuron() instanceof PatternNeuron) {
+            node.setAttribute("layout.frozen");
+        }
         if(act.getFired() != NOT_FIRED) {
             Fired f = act.getFired();
-
-            if(act.getNeuron().isInputNeuron()) {
-//                node.setAttribute("layout.frozen");
-            }
             node.setAttribute("x", f.getInputTimestamp());
-            node.setAttribute("y", f.getFired());
+            node.setAttribute("y", 0);
+//            node.setAttribute("y", f.getFired());
         }
 
         ActivationPhase phase = act.getPhase();

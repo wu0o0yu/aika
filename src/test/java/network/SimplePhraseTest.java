@@ -86,7 +86,7 @@ public class SimplePhraseTest {
             i = j + 1;
         }
 
-    //        doc.process(model);
+            doc.process(model);
 
             Thread.sleep(10000000);
 
