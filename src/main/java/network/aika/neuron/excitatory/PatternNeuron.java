@@ -53,7 +53,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         super(p);
     }
 
-    private PatternNeuron(Model model) {
+    public PatternNeuron(Model model) {
         super(model);
     }
 

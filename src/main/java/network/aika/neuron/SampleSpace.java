@@ -25,6 +25,10 @@ public class SampleSpace implements Writable {
         return lastPos;
     }
 
+    public void setLastPos(int lastPos) {
+        this.lastPos = lastPos;
+    }
+
     public void update(Model m, Reference ref) {
         int n = 0;
 
