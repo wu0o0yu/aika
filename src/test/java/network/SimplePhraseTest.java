@@ -76,8 +76,6 @@ public class SimplePhraseTest {
 
 
         Document doc = new Document(phrase);
-        VisualizedDocument vDoc = new VisualizedDocument(doc);
-
 
         int i = 0;
         TextReference lastRef = null;
