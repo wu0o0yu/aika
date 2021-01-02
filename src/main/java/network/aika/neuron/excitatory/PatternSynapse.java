@@ -26,11 +26,6 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
     }
 
     @Override
-    public void updateAttributes(Edge edge) {
-
-    }
-
-    @Override
     public void updateReference(Link l) {
         Reference or = l.getOutput().getReference();
         Reference ir = l.getInput().getReference();

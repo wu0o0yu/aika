@@ -2,6 +2,7 @@ package network.aika.text;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.ui.layout.springbox.BarnesHutLayout;
 import org.graphstream.ui.layout.springbox.NodeParticle;
@@ -10,10 +11,12 @@ import org.graphstream.ui.layout.springbox.implementations.SpringBoxNodeParticle
 
 public class AikaLayout extends SpringBox {
 
-    VisualizedDocument doc;
+    Document doc;
+    Graph graph;
 
-    AikaLayout(VisualizedDocument doc) {
+    AikaLayout(Document doc, Graph g) {
         this.doc = doc;
+        this.graph = g;
     }
 
     @Override
@@ -28,7 +31,7 @@ public class AikaLayout extends SpringBox {
 
     @Override
     public NodeParticle newNodeParticle(String id) {
-        Node n = doc.getGraph().getNode(id);
+        Node n = graph.getNode(id);
         Activation act = doc.getActivation(n.getAttribute("aika.id", Integer.class));
 
         return new AikaParticle(act, this, id);

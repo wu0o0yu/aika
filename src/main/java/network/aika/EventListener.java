@@ -14,35 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.phase.RankedImpl;
-import network.aika.neuron.phase.VisitorPhase;
-import org.graphstream.graph.Node;
+import network.aika.neuron.activation.Link;
+
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class FinalLinking extends RankedImpl implements ActivationPhase {
+public interface EventListener {
 
-    public FinalLinking(int rank) {
-        super(rank);
-    }
+    void onActivationCreationEvent(Activation act, Activation originAct);
 
-    public boolean isFinal() {
-        return true;
-    }
+    void onActivationProcessedEvent(Activation act);
 
-    @Override
-    public void process(Activation act) {
-        act.updateOutgoingLinks();
-    }
-
-    @Override
-    public int compare(Activation act1, Activation act2) {
-        return act1.getFired().compareTo(act2.getFired());
-    }
+    void onLinkProcessedEvent(Link l);
 }

@@ -37,11 +37,6 @@ public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPha
     }
 
     @Override
-    public void updateAttributes(Node node) {
-        node.setAttribute("ui.style", "stroke-color: light green;");
-    }
-
-    @Override
     public boolean isFinal() {
         return false;
     }

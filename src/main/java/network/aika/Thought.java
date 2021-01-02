@@ -39,14 +39,38 @@ public abstract class Thought {
 
     private Map<NeuronProvider, SortedSet<Activation>> actsPerNeuron = null;
 
+    private List<EventListener> eventListeners = new ArrayList<>();
+
     public Thought() {
     }
 
-    public abstract void onActivationEvent(Activation act);
+    public void onActivationCreationEvent(Activation act, Activation originAct) {
+        eventListeners.forEach(
+                el -> el.onActivationCreationEvent(act, originAct)
+        );
+    }
 
-    public abstract void onLinkEvent(Link l);
+    public void onActivationProcessedEvent(Activation act) {
+        eventListeners.forEach(
+                el -> el.onActivationProcessedEvent(act)
+        );
+    }
+
+    public void onLinkProcessedEvent(Link l) {
+        eventListeners.forEach(
+                el -> el.onLinkProcessedEvent(l)
+        );
+    }
 
     public abstract int length();
+
+    public void addEventListener(EventListener l) {
+        eventListeners.add(l);
+    }
+
+    public void removeEventListener(EventListener l) {
+        eventListeners.remove(l);
+    }
 
     public void registerActivation(Activation act) {
         activationsById.put(act.getId(), act);

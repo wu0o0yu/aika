@@ -46,9 +46,4 @@ public class PrepareFinalLinking extends RankedImpl implements ActivationPhase {
     public int compare(Activation o1, Activation o2) {
         return 0;
     }
-
-    @Override
-    public void updateAttributes(Node node) {
-        node.setAttribute("ui.style", "stroke-color: brown;");
-    }
 }

@@ -78,11 +78,6 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
         propagate(act, v);
     }
 
-    @Override
-    public void updateAttributes(Node node) {
-        node.setAttribute("ui.style", "stroke-color: red;");
-    }
-
     public boolean isFinal() {
         return false;
     }

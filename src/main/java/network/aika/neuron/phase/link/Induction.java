@@ -46,11 +46,6 @@ public class Induction extends RankedImpl implements LinkPhase {
     }
 
     @Override
-    public void updateAttributes(Edge e) {
-
-    }
-
-    @Override
     public int compare(Link l1, Link l2) {
         return 0;
     }

@@ -56,11 +56,6 @@ public class SelfGradient extends RankedImpl implements ActivationPhase {
     }
 
     @Override
-    public void updateAttributes(Node node) {
-        node.setAttribute("ui.style", "stroke-color: light blue;");
-    }
-
-    @Override
     public boolean isFinal() {
         return true;
     }

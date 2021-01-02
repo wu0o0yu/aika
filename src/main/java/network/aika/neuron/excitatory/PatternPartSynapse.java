@@ -55,15 +55,6 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         super(input, output, template);
     }
 
-    @Override
-    public void updateAttributes(Edge edge) {
-        if(isRecurrent) {
-            edge.setAttribute("ui.style", "fill-color: rgb(104,34,139);");
-        }
-        if(isNegative) {
-            edge.setAttribute("ui.style", "fill-color: rgb(100,0,0);");
-        }
-    }
 
     public PatternPartSynapse(I input, PatternPartNeuron output, Synapse template, boolean isNegative, boolean isRecurrent, boolean inputScope, boolean isSamePattern) {
         super(input, output, template);

@@ -75,7 +75,9 @@ public class SimplePhraseTest {
         Neuron.debugOutput = phrase.equalsIgnoreCase("der Hund");
 
 
-        VisualizedDocument doc = new VisualizedDocument(phrase);
+        Document doc = new Document(phrase);
+        VisualizedDocument vDoc = new VisualizedDocument(doc);
+
 
         int i = 0;
         TextReference lastRef = null;

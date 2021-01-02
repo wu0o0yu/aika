@@ -47,11 +47,6 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     }
 
     @Override
-    public void updateAttributes(Edge edge) {
-
-    }
-
-    @Override
     public void updateReference(Link l) {
         l.getOutput().propagateReference(
                 l.getInput().getReference()

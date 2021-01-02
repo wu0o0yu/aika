@@ -53,11 +53,6 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
     }
 
     @Override
-    public void updateAttributes(Edge edge) {
-
-    }
-
-    @Override
     public PrimaryInhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
         if(!input.getTemplates().contains(getInput()))
             return null;

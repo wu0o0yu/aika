@@ -36,11 +36,6 @@ public class Softmax extends RankedImpl implements ActivationPhase {
     }
 
     @Override
-    public void updateAttributes(Node node) {
-        node.setAttribute("ui.style", "stroke-color: violet;");
-    }
-
-    @Override
     public boolean isFinal() {
         return false;
     }

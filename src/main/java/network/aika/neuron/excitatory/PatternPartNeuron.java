@@ -48,11 +48,6 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     @Override
-    public void updateAttributes(Node node) {
-        node.setAttribute("ui.style", "fill-color: rgb(0,205,0);");
-    }
-
-    @Override
     public Scope[] getInitialScopes(Direction dir) {
         return dir == Direction.INPUT ?
                 new Scope[]{ Scope.PP_SAME } :

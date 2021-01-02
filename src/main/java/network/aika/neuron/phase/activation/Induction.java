@@ -51,11 +51,6 @@ public class Induction extends RankedImpl implements ActivationPhase {
     }
 
     @Override
-    public void updateAttributes(Node node) {
-        node.setAttribute("ui.style", "stroke-color: yellow;");
-    }
-
-    @Override
     public boolean isFinal() {
         return false;
     }

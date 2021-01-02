@@ -71,12 +71,12 @@ public class Document extends Thought {
     }
 
     @Override
-    public void onActivationEvent(Activation act) {
+    public void onActivationProcessedEvent(Activation act) {
 
     }
 
     @Override
-    public void onLinkEvent(Link l) {
+    public void onLinkProcessedEvent(Link l) {
 
     }
 

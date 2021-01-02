@@ -52,7 +52,4 @@ public interface LinkPhase extends Phase<Link> {
                         COUNTING
                 };
     }
-
-    void updateAttributes(Edge e);
-
 }

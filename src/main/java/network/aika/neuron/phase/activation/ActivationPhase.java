@@ -43,8 +43,6 @@ public interface ActivationPhase extends Phase<Activation> {
 
     void process(Activation act);
 
-    void updateAttributes(Node n);
-
     boolean isFinal();
 
     static boolean isFinal(ActivationPhase ap) {

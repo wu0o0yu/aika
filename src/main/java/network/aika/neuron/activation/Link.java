@@ -26,9 +26,6 @@ import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.activation.ActivationPhase;
 import network.aika.neuron.phase.link.LinkPhase;
-import network.aika.text.VisualizedDocument;
-import org.graphstream.graph.Edge;
-import org.graphstream.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +59,7 @@ public class Link extends QueueEntry<LinkPhase> {
 
     @Override
     public void onProcessEvent() {
-        getThought().onLinkEvent(this);
+        getThought().onLinkProcessedEvent(this);
     }
 
     public static boolean synapseExists(Activation iAct, Activation oAct) {

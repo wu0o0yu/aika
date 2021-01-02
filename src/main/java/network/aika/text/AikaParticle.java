@@ -63,20 +63,28 @@ public class AikaParticle extends SpringBoxNodeParticle {
                     continue;
 
                 Synapse s = link.getSynapse();
+                boolean isRecurrent = false;
                 if(s instanceof PatternPartSynapse) {
                     PatternPartSynapse pps = (PatternPartSynapse) s;
-                    if(pps.isRecurrent())
-                        continue;
+                    isRecurrent = pps.isRecurrent();
                 }
 
                 Fired fIn = link.getInput().getFired();
                 Fired fOut = link.getOutput().getFired();
 
-                int fDiff = 1; // fOut.getFired() - fIn.getFired();
 
                 Point3 opos = other.getPosition();
 
-                delta.set(opos.x - pos.x, fDiff + Math.max(0.0, opos.y - pos.y), is3D ? opos.z - pos.z : 0);
+                double dx = opos.x - pos.x;
+
+                double dy = 0.0;
+                int fDiff = 0;
+                if(!isRecurrent) {
+                    fDiff = fOut.getFired() - fIn.getFired();
+                    dy = Math.max(0.0, opos.y - pos.y);
+                }
+
+                delta.set(dx, dy, is3D ? opos.z - pos.z : 0);
 
 //                double len = delta.normalize();
 //                double k = this.k * edge.weight;
@@ -88,7 +96,7 @@ public class AikaParticle extends SpringBoxNodeParticle {
                 attE += factor;
                 energies.accumulateEnergy(factor);
 
-                System.out.println("in:" + other.getId() + " out:" + act.getId() + " fDiff:" + fDiff + " xd:" + delta.data[0] + " yd:" + delta.data[1]);
+                System.out.println("in:" + other.getId() + " out:" + act.getId() + " fDiff:" + fDiff + " xd:" + dx + " yd:" + dy);
             }
         }
 

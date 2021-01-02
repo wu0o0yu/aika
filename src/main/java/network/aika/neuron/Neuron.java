@@ -81,8 +81,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         modified = true;
     }
 
-    public abstract void updateAttributes(Node node);
-
     public boolean isTemplate() {
         return getId() < 0;
     }

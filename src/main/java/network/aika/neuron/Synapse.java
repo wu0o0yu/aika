@@ -73,8 +73,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         assert input.getId() < 0 || input.getId() != output.getId();
     }
 
-    public abstract void updateAttributes(Edge edge);
-
     public static boolean synapseExists(Neuron iN, Neuron oN) {
         return oN.getInputSynapse(iN.getProvider()) != null;
     }
@@ -159,6 +157,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 v.startDir.getNeuron(this)
         );
 
+        fromAct.getThought().onActivationCreationEvent(toAct, fromAct);
+
         toAct.addNextActivationPhases(v.getPhase());
 
         return toAct;
@@ -189,7 +189,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 v.getSelfRef()
         );
 
-        nl.getThought().onLinkEvent(nl);
+        nl.getThought().onLinkProcessedEvent(nl);
 
         v.link = nl;
 

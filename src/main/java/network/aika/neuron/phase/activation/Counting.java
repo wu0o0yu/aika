@@ -38,11 +38,6 @@ public class Counting extends RankedImpl implements ActivationPhase {
     }
 
     @Override
-    public void updateAttributes(Node node) {
-        node.setAttribute("ui.style", "stroke-color: pink;");
-    }
-
-    @Override
     public boolean isFinal() {
         return false;
     }

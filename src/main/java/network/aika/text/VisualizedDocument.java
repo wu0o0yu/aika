@@ -1,20 +1,24 @@
 package network.aika.text;
 
+import network.aika.EventListener;
 import network.aika.Model;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.excitatory.PatternPartNeuron;
+import network.aika.neuron.excitatory.PatternPartSynapse;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.phase.activation.ActivationPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
-import org.graphstream.ui.graphicGraph.stylesheet.Style;
-import org.graphstream.ui.graphicGraph.stylesheet.StyleConstants;
-import org.graphstream.ui.graphicGraph.stylesheet.Values;
+
 import org.graphstream.ui.swing_viewer.ViewPanel;
 import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
@@ -24,10 +28,16 @@ import org.graphstream.ui.view.camera.Camera;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 
-public class VisualizedDocument extends Document implements ViewerListener {
+public class VisualizedDocument implements EventListener, ViewerListener {
 
     public Graph getGraph() {
         return graph;
@@ -41,8 +51,14 @@ public class VisualizedDocument extends Document implements ViewerListener {
     private Viewer viewer;
     private ViewerPipe fromViewer;
 
-    public VisualizedDocument(String content) {
-        super(content);
+    private Map<ActivationPhase, Consumer<Node>> actPhaseModifiers = new TreeMap<>(Comparator.comparing(p -> p.getRank()));
+    private Map<LinkPhase, Consumer<Edge>> linkPhaseModifiers = new TreeMap<>(Comparator.comparing(p -> p.getRank()));
+    private Map<Class<? extends Neuron>, Consumer<Node>> neuronTypeModifiers = new HashMap<>();
+    private Map<Class<? extends Synapse>, BiConsumer<Edge, Synapse>> synapseTypeModifiers = new HashMap<>();
+
+    public VisualizedDocument(Document doc) {
+        initModifiers();
+        doc.addEventListener(this);
 
 //        System.setProperty("org.graphstream.ui", "org.graphstream.ui.swing.util.Display");
 
@@ -88,7 +104,7 @@ public class VisualizedDocument extends Document implements ViewerListener {
 
         viewer = graph.display(false);
 
-        viewer.enableAutoLayout(new AikaLayout(this));
+        viewer.enableAutoLayout(new AikaLayout(doc, graph));
 
  //       viewer.computeGraphMetrics();
 
@@ -99,12 +115,7 @@ public class VisualizedDocument extends Document implements ViewerListener {
         view.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(!queue.isEmpty()) {
-                    QueueEntry<?> qe = queue.pollFirst();
-                    qe.process();
 
-                    fromViewer.pump();
-                }
             }
 
             @Override
@@ -142,30 +153,56 @@ public class VisualizedDocument extends Document implements ViewerListener {
         fromViewer.addSink(graph);
     }
 
-    public void process(Model m) throws InterruptedException {
-        while (!queue.isEmpty()) {
-            fromViewer.pump(); // or fromViewer.blockingPump(); in the nightly builds
+    private void initModifiers() {
+        actPhaseModifiers.put(ActivationPhase.INITIAL_LINKING, n -> n.setAttribute("ui.style", "stroke-color: red;"));
+        actPhaseModifiers.put(ActivationPhase.PREPARE_FINAL_LINKING, n -> n.setAttribute("ui.style", "stroke-color: brown;"));
+        actPhaseModifiers.put(ActivationPhase.FINAL_LINKING, n -> n.setAttribute("ui.style", "stroke-color: orange;"));
+        actPhaseModifiers.put(ActivationPhase.SOFTMAX, n -> n.setAttribute("ui.style", "stroke-color: violet;"));
+        actPhaseModifiers.put(ActivationPhase.COUNTING, n -> n.setAttribute("ui.style", "stroke-color: pink;"));
+        actPhaseModifiers.put(ActivationPhase.SELF_GRADIENT, n -> n.setAttribute("ui.style", "stroke-color: light blue;"));
+        actPhaseModifiers.put(ActivationPhase.PROPAGATE_GRADIENT, n -> n.setAttribute("ui.style", "stroke-color: blue;"));
+        actPhaseModifiers.put(ActivationPhase.UPDATE_SYNAPSE_INPUT_LINKS, n -> n.setAttribute("ui.style", "stroke-color: light green;"));
+        actPhaseModifiers.put(ActivationPhase.TEMPLATE_INPUT, n -> n.setAttribute("ui.style", "stroke-color: green;"));
+        actPhaseModifiers.put(ActivationPhase.TEMPLATE_OUTPUT, n -> n.setAttribute("ui.style", "stroke-color: green;"));
+        actPhaseModifiers.put(ActivationPhase.INDUCTION, n -> n.setAttribute("ui.style", "stroke-color: yellow;"));
 
-            QueueEntry<?> qe = queue.pollFirst();
-            processEntry(qe);
-        }
-        m.addToN(length());
+        neuronTypeModifiers.put(PatternNeuron.class, n -> n.setAttribute("ui.style", "fill-color: rgb(0,130,0);"));
+        neuronTypeModifiers.put(PatternPartNeuron.class, n -> n.setAttribute("ui.style", "fill-color: rgb(0,205,0);"));
+        neuronTypeModifiers.put(InhibitoryNeuron.class, n -> n.setAttribute("ui.style", "fill-color: rgb(100,100,255);"));
+
+        synapseTypeModifiers.put(PatternPartSynapse.class, (e, s) -> {
+            PatternPartSynapse pps = (PatternPartSynapse) s;
+            if(pps.isRecurrent()) {
+                e.setAttribute("ui.style", "fill-color: rgb(104,34,139);");
+            }
+            if(pps.isNegative()) {
+                e.setAttribute("ui.style", "fill-color: rgb(100,0,0);");
+            }
+        });
     }
 
-
-    private void processEntry(QueueEntry queueEntry) {
-        queueEntry.process();
-
-        queueEntry.onProcessEvent();
-
+    private void pump() {
+        fromViewer.pump();
+        // fromViewer.blockingPump();
         try {
-            Thread.sleep(100);
+            Thread.sleep(300);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    public void onActivationEvent(Activation act) {
+    @Override
+    public void onActivationCreationEvent(Activation act, Activation originAct) {
+        onActivationEvent(act, originAct);
+    }
+
+
+    @Override
+    public void onActivationProcessedEvent(Activation act) {
+        onActivationEvent(act, null);
+    }
+
+    private void onActivationEvent(Activation act, Activation originAct) {
         Graph g = getGraph();
         String id = "" + act.getId();
         Node node = g.getNode(id);
@@ -175,6 +212,9 @@ public class VisualizedDocument extends Document implements ViewerListener {
         }
 
         node.setAttribute("aika.id", act.getId());
+        if(originAct != null) {
+            node.setAttribute("aika.originActId", originAct.getId());
+        }
         node.setAttribute("ui.label", act.getLabel());
 
         if(act.getNeuron().isInputNeuron() && act.getNeuron() instanceof PatternNeuron) {
@@ -189,26 +229,39 @@ public class VisualizedDocument extends Document implements ViewerListener {
 
         ActivationPhase phase = act.getPhase();
         if(phase != null) {
-            phase.updateAttributes(node);
-            act.getNeuron().updateAttributes(node);
+            Consumer<Node> actPhaseModifier = actPhaseModifiers.get(phase);
+            if(actPhaseModifier != null) {
+                actPhaseModifier.accept(node);
+            }
+            Consumer<Node> neuronTypeModifier = neuronTypeModifiers.get(act.getNeuron().getClass());
+            if(neuronTypeModifier != null) {
+                neuronTypeModifier.accept(node);
+            }
         } else {
             node.setAttribute("ui.style", "stroke-color: gray;");
         }
+        pump();
     }
 
     @Override
-    public void onLinkEvent(Link l) {
+    public void onLinkProcessedEvent(Link l) {
         String inputId = "" + l.getInput().getId();
         String outputId = "" + l.getOutput().getId();
         String edgeId = inputId + "-" + outputId;
         Edge edge = graph.getEdge(edgeId);
         if (edge == null) {
-            edge = graph.addEdge(edgeId, inputId, outputId, true);
-            l.getSynapse().updateAttributes(edge);
+            BiConsumer<Edge, Synapse> synapseTypeModifier = synapseTypeModifiers.get(l.getSynapse().getClass());
+            if(synapseTypeModifier != null) {
+                edge = graph.addEdge(edgeId, inputId, outputId, true);
+                synapseTypeModifier.accept(edge, l.getSynapse());
+            }
         }
         LinkPhase phase = l.getPhase();
         if(phase != null) {
-            phase.updateAttributes(edge);
+            Consumer<Edge> linkPhaseModifier = linkPhaseModifiers.get(phase);
+            if(linkPhaseModifier != null) {
+                linkPhaseModifier.accept(edge);
+            }
         }
     }
 

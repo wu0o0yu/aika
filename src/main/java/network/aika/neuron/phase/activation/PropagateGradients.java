@@ -36,11 +36,6 @@ public class PropagateGradients extends RankedImpl implements ActivationPhase {
     }
 
     @Override
-    public void updateAttributes(Node node) {
-        node.setAttribute("ui.style", "stroke-color: blue;");
-    }
-
-    @Override
     public boolean isFinal() {
         return false;
     }
