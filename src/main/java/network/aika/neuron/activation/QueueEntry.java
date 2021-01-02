@@ -2,7 +2,6 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.neuron.phase.Phase;
-import org.graphstream.graph.Graph;
 
 import java.util.Arrays;
 import java.util.Comparator;

@@ -20,7 +20,6 @@ import network.aika.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import org.apache.commons.math3.distribution.BetaDistribution;
-import org.graphstream.graph.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +30,6 @@ import java.util.stream.Stream;
 import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
-import static network.aika.neuron.activation.Visitor.Transition.LINK;
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
  *

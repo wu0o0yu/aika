@@ -20,12 +20,8 @@ import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
-import org.graphstream.graph.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static network.aika.neuron.activation.Visitor.Transition.LINK;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  * @author Lukas Molzberger

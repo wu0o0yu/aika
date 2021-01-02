@@ -19,7 +19,6 @@ package network.aika.neuron.phase.activation;
 import network.aika.Config;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Phase;
-import org.graphstream.graph.Node;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;

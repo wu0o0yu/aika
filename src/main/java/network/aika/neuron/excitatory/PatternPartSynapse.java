@@ -21,7 +21,6 @@ import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.Scope;
-import org.graphstream.graph.Edge;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -31,7 +30,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.phase.activation.ActivationPhase.*;
 
 /**
  *

@@ -19,12 +19,9 @@ package network.aika.neuron.inhibitory;
 import network.aika.ActivationFunction;
 import network.aika.Model;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.Templates;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.direction.Direction;
-import org.graphstream.graph.Node;
 
 /**
  *

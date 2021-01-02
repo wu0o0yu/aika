@@ -17,10 +17,7 @@
 package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.phase.RankedImpl;
-import network.aika.neuron.phase.VisitorPhase;
-import org.graphstream.graph.Node;
 
 /**
  *

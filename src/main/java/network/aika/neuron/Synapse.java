@@ -22,7 +22,6 @@ import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.Scope;
 import org.apache.commons.math3.distribution.BetaDistribution;
-import org.graphstream.graph.Edge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
