@@ -88,9 +88,10 @@ public abstract class Thought {
     public abstract void linkInputRelations(Activation act);
 
 
-    public void process(Model m) throws InterruptedException {
+    public void process(Model m) {
         while (!queue.isEmpty()) {
             QueueEntry<?> qe = queue.pollFirst();
+            qe.onProcessEvent();
             qe.process();
         }
         m.addToN(length());

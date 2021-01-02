@@ -70,16 +70,6 @@ public class Document extends Thought {
         return content.toString();
     }
 
-    @Override
-    public void onActivationProcessedEvent(Activation act) {
-
-    }
-
-    @Override
-    public void onLinkProcessedEvent(Link l) {
-
-    }
-
     public int length() {
         return content.length();
     }

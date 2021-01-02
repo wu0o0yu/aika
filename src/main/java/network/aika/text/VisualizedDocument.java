@@ -250,9 +250,10 @@ public class VisualizedDocument implements EventListener, ViewerListener {
         String edgeId = inputId + "-" + outputId;
         Edge edge = graph.getEdge(edgeId);
         if (edge == null) {
+            edge = graph.addEdge(edgeId, inputId, outputId, true);
+
             BiConsumer<Edge, Synapse> synapseTypeModifier = synapseTypeModifiers.get(l.getSynapse().getClass());
             if(synapseTypeModifier != null) {
-                edge = graph.addEdge(edgeId, inputId, outputId, true);
                 synapseTypeModifier.accept(edge, l.getSynapse());
             }
         }
