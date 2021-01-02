@@ -96,6 +96,11 @@ public class Activation extends QueueEntry<ActivationPhase> {
         outputLinks = new TreeMap<>();
     }
 
+    @Override
+    public void onProcessEvent() {
+        thought.onActivationProcessedEvent(this);
+    }
+
     public void initInput(Reference ref) {
         initPhases(
                 getInitialPhases(getConfig())
@@ -209,6 +214,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
     public Activation createBranch(Synapse excludedSyn) {
         Activation clonedAct = new Activation(thought.createActivationId(), thought, neuron);
+        thought.onActivationCreationEvent(clonedAct, this);
+
         clonedAct.copyPhases(this);
         clonedAct.round = round + 1;
         branches.add(clonedAct);
@@ -221,6 +228,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
         if (!isFinal) return this;
 
         Activation clonedAct = new Activation(id, thought, neuron);
+        thought.onActivationCreationEvent(clonedAct, this);
+
         clonedAct.copyPhases(this);
         clearPendingPhases();
 

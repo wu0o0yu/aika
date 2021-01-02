@@ -19,7 +19,7 @@ import static network.aika.neuron.Templates.*;
 public class InductionTest {
 
     @Test
-    public void testInduceFromMaturePattern() {
+    public void testInduceFromMaturePattern() throws InterruptedException {
         Model m = new TextModel();
         Templates t = new Templates(m);
 
@@ -117,7 +117,7 @@ public class InductionTest {
     }
 
     @Test
-    public void inductionTest() {
+    public void inductionTest() throws InterruptedException {
         TextModel model = new TextModel();
         model.setConfig(
                 new Config()

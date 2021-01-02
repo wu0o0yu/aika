@@ -18,6 +18,7 @@ package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.RankedImpl;
+import org.graphstream.graph.Node;
 
 /**
  *

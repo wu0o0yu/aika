@@ -2,6 +2,7 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.neuron.phase.Phase;
+import org.graphstream.graph.Graph;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -16,6 +17,8 @@ public abstract class QueueEntry<P extends Phase> implements Comparable<QueueEnt
     private TreeSet<P> pendingPhases = new TreeSet<>(Comparator.comparing(p -> p.getRank()));
     private boolean isQueued;
     private boolean marked;
+
+    public abstract void onProcessEvent();
 
     public void initPhases(P... initialPhases) {
         pendingPhases.addAll(Arrays.asList(initialPhases));

@@ -22,6 +22,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.Scope;
+import org.graphstream.graph.Edge;
 
 import java.util.Collection;
 import java.util.Collections;

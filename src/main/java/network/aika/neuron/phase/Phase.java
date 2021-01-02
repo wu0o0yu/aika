@@ -21,7 +21,6 @@ import network.aika.neuron.activation.QueueEntry;
 import java.util.Comparator;
 
 /**
- *
  * @author Lukas Molzberger
  */
 public interface Phase<E extends QueueEntry> extends Ranked, Comparator<E> {

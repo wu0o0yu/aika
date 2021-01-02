@@ -56,6 +56,12 @@ public class Link extends QueueEntry<LinkPhase> {
         this.isSelfRef = isSelfRef;
     }
 
+
+    @Override
+    public void onProcessEvent() {
+        getThought().onLinkProcessedEvent(this);
+    }
+
     public static boolean synapseExists(Activation iAct, Activation oAct) {
         return Synapse.synapseExists(iAct.getNeuron(), oAct.getNeuron());
     }

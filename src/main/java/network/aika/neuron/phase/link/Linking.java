@@ -19,6 +19,7 @@ package network.aika.neuron.phase.link;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.RankedImpl;
+import org.graphstream.graph.Edge;
 
 import static network.aika.neuron.phase.activation.ActivationPhase.INITIAL_LINKING;
 
@@ -41,5 +42,4 @@ public class Linking extends RankedImpl implements LinkPhase {
     public int compare(Link l1, Link l2) {
         return 0;
     }
-
 }

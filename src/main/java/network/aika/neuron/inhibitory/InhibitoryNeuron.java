@@ -24,6 +24,7 @@ import network.aika.neuron.Templates;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.direction.Direction;
+import org.graphstream.graph.Node;
 
 /**
  *

@@ -25,6 +25,7 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
+import org.graphstream.graph.Node;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 

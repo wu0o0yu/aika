@@ -22,6 +22,7 @@ import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.Scope;
 import org.apache.commons.math3.distribution.BetaDistribution;
+import org.graphstream.graph.Edge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,7 +157,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 v.startDir.getNeuron(this)
         );
 
+        fromAct.getThought().onActivationCreationEvent(toAct, fromAct);
+
         toAct.addNextActivationPhases(v.getPhase());
+
         return toAct;
     }
 
@@ -184,6 +188,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 oAct,
                 v.getSelfRef()
         );
+
+        nl.getThought().onLinkProcessedEvent(nl);
 
         v.link = nl;
 

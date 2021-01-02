@@ -19,6 +19,7 @@ package network.aika.neuron.phase.link;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.RankedImpl;
+import org.graphstream.graph.Edge;
 
 /**
  *

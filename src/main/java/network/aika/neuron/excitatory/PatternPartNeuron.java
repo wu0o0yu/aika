@@ -20,6 +20,7 @@ import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import org.graphstream.graph.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +46,6 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     public PatternPartNeuron(Model model) {
         super(model);
     }
-
 
     @Override
     public Scope[] getInitialScopes(Direction dir) {

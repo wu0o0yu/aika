@@ -19,6 +19,8 @@ package network.aika.neuron.phase.link;
 import network.aika.Config;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.Phase;
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.Node;
 
 /**
  *

@@ -19,7 +19,9 @@ package network.aika;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.QueueEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,16 +33,44 @@ public abstract class Thought {
 
     private int activationIdCounter = 0;
 
-    private final TreeSet<QueueEntry> queue = new TreeSet<>();
+    protected final TreeSet<QueueEntry> queue = new TreeSet<>();
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
     private Map<NeuronProvider, SortedSet<Activation>> actsPerNeuron = null;
 
+    private List<EventListener> eventListeners = new ArrayList<>();
+
     public Thought() {
     }
 
+    public void onActivationCreationEvent(Activation act, Activation originAct) {
+        eventListeners.forEach(
+                el -> el.onActivationCreationEvent(act, originAct)
+        );
+    }
+
+    public void onActivationProcessedEvent(Activation act) {
+        eventListeners.forEach(
+                el -> el.onActivationProcessedEvent(act)
+        );
+    }
+
+    public void onLinkProcessedEvent(Link l) {
+        eventListeners.forEach(
+                el -> el.onLinkProcessedEvent(l)
+        );
+    }
+
     public abstract int length();
+
+    public void addEventListener(EventListener l) {
+        eventListeners.add(l);
+    }
+
+    public void removeEventListener(EventListener l) {
+        eventListeners.remove(l);
+    }
 
     public void registerActivation(Activation act) {
         activationsById.put(act.getId(), act);
@@ -57,10 +87,11 @@ public abstract class Thought {
 
     public abstract void linkInputRelations(Activation act);
 
+
     public void process(Model m) {
         while (!queue.isEmpty()) {
             QueueEntry<?> qe = queue.pollFirst();
-
+            qe.onProcessEvent();
             qe.process();
         }
         m.addToN(length());
@@ -68,6 +99,11 @@ public abstract class Thought {
 
     public int createActivationId() {
         return activationIdCounter++;
+    }
+
+
+    public Activation getActivation(Integer id) {
+        return activationsById.get(id);
     }
 
     public Collection<Activation> getActivations() {
