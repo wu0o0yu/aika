@@ -22,6 +22,7 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.activation.Visitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +60,12 @@ public abstract class Thought {
     public void onLinkProcessedEvent(Link l) {
         eventListeners.forEach(
                 el -> el.onLinkProcessedEvent(l)
+        );
+    }
+
+    public void onVisitorEvent(Visitor v) {
+        eventListeners.forEach(
+                el -> el.onVisitorEvent(v)
         );
     }
 

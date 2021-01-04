@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.EventListener;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.VisitorPhase;
 
