@@ -28,6 +28,6 @@ public interface Phase<E extends QueueEntry> extends Ranked, Comparator<E> {
     void process(E e);
 
     static String toString(Phase p) {
-        return " (" + (p != null ? p.getClass().getSimpleName() : "X") + ")";
+        return " (" + (p != null ? p.getClass().getSimpleName() + "-" + p.getRank() : "X") + ")";
     }
 }
