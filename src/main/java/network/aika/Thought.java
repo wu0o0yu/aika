@@ -80,6 +80,14 @@ public abstract class Thought {
         eventListeners.remove(l);
     }
 
+    public void addVisitorEventListener(VisitorEventListener l) {
+        visitorEventListeners.add(l);
+    }
+
+    public void removeVisitorEventListener(VisitorEventListener l) {
+        visitorEventListeners.remove(l);
+    }
+
     public void registerActivation(Activation act) {
         activationsById.put(act.getId(), act);
     }
