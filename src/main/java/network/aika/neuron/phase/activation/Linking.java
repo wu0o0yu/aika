@@ -26,6 +26,7 @@ import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 
@@ -67,7 +68,8 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
         Visitor v = new Visitor(
                 this,
                 act,
-                OUTPUT
+                OUTPUT,
+                ACT
         );
 
         act.followLinks(v);

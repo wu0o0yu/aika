@@ -53,15 +53,17 @@ public class Visitor {
 
     private Visitor() {}
 
-    public Visitor(VisitorPhase vp, Activation act, Direction startDir) {
+    public Visitor(VisitorPhase vp, Activation act, Direction startDir, Transition t) {
         this.phase = vp;
         this.origin = this;
         this.act = act;
-        this.transition = LINK;
+        this.transition = t;
         this.startDir = startDir;
         this.scopes = Arrays.asList(
                 act.getNeuron().getInitialScopes(startDir)
         );
+
+        act.getThought().onVisitorEvent(this);
     }
 
     public Visitor prepareNextStep(Activation currentAct, Link currentLink, List<Scope> scopes, Transition t) {
@@ -80,6 +82,8 @@ public class Visitor {
         nv.upSteps = upSteps;
         nv.downSteps = downSteps;
         nv.scopes = scopes;
+
+        act.getThought().onVisitorEvent(this);
         return nv;
     }
 

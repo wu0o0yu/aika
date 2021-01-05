@@ -30,6 +30,8 @@ import network.aika.neuron.phase.link.LinkPhase;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
+
 /**
  *
  * @author Lukas Molzberger
@@ -80,7 +82,8 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
                 new Visitor(
                         this,
                         act,
-                        direction
+                        direction,
+                        ACT
                 )
         );
     }

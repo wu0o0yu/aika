@@ -30,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static network.aika.neuron.activation.Activation.TOLERANCE;
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
+import static network.aika.neuron.activation.Visitor.Transition.LINK;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
@@ -97,7 +99,7 @@ public class Link extends QueueEntry<LinkPhase> {
         output.setMarked(true);
 
         Visitor nv = synapse.transition(
-                new Visitor(p, output, INPUT),
+                new Visitor(p, output, INPUT, ACT),
                 this
         );
         synapse.follow(input, nv);
