@@ -34,7 +34,6 @@ public interface LinkPhase extends Phase<Link> {
     int PROPAGATE_GRADIENT_RANK = 12;
     LinkPhase UPDATE_WEIGHTS = new UpdateWeight(14);
     LinkPhase TEMPLATE = new Template(16);
-    LinkPhase FINAL = new Final(20);
 
 
     static LinkPhase[] getInitialPhases(Config c) {
@@ -45,12 +44,10 @@ public interface LinkPhase extends Phase<Link> {
                         SHADOW_FACTOR,
                         SELF_GRADIENT,
                         UPDATE_WEIGHTS,
-                        TEMPLATE,
-                        FINAL
+                        TEMPLATE
                 } :
                 new LinkPhase[] {
-                        COUNTING,
-                        FINAL
+                        COUNTING
                 };
     }
 }

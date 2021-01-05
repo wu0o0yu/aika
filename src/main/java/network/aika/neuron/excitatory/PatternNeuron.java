@@ -20,6 +20,7 @@ import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.direction.Direction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +29,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static network.aika.neuron.Sign.POS;
-import static network.aika.neuron.activation.Visitor.Transition.LINK;
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
@@ -51,24 +52,24 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         super(p);
     }
 
-    private PatternNeuron(Model model) {
+    public PatternNeuron(Model model) {
         super(model);
     }
 
-
     @Override
-    public boolean checkTemplate(Activation act) {
-        Neuron n = act.getNeuron();
-
-        if(n.getSurprisal(POS) < 1.4) {
-            return false;
-        }
-
-        return true;
+    public Scope[] getInitialScopes(Direction dir) {
+        return dir == Direction.INPUT ?
+                new Scope[]{ Scope.P_SAME } :
+                new Scope[]{ Scope.PP_SAME, Scope.PP_INPUT, Scope.I_INPUT };
     }
 
     @Override
-    public boolean checkInduction(Activation act) {
+    public boolean checkGradientThreshold(Activation act) {
+        Neuron n = act.getNeuron();
+
+        if(n.getSurprisal(POS) < 1.4)
+            return false;
+
         return true;
     }
 
@@ -81,11 +82,11 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     @Override
-    public void transition(Visitor v, Activation act, boolean create) {
+    public void transition(Visitor v, Activation act) {
         if (v.downUpDir == OUTPUT)
             return;
 
-        Visitor nv = v.prepareNextStep(act, v.getScopes(), LINK);
+        Visitor nv = v.prepareNextStep(act, null, v.getScopes(), ACT);
 
         if(nv == null)
             return;

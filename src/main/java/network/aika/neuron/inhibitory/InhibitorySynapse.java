@@ -25,9 +25,6 @@ import network.aika.neuron.activation.Scope;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.stream.Collectors;
-
-import static network.aika.neuron.activation.Visitor.Transition.ACT;
 
 /**
  *
@@ -57,20 +54,10 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     }
 
     @Override
-    public boolean checkTemplate(Activation iAct, Activation oAct, Visitor v) {
-        return true;
-    }
-
-    @Override
-    public boolean checkInduction(Link l) {
-        return true;
-    }
-
-    @Override
     public InhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
-        if(!input.getTemplates().contains(getInput())) {
+        if(!input.getTemplates().contains(getInput()))
             return null;
-        }
+
         return new InhibitorySynapse(input, output, this);
     }
 
@@ -80,7 +67,7 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     }
 
     @Override
-    public Activation getOutputActivationToLink(Activation oAct, Visitor v) {
+    public Activation branchIfNecessary(Activation oAct, Visitor v) {
         return oAct;
     }
 
@@ -118,7 +105,7 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     }
 
     @Override
-    protected boolean checkOnCreate(Activation fromAct, Activation toAct, Visitor v) {
+    protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
         return true;
     }
 }

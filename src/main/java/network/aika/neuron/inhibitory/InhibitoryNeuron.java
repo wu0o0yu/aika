@@ -19,13 +19,9 @@ package network.aika.neuron.inhibitory;
 import network.aika.ActivationFunction;
 import network.aika.Model;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.Templates;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.activation.Fired;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.direction.Direction;
 
 /**
  *
@@ -47,15 +43,20 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         super(model);
     }
 
-
     @Override
-    public boolean checkTemplate(Activation act) {
+    public boolean checkGradientThreshold(Activation act) {
+/*        if(act.gradientSumIsZero())
+            return false;*/
         return false;
     }
 
     @Override
-    public boolean checkInduction(Activation act) {
-        return true;
+    public Scope[] getInitialScopes(Direction dir) {
+        if(dir == Direction.INPUT) {
+            return new Scope[]{ Scope.I_SAME };
+        } else {
+            return new Scope[]{ Scope.I_SAME, Scope.PP_INPUT };
+        }
     }
 
     @Override
@@ -68,21 +69,11 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     @Override
     public void addDummyLinks(Activation act) {
-
     }
 
     @Override
     public byte getType() {
         return type;
-    }
-
-    @Override
-    public void transition(Visitor v, Activation act, boolean create) {
-        act.followLinks(v);
-    }
-
-    public boolean isInitialized() {
-        return false;
     }
 
     @Override

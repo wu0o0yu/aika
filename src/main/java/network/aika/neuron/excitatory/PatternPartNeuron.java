@@ -19,11 +19,9 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.direction.Direction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static network.aika.neuron.activation.Visitor.Transition.LINK;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  * @author Lukas Molzberger
@@ -45,20 +43,23 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         super(model);
     }
 
-
     @Override
-    public boolean checkTemplate(Activation act) {
-        Neuron n = act.getNeuron();
-
-        if(n.isInputNeuron()) {
-            return false;
-        }
-
-        return true;
+    public Scope[] getInitialScopes(Direction dir) {
+        return dir == Direction.INPUT ?
+                new Scope[]{ Scope.PP_SAME } :
+                new Scope[]{ Scope.PP_SAME, Scope.PP_INPUT };
     }
 
     @Override
-    public boolean checkInduction(Activation act) {
+    public boolean checkGradientThreshold(Activation act) {
+        Neuron n = act.getNeuron();
+
+        if(n.isInputNeuron())
+            return false;
+
+        if(act.gradientSumIsZero())
+            return false;
+
         return true;
     }
 
@@ -71,22 +72,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     @Override
-    public void transition(Visitor v, Activation act, boolean create) {
-/*        if(v.samePattern) {
-            if(v.downUpDir == OUTPUT) {
-                return;
-            }
-
-            v = v.prepareNextStep(act, LINK);
-            v.downUpDir = OUTPUT;
-        }
-*/
-        act.followLinks(v);
-    }
-
-    @Override
     public byte getType() {
         return type;
     }
-
 }

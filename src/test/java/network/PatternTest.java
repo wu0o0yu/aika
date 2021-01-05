@@ -37,7 +37,7 @@ import static network.aika.neuron.Templates.*;
 public class PatternTest {
 
     @Test
-    public void testPatternPos() {
+    public void testPatternPos() throws InterruptedException {
         TextModel m = initModel();
 
         Document doc = new Document("ABC");
@@ -55,7 +55,7 @@ public class PatternTest {
 
 
     @Test
-    public void testPatternNeg() {
+    public void testPatternNeg() throws InterruptedException {
         TextModel m = initModel();
 
         Document doc = new Document("ABC");
@@ -76,11 +76,11 @@ public class PatternTest {
         PatternNeuron nB = m.lookupToken(null, "B");
         PatternNeuron nC = m.lookupToken(null, "C");
 
-        PatternPartNeuron eA = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
+        PatternPartNeuron eA = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
         eA.setLabel("E A");
-        PatternPartNeuron eB = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
+        PatternPartNeuron eB = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
         eB.setLabel("E B");
-        PatternPartNeuron eC = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
+        PatternPartNeuron eC = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
         eC.setLabel("E C");
 
         PatternNeuron out = t.SAME_PATTERN_TEMPLATE.instantiateTemplate();

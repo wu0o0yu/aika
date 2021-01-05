@@ -19,7 +19,7 @@ import static network.aika.neuron.Templates.*;
 public class InductionTest {
 
     @Test
-    public void testInduceFromMaturePattern() {
+    public void testInduceFromMaturePattern() throws InterruptedException {
         Model m = new TextModel();
         Templates t = new Templates(m);
 
@@ -61,7 +61,7 @@ public class InductionTest {
         inB.setTokenLabel("B");
         inB.setInputNeuron(true);
         inB.setLabel("IN-B");
-        PatternPartNeuron targetN = t.PATTERN_PART_TEMPLATE.instantiateTemplate();
+        PatternPartNeuron targetN = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
         targetN.setLabel("OUT-Target");
 
         targetN.setBias(0.0);
@@ -117,7 +117,7 @@ public class InductionTest {
     }
 
     @Test
-    public void inductionTest() {
+    public void inductionTest() throws InterruptedException {
         TextModel model = new TextModel();
         model.setConfig(
                 new Config()

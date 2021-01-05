@@ -39,7 +39,6 @@ public interface ActivationPhase extends Phase<Activation> {
     ActivationPhase UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks(15);
     Template TEMPLATE_INPUT = new Template(17, INPUT);
     Template TEMPLATE_OUTPUT = new Template(18, OUTPUT);
-    ActivationPhase FINAL = new Final(19);
 
     void process(Activation act);
 
@@ -60,15 +59,13 @@ public interface ActivationPhase extends Phase<Activation> {
                         PROPAGATE_GRADIENT,
                         UPDATE_SYNAPSE_INPUT_LINKS,
                         TEMPLATE_INPUT,
-                        TEMPLATE_OUTPUT,
-                        FINAL
+                        TEMPLATE_OUTPUT
                 } :
                 new ActivationPhase[] {
                         INITIAL_LINKING,
                         PREPARE_FINAL_LINKING,
                         SOFTMAX,
-                        COUNTING,
-                        FINAL
+                        COUNTING
                 };
     }
 }

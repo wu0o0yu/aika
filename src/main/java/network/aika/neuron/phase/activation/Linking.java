@@ -19,23 +19,30 @@ package network.aika.neuron.phase.activation;
 import network.aika.Config;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Scope;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 
 /**
+ * The job of the linking phase is to propagate information through the network by creating the required activations and links.
+ * Each activation and each link have an corresponding neuron or synapse respectively. Depending on the data set in the
+ * document, a neuron might have several activations associated with it. During propagation an input activation
+ * causes the creating of a link in one or more output synapses and the creation of an output activation. Initially the value
+ * of the input activation and the weight of the synapse might not suffice to activate the output activation. But that might
+ * change later on as more input links are added to the activation. New input links are added by the closeCycle method. This
+ * method is called by the visitor which follows the links in the activation network to check that both input and output
+ * activation of a new link refer to the same object in the input data set.
  *
  * @author Lukas Molzberger
  */
 public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase {
-    private static final Logger log = LoggerFactory.getLogger(Linking.class);
 
     public Linking(int rank) {
         super(rank);
@@ -54,24 +61,22 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
     @Override
     public void process(Activation act) {
         act.getThought().linkInputRelations(act);
-        boolean hasChanged = act.updateValue();
 
-        if(hasChanged) {
-            Visitor v = new Visitor(
-                    this,
-                    act,
-                    OUTPUT,
-                    Scope.SAME,
-                    Scope.INPUT
-            );
+        if(!act.updateValue())
+            return;
 
-//            act.getNeuron().transition(v, act, false);
-            act.followLinks(v);
+        Visitor v = new Visitor(
+                this,
+                act,
+                OUTPUT,
+                ACT
+        );
 
-            act.getModel().linkInputRelations(act, OUTPUT);
+        act.followLinks(v);
 
-            act.propagate(v);
-        }
+        act.getModel().linkInputRelations(act, OUTPUT);
+
+        propagate(act, v);
     }
 
     public boolean isFinal() {
@@ -79,29 +84,35 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
     }
 
     @Override
-    public void tryToLink(Activation act, Visitor v) {
-        Activation iAct = v.startDir.getInput(v.origin, act);
-        Activation oAct = v.startDir.getOutput(v.origin, act);
+    public void closeCycle(Activation fromAct, Visitor v) {
+        Direction dir = v.startDir;
+        Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());
+        Activation oAct = dir.getCycleOutput(fromAct, v.getOriginAct());
 
-        if(!iAct.isActive()) {
+        if(!iAct.isActive())
             return;
-        }
 
-        Synapse s = oAct.getNeuron()
-                .getInputSynapse(
-                        iAct.getNeuronProvider()
+        Synapse s = Link.getSynapse(iAct, oAct);
+        if(s == null)
+            return;
+
+        if (Link.linkExists(iAct, oAct))
+            return;
+
+        oAct = s.branchIfNecessary(oAct, v);
+        if (oAct == null)
+            return;
+
+        s.closeCycle(v, iAct, oAct);
+    }
+
+    public void propagate(Activation act, Visitor v) {
+        act.getNeuron()
+                .getOutputSynapses()
+                .filter(s -> !act.outputLinkExists(s))
+                .forEach(s ->
+                        s.propagate(act, v)
                 );
-
-        if(s == null || iAct.outputLinkExists(oAct)) {
-            return;
-        }
-
-        oAct = s.getOutputActivationToLink(oAct, v);
-        if (oAct == null) {
-            return;
-        }
-
-        s.transition(v, act, v.origin, true);
     }
 
     @Override

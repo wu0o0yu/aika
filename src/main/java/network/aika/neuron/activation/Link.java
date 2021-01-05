@@ -30,9 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static network.aika.neuron.activation.Activation.TOLERANCE;
-import static network.aika.neuron.activation.Scope.SAME;
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
+import static network.aika.neuron.activation.Visitor.Transition.LINK;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.phase.activation.ActivationPhase.INITIAL_LINKING;
 
 /**
  *
@@ -56,7 +56,37 @@ public class Link extends QueueEntry<LinkPhase> {
         this.input = input;
         this.output = output;
         this.isSelfRef = isSelfRef;
-        this.queueState = new QueueState();
+    }
+
+
+    @Override
+    public void onProcessEvent() {
+        getThought().onLinkProcessedEvent(this);
+    }
+
+    public static boolean synapseExists(Activation iAct, Activation oAct) {
+        return Synapse.synapseExists(iAct.getNeuron(), oAct.getNeuron());
+    }
+
+    public static boolean linkExists(Activation iAct, Activation oAct) {
+        return iAct.outputLinkExists(oAct);
+    }
+
+    public static boolean linkExists(Synapse s, Activation oAct) {
+        Link ol = oAct.getInputLink(s);
+        if (ol != null) {
+//                    toAct = oAct.cloneToReplaceLink(s);
+            log.warn("Link already exists! ");
+            return false;
+        }
+        return true;
+    }
+
+    public static Synapse getSynapse(Activation iAct, Activation oAct) {
+        return oAct.getNeuron()
+                .getInputSynapse(
+                        iAct.getNeuronProvider()
+                );
     }
 
     public void count() {
@@ -65,13 +95,26 @@ public class Link extends QueueEntry<LinkPhase> {
         }
     }
 
-    public void propagate(VisitorPhase p) {
+    public void follow(VisitorPhase p) {
         output.setMarked(true);
 
-        Visitor v = new Visitor(p, output, INPUT, Scope.SAME, Scope.INPUT);
-        synapse.transition(v, output, input, false);
+        Visitor nv = synapse.transition(
+                new Visitor(p, output, INPUT, ACT),
+                this
+        );
+        synapse.follow(input, nv);
 
         output.setMarked(false);
+    }
+
+    public void follow(Visitor v) {
+        Visitor nv = synapse.transition(v, this);
+        if(nv != null) {
+            synapse.follow(
+                    v.downUpDir.getActivation(this),
+                    nv
+            );
+        }
     }
 
     public void computeSelfGradient() {
@@ -232,9 +275,21 @@ public class Link extends QueueEntry<LinkPhase> {
         output.inputLinks.put(input.getNeuronProvider(), this);
     }
 
-    public void unlink() {
+    public void unlinkInput() {
         OutputKey ok = output.getOutputKey();
-        input.outputLinks.remove(ok, this);
+        boolean successful = input.outputLinks.remove(ok, this);
+        assert successful;
+    }
+
+    public void unlinkOutput() {
+        boolean successful = output.inputLinks.remove(input.getNeuronProvider(), this);
+        assert successful;
+    }
+
+    public void addNextLinkPhases(VisitorPhase p) {
+        addToQueue(
+                p.getNextLinkPhases(output.getConfig())
+        );
     }
 
     @Override

@@ -16,13 +16,13 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.EventListener;
+import network.aika.Thought;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.VisitorPhase;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Visitor.Transition.LINK;
 import static network.aika.neuron.activation.direction.Direction.*;
@@ -32,8 +32,9 @@ import static network.aika.neuron.activation.direction.Direction.*;
  * @author Lukas Molzberger
  */
 public class Visitor {
-    public Activation origin;
-    public Activation current; // Just debug code
+    public Visitor origin;
+    public Activation act; // Just debug code
+    public Link link; // Just debug code
     public Transition transition; // Just debug code
     public Visitor previousStep;
     public VisitorPhase phase;
@@ -46,44 +47,46 @@ public class Visitor {
     public Direction downUpDir = INPUT;
     public Direction startDir;
 
-//    public boolean related;
     private List<Scope> scopes;
-//    public boolean samePattern;
 
     public int downSteps = 0;
     public int upSteps = 0;
 
     private Visitor() {}
 
-    public Visitor(VisitorPhase vp, Activation origin, Direction startDir, Scope... s) {
+    public Visitor(VisitorPhase vp, Activation act, Direction startDir, Transition t) {
         this.phase = vp;
-        this.origin = origin;
-        this.current = origin;
-        this.transition = LINK;
+        this.origin = this;
+        this.act = act;
+        this.transition = t;
         this.startDir = startDir;
-        this.scopes = Arrays.asList(s);
+        this.scopes = Arrays.asList(
+                act.getNeuron().getInitialScopes(startDir)
+        );
+
+        getThought().onVisitorEvent(this);
     }
 
-    public Visitor prepareNextStep(Activation current, List<Scope> scopes, Transition t) {
+    public Visitor prepareNextStep(Activation currentAct, Link currentLink, List<Scope> scopes, Transition t) {
         if(scopes.isEmpty())
             return null;
 
         Visitor nv = new Visitor();
         nv.phase = phase;
-        nv.current = current;
+        nv.act = currentAct;
+        nv.link = currentLink;
         nv.transition = t;
         nv.previousStep = this;
         nv.origin = origin;
         nv.downUpDir = downUpDir;
         nv.startDir = startDir;
-//        nv.related = related;
         nv.upSteps = upSteps;
         nv.downSteps = downSteps;
         nv.scopes = scopes;
-//        nv.samePattern = samePattern;
+
+        getThought().onVisitorEvent(this);
         return nv;
     }
-
 
     public List<Scope> getScopes() {
         return scopes;
@@ -93,12 +96,23 @@ public class Visitor {
         return phase;
     }
 
+    public Activation getOriginAct() {
+        return origin.act;
+    }
+
     public void incrementPathLength() {
         if (downUpDir == INPUT) {
             this.downSteps++;
         } else {
             this.upSteps++;
         }
+    }
+
+    public boolean isClosedCycle() {
+        return scopes.stream()
+                        .anyMatch(s ->
+                                origin.scopes.contains(s)
+                        );
     }
 
     public boolean getSelfRef() {
@@ -111,11 +125,15 @@ public class Visitor {
 
     public void tryToLink(Activation act) {
         if (downUpDir != OUTPUT || numSteps() < 1) return;
-        if (scopes.contains(Scope.RELATED_INPUT)) return;
-        if (startDir == INPUT && !act.isActive()) return; // <--
-        if (act == origin || act.isConflicting()) return; // <--
+        if (act == origin.act || act.isConflicting()) return; // <--
 
-        phase.tryToLink(act, this);
+        if (scopes.contains(Scope.PP_RELATED_INPUT)) return; // TODO
+
+        phase.closeCycle(act, this);
+    }
+
+    private Thought getThought() {
+        return origin.act.getThought();
     }
 
     public String toString() {
@@ -125,16 +143,18 @@ public class Visitor {
             sb.append(previousStep + "\n");
         }
 
-        sb.append("Origin:" + origin.getShortString() + ", ");
-        sb.append("Current:" + (current != null ? current.getShortString() : "X") + ", ");
+        sb.append("Origin:" + origin.act.getShortString() + ", ");
+
+        if(act != null) {
+            sb.append("Current:" + act.getShortString() + ", ");
+        } else if(link != null) {
+            sb.append("Current:" + link.toString() + ", ");
+        }
 
         sb.append("DownUp:" + downUpDir + ", ");
         sb.append("StartDir:" + startDir + ", ");
 
-//        sb.append("Related:" + related + ", ");
         sb.append("Scopes:" + scopes + ", ");
-//        sb.append("SamePattern:" + samePattern + ", ");
-
         sb.append("DownSteps:" + downSteps + ", ");
         sb.append("UpSteps:" + upSteps + "");
 

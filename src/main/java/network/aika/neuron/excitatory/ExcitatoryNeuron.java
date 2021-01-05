@@ -70,10 +70,6 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         }
     }
 
-    public boolean isInitialized() {
-        return !isTemplate();
-    }
-
     public void addDummyLinks(Activation act) {
         inputSynapses
                 .values()
@@ -161,7 +157,11 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
     public String inStatToString() {
         StringBuilder sb = new StringBuilder();
         inputSynapses.values().forEach(s ->
-                sb.append("  in " + s.getInput().getId() + ":" + s.getInput().getLabel() + " " + s.statToString())
+                sb.append("  in " +
+                        s.getInput().getId() +
+                        ":" + s.getInput().getLabel() +
+                        " " + s.statToString()
+                )
         );
         return sb.toString();
     }
@@ -171,8 +171,11 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         outputSynapses.values().stream()
                 .filter(s -> s instanceof InhibitorySynapse)
                 .forEach(s ->
-                        sb.append("  out " + s.getOutput().getId() + ":" + s.getOutput().getLabel() + " " + " " + s.statToString())
-        );
+                        sb.append("  out " +
+                                s.getOutput().getId() +
+                                ":" + s.getOutput().getLabel() +
+                                "  " + s.statToString())
+                );
         return sb.toString();
     }
 }

@@ -68,24 +68,24 @@ public class TextModel extends Model {
     }
 
     @Override
-    public void linkInputRelations(Activation originAct, Direction dir) {
-        TextReference ref = originAct.getReference();
+    public void linkInputRelations(Activation fromAct, Direction dir) {
+        TextReference ref = fromAct.getReference();
         TextReference lastRef = ref.getPrevious();
         if(lastRef == null) return;
 
         if (dir == OUTPUT) {
-            if (originAct.getNeuron().isInputNeuron() && prevTokenInhib.getId().equals(originAct.getNeuron().getId()) && lastRef.nextTokenPPAct != null) {
+            if (fromAct.getNeuron().isInputNeuron() && prevTokenInhib.getId().equals(fromAct.getNeuron().getId()) && lastRef.nextTokenPPAct != null) {
                 Synapse s = getRelSynapse(lastRef.nextTokenPPAct.getNeuron());
-                addLink(s, originAct, lastRef.nextTokenPPAct);
+                addLink(s, fromAct, lastRef.nextTokenPPAct);
             }
         } else if (dir == INPUT) {
-            Neuron n = originAct.getNeuron();
+            Neuron n = fromAct.getNeuron();
             if (n instanceof ExcitatoryNeuron) {
                 Synapse s = getRelSynapse(n);
 
                 if (s != null) {
-                    if (isPrevTokenPatternPart(originAct.getNeuron()) && lastRef.nextTokenIAct != null) {
-                        addLink(s, lastRef.nextTokenIAct, originAct);
+                    if (isPrevTokenPatternPart(fromAct.getNeuron()) && lastRef.nextTokenIAct != null) {
+                        addLink(s, lastRef.nextTokenIAct, fromAct);
                     }
                 }
             }
@@ -126,11 +126,11 @@ public class TextModel extends Model {
         in.setLabel("P-" + tokenLabel);
         getSuspensionHook().putLabel(tokenLabel, in.getId());
 
-        PatternPartNeuron inRelPT = getTemplates().PATTERN_PART_TEMPLATE.instantiateTemplate();
+        PatternPartNeuron inRelPT = getTemplates().INPUT_PATTERN_PART_TEMPLATE.instantiateTemplate();
         inRelPT.setInputNeuron(true);
         inRelPT.setLabel(tokenLabel + " Rel Prev. Token");
 
-        PatternPartNeuron inRelNT = getTemplates().PATTERN_PART_TEMPLATE.instantiateTemplate();
+        PatternPartNeuron inRelNT = getTemplates().INPUT_PATTERN_PART_TEMPLATE.instantiateTemplate();
         inRelNT.setInputNeuron(true);
         inRelNT.setLabel(tokenLabel + " Rel Next Token");
 

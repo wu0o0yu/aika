@@ -27,6 +27,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.activation.ActivationPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 import network.aika.neuron.phase.link.PropagateGradient;
@@ -36,7 +37,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
 import static network.aika.neuron.phase.link.LinkPhase.PROPAGATE_GRADIENT_RANK;
@@ -96,9 +96,13 @@ public class Activation extends QueueEntry<ActivationPhase> {
         outputLinks = new TreeMap<>();
     }
 
+    @Override
+    public void onProcessEvent() {
+        thought.onActivationProcessedEvent(this);
+    }
+
     public void initInput(Reference ref) {
-        queueState = new QueueState(
-                this,
+        initPhases(
                 getInitialPhases(getConfig())
         );
 
@@ -136,7 +140,18 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void setFired(int inputTimestamp) {
-        this.fired = new Fired(inputTimestamp, 0);
+        setFired(new Fired(inputTimestamp, 0));
+    }
+
+    public void setFired(Fired f) {
+        if(isQueued()) {
+            updateQueueEntry(() -> {
+                this.fired = f;
+                return this;
+            });
+        } else {
+            this.fired = f;
+        }
     }
 
     public boolean isFinal() {
@@ -199,7 +214,9 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
     public Activation createBranch(Synapse excludedSyn) {
         Activation clonedAct = new Activation(thought.createActivationId(), thought, neuron);
-        clonedAct.queueState = queueState.copy(clonedAct);
+        thought.onActivationCreationEvent(clonedAct, this);
+
+        clonedAct.copyPhases(this);
         clonedAct.round = round + 1;
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
@@ -211,8 +228,11 @@ public class Activation extends QueueEntry<ActivationPhase> {
         if (!isFinal) return this;
 
         Activation clonedAct = new Activation(id, thought, neuron);
-        queueState.setEntryToQueue(clonedAct);
-        clonedAct.queueState = queueState;
+        thought.onActivationCreationEvent(clonedAct, this);
+
+        clonedAct.copyPhases(this);
+        clearPendingPhases();
+
         clonedAct.round = round + 1;
         clonedAct.lastRound = this;
         linkClone(clonedAct, excludedSyn);
@@ -260,7 +280,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public boolean searchWithinBranch() {
-        if (queueState.isMarked()) return true;
+        if (isMarked())
+            return true;
 
         return getOutputLinks()
                 .filter(l -> !l.isNegative() || l.isCausal())
@@ -302,23 +323,25 @@ public class Activation extends QueueEntry<ActivationPhase> {
                                 l.isSelfRef()
                         )
                 );
-        lastRound.unlink();
+//        lastRound.unlinkInputs();
         lastRound = null;
     }
 
-    public void propagate(Visitor v) {
-        getNeuron().getOutputSynapses()
-                .filter(s -> !outputLinkExists(s))
-                .forEach(s ->
-                        s.transition(v, this, null, true)
-                );
-    }
 
     public static Activation createActivation(Thought t, Neuron n) {
-        Activation act = new Activation(t.createActivationId(), t, n);
-        act.queueState = new QueueState(act);
+        Activation act = new Activation(
+                t.createActivationId(),
+                t,
+                n
+        );
 
         return act;
+    }
+
+    public void addNextActivationPhases(VisitorPhase p) {
+        addToQueue(
+                p.getNextActivationPhases(getConfig())
+        );
     }
 
     public void followLinks(Visitor v) {
@@ -331,13 +354,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
                 .filter(l -> l.follow(dir))
                 .collect(Collectors.toList()).stream()
                 .forEach(l ->
-                        l.getSynapse()
-                                .transition(
-                                        v,
-                                        this,
-                                        dir.getActivation(l),
-                                        false
-                                )
+                        l.follow(v)
                 );
         setMarked(false);
     }
@@ -403,9 +420,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void updateForFinalPhase() {
-        if (fixed) {
+        if (fixed)
             return;
-        }
 
         double initialValue = computeValue(false);
         double finalValue = computeValue(true);
@@ -422,7 +438,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
     private void checkIfFired() {
         if (fired == NOT_FIRED && getNet() > 0.0) {
-            fired = neuron.incrementFired(getLatestFired());
+            setFired(neuron.incrementFired(getLatestFired()));
             addToQueue(INITIAL_LINKING);
         }
     }
@@ -487,10 +503,38 @@ public class Activation extends QueueEntry<ActivationPhase> {
         addToQueue(PROPAGATE_GRADIENT);
     }
 
-    public void unlink() {
+    public void linkInputs() {
         inputLinks
                 .values()
-                .forEach(l -> l.unlink());
+                .forEach(l -> l.linkInput());
+    }
+
+    public void unlinkInputs() {
+        inputLinks
+                .values()
+                .forEach(l -> l.unlinkInput());
+    }
+
+    public void linkOutputs() {
+        outputLinks
+                .values()
+                .forEach(l -> l.linkOutput());
+    }
+
+    public void unlinkOutputs() {
+        outputLinks
+                .values()
+                .forEach(l -> l.unlinkOutput());
+    }
+
+    public void link() {
+        linkInputs();
+        linkOutputs();
+    }
+
+    public void unlink() {
+        unlinkInputs();
+        unlinkOutputs();
     }
 
     public void computeBranchProbability() {
@@ -523,12 +567,6 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
         Activation cAct = getModifiable(null);
         cAct.branchProbability = p;
-    }
-
-    public void count() {
-        getNeuron().count(this);
-
-        addLinksToQueue(INPUT, LinkPhase.COUNTING);
     }
 
     public void addLinksToQueue(Direction dir, LinkPhase... phases) {

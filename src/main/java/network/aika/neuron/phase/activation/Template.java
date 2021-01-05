@@ -20,7 +20,7 @@ import network.aika.Config;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Scope;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.RankedImpl;
@@ -29,6 +29,8 @@ import network.aika.neuron.phase.link.LinkPhase;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
 
 /**
  *
@@ -49,11 +51,9 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
                 PREPARE_FINAL_LINKING,
                 SOFTMAX,
                 COUNTING,
-//                TEMPLATE,
                 INDUCTION,
                 PROPAGATE_GRADIENT,
-                UPDATE_SYNAPSE_INPUT_LINKS,
-                FINAL
+                UPDATE_SYNAPSE_INPUT_LINKS
         };
     }
 
@@ -63,18 +63,28 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
                 LinkPhase.SELF_GRADIENT,
                 LinkPhase.SHADOW_FACTOR,
                 LinkPhase.INDUCTION,
-                LinkPhase.UPDATE_WEIGHTS
+                LinkPhase.UPDATE_WEIGHTS,
+                LinkPhase.TEMPLATE
         };
     }
 
     @Override
     public void process(Activation act) {
-        act.followLinks( // Sollte durch die Link phase erfolgen
-                new Visitor(this, act, direction, Scope.SAME, Scope.INPUT)
+/*        act.followLinks( // Sollte durch die Link phase erfolgen
+                new Visitor(
+                        this,
+                        act,
+                        direction
+                )
         );
-
+*/
         propagate(act,
-                new Visitor(this, act, direction, Scope.SAME, Scope.INPUT)
+                new Visitor(
+                        this,
+                        act,
+                        direction,
+                        ACT
+                )
         );
     }
 
@@ -84,36 +94,36 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     }
 
     @Override
-    public void tryToLink(Activation act, Visitor v) {
-        Activation iAct = v.startDir.getInput(v.origin, act);
-        Activation oAct = v.startDir.getOutput(v.origin, act);
+    public void closeCycle(Activation fromAct, Visitor v) {
+        Direction dir = v.startDir;
 
-        Neuron n = oAct.getNeuron();
+        Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());
+        Activation oAct = dir.getCycleOutput(fromAct, v.getOriginAct());
 
-        if(!iAct.isActive() || n.isInputNeuron())
+        if(oAct.getNeuron().isInputNeuron())
             return;
 
-        if (n.getInputSynapse(iAct.getNeuronProvider()) != null)
+        if(!iAct.isActive())
             return;
+
+        if (Link.synapseExists(iAct, oAct))
+            return;
+
+        Set<Neuron<?>> inputTemplates = iAct.getNeuron().getTemplates();
 
         oAct.getNeuron()
                 .getTemplates()
                 .stream()
-                .flatMap(tn -> tn.getInputSynapses())
-                .filter(ts -> ts.checkTemplate(iAct, oAct, v))
-                .filter(s -> iAct.getNeuron().getTemplates().contains(s.getInput()))
-                .forEach(s ->
-                        s.transition(v, act, v.origin, true)
+                .flatMap(tn -> tn.getInputSynapses()) // TODO!
+                .filter(ts -> inputTemplates.contains(ts.getInput()))
+                .forEach(ts ->
+                        ts.closeCycle(v, iAct, oAct)
                 );
     }
 
     private void propagate(Activation act, Visitor v) {
-        if (act.gradientSumIsZero())
+        if (!act.getNeuron().checkGradientThreshold(act))
             return;
-
-        if (!act.getNeuron().checkTemplate(act)) {
-            return;
-        }
 
         Set<Synapse> templateSynapses = act
                 .getNeuron()
@@ -129,7 +139,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
                 );
 
         templateSynapses.forEach(s ->
-                s.transition(v, act, null, true)
+                s.propagate(act, v)
         );
     }
 

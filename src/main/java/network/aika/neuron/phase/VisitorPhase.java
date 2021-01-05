@@ -8,7 +8,7 @@ import network.aika.neuron.phase.link.LinkPhase;
 
 public interface VisitorPhase {
 
-    void tryToLink(Activation act, Visitor v);
+    void closeCycle(Activation act, Visitor v);
 
     ActivationPhase[] getNextActivationPhases(Config c);
 
