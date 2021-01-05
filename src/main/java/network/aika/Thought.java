@@ -41,6 +41,7 @@ public abstract class Thought {
     private Map<NeuronProvider, SortedSet<Activation>> actsPerNeuron = null;
 
     private List<EventListener> eventListeners = new ArrayList<>();
+    private List<VisitorEventListener> visitorEventListeners = new ArrayList<>();
 
     public Thought() {
     }
@@ -64,7 +65,7 @@ public abstract class Thought {
     }
 
     public void onVisitorEvent(Visitor v) {
-        eventListeners.forEach(
+        visitorEventListeners.forEach(
                 el -> el.onVisitorEvent(v)
         );
     }

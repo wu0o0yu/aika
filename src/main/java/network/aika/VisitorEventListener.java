@@ -16,8 +16,6 @@
  */
 package network.aika;
 
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 
 
@@ -25,11 +23,7 @@ import network.aika.neuron.activation.Visitor;
  *
  * @author Lukas Molzberger
  */
-public interface EventListener {
+public interface VisitorEventListener {
 
-    void onActivationCreationEvent(Activation act, Activation originAct);
-
-    void onActivationProcessedEvent(Activation act);
-
-    void onLinkProcessedEvent(Link l);
+    void onVisitorEvent(Visitor v);
 }
