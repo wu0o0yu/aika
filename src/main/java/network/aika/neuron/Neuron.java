@@ -78,13 +78,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         modified = true;
     }
 
-    public boolean isTemplate() {
-        return getId() < 0;
-    }
-
-    public Set<Neuron<?>> getTemplates() {
-        return templates;
-    }
 
     public abstract Neuron<?> instantiateTemplate();
 
@@ -94,6 +87,21 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract Fired incrementFired(Fired f);
 
+    public abstract byte getType();
+
+    public abstract boolean checkGradientThreshold(Activation act);
+
+    public abstract Scope[] getInitialScopes(Direction dir);
+
+
+    public boolean isTemplate() {
+        return getId() < 0;
+    }
+
+    public Set<Neuron<?>> getTemplates() {
+        return templates;
+    }
+
     public void transition(Visitor v, Activation act) {
         Visitor nv = v.prepareNextStep(act, null, v.getScopes(), ACT);
 
@@ -102,12 +110,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
         act.followLinks(nv);
     }
-
-    public abstract byte getType();
-
-    public abstract boolean checkGradientThreshold(Activation act);
-
-    public abstract Scope[] getInitialScopes(Direction dir);
 
     public Synapse getOutputSynapse(NeuronProvider n) {
         lock.acquireReadLock();

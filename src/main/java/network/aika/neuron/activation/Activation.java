@@ -345,6 +345,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void followLinks(Visitor v) {
+        v.onEvent(false);
+
         v.tryToLink(this);
 
         Direction dir = v.downUpDir;
@@ -357,6 +359,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
                         l.follow(v)
                 );
         setMarked(false);
+
+        v.onEvent(true);
     }
 
     public Link getInputLink(Synapse s) {

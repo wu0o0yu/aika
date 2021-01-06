@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.EventListener;
 import network.aika.Thought;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.VisitorPhase;
@@ -24,7 +23,6 @@ import network.aika.neuron.phase.VisitorPhase;
 import java.util.Arrays;
 import java.util.List;
 
-import static network.aika.neuron.activation.Visitor.Transition.LINK;
 import static network.aika.neuron.activation.direction.Direction.*;
 
 /**
@@ -63,8 +61,6 @@ public class Visitor {
         this.scopes = Arrays.asList(
                 act.getNeuron().getInitialScopes(startDir)
         );
-
-        getThought().onVisitorEvent(this);
     }
 
     public Visitor prepareNextStep(Activation currentAct, Link currentLink, List<Scope> scopes, Transition t) {
@@ -84,7 +80,6 @@ public class Visitor {
         nv.downSteps = downSteps;
         nv.scopes = scopes;
 
-        getThought().onVisitorEvent(this);
         return nv;
     }
 
@@ -134,6 +129,10 @@ public class Visitor {
 
     private Thought getThought() {
         return origin.act.getThought();
+    }
+
+    public void onEvent(boolean dir) {
+        getThought().onVisitorEvent(this, dir);
     }
 
     public String toString() {

@@ -17,6 +17,7 @@
 package network.aika;
 
 import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.direction.Direction;
 
 
 /**
@@ -25,5 +26,6 @@ import network.aika.neuron.activation.Visitor;
  */
 public interface VisitorEventListener {
 
-    void onVisitorEvent(Visitor v);
+    void onVisitorEvent(Visitor v, boolean dir);
+
 }

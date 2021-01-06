@@ -23,10 +23,12 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.direction.Direction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public abstract class Thought {
@@ -46,46 +48,65 @@ public abstract class Thought {
     public Thought() {
     }
 
+    public abstract int length();
+
+    public abstract void linkInputRelations(Activation act);
+
+
     public void onActivationCreationEvent(Activation act, Activation originAct) {
-        eventListeners.forEach(
+        getEventListeners()
+                .forEach(
                 el -> el.onActivationCreationEvent(act, originAct)
         );
     }
 
     public void onActivationProcessedEvent(Activation act) {
-        eventListeners.forEach(
+        getEventListeners()
+                .forEach(
                 el -> el.onActivationProcessedEvent(act)
         );
     }
 
     public void onLinkProcessedEvent(Link l) {
-        eventListeners.forEach(
+        getEventListeners()
+                .forEach(
                 el -> el.onLinkProcessedEvent(l)
         );
     }
 
-    public void onVisitorEvent(Visitor v) {
-        visitorEventListeners.forEach(
-                el -> el.onVisitorEvent(v)
-        );
+    public void onVisitorEvent(Visitor v, boolean dir) {
+        getVisitorEventListeners()
+                .forEach(
+                        el -> el.onVisitorEvent(v, dir)
+                );
     }
 
-    public abstract int length();
+    public synchronized Collection<EventListener> getEventListeners() {
+        return eventListeners
+                .stream()
+                .collect(Collectors.toList());
+    }
 
-    public void addEventListener(EventListener l) {
+    public synchronized void addEventListener(EventListener l) {
         eventListeners.add(l);
     }
 
-    public void removeEventListener(EventListener l) {
+    public synchronized void removeEventListener(EventListener l) {
         eventListeners.remove(l);
     }
 
-    public void addVisitorEventListener(VisitorEventListener l) {
+    public synchronized void addVisitorEventListener(VisitorEventListener l) {
         visitorEventListeners.add(l);
     }
 
-    public void removeVisitorEventListener(VisitorEventListener l) {
+    public synchronized void removeVisitorEventListener(VisitorEventListener l) {
         visitorEventListeners.remove(l);
+    }
+
+    public synchronized Collection<VisitorEventListener> getVisitorEventListeners() {
+        return visitorEventListeners
+                .stream()
+                .collect(Collectors.toList());
     }
 
     public void registerActivation(Activation act) {
@@ -101,9 +122,6 @@ public abstract class Thought {
         assert isRemoved;
     }
 
-    public abstract void linkInputRelations(Activation act);
-
-
     public void process(Model m) {
         while (!queue.isEmpty()) {
             QueueEntry<?> qe = queue.pollFirst();
@@ -116,7 +134,6 @@ public abstract class Thought {
     public int createActivationId() {
         return activationIdCounter++;
     }
-
 
     public Activation getActivation(Integer id) {
         return activationsById.get(id);

@@ -86,23 +86,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Synapse instantiateTemplate(I input, O output);
 
-    public Visitor transition(Visitor v, Link l) {
-        Visitor nv = v.prepareNextStep(
-                null,
-                l,
-                v.getScopes()
-                        .stream()
-                        .flatMap(s -> transition(s, v.downUpDir).stream())
-                        .collect(Collectors.toList()),
-                LINK
-        );
-
-        if(nv != null)
-            nv.incrementPathLength();
-
-        return nv;
-    }
-
     public abstract Collection<Scope> transition(Scope s, Direction dir);
 
     protected abstract boolean checkCausality(Activation iAct, Activation oAct, Visitor v);
@@ -123,9 +106,30 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Activation branchIfNecessary(Activation oAct, Visitor v);
 
+    public Visitor transition(Visitor v, Link l) {
+        Visitor nv = v.prepareNextStep(
+                null,
+                l,
+                v.getScopes()
+                        .stream()
+                        .flatMap(s -> transition(s, v.downUpDir).stream())
+                        .collect(Collectors.toList()),
+                LINK
+        );
+
+        if(nv != null)
+            nv.incrementPathLength();
+
+        return nv;
+    }
+
     public void follow(Activation toAct, Visitor v) {
+        v.onEvent(false);
+
         toAct.getNeuron()
                 .transition(v, toAct);
+
+        v.onEvent(true);
     }
 
     public void propagate(Activation fromAct, Visitor v) {
