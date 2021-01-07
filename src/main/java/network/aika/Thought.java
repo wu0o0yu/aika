@@ -70,8 +70,15 @@ public abstract class Thought {
     public void onLinkProcessedEvent(Link l) {
         getEventListeners()
                 .forEach(
-                el -> el.onLinkProcessedEvent(l)
-        );
+                        el -> el.onLinkProcessedEvent(l)
+                );
+    }
+
+    public void onLinkCreationEvent(Link l) {
+        getEventListeners()
+                .forEach(
+                        el -> el.onLinkCreationEvent(l)
+                );
     }
 
     public void onVisitorEvent(Visitor v, boolean dir) {

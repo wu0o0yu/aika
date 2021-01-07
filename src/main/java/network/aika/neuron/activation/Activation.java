@@ -393,6 +393,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
         Link ol = getInputLink(s);
         Link nl = new Link(s, input, this, isSelfRef);
 
+        getThought().onLinkCreationEvent(nl);
+
         nl.linkInput();
         nl.linkOutput();
 
