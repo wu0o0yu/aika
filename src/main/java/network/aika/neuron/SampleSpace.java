@@ -21,7 +21,7 @@ public class SampleSpace implements Writable {
         this.N = N;
     }
 
-    public int getLastPos() {
+    public Integer getLastPos() {
         return lastPos;
     }
 
