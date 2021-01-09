@@ -39,6 +39,10 @@ public class PropagateGradients extends RankedImpl implements ActivationPhase {
         return false;
     }
 
+    public String toString() {
+        return "PropagateGradients";
+    }
+
     @Override
     public int compare(Activation act1, Activation act2) {
         return act2.getFired().compareTo(act1.getFired());

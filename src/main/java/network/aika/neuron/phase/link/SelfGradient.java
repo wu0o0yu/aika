@@ -34,6 +34,10 @@ public class SelfGradient extends RankedImpl implements LinkPhase {
         l.computeSelfGradient();
     }
 
+    public String toString() {
+        return "Link-SelfGradient";
+    }
+
     @Override
     public int compare(Link l1, Link l2) {
         return 0;

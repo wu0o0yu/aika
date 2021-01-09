@@ -59,6 +59,10 @@ public class SelfGradient extends RankedImpl implements ActivationPhase {
         return true;
     }
 
+    public String toString() {
+        return "SelfGradient";
+    }
+
     @Override
     public int compare(Activation act1, Activation act2) {
         return 0;

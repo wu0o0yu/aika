@@ -36,6 +36,10 @@ public class Linking extends RankedImpl implements LinkPhase {
         l.follow(INITIAL_LINKING);
     }
 
+    public String toString() {
+        return "Link-Linking";
+    }
+
     @Override
     public int compare(Link l1, Link l2) {
         return 0;

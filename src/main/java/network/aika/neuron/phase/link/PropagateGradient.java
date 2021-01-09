@@ -37,6 +37,10 @@ public class PropagateGradient extends RankedImpl implements LinkPhase {
         l.propagateGradient(gradient);
     }
 
+    public String toString() {
+        return "Link-PropagateGradient";
+    }
+
     @Override
     public int compare(Link l1, Link l2) {
         return 0;

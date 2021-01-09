@@ -54,6 +54,10 @@ public class Induction extends RankedImpl implements ActivationPhase {
         return false;
     }
 
+    public String toString() {
+        return "Induction";
+    }
+
     @Override
     public int compare(Activation act1, Activation act2) {
         return 0;

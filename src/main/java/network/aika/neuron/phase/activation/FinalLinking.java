@@ -38,6 +38,9 @@ public class FinalLinking extends RankedImpl implements ActivationPhase {
         act.updateOutgoingLinks();
     }
 
+    public String toString() {
+        return "FinalLinking";
+    }
     @Override
     public int compare(Activation act1, Activation act2) {
         return act1.getFired().compareTo(act2.getFired());

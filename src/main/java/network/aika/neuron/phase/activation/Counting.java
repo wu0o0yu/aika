@@ -17,6 +17,7 @@
 package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.RankedImpl;
 
 /**
@@ -39,6 +40,10 @@ public class Counting extends RankedImpl implements ActivationPhase {
     @Override
     public boolean isFinal() {
         return false;
+    }
+
+    public String toString() {
+        return "Counting";
     }
 
     @Override

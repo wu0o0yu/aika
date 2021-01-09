@@ -115,6 +115,10 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
                 );
     }
 
+    public String toString() {
+        return "Linking";
+    }
+
     @Override
     public int compare(Activation act1, Activation act2) {
         return act1.getFired().compareTo(act2.getFired());

@@ -34,6 +34,10 @@ public class UpdateWeight extends RankedImpl implements LinkPhase {
         l.updateSynapse();
     }
 
+    public String toString() {
+        return "Link-UpdateWeight";
+    }
+
     @Override
     public int compare(Link l1, Link l2) {
         return 0;

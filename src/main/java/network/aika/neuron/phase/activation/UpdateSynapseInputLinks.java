@@ -40,6 +40,10 @@ public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPha
         return false;
     }
 
+    public String toString() {
+        return "UpdateSynapseInputLinks";
+    }
+
     @Override
     public int compare(Activation act1, Activation act2) {
         return 0;

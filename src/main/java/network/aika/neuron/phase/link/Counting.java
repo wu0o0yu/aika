@@ -34,6 +34,10 @@ public class Counting extends RankedImpl implements LinkPhase {
         l.count();
     }
 
+    public String toString() {
+        return "Link-Counting";
+    }
+
     @Override
     public int compare(Link l1, Link l2) {
         return 0;

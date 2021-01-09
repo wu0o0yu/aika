@@ -39,6 +39,10 @@ public class Softmax extends RankedImpl implements ActivationPhase {
         return false;
     }
 
+    public String toString() {
+        return "Softmax";
+    }
+
     @Override
     public int compare(Activation act1, Activation act2) {
         return 0;
