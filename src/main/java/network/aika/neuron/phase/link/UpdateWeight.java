@@ -35,7 +35,7 @@ public class UpdateWeight extends RankedImpl implements LinkPhase {
     }
 
     public String toString() {
-        return "Link-UpdateWeight";
+        return "Link-Update Weight";
     }
 
     @Override

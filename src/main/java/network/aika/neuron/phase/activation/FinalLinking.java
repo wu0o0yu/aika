@@ -39,7 +39,7 @@ public class FinalLinking extends RankedImpl implements ActivationPhase {
     }
 
     public String toString() {
-        return "FinalLinking";
+        return "Final Linking";
     }
     @Override
     public int compare(Activation act1, Activation act2) {

@@ -42,7 +42,7 @@ public class PrepareFinalLinking extends RankedImpl implements ActivationPhase {
     }
 
     public String toString() {
-        return "PrepareFinalLinking";
+        return "Prepare Final Linking";
     }
 
     @Override

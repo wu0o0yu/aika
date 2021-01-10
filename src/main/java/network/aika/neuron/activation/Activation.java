@@ -488,7 +488,6 @@ public class Activation extends QueueEntry<ActivationPhase> {
 
     public void processGradient() {
         gradientSum += gradient;
-        gradient = 0.0;
 
         if (getNeuron().isInputNeuron())
             return;
@@ -497,6 +496,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
             return;
 
         addLinksToQueue(INPUT, new PropagateGradient(PROPAGATE_GRADIENT_RANK, gradient));
+        gradient = 0.0;
     }
 
     public double getActFunctionDerivative() {
