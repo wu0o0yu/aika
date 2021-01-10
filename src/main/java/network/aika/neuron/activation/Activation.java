@@ -127,6 +127,10 @@ public class Activation extends QueueEntry<ActivationPhase> {
         return gradient;
     }
 
+    public double getGradientSum() {
+        return gradientSum;
+    }
+
     public double getNet(boolean isFinal) {
         return sum + (isFinal ? lateSum : 0.0) + getNeuron().getBias(isFinal);
     }
