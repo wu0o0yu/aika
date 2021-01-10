@@ -262,7 +262,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return (O) output.getNeuron();
     }
 
-    public SampleSpace getInstances() {
+    public SampleSpace getSampleSpace() {
         return sampleSpace;
     }
 
