@@ -58,6 +58,9 @@ public class Link extends QueueEntry<LinkPhase> {
         this.isSelfRef = isSelfRef;
     }
 
+    public double getGradient() {
+        return gradient;
+    }
 
     @Override
     public void onProcessEvent() {

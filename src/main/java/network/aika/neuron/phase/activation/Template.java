@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
@@ -70,14 +71,17 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
 
     @Override
     public void process(Activation act) {
-/*        act.followLinks( // Sollte durch die Link phase erfolgen
-                new Visitor(
-                        this,
-                        act,
-                        direction
-                )
-        );
-*/
+        if(direction == OUTPUT) {
+            act.followLinks(
+                    new Visitor(
+                            this,
+                            act,
+                            direction,
+                            ACT
+                    )
+            );
+        }
+
         propagate(act,
                 new Visitor(
                         this,
@@ -144,7 +148,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     }
 
     public String toString() {
-        return "Template" + direction;
+        return "Template-" + direction;
     }
 
     @Override
