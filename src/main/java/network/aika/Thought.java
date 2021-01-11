@@ -30,7 +30,10 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
+/**
+ *
+ * @author Lukas Molzberger
+ */
 public abstract class Thought {
     private static final Logger log = LoggerFactory.getLogger(Thought.class);
 

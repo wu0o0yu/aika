@@ -16,7 +16,6 @@
  */
 package network.aika.text;
 
-
 import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Reference;

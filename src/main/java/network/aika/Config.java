@@ -16,19 +16,13 @@
  */
 package network.aika;
 
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.phase.activation.ActivationPhase;
-
-import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Supplier;
 
-import static network.aika.neuron.Sign.POS;
-
+/**
+ *
+ * @author Lukas Molzberger
+ */
 public class Config {
     private Double alpha = null; //0.99;
     private double learnRate;

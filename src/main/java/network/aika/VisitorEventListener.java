@@ -17,7 +17,6 @@
 package network.aika;
 
 import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.activation.direction.Direction;
 
 
 /**

@@ -16,7 +16,6 @@
  */
 package network.aika.text;
 
-import network.aika.Config;
 import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
