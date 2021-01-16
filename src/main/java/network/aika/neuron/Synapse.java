@@ -21,6 +21,7 @@ import network.aika.Writable;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.Scope;
+import network.aika.neuron.phase.link.PropagateGradient;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,8 @@ import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.activation.Link.linkExists;
 import static network.aika.neuron.activation.Visitor.Transition.LINK;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.phase.link.LinkPhase.PROPAGATE_GRADIENT_RANK;
 
 /**
  *
@@ -201,6 +204,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 nl.getSynapse().isTemplate()
         ) {
             nl.addNextLinkPhases(v.getPhase());
+
+            if(!oAct.gradientSumIsZero()) {
+                nl.addToQueue(new PropagateGradient(PROPAGATE_GRADIENT_RANK, oAct.getGradientSum()));
+            }
         }
     }
 
