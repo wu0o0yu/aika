@@ -101,6 +101,12 @@ public class Activation extends QueueEntry<ActivationPhase> {
         thought.onActivationProcessedEvent(this);
     }
 
+
+    @Override
+    public void afterProcessEvent() {
+        thought.afterActivationProcessedEvent(this);
+    }
+
     public void initInput(Reference ref) {
         initPhases(
                 getInitialPhases(getConfig())

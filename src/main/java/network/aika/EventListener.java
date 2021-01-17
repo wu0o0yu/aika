@@ -31,7 +31,11 @@ public interface EventListener {
 
     void onActivationProcessedEvent(Activation act);
 
+    void afterActivationProcessedEvent(Activation act);
+
     void onLinkCreationEvent(Link l);
 
     void onLinkProcessedEvent(Link l);
+
+    void afterLinkProcessedEvent(Link l);
 }

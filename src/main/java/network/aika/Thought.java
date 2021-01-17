@@ -66,14 +66,28 @@ public abstract class Thought {
     public void onActivationProcessedEvent(Activation act) {
         getEventListeners()
                 .forEach(
-                el -> el.onActivationProcessedEvent(act)
-        );
+                        el -> el.onActivationProcessedEvent(act)
+                );
+    }
+
+    public void afterActivationProcessedEvent(Activation act) {
+        getEventListeners()
+                .forEach(
+                        el -> el.afterActivationProcessedEvent(act)
+                );
     }
 
     public void onLinkProcessedEvent(Link l) {
         getEventListeners()
                 .forEach(
                         el -> el.onLinkProcessedEvent(l)
+                );
+    }
+
+    public void afterLinkProcessedEvent(Link l) {
+        getEventListeners()
+                .forEach(
+                        el -> el.afterLinkProcessedEvent(l)
                 );
     }
 
@@ -137,6 +151,7 @@ public abstract class Thought {
             QueueEntry<?> qe = queue.pollFirst();
             qe.onProcessEvent();
             qe.process();
+            qe.afterProcessEvent();
         }
         m.addToN(length());
     }

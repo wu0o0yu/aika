@@ -21,6 +21,7 @@ import network.aika.neuron.phase.Phase;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Supplier;
 
@@ -37,6 +38,8 @@ public abstract class QueueEntry<P extends Phase> implements Comparable<QueueEnt
     private boolean marked;
 
     public abstract void onProcessEvent();
+
+    public abstract void afterProcessEvent();
 
     public void initPhases(P... initialPhases) {
         pendingPhases.addAll(Arrays.asList(initialPhases));
@@ -90,6 +93,10 @@ public abstract class QueueEntry<P extends Phase> implements Comparable<QueueEnt
         return isQueued;
     }
 
+    public SortedSet<P> getPendingPhases() {
+        return pendingPhases;
+    }
+
     public void removePendingPhase() {
         isQueued = false;
         pendingPhases.pollFirst();
@@ -104,6 +111,10 @@ public abstract class QueueEntry<P extends Phase> implements Comparable<QueueEnt
     }
 
     public String toString() {
+        return pendingPhasesToString();
+    }
+
+    public String pendingPhasesToString() {
         StringBuilder sb = new StringBuilder();
         pendingPhases.forEach(p -> sb.append(p.getClass().getSimpleName() + ", "));
 
