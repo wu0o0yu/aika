@@ -335,7 +335,8 @@ public class Activation implements ActivationGraphElement {
                                 l.getSynapse(),
                                 this,
                                 l.getOutput(),
-                                l.isSelfRef()
+                                l.isSelfRef(),
+                                true
                         )
                 );
 //        lastRound.unlinkInputs();
@@ -449,7 +450,7 @@ public class Activation implements ActivationGraphElement {
         double finalValue = computeValue(true);
 
         if (Math.abs(finalValue - initialValue) > TOLERANCE) {
-            boolean hasChanged = updateValue();
+            boolean hasChanged = updateValue(true);
 
             if (hasChanged) {
                 getThought().addToQueue(

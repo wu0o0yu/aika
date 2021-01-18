@@ -192,7 +192,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 this,
                 iAct,
                 oAct,
-                v.getSelfRef()
+                v.getSelfRef(),
+                false
         );
 
         nl.getThought().onLinkProcessedEvent(nl);
@@ -206,7 +207,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
             nl.addNextLinkPhases(v.getPhase());
 
             if(!oAct.gradientSumIsZero()) {
-                nl.addToQueue(new PropagateGradient(PROPAGATE_GRADIENT_RANK, oAct.getGradientSum()));
+                oAct.getThought().addToQueue(
+                        nl,
+                        new PropagateGradient(PROPAGATE_GRADIENT_RANK, oAct.getGradientSum())
+                );
             }
         }
     }

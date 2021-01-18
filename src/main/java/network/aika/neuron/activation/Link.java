@@ -234,8 +234,8 @@ public class Link implements ActivationGraphElement {
         return input != null ? input.getValue() : 0.0;
     }
 
-    public static Link link(Synapse s, Activation input, Activation output, boolean isSelfRef) {
-        if (!ActivationPhase.isFinal(output.getPhase()) && output.isFinal()) {
+    public static Link link(Synapse s, Activation input, Activation output, boolean isSelfRef, boolean finalLinkingMode) {
+        if (!finalLinkingMode && output.isFinal()) {
             output = output.getModifiable(s);
         }
 
@@ -295,7 +295,8 @@ public class Link implements ActivationGraphElement {
     }
 
     public void addNextLinkPhases(VisitorPhase p) {
-        addToQueue(
+        getThought().addToQueue(
+                this,
                 p.getNextLinkPhases(output.getConfig())
         );
     }

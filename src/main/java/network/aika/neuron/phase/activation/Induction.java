@@ -20,14 +20,17 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.RankedImpl;
 
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+
 /**
  *
  * @author Lukas Molzberger
  */
 public class Induction extends RankedImpl implements ActivationPhase {
 
-    public Induction(int rank) {
-        super(rank);
+    public Induction(int round) {
+        super(round, INDUCTION_RANK);
     }
 
     @Override
@@ -43,9 +46,9 @@ public class Induction extends RankedImpl implements ActivationPhase {
 
         act.link();
 
-        act.addToQueue(
-                TEMPLATE_INPUT,
-                TEMPLATE_OUTPUT
+        act.getThought().addToQueue(act,
+                new Template(0, INPUT),
+                new Template(0, OUTPUT)
         );
     }
 

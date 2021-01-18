@@ -30,8 +30,8 @@ import static network.aika.neuron.phase.link.LinkPhase.*;
  */
 public class SelfGradient extends RankedImpl implements ActivationPhase {
 
-    public SelfGradient(int rank) {
-        super(rank);
+    public SelfGradient(int round) {
+        super(round, SELF_GRADIENT_RANK);
     }
 
     @Override

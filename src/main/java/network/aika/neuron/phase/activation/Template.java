@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
@@ -41,8 +42,8 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
 
     private Direction direction;
 
-    public Template(int rank, Direction dir) {
-        super(rank);
+    public Template(int round, Direction dir) {
+        super(round, dir == INPUT ? TEMPLATE_INPUT_RANK : TEMPLATE_OUTPUT_RANK);
         direction = dir;
     }
 

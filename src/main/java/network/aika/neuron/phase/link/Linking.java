@@ -27,8 +27,8 @@ import static network.aika.neuron.phase.activation.ActivationPhase.INITIAL_LINKI
  */
 public class Linking extends RankedImpl implements LinkPhase {
 
-    public Linking(int rank) {
-        super(rank);
+    public Linking(int round) {
+        super(round, LINKING_RANK);
     }
 
     @Override

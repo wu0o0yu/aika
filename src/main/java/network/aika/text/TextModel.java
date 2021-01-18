@@ -94,7 +94,8 @@ public class TextModel extends Model {
     private static void addLink(Synapse s, Activation iAct, Activation oAct) {
         Link nl = oAct.addLink(s, iAct, false);
 
-        nl.addToQueue(
+        iAct.getThought().addToQueue(
+                nl,
                 INITIAL_LINKING.getNextLinkPhases(oAct.getConfig())
         );
     }

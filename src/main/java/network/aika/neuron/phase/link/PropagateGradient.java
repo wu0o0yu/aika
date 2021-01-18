@@ -28,8 +28,8 @@ public class PropagateGradient extends RankedImpl implements LinkPhase {
 
     private double gradient;
 
-    public PropagateGradient(int rank, double gradient) {
-        super(rank);
+    public PropagateGradient(int round, double gradient) {
+        super(round, PROPAGATE_GRADIENT_RANK);
         this.gradient = gradient;
     }
 

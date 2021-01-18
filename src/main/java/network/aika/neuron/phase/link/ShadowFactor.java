@@ -25,8 +25,8 @@ import network.aika.neuron.phase.RankedImpl;
  */
 public class ShadowFactor extends RankedImpl implements LinkPhase {
 
-    public ShadowFactor(int rank) {
-        super(rank);
+    public ShadowFactor(int round) {
+        super(round, SHADOW_FACTOR_RANK);
     }
 
     @Override

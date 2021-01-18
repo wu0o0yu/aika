@@ -25,8 +25,8 @@ import network.aika.neuron.phase.RankedImpl;
  */
 public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPhase {
 
-    public UpdateSynapseInputLinks(int rank) {
-        super(rank);
+    public UpdateSynapseInputLinks(int round) {
+        super(round, UPDATE_SYNAPSE_INPUT_LINKS_RANK);
     }
 
     @Override

@@ -44,8 +44,8 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase {
 
-    public Linking(int rank) {
-        super(rank);
+    public Linking(int round) {
+        super(round, INITIAL_LINKING_RANK);
     }
 
     @Override

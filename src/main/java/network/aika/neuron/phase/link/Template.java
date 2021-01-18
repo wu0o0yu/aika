@@ -27,8 +27,8 @@ import network.aika.neuron.phase.activation.ActivationPhase;
  */
 public class Template extends RankedImpl implements LinkPhase {
 
-    public Template(int rank) {
-        super(rank);
+    public Template(int round) {
+        super(round, TEMPLATE_RANK);
     }
 
     @Override
