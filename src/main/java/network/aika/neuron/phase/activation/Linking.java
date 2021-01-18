@@ -62,7 +62,7 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
     public void process(Activation act) {
         act.getThought().linkInputRelations(act);
 
-        if(!act.updateValue())
+        if(!act.updateValue(isFinal()))
             return;
 
         Visitor v = new Visitor(

@@ -35,7 +35,7 @@ public interface LinkPhase extends Phase<Link> {
     LinkPhase UPDATE_WEIGHTS = new UpdateWeight(14);
     LinkPhase TEMPLATE = new Template(16);
 
-
+/*
     static LinkPhase[] getInitialPhases(Config c) {
         return c.isEnableTraining() ?
                 new LinkPhase[] {
@@ -50,4 +50,5 @@ public interface LinkPhase extends Phase<Link> {
                         COUNTING
                 };
     }
+ */
 }

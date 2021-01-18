@@ -29,134 +29,66 @@ import java.util.function.Supplier;
  *
  * @author Lukas Molzberger
  */
-public abstract class QueueEntry<P extends Phase> implements Comparable<QueueEntry<P>> {
+public class QueueEntry implements Comparable<QueueEntry> {
 
-    protected P phase;
+    private Phase phase;
+    private ActivationGraphElement graphElement;
 
-    private TreeSet<P> pendingPhases = new TreeSet<>(Comparator.comparing(p -> p.getRank()));
-    private boolean isQueued;
-    private boolean marked;
-
-    public abstract void onProcessEvent();
-
-    public abstract void afterProcessEvent();
-
-    public void initPhases(P... initialPhases) {
-        pendingPhases.addAll(Arrays.asList(initialPhases));
+    public QueueEntry(Phase phase, ActivationGraphElement graphElement) {
+        this.phase = phase;
+        this.graphElement = graphElement;
     }
 
-    public boolean isMarked() {
-        return marked;
-    }
-
-    public void setMarked(boolean marked) {
-        this.marked = marked;
-    }
-
-    public void addPhase(QueueEntry<P> e, P... p) {
-        pendingPhases.addAll(Arrays.asList(p));
-
-        queueNextPhase(e);
-    }
-
-    public void queueNextPhase(QueueEntry<P> e) {
-        if(pendingPhases.isEmpty()) {
-            e.setPhase(null);
-            return;
-        }
-
-        updateQueueEntry(() -> {
-            e.setPhase(pendingPhases.first());
-            return e;
-        });
-    }
-
+    /*
     public void updateQueueEntry(Supplier<QueueEntry<P>> newEntrySupplier) {
         removeFromQueue();
         QueueEntry<P> newEntry = newEntrySupplier.get();
         addToQueue(newEntry);
     }
 
-    private void addToQueue(QueueEntry<P> newEntry) {
+    private void addToQueue(QueueEntry<P, E> newEntry) {
         newEntry.getThought().addToQueue(newEntry);
-        isQueued = true;
     }
 
     private void removeFromQueue() {
-        if(isQueued()) {
-            getThought().removeActivationFromQueue(this);
-            isQueued = true;
-        }
+        getThought().removeActivationFromQueue(this);
     }
-
-    public boolean isQueued() {
-        return isQueued;
-    }
-
-    public SortedSet<P> getPendingPhases() {
-        return pendingPhases;
-    }
-
-    public void removePendingPhase() {
-        isQueued = false;
-        pendingPhases.pollFirst();
-    }
-
-    public void clearPendingPhases() {
-        pendingPhases.clear();
-    }
-
-    public void copyPhases(QueueEntry<P> oldEntry) {
-        pendingPhases.addAll(oldEntry.pendingPhases);
-    }
-
+*/
     public String toString() {
-        return pendingPhasesToString();
+        return Phase.toString(getPhase()) + " : " + graphElement.toString();
     }
 
     public String pendingPhasesToString() {
         StringBuilder sb = new StringBuilder();
-        pendingPhases.forEach(p -> sb.append(p.getClass().getSimpleName() + ", "));
+ //       pendingPhases.forEach(p -> sb.append(p.toString() + ", "));
 
-        return sb.toString();
+        return sb.substring(0, Math.max(0, sb.length() - 2));
     }
 
+    /*
     public void addToQueue(P... p) {
-        if(p.length == 0) {
-            return;
-        }
 
-        addPhase(this, p);
+
+        getThought().addToQueue(this, p);
     }
+*/
 
-    public P getPhase() {
+    public Phase getPhase() {
         return phase;
     }
 
-    public void setPhase(P p) {
-        phase = p;
-    }
-
-    public abstract boolean isActive();
-
-    public abstract Thought getThought();
-
     public void process() {
-        removePendingPhase();
-
-        getPhase().process(this);
-
-        queueNextPhase(this);
+        graphElement.onProcessEvent();
+        phase.process(this);
+        graphElement.afterProcessEvent();
     }
 
     @Override
-    public int compareTo(QueueEntry<P> qe) {
+    public int compareTo(QueueEntry qe) {
         int r = Integer.compare(getPhase().getRank(), qe.getPhase().getRank());
         if(r != 0) return r;
         r = getPhase().compare(this, qe);
         if(r != 0) return r;
-        return innerCompareTo(qe);
+        return compareTo(qe);
     }
-
-    protected abstract int innerCompareTo(QueueEntry<P> qe);
 }

@@ -47,7 +47,7 @@ public interface ActivationPhase extends Phase<Activation> {
     static boolean isFinal(ActivationPhase ap) {
         return ap != null && ap.isFinal();
     }
-
+/*
     static ActivationPhase[] getInitialPhases(Config c) {
         return c.isEnableTraining() ?
                 new ActivationPhase[]{
@@ -68,4 +68,5 @@ public interface ActivationPhase extends Phase<Activation> {
                         COUNTING
                 };
     }
+ */
 }

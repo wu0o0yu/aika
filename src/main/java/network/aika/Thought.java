@@ -19,11 +19,9 @@ package network.aika;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.QueueEntry;
-import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.phase.Phase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,8 +135,12 @@ public abstract class Thought {
         activationsById.put(act.getId(), act);
     }
 
-    public void addToQueue(QueueEntry qe) {
-        queue.add(qe);
+    public void addToQueue(ActivationGraphElement ge, Phase... phases) {
+        for(Phase p: phases) {
+            queue.add(
+                    new QueueEntry(p, ge)
+            );
+        }
     }
 
     public void removeActivationFromQueue(QueueEntry qe) {
@@ -148,10 +150,8 @@ public abstract class Thought {
 
     public void process(Model m) {
         while (!queue.isEmpty()) {
-            QueueEntry<?> qe = queue.pollFirst();
-            qe.onProcessEvent();
-            qe.process();
-            qe.afterProcessEvent();
+            queue.pollFirst()
+                    .process();
         }
         m.addToN(length());
     }

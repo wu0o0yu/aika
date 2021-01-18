@@ -38,7 +38,7 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
  *
  * @author Lukas Molzberger
  */
-public class Link extends QueueEntry<LinkPhase> {
+public class Link implements ActivationGraphElement {
 
     private static final Logger log = LoggerFactory.getLogger(Link.class);
 
@@ -300,11 +300,6 @@ public class Link extends QueueEntry<LinkPhase> {
         );
     }
 
-    @Override
-    public boolean isActive() {
-        return true;
-    }
-
     public boolean isNegative() {
         return synapse.getWeight() < 0.0;
     }
@@ -315,19 +310,18 @@ public class Link extends QueueEntry<LinkPhase> {
     }
 
     @Override
-    protected int innerCompareTo(QueueEntry<LinkPhase> qe) {
-        Link l = ((Link) qe);
-        int r = output.innerCompareTo(l.output);
+    public int compareTo(ActivationGraphElement ge) {
+        Link l = ((Link) ge);
+        int r = output.compareTo(l.output);
         if(r != 0) return r;
 
-        return input.innerCompareTo(l.input);
+        return input.compareTo(l.input);
     }
 
     public String toString() {
         return synapse.getClass().getSimpleName() +
                 ": " + getIdString() +
-                " --> " + output.getShortString() +
-                Phase.toString(getPhase());
+                " --> " + output.getShortString();
     }
 
     public String toDetailedString() {

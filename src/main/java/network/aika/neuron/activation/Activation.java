@@ -44,7 +44,7 @@ import static network.aika.neuron.phase.link.LinkPhase.PROPAGATE_GRADIENT_RANK;
 /**
  * @author Lukas Molzberger
  */
-public class Activation extends QueueEntry<ActivationPhase> {
+public class Activation implements ActivationGraphElement {
 
     public static double TOLERANCE = 0.001;
 
@@ -53,6 +53,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     private double lateSum;
     private Fired fired = NOT_FIRED;
     private boolean fixed;
+    private boolean marked;
 
     private int id;
     private Neuron<?> neuron;
@@ -96,6 +97,14 @@ public class Activation extends QueueEntry<ActivationPhase> {
         outputLinks = new TreeMap<>();
     }
 
+    public boolean isMarked() {
+        return marked;
+    }
+
+    public void setMarked(boolean marked) {
+        this.marked = marked;
+    }
+
     @Override
     public void onProcessEvent() {
         thought.onActivationProcessedEvent(this);
@@ -108,10 +117,6 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void initInput(Reference ref) {
-        initPhases(
-                getInitialPhases(getConfig())
-        );
-
         setReference(ref);
 
         setValue(1.0);
@@ -173,8 +178,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     @Override
-    protected int innerCompareTo(QueueEntry<ActivationPhase> qe) {
-        return Integer.compare(getId(), ((Activation) qe).getId());
+    public int compareTo(ActivationGraphElement ge) {
+        return Integer.compare(getId(), ((Activation) ge).getId());
     }
 
     public OutputKey getOutputKey() {
@@ -314,9 +319,9 @@ public class Activation extends QueueEntry<ActivationPhase> {
                 .map(l -> l.getInput());
     }
 
-    public boolean updateValue() {
+    public boolean updateValue(boolean finalLinkingMode) {
         if (!fixed) {
-            value = computeValue(ActivationPhase.isFinal(getPhase()));
+            value = computeValue(finalLinkingMode);
         }
         isFinal = true;
         return !equals(lastRound);
@@ -349,7 +354,8 @@ public class Activation extends QueueEntry<ActivationPhase> {
     }
 
     public void addNextActivationPhases(VisitorPhase p) {
-        addToQueue(
+        getThought().addToQueue(
+                this,
                 p.getNextActivationPhases(getConfig())
         );
     }
@@ -446,8 +452,10 @@ public class Activation extends QueueEntry<ActivationPhase> {
             boolean hasChanged = updateValue();
 
             if (hasChanged) {
-                getModifiable(null)
-                        .addToQueue(FINAL_LINKING);
+                getThought().addToQueue(
+                        getModifiable(null),
+                        FINAL_LINKING
+                );
             }
         }
     }
@@ -455,7 +463,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     private void checkIfFired() {
         if (fired == NOT_FIRED && getNet() > 0.0) {
             setFired(neuron.incrementFired(getLatestFired()));
-            addToQueue(INITIAL_LINKING);
+            getThought().addToQueue(this, INITIAL_LINKING);
         }
     }
 
@@ -516,7 +524,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     public void propagateGradient(double g) {
         gradient += g;
 
-        addToQueue(PROPAGATE_GRADIENT);
+        getThought().addToQueue(this, PROPAGATE_GRADIENT);
     }
 
     public void linkInputs() {
@@ -588,7 +596,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     public void addLinksToQueue(Direction dir, LinkPhase... phases) {
         dir.getLinks(this)
                 .forEach(l ->
-                        l.addToQueue(phases)
+                        getThought().addToQueue(l, phases)
                 );
     }
 
@@ -616,8 +624,7 @@ public class Activation extends QueueEntry<ActivationPhase> {
     public String getShortString() {
         return "id:" +
                 getId() +
-                " n:[" + getNeuron() + "]" +
-                Phase.toString(getPhase());
+                " n:[" + getNeuron() + "]";
     }
 
     public String gradientsToString() {
