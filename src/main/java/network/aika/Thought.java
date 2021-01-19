@@ -158,7 +158,7 @@ public abstract class Thought {
     public <E extends Element> List<Phase> getPhasesForElement(E element) {
         return queue
                 .stream()
-                .filter(qe -> qe.getGraphElement() == element)
+                .filter(qe -> qe.getElement() == element)
                 .map(qe -> qe.getPhase())
                 .collect(Collectors.toList());
     }
