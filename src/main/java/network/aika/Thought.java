@@ -20,7 +20,6 @@ package network.aika;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.Phase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,7 +134,7 @@ public abstract class Thought {
         activationsById.put(act.getId(), act);
     }
 
-    public void addToQueue(ActivationGraphElement ge, Phase... phases) {
+    public void addToQueue(Element ge, Phase... phases) {
         for(Phase p: phases) {
             queue.add(
                     new QueueEntry(p, ge)
@@ -154,6 +153,14 @@ public abstract class Thought {
                     .process();
         }
         m.addToN(length());
+    }
+
+    public <E extends Element> List<Phase> getPhasesForElement(E element) {
+        return queue
+                .stream()
+                .filter(qe -> qe.getGraphElement() == element)
+                .map(qe -> qe.getPhase())
+                .collect(Collectors.toList());
     }
 
     public int createActivationId() {

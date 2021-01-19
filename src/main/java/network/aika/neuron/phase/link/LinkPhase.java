@@ -28,6 +28,7 @@ public interface LinkPhase extends Phase<Link> {
 
     int INDUCTION_RANK = 1;
     int LINKING_RANK = 2;
+    int SUM_UP_LINK_RANK = 2;
     int COUNTING_RANK = 8;
     int SHADOW_FACTOR_RANK = 9;
     int SELF_GRADIENT_RANK = 11;

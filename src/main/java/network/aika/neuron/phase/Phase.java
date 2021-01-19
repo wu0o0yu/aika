@@ -16,15 +16,14 @@
  */
 package network.aika.neuron.phase;
 
-import network.aika.neuron.activation.ActivationGraphElement;
-import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.activation.Element;
 
 import java.util.Comparator;
 
 /**
  * @author Lukas Molzberger
  */
-public interface Phase<E extends ActivationGraphElement> extends Ranked, Comparator<E> {
+public interface Phase<E extends Element> extends Ranked, Comparator<E> {
 
     void process(E e);
 

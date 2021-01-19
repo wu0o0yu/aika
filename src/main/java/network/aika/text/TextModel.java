@@ -31,7 +31,6 @@ import network.aika.neuron.inhibitory.InhibitorySynapse;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
-import static network.aika.neuron.phase.activation.ActivationPhase.INITIAL_LINKING;
 
 /**
  *

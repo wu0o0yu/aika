@@ -22,23 +22,19 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.VisitorPhase;
-import network.aika.neuron.phase.activation.ActivationPhase;
-import network.aika.neuron.phase.link.LinkPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
-import static network.aika.neuron.activation.Visitor.Transition.LINK;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Link implements ActivationGraphElement {
+public class Link implements Element {
 
     private static final Logger log = LoggerFactory.getLogger(Link.class);
 
@@ -153,10 +149,6 @@ public class Link implements ActivationGraphElement {
     }
 
     private double getActFunctionDerivative() {
-        if(output.getNet() == 0.0) {
-            return 0.0;
-        }
-
         return output.getNeuron()
                 .getActivationFunction()
                 .outerGrad(
@@ -234,14 +226,6 @@ public class Link implements ActivationGraphElement {
         return input != null ? input.getValue() : 0.0;
     }
 
-    public static Link link(Synapse s, Activation input, Activation output, boolean isSelfRef, boolean finalLinkingMode) {
-        if (!finalLinkingMode && output.isFinal()) {
-            output = output.getModifiable(s);
-        }
-
-        return output.addLink(s, input, isSelfRef);
-    }
-
     public Synapse getSynapse() {
         return synapse;
     }
@@ -311,7 +295,7 @@ public class Link implements ActivationGraphElement {
     }
 
     @Override
-    public int compareTo(ActivationGraphElement ge) {
+    public int compareTo(Element ge) {
         Link l = ((Link) ge);
         int r = output.compareTo(l.output);
         if(r != 0) return r;

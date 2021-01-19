@@ -16,14 +16,7 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.Thought;
 import network.aika.neuron.phase.Phase;
-
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.function.Supplier;
 
 /**
  *
@@ -32,9 +25,9 @@ import java.util.function.Supplier;
 public class QueueEntry implements Comparable<QueueEntry> {
 
     private Phase phase;
-    private ActivationGraphElement graphElement;
+    private Element graphElement;
 
-    public QueueEntry(Phase phase, ActivationGraphElement graphElement) {
+    public QueueEntry(Phase phase, Element graphElement) {
         this.phase = phase;
         this.graphElement = graphElement;
     }
@@ -77,9 +70,14 @@ public class QueueEntry implements Comparable<QueueEntry> {
         return phase;
     }
 
+
+    public Element getGraphElement() {
+        return graphElement;
+    }
+
     public void process() {
         graphElement.onProcessEvent();
-        phase.process(this);
+        phase.process(graphElement);
         graphElement.afterProcessEvent();
     }
 

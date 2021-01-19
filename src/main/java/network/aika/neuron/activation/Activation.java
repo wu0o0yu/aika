@@ -26,11 +26,11 @@ import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.VisitorPhase;
-import network.aika.neuron.phase.activation.ActivationPhase;
+import network.aika.neuron.phase.activation.*;
 import network.aika.neuron.phase.link.LinkPhase;
 import network.aika.neuron.phase.link.PropagateGradient;
+import network.aika.neuron.phase.link.SumUpLink;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,13 +38,12 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
-import static network.aika.neuron.phase.activation.ActivationPhase.*;
 import static network.aika.neuron.phase.link.LinkPhase.PROPAGATE_GRADIENT_RANK;
 
 /**
  * @author Lukas Molzberger
  */
-public class Activation implements ActivationGraphElement {
+public class Activation implements Element {
 
     public static double TOLERANCE = 0.001;
 
@@ -123,7 +122,10 @@ public class Activation implements ActivationGraphElement {
         setFired(ref.getBegin());
 
         isFinal = true;
-        addToQueue(INITIAL_LINKING);
+        getThought().addToQueue(
+                this,
+                new Linking(0)
+        );
     }
 
     public int getId() {
@@ -159,14 +161,16 @@ public class Activation implements ActivationGraphElement {
     }
 
     public void setFired(Fired f) {
-        if(isQueued()) {
+        // TODO: check if really necessary
+/*        if(isQueued()) {
             updateQueueEntry(() -> {
                 this.fired = f;
                 return this;
             });
         } else {
-            this.fired = f;
-        }
+ */
+            fired = f;
+//        }
     }
 
     public boolean isFinal() {
@@ -178,7 +182,7 @@ public class Activation implements ActivationGraphElement {
     }
 
     @Override
-    public int compareTo(ActivationGraphElement ge) {
+    public int compareTo(Element ge) {
         return Integer.compare(getId(), ((Activation) ge).getId());
     }
 
@@ -231,7 +235,8 @@ public class Activation implements ActivationGraphElement {
         Activation clonedAct = new Activation(thought.createActivationId(), thought, neuron);
         thought.onActivationCreationEvent(clonedAct, this);
 
-        clonedAct.copyPhases(this);
+        // TODO: Check if necessary
+        //clonedAct.copyPhases(this);
         clonedAct.round = round + 1;
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
@@ -245,8 +250,9 @@ public class Activation implements ActivationGraphElement {
         Activation clonedAct = new Activation(id, thought, neuron);
         thought.onActivationCreationEvent(clonedAct, this);
 
-        clonedAct.copyPhases(this);
-        clearPendingPhases();
+        // TODO: Check if necessary
+//        clonedAct.copyPhases(this);
+//        clearPendingPhases();
 
         clonedAct.round = round + 1;
         clonedAct.lastRound = this;
@@ -301,8 +307,12 @@ public class Activation implements ActivationGraphElement {
         return getOutputLinks()
                 .filter(l -> !l.isNegative() || l.isCausal())
                 .map(l -> l.getOutput())
-                .filter(act -> act.fired != NOT_FIRED && fired.compareTo(act.fired) == -1)
-                .anyMatch(act -> act.searchWithinBranch());
+                .filter(act ->
+                        act.fired != NOT_FIRED && fired.compareTo(act.fired) == -1
+                )
+                .anyMatch(act ->
+                        act.searchWithinBranch()
+                );
     }
 
     public Stream<Activation> getConflictingMainBranches() {
@@ -331,18 +341,17 @@ public class Activation implements ActivationGraphElement {
         lastRound.outputLinks
                 .values()
                 .forEach(l ->
-                        Link.link(
-                                l.getSynapse(),
-                                this,
-                                l.getOutput(),
-                                l.isSelfRef(),
-                                true
-                        )
+                        l.getOutput()
+                                .getModifiable(l.getSynapse())
+                                .addLink(
+                                        l.getSynapse(),
+                                        this,
+                                        l.isSelfRef()
+                                )
                 );
 //        lastRound.unlinkInputs();
         lastRound = null;
     }
-
 
     public static Activation createActivation(Thought t, Neuron n) {
         Activation act = new Activation(
@@ -415,8 +424,10 @@ public class Activation implements ActivationGraphElement {
         nl.linkInput();
         nl.linkOutput();
 
-        sumUpLink(ol, nl);
-        checkIfFired();
+        getThought().addToQueue(
+                nl,
+                new SumUpLink(0, ol)
+        );
 
         return nl;
     }
@@ -455,16 +466,21 @@ public class Activation implements ActivationGraphElement {
             if (hasChanged) {
                 getThought().addToQueue(
                         getModifiable(null),
-                        FINAL_LINKING
+                        new FinalLinking(0)
                 );
             }
         }
     }
 
-    private void checkIfFired() {
+    public void checkIfFired() {
         if (fired == NOT_FIRED && getNet() > 0.0) {
             setFired(neuron.incrementFired(getLatestFired()));
-            getThought().addToQueue(this, INITIAL_LINKING);
+            getThought().addToQueue(
+                    this,
+                    new Linking(0),
+                    new Softmax(0),
+                    new Counting(0)
+            );
         }
     }
 
@@ -525,7 +541,10 @@ public class Activation implements ActivationGraphElement {
     public void propagateGradient(double g) {
         gradient += g;
 
-        getThought().addToQueue(this, PROPAGATE_GRADIENT);
+        getThought().addToQueue(
+                this,
+                new PropagateGradients(0)
+        );
     }
 
     public void linkInputs() {
@@ -565,7 +584,7 @@ public class Activation implements ActivationGraphElement {
     public void computeBranchProbability() {
         if (!isActive() || !hasBranches()) return;
 
-        double net = getNet();
+        double net = getNet(true);
         Set<Activation> conflictingActs = branches
                 .stream()
                 .flatMap(bAct -> bAct.getInputLinks())
@@ -576,14 +595,14 @@ public class Activation implements ActivationGraphElement {
 
         double offset = conflictingActs
                 .stream()
-                .mapToDouble(cAct -> cAct.getNet())
+                .mapToDouble(cAct -> cAct.getNet(true))
                 .min()
                 .getAsDouble();
 
         double norm = Math.exp(net - offset);
         norm += conflictingActs
                 .stream()
-                .mapToDouble(cAct -> Math.exp(cAct.getNet() - offset))
+                .mapToDouble(cAct -> Math.exp(cAct.getNet(true) - offset))
                 .sum();
 
         double p = Math.exp(net - offset) / norm;
@@ -651,7 +670,8 @@ public class Activation implements ActivationGraphElement {
         sb.append("act " +
                 getShortString() +
                 " value:" + Utils.round(value) +
-                " net:" + Utils.round(getNet()) +
+                " net:" + Utils.round(getNet(false)) +
+                " net-final:" + Utils.round(getNet(true)) +
                 " bp:" + Utils.round(branchProbability) +
                 " round:" + round);
 

@@ -100,10 +100,9 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
             return;
 
         oAct = s.branchIfNecessary(oAct, v);
-        if (oAct == null)
-            return;
 
-        s.closeCycle(v, iAct, oAct);
+        if(oAct != null)
+            s.closeCycle(v, iAct, oAct);
     }
 
     public void propagate(Activation act, Visitor v) {

@@ -14,35 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.activation;
 
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.phase.RankedImpl;
-
-import network.aika.neuron.phase.activation.ActivationPhase;
+import network.aika.Thought;
 
 /**
+ * An Element is either a node (Activation) or an edge (Link) in the Activation graph.
  *
- * @author Lukas Molzberger
+ *  @author Lukas Molzberger
  */
-public class Template extends RankedImpl implements LinkPhase {
+public interface Element extends Comparable<Element> {
 
-    public Template(int round) {
-        super(round, TEMPLATE_RANK);
-    }
+    void onProcessEvent();
 
-    @Override
-    public void process(Link l) {
-        l.follow(new network.aika.neuron.phase.activation.Template(getRound(), Direction.INPUT));
-    }
+    void afterProcessEvent();
 
-    public String toString() {
-        return "Link-Template";
-    }
-
-    @Override
-    public int compare(Link l1, Link l2) {
-        return 0;
-    }
+    Thought getThought();
 }
