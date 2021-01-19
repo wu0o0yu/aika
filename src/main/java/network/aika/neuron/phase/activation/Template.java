@@ -25,6 +25,7 @@ import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
+import network.aika.neuron.phase.link.LinkInduction;
 import network.aika.neuron.phase.link.LinkPhase;
 
 import java.util.Set;
@@ -50,23 +51,14 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     @Override
     public ActivationPhase[] getNextActivationPhases(Config c) {
         return new ActivationPhase[] {
-                PREPARE_FINAL_LINKING,
-                SOFTMAX,
-                COUNTING,
-                INDUCTION,
-                PROPAGATE_GRADIENT,
-                UPDATE_SYNAPSE_INPUT_LINKS
+                new Induction(0)
         };
     }
 
     @Override
     public LinkPhase[] getNextLinkPhases(Config c) {
         return new LinkPhase[] {
-                LinkPhase.SELF_GRADIENT,
-                LinkPhase.SHADOW_FACTOR,
-                LinkPhase.INDUCTION,
-                LinkPhase.UPDATE_WEIGHTS,
-                LinkPhase.TEMPLATE
+                new LinkInduction(0)
         };
     }
 

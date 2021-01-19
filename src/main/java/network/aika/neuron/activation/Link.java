@@ -152,7 +152,7 @@ public class Link implements Element {
         return output.getNeuron()
                 .getActivationFunction()
                 .outerGrad(
-                        output.getNet() - (input.getValue() * synapse.getWeight())
+                        output.getNet(true) - (input.getValue() * synapse.getWeight())
                 );
     }
 /*

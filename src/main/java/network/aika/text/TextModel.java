@@ -28,6 +28,7 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
+import network.aika.neuron.phase.activation.LinkAndPropagate;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -95,7 +96,7 @@ public class TextModel extends Model {
 
         iAct.getThought().addToQueue(
                 nl,
-                INITIAL_LINKING.getNextLinkPhases(oAct.getConfig())
+                new LinkAndPropagate(0)
         );
     }
 

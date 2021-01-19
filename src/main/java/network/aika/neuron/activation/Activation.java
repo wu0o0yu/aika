@@ -47,7 +47,7 @@ public class Activation implements Element {
 
     public static double TOLERANCE = 0.001;
 
-    private double value;
+    private Double value = null;
     private double sum;
     private double lateSum;
     private Fired fired = NOT_FIRED;
@@ -63,7 +63,7 @@ public class Activation implements Element {
     Map<NeuronProvider, Link> inputLinks;
     NavigableMap<OutputKey, Link> outputLinks;
 
-    private boolean isFinal;
+//    private boolean isFinal;
 
     private int round; // Only used as stopping criteria
     private Activation lastRound;
@@ -121,10 +121,9 @@ public class Activation implements Element {
         setValue(1.0);
         setFired(ref.getBegin());
 
-        isFinal = true;
         getThought().addToQueue(
                 this,
-                new Linking(0)
+                new LinkAndPropagate(0)
         );
     }
 
@@ -148,10 +147,6 @@ public class Activation implements Element {
         return sum + (isFinal ? lateSum : 0.0) + getNeuron().getBias(isFinal);
     }
 
-    public double getNet() {
-        return getNet(ActivationPhase.isFinal(getPhase()));
-    }
-
     public Fired getFired() {
         return fired;
     }
@@ -172,11 +167,11 @@ public class Activation implements Element {
             fired = f;
 //        }
     }
-
+/*
     public boolean isFinal() {
         return isFinal;
     }
-
+*/
     public Thought getThought() {
         return thought;
     }
@@ -245,7 +240,8 @@ public class Activation implements Element {
     }
 
     public Activation getModifiable(Synapse excludedSyn) {
-        if (!isFinal) return this;
+        if (value == null)
+            return this;
 
         Activation clonedAct = new Activation(id, thought, neuron);
         thought.onActivationCreationEvent(clonedAct, this);
@@ -333,7 +329,6 @@ public class Activation implements Element {
         if (!fixed) {
             value = computeValue(finalLinkingMode);
         }
-        isFinal = true;
         return !equals(lastRound);
     }
 
@@ -433,7 +428,7 @@ public class Activation implements Element {
     }
 
     public void sumUpLink(Link ol, Link nl) {
-        assert ol == null || !isFinal;
+        assert ol == null || value == null;
 
         double w = nl.getSynapse().getWeight();
 
@@ -442,13 +437,11 @@ public class Activation implements Element {
         double x = nl.getInput().value - (ol != null ? ol.getInput().value : 0.0);
         double s = x * w;
 
-        if (isFinal) {
+        if (value != null) {
             lateSum += s;
         } else {
             sum += s;
-        }
 
-        if (!isFinal) {
             nl.getSynapse().updateReference(nl);
         }
     }
@@ -473,11 +466,11 @@ public class Activation implements Element {
     }
 
     public void checkIfFired() {
-        if (fired == NOT_FIRED && getNet() > 0.0) {
+        if (fired == NOT_FIRED && getNet(false) > 0.0) {
             setFired(neuron.incrementFired(getLatestFired()));
             getThought().addToQueue(
                     this,
-                    new Linking(0),
+                    new LinkAndPropagate(0),
                     new Softmax(0),
                     new Counting(0)
             );
@@ -534,7 +527,7 @@ public class Activation implements Element {
         return getNeuron()
                 .getActivationFunction()
                 .outerGrad(
-                        getNet()
+                        getNet(true)
                 );
     }
 
@@ -625,7 +618,7 @@ public class Activation implements Element {
     }
 
     private Activation getMostRecentFinalActivation() {
-        return !isFinal && lastRound != null ? lastRound : this;
+        return value == null && lastRound != null ? lastRound : this;
     }
 
     public Stream<Link> getInputLinks() {

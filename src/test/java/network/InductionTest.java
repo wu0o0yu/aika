@@ -106,8 +106,8 @@ public class InductionTest {
         actB.setReference(new TextReference(doc, 0, 1));
         actB.setValue(1.0);
 
-        Link.link(sA, actA, actTarget, false);
-        Link.link(sB, actB, actTarget, false);
+        actTarget.addLink(sA, actA, false);
+        actTarget.addLink(sB, actB, false);
 
         actTarget.initSelfGradient();
  //       actTarget.computeInitialLinkGradients();

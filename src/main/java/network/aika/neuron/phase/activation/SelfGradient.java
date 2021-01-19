@@ -20,6 +20,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.link.LinkPhase;
+import network.aika.neuron.phase.link.LinkSelfGradient;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.link.LinkPhase.*;
@@ -48,9 +49,7 @@ public class SelfGradient extends RankedImpl implements ActivationPhase {
 
         act.addLinksToQueue(
                 INPUT,
-                LinkPhase.SELF_GRADIENT,
-                SHADOW_FACTOR,
-                UPDATE_WEIGHTS
+                new LinkSelfGradient(0)
         );
     }
 
