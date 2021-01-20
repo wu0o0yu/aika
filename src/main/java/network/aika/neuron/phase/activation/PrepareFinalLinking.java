@@ -25,8 +25,8 @@ import network.aika.neuron.phase.RankedImpl;
  */
 public class PrepareFinalLinking extends RankedImpl implements ActivationPhase {
 
-    public PrepareFinalLinking(int round) {
-        super(round, PREPARE_FINAL_LINKING_RANK);
+    public PrepareFinalLinking(int rank) {
+        super(rank);
     }
 
     @Override

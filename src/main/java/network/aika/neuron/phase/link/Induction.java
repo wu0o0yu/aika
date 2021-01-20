@@ -24,10 +24,10 @@ import network.aika.neuron.phase.RankedImpl;
  *
  * @author Lukas Molzberger
  */
-public class LinkInduction extends RankedImpl implements LinkPhase {
+public class Induction extends RankedImpl implements LinkPhase {
 
-    public LinkInduction(int round) {
-        super(round, INDUCTION_RANK);
+    public Induction(int rank) {
+        super(rank);
     }
 
     @Override

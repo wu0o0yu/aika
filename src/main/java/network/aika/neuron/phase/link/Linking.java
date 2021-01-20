@@ -18,7 +18,8 @@ package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.RankedImpl;
-import network.aika.neuron.phase.activation.LinkAndPropagate;
+
+import static network.aika.neuron.phase.activation.ActivationPhase.LINK_AND_PROPAGATE;
 
 
 /**
@@ -27,13 +28,13 @@ import network.aika.neuron.phase.activation.LinkAndPropagate;
  */
 public class Linking extends RankedImpl implements LinkPhase {
 
-    public Linking(int round) {
-        super(round, LINKING_RANK);
+    public Linking(int rank) {
+        super(rank);
     }
 
     @Override
     public void process(Link l) {
-        l.follow(new LinkAndPropagate(getRound()));
+        l.follow(LINK_AND_PROPAGATE);
     }
 
     public String toString() {

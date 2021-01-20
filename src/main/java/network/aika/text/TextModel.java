@@ -32,6 +32,7 @@ import network.aika.neuron.phase.activation.LinkAndPropagate;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+import static network.aika.neuron.phase.activation.ActivationPhase.LINK_AND_PROPAGATE;
 
 /**
  *
@@ -96,7 +97,7 @@ public class TextModel extends Model {
 
         iAct.getThought().addToQueue(
                 nl,
-                new LinkAndPropagate(0)
+                LINK_AND_PROPAGATE.getNextLinkPhases(oAct.getConfig())
         );
     }
 

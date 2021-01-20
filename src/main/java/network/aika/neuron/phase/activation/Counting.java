@@ -26,8 +26,8 @@ import network.aika.neuron.phase.RankedImpl;
  */
 public class Counting extends RankedImpl implements ActivationPhase {
 
-    public Counting(int round) {
-        super(round, COUNTING_RANK);
+    public Counting(int rank) {
+        super(rank);
     }
 
     @Override

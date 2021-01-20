@@ -25,14 +25,12 @@ import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
-import network.aika.neuron.phase.link.LinkInduction;
 import network.aika.neuron.phase.link.LinkPhase;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
@@ -43,22 +41,22 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
 
     private Direction direction;
 
-    public Template(int round, Direction dir) {
-        super(round, dir == INPUT ? TEMPLATE_INPUT_RANK : TEMPLATE_OUTPUT_RANK);
+    public Template(int rank, Direction dir) {
+        super(rank);
         direction = dir;
     }
 
     @Override
     public ActivationPhase[] getNextActivationPhases(Config c) {
         return new ActivationPhase[] {
-                new Induction(0)
+                INDUCTION
         };
     }
 
     @Override
     public LinkPhase[] getNextLinkPhases(Config c) {
         return new LinkPhase[] {
-                new LinkInduction(0)
+                LinkPhase.INDUCTION
         };
     }
 

@@ -22,17 +22,10 @@ package network.aika.neuron.phase;
  */
 public class RankedImpl implements Ranked {
 
-    private int round;
     private int rank;
 
-    public RankedImpl(int round, int rank) {
-        this.round = round;
+    public RankedImpl(int rank) {
         this.rank = rank;
-    }
-
-
-    public int getRound() {
-        return round;
     }
 
     @Override

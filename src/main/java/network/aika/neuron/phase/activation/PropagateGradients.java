@@ -25,8 +25,8 @@ import network.aika.neuron.phase.RankedImpl;
  */
 public class PropagateGradients extends RankedImpl implements ActivationPhase {
 
-    public PropagateGradients(int round) {
-        super(round, PROPAGATE_GRADIENT_RANK);
+    public PropagateGradients(int rank) {
+        super(rank);
     }
 
     @Override

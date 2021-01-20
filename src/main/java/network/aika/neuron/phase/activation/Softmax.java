@@ -25,8 +25,8 @@ import network.aika.neuron.phase.RankedImpl;
  */
 public class Softmax extends RankedImpl implements ActivationPhase {
 
-    public Softmax(int round) {
-        super(round, SOFTMAX_RANK);
+    public Softmax(int rank) {
+        super(rank);
     }
 
     @Override

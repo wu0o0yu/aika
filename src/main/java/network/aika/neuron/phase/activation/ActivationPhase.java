@@ -28,17 +28,17 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  * @author Lukas Molzberger
  */
 public interface ActivationPhase extends Phase<Activation> {
-    int INDUCTION_RANK = 0;
-    int INITIAL_LINKING_RANK = 3;
-    int PREPARE_FINAL_LINKING_RANK = 4;
-    int FINAL_LINKING_RANK = 5;
-    int SOFTMAX_RANK = 6;
-    int COUNTING_RANK = 7;
-    int SELF_GRADIENT_RANK = 10;
-    int PROPAGATE_GRADIENT_RANK = 13;
-    int UPDATE_SYNAPSE_INPUT_LINKS_RANK = 15;
-    int TEMPLATE_INPUT_RANK = 17;
-    int TEMPLATE_OUTPUT_RANK = 18;
+    ActivationPhase INDUCTION = new Induction(0);
+    LinkAndPropagate LINK_AND_PROPAGATE = new LinkAndPropagate(4);
+    ActivationPhase PREPARE_FINAL_LINKING = new PrepareFinalLinking(5);
+    ActivationPhase FINAL_LINKING = new FinalLinking(6);
+    ActivationPhase SOFTMAX = new Softmax(7);
+    ActivationPhase COUNTING = new Counting(8);
+    ActivationPhase SELF_GRADIENT = new SelfGradient(11);
+    ActivationPhase PROPAGATE_GRADIENT = new PropagateGradients(14);
+    ActivationPhase UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks(16);
+    Template TEMPLATE_INPUT = new Template(18, INPUT);
+    Template TEMPLATE_OUTPUT = new Template(19, OUTPUT);
 
     void process(Activation act);
 

@@ -23,10 +23,10 @@ import network.aika.neuron.phase.RankedImpl;
  *
  * @author Lukas Molzberger
  */
-public class LinkSelfGradient extends RankedImpl implements LinkPhase {
+public class SelfGradient extends RankedImpl implements LinkPhase {
 
-    public LinkSelfGradient(int round) {
-        super(round, SELF_GRADIENT_RANK);
+    public SelfGradient(int rank) {
+        super(rank);
     }
 
     @Override

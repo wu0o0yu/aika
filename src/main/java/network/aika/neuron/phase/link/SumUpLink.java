@@ -8,8 +8,8 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
 
     private Link oldLink;
 
-    public SumUpLink(int round, Link ol) {
-        super(round, SUM_UP_LINK_RANK);
+    public SumUpLink(int rank, Link ol) {
+        super(rank);
 
         oldLink = ol;
     }

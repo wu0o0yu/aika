@@ -38,6 +38,7 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
+import static network.aika.neuron.phase.activation.ActivationPhase.*;
 import static network.aika.neuron.phase.link.LinkPhase.PROPAGATE_GRADIENT_RANK;
 
 /**
@@ -123,7 +124,7 @@ public class Activation implements Element {
 
         getThought().addToQueue(
                 this,
-                new LinkAndPropagate(0)
+                LINK_AND_PROPAGATE
         );
     }
 
@@ -421,7 +422,7 @@ public class Activation implements Element {
 
         getThought().addToQueue(
                 nl,
-                new SumUpLink(0, ol)
+                new SumUpLink(3, ol)
         );
 
         return nl;
@@ -459,7 +460,7 @@ public class Activation implements Element {
             if (hasChanged) {
                 getThought().addToQueue(
                         getModifiable(null),
-                        new FinalLinking(0)
+                        FINAL_LINKING
                 );
             }
         }
@@ -470,9 +471,9 @@ public class Activation implements Element {
             setFired(neuron.incrementFired(getLatestFired()));
             getThought().addToQueue(
                     this,
-                    new LinkAndPropagate(0),
-                    new Softmax(0),
-                    new Counting(0)
+                    LINK_AND_PROPAGATE,
+                    SOFTMAX,
+                    COUNTING
             );
         }
     }
@@ -536,7 +537,7 @@ public class Activation implements Element {
 
         getThought().addToQueue(
                 this,
-                new PropagateGradients(0)
+                PROPAGATE_GRADIENT
         );
     }
 

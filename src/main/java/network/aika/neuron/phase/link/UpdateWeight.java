@@ -25,8 +25,8 @@ import network.aika.neuron.phase.RankedImpl;
  */
 public class UpdateWeight extends RankedImpl implements LinkPhase {
 
-    public UpdateWeight(int round) {
-        super(round, UPDATE_WEIGHTS_RANK);
+    public UpdateWeight(int rank) {
+        super(rank);
     }
 
     @Override

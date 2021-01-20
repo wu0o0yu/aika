@@ -29,8 +29,8 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class Induction extends RankedImpl implements ActivationPhase {
 
-    public Induction(int round) {
-        super(round, INDUCTION_RANK);
+    public Induction(int rank) {
+        super(rank);
     }
 
     @Override
@@ -47,8 +47,8 @@ public class Induction extends RankedImpl implements ActivationPhase {
         act.link();
 
         act.getThought().addToQueue(act,
-                new Template(0, INPUT),
-                new Template(0, OUTPUT)
+                TEMPLATE_INPUT,
+                TEMPLATE_OUTPUT
         );
     }
 

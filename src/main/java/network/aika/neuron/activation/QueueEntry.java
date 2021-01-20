@@ -24,12 +24,22 @@ import network.aika.neuron.phase.Phase;
  */
 public class QueueEntry implements Comparable<QueueEntry> {
 
+    private int round;
     private Phase phase;
     private Element element;
 
-    public QueueEntry(Phase phase, Element element) {
+    public QueueEntry(int round, Phase phase, Element element) {
+        this.round = round;
         this.phase = phase;
         this.element = element;
+    }
+
+    public int getRound() {
+        return round;
+    }
+
+    public Phase getPhase() {
+        return phase;
     }
 
     /*
@@ -66,11 +76,6 @@ public class QueueEntry implements Comparable<QueueEntry> {
     }
 */
 
-    public Phase getPhase() {
-        return phase;
-    }
-
-
     public Element getElement() {
         return element;
     }
@@ -83,10 +88,12 @@ public class QueueEntry implements Comparable<QueueEntry> {
 
     @Override
     public int compareTo(QueueEntry qe) {
-        int r = Integer.compare(getPhase().getRank(), qe.getPhase().getRank());
+        int r = Integer.compare(round, qe.getRound());
+        if(r != 0) return r;
+        r = Integer.compare(getPhase().getRank(), qe.getPhase().getRank());
         if(r != 0) return r;
         r = getPhase().compare(element, qe.getElement());
         if(r != 0) return r;
-        return compareTo(qe);
+        return element.compareTo(qe.getElement());
     }
 }

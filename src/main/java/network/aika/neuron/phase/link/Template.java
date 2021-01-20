@@ -22,19 +22,21 @@ import network.aika.neuron.phase.RankedImpl;
 
 import network.aika.neuron.phase.activation.ActivationPhase;
 
+import static network.aika.neuron.phase.activation.ActivationPhase.TEMPLATE_INPUT;
+
 /**
  *
  * @author Lukas Molzberger
  */
 public class Template extends RankedImpl implements LinkPhase {
 
-    public Template(int round) {
-        super(round, TEMPLATE_RANK);
+    public Template(int rank) {
+        super(rank);
     }
 
     @Override
     public void process(Link l) {
-        l.follow(new network.aika.neuron.phase.activation.Template(getRound(), Direction.INPUT));
+        l.follow(TEMPLATE_INPUT);
     }
 
     public String toString() {
