@@ -1,25 +1,22 @@
 package network.aika.neuron.phase.link;
 
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.RankedImpl;
 
 public class SumUpLink extends RankedImpl implements LinkPhase {
 
-    private Link oldLink;
+    private double delta;
 
-    public SumUpLink(int rank, Link ol) {
+    public SumUpLink(int rank, double delta) {
         super(rank);
 
-        oldLink = ol;
+        this.delta = delta;
     }
 
     @Override
     public void process(Link l) {
-        Activation oAct = l.getOutput();
-
-        oAct.sumUpLink(oldLink, l);
-        oAct.checkIfFired();
+        l.sumUpLink(delta);
+        l.getOutput().checkIfFired();
     }
 
     @Override

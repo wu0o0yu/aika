@@ -285,6 +285,17 @@ public class Link implements Element {
         );
     }
 
+    public void sumUpLink(double delta) {
+        double w = getSynapse().getWeight();
+
+        if (w <= 0.0 && isSelfRef())
+            return;
+
+        if(!getOutput().addToSum(w * delta)) {
+            getSynapse().updateReference(this);
+        }
+    }
+
     public boolean isNegative() {
         return synapse.getWeight() < 0.0;
     }

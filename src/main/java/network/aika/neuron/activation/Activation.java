@@ -132,7 +132,7 @@ public class Activation implements Element {
         return id;
     }
 
-    public double getValue() {
+    public Double getValue() {
         return value;
     }
 
@@ -274,7 +274,7 @@ public class Activation implements Element {
                     Link nl = new Link(l.getSynapse(), l.getInput(), clonedAct, l.isSelfRef());
                             nl.linkInput();
                             nl.linkOutput();
-                            clonedAct.sumUpLink(null, nl);
+                            nl.sumUpLink(nl.getInputValue());
                         }
                 );
     }
@@ -285,7 +285,7 @@ public class Activation implements Element {
     }
 
     public boolean isActive() {
-        return value > 0.0;
+        return value != null && value > 0.0;
     }
 
     public double getBranchProbability() {
@@ -417,33 +417,26 @@ public class Activation implements Element {
 
         getThought().onLinkCreationEvent(nl);
 
+        double delta = nl.getInputValue() - (ol != null ? ol.getInputValue() : 0.0);
+
         nl.linkInput();
         nl.linkOutput();
 
         getThought().addToQueue(
                 nl,
-                new SumUpLink(3, ol)
+                new SumUpLink(3, delta)
         );
 
         return nl;
     }
 
-    public void sumUpLink(Link ol, Link nl) {
-        assert ol == null || value == null;
-
-        double w = nl.getSynapse().getWeight();
-
-        if (w <= 0.0 && nl.isSelfRef()) return;
-
-        double x = nl.getInput().value - (ol != null ? ol.getInput().value : 0.0);
-        double s = x * w;
-
+    public boolean addToSum(double x) {
         if (value != null) {
-            lateSum += s;
+            lateSum += x;
+            return true;
         } else {
-            sum += s;
-
-            nl.getSynapse().updateReference(nl);
+            sum += x;
+            return false;
         }
     }
 
