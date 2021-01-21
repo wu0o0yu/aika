@@ -38,20 +38,16 @@ public class RankedImpl implements Ranked {
 
     @Override
     public int getRank() {
-        if(rank != null)
-            return rank;
-
-        if(getPreviousRank() == null) {
-            rank = 0;
-        } else {
-            rank = getPreviousRank().getRank() + 1;
-        }
+        if(rank == null)
+            rank = getPreviousRank() != null ?
+                    getPreviousRank().getRank() + 1 :
+                    0;
 
         return rank;
     }
 
     public String toString() {
-        return "";
+        return "Placeholder";
     }
 
     @Override
