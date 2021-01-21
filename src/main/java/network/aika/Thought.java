@@ -56,8 +56,8 @@ public abstract class Thought {
     public void onActivationCreationEvent(Activation act, Activation originAct) {
         getEventListeners()
                 .forEach(
-                el -> el.onActivationCreationEvent(act, originAct)
-        );
+                        el -> el.onActivationCreationEvent(act, originAct)
+                );
     }
 
     public void onActivationProcessedEvent(Activation act) {

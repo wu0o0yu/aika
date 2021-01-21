@@ -641,9 +641,9 @@ public class Activation implements Element {
         StringBuilder sb = new StringBuilder();
         sb.append("act " +
                 getShortString() +
-                " value:" + Utils.round(value) +
+                " value:" + (value != null ? Utils.round(value) : "X") +
                 " net:" + Utils.round(getNet(false)) +
-                " net-final:" + Utils.round(getNet(true)) +
+                " netFinal:" + Utils.round(getNet(true)) +
                 " bp:" + Utils.round(branchProbability) +
                 " round:" + round);
 
