@@ -22,13 +22,13 @@ import network.aika.neuron.phase.Phase;
  *
  * @author Lukas Molzberger
  */
-public class QueueEntry implements Comparable<QueueEntry> {
+public class QueueEntry<P extends Phase, E extends Element> implements Comparable<QueueEntry> {
 
     private int round;
-    private Phase phase;
-    private Element element;
+    private P phase;
+    private E element;
 
-    public QueueEntry(int round, Phase phase, Element element) {
+    public QueueEntry(int round, P phase, E element) {
         this.round = round;
         this.phase = phase;
         this.element = element;
@@ -38,7 +38,7 @@ public class QueueEntry implements Comparable<QueueEntry> {
         return round;
     }
 
-    public Phase getPhase() {
+    public P getPhase() {
         return phase;
     }
 
@@ -67,14 +67,6 @@ public class QueueEntry implements Comparable<QueueEntry> {
 
         return sb.substring(0, Math.max(0, sb.length() - 2));
     }
-
-    /*
-    public void addToQueue(P... p) {
-
-
-        getThought().addToQueue(this, p);
-    }
-*/
 
     public Element getElement() {
         return element;

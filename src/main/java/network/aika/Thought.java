@@ -21,6 +21,8 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.activation.ActivationPhase;
+import network.aika.neuron.phase.link.LinkPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,14 +136,20 @@ public abstract class Thought {
         activationsById.put(act.getId(), act);
     }
 
-    public void addToQueue(Element ge, Phase... phases) {
-        for(Phase p: phases) {
+    public void addToQueue(Activation act, ActivationPhase... phases) {
+        addToQueueIntern(act, phases);
+    }
+
+    public void addToQueue(Link l, LinkPhase... phases) {
+        addToQueueIntern(l, phases);
+    }
+
+    private <P extends Phase, E extends Element> void addToQueueIntern(E ge, P... phases) {
+        for(P p: phases) {
             if(p == null)
                 continue;
 
-            queue.add(
-                    new QueueEntry(0, p, ge)
-            );
+            queue.add(new QueueEntry(0, p, ge));
         }
     }
 
