@@ -23,12 +23,14 @@ import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.VisitorPhase;
+import network.aika.neuron.phase.link.SumUpLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.phase.link.LinkPhase.LINKING;
 
 /**
  *
@@ -52,6 +54,25 @@ public class Link implements Element {
         this.input = input;
         this.output = output;
         this.isSelfRef = isSelfRef;
+    }
+
+    public Link(Link oldLink, Synapse s, Activation input, Activation output, boolean isSelfRef) {
+        this(s, input, output, isSelfRef);
+
+        Thought t = getThought();
+
+        t.onLinkCreationEvent(this);
+
+        linkInput();
+        linkOutput();
+
+        t.addToQueue(
+                this,
+                new SumUpLink(
+                        LINKING,
+                        getInputValue() - getInputValue(oldLink)
+                )
+        );
     }
 
     public double getGradient() {
@@ -220,6 +241,10 @@ public class Link implements Element {
 
     public boolean isCausal() {
         return input == null || input.getFired().compareTo(output.getFired()) <= 0;
+    }
+
+    public static double getInputValue(Link l) {
+        return l != null ? l.getInputValue() : 0.0;
     }
 
     public double getInputValue() {

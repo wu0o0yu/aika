@@ -170,11 +170,7 @@ public class Activation implements Element {
             fired = f;
 //        }
     }
-/*
-    public boolean isFinal() {
-        return isFinal;
-    }
-*/
+
     public Thought getThought() {
         return thought;
     }
@@ -397,22 +393,13 @@ public class Activation implements Element {
     }
 
     public Link addLink(Synapse s, Activation input, boolean isSelfRef) {
-        Link ol = getInputLink(s);
-        Link nl = new Link(s, input, this, isSelfRef);
-
-        getThought().onLinkCreationEvent(nl);
-
-        double delta = nl.getInputValue() - (ol != null ? ol.getInputValue() : 0.0);
-
-        nl.linkInput();
-        nl.linkOutput();
-
-        getThought().addToQueue(
-                nl,
-                new SumUpLink(LINKING, delta)
+        return new Link(
+                getInputLink(s),
+                s,
+                input,
+                this,
+                isSelfRef
         );
-
-        return nl;
     }
 
     public boolean addToSum(double x) {
