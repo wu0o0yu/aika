@@ -41,20 +41,4 @@ public interface LinkPhase extends Phase<Link> {
     LinkPhase UPDATE_WEIGHTS = new UpdateWeight();
     LinkPhase TEMPLATE = new Template();
 
-/*
-    static LinkPhase[] getInitialPhases(Config c) {
-        return c.isEnableTraining() ?
-                new LinkPhase[] {
-                        LINKING,
-                        COUNTING,
-                        SHADOW_FACTOR,
-                        SELF_GRADIENT,
-                        UPDATE_WEIGHTS,
-                        TEMPLATE
-                } :
-                new LinkPhase[] {
-                        COUNTING
-                };
-    }
- */
 }

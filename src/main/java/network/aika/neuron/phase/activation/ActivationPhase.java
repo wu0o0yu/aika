@@ -50,26 +50,5 @@ public interface ActivationPhase extends Phase<Activation> {
     static boolean isFinal(ActivationPhase ap) {
         return ap != null && ap.isFinal();
     }
-/*
-    static ActivationPhase[] getInitialPhases(Config c) {
-        return c.isEnableTraining() ?
-                new ActivationPhase[]{
-                        INITIAL_LINKING,
-                        PREPARE_FINAL_LINKING,
-                        SOFTMAX,
-                        COUNTING,
-                        SELF_GRADIENT,
-                        PROPAGATE_GRADIENT,
-                        UPDATE_SYNAPSE_INPUT_LINKS,
-                        TEMPLATE_INPUT,
-                        TEMPLATE_OUTPUT
-                } :
-                new ActivationPhase[] {
-                        INITIAL_LINKING,
-                        PREPARE_FINAL_LINKING,
-                        SOFTMAX,
-                        COUNTING
-                };
-    }
- */
+
 }
