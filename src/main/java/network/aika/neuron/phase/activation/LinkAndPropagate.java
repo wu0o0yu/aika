@@ -22,6 +22,8 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
@@ -30,6 +32,7 @@ import network.aika.neuron.phase.link.Linking;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.phase.link.LinkPhase.LINKING;
+import static network.aika.neuron.phase.link.LinkPhase.SUM_UP_LINK_RANK;
 
 
 /**
@@ -46,8 +49,9 @@ import static network.aika.neuron.phase.link.LinkPhase.LINKING;
  */
 public class LinkAndPropagate extends RankedImpl implements VisitorPhase, ActivationPhase {
 
-    public LinkAndPropagate(int rank) {
-        super(rank);
+    @Override
+    public Ranked getPreviousRank() {
+        return SUM_UP_LINK_RANK;
     }
 
     @Override

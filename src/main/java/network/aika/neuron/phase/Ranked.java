@@ -16,6 +16,8 @@
  */
 package network.aika.neuron.phase;
 
+import static network.aika.neuron.phase.activation.ActivationPhase.TEMPLATE_OUTPUT;
+
 /**
  *
  * @author Lukas Molzberger
@@ -24,4 +26,11 @@ public interface Ranked {
 
     int getRank();
 
+    Ranked getPreviousRank();
+
+    String dumpPreviousRanks();
+
+    static String dumpPhaseRanks() {
+        return TEMPLATE_OUTPUT.dumpPreviousRanks();
+    }
 }

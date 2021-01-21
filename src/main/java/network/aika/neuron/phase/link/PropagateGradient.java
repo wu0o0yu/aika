@@ -18,6 +18,8 @@ package network.aika.neuron.phase.link;
 
 import network.aika.Utils;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
 /**
@@ -28,8 +30,8 @@ public class PropagateGradient extends RankedImpl implements LinkPhase {
 
     private double gradient;
 
-    public PropagateGradient(int rank, double gradient) {
-        super(rank);
+    public PropagateGradient(Ranked previousRank, double gradient) {
+        super(previousRank);
         this.gradient = gradient;
     }
 

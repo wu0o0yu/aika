@@ -22,14 +22,40 @@ package network.aika.neuron.phase;
  */
 public class RankedImpl implements Ranked {
 
-    private int rank;
+    private Integer rank;
+    private Ranked previousRank;
 
-    public RankedImpl(int rank) {
-        this.rank = rank;
+    public RankedImpl() {}
+
+    public RankedImpl(Ranked previousPhase) {
+        this.previousRank = previousPhase;
+    }
+
+    @Override
+    public Ranked getPreviousRank() {
+        return previousRank;
     }
 
     @Override
     public int getRank() {
+        if(rank != null)
+            return rank;
+
+        if(getPreviousRank() == null) {
+            rank = 0;
+        } else {
+            rank = getPreviousRank().getRank() + 1;
+        }
+
         return rank;
+    }
+
+    public String toString() {
+        return "";
+    }
+
+    @Override
+    public String dumpPreviousRanks() {
+        return (getPreviousRank() != null ? getPreviousRank().dumpPreviousRanks() + "\n" : "") + getRank() + " : " + toString();
     }
 }

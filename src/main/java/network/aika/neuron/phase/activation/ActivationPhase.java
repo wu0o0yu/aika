@@ -19,26 +19,29 @@ package network.aika.neuron.phase.activation;
 import network.aika.Config;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.Ranked;
+import network.aika.neuron.phase.link.LinkPhase;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+import static network.aika.neuron.phase.link.LinkPhase.*;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public interface ActivationPhase extends Phase<Activation> {
-    ActivationPhase INDUCTION = new Induction(0);
-    LinkAndPropagate LINK_AND_PROPAGATE = new LinkAndPropagate(4);
-    ActivationPhase PREPARE_FINAL_LINKING = new PrepareFinalLinking(5);
-    ActivationPhase FINAL_LINKING = new FinalLinking(6);
-    ActivationPhase SOFTMAX = new Softmax(7);
-    ActivationPhase COUNTING = new Counting(8);
-    ActivationPhase SELF_GRADIENT = new SelfGradient(11);
-    ActivationPhase PROPAGATE_GRADIENT = new PropagateGradients(14);
-    ActivationPhase UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks(16);
-    Template TEMPLATE_INPUT = new Template(18, INPUT);
-    Template TEMPLATE_OUTPUT = new Template(19, OUTPUT);
+    ActivationPhase INDUCTION = new Induction();
+    LinkAndPropagate LINK_AND_PROPAGATE = new LinkAndPropagate();
+    ActivationPhase PREPARE_FINAL_LINKING = new PrepareFinalLinking();
+    ActivationPhase FINAL_LINKING = new FinalLinking();
+    ActivationPhase SOFTMAX = new Softmax();
+    ActivationPhase COUNTING = new Counting();
+    ActivationPhase SELF_GRADIENT = new SelfGradient();
+    ActivationPhase PROPAGATE_GRADIENT = new PropagateGradients();
+    ActivationPhase UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks();
+    Template TEMPLATE_INPUT = new Template(TEMPLATE, INPUT);
+    Template TEMPLATE_OUTPUT = new Template(TEMPLATE_INPUT, OUTPUT);
 
     void process(Activation act);
 

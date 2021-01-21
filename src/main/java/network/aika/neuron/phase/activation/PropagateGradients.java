@@ -17,7 +17,11 @@
 package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
+
+import static network.aika.neuron.phase.link.LinkPhase.PROPAGATE_GRADIENT_RANK;
 
 /**
  *
@@ -25,8 +29,9 @@ import network.aika.neuron.phase.RankedImpl;
  */
 public class PropagateGradients extends RankedImpl implements ActivationPhase {
 
-    public PropagateGradients(int rank) {
-        super(rank);
+    @Override
+    public Ranked getPreviousRank() {
+        return PROPAGATE_GRADIENT_RANK;
     }
 
     @Override

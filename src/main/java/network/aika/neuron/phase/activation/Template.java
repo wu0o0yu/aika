@@ -23,6 +23,8 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
@@ -41,8 +43,8 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
 
     private Direction direction;
 
-    public Template(int rank, Direction dir) {
-        super(rank);
+    public Template(Ranked previousRank, Direction dir) {
+        super(previousRank);
         direction = dir;
     }
 
