@@ -72,7 +72,7 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
     public void process(Activation act) {
         act.getThought().linkInputRelations(act);
 
-        if(!act.updateValue(isFinal()))
+        if(!act.updateValue(false))
             return;
 
         Visitor v = new Visitor(
@@ -87,10 +87,6 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
         act.getModel().linkInputRelations(act, OUTPUT);
 
         propagate(act, v);
-    }
-
-    public boolean isFinal() {
-        return false;
     }
 
     @Override

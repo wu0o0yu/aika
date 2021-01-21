@@ -45,10 +45,4 @@ public interface ActivationPhase extends Phase<Activation> {
 
     void process(Activation act);
 
-    boolean isFinal();
-
-    static boolean isFinal(ActivationPhase ap) {
-        return ap != null && ap.isFinal();
-    }
-
 }

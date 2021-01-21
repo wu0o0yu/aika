@@ -39,11 +39,6 @@ public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPha
         act.getNeuronProvider().save();
     }
 
-    @Override
-    public boolean isFinal() {
-        return false;
-    }
-
     public String toString() {
         return "Update Synapse Input Links";
     }

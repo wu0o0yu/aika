@@ -32,10 +32,6 @@ public class FinalLinking extends RankedImpl implements ActivationPhase {
         return PREPARE_FINAL_LINKING;
     }
 
-    public boolean isFinal() {
-        return true;
-    }
-
     @Override
     public void process(Activation act) {
         act.updateOutgoingLinks();

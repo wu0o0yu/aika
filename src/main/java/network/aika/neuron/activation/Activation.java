@@ -35,9 +35,8 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
-import static network.aika.neuron.phase.activation.ActivationPhase.COUNTING;
-import static network.aika.neuron.phase.link.LinkPhase.SELF_GRADIENT;
 
 /**
  * @author Lukas Molzberger
@@ -320,19 +319,18 @@ public class Activation implements Element {
                 .map(l -> l.getInput());
     }
 
-    public boolean updateValue(boolean finalLinkingMode) {
+    public boolean updateValue(boolean isFinal) {
         if (!fixed) {
-            value = computeValue(finalLinkingMode);
+            value = computeValue(isFinal);
         }
         return !equals(lastRound);
     }
 
     public void updateOutgoingLinks() {
-        lastRound.outputLinks
-                .values()
-                .forEach(l ->
-
-                );
+        lastRound.addLinksToQueue(
+                OUTPUT,
+                LinkPhase.FINAL_LINKING
+        );
 //        lastRound.unlinkInputs();
         lastRound = null;
     }

@@ -29,6 +29,7 @@ public interface LinkPhase extends Phase<Link> {
 
     LinkPhase INDUCTION = new Induction();
     LinkPhase LINKING = new Linking();
+    LinkPhase FINAL_LINKING = new FinalLinking();
     Ranked SUM_UP_LINK_RANK = new RankedImpl(LINKING);
     LinkPhase COUNTING = new Counting();
     LinkPhase SHADOW_FACTOR = new ShadowFactor();

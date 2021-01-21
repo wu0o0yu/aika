@@ -58,11 +58,6 @@ public class SelfGradient extends RankedImpl implements ActivationPhase {
         );
     }
 
-    @Override
-    public boolean isFinal() {
-        return true;
-    }
-
     public String toString() {
         return "SelfGradient";
     }

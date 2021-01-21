@@ -86,11 +86,6 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     }
 
     @Override
-    public boolean isFinal() {
-        return true;
-    }
-
-    @Override
     public void closeCycle(Activation fromAct, Visitor v) {
         Direction dir = v.startDir;
 

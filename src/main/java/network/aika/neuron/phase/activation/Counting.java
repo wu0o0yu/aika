@@ -39,11 +39,6 @@ public class Counting extends RankedImpl implements ActivationPhase {
         act.getThought().addToQueue(act, SELF_GRADIENT);
     }
 
-    @Override
-    public boolean isFinal() {
-        return false;
-    }
-
     public String toString() {
         return "Counting";
     }

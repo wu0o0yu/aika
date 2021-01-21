@@ -55,11 +55,6 @@ public class Induction extends RankedImpl implements ActivationPhase {
         );
     }
 
-    @Override
-    public boolean isFinal() {
-        return false;
-    }
-
     public String toString() {
         return "Induction";
     }

@@ -20,6 +20,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
+import network.aika.neuron.phase.link.LinkPhase;
 
 /**
  *
@@ -29,17 +30,12 @@ public class Softmax extends RankedImpl implements ActivationPhase {
 
     @Override
     public Ranked getPreviousRank() {
-        return FINAL_LINKING;
+        return LinkPhase.FINAL_LINKING;
     }
 
     @Override
     public void process(Activation act) {
         act.computeBranchProbability();
-    }
-
-    @Override
-    public boolean isFinal() {
-        return false;
     }
 
     public String toString() {

@@ -39,11 +39,6 @@ public class PropagateGradients extends RankedImpl implements ActivationPhase {
         act.processGradient();
     }
 
-    @Override
-    public boolean isFinal() {
-        return false;
-    }
-
     public String toString() {
         return "Propagate Gradients";
     }
