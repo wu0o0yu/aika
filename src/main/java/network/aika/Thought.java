@@ -136,6 +136,9 @@ public abstract class Thought {
 
     public void addToQueue(Element ge, Phase... phases) {
         for(Phase p: phases) {
+            if(p == null)
+                continue;
+
             queue.add(
                     new QueueEntry(0, p, ge)
             );

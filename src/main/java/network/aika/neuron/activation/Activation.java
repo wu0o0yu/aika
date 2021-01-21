@@ -437,8 +437,12 @@ public class Activation implements Element {
             getThought().addToQueue(
                     this,
                     LINK_AND_PROPAGATE,
-                    SOFTMAX,
+                    !hasBranches() ? SOFTMAX : null,
                     COUNTING
+            );
+            addLinksToQueue(
+                    INPUT,
+                    LinkPhase.COUNTING
             );
         }
     }
@@ -541,8 +545,6 @@ public class Activation implements Element {
     }
 
     public void computeBranchProbability() {
-        if (!isActive() || !hasBranches()) return;
-
         double net = getNet(true);
         Set<Activation> conflictingActs = branches
                 .stream()

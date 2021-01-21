@@ -38,6 +38,8 @@ public class Linking extends RankedImpl implements LinkPhase {
     @Override
     public void process(Link l) {
         l.follow(LINK_AND_PROPAGATE);
+
+        l.getThought().addToQueue(l, COUNTING);
     }
 
     public String toString() {

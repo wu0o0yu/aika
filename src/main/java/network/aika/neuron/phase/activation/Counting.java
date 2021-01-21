@@ -34,9 +34,9 @@ public class Counting extends RankedImpl implements ActivationPhase {
 
     @Override
     public void process(Activation act) {
-        if(act.isActive()) {
-            act.getNeuron().count(act);
-        }
+        act.getNeuron().count(act);
+
+        act.getThought().addToQueue(act, SELF_GRADIENT);
     }
 
     @Override

@@ -16,9 +16,11 @@
  */
 package network.aika.neuron.phase.link;
 
+import network.aika.Thought;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
+import network.aika.neuron.phase.activation.ActivationPhase;
 
 /**
  *
@@ -38,6 +40,10 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
     public void process(Link l) {
         l.sumUpLink(delta);
         l.getOutput().checkIfFired();
+
+        Thought t = l.getThought();
+        t.addToQueue(l, SELF_GRADIENT);
+        t.addToQueue(l.getOutput(), ActivationPhase.SELF_GRADIENT);
     }
 
 
