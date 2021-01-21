@@ -89,7 +89,7 @@ public class Activation implements Element {
         this(t.createActivationId(), t, n);
     }
 
-    private Activation(int id, Thought t, Neuron<?> n) {
+    public Activation(int id, Thought t, Neuron<?> n) {
         this(id, n);
         this.thought = t;
 
@@ -349,23 +349,6 @@ public class Activation implements Element {
                 );
 //        lastRound.unlinkInputs();
         lastRound = null;
-    }
-
-    public static Activation createActivation(Thought t, Neuron n) {
-        Activation act = new Activation(
-                t.createActivationId(),
-                t,
-                n
-        );
-
-        return act;
-    }
-
-    public void addNextActivationPhases(VisitorPhase p) {
-        getThought().addToQueue(
-                this,
-                p.getNextActivationPhases(getConfig())
-        );
     }
 
     public void followLinks(Visitor v) {

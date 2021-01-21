@@ -141,6 +141,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if(nv == null)
             return;
 
+        Thought t = fromAct.getThought();
         Direction dir = nv.startDir;
 /*
         if(!checkCausality(
@@ -149,26 +150,22 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 v)
         ) return;
 */
-        Activation toAct = createActivation(nv, fromAct);
+        Activation toAct = t
+                .createActivation(
+                        nv.startDir.getNeuron(this),
+                        fromAct
+                );
+
+        t.addToQueue(
+                toAct,
+                nv.getPhase().getNextActivationPhases()
+        );
 
         createLink(
                 dir.getPropagateInput(fromAct, toAct),
                 dir.getPropagateOutput(fromAct, toAct),
                 nv
         );
-    }
-
-    public Activation createActivation(Visitor v, Activation fromAct) {
-        Activation toAct = Activation.createActivation(
-                fromAct.getThought(),
-                v.startDir.getNeuron(this)
-        );
-
-        fromAct.getThought().onActivationCreationEvent(toAct, fromAct);
-
-        toAct.addNextActivationPhases(v.getPhase());
-
-        return toAct;
     }
 
     public void closeCycle(Visitor v, Activation iAct, Activation oAct) {

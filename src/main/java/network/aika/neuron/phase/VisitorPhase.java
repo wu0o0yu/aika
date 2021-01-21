@@ -30,7 +30,7 @@ public interface VisitorPhase {
 
     void closeCycle(Activation act, Visitor v);
 
-    ActivationPhase[] getNextActivationPhases(Config c);
+    ActivationPhase[] getNextActivationPhases();
 
-    LinkPhase[] getNextLinkPhases(Config c);
+    LinkPhase[] getNextLinkPhases();
 }

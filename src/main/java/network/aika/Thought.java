@@ -167,6 +167,18 @@ public abstract class Thought {
         return activationIdCounter++;
     }
 
+    public Activation createActivation(Neuron n, Activation fromAct) {
+        Activation toAct = new Activation(
+                createActivationId(),
+                this,
+                n
+        );
+
+        onActivationCreationEvent(toAct, fromAct);
+
+        return toAct;
+    }
+
     public Activation getActivation(Integer id) {
         return activationsById.get(id);
     }

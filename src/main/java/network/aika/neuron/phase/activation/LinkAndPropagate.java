@@ -55,14 +55,14 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
     }
 
     @Override
-    public ActivationPhase[] getNextActivationPhases(Config c) {
+    public ActivationPhase[] getNextActivationPhases() {
         return new ActivationPhase[] {
                 LINK_AND_PROPAGATE
         };
     }
 
     @Override
-    public LinkPhase[] getNextLinkPhases(Config c) {
+    public LinkPhase[] getNextLinkPhases() {
         return new LinkPhase[] {
                 LINKING
         };

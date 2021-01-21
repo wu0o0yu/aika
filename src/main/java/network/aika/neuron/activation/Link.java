@@ -281,7 +281,7 @@ public class Link implements Element {
     public void addNextLinkPhases(VisitorPhase p) {
         getThought().addToQueue(
                 this,
-                p.getNextLinkPhases(output.getConfig())
+                p.getNextLinkPhases()
         );
     }
 

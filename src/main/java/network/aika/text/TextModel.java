@@ -97,7 +97,7 @@ public class TextModel extends Model {
 
         iAct.getThought().addToQueue(
                 nl,
-                LINK_AND_PROPAGATE.getNextLinkPhases(oAct.getConfig())
+                LINK_AND_PROPAGATE.getNextLinkPhases()
         );
     }
 
