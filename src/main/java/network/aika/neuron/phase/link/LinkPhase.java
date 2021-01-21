@@ -34,7 +34,7 @@ public interface LinkPhase extends Phase<Link> {
     LinkPhase SHADOW_FACTOR = new ShadowFactor();
     LinkPhase SELF_GRADIENT = new SelfGradient();
     Ranked PROPAGATE_GRADIENT_RANK = new RankedImpl(SELF_GRADIENT);
-    LinkPhase UPDATE_WEIGHTS = new UpdateWeight();
+    LinkPhase UPDATE_WEIGHT = new UpdateWeight();
     LinkPhase TEMPLATE = new Template();
 
 }

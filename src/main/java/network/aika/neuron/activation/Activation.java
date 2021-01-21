@@ -331,13 +331,7 @@ public class Activation implements Element {
         lastRound.outputLinks
                 .values()
                 .forEach(l ->
-                        l.getOutput()
-                                .getModifiable(l.getSynapse())
-                                .addLink(
-                                        l.getSynapse(),
-                                        this,
-                                        l.isSelfRef()
-                                )
+
                 );
 //        lastRound.unlinkInputs();
         lastRound = null;
@@ -408,39 +402,25 @@ public class Activation implements Element {
         }
     }
 
-    public void updateForFinalPhase() {
+    public boolean updateForFinalPhase() {
         if (fixed)
-            return;
+            return false;
 
         double initialValue = computeValue(false);
         double finalValue = computeValue(true);
 
         if (Math.abs(finalValue - initialValue) > TOLERANCE) {
-            boolean hasChanged = updateValue(true);
-
-            if (hasChanged) {
-                getThought().addToQueue(
-                        getModifiable(null),
-                        FINAL_LINKING
-                );
-            }
+            return updateValue(true);
         }
+        return false;
     }
 
-    public void checkIfFired() {
+    public boolean checkIfFired() {
         if (fired == NOT_FIRED && getNet(false) > 0.0) {
             setFired(neuron.incrementFired(getLatestFired()));
-            getThought().addToQueue(
-                    this,
-                    LINK_AND_PROPAGATE,
-                    !hasBranches() ? SOFTMAX : null,
-                    COUNTING
-            );
-            addLinksToQueue(
-                    INPUT,
-                    LinkPhase.COUNTING
-            );
+            return true;
         }
+        return false;
     }
 
     private Fired getLatestFired() {

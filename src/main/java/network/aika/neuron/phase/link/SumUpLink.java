@@ -17,10 +17,13 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.Thought;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.activation.ActivationPhase;
+
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.phase.activation.ActivationPhase.*;
 
 /**
  *
@@ -30,22 +33,37 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
 
     private double delta;
 
-    public SumUpLink(Ranked previousRank, double delta) {
-        super(previousRank);
-
+    public SumUpLink(double delta) {
+        super(LINKING);
         this.delta = delta;
     }
 
     @Override
     public void process(Link l) {
-        l.sumUpLink(delta);
-        l.getOutput().checkIfFired();
-
         Thought t = l.getThought();
-        t.addToQueue(l, SELF_GRADIENT);
-        t.addToQueue(l.getOutput(), ActivationPhase.SELF_GRADIENT);
-    }
+        l.sumUpLink(delta);
 
+        t.addToQueue(l, SELF_GRADIENT);
+        t.addToQueue(
+                l.getOutput(),
+                ActivationPhase.SELF_GRADIENT
+        );
+
+        Activation oAct = l.getOutput();
+        if(oAct.checkIfFired()) {
+            t.addToQueue(
+                    oAct,
+                    LINK_AND_PROPAGATE,
+                    PREPARE_FINAL_LINKING,
+                    !oAct.hasBranches() ? SOFTMAX : null,
+                    COUNTING
+            );
+            oAct.addLinksToQueue(
+                    INPUT,
+                    LinkPhase.COUNTING
+            );
+        }
+    }
 
     public String toString() {
         return "Sum up Link";

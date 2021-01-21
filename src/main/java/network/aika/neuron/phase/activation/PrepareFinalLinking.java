@@ -34,8 +34,11 @@ public class PrepareFinalLinking extends RankedImpl implements ActivationPhase {
 
     @Override
     public void process(Activation act) {
-        if(act.isActive()) {
-            act.updateForFinalPhase();
+        if(act.updateForFinalPhase()) {
+            act.getThought().addToQueue(
+                    act.getModifiable(null),
+                    FINAL_LINKING
+            );
         }
     }
 

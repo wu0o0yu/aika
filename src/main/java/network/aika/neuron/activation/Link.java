@@ -66,12 +66,14 @@ public class Link implements Element {
         linkInput();
         linkOutput();
 
+        double w = getSynapse().getWeight();
+
+        if (w <= 0.0 && isSelfRef())
+            return;
+
         t.addToQueue(
                 this,
-                new SumUpLink(
-                        LINKING,
-                        getInputValue() - getInputValue(oldLink)
-                )
+                new SumUpLink(w * (getInputValue() - getInputValue(oldLink)))
         );
     }
 
@@ -311,12 +313,7 @@ public class Link implements Element {
     }
 
     public void sumUpLink(double delta) {
-        double w = getSynapse().getWeight();
-
-        if (w <= 0.0 && isSelfRef())
-            return;
-
-        if(!getOutput().addToSum(w * delta)) {
+        if(!getOutput().addToSum(delta)) {
             getSynapse().updateReference(this);
         }
     }

@@ -14,58 +14,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.phase.link;
 
-import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.phase.Phase;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
-
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+import network.aika.neuron.phase.activation.ActivationPhase;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Induction extends RankedImpl implements ActivationPhase {
+public class FinalLinking extends RankedImpl implements LinkPhase {
 
     @Override
     public Ranked getPreviousRank() {
-        return null;
+        return ActivationPhase.FINAL_LINKING;
     }
 
     @Override
-    public void process(Activation act) {
-        assert act.getNeuron().isTemplate();
+    public void process(Link l) {
+        Synapse s = l.getSynapse();
+        Activation newOutputAct = l.getOutput().getModifiable(s);
 
-        Neuron inducedNeuron = act.getNeuron().instantiateTemplate();
-        inducedNeuron.setLabel(act.getConfig().getLabel(act));
-
-        act.unlink();
-
-        act.setNeuron(inducedNeuron);
-
-        act.link();
-
-        act.getThought().addToQueue(
-                act,
-                COUNTING
-        );
-    }
-
-    @Override
-    public boolean isFinal() {
-        return false;
+        newOutputAct.addLink(
+                        s,
+                        l.getInput(),
+                        l.isSelfRef()
+                );
     }
 
     public String toString() {
-        return "Induction";
+        return "Link-Final Linking";
     }
 
     @Override
-    public int compare(Activation act1, Activation act2) {
+    public int compare(Link l1, Link l2) {
         return 0;
     }
 }

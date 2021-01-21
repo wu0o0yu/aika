@@ -16,11 +16,13 @@
  */
 package network.aika.neuron.phase.link;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
 import static network.aika.neuron.phase.activation.ActivationPhase.PROPAGATE_GRADIENTS;
+import static network.aika.neuron.phase.activation.ActivationPhase.UPDATE_SYNAPSE_INPUT_LINKS;
 
 /**
  *
@@ -35,7 +37,16 @@ public class UpdateWeight extends RankedImpl implements LinkPhase {
 
     @Override
     public void process(Link l) {
+        Synapse s = l.getSynapse();
+        double oldWeight = s.getWeight();
+
         l.updateSynapse();
+
+        l.getThought().addToQueue(
+                l,
+                UPDATE_SYNAPSE_INPUT_LINKS,
+                new SumUpLink(l.getInputValue() * (s.getWeight() - oldWeight))
+        );
     }
 
     public String toString() {
