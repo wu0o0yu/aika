@@ -30,8 +30,8 @@ public class PropagateGradient extends RankedImpl implements LinkPhase {
 
     private double gradient;
 
-    public PropagateGradient(Ranked previousRank, double gradient) {
-        super(previousRank);
+    public PropagateGradient(double gradient) {
+        super(SELF_GRADIENT);
         this.gradient = gradient;
     }
 

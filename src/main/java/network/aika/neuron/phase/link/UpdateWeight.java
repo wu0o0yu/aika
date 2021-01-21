@@ -17,11 +17,10 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
-import static network.aika.neuron.phase.activation.ActivationPhase.PROPAGATE_GRADIENT;
+import static network.aika.neuron.phase.activation.ActivationPhase.PROPAGATE_GRADIENTS;
 
 /**
  *
@@ -31,7 +30,7 @@ public class UpdateWeight extends RankedImpl implements LinkPhase {
 
     @Override
     public Ranked getPreviousRank() {
-        return PROPAGATE_GRADIENT;
+        return PROPAGATE_GRADIENTS;
     }
 
     @Override

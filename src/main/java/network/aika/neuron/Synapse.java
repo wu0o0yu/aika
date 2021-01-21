@@ -205,7 +205,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
             if(!oAct.gradientSumIsZero()) {
                 oAct.getThought().addToQueue(
                         nl,
-                        new PropagateGradient(SELF_GRADIENT, oAct.getGradientSum())
+                        new PropagateGradient(oAct.getGradientSum())
                 );
             }
         }

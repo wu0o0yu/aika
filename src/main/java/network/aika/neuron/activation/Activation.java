@@ -26,11 +26,8 @@ import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.phase.VisitorPhase;
-import network.aika.neuron.phase.activation.*;
 import network.aika.neuron.phase.link.LinkPhase;
 import network.aika.neuron.phase.link.PropagateGradient;
-import network.aika.neuron.phase.link.SumUpLink;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,7 +37,6 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
 import static network.aika.neuron.phase.activation.ActivationPhase.COUNTING;
-import static network.aika.neuron.phase.link.LinkPhase.*;
 import static network.aika.neuron.phase.link.LinkPhase.SELF_GRADIENT;
 
 /**
@@ -489,7 +485,10 @@ public class Activation implements Element {
         if(gradientIsZero())
             return;
 
-        addLinksToQueue(INPUT, new PropagateGradient(SELF_GRADIENT, gradient));
+        addLinksToQueue(
+                INPUT,
+                new PropagateGradient(gradient)
+        );
         gradient = 0.0;
     }
 
@@ -506,7 +505,7 @@ public class Activation implements Element {
 
         getThought().addToQueue(
                 this,
-                PROPAGATE_GRADIENT
+                PROPAGATE_GRADIENTS
         );
     }
 
