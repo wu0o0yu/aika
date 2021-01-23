@@ -56,9 +56,7 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
 
     @Override
     public ActivationPhase[] getNextActivationPhases() {
-        return new ActivationPhase[] {
-                LINK_AND_PROPAGATE
-        };
+        return new ActivationPhase[] {};
     }
 
     @Override
@@ -121,7 +119,7 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
     }
 
     public String toString() {
-        return "Linking";
+        return "Link and Propagate";
     }
 
     @Override

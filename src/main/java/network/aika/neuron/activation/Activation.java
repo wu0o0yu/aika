@@ -390,13 +390,11 @@ public class Activation implements Element {
         );
     }
 
-    public boolean addToSum(double x) {
+    public void addToSum(double x) {
         if (value != null) {
             lateSum += x;
-            return true;
         } else {
             sum += x;
-            return false;
         }
     }
 

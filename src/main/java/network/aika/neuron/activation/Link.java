@@ -71,6 +71,10 @@ public class Link implements Element {
         if (w <= 0.0 && isSelfRef())
             return;
 
+        if(output.getValue() == null) {
+            getSynapse().updateReference(this);
+        }
+
         t.addToQueue(
                 this,
                 new SumUpLink(w * (getInputValue() - getInputValue(oldLink)))
@@ -313,9 +317,7 @@ public class Link implements Element {
     }
 
     public void sumUpLink(double delta) {
-        if(!getOutput().addToSum(delta)) {
-            getSynapse().updateReference(this);
-        }
+        getOutput().addToSum(delta);
     }
 
     public boolean isNegative() {

@@ -196,10 +196,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         v.link = nl;
 
-        if (
-                nl.getSynapse().getWeight() > 0.0 ||
-                nl.getSynapse().isTemplate()
-        ) {
+        Synapse s = nl.getSynapse();
+        if (s.getWeight() > 0.0 || s.isTemplate()) {
             nl.addNextLinkPhases(v.getPhase());
 
             if(!oAct.gradientSumIsZero()) {
