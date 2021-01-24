@@ -2,7 +2,6 @@ package network;
 
 import network.aika.Config;
 import network.aika.neuron.Templates;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.PatternPartSynapse;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.text.Document;
@@ -13,8 +12,6 @@ import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
-
-import static network.aika.neuron.Templates.*;
 
 public class InductionTest {
 
@@ -111,7 +108,7 @@ public class InductionTest {
 
         actTarget.initSelfGradient();
  //       actTarget.computeInitialLinkGradients();
-        actTarget.processGradient();
+        actTarget.getAndResetGradient();
 
         System.out.println(actTarget.gradientsToString());
     }

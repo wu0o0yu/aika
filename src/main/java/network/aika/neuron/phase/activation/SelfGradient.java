@@ -45,9 +45,6 @@ public class SelfGradient extends RankedImpl implements ActivationPhase {
 
         act.initSelfGradient();
 
-        if(n.isInputNeuron())
-            return;
-
         act.addLinksToQueue(
                 INPUT,
                 LinkPhase.SELF_GRADIENT

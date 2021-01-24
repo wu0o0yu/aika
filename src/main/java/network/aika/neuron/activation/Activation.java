@@ -26,6 +26,7 @@ import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.phase.activation.ActivationPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 import network.aika.neuron.phase.link.PropagateGradient;
 
@@ -120,7 +121,8 @@ public class Activation extends Element {
 
         getThought().addToQueue(
                 this,
-                LINK_AND_PROPAGATE
+                LINK_AND_PROPAGATE,
+                SELF_GRADIENT
         );
     }
 
@@ -448,20 +450,11 @@ public class Activation extends Element {
         return Math.abs(gradientSum) < TOLERANCE;
     }
 
-    public void processGradient() {
+    public double getAndResetGradient() {
         gradientSum += gradient;
-
-        if (getNeuron().isInputNeuron())
-            return;
-
-        if(gradientIsZero())
-            return;
-
-        addLinksToQueue(
-                INPUT,
-                new PropagateGradient(gradient)
-        );
+        double oldGradient = gradient;
         gradient = 0.0;
+        return oldGradient;
     }
 
     public double getActFunctionDerivative() {

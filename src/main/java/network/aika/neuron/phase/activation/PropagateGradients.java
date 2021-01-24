@@ -17,10 +17,12 @@
 package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
+import network.aika.neuron.phase.link.LinkPhase;
+import network.aika.neuron.phase.link.PropagateGradient;
 
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.link.LinkPhase.PROPAGATE_GRADIENT_RANK;
 
 /**
@@ -36,7 +38,22 @@ public class PropagateGradients extends RankedImpl implements ActivationPhase {
 
     @Override
     public void process(Activation act) {
-        act.processGradient();
+        if(act.gradientIsZero())
+            return;
+
+        double gradient = act.getAndResetGradient();
+
+        act.addLinksToQueue(
+                INPUT,
+                !act.getNeuron().isInputNeuron() ? new PropagateGradient(gradient) : null,
+                LinkPhase.TEMPLATE
+        );
+
+        act.getThought().addToQueue(
+                act,
+                TEMPLATE_INPUT,
+                TEMPLATE_OUTPUT
+        );
     }
 
     public String toString() {
