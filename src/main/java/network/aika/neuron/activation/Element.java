@@ -18,16 +18,49 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 /**
  * An Element is either a node (Activation) or an edge (Link) in the Activation graph.
  *
  *  @author Lukas Molzberger
  */
-public interface Element extends Comparable<Element> {
+public abstract class Element implements Comparable<Element> {
 
-    void onProcessEvent();
+    private Set<QueueEntry> queuedPhases = new TreeSet<>();
 
-    void afterProcessEvent();
+    public void addQueuedPhase(QueueEntry qe) {
+        queuedPhases.add(qe);
+    }
 
-    Thought getThought();
+    public void removeQueuedPhase(QueueEntry qe) {
+        queuedPhases.remove(qe);
+    }
+
+    public void replaceElement(Element newElement) {
+        removeFromQueue();
+        copyPhases(newElement);
+        queuedPhases.clear();
+    }
+
+    public void copyPhases(Element newElement) {
+        queuedPhases.stream()
+                .map(qe ->
+                        new QueueEntry(qe.getRound(), qe.getPhase(), newElement)
+                )
+                .forEach(qe ->
+                        getThought().addQueueEntry(qe)
+                );
+    }
+
+    private void removeFromQueue() {
+        getThought().removeQueueEntries(queuedPhases);
+    }
+
+    public abstract void onProcessEvent();
+
+    public abstract void afterProcessEvent();
+
+    public abstract Thought getThought();
 }

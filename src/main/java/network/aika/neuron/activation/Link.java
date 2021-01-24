@@ -36,7 +36,7 @@ import static network.aika.neuron.phase.link.LinkPhase.LINKING;
  *
  * @author Lukas Molzberger
  */
-public class Link implements Element {
+public class Link extends Element {
 
     private static final Logger log = LoggerFactory.getLogger(Link.class);
 

@@ -144,24 +144,35 @@ public abstract class Thought {
         addToQueueIntern(l, phases);
     }
 
-    private <P extends Phase, E extends Element> void addToQueueIntern(E ge, P... phases) {
+    private <P extends Phase, E extends Element> void addToQueueIntern(E e, P... phases) {
         for(P p: phases) {
             if(p == null)
                 continue;
 
-            queue.add(new QueueEntry(0, p, ge));
+            QueueEntry qe = new QueueEntry(0, p, e);
+            e.addQueuedPhase(qe);
+            addQueueEntry(qe);
         }
     }
 
-    public void removeActivationFromQueue(QueueEntry qe) {
+    public void addQueueEntry(QueueEntry qe) {
+        queue.add(qe);
+    }
+
+    public void removeQueueEntry(QueueEntry qe) {
         boolean isRemoved = queue.remove(qe);
         assert isRemoved;
     }
 
+    public void removeQueueEntries(Collection<QueueEntry> qe) {
+        queue.removeAll(qe);
+    }
+
     public void process(Model m) {
         while (!queue.isEmpty()) {
-            queue.pollFirst()
-                    .process();
+            QueueEntry qe = queue.pollFirst();
+            qe.getElement().removeQueuedPhase(qe);
+            qe.process();
         }
         m.addToN(length());
     }

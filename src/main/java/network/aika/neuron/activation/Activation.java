@@ -41,7 +41,7 @@ import static network.aika.neuron.phase.activation.ActivationPhase.*;
 /**
  * @author Lukas Molzberger
  */
-public class Activation implements Element {
+public class Activation extends Element {
 
     public static double TOLERANCE = 0.001;
 
@@ -106,7 +106,6 @@ public class Activation implements Element {
     public void onProcessEvent() {
         thought.onActivationProcessedEvent(this);
     }
-
 
     @Override
     public void afterProcessEvent() {
@@ -224,8 +223,7 @@ public class Activation implements Element {
         Activation clonedAct = new Activation(thought.createActivationId(), thought, neuron);
         thought.onActivationCreationEvent(clonedAct, this);
 
-        // TODO: Check if necessary
-        //clonedAct.copyPhases(this);
+        copyPhases(clonedAct);
         clonedAct.round = round + 1;
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
@@ -240,9 +238,7 @@ public class Activation implements Element {
         Activation clonedAct = new Activation(id, thought, neuron);
         thought.onActivationCreationEvent(clonedAct, this);
 
-        // TODO: Check if necessary
-//        clonedAct.copyPhases(this);
-//        clearPendingPhases();
+        replaceElement(clonedAct);
 
         clonedAct.round = round + 1;
         clonedAct.lastRound = this;
