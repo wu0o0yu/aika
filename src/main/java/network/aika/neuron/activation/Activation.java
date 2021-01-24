@@ -62,8 +62,6 @@ public class Activation extends Element {
     Map<NeuronProvider, Link> inputLinks;
     NavigableMap<OutputKey, Link> outputLinks;
 
-//    private boolean isFinal;
-
     private int round; // Only used as stopping criteria
     private Activation lastRound;
 

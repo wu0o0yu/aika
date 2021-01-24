@@ -200,12 +200,11 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if (s.getWeight() > 0.0 || s.isTemplate()) {
             nl.addNextLinkPhases(v.getPhase());
 
-            if(!oAct.gradientSumIsZero()) {
-                oAct.getThought().addToQueue(
-                        nl,
-                        new PropagateGradient(oAct.getGradientSum())
-                );
-            }
+            oAct.getThought().addToQueue(
+                    nl,
+                    SELF_GRADIENT,
+                    !oAct.gradientSumIsZero() ? new PropagateGradient(oAct.getGradientSum()) : null
+            );
         }
     }
 
