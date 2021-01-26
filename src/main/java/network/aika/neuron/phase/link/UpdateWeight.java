@@ -41,7 +41,11 @@ public class UpdateWeight extends RankedImpl implements LinkPhase {
         Synapse s = l.getSynapse();
         double oldWeight = s.getWeight();
 
-        l.updateSynapse();
+        s.updateSynapse(
+                l.getInputValue(),
+                l.getAndResetGradient(),
+                l.isCausal()
+        );
 
         Thought t = l.getThought();
         t.addToQueue(

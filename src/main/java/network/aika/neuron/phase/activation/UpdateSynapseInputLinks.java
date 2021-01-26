@@ -20,7 +20,8 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
-import static network.aika.neuron.phase.link.LinkPhase.UPDATE_WEIGHT;
+import static network.aika.neuron.phase.link.LinkPhase.UPDATE_WEIGHT_RANK;
+
 
 /**
  *
@@ -30,7 +31,7 @@ public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPha
 
     @Override
     public Ranked getPreviousRank() {
-        return UPDATE_WEIGHT;
+        return UPDATE_WEIGHT_RANK;
     }
 
     @Override

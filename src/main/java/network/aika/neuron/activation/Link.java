@@ -196,9 +196,8 @@ public class Link extends Element {
     public void propagateGradient(double g) {
         gradient += g;
 
-        if(input == null) {
+        if(input == null)
             return;
-        }
 
         input.propagateGradient(
                 synapse.getWeight() *
@@ -208,33 +207,7 @@ public class Link extends Element {
     }
 
     public boolean gradientIsZero() {
-        return Math.abs(gradient) < TOLERANCE;
-    }
-
-    public void updateSynapse() {
-        if(gradientIsZero())
-            return;
-
-        Neuron on = output.getNeuron();
-
-        boolean causal = isCausal();
-        double x = getInputValue();
-        double learnRate = on.getConfig().getLearnRate();
-
-        double posWDelta = learnRate * x * gradient;
-        double negWDelta = learnRate * (1.0 - x) * gradient;
-        double biasDelta = learnRate * gradient;
-
-        gradient = 0.0;
-
-        synapse.addWeight(posWDelta - negWDelta);
-        on.addConjunctiveBias(negWDelta, !causal);
-        on.addBias(biasDelta);
-
-        double finalBias = on.getBias(true);
-        if(finalBias > 0.0) {
-            on.addConjunctiveBias(-finalBias, false);
-        }
+            return Math.abs(gradient) < TOLERANCE;
     }
 
     public boolean follow(Direction dir) {
@@ -275,6 +248,12 @@ public class Link extends Element {
 
     public boolean isSelfRef() {
         return isSelfRef;
+    }
+
+    public double getAndResetGradient() {
+        double oldGradient = gradient;
+        gradient = 0.0;
+        return oldGradient;
     }
 
     public void linkInput() {
