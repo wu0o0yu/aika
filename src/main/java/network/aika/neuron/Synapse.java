@@ -270,8 +270,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return sampleSpace;
     }
 
-    public void updateSynapse(double x, double gradient, boolean isCausal) {
+    public double updateSynapse(double x, double gradient, boolean isCausal) {
         Neuron on = getOutput();
+        double oldWeight = weight;
 
         double learnRate = on.getConfig().getLearnRate();
 
@@ -287,6 +288,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if(finalBias > 0.0) {
             on.addConjunctiveBias(-finalBias, false);
         }
+
+        return weight - oldWeight;
     }
 
     public double getFrequency(Sign is, Sign os, double n) {

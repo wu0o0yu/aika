@@ -17,6 +17,7 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.Thought;
+import network.aika.Utils;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.RankedImpl;
@@ -66,7 +67,7 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
     }
 
     public String toString() {
-        return "Sum up Link";
+        return "Sum up Link (" + Utils.round(delta) + ")";
     }
 
     @Override

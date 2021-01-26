@@ -39,10 +39,10 @@ public class UpdateWeight extends RankedImpl implements LinkPhase {
     @Override
     public void process(Link l) {
         Synapse s = l.getSynapse();
-        double oldWeight = s.getWeight();
+        double x = l.getInputValue();
 
-        s.updateSynapse(
-                l.getInputValue(),
+        double weightDelta = s.updateSynapse(
+                x,
                 l.getAndResetGradient(),
                 l.isCausal()
         );
@@ -55,7 +55,7 @@ public class UpdateWeight extends RankedImpl implements LinkPhase {
 
         t.addToQueue(
                 l,
-                new SumUpLink(l.getInputValue() * (s.getWeight() - oldWeight))
+                new SumUpLink(x * weightDelta)
         );
     }
 
