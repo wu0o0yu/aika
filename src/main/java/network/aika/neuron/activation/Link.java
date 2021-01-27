@@ -66,14 +66,12 @@ public class Link extends Element {
         linkInput();
         linkOutput();
 
+        getSynapse().updateReference(this);
+
         double w = getSynapse().getWeight();
 
         if (w <= 0.0 && isSelfRef())
             return;
-
-        if(output.getValue() == null) {
-            getSynapse().updateReference(this);
-        }
 
         t.addToQueue(
                 this,

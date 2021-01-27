@@ -38,11 +38,6 @@ public class SelfGradient extends RankedImpl implements LinkPhase {
     @Override
     public void process(Link l) {
         l.computeSelfGradient();
-
-        l.getThought().addToQueue(
-                l.getOutput(),
-                PROPAGATE_GRADIENTS
-        );
     }
 
     public String toString() {

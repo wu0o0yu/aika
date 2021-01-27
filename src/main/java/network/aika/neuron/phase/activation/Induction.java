@@ -48,11 +48,6 @@ public class Induction extends RankedImpl implements ActivationPhase {
         act.setNeuron(inducedNeuron);
 
         act.link();
-
-        act.getThought().addToQueue(
-                act,
-                COUNTING
-        );
     }
 
     public String toString() {
