@@ -45,10 +45,6 @@ public class SelfGradient extends RankedImpl implements ActivationPhase {
 
         act.initSelfGradient();
 
-        act.addLinksToQueue(
-                INPUT,
-                LinkPhase.SELF_GRADIENT
-        );
         act.getThought().addToQueue(
                 act,
                 PROPAGATE_GRADIENTS

@@ -22,6 +22,7 @@ import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.VisitorPhase;
+import network.aika.neuron.phase.link.PropagateGradient;
 import network.aika.neuron.phase.link.SumUpLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,7 +152,10 @@ public class Link extends Element {
         if(isNegative())
             return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
 
-        double s = 0.0;
+        double s = getSynapse().getSurprisal(
+                Sign.getSign(input),
+                Sign.getSign(output)
+        );
 
         s -= input.getNeuron().getSurprisal(
                 Sign.getSign(input)
@@ -161,17 +165,16 @@ public class Link extends Element {
                 Sign.getSign(output)
         );
 
-        s += getSynapse().getSurprisal(
-                Sign.getSign(input),
-                Sign.getSign(output)
-        );
-
         double f = s * getInputValue() * output.getNorm();
 
         double offsetGradient =  f * getActFunctionDerivative();
         double outputGradient = (f * output.getActFunctionDerivative()) - offsetGradient;
 
-        gradient += offsetGradient - lastOffsetGradient;
+        double g = offsetGradient - lastOffsetGradient;
+        if(Math.abs(g) >= TOLERANCE) {
+            getThought().addToQueue(this, new PropagateGradient(g));
+        }
+
         lastOffsetGradient = offsetGradient;
 
         if(Math.abs(outputGradient) >= TOLERANCE) {
