@@ -18,7 +18,6 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.Utils;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
@@ -30,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.phase.link.LinkPhase.LINKING;
 
 /**
  *
@@ -46,6 +44,9 @@ public class Link extends Element {
     private Activation output;
 
     private boolean isSelfRef;
+
+    private double lastOffsetGradient;
+    private double lastOutputGradient;
 
     private double gradient;
 
@@ -147,7 +148,8 @@ public class Link extends Element {
     }
 
     public void computeSelfGradient() {
-        if(isNegative()) return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
+        if(isNegative())
+            return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
 
         double s = 0.0;
 
@@ -169,8 +171,13 @@ public class Link extends Element {
         double offsetGradient =  f * getActFunctionDerivative();
         double outputGradient = (f * output.getActFunctionDerivative()) - offsetGradient;
 
-        gradient += offsetGradient;
-        getOutput().propagateGradient(outputGradient);
+        gradient += offsetGradient - lastOffsetGradient;
+        lastOffsetGradient = offsetGradient;
+
+        if(Math.abs(outputGradient) >= TOLERANCE) {
+            getOutput().propagateGradient(outputGradient - lastOutputGradient);
+            lastOutputGradient = outputGradient;
+        }
     }
 
     private double getActFunctionDerivative() {

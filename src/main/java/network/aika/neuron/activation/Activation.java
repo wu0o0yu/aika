@@ -26,9 +26,7 @@ import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.phase.activation.ActivationPhase;
 import network.aika.neuron.phase.link.LinkPhase;
-import network.aika.neuron.phase.link.PropagateGradient;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -70,6 +68,7 @@ public class Activation extends Element {
 
     private Reference reference;
 
+    private double lastSelfGradient = 0.0;
     private double gradient;
     private double gradientSum;
 
@@ -430,10 +429,13 @@ public class Activation extends Element {
     }
 
     public void initSelfGradient() {
-        gradient += getNorm() * getActFunctionDerivative() *
+        double selfGradient = getNorm() * getActFunctionDerivative() *
                 getNeuron().getSurprisal(
                         Sign.getSign(this)
                 );
+
+        gradient += selfGradient - lastSelfGradient;
+        lastSelfGradient = selfGradient;
     }
 
     public double getNorm() {
