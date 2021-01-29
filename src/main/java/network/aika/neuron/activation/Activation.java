@@ -566,8 +566,8 @@ public class Activation extends Element {
         return !branches.isEmpty();
     }
 
-    public String getShortString() {
-        return "id:" +
+    public String toShortString() {
+        return "Act id:" +
                 getId() +
                 " n:[" + getNeuron() + "]";
     }
@@ -593,7 +593,7 @@ public class Activation extends Element {
     public String toString(boolean includeLink) {
         StringBuilder sb = new StringBuilder();
         sb.append("act " +
-                getShortString() +
+                toShortString() +
                 " value:" + (value != null ? Utils.round(value) : "X") +
                 " net:" + Utils.round(getNet(false)) +
                 " netFinal:" + Utils.round(getNet(true)) +

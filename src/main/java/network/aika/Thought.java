@@ -168,6 +168,10 @@ public abstract class Thought {
         queue.removeAll(qe);
     }
 
+    public SortedSet<QueueEntry> getQueue() {
+        return queue;
+    }
+
     public void process(Model m) {
         while (!queue.isEmpty()) {
             QueueEntry qe = queue.pollFirst();

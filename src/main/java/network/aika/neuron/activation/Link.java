@@ -328,21 +328,25 @@ public class Link extends Element {
     public String toString() {
         return synapse.getClass().getSimpleName() +
                 ": " + getIdString() +
-                " --> " + output.getShortString();
+                " --> " + output.toShortString();
     }
 
     public String toDetailedString() {
-        return "in:[" + input.getShortString() +
-                " v:" + Utils.round(input.getValue()) + "] - s:[" + synapse.toString() + "] - out:[" + input.getShortString() + " v:" + Utils.round(input.getValue()) + "]";
+        return "in:[" + input.toShortString() +
+                " v:" + Utils.round(input.getValue()) + "] - s:[" + synapse.toString() + "] - out:[" + input.toShortString() + " v:" + Utils.round(input.getValue()) + "]";
     }
 
     public String getIdString() {
-        return (input != null ? input.getShortString() : "X:" + synapse.getInput());
+        return (input != null ? input.toShortString() : "X:" + synapse.getInput());
     }
 
     public String gradientsToString() {
         return "   " + getIdString() +
                 " x:" + Utils.round(getInputValue()) +
                 " w:" + Utils.round(getSynapse().getWeight());
+    }
+
+    public String toShortString() {
+        return toString();
     }
 }

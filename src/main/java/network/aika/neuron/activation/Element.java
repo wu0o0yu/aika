@@ -63,4 +63,6 @@ public abstract class Element implements Comparable<Element> {
     public abstract void afterProcessEvent();
 
     public abstract Thought getThought();
+
+    public abstract String toShortString();
 }

@@ -142,10 +142,10 @@ public class Visitor {
             sb.append(previousStep + "\n");
         }
 
-        sb.append("Origin:" + origin.act.getShortString() + ", ");
+        sb.append("Origin:" + origin.act.toShortString() + ", ");
 
         if(act != null) {
-            sb.append("Current:" + act.getShortString() + ", ");
+            sb.append("Current:" + act.toShortString() + ", ");
         } else if(link != null) {
             sb.append("Current:" + link.toString() + ", ");
         }
