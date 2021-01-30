@@ -21,7 +21,7 @@ import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
 /**
- * Counts the number of activations of a particular neuron.
+ * Counts the number of activations a particular neuron has encountered.
  *
  * @author Lukas Molzberger
  */

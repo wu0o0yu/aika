@@ -32,7 +32,7 @@ public interface ActivationPhase extends Phase<Activation> {
     LinkAndPropagate LINK_AND_PROPAGATE = new LinkAndPropagate();
     ActivationPhase PREPARE_POSITIVE_FEEDBACK_LOOP_UPDATE = new PreparePositiveFeedbackLoopUpdate();
     ActivationPhase POSITIVE_FEEDBACK_LOOP_UPDATE = new PositiveFeedbackLoopUpdate();
-    ActivationPhase SOFTMAX = new Softmax();
+    ActivationPhase SOFTMAX = new DetermineBranchProbability();
     ActivationPhase COUNTING = new Counting();
     ActivationPhase ENTROPY_GRADIENT = new EntropyGradient();
     ActivationPhase PROPAGATE_GRADIENTS = new PropagateGradients();

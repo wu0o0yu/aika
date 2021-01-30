@@ -23,6 +23,9 @@ import network.aika.neuron.phase.RankedImpl;
 import static network.aika.neuron.phase.link.LinkPhase.UPDATE_WEIGHT;
 
 /**
+ * Determines which input synapses of this activations neuron should be linked to the input neuron.
+ * Connecting a synapse to its input neuron is not necessary if the synapse weight is weak. That is the case if the
+ * synapse is incapable to completely suppress the activation of this neuron.
  *
  * @author Lukas Molzberger
  */

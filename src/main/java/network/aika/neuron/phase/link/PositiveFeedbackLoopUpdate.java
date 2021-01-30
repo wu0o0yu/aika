@@ -47,7 +47,7 @@ public class PositiveFeedbackLoopUpdate extends RankedImpl implements LinkPhase 
     }
 
     public String toString() {
-        return "Link-Final Linking";
+        return "Link-Positive Feedback Loop Update";
     }
 
     @Override

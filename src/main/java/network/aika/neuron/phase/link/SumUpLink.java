@@ -27,6 +27,7 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
 
 /**
+ * Uses the input activation value, and the synapse weight to update the net value of the output activation.
  *
  * @author Lukas Molzberger
  */

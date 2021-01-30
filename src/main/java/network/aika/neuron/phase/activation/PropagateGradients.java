@@ -26,6 +26,7 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.link.LinkPhase.PROPAGATE_GRADIENT_RANK;
 
 /**
+ * Propagates the gradient of this activation backwards to all its input-links.
  *
  * @author Lukas Molzberger
  */

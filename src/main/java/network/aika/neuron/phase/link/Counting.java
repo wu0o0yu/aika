@@ -22,7 +22,7 @@ import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.activation.ActivationPhase;
 
 /**
- * Counts the number of input or output activations of a particular synapse.
+ * Counts the number of input or output activations a particular synapse has encountered.
  * The four different cases are counted separately.
  *
  * @author Lukas Molzberger

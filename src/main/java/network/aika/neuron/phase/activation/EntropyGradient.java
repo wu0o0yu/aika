@@ -53,7 +53,7 @@ public class EntropyGradient extends RankedImpl implements ActivationPhase {
     }
 
     public String toString() {
-        return "SelfGradient";
+        return "Entropy Gradient";
     }
 
     @Override
