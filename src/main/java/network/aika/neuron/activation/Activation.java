@@ -429,7 +429,7 @@ public class Activation extends Element {
                 );
     }
 
-    public void initSelfGradient() {
+    public void initEntropyGradient() {
         double selfGradient = getNorm() * getActFunctionDerivative() *
                 getNeuron().getSurprisal(
                         Sign.getSign(this)

@@ -106,7 +106,7 @@ public class InductionTest {
         actTarget.addLink(sA, actA, false);
         actTarget.addLink(sB, actB, false);
 
-        actTarget.initSelfGradient();
+        actTarget.initEntropyGradient();
  //       actTarget.computeInitialLinkGradients();
         actTarget.getAndResetGradient();
 

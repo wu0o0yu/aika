@@ -149,7 +149,7 @@ public class Link extends Element {
         }
     }
 
-    public void computeSelfGradient() {
+    public void computeInormationGainGradient() {
         if(isNegative())
             return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
 
@@ -184,6 +184,13 @@ public class Link extends Element {
         }
     }
 
+
+    /**
+     * This term is used for two purposes. Firstly, it limits the influence that weak synapses have on neighbouring
+     * synapses of the same output neuron. Secondly, it bootstraps the training of a weak synapse.
+     *
+     * @return
+     */
     private double getActFunctionDerivative() {
         return output.getNeuron()
                 .getActivationFunction()

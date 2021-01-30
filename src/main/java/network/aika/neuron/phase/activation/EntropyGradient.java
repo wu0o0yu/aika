@@ -20,9 +20,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
-import network.aika.neuron.phase.link.LinkPhase;
 
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.link.LinkPhase.SHADOW_FACTOR;
 
 /**
@@ -46,7 +44,7 @@ public class EntropyGradient extends RankedImpl implements ActivationPhase {
         if(n.isTemplate())
             return;
 
-        act.initSelfGradient();
+        act.initEntropyGradient();
 
         act.getThought().addToQueue(
                 act,
