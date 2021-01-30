@@ -191,7 +191,7 @@ public class Link extends Element {
      *
      * @return
      */
-    private double getActFunctionDerivative() {
+    public double getActFunctionDerivative() {
         return output.getNeuron()
                 .getActivationFunction()
                 .outerGrad(

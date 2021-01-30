@@ -69,7 +69,7 @@ public class Activation extends Element {
 
     private Reference reference;
 
-    private double lastSelfGradient = 0.0;
+    private double lastEntropyGradient = 0.0;
     private double gradient;
     private double gradientSum;
 
@@ -435,8 +435,8 @@ public class Activation extends Element {
                         Sign.getSign(this)
                 );
 
-        gradient += selfGradient - lastSelfGradient;
-        lastSelfGradient = selfGradient;
+        gradient += selfGradient - lastEntropyGradient;
+        lastEntropyGradient = selfGradient;
     }
 
     public double getNorm() {
