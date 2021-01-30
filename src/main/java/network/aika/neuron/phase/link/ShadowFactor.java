@@ -22,6 +22,7 @@ import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
 /**
+ * Avoid that synapses which access the same source information generate twice the gradient.
  *
  * @author Lukas Molzberger
  */

@@ -21,6 +21,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.RankedImpl;
 
 /**
+ * Propagate the gradient backwards through the network.
  *
  * @author Lukas Molzberger
  */

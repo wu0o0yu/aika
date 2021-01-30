@@ -26,6 +26,7 @@ import static network.aika.neuron.phase.activation.ActivationPhase.PROPAGATE_GRA
 import static network.aika.neuron.phase.activation.ActivationPhase.UPDATE_SYNAPSE_INPUT_LINKS;
 
 /**
+ * Use the link gradient to update the synapse weight.
  *
  * @author Lukas Molzberger
  */

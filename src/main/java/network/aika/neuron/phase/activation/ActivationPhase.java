@@ -30,8 +30,8 @@ import static network.aika.neuron.phase.link.LinkPhase.*;
 public interface ActivationPhase extends Phase<Activation> {
     ActivationPhase INDUCTION = new Induction();
     LinkAndPropagate LINK_AND_PROPAGATE = new LinkAndPropagate();
-    ActivationPhase PREPARE_FINAL_LINKING = new PrepareFinalLinking();
-    ActivationPhase FINAL_LINKING = new FinalLinking();
+    ActivationPhase PREPARE_POSITIVE_FEEDBACK_LOOP_UPDATE = new PreparePositiveFeedbackLoopUpdate();
+    ActivationPhase POSITIVE_FEEDBACK_LOOP_UPDATE = new PositiveFeedbackLoopUpdate();
     ActivationPhase SOFTMAX = new Softmax();
     ActivationPhase COUNTING = new Counting();
     ActivationPhase ENTROPY_GRADIENT = new EntropyGradient();

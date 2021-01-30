@@ -25,6 +25,7 @@ import static network.aika.neuron.phase.activation.ActivationPhase.LINK_AND_PROP
 
 
 /**
+ * Use the visitor to link neighbouring links to the same output activation.
  *
  * @author Lukas Molzberger
  */

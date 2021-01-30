@@ -17,19 +17,20 @@
 package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
 /**
+ * During the initial linking process all positive recurrent synapses are assumed to be
+ * active. If that is not the case, updates of the affected activations are required.
  *
  * @author Lukas Molzberger
  */
-public class FinalLinking extends RankedImpl implements ActivationPhase {
+public class PositiveFeedbackLoopUpdate extends RankedImpl implements ActivationPhase {
 
     @Override
     public Ranked getPreviousRank() {
-        return PREPARE_FINAL_LINKING;
+        return PREPARE_POSITIVE_FEEDBACK_LOOP_UPDATE;
     }
 
     @Override
@@ -38,8 +39,9 @@ public class FinalLinking extends RankedImpl implements ActivationPhase {
     }
 
     public String toString() {
-        return "Final Linking";
+        return "Positive Feedback Loop Update";
     }
+
     @Override
     public int compare(Activation act1, Activation act2) {
         return act1.getFired().compareTo(act2.getFired());

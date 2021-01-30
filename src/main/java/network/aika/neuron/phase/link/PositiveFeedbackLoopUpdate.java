@@ -27,11 +27,11 @@ import network.aika.neuron.phase.activation.ActivationPhase;
  *
  * @author Lukas Molzberger
  */
-public class FinalLinking extends RankedImpl implements LinkPhase {
+public class PositiveFeedbackLoopUpdate extends RankedImpl implements LinkPhase {
 
     @Override
     public Ranked getPreviousRank() {
-        return ActivationPhase.FINAL_LINKING;
+        return ActivationPhase.POSITIVE_FEEDBACK_LOOP_UPDATE;
     }
 
     @Override

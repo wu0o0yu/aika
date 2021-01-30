@@ -17,15 +17,15 @@
 package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
 /**
+ * Check if there are positive recurrent links that have not been activated and thus need to be updated.
  *
  * @author Lukas Molzberger
  */
-public class PrepareFinalLinking extends RankedImpl implements ActivationPhase {
+public class PreparePositiveFeedbackLoopUpdate extends RankedImpl implements ActivationPhase {
 
     @Override
     public Ranked getPreviousRank() {
@@ -37,13 +37,13 @@ public class PrepareFinalLinking extends RankedImpl implements ActivationPhase {
         if(act.updateForFinalPhase()) {
             act.getThought().addToQueue(
                     act.getModifiable(null),
-                    FINAL_LINKING
+                    POSITIVE_FEEDBACK_LOOP_UPDATE
             );
         }
     }
 
     public String toString() {
-        return "Prepare Final Linking";
+        return "Prepare Feedback Loop Update";
     }
 
     @Override
