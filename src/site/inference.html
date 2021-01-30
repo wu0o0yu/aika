@@ -122,16 +122,20 @@
 			<p>
 				By choosing the weights and the threshold
 				(i.e. the bias) accordingly, neurons can take on the characteristics of boolean logic gates such as an
-				and-gate or an or-gate.
+				and-gate or an or-gate. These two kinds of logic gates can be implemented by two different types neurons.
+				Excitatory neurons take on the characteristics of an and-gate. These are used to detect a pattern in the
+				input data set. The second type of neuron are the inhibitory neurons act like an or-gate. They are able
+				to group a large number of excitatory neurons together and form a category of them. They are called inhibitory
+				because they are able to form negative feedback loops with their input neurons so that only one of their
+				inputs is allowed to stay active. All other input neurons will be suppressed.
 
 				The ability to make exact inferences using formal logic is the strength of classical AI. But neurons can
 				do more than that. They can also incorporate many weak inputs that only in sum give a clear picture of
 				whether the neuron should fire or not. Therefore, given a fitting training rule, neurons are able to combine
 				the strength of the classical symbolic AI and the connectionist sub-symbolic AI.
 
-				Now to the part where I see the great similarity to your capsule networks. Basically, there are three
-				types of neurons, pattern neurons, pattern part neurons, and inhibitory neurons. The pattern neurons and
-				the pattern part neurons are both conjunctive in nature and the inhibitory neuron is disjunctive. The
+				The excitatory neurons, however, can be further split up in two additional types of neurons. The pattern neurons and
+				the pattern part neurons. Both are conjunctive in nature. The
 				pattern part neurons kind of describe which lower-level patterns are part of the current pattern. Each
 				pattern part neuron receives a positive feedback synapse from the pattern to which it belongs to. The pattern
 				neuron on the other hand is only activated if the pattern as a whole is detected. For example, if we
