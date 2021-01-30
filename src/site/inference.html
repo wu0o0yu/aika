@@ -124,17 +124,22 @@
 				(i.e. the bias) accordingly, neurons can take on the characteristics of boolean logic gates such as an
 				and-gate or an or-gate.
 
-				Also, neurons need to be able to act more like formal logic. Sure their ability to integrate weak input signals is important, this is something that classical AI has great difficulties with, but there is also the need for strong conjunctive or disjunctive behavior. Surely, these things can be achieved by setting the synapse weights and the bias value appropriately, but still, these neurons are sufficiently different to justify the introduction of different types of neurons for these. I believe that the human brain does something very similar with its excitatory pyramidal neurons and its inhibitory stellate neurons.
-				Now to the part where I see the great similarity to your capsule networks. Basically, there are three types of neurons, pattern neurons, pattern part neurons, and inhibitory neurons. The pattern neurons and the pattern part neurons are both conjunctive in nature and the inhibitory neuron is disjunctive. The pattern part neurons kind of describe which lower-level patterns are part of the current pattern. Each pattern part neuron receives a positive feedback synapse from the pattern to which it belongs to. The pattern neuron on the other hand is only activated if the pattern as a whole is detected. For example, if we consider a word consisting of individual letters as lower-level patterns, then we have a corresponding pattern part neuron for each letter whose meaning is that this letter occurred as part of this word. The pattern part neurons also receive negative feedback synapses from the inhibitory neurons such that competing patterns are able to suppress each other.
-			</p>
-			<h2>Network Topology</h2>
-			<p>
-			<h2>Positive and Negative Feedback Loops</h2>
-			<p>
-				Another crucial insight is the need for positive and negative feedback loops. These are synapses that ignore the causal sequence of fired activations. Especially the negative feedback synapses are interesting because they require the introduction of mutually shielded branches for the following activations. They create a kind of independent interpretation of parts of the input data set and only later on its decision which of these interpretations gets selected. It's very similar to what a parse tree does only that a parse tree is limited to syntactic information only. Another way to relate it to classical logic is to consider it as non-monotonic inference, which in classical AI could not be solved properly since classical logic is missing the weak influences that neural networks are able to capture.
-			</p>
+				The ability to make exact inferences using formal logic is the strength of classical AI. But neurons can
+				do more than that. They can also incorporate many weak inputs that only in sum give a clear picture of
+				whether the neuron should fire or not. Therefore, given a fitting training rule, neurons are able to combine
+				the strength of the classical symbolic AI and the connectionist sub-symbolic AI.
 
-			<h2>Neuron Types</h2>
+				Now to the part where I see the great similarity to your capsule networks. Basically, there are three
+				types of neurons, pattern neurons, pattern part neurons, and inhibitory neurons. The pattern neurons and
+				the pattern part neurons are both conjunctive in nature and the inhibitory neuron is disjunctive. The
+				pattern part neurons kind of describe which lower-level patterns are part of the current pattern. Each
+				pattern part neuron receives a positive feedback synapse from the pattern to which it belongs to. The pattern
+				neuron on the other hand is only activated if the pattern as a whole is detected. For example, if we
+				consider a word consisting of individual letters as lower-level patterns, then we have a corresponding
+				pattern part neuron for each letter whose meaning is that this letter occurred as part of this word. The
+				pattern part neurons also receive negative feedback synapses from the inhibitory neurons such that
+				competing patterns are able to suppress each other.
+			</p>
 			<p>
 				There are two main types of neurons in Aika: excitatory neurons and inhibitory neurons. The biological
 				role models for those neurons are the spiny pyramidal cell and the aspiny stellate cell in the cerebral
@@ -164,6 +169,11 @@
 			<p>
 				Especially for strongly disjunctive neurons like the inhibitory neuron, ReLU has the advantage of
 				propagating its input signal exactly as it is, without distortion or loss of information.
+			</p>
+
+			<h2>Positive and Negative Feedback Loops</h2>
+			<p>
+				Another crucial insight is the need for positive and negative feedback loops. These are synapses that ignore the causal sequence of fired activations. Especially the negative feedback synapses are interesting because they require the introduction of mutually shielded branches for the following activations. They create a kind of independent interpretation of parts of the input data set and only later on its decision which of these interpretations gets selected. It's very similar to what a parse tree does only that a parse tree is limited to syntactic information only. Another way to relate it to classical logic is to consider it as non-monotonic inference, which in classical AI could not be solved properly since classical logic is missing the weak influences that neural networks are able to capture.
 			</p>
         </div>
 	</div>
