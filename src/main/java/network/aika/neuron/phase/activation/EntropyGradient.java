@@ -26,10 +26,13 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.link.LinkPhase.SHADOW_FACTOR;
 
 /**
+ * Computes the gradient of the entropy function for this activation.
+ *
+ * @see <a href="https://aika.network/training.html">Aika Training</a>
  *
  * @author Lukas Molzberger
  */
-public class SelfGradient extends RankedImpl implements ActivationPhase {
+public class EntropyGradient extends RankedImpl implements ActivationPhase {
 
     @Override
     public Ranked getPreviousRank() {

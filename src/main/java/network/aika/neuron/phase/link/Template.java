@@ -28,6 +28,8 @@ import static network.aika.neuron.phase.activation.ActivationPhase.TEMPLATE_INPU
 import static network.aika.neuron.phase.activation.ActivationPhase.UPDATE_SYNAPSE_INPUT_LINKS;
 
 /**
+ * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
+ * activations and links.
  *
  * @author Lukas Molzberger
  */

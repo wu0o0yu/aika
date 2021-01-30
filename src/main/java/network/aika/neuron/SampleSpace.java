@@ -25,6 +25,9 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 /**
+ * The <a href="https://en.wikipedia.org/wiki/Sample_space}">Sample Space</a> keeps track of the number of
+ * training instances a certain neuron or synapse has encountered. The Sample Space is used
+ * to convert the counted frequencies to probabilities.
  *
  * @author Lukas Molzberger
  */

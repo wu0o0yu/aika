@@ -17,12 +17,13 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.activation.ActivationPhase;
 
 /**
+ * Counts the number of input or output activations of a particular synapse.
+ * The four different cases are counted separately.
  *
  * @author Lukas Molzberger
  */
@@ -37,7 +38,7 @@ public class Counting extends RankedImpl implements LinkPhase {
     public void process(Link l) {
         l.count();
 
-        l.getThought().addToQueue(l, SELF_GRADIENT);
+        l.getThought().addToQueue(l, INFORMATION_GAIN_GRADIENT);
     }
 
     public String toString() {

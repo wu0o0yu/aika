@@ -120,7 +120,7 @@ public class Activation extends Element {
         getThought().addToQueue(
                 this,
                 LINK_AND_PROPAGATE,
-                SELF_GRADIENT
+                ENTROPY_GRADIENT
         );
     }
 

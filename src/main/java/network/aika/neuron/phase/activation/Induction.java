@@ -26,6 +26,7 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
+ * Creates a new untrained neuron from a template activation.
  *
  * @author Lukas Molzberger
  */

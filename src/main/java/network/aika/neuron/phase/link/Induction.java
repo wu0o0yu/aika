@@ -24,6 +24,7 @@ import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.activation.ActivationPhase;
 
 /**
+ * Creates a new untrained synapse from a template link.
  *
  * @author Lukas Molzberger
  */

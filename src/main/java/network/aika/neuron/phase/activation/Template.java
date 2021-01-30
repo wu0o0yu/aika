@@ -16,14 +16,12 @@
  */
 package network.aika.neuron.phase.activation;
 
-import network.aika.Config;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
@@ -36,6 +34,8 @@ import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
+ * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
+ * activations and links.
  *
  * @author Lukas Molzberger
  */

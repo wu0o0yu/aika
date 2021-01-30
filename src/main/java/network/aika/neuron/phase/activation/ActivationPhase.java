@@ -16,11 +16,8 @@
  */
 package network.aika.neuron.phase.activation;
 
-import network.aika.Config;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Phase;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.link.LinkPhase;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -37,7 +34,7 @@ public interface ActivationPhase extends Phase<Activation> {
     ActivationPhase FINAL_LINKING = new FinalLinking();
     ActivationPhase SOFTMAX = new Softmax();
     ActivationPhase COUNTING = new Counting();
-    ActivationPhase SELF_GRADIENT = new SelfGradient();
+    ActivationPhase ENTROPY_GRADIENT = new EntropyGradient();
     ActivationPhase PROPAGATE_GRADIENTS = new PropagateGradients();
     ActivationPhase UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks();
     Template TEMPLATE_INPUT = new Template(TEMPLATE, INPUT);

@@ -36,9 +36,7 @@ import static network.aika.neuron.Sign.NEG;
 import static network.aika.neuron.Sign.POS;
 import static network.aika.neuron.activation.Link.linkExists;
 import static network.aika.neuron.activation.Visitor.Transition.LINK;
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.phase.link.LinkPhase.PROPAGATE_GRADIENT_RANK;
-import static network.aika.neuron.phase.link.LinkPhase.SELF_GRADIENT;
+import static network.aika.neuron.phase.link.LinkPhase.INFORMATION_GAIN_GRADIENT;
 
 /**
  *
@@ -202,7 +200,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
             oAct.getThought().addToQueue(
                     nl,
-                    SELF_GRADIENT,
+                    INFORMATION_GAIN_GRADIENT,
                     !oAct.gradientSumIsZero() ? new PropagateGradient(oAct.getGradientSum()) : null
             );
         }
