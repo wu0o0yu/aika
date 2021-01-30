@@ -70,12 +70,23 @@
 				Since we have a one-to-many relation between neurons and activations, we also need a one-to-many relation between the synapses and the links between the
 				activations. Therefore we need a linking process to determine which activation are going to be connected which others. Roughly speaking activations can be linked if
 				they are grounded in the same input data. <br/>
+
 				A consequence of separating the neurons and their activations is that we can not rely on the network topology to give us the chronological sequence in which each
 				activation is processed. Therefore each activation needs a fired timestamp information that describes the point in time when this activation becomes visible to other neurons.
-				In contrast to conventional neural networks, with their predefined layered architecture, the Aika network starts out empty. Neurons and synapses are added during training.
-				There is an underlying set of rules which determine when certain types of neurons or synapses are induced. <br/>
-				For the network to be able to scale to a sufficient number of neurons and still be computed efficiently, we need to restrict the number of synapses that are
-				induced or even considered to be induced.
+				In contrast to conventional neural networks, with their predefined layered architecture, where one layer after the other is processed by hardware accelerated matrix
+				operations Aika follows a different approach. The core of the Aika algorithm is a single queue to which primitive operations within the graph of the neural network are
+				added and then processed in a predefined order. The advantage of this approach is that the activation network can be very sparse with respect to the actual neural network.
+				Only a tiny minority of neurons that are relevant to a given input data set are actually activated and the order in which inferences are performed within the network is
+				completely determined by the input data set instead of the hardwired network architecture. <br/>
+
+				Another difference to classical neural networks is that the complete structure of the network is inferred during training. The Aika network starts out completely empty.
+				In a first step, input neurons and their activations are added to the network. These represent either letters or words. Some relational input activations are then added
+				to capture the correct sequence in which the input words occur. Then, during training, new neurons and synapses are instantiated and added to the network. These, however,
+				are not completely created from scratch. Instead they are instantiated based on neurons and synapses in a template network. This template network contains several
+				different types of neurons and synapses that are needed for specific tasks within the network. A similar approach can be observed in the human brain where different types of
+				neurons serve different purposes. Pyramidal neurons for instance possess long axons through which these neurons are able to connect distance parts in the brain. Interneurons
+				on the other hand create local circuits. Depending on the type of neuron different neurotransmitters are used such as gamma-Aminobutyric acid (GABA) in some of the
+				inhibitory neurons.
 			</p>
 
 			<h2>The weighted sum and the activation function</h2>
