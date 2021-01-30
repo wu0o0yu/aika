@@ -62,31 +62,31 @@ public abstract class Thought {
                 );
     }
 
-    public void onActivationProcessedEvent(Activation act) {
+    public void onActivationProcessedEvent(Phase p, Activation act) {
         getEventListeners()
                 .forEach(
-                        el -> el.onActivationProcessedEvent(act)
+                        el -> el.onActivationProcessedEvent(p, act)
                 );
     }
 
-    public void afterActivationProcessedEvent(Activation act) {
+    public void afterActivationProcessedEvent(Phase p, Activation act) {
         getEventListeners()
                 .forEach(
-                        el -> el.afterActivationProcessedEvent(act)
+                        el -> el.afterActivationProcessedEvent(p, act)
                 );
     }
 
-    public void onLinkProcessedEvent(Link l) {
+    public void onLinkProcessedEvent(Phase p, Link l) {
         getEventListeners()
                 .forEach(
-                        el -> el.onLinkProcessedEvent(l)
+                        el -> el.onLinkProcessedEvent(p, l)
                 );
     }
 
-    public void afterLinkProcessedEvent(Link l) {
+    public void afterLinkProcessedEvent(Phase p, Link l) {
         getEventListeners()
                 .forEach(
-                        el -> el.afterLinkProcessedEvent(l)
+                        el -> el.afterLinkProcessedEvent(p, l)
                 );
     }
 

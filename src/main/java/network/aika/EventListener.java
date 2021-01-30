@@ -19,6 +19,7 @@ package network.aika;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.phase.Phase;
 
 
 /**
@@ -29,13 +30,13 @@ public interface EventListener {
 
     void onActivationCreationEvent(Activation act, Activation originAct);
 
-    void onActivationProcessedEvent(Activation act);
+    void onActivationProcessedEvent(Phase p, Activation act);
 
-    void afterActivationProcessedEvent(Activation act);
+    void afterActivationProcessedEvent(Phase p, Activation act);
 
     void onLinkCreationEvent(Link l);
 
-    void onLinkProcessedEvent(Link l);
+    void onLinkProcessedEvent(Phase p, Link l);
 
-    void afterLinkProcessedEvent(Link l);
+    void afterLinkProcessedEvent(Phase p, Link l);
 }

@@ -26,6 +26,7 @@ import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.link.LinkPhase;
 
 import java.util.*;
@@ -101,13 +102,13 @@ public class Activation extends Element {
     }
 
     @Override
-    public void onProcessEvent() {
-        thought.onActivationProcessedEvent(this);
+    public void onProcessEvent(Phase p) {
+        thought.onActivationProcessedEvent(p, this);
     }
 
     @Override
-    public void afterProcessEvent() {
-        thought.afterActivationProcessedEvent(this);
+    public void afterProcessEvent(Phase p) {
+        thought.afterActivationProcessedEvent(p, this);
     }
 
     public void initInput(Reference ref) {

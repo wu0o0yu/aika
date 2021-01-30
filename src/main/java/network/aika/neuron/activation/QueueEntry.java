@@ -73,9 +73,9 @@ public class QueueEntry<P extends Phase, E extends Element> implements Comparabl
     }
 
     public void process() {
-        element.onProcessEvent();
+        element.onProcessEvent(phase);
         phase.process(element);
-        element.afterProcessEvent();
+        element.afterProcessEvent(phase);
     }
 
     @Override

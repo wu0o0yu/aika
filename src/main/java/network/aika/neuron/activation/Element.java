@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.neuron.phase.Phase;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -58,9 +59,9 @@ public abstract class Element implements Comparable<Element> {
         getThought().removeQueueEntries(queuedPhases);
     }
 
-    public abstract void onProcessEvent();
+    public abstract void onProcessEvent(Phase p);
 
-    public abstract void afterProcessEvent();
+    public abstract void afterProcessEvent(Phase p);
 
     public abstract Thought getThought();
 

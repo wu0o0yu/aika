@@ -21,6 +21,7 @@ import network.aika.Utils;
 import network.aika.neuron.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.PropagateGradient;
 import network.aika.neuron.phase.link.SumUpLink;
@@ -86,13 +87,13 @@ public class Link extends Element {
     }
 
     @Override
-    public void onProcessEvent() {
-        getThought().onLinkProcessedEvent(this);
+    public void onProcessEvent(Phase p) {
+        getThought().onLinkProcessedEvent(p, this);
     }
 
     @Override
-    public void afterProcessEvent() {
-        getThought().afterLinkProcessedEvent(this);
+    public void afterProcessEvent(Phase p) {
+        getThought().afterLinkProcessedEvent(p, this);
     }
 
     public static boolean synapseExists(Activation iAct, Activation oAct) {
