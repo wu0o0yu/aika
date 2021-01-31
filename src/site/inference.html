@@ -81,7 +81,7 @@
 
 				Another difference to classical neural networks is that the complete structure of the network is inferred during training. The Aika network starts out completely empty.
 				In a first step, input neurons and their activations are added to the network. These represent either letters or words. Some relational input activations are then added
-				to capture the correct sequence in which the input words occur. Then, during training, new neurons and synapses are instantiated and added to the network. These, however,
+				to capture the correct sequence in which the input tokens occur. Then, during training, new neurons and synapses are instantiated and added to the network. These, however,
 				are not completely created from scratch. Instead they are instantiated based on neurons and synapses in a template network. This template network contains several
 				different types of neurons and synapses that are needed for specific tasks within the network. A similar approach can be observed in the human brain where different types of
 				neurons serve different purposes. Pyramidal neurons for instance possess long axons through which these neurons are able to connect distance parts in the brain. Interneurons
@@ -123,30 +123,15 @@
 				By choosing the weights and the threshold
 				(i.e. the bias) accordingly, neurons can take on the characteristics of boolean logic gates such as an
 				and-gate or an or-gate. These two kinds of logic gates can be implemented by two different types neurons.
-				Excitatory neurons take on the characteristics of an and-gate. These are used to detect a pattern in the
-				input data set. The second type of neuron are the inhibitory neurons act like an or-gate. They are able
+				Excitatory neurons take on the characteristics of an and-gate. These are used to detect patterns in the
+				input data set. The second type of neuron are the inhibitory neurons which act like an or-gate. They are able
 				to group a large number of excitatory neurons together and form a category of them. They are called inhibitory
 				because they are able to form negative feedback loops with their input neurons so that only one of their
-				inputs is allowed to stay active. All other input neurons will be suppressed.
-
-				The ability to make exact inferences using formal logic is the strength of classical AI. But neurons can
-				do more than that. They can also incorporate many weak inputs that only in sum give a clear picture of
-				whether the neuron should fire or not. Therefore, given a fitting training rule, neurons are able to combine
-				the strength of the classical symbolic AI and the connectionist sub-symbolic AI.
-
-				The excitatory neurons, however, can be further split up in two additional types of neurons. The pattern neurons and
-				the pattern part neurons. Both are conjunctive in nature. The
-				pattern part neurons kind of describe which lower-level patterns are part of the current pattern. Each
-				pattern part neuron receives a positive feedback synapse from the pattern to which it belongs to. The pattern
-				neuron on the other hand is only activated if the pattern as a whole is detected. For example, if we
-				consider a word consisting of individual letters as lower-level patterns, then we have a corresponding
-				pattern part neuron for each letter whose meaning is that this letter occurred as part of this word. The
-				pattern part neurons also receive negative feedback synapses from the inhibitory neurons such that
-				competing patterns are able to suppress each other.
+				inputs is allowed to stay active. All other input neurons will then be suppressed.
 			</p>
 			<p>
-				There are two main types of neurons in Aika: excitatory neurons and inhibitory neurons. The biological
-				role models for those neurons are the spiny pyramidal cell and the aspiny stellate cell in the cerebral
+				The biological
+				role models for these neurons are the spiny pyramidal cell and the aspiny stellate cell in the cerebral
 				cortex. The pyramidal cells usually exhibit an excitatory characteristic and some of them possess long
 				ranging axons that connect to other parts of the brain. The stellate cells on the other hand are usually
 				inhibitory interneurons with short axons which form circuits with nearby neurons. <br/>
@@ -165,7 +150,7 @@
 				For inhibitory neurons Aika uses the rectified linear unit function (ReLU).
 			</p>
 
-				$$y = \max(0, x)$$
+			$$y = \max(0, x)$$
 
 			<div style="text-align:center; width:100%">
 				<img src="images/relu-diagram.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
@@ -174,10 +159,34 @@
 				Especially for strongly disjunctive neurons like the inhibitory neuron, ReLU has the advantage of
 				propagating its input signal exactly as it is, without distortion or loss of information.
 			</p>
+			<p>
+				The ability to make exact inferences using formal logic is the strength of classical AI. But neurons can
+				do more than that. They can also incorporate many weak inputs that only in sum give a clear picture of
+				whether the neuron should fire or not. Therefore, given a fitting training rule, neurons are able to combine
+				the strength of the classical symbolic AI and the connectionist sub-symbolic AI.
+
+				The excitatory neurons, however, can be further split up in two additional sub-types of neurons. The pattern neurons and
+				the pattern part neurons. Both are conjunctive in nature. The
+				pattern part neurons kind of describe which lower-level input patterns are part of the current pattern.
+				Each pattern part neuron receives a positive feedback synapse from the pattern to which it belongs to. The pattern
+				neuron on the other hand is only activated if the pattern as a whole is detected. For example, if we
+				consider a word consisting of individual letters as lower-level patterns, then we have a corresponding
+				pattern part neuron for each letter whose meaning is that this letter occurred as part of this word. The
+				pattern part neurons also receive negative feedback synapses from the inhibitory neurons such that
+				competing patterns are able to suppress each other.
+			</p>
+
 
 			<h2>Positive and Negative Feedback Loops</h2>
 			<p>
-				Another crucial insight is the need for positive and negative feedback loops. These are synapses that ignore the causal sequence of fired activations. Especially the negative feedback synapses are interesting because they require the introduction of mutually shielded branches for the following activations. They create a kind of independent interpretation of parts of the input data set and only later on its decision which of these interpretations gets selected. It's very similar to what a parse tree does only that a parse tree is limited to syntactic information only. Another way to relate it to classical logic is to consider it as non-monotonic inference, which in classical AI could not be solved properly since classical logic is missing the weak influences that neural networks are able to capture.
+				Another crucial insight is the need for positive and negative feedback loops. These are synapses that ignore
+				the causal sequence of fired activations. Especially the negative feedback synapses are interesting because
+				they require the introduction of mutually shielded branches for the following activations. They create a
+				kind of independent interpretation of parts of the input data set and only later on its decision which of
+				these interpretations gets selected. It's very similar to what a parse tree does only that a parse tree is
+				limited to syntactic information only. Another way to relate it to classical logic is to consider it as
+				non-monotonic inference, which in classical AI could not be solved properly since classical logic is missing
+				the weak influences that neural networks are able to capture.
 			</p>
         </div>
 	</div>

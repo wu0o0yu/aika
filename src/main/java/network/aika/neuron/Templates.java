@@ -25,6 +25,9 @@ import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 import network.aika.neuron.inhibitory.PrimaryInhibitorySynapse;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 /**
  *
  * @author Lukas Molzberger
@@ -127,6 +130,16 @@ public class Templates {
                         false,
                         true
                 );
+    }
+
+    public Collection<Neuron> getAllTemplates() {
+        return Arrays.asList(
+                INPUT_PATTERN_PART_TEMPLATE,
+                SAME_PATTERN_PART_TEMPLATE,
+                INPUT_PATTERN_TEMPLATE,
+                SAME_PATTERN_TEMPLATE,
+                INHIBITORY_TEMPLATE
+        );
     }
 
     private <N extends Neuron> N init(N n, int id, String label) {
