@@ -54,7 +54,7 @@
 	</div>
 </div>
 	<div id="contents">
-		<div align="right"><span style='color: #FF0000;'>January 30, 2021</span></div>
+		<div align="right"><span style='color: #FF0000;'>January 31, 2021</span></div>
 		<div align="middle"><b><span style='color: #FF0000;'>Work in progress</span></b></div>
 		<div class="features">
 			<h1>How information is propagated through the network</h1>
@@ -176,7 +176,6 @@
 				competing patterns are able to suppress each other.
 			</p>
 
-
 			<h2>Positive and Negative Feedback Loops</h2>
 			<p>
 				Another crucial insight is the need for positive and negative feedback loops. These are synapses that ignore
@@ -187,6 +186,37 @@
 				limited to syntactic information only. Another way to relate it to classical logic is to consider it as
 				non-monotonic inference, which in classical AI could not be solved properly since classical logic is missing
 				the weak influences that neural networks are able to capture.
+			</p>
+
+			<h2>Relational Pattern Part Neurons</h2>
+			<p>
+				In a text, the sequence of words is not arbitrary and is required to carry the meaning of that text. Thus,
+				we also need a way to represent this sequence in the activations network. Let us consider the two word
+				phrase "the cat" as an example. Here we have the an input pattern neuron representing each word.
+				Additionally we have two relational pattern part neurons per word that allow us to establish the connections
+				to the previous and next word. Since the pattern part neurons belong to the pattern of a specific word, we
+				also need an inhibitory neuron to avoid having to create an quadratic number of synapses to connect these.
+			</p>
+			<div style="text-align:center; width:100%">
+				<img src="images/relational-neurons.svg" width="60%" height="60%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+			</div>
+			<p>
+				Now, how can we facilitate these relational neurons to match the phrase pattern neuron "P-the cat"? For this
+				we need to ensure that the pattern part neurons of the pattern "P-the cat" do not map to any unrelated words
+				in the text. There are two things needed for this. First, there needs to be a synapse from the pattern part
+				neuron "PP-the" to the pattern part neuron "PP-cat" that establishes the requirement of an relation between
+				these two neurons. The second part is to verify this relation during the linking process for the activations.
+				This is done by requiring a connecting path through the activation network between the input and the output
+				activation of a potential new link. This verification is performed by a 'visitor' class which steps through
+				the activation network in search for such a connection. At each activation and each link a transition operation is
+				performed in order to check that all conditions for certain neuron or synapse type hold. When the visitor
+				is able to close a loop, a new link is created.
+			</p>
+			<div style="text-align:center; width:100%">
+				<img src="images/pattern-the-cat.svg" width="60%" height="60%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+			</div>
+			<p>
+				The red arrows depict the path of the visitor.
 			</p>
         </div>
 	</div>
