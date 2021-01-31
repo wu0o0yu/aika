@@ -39,6 +39,9 @@
 				<a rel="canonical" href="inference.html">Inference</a>
 			</li>
 			<li>
+				<a rel="canonical" href="nlp.html">NLP</a>
+			</li>
+			<li>
 				<a rel="canonical" href="training.html">Training</a>
 			</li>
 			<li>
@@ -61,31 +64,31 @@
 			<p>
 			<h2>General Architecture</h2>
 			<p>
-				In the Aika neural network neurons and their activations are represented separately. Thus each neuron may have an arbitrary number of activations.
+				In the Aika neural network, neurons and their activations are represented separately. Thus, each neuron may have an arbitrary number of activations.
 				For example, if the input data set is a text and a neuron represents a specific word, then there might be several occurrences of this word and therefore
 				several activations of this neuron. The human brain probably does something similar through the timing of activation spikes.<br/>
 				These activations represent the information that the neural network was able to infer about the input data set. Every activation is directly or
-				indirectly grounded in the input data set. That is by following the input links of an activation down to the input layer of the network one can determine
+				indirectly grounded in the input data set. That is, by following the input links of an activation down to the input layer of the network, one can determine
 				the atomic input information this activation is referring to, similar to an annotation.<br/>
-				Since we have a one-to-many relation between neurons and activations, we also need a one-to-many relation between the synapses and the links between the
-				activations. Therefore we need a linking process to determine which activation are going to be connected which others. Roughly speaking activations can be linked if
+				Since we have a one-to-many relationship between neurons and activations, we also need a one-to-many relationship between the synapses and the links between the
+				activations. Therefore, we need a linking process to determine which activations are going to be connected with which others. Roughly speaking, activations can be linked if
 				they are grounded in the same input data. <br/>
 
-				A consequence of separating the neurons and their activations is that we can not rely on the network topology to give us the chronological sequence in which each
-				activation is processed. Therefore each activation needs a fired timestamp information that describes the point in time when this activation becomes visible to other neurons.
-				In contrast to conventional neural networks, with their predefined layered architecture, where one layer after the other is processed by hardware accelerated matrix
-				operations Aika follows a different approach. The core of the Aika algorithm is a single queue to which primitive operations within the graph of the neural network are
-				added and then processed in a predefined order. The advantage of this approach is that the activation network can be very sparse with respect to the actual neural network.
-				Only a tiny minority of neurons that are relevant to a given input data set are actually activated and the order in which inferences are performed within the network is
+				A consequence of separating the neurons and their activations is that we cannot rely on the network topology to give us the chronological sequence in which each
+				activation is processed. Therefore each activation needs fired timestamp information that describes the point in time when this activation becomes visible to other neurons.
+				In contrast to conventional neural networks, with their predefined and layered architecture, in which one layer after another is processed by hardware-accelerated matrix
+				operations Aika, follows a different approach. The core of the Aika algorithm is a single queue to which primitive operations within the graph of the neural network are
+				added and then processed in a predefined order. The advantage of this approach is that the activation network can be very sparse in comparison to the actual neural network.
+				Only a tiny minority of neurons that are relevant to a given input data set are actually activated, and the order in which inferences are performed within the network is
 				completely determined by the input data set instead of the hardwired network architecture. <br/>
 
-				Another difference to classical neural networks is that the complete structure of the network is inferred during training. The Aika network starts out completely empty.
+				Another difference from classical neural networks is that the complete structure of the network is inferred during training. The Aika network starts out completely empty.
 				In a first step, input neurons and their activations are added to the network. These represent either letters or words. Some relational input activations are then added
 				to capture the correct sequence in which the input tokens occur. Then, during training, new neurons and synapses are instantiated and added to the network. These, however,
 				are not completely created from scratch. Instead they are instantiated based on neurons and synapses in a template network. This template network contains several
-				different types of neurons and synapses that are needed for specific tasks within the network. A similar approach can be observed in the human brain where different types of
-				neurons serve different purposes. Pyramidal neurons for instance possess long axons through which these neurons are able to connect distance parts in the brain. Interneurons
-				on the other hand create local circuits. Depending on the type of neuron different neurotransmitters are used such as gamma-Aminobutyric acid (GABA) in some of the
+				different types of neurons and synapses that are needed for specific tasks within the network. A similar approach can be observed in the human brain, where different types of
+				neurons serve different purposes. Pyramidal neurons, for instance, possess long axons through which these neurons are able to connect parts of the brain that are far from
+				each other. Interneurons, on the other hand, create local circuits. Depending on the type of neuron, different neurotransmitters are used, such as gamma-Aminobutyric acid (GABA) in some of the
 				inhibitory neurons.
 			</p>
 
@@ -113,7 +116,7 @@
 				<img src="images/tanh-diagram.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
 			</div>
 			<p>
-				The activation functions are chosen in a way that they clearly distinguish between active
+				The activation functions are chosen in such a way that they clearly distinguish between active
 				and inactive neurons. Only activated neurons are processed and are thus visible to other neurons. These
 				activations are expressed not only by a real valued number but also by an activation object.
 			</p>
@@ -121,33 +124,32 @@
 			<h2>Neuron Types</h2>
 			<p>
 				By choosing the weights and the threshold
-				(i.e. the bias) accordingly, neurons can take on the characteristics of boolean logic gates such as an
+				(i.e., the bias) accordingly, neurons can take on the characteristics of boolean logic gates, such as an
 				and-gate or an or-gate. These two kinds of logic gates can be implemented by two different types neurons.
 				Excitatory neurons take on the characteristics of an and-gate. These are used to detect patterns in the
-				input data set. The second type of neuron are the inhibitory neurons which act like an or-gate. They are able
+				input data set. The second type of neuron is the inhibitory neuron, which acts like an or-gate. These are able
 				to group a large number of excitatory neurons together and form a category of them. They are called inhibitory
-				because they are able to form negative feedback loops with their input neurons so that only one of their
+				because they are able to form negative feedback loops with their input neurons, so that only one of their
 				inputs is allowed to stay active. All other input neurons will then be suppressed.
 			</p>
 			<p>
-				The biological
-				role models for these neurons are the spiny pyramidal cell and the aspiny stellate cell in the cerebral
-				cortex. The pyramidal cells usually exhibit an excitatory characteristic and some of them possess long
-				ranging axons that connect to other parts of the brain. The stellate cells on the other hand are usually
-				inhibitory interneurons with short axons which form circuits with nearby neurons. <br/>
-				Those two types of neurons also have a different electrical signature. Stellate cells usually react to
+				The biological role models for these neurons are the spiny pyramidal cell and the aspiny stellate cell in the cerebral
+				cortex. The pyramidal cells usually exhibit an excitatory characteristic and some of them possess long-ranging
+				axons that connect to other parts of the brain. On the other hand, the stellate cells are usually
+				inhibitory interneurons with short axons that form circuits with nearby neurons. <br/>
+				These two types of neurons also have different electrical signatures. Stellate cells usually react to
 				a constant depolarising current by firing action potentials. This occurs with a relatively constant frequency
 				during the entire stimulus. In contrast, most pyramidal cells are unable to maintain a constant firing
-				rate. Instead, they are firing quickly at the beginning of the stimulus and then reduce the frequency even
-				if the stimulus stays strong. This slowdown over time is called adaption. <br/>
+				rate. Instead, they fire quickly at the beginning of the stimulus but then the firing reduces in frequency even
+				if the stimulus stays strong. This slowdown over time is called "adaption". <br/>
 				Aika tries to mimic this behaviour by using different activation functions for the different types of
-				neurons. Since Aika is not a spiking neural network like the biological counterpart, we only have the neurons
-				activation value which can roughly be interpreted as the firing frequency of a spiking neuron. In a sense the
-				earlier described activation function based on the rectified tanh function quite nicely captures
+				neurons. Since Aika is not a spiking neural network like its biological counterpart, we have only the neurons'
+				activation value, which can be roughly interpreted as the firing frequency of a spiking neuron. In a sense, the
+				earlier-described activation function based on the rectified tanh function quite nicely captures
 				the adaption behaviour of a pyramidal cell. An increase of a weak signal has a strong effect on the
-				neurons output, while an increase on an already strong signal has almost no effect. Furthermore, if the
-				input of the neuron does not surpass a certain threshold then the neuron will not fire at all.
-				For inhibitory neurons Aika uses the rectified linear unit function (ReLU).
+				neurons' output, while an increase of an already-strong signal has almost no effect. Furthermore, if the
+				input of the neuron does not exceed a certain threshold, it will not fire at all.
+				For inhibitory neurons, Aika uses the rectified linear unit function (ReLU).
 			</p>
 
 			$$y = \max(0, x)$$
@@ -161,18 +163,18 @@
 			</p>
 			<p>
 				The ability to make exact inferences using formal logic is the strength of classical AI. But neurons can
-				do more than that. They can also incorporate many weak inputs that only in sum give a clear picture of
+				do more than that. They can also incorporate many weak inputs that, only when they are taken together, give a clear picture of
 				whether the neuron should fire or not. Therefore, given a fitting training rule, neurons are able to combine
 				the strength of the classical symbolic AI and the connectionist sub-symbolic AI.
 
-				The excitatory neurons, however, can be further split up in two additional sub-types of neurons. The pattern neurons and
+				The excitatory neurons, however, can be further split up into two additional sub-types — pattern neurons and
 				the pattern part neurons. Both are conjunctive in nature. The
-				pattern part neurons kind of describe which lower-level input patterns are part of the current pattern.
-				Each pattern part neuron receives a positive feedback synapse from the pattern to which it belongs to. The pattern
-				neuron on the other hand is only activated if the pattern as a whole is detected. For example, if we
-				consider a word consisting of individual letters as lower-level patterns, then we have a corresponding
+				pattern part neurons describe which lower-level input patterns are part of the current pattern.
+				Each pattern part neuron receives a positive feedback synapse from the pattern to which it belongs. The pattern
+				neuron, on the other hand, is only activated if a pattern as a whole is detected. For example, if we
+				consider a word consisting of individual letters as a lower-level pattern, then we have a corresponding
 				pattern part neuron for each letter whose meaning is that this letter occurred as part of this word. The
-				pattern part neurons also receive negative feedback synapses from the inhibitory neurons such that
+				pattern part neurons also receive negative feedback synapses from the inhibitory neurons in such a way that
 				competing patterns are able to suppress each other.
 			</p>
 
@@ -180,22 +182,23 @@
 			<p>
 				Another crucial insight is the need for positive and negative feedback loops. These are synapses that ignore
 				the causal sequence of fired activations. Especially the negative feedback synapses are interesting because
-				they require the introduction of mutually shielded branches for the following activations. They create a
-				kind of independent interpretation of parts of the input data set and only later on its decision which of
-				these interpretations gets selected. It's very similar to what a parse tree does only that a parse tree is
-				limited to syntactic information only. Another way to relate it to classical logic is to consider it as
-				non-monotonic inference, which in classical AI could not be solved properly since classical logic is missing
-				the weak influences that neural networks are able to capture.
+				they require the introduction of mutually shielded branches for the activations that follow. They create a
+				kind of independent interpretation of parts of the input data set, and only later on the decision is made which of
+				these interpretations is selected. It is very similar to what a parse tree does, except that a parse tree is
+				limited to syntactic information only. Another way to relate it to classical logic is to consider it as a
+				non-monotonic inference, which in classical AI could not be solved properly since the weak influences that
+				neural networks are able to capture are missing from classical logic.
 			</p>
 
 			<h2>Relational Pattern Part Neurons</h2>
 			<p>
 				In a text, the sequence of words is not arbitrary and is required to carry the meaning of that text. Thus,
-				we also need a way to represent this sequence in the activations network. Let us consider the two word
-				phrase "the cat" as an example. Here we have the an input pattern neuron representing each word.
+				we also need a way to represent this sequence in the activations network. Let us consider the example of the two-word
+				phrase "the cat". Here we have an input pattern neuron representing each word.
 				Additionally we have two relational pattern part neurons per word that allow us to establish the connections
 				to the previous and next word. Since the pattern part neurons belong to the pattern of a specific word, we
-				also need an inhibitory neuron to avoid having to create an quadratic number of synapses to connect these.
+				also need an inhibitory neuron to avoid having to create a quadratic number of synapses to connect the
+				corresponding relational neurons.
 			</p>
 			<div style="text-align:center; width:100%">
 				<img src="images/relational-neurons.svg" width="60%" height="60%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
@@ -204,12 +207,12 @@
 				Now, how can we facilitate these relational neurons to match the phrase pattern neuron "P-the cat"? For this
 				we need to ensure that the pattern part neurons of the pattern "P-the cat" do not map to any unrelated words
 				in the text. There are two things needed for this. First, there needs to be a synapse from the pattern part
-				neuron "PP-the" to the pattern part neuron "PP-cat" that establishes the requirement of an relation between
-				these two neurons. The second part is to verify this relation during the linking process for the activations.
+				neuron "PP-the" to the pattern part neuron "PP-cat" that establishes the requirement of an relationship between
+				these two neurons. The second part is to verify this relationship during the linking process for the activations.
 				This is done by requiring a connecting path through the activation network between the input and the output
-				activation of a potential new link. This verification is performed by a 'visitor' class which steps through
-				the activation network in search for such a connection. At each activation and each link a transition operation is
-				performed in order to check that all conditions for certain neuron or synapse type hold. When the visitor
+				activation of a potential new link. This verification is performed by a 'visitor' class that steps through
+				the activation network in search of such a connection. At each activation and each link a transition operation is
+				performed in order to check that all of the conditions for a certain neuron or synapse type hold. When the visitor
 				is able to close a loop, a new link is created.
 			</p>
 			<div style="text-align:center; width:100%">
