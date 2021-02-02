@@ -38,7 +38,8 @@ public class Counting extends RankedImpl implements LinkPhase {
     public void process(Link l) {
         l.count();
 
-        l.getThought().addToQueue(l, INFORMATION_GAIN_GRADIENT);
+        // Should probably have no effect on the current example.
+//        l.getThought().addToQueue(l, INFORMATION_GAIN_GRADIENT);
     }
 
     public String toString() {

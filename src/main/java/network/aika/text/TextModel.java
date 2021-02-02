@@ -142,6 +142,7 @@ public class TextModel extends Model {
                 s.linkInput();
                 s.linkOutput();
                 s.setWeight(11.0);
+                s.setAllowTraining(false);
                 inRelPT.addConjunctiveBias(-11.0, false);
             }
 
@@ -150,9 +151,11 @@ public class TextModel extends Model {
 
                 s.linkOutput();
                 s.addWeight(10.0);
+                s.setAllowTraining(false);
                 inRelPT.addConjunctiveBias(-10.0, false);
             }
             inRelPT.setBias(4.0);
+            inRelPT.setAllowTraining(false);
         }
         {
             {
@@ -161,6 +164,7 @@ public class TextModel extends Model {
                 s.linkInput();
                 s.linkOutput();
                 s.addWeight(11.0);
+                s.setAllowTraining(false);
                 inRelNT.addConjunctiveBias(-11.0, false);
             }
 
@@ -169,9 +173,11 @@ public class TextModel extends Model {
 
                 s.linkOutput();
                 s.addWeight(10.0);
+                s.setAllowTraining(false);
                 inRelNT.addConjunctiveBias(-10.0, true);
             }
             inRelNT.setBias(4.0);
+            inRelNT.setAllowTraining(false);
         }
 
         {
@@ -179,6 +185,7 @@ public class TextModel extends Model {
 
             s.linkInput();
             s.addWeight(1.0);
+            s.setAllowTraining(false);
         }
 
         {
@@ -186,6 +193,7 @@ public class TextModel extends Model {
 
             s.linkInput();
             s.addWeight(1.0);
+            s.setAllowTraining(false);
         }
 
         in.getProvider().save();

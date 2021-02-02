@@ -38,10 +38,12 @@ public class PropagateGradient extends RankedImpl implements LinkPhase {
     public void process(Link l) {
         l.propagateGradient(gradient);
 
-        l.getThought().addToQueue(
-                l,
-                UPDATE_WEIGHT
-        );
+        if(l.getSynapse().isAllowTraining()) {
+            l.getThought().addToQueue(
+                    l,
+                    UPDATE_WEIGHT
+            );
+        }
     }
 
     public String toString() {

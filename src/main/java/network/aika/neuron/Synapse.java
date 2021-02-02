@@ -62,6 +62,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     protected double frequencyINegOPos;
     private volatile boolean modified;
 
+    protected boolean allowTraining = true;
+
 
     public Synapse() {
     }
@@ -72,6 +74,14 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         this.template = template;
 
         assert input.getId() < 0 || input.getId() != output.getId();
+    }
+
+    public boolean isAllowTraining() {
+        return allowTraining;
+    }
+
+    public void setAllowTraining(boolean allowTraining) {
+        this.allowTraining = allowTraining;
     }
 
     public static boolean synapseExists(Neuron iN, Neuron oN) {

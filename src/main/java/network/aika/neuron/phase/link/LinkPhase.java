@@ -31,10 +31,10 @@ public interface LinkPhase extends Phase<Link> {
     LinkPhase LINKING = new Linking();
     LinkPhase POSITIVE_FEEDBACK_LOOP_UPDATE = new PositiveFeedbackLoopUpdate();
     Ranked SUM_UP_LINK_RANK = new RankedImpl(LINKING);
-    LinkPhase COUNTING = new Counting();
     LinkPhase SHADOW_FACTOR = new ShadowFactor();
     LinkPhase INFORMATION_GAIN_GRADIENT = new InformationGainGradient();
     Ranked PROPAGATE_GRADIENT_RANK = new RankedImpl(INFORMATION_GAIN_GRADIENT);
     LinkPhase UPDATE_WEIGHT = new UpdateWeight();
     LinkPhase TEMPLATE = new Template();
+    LinkPhase COUNTING = new Counting();
 }

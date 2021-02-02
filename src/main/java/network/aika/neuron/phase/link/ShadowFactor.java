@@ -21,6 +21,8 @@ import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
+import static network.aika.neuron.phase.activation.ActivationPhase.DETERMINE_BRANCH_PROBABILITY;
+
 /**
  * Avoid that synapses which access the same source information generate twice the gradient.
  *
@@ -30,7 +32,7 @@ public class ShadowFactor extends RankedImpl implements LinkPhase {
 
     @Override
     public Ranked getPreviousRank() {
-        return COUNTING;
+        return DETERMINE_BRANCH_PROBABILITY;
     }
 
     @Override

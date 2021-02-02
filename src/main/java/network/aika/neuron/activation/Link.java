@@ -149,7 +149,7 @@ public class Link extends Element {
         }
     }
 
-    public void computeInormationGainGradient() {
+    public void computeInformationGainGradient() {
         if(isNegative())
             return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
 

@@ -29,14 +29,15 @@ public class Counting extends RankedImpl implements ActivationPhase {
 
     @Override
     public Ranked getPreviousRank() {
-        return SOFTMAX;
+        return TEMPLATE_OUTPUT;
     }
 
     @Override
     public void process(Activation act) {
         act.getNeuron().count(act);
 
-        act.getThought().addToQueue(act, ENTROPY_GRADIENT);
+        // Should probably have no effect on the current example.
+//        act.getThought().addToQueue(act, ENTROPY_GRADIENT);
     }
 
     public String toString() {

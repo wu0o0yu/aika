@@ -64,6 +64,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     protected boolean isInputNeuron; // Input Neurons won't be trained!
 
+    protected boolean allowTraining = true;
+
     private Set<Neuron<?>> templates = new TreeSet<>(Comparator.comparing(n -> n.getId()));
 
     protected Neuron() {
@@ -92,6 +94,13 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract Scope[] getInitialScopes(Direction dir);
 
+    public boolean isAllowTraining() {
+        return allowTraining;
+    }
+
+    public void setAllowTraining(boolean allowTraining) {
+        this.allowTraining = allowTraining;
+    }
 
     public boolean isTemplate() {
         return getId() < 0;
