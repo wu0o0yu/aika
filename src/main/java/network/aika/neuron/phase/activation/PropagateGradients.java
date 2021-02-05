@@ -39,22 +39,7 @@ public class PropagateGradients extends RankedImpl implements ActivationPhase {
 
     @Override
     public void process(Activation act) {
-        if(act.gradientIsZero())
-            return;
-
-        double gradient = act.getAndResetGradient();
-
-        act.addLinksToQueue(
-                INPUT,
-                !act.getNeuron().isInputNeuron() ? new PropagateGradient(gradient) : null,
-                LinkPhase.TEMPLATE
-        );
-
-        act.getThought().addToQueue(
-                act,
-                TEMPLATE_INPUT,
-                TEMPLATE_OUTPUT
-        );
+        act.propagateGradients();
     }
 
     public String toString() {

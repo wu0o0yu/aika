@@ -47,9 +47,7 @@ public class Link extends Element {
 
     private boolean isSelfRef;
 
-    private double lastOffsetGradient;
-    private double lastOutputGradient;
-
+    private double lastIGGradient;
     private double gradient;
 
     public Link(Synapse s, Activation input, Activation output, boolean isSelfRef) {
@@ -166,38 +164,14 @@ public class Link extends Element {
                 Sign.getSign(output)
         );
 
-        double f = s * getInputValue() * output.getNorm();
+        double igGradient = s * getInputValue() * output.getNorm();
 
-        double offsetGradient =  f * getActFunctionDerivative();
-        double outputGradient = (f * output.getActFunctionDerivative()) - offsetGradient;
-
-        double g = offsetGradient - lastOffsetGradient;
-        if(Math.abs(g) >= TOLERANCE) {
-            getThought().addToQueue(this, new PropagateGradient(g));
-        }
-
-        lastOffsetGradient = offsetGradient;
-
-        if(Math.abs(outputGradient) >= TOLERANCE) {
-            getOutput().propagateGradient(outputGradient - lastOutputGradient);
-            lastOutputGradient = outputGradient;
+        if(Math.abs(igGradient) >= TOLERANCE) {
+            getOutput().propagateGradient(igGradient - lastIGGradient);
+            lastIGGradient = igGradient;
         }
     }
 
-
-    /**
-     * This term is used for two purposes. Firstly, it limits the influence that weak synapses have on neighbouring
-     * synapses of the same output neuron. Secondly, it bootstraps the training of a weak synapse.
-     *
-     * @return
-     */
-    public double getActFunctionDerivative() {
-        return output.getNeuron()
-                .getActivationFunction()
-                .outerGrad(
-                        output.getNet(true) - (input.getValue() * synapse.getWeight())
-                );
-    }
 /*
     public void removeGradientDependencies() {
         output.getInputLinks()
@@ -217,8 +191,7 @@ public class Link extends Element {
 
         input.propagateGradient(
                 synapse.getWeight() *
-                        g *
-                        input.getActFunctionDerivative()
+                        g
         );
     }
 

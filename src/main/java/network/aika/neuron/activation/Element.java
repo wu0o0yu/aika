@@ -18,9 +18,13 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.link.LinkPhase;
+import network.aika.neuron.phase.link.PropagateGradient;
 
 import java.util.Set;
 import java.util.TreeSet;
+
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
  * An Element is either a node (Activation) or an edge (Link) in the Activation graph.

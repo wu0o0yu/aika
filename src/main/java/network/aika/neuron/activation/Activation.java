@@ -28,6 +28,7 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.link.LinkPhase;
+import network.aika.neuron.phase.link.PropagateGradient;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -430,13 +431,33 @@ public class Activation extends Element {
     }
 
     public void initEntropyGradient() {
-        double selfGradient = getNorm() * getActFunctionDerivative() *
-                getNeuron().getSurprisal(
+        double selfGradient = getNeuron().getSurprisal(
                         Sign.getSign(this)
                 );
 
         gradient += selfGradient - lastEntropyGradient;
         lastEntropyGradient = selfGradient;
+    }
+
+    public void propagateGradients() {
+        if(gradientIsZero())
+            return;
+
+        double g = getNorm() * getActFunctionDerivative() * gradient;
+        gradient = 0.0;
+        gradientSum += g;
+
+        addLinksToQueue(
+                INPUT,
+                ! getNeuron().isInputNeuron() ? new PropagateGradient(g) : null,
+                LinkPhase.TEMPLATE
+        );
+
+        getThought().addToQueue(
+                this,
+                TEMPLATE_INPUT,
+                TEMPLATE_OUTPUT
+        );
     }
 
     public double getNorm() {
@@ -449,13 +470,6 @@ public class Activation extends Element {
 
     public boolean gradientSumIsZero() {
         return Math.abs(gradientSum) < TOLERANCE;
-    }
-
-    public double getAndResetGradient() {
-        gradientSum += gradient;
-        double oldGradient = gradient;
-        gradient = 0.0;
-        return oldGradient;
     }
 
     public double getActFunctionDerivative() {
