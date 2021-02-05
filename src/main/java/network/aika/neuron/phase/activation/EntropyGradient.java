@@ -46,10 +46,12 @@ public class EntropyGradient extends RankedImpl implements ActivationPhase {
 
         act.initEntropyGradient();
 
-        act.getThought().addToQueue(
-                act,
-                PROPAGATE_GRADIENTS
-        );
+        if(!act.gradientIsZero()) {
+            act.getThought().addToQueue(
+                    act,
+                    PROPAGATE_GRADIENTS
+            );
+        }
     }
 
     public String toString() {

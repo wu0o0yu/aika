@@ -242,7 +242,7 @@ public class Link extends Element {
         return l != null ? l.getInputValue() : 0.0;
     }
 
-    public double getInputValue() {
+    public Double getInputValue() {
         return input != null ? input.getValue() : 0.0;
     }
 

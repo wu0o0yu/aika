@@ -64,7 +64,7 @@
 			<p>
 			<h2>The entropy framework</h2>
 			<p>
-				Since the network contains a lot of cycles, the usual backpropagation algorithm won't work very well for this type of network.
+				Since the network contains a lot of feedback cycles, the usual backpropagation algorithm won't work very well for this type of network.
 				Also relying on handcrafted labels that are applied to the output of the network is very error-prone and it creates a large
 				distance between our training signal and the weights that we would like to adjust. Hence we would like to train our neurons
 				more locally without the reliance on an external signal source. This is where the Shannon entropy framework comes in quite handy.
@@ -183,33 +183,44 @@
 				information gain and the neuron itself can be modeled using the entropy.
 
 				$$G = H(Y) - \sum \limits _{i} I(X_i, Y)$$
+			</p>
+			<p>
+				To clarify the variables and indices before we dive into the math I would like to give a brief overview:
 
+				\(G\) is the overall entropy for the entire neuron, \(H(Y)\) the entropy of the neuron output and \(I(X_i, Y)\) the information gain of the synapse \(i\).
+				The set \(\mathcal Y\) contains the positive and negative or fired and non-fired states of the current neuron. Hence \(p_Y(y)\) and \(p_Y(\neg y)\) are
+				the probabilities of these two states. The same holds for the set \(\mathcal X_i\) which simply contains the positive and negative states of the input neuron
+				of the synapse \(i\). That means if we consider the probabilities of the synapse \(i\) we get four different states: \(p(x_i,y), p(\neg x_i,y), p(x_i,\neg y), p(\neg x_i,\neg y)\)
+			</p>
+			<p>
 				Now, before we go on to calculate the derivative function, we need to make two simplifying assumptions. The first one is that we consider
 				the surprisal parts of the equation as constants. If we first look at the information gain part of the equation we can split the equation
 
-				$$I(X;Y) = \sum_{y \in \mathcal Y} \sum_{x \in \mathcal X}
-				{ p_{(X,Y)}(x, y) \left( \log{p_{(X,Y)}(x, y)} - \log{p_X(x)} - \log{p_Y(y)} \right) } $$
+				$$I(X_i;Y) = \sum_{y \in \mathcal Y} \sum_{x_i \in \mathcal X_i}
+				{ p_{(X_i,Y)}(x_i, y) \left( \log{p_{(X_i,Y)}(x_i, y)} - \log{p_X(x_i)} - \log{p_Y(y)} \right) } $$
 
-				and consider \(S(x, y)\) as constant later on.
+				and consider \(S(x_i, y)\) as constant later on.
 
-				$$S(x,y) = \log{p_{(X,Y)}(x, y)} - \log{p_X(x)} - \log{p_Y(y)} $$
+				$$S(x_i,y) = \log{p(x_i, y)} - \log{p(x_i)} - \log{p(y)} $$
 
-				$$I(X;Y) = \sum_{y \in \mathcal Y} \sum_{x \in \mathcal X}
-				{ p_{(X,Y)}(x, y) S(x, y) } $$
+				$$I(X_i;Y) = \sum_{y \in \mathcal Y} \sum_{x_i \in \mathcal X_i}
+				{ p_{(X_i,Y)}(x_i, y) S(x_i, y) } $$
 
 				The only variable part left that we need to consider while calculating the derivative is the probability \(p_{(X,Y)}(x, y)\). \(p_{(X,Y)}(x, y)\) can be computed using the
-				frequency \(f_{(X,Y)}(x, y)\) and the number of trainings instances \(H\).
+				frequency \(f_{(X_i,Y)}(x_i, y)\) and the number of trainings instances \(H\).
 
-				$$p_{(X,Y)}(x, y) = \frac{f_{(X,Y)}(x, y)}{N}$$
+				$$p_{(X_i,Y)}(x_i, y) = \frac{f_{(X_i,Y)}(x_i, y)}{N}$$
 
-				Where the frequency \(f_{(X,Y)}(x, y)\) is just the sum of all fired activations.
+				Where the frequency \(f_{(X_i,Y)}(x_i, y)\) is just the sum of all fired activations.
 
-				$$ f_{(X,Y)}(x, y) = \sum_{i}^N \varphi (net_i)$$
+				$$\Theta(x) = \Bigg \{ {0 \atop 1} {: x \leq 0 \atop : x > 0}$$
+
+				$$ f_{(X_i,Y)}(x_i, y) = \sum_{i}^N \Theta(x_i) \varphi (net_i)$$
 
 				The second assumption that we need to make is that only the most recent training example is considered as variable. All other training examples are considered as constants
 				and since they are part of a summation, they can be simply removed from the equation. Hence the derivative function of \(f_{(X, Y)}\) looks as follows:
 
-				$$ f_{(X,Y)}(x, y)' = \varphi (net') \varphi' (net)$$
+				$$ f_{(X,Y)}(x, y)' = \Theta(x) \varphi (net') \varphi' (net)$$
 
 				Since the activation function \(\varphi (x)\) is given by
 				\[\varphi(x) = \Bigg \{ {0 \atop \tanh(x)} {: x \leq 0 \atop : x > 0}\]
@@ -218,11 +229,63 @@
 
 				\[\varphi(x)' = \Bigg \{ {0 \atop 1 - \tanh^2(x)} {: x \leq 0 \atop : x > 0}\]
 
-				To get a better understanding the following graph shows the outer derivative of the activation function.
+				To get a better understanding, the following graph shows the outer derivative of the activation function.
+			</p>
 			<div style="text-align:center; width:100%">
 				<img src="images/deriv-actf.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
 			</div>
+			<p>
+			    As you can see, there is a strong discontinuity at \(x = 0\) where the activation function exceeds the
+			    activation threshold of the neuron.
+			</p>
+			<p>
+				Now, remember that the weighted sum \(net\) of the neuron is calculated in the following way:
 
+			$$net = {b + \sum\limits_{j=0}^N{x_j w_{j}}}$$
+
+				To be able to adjust the weights and the bias in our model according to the objective function, we need to
+				calculate the partial derivative of \(net\) with respect to these parameters. But before we go on to do
+				this we need a little detour. Let us first reformulate this equation to better understand the case of a
+				conjunctive neuron where the input synapses can be considered as this inputs of an and-gate. In this case
+				we can split up the overall bias value \(b\) into a component \(b_c\) that is used to push \(net\) above the
+				threshold and a component \(b_j\) for each synapse that act as counterweights.
+
+			$$b = b_c + \sum\limits_{j=0}^N{-b_j}$$
+
+				If we reformulate the equation for \(net\) with this split up bias, it looks as follows:
+
+			$$net = {b_c + \sum\limits_{i=0}^N{x_j w_{j} - b_j}}$$
+
+				If we then chose the value of these counterweight biases to be equal to the synapse weights, that is \(b_j = w_j\)
+				we get the following equation:
+
+			$$net = {b_c + \sum\limits_{i=0}^N{-w_{j} (1 - x_j)}}$$
+
+				Now we are able to not only able to calculate the derivative for the case of a positive input signal \(x_i\) but also
+				for the negative case \(\neg x_j = 1 - xj\).
+
+			The positive case can be stated as:
+				$$\dfrac{\partial net}{\partial w_j} = x_j $$ or
+				$$\dfrac{\partial y}{\partial w_j} = x_j \cdot \varphi(net)^{'} $$
+
+				For the negative case we need to take into account that we have assumed \(b_j\) to be equal to \(w_j\) and
+				therefore needs to be adjusted at the same time.
+
+				$$\dfrac{\partial (net + b_c - b)}{\partial w_j} = (1 - x_j) $$
+
+				Basically, in the negative case, the \(b_j\) part of the bias needs to be adjusted at the same time as \(w_j\).
+			</p>
+			<p>
+				Now let us go back to the equation for the information gain and calculate the gradient for it.
+
+				$$I(X_i;Y) = \sum_{y \in \mathcal Y} \sum_{x_i \in \mathcal X_i}
+				{ p_{(X_i,Y)}(x_i, y) S(x_i, y) } $$
+
+				Remember, the suprisal part of the equation is considered as constant.
+
+				So if we put the whole equation together and derive it with respect to \(net\), it looks as follows:
+
+				$$I_{sum}' = \frac{1}{N} \sum\limits_{i=0}^N{ \Theta(x_i) \varphi (net') \varphi' (net) }$$
 			</p>
 			<h2>Concept Drift</h2>
 			<p>

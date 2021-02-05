@@ -58,6 +58,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     @Override
     public LinkPhase[] getNextLinkPhases() {
         return new LinkPhase[] {
+                LinkPhase.TEMPLATE,
                 LinkPhase.INDUCTION
         };
     }
