@@ -443,8 +443,16 @@ public class Activation extends Element {
         if(gradientIsZero())
             return;
 
-        double g = getNorm() * getActFunctionDerivative() * gradient;
+        double g = gradient;
         gradient = 0.0;
+
+        g *= getNorm();
+        g *= getNeuron()
+                .getActivationFunction()
+                .outerGrad(
+                        getNet(true)
+                );
+
         gradientSum += g;
 
         addLinksToQueue(
@@ -470,14 +478,6 @@ public class Activation extends Element {
 
     public boolean gradientSumIsZero() {
         return Math.abs(gradientSum) < TOLERANCE;
-    }
-
-    public double getActFunctionDerivative() {
-        return getNeuron()
-                .getActivationFunction()
-                .outerGrad(
-                        getNet(true)
-                );
     }
 
     public void propagateGradient(double g) {

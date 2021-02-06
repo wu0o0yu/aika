@@ -345,10 +345,11 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public double getSurprisal(Sign si, Sign so) {
-        if(isTemplate())
+        double N = sampleSpace.getN();
+        if(isTemplate() || N == 0.0)
             return 0.0;
 
-        double p = getP(si, so, sampleSpace.getN());
+        double p = getP(si, so, N);
         return -Math.log(p);
     }
 

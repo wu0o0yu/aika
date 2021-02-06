@@ -279,10 +279,11 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public double getSurprisal(Sign s) {
-        if(isTemplate())
+        double N = sampleSpace.getN();
+        if(isTemplate() || N == 0.0)
             return 0.0;
 
-        double p = getP(s, sampleSpace.getN());
+        double p = getP(s, N);
         return -Math.log(p);
     }
 
