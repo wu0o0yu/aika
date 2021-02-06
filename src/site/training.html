@@ -18,9 +18,24 @@
 
 	</script>
 	<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
-	<script type="text/javascript" async
-			src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
-	</script>
+	<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+	<script>
+  MathJax = {
+    tex: {
+      tags: 'all'
+    }
+  };
+  </script>
+	<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+	<Style>
+  h1 {
+    text-align: center;
+    background: #CCCCCC;
+    padding: .2em 1em;
+    border-top: 3px solid #666666;
+    border-bottom: 3px solid #999999;
+  }
+  </style>
 </head>
 <body>
 <div id="header">
