@@ -79,7 +79,7 @@
 			<p>
 			<h2>The entropy framework</h2>
 			<p>
-				Since the network contains a lot of feedback cycles, the usual backpropagation algorithm won't work very well for this type of network.
+				Since the network contains feedback cycles, the usual backpropagation algorithm won't work very well for this type of network.
 				Also relying on handcrafted labels that are applied to the output of the network is very error-prone and it creates a large
 				distance between our training signal and the weights that we would like to adjust. Hence we would like to train our neurons
 				more locally without the reliance on an external signal source. This is where the Shannon entropy framework comes in quite handy.
@@ -108,6 +108,7 @@
 			<div style="text-align:center; width:100%">
 				<img src="images/entropy-graph.jpg" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
 			</div>
+			<h3>Information gain</h3>
 			<p>
 			    Now that we have an understanding of the basics of Shannon entropy we can go on and see what the information gain is
 			    and how it is calculated. The information gain quantifies the "amount of information" obtained about one random
@@ -134,19 +135,24 @@
 				As you can see, at the core of this formula are now the surprisal values of different probability distributions.
 				The outer part is actually just the calculation of the expected value of the inner part.
 				We will come back to that later on.
+			</p>
+			<p>
+				To clarify the variables and indices before we dive into the math I would like to give a brief overview:
+
+				The set \(\mathcal Y\) contains the positive and negative or fired and non-fired states of the current neuron. Hence \(p_Y(y)\) and \(p_Y(\neg y)\) are
+				the probabilities of these two states. The same holds for the set \(\mathcal X_i\) which simply contains the positive and negative states of the input neuron
+				of the synapse \(i\). That means if we consider the probabilities of the synapse \(i\) we get four different states: \(p(x_i,y), p(\neg x_i,y), p(x_i,\neg y), p(\neg x_i,\neg y)\)
+			</p>
+			<h3>The entropy model for a neuron</h3>
+			<p>
+				To figure out how the objective function may look like, we need to take a closer look at a neuron and its input synapses. Let us consider the synapses
+				as information consumers and the neuron itself as an information producer. The synapses or information consumers can now be modeled using the
+				information gain \(I\) and the neuron itself can be modeled using the entropy \(H\).
 
 				$$G = H(Y) - \sum \limits _{i} I(X_i, Y)$$
 
 				In this model, we make the implicit assumption, that the probability distributions of the input synapses are
 				independent of each other except the case that they are all activated together.
-			</p>
-			<p>
-				To clarify the variables and indices before we dive into the math I would like to give a brief overview:
-
-				\(G\) is the overall entropy for the entire neuron, \(H(Y)\) the entropy of the neuron output and \(I(X_i, Y)\) the information gain of the synapse \(i\).
-				The set \(\mathcal Y\) contains the positive and negative or fired and non-fired states of the current neuron. Hence \(p_Y(y)\) and \(p_Y(\neg y)\) are
-				the probabilities of these two states. The same holds for the set \(\mathcal X_i\) which simply contains the positive and negative states of the input neuron
-				of the synapse \(i\). That means if we consider the probabilities of the synapse \(i\) we get four different states: \(p(x_i,y), p(\neg x_i,y), p(x_i,\neg y), p(\neg x_i,\neg y)\)
 			</p>
 			<h2>Counting Frequencies</h2>
 			<p>
@@ -214,11 +220,11 @@
 			</p>
 			<h3>The outer part</h3>
 			<p>
-				To figure out how the objective function may look like, we need to take a closer look at a neuron and its input synapses. Let us consider the synapses
-				as information consumers and the neuron itself as an information producer. The synapses or information consumers can now be modeled using the
-				information gain \(I\) and the neuron itself can be modeled using the entropy \(H\).
+				To calculate the outer part for our derivative function we start out with equation (7).
 
 				$$G = H(Y) - \sum \limits _{i} I(X_i, Y)$$
+
+
 			</p>
 			<p>
 				Now, before we go on to calculate the derivative function, we need to make two simplifying assumptions. The first one is that we consider
