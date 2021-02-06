@@ -57,7 +57,7 @@
 	</div>
 </div>
 	<div id="contents">
-		<div align="right"><span style='color: #FF0000;'>February 5, 2021</span></div>
+		<div align="right"><span style='color: #FF0000;'>February 6, 2021</span></div>
 		<div align="middle"><b><span style='color: #FF0000;'>Work in progress</span></b></div>
 		<div class="features">
 			<h1>How the network is trained</h1>
@@ -113,12 +113,25 @@
 
 				Before going forward we would like to introduce a slightly different notion of the information gain:
 
-				$$I(X;Y) = \sum_{y \in \mathcal Y} \sum_{x \in \mathcal X}
-				{ p_{(X,Y)}(x, y) \left( \log{p_{(X,Y)}(x, y)} - \log{p_X(x)} - \log{p_Y(y)} \right) } $$
+				$$I(X_i;Y) = \sum_{y \in \mathcal Y} \sum_{x_i \in \mathcal X_i}
+				{ p_{(X_i,Y)}(x_i, y) \left( \log{p_{(X_i,Y)}(x_i, y)} - \log{p_{X_i}(x_i)} - \log{p_Y(y)} \right) } $$
 
 				As you can see, at the core of this formula are now the surprisal values of different probability distributions.
 				The outer part is actually just the calculation of the expected value of the inner part.
 				We will come back to that later on.
+
+				$$G = H(Y) - \sum \limits _{i} I(X_i, Y)$$
+
+				In this model, we make the implicit assumption, that the probability distributions of the input synapses are
+				independent of each other except the case that they are all activated together.
+			</p>
+			<p>
+				To clarify the variables and indices before we dive into the math I would like to give a brief overview:
+
+				\(G\) is the overall entropy for the entire neuron, \(H(Y)\) the entropy of the neuron output and \(I(X_i, Y)\) the information gain of the synapse \(i\).
+				The set \(\mathcal Y\) contains the positive and negative or fired and non-fired states of the current neuron. Hence \(p_Y(y)\) and \(p_Y(\neg y)\) are
+				the probabilities of these two states. The same holds for the set \(\mathcal X_i\) which simply contains the positive and negative states of the input neuron
+				of the synapse \(i\). That means if we consider the probabilities of the synapse \(i\) we get four different states: \(p(x_i,y), p(\neg x_i,y), p(x_i,\neg y), p(\neg x_i,\neg y)\)
 			</p>
 			<h2>Counting Frequencies</h2>
 			<p>
@@ -178,19 +191,19 @@
 				biases such that the network requires less information to encode the message of the input data. To do so we will need an objective function
 				that we can convert to its first derivative. With this derivative function we are then able to use the gradient decent method to adjust the
 				synapse weights and bias values.
-				To figure out how the objective function may look like, we need to take a closer look at a neuron and its input synapses. Let us consider the synapses
-				as information consumers and the neuron itself as an information producer. The synapses or information consumers can now be modeled using the
-				information gain and the neuron itself can be modeled using the entropy.
-
-				$$G = H(Y) - \sum \limits _{i} I(X_i, Y)$$
 			</p>
 			<p>
-				To clarify the variables and indices before we dive into the math I would like to give a brief overview:
+				Before going into more detail, we would like to break up the calculation of the derivative function into three more comprehensible parts. The first
+				or outer part includes the derivative of the information gain and entropy functions. The second consists of the derivative of the activation function and the
+				third or inner part consists of the derivative of the weighted sum.
+			</p>
+			<h3>The outer part</h3>
+			<p>
+				To figure out how the objective function may look like, we need to take a closer look at a neuron and its input synapses. Let us consider the synapses
+				as information consumers and the neuron itself as an information producer. The synapses or information consumers can now be modeled using the
+				information gain \(I\) and the neuron itself can be modeled using the entropy \(H\).
 
-				\(G\) is the overall entropy for the entire neuron, \(H(Y)\) the entropy of the neuron output and \(I(X_i, Y)\) the information gain of the synapse \(i\).
-				The set \(\mathcal Y\) contains the positive and negative or fired and non-fired states of the current neuron. Hence \(p_Y(y)\) and \(p_Y(\neg y)\) are
-				the probabilities of these two states. The same holds for the set \(\mathcal X_i\) which simply contains the positive and negative states of the input neuron
-				of the synapse \(i\). That means if we consider the probabilities of the synapse \(i\) we get four different states: \(p(x_i,y), p(\neg x_i,y), p(x_i,\neg y), p(\neg x_i,\neg y)\)
+				$$G = H(Y) - \sum \limits _{i} I(X_i, Y)$$
 			</p>
 			<p>
 				Now, before we go on to calculate the derivative function, we need to make two simplifying assumptions. The first one is that we consider
@@ -215,12 +228,33 @@
 
 				$$\Theta(x) = \Bigg \{ {0 \atop 1} {: x \leq 0 \atop : x > 0}$$
 
-				$$ f_{(X_i,Y)}(x_i, y) = \sum_{i}^N \Theta(x_i) \varphi (net_i)$$
+				$$ f_{(X_i,Y)}(x_i, y) = \sum_{i}^N \Theta(x_i) y $$
 
 				The second assumption that we need to make is that only the most recent training example is considered as variable. All other training examples are considered as constants
 				and since they are part of a summation, they can be simply removed from the equation. Hence the derivative function of \(f_{(X, Y)}\) looks as follows:
 
-				$$ f_{(X,Y)}(x, y)' = \Theta(x) \varphi (net') \varphi' (net)$$
+				$$ f_{(X,Y)}(x, y)' = \Theta(x) y$$
+			</p>
+			<p>
+				Now let us go back to the equation for the information gain and calculate the gradient for it.
+
+				$$I(X_i;Y) = \sum_{y \in \mathcal Y} \sum_{x_i \in \mathcal X_i}
+				{ p_{(X_i,Y)}(x_i, y) S(x_i, y) } $$
+
+				Remember, the suprisal part of the equation is considered as constant.
+
+				So if we put the whole equation together and derive it with respect to \(net\), it looks as follows:
+
+				$$I_{sum}' = \frac{1}{N} \sum\limits_{i=0}^N{ \Theta(x_i) \varphi (net') \varphi' (net) }$$
+			</p>
+			<h3>The gradient of the activation function</h3>
+			<p>
+				To obtain the derivative of the activation function
+			    $$ y = \varphi (net) $$
+
+				we can simply apply the chain rule to obtain
+
+			    $$ y' = \varphi (net') \varphi' (net) $$
 
 				Since the activation function \(\varphi (x)\) is given by
 				\[\varphi(x) = \Bigg \{ {0 \atop \tanh(x)} {: x \leq 0 \atop : x > 0}\]
@@ -235,9 +269,11 @@
 				<img src="images/deriv-actf.png" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
 			</div>
 			<p>
-			    As you can see, there is a strong discontinuity at \(x = 0\) where the activation function exceeds the
+			    As you can see, there is a discontinuity at \(x = 0\) where the activation function exceeds the
 			    activation threshold of the neuron.
 			</p>
+
+			<h3>The inner part</h3>
 			<p>
 				Now, remember that the weighted sum \(net\) of the neuron is calculated in the following way:
 
@@ -275,18 +311,7 @@
 
 				Basically, in the negative case, the \(b_j\) part of the bias needs to be adjusted at the same time as \(w_j\).
 			</p>
-			<p>
-				Now let us go back to the equation for the information gain and calculate the gradient for it.
 
-				$$I(X_i;Y) = \sum_{y \in \mathcal Y} \sum_{x_i \in \mathcal X_i}
-				{ p_{(X_i,Y)}(x_i, y) S(x_i, y) } $$
-
-				Remember, the suprisal part of the equation is considered as constant.
-
-				So if we put the whole equation together and derive it with respect to \(net\), it looks as follows:
-
-				$$I_{sum}' = \frac{1}{N} \sum\limits_{i=0}^N{ \Theta(x_i) \varphi (net') \varphi' (net) }$$
-			</p>
 			<h2>Concept Drift</h2>
 			<p>
 				Another problem is that of concept drift. Since we are using the distribution to adjust the synapse weights
