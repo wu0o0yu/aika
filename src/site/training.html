@@ -79,30 +79,30 @@
 			<p>
 			<h2>The entropy framework</h2>
 			<p>
-				Since the network contains feedback cycles, the usual backpropagation algorithm won't work very well for this type of network.
-				Also relying on handcrafted labels that are applied to the output of the network is very error-prone and it creates a large
-				distance between our training signal and the weights that we would like to adjust. Hence we would like to train our neurons
-				more locally without the reliance on an external signal source. This is where the Shannon entropy framework comes in quite handy.
-				If we consider the example of a word pattern again, we can measure the amount information for each letter, that is the number of bits required
-				to represent this letter in a message, by calculating the Shannon entropy. We can then look at the word pattern neuron as a
-				way of compressing the information given by the individual letter neurons. This compression can be formalized using the mutual
-				information which can then be used to derive an objective function for our training algorithm. The resulting derivative function
-				exhibits a very interesting and unexpected behavior with regard to when the synapse weights and neuron bias values are increased or decreased.
+				Since the network contains feedback cycles, the usual backpropagation algorithm won't work very well.
+				Furthermore, relying on handcrafted labels that are applied to the output of the network is very error-prone and it creates a large
+				distance between our training signal and the weights that we would like to adjust. Hence, we would like to train our neurons
+				more locally without a reliance on an external signal source. This is where the Shannon entropy framework comes quite in handy.
+				If we consider the example of a word pattern again, we can measure the amount of information for each letter — that is, the number of bits required
+				to represent this letter in a message — by calculating the Shannon entropy. We can then look at the word pattern neuron as a
+				way of compressing the information given by the individual letter neurons. This compression can be formalized using mutual
+				information, which can then be used to derive an objective function for our training algorithm. The resulting derivative function
+				exhibits a very interesting and unexpected behavior with regard to when the synapse weights and neuron bias values increase or decrease.
 
-				Before we go on lets first have a look at the formula for calculating the entropy:
+				Before we go on, let's first have a look at the formula for calculating entropy:
 
 				$$H(X) = -\sum_{i=1}^n {\mathrm{P}(x_i) \log \mathrm{P}(x_i)}$$
 
-				This formula is actually comprised of two parts, the Shannon information or information content or surprisal part:
+				This formula is actually comprised of two parts. The first involves the Shannon information or information content or surprisal part:
 
 				$$S(x) = -\log_b{\left(P\right)}$$
 
-				and the calculation of the expected value of the surprisal:
+				The second involves the calculation of the expected value of the surprisal:
 
 				$$\operatorname{E}[X] =\sum_{i=1}^n x_i\,p_i$$
 
-				The Shannon information can be interpreted as quantifying the level of "surprise" of a particular outcome. So events
-				with a very high probability have a low surprisal value and events with a low probability have high one.
+				The Shannon information can be interpreted as quantifying the level of "surprise" of a particular outcome. So, events
+				with a high probability have a low surprisal value and events with a low probability have a high surprisal value.
 			</p>
 
 			<div style="text-align:center; width:100%">
@@ -110,21 +110,21 @@
 			</div>
 			<h3>Information gain</h3>
 			<p>
-			    Now that we have an understanding of the basics of Shannon entropy we can go on and see what the information gain is
-			    and how it is calculated. The information gain quantifies the "amount of information" obtained about one random
-			    variable through observing another random variable. In our example, the observed random variable would be that of
-			    the letter and the other one that of the word. The formula for the information gain looks as follows:
+			    Now that we have an understanding of the basics of Shannon entropy, we can see what information gain is
+			    and how it is calculated. Information gain quantifies the "amount of information" obtained about one random
+			    variable through the observation of another random variable. In our example, the observed random variable would be that of
+			    the letter, and the other that of the word. The formula for information gain is as follows:
 
 				$$I(X;Y) = \sum_{y \in \mathcal Y} \sum_{x \in \mathcal X}
 				{ p_{(X,Y)}(x, y) \log{ \left(\frac{p_{(X,Y)}(x, y)}{p_X(x)\,p_Y(y)} \right) }} $$
 
-				To get a better understanding of this formula we can take a closer look at the components its comprised of.
-				It actually uses the concept of the Kullback-Leibler divergence to calculate the divergence between the
+				To get a better understanding of this formula, we can take a closer look at its components.
+				It actually uses the concept of Kullback-Leibler divergence to calculate the divergence between the
 				joint distribution of \(X\) and \(Y\) and the product of the marginals.
 
 				$$D_\text{KL}(P \parallel Q) = \sum_{x\in\mathcal{X}} P(x) \log\left(\frac{P(x)}{Q(x)}\right)$$
 
-				In other words, we are using the KL divergence to compare the joint distribution of \(X\) and \(Y\) to the
+				In other words, we are using KL divergence to compare the joint distribution of \(X\) and \(Y\) to the
 				special case where these occur independent of each other. <br/>
 
 				Before going forward we would like to introduce a slightly different notion of the information gain:
@@ -269,6 +269,7 @@
 				So if we put the whole equation together and derive it with respect to \(y\), it looks as follows:
 
 				$$I'(X_i;Y) = \frac{1}{N} \sum_{y \in \mathcal Y} \sum_{x_i \in \mathcal X_i} {x_i y' S(x_i, y)}$$
+				$$\frac{1}{N} \sum_{x_i \in \mathcal X_i} {x_i S(x_i, y)}$$
 			</p>
 			<p>
 				The derivative of the entropy function can be stated very similarly:
