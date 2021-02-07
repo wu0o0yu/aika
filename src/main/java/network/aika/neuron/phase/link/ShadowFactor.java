@@ -41,7 +41,7 @@ public class ShadowFactor extends RankedImpl implements LinkPhase {
     }
 
     public String toString() {
-        return "Link-Shadow Factor";
+        return "Link: Shadow Factor";
     }
 
     @Override

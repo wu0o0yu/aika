@@ -47,7 +47,7 @@ public class PropagateGradient extends RankedImpl implements LinkPhase {
     }
 
     public String toString() {
-        return "Link-Propagate Gradient (" + Utils.round(gradient) + ")";
+        return "Link: Propagate Gradient (" + Utils.round(gradient) + ")";
     }
 
     @Override

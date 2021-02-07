@@ -52,7 +52,7 @@ public class Induction extends RankedImpl implements ActivationPhase {
     }
 
     public String toString() {
-        return "Induction";
+        return "Act: Induction";
     }
 
     @Override

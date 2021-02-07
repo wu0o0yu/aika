@@ -50,7 +50,7 @@ public class Induction extends RankedImpl implements LinkPhase {
     }
 
     public String toString() {
-        return "Link-Induction";
+        return "Link: Induction";
     }
 
     @Override

@@ -14,44 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.phase.activation;
 
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
-import network.aika.neuron.phase.activation.ActivationPhase;
 
 /**
+ * During the initial linking process all positive recurrent synapses are assumed to be
+ * active. If that is not the case, updates of the affected activations are required.
  *
  * @author Lukas Molzberger
  */
-public class PositiveFeedbackLoopUpdate extends RankedImpl implements LinkPhase {
+public class PropagateChange extends RankedImpl implements ActivationPhase {
 
     @Override
     public Ranked getPreviousRank() {
-        return ActivationPhase.POSITIVE_FEEDBACK_LOOP_UPDATE;
+        return USE_FINAL_BIAS;
     }
 
     @Override
-    public void process(Link l) {
-        Synapse s = l.getSynapse();
-        Activation newOutputAct = l.getOutput().getModifiable(s);
-
-        newOutputAct.addLink(
-                        s,
-                        l.getInput(),
-                        l.isSelfRef()
-                );
+    public void process(Activation act) {
+        act.updateOutgoingLinks();
     }
 
     public String toString() {
-        return "Link-Positive Feedback Loop Update";
+        return "Act: Propagate Change";
     }
 
     @Override
-    public int compare(Link l1, Link l2) {
-        return 0;
+    public int compare(Activation act1, Activation act2) {
+        return act1.getFired().compareTo(act2.getFired());
     }
 }

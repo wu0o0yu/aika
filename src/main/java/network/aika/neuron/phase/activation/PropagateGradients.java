@@ -43,7 +43,7 @@ public class PropagateGradients extends RankedImpl implements ActivationPhase {
     }
 
     public String toString() {
-        return "Propagate Gradients";
+        return "Act: Propagate Gradients";
     }
 
     @Override

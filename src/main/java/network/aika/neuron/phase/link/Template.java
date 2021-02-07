@@ -46,7 +46,7 @@ public class Template extends RankedImpl implements LinkPhase {
     }
 
     public String toString() {
-        return "Link-Template";
+        return "Link: Template";
     }
 
     @Override

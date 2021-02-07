@@ -41,7 +41,7 @@ public class Counting extends RankedImpl implements ActivationPhase {
     }
 
     public String toString() {
-        return "Counting";
+        return "Act: Counting";
     }
 
     @Override

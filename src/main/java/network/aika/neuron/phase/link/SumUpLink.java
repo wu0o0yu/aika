@@ -56,7 +56,7 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
             t.addToQueue(
                     oAct,
                     LINK_AND_PROPAGATE,
-                    PREPARE_POSITIVE_FEEDBACK_LOOP_UPDATE,
+                    USE_FINAL_BIAS,
                     oAct.hasBranches() ? DETERMINE_BRANCH_PROBABILITY : null,
                     ActivationPhase.COUNTING
             );
@@ -68,7 +68,7 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
     }
 
     public String toString() {
-        return "Sum up Link (" + Utils.round(delta) + ")";
+        return "Link: Sum up Link (" + Utils.round(delta) + ")";
     }
 
     @Override

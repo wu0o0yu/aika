@@ -256,6 +256,16 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return bias;
     }
 
+    public double updateBias(Activation act) {
+        double learnRate = getConfig().getLearnRate();
+
+        double biasDelta = learnRate * act.getGradientSum();
+
+        addBias(biasDelta);
+
+        return biasDelta;
+    }
+
     public ReadWriteLock getLock() {
         return lock;
     }

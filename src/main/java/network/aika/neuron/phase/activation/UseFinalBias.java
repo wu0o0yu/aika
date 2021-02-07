@@ -25,7 +25,7 @@ import network.aika.neuron.phase.RankedImpl;
  *
  * @author Lukas Molzberger
  */
-public class PreparePositiveFeedbackLoopUpdate extends RankedImpl implements ActivationPhase {
+public class UseFinalBias extends RankedImpl implements ActivationPhase {
 
     @Override
     public Ranked getPreviousRank() {
@@ -37,13 +37,13 @@ public class PreparePositiveFeedbackLoopUpdate extends RankedImpl implements Act
         if(act.updateForFinalPhase()) {
             act.getThought().addToQueue(
                     act.getModifiable(null),
-                    POSITIVE_FEEDBACK_LOOP_UPDATE
+                    PROPAGATE_CHANGE
             );
         }
     }
 
     public String toString() {
-        return "Prepare Feedback Loop Update";
+        return "Act: Use Final Bias";
     }
 
     @Override

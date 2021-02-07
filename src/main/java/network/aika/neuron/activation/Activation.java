@@ -326,7 +326,7 @@ public class Activation extends Element {
     public void updateOutgoingLinks() {
         lastRound.addLinksToQueue(
                 OUTPUT,
-                LinkPhase.POSITIVE_FEEDBACK_LOOP_UPDATE
+                LinkPhase.PROPAGATE_CHANGE
         );
 //        lastRound.unlinkInputs();
         lastRound = null;

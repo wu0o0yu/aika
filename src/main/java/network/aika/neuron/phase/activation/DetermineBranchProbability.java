@@ -31,7 +31,7 @@ public class DetermineBranchProbability extends RankedImpl implements Activation
 
     @Override
     public Ranked getPreviousRank() {
-        return LinkPhase.POSITIVE_FEEDBACK_LOOP_UPDATE;
+        return LinkPhase.PROPAGATE_CHANGE;
     }
 
     @Override
@@ -40,7 +40,7 @@ public class DetermineBranchProbability extends RankedImpl implements Activation
     }
 
     public String toString() {
-        return "Determine Branch Probability";
+        return "Act: Determine Branch Probability";
     }
 
     @Override
