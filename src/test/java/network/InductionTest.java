@@ -98,17 +98,16 @@ public class InductionTest {
         Activation actTarget = new Activation(doc, targetN);
 
         actA.setReference(new TextReference(doc, 0, 1));
-        actA.setValue(1.0);
+        actA.setInputValue(1.0);
 
         actB.setReference(new TextReference(doc, 0, 1));
-        actB.setValue(1.0);
+        actB.setInputValue(1.0);
 
         actTarget.addLink(sA, actA, false);
         actTarget.addLink(sB, actB, false);
 
         actTarget.initEntropyGradient();
  //       actTarget.computeInitialLinkGradients();
-        actTarget.getAndResetGradient();
 
         System.out.println(actTarget.gradientsToString());
     }

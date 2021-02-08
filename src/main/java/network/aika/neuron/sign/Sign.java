@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron;
+package network.aika.neuron.sign;
 
 import network.aika.neuron.activation.Activation;
 
@@ -23,26 +23,18 @@ import network.aika.neuron.activation.Activation;
  *
  * @author Lukas Molzberger
  */
-public enum Sign {
-    POS,
-    NEG;
+public interface Sign {
 
-    static {
-        POS.init(NEG);
-        NEG.init(POS);
-    }
+    Positive POS = new Positive();
+    Negative NEG = new Negative();
 
-    private Sign inverted;
+    Sign[] SIGNS = new Sign[] {POS, NEG};
 
-    private void init(Sign inverted) {
-        this.inverted = inverted;
-    }
+    Sign invert();
 
-    public Sign invert() {
-        return inverted;
-    }
-
-    public static Sign getSign(Activation act) {
+    static Sign getSign(Activation act) {
         return act.isActive() ? POS : NEG;
     }
+
+    Double getValue(double v);
 }

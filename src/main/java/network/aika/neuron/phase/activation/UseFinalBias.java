@@ -36,7 +36,7 @@ public class UseFinalBias extends RankedImpl implements ActivationPhase {
     public void process(Activation act) {
         if(act.updateForFinalPhase()) {
             act.getThought().addToQueue(
-                    act.getModifiable(null),
+                    act,
                     PROPAGATE_CHANGE
             );
         }

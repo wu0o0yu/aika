@@ -22,7 +22,7 @@ import network.aika.Thought;
 import network.aika.Utils;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Sign;
+import network.aika.neuron.sign.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
@@ -36,8 +36,8 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
+import static network.aika.neuron.sign.Sign.POS;
 
 /**
  * @author Lukas Molzberger
@@ -47,10 +47,10 @@ public class Activation extends Element {
     public static double TOLERANCE = 0.001;
 
     private Double value = null;
+    private Double inputValue = null;
     private double sum;
     private double lateSum;
     private Fired fired = NOT_FIRED;
-    private boolean fixed;
     private boolean marked;
 
     private int id;
@@ -63,7 +63,7 @@ public class Activation extends Element {
     NavigableMap<OutputKey, Link> outputLinks;
 
     private int round; // Only used as stopping criteria
-    private Activation lastRound;
+//    private Activation lastRound;
 
     private Set<Activation> branches = new TreeSet<>();
     private Activation mainBranch;
@@ -115,7 +115,7 @@ public class Activation extends Element {
     public void initInput(Reference ref) {
         setReference(ref);
 
-        setValue(1.0);
+        setInputValue(1.0);
         setFired(ref.getBegin());
 
         getThought().addToQueue(
@@ -196,10 +196,6 @@ public class Activation extends Element {
         getModel().linkInputRelations(this, INPUT);
     }
 
-    public Activation getLastRound() {
-        return lastRound;
-    }
-
     public Neuron<?> getNeuron() {
         return neuron;
     }
@@ -232,7 +228,7 @@ public class Activation extends Element {
         return clonedAct;
     }
 
-    public Activation getModifiable(Synapse excludedSyn) {
+    public Activation clone(Synapse excludedSyn) {
         if (value == null)
             return this;
 
@@ -242,7 +238,6 @@ public class Activation extends Element {
         replaceElement(clonedAct);
 
         clonedAct.round = round + 1;
-        clonedAct.lastRound = this;
         linkClone(clonedAct, excludedSyn);
 
         return clonedAct;
@@ -264,14 +259,13 @@ public class Activation extends Element {
                     Link nl = new Link(l.getSynapse(), l.getInput(), clonedAct, l.isSelfRef());
                             nl.linkInput();
                             nl.linkOutput();
-                            nl.sumUpLink(nl.getInputValue());
+                            nl.sumUpLink(nl.getInputValue(POS));
                         }
                 );
     }
 
-    public void setValue(double v) {
-        value = v;
-        fixed = true;
+    public void setInputValue(double v) {
+        inputValue = v;
     }
 
     public boolean isActive() {
@@ -317,19 +311,22 @@ public class Activation extends Element {
     }
 
     public boolean updateValue(boolean isFinal) {
-        if (!fixed) {
-            value = computeValue(isFinal);
-        }
-        return !equals(lastRound);
+        Double oldValue = value;
+
+        value = inputValue != null ?
+                inputValue :
+                computeValue(isFinal);
+
+        return oldValue == null || Math.abs(value - oldValue) > TOLERANCE;
     }
 
     public void updateOutgoingLinks() {
-        lastRound.addLinksToQueue(
-                OUTPUT,
-                LinkPhase.PROPAGATE_CHANGE
-        );
-//        lastRound.unlinkInputs();
-        lastRound = null;
+        getOutputLinks()
+                .map(l -> l.getOutput())
+//                .filter(act -> act.isActive())
+                .forEach(act ->
+                        getThought().addToQueue(act, PROPAGATE_CHANGE)
+                );
     }
 
     public void followLinks(Visitor v) {
@@ -396,7 +393,7 @@ public class Activation extends Element {
     }
 
     public boolean updateForFinalPhase() {
-        if (fixed)
+        if (inputValue != null)
             return false;
 
         double initialValue = computeValue(false);
@@ -549,7 +546,7 @@ public class Activation extends Element {
 
         if (Math.abs(p - getBranchProbability()) <= TOLERANCE) return;
 
-        Activation cAct = getModifiable(null);
+        Activation cAct = clone(null);
         cAct.branchProbability = p;
     }
 
@@ -560,21 +557,12 @@ public class Activation extends Element {
                 );
     }
 
-    public boolean equals(Activation act) {
-        return act != null && Math.abs(value - act.value) <= TOLERANCE;
-    }
-
-    private Activation getMostRecentFinalActivation() {
-        return value == null && lastRound != null ? lastRound : this;
-    }
-
     public Stream<Link> getInputLinks() {
         return inputLinks.values().stream();
     }
 
     public Stream<Link> getOutputLinks() {
-        Activation act = getMostRecentFinalActivation();
-        return act.outputLinks.values().stream();
+        return outputLinks.values().stream();
     }
 
     public boolean hasBranches() {

@@ -18,12 +18,11 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.Utils;
-import network.aika.neuron.Sign;
+import network.aika.neuron.sign.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.VisitorPhase;
-import network.aika.neuron.phase.link.PropagateGradient;
 import network.aika.neuron.phase.link.SumUpLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.sign.Sign.POS;
 
 /**
  *
@@ -76,7 +76,7 @@ public class Link extends Element {
 
         t.addToQueue(
                 this,
-                new SumUpLink(w * (getInputValue() - getInputValue(oldLink)))
+                new SumUpLink(w * (getInputValue(POS) - getInputValue(POS, oldLink)))
         );
     }
 
@@ -151,20 +151,16 @@ public class Link extends Element {
         if(isNegative())
             return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
 
-        double s = getSynapse().getSurprisal(
-                Sign.getSign(input),
-                Sign.getSign(output)
-        );
+        double igGradient = 0.0;
+        for(Sign si: Sign.SIGNS) {
+            for (Sign so : Sign.SIGNS) {
+                double s = getSynapse().getSurprisal(si, so);
+                s -= input.getNeuron().getSurprisal(si);
+                s -= output.getNeuron().getSurprisal(so);
 
-        s -= input.getNeuron().getSurprisal(
-                Sign.getSign(input)
-        );
-
-        s -= output.getNeuron().getSurprisal(
-                Sign.getSign(output)
-        );
-
-        double igGradient = s * getInputValue() * output.getNorm();
+                igGradient += s * getInputValue(si) * output.getNorm();
+            }
+        }
 
         if(Math.abs(igGradient) >= TOLERANCE) {
             getOutput().propagateGradient(igGradient - lastIGGradient);
@@ -211,12 +207,12 @@ public class Link extends Element {
         return input == null || input.getFired().compareTo(output.getFired()) <= 0;
     }
 
-    public static double getInputValue(Link l) {
-        return l != null ? l.getInputValue() : 0.0;
+    public static double getInputValue(Sign s, Link l) {
+        return l != null ? l.getInputValue(s) : 0.0;
     }
 
-    public Double getInputValue() {
-        return input != null ? input.getValue() : 0.0;
+    public Double getInputValue(Sign s) {
+        return s.getValue(input != null ? input.getValue() : 0.0);
     }
 
     public Synapse getSynapse() {
@@ -323,7 +319,7 @@ public class Link extends Element {
 
     public String gradientsToString() {
         return "   " + getIdString() +
-                " x:" + Utils.round(getInputValue()) +
+                " x:" + Utils.round(getInputValue(POS)) +
                 " w:" + Utils.round(getSynapse().getWeight());
     }
 

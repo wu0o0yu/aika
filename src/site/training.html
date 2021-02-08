@@ -125,19 +125,19 @@
 				$$D_\text{KL}(P \parallel Q) = \sum_{x\in\mathcal{X}} P(x) \log\left(\frac{P(x)}{Q(x)}\right)$$
 
 				In other words, we are using KL divergence to compare the joint distribution of \(X\) and \(Y\) to the
-				special case where these occur independent of each other. <br/>
+				special case in which these occur independently of each other. <br/>
 
-				Before going forward we would like to introduce a slightly different notion of the information gain:
+				Before going forward, we would like to introduce a slightly different notion of information gain:
 
 				$$I(X_i;Y) = \sum_{y \in \mathcal Y} \sum_{x_i \in \mathcal X_i}
 				{ p_{(X_i,Y)}(x_i, y) \left( \log{p_{(X_i,Y)}(x_i, y)} - \log{p_{X_i}(x_i)} - \log{p_Y(y)} \right) } $$
 
-				As you can see, at the core of this formula are now the surprisal values of different probability distributions.
-				The outer part is actually just the calculation of the expected value of the inner part.
+				As you can see, the surprisal values of different probability distributions now lie at the core of this formula.
+				The outer part is simply the calculation of the expected value of the inner part.
 			</p>
 			<p>
 				To clarify the variables and indices we would like to give a brief overview:<br/>
-				The set \(\mathcal Y\) contains the positive and negative or fired and non-fired states of the current neuron. Hence \(p_Y(y)\) and \(p_Y(\neg y)\) are
+				The set \(\mathcal Y\) contains the positive and negative or fired and non-fired states of the current neuron. Hence, \(p_Y(y)\) and \(p_Y(\neg y)\) are
 				the probabilities of these two states. The same holds for the set \(\mathcal X_i\) which simply contains the positive and negative states of the input neuron
 				of the synapse \(i\). That means, if we consider the probabilities of the synapse \(i\) we get four different states: \(p(x_i,y), p(\neg x_i,y), p(x_i,\neg y), p(\neg x_i,\neg y)\)
 			</p>

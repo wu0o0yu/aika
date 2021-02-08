@@ -30,7 +30,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 
 
-import static network.aika.neuron.Templates.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -141,7 +140,7 @@ public class MutualExclusionTest {
         Document doc = new Document("test");
 
         Activation act = new Activation(doc, in);
-        act.setValue(1.0);
+        act.setInputValue(1.0);
         act.setFired(0);
 
         act.initInput(new TextReference(doc, 0, 4));

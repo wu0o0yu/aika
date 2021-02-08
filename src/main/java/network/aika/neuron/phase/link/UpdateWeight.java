@@ -23,6 +23,7 @@ import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
+import static network.aika.neuron.sign.Sign.POS;
 
 /**
  * Use the link gradient to update the synapse weight.
@@ -39,13 +40,8 @@ public class UpdateWeight extends RankedImpl implements LinkPhase {
     @Override
     public void process(Link l) {
         Synapse s = l.getSynapse();
-        double x = l.getInputValue();
 
-        double weightDelta = s.updateSynapse(
-                x,
-                l.getAndResetGradient(),
-                l.isCausal()
-        );
+        double weightDelta = s.updateSynapse(l);
 
         Thought t = l.getThought();
         t.addToQueue(
@@ -55,7 +51,7 @@ public class UpdateWeight extends RankedImpl implements LinkPhase {
 
         t.addToQueue(
                 l,
-                new SumUpLink(x * weightDelta)
+                new SumUpLink(l.getInputValue(POS) * weightDelta)
         );
     }
 

@@ -22,6 +22,7 @@ import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.Scope;
 import network.aika.neuron.phase.link.PropagateGradient;
+import network.aika.neuron.sign.Sign;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +33,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.Sign.NEG;
-import static network.aika.neuron.Sign.POS;
+import static network.aika.neuron.sign.Sign.NEG;
+import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.activation.Link.linkExists;
 import static network.aika.neuron.activation.Visitor.Transition.LINK;
 import static network.aika.neuron.phase.link.LinkPhase.INFORMATION_GAIN_GRADIENT;
@@ -278,7 +279,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return sampleSpace;
     }
 
-    public double updateSynapse(double x, double gradient, boolean isCausal) {
+    public double updateSynapse(Link l) {
+        double x = l.getInputValue(POS);
+        double gradient = l.getAndResetGradient();
+
         Neuron on = getOutput();
         double oldWeight = weight;
 
@@ -289,7 +293,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         double biasDelta = learnRate * gradient;
 
         addWeight(posWDelta - negWDelta);
-        on.addConjunctiveBias(negWDelta, !isCausal);
+        on.addConjunctiveBias(negWDelta, !l.isCausal());
         on.addBias(biasDelta);
 
         double finalBias = on.getBias(true);

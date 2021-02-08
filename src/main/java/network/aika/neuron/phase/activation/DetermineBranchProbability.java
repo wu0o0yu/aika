@@ -31,7 +31,7 @@ public class DetermineBranchProbability extends RankedImpl implements Activation
 
     @Override
     public Ranked getPreviousRank() {
-        return LinkPhase.PROPAGATE_CHANGE;
+        return ActivationPhase.PROPAGATE_CHANGE;
     }
 
     @Override
