@@ -428,12 +428,12 @@ public class Activation extends Element {
     }
 
     public void initEntropyGradient() {
-        double selfGradient = getNeuron().getSurprisal(
+        double g = getNeuron().getSurprisal(
                         Sign.getSign(this)
                 );
 
-        gradient += selfGradient - lastEntropyGradient;
-        lastEntropyGradient = selfGradient;
+        gradient += g - lastEntropyGradient;
+        lastEntropyGradient = g;
     }
 
     public void propagateGradients() {
