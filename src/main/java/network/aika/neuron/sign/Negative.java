@@ -8,6 +8,6 @@ public class Negative implements Sign {
 
     @Override
     public Double getValue(double x) {
-        return x;
+        return 1.0 - x;
     }
 }
