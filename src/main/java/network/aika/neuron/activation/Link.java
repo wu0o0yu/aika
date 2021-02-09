@@ -158,7 +158,7 @@ public class Link extends Element {
                 s -= input.getNeuron().getSurprisal(si);
                 s -= output.getNeuron().getSurprisal(so);
 
-                igGradient += s * getInputValue(si) * output.getNorm();
+                igGradient += s * getInputValue(si) * getOutputValue(so) * output.getNorm();
             }
         }
 
@@ -211,8 +211,12 @@ public class Link extends Element {
         return l != null ? l.getInputValue(s) : 0.0;
     }
 
-    public Double getInputValue(Sign s) {
-        return s.getValue(input != null ? input.getValue() : 0.0);
+    public double getInputValue(Sign s) {
+        return s.getValue(input != null ? input.getValue() : Double.valueOf(0.0));
+    }
+
+    public double getOutputValue(Sign s) {
+        return s.getValue(output != null ? output.getValue() : Double.valueOf(0.0));
     }
 
     public Synapse getSynapse() {

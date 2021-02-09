@@ -290,16 +290,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         double posWDelta = learnRate * x * gradient;
         double negWDelta = learnRate * (1.0 - x) * gradient;
-        double biasDelta = learnRate * gradient;
 
         addWeight(posWDelta - negWDelta);
         on.addConjunctiveBias(negWDelta, !l.isCausal());
-        on.addBias(biasDelta);
-
-        double finalBias = on.getBias(true);
-        if(finalBias > 0.0) {
-            on.addConjunctiveBias(-finalBias, false);
-        }
 
         return weight - oldWeight;
     }

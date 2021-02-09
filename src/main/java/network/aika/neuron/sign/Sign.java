@@ -36,5 +36,5 @@ public interface Sign {
         return act.isActive() ? POS : NEG;
     }
 
-    Double getValue(double v);
+    double getValue(Double x);
 }
