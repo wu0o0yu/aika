@@ -460,6 +460,7 @@ public class Activation extends Element {
 
         getThought().addToQueue(
                 this,
+                getNeuron().isAllowTraining() ? UPDATE_BIAS : null,
                 TEMPLATE_INPUT,
                 TEMPLATE_OUTPUT
         );

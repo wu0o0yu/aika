@@ -125,6 +125,7 @@ public class TextModel extends Model {
         in.setTokenLabel(tokenLabel);
         in.setInputNeuron(true);
         in.setLabel("P-" + tokenLabel);
+        in.setAllowTraining(false);
         getSuspensionHook().putLabel(tokenLabel, in.getId());
 
         PatternPartNeuron inRelPT = getTemplates().INPUT_PATTERN_PART_TEMPLATE.instantiateTemplate();

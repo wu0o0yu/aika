@@ -4,11 +4,13 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
+import static network.aika.neuron.phase.link.LinkPhase.UPDATE_WEIGHT;
+
 public class UpdateBias extends RankedImpl implements ActivationPhase {
 
     @Override
     public Ranked getPreviousRank() {
-        return PROPAGATE_GRADIENTS;
+        return UPDATE_WEIGHT;
     }
 
     @Override

@@ -34,7 +34,7 @@ public class UpdateWeight extends RankedImpl implements LinkPhase {
 
     @Override
     public Ranked getPreviousRank() {
-        return UPDATE_BIAS;
+        return PROPAGATE_GRADIENTS;
     }
 
     @Override
