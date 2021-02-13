@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 
 /**
  *

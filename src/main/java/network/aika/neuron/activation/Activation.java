@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.*;
+import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
@@ -26,6 +27,7 @@ import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.link.LinkPhase;
 import network.aika.neuron.phase.link.PropagateGradient;
 import network.aika.neuron.sign.Sign;
+import network.aika.utils.Utils;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -17,7 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.Utils;
+import network.aika.utils.Utils;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;

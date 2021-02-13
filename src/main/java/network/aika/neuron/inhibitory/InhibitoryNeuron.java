@@ -16,7 +16,7 @@
  */
 package network.aika.neuron.inhibitory;
 
-import network.aika.ActivationFunction;
+import network.aika.neuron.ActivationFunction;
 import network.aika.Model;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;

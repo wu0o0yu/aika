@@ -14,17 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.callbacks;
 
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.phase.Phase;
 
 
 /**
  *
  * @author Lukas Molzberger
  */
-public interface VisitorEventListener {
+public interface EventListener {
 
-    void onVisitorEvent(Visitor v, boolean dir);
+    void onActivationCreationEvent(Activation act, Activation originAct);
 
+    void onActivationProcessedEvent(Phase p, Activation act);
+
+    void afterActivationProcessedEvent(Phase p, Activation act);
+
+    void onLinkCreationEvent(Link l);
+
+    void onLinkProcessedEvent(Phase p, Link l);
+
+    void afterLinkProcessedEvent(Phase p, Link l);
 }

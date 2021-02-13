@@ -17,6 +17,8 @@
 package network.aika;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.utils.Writable;
+
 import java.util.function.Supplier;
 
 /**

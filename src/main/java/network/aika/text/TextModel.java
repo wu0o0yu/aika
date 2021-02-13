@@ -19,7 +19,7 @@ package network.aika.text;
 import network.aika.Model;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
-import network.aika.SuspensionCallback;
+import network.aika.callbacks.SuspensionCallback;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;

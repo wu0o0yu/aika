@@ -17,7 +17,7 @@
 package network.aika.neuron;
 
 import network.aika.Model;
-import network.aika.Writable;
+import network.aika.utils.Writable;
 import network.aika.neuron.activation.Reference;
 
 import java.io.DataInput;

@@ -17,6 +17,8 @@
 package network.aika;
 
 
+import network.aika.callbacks.InMemorySuspensionCallback;
+import network.aika.callbacks.SuspensionCallback;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.NeuronProvider.SuspensionMode;

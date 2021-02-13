@@ -17,7 +17,8 @@
 package network.aika.neuron;
 
 import network.aika.*;
-import network.aika.Writable;
+import network.aika.utils.Utils;
+import network.aika.utils.Writable;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.Scope;

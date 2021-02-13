@@ -17,7 +17,7 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.Thought;
-import network.aika.Utils;
+import network.aika.utils.Utils;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.RankedImpl;

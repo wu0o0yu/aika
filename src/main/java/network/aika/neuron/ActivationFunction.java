@@ -14,33 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.neuron;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Utils {
+public enum ActivationFunction {
 
-    public static double round(double x) {
-        return Math.round(x * 1000.0) / 1000.0;
+    RECTIFIED_HYPERBOLIC_TANGENT(
+            x -> Math.max(0.0, Math.tanh(x)),
+            x -> x >= 0.0 ? 1.0 - Math.pow(Math.tanh(x), 2.0) : 0.0
+    ),
+    LIMITED_RECTIFIED_LINEAR_UNIT(
+            x -> Math.max(0.0, Math.min(1.0, x)),
+            x -> x >= 0.0 && x <= 1.0 ? 1.0 : 0.0
+    );
+
+    private Function f;
+    private Function outerGrad;
+
+    ActivationFunction(Function f, Function outerGrad) {
+        this.f = f;
+        this.outerGrad = outerGrad;
     }
 
-    public static String collapseText(String txt, int length) {
-        if (txt.length() <= 2 * length) {
-            return txt;
-        } else {
-            return txt.substring(0, length) + "..." + txt.substring(txt.length() - length);
-        }
+    public double f(double x) {
+        return f.f(x);
     }
 
-    public static String addPadding(String s, int targetSize) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(s);
-        for(int i = s.length(); i < targetSize; i++) {
-            sb.append(' ');
-        }
+    public double outerGrad(double x) {
+        return outerGrad.f(x);
+    }
 
-        return sb.toString();
+    interface Function {
+        double f(double x);
     }
 }

@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.callbacks;
 
+import network.aika.utils.Writable;
 import network.aika.neuron.NeuronProvider;
 
 import java.util.HashMap;

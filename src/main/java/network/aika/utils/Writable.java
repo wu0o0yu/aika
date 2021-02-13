@@ -14,7 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.utils;
+
+import network.aika.Model;
 
 import java.io.DataInput;
 import java.io.DataOutput;

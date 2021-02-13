@@ -17,6 +17,8 @@
 package network.aika;
 
 
+import network.aika.callbacks.EventListener;
+import network.aika.callbacks.VisitorEventListener;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
@@ -44,7 +46,7 @@ public abstract class Thought {
 
     private Map<NeuronProvider, SortedSet<Activation>> actsPerNeuron = null;
 
-    private List<EventListener> eventListeners = new ArrayList<>();
+    private List<network.aika.callbacks.EventListener> eventListeners = new ArrayList<>();
     private List<VisitorEventListener> visitorEventListeners = new ArrayList<>();
 
     public Thought() {
@@ -104,13 +106,13 @@ public abstract class Thought {
                 );
     }
 
-    public synchronized Collection<EventListener> getEventListeners() {
+    public synchronized Collection<network.aika.callbacks.EventListener> getEventListeners() {
         return eventListeners
                 .stream()
                 .collect(Collectors.toList());
     }
 
-    public synchronized void addEventListener(EventListener l) {
+    public synchronized void addEventListener(network.aika.callbacks.EventListener l) {
         eventListeners.add(l);
     }
 
