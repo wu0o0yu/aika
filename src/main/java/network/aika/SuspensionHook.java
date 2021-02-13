@@ -34,7 +34,7 @@ public interface SuspensionHook {
 
     long createId();
 
-    void store(Long id, byte[] data);
+    void store(Long id, Writable customData, byte[] data);
 
     byte[] retrieve(long id);
 

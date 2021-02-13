@@ -127,7 +127,11 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
                 throw new RuntimeException(e);
             }
 
-            model.getSuspensionHook().store(id, baos.toByteArray());
+            model.getSuspensionHook().store(
+                    id,
+                    neuron.getCustomData(),
+                    baos.toByteArray()
+            );
         }
         neuron.setModified(false);
     }
