@@ -463,10 +463,12 @@ public class Activation extends Element {
     public void propagateGradientsFromNetUpdate() {
         ActivationFunction actF = getNeuron().getActivationFunction();
 
+        double net = getNet(true);
         double netDerivedLast = actF.outerGrad(lastNet);
-        double netDerivedCurrent = actF.outerGrad(
-                getNet(true)
-        );
+        double netDerivedCurrent = actF.outerGrad(net);
+
+        lastNet = net;
+
         double netDerivedDelta = netDerivedCurrent - netDerivedLast;
         if(Math.abs(netDerivedDelta) < TOLERANCE)
             return;
