@@ -28,7 +28,7 @@ import java.util.stream.Stream;
  *
  * @author Lukas Molzberger
  */
-public class InMemorySuspensionHook implements SuspensionHook {
+public class InMemorySuspensionCallback implements SuspensionCallback {
 
     private AtomicInteger currentId = new AtomicInteger(0);
 

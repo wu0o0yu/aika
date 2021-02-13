@@ -19,7 +19,7 @@ package network.aika.text;
 import network.aika.Model;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
-import network.aika.SuspensionHook;
+import network.aika.SuspensionCallback;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
@@ -28,7 +28,6 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
-import network.aika.neuron.phase.activation.LinkAndPropagate;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -48,7 +47,7 @@ public class TextModel extends Model {
         init();
     }
 
-    public TextModel(SuspensionHook sh) {
+    public TextModel(SuspensionCallback sh) {
         super(sh);
         init();
     }

@@ -30,7 +30,7 @@ import java.util.stream.Stream;
  *
  * @author Lukas Molzberger
  */
-public interface SuspensionHook {
+public interface SuspensionCallback {
 
     long createId();
 
