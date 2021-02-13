@@ -32,14 +32,21 @@ import static network.aika.neuron.phase.link.LinkPhase.PROPAGATE_GRADIENT_RANK;
  */
 public class PropagateGradients extends RankedImpl implements ActivationPhase {
 
-    @Override
-    public Ranked getPreviousRank() {
-        return PROPAGATE_GRADIENT_RANK;
+    public enum Mode {
+        SUM,
+        NET
+    }
+
+    private Mode mode;
+
+    public PropagateGradients(Ranked previousRank, Mode m) {
+        super(previousRank);
+        mode = m;
     }
 
     @Override
     public void process(Activation act) {
-        act.propagateGradients();
+        act.propagateGradients(mode);
     }
 
     public String toString() {

@@ -162,8 +162,9 @@ public class Link extends Element {
             }
         }
 
-        if(Math.abs(igGradient) >= TOLERANCE) {
-            getOutput().propagateGradient(igGradient - lastIGGradient);
+        double igGradientDelta = igGradient - lastIGGradient;
+        if(Math.abs(igGradientDelta) >= TOLERANCE) {
+            getOutput().propagateGradient(igGradientDelta);
             lastIGGradient = igGradient;
         }
     }

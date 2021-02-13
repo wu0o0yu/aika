@@ -16,12 +16,10 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.Config;
-import network.aika.Model;
-import network.aika.Thought;
-import network.aika.Utils;
+import network.aika.*;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.phase.activation.PropagateGradients;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
@@ -71,8 +69,17 @@ public class Activation extends Element {
     private Reference reference;
 
     private double lastEntropyGradient = 0.0;
-    private double gradient;
-    private double gradientSum;
+
+    private double lastNet = 0.0;
+
+    private double inputGradient;
+    private double outputGradient;
+
+    /**
+     * Accumulates all gradients in case a new link is added that needs be get informed about the gradient.
+     */
+    private double outputGradientSum;
+    private double inputGradientSum;
 
 
     private Activation(int id, Neuron<?> n) {
@@ -133,12 +140,12 @@ public class Activation extends Element {
         return value;
     }
 
-    public double getGradient() {
-        return gradient;
+    public double getInputGradient() {
+        return inputGradient;
     }
 
-    public double getGradientSum() {
-        return gradientSum;
+    public double getOutputGradientSum() {
+        return outputGradientSum;
     }
 
     public double getNet(boolean isFinal) {
@@ -432,25 +439,43 @@ public class Activation extends Element {
                         Sign.getSign(this)
                 );
 
-        gradient += g - lastEntropyGradient;
+        inputGradient += g - lastEntropyGradient;
         lastEntropyGradient = g;
     }
 
-    public void propagateGradients() {
+    public void propagateGradients(PropagateGradients.Mode m) {
         if(gradientIsZero())
             return;
 
-        double g = gradient;
-        gradient = 0.0;
+        ActivationFunction actF = getNeuron().getActivationFunction();
 
-        g *= getNorm();
-        g *= getNeuron()
-                .getActivationFunction()
-                .outerGrad(
-                        getNet(true)
-                );
+        double g = 0.0;
 
-        gradientSum += g;
+        switch (m) {
+            case SUM:
+                g = inputGradient;
+                inputGradientSum += inputGradient;
+
+                inputGradient = 0.0;
+
+                g *= getNorm();
+                g *= actF.outerGrad(
+                                getNet(true)
+                        );
+                lastNet = getNet(true);
+                break;
+            case NET:
+                double netDerivedLast = actF.outerGrad(lastNet);
+                double netDerivedCurrent = actF.outerGrad(
+                                getNet(true)
+                        );
+                double netDerivedDelta = netDerivedCurrent - netDerivedLast;
+                netDerivedDelta *= getNorm();
+
+                g = inputGradientSum * netDerivedDelta;
+        }
+
+        outputGradientSum += g;
 
         addLinksToQueue(
                 INPUT,
@@ -471,19 +496,19 @@ public class Activation extends Element {
     }
 
     public boolean gradientIsZero() {
-        return Math.abs(gradient) < TOLERANCE;
+        return Math.abs(inputGradient) < TOLERANCE;
     }
 
     public boolean gradientSumIsZero() {
-        return Math.abs(gradientSum) < TOLERANCE;
+        return Math.abs(outputGradientSum) < TOLERANCE;
     }
 
     public void propagateGradient(double g) {
-        gradient += g;
+        inputGradient += g;
 
         getThought().addToQueue(
                 this,
-                PROPAGATE_GRADIENTS
+                PROPAGATE_GRADIENTS_SUM
         );
     }
 

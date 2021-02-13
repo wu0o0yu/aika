@@ -49,7 +49,7 @@ public class EntropyGradient extends RankedImpl implements ActivationPhase {
         if(!act.gradientIsZero()) {
             act.getThought().addToQueue(
                     act,
-                    PROPAGATE_GRADIENTS
+                    PROPAGATE_GRADIENTS_SUM
             );
         }
     }

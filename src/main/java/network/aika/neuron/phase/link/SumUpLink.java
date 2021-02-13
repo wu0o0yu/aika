@@ -45,10 +45,9 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
         Thought t = l.getThought();
         l.sumUpLink(delta);
 
-        t.addToQueue(l, INFORMATION_GAIN_GRADIENT);
         t.addToQueue(
                 l.getOutput(),
-                ActivationPhase.ENTROPY_GRADIENT
+                PROPAGATE_GRADIENTS_NET
         );
 
         Activation oAct = l.getOutput();
