@@ -41,7 +41,7 @@ public class InMemorySuspensionCallback implements SuspensionCallback {
     }
 
     @Override
-    public void store(Long id, Writable customData, byte[] data) {
+    public void store(Long id, String label, Writable customData, byte[] data) {
         storage.put(id, data);
     }
 

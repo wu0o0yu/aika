@@ -129,6 +129,7 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
 
             model.getSuspensionHook().store(
                     id,
+                    neuron.getLabel(),
                     neuron.getCustomData(),
                     baos.toByteArray()
             );

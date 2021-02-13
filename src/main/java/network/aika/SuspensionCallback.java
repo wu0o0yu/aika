@@ -34,7 +34,7 @@ public interface SuspensionCallback {
 
     long createId();
 
-    void store(Long id, Writable customData, byte[] data);
+    void store(Long id, String label, Writable customData, byte[] data);
 
     void delete(Long id);
 
