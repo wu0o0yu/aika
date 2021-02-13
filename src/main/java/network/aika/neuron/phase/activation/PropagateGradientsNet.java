@@ -19,38 +19,25 @@ package network.aika.neuron.phase.activation;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
-import network.aika.neuron.phase.link.LinkPhase;
-import network.aika.neuron.phase.link.PropagateGradient;
-
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.phase.link.LinkPhase.PROPAGATE_GRADIENT_RANK;
 
 /**
  * Propagates the gradient of this activation backwards to all its input-links.
  *
  * @author Lukas Molzberger
  */
-public class PropagateGradients extends RankedImpl implements ActivationPhase {
+public class PropagateGradientsNet extends RankedImpl implements ActivationPhase {
 
-    public enum Mode {
-        SUM,
-        NET
-    }
-
-    private Mode mode;
-
-    public PropagateGradients(Ranked previousRank, Mode m) {
-        super(previousRank);
-        mode = m;
+    public PropagateGradientsNet() {
+        super(PROPAGATE_GRADIENTS_SUM);
     }
 
     @Override
     public void process(Activation act) {
-        act.propagateGradients(mode);
+        act.propagateGradientsFromNetUpdate();
     }
 
     public String toString() {
-        return "Act: Propagate Gradients";
+        return "Act: Propagate Gradients from Net Update";
     }
 
     @Override

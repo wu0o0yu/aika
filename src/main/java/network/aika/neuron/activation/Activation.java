@@ -19,21 +19,20 @@ package network.aika.neuron.activation;
 import network.aika.*;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.phase.activation.PropagateGradients;
-import network.aika.neuron.sign.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.link.LinkPhase;
 import network.aika.neuron.phase.link.PropagateGradient;
+import network.aika.neuron.sign.Sign;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
 import static network.aika.neuron.sign.Sign.POS;
 
@@ -443,38 +442,43 @@ public class Activation extends Element {
         lastEntropyGradient = g;
     }
 
-    public void propagateGradients(PropagateGradients.Mode m) {
-        if(gradientIsZero())
+    public void propagateGradientsFromSumUpdate() {
+        if (gradientIsZero())
             return;
 
         ActivationFunction actF = getNeuron().getActivationFunction();
 
-        double g = 0.0;
+        double g = inputGradient;
+        inputGradientSum += inputGradient;
+        inputGradient = 0.0;
 
-        switch (m) {
-            case SUM:
-                g = inputGradient;
-                inputGradientSum += inputGradient;
+        double net = getNet(true);
+        g *= getNorm();
+        g *= actF.outerGrad(net);
+        lastNet = net;
 
-                inputGradient = 0.0;
+        propagateGradients(g);
+    }
 
-                g *= getNorm();
-                g *= actF.outerGrad(
-                                getNet(true)
-                        );
-                lastNet = getNet(true);
-                break;
-            case NET:
-                double netDerivedLast = actF.outerGrad(lastNet);
-                double netDerivedCurrent = actF.outerGrad(
-                                getNet(true)
-                        );
-                double netDerivedDelta = netDerivedCurrent - netDerivedLast;
-                netDerivedDelta *= getNorm();
+    public void propagateGradientsFromNetUpdate() {
+        ActivationFunction actF = getNeuron().getActivationFunction();
 
-                g = inputGradientSum * netDerivedDelta;
-        }
+        double netDerivedLast = actF.outerGrad(lastNet);
+        double netDerivedCurrent = actF.outerGrad(
+                getNet(true)
+        );
+        double netDerivedDelta = netDerivedCurrent - netDerivedLast;
+        if(Math.abs(netDerivedDelta) < TOLERANCE)
+            return;
 
+        netDerivedDelta *= getNorm();
+
+        double g = inputGradientSum * netDerivedDelta;
+
+        propagateGradients(g);
+    }
+
+    public void propagateGradients(double g) {
         outputGradientSum += g;
 
         addLinksToQueue(

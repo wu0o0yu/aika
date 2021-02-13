@@ -34,8 +34,8 @@ public interface ActivationPhase extends Phase<Activation> {
     ActivationPhase PROPAGATE_CHANGE = new PropagateChange();
     ActivationPhase DETERMINE_BRANCH_PROBABILITY = new DetermineBranchProbability();
     ActivationPhase ENTROPY_GRADIENT = new EntropyGradient();
-    ActivationPhase PROPAGATE_GRADIENTS_SUM = new PropagateGradients(PROPAGATE_GRADIENT_RANK, PropagateGradients.Mode.SUM);
-    ActivationPhase PROPAGATE_GRADIENTS_NET = new PropagateGradients(PROPAGATE_GRADIENTS_SUM, PropagateGradients.Mode.NET);
+    ActivationPhase PROPAGATE_GRADIENTS_SUM = new PropagateGradientsSum();
+    ActivationPhase PROPAGATE_GRADIENTS_NET = new PropagateGradientsNet();
     ActivationPhase UPDATE_BIAS = new UpdateBias();
     ActivationPhase UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks();
     Template TEMPLATE_INPUT = new Template(TEMPLATE, INPUT);
