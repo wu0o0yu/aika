@@ -46,8 +46,9 @@ public class InMemorySuspensionCallback implements SuspensionCallback {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Long id, String label) {
         storage.remove(id);
+        removeLabel(label);
     }
 
     @Override
