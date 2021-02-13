@@ -36,11 +36,15 @@ public interface SuspensionHook {
 
     void store(Long id, Writable customData, byte[] data);
 
-    byte[] retrieve(long id);
+    void delete(Long id);
+
+    byte[] retrieve(Long id);
 
     Stream<Long> getAllIds();
 
     void putLabel(String label, Long id);
+
+    void removeLabel(String label);
 
     Long getIdByLabel(String tokenLabel);
 

@@ -46,12 +46,22 @@ public class InMemorySuspensionHook implements SuspensionHook {
     }
 
     @Override
+    public void delete(Long id) {
+        storage.remove(id);
+    }
+
+    @Override
     public void putLabel(String label, Long id) {
         labels.put(label, id);
     }
 
     @Override
-    public byte[] retrieve(long id) {
+    public void removeLabel(String label) {
+        labels.remove(label);
+    }
+
+    @Override
+    public byte[] retrieve(Long id) {
         return storage.get(id);
     }
 
