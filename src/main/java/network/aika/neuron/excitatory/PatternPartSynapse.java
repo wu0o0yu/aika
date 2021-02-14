@@ -53,7 +53,6 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         super(input, output, template);
     }
 
-
     public PatternPartSynapse(I input, PatternPartNeuron output, Synapse template, boolean isNegative, boolean isRecurrent, boolean inputScope, boolean isSamePattern) {
         super(input, output, template);
         this.isNegative = isNegative;
@@ -61,7 +60,6 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         this.inputScope = inputScope;
         this.isSamePattern = isSamePattern;
     }
-
 
     @Override
     public void updateReference(Link l) {
@@ -87,7 +85,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     @Override
     protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
         if(!isRecurrent) {
-            return fromAct.getFired().compareTo(toAct.getFired()) < 0;
+            return fromAct.getFired().compareTo(toAct.getFired()) <= 0;
         } else {
             return v.getSelfRef();
         }
