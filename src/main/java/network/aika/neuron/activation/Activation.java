@@ -62,7 +62,6 @@ public class Activation extends Element {
     NavigableMap<OutputKey, Link> outputLinks;
 
     private int round; // Only used as stopping criteria
-//    private Activation lastRound;
 
     private Set<Activation> branches = new TreeSet<>();
     private Activation mainBranch;

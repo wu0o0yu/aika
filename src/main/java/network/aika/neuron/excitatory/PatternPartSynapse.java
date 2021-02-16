@@ -66,11 +66,15 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         if(isNegative)
             return;
 
+        Reference iRef = l.getInput().getReference();
+        if(iRef == null)
+            return;
+
         // TODO: find a better solution.
         Synapse ts = l.getSynapse().getTemplate();
         Templates t = getModel().getTemplates();
         if(ts != t.RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE && ts != t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE) {
-            l.getOutput().propagateReference(l.getInput().getReference());
+            l.getOutput().propagateReference(iRef);
         }
     }
 
