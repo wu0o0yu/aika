@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.sign.Sign.POS;
 
 /**
@@ -126,12 +127,14 @@ public class Link extends Element {
     }
 
     public void follow(VisitorPhase p) {
+        follow(p, synapse.isRecurrent() ? OUTPUT : INPUT);
+    }
+
+    public void follow(VisitorPhase p, Direction dir) {
         output.setMarked(true);
 
-        Visitor nv = synapse.transition(
-                new Visitor(p, output, INPUT, ACT),
-                this
-        );
+        Visitor v = new Visitor(p, output, dir, ACT);
+        Visitor nv = synapse.transition(v, this);
         synapse.follow(input, nv);
 
         output.setMarked(false);

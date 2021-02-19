@@ -118,6 +118,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return getInput().containsOutputSynapse(this);
     }
 
+    public boolean isRecurrent() {
+        return false;
+    }
+
     public abstract Activation branchIfNecessary(Activation oAct, Visitor v);
 
     public Visitor transition(Visitor v, Link l) {

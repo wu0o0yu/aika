@@ -142,8 +142,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         this.provider = p;
     }
 
-    public Stream<? extends Synapse> getInputSynapses() {
-        throw new UnsupportedOperationException();
+    public Stream<S> getInputSynapses() {
+        return inputSynapses.values().stream();
     }
 
     public Stream<Synapse> getOutputSynapses() {

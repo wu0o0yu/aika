@@ -80,10 +80,6 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
                 );
     }
 
-    public Stream<? extends Synapse> getInputSynapses() {
-        return inputSynapses.values().stream();
-    }
-
     public ActivationFunction getActivationFunction() {
         return RECTIFIED_HYPERBOLIC_TANGENT;
     }
