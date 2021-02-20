@@ -285,7 +285,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public double updateSynapse(Link l) {
-        double x = l.getInputValue(POS);
         double gradient = l.getAndResetGradient();
 
         Neuron on = getOutput();
@@ -293,11 +292,15 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         double learnRate = on.getConfig().getLearnRate();
 
-        double posWDelta = learnRate * x * gradient;
-        double negWDelta = learnRate * (1.0 - x) * gradient;
+        if(l.getInput().isActive()) {
+            double wDelta = learnRate * gradient;
+            addWeight(wDelta);
+        } else {
+            double wDelta = learnRate * gradient;
 
-        addWeight(posWDelta - negWDelta);
-        on.addConjunctiveBias(negWDelta, !l.isCausal());
+            addWeight(-wDelta);
+            on.addConjunctiveBias(wDelta, !l.isCausal());
+        }
 
         return weight - oldWeight;
     }
