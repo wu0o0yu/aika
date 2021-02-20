@@ -287,12 +287,13 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public double updateSynapse(Link l) {
         double gradient = l.getAndResetGradient();
 
+        Activation iAct = l.getInput();
         Neuron on = getOutput();
         double oldWeight = weight;
 
         double learnRate = on.getConfig().getLearnRate();
 
-        if(l.getInput().isActive()) {
+        if(iAct.isActive() || !iAct.isInitialized()) {
             double wDelta = learnRate * gradient;
             addWeight(wDelta);
         } else {

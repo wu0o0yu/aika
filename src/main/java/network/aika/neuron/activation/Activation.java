@@ -279,6 +279,10 @@ public class Activation extends Element {
         return value != null && value > 0.0;
     }
 
+    public boolean isInitialized() {
+        return inputValue != null || value != null || inputLinks.size() > 0;
+    }
+
     public double getBranchProbability() {
         return branchProbability;
     }
