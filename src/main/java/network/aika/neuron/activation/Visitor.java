@@ -43,7 +43,7 @@ public class Visitor {
         LINK
     }
 
-    public Direction downUpDir = INPUT;
+    public Direction downUpDir;
     public Direction startDir;
 
     private Set<Scope> scopes;
@@ -53,11 +53,12 @@ public class Visitor {
 
     private Visitor() {}
 
-    public Visitor(VisitorPhase vp, Activation act, Direction startDir, Transition t) {
+    public Visitor(VisitorPhase vp, Activation act, Direction startDir, Direction downUpDir, Transition t) {
         this.phase = vp;
         this.origin = this;
         this.act = act;
         this.transition = t;
+        this.downUpDir = downUpDir;
         this.startDir = startDir;
         this.scopes = Set.of(
                 act.getNeuron().getInitialScopes(startDir)

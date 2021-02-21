@@ -133,7 +133,7 @@ public class Link extends Element {
     public void follow(VisitorPhase p, Direction dir) {
         output.setMarked(true);
 
-        Visitor v = new Visitor(p, output, dir, ACT);
+        Visitor v = new Visitor(p, output, dir, INPUT, ACT);
         Visitor nv = synapse.transition(v, this);
         synapse.follow(input, nv);
 

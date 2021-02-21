@@ -27,6 +27,7 @@ import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.phase.link.LinkPhase.LINKING;
 import static network.aika.neuron.phase.link.LinkPhase.SUM_UP_LINK_RANK;
@@ -70,18 +71,27 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
         if(!act.updateValue(false))
             return;
 
-        Visitor v = new Visitor(
-                this,
-                act,
-                OUTPUT,
-                ACT
+        act.followLinks(
+                new Visitor(
+                        this,
+                        act,
+                        OUTPUT,
+                        INPUT,
+                        ACT
+                )
         );
-
-        act.followLinks(v);
 
         act.getModel().linkInputRelations(act, OUTPUT);
 
-        propagate(act, v);
+        propagate(act,
+                new Visitor(
+                        this,
+                        act,
+                        OUTPUT,
+                        OUTPUT,
+                        ACT
+                )
+        );
     }
 
     @Override
