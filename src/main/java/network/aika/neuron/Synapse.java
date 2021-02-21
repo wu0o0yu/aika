@@ -131,7 +131,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 v.getScopes()
                         .stream()
                         .flatMap(s -> transition(s, v.downUpDir).stream())
-                        .collect(Collectors.toList()),
+                        .collect(Collectors.toSet()),
                 LINK
         );
 
@@ -157,13 +157,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         Thought t = fromAct.getThought();
         Direction dir = nv.startDir;
-/*
-        if(!checkCausality(
-                dir.getPropagateInput(fromAct, null),
-                dir.getPropagateOutput(fromAct, null),
-                v)
-        ) return;
-*/
+
         Activation toAct = t
                 .createActivation(
                         nv.startDir.getNeuron(this),
@@ -287,13 +281,12 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public double updateSynapse(Link l) {
         double gradient = l.getAndResetGradient();
 
-        Activation iAct = l.getInput();
         Neuron on = getOutput();
         double oldWeight = weight;
 
         double learnRate = on.getConfig().getLearnRate();
 
-        if(iAct.isActive() || !iAct.isInitialized()) {
+        if(l.getInput().isActive(true)) {
             double wDelta = learnRate * gradient;
             addWeight(wDelta);
         } else {
@@ -334,13 +327,13 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public void count(Link l) {
         sampleSpace.update(getModel(), l.getInput().getReference());
 
-        if(l.getInput().isActive() && l.getOutput().isActive()) {
+        if(l.getInput().isActive(false) && l.getOutput().isActive(false)) {
             frequencyIPosOPos += 1.0;
             modified = true;
-        } else if(l.getInput().isActive() && !l.getOutput().isActive()) {
+        } else if(l.getInput().isActive(false) && !l.getOutput().isActive(false)) {
             frequencyIPosONeg += 1.0;
             modified = true;
-        } else if(!l.getInput().isActive() && l.getOutput().isActive()) {
+        } else if(!l.getInput().isActive(false) && l.getOutput().isActive(false)) {
             frequencyINegOPos += 1.0;
             modified = true;
         }

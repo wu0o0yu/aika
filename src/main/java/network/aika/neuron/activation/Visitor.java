@@ -22,6 +22,7 @@ import network.aika.neuron.phase.VisitorPhase;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static network.aika.neuron.activation.direction.Direction.*;
 
@@ -45,7 +46,7 @@ public class Visitor {
     public Direction downUpDir = INPUT;
     public Direction startDir;
 
-    private List<Scope> scopes;
+    private Set<Scope> scopes;
 
     public int downSteps = 0;
     public int upSteps = 0;
@@ -58,12 +59,12 @@ public class Visitor {
         this.act = act;
         this.transition = t;
         this.startDir = startDir;
-        this.scopes = Arrays.asList(
+        this.scopes = Set.of(
                 act.getNeuron().getInitialScopes(startDir)
         );
     }
 
-    public Visitor prepareNextStep(Activation currentAct, Link currentLink, List<Scope> scopes, Transition t) {
+    public Visitor prepareNextStep(Activation currentAct, Link currentLink, Set<Scope> scopes, Transition t) {
         if(scopes.isEmpty())
             return null;
 
@@ -83,7 +84,7 @@ public class Visitor {
         return nv;
     }
 
-    public List<Scope> getScopes() {
+    public Set<Scope> getScopes() {
         return scopes;
     }
 

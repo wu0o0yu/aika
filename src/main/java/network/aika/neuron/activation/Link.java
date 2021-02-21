@@ -199,12 +199,12 @@ public class Link extends Element {
             return Math.abs(gradient) < TOLERANCE;
     }
 
-    public boolean follow(Direction dir) {
+    public boolean followAllowed(Direction dir) {
         Activation nextAct = dir.getActivation(this);
         return !isNegative() &&
                 nextAct != null &&
-                !nextAct.isMarked() &&
-                isCausal();
+                !nextAct.isMarked();// &&
+//                isCausal();
     }
 
     public boolean isCausal() {

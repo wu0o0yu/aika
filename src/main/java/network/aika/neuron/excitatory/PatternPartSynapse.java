@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 
@@ -119,7 +120,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     }
 
     @Override
-    public Collection<Scope> transition(Scope s, Direction dir) {
+    public Set<Scope> transition(Scope s, Direction dir) {
         if(inputScope) {
             if(dir == INPUT) {
                 switch (s) {
@@ -134,7 +135,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
             } else {
                 switch (s) {
                     case PP_INPUT:
-                        return Arrays.asList(Scope.PP_SAME, Scope.PP_RELATED_INPUT);
+                        return Set.of(Scope.PP_SAME, Scope.PP_RELATED_INPUT);
                     case PP_RELATED_INPUT:
                         return Collections.singleton(Scope.PP_RELATED_SAME);
                     case I_INPUT:
@@ -146,7 +147,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         if(isSamePattern) {
             switch (s) {
                 case PP_SAME:
-                    return Collections.singleton(Scope.PP_RELATED_SAME);
+                    return Set.of(Scope.PP_RELATED_SAME, Scope.PP_SAME);
                 case PP_RELATED_SAME:
                     return Collections.singleton(Scope.PP_SAME);
                 case PP_RELATED_INPUT:
@@ -156,7 +157,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
             }
         }
 
-        return Collections.emptyList();
+        return Collections.emptySet();
     }
 
     @Override

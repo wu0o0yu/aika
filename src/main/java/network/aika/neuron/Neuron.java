@@ -281,7 +281,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public void count(Activation act) {
         addDummyLinks(act);
 
-        if(act.isActive()) {
+        if(act.isActive(false)) {
             sampleSpace.update(getModel(), act.getReference());
             frequency += 1.0;
             modified = true;

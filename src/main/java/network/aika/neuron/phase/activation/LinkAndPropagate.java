@@ -90,7 +90,7 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
         Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());
         Activation oAct = dir.getCycleOutput(fromAct, v.getOriginAct());
 
-        if(!iAct.isActive())
+        if(!iAct.isActive(false))
             return;
 
         Synapse s = Link.getSynapse(iAct, oAct);

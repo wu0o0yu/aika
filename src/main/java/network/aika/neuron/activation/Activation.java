@@ -275,12 +275,11 @@ public class Activation extends Element {
         inputValue = v;
     }
 
-    public boolean isActive() {
-        return value != null && value > 0.0;
-    }
+    public boolean isActive(boolean defaultValue) {
+        if(value == null)
+            return defaultValue;
 
-    public boolean isInitialized() {
-        return inputValue != null || value != null || inputLinks.size() > 0;
+        return value > 0.0;
     }
 
     public double getBranchProbability() {
@@ -349,8 +348,9 @@ public class Activation extends Element {
 
         setMarked(true);
         dir.getLinks(this)
-                .filter(l -> l.follow(dir))
-                .collect(Collectors.toList()).stream()
+                .filter(l ->
+                        l.followAllowed(dir)
+                ).collect(Collectors.toList()).stream()
                 .forEach(l ->
                         l.follow(v)
                 );

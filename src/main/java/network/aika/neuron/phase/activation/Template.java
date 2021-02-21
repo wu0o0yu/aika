@@ -96,7 +96,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
         if(oAct.getNeuron().isInputNeuron())
             return;
 
-        if(!iAct.isActive())
+        if(!iAct.isActive(true))
             return;
 
         if (Link.synapseExists(iAct, oAct))

@@ -33,7 +33,7 @@ public interface Sign {
     Sign invert();
 
     static Sign getSign(Activation act) {
-        return act.isActive() ? POS : NEG;
+        return act.isActive(false) ? POS : NEG;
     }
 
     double getValue(Double x);
