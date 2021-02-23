@@ -60,9 +60,7 @@ public class Visitor {
         this.transition = t;
         this.downUpDir = downUpDir;
         this.startDir = startDir;
-        this.scopes = Set.of(
-                act.getNeuron().getInitialScopes(startDir)
-        );
+        this.scopes = act.getNeuron().getInitialScopes(startDir);
     }
 
     public Visitor prepareNextStep(Activation currentAct, Link currentLink, Set<Scope> scopes, Transition t) {

@@ -23,6 +23,11 @@ import network.aika.neuron.activation.*;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.direction.Direction;
 
+import java.util.Set;
+
+import static network.aika.neuron.activation.Scope.I_SAME;
+import static network.aika.neuron.activation.Scope.PP_INPUT;
+
 /**
  *
  * @author Lukas Molzberger
@@ -51,11 +56,11 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     @Override
-    public Scope[] getInitialScopes(Direction dir) {
+    public Set<Scope> getInitialScopes(Direction dir) {
         if(dir == Direction.INPUT) {
-            return new Scope[]{ Scope.I_SAME };
+            return Set.of(I_SAME);
         } else {
-            return new Scope[]{ Scope.I_SAME, Scope.PP_INPUT };
+            return Set.of(I_SAME, PP_INPUT);
         }
     }
 

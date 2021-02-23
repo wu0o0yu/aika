@@ -32,6 +32,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.sign.Sign.NEG;
@@ -100,7 +101,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Synapse instantiateTemplate(I input, O output);
 
-    public abstract Collection<Scope> transition(Scope s, Direction dir);
+    public abstract Set<Scope> transition(Scope s, Direction dir, boolean checkFinalRequirement);
 
     protected abstract boolean checkCausality(Activation iAct, Activation oAct, Visitor v);
 
@@ -130,8 +131,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 l,
                 v.getScopes()
                         .stream()
-                        .flatMap(s -> transition(s, v.downUpDir).stream())
-                        .collect(Collectors.toSet()),
+                        .flatMap(s ->
+                                transition(s, v.downUpDir, l == null)
+                                        .stream()
+                        ).collect(Collectors.toSet()),
                 LINK
         );
 

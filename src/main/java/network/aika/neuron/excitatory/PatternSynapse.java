@@ -24,6 +24,7 @@ import network.aika.neuron.activation.Scope;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 /**
  *
@@ -78,7 +79,11 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
     }
 
     @Override
-    public Collection<Scope> transition(Scope s, Direction dir) {
+    public Set<Scope> transition(Scope s, Direction dir, boolean checkFinalRequirement) {
+        if(checkFinalRequirement && s != Scope.P_SAME) {
+            return Collections.emptySet();
+        }
+
         return Collections.singleton(s);
     }
 

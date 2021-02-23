@@ -26,6 +26,7 @@ import network.aika.neuron.activation.Scope;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 
@@ -57,7 +58,7 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
     }
 
     @Override
-    public Collection<Scope> transition(Scope s, Direction dir) {
+    public Set<Scope> transition(Scope s, Direction dir, boolean checkFinalRequirement) {
         if (dir == INPUT) {
             switch (s) {
                 case I_SAME:
@@ -69,6 +70,6 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
                     return Collections.singleton(Scope.I_SAME);
             }
         }
-        return Collections.emptyList();
+        return Collections.emptySet();
     }
 }

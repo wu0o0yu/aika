@@ -42,21 +42,6 @@ public class QueueEntry<P extends Phase, E extends Element> implements Comparabl
         return phase;
     }
 
-    /*
-    public void updateQueueEntry(Supplier<QueueEntry<P>> newEntrySupplier) {
-        removeFromQueue();
-        QueueEntry<P> newEntry = newEntrySupplier.get();
-        addToQueue(newEntry);
-    }
-
-    private void addToQueue(QueueEntry<P, E> newEntry) {
-        newEntry.getThought().addToQueue(newEntry);
-    }
-
-    private void removeFromQueue() {
-        getThought().removeActivationFromQueue(this);
-    }
-*/
     public String toString() {
         return Phase.toString(getPhase()) + " : " + element.toString();
     }

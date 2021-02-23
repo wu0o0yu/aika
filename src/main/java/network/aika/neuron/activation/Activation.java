@@ -250,13 +250,6 @@ public class Activation extends Element {
         return clonedAct;
     }
 
-    /*
-        public Activation cloneToReplaceLink(Synapse excludedSyn) {
-            Activation clonedAct = new Activation(id, thought, neuron);
-            linkClone(clonedAct, excludedSyn);
-            return clonedAct;
-        }
-    */
     private void linkClone(Activation clonedAct, Synapse excludedSyn) {
         inputLinks
                 .values()

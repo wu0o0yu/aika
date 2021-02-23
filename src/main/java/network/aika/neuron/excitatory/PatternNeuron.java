@@ -27,7 +27,9 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Set;
 
+import static network.aika.neuron.activation.Scope.*;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -57,10 +59,10 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     @Override
-    public Scope[] getInitialScopes(Direction dir) {
+    public Set<Scope> getInitialScopes(Direction dir) {
         return dir == Direction.INPUT ?
-                new Scope[]{ Scope.P_SAME } :
-                new Scope[]{ Scope.PP_SAME, Scope.PP_INPUT, Scope.I_INPUT };
+                Set.of(P_SAME) :
+                Set.of(PP_SAME, PP_INPUT, I_INPUT);
     }
 
     @Override

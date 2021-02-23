@@ -23,6 +23,10 @@ import network.aika.neuron.activation.direction.Direction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Set;
+
+import static network.aika.neuron.activation.Scope.*;
+
 /**
  * @author Lukas Molzberger
  */
@@ -44,10 +48,10 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     @Override
-    public Scope[] getInitialScopes(Direction dir) {
+    public Set<Scope> getInitialScopes(Direction dir) {
         return dir == Direction.INPUT ?
-                new Scope[]{ Scope.PP_SAME } :
-                new Scope[]{ Scope.PP_SAME, Scope.PP_INPUT };
+                Set.of(PP_SAME) :
+                Set.of(PP_SAME, PP_INPUT, I_SAME, P_SAME);
     }
 
     @Override
