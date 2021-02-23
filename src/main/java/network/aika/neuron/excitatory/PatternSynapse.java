@@ -26,6 +26,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import static network.aika.neuron.activation.Scope.P_SAME;
+
 /**
  *
  * @author Lukas Molzberger
@@ -80,7 +82,7 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
 
     @Override
     public Set<Scope> transition(Scope s, Direction dir, boolean checkFinalRequirement) {
-        if(checkFinalRequirement && s != Scope.P_SAME) {
+        if(checkFinalRequirement && s != P_SAME) {
             return Collections.emptySet();
         }
 

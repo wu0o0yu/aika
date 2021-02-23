@@ -28,6 +28,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import static network.aika.neuron.activation.Scope.I_INPUT;
+import static network.aika.neuron.activation.Scope.I_SAME;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
@@ -62,12 +64,12 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
         if (dir == INPUT) {
             switch (s) {
                 case I_SAME:
-                    return Collections.singleton(Scope.I_INPUT);
+                    return Collections.singleton(I_INPUT);
             }
         } else {
             switch (s) {
                 case I_INPUT:
-                    return Collections.singleton(Scope.I_SAME);
+                    return Collections.singleton(I_SAME);
             }
         }
         return Collections.emptySet();

@@ -85,7 +85,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         if (v.startDir == INPUT) {
             return !act.getNeuron().isInputNeuron() && this == act.getModel().getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE;
         } else {
-            return true;
+            return act.getNeuron() instanceof PatternNeuron || !isInputScope();
         }
     }
 
