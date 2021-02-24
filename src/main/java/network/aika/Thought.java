@@ -40,7 +40,9 @@ public abstract class Thought {
 
     private int activationIdCounter = 0;
 
-    protected final TreeSet<QueueEntry> queue = new TreeSet<>();
+    private final TreeSet<QueueEntry> queue = new TreeSet<>();
+
+    private Set<Phase> filters = new TreeSet<>(Comparator.comparing(p -> p.getRank()));
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
@@ -56,6 +58,9 @@ public abstract class Thought {
 
     public abstract void linkInputRelations(Activation act);
 
+    public void addFilters(Phase... p) {
+        filters.addAll(Set.of(p));
+    }
 
     public void onActivationCreationEvent(Activation act, Activation originAct) {
         getEventListeners()
@@ -158,6 +163,9 @@ public abstract class Thought {
     }
 
     public void addQueueEntry(QueueEntry qe) {
+        if(filters.contains(qe.getPhase()))
+            return;
+
         queue.add(qe);
     }
 
@@ -177,6 +185,7 @@ public abstract class Thought {
     public void process(Model m) {
         while (!queue.isEmpty()) {
             QueueEntry qe = queue.pollFirst();
+
             qe.getElement().removeQueuedPhase(qe);
             qe.process();
         }
