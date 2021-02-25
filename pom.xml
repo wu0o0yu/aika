@@ -90,7 +90,7 @@
                     </includes>
                 </configuration>
             </plugin>
-
+<!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -109,7 +109,7 @@
                     </additionalOptions>
                 </configuration>
             </plugin>
-
+-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -148,7 +148,7 @@
         <resources>
             <resource>
                 <filtering>false</filtering>
-                <directory>../src/main/resources</directory>
+                <directory>src/main/resources</directory>
                 <includes>
                     <include>**/*</include>
                 </includes>
@@ -158,7 +158,7 @@
         <testResources>
             <testResource>
                 <filtering>false</filtering>
-                <directory>../src/test/resources</directory>
+                <directory>src/test/resources</directory>
                 <includes>
                     <include>**/*</include>
                 </includes>
