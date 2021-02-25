@@ -14,28 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.phase.activation;
 
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
 /**
+ * Propagates the gradient of this activation backwards to all its input-links.
  *
  * @author Lukas Molzberger
  */
-public class SelfGradient extends RankedImpl implements LinkPhase {
+public class PropagateGradientsNet extends RankedImpl implements ActivationPhase {
 
-    public SelfGradient(int rank) {
-        super(rank);
+    public PropagateGradientsNet() {
+        super(PROPAGATE_GRADIENTS_SUM);
     }
 
     @Override
-    public void process(Link l) {
-        l.computeSelfGradient();
+    public void process(Activation act) {
+        act.propagateGradientsFromNetUpdate();
+    }
+
+    public String toString() {
+        return "Act: Propagate Gradients from Net Update";
     }
 
     @Override
-    public int compare(Link l1, Link l2) {
-        return 0;
+    public int compare(Activation act1, Activation act2) {
+        return act2.getFired().compareTo(act1.getFired());
     }
 }

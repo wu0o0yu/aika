@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static network.aika.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 
 /**
  *
@@ -78,10 +78,6 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
                 .forEach(s ->
                         new Link(s, null, act, false)
                 );
-    }
-
-    public Stream<? extends Synapse> getInputSynapses() {
-        return inputSynapses.values().stream();
     }
 
     public ActivationFunction getActivationFunction() {

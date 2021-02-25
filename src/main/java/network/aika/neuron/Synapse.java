@@ -17,10 +17,13 @@
 package network.aika.neuron;
 
 import network.aika.*;
-import network.aika.Writable;
+import network.aika.utils.Utils;
+import network.aika.utils.Writable;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.Scope;
+import network.aika.neuron.phase.link.PropagateGradient;
+import network.aika.neuron.sign.Sign;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +32,14 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.Sign.NEG;
-import static network.aika.neuron.Sign.POS;
+import static network.aika.neuron.sign.Sign.NEG;
+import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.activation.Link.linkExists;
 import static network.aika.neuron.activation.Visitor.Transition.LINK;
+import static network.aika.neuron.phase.link.LinkPhase.INFORMATION_GAIN_GRADIENT;
 
 /**
  *
@@ -60,6 +65,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     protected double frequencyINegOPos;
     private volatile boolean modified;
 
+    protected boolean allowTraining = true;
+
 
     public Synapse() {
     }
@@ -70,6 +77,14 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         this.template = template;
 
         assert input.getId() < 0 || input.getId() != output.getId();
+    }
+
+    public boolean isAllowTraining() {
+        return allowTraining;
+    }
+
+    public void setAllowTraining(boolean allowTraining) {
+        this.allowTraining = allowTraining;
     }
 
     public static boolean synapseExists(Neuron iN, Neuron oN) {
@@ -86,24 +101,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Synapse instantiateTemplate(I input, O output);
 
-    public Visitor transition(Visitor v, Link l) {
-        Visitor nv = v.prepareNextStep(
-                null,
-                l,
-                v.getScopes()
-                        .stream()
-                        .flatMap(s -> transition(s, v.downUpDir).stream())
-                        .collect(Collectors.toList()),
-                LINK
-        );
-
-        if(nv != null)
-            nv.incrementPathLength();
-
-        return nv;
-    }
-
-    public abstract Collection<Scope> transition(Scope s, Direction dir);
+    public abstract Set<Scope> transition(Scope s, Direction dir, boolean checkFinalRequirement);
 
     protected abstract boolean checkCausality(Activation iAct, Activation oAct, Visitor v);
 
@@ -121,11 +119,38 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return getInput().containsOutputSynapse(this);
     }
 
+    public boolean isRecurrent() {
+        return false;
+    }
+
     public abstract Activation branchIfNecessary(Activation oAct, Visitor v);
 
+    public Visitor transition(Visitor v, Link l) {
+        Visitor nv = v.prepareNextStep(
+                null,
+                l,
+                v.getScopes()
+                        .stream()
+                        .flatMap(s ->
+                                transition(s, v.downUpDir, l == null)
+                                        .stream()
+                        ).collect(Collectors.toSet()),
+                LINK
+        );
+
+        if(nv != null)
+            nv.incrementPathLength();
+
+        return nv;
+    }
+
     public void follow(Activation toAct, Visitor v) {
+        v.onEvent(false);
+
         toAct.getNeuron()
                 .transition(v, toAct);
+
+        v.onEvent(true);
     }
 
     public void propagate(Activation fromAct, Visitor v) {
@@ -133,34 +158,25 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if(nv == null)
             return;
 
+        Thought t = fromAct.getThought();
         Direction dir = nv.startDir;
-/*
-        if(!checkCausality(
-                dir.getPropagateInput(fromAct, null),
-                dir.getPropagateOutput(fromAct, null),
-                v)
-        ) return;
-*/
-        Activation toAct = createActivation(nv, fromAct);
+
+        Activation toAct = t
+                .createActivation(
+                        nv.startDir.getNeuron(this),
+                        fromAct
+                );
+
+        t.addToQueue(
+                toAct,
+                nv.getPhase().getNextActivationPhases()
+        );
 
         createLink(
                 dir.getPropagateInput(fromAct, toAct),
                 dir.getPropagateOutput(fromAct, toAct),
                 nv
         );
-    }
-
-    public Activation createActivation(Visitor v, Activation fromAct) {
-        Activation toAct = Activation.createActivation(
-                fromAct.getThought(),
-                v.startDir.getNeuron(this)
-        );
-
-        fromAct.getThought().onActivationCreationEvent(toAct, fromAct);
-
-        toAct.addNextActivationPhases(v.getPhase());
-
-        return toAct;
     }
 
     public void closeCycle(Visitor v, Activation iAct, Activation oAct) {
@@ -181,22 +197,25 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void createLink(Activation iAct, Activation oAct, Visitor v) {
-        Link nl = Link.link(
+        Link nl = oAct.addLink(
                 this,
                 iAct,
-                oAct,
                 v.getSelfRef()
         );
 
-        nl.getThought().onLinkProcessedEvent(nl);
+        nl.getThought().onLinkProcessedEvent(null, nl);
 
         v.link = nl;
 
-        if (
-                nl.getSynapse().getWeight() > 0.0 ||
-                nl.getSynapse().isTemplate()
-        ) {
+        Synapse s = nl.getSynapse();
+        if (s.getWeight() > 0.0 || s.isTemplate()) {
             nl.addNextLinkPhases(v.getPhase());
+
+            oAct.getThought().addToQueue(
+                    nl,
+                    INFORMATION_GAIN_GRADIENT,
+                    !oAct.gradientSumIsZero() ? new PropagateGradient(oAct.getOutputGradientSum()) : null
+            );
         }
     }
 
@@ -258,8 +277,29 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return (O) output.getNeuron();
     }
 
-    public SampleSpace getInstances() {
+    public SampleSpace getSampleSpace() {
         return sampleSpace;
+    }
+
+    public double updateSynapse(Link l) {
+        double gradient = l.getAndResetGradient();
+
+        Neuron on = getOutput();
+        double oldWeight = weight;
+
+        double learnRate = on.getConfig().getLearnRate();
+
+        if(l.getInput().isActive(true)) {
+            double wDelta = learnRate * gradient;
+            addWeight(wDelta);
+        } else {
+            double wDelta = learnRate * gradient;
+
+            addWeight(-wDelta);
+            on.addConjunctiveBias(wDelta, !l.isCausal());
+        }
+
+        return weight - oldWeight;
     }
 
     public double getFrequency(Sign is, Sign os, double n) {
@@ -290,13 +330,13 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public void count(Link l) {
         sampleSpace.update(getModel(), l.getInput().getReference());
 
-        if(l.getInput().isActive() && l.getOutput().isActive()) {
+        if(l.getInput().isActive(false) && l.getOutput().isActive(false)) {
             frequencyIPosOPos += 1.0;
             modified = true;
-        } else if(l.getInput().isActive() && !l.getOutput().isActive()) {
+        } else if(l.getInput().isActive(false) && !l.getOutput().isActive(false)) {
             frequencyIPosONeg += 1.0;
             modified = true;
-        } else if(!l.getInput().isActive() && l.getOutput().isActive()) {
+        } else if(!l.getInput().isActive(false) && l.getOutput().isActive(false)) {
             frequencyINegOPos += 1.0;
             modified = true;
         }
@@ -307,10 +347,11 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public double getSurprisal(Sign si, Sign so) {
-        if(isTemplate())
+        double N = sampleSpace.getN();
+        if(isTemplate() || N == 0.0)
             return 0.0;
 
-        double p = getP(si, so, sampleSpace.getN());
+        double p = getP(si, so, N);
         return -Math.log(p);
     }
 

@@ -16,56 +16,32 @@
  */
 package network.aika.neuron.phase.activation;
 
-import network.aika.Config;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Phase;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+import static network.aika.neuron.phase.link.LinkPhase.*;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public interface ActivationPhase extends Phase<Activation> {
-    ActivationPhase INDUCTION = new Induction(0);
-    Linking INITIAL_LINKING = new Linking(3);
-    ActivationPhase PREPARE_FINAL_LINKING = new PrepareFinalLinking(4);
-    ActivationPhase FINAL_LINKING = new FinalLinking(5);
-    ActivationPhase SOFTMAX = new Softmax(6);
-    ActivationPhase COUNTING = new Counting(7);
-    ActivationPhase SELF_GRADIENT = new SelfGradient(10);
-    ActivationPhase PROPAGATE_GRADIENT = new PropagateGradients(13);
-    ActivationPhase UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks(15);
-    Template TEMPLATE_INPUT = new Template(17, INPUT);
-    Template TEMPLATE_OUTPUT = new Template(18, OUTPUT);
+    ActivationPhase INDUCTION = new Induction();
+    LinkAndPropagate LINK_AND_PROPAGATE = new LinkAndPropagate();
+    ActivationPhase USE_FINAL_BIAS = new UseFinalBias();
+    ActivationPhase PROPAGATE_CHANGE = new PropagateChange();
+    ActivationPhase DETERMINE_BRANCH_PROBABILITY = new DetermineBranchProbability();
+    ActivationPhase ENTROPY_GRADIENT = new EntropyGradient();
+    ActivationPhase PROPAGATE_GRADIENTS_SUM = new PropagateGradientsSum();
+    ActivationPhase PROPAGATE_GRADIENTS_NET = new PropagateGradientsNet();
+    ActivationPhase UPDATE_BIAS = new UpdateBias();
+    ActivationPhase UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks();
+    Template TEMPLATE_INPUT = new Template(TEMPLATE, INPUT);
+    Template TEMPLATE_OUTPUT = new Template(TEMPLATE_INPUT, OUTPUT);
+    ActivationPhase COUNTING = new Counting();
 
     void process(Activation act);
 
-    boolean isFinal();
-
-    static boolean isFinal(ActivationPhase ap) {
-        return ap != null && ap.isFinal();
-    }
-
-    static ActivationPhase[] getInitialPhases(Config c) {
-        return c.isEnableTraining() ?
-                new ActivationPhase[]{
-                        INITIAL_LINKING,
-                        PREPARE_FINAL_LINKING,
-                        SOFTMAX,
-                        COUNTING,
-                        SELF_GRADIENT,
-                        PROPAGATE_GRADIENT,
-                        UPDATE_SYNAPSE_INPUT_LINKS,
-                        TEMPLATE_INPUT,
-                        TEMPLATE_OUTPUT
-                } :
-                new ActivationPhase[] {
-                        INITIAL_LINKING,
-                        PREPARE_FINAL_LINKING,
-                        SOFTMAX,
-                        COUNTING
-                };
-    }
 }

@@ -19,6 +19,10 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.sign.Sign;
+import network.aika.utils.ReadWriteLock;
+import network.aika.utils.Utils;
+import network.aika.utils.Writable;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +31,8 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.Sign.NEG;
-import static network.aika.neuron.Sign.POS;
+import static network.aika.neuron.sign.Sign.NEG;
+import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 
 /**
@@ -64,6 +68,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     protected boolean isInputNeuron; // Input Neurons won't be trained!
 
+    protected boolean allowTraining = true;
+
     private Set<Neuron<?>> templates = new TreeSet<>(Comparator.comparing(n -> n.getId()));
 
     protected Neuron() {
@@ -78,14 +84,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         modified = true;
     }
 
-    public boolean isTemplate() {
-        return getId() < 0;
-    }
-
-    public Set<Neuron<?>> getTemplates() {
-        return templates;
-    }
-
     public abstract Neuron<?> instantiateTemplate();
 
     public abstract void addDummyLinks(Activation act);
@@ -93,6 +91,28 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public abstract ActivationFunction getActivationFunction();
 
     public abstract Fired incrementFired(Fired f);
+
+    public abstract byte getType();
+
+    public abstract boolean checkGradientThreshold(Activation act);
+
+    public abstract Set<Scope> getInitialScopes(Direction dir);
+
+    public boolean isAllowTraining() {
+        return allowTraining;
+    }
+
+    public void setAllowTraining(boolean allowTraining) {
+        this.allowTraining = allowTraining;
+    }
+
+    public boolean isTemplate() {
+        return getId() < 0;
+    }
+
+    public Set<Neuron<?>> getTemplates() {
+        return templates;
+    }
 
     public void transition(Visitor v, Activation act) {
         Visitor nv = v.prepareNextStep(act, null, v.getScopes(), ACT);
@@ -102,12 +122,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
         act.followLinks(nv);
     }
-
-    public abstract byte getType();
-
-    public abstract boolean checkGradientThreshold(Activation act);
-
-    public abstract Scope[] getInitialScopes(Direction dir);
 
     public Synapse getOutputSynapse(NeuronProvider n) {
         lock.acquireReadLock();
@@ -128,8 +142,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         this.provider = p;
     }
 
-    public Stream<? extends Synapse> getInputSynapses() {
-        throw new UnsupportedOperationException();
+    public Stream<S> getInputSynapses() {
+        return inputSynapses.values().stream();
     }
 
     public Stream<Synapse> getOutputSynapses() {
@@ -246,6 +260,20 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return bias;
     }
 
+    public double updateBias(Activation act) {
+        double learnRate = getConfig().getLearnRate();
+
+        double biasDelta = learnRate * act.getInputGradient();
+        addBias(biasDelta);
+
+        double finalBias = getBias(true);
+        if(finalBias > 0.0) {
+            addBias(-finalBias);
+        }
+
+        return biasDelta;
+    }
+
     public ReadWriteLock getLock() {
         return lock;
     }
@@ -253,7 +281,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public void count(Activation act) {
         addDummyLinks(act);
 
-        if(act.isActive()) {
+        if(act.isActive(false)) {
             sampleSpace.update(getModel(), act.getReference());
             frequency += 1.0;
             modified = true;
@@ -269,10 +297,11 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public double getSurprisal(Sign s) {
-        if(isTemplate())
+        double N = sampleSpace.getN();
+        if(isTemplate() || N == 0.0)
             return 0.0;
 
-        double p = getP(s, sampleSpace.getN());
+        double p = getP(s, N);
         return -Math.log(p);
     }
 

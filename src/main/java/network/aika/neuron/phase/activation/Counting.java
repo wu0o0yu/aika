@@ -17,28 +17,31 @@
 package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
 /**
+ * Counts the number of activations a particular neuron has encountered.
  *
  * @author Lukas Molzberger
  */
 public class Counting extends RankedImpl implements ActivationPhase {
 
-    public Counting(int rank) {
-        super(rank);
+    @Override
+    public Ranked getPreviousRank() {
+        return TEMPLATE_OUTPUT;
     }
 
     @Override
     public void process(Activation act) {
-        if(act.isActive()) {
-            act.getNeuron().count(act);
-        }
+        act.getNeuron().count(act);
+
+        // Should probably have no effect on the current example.
+//        act.getThought().addToQueue(act, ENTROPY_GRADIENT);
     }
 
-    @Override
-    public boolean isFinal() {
-        return false;
+    public String toString() {
+        return "Act: Counting";
     }
 
     @Override

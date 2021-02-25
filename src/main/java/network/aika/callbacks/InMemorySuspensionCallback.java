@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.callbacks;
 
+import network.aika.utils.Writable;
 import network.aika.neuron.NeuronProvider;
 
 import java.util.HashMap;
@@ -28,7 +29,7 @@ import java.util.stream.Stream;
  *
  * @author Lukas Molzberger
  */
-public class InMemorySuspensionHook implements SuspensionHook {
+public class InMemorySuspensionCallback implements SuspensionCallback {
 
     private AtomicInteger currentId = new AtomicInteger(0);
 
@@ -41,8 +42,14 @@ public class InMemorySuspensionHook implements SuspensionHook {
     }
 
     @Override
-    public void store(Long id, byte[] data) {
+    public void store(Long id, String label, Writable customData, byte[] data) {
         storage.put(id, data);
+    }
+
+    @Override
+    public void delete(Long id, String label) {
+        storage.remove(id);
+        removeLabel(label);
     }
 
     @Override
@@ -51,7 +58,12 @@ public class InMemorySuspensionHook implements SuspensionHook {
     }
 
     @Override
-    public byte[] retrieve(long id) {
+    public void removeLabel(String label) {
+        labels.remove(label);
+    }
+
+    @Override
+    public byte[] retrieve(Long id) {
         return storage.get(id);
     }
 

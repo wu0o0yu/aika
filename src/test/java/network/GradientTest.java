@@ -8,6 +8,7 @@ import network.aika.neuron.activation.Reference;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
 import network.aika.neuron.excitatory.PatternPartSynapse;
+import network.aika.neuron.phase.Ranked;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
@@ -22,6 +23,8 @@ public class GradientTest {
 
     @Test
     public void gradientAndInduction() throws InterruptedException {
+        System.out.println(Ranked.dumpPhaseRanks());
+
         TextModel m = new TextModel();
         m.setConfig(
                 new Config() {

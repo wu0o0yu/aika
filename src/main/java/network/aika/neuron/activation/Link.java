@@ -17,28 +17,27 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.Utils;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.Sign;
+import network.aika.utils.Utils;
+import network.aika.neuron.sign.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.VisitorPhase;
-import network.aika.neuron.phase.activation.ActivationPhase;
-import network.aika.neuron.phase.link.LinkPhase;
+import network.aika.neuron.phase.link.SumUpLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
-import static network.aika.neuron.activation.Visitor.Transition.LINK;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+import static network.aika.neuron.sign.Sign.POS;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Link extends QueueEntry<LinkPhase> {
+public class Link extends Element {
 
     private static final Logger log = LoggerFactory.getLogger(Link.class);
 
@@ -49,6 +48,7 @@ public class Link extends QueueEntry<LinkPhase> {
 
     private boolean isSelfRef;
 
+    private double lastIGGradient;
     private double gradient;
 
     public Link(Synapse s, Activation input, Activation output, boolean isSelfRef) {
@@ -58,10 +58,41 @@ public class Link extends QueueEntry<LinkPhase> {
         this.isSelfRef = isSelfRef;
     }
 
+    public Link(Link oldLink, Synapse s, Activation input, Activation output, boolean isSelfRef) {
+        this(s, input, output, isSelfRef);
+
+        Thought t = getThought();
+
+        t.onLinkCreationEvent(this);
+
+        linkInput();
+        linkOutput();
+
+        getSynapse().updateReference(this);
+
+        double w = getSynapse().getWeight();
+
+        if (w <= 0.0 && isSelfRef())
+            return;
+
+        t.addToQueue(
+                this,
+                new SumUpLink(w * (getInputValue(POS) - getInputValue(POS, oldLink)))
+        );
+    }
+
+    public double getGradient() {
+        return gradient;
+    }
 
     @Override
-    public void onProcessEvent() {
-        getThought().onLinkProcessedEvent(this);
+    public void onProcessEvent(Phase p) {
+        getThought().onLinkProcessedEvent(p, this);
+    }
+
+    @Override
+    public void afterProcessEvent(Phase p) {
+        getThought().afterLinkProcessedEvent(p, this);
     }
 
     public static boolean synapseExists(Activation iAct, Activation oAct) {
@@ -96,12 +127,14 @@ public class Link extends QueueEntry<LinkPhase> {
     }
 
     public void follow(VisitorPhase p) {
+        follow(p, synapse.isRecurrent() ? OUTPUT : INPUT);
+    }
+
+    public void follow(VisitorPhase p, Direction dir) {
         output.setMarked(true);
 
-        Visitor nv = synapse.transition(
-                new Visitor(p, output, INPUT, ACT),
-                this
-        );
+        Visitor v = new Visitor(p, output, dir, INPUT, ACT);
+        Visitor nv = synapse.transition(v, this);
         synapse.follow(input, nv);
 
         output.setMarked(false);
@@ -117,44 +150,28 @@ public class Link extends QueueEntry<LinkPhase> {
         }
     }
 
-    public void computeSelfGradient() {
-        if(isNegative()) return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
+    public void computeInformationGainGradient() {
+        if(isNegative())
+            return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
 
-        double s = 0.0;
+        double igGradient = 0.0;
+        for(Sign si: Sign.SIGNS) {
+            for (Sign so : Sign.SIGNS) {
+                double s = getSynapse().getSurprisal(si, so);
+                s -= input.getNeuron().getSurprisal(si);
+                s -= output.getNeuron().getSurprisal(so);
 
-        s -= input.getNeuron().getSurprisal(
-                Sign.getSign(input)
-        );
-
-        s -= output.getNeuron().getSurprisal(
-                Sign.getSign(output)
-        );
-
-        s += getSynapse().getSurprisal(
-                Sign.getSign(input),
-                Sign.getSign(output)
-        );
-
-        double f = s * getInputValue() * output.getNorm();
-
-        double offsetGradient =  f * getActFunctionDerivative();
-        double outputGradient = (f * output.getActFunctionDerivative()) - offsetGradient;
-
-        gradient += offsetGradient;
-        getOutput().propagateGradient(outputGradient);
-    }
-
-    private double getActFunctionDerivative() {
-        if(output.getNet() == 0.0) {
-            return 0.0;
+                igGradient += s * getInputValue(si) * getOutputValue(so) * output.getNorm();
+            }
         }
 
-        return output.getNeuron()
-                .getActivationFunction()
-                .outerGrad(
-                        output.getNet() - (input.getValue() * synapse.getWeight())
-                );
+        double igGradientDelta = igGradient - lastIGGradient;
+        if(Math.abs(igGradientDelta) >= TOLERANCE) {
+            getOutput().propagateGradient(igGradientDelta);
+            lastIGGradient = igGradient;
+        }
     }
+
 /*
     public void removeGradientDependencies() {
         output.getInputLinks()
@@ -169,69 +186,41 @@ public class Link extends QueueEntry<LinkPhase> {
     public void propagateGradient(double g) {
         gradient += g;
 
-        if(input == null) {
+        if(input == null)
             return;
-        }
 
         input.propagateGradient(
                 synapse.getWeight() *
-                        g *
-                        input.getActFunctionDerivative()
+                        g
         );
     }
 
     public boolean gradientIsZero() {
-        return Math.abs(gradient) < TOLERANCE;
+            return Math.abs(gradient) < TOLERANCE;
     }
 
-    public void updateSynapse() {
-        if(gradientIsZero())
-            return;
-
-        Neuron on = output.getNeuron();
-
-        boolean causal = isCausal();
-        double x = getInputValue();
-        double learnRate = on.getConfig().getLearnRate();
-
-        double posWDelta = learnRate * x * gradient;
-        double negWDelta = learnRate * (1.0 - x) * gradient;
-        double biasDelta = learnRate * gradient;
-
-        gradient = 0.0;
-
-        synapse.addWeight(posWDelta - negWDelta);
-        on.addConjunctiveBias(negWDelta, !causal);
-        on.addBias(biasDelta);
-
-        double finalBias = on.getBias(true);
-        if(finalBias > 0.0) {
-            on.addConjunctiveBias(-finalBias, false);
-        }
-    }
-
-    public boolean follow(Direction dir) {
+    public boolean followAllowed(Direction dir) {
         Activation nextAct = dir.getActivation(this);
         return !isNegative() &&
                 nextAct != null &&
-                !nextAct.isMarked() &&
-                isCausal();
+                !nextAct.isMarked();// &&
+//                isCausal();
     }
 
     public boolean isCausal() {
         return input == null || input.getFired().compareTo(output.getFired()) <= 0;
     }
 
-    public double getInputValue() {
-        return input != null ? input.getValue() : 0.0;
+    public static double getInputValue(Sign s, Link l) {
+        return l != null ? l.getInputValue(s) : 0.0;
     }
 
-    public static Link link(Synapse s, Activation input, Activation output, boolean isSelfRef) {
-        if (!ActivationPhase.isFinal(output.getPhase()) && output.isFinal()) {
-            output = output.getModifiable(s);
-        }
+    public double getInputValue(Sign s) {
+        return s.getValue(input != null ? input.getValue() : Double.valueOf(0.0));
+    }
 
-        return output.addLink(s, input, isSelfRef);
+    public double getOutputValue(Sign s) {
+        return s.getValue(output != null ? output.getValue() : Double.valueOf(0.0));
     }
 
     public Synapse getSynapse() {
@@ -252,6 +241,12 @@ public class Link extends QueueEntry<LinkPhase> {
 
     public boolean isSelfRef() {
         return isSelfRef;
+    }
+
+    public double getAndResetGradient() {
+        double oldGradient = gradient;
+        gradient = 0.0;
+        return oldGradient;
     }
 
     public void linkInput() {
@@ -287,14 +282,14 @@ public class Link extends QueueEntry<LinkPhase> {
     }
 
     public void addNextLinkPhases(VisitorPhase p) {
-        addToQueue(
-                p.getNextLinkPhases(output.getConfig())
+        getThought().addToQueue(
+                this,
+                p.getNextLinkPhases()
         );
     }
 
-    @Override
-    public boolean isActive() {
-        return true;
+    public void sumUpLink(double delta) {
+        getOutput().addToSum(delta);
     }
 
     public boolean isNegative() {
@@ -307,33 +302,36 @@ public class Link extends QueueEntry<LinkPhase> {
     }
 
     @Override
-    protected int innerCompareTo(QueueEntry<LinkPhase> qe) {
-        Link l = ((Link) qe);
-        int r = output.innerCompareTo(l.output);
+    public int compareTo(Element ge) {
+        Link l = ((Link) ge);
+        int r = output.compareTo(l.output);
         if(r != 0) return r;
 
-        return input.innerCompareTo(l.input);
+        return input.compareTo(l.input);
     }
 
     public String toString() {
         return synapse.getClass().getSimpleName() +
                 ": " + getIdString() +
-                " --> " + output.getShortString() +
-                Phase.toString(getPhase());
+                " --> " + output.toShortString();
     }
 
     public String toDetailedString() {
-        return "in:[" + input.getShortString() +
-                " v:" + Utils.round(input.getValue()) + "] - s:[" + synapse.toString() + "] - out:[" + input.getShortString() + " v:" + Utils.round(input.getValue()) + "]";
+        return "in:[" + input.toShortString() +
+                " v:" + Utils.round(input.getValue()) + "] - s:[" + synapse.toString() + "] - out:[" + input.toShortString() + " v:" + Utils.round(input.getValue()) + "]";
     }
 
     public String getIdString() {
-        return (input != null ? input.getShortString() : "X:" + synapse.getInput());
+        return (input != null ? input.toShortString() : "X:" + synapse.getInput());
     }
 
     public String gradientsToString() {
         return "   " + getIdString() +
-                " x:" + Utils.round(getInputValue()) +
+                " x:" + Utils.round(getInputValue(POS)) +
                 " w:" + Utils.round(getSynapse().getWeight());
+    }
+
+    public String toShortString() {
+        return toString();
     }
 }

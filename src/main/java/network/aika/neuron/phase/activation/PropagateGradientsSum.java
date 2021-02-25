@@ -14,44 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.phase.activation;
 
-import network.aika.utils.Utils;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
+import network.aika.neuron.phase.link.LinkPhase;
+import network.aika.neuron.phase.link.PropagateGradient;
+
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.phase.link.LinkPhase.PROPAGATE_GRADIENT_RANK;
 
 /**
- * Propagate the gradient backwards through the network.
+ * Propagates the gradient of this activation backwards to all its input-links.
  *
  * @author Lukas Molzberger
  */
-public class PropagateGradient extends RankedImpl implements LinkPhase {
+public class PropagateGradientsSum extends RankedImpl implements ActivationPhase {
 
-    private double gradient;
-
-    public PropagateGradient(double gradient) {
-        super(INFORMATION_GAIN_GRADIENT);
-        this.gradient = gradient;
+    public PropagateGradientsSum() {
+        super(PROPAGATE_GRADIENT_RANK);
     }
 
     @Override
-    public void process(Link l) {
-        l.propagateGradient(gradient);
-
-        if(l.getSynapse().isAllowTraining()) {
-            l.getThought().addToQueue(
-                    l,
-                    UPDATE_WEIGHT
-            );
-        }
+    public void process(Activation act) {
+        act.propagateGradientsFromSumUpdate();
     }
 
     public String toString() {
-        return "Link: Propagate Gradient (" + Utils.round(gradient) + ")";
+        return "Act: Propagate Gradients from Sum Update";
     }
 
     @Override
-    public int compare(Link l1, Link l2) {
-        return 0;
+    public int compare(Activation act1, Activation act2) {
+        return act2.getFired().compareTo(act1.getFired());
     }
 }

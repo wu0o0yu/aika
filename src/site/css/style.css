@@ -38,7 +38,8 @@ img {
 
 @media (min-width:500px) {
 	#header > div, #footer > div {
-		width: 980px;
+		width: 1030px;
+		min-height: 80px;
 		margin: 0 auto;
 		padding: 0 20px;
 	}

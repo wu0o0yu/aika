@@ -14,44 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
-
-import network.aika.utils.Utils;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.RankedImpl;
+package network.aika.neuron.sign;
 
 /**
- * Propagate the gradient backwards through the network.
  *
  * @author Lukas Molzberger
  */
-public class PropagateGradient extends RankedImpl implements LinkPhase {
-
-    private double gradient;
-
-    public PropagateGradient(double gradient) {
-        super(INFORMATION_GAIN_GRADIENT);
-        this.gradient = gradient;
+public class Positive implements Sign {
+    @Override
+    public Sign invert() {
+        return NEG;
     }
 
     @Override
-    public void process(Link l) {
-        l.propagateGradient(gradient);
-
-        if(l.getSynapse().isAllowTraining()) {
-            l.getThought().addToQueue(
-                    l,
-                    UPDATE_WEIGHT
-            );
-        }
+    public double getValue(Double x) {
+        return x != null ? x : 0.0;
     }
 
     public String toString() {
-        return "Link: Propagate Gradient (" + Utils.round(gradient) + ")";
-    }
-
-    @Override
-    public int compare(Link l1, Link l2) {
-        return 0;
+        return "POS";
     }
 }

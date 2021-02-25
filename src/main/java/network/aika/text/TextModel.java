@@ -19,7 +19,7 @@ package network.aika.text;
 import network.aika.Model;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
-import network.aika.SuspensionHook;
+import network.aika.callbacks.SuspensionCallback;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
@@ -31,8 +31,7 @@ import network.aika.neuron.inhibitory.InhibitorySynapse;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
-import static network.aika.neuron.phase.activation.ActivationPhase.INITIAL_LINKING;
-
+import static network.aika.neuron.phase.activation.ActivationPhase.LINK_AND_PROPAGATE;
 
 /**
  *
@@ -48,7 +47,7 @@ public class TextModel extends Model {
         init();
     }
 
-    public TextModel(SuspensionHook sh) {
+    public TextModel(SuspensionCallback sh) {
         super(sh);
         init();
     }
@@ -95,8 +94,9 @@ public class TextModel extends Model {
     private static void addLink(Synapse s, Activation iAct, Activation oAct) {
         Link nl = oAct.addLink(s, iAct, false);
 
-        nl.addToQueue(
-                INITIAL_LINKING.getNextLinkPhases(oAct.getConfig())
+        iAct.getThought().addToQueue(
+                nl,
+                LINK_AND_PROPAGATE.getNextLinkPhases()
         );
     }
 
@@ -124,6 +124,7 @@ public class TextModel extends Model {
         in.setTokenLabel(tokenLabel);
         in.setInputNeuron(true);
         in.setLabel("P-" + tokenLabel);
+        in.setAllowTraining(false);
         getSuspensionHook().putLabel(tokenLabel, in.getId());
 
         PatternPartNeuron inRelPT = getTemplates().INPUT_PATTERN_PART_TEMPLATE.instantiateTemplate();
@@ -141,6 +142,7 @@ public class TextModel extends Model {
                 s.linkInput();
                 s.linkOutput();
                 s.setWeight(11.0);
+                s.setAllowTraining(false);
                 inRelPT.addConjunctiveBias(-11.0, false);
             }
 
@@ -149,9 +151,11 @@ public class TextModel extends Model {
 
                 s.linkOutput();
                 s.addWeight(10.0);
+                s.setAllowTraining(false);
                 inRelPT.addConjunctiveBias(-10.0, false);
             }
             inRelPT.setBias(4.0);
+            inRelPT.setAllowTraining(false);
         }
         {
             {
@@ -160,6 +164,7 @@ public class TextModel extends Model {
                 s.linkInput();
                 s.linkOutput();
                 s.addWeight(11.0);
+                s.setAllowTraining(false);
                 inRelNT.addConjunctiveBias(-11.0, false);
             }
 
@@ -168,9 +173,11 @@ public class TextModel extends Model {
 
                 s.linkOutput();
                 s.addWeight(10.0);
+                s.setAllowTraining(false);
                 inRelNT.addConjunctiveBias(-10.0, true);
             }
             inRelNT.setBias(4.0);
+            inRelNT.setAllowTraining(false);
         }
 
         {
@@ -178,6 +185,7 @@ public class TextModel extends Model {
 
             s.linkInput();
             s.addWeight(1.0);
+            s.setAllowTraining(false);
         }
 
         {
@@ -185,6 +193,7 @@ public class TextModel extends Model {
 
             s.linkInput();
             s.addWeight(1.0);
+            s.setAllowTraining(false);
         }
 
         in.getProvider().save();

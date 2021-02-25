@@ -17,16 +17,22 @@
 package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
+
 /**
+ * Determines which input synapses of this activations neuron should be linked to the input neuron.
+ * Connecting a synapse to its input neuron is not necessary if the synapse weight is weak. That is the case if the
+ * synapse is incapable to completely suppress the activation of this neuron.
  *
  * @author Lukas Molzberger
  */
 public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPhase {
 
-    public UpdateSynapseInputLinks(int rank) {
-        super(rank);
+    @Override
+    public Ranked getPreviousRank() {
+        return UPDATE_BIAS;
     }
 
     @Override
@@ -35,9 +41,8 @@ public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPha
         act.getNeuronProvider().save();
     }
 
-    @Override
-    public boolean isFinal() {
-        return false;
+    public String toString() {
+        return "Act: Update Synapse Input Links";
     }
 
     @Override

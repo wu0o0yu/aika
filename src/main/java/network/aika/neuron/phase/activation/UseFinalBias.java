@@ -14,36 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.neuron.phase.activation;
 
-import org.apache.commons.math3.distribution.GammaDistribution;
-import org.apache.commons.math3.util.FastMath;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.phase.Ranked;
+import network.aika.neuron.phase.RankedImpl;
 
 /**
+ * Check if there are positive recurrent links that have not been activated and thus need to be updated.
  *
  * @author Lukas Molzberger
  */
-public class Utils {
+public class UseFinalBias extends RankedImpl implements ActivationPhase {
 
-    public static double round(double x) {
-        return Math.round(x * 1000.0) / 1000.0;
+    @Override
+    public Ranked getPreviousRank() {
+        return LINK_AND_PROPAGATE;
     }
 
-    public static String collapseText(String txt, int length) {
-        if (txt.length() <= 2 * length) {
-            return txt;
-        } else {
-            return txt.substring(0, length) + "..." + txt.substring(txt.length() - length);
+    @Override
+    public void process(Activation act) {
+        if(act.updateForFinalPhase()) {
+            act.getThought().addToQueue(
+                    act,
+                    PROPAGATE_CHANGE
+            );
         }
     }
 
-    public static String addPadding(String s, int targetSize) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(s);
-        for(int i = s.length(); i < targetSize; i++) {
-            sb.append(' ');
-        }
+    public String toString() {
+        return "Act: Use Final Bias";
+    }
 
-        return sb.toString();
+    @Override
+    public int compare(Activation o1, Activation o2) {
+        return 0;
     }
 }

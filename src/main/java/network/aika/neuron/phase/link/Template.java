@@ -17,23 +17,36 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
 import network.aika.neuron.phase.activation.ActivationPhase;
 
+import static network.aika.neuron.phase.activation.ActivationPhase.TEMPLATE_INPUT;
+import static network.aika.neuron.phase.activation.ActivationPhase.UPDATE_SYNAPSE_INPUT_LINKS;
+
 /**
+ * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
+ * activations and links.
  *
  * @author Lukas Molzberger
  */
 public class Template extends RankedImpl implements LinkPhase {
 
-    public Template(int rank) {
-        super(rank);
+    @Override
+    public Ranked getPreviousRank() {
+        return UPDATE_SYNAPSE_INPUT_LINKS;
     }
 
     @Override
     public void process(Link l) {
-        l.follow(ActivationPhase.TEMPLATE_INPUT);
+        l.follow(TEMPLATE_INPUT);
+    }
+
+    public String toString() {
+        return "Link: Template";
     }
 
     @Override

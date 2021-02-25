@@ -14,40 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.utils;
 
-/**
- *
- * @author Lukas Molzberger
- */
-public enum ActivationFunction {
+import network.aika.Model;
 
-    RECTIFIED_HYPERBOLIC_TANGENT(
-            x -> Math.max(0.0, Math.tanh(x)),
-            x -> x >= 0.0 ? 1.0 - Math.pow(Math.tanh(x), 2.0) : 0.0
-    ),
-    LIMITED_RECTIFIED_LINEAR_UNIT(
-            x -> Math.max(0.0, Math.min(1.0, x)),
-            x -> x >= 0.0 && x <= 1.0 ? 1.0 : 0.0
-    );
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
-    private Function f;
-    private Function outerGrad;
 
-    ActivationFunction(Function f, Function outerGrad) {
-        this.f = f;
-        this.outerGrad = outerGrad;
-    }
+public interface Writable {
 
-    public double f(double x) {
-        return f.f(x);
-    }
+    /**
+     * Serialize the fields of this object to <code>out</code>.
+     *
+     * @param out <code>DataOuput</code> to serialize this object into.
+     * @throws IOException
+     */
+    void write(DataOutput out) throws IOException;
 
-    public double outerGrad(double x) {
-        return outerGrad.f(x);
-    }
+    /**
+     * Deserialize the fields of this object from <code>in</code>.
+     *
+     * <p>For efficiency, implementations should attempt to re-use storage in the
+     * existing object where possible.</p>
+     *
+     * @param in <code>DataInput</code> to deseriablize this object from.
+     * @throws Exception
+     */
+    void readFields(DataInput in, Model m) throws Exception;
 
-    interface Function {
-        double f(double x);
-    }
 }

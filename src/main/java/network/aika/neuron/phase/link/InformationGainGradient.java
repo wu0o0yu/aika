@@ -14,53 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.phase.link;
 
-import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
-import network.aika.neuron.phase.link.LinkPhase;
-
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.phase.link.LinkPhase.*;
+import network.aika.neuron.phase.activation.ActivationPhase;
 
 /**
+ * Computes the gradient of the information gain function for this activation.
+ *
+ * @see <a href="https://aika.network/training.html">Aika Training</a>
  *
  * @author Lukas Molzberger
  */
-public class SelfGradient extends RankedImpl implements ActivationPhase {
+public class InformationGainGradient extends RankedImpl implements LinkPhase {
 
-    public SelfGradient(int rank) {
-        super(rank);
+    @Override
+    public Ranked getPreviousRank() {
+        return ActivationPhase.ENTROPY_GRADIENT;
     }
 
     @Override
-    public void process(Activation act) {
-        Neuron n = act.getNeuron();
+    public void process(Link l) {
+        l.computeInformationGainGradient();
+    }
 
-        if(n.isTemplate())
-            return;
-
-        act.initSelfGradient();
-
-        if(n.isInputNeuron())
-            return;
-
-        act.addLinksToQueue(
-                INPUT,
-                LinkPhase.SELF_GRADIENT,
-                SHADOW_FACTOR,
-                UPDATE_WEIGHTS
-        );
+    public String toString() {
+        return "Link: Information-Gain Gradient";
     }
 
     @Override
-    public boolean isFinal() {
-        return true;
-    }
-
-    @Override
-    public int compare(Activation act1, Activation act2) {
+    public int compare(Link l1, Link l2) {
         return 0;
     }
 }

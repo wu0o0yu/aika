@@ -14,44 +14,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.phase.activation;
 
-import network.aika.utils.Utils;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
+import static network.aika.neuron.phase.link.LinkPhase.SHADOW_FACTOR;
+
 /**
- * Propagate the gradient backwards through the network.
+ * Computes the gradient of the entropy function for this activation.
+ *
+ * @see <a href="https://aika.network/training.html">Aika Training</a>
  *
  * @author Lukas Molzberger
  */
-public class PropagateGradient extends RankedImpl implements LinkPhase {
+public class EntropyGradient extends RankedImpl implements ActivationPhase {
 
-    private double gradient;
-
-    public PropagateGradient(double gradient) {
-        super(INFORMATION_GAIN_GRADIENT);
-        this.gradient = gradient;
+    @Override
+    public Ranked getPreviousRank() {
+        return SHADOW_FACTOR;
     }
 
     @Override
-    public void process(Link l) {
-        l.propagateGradient(gradient);
+    public void process(Activation act) {
+        Neuron n = act.getNeuron();
 
-        if(l.getSynapse().isAllowTraining()) {
-            l.getThought().addToQueue(
-                    l,
-                    UPDATE_WEIGHT
+        if(n.isTemplate())
+            return;
+
+        act.initEntropyGradient();
+
+        if(!act.gradientIsZero()) {
+            act.getThought().addToQueue(
+                    act,
+                    PROPAGATE_GRADIENTS_SUM
             );
         }
     }
 
     public String toString() {
-        return "Link: Propagate Gradient (" + Utils.round(gradient) + ")";
+        return "Act: Entropy Gradient";
     }
 
     @Override
-    public int compare(Link l1, Link l2) {
+    public int compare(Activation act1, Activation act2) {
         return 0;
     }
 }

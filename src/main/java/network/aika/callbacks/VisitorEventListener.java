@@ -14,35 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.callbacks;
 
+import network.aika.neuron.activation.Visitor;
 
-import network.aika.neuron.NeuronProvider;
-
-import java.util.stream.Stream;
 
 /**
  *
- * The suspension hook is used to suspend neurons to an external storage in order to reduce the memory footprint.
- *
- * !!! Important: When using the suspension hook, all references to a neuron need to occur through a
- * provider. Otherwise the reference might be outdated.
- *
  * @author Lukas Molzberger
  */
-public interface SuspensionHook {
+public interface VisitorEventListener {
 
-    long createId();
+    void onVisitorEvent(Visitor v, boolean dir);
 
-    void store(Long id, byte[] data);
-
-    byte[] retrieve(long id);
-
-    Stream<Long> getAllIds();
-
-    void putLabel(String label, Long id);
-
-    Long getIdByLabel(String tokenLabel);
-
-    void suspendAll(NeuronProvider.SuspensionMode sm);
 }

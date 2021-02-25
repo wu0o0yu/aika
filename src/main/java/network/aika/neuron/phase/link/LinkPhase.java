@@ -16,9 +16,10 @@
  */
 package network.aika.neuron.phase.link;
 
-import network.aika.Config;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.Ranked;
+import network.aika.neuron.phase.RankedImpl;
 
 /**
  *
@@ -26,28 +27,13 @@ import network.aika.neuron.phase.Phase;
  */
 public interface LinkPhase extends Phase<Link> {
 
-    LinkPhase INDUCTION = new Induction(1);
-    LinkPhase LINKING = new Linking(2);
-    LinkPhase COUNTING = new Counting(8);
-    LinkPhase SHADOW_FACTOR = new ShadowFactor(9);
-    LinkPhase SELF_GRADIENT = new SelfGradient(11);
-    int PROPAGATE_GRADIENT_RANK = 12;
-    LinkPhase UPDATE_WEIGHTS = new UpdateWeight(14);
-    LinkPhase TEMPLATE = new Template(16);
-
-
-    static LinkPhase[] getInitialPhases(Config c) {
-        return c.isEnableTraining() ?
-                new LinkPhase[] {
-                        LINKING,
-                        COUNTING,
-                        SHADOW_FACTOR,
-                        SELF_GRADIENT,
-                        UPDATE_WEIGHTS,
-                        TEMPLATE
-                } :
-                new LinkPhase[] {
-                        COUNTING
-                };
-    }
+    LinkPhase INDUCTION = new Induction();
+    LinkPhase LINKING = new Linking();
+    Ranked SUM_UP_LINK_RANK = new RankedImpl(LINKING);
+    LinkPhase SHADOW_FACTOR = new ShadowFactor();
+    LinkPhase INFORMATION_GAIN_GRADIENT = new InformationGainGradient();
+    Ranked PROPAGATE_GRADIENT_RANK = new RankedImpl(INFORMATION_GAIN_GRADIENT);
+    LinkPhase UPDATE_WEIGHT = new UpdateWeight();
+    LinkPhase TEMPLATE = new Template();
+    LinkPhase COUNTING = new Counting();
 }

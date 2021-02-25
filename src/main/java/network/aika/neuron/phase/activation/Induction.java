@@ -18,16 +18,23 @@ package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+
 /**
+ * Creates a new untrained neuron from a template activation.
  *
  * @author Lukas Molzberger
  */
 public class Induction extends RankedImpl implements ActivationPhase {
 
-    public Induction(int rank) {
-        super(rank);
+    @Override
+    public Ranked getPreviousRank() {
+        return null;
     }
 
     @Override
@@ -42,16 +49,10 @@ public class Induction extends RankedImpl implements ActivationPhase {
         act.setNeuron(inducedNeuron);
 
         act.link();
-
-        act.addToQueue(
-                TEMPLATE_INPUT,
-                TEMPLATE_OUTPUT
-        );
     }
 
-    @Override
-    public boolean isFinal() {
-        return false;
+    public String toString() {
+        return "Act: Induction";
     }
 
     @Override

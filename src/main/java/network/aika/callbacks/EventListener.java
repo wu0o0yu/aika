@@ -14,32 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.callbacks;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.phase.Phase;
 
 
-public interface Writable {
+/**
+ *
+ * @author Lukas Molzberger
+ */
+public interface EventListener {
 
-    /**
-     * Serialize the fields of this object to <code>out</code>.
-     *
-     * @param out <code>DataOuput</code> to serialize this object into.
-     * @throws IOException
-     */
-    void write(DataOutput out) throws IOException;
+    void onActivationCreationEvent(Activation act, Activation originAct);
 
-    /**
-     * Deserialize the fields of this object from <code>in</code>.
-     *
-     * <p>For efficiency, implementations should attempt to re-use storage in the
-     * existing object where possible.</p>
-     *
-     * @param in <code>DataInput</code> to deseriablize this object from.
-     * @throws Exception
-     */
-    void readFields(DataInput in, Model m) throws Exception;
+    void onActivationProcessedEvent(Phase p, Activation act);
 
+    void afterActivationProcessedEvent(Phase p, Activation act);
+
+    void onLinkCreationEvent(Link l);
+
+    void onLinkProcessedEvent(Phase p, Link l);
+
+    void afterLinkProcessedEvent(Phase p, Link l);
 }

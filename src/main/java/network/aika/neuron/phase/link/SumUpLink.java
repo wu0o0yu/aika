@@ -17,46 +17,57 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.Thought;
-import network.aika.neuron.Synapse;
+import network.aika.utils.Utils;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
+import network.aika.neuron.phase.activation.ActivationPhase;
 
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
-import static network.aika.neuron.sign.Sign.POS;
 
 /**
- * Use the link gradient to update the synapse weight.
+ * Uses the input activation value, and the synapse weight to update the net value of the output activation.
  *
  * @author Lukas Molzberger
  */
-public class UpdateWeight extends RankedImpl implements LinkPhase {
+public class SumUpLink extends RankedImpl implements LinkPhase {
 
-    @Override
-    public Ranked getPreviousRank() {
-        return PROPAGATE_GRADIENTS_NET;
+    private double delta;
+
+    public SumUpLink(double delta) {
+        super(LINKING);
+        this.delta = delta;
     }
 
     @Override
     public void process(Link l) {
-        Synapse s = l.getSynapse();
-
-        double weightDelta = s.updateSynapse(l);
-
         Thought t = l.getThought();
+        l.sumUpLink(delta);
+
         t.addToQueue(
                 l.getOutput(),
-                UPDATE_SYNAPSE_INPUT_LINKS
+                PROPAGATE_GRADIENTS_NET
         );
 
-        t.addToQueue(
-                l,
-                new SumUpLink(l.getInputValue(POS) * weightDelta)
-        );
+        Activation oAct = l.getOutput();
+        if(oAct.checkIfFired()) {
+            t.addToQueue(
+                    oAct,
+                    LINK_AND_PROPAGATE,
+                    USE_FINAL_BIAS,
+                    oAct.hasBranches() ? DETERMINE_BRANCH_PROBABILITY : null,
+                    ActivationPhase.COUNTING
+            );
+            oAct.addLinksToQueue(
+                    INPUT,
+                    COUNTING
+            );
+        }
     }
 
     public String toString() {
-        return "Link: Update Weight";
+        return "Link: Sum up Link (" + Utils.round(delta) + ")";
     }
 
     @Override

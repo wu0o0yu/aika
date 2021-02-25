@@ -16,15 +16,14 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.EventListener;
 import network.aika.Thought;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.VisitorPhase;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
-import static network.aika.neuron.activation.Visitor.Transition.LINK;
 import static network.aika.neuron.activation.direction.Direction.*;
 
 /**
@@ -44,30 +43,27 @@ public class Visitor {
         LINK
     }
 
-    public Direction downUpDir = INPUT;
+    public Direction downUpDir;
     public Direction startDir;
 
-    private List<Scope> scopes;
+    private Set<Scope> scopes;
 
     public int downSteps = 0;
     public int upSteps = 0;
 
     private Visitor() {}
 
-    public Visitor(VisitorPhase vp, Activation act, Direction startDir, Transition t) {
+    public Visitor(VisitorPhase vp, Activation act, Direction startDir, Direction downUpDir, Transition t) {
         this.phase = vp;
         this.origin = this;
         this.act = act;
         this.transition = t;
+        this.downUpDir = downUpDir;
         this.startDir = startDir;
-        this.scopes = Arrays.asList(
-                act.getNeuron().getInitialScopes(startDir)
-        );
-
-        getThought().onVisitorEvent(this);
+        this.scopes = act.getNeuron().getInitialScopes(startDir);
     }
 
-    public Visitor prepareNextStep(Activation currentAct, Link currentLink, List<Scope> scopes, Transition t) {
+    public Visitor prepareNextStep(Activation currentAct, Link currentLink, Set<Scope> scopes, Transition t) {
         if(scopes.isEmpty())
             return null;
 
@@ -84,11 +80,10 @@ public class Visitor {
         nv.downSteps = downSteps;
         nv.scopes = scopes;
 
-        getThought().onVisitorEvent(this);
         return nv;
     }
 
-    public List<Scope> getScopes() {
+    public Set<Scope> getScopes() {
         return scopes;
     }
 
@@ -136,6 +131,10 @@ public class Visitor {
         return origin.act.getThought();
     }
 
+    public void onEvent(boolean dir) {
+        getThought().onVisitorEvent(this, dir);
+    }
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
@@ -143,10 +142,10 @@ public class Visitor {
             sb.append(previousStep + "\n");
         }
 
-        sb.append("Origin:" + origin.act.getShortString() + ", ");
+        sb.append("Origin:" + origin.act.toShortString() + ", ");
 
         if(act != null) {
-            sb.append("Current:" + act.getShortString() + ", ");
+            sb.append("Current:" + act.toShortString() + ", ");
         } else if(link != null) {
             sb.append("Current:" + link.toString() + ", ");
         }

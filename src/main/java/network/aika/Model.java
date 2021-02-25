@@ -17,6 +17,8 @@
 package network.aika;
 
 
+import network.aika.callbacks.InMemorySuspensionCallback;
+import network.aika.callbacks.SuspensionCallback;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.NeuronProvider.SuspensionMode;
@@ -65,7 +67,7 @@ public abstract class Model {
         registerType(InhibitorySynapse.class);
     }
 
-    private SuspensionHook suspensionHook;
+    private SuspensionCallback suspensionCallback;
     private AtomicLong retrievalCounter = new AtomicLong(0);
 
     // Important: the id field needs to be referenced by the provider!
@@ -77,11 +79,11 @@ public abstract class Model {
     private Config config;
 
     public Model() {
-        this(new InMemorySuspensionHook());
+        this(new InMemorySuspensionCallback());
     }
 
-    public Model(SuspensionHook sh) {
-        suspensionHook = sh;
+    public Model(SuspensionCallback sh) {
+        suspensionCallback = sh;
     }
 
     public Config getConfig() {
@@ -103,7 +105,7 @@ public abstract class Model {
     }
 
     public long createNeuronId() {
-        return suspensionHook.createId();
+        return suspensionCallback.createId();
     }
 
     public Templates getTemplates() {
@@ -118,19 +120,19 @@ public abstract class Model {
     }
 
     public NeuronProvider lookupNeuronProvider(String tokenLabel, NeuronProducer onNewCallback) {
-        Long id = suspensionHook.getIdByLabel(tokenLabel);
+        Long id = suspensionCallback.getIdByLabel(tokenLabel);
         if (id == null) {
             Neuron<?> n = onNewCallback.createNeuron(tokenLabel);
             NeuronProvider p = n.getProvider();
 
-            suspensionHook.putLabel(tokenLabel, p.getId());
+            suspensionCallback.putLabel(tokenLabel, p.getId());
             return p;
         }
         return lookupNeuron(id);
     }
 
     public NeuronProvider getNeuronProvider(String tokenLabel) {
-        Long id = suspensionHook.getIdByLabel(tokenLabel);
+        Long id = suspensionCallback.getIdByLabel(tokenLabel);
         if(id == null) return null;
         return lookupNeuron(id);
     }
@@ -141,7 +143,7 @@ public abstract class Model {
     }
 
     public Stream<NeuronProvider> getAllNeurons() {
-        return suspensionHook
+        return suspensionCallback
                 .getAllIds()
                 .map(id -> lookupNeuron(id));
     }
@@ -162,12 +164,12 @@ public abstract class Model {
         }
     }
 
-    public SuspensionHook getSuspensionHook() {
-        return suspensionHook;
+    public SuspensionCallback getSuspensionHook() {
+        return suspensionCallback;
     }
 
-    public void setSuspensionHook(SuspensionHook suspensionHook) {
-        this.suspensionHook = suspensionHook;
+    public void setSuspensionHook(SuspensionCallback suspensionCallback) {
+        this.suspensionCallback = suspensionCallback;
     }
 
     public Neuron readNeuron(DataInput in, NeuronProvider p) throws Exception {
@@ -226,7 +228,7 @@ public abstract class Model {
 
     public void suspendAll(SuspensionMode sm) {
         suspendUnusedNeurons(Integer.MAX_VALUE, sm);
-        suspensionHook.suspendAll(sm);
+        suspensionCallback.suspendAll(sm);
     }
 
     private boolean suspend(long retrievalCount, NeuronProvider p, SuspensionMode sm) {

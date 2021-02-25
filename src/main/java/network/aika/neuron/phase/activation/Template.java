@@ -16,13 +16,13 @@
  */
 package network.aika.neuron.phase.activation;
 
-import network.aika.Config;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
@@ -31,8 +31,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
+ * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
+ * activations and links.
  *
  * @author Lukas Molzberger
  */
@@ -40,57 +44,49 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
 
     private Direction direction;
 
-    public Template(int rank, Direction dir) {
-        super(rank);
+    public Template(Ranked previousRank, Direction dir) {
+        super(previousRank);
         direction = dir;
     }
 
     @Override
-    public ActivationPhase[] getNextActivationPhases(Config c) {
+    public ActivationPhase[] getNextActivationPhases() {
         return new ActivationPhase[] {
-                PREPARE_FINAL_LINKING,
-                SOFTMAX,
-                COUNTING,
-                INDUCTION,
-                PROPAGATE_GRADIENT,
-                UPDATE_SYNAPSE_INPUT_LINKS
+                INDUCTION
         };
     }
 
     @Override
-    public LinkPhase[] getNextLinkPhases(Config c) {
+    public LinkPhase[] getNextLinkPhases() {
         return new LinkPhase[] {
-                LinkPhase.SELF_GRADIENT,
-                LinkPhase.SHADOW_FACTOR,
-                LinkPhase.INDUCTION,
-                LinkPhase.UPDATE_WEIGHTS,
-                LinkPhase.TEMPLATE
+                LinkPhase.TEMPLATE,
+                LinkPhase.INDUCTION
         };
     }
 
     @Override
     public void process(Activation act) {
-/*        act.followLinks( // Sollte durch die Link phase erfolgen
-                new Visitor(
-                        this,
-                        act,
-                        direction
-                )
-        );
-*/
+        if(direction == OUTPUT) {
+            act.followLinks(
+                    new Visitor(
+                            this,
+                            act,
+                            direction,
+                            INPUT,
+                            ACT
+                    )
+            );
+        }
+
         propagate(act,
                 new Visitor(
                         this,
                         act,
                         direction,
+                        direction,
                         ACT
                 )
         );
-    }
-
-    @Override
-    public boolean isFinal() {
-        return true;
     }
 
     @Override
@@ -103,7 +99,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
         if(oAct.getNeuron().isInputNeuron())
             return;
 
-        if(!iAct.isActive())
+        if(!iAct.isActive(true))
             return;
 
         if (Link.synapseExists(iAct, oAct))
@@ -141,6 +137,10 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
         templateSynapses.forEach(s ->
                 s.propagate(act, v)
         );
+    }
+
+    public String toString() {
+        return "Act: Template-" + direction;
     }
 
     @Override

@@ -16,18 +16,21 @@
  */
 package network.aika.neuron.phase.activation;
 
-import network.aika.Config;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+import static network.aika.neuron.phase.link.LinkPhase.LINKING;
+import static network.aika.neuron.phase.link.LinkPhase.SUM_UP_LINK_RANK;
 
 
 /**
@@ -42,45 +45,53 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase {
+public class LinkAndPropagate extends RankedImpl implements VisitorPhase, ActivationPhase {
 
-    public Linking(int rank) {
-        super(rank);
+    @Override
+    public Ranked getPreviousRank() {
+        return SUM_UP_LINK_RANK;
     }
 
     @Override
-    public ActivationPhase[] getNextActivationPhases(Config c) {
-        return ActivationPhase.getInitialPhases(c);
+    public ActivationPhase[] getNextActivationPhases() {
+        return new ActivationPhase[] {};
     }
 
     @Override
-    public LinkPhase[] getNextLinkPhases(Config c) {
-        return LinkPhase.getInitialPhases(c);
+    public LinkPhase[] getNextLinkPhases() {
+        return new LinkPhase[] {
+                LINKING
+        };
     }
 
     @Override
     public void process(Activation act) {
         act.getThought().linkInputRelations(act);
 
-        if(!act.updateValue())
+        if(!act.updateValue(false))
             return;
 
-        Visitor v = new Visitor(
-                this,
-                act,
-                OUTPUT,
-                ACT
+        act.followLinks(
+                new Visitor(
+                        this,
+                        act,
+                        OUTPUT,
+                        INPUT,
+                        ACT
+                )
         );
-
-        act.followLinks(v);
 
         act.getModel().linkInputRelations(act, OUTPUT);
 
-        propagate(act, v);
-    }
-
-    public boolean isFinal() {
-        return false;
+        propagate(act,
+                new Visitor(
+                        this,
+                        act,
+                        OUTPUT,
+                        OUTPUT,
+                        ACT
+                )
+        );
     }
 
     @Override
@@ -89,7 +100,7 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
         Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());
         Activation oAct = dir.getCycleOutput(fromAct, v.getOriginAct());
 
-        if(!iAct.isActive())
+        if(!iAct.isActive(false))
             return;
 
         Synapse s = Link.getSynapse(iAct, oAct);
@@ -100,10 +111,9 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
             return;
 
         oAct = s.branchIfNecessary(oAct, v);
-        if (oAct == null)
-            return;
 
-        s.closeCycle(v, iAct, oAct);
+        if(oAct != null)
+            s.closeCycle(v, iAct, oAct);
     }
 
     public void propagate(Activation act, Visitor v) {
@@ -113,6 +123,10 @@ public class Linking extends RankedImpl implements VisitorPhase, ActivationPhase
                 .forEach(s ->
                         s.propagate(act, v)
                 );
+    }
+
+    public String toString() {
+        return "Act: Link and Propagate";
     }
 
     @Override

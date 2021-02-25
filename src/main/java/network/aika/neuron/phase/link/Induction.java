@@ -18,16 +18,21 @@ package network.aika.neuron.phase.link;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
+import network.aika.neuron.phase.activation.ActivationPhase;
 
 /**
+ * Creates a new untrained synapse from a template link.
  *
  * @author Lukas Molzberger
  */
 public class Induction extends RankedImpl implements LinkPhase {
 
-    public Induction(int rank) {
-        super(rank);
+    @Override
+    public Ranked getPreviousRank() {
+        return ActivationPhase.INDUCTION;
     }
 
     @Override
@@ -42,6 +47,10 @@ public class Induction extends RankedImpl implements LinkPhase {
 
         l.setSynapse(inducedSynapse);
         inducedSynapse.linkOutput();
+    }
+
+    public String toString() {
+        return "Link: Induction";
     }
 
     @Override

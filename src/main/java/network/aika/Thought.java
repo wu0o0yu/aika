@@ -17,106 +17,204 @@
 package network.aika;
 
 
+import network.aika.callbacks.EventListener;
+import network.aika.callbacks.VisitorEventListener;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.QueueEntry;
-import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.*;
+import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.activation.ActivationPhase;
+import network.aika.neuron.phase.link.LinkPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-
+/**
+ *
+ * @author Lukas Molzberger
+ */
 public abstract class Thought {
     private static final Logger log = LoggerFactory.getLogger(Thought.class);
 
     private int activationIdCounter = 0;
 
-    protected final TreeSet<QueueEntry> queue = new TreeSet<>();
+    private final TreeSet<QueueEntry> queue = new TreeSet<>();
+
+    private Set<Phase> filters = new TreeSet<>(Comparator.comparing(p -> p.getRank()));
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
     private Map<NeuronProvider, SortedSet<Activation>> actsPerNeuron = null;
 
-    private List<EventListener> eventListeners = new ArrayList<>();
+    private List<network.aika.callbacks.EventListener> eventListeners = new ArrayList<>();
     private List<VisitorEventListener> visitorEventListeners = new ArrayList<>();
 
     public Thought() {
     }
 
-    public void onActivationCreationEvent(Activation act, Activation originAct) {
-        eventListeners.forEach(
-                el -> el.onActivationCreationEvent(act, originAct)
-        );
-    }
-
-    public void onActivationProcessedEvent(Activation act) {
-        eventListeners.forEach(
-                el -> el.onActivationProcessedEvent(act)
-        );
-    }
-
-    public void onLinkProcessedEvent(Link l) {
-        eventListeners.forEach(
-                el -> el.onLinkProcessedEvent(l)
-        );
-    }
-
-    public void onVisitorEvent(Visitor v) {
-        visitorEventListeners.forEach(
-                el -> el.onVisitorEvent(v)
-        );
-    }
-
     public abstract int length();
 
-    public void addEventListener(EventListener l) {
+    public abstract void linkInputRelations(Activation act);
+
+    public void addFilters(Phase... p) {
+        filters.addAll(Set.of(p));
+    }
+
+    public void onActivationCreationEvent(Activation act, Activation originAct) {
+        getEventListeners()
+                .forEach(
+                        el -> el.onActivationCreationEvent(act, originAct)
+                );
+    }
+
+    public void onActivationProcessedEvent(Phase p, Activation act) {
+        getEventListeners()
+                .forEach(
+                        el -> el.onActivationProcessedEvent(p, act)
+                );
+    }
+
+    public void afterActivationProcessedEvent(Phase p, Activation act) {
+        getEventListeners()
+                .forEach(
+                        el -> el.afterActivationProcessedEvent(p, act)
+                );
+    }
+
+    public void onLinkProcessedEvent(Phase p, Link l) {
+        getEventListeners()
+                .forEach(
+                        el -> el.onLinkProcessedEvent(p, l)
+                );
+    }
+
+    public void afterLinkProcessedEvent(Phase p, Link l) {
+        getEventListeners()
+                .forEach(
+                        el -> el.afterLinkProcessedEvent(p, l)
+                );
+    }
+
+    public void onLinkCreationEvent(Link l) {
+        getEventListeners()
+                .forEach(
+                        el -> el.onLinkCreationEvent(l)
+                );
+    }
+
+    public void onVisitorEvent(Visitor v, boolean dir) {
+        getVisitorEventListeners()
+                .forEach(
+                        el -> el.onVisitorEvent(v, dir)
+                );
+    }
+
+    public synchronized Collection<network.aika.callbacks.EventListener> getEventListeners() {
+        return eventListeners
+                .stream()
+                .collect(Collectors.toList());
+    }
+
+    public synchronized void addEventListener(network.aika.callbacks.EventListener l) {
         eventListeners.add(l);
     }
 
-    public void removeEventListener(EventListener l) {
+    public synchronized void removeEventListener(EventListener l) {
         eventListeners.remove(l);
     }
 
-    public void addVisitorEventListener(VisitorEventListener l) {
+    public synchronized void addVisitorEventListener(VisitorEventListener l) {
         visitorEventListeners.add(l);
     }
 
-    public void removeVisitorEventListener(VisitorEventListener l) {
+    public synchronized void removeVisitorEventListener(VisitorEventListener l) {
         visitorEventListeners.remove(l);
+    }
+
+    public synchronized Collection<VisitorEventListener> getVisitorEventListeners() {
+        return visitorEventListeners
+                .stream()
+                .collect(Collectors.toList());
     }
 
     public void registerActivation(Activation act) {
         activationsById.put(act.getId(), act);
     }
 
-    public void addToQueue(QueueEntry qe) {
+    public void addToQueue(Activation act, ActivationPhase... phases) {
+        addToQueueIntern(act, phases);
+    }
+
+    public void addToQueue(Link l, LinkPhase... phases) {
+        addToQueueIntern(l, phases);
+    }
+
+    private <P extends Phase, E extends Element> void addToQueueIntern(E e, P... phases) {
+        for(P p: phases) {
+            if(p == null)
+                continue;
+
+            QueueEntry qe = new QueueEntry(0, p, e);
+            e.addQueuedPhase(qe);
+            addQueueEntry(qe);
+        }
+    }
+
+    public void addQueueEntry(QueueEntry qe) {
+        if(filters.contains(qe.getPhase()))
+            return;
+
         queue.add(qe);
     }
 
-    public void removeActivationFromQueue(QueueEntry qe) {
+    public void removeQueueEntry(QueueEntry qe) {
         boolean isRemoved = queue.remove(qe);
         assert isRemoved;
     }
 
-    public abstract void linkInputRelations(Activation act);
+    public void removeQueueEntries(Collection<QueueEntry> qe) {
+        queue.removeAll(qe);
+    }
 
+    public SortedSet<QueueEntry> getQueue() {
+        return queue;
+    }
 
     public void process(Model m) {
         while (!queue.isEmpty()) {
-            QueueEntry<?> qe = queue.pollFirst();
-            qe.onProcessEvent();
+            QueueEntry qe = queue.pollFirst();
+
+            qe.getElement().removeQueuedPhase(qe);
             qe.process();
         }
         m.addToN(length());
+    }
+
+    public <E extends Element> List<Phase> getPhasesForElement(E element) {
+        return queue
+                .stream()
+                .filter(qe -> qe.getElement() == element)
+                .map(qe -> qe.getPhase())
+                .collect(Collectors.toList());
     }
 
     public int createActivationId() {
         return activationIdCounter++;
     }
 
+    public Activation createActivation(Neuron n, Activation fromAct) {
+        Activation toAct = new Activation(
+                createActivationId(),
+                this,
+                n
+        );
+
+        onActivationCreationEvent(toAct, fromAct);
+
+        return toAct;
+    }
 
     public Activation getActivation(Integer id) {
         return activationsById.get(id);
@@ -147,7 +245,7 @@ public abstract class Thought {
         Map<NeuronProvider, SortedSet<Activation>> results = new TreeMap<>();
 
         activationsById.values().stream()
-                .filter(act -> act.isActive())
+                .filter(act -> act.isActive(false))
                 .forEach(act -> {
                     Set<Activation> acts = results.computeIfAbsent(
                             act.getNeuronProvider(),

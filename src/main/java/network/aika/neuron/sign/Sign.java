@@ -14,22 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.neuron.sign;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Visitor;
 
 
 /**
  *
  * @author Lukas Molzberger
  */
-public interface EventListener {
+public interface Sign {
 
-    void onActivationCreationEvent(Activation act, Activation originAct);
+    Positive POS = new Positive();
+    Negative NEG = new Negative();
 
-    void onActivationProcessedEvent(Activation act);
+    Sign[] SIGNS = new Sign[] {POS, NEG};
 
-    void onLinkProcessedEvent(Link l);
+    Sign invert();
+
+    static Sign getSign(Activation act) {
+        return act.isActive(false) ? POS : NEG;
+    }
+
+    double getValue(Double x);
 }

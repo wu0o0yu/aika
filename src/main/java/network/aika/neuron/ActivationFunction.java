@@ -14,35 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
-
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.phase.RankedImpl;
+package network.aika.neuron;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PrepareFinalLinking extends RankedImpl implements ActivationPhase {
+public enum ActivationFunction {
 
-    public PrepareFinalLinking(int rank) {
-        super(rank);
+    RECTIFIED_HYPERBOLIC_TANGENT(
+            x -> Math.max(0.0, Math.tanh(x)),
+            x -> x >= 0.0 ? 1.0 - Math.pow(Math.tanh(x), 2.0) : 0.0
+    ),
+    LIMITED_RECTIFIED_LINEAR_UNIT(
+            x -> Math.max(0.0, Math.min(1.0, x)),
+            x -> x >= 0.0 && x <= 1.0 ? 1.0 : 0.0
+    );
+
+    private Function f;
+    private Function outerGrad;
+
+    ActivationFunction(Function f, Function outerGrad) {
+        this.f = f;
+        this.outerGrad = outerGrad;
     }
 
-    @Override
-    public void process(Activation act) {
-        if(act.isActive()) {
-            act.updateForFinalPhase();
-        }
+    public double f(double x) {
+        return f.f(x);
     }
 
-    @Override
-    public boolean isFinal() {
-        return true;
+    public double outerGrad(double x) {
+        return outerGrad.f(x);
     }
 
-    @Override
-    public int compare(Activation o1, Activation o2) {
-        return 0;
+    interface Function {
+        double f(double x);
     }
 }
