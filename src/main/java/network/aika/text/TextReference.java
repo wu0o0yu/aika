@@ -37,6 +37,8 @@ public class TextReference implements Reference {
     public Activation nextTokenIAct;
 
     public TextReference(Document doc, int begin, int end) {
+        assert begin < end;
+
         this.doc = doc;
         this.begin = begin;
         this.end = end;
