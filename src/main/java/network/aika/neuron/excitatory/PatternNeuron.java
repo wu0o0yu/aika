@@ -69,7 +69,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     public boolean checkGradientThreshold(Activation act) {
         Neuron n = act.getNeuron();
 
-        if(n.getSurprisal(POS) < 1.4)
+        if(n.getSurprisal(POS, act.getReference()) < 1.4)
             return false;
 
         return true;

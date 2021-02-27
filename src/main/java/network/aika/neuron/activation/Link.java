@@ -157,9 +157,10 @@ public class Link extends Element {
         double igGradient = 0.0;
         for(Sign si: Sign.SIGNS) {
             for (Sign so : Sign.SIGNS) {
-                double s = getSynapse().getSurprisal(si, so);
-                s -= input.getNeuron().getSurprisal(si);
-                s -= output.getNeuron().getSurprisal(so);
+                Reference ref = getInput().getReference();
+                double s = getSynapse().getSurprisal(si, so, ref);
+                s -= input.getNeuron().getSurprisal(si, ref);
+                s -= output.getNeuron().getSurprisal(so, ref);
 
                 igGradient += s * getInputValue(si) * getOutputValue(so) * output.getNorm();
             }

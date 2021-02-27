@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,7 +57,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     private double weight;
 
-    protected SampleSpace sampleSpace = new SampleSpace();
+    protected SampleSpace sampleSpace;
 
     protected double frequencyIPosOPos;
     protected double frequencyIPosONeg;
@@ -75,6 +74,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         this.input = input.getProvider();
         this.output = output.getProvider();
         this.template = template;
+
+        sampleSpace = new SampleSpace(getModel());
 
         assert input.getId() < 0 || input.getId() != output.getId();
     }
@@ -328,7 +329,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void count(Link l) {
-        sampleSpace.update(getModel(), l.getInput().getReference());
+        sampleSpace.update(l.getInput().getReference());
 
         if(l.getInput().isActive(false) && l.getOutput().isActive(false)) {
             frequencyIPosOPos += 1.0;
@@ -346,8 +347,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return getPOutput().getModel();
     }
 
-    public double getSurprisal(Sign si, Sign so) {
-        double N = sampleSpace.getN();
+    public double getSurprisal(Sign si, Sign so, Reference ref) {
+        double N = sampleSpace.getN(ref);
         if(isTemplate() || N == 0.0)
             return 0.0;
 
@@ -426,9 +427,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         int n = getModel().getN();
         return "f:" + Utils.round(getInput().getFrequency()) + " " +
                 "N:" + Utils.round(n) + " " +
-                "s(p,p):" + Utils.round(getSurprisal(POS, POS)) + " " +
-                "s(n,p):" + Utils.round(getSurprisal(NEG, POS)) + " " +
-                "s(p,n):" + Utils.round(getSurprisal(POS, NEG)) + " " +
-                "s(n,n):" + Utils.round(getSurprisal(NEG, NEG)) + " \n";
+                "s(p,p):" + Utils.round(getSurprisal(POS, POS, null)) + " " +
+                "s(n,p):" + Utils.round(getSurprisal(NEG, POS, null)) + " " +
+                "s(p,n):" + Utils.round(getSurprisal(POS, NEG, null)) + " " +
+                "s(n,n):" + Utils.round(getSurprisal(NEG, NEG, null)) + " \n";
     }
 }

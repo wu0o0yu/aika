@@ -24,6 +24,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.activation.ActivationPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 import network.aika.neuron.phase.link.PropagateGradient;
 import network.aika.neuron.sign.Sign;
@@ -128,7 +129,8 @@ public class Activation extends Element {
         getThought().addToQueue(
                 this,
                 LINK_AND_PROPAGATE,
-                ENTROPY_GRADIENT
+                ENTROPY_GRADIENT,
+                COUNTING
         );
     }
 
@@ -433,7 +435,8 @@ public class Activation extends Element {
 
     public void initEntropyGradient() {
         double g = getNeuron().getSurprisal(
-                        Sign.getSign(this)
+                        Sign.getSign(this),
+                        getReference()
                 );
 
         inputGradient += g - lastEntropyGradient;
@@ -496,7 +499,7 @@ public class Activation extends Element {
     }
 
     public double getNorm() {
-        return (1 / (1 + getNeuron().getSampleSpace().getN()));
+        return (1 / (1 + getNeuron().getSampleSpace().getN(getReference())));
     }
 
     public boolean gradientIsZero() {

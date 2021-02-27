@@ -64,7 +64,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     protected final ReadWriteLock lock = new ReadWriteLock();
 
     protected double frequency;
-    protected SampleSpace sampleSpace = new SampleSpace();
+    protected SampleSpace sampleSpace;
 
     protected boolean isInputNeuron; // Input Neurons won't be trained!
 
@@ -81,6 +81,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public Neuron(Model m) {
         provider = new NeuronProvider(m, this);
+        sampleSpace = new SampleSpace(m);
         modified = true;
     }
 
@@ -282,7 +283,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         addDummyLinks(act);
 
         if(act.isActive(false)) {
-            sampleSpace.update(getModel(), act.getReference());
+            sampleSpace.update(act.getReference());
             frequency += 1.0;
             modified = true;
         }
@@ -296,8 +297,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         }
     }
 
-    public double getSurprisal(Sign s) {
-        double N = sampleSpace.getN();
+    public double getSurprisal(Sign s, Reference ref) {
+        double N = sampleSpace.getN(ref);
         if(isTemplate() || N == 0.0)
             return 0.0;
 
@@ -419,10 +420,10 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return getClass().getSimpleName() + " " +
                 getId() + ":" + getLabel() + " " +
                 "f:" + Utils.round(frequency) + " " +
-                "N:" + Utils.round(sampleSpace.getN()) + " " +
-                "p:" + Utils.round(getP(POS, sampleSpace.getN())) + " " +
-                "s(p):" + Utils.round(getSurprisal(POS)) + " " +
-                "s(n):" + Utils.round(getSurprisal(NEG)) + " " +
+                "N:" + Utils.round(sampleSpace.getN(null)) + " " +
+                "p:" + Utils.round(getP(POS, sampleSpace.getN(null))) + " " +
+                "s(p):" + Utils.round(getSurprisal(POS, null)) + " " +
+                "s(n):" + Utils.round(getSurprisal(NEG, null)) + " " +
                 "\n";
     }
 }
