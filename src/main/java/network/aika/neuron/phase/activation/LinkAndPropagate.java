@@ -126,7 +126,7 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
     }
 
     public String toString() {
-        return "Act: Link and Propagate";
+        return "Act-Phase: Link and Propagate";
     }
 
     @Override

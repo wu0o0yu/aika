@@ -24,7 +24,6 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.phase.Phase;
-import network.aika.neuron.phase.activation.ActivationPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 import network.aika.neuron.phase.link.PropagateGradient;
 import network.aika.neuron.sign.Sign;
@@ -61,8 +60,6 @@ public class Activation extends Element {
 
     Map<NeuronProvider, Link> inputLinks;
     NavigableMap<OutputKey, Link> outputLinks;
-
-    private int round; // Only used as stopping criteria
 
     private Set<Activation> branches = new TreeSet<>();
     private Activation mainBranch;
@@ -230,7 +227,7 @@ public class Activation extends Element {
         thought.onActivationCreationEvent(clonedAct, this);
 
         copyPhases(clonedAct);
-        clonedAct.round = round + 1;
+        clonedAct.setRound(getRound() + 1);
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
         linkClone(clonedAct, excludedSyn);
@@ -246,7 +243,7 @@ public class Activation extends Element {
 
         replaceElement(clonedAct);
 
-        clonedAct.round = round + 1;
+        clonedAct.setRound(getRound() + 1);
         linkClone(clonedAct, excludedSyn);
 
         return clonedAct;
@@ -634,7 +631,7 @@ public class Activation extends Element {
                 " net:" + Utils.round(getNet(false)) +
                 " netFinal:" + Utils.round(getNet(true)) +
                 " bp:" + Utils.round(branchProbability) +
-                " round:" + round);
+                " round:" + getRound());
 
         if (includeLink) {
             sb.append("\n");

@@ -140,7 +140,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     }
 
     public String toString() {
-        return "Act: Template-" + direction;
+        return "Act-Phase: Template-" + direction;
     }
 
     @Override

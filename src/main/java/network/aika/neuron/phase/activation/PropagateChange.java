@@ -39,7 +39,7 @@ public class PropagateChange extends RankedImpl implements ActivationPhase {
     }
 
     public String toString() {
-        return "Act: Propagate Change";
+        return "Act-Phase: Propagate Change";
     }
 
     @Override

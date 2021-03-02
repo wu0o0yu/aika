@@ -19,7 +19,7 @@ public class UpdateBias extends RankedImpl implements ActivationPhase {
     }
 
     public String toString() {
-        return "Act: Update Bias";
+        return "Act-Phase: Update Bias";
     }
 
     @Override

@@ -41,7 +41,7 @@ public class InformationGainGradient extends RankedImpl implements LinkPhase {
     }
 
     public String toString() {
-        return "Link: Information-Gain Gradient";
+        return "Link-Phase: Information-Gain Gradient";
     }
 
     @Override

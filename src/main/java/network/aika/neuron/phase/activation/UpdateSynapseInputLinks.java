@@ -42,7 +42,7 @@ public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPha
     }
 
     public String toString() {
-        return "Act: Update Synapse Input Links";
+        return "Act-Phase: Update Synapse Input Links";
     }
 
     @Override

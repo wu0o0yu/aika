@@ -33,7 +33,17 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
  */
 public abstract class Element implements Comparable<Element> {
 
+    private int round;
+
     private Set<QueueEntry> queuedPhases = new TreeSet<>();
+
+    public int getRound() {
+        return round;
+    }
+
+    public void setRound(int round) {
+        this.round = round;
+    }
 
     public void addQueuedPhase(QueueEntry qe) {
         queuedPhases.add(qe);
@@ -70,4 +80,5 @@ public abstract class Element implements Comparable<Element> {
     public abstract Thought getThought();
 
     public abstract String toShortString();
+
 }

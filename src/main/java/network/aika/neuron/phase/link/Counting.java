@@ -43,7 +43,7 @@ public class Counting extends RankedImpl implements LinkPhase {
     }
 
     public String toString() {
-        return "Link: Counting";
+        return "Link-Phase: Counting";
     }
 
     @Override

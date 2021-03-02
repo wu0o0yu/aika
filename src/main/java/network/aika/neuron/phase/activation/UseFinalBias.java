@@ -43,7 +43,7 @@ public class UseFinalBias extends RankedImpl implements ActivationPhase {
     }
 
     public String toString() {
-        return "Act: Use Final Bias";
+        return "Act-Phase: Use Final Bias";
     }
 
     @Override

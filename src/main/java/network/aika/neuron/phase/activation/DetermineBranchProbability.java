@@ -40,7 +40,7 @@ public class DetermineBranchProbability extends RankedImpl implements Activation
     }
 
     public String toString() {
-        return "Act: Determine Branch Probability";
+        return "Act-Phase: Determine Branch Probability";
     }
 
     @Override

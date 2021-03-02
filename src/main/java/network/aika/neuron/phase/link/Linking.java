@@ -44,7 +44,7 @@ public class Linking extends RankedImpl implements LinkPhase {
     }
 
     public String toString() {
-        return "Link: Linking";
+        return "Link-Phase: Linking";
     }
 
     @Override

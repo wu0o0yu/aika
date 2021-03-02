@@ -55,7 +55,7 @@ public class EntropyGradient extends RankedImpl implements ActivationPhase {
     }
 
     public String toString() {
-        return "Act: Entropy Gradient";
+        return "Act-Phase: Entropy Gradient";
     }
 
     @Override
