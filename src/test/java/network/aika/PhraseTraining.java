@@ -79,22 +79,22 @@ public class PhraseTraining {
                 .forEach(p -> {
                             System.out.println(p);
                             Document doc = new Document(p);
-                            if (round == 0) {
-                                doc.addFilters(countingOnlyFilters);
-                             //   AikaDebugger.createAndShowGUI(doc, m);
-                            } else {
-                                AikaDebugger.createAndShowGUI(doc, m);
-                            }
 
                             int i = 0;
                             TextReference lastRef = null;
                             for (String t : doc.getContent().split(" ")) {
-                                if(!isBlank(t)) {
+                                if (!isBlank(t)) {
                                     int j = i + t.length();
                                     lastRef = doc.processToken(m, lastRef, i, j, t).getReference();
 
                                     i = j + 1;
                                 }
+                            }
+
+                            if (round == 0) {
+                                doc.addFilters(countingOnlyFilters);
+                            } else {
+                                AikaDebugger.createAndShowGUI(doc, m);
                             }
 
                             doc.process(m);

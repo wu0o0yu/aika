@@ -51,7 +51,7 @@ public class Document extends Thought {
     public void linkInputRelations(Activation act) {
         TextReference ref = act.getReference();
         TextModel tm = act.getNeuron().getModel();
-        if(tm.nextTokenInhib.getId().equals(act.getNeuron().getId())) {
+        if(tm.getNextTokenInhib().getId().equals(act.getNeuron().getId())) {
             ref.nextTokenIAct = act;
             ref.nextTokenPPAct = act.getInputLinks()
                     .findAny()

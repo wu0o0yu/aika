@@ -41,9 +41,12 @@ public class TextModel extends Model {
 
     public static String REL_PREVIOUS_TOKEN_LABEL = " Rel Prev. Token";
     public static String REL_NEXT_TOKEN_LABEL = " Rel Next Token";
+    public static String PREVIOUS_TOKEN_LABEL = "Prev. Token";
+    public static String NEXT_TOKEN_LABEL = "Next Token";
 
-    public NeuronProvider prevTokenInhib;
-    public NeuronProvider nextTokenInhib;
+
+    private NeuronProvider prevTokenInhib;
+    private NeuronProvider nextTokenInhib;
 
     public TextModel() {
         super();
@@ -58,13 +61,13 @@ public class TextModel extends Model {
     private void init() {
         InhibitoryNeuron ptN = getTemplates().INHIBITORY_TEMPLATE.instantiateTemplate();
         ptN.setInputNeuron(true);
-        ptN.setLabel("Prev. Token");
+        ptN.setLabel(PREVIOUS_TOKEN_LABEL);
         prevTokenInhib = ptN.getProvider();
         prevTokenInhib.save();
 
         InhibitoryNeuron ntN = getTemplates().INHIBITORY_TEMPLATE.instantiateTemplate();
         ntN.setInputNeuron(true);
-        ntN.setLabel("Next Token");
+        ntN.setLabel(NEXT_TOKEN_LABEL);
         nextTokenInhib = ntN.getProvider();
         nextTokenInhib.save();
     }
