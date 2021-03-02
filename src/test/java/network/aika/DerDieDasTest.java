@@ -1,4 +1,4 @@
-package network;
+package network.aika;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Templates;
@@ -13,8 +13,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
-
-import static network.aika.neuron.Templates.*;
 
 public class DerDieDasTest {
 

@@ -39,6 +39,9 @@ import static network.aika.neuron.phase.activation.ActivationPhase.LINK_AND_PROP
 */
 public class TextModel extends Model {
 
+    public static String REL_PREVIOUS_TOKEN_LABEL = " Rel Prev. Token";
+    public static String REL_NEXT_TOKEN_LABEL = " Rel Next Token";
+
     public NeuronProvider prevTokenInhib;
     public NeuronProvider nextTokenInhib;
 
@@ -129,11 +132,11 @@ public class TextModel extends Model {
 
         PatternPartNeuron inRelPT = getTemplates().INPUT_PATTERN_PART_TEMPLATE.instantiateTemplate();
         inRelPT.setInputNeuron(true);
-        inRelPT.setLabel(tokenLabel + " Rel Prev. Token");
+        inRelPT.setLabel(tokenLabel + REL_PREVIOUS_TOKEN_LABEL);
 
         PatternPartNeuron inRelNT = getTemplates().INPUT_PATTERN_PART_TEMPLATE.instantiateTemplate();
         inRelNT.setInputNeuron(true);
-        inRelNT.setLabel(tokenLabel + " Rel Next Token");
+        inRelNT.setLabel(tokenLabel + REL_NEXT_TOKEN_LABEL);
 
         {
             {

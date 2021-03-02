@@ -1,4 +1,4 @@
-package network;
+package network.aika;
 
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.junit.jupiter.api.Test;
