@@ -78,6 +78,14 @@
           <option name="url" value="http://github.com" />
           <option name="userName" value="aika-algorithm" />
         </UrlAndUserName>
+        <UrlAndUserName>
+          <option name="url" value="https://github.com/aika-algorithm/gs-core.git" />
+          <option name="userName" value="" />
+        </UrlAndUserName>
+        <UrlAndUserName>
+          <option name="url" value="https://github.com/aika-algorithm/gs-ui-swing.git" />
+          <option name="userName" value="" />
+        </UrlAndUserName>
       </list>
     </option>
     <option name="cloneParentDir" value="$USER_HOME$/aika-ws" />
