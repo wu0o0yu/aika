@@ -28,8 +28,8 @@ public class QueueEntry<P extends Phase, E extends Element> implements Comparabl
     private P phase;
     private E element;
 
-    public QueueEntry(int round, P phase, E element) {
-        this.round = round;
+    public QueueEntry(P phase, E element) {
+        this.round = phase.getRound(element);
         this.phase = phase;
         this.element = element;
     }

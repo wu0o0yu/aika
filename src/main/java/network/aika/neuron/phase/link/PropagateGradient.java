@@ -20,6 +20,9 @@ import network.aika.utils.Utils;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.RankedImpl;
 
+import static network.aika.neuron.activation.Element.RoundType.ACT;
+import static network.aika.neuron.activation.Element.RoundType.GRADIENT;
+
 /**
  * Propagate the gradient backwards through the network.
  *
@@ -44,6 +47,12 @@ public class PropagateGradient extends RankedImpl implements LinkPhase {
                     UPDATE_WEIGHT
             );
         }
+    }
+
+
+    @Override
+    public int getRound(Link l) {
+        return l.getRound(GRADIENT);
     }
 
     public String toString() {

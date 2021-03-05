@@ -31,6 +31,8 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.activation.Element.RoundType.GRADIENT;
+import static network.aika.neuron.activation.Element.RoundType.WEIGHT;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
@@ -266,6 +268,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
         double biasDelta = learnRate * act.getInputGradient();
         addBias(biasDelta);
+        act.updateRound(WEIGHT, act.getRound(GRADIENT), true);
 
         double finalBias = getBias(true);
         if(finalBias > 0.0) {

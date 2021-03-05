@@ -20,6 +20,8 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
+import static network.aika.neuron.activation.Element.RoundType.*;
+
 /**
  * Check if there are positive recurrent links that have not been activated and thus need to be updated.
  *
@@ -40,6 +42,11 @@ public class UseFinalBias extends RankedImpl implements ActivationPhase {
                     PROPAGATE_CHANGE
             );
         }
+    }
+
+    @Override
+    public int getRound(Activation act) {
+        return act.getRound(WEIGHT);
     }
 
     public String toString() {

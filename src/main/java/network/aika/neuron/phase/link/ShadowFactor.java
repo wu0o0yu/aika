@@ -21,6 +21,7 @@ import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
+import static network.aika.neuron.activation.Element.RoundType.ACT;
 import static network.aika.neuron.phase.activation.ActivationPhase.DETERMINE_BRANCH_PROBABILITY;
 
 /**
@@ -38,6 +39,11 @@ public class ShadowFactor extends RankedImpl implements LinkPhase {
     @Override
     public void process(Link l) {
     //    l.removeGradientDependencies();
+    }
+
+    @Override
+    public int getRound(Link l) {
+        return l.getRound(ACT);
     }
 
     public String toString() {

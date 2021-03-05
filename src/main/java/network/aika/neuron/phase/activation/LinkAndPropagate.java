@@ -18,6 +18,7 @@ package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
@@ -26,6 +27,7 @@ import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 
+import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -92,6 +94,11 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
                         ACT
                 )
         );
+    }
+
+    @Override
+    public int getRound(Activation act) {
+        return act.getRound(Element.RoundType.ACT);
     }
 
     @Override

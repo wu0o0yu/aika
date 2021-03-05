@@ -16,10 +16,14 @@
  */
 package network.aika.neuron.phase.link;
 
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.activation.ActivationPhase;
+
+import static network.aika.neuron.activation.Element.RoundType.ACT;
+import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
 
 /**
  * Counts the number of input or output activations a particular synapse has encountered.
@@ -40,6 +44,11 @@ public class Counting extends RankedImpl implements LinkPhase {
 
         // Should probably have no effect on the current example.
 //        l.getThought().addToQueue(l, INFORMATION_GAIN_GRADIENT);
+    }
+
+    @Override
+    public int getRound(Link l) {
+        return l.getRound(ACT);
     }
 
     public String toString() {

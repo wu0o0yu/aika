@@ -22,6 +22,8 @@ import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.link.LinkPhase;
 import network.aika.neuron.phase.link.PropagateGradient;
 
+import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
+import static network.aika.neuron.activation.Element.RoundType.GRADIENT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.link.LinkPhase.PROPAGATE_GRADIENT_RANK;
 
@@ -39,6 +41,11 @@ public class PropagateGradientsSum extends RankedImpl implements ActivationPhase
     @Override
     public void process(Activation act) {
         act.propagateGradientsFromSumUpdate();
+    }
+
+    @Override
+    public int getRound(Activation act) {
+        return act.getRound(GRADIENT);
     }
 
     public String toString() {

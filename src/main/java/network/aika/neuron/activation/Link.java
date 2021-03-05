@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static network.aika.neuron.activation.Activation.TOLERANCE;
+import static network.aika.neuron.activation.Element.RoundType.WEIGHT;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -290,7 +291,13 @@ public class Link extends Element {
     }
 
     public void sumUpLink(double delta) {
-        getOutput().addToSum(delta);
+        Activation oAct = getOutput();
+        oAct.addToSum(delta);
+        oAct.updateRound(
+                RoundType.ACT,
+                getRound(WEIGHT),
+                getSynapse().isRecurrent()
+        );
     }
 
     public boolean isNegative() {

@@ -23,6 +23,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.activation.ActivationPhase;
 
+import static network.aika.neuron.activation.Element.RoundType.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
 
@@ -64,6 +65,11 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
                     COUNTING
             );
         }
+    }
+
+    @Override
+    public int getRound(Link l) {
+        return l.getRound(ACT);
     }
 
     public String toString() {

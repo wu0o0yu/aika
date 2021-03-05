@@ -156,7 +156,7 @@ public abstract class Thought {
             if(p == null)
                 continue;
 
-            QueueEntry qe = new QueueEntry(e.getRound(), p, e);
+            QueueEntry qe = new QueueEntry(p, e);
             e.addQueuedPhase(qe);
             addQueueEntry(qe);
         }

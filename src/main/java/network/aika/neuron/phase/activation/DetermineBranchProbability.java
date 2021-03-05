@@ -21,6 +21,9 @@ import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.link.LinkPhase;
 
+import static network.aika.neuron.activation.Element.RoundType.ACT;
+import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
+
 /**
  * If there are multiple mutually exclusive branches, then the softmax function will be used, to assign
  * a probability to each branch.
@@ -37,6 +40,11 @@ public class DetermineBranchProbability extends RankedImpl implements Activation
     @Override
     public void process(Activation act) {
         act.computeBranchProbability();
+    }
+
+    @Override
+    public int getRound(Activation act) {
+        return act.getRound(ACT);
     }
 
     public String toString() {

@@ -20,6 +20,9 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
+import static network.aika.neuron.activation.Element.RoundType.ACT;
+import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
+
 /**
  * During the initial linking process all positive recurrent synapses are assumed to be
  * active. If that is not the case, updates of the affected activations are required.
@@ -36,6 +39,11 @@ public class PropagateChange extends RankedImpl implements ActivationPhase {
     @Override
     public void process(Activation act) {
         act.updateOutgoingLinks();
+    }
+
+    @Override
+    public int getRound(Activation act) {
+        return act.getRound(ACT);
     }
 
     public String toString() {

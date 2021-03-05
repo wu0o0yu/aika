@@ -27,6 +27,8 @@ public interface Phase<E extends Element> extends Ranked, Comparator<E> {
 
     void process(E e);
 
+    int getRound(E element);
+
     static String toString(Phase p) {
         return " (" + (p != null ? p.toString() + "-" + p.getRank() : "X") + ")";
     }

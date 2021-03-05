@@ -21,6 +21,7 @@ import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
+import static network.aika.neuron.activation.Element.RoundType.ACT;
 import static network.aika.neuron.phase.activation.ActivationPhase.LINK_AND_PROPAGATE;
 
 
@@ -41,6 +42,11 @@ public class Linking extends RankedImpl implements LinkPhase {
         l.follow(LINK_AND_PROPAGATE);
 
         l.getThought().addToQueue(l, COUNTING);
+    }
+
+    @Override
+    public int getRound(Link l) {
+        return l.getRound(ACT);
     }
 
     public String toString() {

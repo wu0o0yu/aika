@@ -30,6 +30,8 @@ import network.aika.neuron.phase.link.LinkPhase;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
+import static network.aika.neuron.activation.Element.RoundType.GRADIENT;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -87,6 +89,11 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
                         ACT
                 )
         );
+    }
+
+    @Override
+    public int getRound(Activation act) {
+        return act.getRound(GRADIENT);
     }
 
     @Override

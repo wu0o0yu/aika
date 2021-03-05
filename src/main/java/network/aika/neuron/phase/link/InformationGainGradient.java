@@ -21,6 +21,9 @@ import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.activation.ActivationPhase;
 
+import static network.aika.neuron.activation.Element.RoundType.ACT;
+import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
+
 /**
  * Computes the gradient of the information gain function for this activation.
  *
@@ -38,6 +41,11 @@ public class InformationGainGradient extends RankedImpl implements LinkPhase {
     @Override
     public void process(Link l) {
         l.computeInformationGainGradient();
+    }
+
+    @Override
+    public int getRound(Link l) {
+        return l.getRound(FREQUENCY);
     }
 
     public String toString() {

@@ -24,6 +24,8 @@ import network.aika.neuron.phase.RankedImpl;
 
 import network.aika.neuron.phase.activation.ActivationPhase;
 
+import static network.aika.neuron.activation.Element.RoundType.ACT;
+import static network.aika.neuron.activation.Element.RoundType.GRADIENT;
 import static network.aika.neuron.phase.activation.ActivationPhase.TEMPLATE_INPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.UPDATE_SYNAPSE_INPUT_LINKS;
 
@@ -43,6 +45,11 @@ public class Template extends RankedImpl implements LinkPhase {
     @Override
     public void process(Link l) {
         l.follow(TEMPLATE_INPUT);
+    }
+
+    @Override
+    public int getRound(Link l) {
+        return l.getRound(GRADIENT);
     }
 
     public String toString() {

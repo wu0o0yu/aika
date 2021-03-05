@@ -20,6 +20,8 @@ import network.aika.Model;
 import network.aika.neuron.activation.Activation;
 import network.aika.utils.Writable;
 import network.aika.neuron.activation.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -33,6 +35,9 @@ import java.io.IOException;
  * @author Lukas Molzberger
  */
 public class SampleSpace implements Writable {
+
+    private static final Logger log = LoggerFactory.getLogger(SampleSpace.class);
+
 
     private Model m;
     private double N = 0;
@@ -76,7 +81,12 @@ public class SampleSpace implements Writable {
         if(lastPos != null) {
             n = getAbsoluteBegin(m, ref) - lastPos;
         }
-        assert n >= 0;
+
+        if(n < 0) {
+            log.warn("getNegativeInstancesSinceLastPos is not allowed to be called after update.");
+            return 0;
+        }
+
 
         n /= ref.length();
         return n;

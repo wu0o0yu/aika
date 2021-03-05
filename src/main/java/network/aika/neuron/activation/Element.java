@@ -33,16 +33,27 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
  */
 public abstract class Element implements Comparable<Element> {
 
-    private int round;
+    public enum RoundType {
+        ACT,
+        WEIGHT,
+        GRADIENT,
+        FREQUENCY
+    }
+
+    private int[] round = new int[RoundType.values().length];
 
     private Set<QueueEntry> queuedPhases = new TreeSet<>();
 
-    public int getRound() {
-        return round;
+    public int getRound(RoundType type) {
+        return round[type.ordinal()];
     }
 
-    public void setRound(int round) {
-        this.round = round;
+    public void setRound(RoundType type, int round) {
+        this.round[type.ordinal()] = round;
+    }
+
+    public void updateRound(RoundType type, int round, boolean increment) {
+        this.round[type.ordinal()] = Math.max(this.round[type.ordinal()], round + (increment ? 1 : 0));
     }
 
     public void addQueuedPhase(QueueEntry qe) {
@@ -62,7 +73,7 @@ public abstract class Element implements Comparable<Element> {
     public void copyPhases(Element newElement) {
         queuedPhases.stream()
                 .map(qe ->
-                        new QueueEntry(qe.getRound(), qe.getPhase(), newElement)
+                        new QueueEntry(qe.getPhase(), newElement)
                 )
                 .forEach(qe ->
                         getThought().addQueueEntry(qe)
@@ -80,5 +91,4 @@ public abstract class Element implements Comparable<Element> {
     public abstract Thought getThought();
 
     public abstract String toShortString();
-
 }

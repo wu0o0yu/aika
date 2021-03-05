@@ -20,6 +20,9 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
+import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
+import static network.aika.neuron.activation.Element.RoundType.WEIGHT;
+
 
 /**
  * Determines which input synapses of this activations neuron should be linked to the input neuron.
@@ -39,6 +42,11 @@ public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPha
     public void process(Activation act) {
         act.getNeuron().updateSynapseInputLinks();
         act.getNeuronProvider().save();
+    }
+
+    @Override
+    public int getRound(Activation act) {
+        return act.getRound(WEIGHT);
     }
 
     public String toString() {

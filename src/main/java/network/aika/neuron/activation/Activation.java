@@ -33,6 +33,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.activation.Element.RoundType.ACT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
@@ -227,7 +228,7 @@ public class Activation extends Element {
         thought.onActivationCreationEvent(clonedAct, this);
 
         copyPhases(clonedAct);
-        clonedAct.setRound(getRound() + 1);
+        clonedAct.setRound(ACT, getRound(ACT) + 1);
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
         linkClone(clonedAct, excludedSyn);
@@ -243,7 +244,7 @@ public class Activation extends Element {
 
         replaceElement(clonedAct);
 
-        clonedAct.setRound(getRound() + 1);
+        clonedAct.setRound(ACT, getRound(ACT) + 1);
         linkClone(clonedAct, excludedSyn);
 
         return clonedAct;
@@ -631,7 +632,7 @@ public class Activation extends Element {
                 " net:" + Utils.round(getNet(false)) +
                 " netFinal:" + Utils.round(getNet(true)) +
                 " bp:" + Utils.round(branchProbability) +
-                " round:" + getRound());
+                " round:" + getRound(ACT));
 
         if (includeLink) {
             sb.append("\n");

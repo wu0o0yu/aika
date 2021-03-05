@@ -22,6 +22,8 @@ import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
+import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
+import static network.aika.neuron.activation.Element.RoundType.GRADIENT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
@@ -49,6 +51,11 @@ public class Induction extends RankedImpl implements ActivationPhase {
         act.setNeuron(inducedNeuron);
 
         act.link();
+    }
+
+    @Override
+    public int getRound(Activation act) {
+        return act.getRound(GRADIENT);
     }
 
     public String toString() {
