@@ -48,7 +48,7 @@ public class Counting extends RankedImpl implements LinkPhase {
 
     @Override
     public int getRound(Link l) {
-        return l.getRound(ACT);
+        return Integer.MAX_VALUE;
     }
 
     public String toString() {

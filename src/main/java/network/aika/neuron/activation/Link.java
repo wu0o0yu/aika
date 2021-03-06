@@ -86,16 +86,6 @@ public class Link extends Element {
         return gradient;
     }
 
-    @Override
-    public void onProcessEvent(Phase p) {
-        getThought().onLinkProcessedEvent(p, this);
-    }
-
-    @Override
-    public void afterProcessEvent(Phase p) {
-        getThought().afterLinkProcessedEvent(p, this);
-    }
-
     public static boolean synapseExists(Activation iAct, Activation oAct) {
         return Synapse.synapseExists(iAct.getNeuron(), oAct.getNeuron());
     }
@@ -296,7 +286,7 @@ public class Link extends Element {
         oAct.updateRound(
                 RoundType.ACT,
                 getRound(WEIGHT),
-                getSynapse().isRecurrent()
+                getSynapse().isRecurrent() && !oAct.getNeuron().isInputNeuron()
         );
     }
 

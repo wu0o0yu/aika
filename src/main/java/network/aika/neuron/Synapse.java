@@ -206,7 +206,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 v.getSelfRef()
         );
 
-        nl.getThought().onLinkProcessedEvent(null, nl);
+        nl.getThought().onLinkCreationEvent(nl);
 
         v.link = nl;
 

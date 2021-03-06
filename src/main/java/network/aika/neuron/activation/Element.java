@@ -84,10 +84,6 @@ public abstract class Element implements Comparable<Element> {
         getThought().removeQueueEntries(queuedPhases);
     }
 
-    public abstract void onProcessEvent(Phase p);
-
-    public abstract void afterProcessEvent(Phase p);
-
     public abstract Thought getThought();
 
     public abstract String toShortString();

@@ -42,7 +42,7 @@ public class Counting extends RankedImpl implements ActivationPhase {
 
     @Override
     public int getRound(Activation act) {
-        return act.getRound(ACT);
+        return Integer.MAX_VALUE;
     }
 
     public String toString() {

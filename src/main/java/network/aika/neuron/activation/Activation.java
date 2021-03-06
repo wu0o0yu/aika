@@ -108,16 +108,6 @@ public class Activation extends Element {
         this.marked = marked;
     }
 
-    @Override
-    public void onProcessEvent(Phase p) {
-        thought.onActivationProcessedEvent(p, this);
-    }
-
-    @Override
-    public void afterProcessEvent(Phase p) {
-        thought.afterActivationProcessedEvent(p, this);
-    }
-
     public void initInput(Reference ref) {
         setReference(ref);
 

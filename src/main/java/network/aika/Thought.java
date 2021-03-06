@@ -69,31 +69,17 @@ public abstract class Thought {
                 );
     }
 
-    public void onActivationProcessedEvent(Phase p, Activation act) {
+    public void beforeProcessedEvent(QueueEntry qe) {
         getEventListeners()
                 .forEach(
-                        el -> el.onActivationProcessedEvent(p, act)
+                        el -> el.beforeProcessedEvent(qe)
                 );
     }
 
-    public void afterActivationProcessedEvent(Phase p, Activation act) {
+    public void afterProcessedEvent(QueueEntry qe) {
         getEventListeners()
                 .forEach(
-                        el -> el.afterActivationProcessedEvent(p, act)
-                );
-    }
-
-    public void onLinkProcessedEvent(Phase p, Link l) {
-        getEventListeners()
-                .forEach(
-                        el -> el.onLinkProcessedEvent(p, l)
-                );
-    }
-
-    public void afterLinkProcessedEvent(Phase p, Link l) {
-        getEventListeners()
-                .forEach(
-                        el -> el.afterLinkProcessedEvent(p, l)
+                        el -> el.afterProcessedEvent(qe)
                 );
     }
 
@@ -111,13 +97,13 @@ public abstract class Thought {
                 );
     }
 
-    public synchronized Collection<network.aika.callbacks.EventListener> getEventListeners() {
+    public synchronized Collection<EventListener> getEventListeners() {
         return eventListeners
                 .stream()
                 .collect(Collectors.toList());
     }
 
-    public synchronized void addEventListener(network.aika.callbacks.EventListener l) {
+    public synchronized void addEventListener(EventListener l) {
         eventListeners.add(l);
     }
 
@@ -187,7 +173,10 @@ public abstract class Thought {
             QueueEntry qe = queue.pollFirst();
 
             qe.getElement().removeQueuedPhase(qe);
+
+            beforeProcessedEvent(qe);
             qe.process();
+            afterProcessedEvent(qe);
         }
         m.addToN(length());
     }
