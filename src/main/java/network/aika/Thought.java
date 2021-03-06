@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 public abstract class Thought {
     private static final Logger log = LoggerFactory.getLogger(Thought.class);
 
+    private long timestampCounter = 0;
     private int activationIdCounter = 0;
 
     private final TreeSet<QueueEntry> queue = new TreeSet<>();
@@ -152,6 +153,7 @@ public abstract class Thought {
         if(filters.contains(qe.getPhase()))
             return;
 
+        qe.setAddedTimestamp(timestampCounter);
         queue.add(qe);
     }
 
@@ -171,12 +173,15 @@ public abstract class Thought {
     public void process(Model m) {
         while (!queue.isEmpty()) {
             QueueEntry qe = queue.pollFirst();
+            qe.setCurrentTimestamp(timestampCounter);
 
             qe.getElement().removeQueuedPhase(qe);
 
             beforeProcessedEvent(qe);
             qe.process();
             afterProcessedEvent(qe);
+
+            timestampCounter++;
         }
         m.addToN(length());
     }

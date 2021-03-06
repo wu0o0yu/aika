@@ -27,6 +27,8 @@ public class QueueEntry<P extends Phase, E extends Element> implements Comparabl
     private int round;
     private P phase;
     private E element;
+    private long addedTimestamp;
+    private long currentTimestamp;
 
     public QueueEntry(P phase, E element) {
         this.round = phase.getRound(element);
@@ -40,6 +42,22 @@ public class QueueEntry<P extends Phase, E extends Element> implements Comparabl
 
     public P getPhase() {
         return phase;
+    }
+
+    public long getAddedTimestamp() {
+        return addedTimestamp;
+    }
+
+    public void setAddedTimestamp(long addedTimestamp) {
+        this.addedTimestamp = addedTimestamp;
+    }
+
+    public long getCurrentTimestamp() {
+        return currentTimestamp;
+    }
+
+    public void setCurrentTimestamp(long currentTimestamp) {
+        this.currentTimestamp = currentTimestamp;
     }
 
     public String toString() {
