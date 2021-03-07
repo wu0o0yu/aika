@@ -31,19 +31,16 @@ import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
  */
 public class PropagateChange extends RankedImpl implements ActivationPhase {
 
-    @Override
-    public Ranked getPreviousRank() {
-        return USE_FINAL_BIAS;
+    private double delta;
+
+    public PropagateChange(double delta) {
+        super(USE_FINAL_BIAS);
+        this.delta = delta;
     }
 
     @Override
     public void process(Activation act) {
-        act.updateOutgoingLinks();
-    }
-
-    @Override
-    public int getRound(Activation act) {
-        return act.getRound(ACT);
+        act.updateOutgoingLinks(delta);
     }
 
     public String toString() {

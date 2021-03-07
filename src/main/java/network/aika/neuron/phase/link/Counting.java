@@ -46,11 +46,6 @@ public class Counting extends RankedImpl implements LinkPhase {
 //        l.getThought().addToQueue(l, INFORMATION_GAIN_GRADIENT);
     }
 
-    @Override
-    public int getRound(Link l) {
-        return Integer.MAX_VALUE;
-    }
-
     public String toString() {
         return "Link-Phase: Counting";
     }

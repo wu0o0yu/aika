@@ -34,8 +34,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.activation.Element.RoundType.GRADIENT;
-import static network.aika.neuron.activation.Element.RoundType.WEIGHT;
+import static network.aika.neuron.activation.Element.RoundType.*;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.activation.Link.linkExists;
@@ -172,6 +171,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         t.addToQueue(
                 toAct,
+                fromAct.getRound(ACT),
                 nv.getPhase().getNextActivationPhases()
         );
 
@@ -216,6 +216,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
             oAct.getThought().addToQueue(
                     nl,
+                    0,
                     INFORMATION_GAIN_GRADIENT,
                     !oAct.gradientSumIsZero() ? new PropagateGradient(oAct.getOutputGradientSum()) : null
             );

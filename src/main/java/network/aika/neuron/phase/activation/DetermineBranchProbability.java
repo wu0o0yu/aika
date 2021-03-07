@@ -42,11 +42,6 @@ public class DetermineBranchProbability extends RankedImpl implements Activation
         act.computeBranchProbability();
     }
 
-    @Override
-    public int getRound(Activation act) {
-        return act.getRound(ACT);
-    }
-
     public String toString() {
         return "Act-Phase: Determine Branch Probability";
     }

@@ -39,11 +39,6 @@ public class PropagateGradientsNet extends RankedImpl implements ActivationPhase
         act.propagateGradientsFromNetUpdate();
     }
 
-    @Override
-    public int getRound(Activation act) {
-        return act.getRound(GRADIENT);
-    }
-
     public String toString() {
         return "Act-Phase: Propagate Gradients from Net Update";
     }

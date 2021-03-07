@@ -40,11 +40,6 @@ public class Counting extends RankedImpl implements ActivationPhase {
         act.getNeuron().count(act);
     }
 
-    @Override
-    public int getRound(Activation act) {
-        return Integer.MAX_VALUE;
-    }
-
     public String toString() {
         return "Act-Phase: Counting";
     }

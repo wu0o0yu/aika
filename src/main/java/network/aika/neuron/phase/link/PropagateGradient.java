@@ -44,15 +44,10 @@ public class PropagateGradient extends RankedImpl implements LinkPhase {
         if(l.getSynapse().isAllowTraining()) {
             l.getThought().addToQueue(
                     l,
+                    l.getRound(GRADIENT),
                     UPDATE_WEIGHT
             );
         }
-    }
-
-
-    @Override
-    public int getRound(Link l) {
-        return l.getRound(GRADIENT);
     }
 
     public String toString() {

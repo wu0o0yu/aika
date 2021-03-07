@@ -20,6 +20,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
+import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Element.RoundType.*;
 
 /**
@@ -36,17 +37,16 @@ public class UseFinalBias extends RankedImpl implements ActivationPhase {
 
     @Override
     public void process(Activation act) {
-        if(act.updateForFinalPhase()) {
-            act.getThought().addToQueue(
-                    act,
-                    PROPAGATE_CHANGE
-            );
-        }
-    }
+        double delta = act.updateValue(true);
 
-    @Override
-    public int getRound(Activation act) {
-        return act.getRound(WEIGHT);
+        if(Math.abs(delta) < TOLERANCE)
+            return;
+
+        act.getThought().addToQueue(
+                act,
+                act.getRound(ACT) + 1,
+                new PropagateChange(delta)
+        );
     }
 
     public String toString() {

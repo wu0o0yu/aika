@@ -47,11 +47,6 @@ public class Template extends RankedImpl implements LinkPhase {
         l.follow(TEMPLATE_INPUT);
     }
 
-    @Override
-    public int getRound(Link l) {
-        return l.getRound(GRADIENT);
-    }
-
     public String toString() {
         return "Link-Phase: Template";
     }

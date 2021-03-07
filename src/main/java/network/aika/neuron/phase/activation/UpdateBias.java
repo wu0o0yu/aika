@@ -20,11 +20,6 @@ public class UpdateBias extends RankedImpl implements ActivationPhase {
         act.getNeuron().updateBias(act);
     }
 
-    @Override
-    public int getRound(Activation act) {
-        return act.getRound(GRADIENT);
-    }
-
     public String toString() {
         return "Act-Phase: Update Bias";
     }

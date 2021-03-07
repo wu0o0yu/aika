@@ -52,12 +52,6 @@ public class Induction extends RankedImpl implements LinkPhase {
         inducedSynapse.linkOutput();
     }
 
-
-    @Override
-    public int getRound(Link l) {
-        return l.getRound(GRADIENT);
-    }
-
     public String toString() {
         return "Link-Phase: Induction";
     }

@@ -130,20 +130,20 @@ public abstract class Thought {
         activationsById.put(act.getId(), act);
     }
 
-    public void addToQueue(Activation act, ActivationPhase... phases) {
-        addToQueueIntern(act, phases);
+    public void addToQueue(Activation act, int round, ActivationPhase... phases) {
+        addToQueueIntern(act, round, phases);
     }
 
-    public void addToQueue(Link l, LinkPhase... phases) {
-        addToQueueIntern(l, phases);
+    public void addToQueue(Link l, int round, LinkPhase... phases) {
+        addToQueueIntern(l, round, phases);
     }
 
-    private <P extends Phase, E extends Element> void addToQueueIntern(E e, P... phases) {
+    private <P extends Phase, E extends Element> void addToQueueIntern(E e, int round, P... phases) {
         for(P p: phases) {
             if(p == null)
                 continue;
 
-            QueueEntry qe = new QueueEntry(p, e);
+            QueueEntry qe = new QueueEntry(round, p, e);
             e.addQueuedPhase(qe);
             addQueueEntry(qe);
         }

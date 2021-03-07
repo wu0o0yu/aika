@@ -41,11 +41,6 @@ public class ShadowFactor extends RankedImpl implements LinkPhase {
     //    l.removeGradientDependencies();
     }
 
-    @Override
-    public int getRound(Link l) {
-        return l.getRound(ACT);
-    }
-
     public String toString() {
         return "Link-Phase: Shadow Factor";
     }

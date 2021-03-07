@@ -22,8 +22,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
-import static network.aika.neuron.activation.Element.RoundType.ACT;
-import static network.aika.neuron.activation.Element.RoundType.GRADIENT;
+import static network.aika.neuron.activation.Element.RoundType.*;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
 import static network.aika.neuron.sign.Sign.POS;
 
@@ -48,18 +47,15 @@ public class UpdateWeight extends RankedImpl implements LinkPhase {
         Thought t = l.getThought();
         t.addToQueue(
                 l.getOutput(),
+                l.getRound(WEIGHT),
                 UPDATE_SYNAPSE_INPUT_LINKS
         );
 
         t.addToQueue(
                 l,
+                l.getRound(WEIGHT),
                 new SumUpLink(l.getInputValue(POS) * weightDelta)
         );
-    }
-
-    @Override
-    public int getRound(Link l) {
-        return l.getRound(GRADIENT);
     }
 
     public String toString() {

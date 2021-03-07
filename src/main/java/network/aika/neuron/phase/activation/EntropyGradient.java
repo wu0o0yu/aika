@@ -51,14 +51,10 @@ public class EntropyGradient extends RankedImpl implements ActivationPhase {
         if(!act.gradientIsZero()) {
             act.getThought().addToQueue(
                     act,
+                    0,
                     PROPAGATE_GRADIENTS_SUM
             );
         }
-    }
-
-    @Override
-    public int getRound(Activation act) {
-        return act.getRound(FREQUENCY);
     }
 
     public String toString() {

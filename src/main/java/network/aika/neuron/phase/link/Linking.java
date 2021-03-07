@@ -41,12 +41,7 @@ public class Linking extends RankedImpl implements LinkPhase {
     public void process(Link l) {
         l.follow(LINK_AND_PROPAGATE);
 
-        l.getThought().addToQueue(l, COUNTING);
-    }
-
-    @Override
-    public int getRound(Link l) {
-        return l.getRound(ACT);
+        l.getThought().addToQueue(l, Integer.MAX_VALUE, COUNTING);
     }
 
     public String toString() {

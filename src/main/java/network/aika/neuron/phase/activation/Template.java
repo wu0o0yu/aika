@@ -92,11 +92,6 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     }
 
     @Override
-    public int getRound(Activation act) {
-        return act.getRound(GRADIENT);
-    }
-
-    @Override
     public void closeCycle(Activation fromAct, Visitor v) {
         Direction dir = v.startDir;
 

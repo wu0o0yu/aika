@@ -53,11 +53,6 @@ public class Induction extends RankedImpl implements ActivationPhase {
         act.link();
     }
 
-    @Override
-    public int getRound(Activation act) {
-        return act.getRound(GRADIENT);
-    }
-
     public String toString() {
         return "Act-Phase: Induction";
     }

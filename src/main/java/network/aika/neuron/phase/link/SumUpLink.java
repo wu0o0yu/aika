@@ -46,15 +46,17 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
         Thought t = l.getThought();
         l.sumUpLink(delta);
 
+        Activation oAct = l.getOutput();
         t.addToQueue(
-                l.getOutput(),
+                oAct,
+                oAct.getRound(ACT),
                 PROPAGATE_GRADIENTS_NET
         );
 
-        Activation oAct = l.getOutput();
         if(oAct.checkIfFired()) {
             t.addToQueue(
                     oAct,
+                    oAct.getRound(ACT),
                     LINK_AND_PROPAGATE,
                     USE_FINAL_BIAS,
                     oAct.hasBranches() ? DETERMINE_BRANCH_PROBABILITY : null,
@@ -62,14 +64,10 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
             );
             oAct.addLinksToQueue(
                     INPUT,
+                    Integer.MAX_VALUE,
                     COUNTING
             );
         }
-    }
-
-    @Override
-    public int getRound(Link l) {
-        return l.getRound(ACT);
     }
 
     public String toString() {

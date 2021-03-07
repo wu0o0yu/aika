@@ -44,11 +44,6 @@ public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPha
         act.getNeuronProvider().save();
     }
 
-    @Override
-    public int getRound(Activation act) {
-        return act.getRound(WEIGHT);
-    }
-
     public String toString() {
         return "Act-Phase: Update Synapse Input Links";
     }

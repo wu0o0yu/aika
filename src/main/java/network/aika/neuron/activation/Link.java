@@ -78,6 +78,7 @@ public class Link extends Element {
 
         t.addToQueue(
                 this,
+                input.getRound(RoundType.ACT),
                 new SumUpLink(w * (getInputValue(POS) - getInputValue(POS, oldLink)))
         );
     }
@@ -276,6 +277,7 @@ public class Link extends Element {
     public void addNextLinkPhases(VisitorPhase p) {
         getThought().addToQueue(
                 this,
+                0,
                 p.getNextLinkPhases()
         );
     }
@@ -285,7 +287,7 @@ public class Link extends Element {
         oAct.addToSum(delta);
         oAct.updateRound(
                 RoundType.ACT,
-                getRound(WEIGHT),
+                Math.max(getRound(WEIGHT), getInput().getRound(RoundType.ACT)),
                 getSynapse().isRecurrent() && !oAct.getNeuron().isInputNeuron()
         );
     }

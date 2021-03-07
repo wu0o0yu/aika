@@ -27,6 +27,7 @@ import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 
+import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
@@ -70,7 +71,9 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
     public void process(Activation act) {
         act.getThought().linkInputRelations(act);
 
-        if(!act.updateValue(false))
+        double delta = act.updateValue(false);
+
+        if(Math.abs(delta) < TOLERANCE)
             return;
 
         act.followLinks(
@@ -94,11 +97,6 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
                         ACT
                 )
         );
-    }
-
-    @Override
-    public int getRound(Activation act) {
-        return act.getRound(Element.RoundType.ACT);
     }
 
     @Override
