@@ -60,7 +60,7 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
     }
 
     @Override
-    public Set<Scope> transition(Scope s, Direction dir, boolean checkFinalRequirement) {
+    public Set<Scope> transition(Scope s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
         if (dir == INPUT) {
             switch (s) {
                 case I_SAME:

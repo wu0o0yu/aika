@@ -59,7 +59,12 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
                     oAct.getRound(ACT),
                     LINK_AND_PROPAGATE,
                     USE_FINAL_BIAS,
-                    oAct.hasBranches() ? DETERMINE_BRANCH_PROBABILITY : null,
+                    oAct.hasBranches() ? DETERMINE_BRANCH_PROBABILITY : null
+            );
+
+            t.addToQueue(
+                    oAct,
+                    Integer.MAX_VALUE,
                     ActivationPhase.COUNTING
             );
             oAct.addLinksToQueue(

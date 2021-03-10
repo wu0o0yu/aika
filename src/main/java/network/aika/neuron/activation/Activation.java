@@ -120,7 +120,12 @@ public class Activation extends Element {
                 this,
                 0,
                 LINK_AND_PROPAGATE,
-                ENTROPY_GRADIENT,
+                ENTROPY_GRADIENT
+        );
+
+        getThought().addToQueue(
+                this,
+                Integer.MAX_VALUE,
                 COUNTING
         );
     }

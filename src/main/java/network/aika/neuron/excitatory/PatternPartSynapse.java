@@ -122,7 +122,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     }
 
     @Override
-    public Set<Scope> transition(Scope s, Direction dir, boolean checkFinalRequirement) {
+    public Set<Scope> transition(Scope s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
         if(inputScope) {
             if(dir == INPUT) {
                 if(checkFinalRequirement && s != PP_SAME) {
@@ -145,7 +145,11 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
 
                 switch (s) {
                     case PP_INPUT:
-                        return Set.of(PP_SAME, PP_RELATED_INPUT);
+                        if(startDir == INPUT) {
+                            return Set.of(PP_SAME, PP_RELATED_INPUT);
+                        } else if(startDir == OUTPUT) {
+                            return Collections.singleton(PP_SAME);
+                        }
                     case PP_RELATED_INPUT:
                         return Collections.singleton(PP_RELATED_SAME);
                     case I_INPUT:

@@ -81,7 +81,7 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
     }
 
     @Override
-    public Set<Scope> transition(Scope s, Direction dir, boolean checkFinalRequirement) {
+    public Set<Scope> transition(Scope s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
         if(checkFinalRequirement && s != P_SAME) {
             return Collections.emptySet();
         }

@@ -85,7 +85,7 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     }
 
     @Override
-    public Set<Scope> transition(Scope s, Direction dir, boolean checkFinalRequirement) {
+    public Set<Scope> transition(Scope s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
         if(checkFinalRequirement && s != I_SAME) {
             return Collections.emptySet();
         }
