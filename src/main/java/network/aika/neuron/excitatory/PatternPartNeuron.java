@@ -23,7 +23,10 @@ import network.aika.neuron.activation.direction.Direction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import static network.aika.neuron.activation.Scope.*;
 
@@ -48,10 +51,15 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     @Override
-    public Set<Scope> getInitialScopes(Direction dir) {
-        return dir == Direction.INPUT ?
-                Set.of(PP_SAME) :
-                Set.of(PP_SAME, PP_INPUT, I_SAME, P_SAME);
+    public Set<ScopeEntry> getInitialScopes(Direction dir) {
+        Set<ScopeEntry> result = new TreeSet<>();
+        result.add(new ScopeEntry(0, PP_SAME));
+        if(dir == Direction.OUTPUT) {
+            result.add(new ScopeEntry(1, PP_INPUT));
+            result.add(new ScopeEntry(2, I_SAME));
+            result.add(new ScopeEntry(3, P_SAME));
+        }
+        return result;
     }
 
     @Override

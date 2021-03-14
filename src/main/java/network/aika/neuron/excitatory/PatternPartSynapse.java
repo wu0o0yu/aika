@@ -122,57 +122,57 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     }
 
     @Override
-    public Set<Scope> transition(Scope s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
+    public Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
         if(inputScope) {
             if(dir == INPUT) {
-                if(checkFinalRequirement && s != PP_SAME) {
+                if(checkFinalRequirement && s.getScope() != PP_SAME) {
                     return Collections.emptySet();
                 }
 
-                switch (s) {
+                switch (s.getScope()) {
                     case PP_SAME:
-                        return Collections.singleton(PP_INPUT);
+                        return s.nextSet(PP_INPUT);
                     case PP_RELATED_SAME:
                     case PP_INPUT:
-                        return Collections.singleton(PP_RELATED_INPUT);
+                        return s.nextSet(PP_RELATED_INPUT);
                     case I_SAME:
-                        return Collections.singleton(I_INPUT);
+                        return s.nextSet(I_INPUT);
                 }
             } else {
-                if(checkFinalRequirement && s != PP_INPUT) {
+                if(checkFinalRequirement && s.getScope() != PP_INPUT) {
                     return Collections.emptySet();
                 }
 
-                switch (s) {
+                switch (s.getScope()) {
                     case PP_INPUT:
                         if(startDir == INPUT) {
-                            return Set.of(PP_SAME, PP_RELATED_INPUT);
+                            return s.nextSet(PP_SAME, PP_RELATED_INPUT);
                         } else if(startDir == OUTPUT) {
-                            return Collections.singleton(PP_SAME);
+                            return s.nextSet(PP_SAME);
                         }
                     case PP_RELATED_INPUT:
-                        return Collections.singleton(PP_RELATED_SAME);
+                        return s.nextSet(PP_RELATED_SAME);
                     case I_INPUT:
-                        return Collections.singleton(I_SAME);
+                        return s.nextSet(I_SAME);
                 }
             }
         }
 
         if(isSamePattern) {
             if(checkFinalRequirement) {
-                if(dir == INPUT && s != PP_SAME) {
+                if(dir == INPUT && s.getScope() != PP_SAME) {
                     return Collections.emptySet();
                 }
-                if(dir == OUTPUT && s != PP_RELATED_SAME && s != PP_SAME) {
+                if(dir == OUTPUT && s.getScope() != PP_RELATED_SAME && s.getScope() != PP_SAME) {
                     return Collections.emptySet();
                 }
             }
 
-            switch (s) {
+            switch (s.getScope()) {
                 case PP_SAME:
-                    return Set.of(PP_RELATED_SAME, PP_SAME);
+                    return s.nextSet(PP_RELATED_SAME, PP_SAME);
                 case PP_RELATED_SAME:
-                    return Collections.singleton(PP_SAME);
+                    return s.nextSet(PP_SAME);
                 case PP_RELATED_INPUT:
                 case PP_INPUT:
                 case P_SAME:

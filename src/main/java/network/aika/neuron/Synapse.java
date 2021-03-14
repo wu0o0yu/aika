@@ -32,6 +32,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.activation.Element.RoundType.*;
@@ -103,7 +104,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Synapse instantiateTemplate(I input, O output);
 
-    public abstract Set<Scope> transition(Scope s, Direction dir, Direction startDir, boolean checkFinalRequirement);
+    public abstract Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement);
 
     protected abstract boolean checkCausality(Activation iAct, Activation oAct, Visitor v);
 
@@ -136,7 +137,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                         .flatMap(s ->
                                 transition(s, v.downUpDir, v.startDir, l == null)
                                         .stream()
-                        ).collect(Collectors.toSet()),
+                        ).collect(Collectors.toCollection(TreeSet::new)),
                 LINK
         );
 

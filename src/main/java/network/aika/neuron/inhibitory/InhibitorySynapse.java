@@ -17,11 +17,8 @@
 package network.aika.neuron.inhibitory;
 
 import network.aika.neuron.*;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.Scope;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -85,8 +82,8 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     }
 
     @Override
-    public Set<Scope> transition(Scope s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
-        if(checkFinalRequirement && s != I_SAME) {
+    public Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
+        if(checkFinalRequirement && s.getScope() != I_SAME) {
             return Collections.emptySet();
         }
 

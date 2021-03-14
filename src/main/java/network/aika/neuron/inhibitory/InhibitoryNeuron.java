@@ -24,9 +24,10 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.direction.Direction;
 
 import java.util.Set;
+import java.util.TreeSet;
 
-import static network.aika.neuron.activation.Scope.I_SAME;
-import static network.aika.neuron.activation.Scope.PP_INPUT;
+import static network.aika.neuron.activation.Scope.*;
+import static network.aika.neuron.activation.Scope.P_SAME;
 
 /**
  *
@@ -56,12 +57,13 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     @Override
-    public Set<Scope> getInitialScopes(Direction dir) {
-        if(dir == Direction.INPUT) {
-            return Set.of(I_SAME);
-        } else {
-            return Set.of(I_SAME, PP_INPUT);
+    public Set<ScopeEntry> getInitialScopes(Direction dir) {
+        Set<ScopeEntry> result = new TreeSet<>();
+        result.add(new ScopeEntry(0, I_SAME));
+        if(dir == Direction.OUTPUT) {
+            result.add(new ScopeEntry(1, PP_INPUT));
         }
+        return result;
     }
 
     @Override

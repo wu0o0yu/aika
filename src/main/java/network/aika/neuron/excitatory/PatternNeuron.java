@@ -28,6 +28,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Set;
+import java.util.TreeSet;
 
 import static network.aika.neuron.activation.Scope.*;
 import static network.aika.neuron.sign.Sign.POS;
@@ -59,10 +60,15 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     @Override
-    public Set<Scope> getInitialScopes(Direction dir) {
-        return dir == Direction.INPUT ?
-                Set.of(P_SAME) :
-                Set.of(PP_SAME, PP_INPUT, I_INPUT);
+    public Set<ScopeEntry> getInitialScopes(Direction dir) {
+        Set<ScopeEntry> result = new TreeSet<>();
+        result.add(new ScopeEntry(0, P_SAME));
+        if(dir == Direction.OUTPUT) {
+            result.add(new ScopeEntry(1, PP_SAME));
+            result.add(new ScopeEntry(2, PP_INPUT));
+            result.add(new ScopeEntry(3, I_INPUT));
+        }
+        return result;
     }
 
     @Override

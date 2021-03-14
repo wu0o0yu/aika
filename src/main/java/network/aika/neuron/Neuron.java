@@ -99,7 +99,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract boolean checkGradientThreshold(Activation act);
 
-    public abstract Set<Scope> getInitialScopes(Direction dir);
+    public abstract Set<ScopeEntry> getInitialScopes(Direction dir);
 
     public boolean isAllowTraining() {
         return allowTraining;
