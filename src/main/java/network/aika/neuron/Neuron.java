@@ -133,6 +133,10 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return s;
     }
 
+    public double getCandidateGradient(Activation act) {
+        return getSurprisal(POS, act.getReference());
+    }
+
     public SampleSpace getSampleSpace() {
         return sampleSpace;
     }

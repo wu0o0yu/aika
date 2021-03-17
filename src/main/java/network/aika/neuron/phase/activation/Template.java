@@ -147,6 +147,13 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
 
     @Override
     public int compare(Activation act1, Activation act2) {
-        return 0;
+        if(direction == OUTPUT) {
+            return Double.compare(
+                    act2.getNeuron().getCandidateGradient(act2),
+                    act1.getNeuron().getCandidateGradient(act1)
+            );
+        } else {
+            return 0;
+        }
     }
 }
