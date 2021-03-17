@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.Scope.*;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -92,11 +93,10 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     @Override
     protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
         if(!isRecurrent) {
-            return fromAct.getFired().compareTo(toAct.getFired()) <= 0;
+            return fromAct.getFired() != NOT_FIRED && fromAct.getFired().compareTo(toAct.getFired()) <= 0;
         } else {
             return v.getSelfRef();
         }
-        // (fromAct.getPhase() != TEMPLATE_INPUT && fromAct.getPhase() != TEMPLATE_OUTPUT) || Should not depend on the phase.
     }
 
     @Override

@@ -44,7 +44,7 @@ public class PropagateGradientsSum extends RankedImpl implements ActivationPhase
     }
 
     public String toString() {
-        return "Act-Phase: Propagate Gradients from Sum Update";
+        return "Act-Phase: Propagate Gradients from Gradient Sum Update";
     }
 
     @Override
