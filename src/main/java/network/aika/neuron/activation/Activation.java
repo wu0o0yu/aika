@@ -406,7 +406,7 @@ public class Activation extends Element {
     }
 
     public boolean checkIfFired() {
-        if (fired == NOT_FIRED && getNet(false) >= 0.0) {
+        if (fired == NOT_FIRED && getNet(false) > 0.0) {
             setFired(neuron.incrementFired(getLatestFired()));
             return true;
         }
