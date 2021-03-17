@@ -73,7 +73,7 @@ public class Link extends Element {
 
         double w = getSynapse().getWeight();
 
-        if (w <= 0.0 && isSelfRef())
+        if (w < 0.0 && isSelfRef())
             return;
 
         t.addToQueue(
