@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static network.aika.neuron.activation.Element.RoundType.ACT;
+
 /**
  *
  * @author Lukas Molzberger
@@ -49,7 +51,7 @@ public abstract class Thought {
 
     private Map<NeuronProvider, SortedSet<Activation>> actsPerNeuron = null;
 
-    private List<network.aika.callbacks.EventListener> eventListeners = new ArrayList<>();
+    private List<EventListener> eventListeners = new ArrayList<>();
     private List<VisitorEventListener> visitorEventListeners = new ArrayList<>();
 
     public Thought() {
@@ -198,15 +200,21 @@ public abstract class Thought {
         return activationIdCounter++;
     }
 
+    public Activation createActivation(Neuron n) {
+        return createActivation(n, null);
+    }
+
     public Activation createActivation(Neuron n, Activation fromAct) {
-        Activation toAct = new Activation(
-                createActivationId(),
-                this,
-                n
-        );
+        Activation toAct = new Activation(createActivationId(), this, n);
+
+        if(fromAct != null)
+            toAct.updateRound(
+                    ACT,
+                    fromAct.getRound(ACT),
+                    n.isTemplate()
+            );
 
         onActivationCreationEvent(toAct, fromAct);
-
         return toAct;
     }
 

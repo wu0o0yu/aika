@@ -32,7 +32,7 @@ public class InductionTest {
 
         Document doc = new Document("");
 
-        Activation act = new Activation(doc, in);
+        Activation act = doc.createActivation(in);
         act.initInput(new TextReference(doc, 0, 1));
 
         doc.process(m);
@@ -93,9 +93,9 @@ public class InductionTest {
 
         Document doc = new Document("");
 
-        Activation actA = new Activation(doc, inA);
-        Activation actB = new Activation(doc, inB);
-        Activation actTarget = new Activation(doc, targetN);
+        Activation actA = doc.createActivation(inA);
+        Activation actB = doc.createActivation(inB);
+        Activation actTarget = doc.createActivation(targetN);
 
         actA.setReference(new TextReference(doc, 0, 1));
         actA.setInputValue(1.0);

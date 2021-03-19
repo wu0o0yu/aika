@@ -74,7 +74,6 @@ public class Activation extends Element {
     private double lastNet = 0.0;
 
     private double inputGradient;
-    private double outputGradient;
 
     /**
      * Accumulates all gradients in case a new link is added that needs be get informed about the gradient.
@@ -86,10 +85,6 @@ public class Activation extends Element {
     private Activation(int id, Neuron<?> n) {
         this.id = id;
         this.neuron = n;
-    }
-
-    public Activation(Thought t, Neuron<?> n) {
-        this(t.createActivationId(), t, n);
     }
 
     public Activation(int id, Thought t, Neuron<?> n) {
@@ -159,16 +154,7 @@ public class Activation extends Element {
     }
 
     public void setFired(Fired f) {
-        // TODO: check if really necessary
-/*        if(isQueued()) {
-            updateQueueEntry(() -> {
-                this.fired = f;
-                return this;
-            });
-        } else {
- */
-            fired = f;
-//        }
+        fired = f;
     }
 
     public Thought getThought() {
@@ -222,7 +208,7 @@ public class Activation extends Element {
     }
 
     public Activation createBranch(Synapse excludedSyn) {
-        Activation clonedAct = new Activation(thought.createActivationId(), thought, neuron);
+        Activation clonedAct = thought.createActivation(neuron);
         thought.onActivationCreationEvent(clonedAct, this);
 
         copyPhases(clonedAct);

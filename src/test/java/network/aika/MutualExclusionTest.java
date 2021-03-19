@@ -139,7 +139,7 @@ public class MutualExclusionTest {
 
         Document doc = new Document("test");
 
-        Activation act = new Activation(doc, in);
+        Activation act = doc.createActivation(in);
         act.setInputValue(1.0);
         act.setFired(0);
 
@@ -236,7 +236,7 @@ public class MutualExclusionTest {
 
         Document doc = new Document("test");
 
-        Activation act = new Activation(doc, in);
+        Activation act = doc.createActivation(in);
         act.initInput(new TextReference(doc, 0, 4));
 
         doc.process(m);
