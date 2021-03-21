@@ -191,7 +191,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if(!nv.isClosedCycle())
             return;
 
-        if (!linkExists(this, oAct))
+        if (linkExists(this, iAct, oAct))
             return;
 
         if (!checkCausality(iAct, oAct, v))
@@ -201,27 +201,34 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void createLink(Activation iAct, Activation oAct, Visitor v) {
+        Thought t = oAct.getThought();
+
         Link nl = oAct.addLink(
                 this,
                 iAct,
                 v.getSelfRef()
         );
 
-        nl.getThought().onLinkCreationEvent(nl);
+        t.onLinkCreationEvent(nl);
 
         v.link = nl;
 
         Synapse s = nl.getSynapse();
-        if (s.getWeight() > 0.0 || s.isTemplate()) {
-            nl.addNextLinkPhases(v.getPhase());
+        if (s.getWeight() <= 0.0 && !s.isTemplate())
+            return;
 
-            oAct.getThought().addToQueue(
-                    nl,
-                    0,
-                    INFORMATION_GAIN_GRADIENT,
-                    !oAct.gradientSumIsZero() ? new PropagateGradient(oAct.getOutputGradientSum()) : null
-            );
-        }
+        t.addToQueue(
+                nl,
+                nl.getRound(Element.RoundType.ACT),
+                v.getPhase().getNextLinkPhases()
+        );
+
+        t.addToQueue(
+                nl,
+                0,
+                INFORMATION_GAIN_GRADIENT,
+                !oAct.gradientSumIsZero() ? new PropagateGradient(oAct.getOutputGradientSum()) : null
+        );
     }
 
     public void linkInput() {

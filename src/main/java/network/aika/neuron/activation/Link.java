@@ -71,6 +71,9 @@ public class Link extends Element {
 
         getSynapse().updateReference(this);
 
+        updateRound(RoundType.ACT, input.getRound(RoundType.ACT), false);
+        updateRound(RoundType.ACT, output.getRound(RoundType.ACT), false);
+
         double w = getSynapse().getWeight();
 
         if (w <= 0.0 && isSelfRef())
@@ -95,14 +98,16 @@ public class Link extends Element {
         return iAct.outputLinkExists(oAct);
     }
 
-    public static boolean linkExists(Synapse s, Activation oAct) {
-        Link ol = oAct.getInputLink(s);
+    public static boolean linkExists(Synapse s, Activation iAct, Activation oAct) {
+        Link ol = oAct.getInputLink(iAct.getNeuron());
         if (ol != null) {
+            assert s == ol.getSynapse();
+
 //                    toAct = oAct.cloneToReplaceLink(s);
             log.warn("Link already exists! ");
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     public static Synapse getSynapse(Activation iAct, Activation oAct) {
@@ -244,14 +249,6 @@ public class Link extends Element {
 
     public void linkInput() {
         if(input != null) {
-/*            if(synapse.isPropagate()) {
-                SortedMap<Activation, Link> outLinks = input.getOutputLinks(synapse);
-                if(!outLinks.isEmpty()) {
-                    Activation oAct = outLinks.firstKey();
-//                    assert oAct.getId() == output.getId();
-                }
-            }
-*/
             input.outputLinks.put(
                     new OutputKey(output.getNeuronProvider(), output.getId()),
                     this
@@ -272,14 +269,6 @@ public class Link extends Element {
     public void unlinkOutput() {
         boolean successful = output.inputLinks.remove(input.getNeuronProvider(), this);
         assert successful;
-    }
-
-    public void addNextLinkPhases(VisitorPhase p) {
-        getThought().addToQueue(
-                this,
-                0,
-                p.getNextLinkPhases()
-        );
     }
 
     public void sumUpLink(double delta) {

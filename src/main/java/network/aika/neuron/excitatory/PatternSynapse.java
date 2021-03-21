@@ -68,8 +68,8 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
 
     @Override
     public PatternSynapse instantiateTemplate(I input, PatternNeuron output) {
-        if(!input.getTemplates().contains(getInput()))
-            return null;
+        assert input.getTemplates().contains(getInput());
+
 
         return new PatternSynapse(input, output, this);
     }

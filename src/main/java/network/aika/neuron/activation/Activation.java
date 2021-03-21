@@ -329,6 +329,10 @@ public class Activation extends Element {
         v.onEvent(true);
     }
 
+    public Link getInputLink(Neuron n) {
+        return inputLinks.get(n.getProvider());
+    }
+
     public Link getInputLink(Synapse s) {
         return inputLinks.get(s.getPInput());
     }

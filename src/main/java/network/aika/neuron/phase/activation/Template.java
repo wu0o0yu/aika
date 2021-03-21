@@ -27,7 +27,9 @@ import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 
+import java.util.Collection;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
@@ -123,13 +125,13 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
         if (!act.getNeuron().checkGradientThreshold(act))
             return;
 
-        Set<Synapse> templateSynapses = act
+        Collection<Synapse> templateSynapses = act
                 .getNeuron()
                 .getTemplates()
                 .stream()
                 .flatMap(tn -> v.startDir.getSynapses(tn))
                 .filter(ts -> ts.checkTemplatePropagate(v, act))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
         v.startDir.getLinks(act)
                 .forEach(l ->
