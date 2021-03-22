@@ -170,16 +170,19 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                         fromAct
                 );
 
+        int round = fromAct.getRound(ACT);
+
         t.addToQueue(
                 toAct,
-                fromAct.getRound(ACT),
+                round,
                 nv.getPhase().getNextActivationPhases()
         );
 
         createLink(
                 dir.getPropagateInput(fromAct, toAct),
                 dir.getPropagateOutput(fromAct, toAct),
-                nv
+                nv,
+                round
         );
     }
 
@@ -197,10 +200,15 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if (!checkCausality(iAct, oAct, v))
             return;
 
-        createLink(iAct, oAct, nv);
+        int round = Math.max(
+                iAct.getRound(ACT),
+                oAct.getRound(ACT)
+        );
+
+        createLink(iAct, oAct, nv, round);
     }
 
-    public void createLink(Activation iAct, Activation oAct, Visitor v) {
+    public void createLink(Activation iAct, Activation oAct, Visitor v, int round) {
         Thought t = oAct.getThought();
 
         Link nl = oAct.addLink(
@@ -219,13 +227,13 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         t.addToQueue(
                 nl,
-                nl.getRound(Element.RoundType.ACT),
+                round,
                 v.getPhase().getNextLinkPhases()
         );
 
         t.addToQueue(
                 nl,
-                0,
+                round,
                 INFORMATION_GAIN_GRADIENT,
                 !oAct.gradientSumIsZero() ? new PropagateGradient(oAct.getOutputGradientSum()) : null
         );
