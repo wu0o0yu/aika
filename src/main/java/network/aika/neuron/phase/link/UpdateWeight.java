@@ -19,6 +19,7 @@ package network.aika.neuron.phase.link;
 import network.aika.Thought;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
@@ -44,18 +45,8 @@ public class UpdateWeight extends RankedImpl implements LinkPhase {
 
         double weightDelta = s.updateSynapse(l);
 
-        Thought t = l.getThought();
-        t.addToQueue(
-                l.getOutput(),
-                l.getRound(WEIGHT),
-                UPDATE_SYNAPSE_INPUT_LINKS
-        );
-
-        t.addToQueue(
-                l,
-                l.getRound(WEIGHT),
-                new SumUpLink(l.getInputValue(POS) * weightDelta)
-        );
+        QueueEntry.add(l.getOutput(), l.getRound(WEIGHT), UPDATE_SYNAPSE_INPUT_LINKS);
+        QueueEntry.add(l, l.getRound(WEIGHT), new SumUpLink(l.getInputValue(POS) * weightDelta));
     }
 
     public String toString() {

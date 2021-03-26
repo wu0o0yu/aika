@@ -17,6 +17,8 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.activation.ActivationPhase;
+import network.aika.neuron.phase.link.LinkPhase;
 
 /**
  *
@@ -34,6 +36,20 @@ public class QueueEntry<P extends Phase, E extends Element> implements Comparabl
         this.round = round;
         this.phase = phase;
         this.element = element;
+    }
+
+    public static void add(Activation act, int round, ActivationPhase p) {
+        addIntern(act, round, p);
+    }
+
+    public static void add(Link l, int round, LinkPhase p) {
+        addIntern(l, round, p);
+    }
+
+    private static <P extends Phase, E extends Element> void addIntern(E e, int round, P p) {
+        QueueEntry qe = new QueueEntry(round, p, e);
+        e.addQueuedPhase(qe);
+        e.getThought().addQueueEntry(qe);
     }
 
     public int getRound() {

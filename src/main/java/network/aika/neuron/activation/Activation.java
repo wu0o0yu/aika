@@ -34,6 +34,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Integer.MAX_VALUE;
 import static network.aika.neuron.activation.Element.RoundType.ACT;
 import static network.aika.neuron.activation.Element.RoundType.GRADIENT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
@@ -111,18 +112,9 @@ public class Activation extends Element {
         setInputValue(1.0);
         setFired(ref.getBegin());
 
-        getThought().addToQueue(
-                this,
-                0,
-                LINK_AND_PROPAGATE,
-                ENTROPY_GRADIENT
-        );
-
-        getThought().addToQueue(
-                this,
-                Integer.MAX_VALUE,
-                COUNTING
-        );
+        QueueEntry.add(this, 0, LINK_AND_PROPAGATE);
+        QueueEntry.add(this, 0, ENTROPY_GRADIENT);
+        QueueEntry.add(this, MAX_VALUE, COUNTING);
     }
 
     public int getId() {
@@ -303,9 +295,9 @@ public class Activation extends Element {
         int round = getRound(ACT);
         getOutputLinks()
                 .forEach(l -> {
-                        t.addToQueue(l, round, new SumUpLink(delta));
-                        t.addToQueue(l.getOutput(), round, USE_FINAL_BIAS);
-                    }
+                            QueueEntry.add(l, round, new SumUpLink(delta));
+                            QueueEntry.add(l.getOutput(), round, USE_FINAL_BIAS);
+                        }
                 );
     }
 
@@ -354,7 +346,7 @@ public class Activation extends Element {
                 .subMap(
                         new OutputKey(s.getOutput().getProvider(), Integer.MIN_VALUE),
                         true,
-                        new OutputKey(s.getOutput().getProvider(), Integer.MAX_VALUE),
+                        new OutputKey(s.getOutput().getProvider(), MAX_VALUE),
                         true
                 );
     }
@@ -463,20 +455,16 @@ public class Activation extends Element {
 
         int round = getRound(GRADIENT);
 
-        addLinksToQueue(
-                INPUT,
-                round,
-                ! getNeuron().isInputNeuron() ? new PropagateGradient(g) : null,
-                LinkPhase.TEMPLATE
-        );
+        if(!getNeuron().isInputNeuron())
+            addLinksToQueue(INPUT, round, new PropagateGradient(g));
 
-        getThought().addToQueue(
-                this,
-                round,
-                getNeuron().isAllowTraining() ? UPDATE_BIAS : null,
-                TEMPLATE_INPUT,
-                TEMPLATE_OUTPUT
-        );
+        addLinksToQueue(INPUT, round, LinkPhase.TEMPLATE);
+
+        if (getNeuron().isAllowTraining())
+            QueueEntry.add(this, round, UPDATE_BIAS);
+
+        QueueEntry.add(this, round, TEMPLATE_INPUT);
+        QueueEntry.add(this, round, TEMPLATE_OUTPUT);
     }
 
     public double getNorm() {
@@ -494,11 +482,7 @@ public class Activation extends Element {
     public void propagateGradient(double g) {
         inputGradient += g;
 
-        getThought().addToQueue(
-                this,
-                0,
-                PROPAGATE_GRADIENTS_SUM
-        );
+        QueueEntry.add(this, 0, PROPAGATE_GRADIENTS_SUM);
     }
 
     public void linkInputs() {
@@ -565,10 +549,10 @@ public class Activation extends Element {
         cAct.branchProbability = p;
     }
 
-    public void addLinksToQueue(Direction dir, int round, LinkPhase... phases) {
+    public void addLinksToQueue(Direction dir, int round, LinkPhase p) {
         dir.getLinks(this)
                 .forEach(l ->
-                        getThought().addToQueue(l, round, phases)
+                        QueueEntry.add(l, round, p)
                 );
     }
 

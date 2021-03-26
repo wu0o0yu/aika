@@ -79,7 +79,7 @@ public class Link extends Element {
         if (w <= 0.0 && isSelfRef())
             return;
 
-        t.addToQueue(
+        QueueEntry.add(
                 this,
                 input.getRound(RoundType.ACT),
                 new SumUpLink(w * (getInputValue(POS) - getInputValue(POS, oldLink)))

@@ -18,6 +18,7 @@ package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
@@ -48,13 +49,8 @@ public class EntropyGradient extends RankedImpl implements ActivationPhase {
 
         act.initEntropyGradient();
 
-        if(!act.gradientIsZero()) {
-            act.getThought().addToQueue(
-                    act,
-                    0,
-                    PROPAGATE_GRADIENTS_SUM
-            );
-        }
+        if(!act.gradientIsZero())
+            QueueEntry.add(act, 0, PROPAGATE_GRADIENTS_SUM);
     }
 
     public String toString() {

@@ -17,10 +17,7 @@
 package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Element;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
@@ -28,7 +25,6 @@ import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 
 import static network.aika.neuron.activation.Activation.TOLERANCE;
-import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -56,15 +52,12 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
     }
 
     @Override
-    public ActivationPhase[] getNextActivationPhases() {
-        return new ActivationPhase[] {};
+    public void getNextPhases(int round, Activation act) {
     }
 
     @Override
-    public LinkPhase[] getNextLinkPhases() {
-        return new LinkPhase[] {
-                LINKING
-        };
+    public void getNextPhases(int round, Link l) {
+        QueueEntry.add(l, round, LINKING);
     }
 
     @Override

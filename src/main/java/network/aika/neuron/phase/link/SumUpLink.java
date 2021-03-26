@@ -17,12 +17,14 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.Thought;
+import network.aika.neuron.activation.QueueEntry;
 import network.aika.utils.Utils;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.activation.ActivationPhase;
 
+import static java.lang.Integer.MAX_VALUE;
 import static network.aika.neuron.activation.Element.RoundType.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
@@ -47,31 +49,19 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
         l.sumUpLink(delta);
 
         Activation oAct = l.getOutput();
-        t.addToQueue(
-                oAct,
-                oAct.getRound(ACT),
-                PROPAGATE_GRADIENTS_NET
-        );
+
+        QueueEntry.add(oAct, oAct.getRound(ACT), PROPAGATE_GRADIENTS_NET);
 
         if(oAct.checkIfFired()) {
-            t.addToQueue(
-                    oAct,
-                    oAct.getRound(ACT),
-                    LINK_AND_PROPAGATE,
-                    USE_FINAL_BIAS,
-                    oAct.hasBranches() ? DETERMINE_BRANCH_PROBABILITY : null
-            );
+            int round = oAct.getRound(ACT);
+            QueueEntry.add(oAct, round, LINK_AND_PROPAGATE);
+            QueueEntry.add(oAct, round, USE_FINAL_BIAS);
 
-            t.addToQueue(
-                    oAct,
-                    Integer.MAX_VALUE,
-                    ActivationPhase.COUNTING
-            );
-            oAct.addLinksToQueue(
-                    INPUT,
-                    Integer.MAX_VALUE,
-                    COUNTING
-            );
+            if(oAct.hasBranches())
+                    QueueEntry.add(oAct, round, DETERMINE_BRANCH_PROBABILITY);
+
+            QueueEntry.add(oAct, MAX_VALUE, ActivationPhase.COUNTING);
+            oAct.addLinksToQueue(INPUT, MAX_VALUE, COUNTING);
         }
     }
 
