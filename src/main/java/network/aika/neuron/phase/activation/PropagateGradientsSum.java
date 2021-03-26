@@ -17,14 +17,12 @@
 package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.phase.Ranked;
+import network.aika.neuron.activation.Fired;
 import network.aika.neuron.phase.RankedImpl;
-import network.aika.neuron.phase.link.LinkPhase;
-import network.aika.neuron.phase.link.PropagateGradient;
 
-import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
-import static network.aika.neuron.activation.Element.RoundType.GRADIENT;
-import static network.aika.neuron.activation.direction.Direction.INPUT;
+import java.util.Comparator;
+
+import static network.aika.neuron.activation.Activation.FIRED_COMPARATOR_REVERSED;
 import static network.aika.neuron.phase.link.LinkPhase.PROPAGATE_GRADIENT_RANK;
 
 /**
@@ -43,12 +41,12 @@ public class PropagateGradientsSum extends RankedImpl implements ActivationPhase
         act.propagateGradientsFromSumUpdate();
     }
 
-    public String toString() {
-        return "Act-Phase: Propagate Gradients from Gradient Sum Update";
+    @Override
+    public Comparator<Activation> getElementComparator() {
+        return FIRED_COMPARATOR_REVERSED;
     }
 
-    @Override
-    public int compare(Activation act1, Activation act2) {
-        return act2.getFired().compareTo(act1.getFired());
+    public String toString() {
+        return "Act-Phase: Propagate Gradients from Gradient Sum Update";
     }
 }

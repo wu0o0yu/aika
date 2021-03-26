@@ -21,7 +21,7 @@ import network.aika.callbacks.InMemorySuspensionCallback;
 import network.aika.callbacks.SuspensionCallback;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.NeuronProvider.SuspensionMode;
+import network.aika.neuron.SuspensionMode;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;

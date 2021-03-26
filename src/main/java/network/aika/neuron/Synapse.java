@@ -35,7 +35,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.activation.Element.RoundType.*;
+import static network.aika.neuron.activation.RoundType.*;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.activation.Link.linkExists;
@@ -161,10 +161,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if(nv == null)
             return;
 
-        Thought t = fromAct.getThought();
         Direction dir = nv.startDir;
 
-        Activation toAct = t
+        Activation toAct = fromAct.getThought()
                 .createActivation(
                         nv.startDir.getNeuron(this),
                         fromAct
@@ -205,15 +204,13 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void createLink(Activation iAct, Activation oAct, Visitor v, int round) {
-        Thought t = oAct.getThought();
-
         Link nl = oAct.addLink(
                 this,
                 iAct,
                 v.getSelfRef()
         );
 
-        t.onLinkCreationEvent(nl);
+        oAct.getThought().onLinkCreationEvent(nl);
 
         v.link = nl;
 

@@ -22,9 +22,10 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
-import network.aika.neuron.phase.link.LinkPhase;
 
-import static network.aika.neuron.activation.Activation.TOLERANCE;
+import java.util.Comparator;
+
+import static network.aika.neuron.activation.Activation.*;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -128,7 +129,7 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
     }
 
     @Override
-    public int compare(Activation act1, Activation act2) {
-        return act1.getFired().compareTo(act2.getFired());
+    public Comparator<Activation> getElementComparator() {
+        return FIRED_COMPARATOR;
     }
 }

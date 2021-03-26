@@ -45,5 +45,4 @@ public interface ActivationPhase extends Phase<Activation> {
     ActivationPhase COUNTING = new Counting();
 
     void process(Activation act);
-
 }

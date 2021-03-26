@@ -27,8 +27,10 @@ import network.aika.neuron.phase.link.SumUpLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Comparator;
+
 import static network.aika.neuron.activation.Activation.TOLERANCE;
-import static network.aika.neuron.activation.Element.RoundType.WEIGHT;
+import static network.aika.neuron.activation.RoundType.WEIGHT;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -38,9 +40,13 @@ import static network.aika.neuron.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public class Link extends Element {
+public class Link extends Element<Link> {
 
     private static final Logger log = LoggerFactory.getLogger(Link.class);
+
+    public static final Comparator<Link> COMPARE = Comparator.
+            <Link, Activation>comparing(l -> l.output)
+            .thenComparing(l -> l.input);
 
     private Synapse synapse;
 
@@ -62,9 +68,7 @@ public class Link extends Element {
     public Link(Link oldLink, Synapse s, Activation input, Activation output, boolean isSelfRef) {
         this(s, input, output, isSelfRef);
 
-        Thought t = getThought();
-
-        t.onLinkCreationEvent(this);
+        getThought().onLinkCreationEvent(this);
 
         linkInput();
         linkOutput();
@@ -84,6 +88,10 @@ public class Link extends Element {
                 input.getRound(RoundType.ACT),
                 new SumUpLink(w * (getInputValue(POS) - getInputValue(POS, oldLink)))
         );
+    }
+
+    protected int getElementType() {
+        return 1;
     }
 
     public double getGradient() {
@@ -118,9 +126,8 @@ public class Link extends Element {
     }
 
     public void count() {
-        if(synapse != null) {
+        if(synapse != null)
             synapse.count(this);
-        }
     }
 
     public void follow(VisitorPhase p) {
@@ -206,7 +213,7 @@ public class Link extends Element {
     }
 
     public boolean isCausal() {
-        return input == null || input.getFired().compareTo(output.getFired()) <= 0;
+        return input == null || Fired.COMPARATOR.compare(input.getFired(), output.getFired()) <= 0;
     }
 
     public static double getInputValue(Sign s, Link l) {
@@ -291,12 +298,8 @@ public class Link extends Element {
     }
 
     @Override
-    public int compareTo(Element ge) {
-        Link l = ((Link) ge);
-        int r = output.compareTo(l.output);
-        if(r != 0) return r;
-
-        return input.compareTo(l.input);
+    public int compareTo(Link l) {
+        return COMPARE.compare(this, l);
     }
 
     public String toString() {

@@ -21,7 +21,6 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.phase.Phase;
 
-
 /**
  *
  * @author Lukas Molzberger
@@ -35,5 +34,4 @@ public interface EventListener {
     void onActivationCreationEvent(Activation act, Activation originAct);
 
     void onLinkCreationEvent(Link l);
-
 }

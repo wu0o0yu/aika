@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.phase.link;
 
-import network.aika.Thought;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.utils.Utils;
 import network.aika.neuron.activation.Activation;
@@ -24,8 +23,10 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.activation.ActivationPhase;
 
+import java.util.Comparator;
+
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.neuron.activation.Element.RoundType.ACT;
+import static network.aika.neuron.activation.RoundType.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
 
@@ -45,15 +46,14 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
 
     @Override
     public void process(Link l) {
-        Thought t = l.getThought();
         l.sumUpLink(delta);
 
         Activation oAct = l.getOutput();
+        int round = oAct.getRound(ACT);
 
-        QueueEntry.add(oAct, oAct.getRound(ACT), PROPAGATE_GRADIENTS_NET);
+        QueueEntry.add(oAct, round, PROPAGATE_GRADIENTS_NET);
 
         if(oAct.checkIfFired()) {
-            int round = oAct.getRound(ACT);
             QueueEntry.add(oAct, round, LINK_AND_PROPAGATE);
             QueueEntry.add(oAct, round, USE_FINAL_BIAS);
 
@@ -70,7 +70,7 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
     }
 
     @Override
-    public int compare(Link l1, Link l2) {
-        return 0;
+    public Comparator<Link> getElementComparator() {
+        return Comparator.naturalOrder();
     }
 }

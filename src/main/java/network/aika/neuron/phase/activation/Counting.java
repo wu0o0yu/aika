@@ -20,8 +20,8 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
-import static network.aika.neuron.activation.Element.RoundType.ACT;
-import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
+import java.util.Comparator;
+
 
 /**
  * Counts the number of activations a particular neuron has encountered.
@@ -45,7 +45,7 @@ public class Counting extends RankedImpl implements ActivationPhase {
     }
 
     @Override
-    public int compare(Activation act1, Activation act2) {
-        return 0;
+    public Comparator<Activation> getElementComparator() {
+        return Comparator.naturalOrder();
     }
 }

@@ -29,12 +29,10 @@ import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
-import static network.aika.neuron.activation.Element.RoundType.GRADIENT;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -144,15 +142,17 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
         return "Act-Phase: Template-" + direction;
     }
 
+    private static final Comparator<Activation> GRAD_COMP = Comparator.
+            <Activation>comparingDouble(act -> act.getNeuron().getCandidateGradient(act))
+            .reversed();
+
+
     @Override
-    public int compare(Activation act1, Activation act2) {
+    public Comparator<Activation> getElementComparator() {
         if(direction == OUTPUT) {
-            return Double.compare(
-                    act2.getNeuron().getCandidateGradient(act2),
-                    act1.getNeuron().getCandidateGradient(act1)
-            );
+            return GRAD_COMP;
         } else {
-            return 0;
+            return Comparator.naturalOrder();
         }
     }
 }

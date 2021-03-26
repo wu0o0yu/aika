@@ -23,7 +23,6 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.link.LinkPhase;
 import network.aika.neuron.phase.link.PropagateGradient;
 import network.aika.neuron.phase.link.SumUpLink;
@@ -35,8 +34,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.neuron.activation.Element.RoundType.ACT;
-import static network.aika.neuron.activation.Element.RoundType.GRADIENT;
+import static network.aika.neuron.activation.RoundType.ACT;
+import static network.aika.neuron.activation.RoundType.GRADIENT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
@@ -45,7 +44,12 @@ import static network.aika.neuron.sign.Sign.POS;
 /**
  * @author Lukas Molzberger
  */
-public class Activation extends Element {
+public class Activation extends Element<Activation> {
+
+    public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(act -> act.id);
+
+    public static final Comparator<Activation> FIRED_COMPARATOR = (act1, act2) -> Fired.COMPARATOR.compare(act1.getFired(), act2.getFired());
+    public static final Comparator<Activation> FIRED_COMPARATOR_REVERSED = FIRED_COMPARATOR.reversed();
 
     public static double TOLERANCE = 0.001;
 
@@ -95,7 +99,7 @@ public class Activation extends Element {
         thought.registerActivation(this);
 
         inputLinks = new TreeMap<>();
-        outputLinks = new TreeMap<>();
+        outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
     }
 
     public boolean isMarked() {
@@ -153,9 +157,13 @@ public class Activation extends Element {
         return thought;
     }
 
+    protected int getElementType() {
+        return 0;
+    }
+
     @Override
-    public int compareTo(Element ge) {
-        return Integer.compare(getId(), ((Activation) ge).getId());
+    public int compareTo(Activation act) {
+        return ID_COMPARATOR.compare(this, act);
     }
 
     public OutputKey getOutputKey() {
@@ -268,7 +276,7 @@ public class Activation extends Element {
                 .filter(l -> !l.isNegative() || l.isCausal())
                 .map(l -> l.getOutput())
                 .filter(act ->
-                        act.fired != NOT_FIRED && fired.compareTo(act.fired) == -1
+                        act.fired != NOT_FIRED && Fired.COMPARATOR.compare(fired, act.fired) == -1
                 )
                 .anyMatch(act ->
                         act.searchWithinBranch()
@@ -289,9 +297,7 @@ public class Activation extends Element {
                 .map(l -> l.getInput());
     }
 
-
     public void updateOutgoingLinks(double delta) {
-        Thought t = getThought();
         int round = getRound(ACT);
         getOutputLinks()
                 .forEach(l -> {
@@ -398,7 +404,7 @@ public class Activation extends Element {
     private Fired getLatestFired() {
         return inputLinks.values().stream()
                 .map(il -> il.getInput().getFired())
-                .max(Fired::compareTo)
+                .max(Fired.COMPARATOR)
                 .orElse(null);
     }
 

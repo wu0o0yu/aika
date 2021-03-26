@@ -52,6 +52,9 @@ public class RankedImpl implements Ranked {
 
     @Override
     public String dumpPreviousRanks() {
-        return (getPreviousRank() != null ? getPreviousRank().dumpPreviousRanks() + "\n" : "") + getRank() + " : " + toString();
+        return (getPreviousRank() != null ? getPreviousRank().dumpPreviousRanks() + "\n" : "") +
+                getRank() +
+                " : " +
+                toString();
     }
 }

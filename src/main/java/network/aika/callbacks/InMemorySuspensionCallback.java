@@ -16,8 +16,8 @@
  */
 package network.aika.callbacks;
 
+import network.aika.neuron.SuspensionMode;
 import network.aika.utils.Writable;
-import network.aika.neuron.NeuronProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -73,7 +73,7 @@ public class InMemorySuspensionCallback implements SuspensionCallback {
     }
 
     @Override
-    public void suspendAll(NeuronProvider.SuspensionMode sm) {
+    public void suspendAll(SuspensionMode sm) {
     }
 
     @Override

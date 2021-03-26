@@ -20,8 +20,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
-import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
-import static network.aika.neuron.activation.Element.RoundType.WEIGHT;
+import java.util.Comparator;
 
 
 /**
@@ -49,7 +48,7 @@ public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPha
     }
 
     @Override
-    public int compare(Activation act1, Activation act2) {
-        return 0;
+    public Comparator<Activation> getElementComparator() {
+        return Comparator.naturalOrder();
     }
 }

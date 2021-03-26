@@ -17,15 +17,18 @@
 package network.aika.neuron.phase;
 
 import network.aika.neuron.activation.Element;
+import network.aika.neuron.activation.QueueEntry;
 
 import java.util.Comparator;
 
 /**
  * @author Lukas Molzberger
  */
-public interface Phase<E extends Element> extends Ranked, Comparator<E> {
+public interface Phase<E extends Element> extends Ranked {
 
     void process(E e);
+
+    Comparator<E> getElementComparator();
 
     static String toString(Phase p) {
         return " (" + (p != null ? p.toString() + "-" + p.getRank() : "X") + ")";

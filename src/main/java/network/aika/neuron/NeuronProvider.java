@@ -33,11 +33,6 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
     public static final NeuronProvider MIN_NEURON = new NeuronProvider(Long.MIN_VALUE);
     public static final NeuronProvider MAX_NEURON = new NeuronProvider(Long.MAX_VALUE);
 
-    public enum SuspensionMode {
-        SAVE,
-        DISCARD
-    }
-
     private Model model;
     private Long id;
 

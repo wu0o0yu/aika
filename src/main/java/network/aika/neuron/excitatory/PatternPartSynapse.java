@@ -93,7 +93,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     @Override
     protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
         if(!isRecurrent) {
-            return fromAct.getFired() != NOT_FIRED && fromAct.getFired().compareTo(toAct.getFired()) <= 0;
+            return fromAct.getFired() != NOT_FIRED && Fired.COMPARATOR.compare(fromAct.getFired(), toAct.getFired()) <= 0;
         } else {
             return v.getSelfRef();
         }

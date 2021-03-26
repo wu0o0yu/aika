@@ -23,15 +23,13 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.phase.Phase;
-import network.aika.neuron.phase.activation.ActivationPhase;
-import network.aika.neuron.phase.link.LinkPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.activation.Element.RoundType.ACT;
+import static network.aika.neuron.activation.RoundType.ACT;
 
 /**
  *
@@ -43,9 +41,9 @@ public abstract class Thought {
     private long timestampCounter = 0;
     private int activationIdCounter = 0;
 
-    private final TreeSet<QueueEntry> queue = new TreeSet<>();
+    private final TreeSet<QueueEntry> queue = new TreeSet<>(QueueEntry.COMPARATOR);
 
-    private Set<Phase> filters = new TreeSet<>(Comparator.comparing(p -> p.getRank()));
+    private Set<Phase> filters = new TreeSet<>(Comparator.comparingInt(p -> p.getRank()));
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 

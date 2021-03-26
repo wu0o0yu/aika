@@ -21,8 +21,9 @@ import network.aika.utils.Utils;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.RankedImpl;
 
-import static network.aika.neuron.activation.Element.RoundType.ACT;
-import static network.aika.neuron.activation.Element.RoundType.GRADIENT;
+import java.util.Comparator;
+
+import static network.aika.neuron.activation.RoundType.GRADIENT;
 
 /**
  * Propagate the gradient backwards through the network.
@@ -51,7 +52,7 @@ public class PropagateGradient extends RankedImpl implements LinkPhase {
     }
 
     @Override
-    public int compare(Link l1, Link l2) {
-        return 0;
+    public Comparator<Link> getElementComparator() {
+        return Comparator.naturalOrder();
     }
 }

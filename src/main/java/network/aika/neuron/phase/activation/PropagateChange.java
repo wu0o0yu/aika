@@ -17,11 +17,12 @@
 package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.phase.Ranked;
+import network.aika.neuron.activation.Fired;
 import network.aika.neuron.phase.RankedImpl;
 
-import static network.aika.neuron.activation.Element.RoundType.ACT;
-import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
+import java.util.Comparator;
+
+import static network.aika.neuron.activation.Activation.FIRED_COMPARATOR;
 
 /**
  * During the initial linking process all positive recurrent synapses are assumed to be
@@ -43,12 +44,12 @@ public class PropagateChange extends RankedImpl implements ActivationPhase {
         act.updateOutgoingLinks(delta);
     }
 
-    public String toString() {
-        return "Act-Phase: Propagate Change";
+    @Override
+    public Comparator<Activation> getElementComparator() {
+        return FIRED_COMPARATOR;
     }
 
-    @Override
-    public int compare(Activation act1, Activation act2) {
-        return act1.getFired().compareTo(act2.getFired());
+    public String toString() {
+        return "Act-Phase: Propagate Change";
     }
 }

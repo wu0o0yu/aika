@@ -17,15 +17,11 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
-import network.aika.neuron.phase.activation.ActivationPhase;
+import java.util.Comparator;
 
-import static network.aika.neuron.activation.Element.RoundType.ACT;
-import static network.aika.neuron.activation.Element.RoundType.GRADIENT;
 import static network.aika.neuron.phase.activation.ActivationPhase.TEMPLATE_INPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.UPDATE_SYNAPSE_INPUT_LINKS;
 
@@ -52,7 +48,7 @@ public class Template extends RankedImpl implements LinkPhase {
     }
 
     @Override
-    public int compare(Link l1, Link l2) {
-        return 0;
+    public Comparator<Link> getElementComparator() {
+        return Comparator.naturalOrder();
     }
 }

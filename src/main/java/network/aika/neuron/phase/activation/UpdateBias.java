@@ -4,8 +4,8 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
-import static network.aika.neuron.activation.Element.RoundType.FREQUENCY;
-import static network.aika.neuron.activation.Element.RoundType.GRADIENT;
+import java.util.Comparator;
+
 import static network.aika.neuron.phase.link.LinkPhase.UPDATE_WEIGHT;
 
 public class UpdateBias extends RankedImpl implements ActivationPhase {
@@ -25,7 +25,7 @@ public class UpdateBias extends RankedImpl implements ActivationPhase {
     }
 
     @Override
-    public int compare(Activation o1, Activation o2) {
-        return 0;
+    public Comparator<Activation> getElementComparator() {
+        return Comparator.naturalOrder();
     }
 }
