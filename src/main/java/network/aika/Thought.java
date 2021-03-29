@@ -23,13 +23,13 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.phase.Phase;
-import network.aika.neuron.phase.activation.ActivationPhase;
-import network.aika.neuron.phase.link.LinkPhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static network.aika.neuron.activation.RoundType.ACT;
 
 /**
  *
@@ -38,17 +38,18 @@ import java.util.stream.Collectors;
 public abstract class Thought {
     private static final Logger log = LoggerFactory.getLogger(Thought.class);
 
+    private long timestampCounter = 0;
     private int activationIdCounter = 0;
 
-    private final TreeSet<QueueEntry> queue = new TreeSet<>();
+    private final TreeSet<QueueEntry> queue = new TreeSet<>(QueueEntry.COMPARATOR);
 
-    private Set<Phase> filters = new TreeSet<>(Comparator.comparing(p -> p.getRank()));
+    private Set<Phase> filters = new TreeSet<>(Comparator.comparingInt(p -> p.getRank()));
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
     private Map<NeuronProvider, SortedSet<Activation>> actsPerNeuron = null;
 
-    private List<network.aika.callbacks.EventListener> eventListeners = new ArrayList<>();
+    private List<EventListener> eventListeners = new ArrayList<>();
     private List<VisitorEventListener> visitorEventListeners = new ArrayList<>();
 
     public Thought() {
@@ -69,31 +70,17 @@ public abstract class Thought {
                 );
     }
 
-    public void onActivationProcessedEvent(Phase p, Activation act) {
+    public void beforeProcessedEvent(QueueEntry qe) {
         getEventListeners()
                 .forEach(
-                        el -> el.onActivationProcessedEvent(p, act)
+                        el -> el.beforeProcessedEvent(qe)
                 );
     }
 
-    public void afterActivationProcessedEvent(Phase p, Activation act) {
+    public void afterProcessedEvent(QueueEntry qe) {
         getEventListeners()
                 .forEach(
-                        el -> el.afterActivationProcessedEvent(p, act)
-                );
-    }
-
-    public void onLinkProcessedEvent(Phase p, Link l) {
-        getEventListeners()
-                .forEach(
-                        el -> el.onLinkProcessedEvent(p, l)
-                );
-    }
-
-    public void afterLinkProcessedEvent(Phase p, Link l) {
-        getEventListeners()
-                .forEach(
-                        el -> el.afterLinkProcessedEvent(p, l)
+                        el -> el.afterProcessedEvent(qe)
                 );
     }
 
@@ -111,13 +98,13 @@ public abstract class Thought {
                 );
     }
 
-    public synchronized Collection<network.aika.callbacks.EventListener> getEventListeners() {
+    public synchronized Collection<EventListener> getEventListeners() {
         return eventListeners
                 .stream()
                 .collect(Collectors.toList());
     }
 
-    public synchronized void addEventListener(network.aika.callbacks.EventListener l) {
+    public synchronized void addEventListener(EventListener l) {
         eventListeners.add(l);
     }
 
@@ -143,29 +130,11 @@ public abstract class Thought {
         activationsById.put(act.getId(), act);
     }
 
-    public void addToQueue(Activation act, ActivationPhase... phases) {
-        addToQueueIntern(act, phases);
-    }
-
-    public void addToQueue(Link l, LinkPhase... phases) {
-        addToQueueIntern(l, phases);
-    }
-
-    private <P extends Phase, E extends Element> void addToQueueIntern(E e, P... phases) {
-        for(P p: phases) {
-            if(p == null)
-                continue;
-
-            QueueEntry qe = new QueueEntry(0, p, e);
-            e.addQueuedPhase(qe);
-            addQueueEntry(qe);
-        }
-    }
-
     public void addQueueEntry(QueueEntry qe) {
         if(filters.contains(qe.getPhase()))
             return;
 
+        qe.setAddedTimestamp(timestampCounter);
         queue.add(qe);
     }
 
@@ -185,9 +154,15 @@ public abstract class Thought {
     public void process(Model m) {
         while (!queue.isEmpty()) {
             QueueEntry qe = queue.pollFirst();
+            qe.setCurrentTimestamp(timestampCounter);
 
             qe.getElement().removeQueuedPhase(qe);
+
+            beforeProcessedEvent(qe);
             qe.process();
+            afterProcessedEvent(qe);
+
+            timestampCounter++;
         }
         m.addToN(length());
     }
@@ -204,15 +179,21 @@ public abstract class Thought {
         return activationIdCounter++;
     }
 
+    public Activation createActivation(Neuron n) {
+        return createActivation(n, null);
+    }
+
     public Activation createActivation(Neuron n, Activation fromAct) {
-        Activation toAct = new Activation(
-                createActivationId(),
-                this,
-                n
-        );
+        Activation toAct = new Activation(createActivationId(), this, n);
+
+        if(fromAct != null)
+            toAct.updateRound(
+                    ACT,
+                    fromAct.getRound(ACT),
+                    n.isTemplate()
+            );
 
         onActivationCreationEvent(toAct, fromAct);
-
         return toAct;
     }
 

@@ -31,10 +31,11 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import static network.aika.neuron.activation.RoundType.*;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.activation.Link.linkExists;
@@ -58,7 +59,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     private double weight;
 
-    protected SampleSpace sampleSpace = new SampleSpace();
+    protected SampleSpace sampleSpace;
 
     protected double frequencyIPosOPos;
     protected double frequencyIPosONeg;
@@ -75,6 +76,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         this.input = input.getProvider();
         this.output = output.getProvider();
         this.template = template;
+
+        sampleSpace = new SampleSpace(getModel());
 
         assert input.getId() < 0 || input.getId() != output.getId();
     }
@@ -101,7 +104,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Synapse instantiateTemplate(I input, O output);
 
-    public abstract Set<Scope> transition(Scope s, Direction dir, boolean checkFinalRequirement);
+    public abstract Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement);
 
     protected abstract boolean checkCausality(Activation iAct, Activation oAct, Visitor v);
 
@@ -132,9 +135,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 v.getScopes()
                         .stream()
                         .flatMap(s ->
-                                transition(s, v.downUpDir, l == null)
+                                transition(s, v.downUpDir, v.startDir, l == null)
                                         .stream()
-                        ).collect(Collectors.toSet()),
+                        ).collect(Collectors.toCollection(TreeSet::new)),
                 LINK
         );
 
@@ -158,24 +161,23 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if(nv == null)
             return;
 
-        Thought t = fromAct.getThought();
         Direction dir = nv.startDir;
 
-        Activation toAct = t
+        Activation toAct = fromAct.getThought()
                 .createActivation(
                         nv.startDir.getNeuron(this),
                         fromAct
                 );
 
-        t.addToQueue(
-                toAct,
-                nv.getPhase().getNextActivationPhases()
-        );
+        int round = fromAct.getRound(ACT);
+
+        nv.getPhase().getNextPhases(round, toAct);
 
         createLink(
                 dir.getPropagateInput(fromAct, toAct),
                 dir.getPropagateOutput(fromAct, toAct),
-                nv
+                nv,
+                round
         );
     }
 
@@ -187,36 +189,41 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if(!nv.isClosedCycle())
             return;
 
-        if (!linkExists(this, oAct))
+        if (linkExists(this, iAct, oAct))
             return;
 
         if (!checkCausality(iAct, oAct, v))
             return;
 
-        createLink(iAct, oAct, nv);
+        int round = Math.max(
+                iAct.getRound(ACT),
+                oAct.getRound(ACT)
+        );
+
+        createLink(iAct, oAct, nv, round);
     }
 
-    public void createLink(Activation iAct, Activation oAct, Visitor v) {
+    public void createLink(Activation iAct, Activation oAct, Visitor v, int round) {
         Link nl = oAct.addLink(
                 this,
                 iAct,
                 v.getSelfRef()
         );
 
-        nl.getThought().onLinkProcessedEvent(null, nl);
+        oAct.getThought().onLinkCreationEvent(nl);
 
         v.link = nl;
 
         Synapse s = nl.getSynapse();
-        if (s.getWeight() > 0.0 || s.isTemplate()) {
-            nl.addNextLinkPhases(v.getPhase());
+        if (s.getWeight() <= 0.0 && !s.isTemplate())
+            return;
 
-            oAct.getThought().addToQueue(
-                    nl,
-                    INFORMATION_GAIN_GRADIENT,
-                    !oAct.gradientSumIsZero() ? new PropagateGradient(oAct.getOutputGradientSum()) : null
-            );
-        }
+        v.getPhase().getNextPhases(round, nl);
+
+        QueueEntry.add(nl, round, INFORMATION_GAIN_GRADIENT);
+
+        if(!oAct.gradientSumIsZero())
+            QueueEntry.add(nl, round, new PropagateGradient(oAct.getOutputGradientSum()));
     }
 
     public void linkInput() {
@@ -298,6 +305,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
             addWeight(-wDelta);
             on.addConjunctiveBias(wDelta, !l.isCausal());
         }
+        l.updateRound(WEIGHT, l.getRound(GRADIENT), true);
 
         return weight - oldWeight;
     }
@@ -328,7 +336,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void count(Link l) {
-        sampleSpace.update(getModel(), l.getInput().getReference());
+        sampleSpace.update(l.getInput().getReference());
 
         if(l.getInput().isActive(false) && l.getOutput().isActive(false)) {
             frequencyIPosOPos += 1.0;
@@ -346,8 +354,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return getPOutput().getModel();
     }
 
-    public double getSurprisal(Sign si, Sign so) {
-        double N = sampleSpace.getN();
+    public double getSurprisal(Sign si, Sign so, Reference ref) {
+        double N = sampleSpace.getN(ref);
         if(isTemplate() || N == 0.0)
             return 0.0;
 
@@ -426,9 +434,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         int n = getModel().getN();
         return "f:" + Utils.round(getInput().getFrequency()) + " " +
                 "N:" + Utils.round(n) + " " +
-                "s(p,p):" + Utils.round(getSurprisal(POS, POS)) + " " +
-                "s(n,p):" + Utils.round(getSurprisal(NEG, POS)) + " " +
-                "s(p,n):" + Utils.round(getSurprisal(POS, NEG)) + " " +
-                "s(n,n):" + Utils.round(getSurprisal(NEG, NEG)) + " \n";
+                "s(p,p):" + Utils.round(getSurprisal(POS, POS, null)) + " " +
+                "s(n,p):" + Utils.round(getSurprisal(NEG, POS, null)) + " " +
+                "s(p,n):" + Utils.round(getSurprisal(POS, NEG, null)) + " " +
+                "s(n,n):" + Utils.round(getSurprisal(NEG, NEG, null)) + " \n";
     }
 }

@@ -18,10 +18,11 @@ package network.aika.neuron.phase.link;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.activation.ActivationPhase;
+
+import java.util.Comparator;
 
 /**
  * Creates a new untrained synapse from a template link.
@@ -50,11 +51,11 @@ public class Induction extends RankedImpl implements LinkPhase {
     }
 
     public String toString() {
-        return "Link: Induction";
+        return "Link-Phase: Induction";
     }
 
     @Override
-    public int compare(Link l1, Link l2) {
-        return 0;
+    public Comparator<Link> getElementComparator() {
+        return Comparator.naturalOrder();
     }
 }

@@ -1,4 +1,4 @@
-package network;
+package network.aika;
 
 import network.aika.Config;
 import network.aika.neuron.Neuron;

@@ -21,6 +21,8 @@ import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.activation.ActivationPhase;
 
+import java.util.Comparator;
+
 /**
  * Computes the gradient of the information gain function for this activation.
  *
@@ -41,11 +43,11 @@ public class InformationGainGradient extends RankedImpl implements LinkPhase {
     }
 
     public String toString() {
-        return "Link: Information-Gain Gradient";
+        return "Link-Phase: Information-Gain Gradient";
     }
 
     @Override
-    public int compare(Link l1, Link l2) {
-        return 0;
+    public Comparator<Link> getElementComparator() {
+        return Comparator.naturalOrder();
     }
 }

@@ -17,8 +17,12 @@
 package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.phase.Ranked;
+import network.aika.neuron.activation.Fired;
 import network.aika.neuron.phase.RankedImpl;
+
+import java.util.Comparator;
+
+import static network.aika.neuron.activation.Activation.FIRED_COMPARATOR;
 
 /**
  * During the initial linking process all positive recurrent synapses are assumed to be
@@ -28,22 +32,24 @@ import network.aika.neuron.phase.RankedImpl;
  */
 public class PropagateChange extends RankedImpl implements ActivationPhase {
 
-    @Override
-    public Ranked getPreviousRank() {
-        return USE_FINAL_BIAS;
+    private double delta;
+
+    public PropagateChange(double delta) {
+        super(USE_FINAL_BIAS);
+        this.delta = delta;
     }
 
     @Override
     public void process(Activation act) {
-        act.updateOutgoingLinks();
-    }
-
-    public String toString() {
-        return "Act: Propagate Change";
+        act.updateOutgoingLinks(delta);
     }
 
     @Override
-    public int compare(Activation act1, Activation act2) {
-        return act1.getFired().compareTo(act2.getFired());
+    public Comparator<Activation> getElementComparator() {
+        return FIRED_COMPARATOR;
+    }
+
+    public String toString() {
+        return "Act-Phase: Propagate Change";
     }
 }

@@ -1,7 +1,8 @@
-package network;
+package network.aika;
 
 import network.aika.Config;
 import network.aika.Thought;
+import network.aika.debugger.AikaDebugger;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Reference;
@@ -73,6 +74,9 @@ public class GradientTest {
         nB.setFrequency(10.0);
         nB.getSampleSpace().setN(121);
         nB.getSampleSpace().setLastPos(739);
+
+
+        AikaDebugger.createAndShowGUI(doc,m);
 
         doc.process(m);
 

@@ -16,9 +16,8 @@
  */
 package network.aika.callbacks;
 
-
+import network.aika.neuron.SuspensionMode;
 import network.aika.utils.Writable;
-import network.aika.neuron.NeuronProvider;
 
 import java.util.stream.Stream;
 
@@ -49,5 +48,5 @@ public interface SuspensionCallback {
 
     Long getIdByLabel(String tokenLabel);
 
-    void suspendAll(NeuronProvider.SuspensionMode sm);
+    void suspendAll(SuspensionMode sm);
 }

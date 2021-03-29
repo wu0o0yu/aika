@@ -18,6 +18,8 @@ package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Phase;
+import network.aika.neuron.phase.Ranked;
+import network.aika.neuron.phase.RankedImpl;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -31,7 +33,7 @@ public interface ActivationPhase extends Phase<Activation> {
     ActivationPhase INDUCTION = new Induction();
     LinkAndPropagate LINK_AND_PROPAGATE = new LinkAndPropagate();
     ActivationPhase USE_FINAL_BIAS = new UseFinalBias();
-    ActivationPhase PROPAGATE_CHANGE = new PropagateChange();
+    Ranked PROPAGATE_CHANGE = new RankedImpl(USE_FINAL_BIAS);
     ActivationPhase DETERMINE_BRANCH_PROBABILITY = new DetermineBranchProbability();
     ActivationPhase ENTROPY_GRADIENT = new EntropyGradient();
     ActivationPhase PROPAGATE_GRADIENTS_SUM = new PropagateGradientsSum();
@@ -43,5 +45,4 @@ public interface ActivationPhase extends Phase<Activation> {
     ActivationPhase COUNTING = new Counting();
 
     void process(Activation act);
-
 }

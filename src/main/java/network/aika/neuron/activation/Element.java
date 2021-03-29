@@ -17,23 +17,39 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.neuron.phase.Phase;
-import network.aika.neuron.phase.link.LinkPhase;
-import network.aika.neuron.phase.link.PropagateGradient;
 
+import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
-
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
  * An Element is either a node (Activation) or an edge (Link) in the Activation graph.
  *
  *  @author Lukas Molzberger
  */
-public abstract class Element implements Comparable<Element> {
+public abstract class Element<E extends Element> implements Comparable<E> {
 
-    private Set<QueueEntry> queuedPhases = new TreeSet<>();
+    Comparator<Element> COMPARE = Comparator.
+            <Element>comparingInt(e -> e.getElementType())
+            .thenComparing(e -> e);
+
+    private int[] round = new int[RoundType.values().length];
+
+    private Set<QueueEntry> queuedPhases = new TreeSet<>(QueueEntry.COMPARATOR);
+
+    protected abstract int getElementType();
+
+    public int getRound(RoundType type) {
+        return round[type.ordinal()];
+    }
+
+    public void setRound(RoundType type, int round) {
+        this.round[type.ordinal()] = round;
+    }
+
+    public void updateRound(RoundType type, int round, boolean increment) {
+        this.round[type.ordinal()] = Math.max(this.round[type.ordinal()], round + (increment ? 1 : 0));
+    }
 
     public void addQueuedPhase(QueueEntry qe) {
         queuedPhases.add(qe);
@@ -62,10 +78,6 @@ public abstract class Element implements Comparable<Element> {
     private void removeFromQueue() {
         getThought().removeQueueEntries(queuedPhases);
     }
-
-    public abstract void onProcessEvent(Phase p);
-
-    public abstract void afterProcessEvent(Phase p);
 
     public abstract Thought getThought();
 

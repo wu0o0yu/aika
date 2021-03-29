@@ -17,8 +17,14 @@
 package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
+
+import java.util.Comparator;
+
+import static network.aika.neuron.activation.Activation.TOLERANCE;
+import static network.aika.neuron.activation.RoundType.*;
 
 /**
  * Check if there are positive recurrent links that have not been activated and thus need to be updated.
@@ -34,20 +40,18 @@ public class UseFinalBias extends RankedImpl implements ActivationPhase {
 
     @Override
     public void process(Activation act) {
-        if(act.updateForFinalPhase()) {
-            act.getThought().addToQueue(
-                    act,
-                    PROPAGATE_CHANGE
-            );
-        }
+        double delta = act.updateValue(true);
+
+        if(Math.abs(delta) >= TOLERANCE)
+            QueueEntry.add(act, act.getRound(ACT) + 1, new PropagateChange(delta));
     }
 
     public String toString() {
-        return "Act: Use Final Bias";
+        return "Act-Phase: Use Final Bias";
     }
 
     @Override
-    public int compare(Activation o1, Activation o2) {
-        return 0;
+    public Comparator<Activation> getElementComparator() {
+        return Comparator.naturalOrder();
     }
 }

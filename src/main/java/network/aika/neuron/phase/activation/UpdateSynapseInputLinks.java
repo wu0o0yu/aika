@@ -20,6 +20,8 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
 
+import java.util.Comparator;
+
 
 /**
  * Determines which input synapses of this activations neuron should be linked to the input neuron.
@@ -42,11 +44,11 @@ public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPha
     }
 
     public String toString() {
-        return "Act: Update Synapse Input Links";
+        return "Act-Phase: Update Synapse Input Links";
     }
 
     @Override
-    public int compare(Activation act1, Activation act2) {
-        return 0;
+    public Comparator<Activation> getElementComparator() {
+        return Comparator.naturalOrder();
     }
 }

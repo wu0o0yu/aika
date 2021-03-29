@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network;
+package network.aika;
 
 import org.apache.commons.io.IOUtils;
 
@@ -27,6 +27,26 @@ import java.util.List;
  * @author Lukas Molzberger
  */
 public class Util {
+
+    public static List<String> loadExamplePhrases(String file) throws IOException {
+        ArrayList<String> phrases = new ArrayList<>();
+        StringWriter writer = new StringWriter();
+        try (InputStream is = Util.class.getResourceAsStream(file)) {
+            IOUtils.copy(is, writer, "UTF-8");
+            String txt = writer.toString();
+
+            for(String phrase: txt.split("\n")) {
+                phrase = phrase.replaceAll("\r", "");
+                phrase = phrase.replaceAll("\\.", "");
+                phrase = phrase.replaceAll(",", "");
+                phrase = phrase.replaceAll("!", "");
+                phrase = phrase.replaceAll("\\?", "");
+                phrase = phrase.replaceAll("-", "");
+                phrases.add(phrase);
+            }
+        }
+        return phrases;
+    }
 
     public static List<String> loadExamplesAsWords(File dir) throws IOException {
         ArrayList<String> words = new ArrayList<>();

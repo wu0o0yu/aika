@@ -16,11 +16,9 @@
  */
 package network.aika.neuron.phase;
 
-import network.aika.Config;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.phase.activation.ActivationPhase;
-import network.aika.neuron.phase.link.LinkPhase;
 
 /**
  *
@@ -30,7 +28,7 @@ public interface VisitorPhase {
 
     void closeCycle(Activation act, Visitor v);
 
-    ActivationPhase[] getNextActivationPhases();
+    void getNextPhases(int round, Activation act);
 
-    LinkPhase[] getNextLinkPhases();
+    void getNextPhases(int round, Link l);
 }

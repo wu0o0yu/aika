@@ -51,7 +51,7 @@ public class Document extends Thought {
     public void linkInputRelations(Activation act) {
         TextReference ref = act.getReference();
         TextModel tm = act.getNeuron().getModel();
-        if(tm.nextTokenInhib.getId().equals(act.getNeuron().getId())) {
+        if(tm.getNextTokenInhib().getId().equals(act.getNeuron().getId())) {
             ref.nextTokenIAct = act;
             ref.nextTokenPPAct = act.getInputLinks()
                     .findAny()
@@ -76,13 +76,6 @@ public class Document extends Thought {
         return content.length();
     }
 
-    public String toString() {
-        StringBuilder sb = new StringBuilder(content);
-        sb.append("\n");
-        sb.append(super.toString());
-        return sb.toString();
-    }
-
     public String getTextSegment(Integer begin, Integer end) {
         if(begin != null && end != null) {
             return content.substring(
@@ -95,13 +88,13 @@ public class Document extends Thought {
     }
 
     public static String getText(Activation act) {
-        return ((TextReference)act.getReference()).getText();
+        TextReference ref = act.getReference();
+        return ref.getText();
     }
 
     public Activation addInput(Neuron n, Reference ref) {
-        Activation act = new Activation(this, n);
+        Activation act = createActivation(n);
         act.initInput(ref);
-
         return act;
     }
 
@@ -120,5 +113,12 @@ public class Document extends Thought {
         }
 
         return tokenPatternAct;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder(content);
+        sb.append("\n");
+        sb.append(super.toString());
+        return sb.toString();
     }
 }

@@ -27,7 +27,10 @@ import network.aika.neuron.phase.link.SumUpLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Comparator;
+
 import static network.aika.neuron.activation.Activation.TOLERANCE;
+import static network.aika.neuron.activation.RoundType.WEIGHT;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -37,9 +40,13 @@ import static network.aika.neuron.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public class Link extends Element {
+public class Link extends Element<Link> {
 
     private static final Logger log = LoggerFactory.getLogger(Link.class);
+
+    public static final Comparator<Link> COMPARE = Comparator.
+            <Link, Activation>comparing(l -> l.output)
+            .thenComparing(l -> l.input);
 
     private Synapse synapse;
 
@@ -61,38 +68,34 @@ public class Link extends Element {
     public Link(Link oldLink, Synapse s, Activation input, Activation output, boolean isSelfRef) {
         this(s, input, output, isSelfRef);
 
-        Thought t = getThought();
-
-        t.onLinkCreationEvent(this);
+        getThought().onLinkCreationEvent(this);
 
         linkInput();
         linkOutput();
 
         getSynapse().updateReference(this);
 
+        updateRound(RoundType.ACT, input.getRound(RoundType.ACT), false);
+        updateRound(RoundType.ACT, output.getRound(RoundType.ACT), false);
+
         double w = getSynapse().getWeight();
 
         if (w <= 0.0 && isSelfRef())
             return;
 
-        t.addToQueue(
+        QueueEntry.add(
                 this,
+                input.getRound(RoundType.ACT),
                 new SumUpLink(w * (getInputValue(POS) - getInputValue(POS, oldLink)))
         );
     }
 
+    protected int getElementType() {
+        return 1;
+    }
+
     public double getGradient() {
         return gradient;
-    }
-
-    @Override
-    public void onProcessEvent(Phase p) {
-        getThought().onLinkProcessedEvent(p, this);
-    }
-
-    @Override
-    public void afterProcessEvent(Phase p) {
-        getThought().afterLinkProcessedEvent(p, this);
     }
 
     public static boolean synapseExists(Activation iAct, Activation oAct) {
@@ -103,14 +106,16 @@ public class Link extends Element {
         return iAct.outputLinkExists(oAct);
     }
 
-    public static boolean linkExists(Synapse s, Activation oAct) {
-        Link ol = oAct.getInputLink(s);
+    public static boolean linkExists(Synapse s, Activation iAct, Activation oAct) {
+        Link ol = oAct.getInputLink(iAct.getNeuron());
         if (ol != null) {
+            assert s == ol.getSynapse();
+
 //                    toAct = oAct.cloneToReplaceLink(s);
             log.warn("Link already exists! ");
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     public static Synapse getSynapse(Activation iAct, Activation oAct) {
@@ -121,9 +126,8 @@ public class Link extends Element {
     }
 
     public void count() {
-        if(synapse != null) {
+        if(synapse != null)
             synapse.count(this);
-        }
     }
 
     public void follow(VisitorPhase p) {
@@ -157,9 +161,10 @@ public class Link extends Element {
         double igGradient = 0.0;
         for(Sign si: Sign.SIGNS) {
             for (Sign so : Sign.SIGNS) {
-                double s = getSynapse().getSurprisal(si, so);
-                s -= input.getNeuron().getSurprisal(si);
-                s -= output.getNeuron().getSurprisal(so);
+                Reference ref = getInput().getReference();
+                double s = getSynapse().getSurprisal(si, so, ref);
+                s -= input.getNeuron().getSurprisal(si, ref);
+                s -= output.getNeuron().getSurprisal(so, ref);
 
                 igGradient += s * getInputValue(si) * getOutputValue(so) * output.getNorm();
             }
@@ -208,7 +213,7 @@ public class Link extends Element {
     }
 
     public boolean isCausal() {
-        return input == null || input.getFired().compareTo(output.getFired()) <= 0;
+        return input == null || Fired.COMPARATOR.compare(input.getFired(), output.getFired()) <= 0;
     }
 
     public static double getInputValue(Sign s, Link l) {
@@ -251,14 +256,6 @@ public class Link extends Element {
 
     public void linkInput() {
         if(input != null) {
-/*            if(synapse.isPropagate()) {
-                SortedMap<Activation, Link> outLinks = input.getOutputLinks(synapse);
-                if(!outLinks.isEmpty()) {
-                    Activation oAct = outLinks.firstKey();
-//                    assert oAct.getId() == output.getId();
-                }
-            }
-*/
             input.outputLinks.put(
                     new OutputKey(output.getNeuronProvider(), output.getId()),
                     this
@@ -281,15 +278,14 @@ public class Link extends Element {
         assert successful;
     }
 
-    public void addNextLinkPhases(VisitorPhase p) {
-        getThought().addToQueue(
-                this,
-                p.getNextLinkPhases()
-        );
-    }
-
     public void sumUpLink(double delta) {
-        getOutput().addToSum(delta);
+        Activation oAct = getOutput();
+        oAct.addToSum(delta);
+        oAct.updateRound(
+                RoundType.ACT,
+                Math.max(getRound(WEIGHT), getInput().getRound(RoundType.ACT)),
+                getSynapse().isRecurrent() && !oAct.getNeuron().isInputNeuron()
+        );
     }
 
     public boolean isNegative() {
@@ -302,12 +298,8 @@ public class Link extends Element {
     }
 
     @Override
-    public int compareTo(Element ge) {
-        Link l = ((Link) ge);
-        int r = output.compareTo(l.output);
-        if(r != 0) return r;
-
-        return input.compareTo(l.input);
+    public int compareTo(Link l) {
+        return COMPARE.compare(this, l);
     }
 
     public String toString() {

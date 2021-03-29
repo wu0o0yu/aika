@@ -20,6 +20,7 @@ package network.aika.neuron.inhibitory;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.ScopeEntry;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.Scope;
@@ -53,23 +54,22 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
 
     @Override
     public PrimaryInhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
-        if(!input.getTemplates().contains(getInput()))
-            return null;
+        assert input.getTemplates().contains(getInput());
 
         return new PrimaryInhibitorySynapse(input, output, this);
     }
 
     @Override
-    public Set<Scope> transition(Scope s, Direction dir, boolean checkFinalRequirement) {
+    public Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
         if (dir == INPUT) {
-            switch (s) {
+            switch (s.getScope()) {
                 case I_SAME:
-                    return Collections.singleton(I_INPUT);
+                    return s.nextSet(I_INPUT);
             }
         } else {
-            switch (s) {
+            switch (s.getScope()) {
                 case I_INPUT:
-                    return Collections.singleton(I_SAME);
+                    return s.nextSet(I_SAME);
             }
         }
         return Collections.emptySet();

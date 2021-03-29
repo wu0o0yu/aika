@@ -22,6 +22,7 @@ import network.aika.neuron.phase.VisitorPhase;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static network.aika.neuron.activation.direction.Direction.*;
@@ -46,7 +47,7 @@ public class Visitor {
     public Direction downUpDir;
     public Direction startDir;
 
-    private Set<Scope> scopes;
+    private Set<ScopeEntry> scopes;
 
     public int downSteps = 0;
     public int upSteps = 0;
@@ -63,7 +64,7 @@ public class Visitor {
         this.scopes = act.getNeuron().getInitialScopes(startDir);
     }
 
-    public Visitor prepareNextStep(Activation currentAct, Link currentLink, Set<Scope> scopes, Transition t) {
+    public Visitor prepareNextStep(Activation currentAct, Link currentLink, Set<ScopeEntry> scopes, Transition t) {
         if(scopes.isEmpty())
             return null;
 
@@ -83,7 +84,7 @@ public class Visitor {
         return nv;
     }
 
-    public Set<Scope> getScopes() {
+    public Set<ScopeEntry> getScopes() {
         return scopes;
     }
 
@@ -119,10 +120,17 @@ public class Visitor {
     }
 
     public void tryToLink(Activation act) {
-        if (downUpDir != OUTPUT || numSteps() < 1) return;
-        if (act == origin.act || act.isConflicting()) return; // <--
+        if (downUpDir != OUTPUT || numSteps() < 1)
+            return;
 
-        if (scopes.contains(Scope.PP_RELATED_INPUT)) return; // TODO
+        if (act == origin.act || act.isConflicting())
+            return; // <--
+
+        if (scopes
+                .stream()
+                .anyMatch(s -> s.getScope() == Scope.PP_RELATED_INPUT)
+        )
+            return; // TODO
 
         phase.closeCycle(act, this);
     }

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network;
+package network.aika;
 
 import network.aika.neuron.Templates;
 import network.aika.neuron.excitatory.PatternPartSynapse;
@@ -57,7 +57,7 @@ public class PropagateTest {
 
         Document doc = new Document("test");
 
-        Activation act = new Activation(doc, in);
+        Activation act = doc.createActivation(in);
         act.initInput(new TextReference(doc, 0, 4));
 
         System.out.println(doc);

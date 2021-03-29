@@ -16,13 +16,17 @@
  */
 package network.aika.neuron.phase.link;
 
-import network.aika.Thought;
+import network.aika.neuron.activation.QueueEntry;
 import network.aika.utils.Utils;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.activation.ActivationPhase;
 
+import java.util.Comparator;
+
+import static java.lang.Integer.MAX_VALUE;
+import static network.aika.neuron.activation.RoundType.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
 
@@ -42,36 +46,31 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
 
     @Override
     public void process(Link l) {
-        Thought t = l.getThought();
         l.sumUpLink(delta);
 
-        t.addToQueue(
-                l.getOutput(),
-                PROPAGATE_GRADIENTS_NET
-        );
-
         Activation oAct = l.getOutput();
+        int round = oAct.getRound(ACT);
+
+        QueueEntry.add(oAct, round, PROPAGATE_GRADIENTS_NET);
+
         if(oAct.checkIfFired()) {
-            t.addToQueue(
-                    oAct,
-                    LINK_AND_PROPAGATE,
-                    USE_FINAL_BIAS,
-                    oAct.hasBranches() ? DETERMINE_BRANCH_PROBABILITY : null,
-                    ActivationPhase.COUNTING
-            );
-            oAct.addLinksToQueue(
-                    INPUT,
-                    COUNTING
-            );
+            QueueEntry.add(oAct, round, LINK_AND_PROPAGATE);
+            QueueEntry.add(oAct, round, USE_FINAL_BIAS);
+
+            if(oAct.hasBranches())
+                    QueueEntry.add(oAct, round, DETERMINE_BRANCH_PROBABILITY);
+
+            QueueEntry.add(oAct, MAX_VALUE, ActivationPhase.COUNTING);
+            oAct.addLinksToQueue(INPUT, MAX_VALUE, COUNTING);
         }
     }
 
     public String toString() {
-        return "Link: Sum up Link (" + Utils.round(delta) + ")";
+        return "Link-Phase: Sum up Link (" + Utils.round(delta) + ")";
     }
 
     @Override
-    public int compare(Link l1, Link l2) {
-        return 0;
+    public Comparator<Link> getElementComparator() {
+        return Comparator.naturalOrder();
     }
 }

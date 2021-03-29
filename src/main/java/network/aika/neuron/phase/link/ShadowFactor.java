@@ -17,9 +17,10 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.Ranked;
 import network.aika.neuron.phase.RankedImpl;
+
+import java.util.Comparator;
 
 import static network.aika.neuron.phase.activation.ActivationPhase.DETERMINE_BRANCH_PROBABILITY;
 
@@ -41,11 +42,11 @@ public class ShadowFactor extends RankedImpl implements LinkPhase {
     }
 
     public String toString() {
-        return "Link: Shadow Factor";
+        return "Link-Phase: Shadow Factor";
     }
 
     @Override
-    public int compare(Link l1, Link l2) {
-        return 0;
+    public Comparator<Link> getElementComparator() {
+        return Comparator.naturalOrder();
     }
 }

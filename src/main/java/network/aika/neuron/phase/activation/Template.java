@@ -20,6 +20,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.phase.Ranked;
@@ -27,6 +28,8 @@ import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,18 +53,14 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     }
 
     @Override
-    public ActivationPhase[] getNextActivationPhases() {
-        return new ActivationPhase[] {
-                INDUCTION
-        };
+    public void getNextPhases(int round, Activation act) {
+        QueueEntry.add(act, round, INDUCTION);
     }
 
     @Override
-    public LinkPhase[] getNextLinkPhases() {
-        return new LinkPhase[] {
-                LinkPhase.TEMPLATE,
-                LinkPhase.INDUCTION
-        };
+    public void getNextPhases(int round, Link l) {
+        QueueEntry.add(l, round, LinkPhase.TEMPLATE);
+        QueueEntry.add(l, round, LinkPhase.INDUCTION);
     }
 
     @Override
@@ -121,13 +120,13 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
         if (!act.getNeuron().checkGradientThreshold(act))
             return;
 
-        Set<Synapse> templateSynapses = act
+        Collection<Synapse> templateSynapses = act
                 .getNeuron()
                 .getTemplates()
                 .stream()
                 .flatMap(tn -> v.startDir.getSynapses(tn))
                 .filter(ts -> ts.checkTemplatePropagate(v, act))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
         v.startDir.getLinks(act)
                 .forEach(l ->
@@ -140,11 +139,20 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     }
 
     public String toString() {
-        return "Act: Template-" + direction;
+        return "Act-Phase: Template-" + direction;
     }
 
+    private static final Comparator<Activation> GRAD_COMP = Comparator.
+            <Activation>comparingDouble(act -> act.getNeuron().getCandidateGradient(act))
+            .reversed();
+
+
     @Override
-    public int compare(Activation act1, Activation act2) {
-        return 0;
+    public Comparator<Activation> getElementComparator() {
+        if(direction == OUTPUT) {
+            return GRAD_COMP;
+        } else {
+            return Comparator.naturalOrder();
+        }
     }
 }

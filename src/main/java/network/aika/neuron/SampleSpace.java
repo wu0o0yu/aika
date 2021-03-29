@@ -17,8 +17,11 @@
 package network.aika.neuron;
 
 import network.aika.Model;
+import network.aika.neuron.activation.Activation;
 import network.aika.utils.Writable;
 import network.aika.neuron.activation.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -33,11 +36,19 @@ import java.io.IOException;
  */
 public class SampleSpace implements Writable {
 
+    private static final Logger log = LoggerFactory.getLogger(SampleSpace.class);
+
+
+    private Model m;
     private double N = 0;
     private Integer lastPos;
 
-    public double getN() {
-        return N;
+    public SampleSpace(Model m) {
+        this.m = m;
+    }
+
+    public double getN(Reference ref) {
+        return N + getNegativeInstancesSinceLastPos(ref);
     }
 
     public void setN(int N) {
@@ -52,20 +63,33 @@ public class SampleSpace implements Writable {
         this.lastPos = lastPos;
     }
 
-    public void update(Model m, Reference ref) {
-        int n = 0;
-
-        if(lastPos != null) {
-            n = getAbsoluteBegin(m, ref) - lastPos;
-        }
-        assert n >= 0;
-
-        N += 1 + n / ref.length();
+    public void update(Reference ref) {
+        N += 1 + getNegativeInstancesSinceLastPos(ref);
 
         Integer newPos = getAbsoluteEnd(m, ref);
         assert lastPos == null || newPos > lastPos;
 
         lastPos = newPos;
+    }
+
+    public int getNegativeInstancesSinceLastPos(Reference ref) {
+        if(ref == null)
+            return 0;
+
+        int n = 0;
+
+        if(lastPos != null) {
+            n = getAbsoluteBegin(m, ref) - lastPos;
+        }
+
+        if(n < 0) {
+            log.warn("getNegativeInstancesSinceLastPos is not allowed to be called after update.");
+            return 0;
+        }
+
+
+        n /= ref.length();
+        return n;
     }
 
     public int getAbsoluteBegin(Model m, Reference ref) {
@@ -86,7 +110,7 @@ public class SampleSpace implements Writable {
     }
 
     public static SampleSpace read(DataInput in, Model m) throws IOException {
-        SampleSpace sampleSpace = new SampleSpace();
+        SampleSpace sampleSpace = new SampleSpace(m);
         sampleSpace.readFields(in, m);
         return sampleSpace;
     }

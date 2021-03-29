@@ -18,6 +18,7 @@ package network.aika.text;
 
 import network.aika.Model;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.Reference;
 import network.aika.callbacks.SuspensionCallback;
 import network.aika.neuron.Neuron;
@@ -39,8 +40,14 @@ import static network.aika.neuron.phase.activation.ActivationPhase.LINK_AND_PROP
 */
 public class TextModel extends Model {
 
-    public NeuronProvider prevTokenInhib;
-    public NeuronProvider nextTokenInhib;
+    public static String REL_PREVIOUS_TOKEN_LABEL = " Rel Prev. Token";
+    public static String REL_NEXT_TOKEN_LABEL = " Rel Next Token";
+    public static String PREVIOUS_TOKEN_LABEL = "Prev. Token";
+    public static String NEXT_TOKEN_LABEL = "Next Token";
+
+
+    private NeuronProvider prevTokenInhib;
+    private NeuronProvider nextTokenInhib;
 
     public TextModel() {
         super();
@@ -55,13 +62,13 @@ public class TextModel extends Model {
     private void init() {
         InhibitoryNeuron ptN = getTemplates().INHIBITORY_TEMPLATE.instantiateTemplate();
         ptN.setInputNeuron(true);
-        ptN.setLabel("Prev. Token");
+        ptN.setLabel(PREVIOUS_TOKEN_LABEL);
         prevTokenInhib = ptN.getProvider();
         prevTokenInhib.save();
 
         InhibitoryNeuron ntN = getTemplates().INHIBITORY_TEMPLATE.instantiateTemplate();
         ntN.setInputNeuron(true);
-        ntN.setLabel("Next Token");
+        ntN.setLabel(NEXT_TOKEN_LABEL);
         nextTokenInhib = ntN.getProvider();
         nextTokenInhib.save();
     }
@@ -94,10 +101,7 @@ public class TextModel extends Model {
     private static void addLink(Synapse s, Activation iAct, Activation oAct) {
         Link nl = oAct.addLink(s, iAct, false);
 
-        iAct.getThought().addToQueue(
-                nl,
-                LINK_AND_PROPAGATE.getNextLinkPhases()
-        );
+        LINK_AND_PROPAGATE.getNextPhases(0, nl);
     }
 
     private Synapse getRelSynapse(Neuron<?> n) {
@@ -129,11 +133,11 @@ public class TextModel extends Model {
 
         PatternPartNeuron inRelPT = getTemplates().INPUT_PATTERN_PART_TEMPLATE.instantiateTemplate();
         inRelPT.setInputNeuron(true);
-        inRelPT.setLabel(tokenLabel + " Rel Prev. Token");
+        inRelPT.setLabel(tokenLabel + REL_PREVIOUS_TOKEN_LABEL);
 
         PatternPartNeuron inRelNT = getTemplates().INPUT_PATTERN_PART_TEMPLATE.instantiateTemplate();
         inRelNT.setInputNeuron(true);
-        inRelNT.setLabel(tokenLabel + " Rel Next Token");
+        inRelNT.setLabel(tokenLabel + REL_NEXT_TOKEN_LABEL);
 
         {
             {

@@ -18,11 +18,17 @@ package network.aika.neuron.activation;
 
 import network.aika.neuron.NeuronProvider;
 
+import java.util.Comparator;
+
 /**
  *
  * @author Lukas Molzberger
  */
-public class OutputKey implements Comparable<OutputKey> {
+public class OutputKey {
+
+    public static final Comparator<OutputKey> COMPARATOR = Comparator
+            .<OutputKey, NeuronProvider>comparing(ok -> ok.n)
+            .thenComparingInt(ok -> ok.actId);
 
     private NeuronProvider n;
     private Integer actId;
@@ -34,12 +40,5 @@ public class OutputKey implements Comparable<OutputKey> {
 
     public String toString() {
         return "[" + n.getId() + "]:" + actId;
-    }
-
-    @Override
-    public int compareTo(OutputKey ok) {
-        int r = n.compareTo(ok.n);
-        if(r != 0) return r;
-        return actId.compareTo(ok.actId);
     }
 }

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network;
+package network.aika;
 
 import network.aika.neuron.Templates;
 import network.aika.neuron.excitatory.*;
@@ -139,7 +139,7 @@ public class MutualExclusionTest {
 
         Document doc = new Document("test");
 
-        Activation act = new Activation(doc, in);
+        Activation act = doc.createActivation(in);
         act.setInputValue(1.0);
         act.setFired(0);
 
@@ -236,7 +236,7 @@ public class MutualExclusionTest {
 
         Document doc = new Document("test");
 
-        Activation act = new Activation(doc, in);
+        Activation act = doc.createActivation(in);
         act.initInput(new TextReference(doc, 0, 4));
 
         doc.process(m);

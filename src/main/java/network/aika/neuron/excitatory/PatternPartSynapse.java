@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.Scope.*;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -92,17 +93,15 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     @Override
     protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
         if(!isRecurrent) {
-            return fromAct.getFired().compareTo(toAct.getFired()) <= 0;
+            return fromAct.getFired() != NOT_FIRED && Fired.COMPARATOR.compare(fromAct.getFired(), toAct.getFired()) <= 0;
         } else {
             return v.getSelfRef();
         }
-        // (fromAct.getPhase() != TEMPLATE_INPUT && fromAct.getPhase() != TEMPLATE_OUTPUT) || Should not depend on the phase.
     }
 
     @Override
     public PatternPartSynapse instantiateTemplate(I input, PatternPartNeuron output) {
-        if(!input.getTemplates().contains(getInput()))
-            return null;
+        assert input.getTemplates().contains(getInput());
 
         return new PatternPartSynapse(input, output, this, isNegative, isRecurrent, inputScope, isSamePattern);
     }
@@ -122,53 +121,57 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     }
 
     @Override
-    public Set<Scope> transition(Scope s, Direction dir, boolean checkFinalRequirement) {
+    public Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
         if(inputScope) {
             if(dir == INPUT) {
-                if(checkFinalRequirement && s != PP_SAME) {
+                if(checkFinalRequirement && s.getScope() != PP_SAME) {
                     return Collections.emptySet();
                 }
 
-                switch (s) {
+                switch (s.getScope()) {
                     case PP_SAME:
-                        return Collections.singleton(PP_INPUT);
+                        return s.nextSet(PP_INPUT);
                     case PP_RELATED_SAME:
                     case PP_INPUT:
-                        return Collections.singleton(PP_RELATED_INPUT);
+                        return s.nextSet(PP_RELATED_INPUT);
                     case I_SAME:
-                        return Collections.singleton(I_INPUT);
+                        return s.nextSet(I_INPUT);
                 }
             } else {
-                if(checkFinalRequirement && s != PP_INPUT) {
+                if(checkFinalRequirement && s.getScope() != PP_INPUT) {
                     return Collections.emptySet();
                 }
 
-                switch (s) {
+                switch (s.getScope()) {
                     case PP_INPUT:
-                        return Set.of(PP_SAME, PP_RELATED_INPUT);
+                        if(startDir == INPUT) {
+                            return s.nextSet(PP_SAME, PP_RELATED_INPUT);
+                        } else if(startDir == OUTPUT) {
+                            return s.nextSet(PP_SAME);
+                        }
                     case PP_RELATED_INPUT:
-                        return Collections.singleton(PP_RELATED_SAME);
+                        return s.nextSet(PP_RELATED_SAME);
                     case I_INPUT:
-                        return Collections.singleton(I_SAME);
+                        return s.nextSet(I_SAME);
                 }
             }
         }
 
         if(isSamePattern) {
             if(checkFinalRequirement) {
-                if(dir == INPUT && s != PP_SAME) {
+                if(dir == INPUT && s.getScope() != PP_SAME) {
                     return Collections.emptySet();
                 }
-                if(dir == OUTPUT && s != PP_RELATED_SAME && s != PP_SAME) {
+                if(dir == OUTPUT && s.getScope() != PP_RELATED_SAME && s.getScope() != PP_SAME) {
                     return Collections.emptySet();
                 }
             }
 
-            switch (s) {
+            switch (s.getScope()) {
                 case PP_SAME:
-                    return Set.of(PP_RELATED_SAME, PP_SAME);
+                    return s.nextSet(PP_RELATED_SAME, PP_SAME);
                 case PP_RELATED_SAME:
-                    return Collections.singleton(PP_SAME);
+                    return s.nextSet(PP_SAME);
                 case PP_RELATED_INPUT:
                 case PP_INPUT:
                 case P_SAME:

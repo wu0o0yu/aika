@@ -1,4 +1,4 @@
-package network;
+package network.aika;
 
 import javax.swing.*;
 

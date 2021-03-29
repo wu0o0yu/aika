@@ -23,9 +23,9 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.phase.Phase;
 import network.aika.neuron.phase.link.LinkPhase;
 import network.aika.neuron.phase.link.PropagateGradient;
+import network.aika.neuron.phase.link.SumUpLink;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.Utils;
 
@@ -33,6 +33,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Integer.MAX_VALUE;
+import static network.aika.neuron.activation.RoundType.ACT;
+import static network.aika.neuron.activation.RoundType.GRADIENT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
@@ -41,7 +44,12 @@ import static network.aika.neuron.sign.Sign.POS;
 /**
  * @author Lukas Molzberger
  */
-public class Activation extends Element {
+public class Activation extends Element<Activation> {
+
+    public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(act -> act.id);
+
+    public static final Comparator<Activation> FIRED_COMPARATOR = (act1, act2) -> Fired.COMPARATOR.compare(act1.getFired(), act2.getFired());
+    public static final Comparator<Activation> FIRED_COMPARATOR_REVERSED = FIRED_COMPARATOR.reversed();
 
     public static double TOLERANCE = 0.001;
 
@@ -61,8 +69,6 @@ public class Activation extends Element {
     Map<NeuronProvider, Link> inputLinks;
     NavigableMap<OutputKey, Link> outputLinks;
 
-    private int round; // Only used as stopping criteria
-
     private Set<Activation> branches = new TreeSet<>();
     private Activation mainBranch;
 
@@ -73,7 +79,6 @@ public class Activation extends Element {
     private double lastNet = 0.0;
 
     private double inputGradient;
-    private double outputGradient;
 
     /**
      * Accumulates all gradients in case a new link is added that needs be get informed about the gradient.
@@ -87,10 +92,6 @@ public class Activation extends Element {
         this.neuron = n;
     }
 
-    public Activation(Thought t, Neuron<?> n) {
-        this(t.createActivationId(), t, n);
-    }
-
     public Activation(int id, Thought t, Neuron<?> n) {
         this(id, n);
         this.thought = t;
@@ -98,7 +99,7 @@ public class Activation extends Element {
         thought.registerActivation(this);
 
         inputLinks = new TreeMap<>();
-        outputLinks = new TreeMap<>();
+        outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
     }
 
     public boolean isMarked() {
@@ -109,27 +110,15 @@ public class Activation extends Element {
         this.marked = marked;
     }
 
-    @Override
-    public void onProcessEvent(Phase p) {
-        thought.onActivationProcessedEvent(p, this);
-    }
-
-    @Override
-    public void afterProcessEvent(Phase p) {
-        thought.afterActivationProcessedEvent(p, this);
-    }
-
     public void initInput(Reference ref) {
         setReference(ref);
 
         setInputValue(1.0);
         setFired(ref.getBegin());
 
-        getThought().addToQueue(
-                this,
-                LINK_AND_PROPAGATE,
-                ENTROPY_GRADIENT
-        );
+        QueueEntry.add(this, 0, LINK_AND_PROPAGATE);
+        QueueEntry.add(this, 0, ENTROPY_GRADIENT);
+        QueueEntry.add(this, MAX_VALUE, COUNTING);
     }
 
     public int getId() {
@@ -161,25 +150,20 @@ public class Activation extends Element {
     }
 
     public void setFired(Fired f) {
-        // TODO: check if really necessary
-/*        if(isQueued()) {
-            updateQueueEntry(() -> {
-                this.fired = f;
-                return this;
-            });
-        } else {
- */
-            fired = f;
-//        }
+        fired = f;
     }
 
     public Thought getThought() {
         return thought;
     }
 
+    protected int getElementType() {
+        return 0;
+    }
+
     @Override
-    public int compareTo(Element ge) {
-        return Integer.compare(getId(), ((Activation) ge).getId());
+    public int compareTo(Activation act) {
+        return ID_COMPARATOR.compare(this, act);
     }
 
     public OutputKey getOutputKey() {
@@ -224,11 +208,11 @@ public class Activation extends Element {
     }
 
     public Activation createBranch(Synapse excludedSyn) {
-        Activation clonedAct = new Activation(thought.createActivationId(), thought, neuron);
+        Activation clonedAct = thought.createActivation(neuron);
         thought.onActivationCreationEvent(clonedAct, this);
 
         copyPhases(clonedAct);
-        clonedAct.round = round + 1;
+        clonedAct.setRound(ACT, getRound(ACT) + 1);
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
         linkClone(clonedAct, excludedSyn);
@@ -244,7 +228,7 @@ public class Activation extends Element {
 
         replaceElement(clonedAct);
 
-        clonedAct.round = round + 1;
+        clonedAct.setRound(ACT, getRound(ACT) + 1);
         linkClone(clonedAct, excludedSyn);
 
         return clonedAct;
@@ -292,7 +276,7 @@ public class Activation extends Element {
                 .filter(l -> !l.isNegative() || l.isCausal())
                 .map(l -> l.getOutput())
                 .filter(act ->
-                        act.fired != NOT_FIRED && fired.compareTo(act.fired) == -1
+                        act.fired != NOT_FIRED && Fired.COMPARATOR.compare(fired, act.fired) == -1
                 )
                 .anyMatch(act ->
                         act.searchWithinBranch()
@@ -313,22 +297,13 @@ public class Activation extends Element {
                 .map(l -> l.getInput());
     }
 
-    public boolean updateValue(boolean isFinal) {
-        Double oldValue = value;
-
-        value = inputValue != null ?
-                inputValue :
-                computeValue(isFinal);
-
-        return oldValue == null || Math.abs(value - oldValue) > TOLERANCE;
-    }
-
-    public void updateOutgoingLinks() {
+    public void updateOutgoingLinks(double delta) {
+        int round = getRound(ACT);
         getOutputLinks()
-                .map(l -> l.getOutput())
-//                .filter(act -> act.isActive())
-                .forEach(act ->
-                        getThought().addToQueue(act, PROPAGATE_CHANGE)
+                .forEach(l -> {
+                            QueueEntry.add(l, round, new SumUpLink(delta));
+                            QueueEntry.add(l.getOutput(), round, USE_FINAL_BIAS);
+                        }
                 );
     }
 
@@ -352,6 +327,10 @@ public class Activation extends Element {
         v.onEvent(true);
     }
 
+    public Link getInputLink(Neuron n) {
+        return inputLinks.get(n.getProvider());
+    }
+
     public Link getInputLink(Synapse s) {
         return inputLinks.get(s.getPInput());
     }
@@ -373,7 +352,7 @@ public class Activation extends Element {
                 .subMap(
                         new OutputKey(s.getOutput().getProvider(), Integer.MIN_VALUE),
                         true,
-                        new OutputKey(s.getOutput().getProvider(), Integer.MAX_VALUE),
+                        new OutputKey(s.getOutput().getProvider(), MAX_VALUE),
                         true
                 );
     }
@@ -396,17 +375,22 @@ public class Activation extends Element {
         }
     }
 
-    public boolean updateForFinalPhase() {
-        if (inputValue != null)
-            return false;
 
-        double initialValue = computeValue(false);
-        double finalValue = computeValue(true);
+    private double computeValue(boolean isFinal) {
+        return branchProbability *
+                neuron.getActivationFunction().f(
+                        getNet(isFinal)
+                );
+    }
 
-        if (Math.abs(finalValue - initialValue) > TOLERANCE) {
-            return updateValue(true);
-        }
-        return false;
+    public double updateValue(boolean isFinal) {
+        Double oldValue = value;
+
+        value = inputValue != null ?
+                inputValue :
+                computeValue(isFinal);
+
+        return value - (oldValue != null ? oldValue : 0.0);
     }
 
     public boolean checkIfFired() {
@@ -420,20 +404,14 @@ public class Activation extends Element {
     private Fired getLatestFired() {
         return inputLinks.values().stream()
                 .map(il -> il.getInput().getFired())
-                .max(Fired::compareTo)
+                .max(Fired.COMPARATOR)
                 .orElse(null);
-    }
-
-    private double computeValue(boolean isFinal) {
-        return branchProbability *
-                neuron.getActivationFunction().f(
-                        getNet(isFinal)
-                );
     }
 
     public void initEntropyGradient() {
         double g = getNeuron().getSurprisal(
-                        Sign.getSign(this)
+                        Sign.getSign(this),
+                        getReference()
                 );
 
         inputGradient += g - lastEntropyGradient;
@@ -481,22 +459,22 @@ public class Activation extends Element {
     public void propagateGradients(double g) {
         outputGradientSum += g;
 
-        addLinksToQueue(
-                INPUT,
-                ! getNeuron().isInputNeuron() ? new PropagateGradient(g) : null,
-                LinkPhase.TEMPLATE
-        );
+        int round = getRound(GRADIENT);
 
-        getThought().addToQueue(
-                this,
-                getNeuron().isAllowTraining() ? UPDATE_BIAS : null,
-                TEMPLATE_INPUT,
-                TEMPLATE_OUTPUT
-        );
+        if(!getNeuron().isInputNeuron())
+            addLinksToQueue(INPUT, round, new PropagateGradient(g));
+
+        addLinksToQueue(INPUT, round, LinkPhase.TEMPLATE);
+
+        if (getNeuron().isAllowTraining())
+            QueueEntry.add(this, round, UPDATE_BIAS);
+
+        QueueEntry.add(this, round, TEMPLATE_INPUT);
+        QueueEntry.add(this, round, TEMPLATE_OUTPUT);
     }
 
     public double getNorm() {
-        return (1 / (1 + getNeuron().getSampleSpace().getN()));
+        return (1 / (1 + getNeuron().getSampleSpace().getN(getReference())));
     }
 
     public boolean gradientIsZero() {
@@ -510,10 +488,7 @@ public class Activation extends Element {
     public void propagateGradient(double g) {
         inputGradient += g;
 
-        getThought().addToQueue(
-                this,
-                PROPAGATE_GRADIENTS_SUM
-        );
+        QueueEntry.add(this, 0, PROPAGATE_GRADIENTS_SUM);
     }
 
     public void linkInputs() {
@@ -580,10 +555,10 @@ public class Activation extends Element {
         cAct.branchProbability = p;
     }
 
-    public void addLinksToQueue(Direction dir, LinkPhase... phases) {
+    public void addLinksToQueue(Direction dir, int round, LinkPhase p) {
         dir.getLinks(this)
                 .forEach(l ->
-                        getThought().addToQueue(l, phases)
+                        QueueEntry.add(l, round, p)
                 );
     }
 
@@ -631,7 +606,7 @@ public class Activation extends Element {
                 " net:" + Utils.round(getNet(false)) +
                 " netFinal:" + Utils.round(getNet(true)) +
                 " bp:" + Utils.round(branchProbability) +
-                " round:" + round);
+                " round:" + getRound(ACT));
 
         if (includeLink) {
             sb.append("\n");
