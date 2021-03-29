@@ -46,8 +46,15 @@ public class UpdateWeight extends RankedImpl implements LinkPhase {
 
         double weightDelta = s.updateSynapse(l);
 
-        QueueEntry.add(l.getOutput(), l.getRound(WEIGHT), UPDATE_SYNAPSE_INPUT_LINKS);
-        QueueEntry.add(l, l.getRound(WEIGHT), new SumUpLink(l.getInputValue(POS) * weightDelta));
+        int round = l.getRound(WEIGHT);
+
+        QueueEntry.add(l.getOutput(), round, UPDATE_SYNAPSE_INPUT_LINKS);
+
+        QueueEntry.add(
+                l,
+                round,
+                new SumUpLink(l.getInputValue(POS) * weightDelta)
+        );
     }
 
     public String toString() {
