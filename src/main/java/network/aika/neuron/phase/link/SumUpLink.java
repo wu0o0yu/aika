@@ -65,12 +65,12 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
         }
     }
 
-    public String toString() {
-        return "Link-Phase: Sum up Link (" + Utils.round(delta) + ")";
-    }
-
     @Override
     public Comparator<Link> getElementComparator() {
         return Comparator.naturalOrder();
+    }
+
+    public String toString() {
+        return "Link-Phase: Sum up Link (" + Utils.round(delta) + ")";
     }
 }

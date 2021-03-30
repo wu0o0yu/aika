@@ -40,17 +40,14 @@ public class Counting extends RankedImpl implements LinkPhase {
     @Override
     public void process(Link l) {
         l.count();
-
-        // Should probably have no effect on the current example.
-//        l.getThought().addToQueue(l, INFORMATION_GAIN_GRADIENT);
-    }
-
-    public String toString() {
-        return "Link-Phase: Counting";
     }
 
     @Override
     public Comparator<Link> getElementComparator() {
         return Comparator.naturalOrder();
+    }
+
+    public String toString() {
+        return "Link-Phase: Counting";
     }
 }

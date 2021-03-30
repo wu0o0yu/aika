@@ -53,12 +53,13 @@ public class EntropyGradient extends RankedImpl implements ActivationPhase {
             QueueEntry.add(act, 0, PROPAGATE_GRADIENTS_SUM);
     }
 
-    public String toString() {
-        return "Act-Phase: Entropy Gradient";
-    }
 
     @Override
     public Comparator<Activation> getElementComparator() {
         return Comparator.naturalOrder();
+    }
+
+    public String toString() {
+        return "Act-Phase: Entropy Gradient";
     }
 }

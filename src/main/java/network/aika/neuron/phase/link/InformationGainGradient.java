@@ -42,12 +42,12 @@ public class InformationGainGradient extends RankedImpl implements LinkPhase {
         l.computeInformationGainGradient();
     }
 
-    public String toString() {
-        return "Link-Phase: Information-Gain Gradient";
-    }
-
     @Override
     public Comparator<Link> getElementComparator() {
         return Comparator.naturalOrder();
+    }
+
+    public String toString() {
+        return "Link-Phase: Information-Gain Gradient";
     }
 }

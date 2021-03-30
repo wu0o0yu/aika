@@ -124,12 +124,12 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
                 );
     }
 
-    public String toString() {
-        return "Act-Phase: Link and Propagate";
-    }
-
     @Override
     public Comparator<Activation> getElementComparator() {
         return FIRED_COMPARATOR;
+    }
+
+    public String toString() {
+        return "Act-Phase: Link and Propagate";
     }
 }

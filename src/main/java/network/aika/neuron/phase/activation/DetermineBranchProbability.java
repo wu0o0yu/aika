@@ -41,12 +41,12 @@ public class DetermineBranchProbability extends RankedImpl implements Activation
         act.computeBranchProbability();
     }
 
-    public String toString() {
-        return "Act-Phase: Determine Branch Probability";
-    }
-
     @Override
     public Comparator<Activation> getElementComparator() {
         return Comparator.naturalOrder();
+    }
+
+    public String toString() {
+        return "Act-Phase: Determine Branch Probability";
     }
 }

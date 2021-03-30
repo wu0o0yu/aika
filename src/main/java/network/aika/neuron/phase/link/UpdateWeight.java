@@ -57,12 +57,12 @@ public class UpdateWeight extends RankedImpl implements LinkPhase {
         );
     }
 
-    public String toString() {
-        return "Link-Phase: Update Weight";
-    }
-
     @Override
     public Comparator<Link> getElementComparator() {
         return Comparator.naturalOrder();
+    }
+
+    public String toString() {
+        return "Link-Phase: Update Weight";
     }
 }

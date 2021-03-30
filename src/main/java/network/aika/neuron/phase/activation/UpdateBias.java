@@ -20,12 +20,12 @@ public class UpdateBias extends RankedImpl implements ActivationPhase {
         act.getNeuron().updateBias(act);
     }
 
-    public String toString() {
-        return "Act-Phase: Update Bias";
-    }
-
     @Override
     public Comparator<Activation> getElementComparator() {
         return Comparator.naturalOrder();
+    }
+
+    public String toString() {
+        return "Act-Phase: Update Bias";
     }
 }

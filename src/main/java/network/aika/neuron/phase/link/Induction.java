@@ -50,12 +50,12 @@ public class Induction extends RankedImpl implements LinkPhase {
         inducedSynapse.linkOutput();
     }
 
-    public String toString() {
-        return "Link-Phase: Induction";
-    }
-
     @Override
     public Comparator<Link> getElementComparator() {
         return Comparator.naturalOrder();
+    }
+
+    public String toString() {
+        return "Link-Phase: Induction";
     }
 }

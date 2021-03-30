@@ -43,12 +43,12 @@ public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPha
         act.getNeuronProvider().save();
     }
 
-    public String toString() {
-        return "Act-Phase: Update Synapse Input Links";
-    }
-
     @Override
     public Comparator<Activation> getElementComparator() {
         return Comparator.naturalOrder();
+    }
+
+    public String toString() {
+        return "Act-Phase: Update Synapse Input Links";
     }
 }

@@ -49,12 +49,12 @@ public class Induction extends RankedImpl implements ActivationPhase {
         act.link();
     }
 
-    public String toString() {
-        return "Act-Phase: Induction";
-    }
-
     @Override
     public Comparator<Activation> getElementComparator() {
         return Comparator.naturalOrder();
+    }
+
+    public String toString() {
+        return "Act-Phase: Induction";
     }
 }

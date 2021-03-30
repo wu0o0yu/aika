@@ -40,12 +40,12 @@ public class Counting extends RankedImpl implements ActivationPhase {
         act.getNeuron().count(act);
     }
 
-    public String toString() {
-        return "Act-Phase: Counting";
-    }
-
     @Override
     public Comparator<Activation> getElementComparator() {
         return Comparator.naturalOrder();
+    }
+
+    public String toString() {
+        return "Act-Phase: Counting";
     }
 }

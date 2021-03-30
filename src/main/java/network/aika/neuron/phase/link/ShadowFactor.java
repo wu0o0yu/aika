@@ -41,12 +41,12 @@ public class ShadowFactor extends RankedImpl implements LinkPhase {
     //    l.removeGradientDependencies();
     }
 
-    public String toString() {
-        return "Link-Phase: Shadow Factor";
-    }
-
     @Override
     public Comparator<Link> getElementComparator() {
         return Comparator.naturalOrder();
+    }
+
+    public String toString() {
+        return "Link-Phase: Shadow Factor";
     }
 }

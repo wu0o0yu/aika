@@ -46,12 +46,12 @@ public class UseFinalBias extends RankedImpl implements ActivationPhase {
             QueueEntry.add(act, act.getRound(ACT) + 1, new PropagateChange(delta));
     }
 
-    public String toString() {
-        return "Act-Phase: Use Final Bias";
-    }
-
     @Override
     public Comparator<Activation> getElementComparator() {
         return Comparator.naturalOrder();
+    }
+
+    public String toString() {
+        return "Act-Phase: Use Final Bias";
     }
 }

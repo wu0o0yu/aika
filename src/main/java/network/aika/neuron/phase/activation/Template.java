@@ -138,10 +138,6 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
         );
     }
 
-    public String toString() {
-        return "Act-Phase: Template-" + direction;
-    }
-
     private static final Comparator<Activation> GRAD_COMP = Comparator.
             <Activation>comparingDouble(act -> act.getNeuron().getCandidateGradient(act))
             .reversed();
@@ -154,5 +150,9 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
         } else {
             return Comparator.naturalOrder();
         }
+    }
+
+    public String toString() {
+        return "Act-Phase: Template-" + direction;
     }
 }

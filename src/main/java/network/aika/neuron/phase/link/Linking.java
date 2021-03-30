@@ -46,12 +46,12 @@ public class Linking extends RankedImpl implements LinkPhase {
         QueueEntry.add(l, MAX_VALUE, COUNTING);
     }
 
-    public String toString() {
-        return "Link-Phase: Linking";
-    }
-
     @Override
     public Comparator<Link> getElementComparator() {
         return Comparator.naturalOrder();
+    }
+
+    public String toString() {
+        return "Link-Phase: Linking";
     }
 }

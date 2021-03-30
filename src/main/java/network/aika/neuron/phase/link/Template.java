@@ -43,12 +43,12 @@ public class Template extends RankedImpl implements LinkPhase {
         l.follow(TEMPLATE_INPUT);
     }
 
-    public String toString() {
-        return "Link-Phase: Template";
-    }
-
     @Override
     public Comparator<Link> getElementComparator() {
         return Comparator.naturalOrder();
+    }
+
+    public String toString() {
+        return "Link-Phase: Template";
     }
 }

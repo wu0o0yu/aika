@@ -47,12 +47,12 @@ public class PropagateGradient extends RankedImpl implements LinkPhase {
             QueueEntry.add(l, l.getRound(GRADIENT), UPDATE_WEIGHT);
     }
 
-    public String toString() {
-        return "Link-Phase: Propagate Gradient (" + Utils.round(gradient) + ")";
-    }
-
     @Override
     public Comparator<Link> getElementComparator() {
         return Comparator.naturalOrder();
+    }
+
+    public String toString() {
+        return "Link-Phase: Propagate Gradient (" + Utils.round(gradient) + ")";
     }
 }
