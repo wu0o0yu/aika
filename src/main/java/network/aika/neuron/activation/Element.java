@@ -33,23 +33,9 @@ public abstract class Element<E extends Element> implements Comparable<E> {
             <Element>comparingInt(e -> e.getElementType())
             .thenComparing(e -> e);
 
-    private int[] round = new int[RoundType.values().length];
-
     private Set<QueueEntry> queuedPhases = new TreeSet<>(QueueEntry.COMPARATOR);
 
     protected abstract int getElementType();
-
-    public int getRound(RoundType type) {
-        return round[type.ordinal()];
-    }
-
-    public void setRound(RoundType type, int round) {
-        this.round[type.ordinal()] = round;
-    }
-
-    public void updateRound(RoundType type, int round, boolean increment) {
-        this.round[type.ordinal()] = Math.max(this.round[type.ordinal()], round + (increment ? 1 : 0));
-    }
 
     public void addQueuedPhase(QueueEntry qe) {
         queuedPhases.add(qe);

@@ -297,8 +297,7 @@ public class Activation extends Element<Activation> {
                 .map(l -> l.getInput());
     }
 
-    public void updateOutgoingLinks(double delta) {
-        int round = getRound(ACT);
+    public void updateOutgoingLinks(double delta, int round) {
         getOutputLinks()
                 .forEach(l -> {
                             QueueEntry.add(l, round, new SumUpLink(delta));
@@ -418,7 +417,7 @@ public class Activation extends Element<Activation> {
         lastEntropyGradient = g;
     }
 
-    public void propagateGradientsFromSumUpdate() {
+    public void propagateGradientsFromSumUpdate(int round) {
         if (gradientIsZero())
             return;
 
@@ -433,10 +432,10 @@ public class Activation extends Element<Activation> {
         g *= actF.outerGrad(net);
         lastNet = net;
 
-        propagateGradients(g);
+        propagateGradients(g, round);
     }
 
-    public void propagateGradientsFromNetUpdate() {
+    public void propagateGradientsFromNetUpdate(int round) {
         ActivationFunction actF = getNeuron().getActivationFunction();
 
         double net = getNet(true);
@@ -453,13 +452,11 @@ public class Activation extends Element<Activation> {
 
         double g = inputGradientSum * netDerivedDelta;
 
-        propagateGradients(g);
+        propagateGradients(g, round);
     }
 
-    public void propagateGradients(double g) {
+    public void propagateGradients(double g, int round) {
         outputGradientSum += g;
-
-        int round = getRound(GRADIENT);
 
         if(!getNeuron().isInputNeuron())
             addLinksToQueue(INPUT, round, new PropagateGradient(g));

@@ -23,6 +23,7 @@ import network.aika.neuron.phase.RankedImpl;
 import java.util.Comparator;
 
 import static network.aika.neuron.activation.Activation.FIRED_COMPARATOR_REVERSED;
+import static network.aika.neuron.activation.RoundType.GRADIENT;
 
 /**
  * Propagates the gradient of this activation backwards to all its input-links.
@@ -37,7 +38,8 @@ public class PropagateGradientsNet extends RankedImpl implements ActivationPhase
 
     @Override
     public void process(Activation act) {
-        act.propagateGradientsFromNetUpdate();
+        int round = act.getRound(GRADIENT);
+        act.propagateGradientsFromNetUpdate(round);
     }
 
     @Override
