@@ -469,8 +469,8 @@ public class Activation extends Element<Activation> {
         if (getNeuron().isAllowTraining())
             QueueEntry.add(this, round, UPDATE_BIAS);
 
-        QueueEntry.add(this, round, TEMPLATE_INPUT);
-        QueueEntry.add(this, round, TEMPLATE_OUTPUT);
+        QueueEntry.add(this, round + 1, TEMPLATE_INPUT);
+        QueueEntry.add(this, round + 1, TEMPLATE_OUTPUT);
     }
 
     public double getNorm() {
