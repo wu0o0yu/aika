@@ -17,6 +17,7 @@
 package network.aika.neuron;
 
 import network.aika.*;
+import network.aika.neuron.phase.link.SumUpLink;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import network.aika.neuron.activation.*;
@@ -169,15 +170,12 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                         fromAct
                 );
 
-        int round = fromAct.getRound(ACT);
-
-        nv.getPhase().getNextPhases(round, toAct);
+        nv.getPhase().getNextPhases(v.getRound(), toAct);
 
         createLink(
                 dir.getPropagateInput(fromAct, toAct),
                 dir.getPropagateOutput(fromAct, toAct),
-                nv,
-                round
+                nv
         );
     }
 
@@ -195,21 +193,18 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if (!checkCausality(iAct, oAct, v))
             return;
 
-        int round = Math.max(
-                iAct.getRound(ACT),
-                oAct.getRound(ACT)
-        );
-
-        createLink(iAct, oAct, nv, round);
+        createLink(iAct, oAct, nv);
     }
 
-    public void createLink(Activation iAct, Activation oAct, Visitor v, int round) {
+    public void createLink(Activation iAct, Activation oAct, Visitor v) {
+        int round = v.getRound();
+
         Link nl = oAct.addLink(
                 this,
                 iAct,
-                v.getSelfRef()
+                v.getSelfRef(),
+                round
         );
-
         oAct.getThought().onLinkCreationEvent(nl);
 
         v.link = nl;
@@ -305,7 +300,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
             addWeight(-wDelta);
             on.addConjunctiveBias(wDelta, !l.isCausal());
         }
-        l.updateRound(WEIGHT, l.getRound(GRADIENT), true);
 
         return weight - oldWeight;
     }

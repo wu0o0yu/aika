@@ -65,7 +65,7 @@ public class Link extends Element<Link> {
         this.isSelfRef = isSelfRef;
     }
 
-    public Link(Link oldLink, Synapse s, Activation input, Activation output, boolean isSelfRef, int round) {
+    public Link(Link oldLink, Synapse s, Activation input, Activation output, boolean isSelfRef) {
         this(s, input, output, isSelfRef);
 
         getThought().onLinkCreationEvent(this);
@@ -74,17 +74,6 @@ public class Link extends Element<Link> {
         linkOutput();
 
         getSynapse().updateReference(this);
-
-        double w = getSynapse().getWeight();
-
-        if (w <= 0.0 && isSelfRef())
-            return;
-
-        QueueEntry.add(
-                this,
-                round,
-                new SumUpLink(w * (getInputValue(POS) - getInputValue(POS, oldLink)))
-        );
     }
 
     protected int getElementType() {
@@ -275,14 +264,9 @@ public class Link extends Element<Link> {
         assert successful;
     }
 
-    public void sumUpLink(double delta, int round) {
+    public void sumUpLink(double delta) {
         Activation oAct = getOutput();
         oAct.addToSum(delta);
-        oAct.updateRound(
-                RoundType.ACT,
-                Math.max(getRound(WEIGHT), getInput().getRound(RoundType.ACT)),
-                getSynapse().isRecurrent() && !oAct.getNeuron().isInputNeuron()
-        );
     }
 
     public boolean isNegative() {

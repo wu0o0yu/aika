@@ -52,13 +52,9 @@ public abstract class Element<E extends Element> implements Comparable<E> {
     }
 
     public void copyPhases(Element newElement) {
-        queuedPhases.stream()
-                .map(qe ->
-                        new QueueEntry(qe.getRound(), qe.getPhase(), newElement)
-                )
-                .forEach(qe ->
-                        getThought().addQueueEntry(qe)
-                );
+        queuedPhases.stream().forEach(qe ->
+                QueueEntry.add(newElement, qe.getRound(), qe.getPhase())
+        );
     }
 
     private void removeFromQueue() {

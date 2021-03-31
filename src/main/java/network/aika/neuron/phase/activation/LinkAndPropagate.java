@@ -76,7 +76,8 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
                         act,
                         OUTPUT,
                         INPUT,
-                        ACT
+                        ACT,
+                        round
                 )
         );
 
@@ -88,7 +89,8 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
                         act,
                         OUTPUT,
                         OUTPUT,
-                        ACT
+                        ACT,
+                        round + 1
                 )
         );
     }

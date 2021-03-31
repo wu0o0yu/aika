@@ -72,7 +72,8 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
                             act,
                             direction,
                             INPUT,
-                            ACT
+                            ACT,
+                            round
                     )
             );
         }
@@ -83,7 +84,8 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
                         act,
                         direction,
                         direction,
-                        ACT
+                        ACT,
+                        round + 1
                 )
         );
     }

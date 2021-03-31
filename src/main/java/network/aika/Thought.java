@@ -185,14 +185,6 @@ public abstract class Thought {
 
     public Activation createActivation(Neuron n, Activation fromAct) {
         Activation toAct = new Activation(createActivationId(), this, n);
-
-        if(fromAct != null)
-            toAct.updateRound(
-                    ACT,
-                    fromAct.getRound(ACT),
-                    n.isTemplate()
-            );
-
         onActivationCreationEvent(toAct, fromAct);
         return toAct;
     }

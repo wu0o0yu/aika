@@ -32,13 +32,13 @@ import static network.aika.neuron.activation.direction.Direction.*;
  * @author Lukas Molzberger
  */
 public class Visitor {
-    public Visitor origin;
-    public Activation act; // Just debug code
+    private Visitor origin;
+    private Activation act; // Just debug code
     public Link link; // Just debug code
-    public Transition transition; // Just debug code
-    public Visitor previousStep;
-    public VisitorPhase phase;
-    public int round;
+    private Transition transition; // Just debug code
+    private Visitor previousStep;
+    private VisitorPhase phase;
+    private int round;
 
     public enum Transition {  // Just debug code
         ACT,
@@ -85,6 +85,10 @@ public class Visitor {
         nv.round = round;
 
         return nv;
+    }
+
+    public int getRound() {
+        return round;
     }
 
     public Set<ScopeEntry> getScopes() {

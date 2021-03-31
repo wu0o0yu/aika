@@ -212,7 +212,6 @@ public class Activation extends Element<Activation> {
         thought.onActivationCreationEvent(clonedAct, this);
 
         copyPhases(clonedAct);
-        clonedAct.setRound(ACT, getRound(ACT) + 1);
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
         linkClone(clonedAct, excludedSyn);
@@ -228,7 +227,6 @@ public class Activation extends Element<Activation> {
 
         replaceElement(clonedAct);
 
-        clonedAct.setRound(ACT, getRound(ACT) + 1);
         linkClone(clonedAct, excludedSyn);
 
         return clonedAct;
@@ -356,14 +354,27 @@ public class Activation extends Element<Activation> {
                 );
     }
 
-    public Link addLink(Synapse s, Activation input, boolean isSelfRef) {
-        return new Link(
-                getInputLink(s),
+    public Link addLink(Synapse s, Activation input, boolean isSelfRef, int round) {
+        Link ol = getInputLink(s);
+        Link nl = new Link(
+                ol,
                 s,
                 input,
                 this,
                 isSelfRef
         );
+
+        double w = s.getWeight();
+
+        if (w > 0.0 || !nl.isSelfRef()) {
+            QueueEntry.add(
+                    this,
+                    round,
+                    new SumUpLink(w * (nl.getInputValue(POS) - nl.getInputValue(POS, ol)))
+            );
+        }
+
+        return nl;
     }
 
     public void addToSum(double x) {
@@ -602,8 +613,8 @@ public class Activation extends Element<Activation> {
                 " value:" + (value != null ? Utils.round(value) : "X") +
                 " net:" + Utils.round(getNet(false)) +
                 " netFinal:" + Utils.round(getNet(true)) +
-                " bp:" + Utils.round(branchProbability) +
-                " round:" + getRound(ACT));
+                " bp:" + Utils.round(branchProbability)
+        );
 
         if (includeLink) {
             sb.append("\n");

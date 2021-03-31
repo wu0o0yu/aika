@@ -17,6 +17,7 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.activation.RoundType;
 import network.aika.utils.Utils;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
@@ -27,6 +28,7 @@ import java.util.Comparator;
 
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.neuron.activation.RoundType.ACT;
+import static network.aika.neuron.activation.RoundType.WEIGHT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
 
@@ -49,6 +51,9 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
         l.sumUpLink(delta);
 
         Activation oAct = l.getOutput();
+
+        if(l.getSynapse().isRecurrent() && !oAct.getNeuron().isInputNeuron())
+            round++;
 
         QueueEntry.add(oAct, round, PROPAGATE_GRADIENTS_NET);
 

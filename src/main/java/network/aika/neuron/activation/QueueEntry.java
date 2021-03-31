@@ -46,15 +46,7 @@ public class QueueEntry<P extends Phase, E extends Element> {
         this.element = element;
     }
 
-    public static void add(Activation act, int round, ActivationPhase p) {
-        addIntern(act, round, p);
-    }
-
-    public static void add(Link l, int round, LinkPhase p) {
-        addIntern(l, round, p);
-    }
-
-    private static <P extends Phase, E extends Element> void addIntern(E e, int round, P p) {
+    public static <P extends Phase, E extends Element> void add(E e, int round, P p) {
         QueueEntry qe = new QueueEntry(round, p, e);
         e.addQueuedPhase(qe);
         e.getThought().addQueueEntry(qe);
