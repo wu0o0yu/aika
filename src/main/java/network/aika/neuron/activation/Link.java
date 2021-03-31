@@ -65,7 +65,7 @@ public class Link extends Element<Link> {
         this.isSelfRef = isSelfRef;
     }
 
-    public Link(Link oldLink, Synapse s, Activation input, Activation output, boolean isSelfRef) {
+    public Link(Link oldLink, Synapse s, Activation input, Activation output, boolean isSelfRef, int round) {
         this(s, input, output, isSelfRef);
 
         getThought().onLinkCreationEvent(this);
@@ -75,9 +75,6 @@ public class Link extends Element<Link> {
 
         getSynapse().updateReference(this);
 
-        updateRound(RoundType.ACT, input.getRound(RoundType.ACT), false);
-        updateRound(RoundType.ACT, output.getRound(RoundType.ACT), false);
-
         double w = getSynapse().getWeight();
 
         if (w <= 0.0 && isSelfRef())
@@ -85,7 +82,7 @@ public class Link extends Element<Link> {
 
         QueueEntry.add(
                 this,
-                input.getRound(RoundType.ACT),
+                round,
                 new SumUpLink(w * (getInputValue(POS) - getInputValue(POS, oldLink)))
         );
     }
@@ -130,14 +127,14 @@ public class Link extends Element<Link> {
             synapse.count(this);
     }
 
-    public void follow(VisitorPhase p) {
-        follow(p, synapse.isRecurrent() ? OUTPUT : INPUT);
+    public void follow(VisitorPhase p, int round) {
+        follow(p, synapse.isRecurrent() ? OUTPUT : INPUT, round);
     }
 
-    public void follow(VisitorPhase p, Direction dir) {
+    public void follow(VisitorPhase p, Direction dir, int round) {
         output.setMarked(true);
 
-        Visitor v = new Visitor(p, output, dir, INPUT, ACT);
+        Visitor v = new Visitor(p, output, dir, INPUT, ACT, round);
         Visitor nv = synapse.transition(v, this);
         synapse.follow(input, nv);
 
@@ -278,7 +275,7 @@ public class Link extends Element<Link> {
         assert successful;
     }
 
-    public void sumUpLink(double delta) {
+    public void sumUpLink(double delta, int round) {
         Activation oAct = getOutput();
         oAct.addToSum(delta);
         oAct.updateRound(

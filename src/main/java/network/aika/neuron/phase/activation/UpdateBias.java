@@ -16,7 +16,7 @@ public class UpdateBias extends RankedImpl implements ActivationPhase {
     }
 
     @Override
-    public void process(Activation act) {
+    public void process(Activation act, int round) {
         act.getNeuron().updateBias(act);
     }
 

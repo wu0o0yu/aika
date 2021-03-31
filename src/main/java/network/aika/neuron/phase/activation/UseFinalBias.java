@@ -39,11 +39,11 @@ public class UseFinalBias extends RankedImpl implements ActivationPhase {
     }
 
     @Override
-    public void process(Activation act) {
+    public void process(Activation act, int round) {
         double delta = act.updateValue(true);
 
         if(Math.abs(delta) >= TOLERANCE)
-            QueueEntry.add(act, act.getRound(ACT) + 1, new PropagateChange(delta));
+            QueueEntry.add(act, round + 1, new PropagateChange(delta));
     }
 
     @Override

@@ -45,11 +45,10 @@ public class SumUpLink extends RankedImpl implements LinkPhase {
     }
 
     @Override
-    public void process(Link l) {
+    public void process(Link l, int round) {
         l.sumUpLink(delta);
 
         Activation oAct = l.getOutput();
-        int round = oAct.getRound(ACT);
 
         QueueEntry.add(oAct, round, PROPAGATE_GRADIENTS_NET);
 

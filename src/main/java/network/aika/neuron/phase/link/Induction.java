@@ -37,7 +37,7 @@ public class Induction extends RankedImpl implements LinkPhase {
     }
 
     @Override
-    public void process(Link l) {
+    public void process(Link l, int round) {
         assert l.getSynapse().isTemplate();
 
         Synapse inducedSynapse = l.getSynapse()

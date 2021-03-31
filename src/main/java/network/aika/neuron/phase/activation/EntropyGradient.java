@@ -41,7 +41,7 @@ public class EntropyGradient extends RankedImpl implements ActivationPhase {
     }
 
     @Override
-    public void process(Activation act) {
+    public void process(Activation act, int round) {
         Neuron n = act.getNeuron();
 
         if(n.isTemplate())

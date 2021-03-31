@@ -37,7 +37,7 @@ public class DetermineBranchProbability extends RankedImpl implements Activation
     }
 
     @Override
-    public void process(Activation act) {
+    public void process(Activation act, int round) {
         act.computeBranchProbability();
     }
 

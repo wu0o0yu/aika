@@ -41,8 +41,7 @@ public class PropagateChange extends RankedImpl implements ActivationPhase {
     }
 
     @Override
-    public void process(Activation act) {
-        int round = act.getRound(ACT);
+    public void process(Activation act, int round) {
         act.updateOutgoingLinks(delta, round);
     }
 

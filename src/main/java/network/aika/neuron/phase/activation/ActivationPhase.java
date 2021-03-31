@@ -43,6 +43,4 @@ public interface ActivationPhase extends Phase<Activation> {
     Template TEMPLATE_INPUT = new Template(TEMPLATE, INPUT);
     Template TEMPLATE_OUTPUT = new Template(TEMPLATE_INPUT, OUTPUT);
     ActivationPhase COUNTING = new Counting();
-
-    void process(Activation act);
 }

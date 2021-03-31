@@ -40,7 +40,7 @@ public class Linking extends RankedImpl implements LinkPhase {
     }
 
     @Override
-    public void process(Link l) {
+    public void process(Link l, int round) {
         l.follow(LINK_AND_PROPAGATE);
 
         QueueEntry.add(l, MAX_VALUE, COUNTING);

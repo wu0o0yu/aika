@@ -38,7 +38,7 @@ public class InformationGainGradient extends RankedImpl implements LinkPhase {
     }
 
     @Override
-    public void process(Link l) {
+    public void process(Link l, int round) {
         l.computeInformationGainGradient();
     }
 

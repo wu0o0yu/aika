@@ -38,9 +38,7 @@ public class PropagateGradientsSum extends RankedImpl implements ActivationPhase
     }
 
     @Override
-    public void process(Activation act) {
-        int round = act.getRound(GRADIENT);
-
+    public void process(Activation act, int round) {
         act.propagateGradientsFromSumUpdate(round);
     }
 

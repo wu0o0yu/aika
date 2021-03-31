@@ -26,7 +26,7 @@ import java.util.Comparator;
  */
 public interface Phase<E extends Element> extends Ranked {
 
-    void process(E e);
+    void process(E e, int round);
 
     Comparator<E> getElementComparator();
 

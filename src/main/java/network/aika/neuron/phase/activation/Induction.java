@@ -36,7 +36,7 @@ public class Induction extends RankedImpl implements ActivationPhase {
     }
 
     @Override
-    public void process(Activation act) {
+    public void process(Activation act, int round) {
         assert act.getNeuron().isTemplate();
 
         Neuron inducedNeuron = act.getNeuron().instantiateTemplate();

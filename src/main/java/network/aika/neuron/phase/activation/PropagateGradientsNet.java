@@ -37,8 +37,7 @@ public class PropagateGradientsNet extends RankedImpl implements ActivationPhase
     }
 
     @Override
-    public void process(Activation act) {
-        int round = act.getRound(GRADIENT);
+    public void process(Activation act, int round) {
         act.propagateGradientsFromNetUpdate(round);
     }
 

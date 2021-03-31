@@ -64,7 +64,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     }
 
     @Override
-    public void process(Activation act) {
+    public void process(Activation act, int round) {
         if(direction == OUTPUT) {
             act.followLinks(
                     new Visitor(

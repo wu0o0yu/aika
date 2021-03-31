@@ -62,7 +62,7 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
     }
 
     @Override
-    public void process(Activation act) {
+    public void process(Activation act, int round) {
         act.getThought().linkInputRelations(act);
 
         double delta = act.updateValue(false);

@@ -38,7 +38,7 @@ public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPha
     }
 
     @Override
-    public void process(Activation act) {
+    public void process(Activation act, int round) {
         act.getNeuron().updateSynapseInputLinks();
         act.getNeuronProvider().save();
     }
