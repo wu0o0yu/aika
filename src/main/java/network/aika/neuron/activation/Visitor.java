@@ -91,6 +91,42 @@ public class Visitor {
         return round;
     }
 
+    public Visitor getOrigin() {
+        return origin;
+    }
+
+    public Activation getAct() {
+        return act;
+    }
+
+    public Link getLink() {
+        return link;
+    }
+
+    public Transition getTransition() {
+        return transition;
+    }
+
+    public Visitor getPreviousStep() {
+        return previousStep;
+    }
+
+    public Direction getDownUpDir() {
+        return downUpDir;
+    }
+
+    public Direction getStartDir() {
+        return startDir;
+    }
+
+    public int getDownSteps() {
+        return downSteps;
+    }
+
+    public int getUpSteps() {
+        return upSteps;
+    }
+
     public Set<ScopeEntry> getScopes() {
         return scopes;
     }
