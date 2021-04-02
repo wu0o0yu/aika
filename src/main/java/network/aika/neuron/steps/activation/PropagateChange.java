@@ -14,27 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 
-
 /**
- * Determines which input synapses of this activations neuron should be linked to the input neuron.
- * Connecting a synapse to its input neuron is not necessary if the synapse weight is weak. That is the case if the
- * synapse is incapable to completely suppress the activation of this neuron.
+ * During the initial linking process all positive recurrent synapses are assumed to be
+ * active. If that is not the case, updates of the affected activations are required.
  *
  * @author Lukas Molzberger
  */
-public class UpdateSynapseInputLinks implements ActivationPhase {
+public class PropagateChange  implements ActivationStep {
+
+    private double delta;
+
+    public PropagateChange(double delta) {
+        this.delta = delta;
+    }
 
     @Override
     public void process(Activation act) {
-        act.getNeuron().updateSynapseInputLinks();
-        act.getNeuronProvider().save();
+        act.updateOutgoingLinks(delta);
     }
 
     public String toString() {
-        return "Act-Phase: Update Synapse Input Links";
+        return "Act-Step: Propagate Change";
     }
 }

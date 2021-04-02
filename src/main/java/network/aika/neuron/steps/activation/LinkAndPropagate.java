@@ -14,20 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.phase.VisitorPhase;
-
-import java.util.Comparator;
+import network.aika.neuron.steps.VisitorStep;
 
 import static network.aika.neuron.activation.Activation.*;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
-import static network.aika.neuron.phase.link.LinkPhase.LINKING;
+import static network.aika.neuron.steps.link.LinkStep.LINKING;
 
 
 /**
@@ -42,14 +40,14 @@ import static network.aika.neuron.phase.link.LinkPhase.LINKING;
  *
  * @author Lukas Molzberger
  */
-public class LinkAndPropagate implements VisitorPhase, ActivationPhase {
+public class LinkAndPropagate implements VisitorStep, ActivationStep {
 
     @Override
-    public void getNextPhases(Activation act) {
+    public void getNextSteps(Activation act) {
     }
 
     @Override
-    public void getNextPhases(Link l) {
+    public void getNextSteps(Link l) {
         QueueEntry.add(l, LINKING);
     }
 
@@ -117,6 +115,6 @@ public class LinkAndPropagate implements VisitorPhase, ActivationPhase {
     }
 
     public String toString() {
-        return "Act-Phase: Link and Propagate";
+        return "Act-Step: Link and Propagate";
     }
 }

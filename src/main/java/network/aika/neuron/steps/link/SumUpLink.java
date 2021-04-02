@@ -14,24 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.utils.Utils;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.activation.ActivationPhase;
+import network.aika.neuron.steps.activation.ActivationStep;
 
-import static java.lang.Integer.MAX_VALUE;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.phase.activation.ActivationPhase.*;
+import static network.aika.neuron.steps.activation.ActivationStep.*;
 
 /**
  * Uses the input activation value, and the synapse weight to update the net value of the output activation.
  *
  * @author Lukas Molzberger
  */
-public class SumUpLink implements LinkPhase {
+public class SumUpLink implements LinkStep {
 
     private double delta;
 
@@ -57,13 +56,13 @@ public class SumUpLink implements LinkPhase {
             if(oAct.hasBranches())
                     QueueEntry.add(oAct, DETERMINE_BRANCH_PROBABILITY);
 
-            QueueEntry.add(oAct, ActivationPhase.COUNTING);
+            QueueEntry.add(oAct, ActivationStep.COUNTING);
             oAct.addLinksToQueue(INPUT, COUNTING);
         }
     }
 
 
     public String toString() {
-        return "Link-Phase: Sum up Link (" + Utils.round(delta) + ")";
+        return "Link-Step: Sum up Link (" + Utils.round(delta) + ")";
     }
 }

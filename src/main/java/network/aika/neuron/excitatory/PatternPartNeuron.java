@@ -42,10 +42,6 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         super();
     }
 
-    public PatternPartNeuron(NeuronProvider p) {
-        super(p);
-    }
-
     public PatternPartNeuron(Model model) {
         super(model);
     }

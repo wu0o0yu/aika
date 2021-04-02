@@ -14,21 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase;
+package network.aika.neuron.steps.link;
 
-import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.QueueEntry;
-
-import java.util.Comparator;
+import network.aika.utils.Utils;
+import network.aika.neuron.activation.Link;
 
 /**
+ * Propagate the gradient backwards through the network.
+ *
  * @author Lukas Molzberger
  */
-public interface Phase<E extends Element> {
+public class PropagateGradient implements LinkStep {
 
-    void process(E e);
+    private double gradient;
 
-    static String toString(Phase p) {
-        return " (" + (p != null ? p.toString() : "X") + ")";
+    public PropagateGradient(double gradient) {
+        this.gradient = gradient;
+    }
+
+    @Override
+    public void process(Link l) {
+        l.propagateGradient(gradient);
+
+        if(l.getSynapse().isAllowTraining())
+            QueueEntry.add(l, UPDATE_WEIGHT);
+    }
+
+    public String toString() {
+        return "Link-Step: Propagate Gradient (" + Utils.round(gradient) + ")";
     }
 }

@@ -39,7 +39,7 @@ public abstract class Element<E extends Element> implements Comparable<E> {
 
     public abstract Fired getFired();
 
-    public void addQueuedPhase(QueueEntry qe) {
+    public void addQueuedStep(QueueEntry qe) {
         queuedPhases.add(qe);
     }
 
@@ -55,7 +55,7 @@ public abstract class Element<E extends Element> implements Comparable<E> {
 
     public void copyPhases(Element newElement) {
         queuedPhases.stream().forEach(qe ->
-                QueueEntry.add(newElement, qe.getPhase())
+                QueueEntry.add(newElement, qe.getStep())
         );
     }
 

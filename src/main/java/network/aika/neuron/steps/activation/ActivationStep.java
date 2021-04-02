@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.phase.Phase;
+import network.aika.neuron.steps.Step;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
@@ -25,17 +25,17 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public interface ActivationPhase extends Phase<Activation> {
-    ActivationPhase INDUCTION = new Induction();
+public interface ActivationStep extends Step<Activation> {
+    ActivationStep INDUCTION = new Induction();
     LinkAndPropagate LINK_AND_PROPAGATE = new LinkAndPropagate();
-    ActivationPhase USE_FINAL_BIAS = new UseFinalBias();
-    ActivationPhase DETERMINE_BRANCH_PROBABILITY = new DetermineBranchProbability();
-    ActivationPhase ENTROPY_GRADIENT = new EntropyGradient();
-    ActivationPhase PROPAGATE_GRADIENTS_SUM = new PropagateGradientsSum();
-    ActivationPhase PROPAGATE_GRADIENTS_NET = new PropagateGradientsNet();
-    ActivationPhase UPDATE_BIAS = new UpdateBias();
-    ActivationPhase UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks();
+    ActivationStep USE_FINAL_BIAS = new UseFinalBias();
+    ActivationStep DETERMINE_BRANCH_PROBABILITY = new DetermineBranchProbability();
+    ActivationStep ENTROPY_GRADIENT = new EntropyGradient();
+    ActivationStep PROPAGATE_GRADIENTS_SUM = new PropagateGradientsSum();
+    ActivationStep PROPAGATE_GRADIENTS_NET = new PropagateGradientsNet();
+    ActivationStep UPDATE_BIAS = new UpdateBias();
+    ActivationStep UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks();
     Template TEMPLATE_INPUT = new Template(INPUT);
     Template TEMPLATE_OUTPUT = new Template(OUTPUT);
-    ActivationPhase COUNTING = new Counting();
+    ActivationStep COUNTING = new Counting();
 }

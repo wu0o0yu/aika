@@ -14,26 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.activation.Link;
-
+import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Activation;
 
 /**
- * Computes the gradient of the information gain function for this activation.
- *
- * @see <a href="https://aika.network/training.html">Aika Training</a>
+ * Creates a new untrained neuron from a template activation.
  *
  * @author Lukas Molzberger
  */
-public class InformationGainGradient implements LinkPhase {
+public class Induction implements ActivationStep {
+
 
     @Override
-    public void process(Link l) {
-        l.computeInformationGainGradient();
+    public void process(Activation act) {
+        assert act.getNeuron().isTemplate();
+
+        Neuron inducedNeuron = act.getNeuron().instantiateTemplate();
+        inducedNeuron.setLabel(act.getConfig().getLabel(act));
+
+        act.unlink();
+
+        act.setNeuron(inducedNeuron);
+
+        act.link();
     }
 
     public String toString() {
-        return "Link-Phase: Information-Gain Gradient";
+        return "Act-Step: Induction";
     }
 }

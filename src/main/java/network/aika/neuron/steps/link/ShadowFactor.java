@@ -14,25 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.link;
 
-import network.aika.neuron.activation.Activation;
-
+import network.aika.neuron.activation.Link;
 
 /**
- * If there are multiple mutually exclusive branches, then the softmax function will be used, to assign
- * a probability to each branch.
+ * Avoid that synapses which access the same source information generate twice the gradient.
  *
  * @author Lukas Molzberger
  */
-public class DetermineBranchProbability  implements ActivationPhase {
+public class ShadowFactor implements LinkStep {
 
     @Override
-    public void process(Activation act) {
-        act.computeBranchProbability();
+    public void process(Link l) {
+    //    l.removeGradientDependencies();
     }
 
     public String toString() {
-        return "Act-Phase: Determine Branch Probability";
+        return "Link-Step: Shadow Factor";
     }
 }

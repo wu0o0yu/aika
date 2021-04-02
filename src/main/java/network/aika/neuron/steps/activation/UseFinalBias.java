@@ -14,36 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.QueueEntry;
 
+import static network.aika.neuron.activation.Activation.TOLERANCE;
+
 /**
- * Computes the gradient of the entropy function for this activation.
- *
- * @see <a href="https://aika.network/training.html">Aika Training</a>
+ * Check if there are positive recurrent links that have not been activated and thus need to be updated.
  *
  * @author Lukas Molzberger
  */
-public class EntropyGradient implements ActivationPhase {
+public class UseFinalBias implements ActivationStep {
 
 
     @Override
     public void process(Activation act) {
-        Neuron n = act.getNeuron();
+        double delta = act.updateValue(true);
 
-        if(n.isTemplate())
-            return;
-
-        act.initEntropyGradient();
-
-        if(!act.gradientIsZero())
-            QueueEntry.add(act, PROPAGATE_GRADIENTS_SUM);
+        if(Math.abs(delta) >= TOLERANCE)
+            QueueEntry.add(act, new PropagateChange(delta));
     }
 
     public String toString() {
-        return "Act-Phase: Entropy Gradient";
+        return "Act-Step: Use Final Bias";
     }
 }

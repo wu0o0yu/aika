@@ -14,34 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.steps;
 
-import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Element;
 
 /**
- * Creates a new untrained synapse from a template link.
- *
  * @author Lukas Molzberger
  */
-public class Induction implements LinkPhase {
+public interface Step<E extends Element> {
 
+    void process(E e);
 
-    @Override
-    public void process(Link l) {
-        assert l.getSynapse().isTemplate();
-
-        Synapse inducedSynapse = l.getSynapse()
-                .instantiateTemplate(
-                        l.getInput().getNeuron(),
-                        l.getOutput().getNeuron()
-                );
-
-        l.setSynapse(inducedSynapse);
-        inducedSynapse.linkOutput();
-    }
-
-    public String toString() {
-        return "Link-Phase: Induction";
+    static String toString(Step p) {
+        return " (" + (p != null ? p.toString() : "X") + ")";
     }
 }

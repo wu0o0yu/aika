@@ -14,34 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 
 /**
- * Creates a new untrained neuron from a template activation.
+ * Propagates the gradient of this activation backwards to all its input-links.
  *
  * @author Lukas Molzberger
  */
-public class Induction implements ActivationPhase {
+public class PropagateGradientsSum implements ActivationStep {
 
+    public PropagateGradientsSum() {
+        super();
+    }
 
     @Override
     public void process(Activation act) {
-        assert act.getNeuron().isTemplate();
-
-        Neuron inducedNeuron = act.getNeuron().instantiateTemplate();
-        inducedNeuron.setLabel(act.getConfig().getLabel(act));
-
-        act.unlink();
-
-        act.setNeuron(inducedNeuron);
-
-        act.link();
+        act.propagateGradientsFromSumUpdate();
     }
 
     public String toString() {
-        return "Act-Phase: Induction";
+        return "Act-Step: Propagate Gradients from Gradient Sum Update";
     }
 }

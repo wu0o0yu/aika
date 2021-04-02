@@ -14,23 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.steps.Step;
 
 /**
- * Avoid that synapses which access the same source information generate twice the gradient.
  *
  * @author Lukas Molzberger
  */
-public class ShadowFactor implements LinkPhase {
+public interface LinkStep extends Step<Link> {
 
-    @Override
-    public void process(Link l) {
-    //    l.removeGradientDependencies();
-    }
-
-    public String toString() {
-        return "Link-Phase: Shadow Factor";
-    }
+    LinkStep INDUCTION = new Induction();
+    LinkStep LINKING = new Linking();
+    LinkStep SHADOW_FACTOR = new ShadowFactor();
+    LinkStep INFORMATION_GAIN_GRADIENT = new InformationGainGradient();
+    LinkStep UPDATE_WEIGHT = new UpdateWeight();
+    LinkStep TEMPLATE = new Template();
+    LinkStep COUNTING = new Counting();
 }

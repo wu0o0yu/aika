@@ -23,9 +23,9 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.phase.link.LinkPhase;
-import network.aika.neuron.phase.link.PropagateGradient;
-import network.aika.neuron.phase.link.SumUpLink;
+import network.aika.neuron.steps.link.LinkStep;
+import network.aika.neuron.steps.link.PropagateGradient;
+import network.aika.neuron.steps.link.SumUpLink;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.Utils;
 
@@ -34,11 +34,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.neuron.activation.RoundType.ACT;
-import static network.aika.neuron.activation.RoundType.GRADIENT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.phase.activation.ActivationPhase.*;
+import static network.aika.neuron.steps.activation.ActivationStep.*;
 import static network.aika.neuron.sign.Sign.POS;
 
 /**
@@ -471,7 +469,7 @@ public class Activation extends Element<Activation> {
         if(!getNeuron().isInputNeuron())
             addLinksToQueue(INPUT, new PropagateGradient(g));
 
-        addLinksToQueue(INPUT, LinkPhase.TEMPLATE);
+        addLinksToQueue(INPUT, LinkStep.TEMPLATE);
 
         if (getNeuron().isAllowTraining())
             QueueEntry.add(this, UPDATE_BIAS);
@@ -562,7 +560,7 @@ public class Activation extends Element<Activation> {
         cAct.branchProbability = p;
     }
 
-    public void addLinksToQueue(Direction dir, LinkPhase p) {
+    public void addLinksToQueue(Direction dir, LinkStep p) {
         dir.getLinks(this)
                 .forEach(l ->
                         QueueEntry.add(l, p)

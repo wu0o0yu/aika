@@ -16,9 +16,7 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.phase.Phase;
-import network.aika.neuron.phase.activation.ActivationPhase;
-import network.aika.neuron.phase.link.LinkPhase;
+import network.aika.neuron.steps.Step;
 
 import java.util.Comparator;
 
@@ -26,38 +24,29 @@ import java.util.Comparator;
  *
  * @author Lukas Molzberger
  */
-public class QueueEntry<P extends Phase, E extends Element> {
+public class QueueEntry<P extends Step, E extends Element> {
 
     public static final Comparator<QueueEntry> COMPARATOR = Comparator
             .<QueueEntry, Fired>comparing(qe -> qe.element.getFired())
             .thenComparing(qe -> qe.timestamp);
 
-    private P phase;
+    private P step;
     private E element;
-    private long addedTimestamp;
     private long timestamp;
 
-    public QueueEntry(P phase, E element) {
-        this.phase = phase;
+    public QueueEntry(P step, E element) {
+        this.step = step;
         this.element = element;
     }
 
-    public static <P extends Phase, E extends Element> void add(E e, P p) {
-        QueueEntry qe = new QueueEntry(p, e);
-        e.addQueuedPhase(qe);
+    public static <S extends Step, E extends Element> void add(E e, S s) {
+        QueueEntry qe = new QueueEntry(s, e);
+        e.addQueuedStep(qe);
         e.getThought().addQueueEntry(qe);
     }
 
-    public P getPhase() {
-        return phase;
-    }
-
-    public long getAddedTimestamp() {
-        return addedTimestamp;
-    }
-
-    public void setAddedTimestamp(long addedTimestamp) {
-        this.addedTimestamp = addedTimestamp;
+    public P getStep() {
+        return step;
     }
 
     public long getTimestamp() {
@@ -69,10 +58,10 @@ public class QueueEntry<P extends Phase, E extends Element> {
     }
 
     public String toString() {
-        return Phase.toString(getPhase()) + " : " + element.toString();
+        return Step.toString(getStep()) + " : " + element.toString();
     }
 
-    public String pendingPhasesToString() {
+    public String pendingStepsToString() {
         StringBuilder sb = new StringBuilder();
  //       pendingPhases.forEach(p -> sb.append(p.toString() + ", "));
 
@@ -84,6 +73,6 @@ public class QueueEntry<P extends Phase, E extends Element> {
     }
 
     public void process() {
-        phase.process(element);
+        step.process(element);
     }
 }

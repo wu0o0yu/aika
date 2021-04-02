@@ -14,30 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.QueueEntry;
-
-import static java.lang.Integer.MAX_VALUE;
-import static network.aika.neuron.phase.activation.ActivationPhase.LINK_AND_PROPAGATE;
 
 
 /**
- * Uses the visitor to link neighbouring links to the same output activation.
+ * Computes the gradient of the information gain function for this activation.
+ *
+ * @see <a href="https://aika.network/training.html">Aika Training</a>
  *
  * @author Lukas Molzberger
  */
-public class Linking implements LinkPhase {
+public class InformationGainGradient implements LinkStep {
 
     @Override
     public void process(Link l) {
-        l.follow(LINK_AND_PROPAGATE);
-
-        QueueEntry.add(l, COUNTING);
+        l.computeInformationGainGradient();
     }
 
     public String toString() {
-        return "Link-Phase: Linking";
+        return "Link-Step: Information-Gain Gradient";
     }
 }

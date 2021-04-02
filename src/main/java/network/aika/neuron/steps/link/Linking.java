@@ -14,36 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.steps.link;
 
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
-import static network.aika.neuron.phase.activation.ActivationPhase.*;
-import static network.aika.neuron.sign.Sign.POS;
+
+import static network.aika.neuron.steps.activation.ActivationStep.LINK_AND_PROPAGATE;
+
 
 /**
- * Use the link gradient to update the synapse weight.
+ * Uses the visitor to link neighbouring links to the same output activation.
  *
  * @author Lukas Molzberger
  */
-public class UpdateWeight implements LinkPhase {
+public class Linking implements LinkStep {
 
     @Override
     public void process(Link l) {
-        Synapse s = l.getSynapse();
+        l.follow(LINK_AND_PROPAGATE);
 
-        double weightDelta = s.updateSynapse(l);
-
-        QueueEntry.add(l.getOutput(), UPDATE_SYNAPSE_INPUT_LINKS);
-
-        QueueEntry.add(
-                l,
-                new SumUpLink(l.getInputValue(POS) * weightDelta)
-        );
+        QueueEntry.add(l, COUNTING);
     }
 
     public String toString() {
-        return "Link-Phase: Update Weight";
+        return "Link-Step: Linking";
     }
 }

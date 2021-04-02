@@ -14,24 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps;
 
 import network.aika.neuron.activation.Activation;
-
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Visitor;
 
 /**
- * Counts the number of activations a particular neuron has encountered.
  *
  * @author Lukas Molzberger
  */
-public class Counting implements ActivationPhase {
+public interface VisitorStep {
 
-    @Override
-    public void process(Activation act) {
-        act.getNeuron().count(act);
-    }
+    void closeCycle(Activation act, Visitor v);
 
-    public String toString() {
-        return "Act-Phase: Counting";
-    }
+    void getNextSteps(Activation act);
+
+    void getNextSteps(Link l);
 }

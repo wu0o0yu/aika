@@ -14,24 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.steps.link;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
 
 /**
- * Counts the number of input or output activations a particular synapse has encountered.
- * The four different cases are counted separately.
+ * Creates a new untrained synapse from a template link.
  *
  * @author Lukas Molzberger
  */
-public class Counting implements LinkPhase {
+public class Induction implements LinkStep {
+
 
     @Override
     public void process(Link l) {
-        l.count();
+        assert l.getSynapse().isTemplate();
+
+        Synapse inducedSynapse = l.getSynapse()
+                .instantiateTemplate(
+                        l.getInput().getNeuron(),
+                        l.getOutput().getNeuron()
+                );
+
+        l.setSynapse(inducedSynapse);
+        inducedSynapse.linkOutput();
     }
 
     public String toString() {
-        return "Link-Phase: Counting";
+        return "Link-Step: Induction";
     }
 }

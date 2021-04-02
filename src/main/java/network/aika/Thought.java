@@ -22,7 +22,7 @@ import network.aika.callbacks.VisitorEventListener;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.phase.Phase;
+import network.aika.neuron.steps.Step;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,12 +36,13 @@ import java.util.stream.Collectors;
 public abstract class Thought {
     private static final Logger log = LoggerFactory.getLogger(Thought.class);
 
+    private long timestampOnProcess = 0;
     private long timestampCounter = 0;
     private int activationIdCounter = 0;
 
     private final TreeSet<QueueEntry> queue = new TreeSet<>(QueueEntry.COMPARATOR);
 
-    private Set<Phase> filters = new TreeSet<>(Comparator.comparing(p -> p.getClass().getSimpleName()));
+    private Set<Step> filters = new TreeSet<>(Comparator.comparing(p -> p.getClass().getSimpleName()));
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
@@ -57,7 +58,7 @@ public abstract class Thought {
 
     public abstract void linkInputRelations(Activation act);
 
-    public void addFilters(Phase... p) {
+    public void addFilters(Step... p) {
         filters.addAll(Set.of(p));
     }
 
@@ -129,10 +130,10 @@ public abstract class Thought {
     }
 
     public void addQueueEntry(QueueEntry qe) {
-        if(filters.contains(qe.getPhase()))
+        if(filters.contains(qe.getStep()))
             return;
 
-        qe.setAddedTimestamp(timestampCounter);
+        qe.setTimestamp(getNextTimestamp());
         queue.add(qe);
     }
 
@@ -152,24 +153,31 @@ public abstract class Thought {
     public void process(Model m) {
         while (!queue.isEmpty()) {
             QueueEntry qe = queue.pollFirst();
-            qe.setTimestamp(timestampCounter);
+
+            timestampOnProcess = timestampCounter;
 
             qe.getElement().removeQueuedPhase(qe);
 
             beforeProcessedEvent(qe);
             qe.process();
             afterProcessedEvent(qe);
-
-            timestampCounter++;
         }
         m.addToN(length());
     }
 
-    public <E extends Element> List<Phase> getPhasesForElement(E element) {
+    public long getTimestampOnProcess() {
+        return timestampOnProcess;
+    }
+
+    public long getNextTimestamp() {
+        return timestampCounter++;
+    }
+
+    public <E extends Element> List<Step> getPhasesForElement(E element) {
         return queue
                 .stream()
                 .filter(qe -> qe.getElement() == element)
-                .map(qe -> qe.getPhase())
+                .map(qe -> qe.getStep())
                 .collect(Collectors.toList());
     }
 

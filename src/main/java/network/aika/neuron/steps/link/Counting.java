@@ -14,27 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.link;
 
-import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 
 /**
- * Propagates the gradient of this activation backwards to all its input-links.
+ * Counts the number of input or output activations a particular synapse has encountered.
+ * The four different cases are counted separately.
  *
  * @author Lukas Molzberger
  */
-public class PropagateGradientsSum implements ActivationPhase {
-
-    public PropagateGradientsSum() {
-        super();
-    }
+public class Counting implements LinkStep {
 
     @Override
-    public void process(Activation act) {
-        act.propagateGradientsFromSumUpdate();
+    public void process(Link l) {
+        l.count();
     }
 
     public String toString() {
-        return "Act-Phase: Propagate Gradients from Gradient Sum Update";
+        return "Link-Step: Counting";
     }
 }

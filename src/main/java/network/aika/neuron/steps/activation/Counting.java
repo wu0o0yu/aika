@@ -14,27 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 
+
 /**
- * Propagates the gradient of this activation backwards to all its input-links.
+ * Counts the number of activations a particular neuron has encountered.
  *
  * @author Lukas Molzberger
  */
-public class PropagateGradientsNet implements ActivationPhase {
-
-    public PropagateGradientsNet() {
-        super();
-    }
+public class Counting implements ActivationStep {
 
     @Override
     public void process(Activation act) {
-        act.propagateGradientsFromNetUpdate();
+        act.getNeuron().count(act);
     }
 
     public String toString() {
-        return "Act-Phase: Propagate Gradients from Net Update";
+        return "Act-Step: Counting";
     }
 }

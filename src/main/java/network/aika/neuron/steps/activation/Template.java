@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
@@ -23,8 +23,8 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.phase.VisitorPhase;
-import network.aika.neuron.phase.link.LinkPhase;
+import network.aika.neuron.steps.VisitorStep;
+import network.aika.neuron.steps.link.LinkStep;
 
 import java.util.Collection;
 import java.util.Set;
@@ -40,7 +40,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Template implements VisitorPhase, ActivationPhase {
+public class Template implements VisitorStep, ActivationStep {
 
     private Direction direction;
 
@@ -49,14 +49,14 @@ public class Template implements VisitorPhase, ActivationPhase {
     }
 
     @Override
-    public void getNextPhases(Activation act) {
+    public void getNextSteps(Activation act) {
         QueueEntry.add(act, INDUCTION);
     }
 
     @Override
-    public void getNextPhases(Link l) {
-        QueueEntry.add(l, LinkPhase.TEMPLATE);
-        QueueEntry.add(l, LinkPhase.INDUCTION);
+    public void getNextSteps(Link l) {
+        QueueEntry.add(l, LinkStep.TEMPLATE);
+        QueueEntry.add(l, LinkStep.INDUCTION);
     }
 
     @Override
@@ -135,6 +135,6 @@ public class Template implements VisitorPhase, ActivationPhase {
     }
 
     public String toString() {
-        return "Act-Phase: Template-" + direction;
+        return "Act-Step: Template-" + direction;
     }
 }

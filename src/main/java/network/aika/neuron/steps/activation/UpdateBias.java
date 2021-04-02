@@ -1,8 +1,8 @@
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 
-public class UpdateBias implements ActivationPhase {
+public class UpdateBias implements ActivationStep {
 
     @Override
     public void process(Activation act) {
@@ -10,6 +10,6 @@ public class UpdateBias implements ActivationPhase {
     }
 
     public String toString() {
-        return "Act-Phase: Update Bias";
+        return "Act-Step: Update Bias";
     }
 }

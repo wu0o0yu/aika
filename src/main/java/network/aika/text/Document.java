@@ -20,10 +20,6 @@ import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.phase.Phase;
-
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * The {@code Document} class represents a single document which may be either used for processing a text or as

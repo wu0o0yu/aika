@@ -14,32 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.QueueEntry;
-
-import java.util.Comparator;
-
-import static network.aika.neuron.activation.Activation.TOLERANCE;
 
 /**
- * Check if there are positive recurrent links that have not been activated and thus need to be updated.
+ * Propagates the gradient of this activation backwards to all its input-links.
  *
  * @author Lukas Molzberger
  */
-public class UseFinalBias implements ActivationPhase {
+public class PropagateGradientsNet implements ActivationStep {
 
+    public PropagateGradientsNet() {
+        super();
+    }
 
     @Override
     public void process(Activation act) {
-        double delta = act.updateValue(true);
-
-        if(Math.abs(delta) >= TOLERANCE)
-            QueueEntry.add(act, new PropagateChange(delta));
+        act.propagateGradientsFromNetUpdate();
     }
 
     public String toString() {
-        return "Act-Phase: Use Final Bias";
+        return "Act-Step: Propagate Gradients from Net Update";
     }
 }

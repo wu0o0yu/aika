@@ -14,30 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.link;
 
-import network.aika.neuron.activation.Activation;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.QueueEntry;
+import static network.aika.neuron.steps.activation.ActivationStep.*;
+import static network.aika.neuron.sign.Sign.POS;
 
 /**
- * During the initial linking process all positive recurrent synapses are assumed to be
- * active. If that is not the case, updates of the affected activations are required.
+ * Use the link gradient to update the synapse weight.
  *
  * @author Lukas Molzberger
  */
-public class PropagateChange  implements ActivationPhase {
-
-    private double delta;
-
-    public PropagateChange(double delta) {
-        this.delta = delta;
-    }
+public class UpdateWeight implements LinkStep {
 
     @Override
-    public void process(Activation act) {
-        act.updateOutgoingLinks(delta);
+    public void process(Link l) {
+        Synapse s = l.getSynapse();
+
+        double weightDelta = s.updateSynapse(l);
+
+        QueueEntry.add(l.getOutput(), UPDATE_SYNAPSE_INPUT_LINKS);
+
+        QueueEntry.add(
+                l,
+                new SumUpLink(l.getInputValue(POS) * weightDelta)
+        );
     }
 
     public String toString() {
-        return "Act-Phase: Propagate Change";
+        return "Link-Step: Update Weight";
     }
 }

@@ -14,34 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.activation.QueueEntry;
-import network.aika.utils.Utils;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Activation;
+
 
 /**
- * Propagate the gradient backwards through the network.
+ * Determines which input synapses of this activations neuron should be linked to the input neuron.
+ * Connecting a synapse to its input neuron is not necessary if the synapse weight is weak. That is the case if the
+ * synapse is incapable to completely suppress the activation of this neuron.
  *
  * @author Lukas Molzberger
  */
-public class PropagateGradient implements LinkPhase {
-
-    private double gradient;
-
-    public PropagateGradient(double gradient) {
-        this.gradient = gradient;
-    }
+public class UpdateSynapseInputLinks implements ActivationStep {
 
     @Override
-    public void process(Link l) {
-        l.propagateGradient(gradient);
-
-        if(l.getSynapse().isAllowTraining())
-            QueueEntry.add(l, UPDATE_WEIGHT);
+    public void process(Activation act) {
+        act.getNeuron().updateSynapseInputLinks();
+        act.getNeuronProvider().save();
     }
 
     public String toString() {
-        return "Link-Phase: Propagate Gradient (" + Utils.round(gradient) + ")";
+        return "Act-Step: Update Synapse Input Links";
     }
 }

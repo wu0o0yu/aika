@@ -14,22 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.Phase;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.QueueEntry;
 
 /**
+ * Computes the gradient of the entropy function for this activation.
+ *
+ * @see <a href="https://aika.network/training.html">Aika Training</a>
  *
  * @author Lukas Molzberger
  */
-public interface LinkPhase extends Phase<Link> {
+public class EntropyGradient implements ActivationStep {
 
-    LinkPhase INDUCTION = new Induction();
-    LinkPhase LINKING = new Linking();
-    LinkPhase SHADOW_FACTOR = new ShadowFactor();
-    LinkPhase INFORMATION_GAIN_GRADIENT = new InformationGainGradient();
-    LinkPhase UPDATE_WEIGHT = new UpdateWeight();
-    LinkPhase TEMPLATE = new Template();
-    LinkPhase COUNTING = new Counting();
+
+    @Override
+    public void process(Activation act) {
+        Neuron n = act.getNeuron();
+
+        if(n.isTemplate())
+            return;
+
+        act.initEntropyGradient();
+
+        if(!act.gradientIsZero())
+            QueueEntry.add(act, PROPAGATE_GRADIENTS_SUM);
+    }
+
+    public String toString() {
+        return "Act-Step: Entropy Gradient";
+    }
 }
