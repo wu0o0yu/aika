@@ -18,10 +18,6 @@ package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
-
-import java.util.Comparator;
 
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.neuron.phase.activation.ActivationPhase.LINK_AND_PROPAGATE;
@@ -32,23 +28,13 @@ import static network.aika.neuron.phase.activation.ActivationPhase.LINK_AND_PROP
  *
  * @author Lukas Molzberger
  */
-public class Linking extends RankedImpl implements LinkPhase {
+public class Linking implements LinkPhase {
 
     @Override
-    public Ranked getPreviousRank() {
-        return INDUCTION;
-    }
-
-    @Override
-    public void process(Link l, int round) {
-        l.follow(LINK_AND_PROPAGATE, round);
+    public void process(Link l) {
+        l.follow(LINK_AND_PROPAGATE);
 
         QueueEntry.add(l, MAX_VALUE, COUNTING);
-    }
-
-    @Override
-    public Comparator<Link> getElementComparator() {
-        return Comparator.naturalOrder();
     }
 
     public String toString() {

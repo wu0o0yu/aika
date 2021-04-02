@@ -116,14 +116,14 @@ public class Link extends Element<Link> {
             synapse.count(this);
     }
 
-    public void follow(VisitorPhase p, int round) {
-        follow(p, synapse.isRecurrent() ? OUTPUT : INPUT, round);
+    public void follow(VisitorPhase p) {
+        follow(p, synapse.isRecurrent() ? OUTPUT : INPUT);
     }
 
-    public void follow(VisitorPhase p, Direction dir, int round) {
+    public void follow(VisitorPhase p, Direction dir) {
         output.setMarked(true);
 
-        Visitor v = new Visitor(p, output, dir, INPUT, ACT, round);
+        Visitor v = new Visitor(p, output, dir, INPUT, ACT);
         Visitor nv = synapse.transition(v, this);
         synapse.follow(input, nv);
 

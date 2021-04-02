@@ -29,31 +29,23 @@ import java.util.Comparator;
 public class QueueEntry<P extends Phase, E extends Element> {
 
     public static final Comparator<QueueEntry> COMPARATOR = Comparator
-            .<QueueEntry>comparingInt(qe -> qe.round)
-            .thenComparing(qe -> qe.getPhase().getRank())
-            .thenComparing((qe1, qe2) -> qe1.getPhase().getElementComparator().compare(qe1.element, qe2.element))
-            .thenComparing(qe -> qe.element);
+            .<QueueEntry, Fired>comparing((qe1, qe2) -> Fired.COMPARATOR.compare(qe1.element.getFired(), qe2.element.getFired()))
+            .thenComparing(qe -> qe.timestamp);
 
-    private int round;
     private P phase;
     private E element;
     private long addedTimestamp;
-    private long currentTimestamp;
+    private long timestamp;
 
-    public QueueEntry(int round, P phase, E element) {
-        this.round = round;
+    public QueueEntry(P phase, E element) {
         this.phase = phase;
         this.element = element;
     }
 
-    public static <P extends Phase, E extends Element> void add(E e, int round, P p) {
-        QueueEntry qe = new QueueEntry(round, p, e);
+    public static <P extends Phase, E extends Element> void add(E e, P p) {
+        QueueEntry qe = new QueueEntry(p, e);
         e.addQueuedPhase(qe);
         e.getThought().addQueueEntry(qe);
-    }
-
-    public int getRound() {
-        return round;
     }
 
     public P getPhase() {
@@ -68,12 +60,12 @@ public class QueueEntry<P extends Phase, E extends Element> {
         this.addedTimestamp = addedTimestamp;
     }
 
-    public long getCurrentTimestamp() {
-        return currentTimestamp;
+    public long getTimestamp() {
+        return timestamp;
     }
 
-    public void setCurrentTimestamp(long currentTimestamp) {
-        this.currentTimestamp = currentTimestamp;
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
     public String toString() {
@@ -92,6 +84,6 @@ public class QueueEntry<P extends Phase, E extends Element> {
     }
 
     public void process() {
-        phase.process(element, round);
+        phase.process(element);
     }
 }

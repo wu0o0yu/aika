@@ -19,37 +19,26 @@ package network.aika.neuron.phase.link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.utils.Utils;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.RankedImpl;
-
-import java.util.Comparator;
-
-import static network.aika.neuron.activation.RoundType.GRADIENT;
 
 /**
  * Propagate the gradient backwards through the network.
  *
  * @author Lukas Molzberger
  */
-public class PropagateGradient extends RankedImpl implements LinkPhase {
+public class PropagateGradient implements LinkPhase {
 
     private double gradient;
 
     public PropagateGradient(double gradient) {
-        super(INFORMATION_GAIN_GRADIENT);
         this.gradient = gradient;
     }
 
     @Override
-    public void process(Link l, int round) {
+    public void process(Link l) {
         l.propagateGradient(gradient);
 
         if(l.getSynapse().isAllowTraining())
-            QueueEntry.add(l, round, UPDATE_WEIGHT);
-    }
-
-    @Override
-    public Comparator<Link> getElementComparator() {
-        return Comparator.naturalOrder();
+            QueueEntry.add(l, UPDATE_WEIGHT);
     }
 
     public String toString() {

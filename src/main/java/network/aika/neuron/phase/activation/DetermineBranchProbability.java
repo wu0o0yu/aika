@@ -17,10 +17,6 @@
 package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
-
-import java.util.Comparator;
 
 
 /**
@@ -29,21 +25,11 @@ import java.util.Comparator;
  *
  * @author Lukas Molzberger
  */
-public class DetermineBranchProbability extends RankedImpl implements ActivationPhase {
+public class DetermineBranchProbability  implements ActivationPhase {
 
     @Override
-    public Ranked getPreviousRank() {
-        return ActivationPhase.PROPAGATE_CHANGE;
-    }
-
-    @Override
-    public void process(Activation act, int round) {
+    public void process(Activation act) {
         act.computeBranchProbability();
-    }
-
-    @Override
-    public Comparator<Activation> getElementComparator() {
-        return Comparator.naturalOrder();
     }
 
     public String toString() {

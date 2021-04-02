@@ -24,13 +24,11 @@ import java.util.Comparator;
 /**
  * @author Lukas Molzberger
  */
-public interface Phase<E extends Element> extends Ranked {
+public interface Phase<E extends Element> {
 
-    void process(E e, int round);
-
-    Comparator<E> getElementComparator();
+    void process(E e);
 
     static String toString(Phase p) {
-        return " (" + (p != null ? p.toString() + "-" + p.getRank() : "X") + ")";
+        return " (" + (p != null ? p.toString() : "X") + ")";
     }
 }

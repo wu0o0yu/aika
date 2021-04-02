@@ -17,10 +17,6 @@
 package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
-
-import java.util.Comparator;
 
 
 /**
@@ -28,21 +24,11 @@ import java.util.Comparator;
  *
  * @author Lukas Molzberger
  */
-public class Counting extends RankedImpl implements ActivationPhase {
+public class Counting implements ActivationPhase {
 
     @Override
-    public Ranked getPreviousRank() {
-        return TEMPLATE_OUTPUT;
-    }
-
-    @Override
-    public void process(Activation act, int round) {
+    public void process(Activation act) {
         act.getNeuron().count(act);
-    }
-
-    @Override
-    public Comparator<Activation> getElementComparator() {
-        return Comparator.naturalOrder();
     }
 
     public String toString() {

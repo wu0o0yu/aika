@@ -23,13 +23,10 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
 import network.aika.neuron.phase.link.LinkPhase;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,12 +40,11 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Template extends RankedImpl implements VisitorPhase, ActivationPhase {
+public class Template implements VisitorPhase, ActivationPhase {
 
     private Direction direction;
 
-    public Template(Ranked previousRank, Direction dir) {
-        super(previousRank);
+    public Template(Direction dir) {
         direction = dir;
     }
 
@@ -64,7 +60,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
     }
 
     @Override
-    public void process(Activation act, int round) {
+    public void process(Activation act) {
         if(direction == OUTPUT) {
             act.followLinks(
                     new Visitor(
@@ -72,8 +68,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
                             act,
                             direction,
                             INPUT,
-                            ACT,
-                            round
+                            ACT
                     )
             );
         }
@@ -84,8 +79,7 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
                         act,
                         direction,
                         direction,
-                        ACT,
-                        round + 1
+                        ACT
                 )
         );
     }
@@ -138,20 +132,6 @@ public class Template extends RankedImpl implements VisitorPhase, ActivationPhas
         templateSynapses.forEach(s ->
                 s.propagate(act, v)
         );
-    }
-
-    private static final Comparator<Activation> GRAD_COMP = Comparator.
-            <Activation>comparingDouble(act -> act.getNeuron().getCandidateGradient(act))
-            .reversed();
-
-
-    @Override
-    public Comparator<Activation> getElementComparator() {
-        if(direction == OUTPUT) {
-            return GRAD_COMP;
-        } else {
-            return Comparator.naturalOrder();
-        }
     }
 
     public String toString() {

@@ -17,10 +17,6 @@
 package network.aika.neuron.phase.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
-
-import java.util.Comparator;
 
 
 /**
@@ -30,22 +26,12 @@ import java.util.Comparator;
  *
  * @author Lukas Molzberger
  */
-public class UpdateSynapseInputLinks extends RankedImpl implements ActivationPhase {
+public class UpdateSynapseInputLinks implements ActivationPhase {
 
     @Override
-    public Ranked getPreviousRank() {
-        return UPDATE_BIAS;
-    }
-
-    @Override
-    public void process(Activation act, int round) {
+    public void process(Activation act) {
         act.getNeuron().updateSynapseInputLinks();
         act.getNeuronProvider().save();
-    }
-
-    @Override
-    public Comparator<Activation> getElementComparator() {
-        return Comparator.naturalOrder();
     }
 
     public String toString() {

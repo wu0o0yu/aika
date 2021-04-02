@@ -18,8 +18,6 @@ package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.phase.Phase;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
 
 /**
  *
@@ -29,10 +27,8 @@ public interface LinkPhase extends Phase<Link> {
 
     LinkPhase INDUCTION = new Induction();
     LinkPhase LINKING = new Linking();
-    Ranked SUM_UP_LINK_RANK = new RankedImpl(LINKING);
     LinkPhase SHADOW_FACTOR = new ShadowFactor();
     LinkPhase INFORMATION_GAIN_GRADIENT = new InformationGainGradient();
-    Ranked PROPAGATE_GRADIENT_RANK = new RankedImpl(INFORMATION_GAIN_GRADIENT);
     LinkPhase UPDATE_WEIGHT = new UpdateWeight();
     LinkPhase TEMPLATE = new Template();
     LinkPhase COUNTING = new Counting();

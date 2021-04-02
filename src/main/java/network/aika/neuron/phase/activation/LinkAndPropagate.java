@@ -19,8 +19,6 @@ package network.aika.neuron.phase.activation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.VisitorPhase;
 
 import java.util.Comparator;
@@ -45,12 +43,7 @@ import static network.aika.neuron.phase.link.LinkPhase.SUM_UP_LINK_RANK;
  *
  * @author Lukas Molzberger
  */
-public class LinkAndPropagate extends RankedImpl implements VisitorPhase, ActivationPhase {
-
-    @Override
-    public Ranked getPreviousRank() {
-        return SUM_UP_LINK_RANK;
-    }
+public class LinkAndPropagate implements VisitorPhase, ActivationPhase {
 
     @Override
     public void getNextPhases(int round, Activation act) {
@@ -62,7 +55,7 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
     }
 
     @Override
-    public void process(Activation act, int round) {
+    public void process(Activation act) {
         act.getThought().linkInputRelations(act);
 
         double delta = act.updateValue(false);
@@ -76,8 +69,7 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
                         act,
                         OUTPUT,
                         INPUT,
-                        ACT,
-                        round
+                        ACT
                 )
         );
 
@@ -89,8 +81,7 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
                         act,
                         OUTPUT,
                         OUTPUT,
-                        ACT,
-                        round + 1
+                        ACT
                 )
         );
     }
@@ -124,11 +115,6 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
                 .forEach(s ->
                         s.propagate(act, v)
                 );
-    }
-
-    @Override
-    public Comparator<Activation> getElementComparator() {
-        return FIRED_COMPARATOR;
     }
 
     public String toString() {

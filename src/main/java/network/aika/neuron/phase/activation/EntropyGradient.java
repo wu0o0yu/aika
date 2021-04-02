@@ -19,12 +19,6 @@ package network.aika.neuron.phase.activation;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.QueueEntry;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
-
-import java.util.Comparator;
-
-import static network.aika.neuron.phase.link.LinkPhase.SHADOW_FACTOR;
 
 /**
  * Computes the gradient of the entropy function for this activation.
@@ -33,15 +27,11 @@ import static network.aika.neuron.phase.link.LinkPhase.SHADOW_FACTOR;
  *
  * @author Lukas Molzberger
  */
-public class EntropyGradient extends RankedImpl implements ActivationPhase {
+public class EntropyGradient implements ActivationPhase {
+
 
     @Override
-    public Ranked getPreviousRank() {
-        return SHADOW_FACTOR;
-    }
-
-    @Override
-    public void process(Activation act, int round) {
+    public void process(Activation act) {
         Neuron n = act.getNeuron();
 
         if(n.isTemplate())
@@ -51,12 +41,6 @@ public class EntropyGradient extends RankedImpl implements ActivationPhase {
 
         if(!act.gradientIsZero())
             QueueEntry.add(act, 0, PROPAGATE_GRADIENTS_SUM);
-    }
-
-
-    @Override
-    public Comparator<Activation> getElementComparator() {
-        return Comparator.naturalOrder();
     }
 
     public String toString() {

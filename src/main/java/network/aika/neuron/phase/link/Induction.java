@@ -18,26 +18,17 @@ package network.aika.neuron.phase.link;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
-import network.aika.neuron.phase.activation.ActivationPhase;
-
-import java.util.Comparator;
 
 /**
  * Creates a new untrained synapse from a template link.
  *
  * @author Lukas Molzberger
  */
-public class Induction extends RankedImpl implements LinkPhase {
+public class Induction implements LinkPhase {
+
 
     @Override
-    public Ranked getPreviousRank() {
-        return ActivationPhase.INDUCTION;
-    }
-
-    @Override
-    public void process(Link l, int round) {
+    public void process(Link l) {
         assert l.getSynapse().isTemplate();
 
         Synapse inducedSynapse = l.getSynapse()
@@ -48,11 +39,6 @@ public class Induction extends RankedImpl implements LinkPhase {
 
         l.setSynapse(inducedSynapse);
         inducedSynapse.linkOutput();
-    }
-
-    @Override
-    public Comparator<Link> getElementComparator() {
-        return Comparator.naturalOrder();
     }
 
     public String toString() {

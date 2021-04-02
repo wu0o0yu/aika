@@ -116,9 +116,9 @@ public class Activation extends Element<Activation> {
         setInputValue(1.0);
         setFired(ref.getBegin());
 
-        QueueEntry.add(this, 0, LINK_AND_PROPAGATE);
-        QueueEntry.add(this, 0, ENTROPY_GRADIENT);
-        QueueEntry.add(this, MAX_VALUE, COUNTING);
+        QueueEntry.add(this, LINK_AND_PROPAGATE);
+        QueueEntry.add(this, ENTROPY_GRADIENT);
+        QueueEntry.add(this, COUNTING);
     }
 
     public int getId() {
@@ -295,11 +295,11 @@ public class Activation extends Element<Activation> {
                 .map(l -> l.getInput());
     }
 
-    public void updateOutgoingLinks(double delta, int round) {
+    public void updateOutgoingLinks(double delta) {
         getOutputLinks()
                 .forEach(l -> {
-                            QueueEntry.add(l, round, new SumUpLink(delta));
-                            QueueEntry.add(l.getOutput(), round, USE_FINAL_BIAS);
+                            QueueEntry.add(l, new SumUpLink(delta));
+                            QueueEntry.add(l.getOutput(), USE_FINAL_BIAS);
                         }
                 );
     }
@@ -369,7 +369,6 @@ public class Activation extends Element<Activation> {
         if (w > 0.0 || !nl.isSelfRef()) {
             QueueEntry.add(
                     this,
-                    round,
                     new SumUpLink(w * (nl.getInputValue(POS) - nl.getInputValue(POS, ol)))
             );
         }
@@ -428,7 +427,7 @@ public class Activation extends Element<Activation> {
         lastEntropyGradient = g;
     }
 
-    public void propagateGradientsFromSumUpdate(int round) {
+    public void propagateGradientsFromSumUpdate() {
         if (gradientIsZero())
             return;
 
@@ -443,10 +442,10 @@ public class Activation extends Element<Activation> {
         g *= actF.outerGrad(net);
         lastNet = net;
 
-        propagateGradients(g, round);
+        propagateGradients(g);
     }
 
-    public void propagateGradientsFromNetUpdate(int round) {
+    public void propagateGradientsFromNetUpdate() {
         ActivationFunction actF = getNeuron().getActivationFunction();
 
         double net = getNet(true);
@@ -463,22 +462,22 @@ public class Activation extends Element<Activation> {
 
         double g = inputGradientSum * netDerivedDelta;
 
-        propagateGradients(g, round);
+        propagateGradients(g);
     }
 
-    public void propagateGradients(double g, int round) {
+    public void propagateGradients(double g) {
         outputGradientSum += g;
 
         if(!getNeuron().isInputNeuron())
-            addLinksToQueue(INPUT, round, new PropagateGradient(g));
+            addLinksToQueue(INPUT, new PropagateGradient(g));
 
-        addLinksToQueue(INPUT, round, LinkPhase.TEMPLATE);
+        addLinksToQueue(INPUT, LinkPhase.TEMPLATE);
 
         if (getNeuron().isAllowTraining())
-            QueueEntry.add(this, round, UPDATE_BIAS);
+            QueueEntry.add(this, UPDATE_BIAS);
 
-        QueueEntry.add(this, round + 1, TEMPLATE_INPUT);
-        QueueEntry.add(this, round + 1, TEMPLATE_OUTPUT);
+        QueueEntry.add(this, TEMPLATE_INPUT);
+        QueueEntry.add(this, TEMPLATE_OUTPUT);
     }
 
     public double getNorm() {
@@ -496,7 +495,7 @@ public class Activation extends Element<Activation> {
     public void propagateGradient(double g) {
         inputGradient += g;
 
-        QueueEntry.add(this, 0, PROPAGATE_GRADIENTS_SUM);
+        QueueEntry.add(this, PROPAGATE_GRADIENTS_SUM);
     }
 
     public void linkInputs() {
@@ -563,10 +562,10 @@ public class Activation extends Element<Activation> {
         cAct.branchProbability = p;
     }
 
-    public void addLinksToQueue(Direction dir, int round, LinkPhase p) {
+    public void addLinksToQueue(Direction dir, LinkPhase p) {
         dir.getLinks(this)
                 .forEach(l ->
-                        QueueEntry.add(l, round, p)
+                        QueueEntry.add(l, p)
                 );
     }
 

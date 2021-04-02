@@ -17,13 +17,8 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
-
-import java.util.Comparator;
 
 import static network.aika.neuron.phase.activation.ActivationPhase.TEMPLATE_INPUT;
-import static network.aika.neuron.phase.activation.ActivationPhase.UPDATE_SYNAPSE_INPUT_LINKS;
 
 /**
  * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
@@ -31,21 +26,11 @@ import static network.aika.neuron.phase.activation.ActivationPhase.UPDATE_SYNAPS
  *
  * @author Lukas Molzberger
  */
-public class Template extends RankedImpl implements LinkPhase {
+public class Template implements LinkPhase {
 
     @Override
-    public Ranked getPreviousRank() {
-        return UPDATE_SYNAPSE_INPUT_LINKS;
-    }
-
-    @Override
-    public void process(Link l, int round) {
-        l.follow(TEMPLATE_INPUT, round);
-    }
-
-    @Override
-    public Comparator<Link> getElementComparator() {
-        return Comparator.naturalOrder();
+    public void process(Link l) {
+        l.follow(TEMPLATE_INPUT);
     }
 
     public String toString() {

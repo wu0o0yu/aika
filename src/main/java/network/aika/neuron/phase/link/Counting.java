@@ -16,13 +16,7 @@
  */
 package network.aika.neuron.phase.link;
 
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
-import network.aika.neuron.phase.activation.ActivationPhase;
-
-import java.util.Comparator;
 
 /**
  * Counts the number of input or output activations a particular synapse has encountered.
@@ -30,21 +24,11 @@ import java.util.Comparator;
  *
  * @author Lukas Molzberger
  */
-public class Counting extends RankedImpl implements LinkPhase {
+public class Counting implements LinkPhase {
 
     @Override
-    public Ranked getPreviousRank() {
-        return ActivationPhase.COUNTING;
-    }
-
-    @Override
-    public void process(Link l, int round) {
+    public void process(Link l) {
         l.count();
-    }
-
-    @Override
-    public Comparator<Link> getElementComparator() {
-        return Comparator.naturalOrder();
     }
 
     public String toString() {

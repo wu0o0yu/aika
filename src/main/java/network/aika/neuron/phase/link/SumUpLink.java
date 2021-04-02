@@ -17,18 +17,12 @@
 package network.aika.neuron.phase.link;
 
 import network.aika.neuron.activation.QueueEntry;
-import network.aika.neuron.activation.RoundType;
 import network.aika.utils.Utils;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.RankedImpl;
 import network.aika.neuron.phase.activation.ActivationPhase;
 
-import java.util.Comparator;
-
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.neuron.activation.RoundType.ACT;
-import static network.aika.neuron.activation.RoundType.WEIGHT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
 
@@ -37,42 +31,37 @@ import static network.aika.neuron.phase.activation.ActivationPhase.*;
  *
  * @author Lukas Molzberger
  */
-public class SumUpLink extends RankedImpl implements LinkPhase {
+public class SumUpLink implements LinkPhase {
 
     private double delta;
 
     public SumUpLink(double delta) {
-        super(LINKING);
         this.delta = delta;
     }
 
     @Override
-    public void process(Link l, int round) {
+    public void process(Link l) {
         l.sumUpLink(delta);
 
         Activation oAct = l.getOutput();
 
-        if(l.getSynapse().isRecurrent() && !oAct.getNeuron().isInputNeuron())
-            round++;
+//        if(l.getSynapse().isRecurrent() && !oAct.getNeuron().isInputNeuron())
+//            round++;
 
-        QueueEntry.add(oAct, round, PROPAGATE_GRADIENTS_NET);
+        QueueEntry.add(oAct, PROPAGATE_GRADIENTS_NET);
 
         if(oAct.checkIfFired()) {
-            QueueEntry.add(oAct, round, LINK_AND_PROPAGATE);
-            QueueEntry.add(oAct, round, USE_FINAL_BIAS);
+            QueueEntry.add(oAct, LINK_AND_PROPAGATE);
+            QueueEntry.add(oAct, USE_FINAL_BIAS);
 
             if(oAct.hasBranches())
-                    QueueEntry.add(oAct, round, DETERMINE_BRANCH_PROBABILITY);
+                    QueueEntry.add(oAct, DETERMINE_BRANCH_PROBABILITY);
 
-            QueueEntry.add(oAct, MAX_VALUE, ActivationPhase.COUNTING);
-            oAct.addLinksToQueue(INPUT, MAX_VALUE, COUNTING);
+            QueueEntry.add(oAct, ActivationPhase.COUNTING);
+            oAct.addLinksToQueue(INPUT, COUNTING);
         }
     }
 
-    @Override
-    public Comparator<Link> getElementComparator() {
-        return Comparator.naturalOrder();
-    }
 
     public String toString() {
         return "Link-Phase: Sum up Link (" + Utils.round(delta) + ")";

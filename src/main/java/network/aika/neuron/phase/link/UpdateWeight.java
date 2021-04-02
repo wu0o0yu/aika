@@ -19,12 +19,6 @@ package network.aika.neuron.phase.link;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
-
-import java.util.Comparator;
-
-import static network.aika.neuron.activation.RoundType.*;
 import static network.aika.neuron.phase.activation.ActivationPhase.*;
 import static network.aika.neuron.sign.Sign.POS;
 
@@ -33,15 +27,10 @@ import static network.aika.neuron.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public class UpdateWeight extends RankedImpl implements LinkPhase {
+public class UpdateWeight implements LinkPhase {
 
     @Override
-    public Ranked getPreviousRank() {
-        return PROPAGATE_GRADIENTS_NET;
-    }
-
-    @Override
-    public void process(Link l, int round) {
+    public void process(Link l) {
         Synapse s = l.getSynapse();
 
         double weightDelta = s.updateSynapse(l);
@@ -53,11 +42,6 @@ public class UpdateWeight extends RankedImpl implements LinkPhase {
                 round,
                 new SumUpLink(l.getInputValue(POS) * weightDelta)
         );
-    }
-
-    @Override
-    public Comparator<Link> getElementComparator() {
-        return Comparator.naturalOrder();
     }
 
     public String toString() {

@@ -38,7 +38,6 @@ public class Visitor {
     private Transition transition; // Just debug code
     private Visitor previousStep;
     private VisitorPhase phase;
-    private int round;
 
     public enum Transition {  // Just debug code
         ACT,
@@ -55,7 +54,7 @@ public class Visitor {
 
     private Visitor() {}
 
-    public Visitor(VisitorPhase vp, Activation act, Direction startDir, Direction downUpDir, Transition t, int round) {
+    public Visitor(VisitorPhase vp, Activation act, Direction startDir, Direction downUpDir, Transition t) {
         this.phase = vp;
         this.origin = this;
         this.act = act;
@@ -63,7 +62,6 @@ public class Visitor {
         this.downUpDir = downUpDir;
         this.startDir = startDir;
         this.scopes = act.getNeuron().getInitialScopes(startDir);
-        this.round = round;
     }
 
     public Visitor prepareNextStep(Activation currentAct, Link currentLink, Set<ScopeEntry> scopes, Transition t) {
@@ -82,13 +80,8 @@ public class Visitor {
         nv.upSteps = upSteps;
         nv.downSteps = downSteps;
         nv.scopes = scopes;
-        nv.round = round;
 
         return nv;
-    }
-
-    public int getRound() {
-        return round;
     }
 
     public Visitor getOrigin() {
@@ -207,7 +200,6 @@ public class Visitor {
         sb.append("Scopes:" + scopes + ", ");
         sb.append("DownSteps:" + downSteps + ", ");
         sb.append("UpSteps:" + upSteps + "");
-        sb.append("Round:" + round + "");
 
         return sb.toString();
     }
