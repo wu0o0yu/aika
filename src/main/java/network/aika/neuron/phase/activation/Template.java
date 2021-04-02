@@ -49,14 +49,14 @@ public class Template implements VisitorPhase, ActivationPhase {
     }
 
     @Override
-    public void getNextPhases(int round, Activation act) {
-        QueueEntry.add(act, round, INDUCTION);
+    public void getNextPhases(Activation act) {
+        QueueEntry.add(act, INDUCTION);
     }
 
     @Override
-    public void getNextPhases(int round, Link l) {
-        QueueEntry.add(l, round, LinkPhase.TEMPLATE);
-        QueueEntry.add(l, round, LinkPhase.INDUCTION);
+    public void getNextPhases(Link l) {
+        QueueEntry.add(l, LinkPhase.TEMPLATE);
+        QueueEntry.add(l, LinkPhase.INDUCTION);
     }
 
     @Override

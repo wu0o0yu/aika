@@ -35,11 +35,10 @@ public class UpdateWeight implements LinkPhase {
 
         double weightDelta = s.updateSynapse(l);
 
-        QueueEntry.add(l.getOutput(), round, UPDATE_SYNAPSE_INPUT_LINKS);
+        QueueEntry.add(l.getOutput(), UPDATE_SYNAPSE_INPUT_LINKS);
 
         QueueEntry.add(
                 l,
-                round,
                 new SumUpLink(l.getInputValue(POS) * weightDelta)
         );
     }

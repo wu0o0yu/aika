@@ -99,9 +99,9 @@ public class TextModel extends Model {
     }
 
     private static void addLink(Synapse s, Activation iAct, Activation oAct) {
-        Link nl = oAct.addLink(s, iAct, false, 0);
+        Link nl = oAct.addLink(s, iAct, false);
 
-        LINK_AND_PROPAGATE.getNextPhases(0, nl);
+        LINK_AND_PROPAGATE.getNextPhases(nl);
     }
 
     private Synapse getRelSynapse(Neuron<?> n) {

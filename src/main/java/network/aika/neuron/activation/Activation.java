@@ -354,7 +354,7 @@ public class Activation extends Element<Activation> {
                 );
     }
 
-    public Link addLink(Synapse s, Activation input, boolean isSelfRef, int round) {
+    public Link addLink(Synapse s, Activation input, boolean isSelfRef) {
         Link ol = getInputLink(s);
         Link nl = new Link(
                 ol,
@@ -368,7 +368,7 @@ public class Activation extends Element<Activation> {
 
         if (w > 0.0 || !nl.isSelfRef()) {
             QueueEntry.add(
-                    this,
+                    nl,
                     new SumUpLink(w * (nl.getInputValue(POS) - nl.getInputValue(POS, ol)))
             );
         }

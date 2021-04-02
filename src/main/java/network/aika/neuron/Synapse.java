@@ -170,7 +170,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                         fromAct
                 );
 
-        nv.getPhase().getNextPhases(v.getRound(), toAct);
+        nv.getPhase().getNextPhases(toAct);
 
         createLink(
                 dir.getPropagateInput(fromAct, toAct),
@@ -197,13 +197,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void createLink(Activation iAct, Activation oAct, Visitor v) {
-        int round = v.getRound();
-
         Link nl = oAct.addLink(
                 this,
                 iAct,
-                v.getSelfRef(),
-                round
+                v.getSelfRef()
         );
         oAct.getThought().onLinkCreationEvent(nl);
 
@@ -213,12 +210,12 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if (s.getWeight() <= 0.0 && !s.isTemplate())
             return;
 
-        v.getPhase().getNextPhases(round, nl);
+        v.getPhase().getNextPhases(nl);
 
-        QueueEntry.add(nl, round, INFORMATION_GAIN_GRADIENT);
+        QueueEntry.add(nl, INFORMATION_GAIN_GRADIENT);
 
         if(!oAct.gradientSumIsZero())
-            QueueEntry.add(nl, round, new PropagateGradient(oAct.getOutputGradientSum()));
+            QueueEntry.add(nl, new PropagateGradient(oAct.getOutputGradientSum()));
     }
 
     public void linkInput() {

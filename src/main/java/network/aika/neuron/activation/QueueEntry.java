@@ -29,7 +29,7 @@ import java.util.Comparator;
 public class QueueEntry<P extends Phase, E extends Element> {
 
     public static final Comparator<QueueEntry> COMPARATOR = Comparator
-            .<QueueEntry, Fired>comparing((qe1, qe2) -> Fired.COMPARATOR.compare(qe1.element.getFired(), qe2.element.getFired()))
+            .<QueueEntry, Fired>comparing(qe -> qe.element.getFired())
             .thenComparing(qe -> qe.timestamp);
 
     private P phase;

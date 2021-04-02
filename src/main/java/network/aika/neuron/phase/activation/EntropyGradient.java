@@ -40,7 +40,7 @@ public class EntropyGradient implements ActivationPhase {
         act.initEntropyGradient();
 
         if(!act.gradientIsZero())
-            QueueEntry.add(act, 0, PROPAGATE_GRADIENTS_SUM);
+            QueueEntry.add(act, PROPAGATE_GRADIENTS_SUM);
     }
 
     public String toString() {

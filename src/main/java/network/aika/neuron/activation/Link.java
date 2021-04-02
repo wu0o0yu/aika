@@ -80,6 +80,11 @@ public class Link extends Element<Link> {
         return 1;
     }
 
+    @Override
+    public Fired getFired() {
+        return input.getFired();
+    }
+
     public double getGradient() {
         return gradient;
     }

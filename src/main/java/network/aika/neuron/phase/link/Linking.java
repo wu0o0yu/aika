@@ -34,7 +34,7 @@ public class Linking implements LinkPhase {
     public void process(Link l) {
         l.follow(LINK_AND_PROPAGATE);
 
-        QueueEntry.add(l, MAX_VALUE, COUNTING);
+        QueueEntry.add(l, COUNTING);
     }
 
     public String toString() {

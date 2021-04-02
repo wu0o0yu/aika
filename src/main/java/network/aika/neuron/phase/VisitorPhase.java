@@ -28,7 +28,7 @@ public interface VisitorPhase {
 
     void closeCycle(Activation act, Visitor v);
 
-    void getNextPhases(int round, Activation act);
+    void getNextPhases(Activation act);
 
-    void getNextPhases(int round, Link l);
+    void getNextPhases(Link l);
 }

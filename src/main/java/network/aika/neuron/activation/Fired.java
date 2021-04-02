@@ -22,15 +22,13 @@ import java.util.Comparator;
  *
  * @author Lukas Molzberger
  */
-public class Fired {
+public class Fired implements Comparable<Fired> {
 
     public static Fired NOT_FIRED = new Fired(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
     public static final Comparator<Fired> COMPARATOR = Comparator
             .<Fired>comparingInt(f -> f.inputTimestamp)
             .thenComparing(f -> f.fired);
-
-    public static final Comparator<Fired> COMPARATOR_REVERSED = COMPARATOR.reversed();
 
     private final int inputTimestamp;
     private final int fired;
@@ -53,5 +51,10 @@ public class Fired {
             return "[NOT_FIRED]";
 
         return "[" + inputTimestamp + "," + fired + "]";
+    }
+
+    @Override
+    public int compareTo(Fired f) {
+        return COMPARATOR.compare(this, f);
     }
 }

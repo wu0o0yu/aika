@@ -29,8 +29,6 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.activation.RoundType.ACT;
-
 /**
  *
  * @author Lukas Molzberger
@@ -43,7 +41,7 @@ public abstract class Thought {
 
     private final TreeSet<QueueEntry> queue = new TreeSet<>(QueueEntry.COMPARATOR);
 
-    private Set<Phase> filters = new TreeSet<>(Comparator.comparingInt(p -> p.getRank()));
+    private Set<Phase> filters = new TreeSet<>(Comparator.comparing(p -> p.getClass().getSimpleName()));
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
@@ -154,7 +152,7 @@ public abstract class Thought {
     public void process(Model m) {
         while (!queue.isEmpty()) {
             QueueEntry qe = queue.pollFirst();
-            qe.setCurrentTimestamp(timestampCounter);
+            qe.setTimestamp(timestampCounter);
 
             qe.getElement().removeQueuedPhase(qe);
 
