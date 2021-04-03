@@ -28,16 +28,19 @@ public class QueueEntry<S extends Step, E extends Element> {
 
     public static final Comparator<QueueEntry> COMPARATOR = Comparator
             .<QueueEntry>comparingInt(qe -> qe.step.getPhase().ordinal())
-            .thenComparing(qe -> qe.element.getFired())
+            .thenComparing(qe -> qe.fired)
             .thenComparing(qe -> qe.timestamp);
 
     private S step;
     private E element;
+
+    private Fired fired;
     private long timestamp;
 
     public QueueEntry(S step, E element) {
         this.step = step;
         this.element = element;
+        this.fired = element.getFired();
     }
 
     public static <S extends Step, E extends Element> void add(E e, S s) {
@@ -48,6 +51,10 @@ public class QueueEntry<S extends Step, E extends Element> {
 
     public S getStep() {
         return step;
+    }
+
+    public Fired getFired() {
+        return fired;
     }
 
     public long getTimestamp() {

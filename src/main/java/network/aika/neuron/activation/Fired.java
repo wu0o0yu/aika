@@ -30,6 +30,11 @@ public class Fired implements Comparable<Fired> {
             .<Fired>comparingInt(f -> f.inputTimestamp)
             .thenComparing(f -> f.fired);
 
+    public static final Comparator<Fired> COMPARATOR_NF_FIRST = Comparator
+            .<Fired>comparingInt(f -> f == NOT_FIRED ? 0 : 1)
+            .thenComparing(f -> f.inputTimestamp)
+            .thenComparing(f -> f.fired);
+
     private final int inputTimestamp;
     private final int fired;
 
@@ -55,6 +60,6 @@ public class Fired implements Comparable<Fired> {
 
     @Override
     public int compareTo(Fired f) {
-        return COMPARATOR.compare(this, f);
+        return COMPARATOR_NF_FIRST.compare(this, f);
     }
 }

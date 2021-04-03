@@ -79,7 +79,7 @@ public class Link extends Element<Link> {
 
     @Override
     public Fired getFired() {
-        return input.getFired();
+        return output.getFired();
     }
 
     public double getGradient() {

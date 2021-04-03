@@ -46,9 +46,6 @@ public class Activation extends Element<Activation> {
 
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(act -> act.id);
 
-    public static final Comparator<Activation> FIRED_COMPARATOR = (act1, act2) -> Fired.COMPARATOR.compare(act1.getFired(), act2.getFired());
-    public static final Comparator<Activation> FIRED_COMPARATOR_REVERSED = FIRED_COMPARATOR.reversed();
-
     public static double TOLERANCE = 0.001;
 
     private Double value = null;
