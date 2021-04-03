@@ -17,6 +17,7 @@
 package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.steps.Phase;
 
 /**
  * Counts the number of input or output activations a particular synapse has encountered.
@@ -25,6 +26,11 @@ import network.aika.neuron.activation.Link;
  * @author Lukas Molzberger
  */
 public class Counting implements LinkStep {
+
+    @Override
+    public Phase getPhase() {
+        return Phase.POST;
+    }
 
     @Override
     public void process(Link l) {

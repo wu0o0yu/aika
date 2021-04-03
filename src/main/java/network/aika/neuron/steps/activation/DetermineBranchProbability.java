@@ -17,6 +17,7 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.steps.Phase;
 
 
 /**
@@ -26,6 +27,11 @@ import network.aika.neuron.activation.Activation;
  * @author Lukas Molzberger
  */
 public class DetermineBranchProbability  implements ActivationStep {
+
+    @Override
+    public Phase getPhase() {
+        return Phase.MAIN;
+    }
 
     @Override
     public void process(Activation act) {

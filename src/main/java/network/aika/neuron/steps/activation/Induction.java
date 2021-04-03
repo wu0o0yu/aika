@@ -18,6 +18,7 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.steps.Phase;
 
 /**
  * Creates a new untrained neuron from a template activation.
@@ -26,6 +27,10 @@ import network.aika.neuron.activation.Activation;
  */
 public class Induction implements ActivationStep {
 
+    @Override
+    public Phase getPhase() {
+        return Phase.PRE;
+    }
 
     @Override
     public void process(Activation act) {

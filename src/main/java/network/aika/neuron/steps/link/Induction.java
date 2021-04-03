@@ -18,6 +18,7 @@ package network.aika.neuron.steps.link;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.steps.Phase;
 
 /**
  * Creates a new untrained synapse from a template link.
@@ -26,6 +27,10 @@ import network.aika.neuron.activation.Link;
  */
 public class Induction implements LinkStep {
 
+    @Override
+    public Phase getPhase() {
+        return Phase.PRE;
+    }
 
     @Override
     public void process(Link l) {

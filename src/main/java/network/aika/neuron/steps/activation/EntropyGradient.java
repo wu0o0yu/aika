@@ -19,6 +19,7 @@ package network.aika.neuron.steps.activation;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.steps.Phase;
 
 /**
  * Computes the gradient of the entropy function for this activation.
@@ -29,6 +30,10 @@ import network.aika.neuron.activation.QueueEntry;
  */
 public class EntropyGradient implements ActivationStep {
 
+    @Override
+    public Phase getPhase() {
+        return Phase.PRE;
+    }
 
     @Override
     public void process(Activation act) {

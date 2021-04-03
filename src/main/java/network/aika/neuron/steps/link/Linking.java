@@ -18,6 +18,7 @@ package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.steps.Phase;
 
 import static network.aika.neuron.steps.activation.ActivationStep.LINK_AND_PROPAGATE;
 
@@ -28,6 +29,11 @@ import static network.aika.neuron.steps.activation.ActivationStep.LINK_AND_PROPA
  * @author Lukas Molzberger
  */
 public class Linking implements LinkStep {
+
+    @Override
+    public Phase getPhase() {
+        return Phase.MAIN;
+    }
 
     @Override
     public void process(Link l) {

@@ -17,6 +17,7 @@
 package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.steps.Phase;
 
 import static network.aika.neuron.steps.activation.ActivationStep.TEMPLATE_INPUT;
 
@@ -27,6 +28,11 @@ import static network.aika.neuron.steps.activation.ActivationStep.TEMPLATE_INPUT
  * @author Lukas Molzberger
  */
 public class Template implements LinkStep {
+
+    @Override
+    public Phase getPhase() {
+        return Phase.MAIN;
+    }
 
     @Override
     public void process(Link l) {

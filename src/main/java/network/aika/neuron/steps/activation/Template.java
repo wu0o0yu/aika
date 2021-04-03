@@ -23,6 +23,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.VisitorStep;
 import network.aika.neuron.steps.link.LinkStep;
 
@@ -46,6 +47,11 @@ public class Template implements VisitorStep, ActivationStep {
 
     public Template(Direction dir) {
         direction = dir;
+    }
+
+    @Override
+    public Phase getPhase() {
+        return Phase.MAIN;
     }
 
     @Override

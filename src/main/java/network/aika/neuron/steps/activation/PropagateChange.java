@@ -17,6 +17,7 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.steps.Phase;
 
 /**
  * During the initial linking process all positive recurrent synapses are assumed to be
@@ -25,6 +26,11 @@ import network.aika.neuron.activation.Activation;
  * @author Lukas Molzberger
  */
 public class PropagateChange  implements ActivationStep {
+
+    @Override
+    public Phase getPhase() {
+        return Phase.MAIN;
+    }
 
     private double delta;
 

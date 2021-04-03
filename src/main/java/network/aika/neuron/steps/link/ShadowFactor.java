@@ -17,6 +17,7 @@
 package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.steps.Phase;
 
 /**
  * Avoid that synapses which access the same source information generate twice the gradient.
@@ -24,6 +25,11 @@ import network.aika.neuron.activation.Link;
  * @author Lukas Molzberger
  */
 public class ShadowFactor implements LinkStep {
+
+    @Override
+    public Phase getPhase() {
+        return Phase.MAIN;
+    }
 
     @Override
     public void process(Link l) {

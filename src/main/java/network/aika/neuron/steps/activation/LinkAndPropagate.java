@@ -19,6 +19,7 @@ package network.aika.neuron.steps.activation;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.VisitorStep;
 
 import static network.aika.neuron.activation.Activation.*;
@@ -41,6 +42,11 @@ import static network.aika.neuron.steps.link.LinkStep.LINKING;
  * @author Lukas Molzberger
  */
 public class LinkAndPropagate implements VisitorStep, ActivationStep {
+
+    @Override
+    public Phase getPhase() {
+        return Phase.MAIN;
+    }
 
     @Override
     public void getNextSteps(Activation act) {

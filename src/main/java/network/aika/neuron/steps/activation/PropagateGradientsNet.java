@@ -17,6 +17,7 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.steps.Phase;
 
 /**
  * Propagates the gradient of this activation backwards to all its input-links.
@@ -24,6 +25,11 @@ import network.aika.neuron.activation.Activation;
  * @author Lukas Molzberger
  */
 public class PropagateGradientsNet implements ActivationStep {
+
+    @Override
+    public Phase getPhase() {
+        return Phase.MAIN;
+    }
 
     public PropagateGradientsNet() {
         super();

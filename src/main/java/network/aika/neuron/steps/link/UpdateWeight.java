@@ -19,6 +19,8 @@ package network.aika.neuron.steps.link;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.steps.Phase;
+
 import static network.aika.neuron.steps.activation.ActivationStep.*;
 import static network.aika.neuron.sign.Sign.POS;
 
@@ -28,6 +30,11 @@ import static network.aika.neuron.sign.Sign.POS;
  * @author Lukas Molzberger
  */
 public class UpdateWeight implements LinkStep {
+
+    @Override
+    public Phase getPhase() {
+        return Phase.MAIN;
+    }
 
     @Override
     public void process(Link l) {

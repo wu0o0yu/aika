@@ -25,6 +25,8 @@ public interface Step<E extends Element> {
 
     void process(E e);
 
+    Phase getPhase();
+
     static String toString(Step p) {
         return " (" + (p != null ? p.toString() : "X") + ")";
     }

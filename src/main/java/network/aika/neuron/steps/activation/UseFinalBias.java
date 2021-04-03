@@ -18,6 +18,7 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.steps.Phase;
 
 import static network.aika.neuron.activation.Activation.TOLERANCE;
 
@@ -28,6 +29,10 @@ import static network.aika.neuron.activation.Activation.TOLERANCE;
  */
 public class UseFinalBias implements ActivationStep {
 
+    @Override
+    public Phase getPhase() {
+        return Phase.MAIN;
+    }
 
     @Override
     public void process(Activation act) {

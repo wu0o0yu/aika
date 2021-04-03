@@ -24,17 +24,18 @@ import java.util.Comparator;
  *
  * @author Lukas Molzberger
  */
-public class QueueEntry<P extends Step, E extends Element> {
+public class QueueEntry<S extends Step, E extends Element> {
 
     public static final Comparator<QueueEntry> COMPARATOR = Comparator
-            .<QueueEntry, Fired>comparing(qe -> qe.element.getFired())
+            .<QueueEntry>comparingInt(qe -> qe.step.getPhase().ordinal())
+            .thenComparing(qe -> qe.element.getFired())
             .thenComparing(qe -> qe.timestamp);
 
-    private P step;
+    private S step;
     private E element;
     private long timestamp;
 
-    public QueueEntry(P step, E element) {
+    public QueueEntry(S step, E element) {
         this.step = step;
         this.element = element;
     }
@@ -45,7 +46,7 @@ public class QueueEntry<P extends Step, E extends Element> {
         e.getThought().addQueueEntry(qe);
     }
 
-    public P getStep() {
+    public S getStep() {
         return step;
     }
 

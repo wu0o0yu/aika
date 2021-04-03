@@ -17,6 +17,7 @@
 package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.steps.Phase;
 
 
 /**
@@ -27,6 +28,11 @@ import network.aika.neuron.activation.Link;
  * @author Lukas Molzberger
  */
 public class InformationGainGradient implements LinkStep {
+
+    @Override
+    public Phase getPhase() {
+        return Phase.PRE;
+    }
 
     @Override
     public void process(Link l) {

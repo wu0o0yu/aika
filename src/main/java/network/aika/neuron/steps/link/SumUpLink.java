@@ -17,6 +17,7 @@
 package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.steps.Phase;
 import network.aika.utils.Utils;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
@@ -36,6 +37,11 @@ public class SumUpLink implements LinkStep {
 
     public SumUpLink(double delta) {
         this.delta = delta;
+    }
+
+    @Override
+    public Phase getPhase() {
+        return Phase.MAIN;
     }
 
     @Override

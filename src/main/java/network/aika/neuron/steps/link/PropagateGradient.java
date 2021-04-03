@@ -17,6 +17,7 @@
 package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.steps.Phase;
 import network.aika.utils.Utils;
 import network.aika.neuron.activation.Link;
 
@@ -31,6 +32,11 @@ public class PropagateGradient implements LinkStep {
 
     public PropagateGradient(double gradient) {
         this.gradient = gradient;
+    }
+
+    @Override
+    public Phase getPhase() {
+        return Phase.MAIN;
     }
 
     @Override
