@@ -29,7 +29,7 @@ public class Counting implements ActivationStep {
 
     @Override
     public Phase getPhase() {
-        return Phase.POST;
+        return Phase.COUNTING;
     }
 
     @Override

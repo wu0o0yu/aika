@@ -31,7 +31,7 @@ public class Template implements LinkStep {
 
     @Override
     public Phase getPhase() {
-        return Phase.POST;
+        return Phase.TEMPLATE;
     }
 
     @Override

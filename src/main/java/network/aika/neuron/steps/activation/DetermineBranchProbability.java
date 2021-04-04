@@ -30,7 +30,7 @@ public class DetermineBranchProbability  implements ActivationStep {
 
     @Override
     public Phase getPhase() {
-        return Phase.MAIN;
+        return Phase.LINKING;
     }
 
     @Override

@@ -1,7 +1,9 @@
 package network.aika.neuron.steps;
 
 public enum Phase {
-    PRE,
-    MAIN,
-    POST
+    INIT,
+    LINKING,
+    FINAL_LINKING,
+    TEMPLATE,
+    COUNTING
 }

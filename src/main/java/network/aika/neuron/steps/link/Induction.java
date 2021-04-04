@@ -29,7 +29,7 @@ public class Induction implements LinkStep {
 
     @Override
     public Phase getPhase() {
-        return Phase.PRE;
+        return Phase.INIT;
     }
 
     @Override

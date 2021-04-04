@@ -45,7 +45,7 @@ public class LinkAndPropagate implements VisitorStep, ActivationStep {
 
     @Override
     public Phase getPhase() {
-        return Phase.MAIN;
+        return Phase.LINKING;
     }
 
     @Override

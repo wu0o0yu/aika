@@ -32,7 +32,7 @@ public class EntropyGradient implements ActivationStep {
 
     @Override
     public Phase getPhase() {
-        return Phase.PRE;
+        return Phase.INIT;
     }
 
     @Override

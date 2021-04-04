@@ -29,7 +29,7 @@ public class Counting implements LinkStep {
 
     @Override
     public Phase getPhase() {
-        return Phase.POST;
+        return Phase.COUNTING;
     }
 
     @Override

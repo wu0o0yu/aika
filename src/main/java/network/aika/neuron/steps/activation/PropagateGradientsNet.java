@@ -28,7 +28,7 @@ public class PropagateGradientsNet implements ActivationStep {
 
     @Override
     public Phase getPhase() {
-        return Phase.MAIN;
+        return Phase.LINKING;
     }
 
     public PropagateGradientsNet() {

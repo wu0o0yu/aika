@@ -28,7 +28,7 @@ public class ShadowFactor implements LinkStep {
 
     @Override
     public Phase getPhase() {
-        return Phase.MAIN;
+        return Phase.LINKING;
     }
 
     @Override

@@ -31,7 +31,7 @@ public class UseFinalBias implements ActivationStep {
 
     @Override
     public Phase getPhase() {
-        return Phase.MAIN;
+        return Phase.FINAL_LINKING;
     }
 
     @Override
