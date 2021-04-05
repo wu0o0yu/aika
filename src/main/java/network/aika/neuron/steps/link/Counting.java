@@ -14,23 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase;
+package network.aika.neuron.steps.link;
 
-import network.aika.neuron.activation.Element;
-import network.aika.neuron.activation.QueueEntry;
-
-import java.util.Comparator;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.steps.Phase;
 
 /**
+ * Counts the number of input or output activations a particular synapse has encountered.
+ * The four different cases are counted separately.
+ *
  * @author Lukas Molzberger
  */
-public interface Phase<E extends Element> extends Ranked {
+public class Counting implements LinkStep {
 
-    void process(E e, int round);
+    @Override
+    public Phase getPhase() {
+        return Phase.COUNTING;
+    }
 
-    Comparator<E> getElementComparator();
+    public boolean checkIfQueued() {
+        return true;
+    }
 
-    static String toString(Phase p) {
-        return " (" + (p != null ? p.toString() + "-" + p.getRank() : "X") + ")";
+    @Override
+    public void process(Link l) {
+        l.count();
+    }
+
+    public String toString() {
+        return "Link-Step: Counting";
     }
 }

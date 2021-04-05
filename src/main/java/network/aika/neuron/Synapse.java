@@ -17,13 +17,11 @@
 package network.aika.neuron;
 
 import network.aika.*;
-import network.aika.neuron.phase.link.SumUpLink;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.Scope;
-import network.aika.neuron.phase.link.PropagateGradient;
+import network.aika.neuron.steps.link.PropagateGradient;
 import network.aika.neuron.sign.Sign;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
@@ -36,12 +34,11 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.activation.RoundType.*;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.activation.Link.linkExists;
 import static network.aika.neuron.activation.Visitor.Transition.LINK;
-import static network.aika.neuron.phase.link.LinkPhase.INFORMATION_GAIN_GRADIENT;
+import static network.aika.neuron.steps.link.LinkStep.INFORMATION_GAIN_GRADIENT;
 
 /**
  *
@@ -170,7 +167,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                         fromAct
                 );
 
-        nv.getPhase().getNextPhases(v.getRound(), toAct);
+        nv.getPhase().getNextSteps(toAct);
 
         createLink(
                 dir.getPropagateInput(fromAct, toAct),
@@ -197,13 +194,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void createLink(Activation iAct, Activation oAct, Visitor v) {
-        int round = v.getRound();
-
         Link nl = oAct.addLink(
                 this,
                 iAct,
-                v.getSelfRef(),
-                round
+                v.getSelfRef()
         );
         oAct.getThought().onLinkCreationEvent(nl);
 
@@ -213,12 +207,12 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if (s.getWeight() <= 0.0 && !s.isTemplate())
             return;
 
-        v.getPhase().getNextPhases(round, nl);
+        v.getPhase().getNextSteps(nl);
 
-        QueueEntry.add(nl, round, INFORMATION_GAIN_GRADIENT);
+        QueueEntry.add(nl, INFORMATION_GAIN_GRADIENT);
 
         if(!oAct.gradientSumIsZero())
-            QueueEntry.add(nl, round, new PropagateGradient(oAct.getOutputGradientSum()));
+            QueueEntry.add(nl, new PropagateGradient(oAct.getOutputGradientSum()));
     }
 
     public void linkInput() {

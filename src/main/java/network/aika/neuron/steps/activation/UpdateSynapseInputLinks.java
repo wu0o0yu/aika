@@ -14,44 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.QueueEntry;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
+import network.aika.neuron.steps.Phase;
 
-import java.util.Comparator;
-
-import static network.aika.neuron.activation.Activation.TOLERANCE;
-import static network.aika.neuron.activation.RoundType.*;
 
 /**
- * Check if there are positive recurrent links that have not been activated and thus need to be updated.
+ * Determines which input synapses of this activations neuron should be linked to the input neuron.
+ * Connecting a synapse to its input neuron is not necessary if the synapse weight is weak. That is the case if the
+ * synapse is incapable to completely suppress the activation of this neuron.
  *
  * @author Lukas Molzberger
  */
-public class UseFinalBias extends RankedImpl implements ActivationPhase {
+public class UpdateSynapseInputLinks implements ActivationStep {
 
     @Override
-    public Ranked getPreviousRank() {
-        return LINK_AND_PROPAGATE;
+    public Phase getPhase() {
+        return Phase.LINKING;
+    }
+
+    public boolean checkIfQueued() {
+        return true;
     }
 
     @Override
-    public void process(Activation act, int round) {
-        double delta = act.updateValue(true);
-
-        if(Math.abs(delta) >= TOLERANCE)
-            QueueEntry.add(act, round + 1, new PropagateChange(delta));
-    }
-
-    @Override
-    public Comparator<Activation> getElementComparator() {
-        return Comparator.naturalOrder();
+    public void process(Activation act) {
+        act.getNeuron().updateSynapseInputLinks();
+        act.getNeuronProvider().save();
     }
 
     public String toString() {
-        return "Act-Phase: Use Final Bias";
+        return "Act-Step: Update Synapse Input Links";
     }
 }

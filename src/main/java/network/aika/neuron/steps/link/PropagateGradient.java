@@ -14,41 +14,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.steps.link;
 
+import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.steps.Phase;
+import network.aika.utils.Utils;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
-
-import java.util.Comparator;
-
-import static network.aika.neuron.phase.activation.ActivationPhase.TEMPLATE_INPUT;
-import static network.aika.neuron.phase.activation.ActivationPhase.UPDATE_SYNAPSE_INPUT_LINKS;
 
 /**
- * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
- * activations and links.
+ * Propagate the gradient backwards through the network.
  *
  * @author Lukas Molzberger
  */
-public class Template extends RankedImpl implements LinkPhase {
+public class PropagateGradient implements LinkStep {
 
-    @Override
-    public Ranked getPreviousRank() {
-        return UPDATE_SYNAPSE_INPUT_LINKS;
+    private double gradient;
+
+    public PropagateGradient(double gradient) {
+        this.gradient = gradient;
+    }
+
+    public boolean checkIfQueued() {
+        return false;
     }
 
     @Override
-    public void process(Link l, int round) {
-        l.follow(TEMPLATE_INPUT, round);
+    public Phase getPhase() {
+        return Phase.LINKING;
     }
 
     @Override
-    public Comparator<Link> getElementComparator() {
-        return Comparator.naturalOrder();
+    public void process(Link l) {
+        l.propagateGradient(gradient);
+
+        if(l.getSynapse().isAllowTraining())
+            QueueEntry.add(l, UPDATE_WEIGHT);
     }
 
     public String toString() {
-        return "Link-Phase: Template";
+        return "Link-Step: Propagate Gradient (" + Utils.round(gradient) + ")";
     }
 }

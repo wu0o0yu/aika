@@ -14,26 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.Phase;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.steps.Phase;
 
 /**
+ * During the initial linking process all positive recurrent synapses are assumed to be
+ * active. If that is not the case, updates of the affected activations are required.
  *
  * @author Lukas Molzberger
  */
-public interface LinkPhase extends Phase<Link> {
+public class PropagateChange  implements ActivationStep {
 
-    LinkPhase INDUCTION = new Induction();
-    LinkPhase LINKING = new Linking();
-    Ranked SUM_UP_LINK_RANK = new RankedImpl(LINKING);
-    LinkPhase SHADOW_FACTOR = new ShadowFactor();
-    LinkPhase INFORMATION_GAIN_GRADIENT = new InformationGainGradient();
-    Ranked PROPAGATE_GRADIENT_RANK = new RankedImpl(INFORMATION_GAIN_GRADIENT);
-    LinkPhase UPDATE_WEIGHT = new UpdateWeight();
-    LinkPhase TEMPLATE = new Template();
-    LinkPhase COUNTING = new Counting();
+    private double delta;
+
+    @Override
+    public Phase getPhase() {
+        return Phase.LINKING;
+    }
+
+    public boolean checkIfQueued() {
+        return false;
+    }
+
+    public PropagateChange(double delta) {
+        this.delta = delta;
+    }
+
+    @Override
+    public void process(Activation act) {
+        act.updateOutgoingLinks(delta);
+    }
+
+    public String toString() {
+        return "Act-Step: Propagate Change";
+    }
 }

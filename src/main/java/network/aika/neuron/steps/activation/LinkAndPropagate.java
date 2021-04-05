@@ -14,23 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
-import network.aika.neuron.phase.VisitorPhase;
-
-import java.util.Comparator;
+import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.VisitorStep;
 
 import static network.aika.neuron.activation.Activation.*;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
-import static network.aika.neuron.phase.link.LinkPhase.LINKING;
-import static network.aika.neuron.phase.link.LinkPhase.SUM_UP_LINK_RANK;
+import static network.aika.neuron.steps.link.LinkStep.LINKING;
 
 
 /**
@@ -45,24 +41,28 @@ import static network.aika.neuron.phase.link.LinkPhase.SUM_UP_LINK_RANK;
  *
  * @author Lukas Molzberger
  */
-public class LinkAndPropagate extends RankedImpl implements VisitorPhase, ActivationPhase {
+public class LinkAndPropagate implements VisitorStep, ActivationStep {
 
     @Override
-    public Ranked getPreviousRank() {
-        return SUM_UP_LINK_RANK;
+    public Phase getPhase() {
+        return Phase.LINKING;
+    }
+
+    public boolean checkIfQueued() {
+        return true;
     }
 
     @Override
-    public void getNextPhases(int round, Activation act) {
+    public void getNextSteps(Activation act) {
     }
 
     @Override
-    public void getNextPhases(int round, Link l) {
-        QueueEntry.add(l, round, LINKING);
+    public void getNextSteps(Link l) {
+        QueueEntry.add(l, LINKING);
     }
 
     @Override
-    public void process(Activation act, int round) {
+    public void process(Activation act) {
         act.getThought().linkInputRelations(act);
 
         double delta = act.updateValue(false);
@@ -76,8 +76,7 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
                         act,
                         OUTPUT,
                         INPUT,
-                        ACT,
-                        round
+                        ACT
                 )
         );
 
@@ -89,8 +88,7 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
                         act,
                         OUTPUT,
                         OUTPUT,
-                        ACT,
-                        round + 1
+                        ACT
                 )
         );
     }
@@ -126,12 +124,7 @@ public class LinkAndPropagate extends RankedImpl implements VisitorPhase, Activa
                 );
     }
 
-    @Override
-    public Comparator<Activation> getElementComparator() {
-        return FIRED_COMPARATOR;
-    }
-
     public String toString() {
-        return "Act-Phase: Link and Propagate";
+        return "Act-Step: Link and Propagate";
     }
 }

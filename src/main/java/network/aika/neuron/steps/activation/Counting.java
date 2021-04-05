@@ -14,40 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Fired;
-import network.aika.neuron.phase.RankedImpl;
+import network.aika.neuron.steps.Phase;
 
-import java.util.Comparator;
-
-import static network.aika.neuron.activation.Activation.FIRED_COMPARATOR_REVERSED;
-import static network.aika.neuron.activation.RoundType.GRADIENT;
-import static network.aika.neuron.phase.link.LinkPhase.PROPAGATE_GRADIENT_RANK;
 
 /**
- * Propagates the gradient of this activation backwards to all its input-links.
+ * Counts the number of activations a particular neuron has encountered.
  *
  * @author Lukas Molzberger
  */
-public class PropagateGradientsSum extends RankedImpl implements ActivationPhase {
+public class Counting implements ActivationStep {
 
-    public PropagateGradientsSum() {
-        super(PROPAGATE_GRADIENT_RANK);
+    @Override
+    public Phase getPhase() {
+        return Phase.COUNTING;
     }
 
     @Override
-    public void process(Activation act, int round) {
-        act.propagateGradientsFromSumUpdate(round);
+    public void process(Activation act) {
+        act.getNeuron().count(act);
     }
 
-    @Override
-    public Comparator<Activation> getElementComparator() {
-        return FIRED_COMPARATOR_REVERSED;
+    public boolean checkIfQueued() {
+        return true;
     }
 
     public String toString() {
-        return "Act-Phase: Propagate Gradients from Gradient Sum Update";
+        return "Act-Step: Counting";
     }
 }

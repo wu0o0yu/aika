@@ -14,40 +14,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.steps.link;
 
+import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.steps.Phase;
+import network.aika.utils.Utils;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
-import network.aika.neuron.phase.activation.ActivationPhase;
 
-import java.util.Comparator;
+import static network.aika.neuron.steps.activation.ActivationStep.*;
 
 /**
- * Computes the gradient of the information gain function for this activation.
- *
- * @see <a href="https://aika.network/training.html">Aika Training</a>
+ * Uses the input activation value, and the synapse weight to update the net value of the output activation.
  *
  * @author Lukas Molzberger
  */
-public class InformationGainGradient extends RankedImpl implements LinkPhase {
+public class SumUpLink implements LinkStep {
 
-    @Override
-    public Ranked getPreviousRank() {
-        return ActivationPhase.ENTROPY_GRADIENT;
+    private double delta;
+
+    public SumUpLink(double delta) {
+        this.delta = delta;
     }
 
     @Override
-    public void process(Link l, int round) {
-        l.computeInformationGainGradient();
+    public Phase getPhase() {
+        return Phase.LINKING;
+    }
+
+    public boolean checkIfQueued() {
+        return false;
     }
 
     @Override
-    public Comparator<Link> getElementComparator() {
-        return Comparator.naturalOrder();
+    public void process(Link l) {
+        l.sumUpLink(delta);
+
+        Activation oAct = l.getOutput();
+
+        QueueEntry.add(oAct, PROPAGATE_GRADIENTS_NET);
+        QueueEntry.add(oAct, CHECK_IF_FIRED);
     }
 
     public String toString() {
-        return "Link-Phase: Information-Gain Gradient";
+        return "Link-Step: Sum up Link (" + Utils.round(delta) + ")";
     }
 }

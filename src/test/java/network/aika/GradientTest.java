@@ -8,8 +8,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
-import network.aika.neuron.excitatory.PatternPartSynapse;
-import network.aika.neuron.phase.Ranked;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
@@ -24,8 +22,6 @@ public class GradientTest {
 
     @Test
     public void gradientAndInduction() throws InterruptedException {
-        System.out.println(Ranked.dumpPhaseRanks());
-
         TextModel m = new TextModel();
         m.setConfig(
                 new Config() {
@@ -54,7 +50,7 @@ public class GradientTest {
 
         m.setN(912);
 
-        Document doc = new Document("A B ");
+        Document doc = new Document("A "); //"A B "
 
         int i = 0;
         TextReference lastRef = null;
@@ -69,12 +65,12 @@ public class GradientTest {
         nA.setFrequency(53.0);
         nA.getSampleSpace().setN(299);
         nA.getSampleSpace().setLastPos(899);
-
+/*
         Neuron nB = m.getNeuron("B");
         nB.setFrequency(10.0);
         nB.getSampleSpace().setN(121);
         nB.getSampleSpace().setLastPos(739);
-
+*/
 
         AikaDebugger.createAndShowGUI(doc,m);
 

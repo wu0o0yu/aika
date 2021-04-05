@@ -14,29 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
-
-import java.util.Comparator;
+import network.aika.neuron.steps.Phase;
 
 /**
  * Creates a new untrained neuron from a template activation.
  *
  * @author Lukas Molzberger
  */
-public class Induction extends RankedImpl implements ActivationPhase {
+public class Induction implements ActivationStep {
 
     @Override
-    public Ranked getPreviousRank() {
-        return null;
+    public Phase getPhase() {
+        return Phase.INIT;
+    }
+
+    public boolean checkIfQueued() {
+        return true;
     }
 
     @Override
-    public void process(Activation act, int round) {
+    public void process(Activation act) {
         assert act.getNeuron().isTemplate();
 
         Neuron inducedNeuron = act.getNeuron().instantiateTemplate();
@@ -49,12 +50,7 @@ public class Induction extends RankedImpl implements ActivationPhase {
         act.link();
     }
 
-    @Override
-    public Comparator<Activation> getElementComparator() {
-        return Comparator.naturalOrder();
-    }
-
     public String toString() {
-        return "Act-Phase: Induction";
+        return "Act-Step: Induction";
     }
 }

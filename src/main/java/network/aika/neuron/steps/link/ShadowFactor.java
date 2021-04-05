@@ -14,48 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.steps.link;
 
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
-import network.aika.neuron.phase.activation.ActivationPhase;
-
-import java.util.Comparator;
+import network.aika.neuron.steps.Phase;
 
 /**
- * Creates a new untrained synapse from a template link.
+ * Avoid that synapses which access the same source information generate twice the gradient.
  *
  * @author Lukas Molzberger
  */
-public class Induction extends RankedImpl implements LinkPhase {
+public class ShadowFactor implements LinkStep {
 
     @Override
-    public Ranked getPreviousRank() {
-        return ActivationPhase.INDUCTION;
+    public Phase getPhase() {
+        return Phase.LINKING;
+    }
+
+    public boolean checkIfQueued() {
+        return true;
     }
 
     @Override
-    public void process(Link l, int round) {
-        assert l.getSynapse().isTemplate();
-
-        Synapse inducedSynapse = l.getSynapse()
-                .instantiateTemplate(
-                        l.getInput().getNeuron(),
-                        l.getOutput().getNeuron()
-                );
-
-        l.setSynapse(inducedSynapse);
-        inducedSynapse.linkOutput();
-    }
-
-    @Override
-    public Comparator<Link> getElementComparator() {
-        return Comparator.naturalOrder();
+    public void process(Link l) {
+    //    l.removeGradientDependencies();
     }
 
     public String toString() {
-        return "Link-Phase: Induction";
+        return "Link-Step: Shadow Factor";
     }
 }

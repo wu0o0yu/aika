@@ -14,23 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase;
+package network.aika.neuron.steps;
 
-import static network.aika.neuron.phase.activation.ActivationPhase.TEMPLATE_OUTPUT;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Visitor;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public interface Ranked {
+public interface VisitorStep {
 
-    int getRank();
+    void closeCycle(Activation act, Visitor v);
 
-    Ranked getPreviousRank();
+    void getNextSteps(Activation act);
 
-    String dumpPreviousRanks();
-
-    static String dumpPhaseRanks() {
-        return TEMPLATE_OUTPUT.dumpPreviousRanks();
-    }
+    void getNextSteps(Link l);
 }

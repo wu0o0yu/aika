@@ -14,45 +14,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.steps.link;
 
-import network.aika.neuron.activation.QueueEntry;
-import network.aika.utils.Utils;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.RankedImpl;
+import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.steps.Phase;
 
-import java.util.Comparator;
-
-import static network.aika.neuron.activation.RoundType.GRADIENT;
+import static network.aika.neuron.steps.activation.ActivationStep.*;
+import static network.aika.neuron.sign.Sign.POS;
 
 /**
- * Propagate the gradient backwards through the network.
+ * Use the link gradient to update the synapse weight.
  *
  * @author Lukas Molzberger
  */
-public class PropagateGradient extends RankedImpl implements LinkPhase {
+public class UpdateWeight implements LinkStep {
 
-    private double gradient;
+    @Override
+    public Phase getPhase() {
+        return Phase.LINKING;
+    }
 
-    public PropagateGradient(double gradient) {
-        super(INFORMATION_GAIN_GRADIENT);
-        this.gradient = gradient;
+    public boolean checkIfQueued() {
+        return true;
     }
 
     @Override
-    public void process(Link l, int round) {
-        l.propagateGradient(gradient);
+    public void process(Link l) {
+        Synapse s = l.getSynapse();
 
-        if(l.getSynapse().isAllowTraining())
-            QueueEntry.add(l, round, UPDATE_WEIGHT);
-    }
+        double weightDelta = s.updateSynapse(l);
 
-    @Override
-    public Comparator<Link> getElementComparator() {
-        return Comparator.naturalOrder();
+        QueueEntry.add(l.getOutput(), UPDATE_SYNAPSE_INPUT_LINKS);
+
+        QueueEntry.add(
+                l,
+                new SumUpLink(l.getInputValue(POS) * weightDelta)
+        );
     }
 
     public String toString() {
-        return "Link-Phase: Propagate Gradient (" + Utils.round(gradient) + ")";
+        return "Link-Step: Update Weight";
     }
 }

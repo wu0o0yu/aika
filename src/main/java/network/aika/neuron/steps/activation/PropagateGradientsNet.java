@@ -14,43 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Fired;
-import network.aika.neuron.phase.RankedImpl;
-
-import java.util.Comparator;
-
-import static network.aika.neuron.activation.Activation.FIRED_COMPARATOR;
-import static network.aika.neuron.activation.RoundType.ACT;
+import network.aika.neuron.steps.Phase;
 
 /**
- * During the initial linking process all positive recurrent synapses are assumed to be
- * active. If that is not the case, updates of the affected activations are required.
+ * Propagates the gradient of this activation backwards to all its input-links.
  *
  * @author Lukas Molzberger
  */
-public class PropagateChange extends RankedImpl implements ActivationPhase {
+public class PropagateGradientsNet implements ActivationStep {
 
-    private double delta;
+    @Override
+    public Phase getPhase() {
+        return Phase.LINKING;
+    }
 
-    public PropagateChange(double delta) {
-        super(USE_FINAL_BIAS);
-        this.delta = delta;
+    public boolean checkIfQueued() {
+        return true;
     }
 
     @Override
-    public void process(Activation act, int round) {
-        act.updateOutgoingLinks(delta, round);
-    }
-
-    @Override
-    public Comparator<Activation> getElementComparator() {
-        return FIRED_COMPARATOR;
+    public void process(Activation act) {
+        act.propagateGradientsFromNetUpdate();
     }
 
     public String toString() {
-        return "Act-Phase: Propagate Change";
+        return "Act-Step: Propagate Gradients from Net Update";
     }
 }

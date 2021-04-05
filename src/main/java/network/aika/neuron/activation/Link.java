@@ -21,16 +21,13 @@ import network.aika.utils.Utils;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.phase.Phase;
-import network.aika.neuron.phase.VisitorPhase;
-import network.aika.neuron.phase.link.SumUpLink;
+import network.aika.neuron.steps.VisitorStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 
 import static network.aika.neuron.activation.Activation.TOLERANCE;
-import static network.aika.neuron.activation.RoundType.WEIGHT;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -80,6 +77,11 @@ public class Link extends Element<Link> {
         return 1;
     }
 
+    @Override
+    public Fired getFired() {
+        return output.getFired();
+    }
+
     public double getGradient() {
         return gradient;
     }
@@ -116,14 +118,14 @@ public class Link extends Element<Link> {
             synapse.count(this);
     }
 
-    public void follow(VisitorPhase p, int round) {
-        follow(p, synapse.isRecurrent() ? OUTPUT : INPUT, round);
+    public void follow(VisitorStep p) {
+        follow(p, synapse.isRecurrent() ? OUTPUT : INPUT);
     }
 
-    public void follow(VisitorPhase p, Direction dir, int round) {
+    public void follow(VisitorStep p, Direction dir) {
         output.setMarked(true);
 
-        Visitor v = new Visitor(p, output, dir, INPUT, ACT, round);
+        Visitor v = new Visitor(p, output, dir, INPUT, ACT);
         Visitor nv = synapse.transition(v, this);
         synapse.follow(input, nv);
 

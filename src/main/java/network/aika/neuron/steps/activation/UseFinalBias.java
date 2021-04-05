@@ -14,52 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.QueueEntry;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
+import network.aika.neuron.steps.Phase;
 
-import java.util.Comparator;
-
-import static network.aika.neuron.phase.link.LinkPhase.SHADOW_FACTOR;
+import static network.aika.neuron.activation.Activation.TOLERANCE;
 
 /**
- * Computes the gradient of the entropy function for this activation.
- *
- * @see <a href="https://aika.network/training.html">Aika Training</a>
+ * Check if there are positive recurrent links that have not been activated and thus need to be updated.
  *
  * @author Lukas Molzberger
  */
-public class EntropyGradient extends RankedImpl implements ActivationPhase {
+public class UseFinalBias implements ActivationStep {
 
     @Override
-    public Ranked getPreviousRank() {
-        return SHADOW_FACTOR;
+    public Phase getPhase() {
+        return Phase.FINAL_LINKING;
+    }
+
+    public boolean checkIfQueued() {
+        return true;
     }
 
     @Override
-    public void process(Activation act, int round) {
-        Neuron n = act.getNeuron();
+    public void process(Activation act) {
+        double delta = act.updateValue(true);
 
-        if(n.isTemplate())
-            return;
-
-        act.initEntropyGradient();
-
-        if(!act.gradientIsZero())
-            QueueEntry.add(act, 0, PROPAGATE_GRADIENTS_SUM);
-    }
-
-
-    @Override
-    public Comparator<Activation> getElementComparator() {
-        return Comparator.naturalOrder();
+        if(Math.abs(delta) >= TOLERANCE)
+            QueueEntry.add(act, new PropagateChange(delta));
     }
 
     public String toString() {
-        return "Act-Phase: Entropy Gradient";
+        return "Act-Step: Use Final Bias";
     }
 }

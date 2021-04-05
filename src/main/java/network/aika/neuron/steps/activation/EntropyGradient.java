@@ -14,40 +14,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.steps.activation;
 
+import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
-import network.aika.neuron.phase.activation.ActivationPhase;
-
-import java.util.Comparator;
+import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.steps.Phase;
 
 /**
- * Counts the number of input or output activations a particular synapse has encountered.
- * The four different cases are counted separately.
+ * Computes the gradient of the entropy function for this activation.
+ *
+ * @see <a href="https://aika.network/training.html">Aika Training</a>
  *
  * @author Lukas Molzberger
  */
-public class Counting extends RankedImpl implements LinkPhase {
+public class EntropyGradient implements ActivationStep {
 
     @Override
-    public Ranked getPreviousRank() {
-        return ActivationPhase.COUNTING;
+    public Phase getPhase() {
+        return Phase.INIT;
+    }
+
+    public boolean checkIfQueued() {
+        return true;
     }
 
     @Override
-    public void process(Link l, int round) {
-        l.count();
-    }
+    public void process(Activation act) {
+        Neuron n = act.getNeuron();
 
-    @Override
-    public Comparator<Link> getElementComparator() {
-        return Comparator.naturalOrder();
+        if(n.isTemplate())
+            return;
+
+        act.initEntropyGradient();
+
+        if(!act.gradientIsZero())
+            QueueEntry.add(act, PROPAGATE_GRADIENTS_SUM);
     }
 
     public String toString() {
-        return "Link-Phase: Counting";
+        return "Act-Step: Entropy Gradient";
     }
 }

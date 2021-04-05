@@ -14,39 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
+import network.aika.neuron.steps.Phase;
 
-import java.util.Comparator;
-
-import static network.aika.neuron.phase.activation.ActivationPhase.DETERMINE_BRANCH_PROBABILITY;
 
 /**
- * Avoid that synapses which access the same source information generate twice the gradient.
+ * Computes the gradient of the information gain function for this activation.
+ *
+ * @see <a href="https://aika.network/training.html">Aika Training</a>
  *
  * @author Lukas Molzberger
  */
-public class ShadowFactor extends RankedImpl implements LinkPhase {
+public class InformationGainGradient implements LinkStep {
 
     @Override
-    public Ranked getPreviousRank() {
-        return DETERMINE_BRANCH_PROBABILITY;
+    public Phase getPhase() {
+        return Phase.INIT;
+    }
+
+    public boolean checkIfQueued() {
+        return true;
     }
 
     @Override
-    public void process(Link l, int round) {
-    //    l.removeGradientDependencies();
-    }
-
-    @Override
-    public Comparator<Link> getElementComparator() {
-        return Comparator.naturalOrder();
+    public void process(Link l) {
+        l.computeInformationGainGradient();
     }
 
     public String toString() {
-        return "Link-Phase: Shadow Factor";
+        return "Link-Step: Information-Gain Gradient";
     }
 }

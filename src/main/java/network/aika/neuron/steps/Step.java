@@ -14,23 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.callbacks;
+package network.aika.neuron.steps;
 
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.activation.Element;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public interface EventListener {
+public interface Step<E extends Element> {
 
-    void beforeProcessedEvent(QueueEntry qe);
+    void process(E e);
 
-    void afterProcessedEvent(QueueEntry qe);
+    Phase getPhase();
 
-    void onActivationCreationEvent(Activation act, Activation originAct);
+    boolean checkIfQueued();
 
-    void onLinkCreationEvent(Link l);
+    static String toString(Step p) {
+        return " (" + (p != null ? p.toString() : "X") + ")";
+    }
 }

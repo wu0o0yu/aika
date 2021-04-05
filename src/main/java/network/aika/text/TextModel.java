@@ -18,7 +18,6 @@ package network.aika.text;
 
 import network.aika.Model;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.Reference;
 import network.aika.callbacks.SuspensionCallback;
 import network.aika.neuron.Neuron;
@@ -32,7 +31,7 @@ import network.aika.neuron.inhibitory.InhibitorySynapse;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
-import static network.aika.neuron.phase.activation.ActivationPhase.LINK_AND_PROPAGATE;
+import static network.aika.neuron.steps.activation.ActivationStep.LINK_AND_PROPAGATE;
 
 /**
  *
@@ -99,9 +98,9 @@ public class TextModel extends Model {
     }
 
     private static void addLink(Synapse s, Activation iAct, Activation oAct) {
-        Link nl = oAct.addLink(s, iAct, false, 0);
+        Link nl = oAct.addLink(s, iAct, false);
 
-        LINK_AND_PROPAGATE.getNextPhases(0, nl);
+        LINK_AND_PROPAGATE.getNextSteps(nl);
     }
 
     private Synapse getRelSynapse(Neuron<?> n) {

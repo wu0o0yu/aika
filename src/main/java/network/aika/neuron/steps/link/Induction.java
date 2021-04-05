@@ -14,53 +14,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.link;
+package network.aika.neuron.steps.link;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
-
-import java.util.Comparator;
-
-import static network.aika.neuron.activation.RoundType.*;
-import static network.aika.neuron.phase.activation.ActivationPhase.*;
-import static network.aika.neuron.sign.Sign.POS;
+import network.aika.neuron.steps.Phase;
 
 /**
- * Use the link gradient to update the synapse weight.
+ * Creates a new untrained synapse from a template link.
  *
  * @author Lukas Molzberger
  */
-public class UpdateWeight extends RankedImpl implements LinkPhase {
+public class Induction implements LinkStep {
 
     @Override
-    public Ranked getPreviousRank() {
-        return PROPAGATE_GRADIENTS_NET;
+    public Phase getPhase() {
+        return Phase.INIT;
+    }
+
+    public boolean checkIfQueued() {
+        return true;
     }
 
     @Override
-    public void process(Link l, int round) {
-        Synapse s = l.getSynapse();
+    public void process(Link l) {
+        assert l.getSynapse().isTemplate();
 
-        double weightDelta = s.updateSynapse(l);
+        Synapse inducedSynapse = l.getSynapse()
+                .instantiateTemplate(
+                        l.getInput().getNeuron(),
+                        l.getOutput().getNeuron()
+                );
 
-        QueueEntry.add(l.getOutput(), round, UPDATE_SYNAPSE_INPUT_LINKS);
+        l.setSynapse(inducedSynapse);
+        inducedSynapse.linkOutput();
 
-        QueueEntry.add(
-                l,
-                round,
-                new SumUpLink(l.getInputValue(POS) * weightDelta)
-        );
-    }
-
-    @Override
-    public Comparator<Link> getElementComparator() {
-        return Comparator.naturalOrder();
+        QueueEntry.add(l, COMMIT);
     }
 
     public String toString() {
-        return "Link-Phase: Update Weight";
+        return "Link-Step: Induction";
     }
 }

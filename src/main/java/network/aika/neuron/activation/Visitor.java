@@ -18,11 +18,8 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.phase.VisitorPhase;
+import network.aika.neuron.steps.VisitorStep;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static network.aika.neuron.activation.direction.Direction.*;
@@ -37,8 +34,7 @@ public class Visitor {
     public Link link; // Just debug code
     private Transition transition; // Just debug code
     private Visitor previousStep;
-    private VisitorPhase phase;
-    private int round;
+    private VisitorStep phase;
 
     public enum Transition {  // Just debug code
         ACT,
@@ -55,7 +51,7 @@ public class Visitor {
 
     private Visitor() {}
 
-    public Visitor(VisitorPhase vp, Activation act, Direction startDir, Direction downUpDir, Transition t, int round) {
+    public Visitor(VisitorStep vp, Activation act, Direction startDir, Direction downUpDir, Transition t) {
         this.phase = vp;
         this.origin = this;
         this.act = act;
@@ -63,7 +59,6 @@ public class Visitor {
         this.downUpDir = downUpDir;
         this.startDir = startDir;
         this.scopes = act.getNeuron().getInitialScopes(startDir);
-        this.round = round;
     }
 
     public Visitor prepareNextStep(Activation currentAct, Link currentLink, Set<ScopeEntry> scopes, Transition t) {
@@ -82,13 +77,8 @@ public class Visitor {
         nv.upSteps = upSteps;
         nv.downSteps = downSteps;
         nv.scopes = scopes;
-        nv.round = round;
 
         return nv;
-    }
-
-    public int getRound() {
-        return round;
     }
 
     public Visitor getOrigin() {
@@ -131,7 +121,7 @@ public class Visitor {
         return scopes;
     }
 
-    public VisitorPhase getPhase() {
+    public VisitorStep getPhase() {
         return phase;
     }
 
@@ -207,7 +197,6 @@ public class Visitor {
         sb.append("Scopes:" + scopes + ", ");
         sb.append("DownSteps:" + downSteps + ", ");
         sb.append("UpSteps:" + upSteps + "");
-        sb.append("Round:" + round + "");
 
         return sb.toString();
     }

@@ -14,38 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.link;
 
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
-
-import java.util.Comparator;
-
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.steps.Step;
 
 /**
- * Counts the number of activations a particular neuron has encountered.
  *
  * @author Lukas Molzberger
  */
-public class Counting extends RankedImpl implements ActivationPhase {
+public interface LinkStep extends Step<Link> {
 
-    @Override
-    public Ranked getPreviousRank() {
-        return TEMPLATE_OUTPUT;
-    }
-
-    @Override
-    public void process(Activation act, int round) {
-        act.getNeuron().count(act);
-    }
-
-    @Override
-    public Comparator<Activation> getElementComparator() {
-        return Comparator.naturalOrder();
-    }
-
-    public String toString() {
-        return "Act-Phase: Counting";
-    }
+    LinkStep INDUCTION = new Induction();
+    LinkStep LINKING = new Linking();
+    LinkStep SHADOW_FACTOR = new ShadowFactor();
+    LinkStep INFORMATION_GAIN_GRADIENT = new InformationGainGradient();
+    LinkStep UPDATE_WEIGHT = new UpdateWeight();
+    LinkStep TEMPLATE = new Template();
+    LinkStep COMMIT = new Commit();
+    LinkStep COUNTING = new Counting();
 }

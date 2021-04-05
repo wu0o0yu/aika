@@ -14,39 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.phase.activation;
+package network.aika.neuron.steps.link;
 
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.phase.Ranked;
-import network.aika.neuron.phase.RankedImpl;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.steps.Phase;
 
-import java.util.Comparator;
+import static network.aika.neuron.steps.activation.ActivationStep.LINK_AND_PROPAGATE;
 
 
 /**
- * If there are multiple mutually exclusive branches, then the softmax function will be used, to assign
- * a probability to each branch.
+ * Uses the visitor to link neighbouring links to the same output activation.
  *
  * @author Lukas Molzberger
  */
-public class DetermineBranchProbability extends RankedImpl implements ActivationPhase {
+public class Linking implements LinkStep {
 
     @Override
-    public Ranked getPreviousRank() {
-        return ActivationPhase.PROPAGATE_CHANGE;
+    public Phase getPhase() {
+        return Phase.LINKING;
+    }
+
+    public boolean checkIfQueued() {
+        return true;
     }
 
     @Override
-    public void process(Activation act, int round) {
-        act.computeBranchProbability();
-    }
+    public void process(Link l) {
+        l.follow(LINK_AND_PROPAGATE);
 
-    @Override
-    public Comparator<Activation> getElementComparator() {
-        return Comparator.naturalOrder();
+        QueueEntry.add(l, COUNTING);
     }
 
     public String toString() {
-        return "Act-Phase: Determine Branch Probability";
+        return "Link-Step: Linking";
     }
 }

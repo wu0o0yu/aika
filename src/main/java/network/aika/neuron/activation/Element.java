@@ -17,8 +17,10 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.neuron.steps.Step;
 
 import java.util.Comparator;
+import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -33,12 +35,21 @@ public abstract class Element<E extends Element> implements Comparable<E> {
             <Element>comparingInt(e -> e.getElementType())
             .thenComparing(e -> e);
 
-    private Set<QueueEntry> queuedPhases = new TreeSet<>(QueueEntry.COMPARATOR);
+    private NavigableSet<QueueEntry> queuedPhases = new TreeSet<>(QueueEntry.COMPARATOR);
 
     protected abstract int getElementType();
 
-    public void addQueuedPhase(QueueEntry qe) {
+    public abstract Fired getFired();
+
+    public void addQueuedStep(QueueEntry qe) {
         queuedPhases.add(qe);
+    }
+
+    public boolean isQueued(Step s) {
+        return !queuedPhases.subSet(
+                new QueueEntry(s, this, Long.MIN_VALUE),
+                new QueueEntry(s, this, Long.MAX_VALUE)
+        ).isEmpty();
     }
 
     public void removeQueuedPhase(QueueEntry qe) {
@@ -53,7 +64,7 @@ public abstract class Element<E extends Element> implements Comparable<E> {
 
     public void copyPhases(Element newElement) {
         queuedPhases.stream().forEach(qe ->
-                QueueEntry.add(newElement, qe.getRound(), qe.getPhase())
+                QueueEntry.add(newElement, qe.getStep())
         );
     }
 
