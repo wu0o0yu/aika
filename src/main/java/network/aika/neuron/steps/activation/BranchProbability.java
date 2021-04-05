@@ -14,35 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.steps.link;
+package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.visitor.TemplateVisitor;
+
 
 /**
- * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
- * activations and links.
+ * If there are multiple mutually exclusive branches, then the softmax function will be used, to assign
+ * a probability to each branch.
+ *
+ * (I guess this step is closer to the many worlds interpretation than the copenhagen interpretation.)
  *
  * @author Lukas Molzberger
  */
-public class Template extends TemplateVisitor implements LinkStep {
+public class BranchProbability implements ActivationStep {
 
     @Override
     public Phase getPhase() {
-        return Phase.TEMPLATE;
+        return Phase.LINKING;
+    }
+
+    @Override
+    public void process(Activation act) {
+        act.computeBranchProbability();
     }
 
     public boolean checkIfQueued() {
         return true;
     }
 
-    @Override
-    public void process(Link l) {
-        l.follow(this);
-    }
-
     public String toString() {
-        return "Link-Step: Template";
+        return "Act-Step: Determine Branch Probability";
     }
 }

@@ -14,11 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.steps.link;
+package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.TemplateVisitor;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+import static network.aika.neuron.activation.Visitor.Transition.ACT;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
@@ -26,7 +36,13 @@ import network.aika.neuron.steps.visitor.TemplateVisitor;
  *
  * @author Lukas Molzberger
  */
-public class Template extends TemplateVisitor implements LinkStep {
+public class TemplateCloseCycle extends TemplateVisitor implements ActivationStep {
+
+    private Direction direction;
+
+    public TemplateCloseCycle(Direction dir) {
+        direction = dir;
+    }
 
     @Override
     public Phase getPhase() {
@@ -38,11 +54,19 @@ public class Template extends TemplateVisitor implements LinkStep {
     }
 
     @Override
-    public void process(Link l) {
-        l.follow(this);
+    public void process(Activation act) {
+        act.followLinks(
+                new Visitor(
+                        this,
+                        act,
+                        direction,
+                        INPUT,
+                        ACT
+                )
+        );
     }
 
     public String toString() {
-        return "Link-Step: Template";
+        return "Act-Step: Template-CloseCycle-" + direction;
     }
 }

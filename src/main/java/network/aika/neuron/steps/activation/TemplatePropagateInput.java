@@ -14,35 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.steps.link;
+package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.visitor.TemplateVisitor;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
- * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
- * activations and links.
  *
  * @author Lukas Molzberger
  */
-public class Template extends TemplateVisitor implements LinkStep {
+public class TemplatePropagateInput extends TemplatePropagate {
 
-    @Override
-    public Phase getPhase() {
-        return Phase.TEMPLATE;
-    }
-
-    public boolean checkIfQueued() {
-        return true;
-    }
-
-    @Override
-    public void process(Link l) {
-        l.follow(this);
-    }
-
-    public String toString() {
-        return "Link-Step: Template";
+    public TemplatePropagateInput() {
+        super(INPUT);
     }
 }

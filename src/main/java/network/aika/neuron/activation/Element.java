@@ -31,13 +31,10 @@ import java.util.TreeSet;
  */
 public abstract class Element<E extends Element> implements Comparable<E> {
 
-    Comparator<Element> COMPARE = Comparator.
-            <Element>comparingInt(e -> e.getElementType())
-            .thenComparing(e -> e);
-
-    private NavigableSet<QueueEntry> queuedPhases = new TreeSet<>(QueueEntry.COMPARATOR);
-
-    protected abstract int getElementType();
+    private NavigableSet<QueueEntry> queuedPhases = new TreeSet<>(Comparator
+            .<QueueEntry, String>comparing(qe -> qe.getStep().getClass().getSimpleName())
+            .thenComparing(qe -> qe.getTimestamp())
+    );
 
     public abstract Fired getFired();
 

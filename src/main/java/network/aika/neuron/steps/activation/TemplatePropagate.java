@@ -19,16 +19,12 @@ package network.aika.neuron.steps.activation;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.VisitorStep;
-import network.aika.neuron.steps.link.LinkStep;
+import network.aika.neuron.steps.visitor.TemplateVisitor;
 
 import java.util.Collection;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
@@ -41,11 +37,11 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Template implements VisitorStep, ActivationStep {
+public abstract class TemplatePropagate extends TemplateVisitor implements ActivationStep {
 
     private Direction direction;
 
-    public Template(Direction dir) {
+    public TemplatePropagate(Direction dir) {
         direction = dir;
     }
 
@@ -59,75 +55,20 @@ public class Template implements VisitorStep, ActivationStep {
     }
 
     @Override
-    public void getNextSteps(Activation act) {
-        QueueEntry.add(act, INDUCTION);
-    }
-
-    @Override
-    public void getNextSteps(Link l) {
-        QueueEntry.add(l, LinkStep.TEMPLATE);
-        QueueEntry.add(l, LinkStep.INDUCTION);
-    }
-
-    @Override
     public void process(Activation act) {
-        if(direction == OUTPUT) {
-            act.followLinks(
-                    new Visitor(
-                            this,
-                            act,
-                            direction,
-                            INPUT,
-                            ACT
-                    )
-            );
-        }
+        Neuron<?> n = act.getNeuron();
+        if (!n.checkGradientThreshold(act))
+            return;
 
-        propagate(act,
-                new Visitor(
-                        this,
-                        act,
-                        direction,
-                        direction,
-                        ACT
-                )
+        Visitor v = new Visitor(
+                this,
+                act,
+                direction,
+                direction,
+                ACT
         );
-    }
 
-    @Override
-    public void closeCycle(Activation fromAct, Visitor v) {
-        Direction dir = v.startDir;
-
-        Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());
-        Activation oAct = dir.getCycleOutput(fromAct, v.getOriginAct());
-
-        if(oAct.getNeuron().isInputNeuron())
-            return;
-
-        if(!iAct.isActive(true))
-            return;
-
-        if (Link.synapseExists(iAct, oAct))
-            return;
-
-        Set<Neuron<?>> inputTemplates = iAct.getNeuron().getTemplates();
-
-        oAct.getNeuron()
-                .getTemplates()
-                .stream()
-                .flatMap(tn -> tn.getInputSynapses()) // TODO!
-                .filter(ts -> inputTemplates.contains(ts.getInput()))
-                .forEach(ts ->
-                        ts.closeCycle(v, iAct, oAct)
-                );
-    }
-
-    private void propagate(Activation act, Visitor v) {
-        if (!act.getNeuron().checkGradientThreshold(act))
-            return;
-
-        Collection<Synapse> templateSynapses = act
-                .getNeuron()
+        Collection<Synapse> templateSynapses = n
                 .getTemplates()
                 .stream()
                 .flatMap(tn -> v.startDir.getSynapses(tn))
@@ -145,6 +86,6 @@ public class Template implements VisitorStep, ActivationStep {
     }
 
     public String toString() {
-        return "Act-Step: Template-" + direction;
+        return "Act-Step: Template-Propagate-" + direction;
     }
 }

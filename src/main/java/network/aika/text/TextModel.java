@@ -31,7 +31,7 @@ import network.aika.neuron.inhibitory.InhibitorySynapse;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
-import static network.aika.neuron.steps.activation.ActivationStep.LINK_AND_PROPAGATE;
+import static network.aika.neuron.steps.activation.ActivationStep.LINKING;
 
 /**
  *
@@ -100,7 +100,7 @@ public class TextModel extends Model {
     private static void addLink(Synapse s, Activation iAct, Activation oAct) {
         Link nl = oAct.addLink(s, iAct, false);
 
-        LINK_AND_PROPAGATE.getNextSteps(nl);
+        LINKING.getNextSteps(nl);
     }
 
     private Synapse getRelSynapse(Neuron<?> n) {

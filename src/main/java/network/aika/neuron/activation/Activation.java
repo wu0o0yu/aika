@@ -111,7 +111,8 @@ public class Activation extends Element<Activation> {
         setInputValue(1.0);
         setFired(ref.getBegin());
 
-        QueueEntry.add(this, LINK_AND_PROPAGATE);
+        QueueEntry.add(this, LINKING);
+        QueueEntry.add(this, PROPAGATE);
         QueueEntry.add(this, ENTROPY_GRADIENT);
         QueueEntry.add(this, COUNTING);
     }
@@ -150,10 +151,6 @@ public class Activation extends Element<Activation> {
 
     public Thought getThought() {
         return thought;
-    }
-
-    protected int getElementType() {
-        return 0;
     }
 
     @Override
@@ -472,8 +469,9 @@ public class Activation extends Element<Activation> {
         if (getNeuron().isAllowTraining())
             QueueEntry.add(this, UPDATE_BIAS);
 
-        QueueEntry.add(this, TEMPLATE_INPUT);
-        QueueEntry.add(this, TEMPLATE_OUTPUT);
+        QueueEntry.add(this, TEMPLATE_PROPAGATE_INPUT);
+        QueueEntry.add(this, TEMPLATE_CLOSE_CYCLE_OUTPUT);
+        QueueEntry.add(this, TEMPLATE_PROPAGATE_OUTPUT);
     }
 
     public double getNorm() {

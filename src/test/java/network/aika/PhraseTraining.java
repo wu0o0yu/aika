@@ -62,8 +62,9 @@ public class PhraseTraining {
 
     private void process(TextModel m, int round) throws IOException {
         Step[] countingOnlyFilters = new Step[]{
-                ActivationStep.TEMPLATE_OUTPUT,
-                ActivationStep.TEMPLATE_INPUT,
+                ActivationStep.TEMPLATE_CLOSE_CYCLE_OUTPUT,
+                ActivationStep.TEMPLATE_PROPAGATE_OUTPUT,
+                ActivationStep.TEMPLATE_PROPAGATE_INPUT,
                 ActivationStep.ENTROPY_GRADIENT,
                 ActivationStep.PROPAGATE_GRADIENTS_NET,
                 ActivationStep.PROPAGATE_GRADIENTS_SUM,

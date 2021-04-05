@@ -16,17 +16,15 @@
  */
 package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.*;
-import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.VisitorStep;
+import network.aika.neuron.steps.visitor.LinkingVisitor;
 
-import static network.aika.neuron.activation.Activation.*;
+import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
-import static network.aika.neuron.steps.link.LinkStep.LINKING;
 
 
 /**
@@ -41,7 +39,7 @@ import static network.aika.neuron.steps.link.LinkStep.LINKING;
  *
  * @author Lukas Molzberger
  */
-public class LinkAndPropagate implements VisitorStep, ActivationStep {
+public class Propagate extends LinkingVisitor implements ActivationStep {
 
     @Override
     public Phase getPhase() {
@@ -53,69 +51,15 @@ public class LinkAndPropagate implements VisitorStep, ActivationStep {
     }
 
     @Override
-    public void getNextSteps(Activation act) {
-    }
-
-    @Override
-    public void getNextSteps(Link l) {
-        QueueEntry.add(l, LINKING);
-    }
-
-    @Override
     public void process(Activation act) {
-        act.getThought().linkInputRelations(act);
-
-        double delta = act.updateValue(false);
-
-        if(Math.abs(delta) < TOLERANCE)
-            return;
-
-        act.followLinks(
-                new Visitor(
-                        this,
-                        act,
-                        OUTPUT,
-                        INPUT,
-                        ACT
-                )
+        Visitor v = new Visitor(
+                this,
+                act,
+                OUTPUT,
+                OUTPUT,
+                ACT
         );
 
-        act.getModel().linkInputRelations(act, OUTPUT);
-
-        propagate(act,
-                new Visitor(
-                        this,
-                        act,
-                        OUTPUT,
-                        OUTPUT,
-                        ACT
-                )
-        );
-    }
-
-    @Override
-    public void closeCycle(Activation fromAct, Visitor v) {
-        Direction dir = v.startDir;
-        Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());
-        Activation oAct = dir.getCycleOutput(fromAct, v.getOriginAct());
-
-        if(!iAct.isActive(false))
-            return;
-
-        Synapse s = Link.getSynapse(iAct, oAct);
-        if(s == null)
-            return;
-
-        if (Link.linkExists(iAct, oAct))
-            return;
-
-        oAct = s.branchIfNecessary(oAct, v);
-
-        if(oAct != null)
-            s.closeCycle(v, iAct, oAct);
-    }
-
-    public void propagate(Activation act, Visitor v) {
         act.getNeuron()
                 .getOutputSynapses()
                 .filter(s -> !act.outputLinkExists(s))
@@ -125,6 +69,6 @@ public class LinkAndPropagate implements VisitorStep, ActivationStep {
     }
 
     public String toString() {
-        return "Act-Step: Link and Propagate";
+        return "Act-Step: Propagate";
     }
 }

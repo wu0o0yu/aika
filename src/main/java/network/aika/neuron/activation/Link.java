@@ -73,10 +73,6 @@ public class Link extends Element<Link> {
         getSynapse().updateReference(this);
     }
 
-    protected int getElementType() {
-        return 1;
-    }
-
     @Override
     public Fired getFired() {
         return output.getFired();

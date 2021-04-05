@@ -16,35 +16,16 @@
  */
 package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.steps.Phase;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 
 /**
- * If there are multiple mutually exclusive branches, then the softmax function will be used, to assign
- * a probability to each branch.
- *
- * (I guess this step is closer to the many worlds interpretation than the copenhagen interpretation.)
  *
  * @author Lukas Molzberger
  */
-public class DetermineBranchProbability  implements ActivationStep {
+public class TemplatePropagateOutput extends TemplatePropagate {
 
-    @Override
-    public Phase getPhase() {
-        return Phase.LINKING;
-    }
-
-    @Override
-    public void process(Activation act) {
-        act.computeBranchProbability();
-    }
-
-    public boolean checkIfQueued() {
-        return true;
-    }
-
-    public String toString() {
-        return "Act-Step: Determine Branch Probability";
+    public TemplatePropagateOutput() {
+        super(OUTPUT);
     }
 }

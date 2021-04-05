@@ -27,16 +27,18 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public interface ActivationStep extends Step<Activation> {
     ActivationStep INDUCTION = new Induction();
-    LinkAndPropagate LINK_AND_PROPAGATE = new LinkAndPropagate();
+    Linking LINKING = new Linking();
+    Propagate PROPAGATE = new Propagate();
     ActivationStep CHECK_IF_FIRED = new CheckIfFired();
     ActivationStep USE_FINAL_BIAS = new UseFinalBias();
-    ActivationStep DETERMINE_BRANCH_PROBABILITY = new DetermineBranchProbability();
+    ActivationStep DETERMINE_BRANCH_PROBABILITY = new BranchProbability();
     ActivationStep ENTROPY_GRADIENT = new EntropyGradient();
     ActivationStep PROPAGATE_GRADIENTS_SUM = new PropagateGradientsSum();
     ActivationStep PROPAGATE_GRADIENTS_NET = new PropagateGradientsNet();
     ActivationStep UPDATE_BIAS = new UpdateBias();
     ActivationStep UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks();
-    Template TEMPLATE_INPUT = new Template(INPUT);
-    Template TEMPLATE_OUTPUT = new Template(OUTPUT);
+    TemplatePropagate TEMPLATE_PROPAGATE_INPUT = new TemplatePropagateInput();
+    TemplateCloseCycle TEMPLATE_CLOSE_CYCLE_OUTPUT = new TemplateCloseCycle(OUTPUT);
+    TemplatePropagate TEMPLATE_PROPAGATE_OUTPUT = new TemplatePropagateOutput();
     ActivationStep COUNTING = new Counting();
 }
