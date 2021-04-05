@@ -40,6 +40,10 @@ public class DetermineBranchProbability  implements ActivationStep {
         act.computeBranchProbability();
     }
 
+    public boolean checkIfQueued() {
+        return true;
+    }
+
     public String toString() {
         return "Act-Step: Determine Branch Probability";
     }

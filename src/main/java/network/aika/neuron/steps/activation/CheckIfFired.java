@@ -28,4 +28,12 @@ public class CheckIfFired implements ActivationStep {
     public Phase getPhase() {
         return Phase.LINKING;
     }
+
+    public boolean checkIfQueued() {
+        return true;
+    }
+
+    public String toString() {
+        return "Act-Step: CheckIfFired";
+    }
 }

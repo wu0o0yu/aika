@@ -54,6 +54,10 @@ public class Template implements VisitorStep, ActivationStep {
         return Phase.TEMPLATE;
     }
 
+    public boolean checkIfQueued() {
+        return true;
+    }
+
     @Override
     public void getNextSteps(Activation act) {
         QueueEntry.add(act, INDUCTION);

@@ -21,9 +21,7 @@ import network.aika.neuron.steps.Phase;
 import network.aika.utils.Utils;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.steps.activation.ActivationStep;
 
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.steps.activation.ActivationStep.*;
 
 /**
@@ -42,6 +40,10 @@ public class SumUpLink implements LinkStep {
     @Override
     public Phase getPhase() {
         return Phase.LINKING;
+    }
+
+    public boolean checkIfQueued() {
+        return false;
     }
 
     @Override

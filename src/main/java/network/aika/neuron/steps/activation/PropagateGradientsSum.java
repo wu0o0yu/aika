@@ -31,8 +31,8 @@ public class PropagateGradientsSum implements ActivationStep {
         return Phase.LINKING;
     }
 
-    public PropagateGradientsSum() {
-        super();
+    public boolean checkIfQueued() {
+        return true;
     }
 
     @Override

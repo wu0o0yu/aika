@@ -32,6 +32,10 @@ public class Counting implements LinkStep {
         return Phase.COUNTING;
     }
 
+    public boolean checkIfQueued() {
+        return true;
+    }
+
     @Override
     public void process(Link l) {
         l.count();

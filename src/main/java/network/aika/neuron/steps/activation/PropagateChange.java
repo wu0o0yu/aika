@@ -27,12 +27,16 @@ import network.aika.neuron.steps.Phase;
  */
 public class PropagateChange  implements ActivationStep {
 
+    private double delta;
+
     @Override
     public Phase getPhase() {
         return Phase.LINKING;
     }
 
-    private double delta;
+    public boolean checkIfQueued() {
+        return false;
+    }
 
     public PropagateChange(double delta) {
         this.delta = delta;

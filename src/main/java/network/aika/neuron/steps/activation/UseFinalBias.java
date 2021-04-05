@@ -34,6 +34,10 @@ public class UseFinalBias implements ActivationStep {
         return Phase.FINAL_LINKING;
     }
 
+    public boolean checkIfQueued() {
+        return true;
+    }
+
     @Override
     public void process(Activation act) {
         double delta = act.updateValue(true);

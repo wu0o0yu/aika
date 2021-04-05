@@ -43,7 +43,17 @@ public class QueueEntry<S extends Step, E extends Element> {
         this.fired = element.getFired();
     }
 
+    public QueueEntry(S step, E element, long timestamp) {
+        this.step = step;
+        this.element = element;
+        this.fired = element.getFired();
+        this.timestamp = timestamp;
+    }
+
     public static <S extends Step, E extends Element> void add(E e, S s) {
+        if(s.checkIfQueued() && e.isQueued(s))
+            return;
+
         QueueEntry qe = new QueueEntry(s, e);
         e.addQueuedStep(qe);
         e.getThought().addQueueEntry(qe);

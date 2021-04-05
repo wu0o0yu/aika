@@ -27,6 +27,8 @@ public interface Step<E extends Element> {
 
     Phase getPhase();
 
+    boolean checkIfQueued();
+
     static String toString(Step p) {
         return " (" + (p != null ? p.toString() : "X") + ")";
     }

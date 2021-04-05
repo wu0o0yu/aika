@@ -34,6 +34,10 @@ public class Template implements LinkStep {
         return Phase.TEMPLATE;
     }
 
+    public boolean checkIfQueued() {
+        return true;
+    }
+
     @Override
     public void process(Link l) {
         l.follow(TEMPLATE_INPUT);

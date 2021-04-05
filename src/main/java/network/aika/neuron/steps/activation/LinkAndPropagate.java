@@ -48,6 +48,10 @@ public class LinkAndPropagate implements VisitorStep, ActivationStep {
         return Phase.LINKING;
     }
 
+    public boolean checkIfQueued() {
+        return true;
+    }
+
     @Override
     public void getNextSteps(Activation act) {
     }

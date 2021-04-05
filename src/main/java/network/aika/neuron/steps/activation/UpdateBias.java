@@ -10,6 +10,10 @@ public class UpdateBias implements ActivationStep {
         return Phase.LINKING;
     }
 
+    public boolean checkIfQueued() {
+        return true;
+    }
+
     @Override
     public void process(Activation act) {
         act.getNeuron().updateBias(act);

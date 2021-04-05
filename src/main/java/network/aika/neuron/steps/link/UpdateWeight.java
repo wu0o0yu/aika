@@ -36,6 +36,10 @@ public class UpdateWeight implements LinkStep {
         return Phase.LINKING;
     }
 
+    public boolean checkIfQueued() {
+        return true;
+    }
+
     @Override
     public void process(Link l) {
         Synapse s = l.getSynapse();

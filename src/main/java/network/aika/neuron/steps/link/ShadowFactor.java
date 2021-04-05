@@ -31,6 +31,10 @@ public class ShadowFactor implements LinkStep {
         return Phase.LINKING;
     }
 
+    public boolean checkIfQueued() {
+        return true;
+    }
+
     @Override
     public void process(Link l) {
     //    l.removeGradientDependencies();

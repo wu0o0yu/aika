@@ -33,6 +33,10 @@ public class Induction implements LinkStep {
         return Phase.INIT;
     }
 
+    public boolean checkIfQueued() {
+        return true;
+    }
+
     @Override
     public void process(Link l) {
         assert l.getSynapse().isTemplate();

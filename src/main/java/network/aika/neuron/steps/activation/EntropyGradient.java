@@ -35,6 +35,10 @@ public class EntropyGradient implements ActivationStep {
         return Phase.INIT;
     }
 
+    public boolean checkIfQueued() {
+        return true;
+    }
+
     @Override
     public void process(Activation act) {
         Neuron n = act.getNeuron();

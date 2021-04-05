@@ -37,6 +37,10 @@ public class Counting implements ActivationStep {
         act.getNeuron().count(act);
     }
 
+    public boolean checkIfQueued() {
+        return true;
+    }
+
     public String toString() {
         return "Act-Step: Counting";
     }

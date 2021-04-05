@@ -35,6 +35,10 @@ public class Linking implements LinkStep {
         return Phase.LINKING;
     }
 
+    public boolean checkIfQueued() {
+        return true;
+    }
+
     @Override
     public void process(Link l) {
         l.follow(LINK_AND_PROPAGATE);

@@ -34,6 +34,10 @@ public class PropagateGradient implements LinkStep {
         this.gradient = gradient;
     }
 
+    public boolean checkIfQueued() {
+        return false;
+    }
+
     @Override
     public Phase getPhase() {
         return Phase.LINKING;

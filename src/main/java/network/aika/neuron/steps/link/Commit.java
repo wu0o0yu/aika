@@ -7,6 +7,15 @@ import network.aika.neuron.steps.Phase;
 public class Commit implements LinkStep {
 
     @Override
+    public Phase getPhase() {
+        return Phase.COUNTING;
+    }
+
+    public boolean checkIfQueued() {
+        return true;
+    }
+
+    @Override
     public void process(Link l) {
         if(l.getOutput().getFired() != Fired.NOT_FIRED)
             return;
@@ -15,8 +24,7 @@ public class Commit implements LinkStep {
         l.unlinkOutput();
     }
 
-    @Override
-    public Phase getPhase() {
-        return Phase.COUNTING;
+    public String toString() {
+        return "Link-Step: Commit";
     }
 }
