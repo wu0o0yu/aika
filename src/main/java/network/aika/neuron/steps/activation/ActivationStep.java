@@ -28,6 +28,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 public interface ActivationStep extends Step<Activation> {
     ActivationStep INDUCTION = new Induction();
     LinkAndPropagate LINK_AND_PROPAGATE = new LinkAndPropagate();
+    ActivationStep CHECK_IF_FIRED = new CheckIfFired();
     ActivationStep USE_FINAL_BIAS = new UseFinalBias();
     ActivationStep DETERMINE_BRANCH_PROBABILITY = new DetermineBranchProbability();
     ActivationStep ENTROPY_GRADIENT = new EntropyGradient();

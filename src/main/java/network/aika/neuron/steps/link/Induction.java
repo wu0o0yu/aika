@@ -18,6 +18,7 @@ package network.aika.neuron.steps.link;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
 
 /**
@@ -44,6 +45,8 @@ public class Induction implements LinkStep {
 
         l.setSynapse(inducedSynapse);
         inducedSynapse.linkOutput();
+
+        QueueEntry.add(l, COMMIT);
     }
 
     public String toString() {

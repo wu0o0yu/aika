@@ -50,7 +50,7 @@ public class GradientTest {
 
         m.setN(912);
 
-        Document doc = new Document("A B ");
+        Document doc = new Document("A "); //"A B "
 
         int i = 0;
         TextReference lastRef = null;
@@ -65,12 +65,12 @@ public class GradientTest {
         nA.setFrequency(53.0);
         nA.getSampleSpace().setN(299);
         nA.getSampleSpace().setLastPos(899);
-
+/*
         Neuron nB = m.getNeuron("B");
         nB.setFrequency(10.0);
         nB.getSampleSpace().setN(121);
         nB.getSampleSpace().setLastPos(739);
-
+*/
 
         AikaDebugger.createAndShowGUI(doc,m);
 

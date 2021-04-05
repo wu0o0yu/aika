@@ -24,6 +24,8 @@ import network.aika.neuron.steps.Phase;
  * If there are multiple mutually exclusive branches, then the softmax function will be used, to assign
  * a probability to each branch.
  *
+ * (I guess this step is closer to the many worlds interpretation than the copenhagen interpretation.)
+ *
  * @author Lukas Molzberger
  */
 public class DetermineBranchProbability  implements ActivationStep {

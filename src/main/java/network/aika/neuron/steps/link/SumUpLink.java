@@ -50,23 +50,9 @@ public class SumUpLink implements LinkStep {
 
         Activation oAct = l.getOutput();
 
-//        if(l.getSynapse().isRecurrent() && !oAct.getNeuron().isInputNeuron())
-//            round++;
-
         QueueEntry.add(oAct, PROPAGATE_GRADIENTS_NET);
-
-        if(oAct.checkIfFired()) {
-            QueueEntry.add(oAct, LINK_AND_PROPAGATE);
-            QueueEntry.add(oAct, USE_FINAL_BIAS);
-
-            if(oAct.hasBranches())
-                    QueueEntry.add(oAct, DETERMINE_BRANCH_PROBABILITY);
-
-            QueueEntry.add(oAct, ActivationStep.COUNTING);
-            oAct.addLinksToQueue(INPUT, COUNTING);
-        }
+        QueueEntry.add(oAct, CHECK_IF_FIRED);
     }
-
 
     public String toString() {
         return "Link-Step: Sum up Link (" + Utils.round(delta) + ")";

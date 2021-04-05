@@ -293,7 +293,8 @@ public class Activation extends Element<Activation> {
     public void updateOutgoingLinks(double delta) {
         getOutputLinks()
                 .forEach(l -> {
-                            QueueEntry.add(l, new SumUpLink(delta));
+                            double w = l.getSynapse().getWeight();
+                            QueueEntry.add(l, new SumUpLink(delta * w));
                             QueueEntry.add(l.getOutput(), USE_FINAL_BIAS);
                         }
                 );
