@@ -102,6 +102,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Synapse instantiateTemplate(I input, O output);
 
+     protected <S extends Synapse> void initFromTemplate(S s) {
+        s.weight = weight;
+    }
+
     public abstract Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement);
 
     protected abstract boolean checkCausality(Activation iAct, Activation oAct, Visitor v);

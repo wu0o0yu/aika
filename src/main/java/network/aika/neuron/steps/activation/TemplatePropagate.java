@@ -28,8 +28,6 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
@@ -57,7 +55,7 @@ public abstract class TemplatePropagate extends TemplateVisitor implements Activ
     @Override
     public void process(Activation act) {
         Neuron<?> n = act.getNeuron();
-        if (!n.checkGradientThreshold(act))
+        if (!n.allowTemplatePropagate(act))
             return;
 
         Visitor v = new Visitor(
@@ -68,14 +66,16 @@ public abstract class TemplatePropagate extends TemplateVisitor implements Activ
                 ACT
         );
 
+        Direction dir = v.startDir;
+
         Collection<Synapse> templateSynapses = n
                 .getTemplates()
                 .stream()
-                .flatMap(tn -> v.startDir.getSynapses(tn))
+                .flatMap(tn -> dir.getSynapses(tn))
                 .filter(ts -> ts.checkTemplatePropagate(v, act))
                 .collect(Collectors.toList());
 
-        v.startDir.getLinks(act)
+        dir.getLinks(act)
                 .forEach(l ->
                         templateSynapses.remove(l.getSynapse().getTemplate())
                 );

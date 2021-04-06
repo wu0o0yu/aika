@@ -72,15 +72,14 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     @Override
-    public boolean checkGradientThreshold(Activation act) {
-        return getCandidateGradient(act) >= 1.4;
+    public boolean allowTemplatePropagate(Activation act) {
+        return true; //getCandidateGradient(act) >= 1.4;
     }
 
     @Override
     public PatternNeuron instantiateTemplate() {
         PatternNeuron n = new PatternNeuron(getModel());
-        n.getTemplates().add(this);
-        n.getTemplates().addAll(getTemplates());
+        initFromTemplate(n);
         return n;
     }
 

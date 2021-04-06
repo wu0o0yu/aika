@@ -50,7 +50,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     @Override
-    public boolean checkGradientThreshold(Activation act) {
+    public boolean allowTemplatePropagate(Activation act) {
 /*        if(act.gradientSumIsZero())
             return false;*/
         return false;
@@ -69,8 +69,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     @Override
     public InhibitoryNeuron instantiateTemplate() {
         InhibitoryNeuron n = new InhibitoryNeuron(getModel());
-        n.getTemplates().add(this);
-        n.getTemplates().addAll(getTemplates());
+        initFromTemplate(n);
         return n;
     }
 

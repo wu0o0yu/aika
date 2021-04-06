@@ -19,6 +19,7 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;
@@ -87,6 +88,13 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         modified = true;
     }
 
+    protected void initFromTemplate(Neuron n) {
+        n.bias = bias;
+
+        n.getTemplates().add(this);
+        n.getTemplates().addAll(getTemplates());
+    }
+
     public abstract Neuron<?> instantiateTemplate();
 
     public abstract void addDummyLinks(Activation act);
@@ -97,7 +105,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract byte getType();
 
-    public abstract boolean checkGradientThreshold(Activation act);
+    public abstract boolean allowTemplatePropagate(Activation act);
 
     public abstract Set<ScopeEntry> getInitialScopes(Direction dir);
 
@@ -135,6 +143,13 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public double getCandidateGradient(Activation act) {
         return getSurprisal(POS, act.getReference());
+    }
+
+    public double computeBiasLB(Activation iAct) {
+        double bias = getBias(true);
+        double learnRate = getConfig().getLearnRate();
+
+        return (learnRate * iAct.getNeuron().getCandidateGradient(iAct)) / bias;
     }
 
     public SampleSpace getSampleSpace() {

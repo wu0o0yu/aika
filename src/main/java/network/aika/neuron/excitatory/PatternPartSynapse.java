@@ -86,6 +86,9 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         if (v.startDir == INPUT) {
             return !act.getNeuron().isInputNeuron() && this == act.getModel().getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE;
         } else {
+            if(getOutput().computeBiasLB(act) < 0.4)
+                return false;
+
             return act.getNeuron() instanceof PatternNeuron || !isInputScope();
         }
     }
@@ -100,10 +103,22 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     }
 
     @Override
+    protected void initFromTemplate(PatternPartSynapse s) {
+        super.initFromTemplate(s);
+
+        s.isNegative = isNegative;
+        s.isRecurrent = isRecurrent;
+        s.inputScope = inputScope;
+        s.isSamePattern = isSamePattern;
+    }
+
+    @Override
     public PatternPartSynapse instantiateTemplate(I input, PatternPartNeuron output) {
         assert input.getTemplates().contains(getInput());
 
-        return new PatternPartSynapse(input, output, this, isNegative, isRecurrent, inputScope, isSamePattern);
+        PatternPartSynapse s = new PatternPartSynapse(input, output, this);
+        initFromTemplate(s);
+        return s;
     }
 
     @Override
