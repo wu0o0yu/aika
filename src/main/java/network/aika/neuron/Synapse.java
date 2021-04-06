@@ -55,7 +55,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     private Synapse template;
 
-    private double weight;
+    protected double weight;
 
     protected SampleSpace sampleSpace;
 
@@ -102,7 +102,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Synapse instantiateTemplate(I input, O output);
 
-     protected <S extends Synapse> void initFromTemplate(S s) {
+    protected void initFromTemplate(Synapse s) {
         s.weight = weight;
     }
 

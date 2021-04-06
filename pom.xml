@@ -173,7 +173,6 @@
     </build>
 
     <dependencies>
-
         <dependency>
             <groupId>network.aika</groupId>
             <artifactId>aika-debugger</artifactId>

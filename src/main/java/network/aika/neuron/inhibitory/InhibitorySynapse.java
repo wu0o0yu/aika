@@ -57,7 +57,9 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
     public InhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
         assert input.getTemplates().contains(getInput());
 
-        return new InhibitorySynapse(input, output, this);
+        InhibitorySynapse s = new InhibitorySynapse(input, output, this);
+        initFromTemplate(s);
+        return s;
     }
 
     @Override

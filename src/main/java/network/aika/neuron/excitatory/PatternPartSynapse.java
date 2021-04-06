@@ -102,7 +102,6 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         }
     }
 
-    @Override
     protected void initFromTemplate(PatternPartSynapse s) {
         super.initFromTemplate(s);
 

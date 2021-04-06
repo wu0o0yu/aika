@@ -70,8 +70,9 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
     public PatternSynapse instantiateTemplate(I input, PatternNeuron output) {
         assert input.getTemplates().contains(getInput());
 
-
-        return new PatternSynapse(input, output, this);
+        PatternSynapse s = new PatternSynapse(input, output, this);
+        initFromTemplate(s);
+        return s;
     }
 
     public Activation branchIfNecessary(Activation oAct, Visitor v) {
