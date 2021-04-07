@@ -23,6 +23,7 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.steps.activation.UpdateBias;
 import network.aika.neuron.steps.link.LinkStep;
 import network.aika.neuron.steps.link.PropagateGradient;
 import network.aika.neuron.steps.link.SumUpLink;
@@ -464,10 +465,10 @@ public class Activation extends Element<Activation> {
         if(!getNeuron().isInputNeuron())
             addLinksToQueue(INPUT, new PropagateGradient(g));
 
-        addLinksToQueue(INPUT, LinkStep.TEMPLATE);
-
         if (getNeuron().isAllowTraining())
-            QueueEntry.add(this, UPDATE_BIAS);
+            QueueEntry.add(this, new UpdateBias(getConfig().getLearnRate() * g));
+
+        addLinksToQueue(INPUT, LinkStep.TEMPLATE);
 
         QueueEntry.add(this, TEMPLATE_PROPAGATE_INPUT);
         QueueEntry.add(this, TEMPLATE_CLOSE_CYCLE_OUTPUT);

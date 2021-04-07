@@ -48,7 +48,7 @@ public class PropagateGradient implements LinkStep {
         l.propagateGradient(gradient);
 
         if(l.getSynapse().isAllowTraining())
-            QueueEntry.add(l, UPDATE_WEIGHT);
+            QueueEntry.add(l, new UpdateWeight(l.getConfig().getLearnRate() * gradient));
     }
 
     public String toString() {

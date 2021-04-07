@@ -29,7 +29,6 @@ public interface LinkStep extends Step<Link> {
     LinkStep LINKING = new Linking();
     LinkStep SHADOW_FACTOR = new ShadowFactor();
     LinkStep INFORMATION_GAIN_GRADIENT = new InformationGainGradient();
-    LinkStep UPDATE_WEIGHT = new UpdateWeight();
     LinkStep TEMPLATE = new Template();
     LinkStep COMMIT = new Commit();
     LinkStep COUNTING = new Counting();

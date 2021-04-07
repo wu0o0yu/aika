@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.Config;
 import network.aika.Thought;
 import network.aika.neuron.steps.Step;
 
@@ -23,6 +24,7 @@ import java.util.Comparator;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 /**
  * An Element is either a node (Activation) or an edge (Link) in the Activation graph.
@@ -65,11 +67,17 @@ public abstract class Element<E extends Element> implements Comparable<E> {
         );
     }
 
+    public Stream<QueueEntry> getQueuedEntries() {
+        return queuedPhases.stream();
+    }
+
     private void removeFromQueue() {
         getThought().removeQueueEntries(queuedPhases);
     }
 
     public abstract Thought getThought();
+
+    public abstract Config getConfig();
 
     public abstract String toShortString();
 }

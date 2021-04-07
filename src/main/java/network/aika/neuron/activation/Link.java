@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.Config;
 import network.aika.Thought;
 import network.aika.utils.Utils;
 import network.aika.neuron.sign.Sign;
@@ -53,7 +54,6 @@ public class Link extends Element<Link> {
     private boolean isSelfRef;
 
     private double lastIGGradient;
-    private double gradient;
 
     public Link(Synapse s, Activation input, Activation output, boolean isSelfRef) {
         this.synapse = s;
@@ -76,10 +76,6 @@ public class Link extends Element<Link> {
     @Override
     public Fired getFired() {
         return output.getFired();
-    }
-
-    public double getGradient() {
-        return gradient;
     }
 
     public static boolean synapseExists(Activation iAct, Activation oAct) {
@@ -173,8 +169,6 @@ public class Link extends Element<Link> {
 */
 
     public void propagateGradient(double g) {
-        gradient += g;
-
         if(input == null)
             return;
 
@@ -182,10 +176,6 @@ public class Link extends Element<Link> {
                 synapse.getWeight() *
                         g
         );
-    }
-
-    public boolean gradientIsZero() {
-            return Math.abs(gradient) < TOLERANCE;
     }
 
     public boolean followAllowed(Direction dir) {
@@ -232,12 +222,6 @@ public class Link extends Element<Link> {
         return isSelfRef;
     }
 
-    public double getAndResetGradient() {
-        double oldGradient = gradient;
-        gradient = 0.0;
-        return oldGradient;
-    }
-
     public void linkInput() {
         if(input != null) {
             input.outputLinks.put(
@@ -274,6 +258,11 @@ public class Link extends Element<Link> {
     @Override
     public Thought getThought() {
         return output.getThought();
+    }
+
+    @Override
+    public Config getConfig() {
+        return output.getConfig();
     }
 
     @Override

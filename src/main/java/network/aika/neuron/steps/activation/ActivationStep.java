@@ -35,7 +35,6 @@ public interface ActivationStep extends Step<Activation> {
     ActivationStep ENTROPY_GRADIENT = new EntropyGradient();
     ActivationStep PROPAGATE_GRADIENTS_SUM = new PropagateGradientsSum();
     ActivationStep PROPAGATE_GRADIENTS_NET = new PropagateGradientsNet();
-    ActivationStep UPDATE_BIAS = new UpdateBias();
     ActivationStep UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks();
     TemplatePropagate TEMPLATE_PROPAGATE_INPUT = new TemplatePropagateInput();
     TemplateCloseCycle TEMPLATE_CLOSE_CYCLE_OUTPUT = new TemplateCloseCycle(OUTPUT);

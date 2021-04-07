@@ -17,6 +17,7 @@
 package network.aika.neuron;
 
 import network.aika.*;
+import network.aika.neuron.steps.link.SumUpLink;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import network.aika.neuron.activation.*;
@@ -281,25 +282,23 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return sampleSpace;
     }
 
-    public double updateSynapse(Link l) {
-        double gradient = l.getAndResetGradient();
-
-        Neuron on = getOutput();
-        double oldWeight = weight;
-
-        double learnRate = on.getConfig().getLearnRate();
-
+    public void updateSynapse(Link l, double delta) {
         if(l.getInput().isActive(true)) {
-            double wDelta = learnRate * gradient;
-            addWeight(wDelta);
+            addWeight(delta);
+
+            QueueEntry.add(
+                    l,
+                    new SumUpLink(l.getInputValue(POS) * delta)
+            );
         } else {
-            double wDelta = learnRate * gradient;
+            addWeight(-delta);
+            getOutput().addConjunctiveBias(delta, !l.isCausal());
 
-            addWeight(-wDelta);
-            on.addConjunctiveBias(wDelta, !l.isCausal());
+            QueueEntry.add(
+                    l,
+                    new SumUpLink((l.getInputValue(POS) * -delta) + delta)
+            );
         }
-
-        return weight - oldWeight;
     }
 
     public double getFrequency(Sign is, Sign os, double n) {

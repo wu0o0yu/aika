@@ -20,6 +20,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
+import network.aika.utils.Utils;
 
 import static network.aika.neuron.steps.activation.ActivationStep.*;
 import static network.aika.neuron.sign.Sign.POS;
@@ -31,30 +32,31 @@ import static network.aika.neuron.sign.Sign.POS;
  */
 public class UpdateWeight implements LinkStep {
 
+    private double weightDelta;
+
+    public UpdateWeight(double weightDelta) {
+        this.weightDelta = weightDelta;
+    }
+
     @Override
     public Phase getPhase() {
         return Phase.LINKING;
     }
 
     public boolean checkIfQueued() {
-        return true;
+        return false;
     }
 
     @Override
     public void process(Link l) {
         Synapse s = l.getSynapse();
 
-        double weightDelta = s.updateSynapse(l);
+        s.updateSynapse(l, weightDelta);
 
         QueueEntry.add(l.getOutput(), UPDATE_SYNAPSE_INPUT_LINKS);
-
-        QueueEntry.add(
-                l,
-                new SumUpLink(l.getInputValue(POS) * weightDelta)
-        );
     }
 
     public String toString() {
-        return "Link-Step: Update Weight";
+        return "Link-Step: Update Weight (" + Utils.round(weightDelta) + ")";
     }
 }
