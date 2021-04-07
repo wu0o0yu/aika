@@ -156,7 +156,7 @@ public class Link extends Element<Link> {
 
         double igGradientDelta = igGradient - lastIGGradient;
         if(Math.abs(igGradientDelta) >= TOLERANCE) {
-            getOutput().propagateGradient(igGradientDelta);
+            getOutput().propagateGradientIn(igGradientDelta);
             lastIGGradient = igGradient;
         }
     }
@@ -178,7 +178,7 @@ public class Link extends Element<Link> {
         if(input == null)
             return;
 
-        input.propagateGradient(
+        input.propagateGradientIn(
                 synapse.getWeight() *
                         g
         );

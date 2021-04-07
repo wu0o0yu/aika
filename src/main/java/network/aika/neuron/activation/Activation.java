@@ -435,7 +435,7 @@ public class Activation extends Element<Activation> {
         g *= actF.outerGrad(net);
         lastNet = net;
 
-        propagateGradients(g);
+        propagateGradientsOut(g);
     }
 
     public void propagateGradientsFromNetUpdate() {
@@ -455,10 +455,10 @@ public class Activation extends Element<Activation> {
 
         double g = inputGradientSum * netDerivedDelta;
 
-        propagateGradients(g);
+        propagateGradientsOut(g);
     }
 
-    public void propagateGradients(double g) {
+    public void propagateGradientsOut(double g) {
         outputGradientSum += g;
 
         if(!getNeuron().isInputNeuron())
@@ -486,7 +486,7 @@ public class Activation extends Element<Activation> {
         return Math.abs(outputGradientSum) < TOLERANCE;
     }
 
-    public void propagateGradient(double g) {
+    public void propagateGradientIn(double g) {
         inputGradient += g;
 
         QueueEntry.add(this, PROPAGATE_GRADIENTS_SUM);
