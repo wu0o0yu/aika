@@ -51,8 +51,7 @@ public class Activation extends Element<Activation> {
 
     private Double value = null;
     private Double inputValue = null;
-    private double sum;
-    private double lateSum;
+    private double net;
     private Fired fired = NOT_FIRED;
     private boolean marked;
 
@@ -91,6 +90,8 @@ public class Activation extends Element<Activation> {
     public Activation(int id, Thought t, Neuron<?> n) {
         this(id, n);
         this.thought = t;
+
+        net = n.getBias();
 
         thought.registerActivation(this);
 
@@ -132,10 +133,6 @@ public class Activation extends Element<Activation> {
 
     public double getOutputGradientSum() {
         return outputGradientSum;
-    }
-
-    public double getNet(boolean isFinal) {
-        return sum + (isFinal ? lateSum : 0.0) + getNeuron().getBias(isFinal);
     }
 
     public Fired getFired() {
@@ -370,34 +367,27 @@ public class Activation extends Element<Activation> {
         return nl;
     }
 
-    public void addToSum(double x) {
-        if (value != null) {
-            lateSum += x;
-        } else {
-            sum += x;
-        }
+    public void changeNet(double x) {
+        net += x;
     }
 
 
-    private double computeValue(boolean isFinal) {
-        return branchProbability *
-                neuron.getActivationFunction().f(
-                        getNet(isFinal)
-                );
+    private double computeValue() {
+        return branchProbability * neuron.getActivationFunction().f(net);
     }
 
-    public double updateValue(boolean isFinal) {
+    public double updateValue() {
         Double oldValue = value;
 
         value = inputValue != null ?
                 inputValue :
-                computeValue(isFinal);
+                computeValue();
 
         return value - (oldValue != null ? oldValue : 0.0);
     }
 
     public boolean checkIfFired() {
-        if (fired == NOT_FIRED && getNet(false) > 0.0) {
+        if (fired == NOT_FIRED && net > 0.0) {
             setFired(neuron.incrementFired(getLatestFired()));
             return true;
         }
@@ -431,7 +421,6 @@ public class Activation extends Element<Activation> {
         inputGradientSum += inputGradient;
         inputGradient = 0.0;
 
-        double net = getNet(true);
         g *= getNorm();
         g *= actF.outerGrad(net);
         lastNet = net;
@@ -442,7 +431,6 @@ public class Activation extends Element<Activation> {
     public void propagateGradientsFromNetUpdate() {
         ActivationFunction actF = getNeuron().getActivationFunction();
 
-        double net = getNet(true);
         double netDerivedLast = actF.outerGrad(lastNet);
         double netDerivedCurrent = actF.outerGrad(net);
 
@@ -528,7 +516,6 @@ public class Activation extends Element<Activation> {
     }
 
     public void computeBranchProbability() {
-        double net = getNet(true);
         Set<Activation> conflictingActs = branches
                 .stream()
                 .flatMap(bAct -> bAct.getInputLinks())
@@ -539,14 +526,14 @@ public class Activation extends Element<Activation> {
 
         double offset = conflictingActs
                 .stream()
-                .mapToDouble(cAct -> cAct.getNet(true))
+                .mapToDouble(cAct -> cAct.net)
                 .min()
                 .getAsDouble();
 
         double norm = Math.exp(net - offset);
         norm += conflictingActs
                 .stream()
-                .mapToDouble(cAct -> Math.exp(cAct.getNet(true) - offset))
+                .mapToDouble(cAct -> Math.exp(cAct.net - offset))
                 .sum();
 
         double p = Math.exp(net - offset) / norm;
@@ -605,8 +592,7 @@ public class Activation extends Element<Activation> {
         sb.append("act " +
                 toShortString() +
                 " value:" + (value != null ? Utils.round(value) : "X") +
-                " net:" + Utils.round(getNet(false)) +
-                " netFinal:" + Utils.round(getNet(true)) +
+                " net:" + Utils.round(net) +
                 " bp:" + Utils.round(branchProbability)
         );
 

@@ -17,6 +17,7 @@
 package network.aika.neuron;
 
 import network.aika.*;
+import network.aika.neuron.steps.activation.SumUpBias;
 import network.aika.neuron.steps.link.SumUpLink;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
@@ -294,6 +295,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
             addWeight(-delta);
             getOutput().addConjunctiveBias(delta, !l.isCausal());
 
+            QueueEntry.add(
+                    l.getOutput(),
+                    new SumUpBias(delta)
+            );
             QueueEntry.add(
                     l,
                     new SumUpLink((l.getInputValue(POS) * -delta) + delta)

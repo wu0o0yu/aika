@@ -146,10 +146,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public double computeBiasLB(Activation iAct) {
-        double bias = getBias(true);
-        double learnRate = getConfig().getLearnRate();
-
-        return (learnRate * iAct.getNeuron().getCandidateGradient(iAct)) / bias;
+        return (getConfig().getLearnRate() * iAct.getNeuron().getCandidateGradient(iAct)) /
+                getBias();
     }
 
     public SampleSpace getSampleSpace() {
@@ -274,18 +272,18 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         modified = true;
     }
 
-    public double getBias(boolean isFinal) {
+    public double getBias() {
         return bias;
     }
 
-    public double getRawBias() {
-        return bias;
+    public double getRecurrentBias() {
+        return 0.0;
     }
 
     public double updateBias(double biasDelta) {
         addBias(biasDelta);
 
-        double finalBias = getBias(true);
+        double finalBias = getBias();
         if(finalBias > 0.0) {
             addBias(-finalBias);
         }

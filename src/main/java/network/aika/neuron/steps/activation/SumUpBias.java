@@ -1,7 +1,9 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
+import network.aika.utils.Utils;
 
 public class SumUpBias implements ActivationStep {
 
@@ -23,6 +25,15 @@ public class SumUpBias implements ActivationStep {
 
     @Override
     public void process(Activation act) {
+        act.changeNet(delta);
 
+//        double delta = act.updateValue();
+
+        QueueEntry.add(act, PROPAGATE_GRADIENTS_NET);
+        QueueEntry.add(act, CHECK_IF_FIRED);
+    }
+
+    public String toString() {
+        return "Act-Step: Sum up Bias (" + Utils.round(delta) + ")";
     }
 }
