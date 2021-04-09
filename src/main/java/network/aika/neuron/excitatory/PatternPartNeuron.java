@@ -20,6 +20,7 @@ import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +66,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         if(n.isInputNeuron())
             return false;
 
-        if(act.gradientSumIsZero())
+        if(Utils.checkTolerance(act.getOutputGradientSum()))
             return false;
 
         return true;

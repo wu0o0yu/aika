@@ -21,9 +21,7 @@ import network.aika.neuron.activation.Visitor;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.LinkingVisitor;
 
-import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 

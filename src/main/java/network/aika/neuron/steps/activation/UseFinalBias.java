@@ -19,8 +19,7 @@ package network.aika.neuron.steps.activation;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
-
-import static network.aika.neuron.activation.Activation.TOLERANCE;
+import network.aika.utils.Utils;
 
 /**
  * Check if there are positive recurrent links that have not been activated and thus need to be updated.
@@ -44,8 +43,10 @@ public class UseFinalBias implements ActivationStep {
 
         double valueDelta = act.updateValue();
 
-        if(Math.abs(valueDelta) >= TOLERANCE)
-            QueueEntry.add(act, new PropagateValueChange(valueDelta));
+        if(Utils.checkTolerance(valueDelta))
+            return;
+
+        QueueEntry.add(act, new PropagateValueChange(valueDelta));
     }
 
     public String toString() {

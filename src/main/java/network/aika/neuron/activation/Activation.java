@@ -47,8 +47,6 @@ public class Activation extends Element<Activation> {
 
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(act -> act.id);
 
-    public static double TOLERANCE = 0.001;
-
     private Double value = null;
     private Double inputValue = null;
     private double net;
@@ -413,9 +411,6 @@ public class Activation extends Element<Activation> {
     }
 
     public void propagateGradientsFromSumUpdate() {
-        if (gradientIsZero())
-            return;
-
         ActivationFunction actF = getNeuron().getActivationFunction();
 
         double g = inputGradient;
@@ -438,7 +433,8 @@ public class Activation extends Element<Activation> {
         lastNet = net;
 
         double netDerivedDelta = netDerivedCurrent - netDerivedLast;
-        if(Math.abs(netDerivedDelta) < TOLERANCE)
+
+        if(Utils.checkTolerance(netDerivedDelta))
             return;
 
         netDerivedDelta *= getNorm();
@@ -468,16 +464,11 @@ public class Activation extends Element<Activation> {
         return (1 / (1 + getNeuron().getSampleSpace().getN(getReference())));
     }
 
-    public boolean gradientIsZero() {
-        return Math.abs(inputGradient) < TOLERANCE;
-    }
-
-    public boolean gradientSumIsZero() {
-        return Math.abs(outputGradientSum) < TOLERANCE;
-    }
-
     public void propagateGradientIn(double g) {
         inputGradient += g;
+
+        if(Utils.checkTolerance(inputGradient))
+            return;
 
         QueueEntry.add(this, PROPAGATE_GRADIENTS_SUM);
     }
@@ -539,7 +530,8 @@ public class Activation extends Element<Activation> {
 
         double p = Math.exp(net - offset) / norm;
 
-        if (Math.abs(p - getBranchProbability()) <= TOLERANCE) return;
+        if(Utils.checkTolerance(p - getBranchProbability()))
+            return;
 
         Activation cAct = clone(null);
         cAct.branchProbability = p;

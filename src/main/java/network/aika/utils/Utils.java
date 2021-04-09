@@ -22,6 +22,12 @@ package network.aika.utils;
  */
 public class Utils {
 
+    public static double TOLERANCE = 0.001;
+
+    public static boolean checkTolerance(double x) {
+        return Math.abs(x) < TOLERANCE;
+    }
+
     public static double round(double x) {
         return Math.round(x * 1000.0) / 1000.0;
     }

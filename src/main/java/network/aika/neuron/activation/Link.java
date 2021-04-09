@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 
-import static network.aika.neuron.activation.Activation.TOLERANCE;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -151,10 +150,11 @@ public class Link extends Element<Link> {
         }
 
         double igGradientDelta = igGradient - lastIGGradient;
-        if(Math.abs(igGradientDelta) >= TOLERANCE) {
-            getOutput().propagateGradientIn(igGradientDelta);
-            lastIGGradient = igGradient;
-        }
+        if(Utils.checkTolerance(igGradientDelta))
+            return;
+
+        getOutput().propagateGradientIn(igGradientDelta);
+        lastIGGradient = igGradient;
     }
 
 /*

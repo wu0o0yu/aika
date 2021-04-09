@@ -16,18 +16,14 @@
  */
 package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.VisitorStep;
 import network.aika.neuron.steps.visitor.LinkingVisitor;
+import network.aika.utils.Utils;
 
-import static network.aika.neuron.activation.Activation.*;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
-import static network.aika.neuron.steps.link.LinkStep.LINKING;
 
 
 /**
@@ -59,7 +55,7 @@ public class Linking extends LinkingVisitor implements ActivationStep {
 
         double delta = act.updateValue(); // TODO
 
-        if(Math.abs(delta) < TOLERANCE)
+        if(Utils.checkTolerance(delta))
             return;
 
         act.followLinks(
