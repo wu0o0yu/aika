@@ -26,7 +26,7 @@ import network.aika.utils.Utils;
  *
  * @author Lukas Molzberger
  */
-public class PropagateChange implements ActivationStep {
+public class PropagateValueChange implements ActivationStep {
 
     private double valueDelta;
 
@@ -39,7 +39,7 @@ public class PropagateChange implements ActivationStep {
         return false;
     }
 
-    public PropagateChange(double valueDelta) {
+    public PropagateValueChange(double valueDelta) {
         this.valueDelta = valueDelta;
     }
 

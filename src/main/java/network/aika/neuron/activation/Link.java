@@ -248,7 +248,7 @@ public class Link extends Element<Link> {
 
     public void sumUpLink(double delta) {
         Activation oAct = getOutput();
-        oAct.changeNet(delta);
+        oAct.updateNet(delta);
     }
 
     public boolean isNegative() {

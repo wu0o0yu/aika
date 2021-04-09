@@ -52,6 +52,7 @@ public class Activation extends Element<Activation> {
     private Double value = null;
     private Double inputValue = null;
     private double net;
+    private double lastNet = 0.0;
     private Fired fired = NOT_FIRED;
     private boolean marked;
 
@@ -70,9 +71,6 @@ public class Activation extends Element<Activation> {
     private Reference reference;
 
     private double lastEntropyGradient = 0.0;
-
-    private double lastNet = 0.0;
-
     private double inputGradient;
 
     /**
@@ -371,10 +369,9 @@ public class Activation extends Element<Activation> {
         return nl;
     }
 
-    public void changeNet(double x) {
-        net += x;
+    public void updateNet(double netDelta) {
+        net += netDelta;
     }
-
 
     private double computeValue() {
         return branchProbability * neuron.getActivationFunction().f(net);

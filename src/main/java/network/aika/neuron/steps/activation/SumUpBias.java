@@ -25,7 +25,7 @@ public class SumUpBias implements ActivationStep {
 
     @Override
     public void process(Activation act) {
-        act.changeNet(delta);
+        act.updateNet(delta);
 
 //        double delta = act.updateValue();
 
