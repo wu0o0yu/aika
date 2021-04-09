@@ -23,6 +23,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.steps.Step;
+import network.aika.utils.BelowToleranceThresholdException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,7 +160,12 @@ public abstract class Thought {
             qe.getElement().removeQueuedPhase(qe);
 
             beforeProcessedEvent(qe);
-            qe.process();
+
+            try {
+                qe.process();
+            } catch(BelowToleranceThresholdException e) {
+            }
+
             afterProcessedEvent(qe);
         }
         m.addToN(length());

@@ -23,6 +23,7 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.steps.activation.PropagateValueChange;
 import network.aika.neuron.steps.activation.UpdateBias;
 import network.aika.neuron.steps.link.LinkStep;
 import network.aika.neuron.steps.link.PropagateGradient;
@@ -183,6 +184,10 @@ public class Activation extends Element<Activation> {
 
     public void setNeuron(Neuron n) {
         this.neuron = n;
+    }
+
+    public ActivationFunction getActivationFunction() {
+        return neuron.getActivationFunction();
     }
 
     public Model getModel() {
@@ -369,20 +374,31 @@ public class Activation extends Element<Activation> {
 
     public void updateNet(double netDelta) {
         net += netDelta;
+
+        Utils.checkTolerance(netDelta);
+
+        QueueEntry.add(this, PROPAGATE_GRADIENTS_NET);
+        QueueEntry.add(this, CHECK_IF_FIRED);
     }
 
     private double computeValue() {
-        return branchProbability * neuron.getActivationFunction().f(net);
+        return branchProbability * getActivationFunction().f(net);
     }
 
-    public double updateValue() {
+    public void updateValue() {
         Double oldValue = value;
 
         value = inputValue != null ?
                 inputValue :
                 computeValue();
 
-        return value - (oldValue != null ? oldValue : 0.0);
+        double valueDelta = value - (oldValue != null ? oldValue : 0.0);
+
+        Utils.checkTolerance(valueDelta);
+
+        QueueEntry.add(this,
+                new PropagateValueChange(valueDelta)
+        );
     }
 
     public boolean checkIfFired() {
@@ -411,37 +427,31 @@ public class Activation extends Element<Activation> {
     }
 
     public void propagateGradientsFromSumUpdate() {
-        ActivationFunction actF = getNeuron().getActivationFunction();
+        ActivationFunction actF = getActivationFunction();
 
-        double g = inputGradient;
         inputGradientSum += inputGradient;
+        double g = inputGradient;
         inputGradient = 0.0;
 
         g *= getNorm();
         g *= actF.outerGrad(net);
-        lastNet = net;
 
         propagateGradientsOut(g);
     }
 
     public void propagateGradientsFromNetUpdate() {
-        ActivationFunction actF = getNeuron().getActivationFunction();
+        ActivationFunction actF = getActivationFunction();
 
-        double netDerivedLast = actF.outerGrad(lastNet);
-        double netDerivedCurrent = actF.outerGrad(net);
-
+        double g = actF.outerGrad(net) - actF.outerGrad(lastNet);
         lastNet = net;
 
-        double netDerivedDelta = netDerivedCurrent - netDerivedLast;
+        Utils.checkTolerance(g);
 
-        if(Utils.checkTolerance(netDerivedDelta))
-            return;
+        g *= getNorm();
 
-        netDerivedDelta *= getNorm();
-
-        double g = inputGradientSum * netDerivedDelta;
-
-        propagateGradientsOut(g);
+        propagateGradientsOut(
+                inputGradientSum * g
+        );
     }
 
     public void propagateGradientsOut(double g) {
@@ -451,7 +461,9 @@ public class Activation extends Element<Activation> {
             addLinksToQueue(INPUT, new PropagateGradient(g));
 
         if (getNeuron().isAllowTraining())
-            QueueEntry.add(this, new UpdateBias(getConfig().getLearnRate() * g));
+            QueueEntry.add(this,
+                    new UpdateBias(getConfig().getLearnRate() * g)
+            );
 
         addLinksToQueue(INPUT, LinkStep.TEMPLATE);
 
@@ -467,8 +479,7 @@ public class Activation extends Element<Activation> {
     public void propagateGradientIn(double g) {
         inputGradient += g;
 
-        if(Utils.checkTolerance(inputGradient))
-            return;
+        Utils.checkTolerance(inputGradient);
 
         QueueEntry.add(this, PROPAGATE_GRADIENTS_SUM);
     }
@@ -530,8 +541,7 @@ public class Activation extends Element<Activation> {
 
         double p = Math.exp(net - offset) / norm;
 
-        if(Utils.checkTolerance(p - getBranchProbability()))
-            return;
+        Utils.checkTolerance(p - getBranchProbability());
 
         Activation cAct = clone(null);
         cAct.branchProbability = p;

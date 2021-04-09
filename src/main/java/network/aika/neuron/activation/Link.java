@@ -150,8 +150,7 @@ public class Link extends Element<Link> {
         }
 
         double igGradientDelta = igGradient - lastIGGradient;
-        if(Utils.checkTolerance(igGradientDelta))
-            return;
+        Utils.checkTolerance(igGradientDelta);
 
         getOutput().propagateGradientIn(igGradientDelta);
         lastIGGradient = igGradient;
@@ -247,8 +246,7 @@ public class Link extends Element<Link> {
     }
 
     public void sumUpLink(double delta) {
-        Activation oAct = getOutput();
-        oAct.updateNet(delta);
+        getOutput().updateNet(delta);
     }
 
     public boolean isNegative() {

@@ -11,6 +11,8 @@ public class CheckIfFired implements ActivationStep {
 
     @Override
     public void process(Activation act) {
+        act.updateValue();
+
         if(!act.checkIfFired())
             return;
 

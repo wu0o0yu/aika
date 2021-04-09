@@ -28,9 +28,6 @@ public class SumUpBias implements ActivationStep {
         act.updateNet(delta);
 
 //        double delta = act.updateValue();
-
-        QueueEntry.add(act, PROPAGATE_GRADIENTS_NET);
-        QueueEntry.add(act, CHECK_IF_FIRED);
     }
 
     public String toString() {

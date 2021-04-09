@@ -39,14 +39,11 @@ public class UseFinalBias implements ActivationStep {
 
     @Override
     public void process(Activation act) {
-        act.updateNet(act.getNeuron().getRecurrentBias());
+        act.updateNet(
+                act.getNeuron().getRecurrentBias()
+        );
 
-        double valueDelta = act.updateValue();
-
-        if(Utils.checkTolerance(valueDelta))
-            return;
-
-        QueueEntry.add(act, new PropagateValueChange(valueDelta));
+        act.updateValue();
     }
 
     public String toString() {

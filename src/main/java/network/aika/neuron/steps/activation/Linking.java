@@ -53,10 +53,7 @@ public class Linking extends LinkingVisitor implements ActivationStep {
     public void process(Activation act) {
         act.getThought().linkInputRelations(act);
 
-        double delta = act.updateValue(); // TODO
-
-        if(Utils.checkTolerance(delta))
-            return;
+        act.updateValue();
 
         act.followLinks(
                 new Visitor(

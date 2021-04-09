@@ -24,8 +24,9 @@ public class Utils {
 
     public static double TOLERANCE = 0.001;
 
-    public static boolean checkTolerance(double x) {
-        return Math.abs(x) < TOLERANCE;
+    public static void checkTolerance(double x) {
+        if(Math.abs(x) < TOLERANCE)
+            throw new BelowToleranceThresholdException();
     }
 
     public static double round(double x) {

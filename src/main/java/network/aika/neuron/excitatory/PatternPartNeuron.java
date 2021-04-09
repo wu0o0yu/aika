@@ -66,8 +66,7 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         if(n.isInputNeuron())
             return false;
 
-        if(Utils.checkTolerance(act.getOutputGradientSum()))
-            return false;
+        Utils.checkTolerance(act.getOutputGradientSum());
 
         return true;
     }
