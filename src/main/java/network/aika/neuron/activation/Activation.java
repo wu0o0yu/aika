@@ -127,6 +127,10 @@ public class Activation extends Element<Activation> {
         return value;
     }
 
+    public double getNet() {
+        return net;
+    }
+
     public double getInputGradient() {
         return inputGradient;
     }
