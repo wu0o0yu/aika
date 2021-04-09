@@ -32,8 +32,6 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.activation.RoundType.GRADIENT;
-import static network.aika.neuron.activation.RoundType.WEIGHT;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
