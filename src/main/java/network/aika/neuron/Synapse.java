@@ -217,7 +217,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         QueueEntry.add(nl, INFORMATION_GAIN_GRADIENT);
 
-        Utils.checkTolerance(oAct.getOutputGradientSum());
+        if(Utils.belowTolerance(oAct.getOutputGradientSum()))
+            return;
 
         QueueEntry.add(nl, new PropagateGradient(oAct.getOutputGradientSum()));
     }

@@ -17,9 +17,7 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
-import network.aika.utils.Utils;
 
 /**
  * Check if there are positive recurrent links that have not been activated and thus need to be updated.

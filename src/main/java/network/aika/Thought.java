@@ -164,6 +164,7 @@ public abstract class Thought {
             try {
                 qe.process();
             } catch(BelowToleranceThresholdException e) {
+                System.out.println();
             }
 
             afterProcessedEvent(qe);

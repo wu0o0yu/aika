@@ -110,10 +110,10 @@ public class Activation extends Element<Activation> {
         setInputValue(1.0);
         setFired(ref.getBegin());
 
-        QueueEntry.add(this, LINKING);
-        QueueEntry.add(this, PROPAGATE);
+        updateValue();
+
         QueueEntry.add(this, ENTROPY_GRADIENT);
-        QueueEntry.add(this, COUNTING);
+        propagate();
     }
 
     public int getId() {
@@ -402,7 +402,7 @@ public class Activation extends Element<Activation> {
     }
 
     public boolean checkIfFired() {
-        if (fired == NOT_FIRED && net > 0.0) {
+        if (fired == NOT_FIRED && value != null && value > 0.0) {
             setFired(neuron.incrementFired(getLatestFired()));
             return true;
         }
@@ -424,6 +424,18 @@ public class Activation extends Element<Activation> {
 
         inputGradient += g - lastEntropyGradient;
         lastEntropyGradient = g;
+    }
+
+    public void propagate() {
+        QueueEntry.add(this, LINKING);
+        QueueEntry.add(this, PROPAGATE);
+        QueueEntry.add(this, USE_FINAL_BIAS);
+
+        if (this.hasBranches())
+            QueueEntry.add(this, DETERMINE_BRANCH_PROBABILITY);
+
+        QueueEntry.add(this, COUNTING);
+        this.addLinksToQueue(INPUT, LinkStep.COUNTING);
     }
 
     public void propagateGradientsFromSumUpdate() {

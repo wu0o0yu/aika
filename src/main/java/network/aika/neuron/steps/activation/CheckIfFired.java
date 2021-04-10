@@ -16,15 +16,7 @@ public class CheckIfFired implements ActivationStep {
         if(!act.checkIfFired())
             return;
 
-        QueueEntry.add(act, LINKING);
-        QueueEntry.add(act, PROPAGATE);
-        QueueEntry.add(act, USE_FINAL_BIAS);
-
-        if (act.hasBranches())
-            QueueEntry.add(act, DETERMINE_BRANCH_PROBABILITY);
-
-        QueueEntry.add(act, COUNTING);
-        act.addLinksToQueue(INPUT, LinkStep.COUNTING);
+        act.propagate();
     }
 
     @Override

@@ -19,7 +19,6 @@ package network.aika.neuron.steps.activation;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.LinkingVisitor;
-import network.aika.utils.Utils;
 
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
@@ -53,8 +52,6 @@ public class Linking extends LinkingVisitor implements ActivationStep {
     public void process(Activation act) {
         act.getThought().linkInputRelations(act);
 
-        act.updateValue();
-
         act.followLinks(
                 new Visitor(
                         this,
@@ -69,6 +66,6 @@ public class Linking extends LinkingVisitor implements ActivationStep {
     }
 
     public String toString() {
-        return "Act-Step: Linking";
+        return "Act-Step: Linking (Outgoing)";
     }
 }
