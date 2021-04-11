@@ -227,14 +227,14 @@ public class Link extends Element<Link> {
     public void linkInput() {
         if(input != null) {
             input.outputLinks.put(
-                    new OutputKey(synapse.getPOutput(), output.getId()),
+                    new OutputKey(output.getNeuronProvider(), output.getId()),
                     this
             );
         }
     }
 
     public void linkOutput() {
-        output.inputLinks.put(synapse.getPInput(), this);
+        output.inputLinks.put(input != null ? input.getNeuronProvider() : synapse.getPInput(), this);
     }
 
     public void unlinkInput() {

@@ -70,6 +70,9 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         if(isNegative)
             return;
 
+        if(l.getInput() != null)
+            return;
+
         Reference iRef = l.getInput().getReference();
         if(iRef == null)
             return;
