@@ -170,7 +170,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         Activation toAct = fromAct.getThought()
                 .createActivation(
                         nv.startDir.getNeuron(this),
-                        fromAct
+                        fromAct,
+                        v
                 );
 
         nv.getPhase().getNextSteps(toAct);
@@ -203,9 +204,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         Link nl = oAct.addLink(
                 this,
                 iAct,
-                v.getSelfRef()
+                v.getSelfRef(),
+                v
         );
-        oAct.getThought().onLinkCreationEvent(nl);
 
         v.link = nl;
 

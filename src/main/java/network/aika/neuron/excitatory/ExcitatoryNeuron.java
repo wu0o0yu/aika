@@ -63,6 +63,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
 
     public void setDirectConjunctiveBias(double b) {
         directConjunctiveBias = b;
+        limitBias();
     }
 
     public void setRecurrentConjunctiveBias(double b) {
@@ -75,6 +76,11 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         } else {
             directConjunctiveBias += b;
         }
+        limitBias();
+    }
+
+    protected void limitBias() {
+        bias = Math.min(-directConjunctiveBias, bias);
     }
 
     public void addDummyLinks(Activation act) {
@@ -83,7 +89,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
                 .stream()
                 .filter(s -> !act.inputLinkExists(s))
                 .forEach(s ->
-                        new Link(s, null, act, false)
+                        new Link(s, null, act, false, null)
                 );
     }
 

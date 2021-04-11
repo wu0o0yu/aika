@@ -54,22 +54,21 @@ public class Link extends Element<Link> {
 
     private double lastIGGradient;
 
-    public Link(Synapse s, Activation input, Activation output, boolean isSelfRef) {
+    public Link(Synapse s, Activation input, Activation output, boolean isSelfRef, Visitor v) {
         this.synapse = s;
         this.input = input;
         this.output = output;
         this.isSelfRef = isSelfRef;
-    }
 
-    public Link(Link oldLink, Synapse s, Activation input, Activation output, boolean isSelfRef) {
-        this(s, input, output, isSelfRef);
+        if(input != null)
+            linkInput();
 
-        getThought().onLinkCreationEvent(this);
-
-        linkInput();
-        linkOutput();
+        if(output != null)
+            linkOutput();
 
         getSynapse().updateReference(this);
+
+        getThought().onLinkCreationEvent(this, v);
     }
 
     @Override

@@ -84,7 +84,7 @@ public class Activation extends Element<Activation> {
         this.neuron = n;
     }
 
-    public Activation(int id, Thought t, Neuron<?> n) {
+    public Activation(int id, Thought t, Neuron<?> n, Activation fromAct, Visitor v) {
         this(id, n);
         this.thought = t;
 
@@ -94,6 +94,8 @@ public class Activation extends Element<Activation> {
 
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
+
+        t.onActivationCreationEvent(this, fromAct, v);
     }
 
     public boolean isMarked() {
@@ -204,7 +206,6 @@ public class Activation extends Element<Activation> {
 
     public Activation createBranch(Synapse excludedSyn) {
         Activation clonedAct = thought.createActivation(neuron);
-        thought.onActivationCreationEvent(clonedAct, this);
 
         copyPhases(clonedAct);
         branches.add(clonedAct);
@@ -217,8 +218,7 @@ public class Activation extends Element<Activation> {
         if (value == null)
             return this;
 
-        Activation clonedAct = new Activation(id, thought, neuron);
-        thought.onActivationCreationEvent(clonedAct, this);
+        Activation clonedAct = new Activation(id, thought, neuron, null, null);
 
         replaceElement(clonedAct);
 
@@ -233,9 +233,7 @@ public class Activation extends Element<Activation> {
                 .stream()
                 .filter(l -> l.getSynapse() != excludedSyn)
                 .forEach(l -> {
-                    Link nl = new Link(l.getSynapse(), l.getInput(), clonedAct, l.isSelfRef());
-                            nl.linkInput();
-                            nl.linkOutput();
+                            Link nl = new Link(l.getSynapse(), l.getInput(), clonedAct, l.isSelfRef(), null);
                             nl.sumUpLink(nl.getInputValue(POS));
                         }
                 );
@@ -350,14 +348,14 @@ public class Activation extends Element<Activation> {
                 );
     }
 
-    public Link addLink(Synapse s, Activation input, boolean isSelfRef) {
+    public Link addLink(Synapse s, Activation input, boolean isSelfRef, Visitor v) {
         Link ol = getInputLink(s);
         Link nl = new Link(
-                ol,
                 s,
                 input,
                 this,
-                isSelfRef
+                isSelfRef,
+                v
         );
 
         double w = s.getWeight();
@@ -457,8 +455,6 @@ public class Activation extends Element<Activation> {
         double g = actF.outerGrad(net) - actF.outerGrad(lastNet);
         lastNet = net;
 
-        Utils.checkTolerance(g);
-
         g *= getNorm();
 
         propagateGradientsOut(
@@ -467,6 +463,8 @@ public class Activation extends Element<Activation> {
     }
 
     public void propagateGradientsOut(double g) {
+        Utils.checkTolerance(g);
+
         outputGradientSum += g;
 
         if(!getNeuron().isInputNeuron())

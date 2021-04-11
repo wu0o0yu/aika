@@ -19,7 +19,6 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;
@@ -57,7 +56,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     private Writable customData;
 
-    private volatile double bias;
+    protected volatile double bias;
 
     protected TreeMap<NeuronProvider, S> inputSynapses = new TreeMap<>();
     protected TreeMap<NeuronProvider, Synapse> outputSynapses = new TreeMap<>();
@@ -262,12 +261,20 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public void setBias(double b) {
         bias += b;
+        limitBias();
+
         modified = true;
     }
 
     public void addBias(double biasDelta) {
         bias += biasDelta;
+        limitBias();
+
         modified = true;
+    }
+
+    protected void limitBias() {
+        bias = Math.min(0.0, bias);
     }
 
     public double getBias() {

@@ -103,8 +103,8 @@ public class InductionTest {
         actB.setReference(new TextReference(doc, 0, 1));
         actB.setInputValue(1.0);
 
-        actTarget.addLink(sA, actA, false);
-        actTarget.addLink(sB, actB, false);
+        actTarget.addLink(sA, actA, false, null);
+        actTarget.addLink(sB, actB, false, null);
 
         actTarget.initEntropyGradient();
  //       actTarget.computeInitialLinkGradients();

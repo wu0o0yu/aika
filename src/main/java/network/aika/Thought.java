@@ -63,10 +63,10 @@ public abstract class Thought {
         filters.addAll(Set.of(p));
     }
 
-    public void onActivationCreationEvent(Activation act, Activation originAct) {
+    public void onActivationCreationEvent(Activation act, Activation originAct, Visitor v) {
         getEventListeners()
                 .forEach(
-                        el -> el.onActivationCreationEvent(act, originAct)
+                        el -> el.onActivationCreationEvent(act, originAct, v)
                 );
     }
 
@@ -84,10 +84,10 @@ public abstract class Thought {
                 );
     }
 
-    public void onLinkCreationEvent(Link l) {
+    public void onLinkCreationEvent(Link l, Visitor v) {
         getEventListeners()
                 .forEach(
-                        el -> el.onLinkCreationEvent(l)
+                        el -> el.onLinkCreationEvent(l, v)
                 );
     }
 
@@ -193,13 +193,11 @@ public abstract class Thought {
     }
 
     public Activation createActivation(Neuron n) {
-        return createActivation(n, null);
+        return createActivation(n, null, null);
     }
 
-    public Activation createActivation(Neuron n, Activation fromAct) {
-        Activation toAct = new Activation(createActivationId(), this, n);
-        onActivationCreationEvent(toAct, fromAct);
-        return toAct;
+    public Activation createActivation(Neuron n, Activation fromAct, Visitor v) {
+        return new Activation(createActivationId(), this, n, fromAct, v);
     }
 
     public Activation getActivation(Integer id) {
