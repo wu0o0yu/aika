@@ -360,12 +360,11 @@ public class Activation extends Element<Activation> {
 
         double w = s.getWeight();
 
-        if (w > 0.0 || !nl.isSelfRef()) {
+        if (w > 0.0 || !nl.isSelfRef())
             QueueEntry.add(
                     nl,
-                    new SumUpLink(w * (nl.getInputValue(POS) - nl.getInputValue(POS, ol)))
+                    new SumUpLink(w * Link.getInputValueDelta(POS, nl, ol))
             );
-        }
 
         return nl;
     }

@@ -57,9 +57,6 @@ public abstract class TemplateVisitor implements VisitorStep {
         if(oAct.getNeuron().isInputNeuron())
             return;
 
-        if(!iAct.isActive(true))
-            return;
-
         if (Link.synapseExists(iAct, oAct))
             return;
 
@@ -70,6 +67,7 @@ public abstract class TemplateVisitor implements VisitorStep {
                 .stream()
                 .flatMap(tn -> tn.getInputSynapses()) // TODO!
                 .filter(ts -> inputTemplates.contains(ts.getInput()))
+                .filter(ts -> iAct.isActive(ts.isRecurrent()))
                 .forEach(ts ->
                         ts.closeCycle(v, iAct, oAct)
                 );

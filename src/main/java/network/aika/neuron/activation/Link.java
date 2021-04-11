@@ -192,6 +192,10 @@ public class Link extends Element<Link> {
         return l != null ? l.getInputValue(s) : 0.0;
     }
 
+    public static double getInputValueDelta(Sign s, Link nl, Link ol) {
+        return nl.getInputValue(s) - Link.getInputValue(s, ol);
+    }
+
     public double getInputValue(Sign s) {
         return s.getValue(input != null ? input.getValue() : Double.valueOf(0.0));
     }
@@ -223,14 +227,14 @@ public class Link extends Element<Link> {
     public void linkInput() {
         if(input != null) {
             input.outputLinks.put(
-                    new OutputKey(output.getNeuronProvider(), output.getId()),
+                    new OutputKey(synapse.getPOutput(), output.getId()),
                     this
             );
         }
     }
 
     public void linkOutput() {
-        output.inputLinks.put(input.getNeuronProvider(), this);
+        output.inputLinks.put(synapse.getPInput(), this);
     }
 
     public void unlinkInput() {
