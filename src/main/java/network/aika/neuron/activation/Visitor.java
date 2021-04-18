@@ -18,6 +18,9 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.scopes.PPRelatedInput;
+import network.aika.neuron.activation.scopes.Scope;
+import network.aika.neuron.activation.scopes.ScopeEntry;
 import network.aika.neuron.steps.VisitorStep;
 
 import java.util.Set;
@@ -161,7 +164,7 @@ public class Visitor {
 
         if (scopes
                 .stream()
-                .anyMatch(s -> s.getScope() == Scope.PP_RELATED_INPUT)
+                .anyMatch(s -> s.getScope() instanceof PPRelatedInput)
         )
             return; // TODO
 

@@ -18,6 +18,7 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
 
 /**
@@ -40,6 +41,8 @@ public class Induction implements ActivationStep {
     public void process(Activation act) {
         assert act.getNeuron().isTemplate();
 
+        Neuron template = act.getNeuron();
+
         Neuron inducedNeuron = act.getNeuron().instantiateTemplate();
         inducedNeuron.setLabel(act.getConfig().getLabel(act));
 
@@ -48,6 +51,8 @@ public class Induction implements ActivationStep {
         act.setNeuron(inducedNeuron);
 
         act.link();
+
+        QueueEntry.add(act, new UpdateBias(template.getBias()));
     }
 
     public String toString() {

@@ -105,9 +105,8 @@ public class TextModel extends Model {
 
     private Synapse getRelSynapse(Neuron<?> n) {
         return n.getInputSynapses()
-                .filter(s -> s instanceof PatternPartSynapse)
-                .map(s -> (PatternPartSynapse) s)
-                .filter(s -> s.isInputScope())
+                .filter(s -> s instanceof InputPPSynapse)
+                .map(s -> (InputPPSynapse) s)
                 .findAny()
                 .orElse(null);
     }

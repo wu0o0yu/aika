@@ -88,7 +88,8 @@ public class Activation extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
-        net = n.getBias();
+        if(!n.isTemplate())
+            net = n.getBias();
 
         thought.registerActivation(this);
 
@@ -360,7 +361,7 @@ public class Activation extends Element<Activation> {
 
         double w = s.getWeight();
 
-        if (w > 0.0 || !nl.isSelfRef())
+        if (!Utils.belowTolerance(w))
             QueueEntry.add(
                     nl,
                     new SumUpLink(w * Link.getInputValueDelta(POS, nl, ol))
@@ -428,11 +429,19 @@ public class Activation extends Element<Activation> {
         QueueEntry.add(this, PROPAGATE);
         QueueEntry.add(this, USE_FINAL_BIAS);
 
-        if (this.hasBranches())
+        if (hasBranches())
             QueueEntry.add(this, DETERMINE_BRANCH_PROBABILITY);
 
         QueueEntry.add(this, COUNTING);
-        this.addLinksToQueue(INPUT, LinkStep.COUNTING);
+        addLinksToQueue(INPUT, LinkStep.COUNTING);
+
+        if(Utils.belowTolerance(outputGradientSum))
+            return;
+
+        QueueEntry.add(this, TEMPLATE_PROPAGATE_INPUT);
+
+        QueueEntry.add(this, TEMPLATE_CLOSE_CYCLE_OUTPUT);
+        QueueEntry.add(this, TEMPLATE_PROPAGATE_OUTPUT);
     }
 
     public void propagateGradientsFromSumUpdate() {
@@ -476,7 +485,11 @@ public class Activation extends Element<Activation> {
 
         addLinksToQueue(INPUT, LinkStep.TEMPLATE);
 
+        if(!isActive(false))
+            return;
+
         QueueEntry.add(this, TEMPLATE_PROPAGATE_INPUT);
+
         QueueEntry.add(this, TEMPLATE_CLOSE_CYCLE_OUTPUT);
         QueueEntry.add(this, TEMPLATE_PROPAGATE_OUTPUT);
     }

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.neuron.activation.scopes;
 
 import java.util.Comparator;
 import java.util.Set;
@@ -28,7 +28,7 @@ public class ScopeEntry implements Comparable<ScopeEntry> {
 
     public static final Comparator<ScopeEntry> COMPARE = Comparator.
             <ScopeEntry>comparingInt(se -> se.sourceId)
-            .thenComparing(se -> se.scope);
+            .thenComparing(se -> se.scope.getClass().getSimpleName());
 
     private int sourceId;
     private Scope scope;

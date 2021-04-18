@@ -19,6 +19,7 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.scopes.ScopeEntry;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;

@@ -14,18 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.neuron.activation.scopes;
+
+import network.aika.neuron.Synapse;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public enum Scope {
-    PP_INPUT,
-    PP_RELATED_INPUT,
-    PP_SAME,
-    PP_RELATED_SAME,
-    P_SAME,
-    I_SAME,
-    I_INPUT
+public abstract class Scope {
+    public Set<Transition> inputs = new TreeSet<>();
+    public Set<Transition> outputs = new TreeSet<>();
+
+
 }

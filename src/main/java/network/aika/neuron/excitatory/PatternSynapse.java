@@ -20,13 +20,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.Scope;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-
-import static network.aika.neuron.activation.Scope.P_SAME;
 
 /**
  *
@@ -81,6 +74,7 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
                 oAct;
     }
 
+    /*
     @Override
     public Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
         if(checkFinalRequirement && s.getScope() != P_SAME) {
@@ -89,6 +83,7 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
 
         return Collections.singleton(s);
     }
+*/
 
     @Override
     public byte getType() {

@@ -19,15 +19,16 @@ package network.aika.neuron.inhibitory;
 import network.aika.neuron.ActivationFunction;
 import network.aika.Model;
 import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.scopes.ScopeEntry;
 
 import java.util.Set;
 import java.util.TreeSet;
 
-import static network.aika.neuron.activation.Scope.*;
-import static network.aika.neuron.activation.Scope.P_SAME;
+import static network.aika.neuron.activation.scopes.Scope.*;
 
 /**
  *
@@ -58,10 +59,12 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     @Override
     public Set<ScopeEntry> getInitialScopes(Direction dir) {
+        Templates t = getModel().getTemplates();
+
         Set<ScopeEntry> result = new TreeSet<>();
-        result.add(new ScopeEntry(0, I_SAME));
+        result.add(new ScopeEntry(0, t.I_SAME));
         if(dir == Direction.OUTPUT) {
-            result.add(new ScopeEntry(1, PP_INPUT));
+            result.add(new ScopeEntry(1, t.PP_INPUT));
         }
         return result;
     }

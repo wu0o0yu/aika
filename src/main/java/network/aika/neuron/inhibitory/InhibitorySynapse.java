@@ -19,12 +19,11 @@ package network.aika.neuron.inhibitory;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.scopes.ScopeEntry;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import static network.aika.neuron.activation.Scope.I_SAME;
 
 /**
  *
@@ -82,6 +81,7 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         input.getNeuron().setModified(true);
     }
 
+    /*
     @Override
     public Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
         if(checkFinalRequirement && s.getScope() != I_SAME) {
@@ -90,6 +90,7 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
         return Collections.singleton(s);
     }
+     */
 
     @Override
     protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {

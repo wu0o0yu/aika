@@ -17,6 +17,7 @@
 package network.aika.neuron;
 
 import network.aika.*;
+import network.aika.neuron.activation.scopes.ScopeEntry;
 import network.aika.neuron.steps.activation.SumUpBias;
 import network.aika.neuron.steps.link.SumUpLink;
 import network.aika.utils.Utils;
@@ -108,8 +109,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         s.weight = weight;
     }
 
-    public abstract Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement);
-
     protected abstract boolean checkCausality(Activation iAct, Activation oAct, Visitor v);
 
     public abstract boolean checkTemplatePropagate(Visitor v, Activation act);
@@ -151,6 +150,14 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return nv;
     }
 
+    public Set<ScopeEntry> transition(ScopeEntry se, Direction dir, Direction startDir, boolean checkFinalRequirement) {
+        return se.getScope().inputs
+                .stream()
+                .filter(s -> s.check(dir, startDir, checkFinalRequirement))
+                .map(s -> new ScopeEntry(se.getSourceId(), s.getOutput()))
+                .collect(Collectors.toCollection(TreeSet::new));
+    }
+
     public void follow(Activation toAct, Visitor v) {
         v.onEvent(false);
 
@@ -169,7 +176,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         Activation toAct = fromAct.getThought()
                 .createActivation(
-                        nv.startDir.getNeuron(this),
+                        dir.getNeuron(this),
                         fromAct,
                         v
                 );
