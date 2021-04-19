@@ -16,20 +16,23 @@
  */
 package network.aika.neuron.activation.scopes;
 
-import network.aika.neuron.Synapse;
-
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class Scope {
+public class Scope {
+    private String label;
     public Set<Transition> inputs = new TreeSet<>();
     public Set<Transition> outputs = new TreeSet<>();
 
+    public Scope(String label) {
+        this.label = label;
+    }
 
+    public String getLabel() {
+        return label;
+    }
 }

@@ -17,6 +17,7 @@
 package network.aika.neuron;
 
 import network.aika.*;
+import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.activation.scopes.ScopeEntry;
 import network.aika.neuron.steps.activation.SumUpBias;
 import network.aika.neuron.steps.link.SumUpLink;
@@ -37,6 +38,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.activation.Link.linkExists;
@@ -151,7 +153,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public Set<ScopeEntry> transition(ScopeEntry se, Direction dir, Direction startDir, boolean checkFinalRequirement) {
-        return se.getScope().inputs
+        Scope is = se.getScope();
+        return (dir == INPUT ? is.outputs : is.inputs)
                 .stream()
                 .filter(s -> s.check(dir, startDir, checkFinalRequirement))
                 .map(s -> new ScopeEntry(se.getSourceId(), s.getOutput()))
