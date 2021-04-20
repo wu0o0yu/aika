@@ -16,8 +16,12 @@
  */
 package network.aika.neuron.activation.scopes;
 
+import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
@@ -25,14 +29,26 @@ import java.util.TreeSet;
  */
 public class Scope {
     private String label;
-    public Set<Transition> inputs = new TreeSet<>();
-    public Set<Transition> outputs = new TreeSet<>();
+    public Set<Transition> inputs = new TreeSet<>(
+            Comparator.<Transition, String>comparing(t -> t.getType().getSimpleName())
+                    .thenComparing(t -> t.getNextScope(OUTPUT).getLabel())
+                    .thenComparingInt(t -> t.isTarget() ? 1 : 0)
+    );
+    public Set<Transition> outputs = new TreeSet<>(
+            Comparator.<Transition, String>comparing(t -> t.getType().getSimpleName())
+                    .thenComparing(t -> t.getNextScope(INPUT).getLabel())
+                    .thenComparingInt(t -> t.isTarget() ? 1 : 0)
+    );
 
     public Scope(String label) {
         this.label = label;
     }
 
     public String getLabel() {
+        return label;
+    }
+
+    public String toString() {
         return label;
     }
 }

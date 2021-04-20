@@ -20,48 +20,61 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  * @author Lukas Molzberger
  */
-public class Transition implements Comparable<Transition> {
+public class Transition {
 
     private Class<? extends Synapse> type;
-    private Direction dir;
+    private Direction startDir;
     private boolean isTarget = false;
     private Scope input;
     private Scope output;
 
 
-    private Transition(Class<? extends Synapse> type, Direction dir, Scope input, Scope output) {
+    private Transition(Class<? extends Synapse> type, Direction startDir, Scope input, Scope output) {
         this.type = type;
-        this.dir = dir;
+        this.startDir = startDir;
         this.input = input;
         this.output = output;
     }
 
-    private Transition(Class<? extends Synapse> type, Direction dir, boolean isTarget, Scope input, Scope output) {
-        this(type, dir, input, output);
+    private Transition(Class<? extends Synapse> type, Direction startDir, boolean isTarget, Scope input, Scope output) {
+        this(type, startDir, input, output);
         this.isTarget = isTarget;
     }
 
-    public static void add(Class<? extends Synapse> type, Direction dir, Scope input, Scope output) {
-        add(type, dir, false, input, output);
+    public static void add(Class<? extends Synapse> type, Direction dir, Direction startDir, Scope input, Scope output) {
+        add(type, dir, startDir, false, input, output);
     }
 
-    public static void add(Class<? extends Synapse> type, Direction dir, boolean isTarget, Scope input, Scope output) {
-        Transition t = new Transition(type, dir, isTarget, input, output);
+    public static void add(Class<? extends Synapse> type, Direction dir, Direction startDir, boolean isTarget, Scope input, Scope output) {
+        Transition t = new Transition(type, startDir, isTarget, input, output);
 
-        input.outputs.add(t);
-        output.inputs.add(t);
+        if(dir == null || dir == OUTPUT)
+            t.link(input, output);
+
+        if(dir == null || dir == INPUT)
+            t.link(output, input);
+    }
+
+    private void link(Scope input, Scope output) {
+        input.outputs.add(this);
+        output.inputs.add(this);
     }
 
     public boolean check(Direction dir, Direction startDir, boolean isTarget) {
-        return (this.dir == null || this.dir == dir) && this.isTarget == isTarget;
+        return (this.startDir == null || this.startDir == startDir) && this.isTarget == isTarget;
     }
 
     public Class<? extends Synapse> getType() {
         return type;
+    }
+
+    public boolean isTarget() {
+        return isTarget;
     }
 
     public Scope getInput() {
@@ -72,22 +85,11 @@ public class Transition implements Comparable<Transition> {
         return output;
     }
 
-    public Direction getDir() {
-        return dir;
-    }
-
-    private Scope getNextScope() {
+    public Scope getNextScope(Direction dir) {
         return dir == INPUT ? input : output;
     }
 
-    @Override
-    public int compareTo(Transition t) {
-        int r = type.getSimpleName().compareTo(t.type.getSimpleName());
-        if(r != 0) return r;
-        r = getNextScope().getLabel().compareTo(t.getNextScope().getLabel());
-        if(r != 0) return r;
-        r = Direction.compare(dir, t.dir);
-        if(r != 0) return r;
-        return Boolean.compare(isTarget, t.isTarget);
+    public String toString() {
+        return input + " -- " + type.getSimpleName() + " - " + startDir + " --> " + output;
     }
 }

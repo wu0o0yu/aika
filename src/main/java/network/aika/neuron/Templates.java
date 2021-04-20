@@ -143,30 +143,30 @@ public class Templates {
                 );
 
 
-        Transition.add(PrimaryInhibitorySynapse.class, null, I_INPUT, I_SAME);
-        Transition.add(InhibitorySynapse.class, null, true, I_SAME, I_SAME);
-        Transition.add(InhibitorySynapse.class, null, I_SAME, I_SAME);
-        Transition.add(InputPPSynapse.class, INPUT, I_SAME, I_INPUT);
-        Transition.add(InputPPSynapse.class, OUTPUT, I_INPUT, I_SAME);
+        Transition.add(PrimaryInhibitorySynapse.class, null, null, I_INPUT, I_SAME);
+        Transition.add(InhibitorySynapse.class, null, null, true, I_SAME, I_SAME);
+        Transition.add(InhibitorySynapse.class, null, null, I_SAME, I_SAME);
+        Transition.add(InputPPSynapse.class, INPUT, null, I_SAME, I_INPUT);
+        Transition.add(InputPPSynapse.class, OUTPUT, null, I_INPUT, I_SAME);
 
-        Transition.add(PatternSynapse.class, null, true, P_SAME, P_SAME);
-        Transition.add(PatternSynapse.class, null, P_SAME, P_SAME);
-        Transition.add(SamePPSynapse.class, null, P_SAME, P_SAME);
+        Transition.add(PatternSynapse.class, null, null, true, P_SAME, P_SAME);
+        Transition.add(PatternSynapse.class, null, null, P_SAME, P_SAME);
+        Transition.add(SamePPSynapse.class, null, null, P_SAME, P_SAME);
 
-        Transition.add(InputPPSynapse.class, INPUT, PP_SAME, PP_INPUT);
-        Transition.add(InputPPSynapse.class, OUTPUT, PP_INPUT, PP_SAME);
+        Transition.add(InputPPSynapse.class, INPUT, null, PP_SAME, PP_INPUT);
+        Transition.add(InputPPSynapse.class, OUTPUT, null, PP_INPUT, PP_SAME);
 
-        Transition.add(InputPPSynapse.class, null, true, PP_INPUT, PP_SAME);
-        Transition.add(InputPPSynapse.class, INPUT, PP_RELATED_SAME, PP_RELATED_INPUT);
-        Transition.add(InputPPSynapse.class, INPUT, PP_INPUT, PP_RELATED_INPUT);
-        Transition.add(InputPPSynapse.class, OUTPUT, PP_INPUT, PP_RELATED_INPUT); //TODO: only when startDir == INPUT
+        Transition.add(InputPPSynapse.class, null, null, true, PP_INPUT, PP_SAME);
+        Transition.add(InputPPSynapse.class, INPUT, null, PP_RELATED_SAME, PP_RELATED_INPUT);
+        Transition.add(InputPPSynapse.class, INPUT, null, PP_INPUT, PP_RELATED_INPUT);
+        Transition.add(InputPPSynapse.class, OUTPUT, null, PP_INPUT, PP_RELATED_INPUT); //TODO: only when startDir == INPUT
 
-        Transition.add(SamePPSynapse.class, null, true, PP_SAME, PP_SAME);
-        Transition.add(SamePPSynapse.class, null, PP_SAME, PP_SAME);
-        Transition.add(SamePPSynapse.class, null, PP_INPUT, PP_INPUT);
-        Transition.add(SamePPSynapse.class, null, PP_RELATED_INPUT, PP_RELATED_INPUT);
-        Transition.add(SamePPSynapse.class, null, PP_SAME, PP_RELATED_SAME);
-        Transition.add(SamePPSynapse.class, null, PP_RELATED_SAME, PP_SAME);
+        Transition.add(SamePPSynapse.class, null, null, true, PP_SAME, PP_SAME);
+        Transition.add(SamePPSynapse.class, null, null, PP_SAME, PP_SAME);
+        Transition.add(SamePPSynapse.class, null, null, PP_INPUT, PP_INPUT);
+        Transition.add(SamePPSynapse.class, null, null, PP_RELATED_INPUT, PP_RELATED_INPUT);
+        Transition.add(SamePPSynapse.class, null, null, PP_SAME, PP_RELATED_SAME);
+        Transition.add(SamePPSynapse.class, null, null, PP_RELATED_SAME, PP_SAME);
     }
 
     public Collection<Neuron> getAllTemplates() {
