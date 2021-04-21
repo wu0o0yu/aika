@@ -57,7 +57,7 @@ public class Transition {
             t.link(input, output);
 
         if(dir == null || dir == INPUT)
-            t.link(output, input);
+            t.invert().link(output, input);
     }
 
     private void link(Scope input, Scope output) {
@@ -65,8 +65,12 @@ public class Transition {
         output.inputs.add(this);
     }
 
-    public boolean check(Direction dir, Direction startDir, boolean isTarget) {
-        return (this.startDir == null || this.startDir == startDir) && this.isTarget == isTarget;
+    private Transition invert() {
+        return new Transition(type, startDir, output, input);
+    }
+
+    public boolean check(Synapse s, Direction startDir, boolean isTarget) {
+        return s.getClass() == type && (this.startDir == null || this.startDir == startDir) && this.isTarget == isTarget;
     }
 
     public Class<? extends Synapse> getType() {
@@ -90,6 +94,6 @@ public class Transition {
     }
 
     public String toString() {
-        return input + " -- " + type.getSimpleName() + " - " + startDir + " --> " + output;
+        return input + " -- " + type.getSimpleName() + " -- " + (startDir != null ? startDir : "X") + " -- " + (isTarget ? "T" : "-")+ " --> " + output;
     }
 }

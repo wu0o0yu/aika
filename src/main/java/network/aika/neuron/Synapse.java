@@ -156,7 +156,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         Scope is = se.getScope();
         return (dir == INPUT ? is.outputs : is.inputs)
                 .stream()
-                .filter(s -> s.check(dir, startDir, checkFinalRequirement))
+                .filter(s -> s.check(this, startDir, checkFinalRequirement))
                 .map(s -> new ScopeEntry(se.getSourceId(), s.getOutput()))
                 .collect(Collectors.toCollection(TreeSet::new));
     }
