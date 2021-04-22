@@ -61,8 +61,8 @@ public class Transition {
     }
 
     private void link(Scope input, Scope output) {
-        input.outputs.add(this);
-        output.inputs.add(this);
+        input.getOutputs().add(this);
+        output.getInputs().add(this);
     }
 
     private Transition invert() {
@@ -87,10 +87,6 @@ public class Transition {
 
     public Scope getOutput() {
         return output;
-    }
-
-    public Scope getNextScope(Direction dir) {
-        return dir == INPUT ? input : output;
     }
 
     public String toString() {

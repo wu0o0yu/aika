@@ -20,6 +20,8 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.scopes.Scope;
+import network.aika.neuron.activation.scopes.Transition;
 
 import java.util.stream.Stream;
 
@@ -65,6 +67,16 @@ public class Output implements Direction {
 
     public Stream<Link> getLinks(Activation act) {
         return act.getOutputLinks();
+    }
+
+    @Override
+    public Stream<Transition> getTransitions(Scope s) {
+        return s.getInputs().stream();
+    }
+
+    @Override
+    public Scope getScope(Transition t) {
+        return t.getOutput();
     }
 
     public Stream<? extends Synapse> getSynapses(Neuron n) {

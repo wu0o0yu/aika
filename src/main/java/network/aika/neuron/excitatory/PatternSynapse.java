@@ -51,7 +51,8 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
 
     @Override
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        return v.startDir != Direction.INPUT || !act.getNeuron().isInputNeuron();
+        return v.startDir != Direction.INPUT ||
+                !act.getNeuron().isInputNeuron();
     }
 
     @Override
@@ -73,17 +74,6 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
                 null :
                 oAct;
     }
-
-    /*
-    @Override
-    public Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
-        if(checkFinalRequirement && s.getScope() != P_SAME) {
-            return Collections.emptySet();
-        }
-
-        return Collections.singleton(s);
-    }
-*/
 
     @Override
     public byte getType() {

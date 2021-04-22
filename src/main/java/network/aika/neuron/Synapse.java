@@ -153,11 +153,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public Set<ScopeEntry> transition(ScopeEntry se, Direction dir, Direction startDir, boolean checkFinalRequirement) {
-        Scope is = se.getScope();
-        return (dir == INPUT ? is.outputs : is.inputs)
-                .stream()
-                .filter(s -> s.check(this, startDir, checkFinalRequirement))
-                .map(s -> new ScopeEntry(se.getSourceId(), s.getOutput()))
+        return dir.getTransitions(se.getScope())
+                .filter(t -> t.check(this, startDir, checkFinalRequirement))
+                .map(t -> new ScopeEntry(se.getSourceId(), dir.getScope(t)))
                 .collect(Collectors.toCollection(TreeSet::new));
     }
 

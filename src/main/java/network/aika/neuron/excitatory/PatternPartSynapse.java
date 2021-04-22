@@ -67,17 +67,6 @@ public abstract class PatternPartSynapse<I extends Neuron<?>> extends Excitatory
         }
     }
 
-    public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        if (v.startDir == INPUT) {
-            return !act.getNeuron().isInputNeuron() && this == act.getModel().getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE;
-        } else {
-            if(getOutput().computeBiasLB(act) < 0.4)
-                return false;
-
-            return act.getNeuron() instanceof PatternNeuron || !(this instanceof InputPPSynapse); // TODO
-        }
-    }
-
     @Override
     protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
         if(!isRecurrent) {

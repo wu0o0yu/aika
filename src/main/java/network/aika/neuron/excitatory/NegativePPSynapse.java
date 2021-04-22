@@ -4,12 +4,10 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.scopes.ScopeEntry;
 import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.activation.direction.Direction;
 
-import java.util.Collections;
-import java.util.Set;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+
 
 public class NegativePPSynapse<I extends Neuron<?>> extends PatternPartSynapse<I> {
 
@@ -17,6 +15,11 @@ public class NegativePPSynapse<I extends Neuron<?>> extends PatternPartSynapse<I
         super(input, output, template);
 
         this.isRecurrent = true;
+    }
+
+    public boolean checkTemplatePropagate(Visitor v, Activation act) {
+        return v.startDir == OUTPUT &&
+                getOutput().computeBiasLB(act) >= 0.4;
     }
 
     public void updateReference(Link l) {
@@ -44,11 +47,4 @@ public class NegativePPSynapse<I extends Neuron<?>> extends PatternPartSynapse<I
         initFromTemplate(s);
         return s;
     }
-
-    /*
-    @Override
-    public Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
-        return Collections.emptySet();
-    }
-     */
 }
