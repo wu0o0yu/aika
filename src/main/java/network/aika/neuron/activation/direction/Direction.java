@@ -20,7 +20,10 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.scopes.Scope;
+import network.aika.neuron.activation.scopes.Transition;
 
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -47,5 +50,18 @@ public interface Direction {
 
     Stream<Link> getLinks(Activation act);
 
+    Set<Transition> getTransitions(Scope s);
+
+    Scope getScope(Transition t);
+
     Stream<? extends Synapse> getSynapses(Neuron n);
+
+    static int compare(Direction a, Direction b) {
+        if(a == b) return 0;
+        if(a == null && b != null) return -1;
+        if(a != null && b == null) return 1;
+        if(a == INPUT && b == OUTPUT) return -1;
+        if(a == OUTPUT && b == INPUT) return 1;
+        throw new IllegalStateException();
+    }
 }

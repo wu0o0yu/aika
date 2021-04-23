@@ -20,15 +20,15 @@ import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.scopes.ScopeEntry;
+import network.aika.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
-import static network.aika.neuron.activation.Scope.*;
+import static network.aika.neuron.activation.scopes.Scope.*;
 
 /**
  * @author Lukas Molzberger
@@ -42,35 +42,32 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
         super();
     }
 
-    public PatternPartNeuron(NeuronProvider p) {
-        super(p);
-    }
-
     public PatternPartNeuron(Model model) {
         super(model);
     }
 
     @Override
     public Set<ScopeEntry> getInitialScopes(Direction dir) {
+        Templates t = getModel().getTemplates();
+
         Set<ScopeEntry> result = new TreeSet<>();
-        result.add(new ScopeEntry(0, PP_SAME));
+        result.add(new ScopeEntry(0, t.PP_SAME));
         if(dir == Direction.OUTPUT) {
-            result.add(new ScopeEntry(1, PP_INPUT));
-            result.add(new ScopeEntry(2, I_SAME));
-            result.add(new ScopeEntry(3, P_SAME));
+            result.add(new ScopeEntry(1, t.PP_INPUT));
+            result.add(new ScopeEntry(2, t.I_SAME));
+            result.add(new ScopeEntry(3, t.P_SAME));
         }
         return result;
     }
 
     @Override
-    public boolean checkGradientThreshold(Activation act) {
+    public boolean allowTemplatePropagate(Activation act) {
         Neuron n = act.getNeuron();
 
         if(n.isInputNeuron())
             return false;
 
-        if(act.gradientSumIsZero())
-            return false;
+        Utils.checkTolerance(act.getOutputGradientSum());
 
         return true;
     }
@@ -78,8 +75,8 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     @Override
     public PatternPartNeuron instantiateTemplate() {
         PatternPartNeuron n = new PatternPartNeuron(getModel());
-        n.getTemplates().add(this);
-        n.getTemplates().addAll(getTemplates());
+        initFromTemplate(n);
+
         return n;
     }
 

@@ -54,8 +54,16 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         super(model);
     }
 
+
+    protected void initFromTemplate(ExcitatoryNeuron n) {
+        super.initFromTemplate(n);
+        n.directConjunctiveBias = directConjunctiveBias;
+        n.recurrentConjunctiveBias = recurrentConjunctiveBias;
+    }
+
     public void setDirectConjunctiveBias(double b) {
         directConjunctiveBias = b;
+        limitBias();
     }
 
     public void setRecurrentConjunctiveBias(double b) {
@@ -68,6 +76,11 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         } else {
             directConjunctiveBias += b;
         }
+        limitBias();
+    }
+
+    protected void limitBias() {
+        bias = Math.min(-directConjunctiveBias, bias);
     }
 
     public void addDummyLinks(Activation act) {
@@ -76,7 +89,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
                 .stream()
                 .filter(s -> !act.inputLinkExists(s))
                 .forEach(s ->
-                        new Link(s, null, act, false)
+                        new Link(s, null, act, false, null)
                 );
     }
 
@@ -89,8 +102,12 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         return new Fired(f.getInputTimestamp(), f.getFired() + 1);
     }
 
-    public double getBias(boolean isFinal) {
-        return super.getBias(isFinal) + (directConjunctiveBias + (isFinal ? recurrentConjunctiveBias : 0.0));
+    public double getBias() {
+        return super.getBias() + directConjunctiveBias;
+    }
+
+    public double getRecurrentBias() {
+        return recurrentConjunctiveBias;
     }
 
     public void updateSynapseInputLinks() {
@@ -101,7 +118,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
 
         sortedSynapses.addAll(inputSynapses.values());
 
-        double sum = getRawBias();
+        double sum = getBias();
         for(Synapse s: sortedSynapses) {
             if(s.getWeight() <= 0.0) break;
 

@@ -19,15 +19,16 @@ package network.aika.neuron.inhibitory;
 import network.aika.neuron.ActivationFunction;
 import network.aika.Model;
 import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.scopes.ScopeEntry;
 
 import java.util.Set;
 import java.util.TreeSet;
 
-import static network.aika.neuron.activation.Scope.*;
-import static network.aika.neuron.activation.Scope.P_SAME;
+import static network.aika.neuron.activation.scopes.Scope.*;
 
 /**
  *
@@ -50,7 +51,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     @Override
-    public boolean checkGradientThreshold(Activation act) {
+    public boolean allowTemplatePropagate(Activation act) {
 /*        if(act.gradientSumIsZero())
             return false;*/
         return false;
@@ -58,10 +59,12 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     @Override
     public Set<ScopeEntry> getInitialScopes(Direction dir) {
+        Templates t = getModel().getTemplates();
+
         Set<ScopeEntry> result = new TreeSet<>();
-        result.add(new ScopeEntry(0, I_SAME));
+        result.add(new ScopeEntry(0, t.I_SAME));
         if(dir == Direction.OUTPUT) {
-            result.add(new ScopeEntry(1, PP_INPUT));
+            result.add(new ScopeEntry(1, t.PP_INPUT));
         }
         return result;
     }
@@ -69,8 +72,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     @Override
     public InhibitoryNeuron instantiateTemplate() {
         InhibitoryNeuron n = new InhibitoryNeuron(getModel());
-        n.getTemplates().add(this);
-        n.getTemplates().addAll(getTemplates());
+        initFromTemplate(n);
         return n;
     }
 

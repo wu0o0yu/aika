@@ -17,10 +17,11 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.Model;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.scopes.ScopeEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +31,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static network.aika.neuron.activation.Scope.*;
-import static network.aika.neuron.sign.Sign.POS;
+import static network.aika.neuron.activation.scopes.Scope.*;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
@@ -61,28 +61,26 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     @Override
     public Set<ScopeEntry> getInitialScopes(Direction dir) {
+        Templates t = getModel().getTemplates();
         Set<ScopeEntry> result = new TreeSet<>();
-        result.add(new ScopeEntry(0, P_SAME));
+        result.add(new ScopeEntry(0, t.P_SAME));
         if(dir == Direction.OUTPUT) {
-            result.add(new ScopeEntry(1, PP_SAME));
-            result.add(new ScopeEntry(2, PP_INPUT));
-            result.add(new ScopeEntry(3, I_INPUT));
+            result.add(new ScopeEntry(1, t.PP_SAME));
+            result.add(new ScopeEntry(2, t.PP_INPUT));
+            result.add(new ScopeEntry(3, t.I_INPUT));
         }
         return result;
     }
 
     @Override
-    public boolean checkGradientThreshold(Activation act) {
-        Neuron n = act.getNeuron();
-
-        return n.getCandidateGradient(act) >= 1.4;
+    public boolean allowTemplatePropagate(Activation act) {
+        return true; //getCandidateGradient(act) >= 1.4;
     }
 
     @Override
     public PatternNeuron instantiateTemplate() {
         PatternNeuron n = new PatternNeuron(getModel());
-        n.getTemplates().add(this);
-        n.getTemplates().addAll(getTemplates());
+        initFromTemplate(n);
         return n;
     }
 

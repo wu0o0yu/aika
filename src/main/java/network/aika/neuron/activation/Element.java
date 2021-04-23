@@ -16,11 +16,15 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.Config;
 import network.aika.Thought;
+import network.aika.neuron.steps.Step;
 
 import java.util.Comparator;
+import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 /**
  * An Element is either a node (Activation) or an edge (Link) in the Activation graph.
@@ -29,30 +33,22 @@ import java.util.TreeSet;
  */
 public abstract class Element<E extends Element> implements Comparable<E> {
 
-    Comparator<Element> COMPARE = Comparator.
-            <Element>comparingInt(e -> e.getElementType())
-            .thenComparing(e -> e);
+    private NavigableSet<QueueEntry> queuedPhases = new TreeSet<>(Comparator
+            .<QueueEntry, String>comparing(qe -> qe.getStep().getClass().getSimpleName())
+            .thenComparing(qe -> qe.getTimestamp())
+    );
 
-    private int[] round = new int[RoundType.values().length];
+    public abstract Fired getFired();
 
-    private Set<QueueEntry> queuedPhases = new TreeSet<>(QueueEntry.COMPARATOR);
-
-    protected abstract int getElementType();
-
-    public int getRound(RoundType type) {
-        return round[type.ordinal()];
-    }
-
-    public void setRound(RoundType type, int round) {
-        this.round[type.ordinal()] = round;
-    }
-
-    public void updateRound(RoundType type, int round, boolean increment) {
-        this.round[type.ordinal()] = Math.max(this.round[type.ordinal()], round + (increment ? 1 : 0));
-    }
-
-    public void addQueuedPhase(QueueEntry qe) {
+    public void addQueuedStep(QueueEntry qe) {
         queuedPhases.add(qe);
+    }
+
+    public boolean isQueued(Step s) {
+        return !queuedPhases.subSet(
+                new QueueEntry(s, this, Long.MIN_VALUE),
+                new QueueEntry(s, this, Long.MAX_VALUE)
+        ).isEmpty();
     }
 
     public void removeQueuedPhase(QueueEntry qe) {
@@ -66,13 +62,13 @@ public abstract class Element<E extends Element> implements Comparable<E> {
     }
 
     public void copyPhases(Element newElement) {
-        queuedPhases.stream()
-                .map(qe ->
-                        new QueueEntry(qe.getRound(), qe.getPhase(), newElement)
-                )
-                .forEach(qe ->
-                        getThought().addQueueEntry(qe)
-                );
+        queuedPhases.stream().forEach(qe ->
+                QueueEntry.add(newElement, qe.getStep())
+        );
+    }
+
+    public Stream<QueueEntry> getQueuedEntries() {
+        return queuedPhases.stream();
     }
 
     private void removeFromQueue() {
@@ -80,6 +76,8 @@ public abstract class Element<E extends Element> implements Comparable<E> {
     }
 
     public abstract Thought getThought();
+
+    public abstract Config getConfig();
 
     public abstract String toShortString();
 }

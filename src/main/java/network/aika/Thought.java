@@ -22,14 +22,15 @@ import network.aika.callbacks.VisitorEventListener;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.phase.Phase;
+import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.activation.SumUpBias;
+import network.aika.utils.BelowToleranceThresholdException;
+import network.aika.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static network.aika.neuron.activation.RoundType.ACT;
 
 /**
  *
@@ -38,12 +39,13 @@ import static network.aika.neuron.activation.RoundType.ACT;
 public abstract class Thought {
     private static final Logger log = LoggerFactory.getLogger(Thought.class);
 
+    private long timestampOnProcess = 0;
     private long timestampCounter = 0;
     private int activationIdCounter = 0;
 
     private final TreeSet<QueueEntry> queue = new TreeSet<>(QueueEntry.COMPARATOR);
 
-    private Set<Phase> filters = new TreeSet<>(Comparator.comparingInt(p -> p.getRank()));
+    private Set<Step> filters = new TreeSet<>(Comparator.comparing(p -> p.getClass().getSimpleName()));
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
@@ -59,14 +61,14 @@ public abstract class Thought {
 
     public abstract void linkInputRelations(Activation act);
 
-    public void addFilters(Phase... p) {
+    public void addFilters(Step... p) {
         filters.addAll(Set.of(p));
     }
 
-    public void onActivationCreationEvent(Activation act, Activation originAct) {
+    public void onActivationCreationEvent(Activation act, Activation originAct, Visitor v) {
         getEventListeners()
                 .forEach(
-                        el -> el.onActivationCreationEvent(act, originAct)
+                        el -> el.onActivationCreationEvent(act, originAct, v)
                 );
     }
 
@@ -84,10 +86,10 @@ public abstract class Thought {
                 );
     }
 
-    public void onLinkCreationEvent(Link l) {
+    public void onLinkCreationEvent(Link l, Visitor v) {
         getEventListeners()
                 .forEach(
-                        el -> el.onLinkCreationEvent(l)
+                        el -> el.onLinkCreationEvent(l, v)
                 );
     }
 
@@ -131,10 +133,10 @@ public abstract class Thought {
     }
 
     public void addQueueEntry(QueueEntry qe) {
-        if(filters.contains(qe.getPhase()))
+        if(filters.contains(qe.getStep()))
             return;
 
-        qe.setAddedTimestamp(timestampCounter);
+        qe.setTimestamp(getNextTimestamp());
         queue.add(qe);
     }
 
@@ -154,24 +156,37 @@ public abstract class Thought {
     public void process(Model m) {
         while (!queue.isEmpty()) {
             QueueEntry qe = queue.pollFirst();
-            qe.setCurrentTimestamp(timestampCounter);
+
+            timestampOnProcess = timestampCounter;
 
             qe.getElement().removeQueuedPhase(qe);
 
             beforeProcessedEvent(qe);
-            qe.process();
-            afterProcessedEvent(qe);
 
-            timestampCounter++;
+            try {
+                qe.process();
+            } catch(BelowToleranceThresholdException e) {
+                System.out.println();
+            }
+
+            afterProcessedEvent(qe);
         }
         m.addToN(length());
     }
 
-    public <E extends Element> List<Phase> getPhasesForElement(E element) {
+    public long getTimestampOnProcess() {
+        return timestampOnProcess;
+    }
+
+    public long getNextTimestamp() {
+        return timestampCounter++;
+    }
+
+    public <E extends Element> List<Step> getPhasesForElement(E element) {
         return queue
                 .stream()
                 .filter(qe -> qe.getElement() == element)
-                .map(qe -> qe.getPhase())
+                .map(qe -> qe.getStep())
                 .collect(Collectors.toList());
     }
 
@@ -180,21 +195,11 @@ public abstract class Thought {
     }
 
     public Activation createActivation(Neuron n) {
-        return createActivation(n, null);
+        return createActivation(n, null, null);
     }
 
-    public Activation createActivation(Neuron n, Activation fromAct) {
-        Activation toAct = new Activation(createActivationId(), this, n);
-
-        if(fromAct != null)
-            toAct.updateRound(
-                    ACT,
-                    fromAct.getRound(ACT),
-                    n.isTemplate()
-            );
-
-        onActivationCreationEvent(toAct, fromAct);
-        return toAct;
+    public Activation createActivation(Neuron n, Activation fromAct, Visitor v) {
+        return new Activation(createActivationId(), this, n, fromAct, v);
     }
 
     public Activation getActivation(Integer id) {

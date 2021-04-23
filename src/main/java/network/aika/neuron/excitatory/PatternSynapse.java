@@ -20,13 +20,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.Scope;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-
-import static network.aika.neuron.activation.Scope.P_SAME;
 
 /**
  *
@@ -58,7 +51,8 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
 
     @Override
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        return v.startDir != Direction.INPUT || !act.getNeuron().isInputNeuron();
+        return v.startDir != Direction.INPUT ||
+                !act.getNeuron().isInputNeuron();
     }
 
     @Override
@@ -70,23 +64,15 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
     public PatternSynapse instantiateTemplate(I input, PatternNeuron output) {
         assert input.getTemplates().contains(getInput());
 
-
-        return new PatternSynapse(input, output, this);
+        PatternSynapse s = new PatternSynapse(input, output, this);
+        initFromTemplate(s);
+        return s;
     }
 
     public Activation branchIfNecessary(Activation oAct, Visitor v) {
         return getOutput().isInputNeuron() ?
                 null :
                 oAct;
-    }
-
-    @Override
-    public Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
-        if(checkFinalRequirement && s.getScope() != P_SAME) {
-            return Collections.emptySet();
-        }
-
-        return Collections.singleton(s);
     }
 
     @Override

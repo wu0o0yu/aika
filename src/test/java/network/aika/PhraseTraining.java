@@ -5,9 +5,9 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.PatternPartNeuron;
-import network.aika.neuron.phase.Phase;
-import network.aika.neuron.phase.activation.ActivationPhase;
-import network.aika.neuron.phase.link.LinkPhase;
+import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.activation.ActivationStep;
+import network.aika.neuron.steps.link.LinkStep;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
@@ -61,17 +61,17 @@ public class PhraseTraining {
 
 
     private void process(TextModel m, int round) throws IOException {
-        Phase[] countingOnlyFilters = new Phase[]{
-                ActivationPhase.TEMPLATE_OUTPUT,
-                ActivationPhase.TEMPLATE_INPUT,
-                ActivationPhase.ENTROPY_GRADIENT,
-                ActivationPhase.PROPAGATE_GRADIENTS_NET,
-                ActivationPhase.PROPAGATE_GRADIENTS_SUM,
-                ActivationPhase.INDUCTION,
-                ActivationPhase.UPDATE_BIAS,
-                LinkPhase.TEMPLATE,
-                LinkPhase.INDUCTION,
-                LinkPhase.INFORMATION_GAIN_GRADIENT
+        Step[] countingOnlyFilters = new Step[]{
+                ActivationStep.TEMPLATE_CLOSE_CYCLE_OUTPUT,
+                ActivationStep.TEMPLATE_PROPAGATE_OUTPUT,
+                ActivationStep.TEMPLATE_PROPAGATE_INPUT,
+                ActivationStep.ENTROPY_GRADIENT,
+                ActivationStep.PROPAGATE_GRADIENTS_NET,
+                ActivationStep.PROPAGATE_GRADIENTS_SUM,
+                ActivationStep.INDUCTION,
+                LinkStep.TEMPLATE,
+                LinkStep.INDUCTION,
+                LinkStep.INFORMATION_GAIN_GRADIENT
         };
         Util.loadExamplePhrases("phrases.txt")
                 .stream()

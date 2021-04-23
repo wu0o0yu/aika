@@ -19,7 +19,7 @@ package network.aika.callbacks;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
-import network.aika.neuron.phase.Phase;
+import network.aika.neuron.activation.Visitor;
 
 /**
  *
@@ -31,7 +31,7 @@ public interface EventListener {
 
     void afterProcessedEvent(QueueEntry qe);
 
-    void onActivationCreationEvent(Activation act, Activation originAct);
+    void onActivationCreationEvent(Activation act, Activation originAct, Visitor v);
 
-    void onLinkCreationEvent(Link l);
+    void onLinkCreationEvent(Link l, Visitor v);
 }

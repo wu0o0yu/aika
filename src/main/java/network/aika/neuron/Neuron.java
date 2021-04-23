@@ -19,6 +19,7 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.scopes.ScopeEntry;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;
@@ -31,8 +32,6 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.activation.RoundType.GRADIENT;
-import static network.aika.neuron.activation.RoundType.WEIGHT;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
@@ -58,7 +57,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     private Writable customData;
 
-    private volatile double bias;
+    protected volatile double bias;
 
     protected TreeMap<NeuronProvider, S> inputSynapses = new TreeMap<>();
     protected TreeMap<NeuronProvider, Synapse> outputSynapses = new TreeMap<>();
@@ -87,6 +86,13 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         modified = true;
     }
 
+    protected void initFromTemplate(Neuron n) {
+        n.bias = bias;
+
+        n.getTemplates().add(this);
+        n.getTemplates().addAll(getTemplates());
+    }
+
     public abstract Neuron<?> instantiateTemplate();
 
     public abstract void addDummyLinks(Activation act);
@@ -97,7 +103,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract byte getType();
 
-    public abstract boolean checkGradientThreshold(Activation act);
+    public abstract boolean allowTemplatePropagate(Activation act);
 
     public abstract Set<ScopeEntry> getInitialScopes(Direction dir);
 
@@ -135,6 +141,11 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public double getCandidateGradient(Activation act) {
         return getSurprisal(POS, act.getReference());
+    }
+
+    public double computeBiasLB(Activation iAct) {
+        return (getConfig().getLearnRate() * iAct.getNeuron().getCandidateGradient(iAct)) /
+                getBias();
     }
 
     public SampleSpace getSampleSpace() {
@@ -251,30 +262,34 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public void setBias(double b) {
         bias += b;
+        limitBias();
+
         modified = true;
     }
 
     public void addBias(double biasDelta) {
         bias += biasDelta;
+        limitBias();
+
         modified = true;
     }
 
-    public double getBias(boolean isFinal) {
+    protected void limitBias() {
+        bias = Math.min(0.0, bias);
+    }
+
+    public double getBias() {
         return bias;
     }
 
-    public double getRawBias() {
-        return bias;
+    public double getRecurrentBias() {
+        return 0.0;
     }
 
-    public double updateBias(Activation act) {
-        double learnRate = getConfig().getLearnRate();
-
-        double biasDelta = learnRate * act.getInputGradient();
+    public double updateBias(double biasDelta) {
         addBias(biasDelta);
-        act.updateRound(WEIGHT, act.getRound(GRADIENT), true);
 
-        double finalBias = getBias(true);
+        double finalBias = getBias();
         if(finalBias > 0.0) {
             addBias(-finalBias);
         }

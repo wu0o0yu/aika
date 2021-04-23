@@ -17,12 +17,15 @@
 package network.aika.neuron;
 
 import network.aika.*;
+import network.aika.neuron.activation.scopes.Scope;
+import network.aika.neuron.activation.scopes.ScopeEntry;
+import network.aika.neuron.steps.activation.SumUpBias;
+import network.aika.neuron.steps.link.SumUpLink;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.Scope;
-import network.aika.neuron.phase.link.PropagateGradient;
+import network.aika.neuron.steps.link.PropagateGradient;
 import network.aika.neuron.sign.Sign;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
@@ -35,12 +38,12 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.activation.RoundType.*;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.activation.Link.linkExists;
 import static network.aika.neuron.activation.Visitor.Transition.LINK;
-import static network.aika.neuron.phase.link.LinkPhase.INFORMATION_GAIN_GRADIENT;
+import static network.aika.neuron.steps.link.LinkStep.INFORMATION_GAIN_GRADIENT;
 
 /**
  *
@@ -57,7 +60,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     private Synapse template;
 
-    private double weight;
+    protected double weight;
 
     protected SampleSpace sampleSpace;
 
@@ -104,7 +107,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Synapse instantiateTemplate(I input, O output);
 
-    public abstract Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement);
+    protected void initFromTemplate(Synapse s) {
+        s.weight = weight;
+    }
 
     protected abstract boolean checkCausality(Activation iAct, Activation oAct, Visitor v);
 
@@ -147,6 +152,13 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return nv;
     }
 
+    public Set<ScopeEntry> transition(ScopeEntry se, Direction dir, Direction startDir, boolean checkFinalRequirement) {
+        return dir.getTransitions(se.getScope()).stream()
+                .filter(t -> t.check(this, startDir, checkFinalRequirement))
+                .map(t -> new ScopeEntry(se.getSourceId(), t.getOutput()))
+                .collect(Collectors.toCollection(TreeSet::new));
+    }
+
     public void follow(Activation toAct, Visitor v) {
         v.onEvent(false);
 
@@ -165,19 +177,17 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         Activation toAct = fromAct.getThought()
                 .createActivation(
-                        nv.startDir.getNeuron(this),
-                        fromAct
+                        dir.getNeuron(this),
+                        fromAct,
+                        v
                 );
 
-        int round = fromAct.getRound(ACT);
-
-        nv.getPhase().getNextPhases(round, toAct);
+        nv.getPhase().getNextSteps(toAct);
 
         createLink(
                 dir.getPropagateInput(fromAct, toAct),
                 dir.getPropagateOutput(fromAct, toAct),
-                nv,
-                round
+                nv
         );
     }
 
@@ -195,22 +205,16 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if (!checkCausality(iAct, oAct, v))
             return;
 
-        int round = Math.max(
-                iAct.getRound(ACT),
-                oAct.getRound(ACT)
-        );
-
-        createLink(iAct, oAct, nv, round);
+        createLink(iAct, oAct, nv);
     }
 
-    public void createLink(Activation iAct, Activation oAct, Visitor v, int round) {
+    public void createLink(Activation iAct, Activation oAct, Visitor v) {
         Link nl = oAct.addLink(
                 this,
                 iAct,
-                v.getSelfRef()
+                v.getSelfRef(),
+                v
         );
-
-        oAct.getThought().onLinkCreationEvent(nl);
 
         v.link = nl;
 
@@ -218,12 +222,14 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if (s.getWeight() <= 0.0 && !s.isTemplate())
             return;
 
-        v.getPhase().getNextPhases(round, nl);
+        v.getPhase().getNextSteps(nl);
 
-        QueueEntry.add(nl, round, INFORMATION_GAIN_GRADIENT);
+        QueueEntry.add(nl, INFORMATION_GAIN_GRADIENT);
 
-        if(!oAct.gradientSumIsZero())
-            QueueEntry.add(nl, round, new PropagateGradient(oAct.getOutputGradientSum()));
+        if(Utils.belowTolerance(oAct.getOutputGradientSum()))
+            return;
+
+        QueueEntry.add(nl, new PropagateGradient(oAct.getOutputGradientSum()));
     }
 
     public void linkInput() {
@@ -288,26 +294,27 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return sampleSpace;
     }
 
-    public double updateSynapse(Link l) {
-        double gradient = l.getAndResetGradient();
-
-        Neuron on = getOutput();
-        double oldWeight = weight;
-
-        double learnRate = on.getConfig().getLearnRate();
-
+    public void updateSynapse(Link l, double delta) {
         if(l.getInput().isActive(true)) {
-            double wDelta = learnRate * gradient;
-            addWeight(wDelta);
+            addWeight(delta);
+
+            QueueEntry.add(
+                    l,
+                    new SumUpLink(l.getInputValue(POS) * delta)
+            );
         } else {
-            double wDelta = learnRate * gradient;
+            addWeight(-delta);
+            getOutput().addConjunctiveBias(delta, !l.isCausal());
 
-            addWeight(-wDelta);
-            on.addConjunctiveBias(wDelta, !l.isCausal());
+            QueueEntry.add(
+                    l.getOutput(),
+                    new SumUpBias(delta)
+            );
+            QueueEntry.add(
+                    l,
+                    new SumUpLink((l.getInputValue(POS) * -delta) + delta)
+            );
         }
-        l.updateRound(WEIGHT, l.getRound(GRADIENT), true);
-
-        return weight - oldWeight;
     }
 
     public double getFrequency(Sign is, Sign os, double n) {

@@ -16,21 +16,18 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.Config;
 import network.aika.Thought;
 import network.aika.utils.Utils;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.phase.Phase;
-import network.aika.neuron.phase.VisitorPhase;
-import network.aika.neuron.phase.link.SumUpLink;
+import network.aika.neuron.steps.VisitorStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 
-import static network.aika.neuron.activation.Activation.TOLERANCE;
-import static network.aika.neuron.activation.RoundType.WEIGHT;
 import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -56,46 +53,27 @@ public class Link extends Element<Link> {
     private boolean isSelfRef;
 
     private double lastIGGradient;
-    private double gradient;
 
-    public Link(Synapse s, Activation input, Activation output, boolean isSelfRef) {
+    public Link(Synapse s, Activation input, Activation output, boolean isSelfRef, Visitor v) {
         this.synapse = s;
         this.input = input;
         this.output = output;
         this.isSelfRef = isSelfRef;
-    }
 
-    public Link(Link oldLink, Synapse s, Activation input, Activation output, boolean isSelfRef) {
-        this(s, input, output, isSelfRef);
+        if(input != null)
+            linkInput();
 
-        getThought().onLinkCreationEvent(this);
-
-        linkInput();
-        linkOutput();
+        if(output != null)
+            linkOutput();
 
         getSynapse().updateReference(this);
 
-        updateRound(RoundType.ACT, input.getRound(RoundType.ACT), false);
-        updateRound(RoundType.ACT, output.getRound(RoundType.ACT), false);
-
-        double w = getSynapse().getWeight();
-
-        if (w <= 0.0 && isSelfRef())
-            return;
-
-        QueueEntry.add(
-                this,
-                input.getRound(RoundType.ACT),
-                new SumUpLink(w * (getInputValue(POS) - getInputValue(POS, oldLink)))
-        );
+        getThought().onLinkCreationEvent(this, v);
     }
 
-    protected int getElementType() {
-        return 1;
-    }
-
-    public double getGradient() {
-        return gradient;
+    @Override
+    public Fired getFired() {
+        return output.getFired();
     }
 
     public static boolean synapseExists(Activation iAct, Activation oAct) {
@@ -130,11 +108,11 @@ public class Link extends Element<Link> {
             synapse.count(this);
     }
 
-    public void follow(VisitorPhase p) {
+    public void follow(VisitorStep p) {
         follow(p, synapse.isRecurrent() ? OUTPUT : INPUT);
     }
 
-    public void follow(VisitorPhase p, Direction dir) {
+    public void follow(VisitorStep p, Direction dir) {
         output.setMarked(true);
 
         Visitor v = new Visitor(p, output, dir, INPUT, ACT);
@@ -171,10 +149,10 @@ public class Link extends Element<Link> {
         }
 
         double igGradientDelta = igGradient - lastIGGradient;
-        if(Math.abs(igGradientDelta) >= TOLERANCE) {
-            getOutput().propagateGradient(igGradientDelta);
-            lastIGGradient = igGradient;
-        }
+        Utils.checkTolerance(igGradientDelta);
+
+        getOutput().propagateGradientIn(igGradientDelta);
+        lastIGGradient = igGradient;
     }
 
 /*
@@ -189,19 +167,13 @@ public class Link extends Element<Link> {
 */
 
     public void propagateGradient(double g) {
-        gradient += g;
-
         if(input == null)
             return;
 
-        input.propagateGradient(
+        input.propagateGradientIn(
                 synapse.getWeight() *
                         g
         );
-    }
-
-    public boolean gradientIsZero() {
-            return Math.abs(gradient) < TOLERANCE;
     }
 
     public boolean followAllowed(Direction dir) {
@@ -218,6 +190,10 @@ public class Link extends Element<Link> {
 
     public static double getInputValue(Sign s, Link l) {
         return l != null ? l.getInputValue(s) : 0.0;
+    }
+
+    public static double getInputValueDelta(Sign s, Link nl, Link ol) {
+        return nl.getInputValue(s) - Link.getInputValue(s, ol);
     }
 
     public double getInputValue(Sign s) {
@@ -248,12 +224,6 @@ public class Link extends Element<Link> {
         return isSelfRef;
     }
 
-    public double getAndResetGradient() {
-        double oldGradient = gradient;
-        gradient = 0.0;
-        return oldGradient;
-    }
-
     public void linkInput() {
         if(input != null) {
             input.outputLinks.put(
@@ -264,7 +234,7 @@ public class Link extends Element<Link> {
     }
 
     public void linkOutput() {
-        output.inputLinks.put(input.getNeuronProvider(), this);
+        output.inputLinks.put(input != null ? input.getNeuronProvider() : synapse.getPInput(), this);
     }
 
     public void unlinkInput() {
@@ -279,13 +249,7 @@ public class Link extends Element<Link> {
     }
 
     public void sumUpLink(double delta) {
-        Activation oAct = getOutput();
-        oAct.addToSum(delta);
-        oAct.updateRound(
-                RoundType.ACT,
-                Math.max(getRound(WEIGHT), getInput().getRound(RoundType.ACT)),
-                getSynapse().isRecurrent() && !oAct.getNeuron().isInputNeuron()
-        );
+        getOutput().updateNet(delta);
     }
 
     public boolean isNegative() {
@@ -295,6 +259,11 @@ public class Link extends Element<Link> {
     @Override
     public Thought getThought() {
         return output.getThought();
+    }
+
+    @Override
+    public Config getConfig() {
+        return output.getConfig();
     }
 
     @Override

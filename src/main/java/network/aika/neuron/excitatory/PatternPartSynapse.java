@@ -19,35 +19,23 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.Scope;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
 
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
-import static network.aika.neuron.activation.Scope.*;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, PatternPartNeuron> {
+public abstract class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, PatternPartNeuron> {
 
     public static byte type;
 
-    public boolean isNegative;
-
     public boolean isRecurrent;
-    public boolean inputScope;
-    public boolean isSamePattern;
 
     public PatternPartSynapse() {
         super();
@@ -57,17 +45,14 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         super(input, output, template);
     }
 
-    public PatternPartSynapse(I input, PatternPartNeuron output, Synapse template, boolean isNegative, boolean isRecurrent, boolean inputScope, boolean isSamePattern) {
+    public PatternPartSynapse(I input, PatternPartNeuron output, Synapse template, boolean isRecurrent) {
         super(input, output, template);
-        this.isNegative = isNegative;
         this.isRecurrent = isRecurrent;
-        this.inputScope = inputScope;
-        this.isSamePattern = isSamePattern;
     }
 
     @Override
     public void updateReference(Link l) {
-        if(isNegative)
+        if(l.getInput() == null)
             return;
 
         Reference iRef = l.getInput().getReference();
@@ -82,14 +67,6 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         }
     }
 
-    public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        if (v.startDir == INPUT) {
-            return !act.getNeuron().isInputNeuron() && this == act.getModel().getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE;
-        } else {
-            return act.getNeuron() instanceof PatternNeuron || !isInputScope();
-        }
-    }
-
     @Override
     protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
         if(!isRecurrent) {
@@ -99,11 +76,10 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         }
     }
 
-    @Override
-    public PatternPartSynapse instantiateTemplate(I input, PatternPartNeuron output) {
-        assert input.getTemplates().contains(getInput());
+    protected void initFromTemplate(PatternPartSynapse s) {
+        super.initFromTemplate(s);
 
-        return new PatternPartSynapse(input, output, this, isNegative, isRecurrent, inputScope, isSamePattern);
+        s.isRecurrent = isRecurrent;
     }
 
     @Override
@@ -114,72 +90,7 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         if(isRecurrent() && !v.getSelfRef())
             return null;
 
-        if (isNegative() && !v.getSelfRef()) {
-            oAct = oAct.createBranch(this);
-        }
         return oAct;
-    }
-
-    @Override
-    public Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
-        if(inputScope) {
-            if(dir == INPUT) {
-                if(checkFinalRequirement && s.getScope() != PP_SAME) {
-                    return Collections.emptySet();
-                }
-
-                switch (s.getScope()) {
-                    case PP_SAME:
-                        return s.nextSet(PP_INPUT);
-                    case PP_RELATED_SAME:
-                    case PP_INPUT:
-                        return s.nextSet(PP_RELATED_INPUT);
-                    case I_SAME:
-                        return s.nextSet(I_INPUT);
-                }
-            } else {
-                if(checkFinalRequirement && s.getScope() != PP_INPUT) {
-                    return Collections.emptySet();
-                }
-
-                switch (s.getScope()) {
-                    case PP_INPUT:
-                        if(startDir == INPUT) {
-                            return s.nextSet(PP_SAME, PP_RELATED_INPUT);
-                        } else if(startDir == OUTPUT) {
-                            return s.nextSet(PP_SAME);
-                        }
-                    case PP_RELATED_INPUT:
-                        return s.nextSet(PP_RELATED_SAME);
-                    case I_INPUT:
-                        return s.nextSet(I_SAME);
-                }
-            }
-        }
-
-        if(isSamePattern) {
-            if(checkFinalRequirement) {
-                if(dir == INPUT && s.getScope() != PP_SAME) {
-                    return Collections.emptySet();
-                }
-                if(dir == OUTPUT && s.getScope() != PP_RELATED_SAME && s.getScope() != PP_SAME) {
-                    return Collections.emptySet();
-                }
-            }
-
-            switch (s.getScope()) {
-                case PP_SAME:
-                    return s.nextSet(PP_RELATED_SAME, PP_SAME);
-                case PP_RELATED_SAME:
-                    return s.nextSet(PP_SAME);
-                case PP_RELATED_INPUT:
-                case PP_INPUT:
-                case P_SAME:
-                    return Collections.singleton(s);
-            }
-        }
-
-        return Collections.emptySet();
     }
 
     @Override
@@ -196,20 +107,8 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
         return type;
     }
 
-    public boolean isNegative() {
-        return isNegative;
-    }
-
     public boolean isRecurrent() {
         return isRecurrent;
-    }
-
-    public boolean isInputScope() {
-        return inputScope;
-    }
-
-    public boolean isSamePattern() {
-        return isSamePattern;
     }
 
     public void setWeight(double weight) {
@@ -226,19 +125,13 @@ public class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I
     public void write(DataOutput out) throws IOException {
         super.write(out);
 
-        out.writeBoolean(isNegative);
         out.writeBoolean(isRecurrent);
-        out.writeBoolean(inputScope);
-        out.writeBoolean(isSamePattern);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
 
-        isNegative = in.readBoolean();
         isRecurrent = in.readBoolean();
-        inputScope = in.readBoolean();
-        isSamePattern = in.readBoolean();
     }
 }

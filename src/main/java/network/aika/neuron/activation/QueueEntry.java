@@ -16,9 +16,7 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.phase.Phase;
-import network.aika.neuron.phase.activation.ActivationPhase;
-import network.aika.neuron.phase.link.LinkPhase;
+import network.aika.neuron.steps.Step;
 
 import java.util.Comparator;
 
@@ -26,69 +24,62 @@ import java.util.Comparator;
  *
  * @author Lukas Molzberger
  */
-public class QueueEntry<P extends Phase, E extends Element> {
+public class QueueEntry<S extends Step, E extends Element> {
 
     public static final Comparator<QueueEntry> COMPARATOR = Comparator
-            .<QueueEntry>comparingInt(qe -> qe.round)
-            .thenComparing(qe -> qe.getPhase().getRank())
-            .thenComparing((qe1, qe2) -> qe1.getPhase().getElementComparator().compare(qe1.element, qe2.element))
-            .thenComparing(qe -> qe.element);
+            .<QueueEntry>comparingInt(qe -> qe.step.getPhase().ordinal())
+            .thenComparing(qe -> qe.fired)
+            .thenComparing(qe -> qe.timestamp);
 
-    private int round;
-    private P phase;
+    private S step;
     private E element;
-    private long addedTimestamp;
-    private long currentTimestamp;
 
-    public QueueEntry(int round, P phase, E element) {
-        this.round = round;
-        this.phase = phase;
+    private Fired fired;
+    private long timestamp;
+
+    public QueueEntry(S step, E element) {
+        this.step = step;
         this.element = element;
+        this.fired = element.getFired();
     }
 
-    public static void add(Activation act, int round, ActivationPhase p) {
-        addIntern(act, round, p);
+    public QueueEntry(S step, E element, long timestamp) {
+        this.step = step;
+        this.element = element;
+        this.fired = element.getFired();
+        this.timestamp = timestamp;
     }
 
-    public static void add(Link l, int round, LinkPhase p) {
-        addIntern(l, round, p);
-    }
+    public static <S extends Step, E extends Element> void add(E e, S s) {
+        if(s.checkIfQueued() && e.isQueued(s))
+            return;
 
-    private static <P extends Phase, E extends Element> void addIntern(E e, int round, P p) {
-        QueueEntry qe = new QueueEntry(round, p, e);
-        e.addQueuedPhase(qe);
+        QueueEntry qe = new QueueEntry(s, e);
+        e.addQueuedStep(qe);
         e.getThought().addQueueEntry(qe);
     }
 
-    public int getRound() {
-        return round;
+    public S getStep() {
+        return step;
     }
 
-    public P getPhase() {
-        return phase;
+    public Fired getFired() {
+        return fired;
     }
 
-    public long getAddedTimestamp() {
-        return addedTimestamp;
+    public long getTimestamp() {
+        return timestamp;
     }
 
-    public void setAddedTimestamp(long addedTimestamp) {
-        this.addedTimestamp = addedTimestamp;
-    }
-
-    public long getCurrentTimestamp() {
-        return currentTimestamp;
-    }
-
-    public void setCurrentTimestamp(long currentTimestamp) {
-        this.currentTimestamp = currentTimestamp;
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
     public String toString() {
-        return Phase.toString(getPhase()) + " : " + element.toString();
+        return Step.toString(getStep()) + " : " + element.toString();
     }
 
-    public String pendingPhasesToString() {
+    public String pendingStepsToString() {
         StringBuilder sb = new StringBuilder();
  //       pendingPhases.forEach(p -> sb.append(p.toString() + ", "));
 
@@ -100,6 +91,6 @@ public class QueueEntry<P extends Phase, E extends Element> {
     }
 
     public void process() {
-        phase.process(element);
+        step.process(element);
     }
 }

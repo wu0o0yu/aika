@@ -23,9 +23,11 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.phase.link.LinkPhase;
-import network.aika.neuron.phase.link.PropagateGradient;
-import network.aika.neuron.phase.link.SumUpLink;
+import network.aika.neuron.steps.activation.PropagateValueChange;
+import network.aika.neuron.steps.activation.UpdateBias;
+import network.aika.neuron.steps.link.LinkStep;
+import network.aika.neuron.steps.link.PropagateGradient;
+import network.aika.neuron.steps.link.SumUpLink;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.Utils;
 
@@ -34,11 +36,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.neuron.activation.RoundType.ACT;
-import static network.aika.neuron.activation.RoundType.GRADIENT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.phase.activation.ActivationPhase.*;
+import static network.aika.neuron.steps.activation.ActivationStep.*;
 import static network.aika.neuron.sign.Sign.POS;
 
 /**
@@ -48,15 +48,10 @@ public class Activation extends Element<Activation> {
 
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(act -> act.id);
 
-    public static final Comparator<Activation> FIRED_COMPARATOR = (act1, act2) -> Fired.COMPARATOR.compare(act1.getFired(), act2.getFired());
-    public static final Comparator<Activation> FIRED_COMPARATOR_REVERSED = FIRED_COMPARATOR.reversed();
-
-    public static double TOLERANCE = 0.001;
-
     private Double value = null;
     private Double inputValue = null;
-    private double sum;
-    private double lateSum;
+    private double net;
+    private double lastNet = 0.0;
     private Fired fired = NOT_FIRED;
     private boolean marked;
 
@@ -75,9 +70,6 @@ public class Activation extends Element<Activation> {
     private Reference reference;
 
     private double lastEntropyGradient = 0.0;
-
-    private double lastNet = 0.0;
-
     private double inputGradient;
 
     /**
@@ -92,14 +84,19 @@ public class Activation extends Element<Activation> {
         this.neuron = n;
     }
 
-    public Activation(int id, Thought t, Neuron<?> n) {
+    public Activation(int id, Thought t, Neuron<?> n, Activation fromAct, Visitor v) {
         this(id, n);
         this.thought = t;
+
+        if(!n.isTemplate())
+            net = n.getBias();
 
         thought.registerActivation(this);
 
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
+
+        t.onActivationCreationEvent(this, fromAct, v);
     }
 
     public boolean isMarked() {
@@ -116,9 +113,10 @@ public class Activation extends Element<Activation> {
         setInputValue(1.0);
         setFired(ref.getBegin());
 
-        QueueEntry.add(this, 0, LINK_AND_PROPAGATE);
-        QueueEntry.add(this, 0, ENTROPY_GRADIENT);
-        QueueEntry.add(this, MAX_VALUE, COUNTING);
+        updateValue();
+
+        QueueEntry.add(this, ENTROPY_GRADIENT);
+        propagate();
     }
 
     public int getId() {
@@ -129,16 +127,16 @@ public class Activation extends Element<Activation> {
         return value;
     }
 
+    public double getNet() {
+        return net;
+    }
+
     public double getInputGradient() {
         return inputGradient;
     }
 
     public double getOutputGradientSum() {
         return outputGradientSum;
-    }
-
-    public double getNet(boolean isFinal) {
-        return sum + (isFinal ? lateSum : 0.0) + getNeuron().getBias(isFinal);
     }
 
     public Fired getFired() {
@@ -155,10 +153,6 @@ public class Activation extends Element<Activation> {
 
     public Thought getThought() {
         return thought;
-    }
-
-    protected int getElementType() {
-        return 0;
     }
 
     @Override
@@ -195,6 +189,10 @@ public class Activation extends Element<Activation> {
         this.neuron = n;
     }
 
+    public ActivationFunction getActivationFunction() {
+        return neuron.getActivationFunction();
+    }
+
     public Model getModel() {
         return neuron.getModel();
     }
@@ -209,10 +207,8 @@ public class Activation extends Element<Activation> {
 
     public Activation createBranch(Synapse excludedSyn) {
         Activation clonedAct = thought.createActivation(neuron);
-        thought.onActivationCreationEvent(clonedAct, this);
 
         copyPhases(clonedAct);
-        clonedAct.setRound(ACT, getRound(ACT) + 1);
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
         linkClone(clonedAct, excludedSyn);
@@ -223,12 +219,10 @@ public class Activation extends Element<Activation> {
         if (value == null)
             return this;
 
-        Activation clonedAct = new Activation(id, thought, neuron);
-        thought.onActivationCreationEvent(clonedAct, this);
+        Activation clonedAct = new Activation(id, thought, neuron, null, null);
 
         replaceElement(clonedAct);
 
-        clonedAct.setRound(ACT, getRound(ACT) + 1);
         linkClone(clonedAct, excludedSyn);
 
         return clonedAct;
@@ -240,9 +234,7 @@ public class Activation extends Element<Activation> {
                 .stream()
                 .filter(l -> l.getSynapse() != excludedSyn)
                 .forEach(l -> {
-                    Link nl = new Link(l.getSynapse(), l.getInput(), clonedAct, l.isSelfRef());
-                            nl.linkInput();
-                            nl.linkOutput();
+                            Link nl = new Link(l.getSynapse(), l.getInput(), clonedAct, l.isSelfRef(), null);
                             nl.sumUpLink(nl.getInputValue(POS));
                         }
                 );
@@ -298,11 +290,11 @@ public class Activation extends Element<Activation> {
     }
 
     public void updateOutgoingLinks(double delta) {
-        int round = getRound(ACT);
         getOutputLinks()
                 .forEach(l -> {
-                            QueueEntry.add(l, round, new SumUpLink(delta));
-                            QueueEntry.add(l.getOutput(), round, USE_FINAL_BIAS);
+                            double w = l.getSynapse().getWeight();
+                            QueueEntry.add(l, new SumUpLink(delta * w));
+                            QueueEntry.add(l.getOutput(), USE_FINAL_BIAS);
                         }
                 );
     }
@@ -357,44 +349,58 @@ public class Activation extends Element<Activation> {
                 );
     }
 
-    public Link addLink(Synapse s, Activation input, boolean isSelfRef) {
-        return new Link(
-                getInputLink(s),
+    public Link addLink(Synapse s, Activation input, boolean isSelfRef, Visitor v) {
+        Link ol = getInputLink(s);
+        Link nl = new Link(
                 s,
                 input,
                 this,
-                isSelfRef
+                isSelfRef,
+                v
         );
+
+        double w = s.getWeight();
+
+        if (!Utils.belowTolerance(w))
+            QueueEntry.add(
+                    nl,
+                    new SumUpLink(w * Link.getInputValueDelta(POS, nl, ol))
+            );
+
+        return nl;
     }
 
-    public void addToSum(double x) {
-        if (value != null) {
-            lateSum += x;
-        } else {
-            sum += x;
-        }
+    public void updateNet(double netDelta) {
+        net += netDelta;
+
+        Utils.checkTolerance(netDelta);
+
+        QueueEntry.add(this, PROPAGATE_GRADIENTS_NET);
+        QueueEntry.add(this, CHECK_IF_FIRED);
     }
 
-
-    private double computeValue(boolean isFinal) {
-        return branchProbability *
-                neuron.getActivationFunction().f(
-                        getNet(isFinal)
-                );
+    private double computeValue() {
+        return branchProbability * getActivationFunction().f(net);
     }
 
-    public double updateValue(boolean isFinal) {
+    public void updateValue() {
         Double oldValue = value;
 
         value = inputValue != null ?
                 inputValue :
-                computeValue(isFinal);
+                computeValue();
 
-        return value - (oldValue != null ? oldValue : 0.0);
+        double valueDelta = value - (oldValue != null ? oldValue : 0.0);
+
+        Utils.checkTolerance(valueDelta);
+
+        QueueEntry.add(this,
+                new PropagateValueChange(valueDelta)
+        );
     }
 
     public boolean checkIfFired() {
-        if (fired == NOT_FIRED && getNet(false) > 0.0) {
+        if (fired == NOT_FIRED && value != null && value > 0.0) {
             setFired(neuron.incrementFired(getLatestFired()));
             return true;
         }
@@ -418,77 +424,87 @@ public class Activation extends Element<Activation> {
         lastEntropyGradient = g;
     }
 
-    public void propagateGradientsFromSumUpdate() {
-        if (gradientIsZero())
+    public void propagate() {
+        QueueEntry.add(this, LINKING);
+        QueueEntry.add(this, PROPAGATE);
+        QueueEntry.add(this, USE_FINAL_BIAS);
+
+        if (hasBranches())
+            QueueEntry.add(this, DETERMINE_BRANCH_PROBABILITY);
+
+        QueueEntry.add(this, COUNTING);
+        addLinksToQueue(INPUT, LinkStep.COUNTING);
+
+        if(Utils.belowTolerance(outputGradientSum))
             return;
 
-        ActivationFunction actF = getNeuron().getActivationFunction();
+        QueueEntry.add(this, TEMPLATE_PROPAGATE_INPUT);
 
-        double g = inputGradient;
+        QueueEntry.add(this, TEMPLATE_CLOSE_CYCLE_OUTPUT);
+        QueueEntry.add(this, TEMPLATE_PROPAGATE_OUTPUT);
+    }
+
+    public void propagateGradientsFromSumUpdate() {
+        ActivationFunction actF = getActivationFunction();
+
         inputGradientSum += inputGradient;
+        double g = inputGradient;
         inputGradient = 0.0;
 
-        double net = getNet(true);
         g *= getNorm();
         g *= actF.outerGrad(net);
-        lastNet = net;
 
-        propagateGradients(g);
+        propagateGradientsOut(g);
     }
 
     public void propagateGradientsFromNetUpdate() {
-        ActivationFunction actF = getNeuron().getActivationFunction();
+        ActivationFunction actF = getActivationFunction();
 
-        double net = getNet(true);
-        double netDerivedLast = actF.outerGrad(lastNet);
-        double netDerivedCurrent = actF.outerGrad(net);
-
+        double g = actF.outerGrad(net) - actF.outerGrad(lastNet);
         lastNet = net;
 
-        double netDerivedDelta = netDerivedCurrent - netDerivedLast;
-        if(Math.abs(netDerivedDelta) < TOLERANCE)
-            return;
+        g *= getNorm();
 
-        netDerivedDelta *= getNorm();
-
-        double g = inputGradientSum * netDerivedDelta;
-
-        propagateGradients(g);
+        propagateGradientsOut(
+                inputGradientSum * g
+        );
     }
 
-    public void propagateGradients(double g) {
+    public void propagateGradientsOut(double g) {
+        Utils.checkTolerance(g);
+
         outputGradientSum += g;
 
-        int round = getRound(GRADIENT);
-
         if(!getNeuron().isInputNeuron())
-            addLinksToQueue(INPUT, round, new PropagateGradient(g));
-
-        addLinksToQueue(INPUT, round, LinkPhase.TEMPLATE);
+            addLinksToQueue(INPUT, new PropagateGradient(g));
 
         if (getNeuron().isAllowTraining())
-            QueueEntry.add(this, round, UPDATE_BIAS);
+            QueueEntry.add(this,
+                    new UpdateBias(getConfig().getLearnRate() * g)
+            );
 
-        QueueEntry.add(this, round, TEMPLATE_INPUT);
-        QueueEntry.add(this, round, TEMPLATE_OUTPUT);
+        addLinksToQueue(INPUT, LinkStep.TEMPLATE);
+
+        if(!isActive(false))
+            return;
+
+        QueueEntry.add(this, TEMPLATE_PROPAGATE_INPUT);
+
+        QueueEntry.add(this, TEMPLATE_CLOSE_CYCLE_OUTPUT);
+        QueueEntry.add(this, TEMPLATE_PROPAGATE_OUTPUT);
     }
 
     public double getNorm() {
         return (1 / (1 + getNeuron().getSampleSpace().getN(getReference())));
     }
 
-    public boolean gradientIsZero() {
-        return Math.abs(inputGradient) < TOLERANCE;
-    }
-
-    public boolean gradientSumIsZero() {
-        return Math.abs(outputGradientSum) < TOLERANCE;
-    }
-
-    public void propagateGradient(double g) {
+    public void propagateGradientIn(double g) {
         inputGradient += g;
 
-        QueueEntry.add(this, 0, PROPAGATE_GRADIENTS_SUM);
+        if(Utils.belowTolerance(inputGradient))
+            return;
+
+        QueueEntry.add(this, PROPAGATE_GRADIENTS_SUM);
     }
 
     public void linkInputs() {
@@ -526,7 +542,6 @@ public class Activation extends Element<Activation> {
     }
 
     public void computeBranchProbability() {
-        double net = getNet(true);
         Set<Activation> conflictingActs = branches
                 .stream()
                 .flatMap(bAct -> bAct.getInputLinks())
@@ -537,28 +552,28 @@ public class Activation extends Element<Activation> {
 
         double offset = conflictingActs
                 .stream()
-                .mapToDouble(cAct -> cAct.getNet(true))
+                .mapToDouble(cAct -> cAct.net)
                 .min()
                 .getAsDouble();
 
         double norm = Math.exp(net - offset);
         norm += conflictingActs
                 .stream()
-                .mapToDouble(cAct -> Math.exp(cAct.getNet(true) - offset))
+                .mapToDouble(cAct -> Math.exp(cAct.net - offset))
                 .sum();
 
         double p = Math.exp(net - offset) / norm;
 
-        if (Math.abs(p - getBranchProbability()) <= TOLERANCE) return;
+        Utils.checkTolerance(p - getBranchProbability());
 
         Activation cAct = clone(null);
         cAct.branchProbability = p;
     }
 
-    public void addLinksToQueue(Direction dir, int round, LinkPhase p) {
+    public void addLinksToQueue(Direction dir, LinkStep p) {
         dir.getLinks(this)
                 .forEach(l ->
-                        QueueEntry.add(l, round, p)
+                        QueueEntry.add(l, p)
                 );
     }
 
@@ -603,10 +618,9 @@ public class Activation extends Element<Activation> {
         sb.append("act " +
                 toShortString() +
                 " value:" + (value != null ? Utils.round(value) : "X") +
-                " net:" + Utils.round(getNet(false)) +
-                " netFinal:" + Utils.round(getNet(true)) +
-                " bp:" + Utils.round(branchProbability) +
-                " round:" + getRound(ACT));
+                " net:" + Utils.round(net) +
+                " bp:" + Utils.round(branchProbability)
+        );
 
         if (includeLink) {
             sb.append("\n");

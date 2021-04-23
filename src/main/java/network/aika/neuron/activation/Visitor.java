@@ -18,11 +18,10 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.phase.VisitorPhase;
+import network.aika.neuron.activation.scopes.Scope;
+import network.aika.neuron.activation.scopes.ScopeEntry;
+import network.aika.neuron.steps.VisitorStep;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static network.aika.neuron.activation.direction.Direction.*;
@@ -32,12 +31,12 @@ import static network.aika.neuron.activation.direction.Direction.*;
  * @author Lukas Molzberger
  */
 public class Visitor {
-    public Visitor origin;
-    public Activation act; // Just debug code
+    private Visitor origin;
+    private Activation act; // Just debug code
     public Link link; // Just debug code
-    public Transition transition; // Just debug code
-    public Visitor previousStep;
-    public VisitorPhase phase;
+    private Transition transition; // Just debug code
+    private Visitor previousStep;
+    private VisitorStep phase;
 
     public enum Transition {  // Just debug code
         ACT,
@@ -54,7 +53,7 @@ public class Visitor {
 
     private Visitor() {}
 
-    public Visitor(VisitorPhase vp, Activation act, Direction startDir, Direction downUpDir, Transition t) {
+    public Visitor(VisitorStep vp, Activation act, Direction startDir, Direction downUpDir, Transition t) {
         this.phase = vp;
         this.origin = this;
         this.act = act;
@@ -84,11 +83,47 @@ public class Visitor {
         return nv;
     }
 
+    public Visitor getOrigin() {
+        return origin;
+    }
+
+    public Activation getAct() {
+        return act;
+    }
+
+    public Link getLink() {
+        return link;
+    }
+
+    public Transition getTransition() {
+        return transition;
+    }
+
+    public Visitor getPreviousStep() {
+        return previousStep;
+    }
+
+    public Direction getDownUpDir() {
+        return downUpDir;
+    }
+
+    public Direction getStartDir() {
+        return startDir;
+    }
+
+    public int getDownSteps() {
+        return downSteps;
+    }
+
+    public int getUpSteps() {
+        return upSteps;
+    }
+
     public Set<ScopeEntry> getScopes() {
         return scopes;
     }
 
-    public VisitorPhase getPhase() {
+    public VisitorStep getPhase() {
         return phase;
     }
 
@@ -126,9 +161,10 @@ public class Visitor {
         if (act == origin.act || act.isConflicting())
             return; // <--
 
+        Scope ppRelatedInput = getOriginAct().getModel().getTemplates().PP_RELATED_INPUT;
         if (scopes
                 .stream()
-                .anyMatch(s -> s.getScope() == Scope.PP_RELATED_INPUT)
+                .anyMatch(s -> s.getScope() == ppRelatedInput)
         )
             return; // TODO
 

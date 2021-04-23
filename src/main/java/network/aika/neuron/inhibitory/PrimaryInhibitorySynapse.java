@@ -20,17 +20,13 @@ package network.aika.neuron.inhibitory;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.ScopeEntry;
+import network.aika.neuron.activation.scopes.ScopeEntry;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.Visitor;
-import network.aika.neuron.activation.Scope;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import static network.aika.neuron.activation.Scope.I_INPUT;
-import static network.aika.neuron.activation.Scope.I_SAME;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
@@ -59,6 +55,7 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
         return new PrimaryInhibitorySynapse(input, output, this);
     }
 
+    /*
     @Override
     public Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
         if (dir == INPUT) {
@@ -74,4 +71,5 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
         }
         return Collections.emptySet();
     }
+     */
 }

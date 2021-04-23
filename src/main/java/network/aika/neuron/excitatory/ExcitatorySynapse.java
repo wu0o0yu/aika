@@ -32,4 +32,9 @@ public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends Excitator
     public ExcitatorySynapse(I input, O output, Synapse template) {
         super(input, output, template);
     }
+
+
+    protected void initFromTemplate(ExcitatorySynapse s) {
+        super.initFromTemplate(s);
+    }
 }
