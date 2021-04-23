@@ -501,7 +501,8 @@ public class Activation extends Element<Activation> {
     public void propagateGradientIn(double g) {
         inputGradient += g;
 
-        Utils.checkTolerance(inputGradient);
+        if(Utils.belowTolerance(inputGradient))
+            return;
 
         QueueEntry.add(this, PROPAGATE_GRADIENTS_SUM);
     }
