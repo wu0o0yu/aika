@@ -23,6 +23,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.activation.scopes.Transition;
 
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -49,7 +50,7 @@ public interface Direction {
 
     Stream<Link> getLinks(Activation act);
 
-    Stream<Transition> getTransitions(Scope s);
+    Set<Transition> getTransitions(Scope s);
 
     Scope getScope(Transition t);
 

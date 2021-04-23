@@ -23,6 +23,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.activation.scopes.Transition;
 
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -70,8 +71,8 @@ public class Output implements Direction {
     }
 
     @Override
-    public Stream<Transition> getTransitions(Scope s) {
-        return s.getInputs().stream();
+    public Set<Transition> getTransitions(Scope s) {
+        return s.getInputs();
     }
 
     @Override

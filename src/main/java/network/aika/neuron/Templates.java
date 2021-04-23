@@ -143,6 +143,7 @@ public class Templates {
                 );
 
 
+        Transition.add(PrimaryInhibitorySynapse.class, null, null, true, I_INPUT, I_SAME);
         Transition.add(PrimaryInhibitorySynapse.class, null, null, I_INPUT, I_SAME);
         Transition.add(InhibitorySynapse.class, null, null, true, I_SAME, I_SAME);
         Transition.add(InhibitorySynapse.class, null, null, I_SAME, I_SAME);

@@ -54,15 +54,19 @@ public class Transition {
         Transition t = new Transition(type, startDir, isTarget, input, output);
 
         if(dir == null || dir == OUTPUT)
-            t.link(input, output);
+            t.link(dir);
 
         if(dir == null || dir == INPUT)
-            t.invert().link(output, input);
+            t.invert().link(dir);
     }
 
-    private void link(Scope input, Scope output) {
-        input.getOutputs().add(this);
-        output.getInputs().add(this);
+    private void link(Direction dir) {
+        if(dir != null)
+            dir.getTransitions(input).add(this);
+        else {
+            link(INPUT);
+            link(OUTPUT);
+        }
     }
 
     private Transition invert() {
