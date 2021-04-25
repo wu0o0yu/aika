@@ -88,8 +88,8 @@ public class Activation extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
-        if(!n.isTemplate())
-            net = n.getBias();
+        lastNet = n.isTemplate() || n.isInputNeuron() ? 0.0 : -1.0;
+        net = n.getBias();
 
         thought.registerActivation(this);
 
@@ -452,7 +452,7 @@ public class Activation extends Element<Activation> {
         inputGradient = 0.0;
 
         g *= getNorm();
-        g *= actF.outerGrad(net);
+        g *= actF.outerGrad(lastNet);
 
         propagateGradientsOut(g);
     }

@@ -20,6 +20,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
+import network.aika.utils.Utils;
 
 /**
  * Creates a new untrained neuron from a template activation.
@@ -30,7 +31,7 @@ public class Induction implements ActivationStep {
 
     @Override
     public Phase getPhase() {
-        return Phase.INIT;
+        return Phase.LINKING;
     }
 
     public boolean checkIfQueued() {
@@ -41,8 +42,6 @@ public class Induction implements ActivationStep {
     public void process(Activation act) {
         assert act.getNeuron().isTemplate();
 
-        Neuron template = act.getNeuron();
-
         Neuron inducedNeuron = act.getNeuron().instantiateTemplate();
         inducedNeuron.setLabel(act.getConfig().getLabel(act));
 
@@ -52,7 +51,9 @@ public class Induction implements ActivationStep {
 
         act.link();
 
-        QueueEntry.add(act, new UpdateBias(template.getBias()));
+        Utils.checkTolerance(inducedNeuron.getBias());
+
+//        QueueEntry.add(act, new SumUpBias(inducedNeuron.getBias()));
     }
 
     public String toString() {

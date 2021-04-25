@@ -222,14 +222,13 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if (s.getWeight() <= 0.0 && !s.isTemplate())
             return;
 
-        v.getPhase().getNextSteps(nl);
-
         QueueEntry.add(nl, INFORMATION_GAIN_GRADIENT);
 
-        if(Utils.belowTolerance(oAct.getOutputGradientSum()))
-            return;
+        if(!Utils.belowTolerance(oAct.getOutputGradientSum())) {
+            QueueEntry.add(nl, new PropagateGradient(oAct.getOutputGradientSum()));
+        }
 
-        QueueEntry.add(nl, new PropagateGradient(oAct.getOutputGradientSum()));
+        v.getPhase().getNextSteps(nl);
     }
 
     public void linkInput() {
