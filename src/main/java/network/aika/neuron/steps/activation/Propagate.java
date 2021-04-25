@@ -17,11 +17,10 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.LinkingVisitor;
 
-import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 
@@ -50,13 +49,7 @@ public class Propagate extends LinkingVisitor implements ActivationStep {
 
     @Override
     public void process(Activation act) {
-        Visitor v = new Visitor(
-                this,
-                act,
-                OUTPUT,
-                OUTPUT,
-                ACT
-        );
+        ActVisitor v = new ActVisitor(this, act, OUTPUT, OUTPUT);
 
         act.getNeuron()
                 .getOutputSynapses()

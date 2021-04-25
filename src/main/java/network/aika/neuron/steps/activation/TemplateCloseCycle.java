@@ -16,19 +16,13 @@
  */
 package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.TemplateVisitor;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
-
-import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
@@ -55,15 +49,8 @@ public class TemplateCloseCycle extends TemplateVisitor implements ActivationSte
 
     @Override
     public void process(Activation act) {
-        act.followLinks(
-                new Visitor(
-                        this,
-                        act,
-                        direction,
-                        INPUT,
-                        ACT
-                )
-        );
+        ActVisitor v = new ActVisitor(this, act, direction, INPUT);
+        act.followLinks(v);
     }
 
     public String toString() {

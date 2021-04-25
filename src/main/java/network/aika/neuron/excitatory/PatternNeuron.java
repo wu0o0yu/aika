@@ -22,6 +22,8 @@ import network.aika.neuron.Templates;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.scopes.ScopeEntry;
+import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.LinkVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +33,6 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static network.aika.neuron.activation.scopes.Scope.*;
-import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
@@ -85,11 +85,11 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     @Override
-    public void transition(Visitor v, Activation act) {
+    public void transition(LinkVisitor v, Activation act) {
         if (v.downUpDir == OUTPUT)
             return;
 
-        Visitor nv = v.prepareNextStep(act, null, v.getScopes(), ACT);
+        ActVisitor nv = v.prepareNextStep(act, v.getScopes());
 
         if(nv == null)
             return;

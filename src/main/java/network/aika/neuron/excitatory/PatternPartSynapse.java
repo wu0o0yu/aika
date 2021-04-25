@@ -19,13 +19,13 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.visitor.Visitor;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
  *

@@ -17,8 +17,10 @@
 package network.aika.neuron;
 
 import network.aika.*;
-import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.activation.scopes.ScopeEntry;
+import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.LinkVisitor;
+import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.steps.activation.SumUpBias;
 import network.aika.neuron.steps.link.SumUpLink;
 import network.aika.utils.Utils;
@@ -38,11 +40,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.activation.Link.linkExists;
-import static network.aika.neuron.activation.Visitor.Transition.LINK;
 import static network.aika.neuron.steps.link.LinkStep.INFORMATION_GAIN_GRADIENT;
 
 /**
@@ -133,17 +133,15 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Activation branchIfNecessary(Activation oAct, Visitor v);
 
-    public Visitor transition(Visitor v, Link l) {
-        Visitor nv = v.prepareNextStep(
-                null,
+    public LinkVisitor transition(ActVisitor v, Link l) {
+        LinkVisitor nv = v.prepareNextStep(
                 l,
                 v.getScopes()
                         .stream()
                         .flatMap(s ->
                                 transition(s, v.downUpDir, v.startDir, l == null)
                                         .stream()
-                        ).collect(Collectors.toCollection(TreeSet::new)),
-                LINK
+                        ).collect(Collectors.toCollection(TreeSet::new))
         );
 
         if(nv != null)
@@ -159,7 +157,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 .collect(Collectors.toCollection(TreeSet::new));
     }
 
-    public void follow(Activation toAct, Visitor v) {
+    public void follow(Activation toAct, LinkVisitor v) {
         v.onEvent(false);
 
         toAct.getNeuron()
@@ -168,8 +166,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         v.onEvent(true);
     }
 
-    public void propagate(Activation fromAct, Visitor v) {
-        Visitor nv = transition(v, null);
+    public void propagate(Activation fromAct, ActVisitor v) {
+        LinkVisitor nv = transition(v, null);
         if(nv == null)
             return;
 
@@ -191,8 +189,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         );
     }
 
-    public void closeCycle(Visitor v, Activation iAct, Activation oAct) {
-        Visitor nv = transition(v, null);
+    public void closeCycle(ActVisitor v, Activation iAct, Activation oAct) {
+        LinkVisitor nv = transition(v, null);
         if(nv == null)
             return;
 
@@ -208,7 +206,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         createLink(iAct, oAct, nv);
     }
 
-    public void createLink(Activation iAct, Activation oAct, Visitor v) {
+    public void createLink(Activation iAct, Activation oAct, LinkVisitor v) {
         Link nl = oAct.addLink(
                 this,
                 iAct,
@@ -216,7 +214,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 v
         );
 
-        v.link = nl;
+        v.setLink(nl);
 
         Synapse s = nl.getSynapse();
         if (s.getWeight() <= 0.0 && !s.isTemplate())

@@ -22,6 +22,8 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.steps.activation.PropagateValueChange;
 import network.aika.neuron.steps.activation.UpdateBias;
@@ -299,7 +301,7 @@ public class Activation extends Element<Activation> {
                 );
     }
 
-    public void followLinks(Visitor v) {
+    public void followLinks(ActVisitor v) {
         v.onEvent(false);
 
         v.tryToLink(this);

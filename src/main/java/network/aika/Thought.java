@@ -22,10 +22,9 @@ import network.aika.callbacks.VisitorEventListener;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.steps.Step;
-import network.aika.neuron.steps.activation.SumUpBias;
 import network.aika.utils.BelowToleranceThresholdException;
-import network.aika.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

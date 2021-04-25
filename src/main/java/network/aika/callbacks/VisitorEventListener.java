@@ -16,7 +16,7 @@
  */
 package network.aika.callbacks;
 
-import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.visitor.Visitor;
 
 
 /**

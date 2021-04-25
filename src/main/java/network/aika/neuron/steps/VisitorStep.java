@@ -18,7 +18,8 @@ package network.aika.neuron.steps;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.Visitor;
 
 /**
  *
@@ -26,7 +27,7 @@ import network.aika.neuron.activation.Visitor;
  */
 public interface VisitorStep {
 
-    void closeCycle(Activation act, Visitor v);
+    void closeCycle(Activation act, ActVisitor v);
 
     void getNextSteps(Activation act);
 

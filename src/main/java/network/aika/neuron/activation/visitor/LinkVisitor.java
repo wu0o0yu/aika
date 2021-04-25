@@ -14,24 +14,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.callbacks;
+package network.aika.neuron.activation.visitor;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.QueueEntry;
-import network.aika.neuron.activation.visitor.Visitor;
+import network.aika.neuron.activation.scopes.ScopeEntry;
+
+import java.util.Set;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public interface EventListener {
+public class LinkVisitor extends Visitor {
 
-    void beforeProcessedEvent(QueueEntry qe);
+    Link link;
 
-    void afterProcessedEvent(QueueEntry qe);
+    public ActVisitor prepareNextStep(Activation act, Set<ScopeEntry> scopes) {
+        ActVisitor nv = new ActVisitor();
+        prepareNextStep(nv, scopes);
+        nv.act = act;
 
-    void onActivationCreationEvent(Activation act, Activation originAct, Visitor v);
+        return nv;
+    }
 
-    void onLinkCreationEvent(Link l, Visitor v);
+    public void setLink(Link link) {
+        this.link = link;
+    }
+
+    public Link getLink() {
+        return link;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Origin:" + origin.act.toShortString() + ", ");
+        sb.append("Current:" + link.toString() + ", ");
+        sb.append(super.toString());
+
+        return sb.toString();
+    }
 }

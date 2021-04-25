@@ -19,7 +19,7 @@ package network.aika.neuron.steps.activation;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.TemplateVisitor;
@@ -27,7 +27,6 @@ import network.aika.neuron.steps.visitor.TemplateVisitor;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.activation.Visitor.Transition.ACT;
 
 /**
  * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
@@ -58,13 +57,7 @@ public abstract class TemplatePropagate extends TemplateVisitor implements Activ
         if (!n.allowTemplatePropagate(act))
             return;
 
-        Visitor v = new Visitor(
-                this,
-                act,
-                direction,
-                direction,
-                ACT
-        );
+        ActVisitor v = new ActVisitor(this, act, direction, direction);
 
         Direction dir = v.startDir;
 
