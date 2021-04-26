@@ -30,6 +30,8 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  * @author Lukas Molzberger
  */
 public class Scope {
+
+    private Scope template;
     private String label;
 
     private Set<Transition> inputs = new TreeSet<>(getComparator(OUTPUT));
@@ -43,6 +45,13 @@ public class Scope {
 
     public Scope(String label) {
         this.label = label;
+    }
+
+    public Scope getInstance(Transition source) {
+        Scope s = new Scope(label);
+        source.setOutput(s);
+        s.template = this;
+        return s;
     }
 
     public String getLabel() {

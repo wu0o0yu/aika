@@ -19,6 +19,7 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.activation.scopes.ScopeEntry;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
@@ -106,7 +107,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract boolean allowTemplatePropagate(Activation act);
 
-    public abstract Set<ScopeEntry> getInitialScopes(Direction dir);
+    public abstract Collection<Scope> getInitialScopeTemplates(Direction dir);
 
     public boolean isAllowTraining() {
         return allowTraining;

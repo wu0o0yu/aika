@@ -18,9 +18,11 @@ package network.aika.neuron.activation.visitor;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.scopes.ScopeEntry;
+import network.aika.neuron.activation.scopes.Scope;
+import network.aika.neuron.activation.scopes.Transition;
 
-import java.util.Set;
+import java.util.Collection;
+
 
 /**
  *
@@ -29,11 +31,14 @@ import java.util.Set;
 public class LinkVisitor extends Visitor {
 
     Link link;
+    Collection<Transition> transitions;
 
-    public ActVisitor prepareNextStep(Activation act, Set<ScopeEntry> scopes) {
+
+    public ActVisitor prepareNextStep(Activation act, Collection<Scope> scopes) {
         ActVisitor nv = new ActVisitor();
-        prepareNextStep(nv, scopes);
+        prepareNextStep(nv);
         nv.act = act;
+        nv.scopes = scopes;
 
         return nv;
     }

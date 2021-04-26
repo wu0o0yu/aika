@@ -40,22 +40,18 @@ public abstract class Visitor {
     public Direction downUpDir;
     public Direction startDir;
 
-    protected Set<ScopeEntry> scopes;
-
     public int downSteps = 0;
     public int upSteps = 0;
 
     protected Visitor() {}
 
-    protected Visitor prepareNextStep(Visitor nv, Set<ScopeEntry> scopes) {
+    protected Visitor prepareNextStep(Visitor nv) {
         nv.phase = phase;
         nv.previousStep = this;
         nv.origin = origin;
         nv.downUpDir = downUpDir;
         nv.startDir = startDir;
         nv.upSteps = upSteps;
-        nv.downSteps = downSteps;
-        nv.scopes = scopes;
 
         return nv;
     }

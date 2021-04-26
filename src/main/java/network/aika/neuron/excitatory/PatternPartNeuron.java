@@ -20,15 +20,13 @@ import network.aika.Model;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.scopes.ScopeEntry;
+import network.aika.neuron.activation.scopes.Scope;
 import network.aika.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Set;
-import java.util.TreeSet;
-
-import static network.aika.neuron.activation.scopes.Scope.*;
 
 /**
  * @author Lukas Molzberger
@@ -47,17 +45,13 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     @Override
-    public Set<ScopeEntry> getInitialScopes(Direction dir) {
+    public Collection<Scope> getInitialScopeTemplates(Direction dir) {
         Templates t = getModel().getTemplates();
 
-        Set<ScopeEntry> result = new TreeSet<>();
-        result.add(new ScopeEntry(0, t.PP_SAME));
-        if(dir == Direction.OUTPUT) {
-            result.add(new ScopeEntry(1, t.PP_INPUT));
-            result.add(new ScopeEntry(2, t.I_SAME));
-            result.add(new ScopeEntry(3, t.P_SAME));
-        }
-        return result;
+        if(dir == Direction.OUTPUT)
+            return Set.of(t.PP_SAME, t.PP_INPUT, t.I_SAME, t.P_SAME);
+        else
+            return Set.of(t.PP_SAME);
     }
 
     @Override

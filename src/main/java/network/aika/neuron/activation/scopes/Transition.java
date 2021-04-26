@@ -27,6 +27,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class Transition {
 
+    private Transition template;
     private Class<? extends Synapse> type;
     private Direction startDir;
     private boolean isTarget = false;
@@ -60,6 +61,12 @@ public class Transition {
             t.invert().link(INPUT);
     }
 
+    public Transition getInstance(Scope source) {
+        Transition t = new Transition(type, startDir, isTarget, source, null);
+        t.template = this;
+        return t;
+    }
+
     private void link(Direction dir) {
         dir.getTransitions(input).add(this);
     }
@@ -82,6 +89,10 @@ public class Transition {
 
     public Scope getInput() {
         return input;
+    }
+
+    public void setOutput(Scope s) {
+        output = s;
     }
 
     public Scope getOutput() {

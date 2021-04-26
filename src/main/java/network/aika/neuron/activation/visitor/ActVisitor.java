@@ -21,10 +21,11 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.scopes.Scope;
-import network.aika.neuron.activation.scopes.ScopeEntry;
+import network.aika.neuron.activation.scopes.Transition;
 import network.aika.neuron.steps.VisitorStep;
 
-import java.util.Set;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
@@ -36,6 +37,9 @@ public class ActVisitor extends Visitor {
 
     Activation act;
 
+    protected Collection<Scope> scopes;
+
+
     protected ActVisitor() {
     }
 
@@ -45,13 +49,18 @@ public class ActVisitor extends Visitor {
         this.act = act;
         this.downUpDir = downUpDir;
         this.startDir = startDir;
-        this.scopes = act.getNeuron().getInitialScopes(startDir);
+        this.scopes = act.getNeuron()
+                .getInitialScopeTemplates(startDir)
+                .stream()
+                .map(s -> s.getInstance(null))
+                .collect(Collectors.toList());
     }
 
-    public LinkVisitor prepareNextStep(Link l, Set<ScopeEntry> scopes) {
+    public LinkVisitor prepareNextStep(Link l, Collection<Transition> transitions) {
         LinkVisitor nv = new LinkVisitor();
-        prepareNextStep(nv, scopes);
+        prepareNextStep(nv);
         nv.link = l;
+        nv.transitions = transitions;
 
         return nv;
     }
