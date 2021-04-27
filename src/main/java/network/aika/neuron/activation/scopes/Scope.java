@@ -50,12 +50,17 @@ public class Scope {
     public Scope getInstance(Transition source) {
         Scope s = new Scope(label);
         source.setOutput(s);
+        s.inputs.add(source);
         s.template = this;
         return s;
     }
 
     public String getLabel() {
         return label;
+    }
+
+    public Scope getTemplate() {
+        return template;
     }
 
     public Set<Transition> getInputs() {

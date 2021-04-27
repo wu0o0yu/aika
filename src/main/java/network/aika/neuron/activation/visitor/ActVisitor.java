@@ -17,6 +17,7 @@
 package network.aika.neuron.activation.visitor;
 
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
@@ -56,13 +57,22 @@ public class ActVisitor extends Visitor {
                 .collect(Collectors.toList());
     }
 
-    public LinkVisitor prepareNextStep(Link l, Collection<Transition> transitions) {
+    public LinkVisitor prepareNextStep(Synapse syn, Link l) {
         LinkVisitor nv = new LinkVisitor();
         prepareNextStep(nv);
         nv.link = l;
-        nv.transitions = transitions;
+        nv.transitions = getScopes()
+                .stream()
+                .<Transition>flatMap(s ->
+                        syn.transition(s, downUpDir, startDir, l == null)
+                )
+                .collect(Collectors.toList());
 
         return nv;
+    }
+
+    public Collection<Scope> getScopes() {
+        return scopes;
     }
 
     public Activation getActivation() {
@@ -79,7 +89,7 @@ public class ActVisitor extends Visitor {
         Scope ppRelatedInput = getOriginAct().getModel().getTemplates().PP_RELATED_INPUT;
         if (scopes
                 .stream()
-                .anyMatch(s -> s.getScope() == ppRelatedInput)
+                .anyMatch(s -> s.getTemplate() == ppRelatedInput)
         )
             return; // TODO
 

@@ -22,6 +22,7 @@ import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.activation.scopes.Transition;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 
 /**
@@ -33,12 +34,14 @@ public class LinkVisitor extends Visitor {
     Link link;
     Collection<Transition> transitions;
 
-
-    public ActVisitor prepareNextStep(Activation act, Collection<Scope> scopes) {
+    public ActVisitor prepareNextStep(Activation act) {
         ActVisitor nv = new ActVisitor();
         prepareNextStep(nv);
         nv.act = act;
-        nv.scopes = scopes;
+        nv.scopes = getTransitions()
+                .stream()
+                .map(t -> t.getOutput().getInstance(t))
+                .collect(Collectors.toList());
 
         return nv;
     }
@@ -49,6 +52,10 @@ public class LinkVisitor extends Visitor {
 
     public Link getLink() {
         return link;
+    }
+
+    public Collection<Transition> getTransitions() {
+        return transitions;
     }
 
     public String toString() {

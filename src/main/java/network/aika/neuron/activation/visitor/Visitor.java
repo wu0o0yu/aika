@@ -18,13 +18,8 @@ package network.aika.neuron.activation.visitor;
 
 import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.scopes.Scope;
-import network.aika.neuron.activation.scopes.ScopeEntry;
 import network.aika.neuron.steps.VisitorStep;
-
-import java.util.Set;
 
 import static network.aika.neuron.activation.direction.Direction.*;
 
@@ -78,10 +73,6 @@ public abstract class Visitor {
 
     public int getUpSteps() {
         return upSteps;
-    }
-
-    public Set<ScopeEntry> getScopes() {
-        return scopes;
     }
 
     public VisitorStep getPhase() {

@@ -86,7 +86,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         if (v.downUpDir == OUTPUT)
             return;
 
-        ActVisitor nv = v.prepareNextStep(act, v.getScopes());
+        ActVisitor nv = v.prepareNextStep(act);
 
         if(nv == null)
             return;

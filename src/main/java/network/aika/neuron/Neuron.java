@@ -20,7 +20,6 @@ import network.aika.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.scopes.Scope;
-import network.aika.neuron.activation.scopes.ScopeEntry;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.sign.Sign;
@@ -126,7 +125,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public void transition(LinkVisitor v, Activation act) {
-        ActVisitor nv = v.prepareNextStep(act, v.getScopes());
+        ActVisitor nv = v.prepareNextStep(act);
 
         if(nv == null)
             return;

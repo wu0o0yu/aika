@@ -17,7 +17,8 @@
 package network.aika.neuron;
 
 import network.aika.*;
-import network.aika.neuron.activation.scopes.ScopeEntry;
+import network.aika.neuron.activation.scopes.Scope;
+import network.aika.neuron.activation.scopes.Transition;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
@@ -36,9 +37,8 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
@@ -134,15 +134,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public abstract Activation branchIfNecessary(Activation oAct, Visitor v);
 
     public LinkVisitor transition(ActVisitor v, Link l) {
-        LinkVisitor nv = v.prepareNextStep(
-                l,
-                v.getScopes()
-                        .stream()
-                        .flatMap(s ->
-                                transition(s, v.downUpDir, v.startDir, l == null)
-                                        .stream()
-                        ).collect(Collectors.toCollection(TreeSet::new))
-        );
+        LinkVisitor nv = v.prepareNextStep(this, l);
 
         if(nv != null)
             nv.incrementPathLength();
@@ -150,11 +142,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return nv;
     }
 
-    public Set<ScopeEntry> transition(ScopeEntry se, Direction dir, Direction startDir, boolean checkFinalRequirement) {
-        return dir.getTransitions(se.getScope()).stream()
+    public Stream<Transition> transition(Scope s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
+        return dir.getTransitions(s.getTemplate()).stream()
                 .filter(t -> t.check(this, startDir, checkFinalRequirement))
-                .map(t -> new ScopeEntry(se.getSourceId(), t.getOutput()))
-                .collect(Collectors.toCollection(TreeSet::new));
+                .map(t -> t.getInstance(s));
     }
 
     public void follow(Activation toAct, LinkVisitor v) {
