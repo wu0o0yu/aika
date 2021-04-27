@@ -91,13 +91,6 @@ public abstract class Visitor {
         }
     }
 
-    public boolean isClosedCycle() {
-        return scopes.stream()
-                        .anyMatch(s ->
-                                origin.scopes.contains(s)
-                        );
-    }
-
     public boolean getSelfRef() {
         return downSteps == 0 || upSteps == 0;
     }
@@ -127,7 +120,6 @@ public abstract class Visitor {
         sb.append("DownUp:" + downUpDir + ", ");
         sb.append("StartDir:" + startDir + ", ");
 
-        sb.append("Scopes:" + scopes + ", ");
         sb.append("DownSteps:" + downSteps + ", ");
         sb.append("UpSteps:" + upSteps + "");
 

@@ -46,6 +46,13 @@ public class LinkVisitor extends Visitor {
         return nv;
     }
 
+    public boolean isClosedCycle() {
+        return transitions.stream()
+                .anyMatch(t ->
+                        origin.scopes.contains(t.getInput().getOrigin())
+                );
+    }
+
     public void setLink(Link link) {
         this.link = link;
     }
@@ -63,6 +70,9 @@ public class LinkVisitor extends Visitor {
 
         sb.append("Origin:" + origin.act.toShortString() + ", ");
         sb.append("Current:" + link.toString() + ", ");
+
+        sb.append("Transitions:" + transitions + ", ");
+
         sb.append(super.toString());
 
         return sb.toString();

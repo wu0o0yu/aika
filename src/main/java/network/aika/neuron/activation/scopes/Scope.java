@@ -31,6 +31,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class Scope {
 
+    private Scope origin;
     private Scope template;
     private String label;
 
@@ -51,8 +52,15 @@ public class Scope {
         Scope s = new Scope(label);
         source.setOutput(s);
         s.inputs.add(source);
+        s.origin = source != null ?
+                source.getInput().origin :
+                this;
         s.template = this;
         return s;
+    }
+
+    public Scope getOrigin() {
+        return origin;
     }
 
     public String getLabel() {

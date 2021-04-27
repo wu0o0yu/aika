@@ -100,6 +100,15 @@ public class Transition {
     }
 
     public String toString() {
-        return input + " -- " + type.getSimpleName() + " -- " + (startDir != null ? startDir : "X") + " -- " + (isTarget ? "T" : "-")+ " --> " + output;
+        return "(" +
+                input +
+                " -- " +
+                type.getSimpleName() +
+                " -- " +
+                (startDir != null ? startDir : "X") +
+                " -- " +
+                (isTarget ? "T" : "-") +
+                " --> " + output +
+                ")";
     }
 }

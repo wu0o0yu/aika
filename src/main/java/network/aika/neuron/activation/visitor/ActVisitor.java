@@ -57,16 +57,15 @@ public class ActVisitor extends Visitor {
                 .collect(Collectors.toList());
     }
 
-    public LinkVisitor prepareNextStep(Synapse syn, Link l) {
+    public LinkVisitor prepareNextStep(Synapse<?, ?> syn, Link l) {
         LinkVisitor nv = new LinkVisitor();
         prepareNextStep(nv);
         nv.link = l;
         nv.transitions = getScopes()
                 .stream()
-                .<Transition>flatMap(s ->
+                .flatMap(s ->
                         syn.transition(s, downUpDir, startDir, l == null)
-                )
-                .collect(Collectors.toList());
+                ).collect(Collectors.toList());
 
         return nv;
     }
@@ -101,6 +100,9 @@ public class ActVisitor extends Visitor {
 
         sb.append("Origin:" + origin.act.toShortString() + ", ");
         sb.append("Current:" + act.toShortString() + ", ");
+
+        sb.append("Scopes:" + scopes + ", ");
+
         sb.append(super.toString());
 
         return sb.toString();
