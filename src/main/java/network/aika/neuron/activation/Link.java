@@ -56,7 +56,7 @@ public class Link extends Element<Link> {
 
     private double lastIGGradient;
 
-    public Link(Synapse s, Activation input, Activation output, boolean isSelfRef, Visitor v) {
+    public Link(Synapse s, Activation input, Activation output, boolean isSelfRef, LinkVisitor v) {
         this.synapse = s;
         this.input = input;
         this.output = output;
@@ -69,6 +69,8 @@ public class Link extends Element<Link> {
             linkOutput();
 
         getSynapse().updateReference(this);
+
+        v.setLink(this);
 
         getThought().onLinkCreationEvent(this, v);
     }

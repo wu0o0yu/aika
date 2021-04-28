@@ -143,7 +143,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public Stream<Transition> transition(Scope s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
-        return dir.getTransitions(s.getTemplate()).stream()
+        return dir.getTransitions(s).stream()
                 .filter(t -> t.check(this, startDir, checkFinalRequirement))
                 .map(t -> t.getInstance(s));
     }
@@ -204,8 +204,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 v.getSelfRef(),
                 v
         );
-
-        v.setLink(nl);
 
         Synapse s = nl.getSynapse();
         if (s.getWeight() <= 0.0 && !s.isTemplate())

@@ -61,6 +61,10 @@ public class Transition {
             t.invert().link(INPUT);
     }
 
+    public Transition getTemplate() {
+        return template;
+    }
+
     public Transition getInstance(Scope source) {
         Transition t = new Transition(type, startDir, isTarget, source, null);
         t.template = this;
@@ -100,15 +104,14 @@ public class Transition {
     }
 
     public String toString() {
-        return "(" +
+        return "<" +
                 input +
-                " -- " +
+                ":" +
                 type.getSimpleName() +
-                " -- " +
+                ":" +
                 (startDir != null ? startDir : "X") +
-                " -- " +
-                (isTarget ? "T" : "-") +
-                " --> " + output +
-                ")";
+                (isTarget ? ":T" : "") +
+                ":" + output +
+                ">";
     }
 }

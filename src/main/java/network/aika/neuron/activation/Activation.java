@@ -23,6 +23,7 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.steps.activation.PropagateValueChange;
@@ -351,7 +352,7 @@ public class Activation extends Element<Activation> {
                 );
     }
 
-    public Link addLink(Synapse s, Activation input, boolean isSelfRef, Visitor v) {
+    public Link addLink(Synapse s, Activation input, boolean isSelfRef, LinkVisitor v) {
         Link ol = getInputLink(s);
         Link nl = new Link(
                 s,

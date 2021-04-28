@@ -50,11 +50,13 @@ public class Scope {
 
     public Scope getInstance(Transition source) {
         Scope s = new Scope(label);
-        source.setOutput(s);
-        s.inputs.add(source);
-        s.origin = source != null ?
-                source.getInput().origin :
-                this;
+        if(source != null) {
+            source.setOutput(s);
+            s.inputs.add(source);
+            s.origin = source.getInput().origin;
+        } else {
+            s.origin = this;
+        }
         s.template = this;
         return s;
     }

@@ -64,7 +64,7 @@ public class ActVisitor extends Visitor {
         nv.transitions = getScopes()
                 .stream()
                 .flatMap(s ->
-                        syn.transition(s, downUpDir, startDir, l == null)
+                        syn.transition(s.getTemplate(), downUpDir, startDir, l == null)
                 ).collect(Collectors.toList());
 
         return nv;
