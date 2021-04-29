@@ -22,7 +22,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.scopes.Scope;
-import network.aika.neuron.activation.scopes.Transition;
 import network.aika.neuron.steps.VisitorStep;
 
 import java.util.Collection;
@@ -64,10 +63,10 @@ public class ActVisitor extends Visitor {
         nv.transitions = getScopes()
                 .stream()
                 .flatMap(s ->
-                        syn.transition(s.getTemplate(), downUpDir, startDir, l == null)
+                        syn.transition(s, downUpDir, startDir, l == null)
                 ).collect(Collectors.toList());
 
-        return nv;
+        return nv.transitions.isEmpty() ? null : nv;
     }
 
     public Collection<Scope> getScopes() {

@@ -18,7 +18,6 @@ package network.aika.neuron.activation.visitor;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.activation.scopes.Transition;
 
 import java.util.Collection;
@@ -43,7 +42,7 @@ public class LinkVisitor extends Visitor {
                 .map(t -> t.getTemplate().getOutput().getInstance(t))
                 .collect(Collectors.toList());
 
-        return nv;
+        return nv.scopes.isEmpty() ? null : nv;
     }
 
     public boolean isClosedCycle() {

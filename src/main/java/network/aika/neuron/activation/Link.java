@@ -70,7 +70,8 @@ public class Link extends Element<Link> {
 
         getSynapse().updateReference(this);
 
-        v.setLink(this);
+        if(v != null)
+            v.setLink(this);
 
         getThought().onLinkCreationEvent(this, v);
     }

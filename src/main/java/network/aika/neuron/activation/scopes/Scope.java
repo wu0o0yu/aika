@@ -54,9 +54,9 @@ public class Scope {
             source.setOutput(s);
             s.inputs.add(source);
             s.origin = source.getInput().origin;
-        } else {
-            s.origin = this;
-        }
+        } else
+            s.origin = s;
+
         s.template = this;
         return s;
     }
