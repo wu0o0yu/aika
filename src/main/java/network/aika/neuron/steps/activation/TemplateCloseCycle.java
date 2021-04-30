@@ -40,7 +40,7 @@ public class TemplateCloseCycle extends TemplateVisitor implements ActivationSte
 
     @Override
     public Phase getPhase() {
-        return Phase.TEMPLATE;
+        return Phase.LINKING;
     }
 
     public boolean checkIfQueued() {

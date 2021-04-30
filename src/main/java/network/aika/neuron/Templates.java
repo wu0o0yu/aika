@@ -168,6 +168,12 @@ public class Templates {
         Transition.add(SamePPSynapse.class, null, null, PP_RELATED_INPUT, PP_RELATED_INPUT);
         Transition.add(SamePPSynapse.class, null, null, PP_SAME, PP_RELATED_SAME);
         Transition.add(SamePPSynapse.class, null, null, PP_RELATED_SAME, PP_SAME);
+
+        Transition.add(InhibitorySynapse.class, null, null, PP_SAME, PP_SAME);
+        Transition.add(InhibitorySynapse.class, null, null, PP_INPUT, PP_INPUT);
+        Transition.add(InhibitorySynapse.class, null, null, PP_RELATED_SAME, PP_RELATED_SAME);
+        Transition.add(InhibitorySynapse.class, null, null, PP_RELATED_INPUT, PP_RELATED_INPUT);
+
     }
 
     public Collection<Neuron> getAllTemplates() {
