@@ -29,58 +29,55 @@ public class Transition {
 
     private Transition template;
     private Class<? extends Synapse> type;
-    private Direction startDir;
     private boolean isTarget = false;
     private Scope input;
     private Scope output;
 
 
-    private Transition(Class<? extends Synapse> type, Direction startDir, Scope input, Scope output) {
+    private Transition(Class<? extends Synapse> type) {
         this.type = type;
-        this.startDir = startDir;
-        this.input = input;
-        this.output = output;
     }
 
-    private Transition(Class<? extends Synapse> type, Direction startDir, boolean isTarget, Scope input, Scope output) {
-        this(type, startDir, input, output);
+    private Transition(Class<? extends Synapse> type, Scope input, Scope output) {
+        this(type);
+        this.input = input;
+        this.output = output;
+
+        input.getOutputs().add(this);
+        output.getInputs().add(this);
+    }
+
+    private Transition(Class<? extends Synapse> type, boolean isTarget) {
+        this(type);
         this.isTarget = isTarget;
     }
 
-    public static void add(Class<? extends Synapse> type, Direction dir, Direction startDir, Scope input, Scope output) {
-        add(type, dir, startDir, false, input, output);
+    private Transition(Class<? extends Synapse> type, boolean isTarget, Scope input, Scope output) {
+        this(type, input, output);
+        this.isTarget = isTarget;
     }
 
-    public static void add(Class<? extends Synapse> type, Direction dir, Direction startDir, boolean isTarget, Scope input, Scope output) {
-        Transition t = new Transition(type, startDir, isTarget, input, output);
+    public static void add(Class<? extends Synapse> type, Scope input, Scope output) {
+        add(type, false, input, output);
+    }
 
-        if(dir == null || dir == OUTPUT)
-            t.link(OUTPUT);
-
-        if(dir == null || dir == INPUT)
-            t.invert().link(INPUT);
+    public static void add(Class<? extends Synapse> type, boolean isTarget, Scope input, Scope output) {
+        new Transition(type, isTarget, input, output);
     }
 
     public Transition getTemplate() {
         return template;
     }
 
-    public Transition getInstance(Scope source) {
-        Transition t = new Transition(type, startDir, isTarget, source, null);
+    public Transition getInstance(Direction dir, Scope from) {
+        Transition t = new Transition(type, isTarget);
         t.template = this;
+        dir.setFromScope(from, t);
         return t;
     }
 
-    private void link(Direction dir) {
-        dir.getTransitions(input).add(this);
-    }
-
-    private Transition invert() {
-        return new Transition(type, startDir, output, input);
-    }
-
-    public boolean check(Synapse s, Direction startDir, boolean isTarget) {
-        return s.getClass() == type && (this.startDir == null || this.startDir == startDir) && this.isTarget == isTarget;
+    public boolean check(Synapse s, boolean isTarget) {
+        return s.getClass() == type && (this.isTarget || !isTarget);
     }
 
     public Class<? extends Synapse> getType() {
@@ -89,6 +86,10 @@ public class Transition {
 
     public boolean isTarget() {
         return isTarget;
+    }
+
+    public void setInput(Scope input) {
+        this.input = input;
     }
 
     public Scope getInput() {
@@ -108,10 +109,10 @@ public class Transition {
                 input +
                 ":" +
                 type.getSimpleName() +
-                ":" +
-                (startDir != null ? startDir : "X") +
                 (isTarget ? ":T" : "") +
                 ":" + output +
                 ">";
     }
+
+
 }

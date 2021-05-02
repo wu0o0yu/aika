@@ -40,7 +40,7 @@ public class Scope {
 
     private static Comparator<Transition> getComparator(Direction dir) {
         return Comparator.<Transition, String>comparing(t -> t.getType().getSimpleName())
-                        .thenComparing(t -> dir.getScope(t).getLabel())
+                        .thenComparing(t -> dir.getFromScope(t).getLabel())
                         .thenComparingInt(t -> t.isTarget() ? 1 : 0);
     }
 
@@ -48,12 +48,12 @@ public class Scope {
         this.label = label;
     }
 
-    public Scope getInstance(Transition source) {
+    public Scope getInstance(Direction dir, Transition from) {
         Scope s = new Scope(label);
-        if(source != null) {
-            source.setOutput(s);
-            s.inputs.add(source);
-            s.origin = source.getInput().origin;
+        if(from != null) {
+            dir.setToScope(s, from);
+            s.inputs.add(from);
+            s.origin = dir.getFromScope(from).origin;
         } else
             s.origin = s;
 

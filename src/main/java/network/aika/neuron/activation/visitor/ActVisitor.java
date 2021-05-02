@@ -52,7 +52,7 @@ public class ActVisitor extends Visitor {
         this.scopes = act.getNeuron()
                 .getInitialScopeTemplates(startDir)
                 .stream()
-                .map(s -> s.getInstance(null))
+                .map(s -> s.getInstance(downUpDir, null))
                 .collect(Collectors.toList());
     }
 
@@ -63,7 +63,7 @@ public class ActVisitor extends Visitor {
         nv.transitions = getScopes()
                 .stream()
                 .flatMap(s ->
-                        syn.transition(s, downUpDir, startDir, l == null)
+                        syn.transition(s, downUpDir, l == null)
                 ).collect(Collectors.toList());
 
         return nv.transitions.isEmpty() ? null : nv;

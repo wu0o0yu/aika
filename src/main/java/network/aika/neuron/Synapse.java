@@ -142,11 +142,11 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return nv;
     }
 
-    public Stream<Transition> transition(Scope s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
+    public Stream<Transition> transition(Scope s, Direction dir, boolean checkFinalRequirement) {
         return dir.getTransitions(s.getTemplate())
                 .stream()
-                .filter(t -> t.check(this, startDir, checkFinalRequirement))
-                .map(t -> t.getInstance(s));
+                .filter(t -> t.check(this, checkFinalRequirement))
+                .map(t -> t.getInstance(dir, s));
     }
 
     public void follow(Activation toAct, LinkVisitor v) {

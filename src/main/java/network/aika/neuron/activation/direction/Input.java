@@ -74,12 +74,27 @@ public class Input implements Direction {
 
     @Override
     public Set<Transition> getTransitions(Scope s) {
-        return s.getOutputs();
+        return s.getInputs();
     }
 
     @Override
-    public Scope getScope(Transition t) {
+    public Scope getFromScope(Transition t) {
+        return t.getOutput();
+    }
+
+    @Override
+    public void setFromScope(Scope s, Transition t) {
+        t.setOutput(s);
+    }
+
+    @Override
+    public Scope getToScope(Transition t) {
         return t.getInput();
+    }
+
+    @Override
+    public void setToScope(Scope s, Transition t) {
+        t.setInput(s);
     }
 
     @Override

@@ -72,12 +72,27 @@ public class Output implements Direction {
 
     @Override
     public Set<Transition> getTransitions(Scope s) {
-        return s.getInputs();
+        return s.getOutputs();
     }
 
     @Override
-    public Scope getScope(Transition t) {
+    public Scope getFromScope(Transition t) {
+        return t.getInput();
+    }
+
+    @Override
+    public void setFromScope(Scope s, Transition t) {
+        t.setInput(s);
+    }
+
+    @Override
+    public Scope getToScope(Transition t) {
         return t.getOutput();
+    }
+
+    @Override
+    public void setToScope(Scope s, Transition t) {
+        t.setOutput(s);
     }
 
     public Stream<? extends Synapse> getSynapses(Neuron n) {

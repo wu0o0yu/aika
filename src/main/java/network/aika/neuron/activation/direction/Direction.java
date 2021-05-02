@@ -52,7 +52,13 @@ public interface Direction {
 
     Set<Transition> getTransitions(Scope s);
 
-    Scope getScope(Transition t);
+    Scope getFromScope(Transition t);
+
+    void setFromScope(Scope s, Transition t);
+
+    Scope getToScope(Transition t);
+
+    void setToScope(Scope s, Transition t);
 
     Stream<? extends Synapse> getSynapses(Neuron n);
 
