@@ -50,6 +50,8 @@ public class Scope {
 
     public Scope getInstance(Direction dir, Transition from) {
         Scope s = new Scope(label);
+        s.template = this;
+
         if(from != null) {
             dir.setToScope(s, from);
             s.inputs.add(from);
@@ -57,7 +59,6 @@ public class Scope {
         } else
             s.origin = s;
 
-        s.template = this;
         return s;
     }
 

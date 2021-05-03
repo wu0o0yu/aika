@@ -39,7 +39,10 @@ public class LinkVisitor extends Visitor {
         nv.act = act;
         nv.scopes = getTransitions()
                 .stream()
-                .map(t -> t.getTemplate().getOutput().getInstance(downUpDir, t))
+                .map(t ->
+                        downUpDir.getToScope(t.getTemplate())
+                                .getInstance(downUpDir, t)
+                )
                 .collect(Collectors.toList());
 
         return nv.scopes.isEmpty() ? null : nv;
