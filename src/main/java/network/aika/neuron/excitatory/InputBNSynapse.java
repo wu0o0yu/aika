@@ -7,9 +7,9 @@ import network.aika.neuron.activation.visitor.Visitor;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
-public class InputPPSynapse<I extends Neuron<?>> extends PatternPartSynapse<I> {
+public class InputBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> {
 
-    public InputPPSynapse(I input, PatternPartNeuron output, Synapse template) {
+    public InputBNSynapse(I input, BindingNeuron output, Synapse template) {
         super(input, output, template);
     }
 
@@ -21,10 +21,10 @@ public class InputPPSynapse<I extends Neuron<?>> extends PatternPartSynapse<I> {
     }
 
     @Override
-    public PatternPartSynapse instantiateTemplate(I input, PatternPartNeuron output) {
+    public BindingNeuronSynapse instantiateTemplate(I input, BindingNeuron output) {
         assert input.getTemplates().contains(getInput());
 
-        PatternPartSynapse s = new InputPPSynapse(input, output, this);
+        BindingNeuronSynapse s = new InputBNSynapse(input, output, this);
         initFromTemplate(s);
         return s;
     }

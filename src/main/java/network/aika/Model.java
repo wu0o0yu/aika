@@ -26,8 +26,8 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.excitatory.PatternPartSynapse;
-import network.aika.neuron.excitatory.PatternPartNeuron;
+import network.aika.neuron.excitatory.BindingNeuronSynapse;
+import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.excitatory.PatternSynapse;
 import network.aika.neuron.inhibitory.*;
 import network.aika.neuron.excitatory.PatternNeuron;
@@ -59,9 +59,9 @@ public abstract class Model {
 
     static {
         registerType(PatternNeuron.class);
-        registerType(PatternPartNeuron.class);
+        registerType(BindingNeuron.class);
         registerType(PatternSynapse.class);
-        registerType(PatternPartSynapse.class);
+        registerType(BindingNeuronSynapse.class);
 
         registerType(InhibitoryNeuron.class);
         registerType(InhibitorySynapse.class);

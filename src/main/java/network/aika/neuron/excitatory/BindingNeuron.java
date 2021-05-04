@@ -31,16 +31,16 @@ import java.util.Set;
 /**
  * @author Lukas Molzberger
  */
-public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
-    private static final Logger log = LoggerFactory.getLogger(PatternPartNeuron.class);
+public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
+    private static final Logger log = LoggerFactory.getLogger(BindingNeuron.class);
 
     public static byte type;
 
-    public PatternPartNeuron() {
+    public BindingNeuron() {
         super();
     }
 
-    public PatternPartNeuron(Model model) {
+    public BindingNeuron(Model model) {
         super(model);
     }
 
@@ -67,8 +67,8 @@ public class PatternPartNeuron extends ExcitatoryNeuron<PatternPartSynapse> {
     }
 
     @Override
-    public PatternPartNeuron instantiateTemplate() {
-        PatternPartNeuron n = new PatternPartNeuron(getModel());
+    public BindingNeuron instantiateTemplate() {
+        BindingNeuron n = new BindingNeuron(getModel());
         initFromTemplate(n);
 
         return n;

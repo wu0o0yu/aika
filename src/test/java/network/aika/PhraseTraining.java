@@ -4,7 +4,7 @@ import network.aika.debugger.AikaDebugger;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.PatternNeuron;
-import network.aika.neuron.excitatory.PatternPartNeuron;
+import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.activation.ActivationStep;
 import network.aika.neuron.steps.link.LinkStep;
@@ -36,7 +36,7 @@ public class PhraseTraining {
                                 .map(l -> l.getInput())
                                 .orElse(null);
 
-                        if (n instanceof PatternPartNeuron) {
+                        if (n instanceof BindingNeuron) {
                             return "PP-" + trimPrefix(iAct.getLabel());
                         } else if (n instanceof PatternNeuron) {
                             return "P-" + ((Document) act.getThought()).getContent();

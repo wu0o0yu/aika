@@ -17,17 +17,14 @@
 package network.aika;
 
 import network.aika.neuron.Templates;
-import network.aika.neuron.excitatory.PatternPartSynapse;
+import network.aika.neuron.excitatory.BindingNeuronSynapse;
 import network.aika.text.Document;
-import network.aika.Model;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.PatternNeuron;
-import network.aika.neuron.excitatory.PatternPartNeuron;
+import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
-
-import static network.aika.neuron.Templates.*;
 
 /**
  *
@@ -44,10 +41,10 @@ public class PropagateTest {
         in.setTokenLabel("A");
         in.setInputNeuron(true);
         in.setLabel("IN");
-        PatternPartNeuron out = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
+        BindingNeuron out = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
         out.setLabel("OUT");
 
-        PatternPartSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, out);
+        BindingNeuronSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, out);
 
         s.linkInput();
         s.linkOutput();

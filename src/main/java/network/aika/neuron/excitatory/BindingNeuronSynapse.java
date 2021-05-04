@@ -31,21 +31,21 @@ import static network.aika.neuron.activation.Fired.NOT_FIRED;
  *
  * @author Lukas Molzberger
  */
-public abstract class PatternPartSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, PatternPartNeuron> {
+public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, BindingNeuron> {
 
     public static byte type;
 
     public boolean isRecurrent;
 
-    public PatternPartSynapse() {
+    public BindingNeuronSynapse() {
         super();
     }
 
-    public PatternPartSynapse(I input, PatternPartNeuron output, Synapse template) {
+    public BindingNeuronSynapse(I input, BindingNeuron output, Synapse template) {
         super(input, output, template);
     }
 
-    public PatternPartSynapse(I input, PatternPartNeuron output, Synapse template, boolean isRecurrent) {
+    public BindingNeuronSynapse(I input, BindingNeuron output, Synapse template, boolean isRecurrent) {
         super(input, output, template);
         this.isRecurrent = isRecurrent;
     }
@@ -76,7 +76,7 @@ public abstract class PatternPartSynapse<I extends Neuron<?>> extends Excitatory
         }
     }
 
-    protected void initFromTemplate(PatternPartSynapse s) {
+    protected void initFromTemplate(BindingNeuronSynapse s) {
         super.initFromTemplate(s);
 
         s.isRecurrent = isRecurrent;

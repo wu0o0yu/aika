@@ -34,13 +34,13 @@ public class DerDieDasTest {
         out.setLabel("P-" + token);
         out.setBias(0.1);
 
-        PatternPartNeuron prevPPN = null;
+        BindingNeuron prevPPN = null;
 
         for(int i = 0; i < token.length(); i++) {
             char c = token.charAt(i);
 
             PatternNeuron inN = m.lookupToken(ref, "" + c);
-            PatternPartNeuron ppN = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
+            BindingNeuron ppN = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
             ppN.setLabel("TP-" + c + "-(" + token + ")");
 
             initPP(ref, c, inN, ppN, prevPPN, out);
@@ -58,7 +58,7 @@ public class DerDieDasTest {
         }
     }
 
-    public void initPP(Reference ref, Character c, PatternNeuron inN, PatternPartNeuron ppN, PatternPartNeuron prevPP, PatternNeuron out) {
+    public void initPP(Reference ref, Character c, PatternNeuron inN, BindingNeuron ppN, BindingNeuron prevPP, PatternNeuron out) {
         TextModel m = charBasedTrainings.getModel();
         Templates t = m.getTemplates();
 
@@ -79,14 +79,14 @@ public class DerDieDasTest {
         }
 
         {
-            PatternPartSynapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhibN, ppN);
+            BindingNeuronSynapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhibN, ppN);
 
             s.linkOutput();
             s.addWeight(-100.0);
         }
 
         {
-            PatternPartSynapse s = t.SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(inN, ppN);
+            BindingNeuronSynapse s = t.SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(inN, ppN);
 
             s.linkInput();
             s.addWeight(0.1);
@@ -94,16 +94,16 @@ public class DerDieDasTest {
         }
 
         if(prevPP != null) {
-            PatternPartSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(prevPP, ppN);
+            BindingNeuronSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(prevPP, ppN);
 
             s.linkOutput();
             s.addWeight(0.1);
             ppN.addConjunctiveBias(-0.1, false);
         }
 
-        PatternPartNeuron nextPP = lookupPPPT(inN);
+        BindingNeuron nextPP = lookupPPPT(inN);
         if(nextPP != null) {
-            PatternPartSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(nextPP, ppN);
+            BindingNeuronSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(nextPP, ppN);
 
             s.linkOutput();
             s.addWeight(0.1);
@@ -111,7 +111,7 @@ public class DerDieDasTest {
         }
 
         {
-            PatternPartSynapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, ppN);
+            BindingNeuronSynapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, ppN);
 
             s.linkOutput();
             s.addWeight(0.1);
@@ -120,8 +120,8 @@ public class DerDieDasTest {
         ppN.setBias(0.1);
     }
 
-    public PatternPartNeuron lookupPPPT(PatternNeuron pn) {
-        return (PatternPartNeuron) pn.getOutputSynapses()
+    public BindingNeuron lookupPPPT(PatternNeuron pn) {
+        return (BindingNeuron) pn.getOutputSynapses()
                 .map(s -> s.getOutput())
                 .filter(n -> isPTNeuron(n))
                 .findAny()
