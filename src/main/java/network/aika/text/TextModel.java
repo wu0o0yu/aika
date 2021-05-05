@@ -129,11 +129,11 @@ public class TextModel extends Model {
         in.setAllowTraining(false);
         getSuspensionHook().putLabel(tokenLabel, in.getId());
 
-        BindingNeuron inRelPT = getTemplates().INPUT_PATTERN_PART_TEMPLATE.instantiateTemplate();
+        BindingNeuron inRelPT = getTemplates().INPUT_BINDING_TEMPLATE.instantiateTemplate();
         inRelPT.setInputNeuron(true);
         inRelPT.setLabel(tokenLabel + REL_PREVIOUS_TOKEN_LABEL);
 
-        BindingNeuron inRelNT = getTemplates().INPUT_PATTERN_PART_TEMPLATE.instantiateTemplate();
+        BindingNeuron inRelNT = getTemplates().INPUT_BINDING_TEMPLATE.instantiateTemplate();
         inRelNT.setInputNeuron(true);
         inRelNT.setLabel(tokenLabel + REL_NEXT_TOKEN_LABEL);
 

@@ -64,7 +64,7 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         Templates t = getModel().getTemplates();
 
         if(dir == Direction.OUTPUT)
-            return Set.of(t.P_SAME, t.PP_SAME, t.PP_INPUT, t.I_INPUT);
+            return Set.of(t.P_SAME, t.B_SAME, t.B_INPUT, t.I_INPUT);
         else
             return Set.of(t.P_SAME);
     }

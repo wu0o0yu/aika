@@ -58,7 +58,7 @@ public class GradientTest {
             i = j + 1;
         }
 
-        m.getTemplates().SAME_PATTERN_PART_TEMPLATE.setDirectConjunctiveBias(-0.32);
+        m.getTemplates().SAME_BINDING_TEMPLATE.setDirectConjunctiveBias(-0.32);
 
         Neuron nA = m.getNeuron("A");
         nA.setFrequency(53.0);

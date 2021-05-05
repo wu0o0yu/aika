@@ -74,11 +74,11 @@ public class PatternTest {
         PatternNeuron nB = m.lookupToken(null, "B");
         PatternNeuron nC = m.lookupToken(null, "C");
 
-        BindingNeuron eA = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
+        BindingNeuron eA = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
         eA.setLabel("E A");
-        BindingNeuron eB = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
+        BindingNeuron eB = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
         eB.setLabel("E B");
-        BindingNeuron eC = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
+        BindingNeuron eC = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
         eC.setLabel("E C");
 
         PatternNeuron out = t.SAME_PATTERN_TEMPLATE.instantiateTemplate();

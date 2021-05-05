@@ -56,7 +56,7 @@ public class InductionTest {
         inB.setTokenLabel("B");
         inB.setInputNeuron(true);
         inB.setLabel("IN-B");
-        BindingNeuron targetN = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
+        BindingNeuron targetN = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
         targetN.setLabel("OUT-Target");
 
         targetN.setBias(0.0);

@@ -41,7 +41,7 @@ public class PropagateTest {
         in.setTokenLabel("A");
         in.setInputNeuron(true);
         in.setLabel("IN");
-        BindingNeuron out = t.SAME_PATTERN_PART_TEMPLATE.instantiateTemplate();
+        BindingNeuron out = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
         out.setLabel("OUT");
 
         BindingNeuronSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, out);
