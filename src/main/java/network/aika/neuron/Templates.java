@@ -51,13 +51,13 @@ public class Templates {
     public InhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE;
 
 
-    public Scope I_INPUT = new Scope("I_INPUT");
-    public Scope I_SAME = new Scope("I_SAME");
-    public Scope P_SAME = new Scope("P_SAME");
-    public Scope B_INPUT = new Scope("PP_INPUT");
-    public Scope B_SAME = new Scope("PP_SAME");
-    public Scope B_RELATED_INPUT = new Scope("PP_RELATED_INPUT");
-    public Scope B_RELATED_SAME = new Scope("PP_RELATED_SAME");
+    public Scope I_INPUT = new Scope("I_INPUT", 0);
+    public Scope I_SAME = new Scope("I_SAME", 1);
+    public Scope P_SAME = new Scope("P_SAME", 2);
+    public Scope B_INPUT = new Scope("B_INPUT", 3);
+    public Scope B_SAME = new Scope("B_SAME", 4);
+    public Scope B_RELATED_INPUT = new Scope("B_RELATED_INPUT", 5);
+    public Scope B_RELATED_SAME = new Scope("B_RELATED_SAME", 6);
 
 
     public Templates(Model m) {

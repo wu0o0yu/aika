@@ -18,9 +18,12 @@ package network.aika.neuron.activation.visitor;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.activation.scopes.Transition;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 
@@ -37,15 +40,21 @@ public class LinkVisitor extends Visitor {
         ActVisitor nv = new ActVisitor();
         prepareNextStep(nv);
         nv.act = act;
-        nv.scopes = getTransitions()
-                .stream()
-                .map(t ->
-                        downUpDir.getToScope(t.getTemplate())
-                                .getInstance(downUpDir, t)
-                )
-                .collect(Collectors.toList());
+        nv.scopes = new ArrayList<>();
+        nv.visitedScopes = new TreeSet<>(visitedScopes);
 
-        return nv.scopes.isEmpty() ? null : nv;
+        getTransitions()
+                .forEach(t -> {
+                    Scope fromScope = downUpDir.getFromScope(t.getTemplate());
+                    Scope toScope = downUpDir.getToScope(t.getTemplate());
+                    if(fromScope == toScope || !visitedScopes.contains(toScope))
+                        nv.scopes.add(toScope.getInstance(downUpDir, t));
+                });
+
+        if(nv.scopes.isEmpty())
+            return null;
+
+        return nv;
     }
 
     public boolean isClosedCycle() {

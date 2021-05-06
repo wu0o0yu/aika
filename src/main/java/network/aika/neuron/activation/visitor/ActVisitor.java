@@ -24,7 +24,10 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.steps.VisitorStep;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -49,11 +52,15 @@ public class ActVisitor extends Visitor {
         this.act = act;
         this.downUpDir = downUpDir;
         this.startDir = startDir;
-        this.scopes = act.getNeuron()
+        this.scopes = new ArrayList<>();
+        this.visitedScopes = new TreeSet<>();
+
+        act.getNeuron()
                 .getInitialScopeTemplates(startDir)
-                .stream()
-                .map(s -> s.getInstance(downUpDir, null))
-                .collect(Collectors.toList());
+                .forEach(s -> {
+                    visitedScopes.add(s);
+                    scopes.add(s.getInstance(downUpDir, null));
+                });
     }
 
     public LinkVisitor prepareNextStep(Synapse<?, ?> syn, Link l) {
@@ -65,6 +72,8 @@ public class ActVisitor extends Visitor {
                 .flatMap(s ->
                         syn.transition(s, downUpDir, l == null)
                 ).collect(Collectors.toList());
+
+        nv.visitedScopes = visitedScopes;
 
         return nv.transitions.isEmpty() ? null : nv;
     }
