@@ -102,6 +102,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public Synapse getTemplate() {
+        if(isTemplate())
+            return this;
         return template;
     }
 
