@@ -169,7 +169,10 @@ public class Templates {
                 RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE,
                 RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE
         );
-        Transition.add(IB_INPUT, IB_INPUT, SAME_PATTERN_SYNAPSE_TEMPLATE);
+        Transition.add(IB_INPUT, IB_INPUT,
+                SAME_PATTERN_SYNAPSE_TEMPLATE,
+                RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE
+        );
         Transition.add(IB_INPUT, IB_INPUT, INHIBITORY_SYNAPSE_TEMPLATE);
 
 
