@@ -49,9 +49,9 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
         Templates t = getModel().getTemplates();
 
         if(dir == Direction.OUTPUT)
-            return Set.of(t.B_RELATED_SAME, t.B_INPUT, t.I_SAME, t.P_SAME);
+            return Set.of(t.SB_RELATED_SAME, t.IB_INPUT, t.I_SAME, t.P_SAME);
         else
-            return Set.of(t.B_SAME);
+            return Set.of(t.IB_SAME, t.SB_SAME, t.PB_SAME);
     }
 
     @Override

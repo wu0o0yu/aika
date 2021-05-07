@@ -93,10 +93,10 @@ public class ActVisitor extends Visitor {
         if (act == origin.act || act.isConflicting())
             return;
 
-        Scope ppRelatedInput = getOriginAct().getModel().getTemplates().B_RELATED_INPUT;
+        Scope bRelatedInput = getOriginAct().getModel().getTemplates().SB_RELATED_INPUT;
         if (scopes
                 .stream()
-                .anyMatch(s -> s.getTemplate() == ppRelatedInput)
+                .anyMatch(s -> s.getTemplate() == bRelatedInput)
         )
             return; // TODO
 

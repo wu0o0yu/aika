@@ -60,7 +60,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         Templates t = getModel().getTemplates();
 
         if(dir == Direction.OUTPUT)
-            return Set.of(t.I_SAME, t.B_INPUT);
+            return Set.of(t.I_SAME, t.IB_INPUT);
         else
             return Set.of(t.I_SAME);
     }

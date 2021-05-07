@@ -62,7 +62,7 @@ public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends Excitato
         // TODO: find a better solution.
         Synapse ts = l.getSynapse().getTemplate();
         Templates t = getModel().getTemplates();
-        if(ts != t.RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE && ts != t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE) {
+        if(ts != t.RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE && ts != t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE) {
             l.getOutput().propagateReference(iRef);
         }
     }

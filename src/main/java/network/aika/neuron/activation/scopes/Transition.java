@@ -25,18 +25,18 @@ import network.aika.neuron.activation.direction.Direction;
 public class Transition {
 
     private Transition template;
-    private Class<? extends Synapse> type;
+    private Synapse templateSynapse;
     private boolean isTarget = false;
     private Scope input;
     private Scope output;
 
 
-    private Transition(Class<? extends Synapse> type) {
-        this.type = type;
+    private Transition(Synapse templateSynapse) {
+        this.templateSynapse = templateSynapse;
     }
 
-    private Transition(Class<? extends Synapse> type, Scope input, Scope output) {
-        this(type);
+    private Transition(Synapse templateSynapse, Scope input, Scope output) {
+        this(templateSynapse);
         this.input = input;
         this.output = output;
 
@@ -44,22 +44,24 @@ public class Transition {
         output.getInputs().add(this);
     }
 
-    private Transition(Class<? extends Synapse> type, boolean isTarget) {
-        this(type);
+    private Transition(Synapse templateSynapse, boolean isTarget) {
+        this(templateSynapse);
         this.isTarget = isTarget;
     }
 
-    private Transition(Class<? extends Synapse> type, boolean isTarget, Scope input, Scope output) {
-        this(type, input, output);
+    private Transition(Synapse templateSynapse, boolean isTarget, Scope input, Scope output) {
+        this(templateSynapse, input, output);
         this.isTarget = isTarget;
     }
 
-    public static void add(Class<? extends Synapse> type, Scope input, Scope output) {
-        add(type, false, input, output);
+    public static void add(Scope input, Scope output, Synapse... templateSynapse) {
+        add(false, input, output, templateSynapse);
     }
 
-    public static void add(Class<? extends Synapse> type, boolean isTarget, Scope input, Scope output) {
-        new Transition(type, isTarget, input, output);
+    public static void add(boolean isTarget, Scope input, Scope output, Synapse... templateSynapse) {
+        for(Synapse ts: templateSynapse) {
+            new Transition(ts, isTarget, input, output);
+        }
     }
 
     public Transition getTemplate() {
@@ -67,18 +69,18 @@ public class Transition {
     }
 
     public Transition getInstance(Direction dir, Scope from) {
-        Transition t = new Transition(type, isTarget);
+        Transition t = new Transition(templateSynapse, isTarget);
         t.template = this;
         dir.setFromScope(from, t);
         return t;
     }
 
     public boolean check(Synapse s, boolean isTarget) {
-        return s.getClass() == type && (this.isTarget || !isTarget);
+        return s.getTemplate() == templateSynapse && (this.isTarget || !isTarget);
     }
 
-    public Class<? extends Synapse> getType() {
-        return type;
+    public Synapse getSynapseTemplate() {
+        return templateSynapse;
     }
 
     public boolean isTarget() {
@@ -105,7 +107,7 @@ public class Transition {
         return "<" +
                 input +
                 ":" +
-                type.getSimpleName() +
+                templateSynapse.getTemplateInfo().getLabel() +
                 (isTarget ? ":T" : "") +
                 ":" + output +
                 ">";

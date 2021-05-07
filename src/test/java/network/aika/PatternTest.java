@@ -125,7 +125,7 @@ public class PatternTest {
             }
 
             {
-                BindingNeuronSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(lookupPPPT(m, nB), eB);
+                BindingNeuronSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(lookupPPPT(m, nB), eB);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -161,7 +161,7 @@ public class PatternTest {
             }
 
             {
-                BindingNeuronSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(lookupPPPT(m, nC), eC);
+                BindingNeuronSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(lookupPPPT(m, nC), eC);
 
                 s.linkOutput();
                 s.addWeight(10.0);

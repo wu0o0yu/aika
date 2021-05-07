@@ -40,7 +40,7 @@ public class Scope implements Comparable<Scope> {
     private Set<Transition> outputs = new TreeSet<>(getComparator(INPUT));
 
     private static Comparator<Transition> getComparator(Direction dir) {
-        return Comparator.<Transition, String>comparing(t -> t.getType().getSimpleName())
+        return Comparator.<Transition, String>comparing(t -> t.getSynapseTemplate().getSimpleName())
                         .thenComparingInt(t -> dir.getFromScope(t).id)
                         .thenComparingInt(t -> t.isTarget() ? 1 : 0);
     }

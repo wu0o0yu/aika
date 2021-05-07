@@ -79,9 +79,9 @@ public class TextModel extends Model {
         if(lastRef == null) return;
 
         if (dir == OUTPUT) {
-            if (fromAct.getNeuron().isInputNeuron() && prevTokenInhib.getId().equals(fromAct.getNeuron().getId()) && lastRef.nextTokenPPAct != null) {
-                Synapse s = getRelSynapse(lastRef.nextTokenPPAct.getNeuron());
-                addLink(s, fromAct, lastRef.nextTokenPPAct);
+            if (fromAct.getNeuron().isInputNeuron() && prevTokenInhib.getId().equals(fromAct.getNeuron().getId()) && lastRef.nextTokenBAct != null) {
+                Synapse s = getRelSynapse(lastRef.nextTokenBAct.getNeuron());
+                addLink(s, fromAct, lastRef.nextTokenBAct);
             }
         } else if (dir == INPUT) {
             Neuron n = fromAct.getNeuron();

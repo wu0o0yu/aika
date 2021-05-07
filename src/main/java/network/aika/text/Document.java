@@ -49,7 +49,7 @@ public class Document extends Thought {
         TextModel tm = act.getNeuron().getModel();
         if(tm.getNextTokenInhib().getId().equals(act.getNeuron().getId())) {
             ref.nextTokenIAct = act;
-            ref.nextTokenPPAct = act.getInputLinks()
+            ref.nextTokenBAct = act.getInputLinks()
                     .findAny()
                     .map(l -> l.getInput())
                     .orElse(null);

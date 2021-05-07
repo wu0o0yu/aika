@@ -94,7 +94,7 @@ public class DerDieDasTest {
         }
 
         if(prevPP != null) {
-            BindingNeuronSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(prevPP, ppN);
+            BindingNeuronSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(prevPP, ppN);
 
             s.linkOutput();
             s.addWeight(0.1);
@@ -103,7 +103,7 @@ public class DerDieDasTest {
 
         BindingNeuron nextPP = lookupPPPT(inN);
         if(nextPP != null) {
-            BindingNeuronSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE.instantiateTemplate(nextPP, ppN);
+            BindingNeuronSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(nextPP, ppN);
 
             s.linkOutput();
             s.addWeight(0.1);

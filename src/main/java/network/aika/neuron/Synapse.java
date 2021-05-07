@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.sign.Sign.NEG;
@@ -59,6 +58,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     protected NeuronProvider output;
 
     private Synapse template;
+    private TemplateSynapseInfo templateInfo;
 
     protected double weight;
 
@@ -103,6 +103,14 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public Synapse getTemplate() {
         return template;
+    }
+
+    public TemplateSynapseInfo getTemplateInfo() {
+        return templateInfo;
+    }
+
+    public void setTemplateInfo(TemplateSynapseInfo templateInfo) {
+        this.templateInfo = templateInfo;
     }
 
     public abstract Synapse instantiateTemplate(I input, O output);

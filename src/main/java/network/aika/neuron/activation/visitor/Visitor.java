@@ -28,6 +28,8 @@ import java.util.TreeSet;
 import static network.aika.neuron.activation.direction.Direction.*;
 
 /**
+ * The Visitor is a finite state machine used to implement the linking process in the neural network.
+ * It traverses the network of activations in order to find yet unlinked synapses.
  *
  * @author Lukas Molzberger
  */
