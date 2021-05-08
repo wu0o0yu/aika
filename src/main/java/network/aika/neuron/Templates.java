@@ -188,7 +188,10 @@ public class Templates {
         Transition.add(SB_RELATED_INPUT, SB_RELATED_SAME, inputBindingSynapses);
         Transition.add(SB_RELATED_INPUT, SB_INPUT, inputBindingSynapses);
         Transition.add(SB_INPUT, SB_RELATED_INPUT, inputBindingSynapses);
-        Transition.add(SB_INPUT, SB_INPUT, INHIBITORY_SYNAPSE_TEMPLATE);
+        Transition.add(SB_INPUT, SB_INPUT,
+                INHIBITORY_SYNAPSE_TEMPLATE,
+                RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE
+        );
         Transition.add(SB_RELATED_INPUT, SB_RELATED_INPUT, INHIBITORY_SYNAPSE_TEMPLATE);
     }
 

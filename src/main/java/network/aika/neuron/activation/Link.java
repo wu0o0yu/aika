@@ -129,12 +129,13 @@ public class Link extends Element<Link> {
 
     public void follow(ActVisitor v) {
         LinkVisitor nv = synapse.transition(v, this);
-        if(nv != null) {
-            synapse.follow(
-                    v.downUpDir.getActivation(this),
-                    nv
-            );
-        }
+        if(nv == null)
+            return;
+
+        synapse.follow(
+                v.downUpDir.getActivation(this),
+                nv
+        );
     }
 
     public void computeInformationGainGradient() {

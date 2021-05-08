@@ -155,7 +155,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public Stream<Transition> transition(Scope s, Direction dir, boolean checkFinalRequirement) {
         return dir.getTransitions(s.getTemplate())
                 .stream()
-                .filter(t -> t.check(this, checkFinalRequirement))
+                .filter(t ->
+                        t.check(this, checkFinalRequirement)
+                )
                 .map(t -> t.getInstance(dir, s));
     }
 
