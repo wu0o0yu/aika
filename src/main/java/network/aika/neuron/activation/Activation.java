@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.*;
+import network.aika.callbacks.VisitorEvent;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
@@ -39,6 +40,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
+import static network.aika.callbacks.VisitorEvent.AFTER;
+import static network.aika.callbacks.VisitorEvent.BEFORE;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.steps.activation.ActivationStep.*;
@@ -303,7 +306,7 @@ public class Activation extends Element<Activation> {
     }
 
     public void followLinks(ActVisitor v) {
-        v.onEvent(false);
+        v.onEvent(BEFORE);
 
         v.tryToLink(this);
 
@@ -319,7 +322,7 @@ public class Activation extends Element<Activation> {
                 );
         setMarked(false);
 
-        v.onEvent(true);
+        v.onEvent(AFTER);
     }
 
     public Link getInputLink(Neuron n) {

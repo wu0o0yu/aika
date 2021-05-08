@@ -18,6 +18,7 @@ package network.aika;
 
 
 import network.aika.callbacks.EventListener;
+import network.aika.callbacks.VisitorEvent;
 import network.aika.callbacks.VisitorEventListener;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
@@ -92,10 +93,10 @@ public abstract class Thought {
                 );
     }
 
-    public void onVisitorEvent(Visitor v, boolean dir) {
+    public void onVisitorEvent(Visitor v, VisitorEvent ve) {
         getVisitorEventListeners()
                 .forEach(
-                        el -> el.onVisitorEvent(v, dir)
+                        el -> el.onVisitorEvent(v, ve)
                 );
     }
 

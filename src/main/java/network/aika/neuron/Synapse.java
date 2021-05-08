@@ -17,6 +17,7 @@
 package network.aika.neuron;
 
 import network.aika.*;
+import network.aika.callbacks.VisitorEvent;
 import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.activation.scopes.Transition;
 import network.aika.neuron.activation.visitor.ActVisitor;
@@ -39,6 +40,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.stream.Stream;
 
+import static network.aika.callbacks.VisitorEvent.AFTER;
+import static network.aika.callbacks.VisitorEvent.BEFORE;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.activation.Link.linkExists;
@@ -162,12 +165,12 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void follow(Activation toAct, LinkVisitor v) {
-        v.onEvent(false);
+        v.onEvent(BEFORE);
 
         toAct.getNeuron()
                 .transition(v, toAct);
 
-        v.onEvent(true);
+        v.onEvent(AFTER);
     }
 
     public void propagate(Activation fromAct, ActVisitor v) {

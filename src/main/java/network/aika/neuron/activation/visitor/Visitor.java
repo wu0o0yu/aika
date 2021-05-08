@@ -17,6 +17,7 @@
 package network.aika.neuron.activation.visitor;
 
 import network.aika.Thought;
+import network.aika.callbacks.VisitorEvent;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.scopes.Scope;
@@ -111,8 +112,8 @@ public abstract class Visitor {
         return origin.act.getThought();
     }
 
-    public void onEvent(boolean dir) {
-        getThought().onVisitorEvent(this, dir);
+    public void onEvent(VisitorEvent ve) {
+        getThought().onVisitorEvent(this, ve);
     }
 
     public String toStringRecursive() {

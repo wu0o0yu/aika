@@ -17,6 +17,7 @@
 package network.aika.neuron.activation.visitor;
 
 
+import network.aika.callbacks.VisitorEvent;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
@@ -30,6 +31,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import static network.aika.callbacks.VisitorEvent.*;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
@@ -67,6 +69,9 @@ public class ActVisitor extends Visitor {
         LinkVisitor nv = new LinkVisitor();
         prepareNextStep(nv);
         nv.link = l;
+
+        nv.onEvent(CANDIDATE_BEFORE);
+
         nv.transitions = getScopes()
                 .stream()
                 .flatMap(s ->
@@ -74,6 +79,8 @@ public class ActVisitor extends Visitor {
                 ).collect(Collectors.toList());
 
         nv.visitedScopes = visitedScopes;
+
+        nv.onEvent(CANDIDATE_AFTER);
 
         return nv.transitions.isEmpty() ? null : nv;
     }

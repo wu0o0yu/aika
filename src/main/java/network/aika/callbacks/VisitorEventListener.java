@@ -25,6 +25,6 @@ import network.aika.neuron.activation.visitor.Visitor;
  */
 public interface VisitorEventListener {
 
-    void onVisitorEvent(Visitor v, boolean dir);
+    void onVisitorEvent(Visitor v, VisitorEvent ve);
 
 }
