@@ -16,6 +16,7 @@
  */
 package network.aika.callbacks;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.visitor.Visitor;
 
 
@@ -25,6 +26,6 @@ import network.aika.neuron.activation.visitor.Visitor;
  */
 public interface VisitorEventListener {
 
-    void onVisitorEvent(Visitor v, VisitorEvent ve);
+    void onVisitorEvent(Visitor v, VisitorEvent ve, Synapse s);
 
 }
