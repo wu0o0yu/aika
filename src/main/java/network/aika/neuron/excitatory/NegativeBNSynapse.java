@@ -4,14 +4,14 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.visitor.Visitor;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 
-public class NegativePPSynapse<I extends Neuron<?>> extends PatternPartSynapse<I> {
+public class NegativeBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> {
 
-    public NegativePPSynapse(I input, PatternPartNeuron output, Synapse template) {
+    public NegativeBNSynapse(I input, BindingNeuron output, Synapse template) {
         super(input, output, template);
 
         this.isRecurrent = true;
@@ -40,10 +40,10 @@ public class NegativePPSynapse<I extends Neuron<?>> extends PatternPartSynapse<I
     }
 
     @Override
-    public PatternPartSynapse instantiateTemplate(I input, PatternPartNeuron output) {
+    public BindingNeuronSynapse instantiateTemplate(I input, BindingNeuron output) {
         assert input.getTemplates().contains(getInput());
 
-        PatternPartSynapse s = new NegativePPSynapse(input, output, this);
+        BindingNeuronSynapse s = new NegativeBNSynapse(input, output, this);
         initFromTemplate(s);
         return s;
     }

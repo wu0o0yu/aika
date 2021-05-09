@@ -14,89 +14,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.neuron.activation.visitor;
 
 import network.aika.Thought;
+import network.aika.callbacks.VisitorEvent;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.scopes.Scope;
-import network.aika.neuron.activation.scopes.ScopeEntry;
 import network.aika.neuron.steps.VisitorStep;
 
 import java.util.Set;
+import java.util.TreeSet;
 
 import static network.aika.neuron.activation.direction.Direction.*;
 
 /**
+ * The Visitor is a finite state machine used to implement the linking process in the neural network.
+ * It traverses the network of activations in order to find yet unlinked synapses.
  *
  * @author Lukas Molzberger
  */
-public class Visitor {
-    private Visitor origin;
-    private Activation act; // Just debug code
-    public Link link; // Just debug code
-    private Transition transition; // Just debug code
+public abstract class Visitor {
+    protected ActVisitor origin;
     private Visitor previousStep;
-    private VisitorStep phase;
-
-    public enum Transition {  // Just debug code
-        ACT,
-        LINK
-    }
+    protected VisitorStep phase;
 
     public Direction downUpDir;
     public Direction startDir;
 
-    private Set<ScopeEntry> scopes;
-
     public int downSteps = 0;
     public int upSteps = 0;
 
-    private Visitor() {}
+    protected Set<Scope> visitedScopes;
 
-    public Visitor(VisitorStep vp, Activation act, Direction startDir, Direction downUpDir, Transition t) {
-        this.phase = vp;
-        this.origin = this;
-        this.act = act;
-        this.transition = t;
-        this.downUpDir = downUpDir;
-        this.startDir = startDir;
-        this.scopes = act.getNeuron().getInitialScopes(startDir);
-    }
+    protected Visitor() {}
 
-    public Visitor prepareNextStep(Activation currentAct, Link currentLink, Set<ScopeEntry> scopes, Transition t) {
-        if(scopes.isEmpty())
-            return null;
-
-        Visitor nv = new Visitor();
+    protected Visitor prepareNextStep(Visitor nv) {
         nv.phase = phase;
-        nv.act = currentAct;
-        nv.link = currentLink;
-        nv.transition = t;
         nv.previousStep = this;
         nv.origin = origin;
         nv.downUpDir = downUpDir;
         nv.startDir = startDir;
         nv.upSteps = upSteps;
-        nv.downSteps = downSteps;
-        nv.scopes = scopes;
 
         return nv;
     }
 
     public Visitor getOrigin() {
         return origin;
-    }
-
-    public Activation getAct() {
-        return act;
-    }
-
-    public Link getLink() {
-        return link;
-    }
-
-    public Transition getTransition() {
-        return transition;
     }
 
     public Visitor getPreviousStep() {
@@ -119,10 +85,6 @@ public class Visitor {
         return upSteps;
     }
 
-    public Set<ScopeEntry> getScopes() {
-        return scopes;
-    }
-
     public VisitorStep getPhase() {
         return phase;
     }
@@ -139,13 +101,6 @@ public class Visitor {
         }
     }
 
-    public boolean isClosedCycle() {
-        return scopes.stream()
-                        .anyMatch(s ->
-                                origin.scopes.contains(s)
-                        );
-    }
-
     public boolean getSelfRef() {
         return downSteps == 0 || upSteps == 0;
     }
@@ -154,50 +109,27 @@ public class Visitor {
         return downSteps + upSteps;
     }
 
-    public void tryToLink(Activation act) {
-        if (downUpDir != OUTPUT || numSteps() < 1)
-            return;
-
-        if (act == origin.act || act.isConflicting())
-            return; // <--
-
-        Scope ppRelatedInput = getOriginAct().getModel().getTemplates().PP_RELATED_INPUT;
-        if (scopes
-                .stream()
-                .anyMatch(s -> s.getScope() == ppRelatedInput)
-        )
-            return; // TODO
-
-        phase.closeCycle(act, this);
-    }
-
     private Thought getThought() {
         return origin.act.getThought();
     }
 
-    public void onEvent(boolean dir) {
-        getThought().onVisitorEvent(this, dir);
+    public void onEvent(VisitorEvent ve, Synapse s) {
+        getThought().onVisitorEvent(this, ve, s);
+    }
+
+    public String toStringRecursive() {
+        if(previousStep != null)
+            return previousStep.toStringRecursive() + "\n" + this;
+        else
+            return "" + this;
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        if(previousStep != null) {
-            sb.append(previousStep + "\n");
-        }
-
-        sb.append("Origin:" + origin.act.toShortString() + ", ");
-
-        if(act != null) {
-            sb.append("Current:" + act.toShortString() + ", ");
-        } else if(link != null) {
-            sb.append("Current:" + link.toString() + ", ");
-        }
-
         sb.append("DownUp:" + downUpDir + ", ");
         sb.append("StartDir:" + startDir + ", ");
 
-        sb.append("Scopes:" + scopes + ", ");
         sb.append("DownSteps:" + downSteps + ", ");
         sb.append("UpSteps:" + upSteps + "");
 

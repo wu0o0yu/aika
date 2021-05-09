@@ -17,8 +17,12 @@
 package network.aika.neuron;
 
 import network.aika.*;
+import network.aika.callbacks.VisitorEvent;
 import network.aika.neuron.activation.scopes.Scope;
-import network.aika.neuron.activation.scopes.ScopeEntry;
+import network.aika.neuron.activation.scopes.Transition;
+import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.LinkVisitor;
+import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.steps.activation.SumUpBias;
 import network.aika.neuron.steps.link.SumUpLink;
 import network.aika.utils.Utils;
@@ -34,15 +38,13 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.callbacks.VisitorEvent.AFTER;
+import static network.aika.callbacks.VisitorEvent.BEFORE;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.activation.Link.linkExists;
-import static network.aika.neuron.activation.Visitor.Transition.LINK;
 import static network.aika.neuron.steps.link.LinkStep.INFORMATION_GAIN_GRADIENT;
 
 /**
@@ -59,6 +61,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     protected NeuronProvider output;
 
     private Synapse template;
+    private TemplateSynapseInfo templateInfo;
 
     protected double weight;
 
@@ -102,7 +105,17 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public Synapse getTemplate() {
+        if(isTemplate())
+            return this;
         return template;
+    }
+
+    public TemplateSynapseInfo getTemplateInfo() {
+        return templateInfo;
+    }
+
+    public void setTemplateInfo(TemplateSynapseInfo templateInfo) {
+        this.templateInfo = templateInfo;
     }
 
     public abstract Synapse instantiateTemplate(I input, O output);
@@ -133,18 +146,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract Activation branchIfNecessary(Activation oAct, Visitor v);
 
-    public Visitor transition(Visitor v, Link l) {
-        Visitor nv = v.prepareNextStep(
-                null,
-                l,
-                v.getScopes()
-                        .stream()
-                        .flatMap(s ->
-                                transition(s, v.downUpDir, v.startDir, l == null)
-                                        .stream()
-                        ).collect(Collectors.toCollection(TreeSet::new)),
-                LINK
-        );
+    public LinkVisitor transition(ActVisitor v, Link l) {
+        LinkVisitor nv = v.prepareNextStep(this, l);
 
         if(nv != null)
             nv.incrementPathLength();
@@ -152,24 +155,26 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return nv;
     }
 
-    public Set<ScopeEntry> transition(ScopeEntry se, Direction dir, Direction startDir, boolean checkFinalRequirement) {
-        return dir.getTransitions(se.getScope()).stream()
-                .filter(t -> t.check(this, startDir, checkFinalRequirement))
-                .map(t -> new ScopeEntry(se.getSourceId(), t.getOutput()))
-                .collect(Collectors.toCollection(TreeSet::new));
+    public Stream<Transition> transition(Scope s, Direction dir, boolean checkFinalRequirement) {
+        return dir.getTransitions(s.getTemplate())
+                .stream()
+                .filter(t ->
+                        t.check(this, checkFinalRequirement)
+                )
+                .map(t -> t.getInstance(dir, s));
     }
 
-    public void follow(Activation toAct, Visitor v) {
-        v.onEvent(false);
+    public void follow(Activation toAct, LinkVisitor v) {
+        v.onEvent(BEFORE, this);
 
         toAct.getNeuron()
                 .transition(v, toAct);
 
-        v.onEvent(true);
+        v.onEvent(AFTER, this);
     }
 
-    public void propagate(Activation fromAct, Visitor v) {
-        Visitor nv = transition(v, null);
+    public void propagate(Activation fromAct, ActVisitor v) {
+        LinkVisitor nv = transition(v, null);
         if(nv == null)
             return;
 
@@ -191,8 +196,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         );
     }
 
-    public void closeCycle(Visitor v, Activation iAct, Activation oAct) {
-        Visitor nv = transition(v, null);
+    public void closeCycle(ActVisitor v, Activation iAct, Activation oAct) {
+        LinkVisitor nv = transition(v, null);
         if(nv == null)
             return;
 
@@ -208,7 +213,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         createLink(iAct, oAct, nv);
     }
 
-    public void createLink(Activation iAct, Activation oAct, Visitor v) {
+    public void createLink(Activation iAct, Activation oAct, LinkVisitor v) {
         Link nl = oAct.addLink(
                 this,
                 iAct,
@@ -216,20 +221,17 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 v
         );
 
-        v.link = nl;
-
         Synapse s = nl.getSynapse();
         if (s.getWeight() <= 0.0 && !s.isTemplate())
             return;
 
-        v.getPhase().getNextSteps(nl);
-
         QueueEntry.add(nl, INFORMATION_GAIN_GRADIENT);
 
-        if(Utils.belowTolerance(oAct.getOutputGradientSum()))
-            return;
+        if(!Utils.belowTolerance(oAct.getOutputGradientSum())) {
+            QueueEntry.add(nl, new PropagateGradient(oAct.getOutputGradientSum()));
+        }
 
-        QueueEntry.add(nl, new PropagateGradient(oAct.getOutputGradientSum()));
+        v.getPhase().getNextSteps(nl);
     }
 
     public void linkInput() {

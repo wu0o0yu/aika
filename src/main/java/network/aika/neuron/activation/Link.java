@@ -18,6 +18,9 @@ package network.aika.neuron.activation;
 
 import network.aika.Config;
 import network.aika.Thought;
+import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.LinkVisitor;
+import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.utils.Utils;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.Synapse;
@@ -28,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 
-import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.sign.Sign.POS;
@@ -54,7 +56,7 @@ public class Link extends Element<Link> {
 
     private double lastIGGradient;
 
-    public Link(Synapse s, Activation input, Activation output, boolean isSelfRef, Visitor v) {
+    public Link(Synapse s, Activation input, Activation output, boolean isSelfRef, LinkVisitor v) {
         this.synapse = s;
         this.input = input;
         this.output = output;
@@ -67,6 +69,9 @@ public class Link extends Element<Link> {
             linkOutput();
 
         getSynapse().updateReference(this);
+
+        if(v != null)
+            v.setLink(this);
 
         getThought().onLinkCreationEvent(this, v);
     }
@@ -115,21 +120,22 @@ public class Link extends Element<Link> {
     public void follow(VisitorStep p, Direction dir) {
         output.setMarked(true);
 
-        Visitor v = new Visitor(p, output, dir, INPUT, ACT);
-        Visitor nv = synapse.transition(v, this);
+        ActVisitor v = new ActVisitor(p, output, dir, INPUT);
+        LinkVisitor nv = synapse.transition(v, this);
         synapse.follow(input, nv);
 
         output.setMarked(false);
     }
 
-    public void follow(Visitor v) {
-        Visitor nv = synapse.transition(v, this);
-        if(nv != null) {
-            synapse.follow(
-                    v.downUpDir.getActivation(this),
-                    nv
-            );
-        }
+    public void follow(ActVisitor v) {
+        LinkVisitor nv = synapse.transition(v, this);
+        if(nv == null)
+            return;
+
+        synapse.follow(
+                v.downUpDir.getActivation(this),
+                nv
+        );
     }
 
     public void computeInformationGainGradient() {

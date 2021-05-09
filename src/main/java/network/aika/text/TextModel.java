@@ -79,9 +79,9 @@ public class TextModel extends Model {
         if(lastRef == null) return;
 
         if (dir == OUTPUT) {
-            if (fromAct.getNeuron().isInputNeuron() && prevTokenInhib.getId().equals(fromAct.getNeuron().getId()) && lastRef.nextTokenPPAct != null) {
-                Synapse s = getRelSynapse(lastRef.nextTokenPPAct.getNeuron());
-                addLink(s, fromAct, lastRef.nextTokenPPAct);
+            if (fromAct.getNeuron().isInputNeuron() && prevTokenInhib.getId().equals(fromAct.getNeuron().getId()) && lastRef.nextTokenBAct != null) {
+                Synapse s = getRelSynapse(lastRef.nextTokenBAct.getNeuron());
+                addLink(s, fromAct, lastRef.nextTokenBAct);
             }
         } else if (dir == INPUT) {
             Neuron n = fromAct.getNeuron();
@@ -105,8 +105,8 @@ public class TextModel extends Model {
 
     private Synapse getRelSynapse(Neuron<?> n) {
         return n.getInputSynapses()
-                .filter(s -> s instanceof InputPPSynapse)
-                .map(s -> (InputPPSynapse) s)
+                .filter(s -> s instanceof InputBNSynapse)
+                .map(s -> (InputBNSynapse) s)
                 .findAny()
                 .orElse(null);
     }
@@ -129,17 +129,17 @@ public class TextModel extends Model {
         in.setAllowTraining(false);
         getSuspensionHook().putLabel(tokenLabel, in.getId());
 
-        PatternPartNeuron inRelPT = getTemplates().INPUT_PATTERN_PART_TEMPLATE.instantiateTemplate();
+        BindingNeuron inRelPT = getTemplates().INPUT_BINDING_TEMPLATE.instantiateTemplate();
         inRelPT.setInputNeuron(true);
         inRelPT.setLabel(tokenLabel + REL_PREVIOUS_TOKEN_LABEL);
 
-        PatternPartNeuron inRelNT = getTemplates().INPUT_PATTERN_PART_TEMPLATE.instantiateTemplate();
+        BindingNeuron inRelNT = getTemplates().INPUT_BINDING_TEMPLATE.instantiateTemplate();
         inRelNT.setInputNeuron(true);
         inRelNT.setLabel(tokenLabel + REL_NEXT_TOKEN_LABEL);
 
         {
             {
-                PatternPartSynapse s = getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(in, inRelPT);
+                BindingNeuronSynapse s = getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(in, inRelPT);
 
                 s.linkInput();
                 s.linkOutput();
@@ -149,7 +149,7 @@ public class TextModel extends Model {
             }
 
             {
-                PatternPartSynapse s = getTemplates().RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE.instantiateTemplate(getNextTokenInhib(), inRelPT);
+                BindingNeuronSynapse s = getTemplates().RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE.instantiateTemplate(getNextTokenInhib(), inRelPT);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -161,7 +161,7 @@ public class TextModel extends Model {
         }
         {
             {
-                PatternPartSynapse s = getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(in, inRelNT);
+                BindingNeuronSynapse s = getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(in, inRelNT);
 
                 s.linkInput();
                 s.linkOutput();
@@ -171,7 +171,7 @@ public class TextModel extends Model {
             }
 
             {
-                PatternPartSynapse s = getTemplates().RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE.instantiateTemplate(getPrevTokenInhib(), inRelNT);
+                BindingNeuronSynapse s = getTemplates().RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE.instantiateTemplate(getPrevTokenInhib(), inRelNT);
 
                 s.linkOutput();
                 s.addWeight(10.0);

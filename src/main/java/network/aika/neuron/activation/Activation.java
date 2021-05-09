@@ -17,11 +17,15 @@
 package network.aika.neuron.activation;
 
 import network.aika.*;
+import network.aika.callbacks.VisitorEvent;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.LinkVisitor;
+import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.steps.activation.PropagateValueChange;
 import network.aika.neuron.steps.activation.UpdateBias;
@@ -36,6 +40,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
+import static network.aika.callbacks.VisitorEvent.AFTER;
+import static network.aika.callbacks.VisitorEvent.BEFORE;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.steps.activation.ActivationStep.*;
@@ -88,8 +94,8 @@ public class Activation extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
-        if(!n.isTemplate())
-            net = n.getBias();
+        lastNet = n.isTemplate() || n.isInputNeuron() ? 0.0 : -1.0;
+        net = n.getBias();
 
         thought.registerActivation(this);
 
@@ -299,8 +305,8 @@ public class Activation extends Element<Activation> {
                 );
     }
 
-    public void followLinks(Visitor v) {
-        v.onEvent(false);
+    public void followLinks(ActVisitor v) {
+        v.onEvent(BEFORE, null);
 
         v.tryToLink(this);
 
@@ -316,7 +322,7 @@ public class Activation extends Element<Activation> {
                 );
         setMarked(false);
 
-        v.onEvent(true);
+        v.onEvent(AFTER, null);
     }
 
     public Link getInputLink(Neuron n) {
@@ -349,7 +355,7 @@ public class Activation extends Element<Activation> {
                 );
     }
 
-    public Link addLink(Synapse s, Activation input, boolean isSelfRef, Visitor v) {
+    public Link addLink(Synapse s, Activation input, boolean isSelfRef, LinkVisitor v) {
         Link ol = getInputLink(s);
         Link nl = new Link(
                 s,
@@ -452,7 +458,7 @@ public class Activation extends Element<Activation> {
         inputGradient = 0.0;
 
         g *= getNorm();
-        g *= actF.outerGrad(net);
+        g *= actF.outerGrad(lastNet);
 
         propagateGradientsOut(g);
     }

@@ -25,10 +25,6 @@ import network.aika.neuron.inhibitory.PrimaryInhibitorySynapse;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
@@ -38,37 +34,41 @@ public class Templates {
 
     private Model model;
 
-    public PatternPartNeuron INPUT_PATTERN_PART_TEMPLATE = new PatternPartNeuron();
-    public PatternPartNeuron SAME_PATTERN_PART_TEMPLATE = new PatternPartNeuron();
+    public BindingNeuron INPUT_BINDING_TEMPLATE = new BindingNeuron();
+    public BindingNeuron SAME_BINDING_TEMPLATE = new BindingNeuron();
     public PatternNeuron INPUT_PATTERN_TEMPLATE = new PatternNeuron();
     public PatternNeuron SAME_PATTERN_TEMPLATE = new PatternNeuron();
     public InhibitoryNeuron INHIBITORY_TEMPLATE = new InhibitoryNeuron();
 
-    public InputPPSynapse PRIMARY_INPUT_SYNAPSE_TEMPLATE;
-    public InputPPSynapse RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE;
-    public InputPPSynapse RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE;
-    public SamePPSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
-    public SamePPSynapse RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE;
-    public NegativePPSynapse NEGATIVE_SYNAPSE_TEMPLATE;
+    public InputBNSynapse PRIMARY_INPUT_SYNAPSE_TEMPLATE;
+    public InputBNSynapse RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE;
+    public InputBNSynapse RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE;
+    public SameBNSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
+    public SameBNSynapse RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE;
+    public NegativeBNSynapse NEGATIVE_SYNAPSE_TEMPLATE;
     public PatternSynapse PATTERN_SYNAPSE_TEMPLATE;
     public PrimaryInhibitorySynapse PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE;
     public InhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE;
 
 
-    public Scope I_INPUT = new Scope("I_INPUT");
-    public Scope I_SAME = new Scope("I_SAME");
-    public Scope P_SAME = new Scope("P_SAME");
-    public Scope PP_INPUT = new Scope("PP_INPUT");
-    public Scope PP_SAME = new Scope("PP_SAME");
-    public Scope PP_RELATED_INPUT = new Scope("PP_RELATED_INPUT");
-    public Scope PP_RELATED_SAME = new Scope("PP_RELATED_SAME");
+    public Scope I_INPUT = new Scope("I_INPUT", 0);
+    public Scope I_SAME = new Scope("I_SAME", 1);
+    public Scope P_SAME = new Scope("P_SAME", 2);
+    public Scope SB_INPUT = new Scope("SB_INPUT", 3);
+    public Scope SB_SAME = new Scope("SB_SAME", 4);
+    public Scope SB_RELATED_INPUT = new Scope("SB_RELATED_INPUT", 5);
+    public Scope SB_RELATED_SAME = new Scope("SB_RELATED_SAME", 6);
+    public Scope IB_INPUT = new Scope("IB_INPUT", 7);
+    public Scope IB_SAME = new Scope("IB_SAME", 8);
+    public Scope PB_SAME = new Scope("PB_SAME", 9);
+
 
 
     public Templates(Model m) {
         model = m;
 
-        init(INPUT_PATTERN_PART_TEMPLATE, -1, "Input Template Pattern Part Neuron");
-        init(SAME_PATTERN_PART_TEMPLATE, -2, "Same Template Pattern Part Neuron");
+        init(INPUT_BINDING_TEMPLATE, -1, "Input Template Binding Neuron");
+        init(SAME_BINDING_TEMPLATE, -2, "Same Template Binding Neuron");
         init(INPUT_PATTERN_TEMPLATE, -3, "Input Template Pattern Neuron");
         init(SAME_PATTERN_TEMPLATE, -4, "Same Template Pattern Neuron");
         init(INHIBITORY_TEMPLATE, -5, "Template Inhibitory Neuron");
@@ -76,54 +76,61 @@ public class Templates {
         INPUT_PATTERN_TEMPLATE.getTemplates().add(SAME_PATTERN_TEMPLATE);
         SAME_PATTERN_TEMPLATE.getTemplates().add(INPUT_PATTERN_TEMPLATE);
 
-        INPUT_PATTERN_PART_TEMPLATE.getTemplates().add(SAME_PATTERN_PART_TEMPLATE);
-        SAME_PATTERN_PART_TEMPLATE.getTemplates().add(INPUT_PATTERN_PART_TEMPLATE);
+        INPUT_BINDING_TEMPLATE.getTemplates().add(SAME_BINDING_TEMPLATE);
+        SAME_BINDING_TEMPLATE.getTemplates().add(INPUT_BINDING_TEMPLATE);
 
         PRIMARY_INPUT_SYNAPSE_TEMPLATE =
                 init(
-                        new InputPPSynapse(INPUT_PATTERN_TEMPLATE, SAME_PATTERN_PART_TEMPLATE, null),
+                        new InputBNSynapse(INPUT_PATTERN_TEMPLATE, SAME_BINDING_TEMPLATE, null),
+                        "PRIMARY_INPUT_SYNAPSE_TEMPLATE",
                         true,
                         true
                 );
 
-        RELATED_INPUT_SYNAPSE_FROM_PP_TEMPLATE =
+        RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE =
                 init(
-                        new InputPPSynapse(INPUT_PATTERN_PART_TEMPLATE, SAME_PATTERN_PART_TEMPLATE, null),
+                        new InputBNSynapse(INPUT_BINDING_TEMPLATE, SAME_BINDING_TEMPLATE, null),
+                        "RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE",
                         true,
                         true
                 );
 
         RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE =
                 init(
-                        new InputPPSynapse(INHIBITORY_TEMPLATE, SAME_PATTERN_PART_TEMPLATE, null),
+                        new InputBNSynapse(INHIBITORY_TEMPLATE, SAME_BINDING_TEMPLATE, null),
+                        "RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE",
                         true,
                         true
                 );
 
         SAME_PATTERN_SYNAPSE_TEMPLATE =
                 init(
-                        new SamePPSynapse(SAME_PATTERN_PART_TEMPLATE, SAME_PATTERN_PART_TEMPLATE, null),
+                        new SameBNSynapse(SAME_BINDING_TEMPLATE, SAME_BINDING_TEMPLATE, null),
+                        "SAME_PATTERN_SYNAPSE_TEMPLATE",
                         true,
                         true
                 );
 
         RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE =
                 init(
-                        new SamePPSynapse(SAME_PATTERN_TEMPLATE, SAME_PATTERN_PART_TEMPLATE, null, true),
+                        new SameBNSynapse(SAME_PATTERN_TEMPLATE, SAME_BINDING_TEMPLATE, null, true),
+                        "RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE",
                         true,
                         true
                 );
 
         NEGATIVE_SYNAPSE_TEMPLATE =
                 init(
-                        new NegativePPSynapse(INHIBITORY_TEMPLATE, SAME_PATTERN_PART_TEMPLATE, null),
+                        new NegativeBNSynapse(INHIBITORY_TEMPLATE, SAME_BINDING_TEMPLATE, null),
+                        "NEGATIVE_SYNAPSE_TEMPLATE",
                         false,
                         true
                 );
 
         PATTERN_SYNAPSE_TEMPLATE =
                 init(
-                        new PatternSynapse(SAME_PATTERN_PART_TEMPLATE, SAME_PATTERN_TEMPLATE, null),
+                        new PatternSynapse(SAME_BINDING_TEMPLATE, SAME_PATTERN_TEMPLATE, null),
+                        "PATTERN_SYNAPSE_TEMPLATE",
                         true,
                         true
                 );
@@ -131,49 +138,67 @@ public class Templates {
         PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE =
                 init(
                         new PrimaryInhibitorySynapse(INPUT_PATTERN_TEMPLATE, INHIBITORY_TEMPLATE, null),
+                        "PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE",
                         true,
                         true
                 );
 
         INHIBITORY_SYNAPSE_TEMPLATE =
                 init(
-                        new InhibitorySynapse(SAME_PATTERN_PART_TEMPLATE, INHIBITORY_TEMPLATE, null),
+                        new InhibitorySynapse(SAME_BINDING_TEMPLATE, INHIBITORY_TEMPLATE, null),
+                        "INHIBITORY_SYNAPSE_TEMPLATE",
                         false,
                         true
                 );
 
 
-        Transition.add(PrimaryInhibitorySynapse.class, null, null, true, I_INPUT, I_SAME);
-        Transition.add(PrimaryInhibitorySynapse.class, null, null, I_INPUT, I_SAME);
-        Transition.add(InhibitorySynapse.class, null, null, true, I_SAME, I_SAME);
-        Transition.add(InhibitorySynapse.class, null, null, I_SAME, I_SAME);
-        Transition.add(InputPPSynapse.class, INPUT, null, I_SAME, I_INPUT);
-        Transition.add(InputPPSynapse.class, OUTPUT, null, I_INPUT, I_SAME);
+        Transition.add(true, I_INPUT, I_SAME, PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE);
+        Transition.add(true, I_SAME, I_SAME, INHIBITORY_SYNAPSE_TEMPLATE);
+        Transition.add(I_INPUT, I_SAME, PRIMARY_INPUT_SYNAPSE_TEMPLATE);
 
-        Transition.add(PatternSynapse.class, null, null, true, P_SAME, P_SAME);
-        Transition.add(PatternSynapse.class, null, null, P_SAME, P_SAME);
-        Transition.add(SamePPSynapse.class, null, null, P_SAME, P_SAME);
 
-        Transition.add(InputPPSynapse.class, INPUT, null, PP_SAME, PP_INPUT);
-        Transition.add(InputPPSynapse.class, OUTPUT, null, PP_INPUT, PP_SAME);
+        Transition.add(true, P_SAME, P_SAME, PATTERN_SYNAPSE_TEMPLATE);
+        Transition.add(P_SAME, P_SAME, RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE);
 
-        Transition.add(InputPPSynapse.class, null, null, true, PP_INPUT, PP_SAME);
-        Transition.add(InputPPSynapse.class, INPUT, null, PP_RELATED_SAME, PP_RELATED_INPUT);
-        Transition.add(InputPPSynapse.class, INPUT, null, PP_INPUT, PP_RELATED_INPUT);
-        Transition.add(InputPPSynapse.class, OUTPUT, null, PP_INPUT, PP_RELATED_INPUT); //TODO: only when startDir == INPUT
+        Transition.add(true, PB_SAME, PB_SAME, RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE);
+        Transition.add(PB_SAME, PB_SAME, PATTERN_SYNAPSE_TEMPLATE);
 
-        Transition.add(SamePPSynapse.class, null, null, true, PP_SAME, PP_SAME);
-        Transition.add(SamePPSynapse.class, null, null, PP_SAME, PP_SAME);
-        Transition.add(SamePPSynapse.class, null, null, PP_INPUT, PP_INPUT);
-        Transition.add(SamePPSynapse.class, null, null, PP_RELATED_INPUT, PP_RELATED_INPUT);
-        Transition.add(SamePPSynapse.class, null, null, PP_SAME, PP_RELATED_SAME);
-        Transition.add(SamePPSynapse.class, null, null, PP_RELATED_SAME, PP_SAME);
+
+        Transition.add(true, IB_INPUT, IB_SAME,
+                PRIMARY_INPUT_SYNAPSE_TEMPLATE,
+                RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE,
+                RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE
+        );
+        Transition.add(IB_INPUT, IB_INPUT,
+                SAME_PATTERN_SYNAPSE_TEMPLATE,
+                RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE
+        );
+        Transition.add(IB_INPUT, IB_INPUT, INHIBITORY_SYNAPSE_TEMPLATE);
+
+
+        Transition.add(true, SB_RELATED_SAME, SB_SAME, SAME_PATTERN_SYNAPSE_TEMPLATE);
+        Transition.add(SB_INPUT, SB_INPUT, SAME_PATTERN_SYNAPSE_TEMPLATE);
+        Transition.add(SB_RELATED_INPUT, SB_RELATED_INPUT, SAME_PATTERN_SYNAPSE_TEMPLATE);
+        Synapse[] inputBindingSynapses = new Synapse[] {
+                PRIMARY_INPUT_SYNAPSE_TEMPLATE,
+                RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE,
+                RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE
+        };
+        Transition.add(SB_INPUT, SB_SAME, inputBindingSynapses);
+        Transition.add(SB_RELATED_INPUT, SB_RELATED_SAME, inputBindingSynapses);
+        Transition.add(SB_RELATED_INPUT, SB_INPUT, inputBindingSynapses);
+        Transition.add(SB_INPUT, SB_RELATED_INPUT, inputBindingSynapses);
+        Transition.add(SB_INPUT, SB_INPUT,
+                INHIBITORY_SYNAPSE_TEMPLATE,
+                RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE
+        );
+        Transition.add(SB_RELATED_INPUT, SB_RELATED_INPUT, INHIBITORY_SYNAPSE_TEMPLATE);
     }
 
     public Collection<Neuron> getAllTemplates() {
         return Arrays.asList(
-                INPUT_PATTERN_PART_TEMPLATE,
-                SAME_PATTERN_PART_TEMPLATE,
+                INPUT_BINDING_TEMPLATE,
+                SAME_BINDING_TEMPLATE,
                 INPUT_PATTERN_TEMPLATE,
                 SAME_PATTERN_TEMPLATE,
                 INHIBITORY_TEMPLATE
@@ -188,7 +213,11 @@ public class Templates {
         return n;
     }
 
-    private <S extends Synapse> S init(S ts, boolean linkInput, boolean linkOutput) {
+    private <S extends Synapse> S init(S ts, String templateLabel, boolean linkInput, boolean linkOutput) {
+        TemplateSynapseInfo templateInfo = new TemplateSynapseInfo();
+        templateInfo.setLabel(templateLabel);
+
+        ts.setTemplateInfo(templateInfo);
         if(linkInput) {
             ts.linkInput();
         }

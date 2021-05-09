@@ -18,14 +18,15 @@ package network.aika;
 
 
 import network.aika.callbacks.EventListener;
+import network.aika.callbacks.VisitorEvent;
 import network.aika.callbacks.VisitorEventListener;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.steps.Step;
-import network.aika.neuron.steps.activation.SumUpBias;
 import network.aika.utils.BelowToleranceThresholdException;
-import network.aika.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,10 +94,10 @@ public abstract class Thought {
                 );
     }
 
-    public void onVisitorEvent(Visitor v, boolean dir) {
+    public void onVisitorEvent(Visitor v, VisitorEvent ve, Synapse s) {
         getVisitorEventListeners()
                 .forEach(
-                        el -> el.onVisitorEvent(v, dir)
+                        el -> el.onVisitorEvent(v, ve, s)
                 );
     }
 

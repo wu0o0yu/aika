@@ -17,10 +17,10 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.LinkingVisitor;
 
-import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
@@ -52,15 +52,8 @@ public class Linking extends LinkingVisitor implements ActivationStep {
     public void process(Activation act) {
         act.getThought().linkInputRelations(act);
 
-        act.followLinks(
-                new Visitor(
-                        this,
-                        act,
-                        OUTPUT,
-                        INPUT,
-                        ACT
-                )
-        );
+        ActVisitor v = new ActVisitor(this, act, OUTPUT, INPUT);
+        act.followLinks(v);
 
         act.getModel().linkInputRelations(act, OUTPUT);
     }

@@ -30,7 +30,7 @@ public class Template extends TemplateVisitor implements LinkStep {
 
     @Override
     public Phase getPhase() {
-        return Phase.TEMPLATE;
+        return Phase.LINKING;
     }
 
     public boolean checkIfQueued() {

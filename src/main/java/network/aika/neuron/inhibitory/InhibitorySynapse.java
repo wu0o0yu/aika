@@ -18,11 +18,7 @@ package network.aika.neuron.inhibitory;
 
 import network.aika.neuron.*;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.scopes.ScopeEntry;
-
-import java.util.Collections;
-import java.util.Set;
+import network.aika.neuron.activation.visitor.Visitor;
 
 
 /**

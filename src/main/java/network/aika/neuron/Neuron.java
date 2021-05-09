@@ -19,7 +19,9 @@ package network.aika.neuron;
 import network.aika.*;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.scopes.ScopeEntry;
+import network.aika.neuron.activation.scopes.Scope;
+import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;
@@ -34,7 +36,6 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
-import static network.aika.neuron.activation.Visitor.Transition.ACT;
 
 /**
  *
@@ -105,7 +106,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract boolean allowTemplatePropagate(Activation act);
 
-    public abstract Set<ScopeEntry> getInitialScopes(Direction dir);
+    public abstract Collection<Scope> getInitialScopeTemplates(Direction dir);
 
     public boolean isAllowTraining() {
         return allowTraining;
@@ -123,8 +124,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return templates;
     }
 
-    public void transition(Visitor v, Activation act) {
-        Visitor nv = v.prepareNextStep(act, null, v.getScopes(), ACT);
+    public void transition(LinkVisitor v, Activation act) {
+        ActVisitor nv = v.prepareNextStep(act);
 
         if(nv == null)
             return;

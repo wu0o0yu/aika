@@ -3,27 +3,27 @@ package network.aika.neuron.excitatory;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Visitor;
+import network.aika.neuron.activation.visitor.Visitor;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 
-public class SamePPSynapse<I extends Neuron<?>> extends PatternPartSynapse<I> {
+public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> {
 
-    public SamePPSynapse(I input, PatternPartNeuron output, Synapse template) {
+    public SameBNSynapse(I input, BindingNeuron output, Synapse template) {
         super(input, output, template);
     }
 
-    public SamePPSynapse(I input, PatternPartNeuron output, Synapse template, boolean isRecurrent) {
+    public SameBNSynapse(I input, BindingNeuron output, Synapse template, boolean isRecurrent) {
         super(input, output, template);
 
         this.isRecurrent = isRecurrent;
     }
 
     @Override
-    public PatternPartSynapse instantiateTemplate(I input, PatternPartNeuron output) {
+    public BindingNeuronSynapse instantiateTemplate(I input, BindingNeuron output) {
         assert input.getTemplates().contains(getInput());
 
-        PatternPartSynapse s = new SamePPSynapse(input, output, this);
+        BindingNeuronSynapse s = new SameBNSynapse(input, output, this);
         initFromTemplate(s);
         return s;
     }

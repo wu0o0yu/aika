@@ -21,18 +21,18 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Templates;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.scopes.ScopeEntry;
+import network.aika.neuron.activation.scopes.Scope;
+import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.LinkVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Set;
-import java.util.TreeSet;
 
-import static network.aika.neuron.activation.scopes.Scope.*;
-import static network.aika.neuron.activation.Visitor.Transition.ACT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
@@ -60,16 +60,13 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     @Override
-    public Set<ScopeEntry> getInitialScopes(Direction dir) {
+    public Collection<Scope> getInitialScopeTemplates(Direction dir) {
         Templates t = getModel().getTemplates();
-        Set<ScopeEntry> result = new TreeSet<>();
-        result.add(new ScopeEntry(0, t.P_SAME));
-        if(dir == Direction.OUTPUT) {
-            result.add(new ScopeEntry(1, t.PP_SAME));
-            result.add(new ScopeEntry(2, t.PP_INPUT));
-            result.add(new ScopeEntry(3, t.I_INPUT));
-        }
-        return result;
+
+        if(dir == Direction.OUTPUT)
+            return Set.of(t.P_SAME, t.PB_SAME, t.IB_INPUT, t.I_INPUT);
+        else
+            return Set.of(t.P_SAME);
     }
 
     @Override
@@ -85,11 +82,11 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     @Override
-    public void transition(Visitor v, Activation act) {
+    public void transition(LinkVisitor v, Activation act) {
         if (v.downUpDir == OUTPUT)
             return;
 
-        Visitor nv = v.prepareNextStep(act, null, v.getScopes(), ACT);
+        ActVisitor nv = v.prepareNextStep(act);
 
         if(nv == null)
             return;

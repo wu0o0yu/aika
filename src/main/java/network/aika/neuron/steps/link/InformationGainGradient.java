@@ -31,7 +31,7 @@ public class InformationGainGradient implements LinkStep {
 
     @Override
     public Phase getPhase() {
-        return Phase.INIT;
+        return Phase.LINKING;
     }
 
     public boolean checkIfQueued() {

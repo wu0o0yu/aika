@@ -28,7 +28,7 @@ public class PropagateGradientsNet implements ActivationStep {
 
     @Override
     public Phase getPhase() {
-        return Phase.LINKING;
+        return Phase.FINAL_LINKING;
     }
 
     public boolean checkIfQueued() {

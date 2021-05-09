@@ -1,13 +1,10 @@
 package network.aika;
 
-import network.aika.Config;
-import network.aika.Thought;
 import network.aika.debugger.AikaDebugger;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Reference;
 import network.aika.neuron.excitatory.PatternNeuron;
-import network.aika.neuron.excitatory.PatternPartNeuron;
+import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
@@ -32,7 +29,7 @@ public class GradientTest {
                                 .map(l -> l.getInput())
                                 .orElse(null);
 
-                        if(n instanceof PatternPartNeuron) {
+                        if(n instanceof BindingNeuron) {
                             return "PP-" + trimPrefix(iAct.getLabel());
                         } else if (n instanceof PatternNeuron) {
                             return "P-" + ((Document)act.getThought()).getContent();
@@ -61,7 +58,7 @@ public class GradientTest {
             i = j + 1;
         }
 
-        m.getTemplates().SAME_PATTERN_PART_TEMPLATE.setDirectConjunctiveBias(-0.2);
+        m.getTemplates().SAME_BINDING_TEMPLATE.setDirectConjunctiveBias(-0.32);
 
         Neuron nA = m.getNeuron("A");
         nA.setFrequency(53.0);

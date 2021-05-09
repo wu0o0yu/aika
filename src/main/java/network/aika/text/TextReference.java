@@ -33,7 +33,7 @@ public class TextReference implements Reference {
     private TextReference previous;
     private TextReference next;
 
-    public Activation nextTokenPPAct;
+    public Activation nextTokenBAct;
     public Activation nextTokenIAct;
 
     public TextReference(Document doc, int begin, int end) {

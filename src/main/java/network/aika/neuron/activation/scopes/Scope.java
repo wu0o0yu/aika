@@ -29,24 +29,51 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Scope {
+public class Scope implements Comparable<Scope> {
+
+    private Scope origin;
+    private Scope template;
     private String label;
+    private int id;
 
     private Set<Transition> inputs = new TreeSet<>(getComparator(OUTPUT));
     private Set<Transition> outputs = new TreeSet<>(getComparator(INPUT));
 
     private static Comparator<Transition> getComparator(Direction dir) {
-        return Comparator.<Transition, String>comparing(t -> t.getType().getSimpleName())
-                        .thenComparing(t -> dir.getScope(t).getLabel())
+        return Comparator.<Transition, String>comparing(t -> t.getSynapseTemplate().getTemplateInfo().getLabel())
+                        .thenComparingInt(t -> dir.getFromScope(t).id)
                         .thenComparingInt(t -> t.isTarget() ? 1 : 0);
     }
 
-    public Scope(String label) {
+    public Scope(String label, int id) {
         this.label = label;
+        this.id = id;
+    }
+
+    public Scope getInstance(Direction dir, Transition from) {
+        Scope s = new Scope(label, id);
+        s.template = this;
+
+        if(from != null) {
+            dir.setToScope(s, from);
+            s.inputs.add(from);
+            s.origin = dir.getFromScope(from).origin;
+        } else
+            s.origin = s;
+
+        return s;
+    }
+
+    public Scope getOrigin() {
+        return origin;
     }
 
     public String getLabel() {
         return label;
+    }
+
+    public Scope getTemplate() {
+        return template;
     }
 
     public Set<Transition> getInputs() {
@@ -59,5 +86,10 @@ public class Scope {
 
     public String toString() {
         return label;
+    }
+
+    @Override
+    public int compareTo(Scope s) {
+        return Integer.compare(id, s.id);
     }
 }
