@@ -20,6 +20,7 @@ import network.aika.Thought;
 import network.aika.callbacks.VisitorEvent;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.steps.VisitorStep;
@@ -113,8 +114,13 @@ public abstract class Visitor {
         return origin.act.getThought();
     }
 
-    public void onEvent(VisitorEvent ve, Synapse s) {
-        getThought().onVisitorEvent(this, ve, s);
+    public void onEvent(VisitorEvent ve) {
+        getThought().onVisitorEvent(this, ve);
+    }
+
+
+    public void onCandidateEvent(Synapse s) {
+        getThought().onVisitorCandidateEvent(this, s);
     }
 
     public String toStringRecursive() {

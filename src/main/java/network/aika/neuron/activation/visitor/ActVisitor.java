@@ -68,8 +68,6 @@ public class ActVisitor extends Visitor {
         prepareNextStep(nv);
         nv.link = l;
 
-        nv.onEvent(CANDIDATE_BEFORE, syn);
-
         nv.transitions = getScopes()
                 .stream()
                 .flatMap(s ->
@@ -78,7 +76,7 @@ public class ActVisitor extends Visitor {
 
         nv.visitedScopes = visitedScopes;
 
-        nv.onEvent(CANDIDATE_AFTER, syn);
+        nv.onCandidateEvent(syn);
 
         return nv.transitions.isEmpty() ? null : nv;
     }

@@ -165,12 +165,12 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void follow(Activation toAct, LinkVisitor v) {
-        v.onEvent(BEFORE, this);
+        v.onEvent(BEFORE);
 
         toAct.getNeuron()
                 .transition(v, toAct);
 
-        v.onEvent(AFTER, this);
+        v.onEvent(AFTER);
     }
 
     public void propagate(Activation fromAct, ActVisitor v) {

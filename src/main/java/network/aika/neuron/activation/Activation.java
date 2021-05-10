@@ -306,7 +306,7 @@ public class Activation extends Element<Activation> {
     }
 
     public void followLinks(ActVisitor v) {
-        v.onEvent(BEFORE, null);
+        v.onEvent(BEFORE);
 
         v.tryToLink(this);
 
@@ -322,7 +322,7 @@ public class Activation extends Element<Activation> {
                 );
         setMarked(false);
 
-        v.onEvent(AFTER, null);
+        v.onEvent(AFTER);
     }
 
     public Link getInputLink(Neuron n) {
