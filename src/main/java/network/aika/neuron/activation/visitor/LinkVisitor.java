@@ -32,16 +32,11 @@ import java.util.stream.Collectors;
  */
 public class LinkVisitor extends Visitor {
 
-    Link link;
-    Collection<Transition> transitions;
+    private Link link;
+    private Collection<Transition> transitions;
 
-    public ActVisitor prepareNextStep(Activation act) {
-        return new ActVisitor()
-                .prepareNextStep(this, act);
-    }
-
-    public LinkVisitor prepareNextStep(ActVisitor v, Synapse<?, ?> syn, Link l) {
-        prepareNextStep(v);
+    public LinkVisitor(ActVisitor v, Synapse<?, ?> syn, Link l) {
+        super(v);
         link = l;
 
         boolean isTargetLink = l == null;
@@ -57,17 +52,16 @@ public class LinkVisitor extends Visitor {
         visitedScopes = v.visitedScopes;
 
         onCandidateEvent(syn);
+    }
 
-        if(transitions.isEmpty())
-            return null;
-
-        return this;
+    public boolean follow() {
+        return !transitions.isEmpty();
     }
 
     public boolean isClosedCycle() {
         return transitions.stream()
                 .anyMatch(t ->
-                        origin.scopes.contains(t.getInput().getOrigin())
+                        origin.getScopes().contains(t.getInput().getOrigin())
                 );
     }
 

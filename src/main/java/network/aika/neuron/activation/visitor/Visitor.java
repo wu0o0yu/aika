@@ -51,14 +51,16 @@ public abstract class Visitor {
 
     protected Visitor() {}
 
-    protected void prepareNextStep(Visitor v) {
-        phase = v.phase;
+    public Visitor(Visitor v) {
         previousStep = v;
+        phase = v.phase;
         origin = v.origin;
         downUpDir = v.downUpDir;
         startDir = v.startDir;
         upSteps = v.upSteps;
     }
+
+    public abstract boolean follow();
 
     public Visitor getOrigin() {
         return origin;

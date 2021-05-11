@@ -16,10 +16,7 @@
  */
 package network.aika.neuron.activation.visitor;
 
-
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.steps.VisitorStep;
@@ -38,10 +35,25 @@ public class ActVisitor extends Visitor {
 
     Activation act;
 
-    protected Collection<Scope> scopes;
+    private Collection<Scope> scopes;
 
 
-    protected ActVisitor() {
+    public ActVisitor() {
+    }
+
+    public ActVisitor(LinkVisitor v, Activation act) {
+        super(v);
+        this.act = act;
+        scopes = new ArrayList<>();
+        visitedScopes = new TreeSet<>(v.visitedScopes);
+
+        v.getTransitions()
+                .forEach(t -> {
+                    Scope fromScope = v.downUpDir.getFromScope(t.getTemplate());
+                    Scope toScope = v.downUpDir.getToScope(t.getTemplate());
+                    if(fromScope == toScope || !v.visitedScopes.contains(toScope))
+                        scopes.add(toScope.getInstance(v.downUpDir, t));
+                });
     }
 
     public ActVisitor(VisitorStep vp, Activation act, Direction startDir, Direction downUpDir) {
@@ -61,29 +73,8 @@ public class ActVisitor extends Visitor {
                 });
     }
 
-    public LinkVisitor prepareNextStep(Synapse<?, ?> syn, Link l) {
-        return new LinkVisitor()
-                .prepareNextStep(this, syn, l);
-    }
-
-    public ActVisitor prepareNextStep(LinkVisitor v, Activation act) {
-        prepareNextStep(v);
-        this.act = act;
-        scopes = new ArrayList<>();
-        visitedScopes = new TreeSet<>(v.visitedScopes);
-
-        v.getTransitions()
-                .forEach(t -> {
-                    Scope fromScope = v.downUpDir.getFromScope(t.getTemplate());
-                    Scope toScope = v.downUpDir.getToScope(t.getTemplate());
-                    if(fromScope == toScope || !v.visitedScopes.contains(toScope))
-                        scopes.add(toScope.getInstance(v.downUpDir, t));
-                });
-
-        if(scopes.isEmpty())
-            return null;
-
-        return this;
+    public boolean follow() {
+        return !scopes.isEmpty();
     }
 
     public Collection<Scope> getScopes() {

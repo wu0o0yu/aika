@@ -125,9 +125,9 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public void transition(LinkVisitor v, Activation act) {
-        ActVisitor nv = v.prepareNextStep(act);
+        ActVisitor nv = new ActVisitor(v, act);
 
-        if(nv == null)
+        if(!nv.follow())
             return;
 
         act.followLinks(nv);

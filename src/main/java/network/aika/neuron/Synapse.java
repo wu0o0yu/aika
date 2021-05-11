@@ -147,11 +147,12 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public abstract Activation branchIfNecessary(Activation oAct, Visitor v);
 
     public LinkVisitor transition(ActVisitor v, Link l) {
-        LinkVisitor nv = v.prepareNextStep(this, l);
+        LinkVisitor nv = new LinkVisitor(v, this, l);
 
-        if(nv != null)
-            nv.incrementPathLength();
+        if(!nv.follow())
+            return null;
 
+        nv.incrementPathLength();
         return nv;
     }
 
