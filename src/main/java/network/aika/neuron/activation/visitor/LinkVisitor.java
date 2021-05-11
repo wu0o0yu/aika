@@ -16,14 +16,13 @@
  */
 package network.aika.neuron.activation.visitor;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.scopes.Scope;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.scopes.Transition;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 
@@ -37,24 +36,32 @@ public class LinkVisitor extends Visitor {
     Collection<Transition> transitions;
 
     public ActVisitor prepareNextStep(Activation act) {
-        ActVisitor nv = new ActVisitor();
-        prepareNextStep(nv);
-        nv.act = act;
-        nv.scopes = new ArrayList<>();
-        nv.visitedScopes = new TreeSet<>(visitedScopes);
+        return new ActVisitor()
+                .prepareNextStep(this, act);
+    }
 
-        getTransitions()
-                .forEach(t -> {
-                    Scope fromScope = downUpDir.getFromScope(t.getTemplate());
-                    Scope toScope = downUpDir.getToScope(t.getTemplate());
-                    if(fromScope == toScope || !visitedScopes.contains(toScope))
-                        nv.scopes.add(toScope.getInstance(downUpDir, t));
-                });
+    public LinkVisitor prepareNextStep(ActVisitor v, Synapse<?, ?> syn, Link l) {
+        prepareNextStep(v);
+        link = l;
 
-        if(nv.scopes.isEmpty())
+        boolean isTargetLink = l == null;
+        Direction dir = isTargetLink ?
+                v.startDir :
+                v.downUpDir;
+
+        transitions = v.getScopes().stream()
+                .flatMap(s ->
+                        syn.transition(s, dir, isTargetLink)
+                ).collect(Collectors.toList());
+
+        visitedScopes = v.visitedScopes;
+
+        onCandidateEvent(syn);
+
+        if(transitions.isEmpty())
             return null;
 
-        return nv;
+        return this;
     }
 
     public boolean isClosedCycle() {

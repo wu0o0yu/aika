@@ -51,15 +51,13 @@ public abstract class Visitor {
 
     protected Visitor() {}
 
-    protected Visitor prepareNextStep(Visitor nv) {
-        nv.phase = phase;
-        nv.previousStep = this;
-        nv.origin = origin;
-        nv.downUpDir = downUpDir;
-        nv.startDir = startDir;
-        nv.upSteps = upSteps;
-
-        return nv;
+    protected void prepareNextStep(Visitor v) {
+        phase = v.phase;
+        previousStep = v;
+        origin = v.origin;
+        downUpDir = v.downUpDir;
+        startDir = v.startDir;
+        upSteps = v.upSteps;
     }
 
     public Visitor getOrigin() {
@@ -95,11 +93,10 @@ public abstract class Visitor {
     }
 
     public void incrementPathLength() {
-        if (downUpDir == INPUT) {
-            this.downSteps++;
-        } else {
-            this.upSteps++;
-        }
+        if (downUpDir == INPUT)
+            downSteps++;
+        else
+            upSteps++;
     }
 
     public boolean getSelfRef() {
@@ -117,7 +114,6 @@ public abstract class Visitor {
     public void onEvent(VisitorEvent ve) {
         getThought().onVisitorEvent(this, ve);
     }
-
 
     public void onCandidateEvent(Synapse s) {
         getThought().onVisitorCandidateEvent(this, s);

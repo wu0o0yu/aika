@@ -42,7 +42,7 @@ public class Scope implements Comparable<Scope> {
     private static Comparator<Transition> getComparator(Direction dir) {
         return Comparator.<Transition, String>comparing(t -> t.getSynapseTemplate().getTemplateInfo().getLabel())
                         .thenComparingInt(t -> dir.getFromScope(t).id)
-                        .thenComparingInt(t -> t.isTarget() ? 1 : 0);
+                        .thenComparingInt(t -> t.isTargetAllowed() ? 1 : 0);
     }
 
     public Scope(String label, int id) {

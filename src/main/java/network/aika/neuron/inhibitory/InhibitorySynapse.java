@@ -77,17 +77,6 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         input.getNeuron().setModified(true);
     }
 
-    /*
-    @Override
-    public Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
-        if(checkFinalRequirement && s.getScope() != I_SAME) {
-            return Collections.emptySet();
-        }
-
-        return Collections.singleton(s);
-    }
-     */
-
     @Override
     protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
         return true;

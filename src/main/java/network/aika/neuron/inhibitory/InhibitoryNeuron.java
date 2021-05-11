@@ -50,8 +50,6 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     @Override
     public boolean allowTemplatePropagate(Activation act) {
-/*        if(act.gradientSumIsZero())
-            return false;*/
         return false;
     }
 

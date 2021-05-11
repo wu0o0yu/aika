@@ -27,9 +27,7 @@ import network.aika.neuron.steps.VisitorStep;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
-import static network.aika.callbacks.VisitorEvent.*;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
@@ -64,21 +62,28 @@ public class ActVisitor extends Visitor {
     }
 
     public LinkVisitor prepareNextStep(Synapse<?, ?> syn, Link l) {
-        LinkVisitor nv = new LinkVisitor();
-        prepareNextStep(nv);
-        nv.link = l;
+        return new LinkVisitor()
+                .prepareNextStep(this, syn, l);
+    }
 
-        nv.transitions = getScopes()
-                .stream()
-                .flatMap(s ->
-                        syn.transition(s, downUpDir, l == null)
-                ).collect(Collectors.toList());
+    public ActVisitor prepareNextStep(LinkVisitor v, Activation act) {
+        prepareNextStep(v);
+        this.act = act;
+        scopes = new ArrayList<>();
+        visitedScopes = new TreeSet<>(v.visitedScopes);
 
-        nv.visitedScopes = visitedScopes;
+        v.getTransitions()
+                .forEach(t -> {
+                    Scope fromScope = v.downUpDir.getFromScope(t.getTemplate());
+                    Scope toScope = v.downUpDir.getToScope(t.getTemplate());
+                    if(fromScope == toScope || !v.visitedScopes.contains(toScope))
+                        scopes.add(toScope.getInstance(v.downUpDir, t));
+                });
 
-        nv.onCandidateEvent(syn);
+        if(scopes.isEmpty())
+            return null;
 
-        return nv.transitions.isEmpty() ? null : nv;
+        return this;
     }
 
     public Collection<Scope> getScopes() {
@@ -96,13 +101,6 @@ public class ActVisitor extends Visitor {
         if (act == origin.act || act.isConflicting())
             return;
 
-        Scope bRelatedInput = getOriginAct().getModel().getTemplates().SB_RELATED_INPUT;
-        if (scopes
-                .stream()
-                .anyMatch(s -> s.getTemplate() == bRelatedInput)
-        )
-            return; // TODO
-
         phase.closeCycle(act, this);
     }
 
@@ -111,7 +109,6 @@ public class ActVisitor extends Visitor {
 
         sb.append("Origin:" + origin.act.toShortString() + ", ");
         sb.append("Current:" + act.toShortString() + ", ");
-
         sb.append("Scopes:" + scopes + ", ");
 
         sb.append(super.toString());

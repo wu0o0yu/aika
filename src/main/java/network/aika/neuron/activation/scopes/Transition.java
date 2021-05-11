@@ -26,7 +26,7 @@ public class Transition {
 
     private Transition template;
     private Synapse templateSynapse;
-    private boolean isTarget = false;
+    private boolean isTargetAllowed = false;
     private Scope input;
     private Scope output;
 
@@ -44,14 +44,14 @@ public class Transition {
         output.getInputs().add(this);
     }
 
-    private Transition(Synapse templateSynapse, boolean isTarget) {
+    private Transition(Synapse templateSynapse, boolean isTargetAllowed) {
         this(templateSynapse);
-        this.isTarget = isTarget;
+        this.isTargetAllowed = isTargetAllowed;
     }
 
-    private Transition(Synapse templateSynapse, boolean isTarget, Scope input, Scope output) {
+    private Transition(Synapse templateSynapse, boolean isTargetAllowed, Scope input, Scope output) {
         this(templateSynapse, input, output);
-        this.isTarget = isTarget;
+        this.isTargetAllowed = isTargetAllowed;
     }
 
     public static void add(Scope input, Scope output, Synapse... templateSynapse) {
@@ -69,22 +69,22 @@ public class Transition {
     }
 
     public Transition getInstance(Direction dir, Scope from) {
-        Transition t = new Transition(templateSynapse, isTarget);
+        Transition t = new Transition(templateSynapse, isTargetAllowed);
         t.template = this;
         dir.setFromScope(from, t);
         return t;
     }
 
-    public boolean check(Synapse s, boolean isTarget) {
-        return s.getTemplate() == templateSynapse && (this.isTarget || !isTarget);
+    public boolean check(Synapse s, boolean isTargetLink) {
+        return s.getTemplate() == templateSynapse && (this.isTargetAllowed || !isTargetLink);
     }
 
     public Synapse getSynapseTemplate() {
         return templateSynapse;
     }
 
-    public boolean isTarget() {
-        return isTarget;
+    public boolean isTargetAllowed() {
+        return isTargetAllowed;
     }
 
     public void setInput(Scope input) {
@@ -108,7 +108,7 @@ public class Transition {
                 input +
                 ":" +
                 templateSynapse.getTemplateInfo().getLabel() +
-                (isTarget ? ":T" : "") +
+                (isTargetAllowed ? ":T" : "") +
                 ":" + output +
                 ">";
     }

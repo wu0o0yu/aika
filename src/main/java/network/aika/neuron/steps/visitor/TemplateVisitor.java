@@ -66,7 +66,7 @@ public abstract class TemplateVisitor implements VisitorStep {
         oAct.getNeuron()
                 .getTemplates()
                 .stream()
-                .flatMap(tn -> tn.getInputSynapses()) // TODO!
+                .flatMap(tn -> tn.getInputSynapses())
                 .filter(ts -> inputTemplates.contains(ts.getInput()))
                 .filter(ts -> iAct.isActive(ts.isRecurrent()))
                 .forEach(ts ->

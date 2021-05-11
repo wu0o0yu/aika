@@ -29,7 +29,6 @@ import network.aika.neuron.activation.visitor.Visitor;
  */
 public class PrimaryInhibitorySynapse extends InhibitorySynapse {
 
-
     public PrimaryInhibitorySynapse() {
         super();
     }
@@ -48,22 +47,4 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
 
         return new PrimaryInhibitorySynapse(input, output, this);
     }
-
-    /*
-    @Override
-    public Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
-        if (dir == INPUT) {
-            switch (s.getScope()) {
-                case I_SAME:
-                    return s.nextSet(I_INPUT);
-            }
-        } else {
-            switch (s.getScope()) {
-                case I_INPUT:
-                    return s.nextSet(I_SAME);
-            }
-        }
-        return Collections.emptySet();
-    }
-     */
 }
