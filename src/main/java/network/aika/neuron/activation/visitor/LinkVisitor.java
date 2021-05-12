@@ -40,13 +40,13 @@ public class LinkVisitor extends Visitor {
         link = l;
 
         boolean isTargetLink = l == null;
-        Direction dir = isTargetLink ?
-                v.startDir :
-                v.downUpDir;
-
         transitions = v.getScopes().stream()
                 .flatMap(s ->
-                        syn.transition(s, dir, isTargetLink)
+                        syn.transition(
+                                s,
+                                getDirection(isTargetLink),
+                                isTargetLink
+                        )
                 ).collect(Collectors.toList());
 
         visitedScopes = v.visitedScopes;
@@ -58,7 +58,7 @@ public class LinkVisitor extends Visitor {
         return !transitions.isEmpty();
     }
 
-    public boolean isClosedCycle() {
+    public boolean isClosedLoop() {
         return transitions.stream()
                 .anyMatch(t ->
                         origin.getScopes().contains(t.getInput().getOrigin())
@@ -82,7 +82,6 @@ public class LinkVisitor extends Visitor {
 
         sb.append("Origin:" + origin.act.toShortString() + ", ");
         sb.append("Current:" + link.toString() + ", ");
-
         sb.append("Transitions:" + transitions + ", ");
 
         sb.append(super.toString());

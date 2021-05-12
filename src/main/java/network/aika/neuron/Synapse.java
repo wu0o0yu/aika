@@ -17,7 +17,6 @@
 package network.aika.neuron;
 
 import network.aika.*;
-import network.aika.callbacks.VisitorEvent;
 import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.activation.scopes.Transition;
 import network.aika.neuron.activation.visitor.ActVisitor;
@@ -203,7 +202,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if(nv == null)
             return;
 
-        if(!nv.isClosedCycle())
+        if(!nv.isClosedLoop())
             return;
 
         if (linkExists(this, iAct, oAct))

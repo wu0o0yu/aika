@@ -59,9 +59,8 @@ public class Transition {
     }
 
     public static void add(boolean isTarget, Scope input, Scope output, Synapse... templateSynapse) {
-        for(Synapse ts: templateSynapse) {
+        for(Synapse ts: templateSynapse)
             new Transition(ts, isTarget, input, output);
-        }
     }
 
     public Transition getTemplate() {

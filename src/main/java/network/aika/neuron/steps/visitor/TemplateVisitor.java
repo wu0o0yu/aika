@@ -49,7 +49,7 @@ public abstract class TemplateVisitor implements VisitorStep {
     }
 
     @Override
-    public void closeCycle(Activation fromAct, ActVisitor v) {
+    public void closeLoop(Activation fromAct, ActVisitor v) {
         Direction dir = v.startDir;
 
         Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());
@@ -67,8 +67,12 @@ public abstract class TemplateVisitor implements VisitorStep {
                 .getTemplates()
                 .stream()
                 .flatMap(tn -> tn.getInputSynapses())
-                .filter(ts -> inputTemplates.contains(ts.getInput()))
-                .filter(ts -> iAct.isActive(ts.isRecurrent()))
+                .filter(ts ->
+                        inputTemplates.contains(ts.getInput())
+                )
+                .filter(ts ->
+                        iAct.isActive(ts.isRecurrent())
+                )
                 .forEach(ts ->
                         ts.closeCycle(v, iAct, oAct)
                 );

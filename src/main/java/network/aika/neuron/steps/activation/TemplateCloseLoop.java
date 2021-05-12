@@ -30,11 +30,11 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
  *
  * @author Lukas Molzberger
  */
-public class TemplateCloseCycle extends TemplateVisitor implements ActivationStep {
+public class TemplateCloseLoop extends TemplateVisitor implements ActivationStep {
 
     private Direction direction;
 
-    public TemplateCloseCycle(Direction dir) {
+    public TemplateCloseLoop(Direction dir) {
         direction = dir;
     }
 

@@ -94,6 +94,12 @@ public abstract class Visitor {
         return origin.act;
     }
 
+    public Direction getDirection(boolean isTargetLink) {
+        return isTargetLink ?
+                startDir :
+                downUpDir;
+    }
+
     public void incrementPathLength() {
         if (downUpDir == INPUT)
             downSteps++;

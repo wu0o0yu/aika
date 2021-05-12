@@ -17,7 +17,6 @@
 package network.aika.neuron.activation;
 
 import network.aika.*;
-import network.aika.callbacks.VisitorEvent;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
@@ -446,7 +445,7 @@ public class Activation extends Element<Activation> {
 
         QueueEntry.add(this, TEMPLATE_PROPAGATE_INPUT);
 
-        QueueEntry.add(this, TEMPLATE_CLOSE_CYCLE_OUTPUT);
+        QueueEntry.add(this, TEMPLATE_CLOSE_LOOP_OUTPUT);
         QueueEntry.add(this, TEMPLATE_PROPAGATE_OUTPUT);
     }
 
@@ -496,7 +495,7 @@ public class Activation extends Element<Activation> {
 
         QueueEntry.add(this, TEMPLATE_PROPAGATE_INPUT);
 
-        QueueEntry.add(this, TEMPLATE_CLOSE_CYCLE_OUTPUT);
+        QueueEntry.add(this, TEMPLATE_CLOSE_LOOP_OUTPUT);
         QueueEntry.add(this, TEMPLATE_PROPAGATE_OUTPUT);
     }
 

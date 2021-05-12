@@ -43,7 +43,7 @@ public abstract class LinkingVisitor implements VisitorStep {
     }
 
     @Override
-    public void closeCycle(Activation fromAct, ActVisitor v) {
+    public void closeLoop(Activation fromAct, ActVisitor v) {
         Direction dir = v.startDir;
         Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());
         Activation oAct = dir.getCycleOutput(fromAct, v.getOriginAct());

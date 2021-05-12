@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeSet;
 
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
  *
@@ -60,8 +60,8 @@ public class ActVisitor extends Visitor {
         this.phase = vp;
         this.origin = this;
         this.act = act;
-        this.downUpDir = downUpDir;
         this.startDir = startDir;
+        this.downUpDir = downUpDir;
         this.scopes = new ArrayList<>();
         this.visitedScopes = new TreeSet<>();
 
@@ -86,13 +86,15 @@ public class ActVisitor extends Visitor {
     }
 
     public void tryToLink(Activation act) {
-        if (downUpDir != OUTPUT || numSteps() < 1)
+        if (
+                downUpDir == INPUT ||
+                numSteps() < 1 ||
+                act == origin.act ||
+                act.isConflicting()
+        )
             return;
 
-        if (act == origin.act || act.isConflicting())
-            return;
-
-        phase.closeCycle(act, this);
+        phase.closeLoop(act, this);
     }
 
     public String toString() {
