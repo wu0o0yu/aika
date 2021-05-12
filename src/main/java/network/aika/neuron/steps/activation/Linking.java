@@ -52,7 +52,7 @@ public class Linking extends LinkingVisitor implements ActivationStep {
     public void process(Activation act) {
         act.getThought().linkInputRelations(act);
 
-        ActVisitor v = new ActVisitor(this, act, OUTPUT, INPUT);
+        ActVisitor v = new ActVisitor(this, act, INPUT, INPUT);
         act.followLinks(v);
 
         act.getModel().linkInputRelations(act, OUTPUT);

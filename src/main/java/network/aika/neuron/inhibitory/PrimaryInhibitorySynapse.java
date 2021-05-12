@@ -38,7 +38,7 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
     }
 
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        return v.startDir != Direction.INPUT;
+        return v.targetDir == Direction.OUTPUT;
     }
 
     @Override

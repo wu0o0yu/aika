@@ -42,7 +42,7 @@ public abstract class Visitor {
     protected VisitorStep phase;
 
     public Direction downUpDir;
-    public Direction startDir;
+    public Direction targetDir;
 
     public int downSteps = 0;
     public int upSteps = 0;
@@ -56,7 +56,7 @@ public abstract class Visitor {
         phase = v.phase;
         origin = v.origin;
         downUpDir = v.downUpDir;
-        startDir = v.startDir;
+        targetDir = v.targetDir;
         upSteps = v.upSteps;
     }
 
@@ -74,8 +74,8 @@ public abstract class Visitor {
         return downUpDir;
     }
 
-    public Direction getStartDir() {
-        return startDir;
+    public Direction getTargetDir() {
+        return targetDir;
     }
 
     public int getDownSteps() {
@@ -96,7 +96,7 @@ public abstract class Visitor {
 
     public Direction getDirection(boolean isTargetLink) {
         return isTargetLink ?
-                startDir :
+                targetDir :
                 downUpDir;
     }
 
@@ -138,7 +138,7 @@ public abstract class Visitor {
         StringBuilder sb = new StringBuilder();
 
         sb.append("DownUp:" + downUpDir + ", ");
-        sb.append("StartDir:" + startDir + ", ");
+        sb.append("TargetDir:" + targetDir + ", ");
 
         sb.append("DownSteps:" + downSteps + ", ");
         sb.append("UpSteps:" + upSteps + "");

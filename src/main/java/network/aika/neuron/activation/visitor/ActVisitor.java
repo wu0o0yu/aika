@@ -56,17 +56,17 @@ public class ActVisitor extends Visitor {
                 });
     }
 
-    public ActVisitor(VisitorStep vp, Activation act, Direction startDir, Direction downUpDir) {
+    public ActVisitor(VisitorStep vp, Activation act, Direction targetDir, Direction downUpDir) {
         this.phase = vp;
         this.origin = this;
         this.act = act;
-        this.startDir = startDir;
+        this.targetDir = targetDir;
         this.downUpDir = downUpDir;
         this.scopes = new ArrayList<>();
         this.visitedScopes = new TreeSet<>();
 
         act.getNeuron()
-                .getInitialScopeTemplates(startDir)
+                .getInitialScopeTemplates(targetDir)
                 .forEach(s -> {
                     visitedScopes.add(s);
                     scopes.add(s.getInstance(downUpDir, null));

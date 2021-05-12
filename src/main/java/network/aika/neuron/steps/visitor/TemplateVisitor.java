@@ -21,7 +21,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.VisitorStep;
 import network.aika.neuron.steps.link.LinkStep;
@@ -50,15 +49,15 @@ public abstract class TemplateVisitor implements VisitorStep {
 
     @Override
     public void closeLoop(Activation fromAct, ActVisitor v) {
-        Direction dir = v.startDir;
+        Direction dir = v.targetDir;
 
-        Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());
-        Activation oAct = dir.getCycleOutput(fromAct, v.getOriginAct());
+        Activation iAct = dir.getLoopInput(fromAct, v.getOriginAct());
+        Activation oAct = dir.getLoopOutput(fromAct, v.getOriginAct());
 
-        if(oAct.getNeuron().isInputNeuron())
-            return;
-
-        if (Link.synapseExists(iAct, oAct))
+        if(
+                oAct.getNeuron().isInputNeuron() ||
+                Link.synapseExists(iAct, oAct)
+        )
             return;
 
         Set<Neuron<?>> inputTemplates = iAct.getNeuron().getTemplates();
@@ -66,7 +65,9 @@ public abstract class TemplateVisitor implements VisitorStep {
         oAct.getNeuron()
                 .getTemplates()
                 .stream()
-                .flatMap(tn -> tn.getInputSynapses())
+                .flatMap(tn ->
+                        tn.getInputSynapses()
+                )
                 .filter(ts ->
                         inputTemplates.contains(ts.getInput())
                 )
@@ -74,7 +75,7 @@ public abstract class TemplateVisitor implements VisitorStep {
                         iAct.isActive(ts.isRecurrent())
                 )
                 .forEach(ts ->
-                        ts.closeCycle(v, iAct, oAct)
+                        ts.closeLoop(v, iAct, oAct)
                 );
     }
 }

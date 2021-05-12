@@ -52,7 +52,7 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
 
     @Override
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        return v.startDir != Direction.INPUT ||
+        return v.targetDir == Direction.OUTPUT ||
                 !act.getNeuron().isInputNeuron();
     }
 

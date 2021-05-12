@@ -36,9 +36,9 @@ public interface Direction {
 
     Direction invert();
 
-    Activation getCycleInput(Activation fromAct, Activation toAct);
+    Activation getLoopInput(Activation fromAct, Activation toAct);
 
-    Activation getCycleOutput(Activation fromAct, Activation toAct);
+    Activation getLoopOutput(Activation fromAct, Activation toAct);
 
     Activation getPropagateInput(Activation fromAct, Activation toAct);
 

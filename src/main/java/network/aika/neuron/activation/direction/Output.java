@@ -38,13 +38,13 @@ public class Output implements Direction {
     }
 
     @Override
-    public Activation getCycleInput(Activation fromAct, Activation toAct) {
-        return toAct;
+    public Activation getLoopInput(Activation fromAct, Activation toAct) {
+        return fromAct;
     }
 
     @Override
-    public Activation getCycleOutput(Activation fromAct, Activation toAct) {
-        return fromAct;
+    public Activation getLoopOutput(Activation fromAct, Activation toAct) {
+        return toAct;
     }
 
     @Override

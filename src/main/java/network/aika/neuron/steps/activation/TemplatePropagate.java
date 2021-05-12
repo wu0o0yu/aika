@@ -59,7 +59,7 @@ public abstract class TemplatePropagate extends TemplateVisitor implements Activ
 
         ActVisitor v = new ActVisitor(this, act, direction, direction);
 
-        Direction dir = v.startDir;
+        Direction dir = v.targetDir;
 
         Collection<Synapse> templateSynapses = n
                 .getTemplates()

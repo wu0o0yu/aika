@@ -179,7 +179,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if(nv == null)
             return;
 
-        Direction dir = nv.startDir;
+        Direction dir = nv.targetDir;
 
         Activation toAct = fromAct.getThought()
                 .createActivation(
@@ -197,7 +197,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         );
     }
 
-    public void closeCycle(ActVisitor v, Activation iAct, Activation oAct) {
+    public void closeLoop(ActVisitor v, Activation iAct, Activation oAct) {
         LinkVisitor nv = transition(v, null);
         if(nv == null)
             return;
