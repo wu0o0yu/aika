@@ -45,16 +45,6 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
     }
 
     @Override
-    public Collection<Scope> getInitialScopeTemplates(Direction dir) {
-        Templates t = getModel().getTemplates();
-
-        if(dir == Direction.OUTPUT)
-            return Set.of(t.SB_RELATED_SAME, t.IB_INPUT, t.I_SAME, t.P_SAME);
-        else
-            return Set.of(t.IB_SAME, t.SB_SAME, t.PB_SAME);
-    }
-
-    @Override
     public boolean allowTemplatePropagate(Activation act) {
         Neuron n = act.getNeuron();
 

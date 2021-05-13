@@ -123,7 +123,7 @@ public class Link extends Element<Link> {
     public void follow(VisitorStep p, Direction targetDir) {
         output.setMarked(true);
 
-        ActVisitor v = new ActVisitor(p, output, targetDir, INPUT);
+        ActVisitor v = new ActVisitor(p, output, targetDir.invert(), targetDir, INPUT);
         LinkVisitor nv = synapse.transition(v, this);
         synapse.follow(input, nv);
 

@@ -25,6 +25,7 @@ import network.aika.neuron.inhibitory.PrimaryInhibitorySynapse;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  *
@@ -39,6 +40,7 @@ public class Templates {
     public PatternNeuron INPUT_PATTERN_TEMPLATE = new PatternNeuron();
     public PatternNeuron SAME_PATTERN_TEMPLATE = new PatternNeuron();
     public InhibitoryNeuron INHIBITORY_TEMPLATE = new InhibitoryNeuron();
+
 
     public InputBNSynapse PRIMARY_INPUT_SYNAPSE_TEMPLATE;
     public InputBNSynapse RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE;
@@ -151,6 +153,15 @@ public class Templates {
                         true
                 );
 
+
+        SAME_BINDING_TEMPLATE.getTemplateInfo().inputScopes = Set.of(IB_SAME, SB_SAME, PB_SAME);
+        SAME_BINDING_TEMPLATE.getTemplateInfo().outputScopes = Set.of(SB_RELATED_SAME, IB_INPUT, I_SAME, P_SAME);
+
+        SAME_PATTERN_TEMPLATE.getTemplateInfo().inputScopes = Set.of(P_SAME);
+        SAME_PATTERN_TEMPLATE.getTemplateInfo().outputScopes = Set.of(P_SAME, PB_SAME, IB_INPUT, I_INPUT);
+
+        INHIBITORY_TEMPLATE.getTemplateInfo().inputScopes = Set.of(I_SAME);
+        INHIBITORY_TEMPLATE.getTemplateInfo().outputScopes = Set.of(I_SAME, IB_INPUT);
 
         Transition.add(true, I_INPUT, I_SAME, PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE);
         Transition.add(true, I_SAME, I_SAME, INHIBITORY_SYNAPSE_TEMPLATE);

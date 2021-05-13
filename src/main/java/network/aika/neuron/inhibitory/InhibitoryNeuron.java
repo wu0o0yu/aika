@@ -54,16 +54,6 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     @Override
-    public Collection<Scope> getInitialScopeTemplates(Direction dir) {
-        Templates t = getModel().getTemplates();
-
-        if(dir == Direction.OUTPUT)
-            return Set.of(t.I_SAME, t.IB_INPUT);
-        else
-            return Set.of(t.I_SAME);
-    }
-
-    @Override
     public InhibitoryNeuron instantiateTemplate() {
         InhibitoryNeuron n = new InhibitoryNeuron(getModel());
         initFromTemplate(n);

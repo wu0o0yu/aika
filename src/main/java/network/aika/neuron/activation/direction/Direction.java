@@ -18,6 +18,7 @@ package network.aika.neuron.activation.direction;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.TemplateNeuronInfo;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.scopes.Scope;
@@ -55,6 +56,8 @@ public interface Direction {
     Scope getToScope(Transition t);
 
     void setToScope(Scope s, Transition t);
+
+    Set<Scope> getInitialScopes(TemplateNeuronInfo templateInfo);
 
     Stream<? extends Synapse> getSynapses(Neuron n);
 

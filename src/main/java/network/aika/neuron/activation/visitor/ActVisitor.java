@@ -56,20 +56,21 @@ public class ActVisitor extends Visitor {
                 });
     }
 
-    public ActVisitor(VisitorStep vp, Activation act, Direction targetDir, Direction downUpDir) {
+    public ActVisitor(VisitorStep vp, Activation act, Direction startDir, Direction targetDir, Direction currentDir) {
         this.visitorStep = vp;
         this.origin = this;
         this.act = act;
         this.targetDir = targetDir;
-        this.currentDir = downUpDir;
+        this.currentDir = currentDir;
         this.scopes = new ArrayList<>();
         this.visitedScopes = new TreeSet<>();
 
-        act.getNeuron()
-                .getInitialScopeTemplates(targetDir)
+        startDir.getInitialScopes(
+                act.getNeuron().getTemplateInfo()
+        )
                 .forEach(s -> {
                     visitedScopes.add(s);
-                    scopes.add(s.getInstance(downUpDir, null));
+                    scopes.add(s.getInstance(currentDir, null));
                 });
     }
 

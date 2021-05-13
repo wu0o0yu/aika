@@ -49,7 +49,7 @@ public class Propagate extends LinkingVisitor implements ActivationStep {
 
     @Override
     public void process(Activation act) {
-        ActVisitor v = new ActVisitor(this, act, OUTPUT, OUTPUT);
+        ActVisitor v = new ActVisitor(this, act, OUTPUT, OUTPUT, OUTPUT);
 
         act.getNeuron()
                 .getOutputSynapses()

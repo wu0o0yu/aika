@@ -312,10 +312,12 @@ public class Activation extends Element<Activation> {
         Direction dir = v.getCurrentDir();
 
         setMarked(true);
-        dir.getLinks(this)
+        List<Link> links = dir.getLinks(this)
                 .filter(l ->
                         l.followAllowed(dir)
-                ).collect(Collectors.toList()).stream()
+                ).collect(Collectors.toList());
+
+        links.stream()
                 .forEach(l ->
                         l.follow(v)
                 );

@@ -18,6 +18,7 @@ package network.aika.neuron.activation.direction;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.TemplateNeuronInfo;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.scopes.Scope;
@@ -85,6 +86,11 @@ public class Input implements Direction {
     @Override
     public void setToScope(Scope s, Transition t) {
         t.setInput(s);
+    }
+
+    @Override
+    public Set<Scope> getInitialScopes(TemplateNeuronInfo templateInfo) {
+        return templateInfo.getInputScopes();
     }
 
     @Override

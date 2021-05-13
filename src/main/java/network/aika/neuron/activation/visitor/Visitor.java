@@ -131,10 +131,9 @@ public abstract class Visitor {
     }
 
     public String toStringRecursive() {
-        if(previousStep != null)
-            return previousStep.toStringRecursive() + "\n" + this;
-        else
-            return "" + this;
+        return (previousStep != null ? previousStep.toStringRecursive() : "") +
+                "\n" +
+                this;
     }
 
     public String toString() {
