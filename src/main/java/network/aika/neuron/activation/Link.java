@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 
+import static network.aika.callbacks.VisitorEvent.AFTER;
+import static network.aika.callbacks.VisitorEvent.BEFORE;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.sign.Sign.POS;
@@ -123,9 +125,9 @@ public class Link extends Element<Link> {
     public void follow(VisitorStep p, Direction targetDir) {
         output.setMarked(true);
 
-        ActVisitor v = new ActVisitor(p, output, targetDir.invert(), targetDir, INPUT);
-        LinkVisitor nv = synapse.transition(v, this);
-        synapse.follow(input, nv);
+        follow(
+                new ActVisitor(p, output, targetDir.invert(), targetDir, INPUT)
+        );
 
         output.setMarked(false);
     }
@@ -135,10 +137,13 @@ public class Link extends Element<Link> {
         if(nv == null)
             return;
 
-        synapse.follow(
-                v.getCurrentDir().getActivation(this),
-                nv
-        );
+        v.onEvent(BEFORE);
+
+        Activation toAct = v.getCurrentDir().getActivation(this);
+        toAct.getNeuron()
+                .transition(nv, toAct);
+
+        v.onEvent(AFTER);
     }
 
     public void computeInformationGainGradient() {
