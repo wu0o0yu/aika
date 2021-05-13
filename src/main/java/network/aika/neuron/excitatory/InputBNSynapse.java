@@ -15,7 +15,7 @@ public class InputBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I>
 
 
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        return v.targetDir == OUTPUT &&
+        return v.getTargetDir() == OUTPUT &&
                 getOutput().computeBiasLB(act) >= 0.4;
     }
 

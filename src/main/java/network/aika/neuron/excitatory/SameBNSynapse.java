@@ -30,9 +30,9 @@ public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> 
     }
 
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        if (v.targetDir == INPUT)
+        if (v.getTargetDir() == INPUT)
             return !act.getNeuron().isInputNeuron() && isRecurrent;
-        else if (v.targetDir == OUTPUT)
+        else if (v.getTargetDir() == OUTPUT)
             return getOutput().computeBiasLB(act) >= 0.4;
 
         throw new IllegalStateException();

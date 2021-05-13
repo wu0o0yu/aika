@@ -309,7 +309,7 @@ public class Activation extends Element<Activation> {
 
         v.tryToLink(this);
 
-        Direction dir = v.downUpDir;
+        Direction dir = v.getCurrentDir();
 
         setMarked(true);
         dir.getLinks(this)

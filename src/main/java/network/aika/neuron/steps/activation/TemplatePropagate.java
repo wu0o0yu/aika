@@ -59,16 +59,16 @@ public abstract class TemplatePropagate extends TemplateVisitor implements Activ
 
         ActVisitor v = new ActVisitor(this, act, direction, direction);
 
-        Direction dir = v.targetDir;
+        Direction targetDir = v.getTargetDir();
 
         Collection<Synapse> templateSynapses = n
                 .getTemplates()
                 .stream()
-                .flatMap(tn -> dir.getSynapses(tn))
+                .flatMap(tn -> targetDir.getSynapses(tn))
                 .filter(ts -> ts.checkTemplatePropagate(v, act))
                 .collect(Collectors.toList());
 
-        dir.getLinks(act)
+        targetDir.getLinks(act)
                 .forEach(l ->
                         templateSynapses.remove(l.getSynapse().getTemplate())
                 );

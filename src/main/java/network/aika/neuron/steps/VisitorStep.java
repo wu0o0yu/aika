@@ -27,7 +27,7 @@ import network.aika.neuron.activation.visitor.Visitor;
  */
 public interface VisitorStep {
 
-    void closeLoop(Activation act, ActVisitor v);
+    void closeLoop(ActVisitor v, Activation iAct, Activation oAct);
 
     void getNextSteps(Activation act);
 

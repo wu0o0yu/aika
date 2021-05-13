@@ -20,7 +20,6 @@ import network.aika.Config;
 import network.aika.Thought;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
-import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.utils.Utils;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.Synapse;
@@ -137,7 +136,7 @@ public class Link extends Element<Link> {
             return;
 
         synapse.follow(
-                v.downUpDir.getActivation(this),
+                v.getCurrentDir().getActivation(this),
                 nv
         );
     }

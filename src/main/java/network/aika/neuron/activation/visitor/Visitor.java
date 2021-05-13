@@ -20,13 +20,11 @@ import network.aika.Thought;
 import network.aika.callbacks.VisitorEvent;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.steps.VisitorStep;
 
 import java.util.Set;
-import java.util.TreeSet;
 
 import static network.aika.neuron.activation.direction.Direction.*;
 
@@ -39,13 +37,13 @@ import static network.aika.neuron.activation.direction.Direction.*;
 public abstract class Visitor {
     protected ActVisitor origin;
     private Visitor previousStep;
-    protected VisitorStep phase;
+    protected VisitorStep visitorStep;
 
-    public Direction downUpDir;
-    public Direction targetDir;
+    protected Direction currentDir;
+    protected Direction targetDir;
 
-    public int downSteps = 0;
-    public int upSteps = 0;
+    private int downSteps = 0;
+    private int upSteps = 0;
 
     protected Set<Scope> visitedScopes;
 
@@ -53,14 +51,19 @@ public abstract class Visitor {
 
     public Visitor(Visitor v) {
         previousStep = v;
-        phase = v.phase;
+        visitorStep = v.visitorStep;
         origin = v.origin;
-        downUpDir = v.downUpDir;
+        currentDir = v.currentDir;
         targetDir = v.targetDir;
         upSteps = v.upSteps;
     }
 
     public abstract boolean follow();
+
+    public void switchDirection() {
+        assert currentDir == INPUT;
+        currentDir = currentDir.invert();
+    }
 
     public Visitor getOrigin() {
         return origin;
@@ -70,8 +73,8 @@ public abstract class Visitor {
         return previousStep;
     }
 
-    public Direction getDownUpDir() {
-        return downUpDir;
+    public Direction getCurrentDir() {
+        return currentDir;
     }
 
     public Direction getTargetDir() {
@@ -86,22 +89,22 @@ public abstract class Visitor {
         return upSteps;
     }
 
-    public VisitorStep getPhase() {
-        return phase;
+    public VisitorStep getVisitorStep() {
+        return visitorStep;
     }
 
     public Activation getOriginAct() {
-        return origin.act;
+        return origin.getActivation();
     }
 
     public Direction getDirection(boolean isTargetLink) {
         return isTargetLink ?
                 targetDir :
-                downUpDir;
+                currentDir;
     }
 
     public void incrementPathLength() {
-        if (downUpDir == INPUT)
+        if (currentDir == INPUT)
             downSteps++;
         else
             upSteps++;
@@ -116,7 +119,7 @@ public abstract class Visitor {
     }
 
     private Thought getThought() {
-        return origin.act.getThought();
+        return origin.getActivation().getThought();
     }
 
     public void onEvent(VisitorEvent ve) {
@@ -137,7 +140,7 @@ public abstract class Visitor {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("DownUp:" + downUpDir + ", ");
+        sb.append("DownUp:" + currentDir + ", ");
         sb.append("TargetDir:" + targetDir + ", ");
 
         sb.append("DownSteps:" + downSteps + ", ");

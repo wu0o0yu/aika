@@ -179,7 +179,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if(nv == null)
             return;
 
-        Direction dir = nv.targetDir;
+        Direction dir = nv.getTargetDir();
 
         Activation toAct = fromAct.getThought()
                 .createActivation(
@@ -188,11 +188,11 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                         v
                 );
 
-        nv.getPhase().getNextSteps(toAct);
+        nv.getVisitorStep().getNextSteps(toAct);
 
         createLink(
-                dir.getPropagateInput(fromAct, toAct),
-                dir.getPropagateOutput(fromAct, toAct),
+                dir.getInput(fromAct, toAct),
+                dir.getOutput(fromAct, toAct),
                 nv
         );
     }
@@ -232,7 +232,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
             QueueEntry.add(nl, new PropagateGradient(oAct.getOutputGradientSum()));
         }
 
-        v.getPhase().getNextSteps(nl);
+        v.getVisitorStep().getNextSteps(nl);
     }
 
     public void linkInput() {

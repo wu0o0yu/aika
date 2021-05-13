@@ -38,22 +38,12 @@ public class Input implements Direction {
     }
 
     @Override
-    public Activation getLoopInput(Activation fromAct, Activation toAct) {
+    public Activation getInput(Activation fromAct, Activation toAct) {
         return toAct;
     }
 
     @Override
-    public Activation getLoopOutput(Activation fromAct, Activation toAct) {
-        return fromAct;
-    }
-
-    @Override
-    public Activation getPropagateInput(Activation fromAct, Activation toAct) {
-        return toAct;
-    }
-
-    @Override
-    public Activation getPropagateOutput(Activation fromAct, Activation toAct) {
+    public Activation getOutput(Activation fromAct, Activation toAct) {
         return fromAct;
     }
 

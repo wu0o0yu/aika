@@ -36,13 +36,9 @@ public interface Direction {
 
     Direction invert();
 
-    Activation getLoopInput(Activation fromAct, Activation toAct);
+    Activation getInput(Activation fromAct, Activation toAct);
 
-    Activation getLoopOutput(Activation fromAct, Activation toAct);
-
-    Activation getPropagateInput(Activation fromAct, Activation toAct);
-
-    Activation getPropagateOutput(Activation fromAct, Activation toAct);
+    Activation getOutput(Activation fromAct, Activation toAct);
 
     Neuron getNeuron(Synapse s);
 

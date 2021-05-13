@@ -33,7 +33,7 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
  */
 public class ActVisitor extends Visitor {
 
-    Activation act;
+    private Activation act;
 
     private Collection<Scope> scopes;
 
@@ -49,19 +49,19 @@ public class ActVisitor extends Visitor {
 
         v.getTransitions()
                 .forEach(t -> {
-                    Scope fromScope = v.downUpDir.getFromScope(t.getTemplate());
-                    Scope toScope = v.downUpDir.getToScope(t.getTemplate());
+                    Scope fromScope = v.currentDir.getFromScope(t.getTemplate());
+                    Scope toScope = v.currentDir.getToScope(t.getTemplate());
                     if(fromScope == toScope || !v.visitedScopes.contains(toScope))
-                        scopes.add(toScope.getInstance(v.downUpDir, t));
+                        scopes.add(toScope.getInstance(v.currentDir, t));
                 });
     }
 
     public ActVisitor(VisitorStep vp, Activation act, Direction targetDir, Direction downUpDir) {
-        this.phase = vp;
+        this.visitorStep = vp;
         this.origin = this;
         this.act = act;
         this.targetDir = targetDir;
-        this.downUpDir = downUpDir;
+        this.currentDir = downUpDir;
         this.scopes = new ArrayList<>();
         this.visitedScopes = new TreeSet<>();
 
@@ -87,14 +87,18 @@ public class ActVisitor extends Visitor {
 
     public void tryToLink(Activation act) {
         if (
-                downUpDir == INPUT ||
+                currentDir == INPUT ||
                 numSteps() < 1 ||
                 act == origin.act ||
                 act.isConflicting()
         )
             return;
 
-        phase.closeLoop(act, this);
+        visitorStep.closeLoop(
+                this,
+                targetDir.getInput(act, getOriginAct()),
+                targetDir.getOutput(act, getOriginAct())
+        );
     }
 
     public String toString() {

@@ -48,12 +48,7 @@ public abstract class TemplateVisitor implements VisitorStep {
     }
 
     @Override
-    public void closeLoop(Activation fromAct, ActVisitor v) {
-        Direction dir = v.targetDir;
-
-        Activation iAct = dir.getLoopInput(fromAct, v.getOriginAct());
-        Activation oAct = dir.getLoopOutput(fromAct, v.getOriginAct());
-
+    public void closeLoop(ActVisitor v, Activation iAct, Activation oAct) {
         if(
                 oAct.getNeuron().isInputNeuron() ||
                 Link.synapseExists(iAct, oAct)
