@@ -33,8 +33,6 @@ import static network.aika.neuron.activation.Fired.NOT_FIRED;
  */
 public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, BindingNeuron> {
 
-    public static byte type;
-
     public boolean isRecurrent;
 
     public BindingNeuronSynapse() {
@@ -100,11 +98,6 @@ public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends Excitato
                         l.getOutput() :
                         l.getInput()
         ).getReference();
-    }
-
-    @Override
-    public byte getType() {
-        return type;
     }
 
     public boolean isRecurrent() {

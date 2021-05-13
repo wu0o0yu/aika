@@ -27,8 +27,6 @@ import network.aika.neuron.activation.visitor.Visitor;
  */
 public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
-    public static byte type;
-
     public InhibitorySynapse() {
         super();
     }
@@ -55,11 +53,6 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         InhibitorySynapse s = new InhibitorySynapse(input, output, this);
         initFromTemplate(s);
         return s;
-    }
-
-    @Override
-    public byte getType() {
-        return type;
     }
 
     @Override

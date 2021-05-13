@@ -65,9 +65,11 @@ public class ActVisitor extends Visitor {
         this.scopes = new ArrayList<>();
         this.visitedScopes = new TreeSet<>();
 
-        startDir.getInitialScopes(
-                act.getNeuron().getTemplateInfo()
-        )
+        act.getNeuron()
+                .getTemplates().stream()
+                .flatMap(tn ->
+                        startDir.getInitialScopes(tn.getTemplateInfo()).stream()
+                )
                 .forEach(s -> {
                     visitedScopes.add(s);
                     scopes.add(s.getInstance(currentDir, null));

@@ -110,6 +110,11 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public TemplateSynapseInfo getTemplateInfo() {
+        assert isTemplate();
+        if(templateInfo == null) {
+            templateInfo = new TemplateSynapseInfo();
+        }
+
         return templateInfo;
     }
 
@@ -126,8 +131,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     protected abstract boolean checkCausality(Activation iAct, Activation oAct, Visitor v);
 
     public abstract boolean checkTemplatePropagate(Visitor v, Activation act);
-
-    public abstract byte getType();
 
     public abstract void updateReference(Link l);
 
@@ -395,7 +398,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeByte(getType());
+        out.writeLong(getTemplate().getInput().getId());
+        out.writeLong(getTemplate().getOutput().getId());
 
         out.writeLong(input.getId());
         out.writeLong(output.getId());

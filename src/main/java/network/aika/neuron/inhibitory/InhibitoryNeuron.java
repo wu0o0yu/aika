@@ -34,8 +34,6 @@ import java.util.Set;
  */
 public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
-    public static byte type;
-
     public InhibitoryNeuron() {
         super();
     }
@@ -62,11 +60,6 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     @Override
     public void addDummyLinks(Activation act) {
-    }
-
-    @Override
-    public byte getType() {
-        return type;
     }
 
     @Override

@@ -43,8 +43,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     private static final Logger log = LoggerFactory.getLogger(PatternNeuron.class);
 
-    public static byte type;
-
     private String tokenLabel;
 
     public PatternNeuron() {
@@ -84,11 +82,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         nv.switchDirection();
 
         act.followLinks(nv);
-    }
-
-    @Override
-    public byte getType() {
-        return type;
     }
 
     public void setTokenLabel(String tokenLabel) {

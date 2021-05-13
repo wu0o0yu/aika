@@ -34,8 +34,6 @@ import java.util.Set;
 public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
     private static final Logger log = LoggerFactory.getLogger(BindingNeuron.class);
 
-    public static byte type;
-
     public BindingNeuron() {
         super();
     }
@@ -62,10 +60,5 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
         initFromTemplate(n);
 
         return n;
-    }
-
-    @Override
-    public byte getType() {
-        return type;
     }
 }

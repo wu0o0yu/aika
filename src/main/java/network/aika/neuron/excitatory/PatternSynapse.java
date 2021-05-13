@@ -28,8 +28,6 @@ import network.aika.neuron.activation.visitor.Visitor;
  */
 public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, PatternNeuron> {
 
-    public static byte type;
-
     public PatternSynapse() {
         super();
     }
@@ -74,10 +72,5 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
         return getOutput().isInputNeuron() ?
                 null :
                 oAct;
-    }
-
-    @Override
-    public byte getType() {
-        return type;
     }
 }

@@ -61,7 +61,9 @@ public class LinkVisitor extends Visitor {
     public boolean isClosedLoop() {
         return transitions.stream()
                 .anyMatch(t ->
-                        origin.getScopes().contains(t.getInput().getOrigin())
+                        origin.getScopes().contains(
+                                t.getInput().getOrigin()
+                        )
                 );
     }
 

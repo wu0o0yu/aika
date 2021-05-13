@@ -55,18 +55,6 @@ public abstract class Model {
 
     private int N = 0; // needs to be stored
 
-    private static Map<Byte, Class> typeRegistry = new HashMap<>();
-
-    static {
-        registerType(PatternNeuron.class);
-        registerType(BindingNeuron.class);
-        registerType(PatternSynapse.class);
-        registerType(BindingNeuronSynapse.class);
-
-        registerType(InhibitoryNeuron.class);
-        registerType(InhibitorySynapse.class);
-    }
-
     private SuspensionCallback suspensionCallback;
     private AtomicLong retrievalCounter = new AtomicLong(0);
 
@@ -154,15 +142,6 @@ public abstract class Model {
         }
     }
 
-    private static void registerType(Class clazz) {
-        byte type = (byte) typeRegistry.size();
-        typeRegistry.put(type, clazz);
-        try {
-            clazz.getField("type").setByte(null, type);
-        } catch (Exception e) {
-            log.error("Initialization error: ", e);
-        }
-    }
 
     public SuspensionCallback getSuspensionHook() {
         return suspensionCallback;
@@ -173,16 +152,20 @@ public abstract class Model {
     }
 
     public Neuron readNeuron(DataInput in, NeuronProvider p) throws Exception {
-        Constructor c = typeRegistry.get(in.readByte()).getDeclaredConstructor(NeuronProvider.class);
+/*        Constructor c = typeRegistry.get(in.readByte()).getDeclaredConstructor(NeuronProvider.class);
         Neuron n = (Neuron) c.newInstance(p);
         n.readFields(in, this);
         return n;
+ */
+        return null;
     }
 
     public Synapse readSynapse(DataInput in) throws Exception {
-        Synapse s = (Synapse) typeRegistry.get(in.readByte()).getDeclaredConstructor().newInstance();
+/*        Synapse s = (Synapse) typeRegistry.get(in.readByte()).getDeclaredConstructor().newInstance();
         s.readFields(in, this);
         return s;
+ */
+        return null;
     }
 
     public void writeSynapse(Synapse s, DataOutput out) throws IOException {

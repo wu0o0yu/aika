@@ -43,8 +43,6 @@ import static network.aika.neuron.sign.Sign.POS;
  */
 public abstract class Neuron<S extends Synapse> implements Writable {
 
-    public static boolean debugOutput = false;
-
     private static final Logger log = LoggerFactory.getLogger(Neuron.class);
 
     volatile long retrievalCount = 0;
@@ -89,11 +87,12 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public TemplateNeuronInfo getTemplateInfo() {
-        return templateInfo;
-    }
+        assert isTemplate();
+        if(templateInfo == null) {
+            templateInfo = new TemplateNeuronInfo();
+        }
 
-    public void setTemplateInfo(TemplateNeuronInfo templateInfo) {
-        this.templateInfo = templateInfo;
+        return templateInfo;
     }
 
     protected void initFromTemplate(Neuron n) {
@@ -110,8 +109,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public abstract ActivationFunction getActivationFunction();
 
     public abstract Fired incrementFired(Fired f);
-
-    public abstract byte getType();
 
     public abstract boolean allowTemplatePropagate(Activation act);
 
@@ -373,7 +370,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeByte(getType());
+ //       out.writeLong(getTemplates().stream());
 
         out.writeBoolean(label != null);
         if(label != null) {
