@@ -45,8 +45,6 @@ public abstract class Visitor {
     private int downSteps = 0;
     private int upSteps = 0;
 
-    protected Set<Scope> visitedScopes;
-
     protected Visitor() {}
 
     public Visitor(Visitor v) {
@@ -63,10 +61,6 @@ public abstract class Visitor {
     public void switchDirection() {
         assert currentDir == INPUT;
         currentDir = currentDir.invert();
-    }
-
-    public Visitor getOrigin() {
-        return origin;
     }
 
     public Visitor getPreviousStep() {

@@ -49,8 +49,6 @@ public class LinkVisitor extends Visitor {
                         )
                 ).collect(Collectors.toList());
 
-        visitedScopes = v.visitedScopes;
-
         onCandidateEvent(syn);
     }
 
@@ -62,7 +60,7 @@ public class LinkVisitor extends Visitor {
         return transitions.stream()
                 .anyMatch(t ->
                         origin.getScopes().contains(
-                                t.getInput().getOrigin()
+                                targetDir.getToScope(t)
                         )
                 );
     }

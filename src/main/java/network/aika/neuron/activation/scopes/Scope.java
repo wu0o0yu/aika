@@ -31,10 +31,10 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class Scope implements Comparable<Scope> {
 
-    private Scope origin;
-    private Scope template;
     private String label;
     private int id;
+
+    private boolean markedVisited; // TODO: for multi-threading copies of scopes and transactions need to be made per document.
 
     private Set<Transition> inputs = new TreeSet<>(getComparator(OUTPUT));
     private Set<Transition> outputs = new TreeSet<>(getComparator(INPUT));
@@ -50,30 +50,16 @@ public class Scope implements Comparable<Scope> {
         this.id = id;
     }
 
-    public Scope getInstance(Direction dir, Transition from) {
-        Scope s = new Scope(label, id);
-        s.template = this;
-
-        if(from != null) {
-            dir.setToScope(s, from);
-            s.inputs.add(from);
-            s.origin = dir.getFromScope(from).origin;
-        } else
-            s.origin = s;
-
-        return s;
-    }
-
-    public Scope getOrigin() {
-        return origin;
-    }
-
     public String getLabel() {
         return label;
     }
 
-    public Scope getTemplate() {
-        return template;
+    public boolean isMarkedVisited() {
+        return markedVisited;
+    }
+
+    public void setMarkedVisited(boolean markedVisited) {
+        this.markedVisited = markedVisited;
     }
 
     public Set<Transition> getInputs() {

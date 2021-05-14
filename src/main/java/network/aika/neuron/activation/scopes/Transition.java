@@ -24,7 +24,6 @@ import network.aika.neuron.activation.direction.Direction;
  */
 public class Transition {
 
-    private Transition template;
     private Synapse templateSynapse;
     private boolean isTargetAllowed = false;
     private Scope input;
@@ -61,17 +60,6 @@ public class Transition {
     public static void add(boolean isTarget, Scope input, Scope output, Synapse... templateSynapse) {
         for(Synapse ts: templateSynapse)
             new Transition(ts, isTarget, input, output);
-    }
-
-    public Transition getTemplate() {
-        return template;
-    }
-
-    public Transition getInstance(Direction dir, Scope from) {
-        Transition t = new Transition(templateSynapse, isTargetAllowed);
-        t.template = this;
-        dir.setFromScope(from, t);
-        return t;
     }
 
     public boolean check(Synapse s, boolean isTargetLink) {

@@ -123,12 +123,14 @@ public class Link extends Element<Link> {
     }
 
     public void follow(VisitorStep p, Direction targetDir) {
+        ActVisitor v = new ActVisitor(p, output, targetDir.invert(), targetDir, INPUT);
+
         output.setMarked(true);
+        v.setScopesVisited(true);
 
-        follow(
-                new ActVisitor(p, output, targetDir.invert(), targetDir, INPUT)
-        );
+        follow(v);
 
+        v.setScopesVisited(false);
         output.setMarked(false);
     }
 
@@ -137,13 +139,11 @@ public class Link extends Element<Link> {
         if(nv == null)
             return;
 
-        v.onEvent(BEFORE);
-
+        nv.onEvent(BEFORE);
         Activation toAct = v.getCurrentDir().getActivation(this);
         toAct.getNeuron()
                 .transition(nv, toAct);
-
-        v.onEvent(AFTER);
+        nv.onEvent(AFTER);
     }
 
     public void computeInformationGainGradient() {

@@ -24,6 +24,7 @@ import network.aika.neuron.steps.VisitorStep;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 
@@ -44,16 +45,14 @@ public class ActVisitor extends Visitor {
     public ActVisitor(LinkVisitor v, Activation act) {
         super(v);
         this.act = act;
-        scopes = new ArrayList<>();
-        visitedScopes = new TreeSet<>(v.visitedScopes);
-
-        v.getTransitions()
-                .forEach(t -> {
-                    Scope fromScope = v.currentDir.getFromScope(t.getTemplate());
-                    Scope toScope = v.currentDir.getToScope(t.getTemplate());
-                    if(fromScope == toScope || !v.visitedScopes.contains(toScope))
-                        scopes.add(toScope.getInstance(v.currentDir, t));
-                });
+        scopes = v.getTransitions().stream()
+                .filter(t -> {
+                    Scope fromScope = v.currentDir.getFromScope(t);
+                    Scope toScope = v.currentDir.getToScope(t);
+                    return fromScope == toScope || !toScope.isMarkedVisited();
+                })
+                .map(t -> v.currentDir.getToScope(t))
+                .collect(Collectors.toList());
     }
 
     public ActVisitor(VisitorStep vp, Activation act, Direction startDir, Direction targetDir, Direction currentDir) {
@@ -62,18 +61,13 @@ public class ActVisitor extends Visitor {
         this.act = act;
         this.targetDir = targetDir;
         this.currentDir = currentDir;
-        this.scopes = new ArrayList<>();
-        this.visitedScopes = new TreeSet<>();
 
-        act.getNeuron()
+        scopes = act.getNeuron()
                 .getTemplates().stream()
                 .flatMap(tn ->
                         startDir.getInitialScopes(tn.getTemplateInfo()).stream()
                 )
-                .forEach(s -> {
-                    visitedScopes.add(s);
-                    scopes.add(s.getInstance(currentDir, null));
-                });
+                .collect(Collectors.toList());
     }
 
     public boolean follow() {
@@ -82,6 +76,10 @@ public class ActVisitor extends Visitor {
 
     public Collection<Scope> getScopes() {
         return scopes;
+    }
+
+    public void setScopesVisited(boolean visited) {
+        scopes.forEach(s -> s.setMarkedVisited(visited));
     }
 
     public Activation getActivation() {

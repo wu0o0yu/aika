@@ -49,8 +49,9 @@ public class TemplateCloseLoop extends TemplateVisitor implements ActivationStep
 
     @Override
     public void process(Activation act) {
-        ActVisitor v = new ActVisitor(this, act, direction, direction.invert(), INPUT);
-        act.followLinks(v);
+        act.followLinks(
+                new ActVisitor(this, act, direction, direction.invert(), INPUT)
+        );
     }
 
     public String toString() {

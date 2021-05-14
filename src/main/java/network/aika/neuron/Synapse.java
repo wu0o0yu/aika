@@ -159,12 +159,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public Stream<Transition> transition(Scope s, Direction dir, boolean isTargetLink) {
-        return dir.getTransitions(s.getTemplate()).stream()
+        return dir.getTransitions(s).stream()
                 .filter(t ->
                         t.check(this, isTargetLink)
-                )
-                .map(t ->
-                        t.getInstance(dir, s)
                 );
     }
 
