@@ -4,6 +4,8 @@
       <mapping ext="space.kts" type="Kotlin" />
       <mapping ext="gradle.kts" type="Kotlin" />
       <mapping ext="main.kts" type="Kotlin" />
+      <mapping pattern="biblatex.cfg" type="LaTeX style file" />
+      <mapping pattern="biblatex-dm.cfg" type="LaTeX style file" />
       <mapping ext="pkb" type="PLAIN_TEXT" />
       <mapping ext="trg" type="PLAIN_TEXT" />
       <mapping ext="dsl" type="PLAIN_TEXT" />
