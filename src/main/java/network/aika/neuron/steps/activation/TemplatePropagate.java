@@ -44,7 +44,7 @@ public abstract class TemplatePropagate extends TemplateVisitor implements Activ
 
     @Override
     public Phase getPhase() {
-        return Phase.FINAL_LINKING;
+        return Phase.TEMPLATE;
     }
 
     public boolean checkIfQueued() {

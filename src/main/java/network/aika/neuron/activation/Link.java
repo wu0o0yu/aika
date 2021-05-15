@@ -94,7 +94,6 @@ public class Link extends Element<Link> {
         Link ol = oAct.getInputLink(iAct.getNeuron());
         if (ol != null) {
             assert s == ol.getSynapse();
-
 //                    toAct = oAct.cloneToReplaceLink(s);
             log.warn("Link already exists! ");
             return true;
