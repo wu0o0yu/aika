@@ -81,7 +81,7 @@ public class LinkVisitor extends Visitor {
         StringBuilder sb = new StringBuilder();
 
         sb.append("Origin:" + origin.getActivation().toShortString() + ", ");
-        sb.append("Current:" + link.toString() + ", ");
+        sb.append("Current:" + (link != null ? link : "X") + ", ");
         sb.append("Transitions:" + transitions + ", ");
 
         sb.append(super.toString());

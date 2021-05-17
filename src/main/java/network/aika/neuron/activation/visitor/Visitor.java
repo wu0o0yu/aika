@@ -53,6 +53,7 @@ public abstract class Visitor {
         origin = v.origin;
         currentDir = v.currentDir;
         targetDir = v.targetDir;
+        downSteps = v.downSteps;
         upSteps = v.upSteps;
     }
 
@@ -106,10 +107,6 @@ public abstract class Visitor {
 
     public boolean getSelfRef() {
         return downSteps == 0 || upSteps == 0;
-    }
-
-    public int numSteps() {
-        return downSteps + upSteps;
     }
 
     private Thought getThought() {

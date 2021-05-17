@@ -89,7 +89,6 @@ public class ActVisitor extends Visitor {
     public void tryToLink(Activation act) {
         if (
                 currentDir == INPUT ||
-                numSteps() < 1 ||
                 act == origin.act ||
                 act.isConflicting()
         )
@@ -106,7 +105,7 @@ public class ActVisitor extends Visitor {
         StringBuilder sb = new StringBuilder();
 
         sb.append("Origin:" + origin.act.toShortString() + ", ");
-        sb.append("Current:" + act.toShortString() + ", ");
+        sb.append("Current:" + (act != null ? act.toShortString() : "X") + ", ");
         sb.append("Scopes:" + scopes + ", ");
 
         sb.append(super.toString());
