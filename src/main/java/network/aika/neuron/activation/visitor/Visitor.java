@@ -40,7 +40,7 @@ public abstract class Visitor {
     protected VisitorStep visitorStep;
 
     protected Direction currentDir;
-    protected Direction targetDir;
+    protected Direction targetDir; // The targetDirection refers to the direction relative to the end of the visitor path.
 
     private int downSteps = 0;
     private int upSteps = 0;

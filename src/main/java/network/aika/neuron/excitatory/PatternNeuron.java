@@ -70,18 +70,8 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     @Override
-    public void transition(LinkVisitor v, Activation act) {
-        if (v.getCurrentDir() == OUTPUT)
-            return;
-
-        ActVisitor nv = new ActVisitor(v, act);
-
-        if(!nv.follow())
-            return;
-
-        nv.switchDirection();
-
-        act.followLinks(nv);
+    public void transition(ActVisitor v) {
+        v.switchDirection();
     }
 
     public void setTokenLabel(String tokenLabel) {

@@ -29,7 +29,7 @@ import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.steps.activation.PropagateValueChange;
 import network.aika.neuron.steps.activation.UpdateBias;
 import network.aika.neuron.steps.link.LinkStep;
-import network.aika.neuron.steps.link.PropagateGradient;
+import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.neuron.steps.link.SumUpLink;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.Utils;
@@ -304,7 +304,16 @@ public class Activation extends Element<Activation> {
                 );
     }
 
-    public void followLinks(ActVisitor v) {
+
+    public void follow(ActVisitor v) {
+        if(!v.follow())
+            return;
+
+        getNeuron().transition(v);
+        followLinks(v);
+    }
+
+    private void followLinks(ActVisitor v) {
         v.onEvent(BEFORE);
 
         v.tryToLink(this);
@@ -486,14 +495,17 @@ public class Activation extends Element<Activation> {
         outputGradientSum += g;
 
         if(!getNeuron().isInputNeuron())
-            addLinksToQueue(INPUT, new PropagateGradient(g));
+            addLinksToQueue(INPUT, new PropagateGradientAndUpdateWeight(g));
 
         if (getNeuron().isAllowTraining())
             QueueEntry.add(this,
                     new UpdateBias(getConfig().getLearnRate() * g)
             );
 
-        addLinksToQueue(INPUT, LinkStep.TEMPLATE);
+
+        QueueEntry.add(this, TEMPLATE_CLOSE_LOOP_INPUT);
+
+//        addLinksToQueue(INPUT, LinkStep.TEMPLATE);
 
         if(!isActive(false))
             return;

@@ -28,7 +28,7 @@ import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.steps.link.PropagateGradient;
+import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.neuron.sign.Sign;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
@@ -39,8 +39,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-import static network.aika.callbacks.VisitorEvent.AFTER;
-import static network.aika.callbacks.VisitorEvent.BEFORE;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.activation.Link.linkExists;
@@ -220,7 +218,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         QueueEntry.add(nl, INFORMATION_GAIN_GRADIENT);
 
         if(!Utils.belowTolerance(oAct.getOutputGradientSum())) {
-            QueueEntry.add(nl, new PropagateGradient(oAct.getOutputGradientSum()));
+            QueueEntry.add(nl, new PropagateGradientAndUpdateWeight(oAct.getOutputGradientSum()));
         }
 
         v.getVisitorStep().getNextSteps(nl);

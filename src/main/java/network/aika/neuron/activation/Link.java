@@ -134,15 +134,17 @@ public class Link extends Element<Link> {
     }
 
     public void follow(ActVisitor v) {
-        LinkVisitor nv = synapse.transition(v, this);
-        if(nv == null)
+        LinkVisitor lv = synapse.transition(v, this);
+        if(lv == null)
             return;
 
-        nv.onEvent(BEFORE);
+        lv.onEvent(BEFORE);
         Activation toAct = v.getCurrentDir().getActivation(this);
-        toAct.getNeuron()
-                .transition(nv, toAct);
-        nv.onEvent(AFTER);
+
+        toAct.follow(
+                new ActVisitor(lv, toAct)
+        );
+        lv.onEvent(AFTER);
     }
 
     public void computeInformationGainGradient() {

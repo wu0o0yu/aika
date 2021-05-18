@@ -16,21 +16,24 @@
  */
 package network.aika.neuron.steps.link;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
 import network.aika.utils.Utils;
 import network.aika.neuron.activation.Link;
+
+import static network.aika.neuron.steps.activation.ActivationStep.UPDATE_SYNAPSE_INPUT_LINKS;
 
 /**
  * Propagate the gradient backwards through the network.
  *
  * @author Lukas Molzberger
  */
-public class PropagateGradient implements LinkStep {
+public class PropagateGradientAndUpdateWeight implements LinkStep {
 
     private double gradient;
 
-    public PropagateGradient(double gradient) {
+    public PropagateGradientAndUpdateWeight(double gradient) {
         this.gradient = gradient;
     }
 
@@ -45,10 +48,16 @@ public class PropagateGradient implements LinkStep {
 
     @Override
     public void process(Link l) {
-        l.propagateGradient(gradient);
+        if(l.getSynapse().isAllowTraining()) {
+            double weightDelta = l.getConfig().getLearnRate() * gradient;
+            Synapse s = l.getSynapse();
 
-        if(l.getSynapse().isAllowTraining())
-            QueueEntry.add(l, new UpdateWeight(l.getConfig().getLearnRate() * gradient));
+            s.updateSynapse(l, weightDelta);
+
+            QueueEntry.add(l.getOutput(), UPDATE_SYNAPSE_INPUT_LINKS);
+        }
+
+        l.propagateGradient(gradient);
     }
 
     public String toString() {

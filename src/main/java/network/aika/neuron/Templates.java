@@ -169,7 +169,10 @@ public class Templates {
 
 
         Transition.add(true, P_SAME, P_SAME, PATTERN_SYNAPSE_TEMPLATE);
-        Transition.add(P_SAME, P_SAME, RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE);
+        Transition.add(P_SAME, P_SAME,
+                RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE,
+                SAME_PATTERN_SYNAPSE_TEMPLATE
+        );
 
         Transition.add(true, PB_SAME, PB_SAME, RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE);
         Transition.add(PB_SAME, PB_SAME, PATTERN_SYNAPSE_TEMPLATE);
