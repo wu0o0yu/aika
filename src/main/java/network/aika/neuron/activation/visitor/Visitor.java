@@ -62,6 +62,7 @@ public abstract class Visitor {
     public void switchDirection() {
         assert currentDir == INPUT;
         currentDir = currentDir.invert();
+        targetDir = targetDir.invert();
     }
 
     public Visitor getPreviousStep() {

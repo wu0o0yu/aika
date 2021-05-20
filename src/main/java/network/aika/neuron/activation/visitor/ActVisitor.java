@@ -55,11 +55,11 @@ public class ActVisitor extends Visitor {
                 .collect(Collectors.toList());
     }
 
-    public ActVisitor(VisitorStep vp, Activation act, Direction startDir, Direction targetDir, Direction currentDir) {
+    public ActVisitor(VisitorStep vp, Activation act, Direction startDir, Direction currentDir) {
         this.visitorStep = vp;
         this.origin = this;
         this.act = act;
-        this.targetDir = targetDir;
+        this.targetDir = startDir;
         this.currentDir = currentDir;
 
         scopes = act.getNeuron()
@@ -88,7 +88,6 @@ public class ActVisitor extends Visitor {
 
     public void tryToLink(Activation act) {
         if (
-                currentDir == INPUT ||
                 act == origin.act ||
                 act.isConflicting()
         )

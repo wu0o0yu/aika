@@ -57,7 +57,7 @@ public abstract class TemplatePropagate extends TemplateVisitor implements Activ
         if (!n.allowTemplatePropagate(act))
             return;
 
-        ActVisitor v = new ActVisitor(this, act, direction, direction, direction);
+        ActVisitor v = new ActVisitor(this, act, direction, direction);
 
         Direction targetDir = v.getTargetDir();
 

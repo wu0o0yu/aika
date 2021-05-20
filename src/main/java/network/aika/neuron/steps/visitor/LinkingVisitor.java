@@ -21,9 +21,9 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.VisitorStep;
 
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.steps.link.LinkStep.LINKING;
 
 /**
@@ -48,6 +48,9 @@ public abstract class LinkingVisitor implements VisitorStep {
 
         Synapse s = Link.getSynapse(iAct, oAct);
         if(s == null)
+            return;
+
+        if(!(v.getCurrentDir() == OUTPUT || s.isRecurrent()))
             return;
 
         if (Link.linkExists(iAct, oAct))

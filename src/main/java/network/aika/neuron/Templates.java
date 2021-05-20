@@ -157,7 +157,7 @@ public class Templates {
         SAME_BINDING_TEMPLATE.getTemplateInfo().inputScopes = Set.of(IB_SAME, SB_SAME, PB_SAME);
         SAME_BINDING_TEMPLATE.getTemplateInfo().outputScopes = Set.of(SB_RELATED_SAME, IB_INPUT, I_SAME, P_SAME);
 
-        SAME_PATTERN_TEMPLATE.getTemplateInfo().inputScopes = Set.of(P_SAME);
+        SAME_PATTERN_TEMPLATE.getTemplateInfo().inputScopes = Set.of(P_SAME, PB_SAME);
         SAME_PATTERN_TEMPLATE.getTemplateInfo().outputScopes = Set.of(P_SAME, PB_SAME, IB_INPUT, I_INPUT);
 
         INHIBITORY_TEMPLATE.getTemplateInfo().inputScopes = Set.of(I_SAME);

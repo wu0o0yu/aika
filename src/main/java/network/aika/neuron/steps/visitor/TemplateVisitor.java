@@ -28,6 +28,7 @@ import network.aika.neuron.steps.link.LinkStep;
 import java.util.Set;
 
 
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.steps.activation.ActivationStep.INDUCTION;
 
 /**
@@ -62,6 +63,9 @@ public abstract class TemplateVisitor implements VisitorStep {
                 .stream()
                 .flatMap(tn ->
                         tn.getInputSynapses()
+                )
+                .filter(
+                        ts -> v.getCurrentDir() == OUTPUT || ts.isRecurrent()
                 )
                 .filter(ts ->
                         inputTemplates.contains(ts.getInput())

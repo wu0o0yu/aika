@@ -116,13 +116,13 @@ public class Link extends Element<Link> {
     public void follow(VisitorStep p) {
         follow(p,
                 synapse.isRecurrent() ?
-                        INPUT :
-                        OUTPUT
+                        OUTPUT :
+                        INPUT
         );
     }
 
-    public void follow(VisitorStep p, Direction targetDir) {
-        ActVisitor v = new ActVisitor(p, output, targetDir.invert(), targetDir, INPUT);
+    public void follow(VisitorStep p, Direction startDir) {
+        ActVisitor v = new ActVisitor(p, output, startDir, INPUT);
 
         output.setMarked(true);
         v.setScopesVisited(true);
