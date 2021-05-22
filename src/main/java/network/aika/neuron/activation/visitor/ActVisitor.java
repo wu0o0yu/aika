@@ -46,11 +46,6 @@ public class ActVisitor extends Visitor {
         super(v);
         this.act = act;
         scopes = v.getTransitions().stream()
-                .filter(t -> {
-                    Scope fromScope = v.currentDir.getFromScope(t);
-                    Scope toScope = v.currentDir.getToScope(t);
-                    return fromScope == toScope || !toScope.isMarkedVisited();
-                })
                 .map(t -> v.currentDir.getToScope(t))
                 .collect(Collectors.toList());
     }
@@ -78,10 +73,6 @@ public class ActVisitor extends Visitor {
         return scopes;
     }
 
-    public void setScopesVisited(boolean visited) {
-        scopes.forEach(s -> s.setMarkedVisited(visited));
-    }
-
     public Activation getActivation() {
         return act;
     }
@@ -103,9 +94,9 @@ public class ActVisitor extends Visitor {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Origin:" + origin.act.toShortString() + ", ");
         sb.append("Current:" + (act != null ? act.toShortString() : "X") + ", ");
         sb.append("Scopes:" + scopes + ", ");
+        sb.append("Origin:" + origin.act.toShortString() + ", ");
 
         sb.append(super.toString());
 

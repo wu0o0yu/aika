@@ -34,8 +34,6 @@ public class Scope implements Comparable<Scope> {
     private String label;
     private int id;
 
-    private boolean markedVisited; // TODO: for multi-threading copies of scopes and transactions need to be made per document.
-
     private Set<Transition> inputs = new TreeSet<>(getComparator(OUTPUT));
     private Set<Transition> outputs = new TreeSet<>(getComparator(INPUT));
 
@@ -52,14 +50,6 @@ public class Scope implements Comparable<Scope> {
 
     public String getLabel() {
         return label;
-    }
-
-    public boolean isMarkedVisited() {
-        return markedVisited;
-    }
-
-    public void setMarkedVisited(boolean markedVisited) {
-        this.markedVisited = markedVisited;
     }
 
     public Set<Transition> getInputs() {

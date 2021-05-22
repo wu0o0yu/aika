@@ -134,8 +134,7 @@ public abstract class Visitor {
         sb.append("DownUp:" + currentDir + ", ");
         sb.append("TargetDir:" + targetDir + ", ");
 
-        sb.append("DownSteps:" + downSteps + ", ");
-        sb.append("UpSteps:" + upSteps + "");
+        sb.append("Steps: (down:" + downSteps + "), (up:" + upSteps + ")");
 
         return sb.toString();
     }

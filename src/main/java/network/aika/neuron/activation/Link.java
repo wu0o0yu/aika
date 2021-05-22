@@ -125,11 +125,7 @@ public class Link extends Element<Link> {
         ActVisitor v = new ActVisitor(p, output, startDir, INPUT);
 
         output.setMarked(true);
-        v.setScopesVisited(true);
-
         follow(v);
-
-        v.setScopesVisited(false);
         output.setMarked(false);
     }
 

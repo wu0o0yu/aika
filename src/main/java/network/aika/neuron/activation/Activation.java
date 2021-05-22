@@ -321,7 +321,6 @@ public class Activation extends Element<Activation> {
         Direction dir = v.getCurrentDir();
 
         setMarked(true);
-        v.setScopesVisited(true);
         List<Link> links = dir.getLinks(this)
                 .filter(l ->
                         l.followAllowed(dir)
@@ -332,7 +331,6 @@ public class Activation extends Element<Activation> {
                         l.follow(v)
                 );
 
-        v.setScopesVisited(false);
         setMarked(false);
 
         v.onEvent(AFTER);
