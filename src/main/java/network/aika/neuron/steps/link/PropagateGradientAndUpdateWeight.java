@@ -22,6 +22,8 @@ import network.aika.neuron.steps.Phase;
 import network.aika.utils.Utils;
 import network.aika.neuron.activation.Link;
 
+import static network.aika.neuron.activation.Activation.INCOMING;
+import static network.aika.neuron.activation.Activation.OWN;
 import static network.aika.neuron.steps.activation.ActivationStep.UPDATE_SYNAPSE_INPUT_LINKS;
 
 /**
@@ -31,9 +33,9 @@ import static network.aika.neuron.steps.activation.ActivationStep.UPDATE_SYNAPSE
  */
 public class PropagateGradientAndUpdateWeight implements LinkStep {
 
-    private double gradient;
+    private double[] gradient;
 
-    public PropagateGradientAndUpdateWeight(double gradient) {
+    public PropagateGradientAndUpdateWeight(double[] gradient) {
         this.gradient = gradient;
     }
 
@@ -49,7 +51,8 @@ public class PropagateGradientAndUpdateWeight implements LinkStep {
     @Override
     public void process(Link l) {
         if(l.getSynapse().isAllowTraining()) {
-            double weightDelta = l.getConfig().getLearnRate() * gradient;
+            double g = gradient[OWN] + gradient[INCOMING];
+            double weightDelta = l.getConfig().getLearnRate() * g;
             Synapse s = l.getSynapse();
 
             s.updateSynapse(l, weightDelta);
@@ -57,10 +60,10 @@ public class PropagateGradientAndUpdateWeight implements LinkStep {
             QueueEntry.add(l.getOutput(), UPDATE_SYNAPSE_INPUT_LINKS);
         }
 
-        l.propagateGradient(gradient);
+        l.propagateGradient(gradient[OWN]);
     }
 
     public String toString() {
-        return "Link-Step: Propagate Gradient (" + Utils.round(gradient) + ")";
+        return "Link-Step: Propagate Gradient (Own:" + Utils.round(gradient[OWN]) + ", Incoming:" + Utils.round(gradient[INCOMING]) + ")";
     }
 }

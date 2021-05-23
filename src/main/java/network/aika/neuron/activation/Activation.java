@@ -74,14 +74,17 @@ public class Activation extends Element<Activation> {
 
     private Reference reference;
 
+    public final static int OWN = 0;
+    public final static int INCOMING = 1;
+
     private double lastEntropyGradient = 0.0;
-    private double inputGradient;
+    private double inputGradient[];
 
     /**
      * Accumulates all gradients in case a new link is added that needs be get informed about the gradient.
      */
-    private double outputGradientSum;
-    private double inputGradientSum;
+    private double outputGradientSum[];
+    private double inputGradientSum[];
 
 
     private Activation(int id, Neuron<?> n) {
@@ -136,11 +139,11 @@ public class Activation extends Element<Activation> {
         return net;
     }
 
-    public double getInputGradient() {
+    public double[] getInputGradient() {
         return inputGradient;
     }
 
-    public double getOutputGradientSum() {
+    public double[] getOutputGradientSum() {
         return outputGradientSum;
     }
 
@@ -437,7 +440,7 @@ public class Activation extends Element<Activation> {
                         getReference()
                 );
 
-        inputGradient += g - lastEntropyGradient;
+        inputGradient[OWN] += g - lastEntropyGradient;
         lastEntropyGradient = g;
     }
 
@@ -452,7 +455,7 @@ public class Activation extends Element<Activation> {
         QueueEntry.add(this, COUNTING);
         addLinksToQueue(INPUT, LinkStep.COUNTING);
 
-        if(Utils.belowTolerance(outputGradientSum))
+        if(Utils.belowTolerance(Utils.sum(outputGradientSum)))
             return;
 
         QueueEntry.add(this, TEMPLATE_PROPAGATE_INPUT);
@@ -464,12 +467,11 @@ public class Activation extends Element<Activation> {
     public void propagateGradientsFromSumUpdate() {
         ActivationFunction actF = getActivationFunction();
 
-        inputGradientSum += inputGradient;
-        double g = inputGradient;
-        inputGradient = 0.0;
+        inputGradientSum = Utils.add(inputGradientSum, inputGradient);
+        double[] g = inputGradient;
+        inputGradient = new double[2];
 
-        g *= getNorm();
-        g *= actF.outerGrad(lastNet);
+        g = Utils.scale(g, getNorm() * actF.outerGrad(lastNet));
 
         propagateGradientsOut(g);
     }
@@ -483,21 +485,21 @@ public class Activation extends Element<Activation> {
         g *= getNorm();
 
         propagateGradientsOut(
-                inputGradientSum * g
+                Utils.scale(inputGradientSum, g)
         );
     }
 
-    public void propagateGradientsOut(double g) {
+    public void propagateGradientsOut(double[] g) {
         Utils.checkTolerance(g);
 
-        outputGradientSum += g;
+        outputGradientSum = Utils.add(outputGradientSum, g);
 
         if(!getNeuron().isInputNeuron())
             addLinksToQueue(INPUT, new PropagateGradientAndUpdateWeight(g));
 
         if (getNeuron().isAllowTraining())
             QueueEntry.add(this,
-                    new UpdateBias(getConfig().getLearnRate() * g)
+                    new UpdateBias(getConfig().getLearnRate() * Utils.sum(g))
             );
 
 
@@ -519,7 +521,7 @@ public class Activation extends Element<Activation> {
     }
 
     public void propagateGradientIn(double g) {
-        inputGradient += g;
+        inputGradient[INCOMING] += g;
 
         if(Utils.belowTolerance(inputGradient))
             return;
