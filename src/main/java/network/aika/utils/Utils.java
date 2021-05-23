@@ -25,6 +25,11 @@ public class Utils {
     public static double TOLERANCE = 0.001;
 
     public static double[] add(double[] a, double[] b) {
+        if(a == null)
+            return b;
+        if(b == null)
+            return a;
+
         double[] r = new double[a.length];
         for(int i = 0; i < r.length; i++)
             r[i] = a[i] + b[i];
@@ -46,6 +51,9 @@ public class Utils {
     }
 
     public static boolean belowTolerance(double[] x) {
+        if(x == null)
+            return true;
+
         return Math.abs(sum(x)) < TOLERANCE;
     }
 
