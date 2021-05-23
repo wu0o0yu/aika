@@ -78,7 +78,7 @@ public class Activation extends Element<Activation> {
     public final static int INCOMING = 1;
 
     private double lastEntropyGradient = 0.0;
-    private double inputGradient[];
+    private double inputGradient[] = new double[2];
 
     /**
      * Accumulates all gradients in case a new link is added that needs be get informed about the gradient.
@@ -455,7 +455,7 @@ public class Activation extends Element<Activation> {
         QueueEntry.add(this, COUNTING);
         addLinksToQueue(INPUT, LinkStep.COUNTING);
 
-        if(Utils.belowTolerance(Utils.sum(outputGradientSum)))
+        if(Utils.belowTolerance(outputGradientSum))
             return;
 
         QueueEntry.add(this, TEMPLATE_PROPAGATE_INPUT);
@@ -477,6 +477,9 @@ public class Activation extends Element<Activation> {
     }
 
     public void propagateGradientsFromNetUpdate() {
+        if(inputGradientSum == null)
+            return;
+
         ActivationFunction actF = getActivationFunction();
 
         double g = actF.outerGrad(net) - actF.outerGrad(lastNet);
