@@ -52,17 +52,30 @@ public class Templates {
     public PrimaryInhibitorySynapse PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE;
     public InhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE;
 
+    double OFFSET_I_X = -4.0;
+    double OFFSET_I_Y = 4.0;
+    public Scope I_INPUT = new Scope("I_INPUT", 0, 0.0 + OFFSET_I_X, -1.0 + OFFSET_I_Y);
+    public Scope I_SAME = new Scope("I_SAME", 1, 0.0 + OFFSET_I_X, 0.0 + OFFSET_I_Y);
 
-    public Scope I_INPUT = new Scope("I_INPUT", 0);
-    public Scope I_SAME = new Scope("I_SAME", 1);
-    public Scope P_SAME = new Scope("P_SAME", 2);
-    public Scope SB_INPUT = new Scope("SB_INPUT", 3);
-    public Scope SB_SAME = new Scope("SB_SAME", 4);
-    public Scope SB_RELATED_INPUT = new Scope("SB_RELATED_INPUT", 5);
-    public Scope SB_RELATED_SAME = new Scope("SB_RELATED_SAME", 6);
-    public Scope IB_INPUT = new Scope("IB_INPUT", 7);
-    public Scope IB_SAME = new Scope("IB_SAME", 8);
-    public Scope PB_SAME = new Scope("PB_SAME", 9);
+    double OFFSET_P_X = 0.0;
+    double OFFSET_P_Y = 4.0;
+    public Scope P_SAME = new Scope("P_SAME", 2, 0.0 + OFFSET_P_X, 0.0 + OFFSET_P_Y);
+
+    double OFFSET_SB_X = 4.0;
+    double OFFSET_SB_Y = 4.0;
+    public Scope SB_INPUT = new Scope("SB_INPUT", 3, 0.0 + OFFSET_SB_X, -1.0 + OFFSET_SB_Y);
+    public Scope SB_SAME = new Scope("SB_SAME", 4, 0.0 + OFFSET_SB_X, 0.0 + OFFSET_SB_Y);
+    public Scope SB_RELATED_INPUT = new Scope("SB_RELATED_INPUT", 5, 1.0 + OFFSET_SB_X, -1.0 + OFFSET_SB_Y);
+    public Scope SB_RELATED_SAME = new Scope("SB_RELATED_SAME", 6, 1.0 + OFFSET_SB_X, 0.0 + OFFSET_SB_Y);
+
+    double OFFSET_IB_X = -4.0;
+    double OFFSET_IB_Y = -4.0;
+    public Scope IB_INPUT = new Scope("IB_INPUT", 7, 0.0 + OFFSET_IB_X, -1.0 + OFFSET_IB_Y);
+    public Scope IB_SAME = new Scope("IB_SAME", 8, 0.0 + OFFSET_IB_X, 0.0 + OFFSET_IB_Y);
+
+    double OFFSET_PB_X = 0.0;
+    double OFFSET_PB_Y = -4.0;
+    public Scope PB_SAME = new Scope("PB_SAME", 9, 0.0 + OFFSET_PB_X, 0.0 + OFFSET_PB_Y);
 
 
 
@@ -88,7 +101,7 @@ public class Templates {
         PRIMARY_INPUT_SYNAPSE_TEMPLATE =
                 init(
                         new InputBNSynapse(INPUT_PATTERN_TEMPLATE, SAME_BINDING_TEMPLATE),
-                        "PRIMARY_INPUT_SYNAPSE_TEMPLATE",
+                        "Primary Input Synapse Template",
                         true,
                         true
                 );
@@ -96,7 +109,7 @@ public class Templates {
         RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE =
                 init(
                         new InputBNSynapse(INPUT_BINDING_TEMPLATE, SAME_BINDING_TEMPLATE),
-                        "RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE",
+                        "Related Input Synapse from Binding Template",
                         true,
                         true
                 );
@@ -104,7 +117,7 @@ public class Templates {
         RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE =
                 init(
                         new InputBNSynapse(INHIBITORY_TEMPLATE, SAME_BINDING_TEMPLATE),
-                        "RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE",
+                        "Related Input Synapse from Inhibitory Template",
                         true,
                         true
                 );
@@ -112,7 +125,7 @@ public class Templates {
         SAME_PATTERN_SYNAPSE_TEMPLATE =
                 init(
                         new SameBNSynapse(SAME_BINDING_TEMPLATE, SAME_BINDING_TEMPLATE),
-                        "SAME_PATTERN_SYNAPSE_TEMPLATE",
+                        "Same Pattern Synapse Template",
                         true,
                         true
                 );
@@ -120,7 +133,7 @@ public class Templates {
         RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE =
                 init(
                         new SameBNSynapse(SAME_PATTERN_TEMPLATE, SAME_BINDING_TEMPLATE, true),
-                        "RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE",
+                        "Recurrent Same Pattern Synapse Template",
                         true,
                         true
                 );
@@ -128,7 +141,7 @@ public class Templates {
         NEGATIVE_SYNAPSE_TEMPLATE =
                 init(
                         new NegativeBNSynapse(INHIBITORY_TEMPLATE, SAME_BINDING_TEMPLATE),
-                        "NEGATIVE_SYNAPSE_TEMPLATE",
+                        "Negative Synapse Template",
                         false,
                         true
                 );
@@ -136,7 +149,7 @@ public class Templates {
         PATTERN_SYNAPSE_TEMPLATE =
                 init(
                         new PatternSynapse(SAME_BINDING_TEMPLATE, SAME_PATTERN_TEMPLATE),
-                        "PATTERN_SYNAPSE_TEMPLATE",
+                        "Pattern Synapse Template",
                         true,
                         true
                 );
@@ -144,7 +157,7 @@ public class Templates {
         PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE =
                 init(
                         new PrimaryInhibitorySynapse(INPUT_PATTERN_TEMPLATE, INHIBITORY_TEMPLATE),
-                        "PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE",
+                        "Primary Inhibitory Synapse Template",
                         true,
                         true
                 );
@@ -152,7 +165,7 @@ public class Templates {
         INHIBITORY_SYNAPSE_TEMPLATE =
                 init(
                         new InhibitorySynapse(SAME_BINDING_TEMPLATE, INHIBITORY_TEMPLATE),
-                        "INHIBITORY_SYNAPSE_TEMPLATE",
+                        "Inhibitory Synapse Template",
                         false,
                         true
                 );

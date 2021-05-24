@@ -34,6 +34,9 @@ public class Scope implements Comparable<Scope> {
     private String label;
     private int id;
 
+    private double xCoord;
+    private double yCoord;
+
     private Set<Transition> inputs = new TreeSet<>(getComparator(OUTPUT));
     private Set<Transition> outputs = new TreeSet<>(getComparator(INPUT));
 
@@ -43,13 +46,32 @@ public class Scope implements Comparable<Scope> {
                         .thenComparingInt(t -> t.isTargetAllowed() ? 1 : 0);
     }
 
-    public Scope(String label, int id) {
+    public Scope(String label, int id, double xCoord, double yCoord) {
         this.label = label;
         this.id = id;
+        this.xCoord = xCoord;
+        this.yCoord = yCoord;
     }
 
     public String getLabel() {
         return label;
+    }
+
+
+    public double getXCoord() {
+        return xCoord;
+    }
+
+    public void setXCoord(double xCoord) {
+        this.xCoord = xCoord;
+    }
+
+    public double getYCoord() {
+        return yCoord;
+    }
+
+    public void setYCoord(double yCoord) {
+        this.yCoord = yCoord;
     }
 
     public Set<Transition> getInputs() {
