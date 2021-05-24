@@ -33,8 +33,8 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
         super();
     }
 
-    public PrimaryInhibitorySynapse(Neuron<?> input, InhibitoryNeuron output, Synapse template) {
-        super(input, output, template);
+    public PrimaryInhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
+        super(input, output);
     }
 
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
@@ -43,8 +43,8 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
 
     @Override
     public PrimaryInhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
-        assert input.getTemplates().contains(getInput());
+        assert input.getTemplateGroup().contains(getInput());
 
-        return new PrimaryInhibitorySynapse(input, output, this);
+        return new PrimaryInhibitorySynapse(input, output);
     }
 }

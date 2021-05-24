@@ -11,8 +11,8 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 public class NegativeBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> {
 
-    public NegativeBNSynapse(I input, BindingNeuron output, Synapse template) {
-        super(input, output, template);
+    public NegativeBNSynapse(I input, BindingNeuron output) {
+        super(input, output);
 
         this.isRecurrent = true;
     }
@@ -41,9 +41,9 @@ public class NegativeBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse
 
     @Override
     public BindingNeuronSynapse instantiateTemplate(I input, BindingNeuron output) {
-        assert input.getTemplates().contains(getInput());
+        assert input.getTemplateGroup().contains(getInput());
 
-        BindingNeuronSynapse s = new NegativeBNSynapse(input, output, this);
+        BindingNeuronSynapse s = new NegativeBNSynapse(input, output);
         initFromTemplate(s);
         return s;
     }

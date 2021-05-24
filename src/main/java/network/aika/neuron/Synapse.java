@@ -75,10 +75,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public Synapse() {
     }
 
-    public Synapse(I input, O output, Synapse template) {
+    public Synapse(I input, O output) {
         this.input = input.getProvider();
         this.output = output.getProvider();
-        this.template = template;
 
         sampleSpace = new SampleSpace(getModel());
 
@@ -116,14 +115,11 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return templateInfo;
     }
 
-    public void setTemplateInfo(TemplateSynapseInfo templateInfo) {
-        this.templateInfo = templateInfo;
-    }
-
     public abstract Synapse instantiateTemplate(I input, O output);
 
     protected void initFromTemplate(Synapse s) {
         s.weight = weight;
+        s.template = this;
     }
 
     protected abstract boolean checkCausality(Activation iAct, Activation oAct, Visitor v);

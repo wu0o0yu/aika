@@ -58,7 +58,7 @@ public class ActVisitor extends Visitor {
         this.currentDir = currentDir;
 
         scopes = act.getNeuron()
-                .getTemplates().stream()
+                .getTemplateGroup().stream()
                 .flatMap(tn ->
                         startDir.getInitialScopes(tn.getTemplateInfo()).stream()
                 )

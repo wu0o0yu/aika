@@ -39,12 +39,12 @@ public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends Excitato
         super();
     }
 
-    public BindingNeuronSynapse(I input, BindingNeuron output, Synapse template) {
-        super(input, output, template);
+    public BindingNeuronSynapse(I input, BindingNeuron output) {
+        super(input, output);
     }
 
-    public BindingNeuronSynapse(I input, BindingNeuron output, Synapse template, boolean isRecurrent) {
-        super(input, output, template);
+    public BindingNeuronSynapse(I input, BindingNeuron output, boolean isRecurrent) {
+        super(input, output);
         this.isRecurrent = isRecurrent;
     }
 

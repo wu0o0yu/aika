@@ -10,21 +10,21 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> {
 
-    public SameBNSynapse(I input, BindingNeuron output, Synapse template) {
-        super(input, output, template);
+    public SameBNSynapse(I input, BindingNeuron output) {
+        super(input, output);
     }
 
-    public SameBNSynapse(I input, BindingNeuron output, Synapse template, boolean isRecurrent) {
-        super(input, output, template);
+    public SameBNSynapse(I input, BindingNeuron output, boolean isRecurrent) {
+        super(input, output);
 
         this.isRecurrent = isRecurrent;
     }
 
     @Override
     public BindingNeuronSynapse instantiateTemplate(I input, BindingNeuron output) {
-        assert input.getTemplates().contains(getInput());
+        assert input.getTemplateGroup().contains(getInput());
 
-        BindingNeuronSynapse s = new SameBNSynapse(input, output, this);
+        BindingNeuronSynapse s = new SameBNSynapse(input, output);
         initFromTemplate(s);
         return s;
     }

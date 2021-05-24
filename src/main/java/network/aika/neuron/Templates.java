@@ -69,21 +69,25 @@ public class Templates {
     public Templates(Model m) {
         model = m;
 
-        init(INPUT_BINDING_TEMPLATE, -1, "Input Template Binding Neuron");
-        init(SAME_BINDING_TEMPLATE, -2, "Same Template Binding Neuron");
-        init(INPUT_PATTERN_TEMPLATE, -3, "Input Template Pattern Neuron");
-        init(SAME_PATTERN_TEMPLATE, -4, "Same Template Pattern Neuron");
-        init(INHIBITORY_TEMPLATE, -5, "Template Inhibitory Neuron");
+        init(INPUT_BINDING_TEMPLATE, -1, "Input Template Binding Neuron", -1.0, -1.0);
+        init(SAME_BINDING_TEMPLATE, -2, "Same Template Binding Neuron", 0.0, 0.0);
+        init(INPUT_PATTERN_TEMPLATE, -3, "Input Template Pattern Neuron", 1.0, -1.0);
+        init(SAME_PATTERN_TEMPLATE, -4, "Same Template Pattern Neuron", -1.0, 1.0);
+        init(INHIBITORY_TEMPLATE, -5, "Template Inhibitory Neuron", 1.0, 1.0);
 
-        INPUT_PATTERN_TEMPLATE.getTemplates().add(SAME_PATTERN_TEMPLATE);
-        SAME_PATTERN_TEMPLATE.getTemplates().add(INPUT_PATTERN_TEMPLATE);
+        Set<Neuron<?>> BINDING_NEURON_TEMPLATE_GROUP = Set.of(INPUT_BINDING_TEMPLATE, SAME_BINDING_TEMPLATE);
+        INPUT_BINDING_TEMPLATE.getTemplateInfo().setTemplateGroup(BINDING_NEURON_TEMPLATE_GROUP);
+        SAME_BINDING_TEMPLATE.getTemplateInfo().setTemplateGroup(BINDING_NEURON_TEMPLATE_GROUP);
 
-        INPUT_BINDING_TEMPLATE.getTemplates().add(SAME_BINDING_TEMPLATE);
-        SAME_BINDING_TEMPLATE.getTemplates().add(INPUT_BINDING_TEMPLATE);
+        Set<Neuron<?>> PATTERN_NEURON_TEMPLATE_GROUP = Set.of(INPUT_PATTERN_TEMPLATE, SAME_PATTERN_TEMPLATE);
+        INPUT_PATTERN_TEMPLATE.getTemplateInfo().setTemplateGroup(PATTERN_NEURON_TEMPLATE_GROUP);
+        SAME_PATTERN_TEMPLATE.getTemplateInfo().setTemplateGroup(PATTERN_NEURON_TEMPLATE_GROUP);
+
+        INHIBITORY_TEMPLATE.getTemplateInfo().setTemplateGroup(Set.of(INHIBITORY_TEMPLATE));
 
         PRIMARY_INPUT_SYNAPSE_TEMPLATE =
                 init(
-                        new InputBNSynapse(INPUT_PATTERN_TEMPLATE, SAME_BINDING_TEMPLATE, null),
+                        new InputBNSynapse(INPUT_PATTERN_TEMPLATE, SAME_BINDING_TEMPLATE),
                         "PRIMARY_INPUT_SYNAPSE_TEMPLATE",
                         true,
                         true
@@ -91,7 +95,7 @@ public class Templates {
 
         RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE =
                 init(
-                        new InputBNSynapse(INPUT_BINDING_TEMPLATE, SAME_BINDING_TEMPLATE, null),
+                        new InputBNSynapse(INPUT_BINDING_TEMPLATE, SAME_BINDING_TEMPLATE),
                         "RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE",
                         true,
                         true
@@ -99,7 +103,7 @@ public class Templates {
 
         RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE =
                 init(
-                        new InputBNSynapse(INHIBITORY_TEMPLATE, SAME_BINDING_TEMPLATE, null),
+                        new InputBNSynapse(INHIBITORY_TEMPLATE, SAME_BINDING_TEMPLATE),
                         "RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE",
                         true,
                         true
@@ -107,7 +111,7 @@ public class Templates {
 
         SAME_PATTERN_SYNAPSE_TEMPLATE =
                 init(
-                        new SameBNSynapse(SAME_BINDING_TEMPLATE, SAME_BINDING_TEMPLATE, null),
+                        new SameBNSynapse(SAME_BINDING_TEMPLATE, SAME_BINDING_TEMPLATE),
                         "SAME_PATTERN_SYNAPSE_TEMPLATE",
                         true,
                         true
@@ -115,7 +119,7 @@ public class Templates {
 
         RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE =
                 init(
-                        new SameBNSynapse(SAME_PATTERN_TEMPLATE, SAME_BINDING_TEMPLATE, null, true),
+                        new SameBNSynapse(SAME_PATTERN_TEMPLATE, SAME_BINDING_TEMPLATE, true),
                         "RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE",
                         true,
                         true
@@ -123,7 +127,7 @@ public class Templates {
 
         NEGATIVE_SYNAPSE_TEMPLATE =
                 init(
-                        new NegativeBNSynapse(INHIBITORY_TEMPLATE, SAME_BINDING_TEMPLATE, null),
+                        new NegativeBNSynapse(INHIBITORY_TEMPLATE, SAME_BINDING_TEMPLATE),
                         "NEGATIVE_SYNAPSE_TEMPLATE",
                         false,
                         true
@@ -131,7 +135,7 @@ public class Templates {
 
         PATTERN_SYNAPSE_TEMPLATE =
                 init(
-                        new PatternSynapse(SAME_BINDING_TEMPLATE, SAME_PATTERN_TEMPLATE, null),
+                        new PatternSynapse(SAME_BINDING_TEMPLATE, SAME_PATTERN_TEMPLATE),
                         "PATTERN_SYNAPSE_TEMPLATE",
                         true,
                         true
@@ -139,7 +143,7 @@ public class Templates {
 
         PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE =
                 init(
-                        new PrimaryInhibitorySynapse(INPUT_PATTERN_TEMPLATE, INHIBITORY_TEMPLATE, null),
+                        new PrimaryInhibitorySynapse(INPUT_PATTERN_TEMPLATE, INHIBITORY_TEMPLATE),
                         "PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE",
                         true,
                         true
@@ -147,7 +151,7 @@ public class Templates {
 
         INHIBITORY_SYNAPSE_TEMPLATE =
                 init(
-                        new InhibitorySynapse(SAME_BINDING_TEMPLATE, INHIBITORY_TEMPLATE, null),
+                        new InhibitorySynapse(SAME_BINDING_TEMPLATE, INHIBITORY_TEMPLATE),
                         "INHIBITORY_SYNAPSE_TEMPLATE",
                         false,
                         true
@@ -218,19 +222,20 @@ public class Templates {
         );
     }
 
-    private <N extends Neuron> N init(N n, int id, String label) {
+    private <N extends Neuron> N init(N n, int id, String label, double x, double y) {
         NeuronProvider np = new NeuronProvider(model, id);
         np.setNeuron(n);
         n.setProvider(np);
         n.setLabel(label);
+        TemplateNeuronInfo templateInfo = n.getTemplateInfo();
+        templateInfo.setXCoord(x);
+        templateInfo.setYCoord(y);
+        templateInfo.setLabel(label);
         return n;
     }
 
     private <S extends Synapse> S init(S ts, String templateLabel, boolean linkInput, boolean linkOutput) {
-        TemplateSynapseInfo templateInfo = new TemplateSynapseInfo();
-        templateInfo.setLabel(templateLabel);
-
-        ts.setTemplateInfo(templateInfo);
+        ts.getTemplateInfo().setLabel(templateLabel);
         if(linkInput) {
             ts.linkInput();
         }

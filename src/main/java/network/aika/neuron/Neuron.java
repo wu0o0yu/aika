@@ -69,7 +69,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     protected boolean allowTraining = true;
 
-    private Set<Neuron<?>> templates = new TreeSet<>(Comparator.comparing(n -> n.getId()));
+    private Neuron<?> template;
 
     private TemplateNeuronInfo templateInfo;
 
@@ -97,9 +97,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     protected void initFromTemplate(Neuron n) {
         n.bias = bias;
-
-        n.getTemplates().add(this);
-        n.getTemplates().addAll(getTemplates());
+        n.template = this;
     }
 
     public abstract Neuron<?> instantiateTemplate();
@@ -124,8 +122,14 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return getId() < 0;
     }
 
-    public Set<Neuron<?>> getTemplates() {
-        return templates;
+    public Neuron<?> getTemplate() {
+        if(isTemplate())
+            return this;
+        return template;
+    }
+
+    public Set<Neuron<?>> getTemplateGroup() {
+        return getTemplate().getTemplateInfo().getTemplateGroup();
     }
 
     public void transition(ActVisitor v) {

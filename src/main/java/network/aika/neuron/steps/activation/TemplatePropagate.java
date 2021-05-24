@@ -62,7 +62,7 @@ public abstract class TemplatePropagate extends TemplateVisitor implements Activ
         Direction targetDir = v.getTargetDir();
 
         Collection<Synapse> templateSynapses = n
-                .getTemplates()
+                .getTemplateGroup()
                 .stream()
                 .flatMap(tn -> targetDir.getSynapses(tn))
                 .filter(ts -> ts.checkTemplatePropagate(v, act))

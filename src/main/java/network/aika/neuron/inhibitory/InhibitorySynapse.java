@@ -31,8 +31,8 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         super();
     }
 
-    public InhibitorySynapse(Neuron<?> input, InhibitoryNeuron output, Synapse template) {
-        super(input, output, template);
+    public InhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
+        super(input, output);
     }
 
     @Override
@@ -48,9 +48,9 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
     @Override
     public InhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
-        assert input.getTemplates().contains(getInput());
+        assert input.getTemplateGroup().contains(getInput());
 
-        InhibitorySynapse s = new InhibitorySynapse(input, output, this);
+        InhibitorySynapse s = new InhibitorySynapse(input, output);
         initFromTemplate(s);
         return s;
     }

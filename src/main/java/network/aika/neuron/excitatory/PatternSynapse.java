@@ -32,8 +32,8 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
         super();
     }
 
-    public PatternSynapse(I input, PatternNeuron output, Synapse template) {
-        super(input, output, template);
+    public PatternSynapse(I input, PatternNeuron output) {
+        super(input, output);
     }
 
     @Override
@@ -61,9 +61,9 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
 
     @Override
     public PatternSynapse instantiateTemplate(I input, PatternNeuron output) {
-        assert input.getTemplates().contains(getInput());
+        assert input.getTemplateGroup().contains(getInput());
 
-        PatternSynapse s = new PatternSynapse(input, output, this);
+        PatternSynapse s = new PatternSynapse(input, output);
         initFromTemplate(s);
         return s;
     }
