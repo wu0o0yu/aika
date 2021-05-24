@@ -115,18 +115,17 @@ public class Link extends Element<Link> {
 
     public void follow(VisitorStep p) {
         follow(p,
-                synapse.isRecurrent() ?
-                        OUTPUT :
-                        INPUT
+                synapse.isRecurrent() ? OUTPUT : INPUT
         );
     }
 
     public void follow(VisitorStep p, Direction startDir) {
-        ActVisitor v = new ActVisitor(p, output, startDir, INPUT);
+        Activation startAct = startDir.invert().getActivation(this);
+        ActVisitor v = new ActVisitor(p, startAct, startDir, startDir);
 
-        output.setMarked(true);
+        startAct.setMarked(true);
         follow(v);
-        output.setMarked(false);
+        startAct.setMarked(false);
     }
 
     public void follow(ActVisitor v) {

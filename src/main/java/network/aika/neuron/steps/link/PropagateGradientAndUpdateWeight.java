@@ -54,6 +54,10 @@ public class PropagateGradientAndUpdateWeight implements LinkStep {
             double g = gradient[OWN] + gradient[INCOMING];
             double weightDelta = l.getConfig().getLearnRate() * g;
             Synapse s = l.getSynapse();
+            if(s.getWeight() == 0.0 && weightDelta > 0.0 && l.getInput().isActive(true)) {
+                QueueEntry.add(l, LINKING);
+                QueueEntry.add(l, TEMPLATE);
+            }
 
             s.updateSynapse(l, weightDelta);
 
