@@ -77,6 +77,9 @@ public class Templates {
     double OFFSET_PB_Y = -4.0;
     public Scope PB_SAME = new Scope("PB_SAME", 9, 0.0 + OFFSET_PB_X, 0.0 + OFFSET_PB_Y);
 
+    double OFFSET_NB_X = 4.0;
+    double OFFSET_NB_Y = -4.0;
+    public Scope NB_SAME = new Scope("NB_SAME", 10, 0.0 + OFFSET_NB_X, 0.0 + OFFSET_NB_Y);
 
 
     public Templates(Model m) {
@@ -171,14 +174,14 @@ public class Templates {
                 );
 
 
-        SAME_BINDING_TEMPLATE.getTemplateInfo().inputScopes = Set.of(IB_SAME, SB_SAME, PB_SAME);
+        SAME_BINDING_TEMPLATE.getTemplateInfo().inputScopes = Set.of(IB_SAME, SB_SAME, PB_SAME, NB_SAME);
         SAME_BINDING_TEMPLATE.getTemplateInfo().outputScopes = Set.of(SB_RELATED_SAME, IB_INPUT, I_SAME, P_SAME);
 
         SAME_PATTERN_TEMPLATE.getTemplateInfo().inputScopes = Set.of(P_SAME, PB_SAME);
         SAME_PATTERN_TEMPLATE.getTemplateInfo().outputScopes = Set.of(P_SAME, PB_SAME, IB_INPUT, I_INPUT);
 
         INHIBITORY_TEMPLATE.getTemplateInfo().inputScopes = Set.of(I_SAME);
-        INHIBITORY_TEMPLATE.getTemplateInfo().outputScopes = Set.of(I_SAME, IB_INPUT);
+        INHIBITORY_TEMPLATE.getTemplateInfo().outputScopes = Set.of(I_SAME, IB_INPUT, NB_SAME);
 
         Transition.add(true, I_INPUT, I_SAME, PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE);
         Transition.add(true, I_SAME, I_SAME, INHIBITORY_SYNAPSE_TEMPLATE);
@@ -193,6 +196,10 @@ public class Templates {
 
         Transition.add(true, PB_SAME, PB_SAME, RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE);
         Transition.add(PB_SAME, PB_SAME, PATTERN_SYNAPSE_TEMPLATE);
+
+
+        Transition.add(true, NB_SAME, NB_SAME, NEGATIVE_SYNAPSE_TEMPLATE);
+        Transition.add(NB_SAME, NB_SAME, INHIBITORY_SYNAPSE_TEMPLATE);
 
 
         Transition.add(true, IB_INPUT, IB_SAME,
