@@ -45,6 +45,8 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse {
     public PrimaryInhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
         assert input.getTemplateGroup().contains(getInput());
 
-        return new PrimaryInhibitorySynapse(input, output);
+        PrimaryInhibitorySynapse s = new PrimaryInhibitorySynapse(input, output);
+        initFromTemplate(s);
+        return s;
     }
 }
