@@ -180,7 +180,7 @@ public class Templates {
         SAME_PATTERN_TEMPLATE.getTemplateInfo().inputScopes = Set.of(P_SAME, PB_SAME);
         SAME_PATTERN_TEMPLATE.getTemplateInfo().outputScopes = Set.of(P_SAME, PB_SAME, IB_INPUT, I_INPUT);
 
-        INHIBITORY_TEMPLATE.getTemplateInfo().inputScopes = Set.of(I_SAME);
+        INHIBITORY_TEMPLATE.getTemplateInfo().inputScopes = Set.of(I_SAME, NB_SAME); // TODO: fix startDir/targetDir for NB_SAME
         INHIBITORY_TEMPLATE.getTemplateInfo().outputScopes = Set.of(I_SAME, IB_INPUT, NB_SAME);
 
         Transition.add(true, I_INPUT, I_SAME, PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE);
