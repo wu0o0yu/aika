@@ -20,7 +20,6 @@ import network.aika.Config;
 import network.aika.Thought;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
-import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.utils.Utils;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.Synapse;
@@ -31,6 +30,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 
+import static network.aika.callbacks.VisitorEvent.AFTER;
+import static network.aika.callbacks.VisitorEvent.BEFORE;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.sign.Sign.POS;
@@ -93,7 +94,6 @@ public class Link extends Element<Link> {
         Link ol = oAct.getInputLink(iAct.getNeuron());
         if (ol != null) {
             assert s == ol.getSynapse();
-
 //                    toAct = oAct.cloneToReplaceLink(s);
             log.warn("Link already exists! ");
             return true;
@@ -114,28 +114,32 @@ public class Link extends Element<Link> {
     }
 
     public void follow(VisitorStep p) {
-        follow(p, synapse.isRecurrent() ? OUTPUT : INPUT);
+        follow(p,
+                synapse.isRecurrent() ? OUTPUT : INPUT
+        );
     }
 
-    public void follow(VisitorStep p, Direction dir) {
-        output.setMarked(true);
+    public void follow(VisitorStep p, Direction startDir) {
+        Activation startAct = startDir.invert().getActivation(this);
+        ActVisitor v = new ActVisitor(p, startAct, startDir, startDir);
 
-        ActVisitor v = new ActVisitor(p, output, dir, INPUT);
-        LinkVisitor nv = synapse.transition(v, this);
-        synapse.follow(input, nv);
-
-        output.setMarked(false);
+        startAct.setMarked(true);
+        follow(v);
+        startAct.setMarked(false);
     }
 
     public void follow(ActVisitor v) {
-        LinkVisitor nv = synapse.transition(v, this);
-        if(nv == null)
+        LinkVisitor lv = synapse.transition(v, this);
+        if(lv == null)
             return;
 
-        synapse.follow(
-                v.downUpDir.getActivation(this),
-                nv
+        lv.onEvent(BEFORE);
+        Activation toAct = v.getCurrentDir().getActivation(this);
+
+        toAct.follow(
+                new ActVisitor(lv, toAct)
         );
+        lv.onEvent(AFTER);
     }
 
     public void computeInformationGainGradient() {

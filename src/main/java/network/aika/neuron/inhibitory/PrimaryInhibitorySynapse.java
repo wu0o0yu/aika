@@ -29,41 +29,24 @@ import network.aika.neuron.activation.visitor.Visitor;
  */
 public class PrimaryInhibitorySynapse extends InhibitorySynapse {
 
-
     public PrimaryInhibitorySynapse() {
         super();
     }
 
-    public PrimaryInhibitorySynapse(Neuron<?> input, InhibitoryNeuron output, Synapse template) {
-        super(input, output, template);
+    public PrimaryInhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
+        super(input, output);
     }
 
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        return v.startDir != Direction.INPUT;
+        return v.getTargetDir() == Direction.OUTPUT;
     }
 
     @Override
     public PrimaryInhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
-        assert input.getTemplates().contains(getInput());
+        assert input.getTemplateGroup().contains(getInput());
 
-        return new PrimaryInhibitorySynapse(input, output, this);
+        PrimaryInhibitorySynapse s = new PrimaryInhibitorySynapse(input, output);
+        initFromTemplate(s);
+        return s;
     }
-
-    /*
-    @Override
-    public Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
-        if (dir == INPUT) {
-            switch (s.getScope()) {
-                case I_SAME:
-                    return s.nextSet(I_INPUT);
-            }
-        } else {
-            switch (s.getScope()) {
-                case I_INPUT:
-                    return s.nextSet(I_SAME);
-            }
-        }
-        return Collections.emptySet();
-    }
-     */
 }

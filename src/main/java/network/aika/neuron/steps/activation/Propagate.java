@@ -49,13 +49,14 @@ public class Propagate extends LinkingVisitor implements ActivationStep {
 
     @Override
     public void process(Activation act) {
-        ActVisitor v = new ActVisitor(this, act, OUTPUT, OUTPUT);
-
         act.getNeuron()
                 .getOutputSynapses()
                 .filter(s -> !act.outputLinkExists(s))
                 .forEach(s ->
-                        s.propagate(act, v)
+                        s.propagate(
+                                act,
+                                new ActVisitor(this, act, OUTPUT, OUTPUT)
+                        )
                 );
     }
 

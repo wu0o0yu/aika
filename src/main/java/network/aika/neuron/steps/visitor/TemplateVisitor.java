@@ -21,7 +21,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.VisitorStep;
 import network.aika.neuron.steps.link.LinkStep;
@@ -29,6 +28,7 @@ import network.aika.neuron.steps.link.LinkStep;
 import java.util.Set;
 
 
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.steps.activation.ActivationStep.INDUCTION;
 
 /**
@@ -49,28 +49,32 @@ public abstract class TemplateVisitor implements VisitorStep {
     }
 
     @Override
-    public void closeCycle(Activation fromAct, ActVisitor v) {
-        Direction dir = v.startDir;
-
-        Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());
-        Activation oAct = dir.getCycleOutput(fromAct, v.getOriginAct());
-
-        if(oAct.getNeuron().isInputNeuron())
+    public void closeLoop(ActVisitor v, Activation iAct, Activation oAct) {
+        if(
+                oAct.getNeuron().isInputNeuron() ||
+                Link.synapseExists(iAct, oAct)
+        )
             return;
 
-        if (Link.synapseExists(iAct, oAct))
-            return;
-
-        Set<Neuron<?>> inputTemplates = iAct.getNeuron().getTemplates();
+        Set<Neuron<?>> inputTemplateGroup = iAct.getNeuron().getTemplateGroup();
 
         oAct.getNeuron()
-                .getTemplates()
+                .getTemplateGroup()
                 .stream()
-                .flatMap(tn -> tn.getInputSynapses()) // TODO!
-                .filter(ts -> inputTemplates.contains(ts.getInput()))
-                .filter(ts -> iAct.isActive(ts.isRecurrent()))
+                .flatMap(tn ->
+                        tn.getInputSynapses()
+                )
+                .filter(
+                        ts -> v.getCurrentDir() == OUTPUT || ts.isRecurrent()
+                )
+                .filter(ts ->
+                        inputTemplateGroup.contains(ts.getInput())
+                )
+                .filter(ts ->
+                        iAct.isActive(ts.isRecurrent())
+                )
                 .forEach(ts ->
-                        ts.closeCycle(v, iAct, oAct)
+                        ts.closeLoop(v, iAct, oAct)
                 );
     }
 }

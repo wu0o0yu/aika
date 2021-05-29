@@ -219,12 +219,12 @@ public class MutualExclusionTest {
             }
 */
             {
-                InhibitorySynapse s = new InhibitorySynapse(na, inhib, null);
+                InhibitorySynapse s = new InhibitorySynapse(na, inhib);
                 s.linkInput();
                 s.addWeight(1.0);
             }
             {
-                InhibitorySynapse s = new InhibitorySynapse(nb, inhib, null);
+                InhibitorySynapse s = new InhibitorySynapse(nb, inhib);
                 s.linkInput();
                 s.addWeight(1.0);
             }

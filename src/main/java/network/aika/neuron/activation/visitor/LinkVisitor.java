@@ -16,14 +16,13 @@
  */
 package network.aika.neuron.activation.visitor;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.scopes.Scope;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.scopes.Transition;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 
@@ -33,34 +32,36 @@ import java.util.stream.Collectors;
  */
 public class LinkVisitor extends Visitor {
 
-    Link link;
-    Collection<Transition> transitions;
+    private Link link;
+    private Collection<Transition> transitions;
 
-    public ActVisitor prepareNextStep(Activation act) {
-        ActVisitor nv = new ActVisitor();
-        prepareNextStep(nv);
-        nv.act = act;
-        nv.scopes = new ArrayList<>();
-        nv.visitedScopes = new TreeSet<>(visitedScopes);
+    public LinkVisitor(ActVisitor v, Synapse<?, ?> syn, Link l) {
+        super(v);
+        link = l;
 
-        getTransitions()
-                .forEach(t -> {
-                    Scope fromScope = downUpDir.getFromScope(t.getTemplate());
-                    Scope toScope = downUpDir.getToScope(t.getTemplate());
-                    if(fromScope == toScope || !visitedScopes.contains(toScope))
-                        nv.scopes.add(toScope.getInstance(downUpDir, t));
-                });
+        boolean isTargetLink = l == null;
+        transitions = v.getScopes().stream()
+                .flatMap(s ->
+                        syn.transition(
+                                s,
+                                getDirection(isTargetLink),
+                                isTargetLink
+                        )
+                ).collect(Collectors.toList());
 
-        if(nv.scopes.isEmpty())
-            return null;
-
-        return nv;
+        onCandidateEvent(syn);
     }
 
-    public boolean isClosedCycle() {
+    public boolean follow() {
+        return !transitions.isEmpty();
+    }
+
+    public boolean isClosedLoop() {
         return transitions.stream()
                 .anyMatch(t ->
-                        origin.scopes.contains(t.getInput().getOrigin())
+                        origin.getScopes().contains(
+                                targetDir.getToScope(t)
+                        )
                 );
     }
 
@@ -79,10 +80,9 @@ public class LinkVisitor extends Visitor {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Origin:" + origin.act.toShortString() + ", ");
-        sb.append("Current:" + link.toString() + ", ");
-
+        sb.append("Current:" + (link != null ? link : "X") + ", ");
         sb.append("Transitions:" + transitions + ", ");
+        sb.append("Origin:" + origin.getActivation().toShortString() + ", ");
 
         sb.append(super.toString());
 

@@ -66,8 +66,6 @@ public class SimplePhraseTest {
             String phrase = phrases[r.nextInt(phrases.length)];
             System.out.println("  " + phrase);
 
-            Neuron.debugOutput = phrase.equalsIgnoreCase("der Hund");
-
             Document doc = new Document(phrase);
 
             int i = 0;
@@ -81,9 +79,7 @@ public class SimplePhraseTest {
 
             doc.process(model);
 
-            if (Neuron.debugOutput) {
-                System.out.println(doc.toString(true));
-            }
+            System.out.println(doc.toString(true));
         }
     }
 }

@@ -30,6 +30,8 @@ import java.util.zip.GZIPOutputStream;
  */
 public class NeuronProvider implements Comparable<NeuronProvider> {
 
+    public static boolean ENABLE_COMPRESSION = false;
+
     public static final NeuronProvider MIN_NEURON = new NeuronProvider(Long.MIN_VALUE);
     public static final NeuronProvider MAX_NEURON = new NeuronProvider(Long.MAX_VALUE);
 
@@ -113,21 +115,32 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
     public void save() {
         if (neuron.isModified()) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try (
-                    GZIPOutputStream gzipos = new GZIPOutputStream(baos);
-                    DataOutputStream dos = new DataOutputStream(gzipos)) {
+            if(ENABLE_COMPRESSION) {
+                try (
+                        GZIPOutputStream gzipos = new GZIPOutputStream(baos);
+                        DataOutputStream dos = new DataOutputStream(gzipos)) {
+                    neuron.write(dos);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                try (DataOutputStream dos = new DataOutputStream(baos)) {
+                    neuron.write(dos);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
 
-                neuron.write(dos);
+            try {
+                model.getSuspensionHook().store(
+                        id,
+                        neuron.getLabel(),
+                        neuron.getCustomData(),
+                        baos.toByteArray()
+                );
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
-            model.getSuspensionHook().store(
-                    id,
-                    neuron.getLabel(),
-                    neuron.getCustomData(),
-                    baos.toByteArray()
-            );
         }
         neuron.setModified(false);
     }
@@ -135,14 +148,27 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
     private void reactivate() {
         assert model.getSuspensionHook() != null;
 
-        byte[] data = model.getSuspensionHook().retrieve(id);
-        ByteArrayInputStream bais = new ByteArrayInputStream(data);
-        try (
-                GZIPInputStream gzipis = new GZIPInputStream(bais);
-                DataInputStream dis = new DataInputStream(gzipis);) {
-            neuron = getModel().readNeuron(dis, this);
-        } catch (Exception e) {
+        byte[] data;
+        try {
+            data = model.getSuspensionHook().retrieve(id);
+        } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+        ByteArrayInputStream bais = new ByteArrayInputStream(data);
+        if(ENABLE_COMPRESSION) {
+            try (
+                    GZIPInputStream gzipis = new GZIPInputStream(bais);
+                    DataInputStream dis = new DataInputStream(gzipis)) {
+                neuron = getModel().readNeuron(dis, this);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            try (DataInputStream dis = new DataInputStream(bais)) {
+                neuron = getModel().readNeuron(dis, this);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
         neuron.reactivate();

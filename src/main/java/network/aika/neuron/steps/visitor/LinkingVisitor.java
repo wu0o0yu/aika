@@ -21,10 +21,9 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.Visitor;
-import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.VisitorStep;
 
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.steps.link.LinkStep.LINKING;
 
 /**
@@ -43,16 +42,15 @@ public abstract class LinkingVisitor implements VisitorStep {
     }
 
     @Override
-    public void closeCycle(Activation fromAct, ActVisitor v) {
-        Direction dir = v.startDir;
-        Activation iAct = dir.getCycleInput(fromAct, v.getOriginAct());
-        Activation oAct = dir.getCycleOutput(fromAct, v.getOriginAct());
-
+    public void closeLoop(ActVisitor v, Activation iAct, Activation oAct) {
         if(!iAct.isActive(false))
             return;
 
         Synapse s = Link.getSynapse(iAct, oAct);
         if(s == null)
+            return;
+
+        if(!(v.getCurrentDir() == OUTPUT || s.isRecurrent()))
             return;
 
         if (Link.linkExists(iAct, oAct))
@@ -61,6 +59,6 @@ public abstract class LinkingVisitor implements VisitorStep {
         oAct = s.branchIfNecessary(oAct, v);
 
         if(oAct != null)
-            s.closeCycle(v, iAct, oAct);
+            s.closeLoop(v, iAct, oAct);
     }
 }

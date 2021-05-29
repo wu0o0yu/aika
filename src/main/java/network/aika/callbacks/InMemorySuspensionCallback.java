@@ -16,14 +16,13 @@
  */
 package network.aika.callbacks;
 
-import network.aika.neuron.SuspensionMode;
 import network.aika.utils.Writable;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 
 /**
  *
@@ -47,9 +46,8 @@ public class InMemorySuspensionCallback implements SuspensionCallback {
     }
 
     @Override
-    public void delete(Long id, String label) {
+    public void remove(Long id) {
         storage.remove(id);
-        removeLabel(label);
     }
 
     @Override
@@ -62,6 +60,7 @@ public class InMemorySuspensionCallback implements SuspensionCallback {
         labels.remove(label);
     }
 
+
     @Override
     public byte[] retrieve(Long id) {
         return storage.get(id);
@@ -73,11 +72,17 @@ public class InMemorySuspensionCallback implements SuspensionCallback {
     }
 
     @Override
-    public void suspendAll(SuspensionMode sm) {
+    public Collection<Long> getAllIds() {
+        return storage.keySet();
     }
 
     @Override
-    public Stream<Long> getAllIds() {
-        return storage.keySet().stream();
+    public void loadIndex() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void storeIndex() {
+        throw new UnsupportedOperationException();
     }
 }

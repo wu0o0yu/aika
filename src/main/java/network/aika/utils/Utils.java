@@ -24,8 +24,46 @@ public class Utils {
 
     public static double TOLERANCE = 0.001;
 
+    public static double[] add(double[] a, double[] b) {
+        if(a == null)
+            return b;
+        if(b == null)
+            return a;
+
+        double[] r = new double[a.length];
+        for(int i = 0; i < r.length; i++)
+            r[i] = a[i] + b[i];
+        return r;
+    }
+
+    public static double[] scale(double[] a, double s) {
+        double[] r = new double[a.length];
+        for(int i = 0; i < r.length; i++)
+            r[i] = a[i] * s;
+        return r;
+    }
+
+    public static double sum(double[] a) {
+        double sum = 0;
+        for(int i = 0; i < a.length; i++)
+            sum += a[i];
+        return sum;
+    }
+
+    public static boolean belowTolerance(double[] x) {
+        if(x == null)
+            return true;
+
+        return Math.abs(sum(x)) < TOLERANCE;
+    }
+
     public static boolean belowTolerance(double x) {
         return Math.abs(x) < TOLERANCE;
+    }
+
+    public static void checkTolerance(double[] x) {
+        if(Math.abs(sum(x)) < TOLERANCE)
+            throw new BelowToleranceThresholdException();
     }
 
     public static void checkTolerance(double x) {

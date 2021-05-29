@@ -27,14 +27,12 @@ import network.aika.neuron.activation.visitor.Visitor;
  */
 public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
-    public static byte type;
-
     public InhibitorySynapse() {
         super();
     }
 
-    public InhibitorySynapse(Neuron<?> input, InhibitoryNeuron output, Synapse template) {
-        super(input, output, template);
+    public InhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
+        super(input, output);
     }
 
     @Override
@@ -50,16 +48,11 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
     @Override
     public InhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
-        assert input.getTemplates().contains(getInput());
+        assert input.getTemplateGroup().contains(getInput());
 
-        InhibitorySynapse s = new InhibitorySynapse(input, output, this);
+        InhibitorySynapse s = new InhibitorySynapse(input, output);
         initFromTemplate(s);
         return s;
-    }
-
-    @Override
-    public byte getType() {
-        return type;
     }
 
     @Override
@@ -76,17 +69,6 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         super.addWeight(weightDelta);
         input.getNeuron().setModified(true);
     }
-
-    /*
-    @Override
-    public Set<ScopeEntry> transition(ScopeEntry s, Direction dir, Direction startDir, boolean checkFinalRequirement) {
-        if(checkFinalRequirement && s.getScope() != I_SAME) {
-            return Collections.emptySet();
-        }
-
-        return Collections.singleton(s);
-    }
-     */
 
     @Override
     protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {

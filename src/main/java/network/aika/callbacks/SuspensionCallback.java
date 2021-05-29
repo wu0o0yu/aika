@@ -19,6 +19,8 @@ package network.aika.callbacks;
 import network.aika.neuron.SuspensionMode;
 import network.aika.utils.Writable;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.stream.Stream;
 
 /**
@@ -34,19 +36,22 @@ public interface SuspensionCallback {
 
     long createId();
 
-    void store(Long id, String label, Writable customData, byte[] data);
+    void store(Long id, String label, Writable customData, byte[] data) throws IOException;
 
-    void delete(Long id, String label);
+    void remove(Long id) throws IOException;
 
-    byte[] retrieve(Long id);
+    byte[] retrieve(Long id) throws IOException;
 
-    Stream<Long> getAllIds();
+    Collection<Long> getAllIds();
+
+
+    Long getIdByLabel(String label);
 
     void putLabel(String label, Long id);
 
     void removeLabel(String label);
 
-    Long getIdByLabel(String tokenLabel);
+    void loadIndex();
 
-    void suspendAll(SuspensionMode sm);
+    void storeIndex() throws IOException;
 }

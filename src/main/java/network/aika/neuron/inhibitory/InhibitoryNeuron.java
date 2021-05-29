@@ -34,8 +34,6 @@ import java.util.Set;
  */
 public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
-    public static byte type;
-
     public InhibitoryNeuron() {
         super();
     }
@@ -50,19 +48,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     @Override
     public boolean allowTemplatePropagate(Activation act) {
-/*        if(act.gradientSumIsZero())
-            return false;*/
         return false;
-    }
-
-    @Override
-    public Collection<Scope> getInitialScopeTemplates(Direction dir) {
-        Templates t = getModel().getTemplates();
-
-        if(dir == Direction.OUTPUT)
-            return Set.of(t.I_SAME, t.IB_INPUT);
-        else
-            return Set.of(t.I_SAME);
     }
 
     @Override
@@ -74,11 +60,6 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     @Override
     public void addDummyLinks(Activation act) {
-    }
-
-    @Override
-    public byte getType() {
-        return type;
     }
 
     @Override

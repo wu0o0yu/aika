@@ -43,9 +43,6 @@ import static network.aika.neuron.sign.Sign.POS;
  */
 public abstract class Neuron<S extends Synapse> implements Writable {
 
-    public static int debugId = 0;
-    public static boolean debugOutput = false;
-
     private static final Logger log = LoggerFactory.getLogger(Neuron.class);
 
     volatile long retrievalCount = 0;
@@ -72,7 +69,9 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     protected boolean allowTraining = true;
 
-    private Set<Neuron<?>> templates = new TreeSet<>(Comparator.comparing(n -> n.getId()));
+    private Neuron<?> template;
+
+    private TemplateNeuronInfo templateInfo;
 
     protected Neuron() {
     }
@@ -87,11 +86,18 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         modified = true;
     }
 
+    public TemplateNeuronInfo getTemplateInfo() {
+        assert isTemplate();
+        if(templateInfo == null) {
+            templateInfo = new TemplateNeuronInfo();
+        }
+
+        return templateInfo;
+    }
+
     protected void initFromTemplate(Neuron n) {
         n.bias = bias;
-
-        n.getTemplates().add(this);
-        n.getTemplates().addAll(getTemplates());
+        n.template = this;
     }
 
     public abstract Neuron<?> instantiateTemplate();
@@ -102,11 +108,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract Fired incrementFired(Fired f);
 
-    public abstract byte getType();
-
     public abstract boolean allowTemplatePropagate(Activation act);
-
-    public abstract Collection<Scope> getInitialScopeTemplates(Direction dir);
 
     public boolean isAllowTraining() {
         return allowTraining;
@@ -120,17 +122,17 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return getId() < 0;
     }
 
-    public Set<Neuron<?>> getTemplates() {
-        return templates;
+    public Neuron<?> getTemplate() {
+        if(isTemplate())
+            return this;
+        return template;
     }
 
-    public void transition(LinkVisitor v, Activation act) {
-        ActVisitor nv = v.prepareNextStep(act);
+    public Set<Neuron<?>> getTemplateGroup() {
+        return getTemplate().getTemplateInfo().getTemplateGroup();
+    }
 
-        if(nv == null)
-            return;
-
-        act.followLinks(nv);
+    public void transition(ActVisitor v) {
     }
 
     public Synapse getOutputSynapse(NeuronProvider n) {
@@ -366,7 +368,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeByte(getType());
+ //       out.writeLong(getTemplates().stream());
 
         out.writeBoolean(label != null);
         if(label != null) {

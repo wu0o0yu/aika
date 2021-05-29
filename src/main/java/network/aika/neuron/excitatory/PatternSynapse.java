@@ -28,14 +28,12 @@ import network.aika.neuron.activation.visitor.Visitor;
  */
 public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, PatternNeuron> {
 
-    public static byte type;
-
     public PatternSynapse() {
         super();
     }
 
-    public PatternSynapse(I input, PatternNeuron output, Synapse template) {
-        super(input, output, template);
+    public PatternSynapse(I input, PatternNeuron output) {
+        super(input, output);
     }
 
     @Override
@@ -52,7 +50,7 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
 
     @Override
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        return v.startDir != Direction.INPUT ||
+        return v.getTargetDir() == Direction.OUTPUT ||
                 !act.getNeuron().isInputNeuron();
     }
 
@@ -63,9 +61,9 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
 
     @Override
     public PatternSynapse instantiateTemplate(I input, PatternNeuron output) {
-        assert input.getTemplates().contains(getInput());
+        assert input.getTemplateGroup().contains(getInput());
 
-        PatternSynapse s = new PatternSynapse(input, output, this);
+        PatternSynapse s = new PatternSynapse(input, output);
         initFromTemplate(s);
         return s;
     }
@@ -74,10 +72,5 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
         return getOutput().isInputNeuron() ?
                 null :
                 oAct;
-    }
-
-    @Override
-    public byte getType() {
-        return type;
     }
 }

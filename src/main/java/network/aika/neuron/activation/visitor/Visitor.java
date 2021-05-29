@@ -25,7 +25,6 @@ import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.steps.VisitorStep;
 
 import java.util.Set;
-import java.util.TreeSet;
 
 import static network.aika.neuron.activation.direction.Direction.*;
 
@@ -38,43 +37,44 @@ import static network.aika.neuron.activation.direction.Direction.*;
 public abstract class Visitor {
     protected ActVisitor origin;
     private Visitor previousStep;
-    protected VisitorStep phase;
+    protected VisitorStep visitorStep;
 
-    public Direction downUpDir;
-    public Direction startDir;
+    protected Direction currentDir;
+    protected Direction targetDir; // The targetDirection refers to the direction relative to the end of the visitor path.
 
-    public int downSteps = 0;
-    public int upSteps = 0;
-
-    protected Set<Scope> visitedScopes;
+    private int downSteps = 0;
+    private int upSteps = 0;
 
     protected Visitor() {}
 
-    protected Visitor prepareNextStep(Visitor nv) {
-        nv.phase = phase;
-        nv.previousStep = this;
-        nv.origin = origin;
-        nv.downUpDir = downUpDir;
-        nv.startDir = startDir;
-        nv.upSteps = upSteps;
-
-        return nv;
+    public Visitor(Visitor v) {
+        previousStep = v;
+        visitorStep = v.visitorStep;
+        origin = v.origin;
+        currentDir = v.currentDir;
+        targetDir = v.targetDir;
+        downSteps = v.downSteps;
+        upSteps = v.upSteps;
     }
 
-    public Visitor getOrigin() {
-        return origin;
+    public abstract boolean follow();
+
+    public void switchDirection() {
+        assert currentDir == INPUT;
+        currentDir = currentDir.invert();
+        targetDir = targetDir.invert();
     }
 
     public Visitor getPreviousStep() {
         return previousStep;
     }
 
-    public Direction getDownUpDir() {
-        return downUpDir;
+    public Direction getCurrentDir() {
+        return currentDir;
     }
 
-    public Direction getStartDir() {
-        return startDir;
+    public Direction getTargetDir() {
+        return targetDir;
     }
 
     public int getDownSteps() {
@@ -85,53 +85,56 @@ public abstract class Visitor {
         return upSteps;
     }
 
-    public VisitorStep getPhase() {
-        return phase;
+    public VisitorStep getVisitorStep() {
+        return visitorStep;
     }
 
     public Activation getOriginAct() {
-        return origin.act;
+        return origin.getActivation();
+    }
+
+    public Direction getDirection(boolean isTargetLink) {
+        return isTargetLink ?
+                targetDir :
+                currentDir;
     }
 
     public void incrementPathLength() {
-        if (downUpDir == INPUT) {
-            this.downSteps++;
-        } else {
-            this.upSteps++;
-        }
+        if (currentDir == INPUT)
+            downSteps++;
+        else
+            upSteps++;
     }
 
     public boolean getSelfRef() {
         return downSteps == 0 || upSteps == 0;
     }
 
-    public int numSteps() {
-        return downSteps + upSteps;
-    }
-
     private Thought getThought() {
-        return origin.act.getThought();
+        return origin.getActivation().getThought();
     }
 
-    public void onEvent(VisitorEvent ve, Synapse s) {
-        getThought().onVisitorEvent(this, ve, s);
+    public void onEvent(VisitorEvent ve) {
+        getThought().onVisitorEvent(this, ve);
+    }
+
+    public void onCandidateEvent(Synapse s) {
+        getThought().onVisitorCandidateEvent(this, s);
     }
 
     public String toStringRecursive() {
-        if(previousStep != null)
-            return previousStep.toStringRecursive() + "\n" + this;
-        else
-            return "" + this;
+        return (previousStep != null ? previousStep.toStringRecursive() : "") +
+                "\n" +
+                this;
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("DownUp:" + downUpDir + ", ");
-        sb.append("StartDir:" + startDir + ", ");
+        sb.append("DownUp:" + currentDir + ", ");
+        sb.append("TargetDir:" + targetDir + ", ");
 
-        sb.append("DownSteps:" + downSteps + ", ");
-        sb.append("UpSteps:" + upSteps + "");
+        sb.append("Steps: (down:" + downSteps + "), (up:" + upSteps + ")");
 
         return sb.toString();
     }

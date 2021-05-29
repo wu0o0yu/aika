@@ -79,13 +79,6 @@ public class QueueEntry<S extends Step, E extends Element> {
         return Step.toString(getStep()) + " : " + element.toString();
     }
 
-    public String pendingStepsToString() {
-        StringBuilder sb = new StringBuilder();
- //       pendingPhases.forEach(p -> sb.append(p.toString() + ", "));
-
-        return sb.substring(0, Math.max(0, sb.length() - 2));
-    }
-
     public Element getElement() {
         return element;
     }

@@ -22,12 +22,9 @@ public class SumUpBias implements ActivationStep {
         return false;
     }
 
-
     @Override
     public void process(Activation act) {
         act.updateNet(delta);
-
-//        double delta = act.updateValue();
     }
 
     public String toString() {

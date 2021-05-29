@@ -16,10 +16,7 @@
  */
 package network.aika.neuron.activation.visitor;
 
-
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.steps.VisitorStep;
@@ -29,8 +26,7 @@ import java.util.Collection;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import static network.aika.callbacks.VisitorEvent.*;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
  *
@@ -38,49 +34,39 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class ActVisitor extends Visitor {
 
-    Activation act;
+    private Activation act;
 
-    protected Collection<Scope> scopes;
+    private Collection<Scope> scopes;
 
 
-    protected ActVisitor() {
+    public ActVisitor() {
     }
 
-    public ActVisitor(VisitorStep vp, Activation act, Direction startDir, Direction downUpDir) {
-        this.phase = vp;
+    public ActVisitor(LinkVisitor v, Activation act) {
+        super(v);
+        this.act = act;
+        scopes = v.getTransitions().stream()
+                .map(t -> v.currentDir.getToScope(t))
+                .collect(Collectors.toList());
+    }
+
+    public ActVisitor(VisitorStep vp, Activation act, Direction startDir, Direction currentDir) {
+        this.visitorStep = vp;
         this.origin = this;
         this.act = act;
-        this.downUpDir = downUpDir;
-        this.startDir = startDir;
-        this.scopes = new ArrayList<>();
-        this.visitedScopes = new TreeSet<>();
+        this.targetDir = startDir;
+        this.currentDir = currentDir;
 
-        act.getNeuron()
-                .getInitialScopeTemplates(startDir)
-                .forEach(s -> {
-                    visitedScopes.add(s);
-                    scopes.add(s.getInstance(downUpDir, null));
-                });
+        scopes = act.getNeuron()
+                .getTemplateGroup().stream()
+                .flatMap(tn ->
+                        startDir.getInitialScopes(tn.getTemplateInfo()).stream()
+                )
+                .collect(Collectors.toList());
     }
 
-    public LinkVisitor prepareNextStep(Synapse<?, ?> syn, Link l) {
-        LinkVisitor nv = new LinkVisitor();
-        prepareNextStep(nv);
-        nv.link = l;
-
-        nv.onEvent(CANDIDATE_BEFORE, syn);
-
-        nv.transitions = getScopes()
-                .stream()
-                .flatMap(s ->
-                        syn.transition(s, downUpDir, l == null)
-                ).collect(Collectors.toList());
-
-        nv.visitedScopes = visitedScopes;
-
-        nv.onEvent(CANDIDATE_AFTER, syn);
-
-        return nv.transitions.isEmpty() ? null : nv;
+    public boolean follow() {
+        return !scopes.isEmpty();
     }
 
     public Collection<Scope> getScopes() {
@@ -92,29 +78,25 @@ public class ActVisitor extends Visitor {
     }
 
     public void tryToLink(Activation act) {
-        if (downUpDir != OUTPUT || numSteps() < 1)
-            return;
-
-        if (act == origin.act || act.isConflicting())
-            return;
-
-        Scope bRelatedInput = getOriginAct().getModel().getTemplates().SB_RELATED_INPUT;
-        if (scopes
-                .stream()
-                .anyMatch(s -> s.getTemplate() == bRelatedInput)
+        if (
+                act == origin.act ||
+                act.isConflicting()
         )
-            return; // TODO
+            return;
 
-        phase.closeCycle(act, this);
+        visitorStep.closeLoop(
+                this,
+                targetDir.getInput(act, getOriginAct()),
+                targetDir.getOutput(act, getOriginAct())
+        );
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Origin:" + origin.act.toShortString() + ", ");
-        sb.append("Current:" + act.toShortString() + ", ");
-
+        sb.append("Current:" + (act != null ? act.toShortString() : "X") + ", ");
         sb.append("Scopes:" + scopes + ", ");
+        sb.append("Origin:" + origin.act.toShortString() + ", ");
 
         sb.append(super.toString());
 

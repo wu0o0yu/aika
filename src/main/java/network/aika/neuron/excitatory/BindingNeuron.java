@@ -34,24 +34,12 @@ import java.util.Set;
 public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
     private static final Logger log = LoggerFactory.getLogger(BindingNeuron.class);
 
-    public static byte type;
-
     public BindingNeuron() {
         super();
     }
 
     public BindingNeuron(Model model) {
         super(model);
-    }
-
-    @Override
-    public Collection<Scope> getInitialScopeTemplates(Direction dir) {
-        Templates t = getModel().getTemplates();
-
-        if(dir == Direction.OUTPUT)
-            return Set.of(t.SB_RELATED_SAME, t.IB_INPUT, t.I_SAME, t.P_SAME);
-        else
-            return Set.of(t.IB_SAME, t.SB_SAME, t.PB_SAME);
     }
 
     @Override
@@ -72,10 +60,5 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
         initFromTemplate(n);
 
         return n;
-    }
-
-    @Override
-    public byte getType() {
-        return type;
     }
 }

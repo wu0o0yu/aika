@@ -43,8 +43,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     private static final Logger log = LoggerFactory.getLogger(PatternNeuron.class);
 
-    public static byte type;
-
     private String tokenLabel;
 
     public PatternNeuron() {
@@ -60,16 +58,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     @Override
-    public Collection<Scope> getInitialScopeTemplates(Direction dir) {
-        Templates t = getModel().getTemplates();
-
-        if(dir == Direction.OUTPUT)
-            return Set.of(t.P_SAME, t.PB_SAME, t.IB_INPUT, t.I_INPUT);
-        else
-            return Set.of(t.P_SAME);
-    }
-
-    @Override
     public boolean allowTemplatePropagate(Activation act) {
         return true; //getCandidateGradient(act) >= 1.4;
     }
@@ -82,23 +70,8 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     @Override
-    public void transition(LinkVisitor v, Activation act) {
-        if (v.downUpDir == OUTPUT)
-            return;
-
-        ActVisitor nv = v.prepareNextStep(act);
-
-        if(nv == null)
-            return;
-
-        nv.downUpDir = OUTPUT;
-
-        act.followLinks(nv);
-    }
-
-    @Override
-    public byte getType() {
-        return type;
+    public void transition(ActVisitor v) {
+        v.switchDirection();
     }
 
     public void setTokenLabel(String tokenLabel) {

@@ -94,10 +94,17 @@ public abstract class Thought {
                 );
     }
 
-    public void onVisitorEvent(Visitor v, VisitorEvent ve, Synapse s) {
+    public void onVisitorEvent(Visitor v, VisitorEvent ve) {
         getVisitorEventListeners()
                 .forEach(
-                        el -> el.onVisitorEvent(v, ve, s)
+                        el -> el.onVisitorEvent(v, ve)
+                );
+    }
+
+    public void onVisitorCandidateEvent(Visitor v, Synapse s) {
+        getVisitorEventListeners()
+                .forEach(
+                        el -> el.onVisitorCandidateEvent(v, s)
                 );
     }
 

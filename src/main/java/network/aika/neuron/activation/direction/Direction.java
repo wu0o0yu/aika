@@ -18,6 +18,7 @@ package network.aika.neuron.activation.direction;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.TemplateNeuronInfo;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.scopes.Scope;
@@ -36,13 +37,9 @@ public interface Direction {
 
     Direction invert();
 
-    Activation getCycleInput(Activation fromAct, Activation toAct);
+    Activation getInput(Activation fromAct, Activation toAct);
 
-    Activation getCycleOutput(Activation fromAct, Activation toAct);
-
-    Activation getPropagateInput(Activation fromAct, Activation toAct);
-
-    Activation getPropagateOutput(Activation fromAct, Activation toAct);
+    Activation getOutput(Activation fromAct, Activation toAct);
 
     Neuron getNeuron(Synapse s);
 
@@ -59,6 +56,8 @@ public interface Direction {
     Scope getToScope(Transition t);
 
     void setToScope(Scope s, Transition t);
+
+    Set<Scope> getInitialScopes(TemplateNeuronInfo templateInfo);
 
     Stream<? extends Synapse> getSynapses(Neuron n);
 

@@ -31,10 +31,11 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class Scope implements Comparable<Scope> {
 
-    private Scope origin;
-    private Scope template;
     private String label;
     private int id;
+
+    private double xCoord;
+    private double yCoord;
 
     private Set<Transition> inputs = new TreeSet<>(getComparator(OUTPUT));
     private Set<Transition> outputs = new TreeSet<>(getComparator(INPUT));
@@ -42,38 +43,35 @@ public class Scope implements Comparable<Scope> {
     private static Comparator<Transition> getComparator(Direction dir) {
         return Comparator.<Transition, String>comparing(t -> t.getSynapseTemplate().getTemplateInfo().getLabel())
                         .thenComparingInt(t -> dir.getFromScope(t).id)
-                        .thenComparingInt(t -> t.isTarget() ? 1 : 0);
+                        .thenComparingInt(t -> t.isTargetAllowed() ? 1 : 0);
     }
 
-    public Scope(String label, int id) {
+    public Scope(String label, int id, double xCoord, double yCoord) {
         this.label = label;
         this.id = id;
-    }
-
-    public Scope getInstance(Direction dir, Transition from) {
-        Scope s = new Scope(label, id);
-        s.template = this;
-
-        if(from != null) {
-            dir.setToScope(s, from);
-            s.inputs.add(from);
-            s.origin = dir.getFromScope(from).origin;
-        } else
-            s.origin = s;
-
-        return s;
-    }
-
-    public Scope getOrigin() {
-        return origin;
+        this.xCoord = xCoord;
+        this.yCoord = yCoord;
     }
 
     public String getLabel() {
         return label;
     }
 
-    public Scope getTemplate() {
-        return template;
+
+    public double getXCoord() {
+        return xCoord;
+    }
+
+    public void setXCoord(double xCoord) {
+        this.xCoord = xCoord;
+    }
+
+    public double getYCoord() {
+        return yCoord;
+    }
+
+    public void setYCoord(double yCoord) {
+        this.yCoord = yCoord;
     }
 
     public Set<Transition> getInputs() {

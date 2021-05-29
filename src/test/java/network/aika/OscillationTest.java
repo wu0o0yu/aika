@@ -39,7 +39,7 @@ public class OscillationTest {
         nA.getSampleSpace().setLastPos(899);
 
         BindingNeuron nPPA =  m.getTemplates().SAME_BINDING_TEMPLATE.instantiateTemplate();
-        nPPA.setLabel("PP-A");
+        nPPA.setLabel("B-A");
 
         BindingNeuronSynapse s = m.getTemplates().PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nA, nPPA);
 

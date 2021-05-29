@@ -41,7 +41,7 @@ public class DerDieDasTest {
 
             PatternNeuron inN = m.lookupToken(ref, "" + c);
             BindingNeuron ppN = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
-            ppN.setLabel("TP-" + c + "-(" + token + ")");
+            ppN.setLabel("B-" + c + "-(" + token + ")");
 
             initPP(ref, c, inN, ppN, prevPPN, out);
 
@@ -72,7 +72,7 @@ public class DerDieDasTest {
         );
 
         {
-            InhibitorySynapse s = new InhibitorySynapse(ppN, inhibN, null);
+            InhibitorySynapse s = new InhibitorySynapse(ppN, inhibN);
 
             s.linkInput();
             s.addWeight(0.1);

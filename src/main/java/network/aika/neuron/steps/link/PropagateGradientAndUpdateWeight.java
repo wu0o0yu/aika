@@ -16,21 +16,26 @@
  */
 package network.aika.neuron.steps.link;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
 import network.aika.utils.Utils;
 import network.aika.neuron.activation.Link;
+
+import static network.aika.neuron.activation.Activation.INCOMING;
+import static network.aika.neuron.activation.Activation.OWN;
+import static network.aika.neuron.steps.activation.ActivationStep.UPDATE_SYNAPSE_INPUT_LINKS;
 
 /**
  * Propagate the gradient backwards through the network.
  *
  * @author Lukas Molzberger
  */
-public class PropagateGradient implements LinkStep {
+public class PropagateGradientAndUpdateWeight implements LinkStep {
 
-    private double gradient;
+    private double[] gradient;
 
-    public PropagateGradient(double gradient) {
+    public PropagateGradientAndUpdateWeight(double[] gradient) {
         this.gradient = gradient;
     }
 
@@ -45,13 +50,24 @@ public class PropagateGradient implements LinkStep {
 
     @Override
     public void process(Link l) {
-        l.propagateGradient(gradient);
+        if(l.getSynapse().isAllowTraining()) {
+            double g = gradient[OWN] + gradient[INCOMING];
+            double weightDelta = l.getConfig().getLearnRate() * g;
+            Synapse s = l.getSynapse();
+            if(s.getWeight() == 0.0 && weightDelta > 0.0 && l.getInput().isActive(true)) {
+                QueueEntry.add(l, LINKING);
+                QueueEntry.add(l, TEMPLATE);
+            }
 
-        if(l.getSynapse().isAllowTraining())
-            QueueEntry.add(l, new UpdateWeight(l.getConfig().getLearnRate() * gradient));
+            s.updateSynapse(l, weightDelta);
+
+            QueueEntry.add(l.getOutput(), UPDATE_SYNAPSE_INPUT_LINKS);
+        }
+
+        l.propagateGradient(gradient[OWN]);
     }
 
     public String toString() {
-        return "Link-Step: Propagate Gradient (" + Utils.round(gradient) + ")";
+        return "Link-Step: Propagate Gradient (Own:" + Utils.round(gradient[OWN]) + ", Incoming:" + Utils.round(gradient[INCOMING]) + ")";
     }
 }

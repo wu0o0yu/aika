@@ -18,6 +18,7 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Step;
+
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
@@ -37,7 +38,8 @@ public interface ActivationStep extends Step<Activation> {
     ActivationStep PROPAGATE_GRADIENTS_NET = new PropagateGradientsNet();
     ActivationStep UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks();
     ActivationStep TEMPLATE_PROPAGATE_INPUT = new TemplatePropagateInput();
-    TemplateCloseCycle TEMPLATE_CLOSE_CYCLE_OUTPUT = new TemplateCloseCycle(OUTPUT);
+    TemplateCloseLoop TEMPLATE_CLOSE_LOOP_INPUT = new TemplateCloseLoop(INPUT);
+    TemplateCloseLoop TEMPLATE_CLOSE_LOOP_OUTPUT = new TemplateCloseLoop(OUTPUT);
     ActivationStep TEMPLATE_PROPAGATE_OUTPUT = new TemplatePropagateOutput();
     ActivationStep COUNTING = new Counting();
 }
