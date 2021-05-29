@@ -1,5 +1,0 @@
-<application>
-  <component name="LocalDatabaseDriverManager" version="201">
-    <driver id="com.dbschema.MongoJdbcDriver" name="com.dbschema.MongoJdbcDriver" driver-class="com.dbschema.MongoJdbcDriver" />
-  </component>
-</application>
