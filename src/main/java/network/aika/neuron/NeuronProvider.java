@@ -131,12 +131,16 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
                 }
             }
 
-            model.getSuspensionHook().store(
-                    id,
-                    neuron.getLabel(),
-                    neuron.getCustomData(),
-                    baos.toByteArray()
-            );
+            try {
+                model.getSuspensionHook().store(
+                        id,
+                        neuron.getLabel(),
+                        neuron.getCustomData(),
+                        baos.toByteArray()
+                );
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         neuron.setModified(false);
     }
@@ -144,7 +148,12 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
     private void reactivate() {
         assert model.getSuspensionHook() != null;
 
-        byte[] data = model.getSuspensionHook().retrieve(id);
+        byte[] data;
+        try {
+            data = model.getSuspensionHook().retrieve(id);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         ByteArrayInputStream bais = new ByteArrayInputStream(data);
         if(ENABLE_COMPRESSION) {
             try (

@@ -132,7 +132,7 @@ public abstract class Model {
 
     public Stream<NeuronProvider> getAllNeurons() {
         return suspensionCallback
-                .getAllIds()
+                .getAllIds().stream()
                 .map(id -> lookupNeuron(id));
     }
 
@@ -211,7 +211,6 @@ public abstract class Model {
 
     public void suspendAll(SuspensionMode sm) {
         suspendUnusedNeurons(Integer.MAX_VALUE, sm);
-        suspensionCallback.suspendAll(sm);
     }
 
     private boolean suspend(long retrievalCount, NeuronProvider p, SuspensionMode sm) {
