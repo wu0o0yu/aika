@@ -81,7 +81,7 @@ public class FSSuspensionCallbackImpl implements SuspensionCallback {
     public synchronized void store(Long id, String label, Writable customData, byte[] data) throws IOException {
         dataStore.seek(dataStore.length());
 
-        index.put(id, new long[]{(int) dataStore.getFilePointer(), data.length});
+        index.put(id, new long[]{dataStore.getFilePointer(), data.length});
         dataStore.write(data);
     }
 
