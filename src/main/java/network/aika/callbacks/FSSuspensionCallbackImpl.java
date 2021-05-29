@@ -17,8 +17,6 @@
 package network.aika.callbacks;
 
 import network.aika.utils.Writable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Collection;
