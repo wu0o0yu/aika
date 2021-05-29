@@ -42,11 +42,15 @@ public class FSSuspensionCallbackImpl implements SuspensionCallback {
     private RandomAccessFile dataStore;
 
 
-    public FSSuspensionCallbackImpl(File path, String modelLabel) throws FileNotFoundException {
+    public void open(File path, String modelLabel, boolean create) throws FileNotFoundException {
         this.path = path;
         this.modelLabel = modelLabel;
-        loadIndex();
-
+        if(create) {
+            getFile("model").deleteOnExit();
+            getFile("index").deleteOnExit();
+        } else {
+            loadIndex();
+        }
         dataStore = new RandomAccessFile(getFile("model"), "rw");
     }
 
