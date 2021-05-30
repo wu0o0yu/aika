@@ -100,7 +100,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        s.initFromTemplate(this);
+        initFromTemplate(s);
         return s;
     }
 
