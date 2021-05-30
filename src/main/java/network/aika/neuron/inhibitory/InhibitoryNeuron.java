@@ -16,17 +16,12 @@
  */
 package network.aika.neuron.inhibitory;
 
-import network.aika.neuron.ActivationFunction;
 import network.aika.Model;
-import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Templates;
-import network.aika.neuron.activation.*;
+import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.scopes.Scope;
-
-import java.util.Collection;
-import java.util.Set;
+import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Fired;
 
 /**
  *

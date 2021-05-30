@@ -16,7 +16,9 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.*;
+import network.aika.Config;
+import network.aika.Model;
+import network.aika.Thought;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
@@ -26,12 +28,12 @@ import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.activation.PropagateValueChange;
 import network.aika.neuron.steps.activation.UpdateBias;
 import network.aika.neuron.steps.link.LinkStep;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.neuron.steps.link.SumUpLink;
-import network.aika.neuron.sign.Sign;
 import network.aika.utils.Utils;
 
 import java.util.*;
@@ -43,8 +45,8 @@ import static network.aika.callbacks.VisitorEvent.AFTER;
 import static network.aika.callbacks.VisitorEvent.BEFORE;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.steps.activation.ActivationStep.*;
 import static network.aika.neuron.sign.Sign.POS;
+import static network.aika.neuron.steps.activation.ActivationStep.*;
 
 /**
  * @author Lukas Molzberger

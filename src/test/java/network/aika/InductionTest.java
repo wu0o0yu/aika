@@ -1,12 +1,11 @@
 package network.aika;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
-import network.aika.neuron.excitatory.BindingNeuronSynapse;
-import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.text.Document;
-
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
@@ -63,14 +62,14 @@ public class InductionTest {
         targetN.setDirectConjunctiveBias(0.0);
         targetN.setRecurrentConjunctiveBias(0.0);
 
-        BindingNeuronSynapse sA = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inA, targetN);
+        Synapse sA = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inA, targetN);
 
         sA.linkInput();
         sA.linkOutput();
         sA.setWeight(0.1);
         targetN.addConjunctiveBias(-0.1, false);
 
-        BindingNeuronSynapse sB = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inB, targetN);
+        Synapse sB = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inB, targetN);
 
         sB.linkInput();
         sB.linkOutput();

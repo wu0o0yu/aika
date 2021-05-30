@@ -16,12 +16,12 @@
  */
 package network.aika.neuron;
 
-import network.aika.*;
-import network.aika.neuron.activation.*;
-import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.scopes.Scope;
+import network.aika.Config;
+import network.aika.Model;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Fired;
+import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;
@@ -30,8 +30,11 @@ import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.sign.Sign.NEG;
@@ -368,7 +371,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     @Override
     public void write(DataOutput out) throws IOException {
- //       out.writeLong(getTemplates().stream());
+        out.writeByte((byte) getTemplate().getId().intValue());
 
         out.writeBoolean(label != null);
         if(label != null) {
@@ -380,7 +383,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         for (Synapse s : inputSynapses.values()) {
             if (s.getInput() != null) {
                 out.writeBoolean(true);
-                getModel().writeSynapse(s, out);
+                s.write(out);
             }
         }
         out.writeBoolean(false);
@@ -388,7 +391,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         for (Synapse s : outputSynapses.values()) {
             if (s.getOutput() != null) {
                 out.writeBoolean(true);
-                getModel().writeSynapse(s, out);
+                s.write(out);
             }
         }
         out.writeBoolean(false);
@@ -404,6 +407,14 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         }
     }
 
+    public static Neuron read(DataInput in, Model m) throws Exception {
+        byte templateNeuronId = in.readByte();
+        Neuron templateNeuron = m.getTemplates().getTemplateNeuron(templateNeuronId);
+        Neuron n = templateNeuron.instantiateTemplate();
+        n.read(in, m);
+        return n;
+    }
+
     @Override
     public void readFields(DataInput in, Model m) throws Exception {
         if(in.readBoolean()) {
@@ -413,12 +424,12 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         bias = in.readDouble();
 
         while (in.readBoolean()) {
-            S syn = (S) m.readSynapse(in);
+            S syn = (S) Synapse.read(in, m);
             inputSynapses.put(syn.getPInput(), syn);
         }
 
         while (in.readBoolean()) {
-            Synapse syn = m.readSynapse(in);
+            Synapse syn = Synapse.read(in, m);
             outputSynapses.put(syn.getPOutput(), syn);
         }
 

@@ -17,8 +17,13 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.Model;
-import network.aika.neuron.*;
-import network.aika.neuron.activation.*;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.Templates;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Fired;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.visitor.Visitor;
 
 import java.io.DataInput;
@@ -39,12 +44,7 @@ public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends Excitato
         super();
     }
 
-    public BindingNeuronSynapse(I input, BindingNeuron output) {
-        super(input, output);
-    }
-
-    public BindingNeuronSynapse(I input, BindingNeuron output, boolean isRecurrent) {
-        super(input, output);
+    public BindingNeuronSynapse(boolean isRecurrent) {
         this.isRecurrent = isRecurrent;
     }
 

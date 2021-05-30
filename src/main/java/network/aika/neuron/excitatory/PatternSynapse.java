@@ -17,8 +17,9 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.Visitor;
 
@@ -27,14 +28,6 @@ import network.aika.neuron.activation.visitor.Visitor;
  * @author Lukas Molzberger
  */
 public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, PatternNeuron> {
-
-    public PatternSynapse() {
-        super();
-    }
-
-    public PatternSynapse(I input, PatternNeuron output) {
-        super(input, output);
-    }
 
     @Override
     public void updateReference(Link l) {
@@ -57,15 +50,6 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
     @Override
     protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
         return true;
-    }
-
-    @Override
-    public PatternSynapse instantiateTemplate(I input, PatternNeuron output) {
-        assert input.getTemplateGroup().contains(getInput());
-
-        PatternSynapse s = new PatternSynapse(input, output);
-        initFromTemplate(s);
-        return s;
     }
 
     public Activation branchIfNecessary(Activation oAct, Visitor v) {

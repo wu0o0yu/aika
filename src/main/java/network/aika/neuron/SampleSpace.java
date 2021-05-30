@@ -17,9 +17,8 @@
 package network.aika.neuron;
 
 import network.aika.Model;
-import network.aika.neuron.activation.Activation;
-import network.aika.utils.Writable;
 import network.aika.neuron.activation.Reference;
+import network.aika.utils.Writable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

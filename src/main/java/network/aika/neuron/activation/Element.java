@@ -22,7 +22,6 @@ import network.aika.neuron.steps.Step;
 
 import java.util.Comparator;
 import java.util.NavigableSet;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 

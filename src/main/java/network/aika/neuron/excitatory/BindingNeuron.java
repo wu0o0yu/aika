@@ -17,16 +17,11 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.Model;
-import network.aika.neuron.*;
-import network.aika.neuron.activation.*;
-import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.scopes.Scope;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Activation;
 import network.aika.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
-import java.util.Set;
 
 /**
  * @author Lukas Molzberger

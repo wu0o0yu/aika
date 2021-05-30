@@ -16,9 +16,15 @@
  */
 package network.aika.neuron.inhibitory;
 
-import network.aika.neuron.*;
-import network.aika.neuron.activation.*;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.visitor.Visitor;
+import network.aika.neuron.steps.link.SumUpLink;
+
+import static network.aika.neuron.sign.Sign.POS;
 
 
 /**
@@ -27,12 +33,16 @@ import network.aika.neuron.activation.visitor.Visitor;
  */
 public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
-    public InhibitorySynapse() {
-        super();
-    }
 
-    public InhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
-        super(input, output);
+    public void updateSynapse(Link l, double delta) {
+        if(l.getInput().isActive(true)) {
+            addWeight(delta);
+
+            QueueEntry.add(
+                    l,
+                    new SumUpLink(l.getInputValue(POS) * delta)
+            );
+        }
     }
 
     @Override
@@ -46,14 +56,6 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         return false;
     }
 
-    @Override
-    public InhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
-        assert input.getTemplateGroup().contains(getInput());
-
-        InhibitorySynapse s = new InhibitorySynapse(input, output);
-        initFromTemplate(s);
-        return s;
-    }
 
     @Override
     public Activation branchIfNecessary(Activation oAct, Visitor v) {

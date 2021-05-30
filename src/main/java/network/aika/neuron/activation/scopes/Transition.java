@@ -17,7 +17,6 @@
 package network.aika.neuron.activation.scopes;
 
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.direction.Direction;
 
 /**
  * @author Lukas Molzberger

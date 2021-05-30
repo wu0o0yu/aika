@@ -16,20 +16,21 @@
  */
 package network.aika.neuron;
 
-import network.aika.*;
+import network.aika.Model;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.activation.Reference;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.activation.scopes.Transition;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
-import network.aika.neuron.steps.activation.SumUpBias;
-import network.aika.neuron.steps.link.SumUpLink;
+import network.aika.neuron.sign.Sign;
+import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
-import network.aika.neuron.activation.*;
-import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
-import network.aika.neuron.sign.Sign;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +40,9 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.activation.Link.linkExists;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
-import static network.aika.neuron.activation.Link.linkExists;
 import static network.aika.neuron.steps.link.LinkStep.INFORMATION_GAIN_GRADIENT;
 
 /**
@@ -71,18 +72,47 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     protected boolean allowTraining = true;
 
-
-    public Synapse() {
-    }
-
-    public Synapse(I input, O output) {
+    public void setInput(I input) {
         this.input = input.getProvider();
-        this.output = output.getProvider();
-
-        sampleSpace = new SampleSpace(getModel());
-
-        assert input.getId() < 0 || input.getId() != output.getId();
     }
+
+    public void setOutput(O output) {
+        this.output = output.getProvider();
+    }
+
+    public void init(Model m) {
+        sampleSpace = new SampleSpace(m);
+    }
+
+    public Synapse<I, O> instantiateTemplate(I input, O output) {
+        Synapse<I, O> s = instantiateTemplate();
+
+        s.input = input.getProvider();
+        s.output = output.getProvider();
+        return s;
+    }
+
+    public Synapse<I, O> instantiateTemplate() {
+        Synapse<I, O> s;
+        try {
+            s = getClass().getConstructor().newInstance();
+            s.init(getModel());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        s.initFromTemplate(this);
+        return s;
+    }
+
+    public abstract void updateSynapse(Link l, double delta);
+
+    protected abstract boolean checkCausality(Activation iAct, Activation oAct, Visitor v);
+
+    public abstract boolean checkTemplatePropagate(Visitor v, Activation act);
+
+    public abstract void updateReference(Link l);
+
+    public abstract Activation branchIfNecessary(Activation oAct, Visitor v);
 
     public boolean isAllowTraining() {
         return allowTraining;
@@ -115,18 +145,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return templateInfo;
     }
 
-    public abstract Synapse instantiateTemplate(I input, O output);
-
     protected void initFromTemplate(Synapse s) {
         s.weight = weight;
         s.template = this;
     }
-
-    protected abstract boolean checkCausality(Activation iAct, Activation oAct, Visitor v);
-
-    public abstract boolean checkTemplatePropagate(Visitor v, Activation act);
-
-    public abstract void updateReference(Link l);
 
     public Reference getReference(Link l) {
         return l.getInput().getReference();
@@ -139,8 +161,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public boolean isRecurrent() {
         return false;
     }
-
-    public abstract Activation branchIfNecessary(Activation oAct, Visitor v);
 
     public LinkVisitor transition(ActVisitor v, Link l) {
         LinkVisitor nv = new LinkVisitor(v, this, l);
@@ -211,7 +231,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if (s.getWeight() <= 0.0 && !s.isTemplate())
             return;
 
-        QueueEntry.add(nl, INFORMATION_GAIN_GRADIENT);
+        if(!s.isTemplate())
+            QueueEntry.add(nl, INFORMATION_GAIN_GRADIENT);
 
         if(!Utils.belowTolerance(oAct.getOutputGradientSum())) {
             QueueEntry.add(nl, new PropagateGradientAndUpdateWeight(oAct.getOutputGradientSum()));
@@ -280,29 +301,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public SampleSpace getSampleSpace() {
         return sampleSpace;
-    }
-
-    public void updateSynapse(Link l, double delta) {
-        if(l.getInput().isActive(true)) {
-            addWeight(delta);
-
-            QueueEntry.add(
-                    l,
-                    new SumUpLink(l.getInputValue(POS) * delta)
-            );
-        } else {
-            addWeight(-delta);
-            getOutput().addConjunctiveBias(delta, !l.isCausal());
-
-            QueueEntry.add(
-                    l.getOutput(),
-                    new SumUpBias(delta)
-            );
-            QueueEntry.add(
-                    l,
-                    new SumUpLink((l.getInputValue(POS) * -delta) + delta)
-            );
-        }
     }
 
     public double getFrequency(Sign is, Sign os, double n) {
@@ -389,8 +387,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeLong(getTemplate().getInput().getId());
-        out.writeLong(getTemplate().getOutput().getId());
+        out.writeByte(getTemplate().getTemplateInfo().getTemplateSynapseId());
 
         out.writeLong(input.getId());
         out.writeLong(output.getId());
@@ -402,6 +399,14 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         out.writeDouble(frequencyINegOPos);
 
         sampleSpace.write(out);
+    }
+
+    public static Synapse read(DataInput in, Model m) throws IOException {
+        byte templateSynapseId = in.readByte();
+        Synapse templateSynapse = m.getTemplates().getTemplateSynapse(templateSynapseId);
+        Synapse s = templateSynapse.instantiateTemplate();
+        s.readFields(in, m);
+        return s;
     }
 
     @Override

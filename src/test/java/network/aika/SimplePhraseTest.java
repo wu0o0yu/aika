@@ -2,8 +2,8 @@ package network.aika;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.BindingNeuron;
+import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;

@@ -16,13 +16,12 @@
  */
 package network.aika;
 
-import network.aika.neuron.Templates;
-import network.aika.neuron.excitatory.BindingNeuronSynapse;
-import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.neuron.excitatory.PatternSynapse;
-import network.aika.text.Document;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.Templates;
+import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
@@ -87,7 +86,7 @@ public class PatternTest {
 
         {
             {
-                BindingNeuronSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nA, eA);
+                Synapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nA, eA);
 
                 s.linkInput();
                 s.linkOutput();
@@ -96,7 +95,7 @@ public class PatternTest {
             }
 
             {
-                BindingNeuronSynapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eA);
+                Synapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eA);
 
                 s.linkInput();
                 s.linkOutput();
@@ -108,7 +107,7 @@ public class PatternTest {
 
         {
             {
-                BindingNeuronSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nB, eB);
+                Synapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nB, eB);
 
                 s.linkInput();
                 s.linkOutput();
@@ -117,7 +116,7 @@ public class PatternTest {
             }
 
             {
-                BindingNeuronSynapse s = t.SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eA, eB);
+                Synapse s = t.SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eA, eB);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -125,7 +124,7 @@ public class PatternTest {
             }
 
             {
-                BindingNeuronSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(lookupPPPT(m, nB), eB);
+                Synapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(lookupPPPT(m, nB), eB);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -133,7 +132,7 @@ public class PatternTest {
             }
 
             {
-                BindingNeuronSynapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eB);
+                Synapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eB);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -144,7 +143,7 @@ public class PatternTest {
 
         {
             {
-                BindingNeuronSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nC, eC);
+                Synapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nC, eC);
 
                 s.linkInput();
                 s.linkOutput();
@@ -153,7 +152,7 @@ public class PatternTest {
             }
 
             {
-                BindingNeuronSynapse s = t.SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eB, eC);
+                Synapse s = t.SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eB, eC);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -161,7 +160,7 @@ public class PatternTest {
             }
 
             {
-                BindingNeuronSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(lookupPPPT(m, nC), eC);
+                Synapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(lookupPPPT(m, nC), eC);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -169,7 +168,7 @@ public class PatternTest {
             }
 
             {
-                BindingNeuronSynapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eC);
+                Synapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eC);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -180,7 +179,7 @@ public class PatternTest {
 
         {
             {
-                PatternSynapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eA, out);
+                Synapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eA, out);
 
                 s.linkInput();
                 s.linkOutput();
@@ -188,7 +187,7 @@ public class PatternTest {
                 out.addConjunctiveBias(-10.0, false);
             }
             {
-                PatternSynapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eB, out);
+                Synapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eB, out);
 
                 s.linkInput();
                 s.linkOutput();
@@ -196,7 +195,7 @@ public class PatternTest {
                 out.addConjunctiveBias(-10.0, false);
             }
             {
-                PatternSynapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eC, out);
+                Synapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eC, out);
 
                 s.linkInput();
                 s.linkOutput();

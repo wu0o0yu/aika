@@ -16,18 +16,18 @@
  */
 package network.aika;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
-import network.aika.neuron.excitatory.*;
-import network.aika.text.Document;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.excitatory.BindingNeuron;
+import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
+import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
-
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -57,7 +57,7 @@ public class MutualExclusionTest {
 
         {
             {
-                BindingNeuronSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, na);
+                Synapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, na);
 
                 s.linkInput();
                 s.linkOutput();
@@ -66,7 +66,7 @@ public class MutualExclusionTest {
             }
 
             {
-                BindingNeuronSynapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, na);
+                Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, na);
 
                 s.linkOutput();
                 s.addWeight(-100.0);
@@ -77,7 +77,7 @@ public class MutualExclusionTest {
 
         {
             {
-                BindingNeuronSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, nb);
+                Synapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, nb);
 
                 s.linkInput();
                 s.linkOutput();
@@ -86,7 +86,7 @@ public class MutualExclusionTest {
             }
 
             {
-                BindingNeuronSynapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, nb);
+                Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, nb);
 
                 s.linkOutput();
                 s.addWeight(-100.0);
@@ -97,7 +97,7 @@ public class MutualExclusionTest {
 
         {
             {
-                BindingNeuronSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, nc);
+                Synapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, nc);
 
                 s.linkInput();
                 s.linkOutput();
@@ -106,7 +106,7 @@ public class MutualExclusionTest {
             }
 
             {
-                BindingNeuronSynapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, nc);
+                Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, nc);
 
                 s.linkOutput();
                 s.addWeight(-100.0);
@@ -117,17 +117,17 @@ public class MutualExclusionTest {
 
         {
             {
-                InhibitorySynapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(na, inhib);
+                Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(na, inhib);
                 s.linkInput();
                 s.addWeight(1.0);
             }
             {
-                InhibitorySynapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(nb, inhib);
+                Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(nb, inhib);
                 s.linkInput();
                 s.addWeight(1.0);
             }
             {
-                InhibitorySynapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(nc, inhib);
+                Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(nc, inhib);
                 s.linkInput();
                 s.addWeight(1.0);
             }
@@ -174,7 +174,7 @@ public class MutualExclusionTest {
 
         {
             {
-                BindingNeuronSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, na);
+                Synapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, na);
 
                 s.linkInput();
                 s.linkOutput();
@@ -183,7 +183,7 @@ public class MutualExclusionTest {
             }
 
             {
-                BindingNeuronSynapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, na);
+                Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, na);
 
                 s.linkOutput();
                 s.addWeight(-100.0);
@@ -194,7 +194,7 @@ public class MutualExclusionTest {
 
         {
             {
-                BindingNeuronSynapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, nb);
+                Synapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, nb);
 
                 s.linkInput();
                 s.linkOutput();
@@ -203,7 +203,7 @@ public class MutualExclusionTest {
             }
 
             {
-                BindingNeuronSynapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, nb);
+                Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, nb);
 
                 s.linkOutput();
                 s.addWeight(-100.0);
@@ -219,12 +219,12 @@ public class MutualExclusionTest {
             }
 */
             {
-                InhibitorySynapse s = new InhibitorySynapse(na, inhib);
+                Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(na, inhib);
                 s.linkInput();
                 s.addWeight(1.0);
             }
             {
-                InhibitorySynapse s = new InhibitorySynapse(nb, inhib);
+                Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(nb, inhib);
                 s.linkInput();
                 s.addWeight(1.0);
             }

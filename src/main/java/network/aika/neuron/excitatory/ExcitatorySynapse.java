@@ -18,6 +18,12 @@ package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.steps.activation.SumUpBias;
+import network.aika.neuron.steps.link.SumUpLink;
+
+import static network.aika.neuron.sign.Sign.POS;
 
 /**
  *
@@ -25,15 +31,30 @@ import network.aika.neuron.Synapse;
  */
 public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron<?>> extends Synapse<I, O> {
 
-    public ExcitatorySynapse() {
-        super();
-    }
-
-    public ExcitatorySynapse(I input, O output) {
-        super(input, output);
-    }
-
     protected void initFromTemplate(ExcitatorySynapse s) {
         super.initFromTemplate(s);
+    }
+
+    public void updateSynapse(Link l, double delta) {
+        if(l.getInput().isActive(true)) {
+            addWeight(delta);
+
+            QueueEntry.add(
+                    l,
+                    new SumUpLink(l.getInputValue(POS) * delta)
+            );
+        } else {
+            addWeight(-delta);
+            getOutput().addConjunctiveBias(delta, !l.isCausal());
+
+            QueueEntry.add(
+                    l.getOutput(),
+                    new SumUpBias(delta)
+            );
+            QueueEntry.add(
+                    l,
+                    new SumUpLink((l.getInputValue(POS) * -delta) + delta)
+            );
+        }
     }
 }

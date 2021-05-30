@@ -19,7 +19,6 @@ package network.aika.neuron.steps.link;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.activation.ActivationStep;
 import network.aika.neuron.steps.visitor.LinkingVisitor;
 
 

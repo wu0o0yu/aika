@@ -21,12 +21,9 @@ import network.aika.callbacks.VisitorEvent;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.steps.VisitorStep;
 
-import java.util.Set;
-
-import static network.aika.neuron.activation.direction.Direction.*;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
  * The Visitor is a finite state machine used to implement the linking process in the neural network.

@@ -19,18 +19,9 @@ package network.aika;
 
 import network.aika.callbacks.InMemorySuspensionCallback;
 import network.aika.callbacks.SuspensionCallback;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.SuspensionMode;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.Templates;
+import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.excitatory.BindingNeuronSynapse;
-import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.neuron.excitatory.PatternSynapse;
-import network.aika.neuron.inhibitory.*;
-import network.aika.neuron.excitatory.PatternNeuron;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +29,10 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -142,34 +135,12 @@ public abstract class Model {
         }
     }
 
-
     public SuspensionCallback getSuspensionHook() {
         return suspensionCallback;
     }
 
     public void setSuspensionHook(SuspensionCallback suspensionCallback) {
         this.suspensionCallback = suspensionCallback;
-    }
-
-    public Neuron readNeuron(DataInput in, NeuronProvider p) throws Exception {
-/*        Constructor c = typeRegistry.get(in.readByte()).getDeclaredConstructor(NeuronProvider.class);
-        Neuron n = (Neuron) c.newInstance(p);
-        n.readFields(in, this);
-        return n;
- */
-        return null;
-    }
-
-    public Synapse readSynapse(DataInput in) throws Exception {
-/*        Synapse s = (Synapse) typeRegistry.get(in.readByte()).getDeclaredConstructor().newInstance();
-        s.readFields(in, this);
-        return s;
- */
-        return null;
-    }
-
-    public void writeSynapse(Synapse s, DataOutput out) throws IOException {
-        s.write(out);
     }
 
     public void addToN(int l) {

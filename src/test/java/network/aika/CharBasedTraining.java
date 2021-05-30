@@ -1,6 +1,5 @@
 package network.aika;
 
-import network.aika.Config;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;

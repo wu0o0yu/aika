@@ -1,10 +1,10 @@
 package network.aika;
 
 import network.aika.debugger.AikaDebugger;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.neuron.excitatory.BindingNeuronSynapse;
+import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
@@ -41,7 +41,7 @@ public class OscillationTest {
         BindingNeuron nPPA =  m.getTemplates().SAME_BINDING_TEMPLATE.instantiateTemplate();
         nPPA.setLabel("B-A");
 
-        BindingNeuronSynapse s = m.getTemplates().PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nA, nPPA);
+        Synapse s = m.getTemplates().PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nA, nPPA);
 
         s.setWeight(0.3);
 

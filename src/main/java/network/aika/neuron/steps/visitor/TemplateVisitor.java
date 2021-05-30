@@ -21,12 +21,10 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.VisitorStep;
 import network.aika.neuron.steps.link.LinkStep;
 
 import java.util.Set;
-
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.steps.activation.ActivationStep.INDUCTION;

@@ -18,13 +18,13 @@ package network.aika.neuron.activation;
 
 import network.aika.Config;
 import network.aika.Thought;
-import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.LinkVisitor;
-import network.aika.utils.Utils;
-import network.aika.neuron.sign.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.LinkVisitor;
+import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.VisitorStep;
+import network.aika.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
