@@ -1,8 +1,15 @@
 package network.aika.utils;
 
-public class BelowToleranceThresholdException extends RuntimeException {
+import network.aika.neuron.activation.Element;
 
-    public BelowToleranceThresholdException() {
-        System.out.println();
+public class BelowToleranceThresholdException extends RuntimeException {
+    private Element element;
+
+    public BelowToleranceThresholdException(Element e) {
+        element = e;
+    }
+
+    public Element getElement() {
+        return element;
     }
 }

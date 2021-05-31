@@ -159,7 +159,7 @@ public class Link extends Element<Link> {
         }
 
         double igGradientDelta = igGradient - lastIGGradient;
-        Utils.checkTolerance(igGradientDelta);
+        Utils.checkTolerance(this, igGradientDelta);
 
         getOutput().propagateGradientIn(igGradientDelta);
         lastIGGradient = igGradient;

@@ -50,7 +50,7 @@ public class Induction implements ActivationStep {
 
         act.link();
 
-        Utils.checkTolerance(inducedNeuron.getBias());
+        Utils.checkTolerance(act, inducedNeuron.getBias());
 
 //        QueueEntry.add(act, new SumUpBias(inducedNeuron.getBias()));
     }

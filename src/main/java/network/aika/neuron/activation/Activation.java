@@ -395,7 +395,7 @@ public class Activation extends Element<Activation> {
     public void updateNet(double netDelta) {
         net += netDelta;
 
-        Utils.checkTolerance(netDelta);
+        Utils.checkTolerance(this, netDelta);
 
         QueueEntry.add(this, PROPAGATE_GRADIENTS_NET);
         QueueEntry.add(this, CHECK_IF_FIRED);
@@ -414,7 +414,7 @@ public class Activation extends Element<Activation> {
 
         double valueDelta = value - (oldValue != null ? oldValue : 0.0);
 
-        Utils.checkTolerance(valueDelta);
+        Utils.checkTolerance(this, valueDelta);
 
         QueueEntry.add(this,
                 new PropagateValueChange(valueDelta)
@@ -495,7 +495,7 @@ public class Activation extends Element<Activation> {
     }
 
     public void propagateGradientsOut(double[] g) {
-        Utils.checkTolerance(g);
+        Utils.checkTolerance(this, g);
 
         outputGradientSum = Utils.add(outputGradientSum, g);
 
@@ -591,7 +591,7 @@ public class Activation extends Element<Activation> {
 
         double p = Math.exp(net - offset) / norm;
 
-        Utils.checkTolerance(p - getBranchProbability());
+        Utils.checkTolerance(this, p - getBranchProbability());
 
         Activation cAct = clone(null);
         cAct.branchProbability = p;
