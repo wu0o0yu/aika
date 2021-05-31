@@ -29,7 +29,10 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author Lukas Molzberger
  */
-public class FSSuspensionCallbackImpl implements SuspensionCallback {
+public class FSSuspensionCallback implements SuspensionCallback {
+
+    public static String MODEL = "model";
+    public static String INDEX = "index";
 
     private AtomicLong currentId = new AtomicLong(0);
 
@@ -46,12 +49,17 @@ public class FSSuspensionCallbackImpl implements SuspensionCallback {
         this.path = path;
         this.modelLabel = modelLabel;
         if(create) {
-            getFile("model").deleteOnExit();
-            getFile("index").deleteOnExit();
+            File modelFile = getFile(MODEL);
+            if(modelFile.exists())
+                modelFile.delete();
+
+            File indexFile = getFile(INDEX);
+            if(indexFile.exists())
+                indexFile.delete();
         } else {
             loadIndex();
         }
-        dataStore = new RandomAccessFile(getFile("model"), "rw");
+        dataStore = new RandomAccessFile(getFile(MODEL), "rw");
     }
 
     @Override
@@ -112,7 +120,7 @@ public class FSSuspensionCallbackImpl implements SuspensionCallback {
 
     @Override
     public void loadIndex() {
-        try (FileInputStream fis = new FileInputStream(getFile("index"));
+        try (FileInputStream fis = new FileInputStream(getFile(INDEX));
              ByteArrayInputStream bais = new ByteArrayInputStream(fis.readAllBytes());
              DataInputStream dis = new DataInputStream(bais)) {
             readIndex(dis);
@@ -126,7 +134,7 @@ public class FSSuspensionCallbackImpl implements SuspensionCallback {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         try (DataOutputStream dos = new DataOutputStream(baos);
-             FileOutputStream fos = new FileOutputStream(getFile("index"))) {
+             FileOutputStream fos = new FileOutputStream(getFile(INDEX))) {
             writeIndex(dos);
             fos.write(baos.toByteArray());
         } catch (IOException e) {
