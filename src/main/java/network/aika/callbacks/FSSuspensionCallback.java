@@ -19,10 +19,7 @@ package network.aika.callbacks;
 import network.aika.utils.Writable;
 
 import java.io.*;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -36,7 +33,7 @@ public class FSSuspensionCallback implements SuspensionCallback {
 
     private AtomicLong currentId = new AtomicLong(0);
 
-    private Map<String, Long> labels = Collections.synchronizedMap(new TreeMap<>());
+    private Map<String, Long> labels = Collections.synchronizedMap(new HashMap<>());
     private Map<Long, long[]> index = Collections.synchronizedMap(new TreeMap<>());
 
     private File path;
