@@ -54,8 +54,6 @@ public class SimplePhraseTest {
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
                         .setEnableTraining(false)
-                        .setSurprisalInductionThreshold(0.0)
-                        .setGradientInductionThreshold(0.0)
         );
 
         Random r = new Random(1);

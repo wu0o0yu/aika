@@ -31,9 +31,6 @@ public class Config {
 
     private double betaThreshold = 0.95;
 
-    private double surprisalInductionThreshold = 2.0;
-    private double gradientInductionThreshold = 2.0;
-
     private boolean enableTraining;
 
     private Supplier<Writable> customDataInstanceSupplier;
@@ -57,23 +54,7 @@ public class Config {
         return this;
     }
 
-    public double getSurprisalInductionThreshold() {
-        return surprisalInductionThreshold;
-    }
 
-    public Config setSurprisalInductionThreshold(double surprisalInductionThreshold) {
-        this.surprisalInductionThreshold = surprisalInductionThreshold;
-        return this;
-    }
-
-    public double getGradientInductionThreshold() {
-        return gradientInductionThreshold;
-    }
-
-    public Config setGradientInductionThreshold(double gradientInductionThreshold) {
-        this.gradientInductionThreshold = gradientInductionThreshold;
-        return this;
-    }
 
     public boolean isEnableTraining() {
         return enableTraining;
@@ -108,8 +89,6 @@ public class Config {
 
     public String toString() {
         return "Alpha: " + alpha + "\n" +
-                "LearnRate" + learnRate + "\n" +
-                "SurprisalInductionThreshold" + surprisalInductionThreshold + "\n" +
-                "GradientInductionThreshold" + gradientInductionThreshold + "\n\n";
+                "LearnRate" + learnRate + "\n\n";
     }
 }

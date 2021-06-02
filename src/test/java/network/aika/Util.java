@@ -16,6 +16,11 @@
  */
 package network.aika;
 
+import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.excitatory.BindingNeuron;
+import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.text.Document;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -27,6 +32,29 @@ import java.util.List;
  * @author Lukas Molzberger
  */
 public class Util {
+    private static String trimPrefix(String l) {
+        return l.substring(l.indexOf("-") + 1);
+    }
+
+    public static Config getTestConfig() {
+        return new Config() {
+            public String getLabel(Activation act) {
+                Neuron n = act.getNeuron();
+                Activation iAct = act.getInputLinks()
+                        .findFirst()
+                        .map(l -> l.getInput())
+                        .orElse(null);
+
+                if(n instanceof BindingNeuron) {
+                    return "B-" + trimPrefix(iAct.getLabel());
+                } else if (n instanceof PatternNeuron) {
+                    return "P-" + ((Document)act.getThought()).getContent();
+                } else {
+                    return "I-" + trimPrefix(iAct.getLabel());
+                }
+            }
+        };
+    }
 
     public static List<String> loadExamplePhrases(String file) throws IOException {
         ArrayList<String> phrases = new ArrayList<>();

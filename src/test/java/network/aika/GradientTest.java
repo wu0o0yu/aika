@@ -13,36 +13,13 @@ import org.junit.jupiter.api.Test;
 public class GradientTest {
 
 
-    private String trimPrefix(String l) {
-        return l.substring(l.indexOf("-") + 1);
-    }
-
     @Test
     public void gradientAndInduction2() {
         TextModel m = new TextModel();
-        m.setConfig(
-                new Config() {
-                    public String getLabel(Activation act) {
-                        Neuron n = act.getNeuron();
-                        Activation iAct = act.getInputLinks()
-                                .findFirst()
-                                .map(l -> l.getInput())
-                                .orElse(null);
-
-                        if(n instanceof BindingNeuron) {
-                            return "B-" + trimPrefix(iAct.getLabel());
-                        } else if (n instanceof PatternNeuron) {
-                            return "P-" + ((Document)act.getThought()).getContent();
-                        } else {
-                            return "I-" + trimPrefix(iAct.getLabel());
-                        }
-                    }
-                }
-                        .setAlpha(0.99)
-                        .setLearnRate(-0.1)
-                        .setEnableTraining(true)
-                        .setSurprisalInductionThreshold(0.0)
-                        .setGradientInductionThreshold(0.0)
+        m.setConfig(Util.getTestConfig()
+                .setAlpha(0.99)
+                .setLearnRate(-0.1)
+                .setEnableTraining(true)
         );
 
         m.setN(912);
@@ -83,29 +60,10 @@ public class GradientTest {
     @Test
     public void gradientAndInduction3() {
         TextModel m = new TextModel();
-        m.setConfig(
-                new Config() {
-                    public String getLabel(Activation act) {
-                        Neuron n = act.getNeuron();
-                        Activation iAct = act.getInputLinks()
-                                .findFirst()
-                                .map(l -> l.getInput())
-                                .orElse(null);
-
-                        if(n instanceof BindingNeuron) {
-                            return "B-" + trimPrefix(iAct.getLabel());
-                        } else if (n instanceof PatternNeuron) {
-                            return "P-" + ((Document)act.getThought()).getContent();
-                        } else {
-                            return "I-" + trimPrefix(iAct.getLabel());
-                        }
-                    }
-                }
-                        .setAlpha(0.99)
-                        .setLearnRate(-0.1)
-                        .setEnableTraining(true)
-                        .setSurprisalInductionThreshold(0.0)
-                        .setGradientInductionThreshold(0.0)
+        m.setConfig(Util.getTestConfig()
+                .setAlpha(0.99)
+                .setLearnRate(-0.1)
+                .setEnableTraining(true)
         );
 
         m.setN(912);
@@ -139,6 +97,50 @@ public class GradientTest {
         nC.setFrequency(30.0);
         nC.getSampleSpace().setN(234);
         nC.getSampleSpace().setLastPos(867);
+
+
+        AikaDebugger.createAndShowGUI(doc,m);
+
+        doc.process(m);
+
+        System.out.println();
+    }
+
+
+    @Test
+    public void gradientAndInduction2With2Docs() {
+        TextModel m = new TextModel();
+        m.setConfig(Util.getTestConfig()
+                .setAlpha(0.99)
+                .setLearnRate(-0.1)
+                .setEnableTraining(true)
+        );
+
+        m.setN(912);
+
+        Document doc = new Document("A B ");
+
+        int i = 0;
+        TextReference lastRef = null;
+        for(String t: doc.getContent().split(" ")) {
+            int j = i + t.length();
+            lastRef = doc.processToken(m, lastRef, i, j, t).getReference();
+
+            i = j + 1;
+        }
+
+        m.getTemplates().SAME_BINDING_TEMPLATE.setDirectConjunctiveBias(-0.32);
+
+        Neuron nA = m.getNeuron("A");
+        nA.setFrequency(53.0);
+        nA.getSampleSpace().setN(299);
+        nA.getSampleSpace().setLastPos(899);
+
+
+        Neuron nB = m.getNeuron("B");
+        nB.setFrequency(10.0);
+        nB.getSampleSpace().setN(121);
+        nB.getSampleSpace().setLastPos(739);
 
 
         AikaDebugger.createAndShowGUI(doc,m);

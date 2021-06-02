@@ -24,8 +24,6 @@ public class OscillationTest {
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
                         .setEnableTraining(true)
-                        .setSurprisalInductionThreshold(0.0)
-                        .setGradientInductionThreshold(0.0)
         );
 
         m.setN(912);

@@ -1,10 +1,6 @@
 package network.aika;
 
 import network.aika.debugger.AikaDebugger;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.activation.ActivationStep;
 import network.aika.neuron.steps.link.LinkStep;
@@ -27,29 +23,10 @@ public class PhraseTraining {
     @Test
     public void trainPhrases() throws IOException {
         TextModel m = new TextModel();
-        m.setConfig(
-                new Config() {
-                    public String getLabel(Activation act) {
-                        Neuron n = act.getNeuron();
-                        Activation iAct = act.getInputLinks()
-                                .findFirst()
-                                .map(l -> l.getInput())
-                                .orElse(null);
-
-                        if (n instanceof BindingNeuron) {
-                            return "PP-" + trimPrefix(iAct.getLabel());
-                        } else if (n instanceof PatternNeuron) {
-                            return "P-" + ((Document) act.getThought()).getContent();
-                        } else {
-                            return "I-" + trimPrefix(iAct.getLabel());
-                        }
-                    }
-                }
-                        .setAlpha(0.99)
-                        .setLearnRate(-0.1)
-                        .setEnableTraining(true)
-                        .setSurprisalInductionThreshold(0.0)
-                        .setGradientInductionThreshold(0.0)
+        m.setConfig(Util.getTestConfig()
+                .setAlpha(0.99)
+                .setLearnRate(-0.1)
+                .setEnableTraining(true)
         );
 
         //    m.setN(912);
