@@ -26,14 +26,7 @@ public class GradientTest {
 
         Document doc = new Document("A B ");
 
-        int i = 0;
-        TextReference lastRef = null;
-        for(String t: doc.getContent().split(" ")) {
-            int j = i + t.length();
-            lastRef = doc.processToken(m, lastRef, i, j, t).getReference();
-
-            i = j + 1;
-        }
+        processDoc(m, doc);
 
         m.getTemplates().SAME_BINDING_TEMPLATE.setDirectConjunctiveBias(-0.32);
 
@@ -70,14 +63,7 @@ public class GradientTest {
 
         Document doc = new Document("A B C ");
 
-        int i = 0;
-        TextReference lastRef = null;
-        for(String t: doc.getContent().split(" ")) {
-            int j = i + t.length();
-            lastRef = doc.processToken(m, lastRef, i, j, t).getReference();
-
-            i = j + 1;
-        }
+        processDoc(m, doc);
 
         m.getTemplates().SAME_BINDING_TEMPLATE.setDirectConjunctiveBias(-0.32);
 
@@ -117,9 +103,39 @@ public class GradientTest {
         );
 
         m.setN(912);
+        m.getTemplates().SAME_BINDING_TEMPLATE.setDirectConjunctiveBias(-0.32);
 
-        Document doc = new Document("A B ");
+        Neuron nA = m.getNeuron("A");
+        nA.setFrequency(53.0);
+        nA.getSampleSpace().setN(299);
+        nA.getSampleSpace().setLastPos(899);
 
+        Neuron nB = m.getNeuron("B");
+        nB.setFrequency(10.0);
+        nB.getSampleSpace().setN(121);
+        nB.getSampleSpace().setLastPos(739);
+
+        Neuron nC = m.getNeuron("C");
+        nC.setFrequency(30.0);
+        nC.getSampleSpace().setN(234);
+        nC.getSampleSpace().setLastPos(867);
+
+        Document doc1 = new Document("A B ");
+
+        processDoc(m, doc1);
+
+        doc1.process(m);
+
+        Document doc2 = new Document("A C ");
+
+        AikaDebugger.createAndShowGUI(doc2,m);
+
+        doc2.process(m);
+
+        System.out.println();
+    }
+
+    private void processDoc(TextModel m, Document doc) {
         int i = 0;
         TextReference lastRef = null;
         for(String t: doc.getContent().split(" ")) {
@@ -128,25 +144,5 @@ public class GradientTest {
 
             i = j + 1;
         }
-
-        m.getTemplates().SAME_BINDING_TEMPLATE.setDirectConjunctiveBias(-0.32);
-
-        Neuron nA = m.getNeuron("A");
-        nA.setFrequency(53.0);
-        nA.getSampleSpace().setN(299);
-        nA.getSampleSpace().setLastPos(899);
-
-
-        Neuron nB = m.getNeuron("B");
-        nB.setFrequency(10.0);
-        nB.getSampleSpace().setN(121);
-        nB.getSampleSpace().setLastPos(739);
-
-
-        AikaDebugger.createAndShowGUI(doc,m);
-
-        doc.process(m);
-
-        System.out.println();
     }
 }
