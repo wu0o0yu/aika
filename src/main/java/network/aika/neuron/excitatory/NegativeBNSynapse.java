@@ -18,14 +18,8 @@ public class NegativeBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse
     }
 
     public void updateSynapse(Link l, double delta) {
-        if(l.getInput().isActive(true)) {
-            addWeight(delta);
-
-            QueueEntry.add(
-                    l,
-                    new SumUpLink(l.getInputValue(POS) * delta)
-            );
-        }
+        if(l.getInput().isActive(true) && l.isSelfRef())
+            addWeight(-delta);
     }
 
     public boolean checkTemplatePropagate(Visitor v, Activation act) {

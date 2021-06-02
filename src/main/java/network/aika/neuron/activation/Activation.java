@@ -301,6 +301,7 @@ public class Activation extends Element<Activation> {
 
     public void updateOutgoingLinks(double delta) {
         getOutputLinks()
+                .filter(l -> !l.getSynapse().isZero())
                 .forEach(l -> {
                             double w = l.getSynapse().getWeight();
                             QueueEntry.add(l, new SumUpLink(delta * w));
