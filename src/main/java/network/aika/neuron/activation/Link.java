@@ -92,13 +92,8 @@ public class Link extends Element<Link> {
 
     public static boolean linkExists(Synapse s, Activation iAct, Activation oAct) {
         Link ol = oAct.getInputLink(iAct.getNeuron());
-        if (ol != null) {
-            assert s == ol.getSynapse();
-//                    toAct = oAct.cloneToReplaceLink(s);
-            log.warn("Link already exists! ");
-            return true;
-        }
-        return false;
+        assert ol == null || s == ol.getSynapse();
+        return ol != null;
     }
 
     public static Synapse getSynapse(Activation iAct, Activation oAct) {

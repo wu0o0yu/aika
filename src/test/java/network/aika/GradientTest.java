@@ -105,6 +105,9 @@ public class GradientTest {
         m.setN(912);
         m.getTemplates().SAME_BINDING_TEMPLATE.setDirectConjunctiveBias(-0.32);
 
+        Document doc1 = new Document("A B ");
+        processDoc(m, doc1);
+
         Neuron nA = m.getNeuron("A");
         nA.setFrequency(53.0);
         nA.getSampleSpace().setN(299);
@@ -115,18 +118,18 @@ public class GradientTest {
         nB.getSampleSpace().setN(121);
         nB.getSampleSpace().setLastPos(739);
 
+        AikaDebugger.createAndShowGUI(doc1,m);
+
+        doc1.process(m);
+
+
+        Document doc2 = new Document("A C ");
+        processDoc(m, doc2);
+
         Neuron nC = m.getNeuron("C");
         nC.setFrequency(30.0);
         nC.getSampleSpace().setN(234);
         nC.getSampleSpace().setLastPos(867);
-
-        Document doc1 = new Document("A B ");
-
-        processDoc(m, doc1);
-
-        doc1.process(m);
-
-        Document doc2 = new Document("A C ");
 
         AikaDebugger.createAndShowGUI(doc2,m);
 

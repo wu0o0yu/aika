@@ -69,9 +69,9 @@ public class PatternTest {
         TextModel m = new TextModel();
         Templates t = new Templates(m);
 
-        PatternNeuron nA = m.lookupToken(null, "A");
-        PatternNeuron nB = m.lookupToken(null, "B");
-        PatternNeuron nC = m.lookupToken(null, "C");
+        PatternNeuron nA = m.lookupToken("A");
+        PatternNeuron nB = m.lookupToken("B");
+        PatternNeuron nC = m.lookupToken( "C");
 
         BindingNeuron eA = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
         eA.setLabel("E A");

@@ -40,7 +40,7 @@ public class DerDieDasTest {
         for(int i = 0; i < token.length(); i++) {
             char c = token.charAt(i);
 
-            PatternNeuron inN = m.lookupToken(ref, "" + c);
+            PatternNeuron inN = m.lookupToken("" + c);
             BindingNeuron ppN = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
             ppN.setLabel("B-" + c + "-(" + token + ")");
 

@@ -119,7 +119,7 @@ public class TextModel extends Model {
                 .anyMatch(s -> prevTokenInhib.getId().equals(s.getOutput().getId()));
     }
 
-    public PatternNeuron lookupToken(Reference ref, String tokenLabel) {
+    public PatternNeuron lookupToken(String tokenLabel) {
         Neuron inProv = getNeuron(tokenLabel);
         if(inProv != null) {
             return (PatternNeuron) inProv;
