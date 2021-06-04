@@ -40,10 +40,6 @@ public class InductionTest {
     @Test
     public void initialGradientTest() {
         Model m = new TextModel();
-        m.setConfig(
-                new Config()
-                        .setLearnRate(-0.1)
-        );
 
         Templates t = new Templates(m);
 
@@ -112,15 +108,16 @@ public class InductionTest {
     @Test
     public void inductionTest() throws InterruptedException {
         TextModel model = new TextModel();
-        model.setConfig(
-                new Config()
-                        .setAlpha(0.99)
-                        .setLearnRate(-0.1)
-        );
 
         String phrase = "der Hund";
 
         Document doc = new Document(phrase);
+        doc.setConfig(
+                Util.getTestConfig()
+                        .setAlpha(0.99)
+                        .setLearnRate(-0.1)
+                        .setEnableTraining(true)
+        );
         System.out.println("  " + phrase);
 
         Activation actDer = doc.processToken(model, null, 0, 4, "der");

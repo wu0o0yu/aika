@@ -23,11 +23,6 @@ public class PhraseTraining {
     @Test
     public void trainPhrases() throws IOException {
         TextModel m = new TextModel();
-        m.setConfig(Util.getTestConfig()
-                .setAlpha(0.99)
-                .setLearnRate(-0.1)
-                .setEnableTraining(true)
-        );
 
         //    m.setN(912);
 
@@ -56,6 +51,12 @@ public class PhraseTraining {
                 .forEach(p -> {
                             System.out.println(p);
                             Document doc = new Document(p);
+                            doc.setConfig(
+                                    Util.getTestConfig()
+                                    .setAlpha(0.99)
+                                    .setLearnRate(-0.1)
+                                    .setEnableTraining(true)
+                            );
 
                             int i = 0;
                             TextReference lastRef = null;

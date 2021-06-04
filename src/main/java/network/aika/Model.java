@@ -22,6 +22,7 @@ import network.aika.callbacks.SuspensionCallback;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.utils.Writable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +35,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -57,7 +59,7 @@ public abstract class Model {
 
     private Templates templates = new Templates(this);
 
-    private Config config;
+    private Supplier<Writable> customDataInstanceSupplier;
 
     public Model() {
         this(new InMemorySuspensionCallback());
@@ -67,12 +69,13 @@ public abstract class Model {
         suspensionCallback = sh;
     }
 
-    public Config getConfig() {
-        return config;
+
+    public Supplier<Writable> getCustomDataInstanceSupplier() {
+        return customDataInstanceSupplier;
     }
 
-    public void setConfig(Config config) {
-        this.config = config;
+    public void setCustomDataInstanceSupplier(Supplier<Writable> customDataInstanceSupplier) {
+        this.customDataInstanceSupplier = customDataInstanceSupplier;
     }
 
     public abstract void linkInputRelations(Activation originAct, Direction dir);

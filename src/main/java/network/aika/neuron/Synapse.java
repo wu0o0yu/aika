@@ -40,6 +40,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.Neuron.BETA_THRESHOLD;
 import static network.aika.neuron.activation.Link.linkExists;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
@@ -360,7 +361,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         );
 
         return dist.inverseCumulativeProbability(
-                getModel().getConfig().getBetaThreshold()
+                BETA_THRESHOLD
         );
     }
 

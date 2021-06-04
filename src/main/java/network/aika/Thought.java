@@ -58,12 +58,23 @@ public abstract class Thought {
     private List<EventListener> eventListeners = new ArrayList<>();
     private List<VisitorEventListener> visitorEventListeners = new ArrayList<>();
 
+    private Config config;
+
+
     public Thought() {
     }
 
     public abstract int length();
 
     public abstract void linkInputRelations(Activation act);
+
+    public Config getConfig() {
+        return config;
+    }
+
+    public void setConfig(Config config) {
+        this.config = config;
+    }
 
     public void addFilters(Step... p) {
         filters.addAll(Set.of(p));

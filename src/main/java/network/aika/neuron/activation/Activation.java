@@ -208,7 +208,7 @@ public class Activation extends Element<Activation> {
     }
 
     public Config getConfig() {
-        return getNeuron().getConfig();
+        return getThought().getConfig();
     }
 
     public NeuronProvider getNeuronProvider() {

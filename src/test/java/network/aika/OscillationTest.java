@@ -15,7 +15,11 @@ public class OscillationTest {
     @Test
     public void oscillationTest() throws InterruptedException {
         TextModel m = new TextModel();
-        m.setConfig(
+
+        m.setN(912);
+
+        Document doc = new Document("A ");
+        doc.setConfig(
                 new Config() {
                     public String getLabel(Activation act) {
                         return "X";
@@ -26,9 +30,6 @@ public class OscillationTest {
                         .setEnableTraining(true)
         );
 
-        m.setN(912);
-
-        Document doc = new Document("A ");
         PatternNeuron nA = m.getTemplates().SAME_PATTERN_TEMPLATE.instantiateTemplate();
         nA.setLabel("P-A");
 

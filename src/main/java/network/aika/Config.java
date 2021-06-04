@@ -29,12 +29,7 @@ public class Config {
     private Double alpha = null; //0.99;
     private double learnRate;
 
-    private double betaThreshold = 0.95;
-
     private boolean enableTraining;
-
-    private Supplier<Writable> customDataInstanceSupplier;
-
 
     public double getLearnRate() {
         return learnRate;
@@ -69,23 +64,7 @@ public class Config {
         return "";
     }
 
-    public double getBetaThreshold() {
-        return betaThreshold;
-    }
 
-    public Config setBetaThreshold(double betaThreshold) {
-        this.betaThreshold = betaThreshold;
-        return this;
-    }
-
-    public Supplier<Writable> getCustomDataInstanceSupplier() {
-        return customDataInstanceSupplier;
-    }
-
-    public Config setCustomDataInstanceSupplier(Supplier<Writable> customDataInstanceSupplier) {
-        this.customDataInstanceSupplier = customDataInstanceSupplier;
-        return this;
-    }
 
     public String toString() {
         return "Alpha: " + alpha + "\n" +

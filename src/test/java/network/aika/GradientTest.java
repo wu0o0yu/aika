@@ -16,15 +16,16 @@ public class GradientTest {
     @Test
     public void gradientAndInduction2() {
         TextModel m = new TextModel();
-        m.setConfig(Util.getTestConfig()
-                .setAlpha(0.99)
-                .setLearnRate(-0.1)
-                .setEnableTraining(true)
-        );
 
         m.setN(912);
 
         Document doc = new Document("A B ");
+        doc.setConfig(
+                Util.getTestConfig()
+                .setAlpha(0.99)
+                .setLearnRate(-0.1)
+                .setEnableTraining(true)
+        );
 
         processDoc(m, doc);
 
@@ -53,15 +54,16 @@ public class GradientTest {
     @Test
     public void gradientAndInduction3() {
         TextModel m = new TextModel();
-        m.setConfig(Util.getTestConfig()
-                .setAlpha(0.99)
-                .setLearnRate(-0.1)
-                .setEnableTraining(true)
-        );
 
         m.setN(912);
 
         Document doc = new Document("A B C ");
+        doc.setConfig(
+                Util.getTestConfig()
+                        .setAlpha(0.99)
+                        .setLearnRate(-0.1)
+                        .setEnableTraining(true)
+        );
 
         processDoc(m, doc);
 
@@ -96,16 +98,17 @@ public class GradientTest {
     @Test
     public void gradientAndInduction2With2Docs() {
         TextModel m = new TextModel();
-        m.setConfig(Util.getTestConfig()
-                .setAlpha(0.99)
-                .setLearnRate(-0.1)
-                .setEnableTraining(true)
-        );
 
         m.setN(912);
         m.getTemplates().SAME_BINDING_TEMPLATE.setDirectConjunctiveBias(-0.32);
 
         Document doc1 = new Document("A B ");
+        doc1.setConfig(
+                Util.getTestConfig()
+                        .setAlpha(0.99)
+                        .setLearnRate(-0.1)
+                        .setEnableTraining(true)
+        );
         processDoc(m, doc1);
 
         Neuron nA = m.getNeuron("A");
@@ -124,6 +127,12 @@ public class GradientTest {
 
 
         Document doc2 = new Document("A C ");
+        doc2.setConfig(
+                Util.getTestConfig()
+                        .setAlpha(0.99)
+                        .setLearnRate(-0.1)
+                        .setEnableTraining(true)
+        );
         processDoc(m, doc2);
 
         Neuron nC = m.getNeuron("C");

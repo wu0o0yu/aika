@@ -33,8 +33,7 @@ public class SimplePhraseTest {
     @Test
     public void simplePhraseTest() {
         TextModel model = new TextModel();
-        model.setConfig(
-                new Config() {
+        Config c = new Config() {
                     public String getLabel(Activation act) {
                         Neuron n = act.getNeuron();
                         Activation iAct = act.getInputLinks()
@@ -53,18 +52,16 @@ public class SimplePhraseTest {
                 }
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
-                        .setEnableTraining(false)
-        );
+                        .setEnableTraining(false);
 
         Random r = new Random(1);
 
         for (int k = 0; k < 1000; k++) {
-            model.getConfig().setEnableTraining(k > 100);
-
             String phrase = phrases[r.nextInt(phrases.length)];
             System.out.println("  " + phrase);
 
             Document doc = new Document(phrase);
+            doc.getConfig().setEnableTraining(k > 100);
 
             int i = 0;
             TextReference lastRef = null;

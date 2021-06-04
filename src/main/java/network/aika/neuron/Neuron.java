@@ -46,6 +46,9 @@ import static network.aika.neuron.sign.Sign.POS;
  */
 public abstract class Neuron<S extends Synapse> implements Writable {
 
+    public static double BETA_THRESHOLD = 0.95;
+
+
     private static final Logger log = LoggerFactory.getLogger(Neuron.class);
 
     volatile long retrievalCount = 0;
@@ -150,7 +153,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public double computeBiasLB(Activation iAct) {
-        return (getConfig().getLearnRate() * iAct.getNeuron().getCandidateGradient(iAct)) /
+        return (iAct.getConfig().getLearnRate() * iAct.getNeuron().getCandidateGradient(iAct)) /
                 getBias();
     }
 
@@ -247,10 +250,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return (M) provider.getModel();
     }
 
-    public Config getConfig() {
-        return getModel().getConfig();
-    }
-
     public long getRetrievalCount() {
         return retrievalCount;
     }
@@ -341,7 +340,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         );
 
         double p = dist.inverseCumulativeProbability(
-                getModel().getConfig().getBetaThreshold()
+                BETA_THRESHOLD
         );
 
         return p;
@@ -374,9 +373,8 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         out.writeByte((byte) getTemplate().getId().intValue());
 
         out.writeBoolean(label != null);
-        if(label != null) {
+        if(label != null)
             out.writeUTF(label);
-        }
 
         out.writeDouble(bias);
 
@@ -402,24 +400,23 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         out.writeBoolean(isInputNeuron);
 
         out.writeBoolean(customData != null);
-        if(customData != null) {
+        if(customData != null)
             customData.write(out);
-        }
     }
 
     public static Neuron read(DataInput in, Model m) throws Exception {
         byte templateNeuronId = in.readByte();
         Neuron templateNeuron = m.getTemplates().getTemplateNeuron(templateNeuronId);
         Neuron n = templateNeuron.instantiateTemplate();
-        n.read(in, m);
+        n.readFields(in, m);
         return n;
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws Exception {
-        if(in.readBoolean()) {
+        if(in.readBoolean())
             label = in.readUTF();
-        }
+
 
         bias = in.readDouble();
 
@@ -439,7 +436,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         isInputNeuron = in.readBoolean();
 
         if(in.readBoolean()) {
-            customData = m.getConfig().getCustomDataInstanceSupplier().get();
+            customData = m.getCustomDataInstanceSupplier().get();
             customData.readFields(in, m);
         }
     }
