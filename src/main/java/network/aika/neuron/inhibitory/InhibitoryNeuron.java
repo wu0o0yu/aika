@@ -37,8 +37,8 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         super(p);
     }
 
-    private InhibitoryNeuron(Model model) {
-        super(model);
+    private InhibitoryNeuron(Model model, boolean addProvider) {
+        super(model, addProvider);
     }
 
     @Override
@@ -47,8 +47,8 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
     @Override
-    public InhibitoryNeuron instantiateTemplate() {
-        InhibitoryNeuron n = new InhibitoryNeuron(getModel());
+    public InhibitoryNeuron instantiateTemplate(boolean addProvider) {
+        InhibitoryNeuron n = new InhibitoryNeuron(getModel(), addProvider);
         initFromTemplate(n);
         return n;
     }

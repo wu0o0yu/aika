@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 public class PatternTest {
 
     @Test
-    public void testPatternPos() throws InterruptedException {
+    public void testPatternPos() {
         TextModel m = initModel();
 
         Document doc = new Document("ABC");
@@ -52,7 +52,7 @@ public class PatternTest {
 
 
     @Test
-    public void testPatternNeg() throws InterruptedException {
+    public void testPatternNeg() {
         TextModel m = initModel();
 
         Document doc = new Document("ABC");
@@ -73,14 +73,14 @@ public class PatternTest {
         PatternNeuron nB = m.lookupToken("B");
         PatternNeuron nC = m.lookupToken( "C");
 
-        BindingNeuron eA = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
+        BindingNeuron eA = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
         eA.setLabel("E A");
-        BindingNeuron eB = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
+        BindingNeuron eB = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
         eB.setLabel("E B");
-        BindingNeuron eC = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
+        BindingNeuron eC = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
         eC.setLabel("E C");
 
-        PatternNeuron out = t.SAME_PATTERN_TEMPLATE.instantiateTemplate();
+        PatternNeuron out = t.SAME_PATTERN_TEMPLATE.instantiateTemplate(true);
         out.setTokenLabel("ABC");
         out.setLabel("OUT");
 

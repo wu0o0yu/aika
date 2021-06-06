@@ -45,8 +45,8 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         super(p);
     }
 
-    public PatternNeuron(Model model) {
-        super(model);
+    public PatternNeuron(Model model, boolean addProvider) {
+        super(model, addProvider);
     }
 
     @Override
@@ -55,8 +55,8 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     @Override
-    public PatternNeuron instantiateTemplate() {
-        PatternNeuron n = new PatternNeuron(getModel());
+    public PatternNeuron instantiateTemplate(boolean addProvider) {
+        PatternNeuron n = new PatternNeuron(getModel(), addProvider);
         initFromTemplate(n);
         return n;
     }

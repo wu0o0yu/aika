@@ -57,6 +57,8 @@ public class Link extends Element<Link> {
 
     private double lastIGGradient;
 
+    private boolean hasBeenCounted = false;
+
     public Link(Synapse s, Activation input, Activation output, boolean isSelfRef, LinkVisitor v) {
         this.synapse = s;
         this.input = input;
@@ -106,6 +108,8 @@ public class Link extends Element<Link> {
     public void count() {
         if(synapse != null)
             synapse.count(this);
+
+        hasBeenCounted = true;
     }
 
     public void follow(VisitorStep p) {

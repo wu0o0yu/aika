@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test;
 public class InductionTest {
 
     @Test
-    public void testInduceFromMaturePattern() throws InterruptedException {
+    public void testInduceFromMaturePattern() {
         Model m = new TextModel();
         Templates t = new Templates(m);
 
-        PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate();
+        PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
         in.setTokenLabel("A");
         in.setInputNeuron(true);
         in.setLabel("IN");
@@ -43,15 +43,15 @@ public class InductionTest {
 
         Templates t = new Templates(m);
 
-        PatternNeuron inA = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate();
+        PatternNeuron inA = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
         inA.setTokenLabel("A");
         inA.setInputNeuron(true);
         inA.setLabel("IN-A");
-        PatternNeuron inB = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate();
+        PatternNeuron inB = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
         inB.setTokenLabel("B");
         inB.setInputNeuron(true);
         inB.setLabel("IN-B");
-        BindingNeuron targetN = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
+        BindingNeuron targetN = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
         targetN.setLabel("OUT-Target");
 
         targetN.setBias(0.0);

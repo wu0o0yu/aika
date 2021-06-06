@@ -41,7 +41,7 @@ public class Induction implements ActivationStep {
     public void process(Activation act) {
         assert act.getNeuron().isTemplate();
 
-        Neuron inducedNeuron = act.getNeuron().instantiateTemplate();
+        Neuron inducedNeuron = act.getNeuron().instantiateTemplate(true);
         inducedNeuron.setLabel(act.getConfig().getLabel(act));
 
         act.unlink();

@@ -55,8 +55,8 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         super(p);
     }
 
-    public ExcitatoryNeuron(Model model) {
-        super(model);
+    public ExcitatoryNeuron(Model model, boolean addProvider) {
+        super(model, addProvider);
     }
 
 

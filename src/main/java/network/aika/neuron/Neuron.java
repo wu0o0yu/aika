@@ -48,7 +48,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public static double BETA_THRESHOLD = 0.95;
 
-
     private static final Logger log = LoggerFactory.getLogger(Neuron.class);
 
     volatile long retrievalCount = 0;
@@ -86,8 +85,9 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         provider = p;
     }
 
-    public Neuron(Model m) {
-        provider = new NeuronProvider(m, this);
+    public Neuron(Model m, boolean addProvider) {
+        if(addProvider)
+            provider = new NeuronProvider(m, this);
         sampleSpace = new SampleSpace(m);
         modified = true;
     }
@@ -106,7 +106,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         n.template = this;
     }
 
-    public abstract Neuron<?> instantiateTemplate();
+    public abstract Neuron<?> instantiateTemplate(boolean addProvider);
 
     public abstract void addDummyLinks(Activation act);
 
@@ -359,7 +359,9 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         modified = true;
     }
 
-    public void reactivate() {
+    public void reactivate(Model m) {
+        m.incrementRetrievalCounter();
+        retrievalCount = m.getCurrentRetrievalCount();
     }
 
     public void suspend() {
@@ -407,7 +409,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public static Neuron read(DataInput in, Model m) throws Exception {
         byte templateNeuronId = in.readByte();
         Neuron templateNeuron = m.getTemplates().getTemplateNeuron(templateNeuronId);
-        Neuron n = templateNeuron.instantiateTemplate();
+        Neuron n = templateNeuron.instantiateTemplate(false);
         n.readFields(in, m);
         return n;
     }

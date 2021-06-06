@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 public class OscillationTest {
 
     @Test
-    public void oscillationTest() throws InterruptedException {
+    public void oscillationTest() {
         TextModel m = new TextModel();
 
         m.setN(912);
@@ -30,14 +30,14 @@ public class OscillationTest {
                         .setEnableTraining(true)
         );
 
-        PatternNeuron nA = m.getTemplates().SAME_PATTERN_TEMPLATE.instantiateTemplate();
+        PatternNeuron nA = m.getTemplates().SAME_PATTERN_TEMPLATE.instantiateTemplate(true);
         nA.setLabel("P-A");
 
         nA.setFrequency(53.0);
         nA.getSampleSpace().setN(299);
         nA.getSampleSpace().setLastPos(899);
 
-        BindingNeuron nPPA =  m.getTemplates().SAME_BINDING_TEMPLATE.instantiateTemplate();
+        BindingNeuron nPPA =  m.getTemplates().SAME_BINDING_TEMPLATE.instantiateTemplate(true);
         nPPA.setLabel("B-A");
 
         Synapse s = m.getTemplates().PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nA, nPPA);

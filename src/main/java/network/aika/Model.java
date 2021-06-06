@@ -129,7 +129,9 @@ public abstract class Model {
     public Stream<NeuronProvider> getAllNeurons() {
         return suspensionCallback
                 .getAllIds().stream()
-                .map(id -> lookupNeuron(id));
+                .map(id ->
+                        lookupNeuron(id)
+                );
     }
 
     public void applyMovingAverage(Config trainingConfig) {

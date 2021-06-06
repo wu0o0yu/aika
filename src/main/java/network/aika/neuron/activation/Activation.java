@@ -125,7 +125,9 @@ public class Activation extends Element<Activation> {
 
         updateValue();
 
-        QueueEntry.add(this, ENTROPY_GRADIENT);
+        if(getConfig().isEnableTraining())
+            QueueEntry.add(this, ENTROPY_GRADIENT);
+
         propagate();
     }
 
@@ -183,6 +185,7 @@ public class Activation extends Element<Activation> {
     }
 
     public void setReference(Reference ref) {
+        assert ref.getThought() == getThought();
         this.reference = ref;
     }
 

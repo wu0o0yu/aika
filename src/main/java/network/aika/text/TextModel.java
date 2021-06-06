@@ -62,13 +62,13 @@ public class TextModel extends Model {
     }
 
     private void init() {
-        InhibitoryNeuron ptN = getTemplates().INHIBITORY_TEMPLATE.instantiateTemplate();
+        InhibitoryNeuron ptN = getTemplates().INHIBITORY_TEMPLATE.instantiateTemplate(true);
         ptN.setInputNeuron(true);
         ptN.setLabel(PREVIOUS_TOKEN_LABEL);
         prevTokenInhib = ptN.getProvider();
         prevTokenInhib.save();
 
-        InhibitoryNeuron ntN = getTemplates().INHIBITORY_TEMPLATE.instantiateTemplate();
+        InhibitoryNeuron ntN = getTemplates().INHIBITORY_TEMPLATE.instantiateTemplate(true);
         ntN.setInputNeuron(true);
         ntN.setLabel(NEXT_TOKEN_LABEL);
         nextTokenInhib = ntN.getProvider();
@@ -126,11 +126,11 @@ public class TextModel extends Model {
         }
 
         PatternNeuron in = getTemplates().INPUT_PATTERN_TEMPLATE
-                .instantiateTemplate();
+                .instantiateTemplate(true);
         BindingNeuron inRelPT = getTemplates().INPUT_BINDING_TEMPLATE
-                .instantiateTemplate();
+                .instantiateTemplate(true);
         BindingNeuron inRelNT = getTemplates().INPUT_BINDING_TEMPLATE
-                .instantiateTemplate();
+                .instantiateTemplate(true);
 
         in.setTokenLabel(tokenLabel);
         in.setInputNeuron(true);

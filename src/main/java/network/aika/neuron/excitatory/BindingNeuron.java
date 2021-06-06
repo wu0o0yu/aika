@@ -33,8 +33,8 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
         super();
     }
 
-    public BindingNeuron(Model model) {
-        super(model);
+    public BindingNeuron(Model model, boolean addProvider) {
+        super(model, addProvider);
     }
 
     @Override
@@ -50,8 +50,8 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
     }
 
     @Override
-    public BindingNeuron instantiateTemplate() {
-        BindingNeuron n = new BindingNeuron(getModel());
+    public BindingNeuron instantiateTemplate(boolean addProvider) {
+        BindingNeuron n = new BindingNeuron(getModel(), addProvider);
         initFromTemplate(n);
 
         return n;

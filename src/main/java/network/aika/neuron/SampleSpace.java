@@ -77,15 +77,13 @@ public class SampleSpace implements Writable {
 
         int n = 0;
 
-        if(lastPos != null) {
+        if(lastPos != null)
             n = getAbsoluteBegin(m, ref) - lastPos;
-        }
 
         if(n < 0) {
             log.warn("getNegativeInstancesSinceLastPos is not allowed to be called after update.");
             return 0;
         }
-
 
         n /= ref.length();
         return n;

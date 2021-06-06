@@ -65,12 +65,9 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
     }
 
     public Neuron getNeuron() {
-        if (neuron == null) {
+        if (neuron == null)
             reactivate();
-        }
-        if(model != null) {
-            neuron.retrievalCount = model.getCurrentRetrievalCount();
-        }
+
         return neuron;
     }
 
@@ -105,9 +102,8 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
 
         model.unregister(this);
 
-        if(sm == SuspensionMode.SAVE) {
+        if(sm == SuspensionMode.SAVE)
             save();
-        }
 
         neuron = null;
     }
@@ -145,11 +141,10 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        neuron.setProvider(this);
 
-        neuron.reactivate();
+        neuron.reactivate(model);
         model.register(this);
-
-        model.incrementRetrievalCounter();
     }
 
     private DataOutputStream getDataOutputStream(OutputStream os, boolean compressed) throws IOException {

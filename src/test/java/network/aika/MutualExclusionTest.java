@@ -38,21 +38,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MutualExclusionTest {
 
     @Test
-    public void testPropagation() throws InterruptedException {
+    public void testPropagation() {
         Model m = new TextModel();
         Templates t = new Templates(m);
 
-        PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate();
+        PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
         in.setTokenLabel("I");
         in.setInputNeuron(true);
         in.setLabel("IN");
-        BindingNeuron na = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
+        BindingNeuron na = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
         na.setLabel("A");
-        BindingNeuron nb = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
+        BindingNeuron nb = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
         nb.setLabel("B");
-        BindingNeuron nc = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
+        BindingNeuron nc = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
         nc.setLabel("C");
-        InhibitoryNeuron inhib = t.INHIBITORY_TEMPLATE.instantiateTemplate();
+        InhibitoryNeuron inhib = t.INHIBITORY_TEMPLATE.instantiateTemplate(true);
         inhib.setLabel("I");
 
         {
@@ -157,19 +157,19 @@ public class MutualExclusionTest {
 
 
     @Test
-    public void testPropagationWithPrimaryLink() throws InterruptedException {
+    public void testPropagationWithPrimaryLink() {
         Model m = new TextModel();
         Templates t = new Templates(m);
 
-        PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate();
+        PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
         in.setTokenLabel("I");
         in.setInputNeuron(true);
         in.setLabel("IN");
-        BindingNeuron na = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
+        BindingNeuron na = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
         na.setLabel("A");
-        BindingNeuron nb = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
+        BindingNeuron nb = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
         nb.setLabel("B");
-        InhibitoryNeuron inhib = t.INHIBITORY_TEMPLATE.instantiateTemplate();
+        InhibitoryNeuron inhib = t.INHIBITORY_TEMPLATE.instantiateTemplate(true);
         inhib.setLabel("I");
 
         {

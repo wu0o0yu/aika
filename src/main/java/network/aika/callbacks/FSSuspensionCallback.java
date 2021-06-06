@@ -98,7 +98,7 @@ public class FSSuspensionCallback implements SuspensionCallback {
     public synchronized byte[] retrieve(Long id) throws IOException {
         long[] pos = index.get(id);
         if(pos == null)
-            throw new MissingNeuronException(String.format("Neuron with id %d is missing in model label %d", id, modelLabel));
+            throw new MissingNeuronException("Neuron with id " + id + " is missing in model label " + modelLabel);
 
         byte[] data = new byte[(int)pos[1]];
 
