@@ -435,7 +435,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public String statToString() {
-        int n = getModel().getN();
+        long n = getModel().getN();
         return "f:" + Utils.round(getInput().getFrequency()) + " " +
                 "N:" + Utils.round(n) + " " +
                 "s(p,p):" + Utils.round(getSurprisal(POS, POS, null)) + " " +

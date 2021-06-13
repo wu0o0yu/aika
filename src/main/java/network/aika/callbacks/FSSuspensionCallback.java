@@ -16,6 +16,7 @@
  */
 package network.aika.callbacks;
 
+import network.aika.Model;
 import network.aika.utils.Writable;
 
 import java.io.*;
@@ -41,29 +42,30 @@ public class FSSuspensionCallback implements SuspensionCallback {
     private Path path;
     private String modelLabel;
 
-    private RandomAccessFile dataStore;
+    private RandomAccessFile modelStore;
 
-
-    public void open(Path path, String modelLabel, boolean create) throws IOException {
+    public FSSuspensionCallback(Path path, String modelLabel) {
         this.path = path;
         this.modelLabel = modelLabel;
-        if(create) {
-            Files.createDirectories(path);
-            File modelFile = getFile(MODEL);
-            if(modelFile.exists())
-                modelFile.delete();
+    }
 
-            File indexFile = getFile(INDEX);
-            if(indexFile.exists())
-                indexFile.delete();
-        } else {
-            loadIndex();
-        }
-        dataStore = new RandomAccessFile(getFile(MODEL), "rw");
+    public void prepareNewModel() throws IOException {
+        Files.createDirectories(path);
+        File modelFile = getFile(MODEL);
+        if(modelFile.exists())
+            modelFile.delete();
+
+        File indexFile = getFile(INDEX);
+        if(indexFile.exists())
+            indexFile.delete();
+    }
+
+    public void open() throws IOException {
+        modelStore = new RandomAccessFile(getFile(MODEL), "rw");
     }
 
     public void close() throws IOException {
-        dataStore.close();
+        modelStore.close();
     }
 
     @Override
@@ -91,10 +93,10 @@ public class FSSuspensionCallback implements SuspensionCallback {
 
     @Override
     public synchronized void store(Long id, String label, Writable customData, byte[] data) throws IOException {
-        dataStore.seek(dataStore.length());
+        modelStore.seek(modelStore.length());
 
-        index.put(id, new long[]{dataStore.getFilePointer(), data.length});
-        dataStore.write(data);
+        index.put(id, new long[]{modelStore.getFilePointer(), data.length});
+        modelStore.write(data);
     }
 
     @Override
@@ -105,8 +107,8 @@ public class FSSuspensionCallback implements SuspensionCallback {
 
         byte[] data = new byte[(int)pos[1]];
 
-        dataStore.seek(pos[0]);
-        dataStore.read(data);
+        modelStore.seek(pos[0]);
+        modelStore.read(data);
 
         return data;
     }
@@ -121,9 +123,8 @@ public class FSSuspensionCallback implements SuspensionCallback {
         return index.keySet();
     }
 
-
     @Override
-    public void loadIndex() {
+    public void loadIndex(Model m) {
         try (FileInputStream fis = new FileInputStream(getFile(INDEX));
              ByteArrayInputStream bais = new ByteArrayInputStream(fis.readAllBytes());
              DataInputStream dis = new DataInputStream(bais)) {
@@ -134,7 +135,7 @@ public class FSSuspensionCallback implements SuspensionCallback {
     }
 
     @Override
-    public void storeIndex() {
+    public void saveIndex(Model m) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         try (DataOutputStream dos = new DataOutputStream(baos);

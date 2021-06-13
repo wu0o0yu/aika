@@ -16,9 +16,11 @@
  */
 package network.aika.callbacks;
 
+import network.aika.Model;
 import network.aika.utils.Writable;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collection;
 
 /**
@@ -31,6 +33,12 @@ import java.util.Collection;
  * @author Lukas Molzberger
  */
 public interface SuspensionCallback {
+
+    void prepareNewModel() throws IOException;
+
+    void open() throws IOException;
+
+    void close() throws IOException;
 
     long createId();
 
@@ -49,7 +57,7 @@ public interface SuspensionCallback {
 
     void removeLabel(String label);
 
-    void loadIndex();
+    void loadIndex(Model m);
 
-    void storeIndex() throws IOException;
+    void saveIndex(Model m) throws IOException;
 }

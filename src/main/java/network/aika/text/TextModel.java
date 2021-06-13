@@ -21,16 +21,18 @@ import network.aika.callbacks.SuspensionCallback;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.InputBNSynapse;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -53,15 +55,13 @@ public class TextModel extends Model {
 
     public TextModel() {
         super();
-        init();
     }
 
-    public TextModel(SuspensionCallback sh) {
-        super(sh);
-        init();
+    public TextModel(SuspensionCallback sc) {
+        super(sc);
     }
 
-    private void init() {
+    public void init() {
         InhibitoryNeuron ptN = getTemplates().INHIBITORY_TEMPLATE.instantiateTemplate(true);
         ptN.setInputNeuron(true);
         ptN.setLabel(PREVIOUS_TOKEN_LABEL);
@@ -136,7 +136,7 @@ public class TextModel extends Model {
         in.setInputNeuron(true);
         in.setLabel("P-" + tokenLabel);
         in.setAllowTraining(false);
-        getSuspensionHook().putLabel(tokenLabel, in.getId());
+        putLabel(tokenLabel, in.getId());
 
         initRelationNeuron(tokenLabel + REL_PREVIOUS_TOKEN_LABEL, in, inRelPT, getNextTokenInhib(), false);
         initRelationNeuron(tokenLabel + REL_NEXT_TOKEN_LABEL, in, inRelNT, getPrevTokenInhib(), true);
@@ -198,5 +198,16 @@ public class TextModel extends Model {
 
     public InhibitoryNeuron getNextTokenInhib() {
         return (InhibitoryNeuron) nextTokenInhib.getNeuron();
+    }
+
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws Exception {
+        super.readFields(in, m);
     }
 }

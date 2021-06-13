@@ -40,7 +40,7 @@ public class SampleSpace implements Writable {
 
     private Model m;
     private double N = 0;
-    private Integer lastPos;
+    private Long lastPos;
 
     public SampleSpace(Model m) {
         this.m = m;
@@ -54,28 +54,28 @@ public class SampleSpace implements Writable {
         this.N = N;
     }
 
-    public Integer getLastPos() {
+    public Long getLastPos() {
         return lastPos;
     }
 
-    public void setLastPos(int lastPos) {
+    public void setLastPos(Long lastPos) {
         this.lastPos = lastPos;
     }
 
     public void update(Reference ref) {
         N += 1 + getNegativeInstancesSinceLastPos(ref);
 
-        Integer newPos = getAbsoluteEnd(m, ref);
+        Long newPos = getAbsoluteEnd(m, ref);
         assert lastPos == null || newPos > lastPos;
 
         lastPos = newPos;
     }
 
-    public int getNegativeInstancesSinceLastPos(Reference ref) {
+    public long getNegativeInstancesSinceLastPos(Reference ref) {
         if(ref == null)
             return 0;
 
-        int n = 0;
+        long n = 0;
 
         if(lastPos != null)
             n = getAbsoluteBegin(m, ref) - lastPos;
@@ -89,11 +89,11 @@ public class SampleSpace implements Writable {
         return n;
     }
 
-    public int getAbsoluteBegin(Model m, Reference ref) {
+    public long getAbsoluteBegin(Model m, Reference ref) {
         return m.getN() + (ref != null ? ref.getBegin() : 0);
     }
 
-    public int getAbsoluteEnd(Model m, Reference ref) {
+    public long getAbsoluteEnd(Model m, Reference ref) {
         return m.getN() + (ref != null ? ref.getEnd() : 0);
     }
 
@@ -101,9 +101,8 @@ public class SampleSpace implements Writable {
     public void write(DataOutput out) throws IOException {
         out.writeDouble(N);
         out.writeBoolean(lastPos != null);
-        if(lastPos != null) {
-            out.writeInt(lastPos);
-        }
+        if(lastPos != null)
+            out.writeLong(lastPos);
     }
 
     public static SampleSpace read(DataInput in, Model m) throws IOException {
@@ -115,9 +114,8 @@ public class SampleSpace implements Writable {
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         N = in.readDouble();
-        if(in.readBoolean()) {
-            lastPos = in.readInt();
-        }
+        if(in.readBoolean())
+            lastPos = in.readLong();
     }
 
     public String toString() {
