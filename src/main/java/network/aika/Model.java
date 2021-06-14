@@ -235,6 +235,8 @@ public abstract class Model implements Writable {
     }
 
     public void close() throws IOException {
+        suspensionCallback.saveIndex(this);
+
         suspensionCallback.close();
     }
 
