@@ -17,8 +17,6 @@
 package network.aika.neuron.inhibitory;
 
 
-import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.Visitor;
@@ -29,24 +27,8 @@ import network.aika.neuron.activation.visitor.Visitor;
  */
 public class PrimaryInhibitorySynapse extends InhibitorySynapse {
 
-    public PrimaryInhibitorySynapse() {
-        super();
-    }
-
-    public PrimaryInhibitorySynapse(Neuron<?> input, InhibitoryNeuron output) {
-        super(input, output);
-    }
-
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
         return v.getTargetDir() == Direction.OUTPUT;
     }
 
-    @Override
-    public PrimaryInhibitorySynapse instantiateTemplate(Neuron<?> input, InhibitoryNeuron output) {
-        assert input.getTemplateGroup().contains(getInput());
-
-        PrimaryInhibitorySynapse s = new PrimaryInhibitorySynapse(input, output);
-        initFromTemplate(s);
-        return s;
-    }
 }

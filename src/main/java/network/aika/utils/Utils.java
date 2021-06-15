@@ -16,6 +16,8 @@
  */
 package network.aika.utils;
 
+import network.aika.neuron.activation.Element;
+
 /**
  *
  * @author Lukas Molzberger
@@ -61,14 +63,14 @@ public class Utils {
         return Math.abs(x) < TOLERANCE;
     }
 
-    public static void checkTolerance(double[] x) {
+    public static void checkTolerance(Element e, double[] x) {
         if(Math.abs(sum(x)) < TOLERANCE)
-            throw new BelowToleranceThresholdException();
+            throw new BelowToleranceThresholdException(e);
     }
 
-    public static void checkTolerance(double x) {
+    public static void checkTolerance(Element e, double x) {
         if(Math.abs(x) < TOLERANCE)
-            throw new BelowToleranceThresholdException();
+            throw new BelowToleranceThresholdException(e);
     }
 
     public static double round(double x) {

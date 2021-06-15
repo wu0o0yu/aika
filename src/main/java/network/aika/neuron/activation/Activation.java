@@ -16,7 +16,9 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.*;
+import network.aika.Config;
+import network.aika.Model;
+import network.aika.Thought;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
@@ -26,12 +28,12 @@ import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.activation.PropagateValueChange;
 import network.aika.neuron.steps.activation.UpdateBias;
 import network.aika.neuron.steps.link.LinkStep;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.neuron.steps.link.SumUpLink;
-import network.aika.neuron.sign.Sign;
 import network.aika.utils.Utils;
 
 import java.util.*;
@@ -43,8 +45,8 @@ import static network.aika.callbacks.VisitorEvent.AFTER;
 import static network.aika.callbacks.VisitorEvent.BEFORE;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.steps.activation.ActivationStep.*;
 import static network.aika.neuron.sign.Sign.POS;
+import static network.aika.neuron.steps.activation.ActivationStep.*;
 
 /**
  * @author Lukas Molzberger
@@ -123,7 +125,9 @@ public class Activation extends Element<Activation> {
 
         updateValue();
 
-        QueueEntry.add(this, ENTROPY_GRADIENT);
+        if(getConfig().isEnableTraining())
+            QueueEntry.add(this, ENTROPY_GRADIENT);
+
         propagate();
     }
 
@@ -181,6 +185,7 @@ public class Activation extends Element<Activation> {
     }
 
     public void setReference(Reference ref) {
+        assert ref.getThought() == getThought();
         this.reference = ref;
     }
 
@@ -206,7 +211,7 @@ public class Activation extends Element<Activation> {
     }
 
     public Config getConfig() {
-        return getNeuron().getConfig();
+        return getThought().getConfig();
     }
 
     public NeuronProvider getNeuronProvider() {
@@ -299,6 +304,7 @@ public class Activation extends Element<Activation> {
 
     public void updateOutgoingLinks(double delta) {
         getOutputLinks()
+                .filter(l -> !l.getSynapse().isZero())
                 .forEach(l -> {
                             double w = l.getSynapse().getWeight();
                             QueueEntry.add(l, new SumUpLink(delta * w));
@@ -393,7 +399,7 @@ public class Activation extends Element<Activation> {
     public void updateNet(double netDelta) {
         net += netDelta;
 
-        Utils.checkTolerance(netDelta);
+        Utils.checkTolerance(this, netDelta);
 
         QueueEntry.add(this, PROPAGATE_GRADIENTS_NET);
         QueueEntry.add(this, CHECK_IF_FIRED);
@@ -412,7 +418,7 @@ public class Activation extends Element<Activation> {
 
         double valueDelta = value - (oldValue != null ? oldValue : 0.0);
 
-        Utils.checkTolerance(valueDelta);
+        Utils.checkTolerance(this, valueDelta);
 
         QueueEntry.add(this,
                 new PropagateValueChange(valueDelta)
@@ -493,7 +499,7 @@ public class Activation extends Element<Activation> {
     }
 
     public void propagateGradientsOut(double[] g) {
-        Utils.checkTolerance(g);
+        Utils.checkTolerance(this, g);
 
         outputGradientSum = Utils.add(outputGradientSum, g);
 
@@ -589,7 +595,7 @@ public class Activation extends Element<Activation> {
 
         double p = Math.exp(net - offset) / norm;
 
-        Utils.checkTolerance(p - getBranchProbability());
+        Utils.checkTolerance(this, p - getBranchProbability());
 
         Activation cAct = clone(null);
         cAct.branchProbability = p;

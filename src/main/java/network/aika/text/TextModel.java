@@ -17,17 +17,22 @@
 package network.aika.text;
 
 import network.aika.Model;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Reference;
 import network.aika.callbacks.SuspensionCallback;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.excitatory.*;
+import network.aika.neuron.excitatory.BindingNeuron;
+import network.aika.neuron.excitatory.ExcitatoryNeuron;
+import network.aika.neuron.excitatory.InputBNSynapse;
+import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -50,22 +55,20 @@ public class TextModel extends Model {
 
     public TextModel() {
         super();
-        init();
     }
 
-    public TextModel(SuspensionCallback sh) {
-        super(sh);
-        init();
+    public TextModel(SuspensionCallback sc) {
+        super(sc);
     }
 
-    private void init() {
-        InhibitoryNeuron ptN = getTemplates().INHIBITORY_TEMPLATE.instantiateTemplate();
+    public void init() {
+        InhibitoryNeuron ptN = getTemplates().INHIBITORY_TEMPLATE.instantiateTemplate(true);
         ptN.setInputNeuron(true);
         ptN.setLabel(PREVIOUS_TOKEN_LABEL);
         prevTokenInhib = ptN.getProvider();
         prevTokenInhib.save();
 
-        InhibitoryNeuron ntN = getTemplates().INHIBITORY_TEMPLATE.instantiateTemplate();
+        InhibitoryNeuron ntN = getTemplates().INHIBITORY_TEMPLATE.instantiateTemplate(true);
         ntN.setInputNeuron(true);
         ntN.setLabel(NEXT_TOKEN_LABEL);
         nextTokenInhib = ntN.getProvider();
@@ -116,93 +119,77 @@ public class TextModel extends Model {
                 .anyMatch(s -> prevTokenInhib.getId().equals(s.getOutput().getId()));
     }
 
-    public PatternNeuron lookupToken(Reference ref, String tokenLabel) {
+    public PatternNeuron lookupToken(String tokenLabel) {
         Neuron inProv = getNeuron(tokenLabel);
         if(inProv != null) {
             return (PatternNeuron) inProv;
         }
 
-        PatternNeuron in = getTemplates().INPUT_PATTERN_TEMPLATE.instantiateTemplate();
+        PatternNeuron in = getTemplates().INPUT_PATTERN_TEMPLATE
+                .instantiateTemplate(true);
+        BindingNeuron inRelPT = getTemplates().INPUT_BINDING_TEMPLATE
+                .instantiateTemplate(true);
+        BindingNeuron inRelNT = getTemplates().INPUT_BINDING_TEMPLATE
+                .instantiateTemplate(true);
+
         in.setTokenLabel(tokenLabel);
         in.setInputNeuron(true);
         in.setLabel("P-" + tokenLabel);
         in.setAllowTraining(false);
-        getSuspensionHook().putLabel(tokenLabel, in.getId());
+        putLabel(tokenLabel, in.getId());
 
-        BindingNeuron inRelPT = getTemplates().INPUT_BINDING_TEMPLATE.instantiateTemplate();
-        inRelPT.setInputNeuron(true);
-        inRelPT.setLabel(tokenLabel + REL_PREVIOUS_TOKEN_LABEL);
+        initRelationNeuron(tokenLabel + REL_PREVIOUS_TOKEN_LABEL, in, inRelPT, getNextTokenInhib(), false);
+        initRelationNeuron(tokenLabel + REL_NEXT_TOKEN_LABEL, in, inRelNT, getPrevTokenInhib(), true);
 
-        BindingNeuron inRelNT = getTemplates().INPUT_BINDING_TEMPLATE.instantiateTemplate();
-        inRelNT.setInputNeuron(true);
-        inRelNT.setLabel(tokenLabel + REL_NEXT_TOKEN_LABEL);
-
-        {
-            {
-                BindingNeuronSynapse s = getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(in, inRelPT);
-
-                s.linkInput();
-                s.linkOutput();
-                s.setWeight(11.0);
-                s.setAllowTraining(false);
-                inRelPT.addConjunctiveBias(-11.0, false);
-            }
-
-            {
-                BindingNeuronSynapse s = getTemplates().RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE.instantiateTemplate(getNextTokenInhib(), inRelPT);
-
-                s.linkOutput();
-                s.addWeight(10.0);
-                s.setAllowTraining(false);
-                inRelPT.addConjunctiveBias(-10.0, false);
-            }
-            inRelPT.setBias(4.0);
-            inRelPT.setAllowTraining(false);
-        }
-        {
-            {
-                BindingNeuronSynapse s = getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(in, inRelNT);
-
-                s.linkInput();
-                s.linkOutput();
-                s.addWeight(11.0);
-                s.setAllowTraining(false);
-                inRelNT.addConjunctiveBias(-11.0, false);
-            }
-
-            {
-                BindingNeuronSynapse s = getTemplates().RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE.instantiateTemplate(getPrevTokenInhib(), inRelNT);
-
-                s.linkOutput();
-                s.addWeight(10.0);
-                s.setAllowTraining(false);
-                inRelNT.addConjunctiveBias(-10.0, true);
-            }
-            inRelNT.setBias(4.0);
-            inRelNT.setAllowTraining(false);
-        }
-
-        {
-            InhibitorySynapse s = getTemplates().INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(inRelPT, getPrevTokenInhib());
-
-            s.linkInput();
-            s.addWeight(1.0);
-            s.setAllowTraining(false);
-        }
-
-        {
-            InhibitorySynapse s = getTemplates().INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(inRelNT, getNextTokenInhib());
-
-            s.linkInput();
-            s.addWeight(1.0);
-            s.setAllowTraining(false);
-        }
+        initInhibitorySynapse(inRelPT, getPrevTokenInhib());
+        initInhibitorySynapse(inRelNT, getNextTokenInhib());
 
         in.getProvider().save();
         inRelPT.getProvider().save();
         inRelNT.getProvider().save();
 
         return in;
+    }
+
+    private void initRelationNeuron(String label, PatternNeuron in, BindingNeuron inRel, InhibitoryNeuron inhib, boolean b) {
+        inRel.setInputNeuron(true);
+        inRel.setLabel(label);
+
+        initRecurrentSameSynapse(in, inRel);
+        initRelatedInputSynapse(inRel, inhib, b);
+
+        inRel.setBias(4.0);
+        inRel.setAllowTraining(false);
+    }
+
+    private void initRelatedInputSynapse(BindingNeuron inRel, InhibitoryNeuron inhib, boolean recurrent) {
+        Synapse s = getTemplates().RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE
+                .instantiateTemplate(inhib, inRel);
+
+        s.linkOutput();
+        s.addWeight(10.0);
+        s.setAllowTraining(false);
+        inRel.addConjunctiveBias(-10.0, recurrent);
+    }
+
+    private void initRecurrentSameSynapse(PatternNeuron in, BindingNeuron inRel) {
+        Synapse s = getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE
+                .instantiateTemplate(in, inRel);
+
+        s.linkInput();
+        s.linkOutput();
+        s.setWeight(11.0);
+        s.setAllowTraining(false);
+        inRel.addConjunctiveBias(-11.0, false);
+    }
+
+    private void initInhibitorySynapse(BindingNeuron inRelPT, InhibitoryNeuron prevTokenInhib) {
+        Synapse s = getTemplates().INHIBITORY_SYNAPSE_TEMPLATE
+                .instantiateTemplate(inRelPT, prevTokenInhib);
+
+        s.linkInput();
+        s.addWeight(1.0);
+        s.setAllowTraining(false);
     }
 
     public InhibitoryNeuron getPrevTokenInhib() {

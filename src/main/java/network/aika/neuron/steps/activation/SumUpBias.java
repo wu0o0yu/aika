@@ -1,7 +1,6 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
 import network.aika.utils.Utils;
 

@@ -17,10 +17,10 @@
 package network.aika.neuron.steps.link;
 
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
 import network.aika.utils.Utils;
-import network.aika.neuron.activation.Link;
 
 import static network.aika.neuron.activation.Activation.INCOMING;
 import static network.aika.neuron.activation.Activation.OWN;
@@ -54,13 +54,14 @@ public class PropagateGradientAndUpdateWeight implements LinkStep {
             double g = gradient[OWN] + gradient[INCOMING];
             double weightDelta = l.getConfig().getLearnRate() * g;
             Synapse s = l.getSynapse();
-            if(s.getWeight() == 0.0 && weightDelta > 0.0 && l.getInput().isActive(true)) {
-                QueueEntry.add(l, LINKING);
-                QueueEntry.add(l, TEMPLATE);
-            }
+            boolean oldWeightIsZero = s.isZero();
 
             s.updateSynapse(l, weightDelta);
 
+            if(oldWeightIsZero && !s.isZero() && l.getInput().isActive(true)) {
+                QueueEntry.add(l, LINKING);
+                QueueEntry.add(l, TEMPLATE);
+            }
             QueueEntry.add(l.getOutput(), UPDATE_SYNAPSE_INPUT_LINKS);
         }
 

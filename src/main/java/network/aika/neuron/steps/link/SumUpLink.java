@@ -16,13 +16,14 @@
  */
 package network.aika.neuron.steps.link;
 
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
 import network.aika.utils.Utils;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 
-import static network.aika.neuron.steps.activation.ActivationStep.*;
+import static network.aika.neuron.steps.activation.ActivationStep.CHECK_IF_FIRED;
+import static network.aika.neuron.steps.activation.ActivationStep.PROPAGATE_GRADIENTS_NET;
 
 /**
  * Uses the input activation value, and the synapse weight to update the net value of the output activation.

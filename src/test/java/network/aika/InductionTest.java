@@ -1,12 +1,11 @@
 package network.aika;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
-import network.aika.neuron.excitatory.BindingNeuronSynapse;
-import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.text.Document;
-
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
@@ -14,11 +13,11 @@ import org.junit.jupiter.api.Test;
 public class InductionTest {
 
     @Test
-    public void testInduceFromMaturePattern() throws InterruptedException {
+    public void testInduceFromMaturePattern() {
         Model m = new TextModel();
         Templates t = new Templates(m);
 
-        PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate();
+        PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
         in.setTokenLabel("A");
         in.setInputNeuron(true);
         in.setLabel("IN");
@@ -41,36 +40,32 @@ public class InductionTest {
     @Test
     public void initialGradientTest() {
         Model m = new TextModel();
-        m.setConfig(
-                new Config()
-                        .setLearnRate(-0.1)
-        );
 
         Templates t = new Templates(m);
 
-        PatternNeuron inA = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate();
+        PatternNeuron inA = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
         inA.setTokenLabel("A");
         inA.setInputNeuron(true);
         inA.setLabel("IN-A");
-        PatternNeuron inB = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate();
+        PatternNeuron inB = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
         inB.setTokenLabel("B");
         inB.setInputNeuron(true);
         inB.setLabel("IN-B");
-        BindingNeuron targetN = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
+        BindingNeuron targetN = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
         targetN.setLabel("OUT-Target");
 
         targetN.setBias(0.0);
         targetN.setDirectConjunctiveBias(0.0);
         targetN.setRecurrentConjunctiveBias(0.0);
 
-        BindingNeuronSynapse sA = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inA, targetN);
+        Synapse sA = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inA, targetN);
 
         sA.linkInput();
         sA.linkOutput();
         sA.setWeight(0.1);
         targetN.addConjunctiveBias(-0.1, false);
 
-        BindingNeuronSynapse sB = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inB, targetN);
+        Synapse sB = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inB, targetN);
 
         sB.linkInput();
         sB.linkOutput();
@@ -113,15 +108,16 @@ public class InductionTest {
     @Test
     public void inductionTest() throws InterruptedException {
         TextModel model = new TextModel();
-        model.setConfig(
-                new Config()
-                        .setAlpha(0.99)
-                        .setLearnRate(-0.1)
-        );
 
         String phrase = "der Hund";
 
         Document doc = new Document(phrase);
+        doc.setConfig(
+                Util.getTestConfig()
+                        .setAlpha(0.99)
+                        .setLearnRate(-0.1)
+                        .setEnableTraining(true)
+        );
         System.out.println("  " + phrase);
 
         Activation actDer = doc.processToken(model, null, 0, 4, "der");

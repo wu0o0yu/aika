@@ -19,28 +19,23 @@ package network.aika;
 
 import network.aika.callbacks.InMemorySuspensionCallback;
 import network.aika.callbacks.SuspensionCallback;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.SuspensionMode;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.Templates;
+import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.excitatory.BindingNeuronSynapse;
-import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.neuron.excitatory.PatternSynapse;
-import network.aika.neuron.inhibitory.*;
-import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.utils.Writable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Constructor;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,11 +44,11 @@ import java.util.stream.Stream;
  *
  * @author Lukas Molzberger
  */
-public abstract class Model {
+public abstract class Model implements Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Model.class);
 
-    private int N = 0; // needs to be stored
+    private long N = 0;
 
     private SuspensionCallback suspensionCallback;
     private AtomicLong retrievalCounter = new AtomicLong(0);
@@ -64,22 +59,32 @@ public abstract class Model {
 
     private Templates templates = new Templates(this);
 
-    private Config config;
+    private Supplier<Writable> customDataInstanceSupplier;
 
     public Model() {
         this(new InMemorySuspensionCallback());
     }
 
-    public Model(SuspensionCallback sh) {
-        suspensionCallback = sh;
+    public Model(SuspensionCallback sc) {
+        suspensionCallback = sc;
     }
 
-    public Config getConfig() {
-        return config;
+    public abstract void init();
+
+    public Long getIdByLabel(String label) {
+        return suspensionCallback.getIdByLabel(label);
     }
 
-    public void setConfig(Config config) {
-        this.config = config;
+    public void putLabel(String label, Long id) {
+        suspensionCallback.putLabel(label, id);
+    }
+
+    public Supplier<Writable> getCustomDataInstanceSupplier() {
+        return customDataInstanceSupplier;
+    }
+
+    public void setCustomDataInstanceSupplier(Supplier<Writable> customDataInstanceSupplier) {
+        this.customDataInstanceSupplier = customDataInstanceSupplier;
     }
 
     public abstract void linkInputRelations(Activation originAct, Direction dir);
@@ -133,7 +138,9 @@ public abstract class Model {
     public Stream<NeuronProvider> getAllNeurons() {
         return suspensionCallback
                 .getAllIds().stream()
-                .map(id -> lookupNeuron(id));
+                .map(id ->
+                        lookupNeuron(id)
+                );
     }
 
     public void applyMovingAverage(Config trainingConfig) {
@@ -141,7 +148,6 @@ public abstract class Model {
             N *= trainingConfig.getAlpha();
         }
     }
-
 
     public SuspensionCallback getSuspensionHook() {
         return suspensionCallback;
@@ -151,36 +157,15 @@ public abstract class Model {
         this.suspensionCallback = suspensionCallback;
     }
 
-    public Neuron readNeuron(DataInput in, NeuronProvider p) throws Exception {
-/*        Constructor c = typeRegistry.get(in.readByte()).getDeclaredConstructor(NeuronProvider.class);
-        Neuron n = (Neuron) c.newInstance(p);
-        n.readFields(in, this);
-        return n;
- */
-        return null;
-    }
-
-    public Synapse readSynapse(DataInput in) throws Exception {
-/*        Synapse s = (Synapse) typeRegistry.get(in.readByte()).getDeclaredConstructor().newInstance();
-        s.readFields(in, this);
-        return s;
- */
-        return null;
-    }
-
-    public void writeSynapse(Synapse s, DataOutput out) throws IOException {
-        s.write(out);
-    }
-
     public void addToN(int l) {
         N += l;
     }
 
-    public int getN() {
+    public long getN() {
         return N;
     }
 
-    public void setN(int n) {
+    public void setN(long n) {
         N = n;
     }
 
@@ -238,6 +223,31 @@ public abstract class Model {
         synchronized (activeProviders) {
             activeProviders.remove(p.getId());
         }
+    }
+
+    public void open(boolean create) throws IOException {
+        if(create)
+            suspensionCallback.prepareNewModel();
+        else
+            suspensionCallback.loadIndex(this);
+
+        suspensionCallback.open();
+    }
+
+    public void close() throws IOException {
+        suspensionCallback.saveIndex(this);
+
+        suspensionCallback.close();
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        out.writeLong(N);
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws Exception {
+        N = in.readLong();
     }
 
     public String statToString() {

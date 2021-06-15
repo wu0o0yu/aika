@@ -1,6 +1,5 @@
 package network.aika;
 
-import network.aika.Config;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
@@ -11,19 +10,20 @@ public class CharBasedTraining {
 
     public void init() {
         model = new TextModel();
-        model.setConfig(
-                new Config()
-                        .setAlpha(0.99)
-                        .setLearnRate(-0.1)
-        );
     }
 
     public TextModel getModel() {
         return model;
     }
 
-    public void train(String word) throws InterruptedException {
+    public void train(String word) {
         Document doc = new Document(word);
+        doc.setConfig(
+                new Config()
+                        .setAlpha(0.99)
+                        .setLearnRate(-0.1)
+        );
+
         System.out.println("  " + word);
 
         TextReference lastRef = null;

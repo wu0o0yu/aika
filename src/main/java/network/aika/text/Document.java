@@ -19,7 +19,8 @@ package network.aika.text;
 import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Reference;
 
 /**
  * The {@code Document} class represents a single document which may be either used for processing a text or as
@@ -88,6 +89,16 @@ public class Document extends Thought {
         return ref.getText();
     }
 
+    public Activation addInput(Neuron n, int begin, int end) {
+        //TODO:
+        return null;
+    }
+
+    public Activation addInput(NeuronProvider n, int begin, int end) {
+        //TODO:
+        return null;
+    }
+
     public Activation addInput(Neuron n, Reference ref) {
         Activation act = createActivation(n);
         act.initInput(ref);
@@ -98,17 +109,21 @@ public class Document extends Thought {
         return addInput(n.getNeuron(), ref);
     }
 
+    @Deprecated
     public Activation processToken(TextModel m, TextReference lastRef, int begin, int end, String tokenLabel) {
         TextReference ref = new TextReference(this, begin, end);
-        Neuron tokenN = m.lookupToken(ref, tokenLabel);
+        Neuron tokenN = m.lookupToken(tokenLabel);
         Activation tokenPatternAct = addInput(tokenN, ref);
-
-        if(lastRef != null) {
-            lastRef.setNext(ref);
-            ref.setPrevious(lastRef);
-        }
+        linkConsecutiveTokens(lastRef, ref);
 
         return tokenPatternAct;
+    }
+
+    public void linkConsecutiveTokens(TextReference prevToken, TextReference nextToken) {
+        if (prevToken == null)
+            return;
+        prevToken.setNext(nextToken);
+        nextToken.setPrevious(prevToken);
     }
 
     public String toString() {

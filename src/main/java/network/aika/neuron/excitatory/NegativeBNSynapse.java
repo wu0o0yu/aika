@@ -1,20 +1,25 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.visitor.Visitor;
+import network.aika.neuron.steps.link.SumUpLink;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+import static network.aika.neuron.sign.Sign.POS;
 
 
 public class NegativeBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> {
 
-    public NegativeBNSynapse(I input, BindingNeuron output) {
-        super(input, output);
-
+    public NegativeBNSynapse() {
         this.isRecurrent = true;
+    }
+
+    public void updateSynapse(Link l, double delta) {
+        if(l.getInput().isActive(true) && l.isSelfRef())
+            addWeight(-delta);
     }
 
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
@@ -37,14 +42,5 @@ public class NegativeBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse
             oAct = oAct.createBranch(this);
         }
         return oAct;
-    }
-
-    @Override
-    public BindingNeuronSynapse instantiateTemplate(I input, BindingNeuron output) {
-        assert input.getTemplateGroup().contains(getInput());
-
-        BindingNeuronSynapse s = new NegativeBNSynapse(input, output);
-        initFromTemplate(s);
-        return s;
     }
 }

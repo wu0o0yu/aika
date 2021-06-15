@@ -16,8 +16,11 @@
  */
 package network.aika.callbacks;
 
+import network.aika.Model;
 import network.aika.utils.Writable;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +37,21 @@ public class InMemorySuspensionCallback implements SuspensionCallback {
 
     private Map<Long, byte[]> storage = new TreeMap<>();
     private final Map<String, Long> labels = new HashMap<>();
+
+    @Override
+    public void prepareNewModel() {
+
+    }
+
+    @Override
+    public void open() throws IOException {
+
+    }
+
+    @Override
+    public void close() throws IOException {
+
+    }
 
     @Override
     public long createId() {
@@ -77,12 +95,12 @@ public class InMemorySuspensionCallback implements SuspensionCallback {
     }
 
     @Override
-    public void loadIndex() {
+    public void loadIndex(Model m) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void storeIndex() {
+    public void saveIndex(Model m) {
         throw new UnsupportedOperationException();
     }
 }

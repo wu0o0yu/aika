@@ -21,12 +21,8 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.steps.VisitorStep;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
-
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
  *

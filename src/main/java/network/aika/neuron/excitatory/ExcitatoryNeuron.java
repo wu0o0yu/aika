@@ -16,9 +16,14 @@
  */
 package network.aika.neuron.excitatory;
 
-import network.aika.*;
-import network.aika.neuron.*;
-import network.aika.neuron.activation.*;
+import network.aika.Model;
+import network.aika.neuron.ActivationFunction;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Fired;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +31,8 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.Comparator;
+import java.util.TreeSet;
 
 import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 
@@ -50,8 +55,8 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         super(p);
     }
 
-    public ExcitatoryNeuron(Model model) {
-        super(model);
+    public ExcitatoryNeuron(Model model, boolean addProvider) {
+        super(model, addProvider);
     }
 
 

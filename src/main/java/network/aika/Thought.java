@@ -23,7 +23,10 @@ import network.aika.callbacks.VisitorEventListener;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Element;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.steps.Step;
 import network.aika.utils.BelowToleranceThresholdException;
@@ -55,12 +58,23 @@ public abstract class Thought {
     private List<EventListener> eventListeners = new ArrayList<>();
     private List<VisitorEventListener> visitorEventListeners = new ArrayList<>();
 
+    private Config config;
+
+
     public Thought() {
     }
 
     public abstract int length();
 
     public abstract void linkInputRelations(Activation act);
+
+    public Config getConfig() {
+        return config;
+    }
+
+    public void setConfig(Config config) {
+        this.config = config;
+    }
 
     public void addFilters(Step... p) {
         filters.addAll(Set.of(p));
@@ -174,7 +188,6 @@ public abstract class Thought {
             try {
                 qe.process();
             } catch(BelowToleranceThresholdException e) {
-                System.out.println();
             }
 
             afterProcessedEvent(qe);

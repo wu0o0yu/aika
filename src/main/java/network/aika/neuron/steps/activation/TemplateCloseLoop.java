@@ -17,8 +17,8 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.TemplateVisitor;
 

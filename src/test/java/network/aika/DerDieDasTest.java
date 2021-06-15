@@ -1,11 +1,12 @@
 package network.aika;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Reference;
-import network.aika.neuron.excitatory.*;
+import network.aika.neuron.excitatory.BindingNeuron;
+import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
 import network.aika.text.TextModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,7 @@ public class DerDieDasTest {
         TextModel m = charBasedTrainings.getModel();
         Templates t = m.getTemplates();
 
-        PatternNeuron out = t.SAME_PATTERN_TEMPLATE.instantiateTemplate();
+        PatternNeuron out = t.SAME_PATTERN_TEMPLATE.instantiateTemplate(true);
         out.setTokenLabel(token);
         out.setLabel("P-" + token);
         out.setBias(0.1);
@@ -39,14 +40,14 @@ public class DerDieDasTest {
         for(int i = 0; i < token.length(); i++) {
             char c = token.charAt(i);
 
-            PatternNeuron inN = m.lookupToken(ref, "" + c);
-            BindingNeuron ppN = t.SAME_BINDING_TEMPLATE.instantiateTemplate();
+            PatternNeuron inN = m.lookupToken("" + c);
+            BindingNeuron ppN = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
             ppN.setLabel("B-" + c + "-(" + token + ")");
 
             initPP(ref, c, inN, ppN, prevPPN, out);
 
             {
-                PatternSynapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(ppN, out);
+                Synapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(ppN, out);
 
                 s.linkInput();
                 s.linkOutput();
@@ -65,28 +66,28 @@ public class DerDieDasTest {
         InhibitoryNeuron inhibN = inhibNeurons.computeIfAbsent(c,
                 ch ->
                 {
-                    InhibitoryNeuron n = t.INHIBITORY_TEMPLATE.instantiateTemplate();
+                    InhibitoryNeuron n = t.INHIBITORY_TEMPLATE.instantiateTemplate(true);
                     n.setLabel("I-" + ch);
                     return n;
                 }
         );
 
         {
-            InhibitorySynapse s = new InhibitorySynapse(ppN, inhibN);
+            Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(ppN, inhibN);
 
             s.linkInput();
             s.addWeight(0.1);
         }
 
         {
-            BindingNeuronSynapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhibN, ppN);
+            Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhibN, ppN);
 
             s.linkOutput();
             s.addWeight(-100.0);
         }
 
         {
-            BindingNeuronSynapse s = t.SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(inN, ppN);
+            Synapse s = t.SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(inN, ppN);
 
             s.linkInput();
             s.addWeight(0.1);
@@ -94,7 +95,7 @@ public class DerDieDasTest {
         }
 
         if(prevPP != null) {
-            BindingNeuronSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(prevPP, ppN);
+            Synapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(prevPP, ppN);
 
             s.linkOutput();
             s.addWeight(0.1);
@@ -103,7 +104,7 @@ public class DerDieDasTest {
 
         BindingNeuron nextPP = lookupPPPT(inN);
         if(nextPP != null) {
-            BindingNeuronSynapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(nextPP, ppN);
+            Synapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(nextPP, ppN);
 
             s.linkOutput();
             s.addWeight(0.1);
@@ -111,7 +112,7 @@ public class DerDieDasTest {
         }
 
         {
-            BindingNeuronSynapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, ppN);
+            Synapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, ppN);
 
             s.linkOutput();
             s.addWeight(0.1);

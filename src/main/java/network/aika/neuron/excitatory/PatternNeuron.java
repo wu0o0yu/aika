@@ -18,22 +18,14 @@ package network.aika.neuron.excitatory;
 
 import network.aika.Model;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Templates;
-import network.aika.neuron.activation.*;
-import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.scopes.Scope;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.LinkVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Set;
-
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
@@ -53,8 +45,8 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         super(p);
     }
 
-    public PatternNeuron(Model model) {
-        super(model);
+    public PatternNeuron(Model model, boolean addProvider) {
+        super(model, addProvider);
     }
 
     @Override
@@ -63,8 +55,8 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
     }
 
     @Override
-    public PatternNeuron instantiateTemplate() {
-        PatternNeuron n = new PatternNeuron(getModel());
+    public PatternNeuron instantiateTemplate(boolean addProvider) {
+        PatternNeuron n = new PatternNeuron(getModel(), addProvider);
         initFromTemplate(n);
         return n;
     }

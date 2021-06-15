@@ -1,10 +1,10 @@
 package network.aika;
 
 import network.aika.debugger.AikaDebugger;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.neuron.excitatory.BindingNeuronSynapse;
+import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
@@ -13,9 +13,13 @@ import org.junit.jupiter.api.Test;
 public class OscillationTest {
 
     @Test
-    public void oscillationTest() throws InterruptedException {
+    public void oscillationTest() {
         TextModel m = new TextModel();
-        m.setConfig(
+
+        m.setN(912);
+
+        Document doc = new Document("A ");
+        doc.setConfig(
                 new Config() {
                     public String getLabel(Activation act) {
                         return "X";
@@ -24,24 +28,19 @@ public class OscillationTest {
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
                         .setEnableTraining(true)
-                        .setSurprisalInductionThreshold(0.0)
-                        .setGradientInductionThreshold(0.0)
         );
 
-        m.setN(912);
-
-        Document doc = new Document("A ");
-        PatternNeuron nA = m.getTemplates().SAME_PATTERN_TEMPLATE.instantiateTemplate();
+        PatternNeuron nA = m.getTemplates().SAME_PATTERN_TEMPLATE.instantiateTemplate(true);
         nA.setLabel("P-A");
 
         nA.setFrequency(53.0);
         nA.getSampleSpace().setN(299);
-        nA.getSampleSpace().setLastPos(899);
+        nA.getSampleSpace().setLastPos(899l);
 
-        BindingNeuron nPPA =  m.getTemplates().SAME_BINDING_TEMPLATE.instantiateTemplate();
+        BindingNeuron nPPA =  m.getTemplates().SAME_BINDING_TEMPLATE.instantiateTemplate(true);
         nPPA.setLabel("B-A");
 
-        BindingNeuronSynapse s = m.getTemplates().PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nA, nPPA);
+        Synapse s = m.getTemplates().PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nA, nPPA);
 
         s.setWeight(0.3);
 
@@ -56,5 +55,4 @@ public class OscillationTest {
 
         System.out.println();
     }
-
 }

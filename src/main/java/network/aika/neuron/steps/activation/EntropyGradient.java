@@ -49,7 +49,7 @@ public class EntropyGradient implements ActivationStep {
 
         act.initEntropyGradient();
 
-        Utils.checkTolerance(act.getInputGradient());
+        Utils.checkTolerance(act, act.getInputGradient());
 
         QueueEntry.add(act, PROPAGATE_GRADIENTS_SUM);
     }

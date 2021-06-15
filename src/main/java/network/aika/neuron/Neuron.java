@@ -16,12 +16,12 @@
  */
 package network.aika.neuron;
 
-import network.aika.*;
-import network.aika.neuron.activation.*;
-import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.scopes.Scope;
+import network.aika.Config;
+import network.aika.Model;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Fired;
+import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;
@@ -30,8 +30,11 @@ import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.sign.Sign.NEG;
@@ -42,6 +45,8 @@ import static network.aika.neuron.sign.Sign.POS;
  * @author Lukas Molzberger
  */
 public abstract class Neuron<S extends Synapse> implements Writable {
+
+    public static double BETA_THRESHOLD = 0.95;
 
     private static final Logger log = LoggerFactory.getLogger(Neuron.class);
 
@@ -80,8 +85,9 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         provider = p;
     }
 
-    public Neuron(Model m) {
-        provider = new NeuronProvider(m, this);
+    public Neuron(Model m, boolean addProvider) {
+        if(addProvider)
+            provider = new NeuronProvider(m, this);
         sampleSpace = new SampleSpace(m);
         modified = true;
     }
@@ -100,7 +106,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         n.template = this;
     }
 
-    public abstract Neuron<?> instantiateTemplate();
+    public abstract Neuron<?> instantiateTemplate(boolean addProvider);
 
     public abstract void addDummyLinks(Activation act);
 
@@ -147,7 +153,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public double computeBiasLB(Activation iAct) {
-        return (getConfig().getLearnRate() * iAct.getNeuron().getCandidateGradient(iAct)) /
+        return (iAct.getConfig().getLearnRate() * iAct.getNeuron().getCandidateGradient(iAct)) /
                 getBias();
     }
 
@@ -244,10 +250,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return (M) provider.getModel();
     }
 
-    public Config getConfig() {
-        return getModel().getConfig();
-    }
-
     public long getRetrievalCount() {
         return retrievalCount;
     }
@@ -338,7 +340,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         );
 
         double p = dist.inverseCumulativeProbability(
-                getModel().getConfig().getBetaThreshold()
+                BETA_THRESHOLD
         );
 
         return p;
@@ -357,7 +359,9 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         modified = true;
     }
 
-    public void reactivate() {
+    public void reactivate(Model m) {
+        m.incrementRetrievalCounter();
+        retrievalCount = m.getCurrentRetrievalCount();
     }
 
     public void suspend() {
@@ -368,19 +372,18 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     @Override
     public void write(DataOutput out) throws IOException {
- //       out.writeLong(getTemplates().stream());
+        out.writeByte((byte) getTemplate().getId().intValue());
 
         out.writeBoolean(label != null);
-        if(label != null) {
+        if(label != null)
             out.writeUTF(label);
-        }
 
         out.writeDouble(bias);
 
         for (Synapse s : inputSynapses.values()) {
             if (s.getInput() != null) {
                 out.writeBoolean(true);
-                getModel().writeSynapse(s, out);
+                s.write(out);
             }
         }
         out.writeBoolean(false);
@@ -388,7 +391,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         for (Synapse s : outputSynapses.values()) {
             if (s.getOutput() != null) {
                 out.writeBoolean(true);
-                getModel().writeSynapse(s, out);
+                s.write(out);
             }
         }
         out.writeBoolean(false);
@@ -399,26 +402,33 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         out.writeBoolean(isInputNeuron);
 
         out.writeBoolean(customData != null);
-        if(customData != null) {
+        if(customData != null)
             customData.write(out);
-        }
+    }
+
+    public static Neuron read(DataInput in, Model m) throws Exception {
+        byte templateNeuronId = in.readByte();
+        Neuron templateNeuron = m.getTemplates().getTemplateNeuron(templateNeuronId);
+        Neuron n = templateNeuron.instantiateTemplate(false);
+        n.readFields(in, m);
+        return n;
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws Exception {
-        if(in.readBoolean()) {
+        if(in.readBoolean())
             label = in.readUTF();
-        }
+
 
         bias = in.readDouble();
 
         while (in.readBoolean()) {
-            S syn = (S) m.readSynapse(in);
+            S syn = (S) Synapse.read(in, m);
             inputSynapses.put(syn.getPInput(), syn);
         }
 
         while (in.readBoolean()) {
-            Synapse syn = m.readSynapse(in);
+            Synapse syn = Synapse.read(in, m);
             outputSynapses.put(syn.getPOutput(), syn);
         }
 
@@ -428,7 +438,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         isInputNeuron = in.readBoolean();
 
         if(in.readBoolean()) {
-            customData = m.getConfig().getCustomDataInstanceSupplier().get();
+            customData = m.getCustomDataInstanceSupplier().get();
             customData.readFields(in, m);
         }
     }

@@ -18,13 +18,13 @@ package network.aika.neuron.activation;
 
 import network.aika.Config;
 import network.aika.Thought;
-import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.LinkVisitor;
-import network.aika.utils.Utils;
-import network.aika.neuron.sign.Sign;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.LinkVisitor;
+import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.VisitorStep;
+import network.aika.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +56,8 @@ public class Link extends Element<Link> {
     private boolean isSelfRef;
 
     private double lastIGGradient;
+
+    private boolean hasBeenCounted = false;
 
     public Link(Synapse s, Activation input, Activation output, boolean isSelfRef, LinkVisitor v) {
         this.synapse = s;
@@ -92,13 +94,8 @@ public class Link extends Element<Link> {
 
     public static boolean linkExists(Synapse s, Activation iAct, Activation oAct) {
         Link ol = oAct.getInputLink(iAct.getNeuron());
-        if (ol != null) {
-            assert s == ol.getSynapse();
-//                    toAct = oAct.cloneToReplaceLink(s);
-            log.warn("Link already exists! ");
-            return true;
-        }
-        return false;
+        assert ol == null || s == ol.getSynapse();
+        return ol != null;
     }
 
     public static Synapse getSynapse(Activation iAct, Activation oAct) {
@@ -111,6 +108,8 @@ public class Link extends Element<Link> {
     public void count() {
         if(synapse != null)
             synapse.count(this);
+
+        hasBeenCounted = true;
     }
 
     public void follow(VisitorStep p) {
@@ -159,7 +158,7 @@ public class Link extends Element<Link> {
         }
 
         double igGradientDelta = igGradient - lastIGGradient;
-        Utils.checkTolerance(igGradientDelta);
+        Utils.checkTolerance(this, igGradientDelta);
 
         getOutput().propagateGradientIn(igGradientDelta);
         lastIGGradient = igGradient;

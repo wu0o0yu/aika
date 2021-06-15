@@ -16,38 +16,56 @@
  */
 package network.aika.callbacks;
 
+import network.aika.Model;
 import network.aika.utils.Writable;
 
 import java.io.*;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.TreeMap;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class FSSuspensionCallbackImpl implements SuspensionCallback {
+public class FSSuspensionCallback implements SuspensionCallback {
+
+    public static String MODEL = "model";
+    public static String INDEX = "index";
 
     private AtomicLong currentId = new AtomicLong(0);
 
-    private Map<String, Long> labels = Collections.synchronizedMap(new TreeMap<>());
+    private Map<String, Long> labels = Collections.synchronizedMap(new HashMap<>());
     private Map<Long, long[]> index = Collections.synchronizedMap(new TreeMap<>());
 
-    private File path;
+    private Path path;
     private String modelLabel;
 
-    private RandomAccessFile dataStore;
+    private RandomAccessFile modelStore;
 
-
-    public FSSuspensionCallbackImpl(File path, String modelLabel) throws FileNotFoundException {
+    public FSSuspensionCallback(Path path, String modelLabel) {
         this.path = path;
         this.modelLabel = modelLabel;
-        loadIndex();
+    }
 
-        dataStore = new RandomAccessFile(getFile("model"), "rw");
+    public void prepareNewModel() throws IOException {
+        Files.createDirectories(path);
+        File modelFile = getFile(MODEL);
+        if(modelFile.exists())
+            modelFile.delete();
+
+        File indexFile = getFile(INDEX);
+        if(indexFile.exists())
+            indexFile.delete();
+    }
+
+    public void open() throws IOException {
+        modelStore = new RandomAccessFile(getFile(MODEL), "rw");
+    }
+
+    public void close() throws IOException {
+        modelStore.close();
     }
 
     @Override
@@ -75,22 +93,22 @@ public class FSSuspensionCallbackImpl implements SuspensionCallback {
 
     @Override
     public synchronized void store(Long id, String label, Writable customData, byte[] data) throws IOException {
-        dataStore.seek(dataStore.length());
+        modelStore.seek(modelStore.length());
 
-        index.put(id, new long[]{(int) dataStore.getFilePointer(), data.length});
-        dataStore.write(data);
+        index.put(id, new long[]{modelStore.getFilePointer(), data.length});
+        modelStore.write(data);
     }
 
     @Override
     public synchronized byte[] retrieve(Long id) throws IOException {
         long[] pos = index.get(id);
         if(pos == null)
-            throw new MissingNeuronException(String.format("Neuron with id %d is missing in model label %d", id, modelLabel));
+            throw new MissingNeuronException("Neuron with id " + id + " is missing in model label " + modelLabel);
 
         byte[] data = new byte[(int)pos[1]];
 
-        dataStore.seek(pos[0]);
-        dataStore.read(data);
+        modelStore.seek(pos[0]);
+        modelStore.read(data);
 
         return data;
     }
@@ -105,12 +123,12 @@ public class FSSuspensionCallbackImpl implements SuspensionCallback {
         return index.keySet();
     }
 
-
     @Override
-    public void loadIndex() {
-        try (FileInputStream fis = new FileInputStream(getFile("index"));
+    public void loadIndex(Model m) {
+        try (FileInputStream fis = new FileInputStream(getFile(INDEX));
              ByteArrayInputStream bais = new ByteArrayInputStream(fis.readAllBytes());
              DataInputStream dis = new DataInputStream(bais)) {
+            m.readFields(dis, m);
             readIndex(dis);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -118,11 +136,12 @@ public class FSSuspensionCallbackImpl implements SuspensionCallback {
     }
 
     @Override
-    public void storeIndex() {
+    public void saveIndex(Model m) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         try (DataOutputStream dos = new DataOutputStream(baos);
-             FileOutputStream fos = new FileOutputStream(getFile("index"))) {
+             FileOutputStream fos = new FileOutputStream(getFile(INDEX))) {
+            m.write(dos);
             writeIndex(dos);
             fos.write(baos.toByteArray());
         } catch (IOException e) {
@@ -131,7 +150,7 @@ public class FSSuspensionCallbackImpl implements SuspensionCallback {
     }
 
     private File getFile(String prefix) {
-        return new File(path, prefix + "-" + modelLabel + ".dat");
+        return new File(path.toFile(), prefix + "-" + modelLabel + ".dat");
     }
 
     private void readIndex(DataInput in) throws IOException {
