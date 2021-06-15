@@ -128,6 +128,7 @@ public class FSSuspensionCallback implements SuspensionCallback {
         try (FileInputStream fis = new FileInputStream(getFile(INDEX));
              ByteArrayInputStream bais = new ByteArrayInputStream(fis.readAllBytes());
              DataInputStream dis = new DataInputStream(bais)) {
+            m.readFields(dis, m);
             readIndex(dis);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -140,6 +141,7 @@ public class FSSuspensionCallback implements SuspensionCallback {
 
         try (DataOutputStream dos = new DataOutputStream(baos);
              FileOutputStream fos = new FileOutputStream(getFile(INDEX))) {
+            m.write(dos);
             writeIndex(dos);
             fos.write(baos.toByteArray());
         } catch (IOException e) {

@@ -199,15 +199,4 @@ public class TextModel extends Model {
     public InhibitoryNeuron getNextTokenInhib() {
         return (InhibitoryNeuron) nextTokenInhib.getNeuron();
     }
-
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-        super.write(out);
-    }
-
-    @Override
-    public void readFields(DataInput in, Model m) throws Exception {
-        super.readFields(in, m);
-    }
 }
