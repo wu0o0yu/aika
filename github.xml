@@ -1,0 +1,7 @@
+<application>
+  <component name="GithubAccounts">
+    <account id="3a342156-8f23-4a63-b6e1-0f2cf4206653" name="aika-algorithm">
+      <server host="github.com" />
+    </account>
+  </component>
+</application>
