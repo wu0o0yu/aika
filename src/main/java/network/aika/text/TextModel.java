@@ -62,17 +62,20 @@ public class TextModel extends Model {
     }
 
     public void init() {
-        InhibitoryNeuron ptN = getTemplates().INHIBITORY_TEMPLATE.instantiateTemplate(true);
-        ptN.setInputNeuron(true);
-        ptN.setLabel(PREVIOUS_TOKEN_LABEL);
-        prevTokenInhib = ptN.getProvider();
-        prevTokenInhib.save();
+        if(prevTokenInhib == null)
+            prevTokenInhib = initInhibitoryNeuron(PREVIOUS_TOKEN_LABEL);
 
-        InhibitoryNeuron ntN = getTemplates().INHIBITORY_TEMPLATE.instantiateTemplate(true);
-        ntN.setInputNeuron(true);
-        ntN.setLabel(NEXT_TOKEN_LABEL);
-        nextTokenInhib = ntN.getProvider();
-        nextTokenInhib.save();
+        if(nextTokenInhib == null)
+            nextTokenInhib = initInhibitoryNeuron(NEXT_TOKEN_LABEL);
+    }
+
+    private NeuronProvider initInhibitoryNeuron(String label) {
+        InhibitoryNeuron n = getTemplates().INHIBITORY_TEMPLATE.instantiateTemplate(true);
+        n.setInputNeuron(true);
+        n.setLabel(label);
+        NeuronProvider np = n.getProvider();
+        np.save();
+        return np;
     }
 
     @Override
@@ -92,7 +95,7 @@ public class TextModel extends Model {
                 Synapse s = getRelSynapse(n);
 
                 if (s != null) {
-                    if (isPrevTokenPatternPart(fromAct.getNeuron()) && lastRef.nextTokenIAct != null) {
+                    if (isPrevTokenBinding(fromAct.getNeuron()) && lastRef.nextTokenIAct != null) {
                         addLink(s, lastRef.nextTokenIAct, fromAct);
                     }
                 }
@@ -114,7 +117,7 @@ public class TextModel extends Model {
                 .orElse(null);
     }
 
-    private boolean isPrevTokenPatternPart(Neuron<?> n) {
+    private boolean isPrevTokenBinding(Neuron<?> n) {
         return n.getOutputSynapses()
                 .anyMatch(s -> prevTokenInhib.getId().equals(s.getOutput().getId()));
     }
@@ -134,7 +137,7 @@ public class TextModel extends Model {
 
         in.setTokenLabel(tokenLabel);
         in.setInputNeuron(true);
-        in.setLabel("P-" + tokenLabel);
+        in.setLabel(tokenLabel);
         in.setAllowTraining(false);
         putLabel(tokenLabel, in.getId());
 
@@ -198,5 +201,21 @@ public class TextModel extends Model {
 
     public InhibitoryNeuron getNextTokenInhib() {
         return (InhibitoryNeuron) nextTokenInhib.getNeuron();
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+
+        out.writeLong(prevTokenInhib.getId());
+        out.writeLong(nextTokenInhib.getId());
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws Exception {
+        super.readFields(in, m);
+
+        prevTokenInhib = lookupNeuron(in.readLong());
+        nextTokenInhib = lookupNeuron(in.readLong());
     }
 }

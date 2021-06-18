@@ -174,9 +174,8 @@ public abstract class Model implements Writable {
             WeakReference<NeuronProvider> wr = providers.get(id);
             if(wr != null) {
                 NeuronProvider n = wr.get();
-                if (n != null) {
+                if (n != null)
                     return n;
-                }
             }
 
             return new NeuronProvider(this, id);
