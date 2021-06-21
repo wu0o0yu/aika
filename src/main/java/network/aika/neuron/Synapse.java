@@ -16,6 +16,7 @@
  */
 package network.aika.neuron;
 
+import network.aika.Config;
 import network.aika.Model;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
@@ -331,8 +332,22 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         modified = true;
     }
 
+    public void applyMovingAverage(double alpha) {
+        sampleSpace.applyMovingAverage(alpha);
+        frequencyIPosOPos *= alpha;
+        frequencyIPosONeg *= alpha;
+        frequencyINegOPos *= alpha;
+        modified = true;
+    }
+
     public void count(Link l) {
-        sampleSpace.update(l.getInput().getReference());
+        sampleSpace.countSkippedInstances(l.getInput().getReference());
+
+        Double alpha = l.getConfig().getAlpha();
+        if(alpha != null)
+            applyMovingAverage(alpha);
+
+        sampleSpace.count();
 
         if(l.getInput().isActive(false) && l.getOutput().isActive(false)) {
             frequencyIPosOPos += 1.0;

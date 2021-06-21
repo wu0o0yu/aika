@@ -62,13 +62,21 @@ public class SampleSpace implements Writable {
         this.lastPos = lastPos;
     }
 
-    public void update(Reference ref) {
-        N += 1 + getNegativeInstancesSinceLastPos(ref);
+    public void applyMovingAverage(double alpha) {
+        N *= alpha;
+    }
+
+    public void countSkippedInstances(Reference ref) {
+        N += getNegativeInstancesSinceLastPos(ref);
 
         Long newPos = getAbsoluteEnd(m, ref);
         assert lastPos == null || newPos > lastPos;
 
         lastPos = newPos;
+    }
+
+    public void count() {
+        N += 1;
     }
 
     public long getNegativeInstancesSinceLastPos(Reference ref) {

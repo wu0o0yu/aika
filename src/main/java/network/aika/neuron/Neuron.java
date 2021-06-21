@@ -310,18 +310,22 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         addDummyLinks(act);
 
         if(act.isActive(false)) {
-            sampleSpace.update(act.getReference());
+            sampleSpace.countSkippedInstances(act.getReference());
+
+            Double alpha = act.getConfig().getAlpha();
+            if(alpha != null)
+                applyMovingAverage(alpha);
+
+            sampleSpace.count();
             frequency += 1.0;
             modified = true;
         }
     }
 
-    public void applyMovingAverage(Config trainingConfig) {
-        Double alpha = trainingConfig.getAlpha();
-        if(alpha != null) {
-            frequency *= alpha;
-            modified = true;
-        }
+    public void applyMovingAverage(double alpha) {
+        sampleSpace.applyMovingAverage(alpha);
+        frequency *= alpha;
+        modified = true;
     }
 
     public double getSurprisal(Sign s, Reference ref) {
