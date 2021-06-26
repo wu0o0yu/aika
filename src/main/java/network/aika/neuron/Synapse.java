@@ -82,7 +82,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         this.output = output.getProvider();
     }
 
-    public void init(Model m) {
+    private void init(Model m) {
         sampleSpace = new SampleSpace(m);
     }
 
@@ -341,21 +341,26 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void count(Link l) {
+        boolean iActive = l.getInput().isActive(false);
+        boolean oActive = l.getOutput().isActive(false);
+
         sampleSpace.countSkippedInstances(l.getInput().getReference());
 
-        Double alpha = l.getConfig().getAlpha();
-        if(alpha != null)
-            applyMovingAverage(alpha);
+        if(oActive) {
+            Double alpha = l.getConfig().getAlpha();
+            if (alpha != null)
+                applyMovingAverage(alpha);
+        }
 
         sampleSpace.count();
 
-        if(l.getInput().isActive(false) && l.getOutput().isActive(false)) {
+        if(iActive && oActive) {
             frequencyIPosOPos += 1.0;
             modified = true;
-        } else if(l.getInput().isActive(false) && !l.getOutput().isActive(false)) {
+        } else if(iActive && !oActive) {
             frequencyIPosONeg += 1.0;
             modified = true;
-        } else if(!l.getInput().isActive(false) && l.getOutput().isActive(false)) {
+        } else if(!iActive && oActive) {
             frequencyINegOPos += 1.0;
             modified = true;
         }

@@ -477,7 +477,7 @@ public class Activation extends Element<Activation> {
         double[] g = inputGradient;
         inputGradient = new double[2];
 
-        g = Utils.scale(g, getNorm() * actF.outerGrad(lastNet));
+        g = Utils.scale(g, actF.outerGrad(lastNet));
 
         propagateGradientsOut(g);
     }
@@ -490,8 +490,6 @@ public class Activation extends Element<Activation> {
 
         double g = actF.outerGrad(net) - actF.outerGrad(lastNet);
         lastNet = net;
-
-        g *= getNorm();
 
         propagateGradientsOut(
                 Utils.scale(inputGradientSum, g)
@@ -523,10 +521,6 @@ public class Activation extends Element<Activation> {
 
         QueueEntry.add(this, TEMPLATE_CLOSE_LOOP_OUTPUT);
         QueueEntry.add(this, TEMPLATE_PROPAGATE_OUTPUT);
-    }
-
-    public double getNorm() {
-        return (1 / (1 + getNeuron().getSampleSpace().getN(getReference())));
     }
 
     public void propagateGradientIn(double g) {

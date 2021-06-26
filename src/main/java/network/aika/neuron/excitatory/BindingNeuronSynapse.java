@@ -25,18 +25,26 @@ import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.visitor.Visitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, BindingNeuron> {
+
+    public static double PROPAGATE_THRESHOLD_LB = 0.4;
+
+    private static final Logger log = LoggerFactory.getLogger(BindingNeuronSynapse.class);
+
 
     public boolean isRecurrent;
 
@@ -46,6 +54,22 @@ public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends Excitato
 
     public BindingNeuronSynapse(boolean isRecurrent) {
         this.isRecurrent = isRecurrent;
+    }
+
+    public boolean checkTemplatePropagate(Visitor v, Activation act) {
+        if(v.getTargetDir() == OUTPUT) {
+            log.info(act.getLabel() + " BiasLB:" + getOutput().computeBiasLB(act));
+        }
+
+        return v.getTargetDir() == OUTPUT &&
+                getOutput().computeBiasLB(act) >= PROPAGATE_THRESHOLD_LB;
+    }
+
+    protected void initFromTemplate(Synapse s) {
+        super.initFromTemplate(s);
+
+        BindingNeuronSynapse bns = (BindingNeuronSynapse) s;
+        bns.isRecurrent = isRecurrent;
     }
 
     @Override
@@ -72,12 +96,6 @@ public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends Excitato
         } else {
             return v.getSelfRef();
         }
-    }
-
-    protected void initFromTemplate(BindingNeuronSynapse s) {
-        super.initFromTemplate(s);
-
-        s.isRecurrent = isRecurrent;
     }
 
     @Override

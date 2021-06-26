@@ -16,7 +16,6 @@
  */
 package network.aika.neuron;
 
-import network.aika.Config;
 import network.aika.Model;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;

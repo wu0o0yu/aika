@@ -87,11 +87,11 @@ public class Templates {
     public Templates(Model m) {
         model = m;
 
-        init(INPUT_BINDING_TEMPLATE, -1, "Input Template Binding Neuron", -1.0, -1.0);
-        init(SAME_BINDING_TEMPLATE, -2, "Same Template Binding Neuron", 0.0, 0.0);
-        init(INPUT_PATTERN_TEMPLATE, -3, "Input Template Pattern Neuron", 1.0, -1.0);
-        init(SAME_PATTERN_TEMPLATE, -4, "Same Template Pattern Neuron", -1.0, 1.0);
-        init(INHIBITORY_TEMPLATE, -5, "Template Inhibitory Neuron", 1.0, 1.0);
+        init(INPUT_BINDING_TEMPLATE, -1, "Input Binding Neuron", -1.0, -1.0);
+        init(SAME_BINDING_TEMPLATE, -2, "Same Binding Neuron", 0.0, 0.0);
+        init(INPUT_PATTERN_TEMPLATE, -3, "Input Pattern Neuron", 1.0, -1.0);
+        init(SAME_PATTERN_TEMPLATE, -4, "Same Pattern Neuron", -1.0, 1.0);
+        init(INHIBITORY_TEMPLATE, -5, "Inhibitory Neuron", 1.0, 1.0);
 
         Set<Neuron<?>> BINDING_NEURON_TEMPLATE_GROUP = Set.of(INPUT_BINDING_TEMPLATE, SAME_BINDING_TEMPLATE);
         INPUT_BINDING_TEMPLATE.getTemplateInfo().setTemplateGroup(BINDING_NEURON_TEMPLATE_GROUP);
@@ -108,7 +108,7 @@ public class Templates {
                         new InputBNSynapse(),
                         INPUT_PATTERN_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
-                        "Primary Input Synapse Template",
+                        "Primary Input Synapse",
                         1,
                         true,
                         true
@@ -119,7 +119,7 @@ public class Templates {
                         new InputBNSynapse(),
                         INPUT_BINDING_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
-                        "Related Input Synapse from Binding Template",
+                        "Related Input Synapse from Binding Neuron",
                         2,
                         true,
                         true
@@ -130,7 +130,7 @@ public class Templates {
                         new InputBNSynapse(),
                         INHIBITORY_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
-                        "Related Input Synapse from Inhibitory Template",
+                        "Related Input Synapse from Inhibitory Neuron",
                         3,
                         true,
                         true
@@ -141,7 +141,7 @@ public class Templates {
                         new SameBNSynapse(false),
                         SAME_BINDING_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
-                        "Same Pattern Synapse Template",
+                        "Same Pattern Synapse",
                         4,
                         true,
                         true
@@ -152,7 +152,7 @@ public class Templates {
                         new SameBNSynapse(true),
                         SAME_PATTERN_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
-                        "Recurrent Same Pattern Synapse Template",
+                        "Recurrent Same Pattern Synapse",
                         5,
                         true,
                         true
@@ -163,7 +163,7 @@ public class Templates {
                         new NegativeBNSynapse(),
                         INHIBITORY_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
-                        "Negative Synapse Template",
+                        "Negative Synapse",
                         6,
                         false,
                         true
@@ -174,7 +174,7 @@ public class Templates {
                         new PatternSynapse(),
                         SAME_BINDING_TEMPLATE,
                         SAME_PATTERN_TEMPLATE,
-                        "Pattern Synapse Template",
+                        "Pattern Synapse",
                         7,
                         true,
                         true
@@ -185,7 +185,7 @@ public class Templates {
                         new PrimaryInhibitorySynapse(),
                         INPUT_PATTERN_TEMPLATE,
                         INHIBITORY_TEMPLATE,
-                        "Primary Inhibitory Synapse Template",
+                        "Primary Inhibitory Synapse",
                         8,
                         true,
                         true
@@ -196,7 +196,7 @@ public class Templates {
                         new InhibitorySynapse(),
                         SAME_BINDING_TEMPLATE,
                         INHIBITORY_TEMPLATE,
-                        "Inhibitory Synapse Template",
+                        "Inhibitory Synapse",
                         9,
                         false,
                         true

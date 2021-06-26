@@ -153,7 +153,7 @@ public class Link extends Element<Link> {
                 s -= input.getNeuron().getSurprisal(si, ref);
                 s -= output.getNeuron().getSurprisal(so, ref);
 
-                igGradient += s * getInputValue(si) * getOutputValue(so) * output.getNorm();
+                igGradient += s * getInputValue(si) * getOutputValue(so);
             }
         }
 
