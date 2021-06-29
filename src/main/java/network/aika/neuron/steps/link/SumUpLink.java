@@ -53,7 +53,8 @@ public class SumUpLink implements LinkStep {
 
         Activation oAct = l.getOutput();
 
-        QueueEntry.add(oAct, PROPAGATE_GRADIENTS_NET);
+        if(!oAct.markedNetUpdateOccurred)
+            QueueEntry.add(oAct, PROPAGATE_GRADIENTS_NET);
         QueueEntry.add(oAct, CHECK_IF_FIRED);
     }
 

@@ -38,6 +38,8 @@ public class PropagateGradientsNet implements ActivationStep {
     @Override
     public void process(Activation act) {
         act.propagateGradientsFromNetUpdate();
+
+        act.markedNetUpdateOccurred = true;
     }
 
     public String toString() {

@@ -88,6 +88,8 @@ public class Activation extends Element<Activation> {
     private double outputGradientSum[];
     private double inputGradientSum[];
 
+    public boolean markedNetUpdateOccurred; // Temporary hack
+
 
     private Activation(int id, Neuron<?> n) {
         this.id = id;
@@ -401,7 +403,8 @@ public class Activation extends Element<Activation> {
 
         Utils.checkTolerance(this, netDelta);
 
-        QueueEntry.add(this, PROPAGATE_GRADIENTS_NET);
+        if(!markedNetUpdateOccurred)
+            QueueEntry.add(this, PROPAGATE_GRADIENTS_NET);
         QueueEntry.add(this, CHECK_IF_FIRED);
     }
 
