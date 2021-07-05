@@ -244,8 +244,9 @@ public class Templates {
 
 
         Transition.add(true, SB_RELATED_SAME, SB_SAME, SAME_PATTERN_SYNAPSE_TEMPLATE);
-        Transition.add(SB_INPUT, SB_INPUT, SAME_PATTERN_SYNAPSE_TEMPLATE);
-        Transition.add(SB_RELATED_INPUT, SB_RELATED_INPUT, SAME_PATTERN_SYNAPSE_TEMPLATE);
+        Transition.add(SB_RELATED_INPUT, SB_RELATED_INPUT,
+                SAME_PATTERN_SYNAPSE_TEMPLATE, INHIBITORY_SYNAPSE_TEMPLATE
+        );
         Synapse[] inputBindingSynapses = new Synapse[] {
                 RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE,
                 RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE
@@ -255,6 +256,7 @@ public class Templates {
         Transition.add(SB_RELATED_INPUT, SB_INPUT, inputBindingSynapses);
         Transition.add(SB_INPUT, SB_RELATED_INPUT, inputBindingSynapses);
         Transition.add(SB_INPUT, SB_INPUT,
+                SAME_PATTERN_SYNAPSE_TEMPLATE,
                 INHIBITORY_SYNAPSE_TEMPLATE,
                 RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE
         );
