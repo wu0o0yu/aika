@@ -18,6 +18,9 @@ package network.aika.neuron.activation.scopes;
 
 import network.aika.neuron.Synapse;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Lukas Molzberger
  */
@@ -56,9 +59,13 @@ public class Transition {
         add(false, input, output, templateSynapse);
     }
 
-    public static void add(boolean isTarget, Scope input, Scope output, Synapse... templateSynapse) {
+    public static List<Transition> add(boolean isTarget, Scope input, Scope output, Synapse... templateSynapse) {
+        ArrayList<Transition> transitions = new ArrayList<>();
+
         for(Synapse ts: templateSynapse)
-            new Transition(ts, isTarget, input, output);
+            transitions.add(new Transition(ts, isTarget, input, output));
+
+        return transitions;
     }
 
     public boolean check(Synapse s, boolean isTargetLink) {
