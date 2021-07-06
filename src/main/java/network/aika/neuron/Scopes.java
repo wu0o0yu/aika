@@ -77,7 +77,7 @@ public class Scopes {
     }
 
     void add(Scope input, Scope output, Synapse... templateSynapse) {
-        add(input, output, templateSynapse);
+        add(false, input, output, templateSynapse);
     }
 
     public Scopes(Model m) {
