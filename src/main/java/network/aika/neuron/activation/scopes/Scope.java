@@ -53,10 +53,14 @@ public class Scope implements Comparable<Scope> {
         this.yCoord = yCoord;
     }
 
+
+    public int getId() {
+        return id;
+    }
+
     public String getLabel() {
         return label;
     }
-
 
     public double getXCoord() {
         return xCoord;

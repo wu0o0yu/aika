@@ -18,6 +18,7 @@ public class GradientTest {
         TextModel m = new TextModel();
 
         m.setN(912);
+        m.init();
 
         Document doc = new Document("A B ");
         doc.setConfig(
@@ -56,6 +57,7 @@ public class GradientTest {
         TextModel m = new TextModel();
 
         m.setN(912);
+        m.init();
 
         Document doc = new Document("A B C ");
         doc.setConfig(
@@ -101,6 +103,7 @@ public class GradientTest {
 
         m.setN(912);
         m.getTemplates().SAME_BINDING_TEMPLATE.setDirectConjunctiveBias(-0.32);
+        m.init();
 
         Document doc1 = new Document("A B ");
         doc1.setConfig(
