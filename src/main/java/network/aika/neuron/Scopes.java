@@ -59,15 +59,22 @@ public class Scopes {
     double OFFSET_NB_Y = -4.0;
     public Scope NB_SAME = new Scope("NB_SAME", 10, 0.0 + OFFSET_NB_X, 0.0 + OFFSET_NB_Y);
 
-    private List<Scope> scopes = new ArrayList<>();
+    private Map<Integer, Scope> scopes = new TreeMap<>();
     private List<Transition> transitions = new ArrayList<>();
 
-    public List<Scope> getScopes() {
+    public Map<Integer, Scope> getScopes() {
         return scopes;
     }
 
     public List<Transition> getTransitions() {
         return transitions;
+    }
+
+    void addScopes(Scope... scs) {
+        for(int i = 0; i < scs.length; i++) {
+            Scope s = scs[i];
+            scopes.put(s.getId(), s);
+        }
     }
 
     void add(boolean isTarget, Scope input, Scope output, Synapse... templateSynapse) {
@@ -82,6 +89,13 @@ public class Scopes {
 
     public Scopes(Model m) {
         model = m;
+
+        addScopes(I_INPUT, I_SAME);
+        addScopes(P_SAME);
+        addScopes(SB_INPUT, SB_SAME, SB_RELATED_INPUT, SB_RELATED_SAME);
+        addScopes(IB_INPUT, IB_SAME);
+        addScopes(PB_SAME);
+        addScopes(NB_SAME);
 
         Templates t = m.getTemplates();
 
