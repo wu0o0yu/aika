@@ -17,10 +17,13 @@
 package network.aika.neuron;
 
 import network.aika.Model;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.activation.scopes.Transition;
 
 import java.util.*;
+
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
  *
@@ -77,14 +80,14 @@ public class Scopes {
         }
     }
 
-    void add(boolean isTarget, Scope input, Scope output, Synapse... templateSynapse) {
+    void add(boolean isTarget, Direction pathDir, Scope input, Scope output, Synapse... templateSynapse) {
         transitions.addAll(
-                Transition.add(isTarget, input, output, templateSynapse)
+                Transition.add(isTarget, pathDir, input, output, templateSynapse)
         );
     }
 
-    void add(Scope input, Scope output, Synapse... templateSynapse) {
-        add(false, input, output, templateSynapse);
+    void add(Direction pathDir, Scope input, Scope output, Synapse... templateSynapse) {
+        add(false, pathDir, input, output, templateSynapse);
     }
 
     public Scopes(Model m) {
@@ -113,18 +116,18 @@ public class Scopes {
         add(I_INPUT, I_SAME, t.PRIMARY_INPUT_SYNAPSE_TEMPLATE);
 
 
-        add(true, P_SAME, P_SAME, t.PATTERN_SYNAPSE_TEMPLATE);
-        add(P_SAME, P_SAME,
+        add(true, INPUT, P_SAME, P_SAME, t.PATTERN_SYNAPSE_TEMPLATE);
+        add(INPUT, P_SAME, P_SAME,
                 t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE,
                 t.SAME_PATTERN_SYNAPSE_TEMPLATE
         );
 
-        add(true, PB_SAME, PB_SAME, t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE);
-        add(PB_SAME, PB_SAME, t.PATTERN_SYNAPSE_TEMPLATE);
+        add(true, INPUT, PB_SAME, PB_SAME, t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE);
+        add(INPUT, PB_SAME, PB_SAME, t.PATTERN_SYNAPSE_TEMPLATE);
 
 
-        add(true, NB_SAME, NB_SAME, t.NEGATIVE_SYNAPSE_TEMPLATE);
-        add(NB_SAME, NB_SAME, t.INHIBITORY_SYNAPSE_TEMPLATE);
+        add(true, INPUT, NB_SAME, NB_SAME, t.NEGATIVE_SYNAPSE_TEMPLATE);
+        add(INPUT, NB_SAME, NB_SAME, t.INHIBITORY_SYNAPSE_TEMPLATE);
 
 
         add(true, IB_INPUT, IB_SAME,

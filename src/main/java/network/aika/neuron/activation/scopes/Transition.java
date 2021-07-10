@@ -17,6 +17,7 @@
 package network.aika.neuron.activation.scopes;
 
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.direction.Direction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,69 +28,51 @@ import java.util.List;
 public class Transition {
 
     private Synapse templateSynapse;
-    private boolean isTargetAllowed = false;
+    private boolean isTarget;
+    private Direction pathDir;
     private Scope input;
     private Scope output;
 
 
-    private Transition(Synapse templateSynapse) {
+    private Transition(Synapse templateSynapse, boolean isTarget, Direction pathDir, Scope input, Scope output) {
         this.templateSynapse = templateSynapse;
-    }
-
-    private Transition(Synapse templateSynapse, Scope input, Scope output) {
-        this(templateSynapse);
         this.input = input;
         this.output = output;
 
         input.getOutputs().add(this);
         output.getInputs().add(this);
+        this.isTarget = isTarget;
+        this.pathDir = pathDir;
     }
 
-    private Transition(Synapse templateSynapse, boolean isTargetAllowed) {
-        this(templateSynapse);
-        this.isTargetAllowed = isTargetAllowed;
-    }
-
-    private Transition(Synapse templateSynapse, boolean isTargetAllowed, Scope input, Scope output) {
-        this(templateSynapse, input, output);
-        this.isTargetAllowed = isTargetAllowed;
-    }
-
-    public static void add(Scope input, Scope output, Synapse... templateSynapse) {
-        add(false, input, output, templateSynapse);
-    }
-
-    public static List<Transition> add(boolean isTarget, Scope input, Scope output, Synapse... templateSynapse) {
+    public static List<Transition> add(boolean isTarget, Direction pathDir, Scope input, Scope output, Synapse... templateSynapse) {
         ArrayList<Transition> transitions = new ArrayList<>();
 
         for(Synapse ts: templateSynapse)
-            transitions.add(new Transition(ts, isTarget, input, output));
+            transitions.add(new Transition(ts, isTarget, pathDir, input, output));
 
         return transitions;
     }
 
     public boolean check(Synapse s, boolean isTargetLink) {
-        return s.getTemplate() == templateSynapse && (this.isTargetAllowed || !isTargetLink);
+        return s.getTemplate() == templateSynapse && (this.isTarget || !isTargetLink);
     }
 
     public Synapse getSynapseTemplate() {
         return templateSynapse;
     }
 
-    public boolean isTargetAllowed() {
-        return isTargetAllowed;
+
+    public Direction getPathDir() {
+        return pathDir;
     }
 
-    public void setInput(Scope input) {
-        this.input = input;
+    public boolean isTarget() {
+        return isTarget;
     }
 
     public Scope getInput() {
         return input;
-    }
-
-    public void setOutput(Scope s) {
-        output = s;
     }
 
     public Scope getOutput() {
@@ -101,7 +84,7 @@ public class Transition {
                 input +
                 ":" +
                 templateSynapse.getTemplateInfo().getLabel() +
-                (isTargetAllowed ? ":T" : "") +
+                (isTarget ? ":T" : "") +
                 ":" + output +
                 ">";
     }
