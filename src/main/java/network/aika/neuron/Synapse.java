@@ -140,11 +140,19 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public TemplateSynapseInfo getTemplateInfo() {
         assert isTemplate();
-        if(templateInfo == null) {
+        if (templateInfo == null) {
             templateInfo = new TemplateSynapseInfo();
         }
 
         return templateInfo;
+    }
+
+    public boolean isOfTemplate(Synapse templateSynapse) {
+        return getTemplateSynapseId() == templateSynapse.getTemplateSynapseId();
+    }
+
+    public byte getTemplateSynapseId() {
+        return getTemplate().getTemplateInfo().getTemplateSynapseId();
     }
 
     protected void initFromTemplate(Synapse s) {

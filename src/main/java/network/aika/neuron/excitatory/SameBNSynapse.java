@@ -45,11 +45,11 @@ public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> 
         Synapse ts = s.getTemplate();
 
         if(v.getStartDir() != v.getCurrentDir()) {
-            if(ts != t.PRIMARY_INPUT_SYNAPSE_TEMPLATE) {
+            if (!ts.isOfTemplate(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE)) {
                 return null;
             }
         } else {
-            if(ts == t.NEGATIVE_SYNAPSE_TEMPLATE || ts == t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE || ts == t.SAME_PATTERN_SYNAPSE_TEMPLATE) {
+            if (ts.isOfTemplate(t.NEGATIVE_SYNAPSE_TEMPLATE) || ts.isOfTemplate(t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE) || ts.isOfTemplate(t.SAME_PATTERN_SYNAPSE_TEMPLATE)) {
                 return null;
             }
         }
