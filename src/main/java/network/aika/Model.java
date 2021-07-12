@@ -58,7 +58,6 @@ public abstract class Model implements Writable {
     public Map<Long, NeuronProvider> activeProviders = new TreeMap<>();
 
     private Templates templates = new Templates(this);
-    private Scopes scopes = new Scopes(this);
 
     private Supplier<Writable> customDataInstanceSupplier;
 
@@ -104,10 +103,6 @@ public abstract class Model implements Writable {
 
     public Templates getTemplates() {
         return templates;
-    }
-
-    public Scopes getScopes() {
-        return scopes;
     }
 
     public Collection<NeuronProvider> getActiveNeurons() {

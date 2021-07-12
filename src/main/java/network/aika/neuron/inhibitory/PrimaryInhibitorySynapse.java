@@ -28,7 +28,7 @@ import network.aika.neuron.activation.visitor.Visitor;
 public class PrimaryInhibitorySynapse extends InhibitorySynapse {
 
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        return v.getTargetDir() == Direction.OUTPUT;
+        return v.getCurrentDir() == Direction.OUTPUT;
     }
 
 }

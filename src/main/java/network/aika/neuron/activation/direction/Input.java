@@ -21,10 +21,8 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.TemplateNeuronInfo;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.scopes.Scope;
-import network.aika.neuron.activation.scopes.Transition;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -64,33 +62,8 @@ public class Input implements Direction {
     }
 
     @Override
-    public Set<Transition> getTransitions(Scope s) {
-        return s.getInputs();
-    }
-
-    @Override
-    public Scope getFromScope(Transition t) {
-        return t.getOutput();
-    }
-
-    @Override
-    public void setFromScope(Scope s, Transition t) {
-        t.setOutput(s);
-    }
-
-    @Override
-    public Scope getToScope(Transition t) {
-        return t.getInput();
-    }
-
-    @Override
-    public void setToScope(Scope s, Transition t) {
-        t.setInput(s);
-    }
-
-    @Override
-    public Set<Scope> getInitialScopes(TemplateNeuronInfo templateInfo) {
-        return templateInfo.getInputScopes();
+    public List<Synapse> getTargetSynapses(TemplateNeuronInfo templateInfo) {
+        return templateInfo.getInputTargetSynapses();
     }
 
     @Override

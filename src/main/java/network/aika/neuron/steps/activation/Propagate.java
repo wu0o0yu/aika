@@ -55,7 +55,7 @@ public class Propagate extends LinkingVisitor implements ActivationStep {
                 .forEach(s ->
                         s.propagate(
                                 act,
-                                new ActVisitor(this, act, OUTPUT, OUTPUT)
+                                new ActVisitor(this, act, s.getTemplate(), OUTPUT, OUTPUT)
                         )
                 );
     }

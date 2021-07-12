@@ -17,10 +17,13 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
 
 /**
@@ -28,6 +31,10 @@ import network.aika.neuron.activation.visitor.Visitor;
  * @author Lukas Molzberger
  */
 public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, PatternNeuron> {
+
+    public LinkVisitor transition(ActVisitor v, Synapse s, Link l) {
+        return null;
+    }
 
     @Override
     public void updateReference(Link l) {
@@ -43,7 +50,7 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
 
     @Override
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        return v.getTargetDir() == Direction.OUTPUT ||
+        return v.getCurrentDir() == Direction.OUTPUT ||
                 !act.getNeuron().isInputNeuron();
     }
 

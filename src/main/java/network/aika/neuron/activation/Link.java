@@ -120,15 +120,18 @@ public class Link extends Element<Link> {
 
     public void follow(VisitorStep p, Direction startDir) {
         Activation startAct = startDir.invert().getActivation(this);
-        ActVisitor v = new ActVisitor(p, startAct, startDir, startDir);
 
-        startAct.setMarked(true);
-        follow(v);
-        startAct.setMarked(false);
+        ActVisitor.getInitialActVisitors(p, startAct, startDir, startDir)
+                .forEach(v -> {
+                            startAct.setMarked(true);
+                            follow(v);
+                            startAct.setMarked(false);
+                        }
+                );
     }
 
     public void follow(ActVisitor v) {
-        LinkVisitor lv = synapse.transition(v, this);
+        LinkVisitor lv = v.getTargetSynapse().transition(v, getSynapse(), this);
         if(lv == null)
             return;
 
@@ -185,13 +188,6 @@ public class Link extends Element<Link> {
         );
     }
 
-    public boolean followAllowed(Direction dir) {
-        Activation nextAct = dir.getActivation(this);
-        return !isNegative() &&
-                nextAct != null &&
-                !nextAct.isMarked();// &&
-//                isCausal();
-    }
 
     public boolean isCausal() {
         return input == null || Fired.COMPARATOR.compare(input.getFired(), output.getFired()) <= 0;

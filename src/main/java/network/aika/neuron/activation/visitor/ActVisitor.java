@@ -16,13 +16,12 @@
  */
 package network.aika.neuron.activation.visitor;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.scopes.Scope;
 import network.aika.neuron.steps.VisitorStep;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -32,41 +31,32 @@ public class ActVisitor extends Visitor {
 
     private Activation act;
 
-    private Collection<Scope> scopes;
-
-
     public ActVisitor() {
     }
 
     public ActVisitor(LinkVisitor v, Activation act) {
         super(v);
         this.act = act;
-        scopes = v.getTransitions().stream()
-                .map(t -> v.currentDir.getToScope(t))
-                .collect(Collectors.toList());
     }
 
-    public ActVisitor(VisitorStep vp, Activation act, Direction startDir, Direction currentDir) {
+    public static Stream<ActVisitor> getInitialActVisitors(VisitorStep vp, Activation act, Direction startDir, Direction currentDir) {
+        return act.getNeuron()
+                .getTemplateGroup().stream()
+                .flatMap(tn ->
+                        startDir.getTargetSynapses(tn.getTemplateInfo()).stream()
+                )
+                .map(ts ->
+                        new ActVisitor(vp, act, ts, startDir, currentDir)
+                );
+    }
+
+    public ActVisitor(VisitorStep vp, Activation act, Synapse targetSynapse, Direction startDir, Direction currentDir) {
         this.visitorStep = vp;
         this.origin = this;
         this.act = act;
-        this.targetDir = startDir;
+        this.targetSynapse = targetSynapse;
+        this.startDir = startDir;
         this.currentDir = currentDir;
-
-        scopes = act.getNeuron()
-                .getTemplateGroup().stream()
-                .flatMap(tn ->
-                        startDir.getInitialScopes(tn.getTemplateInfo()).stream()
-                )
-                .collect(Collectors.toList());
-    }
-
-    public boolean follow() {
-        return !scopes.isEmpty();
-    }
-
-    public Collection<Scope> getScopes() {
-        return scopes;
     }
 
     public Activation getActivation() {
@@ -82,8 +72,8 @@ public class ActVisitor extends Visitor {
 
         visitorStep.closeLoop(
                 this,
-                targetDir.getInput(act, getOriginAct()),
-                targetDir.getOutput(act, getOriginAct())
+                currentDir.getInput(act, getOriginAct()),
+                currentDir.getOutput(act, getOriginAct())
         );
     }
 
@@ -91,7 +81,7 @@ public class ActVisitor extends Visitor {
         StringBuilder sb = new StringBuilder();
 
         sb.append("Current:" + (act != null ? act.toShortString() : "X") + ", ");
-        sb.append("Scopes:" + scopes + ", ");
+        sb.append("TargetSynapse:" + targetSynapse + ", ");
         sb.append("Origin:" + origin.act.toShortString() + ", ");
 
         sb.append(super.toString());

@@ -17,8 +17,6 @@
 package network.aika.neuron;
 
 import network.aika.Model;
-import network.aika.neuron.activation.scopes.Scope;
-import network.aika.neuron.activation.scopes.Transition;
 import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
@@ -62,6 +60,7 @@ public class Templates {
         init(INPUT_PATTERN_TEMPLATE, -3, "Input Pattern Neuron", 1.0, -1.0);
         init(SAME_PATTERN_TEMPLATE, -4, "Same Pattern Neuron", -1.0, 1.0);
         init(INHIBITORY_TEMPLATE, -5, "Inhibitory Neuron", 1.0, 1.0);
+
 
         Set<Neuron<?>> BINDING_NEURON_TEMPLATE_GROUP = Set.of(INPUT_BINDING_TEMPLATE, SAME_BINDING_TEMPLATE);
         INPUT_BINDING_TEMPLATE.getTemplateInfo().setTemplateGroup(BINDING_NEURON_TEMPLATE_GROUP);
@@ -171,6 +170,41 @@ public class Templates {
                         false,
                         true
                 );
+
+
+        SAME_BINDING_TEMPLATE.getTemplateInfo().inputScopes = List.of(
+                PRIMARY_INPUT_SYNAPSE_TEMPLATE, RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE, RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE,
+                SAME_PATTERN_SYNAPSE_TEMPLATE,
+                RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE,
+                NEGATIVE_SYNAPSE_TEMPLATE
+        );
+        SAME_BINDING_TEMPLATE.getTemplateInfo().outputScopes = List.of(
+                SAME_PATTERN_SYNAPSE_TEMPLATE,
+                PRIMARY_INPUT_SYNAPSE_TEMPLATE, RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE, RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE,
+                INHIBITORY_SYNAPSE_TEMPLATE,
+                PATTERN_SYNAPSE_TEMPLATE
+        );
+
+        SAME_PATTERN_TEMPLATE.getTemplateInfo().inputScopes = List.of(
+                PATTERN_SYNAPSE_TEMPLATE,
+                RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE
+        );
+        SAME_PATTERN_TEMPLATE.getTemplateInfo().outputScopes = List.of(
+                PATTERN_SYNAPSE_TEMPLATE,
+                RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE,
+                PRIMARY_INPUT_SYNAPSE_TEMPLATE, RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE, RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE,
+                INHIBITORY_SYNAPSE_TEMPLATE
+        );
+
+        INHIBITORY_TEMPLATE.getTemplateInfo().inputScopes = List.of(
+                INHIBITORY_SYNAPSE_TEMPLATE,
+                NEGATIVE_SYNAPSE_TEMPLATE
+        );
+        INHIBITORY_TEMPLATE.getTemplateInfo().outputScopes = List.of(
+                INHIBITORY_SYNAPSE_TEMPLATE,
+                PRIMARY_INPUT_SYNAPSE_TEMPLATE, RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE, RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE,
+                NEGATIVE_SYNAPSE_TEMPLATE
+        );
     }
 
     public Collection<Neuron> getAllTemplates() {

@@ -16,9 +16,8 @@
  */
 package network.aika.neuron;
 
-import network.aika.neuron.activation.scopes.Scope;
-
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -27,8 +26,8 @@ import java.util.Set;
  */
 public class TemplateNeuronInfo {
 
-    Set<Scope> inputScopes = Collections.emptySet();
-    Set<Scope> outputScopes = Collections.emptySet();
+    List<Synapse> inputScopes = Collections.emptyList();
+    List<Synapse> outputScopes = Collections.emptyList();
 
     private String label;
     private Set<Neuron<?>> templateGroup;
@@ -69,11 +68,11 @@ public class TemplateNeuronInfo {
         this.templateGroup = templateGroup;
     }
 
-    public Set<Scope> getInputScopes() {
+    public List<Synapse> getInputTargetSynapses() {
         return inputScopes;
     }
 
-    public Set<Scope> getOutputScopes() {
+    public List<Synapse> getOutputTargetSynapses() {
         return outputScopes;
     }
 }

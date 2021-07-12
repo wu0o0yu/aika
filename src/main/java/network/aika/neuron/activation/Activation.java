@@ -315,34 +315,29 @@ public class Activation extends Element<Activation> {
                 );
     }
 
-
     public void follow(ActVisitor v) {
-        if(!v.follow())
-            return;
-
         getNeuron().transition(v);
-        followLinks(v);
-    }
 
-    private void followLinks(ActVisitor v) {
         v.onEvent(BEFORE);
-
-        v.tryToLink(this);
 
         Direction dir = v.getCurrentDir();
 
         setMarked(true);
-        List<Link> links = dir.getLinks(this)
-                .filter(l ->
-                        l.followAllowed(dir)
-                ).collect(Collectors.toList());
-
-        links.stream()
+        dir.getLinks(this)
+                .filter(l -> {
+                            Activation nextAct = dir.getActivation(l);
+                            return !l.isNegative() &&
+                                    nextAct != null &&
+                                    !nextAct.isMarked();
+                        }
+                )
                 .forEach(l ->
                         l.follow(v)
                 );
 
         setMarked(false);
+
+        v.tryToLink(this);
 
         v.onEvent(AFTER);
     }

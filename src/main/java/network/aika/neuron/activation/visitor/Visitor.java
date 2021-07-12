@@ -18,6 +18,7 @@ package network.aika.neuron.activation.visitor;
 
 import network.aika.Thought;
 import network.aika.callbacks.VisitorEvent;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
@@ -32,12 +33,13 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
  * @author Lukas Molzberger
  */
 public abstract class Visitor {
+    protected Synapse targetSynapse;
+
     protected ActVisitor origin;
     private Visitor previousStep;
     protected VisitorStep visitorStep;
-
+    protected Direction startDir;
     protected Direction currentDir;
-    protected Direction targetDir; // The targetDirection refers to the direction relative to the end of the visitor path.
 
     private int downSteps = 0;
     private int upSteps = 0;
@@ -46,32 +48,34 @@ public abstract class Visitor {
 
     public Visitor(Visitor v) {
         previousStep = v;
+        targetSynapse = v.targetSynapse;
         visitorStep = v.visitorStep;
         origin = v.origin;
+        startDir = v.startDir;
         currentDir = v.currentDir;
-        targetDir = v.targetDir;
         downSteps = v.downSteps;
         upSteps = v.upSteps;
     }
 
-    public abstract boolean follow();
+    public Synapse getTargetSynapse() {
+        return targetSynapse;
+    }
 
     public void switchDirection() {
         assert currentDir == INPUT;
         currentDir = currentDir.invert();
-        targetDir = targetDir.invert();
     }
 
     public Visitor getPreviousStep() {
         return previousStep;
     }
 
-    public Direction getCurrentDir() {
-        return currentDir;
+    public Direction getStartDir() {
+        return startDir;
     }
 
-    public Direction getTargetDir() {
-        return targetDir;
+    public Direction getCurrentDir() {
+        return currentDir;
     }
 
     public int getDownSteps() {
@@ -88,12 +92,6 @@ public abstract class Visitor {
 
     public Activation getOriginAct() {
         return origin.getActivation();
-    }
-
-    public Direction getDirection(boolean isTargetLink) {
-        return isTargetLink ?
-                targetDir :
-                currentDir;
     }
 
     public void incrementPathLength() {
@@ -129,7 +127,7 @@ public abstract class Visitor {
         StringBuilder sb = new StringBuilder();
 
         sb.append("DownUp:" + currentDir + ", ");
-        sb.append("TargetDir:" + targetDir + ", ");
+        sb.append("StartDir:" + startDir + ", ");
 
         sb.append("Steps: (down:" + downSteps + "), (up:" + upSteps + ")");
 

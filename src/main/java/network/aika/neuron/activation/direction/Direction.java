@@ -21,9 +21,8 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.TemplateNeuronInfo;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.scopes.Scope;
-import network.aika.neuron.activation.scopes.Transition;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -47,17 +46,7 @@ public interface Direction {
 
     Stream<Link> getLinks(Activation act);
 
-    Set<Transition> getTransitions(Scope s);
-
-    Scope getFromScope(Transition t);
-
-    void setFromScope(Scope s, Transition t);
-
-    Scope getToScope(Transition t);
-
-    void setToScope(Scope s, Transition t);
-
-    Set<Scope> getInitialScopes(TemplateNeuronInfo templateInfo);
+    List<Synapse> getTargetSynapses(TemplateNeuronInfo templateInfo);
 
     Stream<? extends Synapse> getSynapses(Neuron n);
 

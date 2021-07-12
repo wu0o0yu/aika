@@ -21,6 +21,8 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.steps.link.SumUpLink;
 
@@ -33,6 +35,9 @@ import static network.aika.neuron.sign.Sign.POS;
  */
 public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
+    public LinkVisitor transition(ActVisitor v, Synapse s, Link l) {
+        return null;
+    }
 
     public void updateSynapse(Link l, double delta) {
         if(l.getInput().isActive(true)) {

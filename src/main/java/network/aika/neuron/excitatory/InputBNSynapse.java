@@ -17,9 +17,15 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
 
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
@@ -27,5 +33,25 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  * @author Lukas Molzberger
  */
 public class InputBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> {
+
+
+    public LinkVisitor transition(ActVisitor v, Synapse s, Link l) {
+        Templates t = getModel().getTemplates();
+        Synapse ts = s.getTemplate();
+
+        if(v.getStartDir() != v.getCurrentDir()) {
+            if(ts != t.RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE && ts != t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE) {
+                return null;
+            }
+        } else {
+            if(ts != t.PRIMARY_INPUT_SYNAPSE_TEMPLATE) {
+                return null;
+            }
+        }
+
+        LinkVisitor nv = new LinkVisitor(v, s, l);
+        nv.incrementPathLength();
+        return nv;
+    }
 
 }

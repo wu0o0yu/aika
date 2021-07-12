@@ -16,15 +16,12 @@
  */
 package network.aika.neuron;
 
-import network.aika.Config;
 import network.aika.Model;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.scopes.Scope;
-import network.aika.neuron.activation.scopes.Transition;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
@@ -39,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.stream.Stream;
 
 import static network.aika.neuron.Neuron.BETA_THRESHOLD;
 import static network.aika.neuron.activation.Link.linkExists;
@@ -73,6 +69,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     private volatile boolean modified;
 
     protected boolean allowTraining = true;
+
+
+
+    public abstract LinkVisitor transition(ActVisitor v, Synapse s, Link l);
 
     public void setInput(I input) {
         this.input = input.getProvider();
@@ -164,29 +164,13 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return false;
     }
 
-    public LinkVisitor transition(ActVisitor v, Link l) {
-        LinkVisitor nv = new LinkVisitor(v, this, l);
-
-        if(!nv.follow())
-            return null;
-
-        nv.incrementPathLength();
-        return nv;
-    }
-
-    public Stream<Transition> transition(Scope s, Direction dir, boolean isTargetLink) {
-        return dir.getTransitions(s).stream()
-                .filter(t ->
-                        t.check(this, isTargetLink)
-                );
-    }
-
     public void propagate(Activation fromAct, ActVisitor v) {
-        LinkVisitor nv = transition(v, null);
+//        LinkVisitor nv = v.getTargetSynapse().transition(v, this, null);
+        LinkVisitor nv = new LinkVisitor(v, this, null);
         if(nv == null)
             return;
 
-        Direction dir = nv.getTargetDir();
+        Direction dir = nv.getCurrentDir();
 
         Activation toAct = fromAct.getThought()
                 .createActivation(
@@ -205,11 +189,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void closeLoop(ActVisitor v, Activation iAct, Activation oAct) {
-        LinkVisitor nv = transition(v, null);
+        LinkVisitor nv = v.getTargetSynapse().transition(v, this, null);
         if(nv == null)
-            return;
-
-        if(!nv.isClosedLoop())
             return;
 
         if (linkExists(this, iAct, oAct))

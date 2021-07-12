@@ -17,7 +17,12 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
@@ -35,11 +40,30 @@ public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> 
         this.isRecurrent = isRecurrent;
     }
 
+    public LinkVisitor transition(ActVisitor v, Synapse s, Link l) {
+        Templates t = getModel().getTemplates();
+        Synapse ts = s.getTemplate();
+
+        if(v.getStartDir() != v.getCurrentDir()) {
+            if(ts != t.PRIMARY_INPUT_SYNAPSE_TEMPLATE) {
+                return null;
+            }
+        } else {
+            if(ts == t.NEGATIVE_SYNAPSE_TEMPLATE || ts == t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE || ts == t.SAME_PATTERN_SYNAPSE_TEMPLATE) {
+                return null;
+            }
+        }
+
+        LinkVisitor nv = new LinkVisitor(v, s, l);
+        nv.incrementPathLength();
+        return nv;
+    }
+
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
         if(super.checkTemplatePropagate(v, act))
             return true;
 
-        if (v.getTargetDir() == INPUT)
+        if (v.getCurrentDir() == INPUT)
             return !act.getNeuron().isInputNeuron() && isRecurrent;
 
         return false;

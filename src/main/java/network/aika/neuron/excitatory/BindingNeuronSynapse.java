@@ -57,11 +57,11 @@ public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends Excitato
     }
 
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        if(v.getTargetDir() == OUTPUT) {
+        if(v.getCurrentDir() == OUTPUT) {
             log.info(act.getLabel() + " BiasLB:" + getOutput().computeBiasLB(act));
         }
 
-        return v.getTargetDir() == OUTPUT &&
+        return v.getCurrentDir() == OUTPUT &&
                 getOutput().computeBiasLB(act) >= PROPAGATE_THRESHOLD_LB;
     }
 

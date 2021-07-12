@@ -25,7 +25,12 @@ import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.TemplateVisitor;
 
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
+
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 
 /**
@@ -57,24 +62,32 @@ public abstract class TemplatePropagate extends TemplateVisitor implements Activ
         if (!n.allowTemplatePropagate(act))
             return;
 
-        ActVisitor v = new ActVisitor(this, act, direction, direction);
+        Map<Synapse, ActVisitor> templateSynapses = new TreeMap<>(
+                Comparator.comparingInt(s -> s.getTemplateInfo().getTemplateSynapseId())
+        );
 
-        Direction targetDir = v.getTargetDir();
-
-        Collection<Synapse> templateSynapses = n
-                .getTemplateGroup()
+        n.getTemplateGroup()
                 .stream()
-                .flatMap(tn -> targetDir.getSynapses(tn))
-                .filter(ts -> ts.checkTemplatePropagate(v, act))
-                .collect(Collectors.toList());
+                .flatMap(tn ->
+                        direction.getSynapses(tn)
+                )
+                .map(ts ->
+                        new ActVisitor(this, act, ts, OUTPUT, direction)
+                )
+                .filter(v ->
+                        v.getTargetSynapse().checkTemplatePropagate(v, act)
+                )
+                .forEach(v ->
+                        templateSynapses.put(v.getTargetSynapse(), v)
+                );
 
-        targetDir.getLinks(act)
+        direction.getLinks(act)
                 .forEach(l ->
                         templateSynapses.remove(l.getSynapse().getTemplate())
                 );
 
-        templateSynapses.forEach(s ->
-                s.propagate(act, v)
+        templateSynapses.entrySet().forEach(e ->
+                e.getKey().propagate(act, e.getValue())
         );
     }
 
