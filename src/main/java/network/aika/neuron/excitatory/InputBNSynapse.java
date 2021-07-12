@@ -24,22 +24,28 @@ import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 
 /**
- *
  * @author Lukas Molzberger
  */
 public class InputBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> {
 
 
+    public InputBNSynapse(boolean recurrent) {
+        super(recurrent);
+    }
+
+    public InputBNSynapse() {
+        super();
+    }
+
     public LinkVisitor transition(ActVisitor v, Synapse s, Link l) {
         Templates t = getModel().getTemplates();
-        Synapse ts = s.getTemplate();
 
-        if(v.getStartDir() != v.getCurrentDir()) {
-            if (!ts.isOfTemplate(t.RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE) && !ts.isOfTemplate(t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE)) {
+        if (v.getStartDir() != v.getCurrentDir()) {
+            if (!s.isOfTemplate(t.RELATED_RECURRENT_INPUT_TEMPLATE) && !s.isOfTemplate(t.RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE) && !s.isOfTemplate(t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE)) {
                 return null;
             }
         } else {
-            if (!ts.isOfTemplate(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE)) {
+            if (!s.isOfTemplate(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE)) {
                 return null;
             }
         }

@@ -42,6 +42,7 @@ public class Templates {
     public InputBNSynapse PRIMARY_INPUT_SYNAPSE_TEMPLATE;
     public InputBNSynapse RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE;
     public InputBNSynapse RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE;
+    public InputBNSynapse RELATED_RECURRENT_INPUT_TEMPLATE;
     public SameBNSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
     public SameBNSynapse RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE;
     public NegativeBNSynapse NEGATIVE_SYNAPSE_TEMPLATE;
@@ -101,6 +102,17 @@ public class Templates {
                         SAME_BINDING_TEMPLATE,
                         "Related Input Synapse from Inhibitory Neuron",
                         3,
+                        true,
+                        true
+                );
+
+        RELATED_RECURRENT_INPUT_TEMPLATE =
+                init(
+                        new InputBNSynapse(true),
+                        INHIBITORY_TEMPLATE,
+                        SAME_BINDING_TEMPLATE,
+                        "Related Input Synapse from Inhibitory Neuron",
+                        10,
                         true,
                         true
                 );

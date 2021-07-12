@@ -158,7 +158,7 @@ public class TextModel extends Model {
         inRel.setInputNeuron(true);
         inRel.setLabel(label);
 
-        initRecurrentSameSynapse(in, inRel);
+        initRelatedRecurrentInputSynapse(in, inRel);
         initRelatedInputSynapse(inRel, inhib, b);
 
         inRel.setBias(4.0);
@@ -175,8 +175,8 @@ public class TextModel extends Model {
         inRel.addConjunctiveBias(-10.0, recurrent);
     }
 
-    private void initRecurrentSameSynapse(PatternNeuron in, BindingNeuron inRel) {
-        Synapse s = getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE
+    private void initRelatedRecurrentInputSynapse(PatternNeuron in, BindingNeuron inRel) {
+        Synapse s = getTemplates().RELATED_RECURRENT_INPUT_TEMPLATE
                 .instantiateTemplate(in, inRel);
 
         s.linkInput();

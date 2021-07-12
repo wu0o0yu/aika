@@ -42,14 +42,13 @@ public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> 
 
     public LinkVisitor transition(ActVisitor v, Synapse s, Link l) {
         Templates t = getModel().getTemplates();
-        Synapse ts = s.getTemplate();
 
         if(v.getStartDir() != v.getCurrentDir()) {
-            if (!ts.isOfTemplate(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE)) {
+            if (!s.isOfTemplate(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE)) {
                 return null;
             }
         } else {
-            if (ts.isOfTemplate(t.NEGATIVE_SYNAPSE_TEMPLATE) || ts.isOfTemplate(t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE) || ts.isOfTemplate(t.SAME_PATTERN_SYNAPSE_TEMPLATE)) {
+            if (s.isOfTemplate(t.NEGATIVE_SYNAPSE_TEMPLATE) || s.isOfTemplate(t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE) || s.isOfTemplate(t.SAME_PATTERN_SYNAPSE_TEMPLATE)) {
                 return null;
             }
         }
