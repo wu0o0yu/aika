@@ -37,7 +37,6 @@ import static network.aika.neuron.sign.Sign.POS;
 public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
     public LinkVisitor transition(ActVisitor v, Synapse s, Link l) {
-
         Templates t = getModel().getTemplates();
 
         if (v.getStartDir() == v.getCurrentDir()) {

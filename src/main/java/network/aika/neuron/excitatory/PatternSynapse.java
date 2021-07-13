@@ -18,6 +18,7 @@ package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
@@ -33,7 +34,13 @@ import network.aika.neuron.activation.visitor.Visitor;
 public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, PatternNeuron> {
 
     public LinkVisitor transition(ActVisitor v, Synapse s, Link l) {
-        return null;
+        Templates t = getModel().getTemplates();
+
+        if (!s.isOfTemplate(t.PATTERN_SYNAPSE_TEMPLATE) && !s.isOfTemplate(t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE)) {
+            return null;
+        }
+
+        return new LinkVisitor(v, s, l);
     }
 
     @Override
@@ -50,8 +57,7 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
 
     @Override
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        return v.getCurrentDir() == Direction.OUTPUT ||
-                !act.getNeuron().isInputNeuron();
+        return false;
     }
 
     @Override
