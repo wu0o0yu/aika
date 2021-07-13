@@ -18,6 +18,7 @@ package network.aika.neuron.inhibitory;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
@@ -36,7 +37,20 @@ import static network.aika.neuron.sign.Sign.POS;
 public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
     public LinkVisitor transition(ActVisitor v, Synapse s, Link l) {
-        return null;
+
+        Templates t = getModel().getTemplates();
+
+        if (v.getStartDir() == v.getCurrentDir()) {
+            if (!s.isOfTemplate(t.PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE)) {
+                return null;
+            }
+        } else {
+            if (!s.isOfTemplate(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE)) {
+                return null;
+            }
+        }
+
+        return new LinkVisitor(v, s, l);
     }
 
     public void updateSynapse(Link l, double delta) {

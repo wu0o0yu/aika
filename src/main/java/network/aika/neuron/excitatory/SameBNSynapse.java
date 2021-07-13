@@ -58,10 +58,9 @@ public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> 
             }
         }
 
-        LinkVisitor nv = new LinkVisitor(v, s, l);
-        nv.incrementPathLength(false);
-        return nv;
+        return new LinkVisitor(v, s, l);
     }
+
 
     public boolean checkTemplatePropagate(Visitor v, Activation act) {
         if (v.getCurrentDir() == INPUT && act.getNeuron().isInputNeuron()) {

@@ -31,7 +31,7 @@ public class LinkVisitor extends Visitor {
     public LinkVisitor(ActVisitor v, Synapse<?, ?> syn, Link l) {
         super(v);
         link = l;
-
+        syn.incrementPathLength(v);
         onCandidateEvent(syn);
     }
 

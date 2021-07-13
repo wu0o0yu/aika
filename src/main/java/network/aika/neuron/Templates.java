@@ -30,6 +30,7 @@ import java.util.*;
  */
 public class Templates {
 
+
     private Model model;
 
     public BindingNeuron INPUT_BINDING_TEMPLATE = new BindingNeuron();

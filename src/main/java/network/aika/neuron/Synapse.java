@@ -71,8 +71,12 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     protected boolean allowTraining = true;
 
 
-
     public abstract LinkVisitor transition(ActVisitor v, Synapse s, Link l);
+
+    public void incrementPathLength(ActVisitor v) {
+        v.incrementPathLength(false);
+    }
+
 
     public void setInput(I input) {
         this.input = input.getProvider();
@@ -452,4 +456,5 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 "s(p,n):" + Utils.round(getSurprisal(POS, NEG, null)) + " " +
                 "s(n,n):" + Utils.round(getSurprisal(NEG, NEG, null)) + " \n";
     }
+
 }
