@@ -43,6 +43,7 @@ public abstract class Visitor {
 
     private int downSteps = 0;
     private int upSteps = 0;
+    private int inputSteps = 0;
 
     protected Visitor() {}
 
@@ -55,6 +56,7 @@ public abstract class Visitor {
         currentDir = v.currentDir;
         downSteps = v.downSteps;
         upSteps = v.upSteps;
+        inputSteps = v.inputSteps;
     }
 
     public Synapse getTargetSynapse() {
@@ -64,6 +66,8 @@ public abstract class Visitor {
     public void switchDirection() {
         assert currentDir == INPUT;
         currentDir = currentDir.invert();
+
+        inputSteps = 0;
     }
 
     public Visitor getPreviousStep() {
@@ -86,6 +90,10 @@ public abstract class Visitor {
         return upSteps;
     }
 
+    public int getInputSteps() {
+        return inputSteps;
+    }
+
     public VisitorStep getVisitorStep() {
         return visitorStep;
     }
@@ -94,11 +102,15 @@ public abstract class Visitor {
         return origin.getActivation();
     }
 
-    public void incrementPathLength() {
+    public void incrementPathLength(boolean isInputStep) {
         if (currentDir == INPUT)
             downSteps++;
         else
             upSteps++;
+
+        if(isInputStep) {
+            inputSteps++;
+        }
     }
 
     public boolean getSelfRef() {

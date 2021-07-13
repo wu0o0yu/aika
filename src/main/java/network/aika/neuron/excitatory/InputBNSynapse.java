@@ -51,7 +51,7 @@ public class InputBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I>
         }
 
         LinkVisitor nv = new LinkVisitor(v, s, l);
-        nv.incrementPathLength();
+        nv.incrementPathLength(true);
         return nv;
     }
 

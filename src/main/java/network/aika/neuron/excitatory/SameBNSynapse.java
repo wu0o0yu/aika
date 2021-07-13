@@ -42,6 +42,10 @@ public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> 
     }
 
     public LinkVisitor transition(ActVisitor v, Synapse s, Link l) {
+        if(v.getInputSteps() >= 1) {
+            return null;
+        }
+
         Templates t = getModel().getTemplates();
 
         if(v.getStartDir() != v.getCurrentDir()) {
@@ -55,7 +59,7 @@ public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> 
         }
 
         LinkVisitor nv = new LinkVisitor(v, s, l);
-        nv.incrementPathLength();
+        nv.incrementPathLength(false);
         return nv;
     }
 
