@@ -56,6 +56,7 @@ public class ActVisitor extends Visitor {
         this.act = act;
         this.targetSynapse = targetSynapse;
         this.startDir = startDir;
+        this.targetDir = startDir;
         this.currentDir = currentDir;
     }
 
@@ -72,8 +73,8 @@ public class ActVisitor extends Visitor {
 
         visitorStep.closeLoop(
                 this,
-                currentDir.getInput(act, getOriginAct()),
-                currentDir.getOutput(act, getOriginAct())
+                targetDir.getInput(act, getOriginAct()),
+                targetDir.getOutput(act, getOriginAct())
         );
     }
 

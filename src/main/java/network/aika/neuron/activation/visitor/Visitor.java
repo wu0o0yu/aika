@@ -40,6 +40,7 @@ public abstract class Visitor {
     protected VisitorStep visitorStep;
     protected Direction startDir;
     protected Direction currentDir;
+    protected Direction targetDir; // The targetDirection refers to the direction relative to the end of the visitor path.
 
     private int downSteps = 0;
     private int upSteps = 0;
@@ -53,6 +54,7 @@ public abstract class Visitor {
         visitorStep = v.visitorStep;
         origin = v.origin;
         startDir = v.startDir;
+        targetDir = v.targetDir;
         currentDir = v.currentDir;
         downSteps = v.downSteps;
         upSteps = v.upSteps;
@@ -66,6 +68,7 @@ public abstract class Visitor {
     public void switchDirection() {
         assert currentDir == INPUT;
         currentDir = currentDir.invert();
+        targetDir = targetDir.invert();
 
         inputSteps = 0;
     }
@@ -140,8 +143,9 @@ public abstract class Visitor {
 
         sb.append("DownUp:" + currentDir + ", ");
         sb.append("StartDir:" + startDir + ", ");
+        sb.append("TargetDir:" + targetDir + ", ");
 
-        sb.append("Steps: (down:" + downSteps + "), (up:" + upSteps + ")");
+        sb.append("Steps: (down:" + downSteps + "), (up:" + upSteps + "), (input:" + inputSteps + ")");
 
         return sb.toString();
     }
