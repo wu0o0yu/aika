@@ -19,8 +19,11 @@ package network.aika.neuron.steps.activation;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Step;
 
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+import static network.aika.neuron.steps.activation.TemplatePropagate.TemplatePropagateInput;
+import static network.aika.neuron.steps.activation.TemplatePropagate.TemplatePropagateOutput;
+import static network.aika.neuron.steps.activation.TemplateCloseLoop.TemplateCloseLoopInput;
+import static network.aika.neuron.steps.activation.TemplateCloseLoop.TemplateCloseLoopOutput;
+
 
 /**
  *
@@ -28,8 +31,8 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public interface ActivationStep extends Step<Activation> {
     ActivationStep INDUCTION = new Induction();
-    Linking LINKING = new Linking(OUTPUT);
-    ActivationStep PROPAGATE = new Propagate(OUTPUT);
+    Linking LINKING = new Linking();
+    ActivationStep PROPAGATE = new Propagate();
     ActivationStep CHECK_IF_FIRED = new CheckIfFired();
     ActivationStep USE_FINAL_BIAS = new UseFinalBias();
     ActivationStep DETERMINE_BRANCH_PROBABILITY = new BranchProbability();
@@ -37,9 +40,9 @@ public interface ActivationStep extends Step<Activation> {
     ActivationStep PROPAGATE_GRADIENTS_SUM = new PropagateGradientsSum();
     ActivationStep PROPAGATE_GRADIENTS_NET = new PropagateGradientsNet();
     ActivationStep UPDATE_SYNAPSE_INPUT_LINKS = new UpdateSynapseInputLinks();
-    ActivationStep TEMPLATE_PROPAGATE_INPUT = new TemplatePropagate(INPUT);
-    TemplateCloseLoop TEMPLATE_CLOSE_LOOP_INPUT = new TemplateCloseLoop(INPUT);
-    TemplateCloseLoop TEMPLATE_CLOSE_LOOP_OUTPUT = new TemplateCloseLoop(OUTPUT);
-    ActivationStep TEMPLATE_PROPAGATE_OUTPUT = new TemplatePropagate(OUTPUT);
+    ActivationStep TEMPLATE_PROPAGATE_INPUT = new TemplatePropagateInput();
+    TemplateCloseLoop TEMPLATE_CLOSE_LOOP_INPUT = new TemplateCloseLoopInput();
+    TemplateCloseLoop TEMPLATE_CLOSE_LOOP_OUTPUT = new TemplateCloseLoopOutput();
+    ActivationStep TEMPLATE_PROPAGATE_OUTPUT = new TemplatePropagateOutput();
     ActivationStep COUNTING = new Counting();
 }

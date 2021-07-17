@@ -38,8 +38,8 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class Linking extends LinkingVisitor implements ActivationStep {
 
-    public Linking(Direction dir) {
-        super(dir);
+    public Linking() {
+        super(OUTPUT);
     }
 
     @Override

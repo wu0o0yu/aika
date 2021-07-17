@@ -21,6 +21,9 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.TemplateVisitor;
 
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+
 /**
  * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
  * activations and links.
@@ -29,7 +32,19 @@ import network.aika.neuron.steps.visitor.TemplateVisitor;
  */
 public class TemplatePropagate extends TemplateVisitor implements ActivationStep {
 
-    public TemplatePropagate(Direction dir) {
+    public static class TemplatePropagateInput extends TemplatePropagate {
+        public TemplatePropagateInput() {
+            super(INPUT);
+        }
+    }
+
+    public static class TemplatePropagateOutput extends TemplatePropagate {
+        public TemplatePropagateOutput() {
+            super(OUTPUT);
+        }
+    }
+
+    private TemplatePropagate(Direction dir) {
         super(dir);
     }
 

@@ -23,6 +23,7 @@ import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.TemplateVisitor;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
@@ -32,7 +33,19 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
  */
 public class TemplateCloseLoop extends TemplateVisitor implements ActivationStep {
 
-    public TemplateCloseLoop(Direction dir) {
+    public static class TemplateCloseLoopInput extends TemplateCloseLoop {
+        public TemplateCloseLoopInput() {
+            super(INPUT);
+        }
+    }
+
+    public static class TemplateCloseLoopOutput extends TemplateCloseLoop {
+        public TemplateCloseLoopOutput() {
+            super(OUTPUT);
+        }
+    }
+
+    private TemplateCloseLoop(Direction dir) {
         super(dir);
     }
 
