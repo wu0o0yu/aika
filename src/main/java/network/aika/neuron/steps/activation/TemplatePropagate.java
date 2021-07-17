@@ -16,22 +16,10 @@
  */
 package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.TemplateVisitor;
-
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
-
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
-
 
 /**
  * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
@@ -39,12 +27,10 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public abstract class TemplatePropagate extends TemplateVisitor implements ActivationStep {
-
-    private Direction direction;
+public class TemplatePropagate extends TemplateVisitor implements ActivationStep {
 
     public TemplatePropagate(Direction dir) {
-        direction = dir;
+        super(dir);
     }
 
     @Override
@@ -58,40 +44,13 @@ public abstract class TemplatePropagate extends TemplateVisitor implements Activ
 
     @Override
     public void process(Activation act) {
-        Neuron<?> n = act.getNeuron();
-        if (!n.allowTemplatePropagate(act))
+        if (!act.getNeuron().allowTemplatePropagate(act))
             return;
 
-        Map<Synapse, ActVisitor> templateSynapses = new TreeMap<>(
-                Comparator.comparingInt(s -> s.getTemplateInfo().getTemplateSynapseId())
-        );
-
-        n.getTemplateGroup()
-                .stream()
-                .flatMap(tn ->
-                        direction.getSynapses(tn)
-                )
-                .map(ts ->
-                        new ActVisitor(this, act, ts, OUTPUT, direction)
-                )
-                .filter(v ->
-                        v.getTargetSynapse().checkTemplatePropagate(v, act)
-                )
-                .forEach(v ->
-                        templateSynapses.put(v.getTargetSynapse(), v)
-                );
-
-        direction.getLinks(act)
-                .forEach(l ->
-                        templateSynapses.remove(l.getSynapse().getTemplate())
-                );
-
-        templateSynapses.entrySet().forEach(e ->
-                e.getKey().propagate(act, e.getValue())
-        );
+        propagate(act);
     }
 
     public String toString() {
-        return "Act-Step: Template-Propagate-" + direction;
+        return "Act-Step: Template-Propagate (" + direction + ")";
     }
 }

@@ -20,8 +20,11 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.steps.VisitorStep;
+
+import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.steps.link.LinkStep.LINKING;
@@ -30,7 +33,27 @@ import static network.aika.neuron.steps.link.LinkStep.LINKING;
  *
  * @author Lukas Molzberger
  */
-public abstract class LinkingVisitor implements VisitorStep {
+public abstract class LinkingVisitor extends VisitorStep {
+
+    public LinkingVisitor(Direction dir) {
+        super(dir);
+    }
+
+    @Override
+    public Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir) {
+         return dir.getSynapses(act.getNeuron())
+                 .filter(s -> !exists(act, s, direction));
+    }
+
+    @Override
+    public boolean exists(Activation act, Synapse s, Direction dir) {
+        return dir.linkExists(act, s);
+    }
+
+    @Override
+    public boolean checkPropagate(Activation act, Synapse targetSynapse) {
+        return true;
+    }
 
     @Override
     public void getNextSteps(Activation act) {
@@ -42,18 +65,16 @@ public abstract class LinkingVisitor implements VisitorStep {
     }
 
     @Override
-    public void closeLoop(ActVisitor v, Activation iAct, Activation oAct) {
-        if(!iAct.isActive(false))
+    public void closeLoopIntern(ActVisitor v, Activation iAct, Activation oAct) {
+        if (!iAct.isActive(false))
             return;
 
-        Synapse s = Link.getSynapse(iAct, oAct);
-        if(s == null)
-            return;
+//        if (Link.linkExists(iAct, oAct))
+//            return;
+
+        Synapse s = v.getTargetSynapse();
 
         if(!(v.getCurrentDir() == OUTPUT || s.isRecurrent()))
-            return;
-
-        if (Link.linkExists(iAct, oAct))
             return;
 
         oAct = s.branchIfNecessary(oAct, v);

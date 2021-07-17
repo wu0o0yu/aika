@@ -104,7 +104,7 @@ public class TextModel extends Model {
     }
 
     private static void addLink(Synapse s, Activation iAct, Activation oAct) {
-        Link nl = oAct.addLink(s, iAct, false, null);
+        Link nl = oAct.addLink(s, iAct, false);
 
         LINKING.getNextSteps(nl);
     }

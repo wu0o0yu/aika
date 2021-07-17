@@ -94,7 +94,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
                 .stream()
                 .filter(s -> !act.inputLinkExists(s))
                 .forEach(s ->
-                        new Link(s, null, act, false, null)
+                        new Link(s, null, act, false)
                 );
     }
 

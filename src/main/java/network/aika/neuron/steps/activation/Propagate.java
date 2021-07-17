@@ -16,7 +16,9 @@
  */
 package network.aika.neuron.steps.activation;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.LinkingVisitor;
@@ -38,9 +40,18 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class Propagate extends LinkingVisitor implements ActivationStep {
 
+    public Propagate(Direction dir) {
+        super(dir);
+    }
+
     @Override
     public Phase getPhase() {
         return Phase.LINKING;
+    }
+
+    @Override
+    public void process(Activation act) {
+        propagate(act);
     }
 
     public boolean checkIfQueued() {
@@ -48,19 +59,11 @@ public class Propagate extends LinkingVisitor implements ActivationStep {
     }
 
     @Override
-    public void process(Activation act) {
-        act.getNeuron()
-                .getOutputSynapses()
-                .filter(s -> !act.outputLinkExists(s))
-                .forEach(s ->
-                        s.propagate(
-                                act,
-                                new ActVisitor(this, act, s.getTemplate(), OUTPUT, OUTPUT)
-                        )
-                );
+    public boolean exists(Activation act, Synapse s, Direction dir) {
+        return dir.linkExists(act, s);
     }
 
     public String toString() {
-        return "Act-Step: Propagate";
+        return "Act-Step: Propagate (" + direction + ")";
     }
 }

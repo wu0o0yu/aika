@@ -56,5 +56,4 @@ public class InputBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I>
     public void incrementPathLength(ActVisitor v) {
         v.incrementPathLength(true);
     }
-
 }

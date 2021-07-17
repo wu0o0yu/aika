@@ -62,8 +62,8 @@ public class Input implements Direction {
     }
 
     @Override
-    public List<Synapse> getTargetSynapses(TemplateNeuronInfo templateInfo) {
-        return templateInfo.getInputTargetSynapses();
+    public boolean linkExists(Activation act, Synapse s) {
+        return act.inputLinkExists(s);
     }
 
     @Override

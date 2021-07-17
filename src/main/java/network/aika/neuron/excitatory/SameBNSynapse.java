@@ -21,6 +21,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
@@ -62,15 +63,15 @@ public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> 
     }
 
 
-    public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        if (v.getCurrentDir() == INPUT && act.getNeuron().isInputNeuron()) {
+    public boolean checkTemplatePropagate(Direction dir, Activation act) {
+        if (dir == INPUT && act.getNeuron().isInputNeuron()) {
             return false;
         }
 
-        if(v.getCurrentDir() == OUTPUT && isRecurrent) {
+        if(dir == OUTPUT && isRecurrent) {
             return false;
         }
 
-        return super.checkTemplatePropagate(v, act);
+        return super.checkTemplatePropagate(dir, act);
     }
 }

@@ -46,9 +46,9 @@ public interface Direction {
 
     Stream<Link> getLinks(Activation act);
 
-    List<Synapse> getTargetSynapses(TemplateNeuronInfo templateInfo);
-
     Stream<? extends Synapse> getSynapses(Neuron n);
+
+    boolean linkExists(Activation act, Synapse s);
 
     static int compare(Direction a, Direction b) {
         if(a == b) return 0;

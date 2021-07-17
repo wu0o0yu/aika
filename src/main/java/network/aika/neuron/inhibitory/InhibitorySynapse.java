@@ -22,6 +22,7 @@ import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
@@ -35,6 +36,12 @@ import static network.aika.neuron.sign.Sign.POS;
  * @author Lukas Molzberger
  */
 public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
+
+
+    @Override
+    public boolean checkTemplatePropagate(Direction dir, Activation act) {
+        return false;
+    }
 
     public LinkVisitor transition(ActVisitor v, Synapse s, Link l) {
         Templates t = getModel().getTemplates();
@@ -69,11 +76,6 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
                 l.getInput().getReference()
         );
     }
-
-    public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        return false;
-    }
-
 
     @Override
     public Activation branchIfNecessary(Activation oAct, Visitor v) {

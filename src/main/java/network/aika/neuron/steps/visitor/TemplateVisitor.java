@@ -17,14 +17,17 @@
 package network.aika.neuron.steps.visitor;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.steps.VisitorStep;
 import network.aika.neuron.steps.link.LinkStep;
 
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.steps.activation.ActivationStep.INDUCTION;
@@ -33,7 +36,31 @@ import static network.aika.neuron.steps.activation.ActivationStep.INDUCTION;
  *
  * @author Lukas Molzberger
  */
-public abstract class TemplateVisitor implements VisitorStep {
+public abstract class TemplateVisitor extends VisitorStep {
+
+    public TemplateVisitor(Direction dir) {
+        super(dir);
+    }
+
+    @Override
+    public Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir) {
+        return act.getNeuron()
+                .getTemplateGroup().stream()
+                .flatMap(tn ->
+                        dir.getSynapses(tn)
+                )
+                .filter(s -> !exists(act, s, direction));
+    }
+
+    @Override
+    public boolean checkPropagate(Activation act, Synapse targetSynapse) {
+        return targetSynapse.checkTemplatePropagate(direction, act);
+    }
+
+    @Override
+    public boolean exists(Activation act, Synapse s, Direction dir) {
+        return dir.linkExists(act, s); // synapseExists ?
+    }
 
     @Override
     public void getNextSteps(Activation act) {
@@ -47,32 +74,21 @@ public abstract class TemplateVisitor implements VisitorStep {
     }
 
     @Override
-    public void closeLoop(ActVisitor v, Activation iAct, Activation oAct) {
-        if(
-                oAct.getNeuron().isInputNeuron() ||
-                Link.synapseExists(iAct, oAct)
-        )
+    public void closeLoopIntern(ActVisitor v, Activation iAct, Activation oAct) {
+        if(oAct.getNeuron().isInputNeuron())
             return;
 
-        Set<Neuron<?>> inputTemplateGroup = iAct.getNeuron().getTemplateGroup();
+//        if(Link.synapseExists(iAct, oAct))
+//            return;
 
-        oAct.getNeuron()
-                .getTemplateGroup()
-                .stream()
-                .flatMap(tn ->
-                        tn.getInputSynapses()
-                )
-                .filter(
-                        ts -> v.getCurrentDir() == OUTPUT || ts.isRecurrent()
-                )
-                .filter(ts ->
-                        inputTemplateGroup.contains(ts.getInput())
-                )
-                .filter(ts ->
-                        iAct.isActive(ts.isRecurrent())
-                )
-                .forEach(ts ->
-                        ts.closeLoop(v, iAct, oAct)
-                );
+        Synapse ts = v.getTargetSynapse();
+
+        if(v.getCurrentDir() != OUTPUT && !ts.isRecurrent())
+            return;
+
+        if(!iAct.isActive(ts.isRecurrent()))
+            return;
+
+        ts.closeLoop(v, iAct, oAct);
     }
 }

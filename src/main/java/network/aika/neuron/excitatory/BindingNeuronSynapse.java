@@ -24,6 +24,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.Visitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,12 +57,12 @@ public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends Excitato
         this.isRecurrent = isRecurrent;
     }
 
-    public boolean checkTemplatePropagate(Visitor v, Activation act) {
-        if(v.getCurrentDir() == OUTPUT) {
+    public boolean checkTemplatePropagate(Direction dir, Activation act) {
+        if(dir == OUTPUT) {
             log.info(act.getLabel() + " BiasLB:" + getOutput().computeBiasLB(act));
         }
 
-        return v.getCurrentDir() == OUTPUT &&
+        return dir == OUTPUT &&
                 getOutput().computeBiasLB(act) >= PROPAGATE_THRESHOLD_LB;
     }
 

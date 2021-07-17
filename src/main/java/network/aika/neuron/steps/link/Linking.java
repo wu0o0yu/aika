@@ -16,10 +16,13 @@
  */
 package network.aika.neuron.steps.link;
 
+
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.LinkingVisitor;
+
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 
 /**
@@ -28,6 +31,10 @@ import network.aika.neuron.steps.visitor.LinkingVisitor;
  * @author Lukas Molzberger
  */
 public class Linking extends LinkingVisitor implements LinkStep {
+
+    public Linking() {
+        super(INPUT);
+    }
 
     @Override
     public Phase getPhase() {
@@ -40,7 +47,7 @@ public class Linking extends LinkingVisitor implements LinkStep {
 
     @Override
     public void process(Link l) {
-        l.follow(this);
+        link(l);
 
         QueueEntry.add(l, COUNTING);
     }

@@ -31,7 +31,7 @@ public interface EventListener {
 
     void afterProcessedEvent(QueueEntry qe);
 
-    void onActivationCreationEvent(Activation act, Activation originAct, Visitor v);
+    void onActivationCreationEvent(Activation act, Activation originAct);
 
-    void onLinkCreationEvent(Link l, Visitor v);
+    void onLinkCreationEvent(Link l);
 }

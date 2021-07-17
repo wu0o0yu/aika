@@ -18,11 +18,9 @@ package network.aika.neuron.activation.direction;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.TemplateNeuronInfo;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 
-import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -60,8 +58,8 @@ public class Output implements Direction {
     }
 
     @Override
-    public List<Synapse> getTargetSynapses(TemplateNeuronInfo templateInfo) {
-        return templateInfo.getOutputTargetSynapses();
+    public boolean linkExists(Activation act, Synapse s) {
+        return act.outputLinkExists(s);
     }
 
     public Stream<? extends Synapse> getSynapses(Neuron n) {

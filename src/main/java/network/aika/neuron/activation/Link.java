@@ -59,7 +59,7 @@ public class Link extends Element<Link> {
 
     private boolean hasBeenCounted = false;
 
-    public Link(Synapse s, Activation input, Activation output, boolean isSelfRef, LinkVisitor v) {
+    public Link(Synapse s, Activation input, Activation output, boolean isSelfRef) {
         this.synapse = s;
         this.input = input;
         this.output = output;
@@ -73,10 +73,7 @@ public class Link extends Element<Link> {
 
         getSynapse().updateReference(this);
 
-        if(v != null)
-            v.setLink(this);
-
-        getThought().onLinkCreationEvent(this, v);
+        getThought().onLinkCreationEvent(this);
     }
 
     @Override
@@ -110,24 +107,6 @@ public class Link extends Element<Link> {
             synapse.count(this);
 
         hasBeenCounted = true;
-    }
-
-    public void follow(VisitorStep p) {
-        follow(p,
-                synapse.isRecurrent() ? OUTPUT : INPUT
-        );
-    }
-
-    public void follow(VisitorStep p, Direction startDir) {
-        Activation startAct = startDir.invert().getActivation(this);
-
-        ActVisitor.getInitialActVisitors(p, startAct, startDir, startDir)
-                .forEach(v -> {
-                            startAct.setMarked(true);
-                            follow(v);
-                            startAct.setMarked(false);
-                        }
-                );
     }
 
     public void follow(ActVisitor v) {

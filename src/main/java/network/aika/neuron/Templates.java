@@ -183,41 +183,6 @@ public class Templates {
                         false,
                         true
                 );
-
-
-        SAME_BINDING_TEMPLATE.getTemplateInfo().inputScopes = List.of(
-                PRIMARY_INPUT_SYNAPSE_TEMPLATE, RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE, RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE,
-                SAME_PATTERN_SYNAPSE_TEMPLATE,
-                RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE,
-                NEGATIVE_SYNAPSE_TEMPLATE
-        );
-        SAME_BINDING_TEMPLATE.getTemplateInfo().outputScopes = List.of(
-                SAME_PATTERN_SYNAPSE_TEMPLATE,
-                PRIMARY_INPUT_SYNAPSE_TEMPLATE, RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE, RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE,
-                INHIBITORY_SYNAPSE_TEMPLATE,
-                PATTERN_SYNAPSE_TEMPLATE
-        );
-
-        SAME_PATTERN_TEMPLATE.getTemplateInfo().inputScopes = List.of(
-                PATTERN_SYNAPSE_TEMPLATE,
-                RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE
-        );
-        SAME_PATTERN_TEMPLATE.getTemplateInfo().outputScopes = List.of(
-                PATTERN_SYNAPSE_TEMPLATE,
-                RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE,
-                PRIMARY_INPUT_SYNAPSE_TEMPLATE, RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE, RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE,
-                INHIBITORY_SYNAPSE_TEMPLATE
-        );
-
-        INHIBITORY_TEMPLATE.getTemplateInfo().inputScopes = List.of(
-                INHIBITORY_SYNAPSE_TEMPLATE,
-                NEGATIVE_SYNAPSE_TEMPLATE
-        );
-        INHIBITORY_TEMPLATE.getTemplateInfo().outputScopes = List.of(
-                INHIBITORY_SYNAPSE_TEMPLATE,
-                PRIMARY_INPUT_SYNAPSE_TEMPLATE, RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE, RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE,
-                NEGATIVE_SYNAPSE_TEMPLATE
-        );
     }
 
     public Collection<Neuron> getAllTemplates() {

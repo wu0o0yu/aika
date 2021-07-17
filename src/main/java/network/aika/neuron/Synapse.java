@@ -26,6 +26,7 @@ import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.sign.Sign;
+import network.aika.neuron.steps.VisitorStep;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
@@ -114,7 +115,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     protected abstract boolean checkCausality(Activation iAct, Activation oAct, Visitor v);
 
-    public abstract boolean checkTemplatePropagate(Visitor v, Activation act);
+    public abstract boolean checkTemplatePropagate(Direction dir, Activation act);
 
     public abstract void updateReference(Link l);
 
@@ -176,57 +177,56 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return false;
     }
 
-    public void propagate(Activation fromAct, ActVisitor v) {
-//        LinkVisitor nv = v.getTargetSynapse().transition(v, this, null);
-        LinkVisitor nv = new LinkVisitor(v, this, null);
+    public void propagate(Activation fromAct, Direction dir, VisitorStep vs, boolean isSelfRef) {
+/*        LinkVisitor nv = v.getTargetSynapse()
+                .transition(v, this, null, true);
+
         if(nv == null)
             return;
-
-        Direction dir = nv.getCurrentDir();
+*/
 
         Activation toAct = fromAct.getThought()
                 .createActivation(
                         dir.getNeuron(this),
-                        fromAct,
-                        v
+                        fromAct
                 );
 
-        nv.getVisitorStep().getNextSteps(toAct);
+        vs.getNextSteps(toAct);
 
         createLink(
                 dir.getInput(fromAct, toAct),
                 dir.getOutput(fromAct, toAct),
-                nv
+                vs,
+                isSelfRef
         );
     }
 
     public void closeLoop(ActVisitor v, Activation iAct, Activation oAct) {
-        LinkVisitor nv = v.getTargetSynapse().transition(v, this, null);
+/*        LinkVisitor nv = v.getTargetSynapse().transition(v, this, null, true);
         if(nv == null)
             return;
-
+*/
         if (linkExists(this, iAct, oAct))
             return;
 
         if (!checkCausality(iAct, oAct, v))
             return;
 
-        createLink(iAct, oAct, nv);
+        createLink(iAct, oAct, v.getVisitorStep(), v.getSelfRef());
     }
 
-    public void createLink(Activation iAct, Activation oAct, LinkVisitor v) {
+    public void createLink(Activation iAct, Activation oAct, VisitorStep vs, boolean isSelfRef) {
         Link nl = oAct.addLink(
                 this,
                 iAct,
-                v.getSelfRef(),
-                v
+                isSelfRef
         );
 
         Synapse s = nl.getSynapse();
         if (s.getWeight() <= 0.0 && !s.isTemplate())
             return;
 
-        v.getVisitorStep().getNextSteps(nl);
+        vs.getNextSteps(nl);
 
         if(!nl.getConfig().isEnableTraining())
             return;
@@ -235,7 +235,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         if (!Utils.belowTolerance(oAct.getOutputGradientSum()))
             QueueEntry.add(nl, new PropagateGradientAndUpdateWeight(oAct.getOutputGradientSum()));
-
     }
 
     public void linkInput() {

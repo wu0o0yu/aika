@@ -32,10 +32,8 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
  */
 public class TemplateCloseLoop extends TemplateVisitor implements ActivationStep {
 
-    private Direction direction;
-
     public TemplateCloseLoop(Direction dir) {
-        direction = dir;
+        super(dir);
     }
 
     @Override
@@ -43,19 +41,16 @@ public class TemplateCloseLoop extends TemplateVisitor implements ActivationStep
         return Phase.LINKING;
     }
 
+    @Override
+    public void process(Activation act) {
+        link(act);
+    }
+
     public boolean checkIfQueued() {
         return true;
     }
 
-    @Override
-    public void process(Activation act) {
-        ActVisitor.getInitialActVisitors(this, act, direction, INPUT)
-                .forEach(v ->
-                        act.follow(v)
-                );
-    }
-
     public String toString() {
-        return "Act-Step: Template-CloseCycle-" + direction;
+        return "Act-Step: Template-CloseCycle (" + direction + ")";
     }
 }

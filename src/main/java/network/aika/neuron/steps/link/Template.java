@@ -16,9 +16,15 @@
  */
 package network.aika.neuron.steps.link;
 
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.TemplateVisitor;
+
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
  * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
@@ -28,18 +34,22 @@ import network.aika.neuron.steps.visitor.TemplateVisitor;
  */
 public class Template extends TemplateVisitor implements LinkStep {
 
+    public Template() {
+        super(INPUT);
+    }
+
     @Override
     public Phase getPhase() {
         return Phase.LINKING;
     }
 
-    public boolean checkIfQueued() {
-        return true;
-    }
-
     @Override
     public void process(Link l) {
-        l.follow(this);
+        link(l);
+    }
+
+    public boolean checkIfQueued() {
+        return true;
     }
 
     public String toString() {

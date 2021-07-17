@@ -17,11 +17,10 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.LinkingVisitor;
 
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 
@@ -39,6 +38,10 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class Linking extends LinkingVisitor implements ActivationStep {
 
+    public Linking(Direction dir) {
+        super(dir);
+    }
+
     @Override
     public Phase getPhase() {
         return Phase.LINKING;
@@ -52,15 +55,12 @@ public class Linking extends LinkingVisitor implements ActivationStep {
     public void process(Activation act) {
         act.getThought().linkInputRelations(act);
 
-        ActVisitor.getInitialActVisitors(this, act, INPUT, INPUT)
-                .forEach(v ->
-                        act.follow(v)
-                );
+        link(act);
 
         act.getModel().linkInputRelations(act, OUTPUT);
     }
 
     public String toString() {
-        return "Act-Step: Linking (Outgoing)";
+        return "Act-Step: Linking (" + direction + ")";
     }
 }

@@ -96,7 +96,7 @@ public class Activation extends Element<Activation> {
         this.neuron = n;
     }
 
-    public Activation(int id, Thought t, Neuron<?> n, Activation fromAct, Visitor v) {
+    public Activation(int id, Thought t, Neuron<?> n, Activation fromAct) {
         this(id, n);
         this.thought = t;
 
@@ -108,7 +108,7 @@ public class Activation extends Element<Activation> {
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
 
-        t.onActivationCreationEvent(this, fromAct, v);
+        t.onActivationCreationEvent(this, fromAct);
     }
 
     public boolean isMarked() {
@@ -234,7 +234,7 @@ public class Activation extends Element<Activation> {
         if (value == null)
             return this;
 
-        Activation clonedAct = new Activation(id, thought, neuron, null, null);
+        Activation clonedAct = new Activation(id, thought, neuron, null);
 
         replaceElement(clonedAct);
 
@@ -249,7 +249,7 @@ public class Activation extends Element<Activation> {
                 .stream()
                 .filter(l -> l.getSynapse() != excludedSyn)
                 .forEach(l -> {
-                            Link nl = new Link(l.getSynapse(), l.getInput(), clonedAct, l.isSelfRef(), null);
+                            Link nl = new Link(l.getSynapse(), l.getInput(), clonedAct, l.isSelfRef());
                             nl.sumUpLink(nl.getInputValue(POS));
                         }
                 );
@@ -372,14 +372,13 @@ public class Activation extends Element<Activation> {
                 );
     }
 
-    public Link addLink(Synapse s, Activation input, boolean isSelfRef, LinkVisitor v) {
+    public Link addLink(Synapse s, Activation input, boolean isSelfRef) {
         Link ol = getInputLink(s);
         Link nl = new Link(
                 s,
                 input,
                 this,
-                isSelfRef,
-                v
+                isSelfRef
         );
 
         double w = s.getWeight();

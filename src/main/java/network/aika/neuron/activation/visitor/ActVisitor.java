@@ -39,24 +39,12 @@ public class ActVisitor extends Visitor {
         this.act = act;
     }
 
-    public static Stream<ActVisitor> getInitialActVisitors(VisitorStep vp, Activation act, Direction startDir, Direction currentDir) {
-        return act.getNeuron()
-                .getTemplateGroup().stream()
-                .flatMap(tn ->
-                        startDir.getTargetSynapses(tn.getTemplateInfo()).stream()
-                )
-                .map(ts ->
-                        new ActVisitor(vp, act, ts, startDir, currentDir)
-                );
-    }
-
     public ActVisitor(VisitorStep vp, Activation act, Synapse targetSynapse, Direction startDir, Direction currentDir) {
         this.visitorStep = vp;
         this.origin = this;
         this.act = act;
         this.targetSynapse = targetSynapse;
         this.startDir = startDir;
-        this.targetDir = startDir;
         this.currentDir = currentDir;
     }
 
@@ -71,11 +59,7 @@ public class ActVisitor extends Visitor {
         )
             return;
 
-        visitorStep.closeLoop(
-                this,
-                targetDir.getInput(act, getOriginAct()),
-                targetDir.getOutput(act, getOriginAct())
-        );
+        visitorStep.closeLoop(this, act, getOriginAct());
     }
 
     public String toString() {

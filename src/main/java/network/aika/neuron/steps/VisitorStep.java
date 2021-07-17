@@ -16,19 +16,81 @@
  */
 package network.aika.neuron.steps;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
+
+import java.util.stream.Stream;
+
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public interface VisitorStep {
+public abstract class VisitorStep {
 
-    void closeLoop(ActVisitor v, Activation iAct, Activation oAct);
+    protected Direction direction;
 
-    void getNextSteps(Activation act);
+    public VisitorStep(Direction dir) {
+        this.direction = dir;
+    }
 
-    void getNextSteps(Link l);
+    public abstract boolean checkPropagate(Activation act, Synapse targetSynapse);
+
+    public abstract Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir);
+
+    public abstract boolean exists(Activation act, Synapse s, Direction dir);
+
+    protected abstract void closeLoopIntern(ActVisitor v, Activation iAct, Activation oAct);
+
+    public abstract void getNextSteps(Activation act);
+
+    public abstract void getNextSteps(Link l);
+
+
+    public void link(Link l) {
+        Direction startDir = l.getSynapse().isRecurrent() ? direction.invert() : direction;
+        Activation startAct = startDir.invert().getActivation(l);
+
+        getTargetSynapses(startAct, startDir)
+                .map(s -> new ActVisitor(this, startAct, s, startDir, startDir))
+                .forEach(v -> {
+                            startAct.setMarked(true);
+                            l.follow(v);
+                            startAct.setMarked(false);
+                        }
+                );
+    }
+
+    public void link(Activation act) {
+        getTargetSynapses(act, direction)
+                .forEach(ts ->
+                        act.follow(
+                                new ActVisitor(this, act, ts, direction, INPUT)
+                        )
+                );
+    }
+
+    public void propagate(Activation act) {
+        getTargetSynapses(act, direction)
+                .filter(s ->
+                        checkPropagate(act, s)
+                )
+                .forEach(s ->
+                        s.propagate(act, direction, this, false)
+                );
+    }
+
+    public void closeLoop(ActVisitor v, Activation currentAct, Activation originAct) {
+        closeLoopIntern(
+                v,
+                direction.getInput(currentAct, originAct),
+                direction.getOutput(currentAct, originAct)
+        );
+    }
 }
