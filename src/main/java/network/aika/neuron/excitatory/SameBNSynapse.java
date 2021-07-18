@@ -42,6 +42,10 @@ public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> 
         this.isRecurrent = isRecurrent;
     }
 
+    public Direction getStartDir(Direction dir) {
+        return isRecurrent() ? dir.invert() : dir;
+    }
+
     public LinkVisitor transition(ActVisitor v, Synapse s, Link l) {
         if(v.getInputSteps() >= 1) {
             return null;

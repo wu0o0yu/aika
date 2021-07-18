@@ -49,7 +49,9 @@ public abstract class TemplateVisitor extends VisitorStep {
                 .flatMap(tn ->
                         dir.getSynapses(tn)
                 )
-                .filter(s -> !exists(act, s, direction));
+                .filter(s ->
+                        !exists(act, s, direction)
+                );
     }
 
     @Override
@@ -59,7 +61,7 @@ public abstract class TemplateVisitor extends VisitorStep {
 
     @Override
     public boolean exists(Activation act, Synapse s, Direction dir) {
-        return dir.linkExists(act, s); // synapseExists ?
+        return act.templateLinkExists(dir, s);
     }
 
     @Override
@@ -77,9 +79,6 @@ public abstract class TemplateVisitor extends VisitorStep {
     public void closeLoopIntern(ActVisitor v, Activation iAct, Activation oAct) {
         if(oAct.getNeuron().isInputNeuron())
             return;
-
-//        if(Link.synapseExists(iAct, oAct))
-//            return;
 
         Synapse ts = v.getTargetSynapse();
 

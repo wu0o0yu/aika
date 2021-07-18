@@ -80,28 +80,7 @@ public class Link extends Element<Link> {
     public Fired getFired() {
         return output.getFired();
     }
-
-    public static boolean synapseExists(Activation iAct, Activation oAct) {
-        return Synapse.synapseExists(iAct.getNeuron(), oAct.getNeuron());
-    }
-
-    public static boolean linkExists(Activation iAct, Activation oAct) {
-        return iAct.outputLinkExists(oAct);
-    }
-
-    public static boolean linkExists(Synapse s, Activation iAct, Activation oAct) {
-        Link ol = oAct.getInputLink(iAct.getNeuron());
-        assert ol == null || s == ol.getSynapse();
-        return ol != null;
-    }
-
-    public static Synapse getSynapse(Activation iAct, Activation oAct) {
-        return oAct.getNeuron()
-                .getInputSynapse(
-                        iAct.getNeuronProvider()
-                );
-    }
-
+    
     public void count() {
         if(synapse != null)
             synapse.count(this);

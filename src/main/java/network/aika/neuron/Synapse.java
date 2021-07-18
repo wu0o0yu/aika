@@ -39,7 +39,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static network.aika.neuron.Neuron.BETA_THRESHOLD;
-import static network.aika.neuron.activation.Link.linkExists;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.steps.link.LinkStep.INFORMATION_GAIN_GRADIENT;
@@ -177,6 +176,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return false;
     }
 
+    public Direction getStartDir(Direction dir) {
+        return dir;
+    }
+
     public void propagate(Activation fromAct, Direction dir, VisitorStep vs, boolean isSelfRef) {
 /*        LinkVisitor nv = v.getTargetSynapse()
                 .transition(v, this, null, true);
@@ -202,13 +205,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void closeLoop(ActVisitor v, Activation iAct, Activation oAct) {
-/*        LinkVisitor nv = v.getTargetSynapse().transition(v, this, null, true);
-        if(nv == null)
-            return;
-*/
-        if (linkExists(this, iAct, oAct))
-            return;
-
         if (!checkCausality(iAct, oAct, v))
             return;
 
@@ -455,5 +451,4 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 "s(p,n):" + Utils.round(getSurprisal(POS, NEG, null)) + " " +
                 "s(n,n):" + Utils.round(getSurprisal(NEG, NEG, null)) + " \n";
     }
-
 }

@@ -69,9 +69,6 @@ public abstract class LinkingVisitor extends VisitorStep {
         if (!iAct.isActive(false))
             return;
 
-//        if (Link.linkExists(iAct, oAct))
-//            return;
-
         Synapse s = v.getTargetSynapse();
 
         if(!(v.getCurrentDir() == OUTPUT || s.isRecurrent()))

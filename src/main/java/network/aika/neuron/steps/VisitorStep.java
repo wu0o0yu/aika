@@ -54,7 +54,7 @@ public abstract class VisitorStep {
 
 
     public void link(Link l) {
-        Direction startDir = l.getSynapse().isRecurrent() ? direction.invert() : direction;
+        Direction startDir = l.getSynapse().getStartDir(direction);
         Activation startAct = startDir.invert().getActivation(l);
 
         getTargetSynapses(startAct, startDir)
@@ -89,8 +89,8 @@ public abstract class VisitorStep {
     public void closeLoop(ActVisitor v, Activation currentAct, Activation originAct) {
         closeLoopIntern(
                 v,
-                direction.getInput(currentAct, originAct),
-                direction.getOutput(currentAct, originAct)
+                direction.getInput(originAct, currentAct),
+                direction.getOutput(originAct, currentAct)
         );
     }
 }
