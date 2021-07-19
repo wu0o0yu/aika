@@ -73,10 +73,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract LinkVisitor transition(ActVisitor v, Synapse s, Link l);
 
-    public void incrementPathLength(ActVisitor v) {
+    public void incrementPathLength(Visitor v) {
         v.incrementPathLength(false);
     }
-
 
     public void setInput(I input) {
         this.input = input.getProvider();

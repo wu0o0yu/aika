@@ -22,6 +22,7 @@ import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
+import network.aika.neuron.activation.visitor.Visitor;
 
 /**
  * @author Lukas Molzberger
@@ -53,7 +54,7 @@ public class InputBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I>
         return new LinkVisitor(v, s, l);
     }
 
-    public void incrementPathLength(ActVisitor v) {
+    public void incrementPathLength(Visitor v) {
         v.incrementPathLength(true);
     }
 }
