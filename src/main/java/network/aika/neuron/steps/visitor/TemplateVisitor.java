@@ -50,7 +50,7 @@ public abstract class TemplateVisitor extends VisitorStep {
                         dir.getSynapses(tn)
                 )
                 .filter(s ->
-                        !exists(act, s, direction)
+                        !exists(act, s, dir)
                 );
     }
 
@@ -62,6 +62,13 @@ public abstract class TemplateVisitor extends VisitorStep {
     @Override
     public boolean exists(Activation act, Synapse s, Direction dir) {
         return act.templateLinkExists(dir, s);
+    }
+
+    @Override
+    protected boolean opposingNeuronMatches(Neuron<?> currentN, Neuron<?> targetN) {
+        return currentN.getTemplateGroup()
+                .stream()
+                .anyMatch(tn -> tn.getId() == targetN.getId());
     }
 
     @Override

@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.steps.visitor;
 
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
@@ -42,7 +43,7 @@ public abstract class LinkingVisitor extends VisitorStep {
     @Override
     public Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir) {
          return dir.getSynapses(act.getNeuron())
-                 .filter(s -> !exists(act, s, direction));
+                 .filter(s -> !exists(act, s, dir));
     }
 
     @Override
@@ -53,6 +54,11 @@ public abstract class LinkingVisitor extends VisitorStep {
     @Override
     public boolean checkPropagate(Activation act, Synapse targetSynapse) {
         return true;
+    }
+
+    @Override
+    protected boolean opposingNeuronMatches(Neuron<?> currentN, Neuron<?> targetN) {
+        return currentN.getId() == targetN.getId();
     }
 
     @Override

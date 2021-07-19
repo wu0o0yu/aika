@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.steps;
 
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Element;
@@ -45,6 +46,8 @@ public abstract class VisitorStep {
     public abstract Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir);
 
     public abstract boolean exists(Activation act, Synapse s, Direction dir);
+
+    protected abstract boolean opposingNeuronMatches(Neuron<?> currentN, Neuron<?> targetN);
 
     protected abstract void closeLoopIntern(ActVisitor v, Activation iAct, Activation oAct);
 
@@ -87,10 +90,14 @@ public abstract class VisitorStep {
     }
 
     public void closeLoop(ActVisitor v, Activation currentAct, Activation originAct) {
-        closeLoopIntern(
-                v,
-                direction.getInput(originAct, currentAct),
-                direction.getOutput(originAct, currentAct)
-        );
+        Neuron<?> currentN = currentAct.getNeuron();
+        Neuron<?> targetN = direction.getNeuron(v.getTargetSynapse());
+        if (!opposingNeuronMatches(currentN, targetN))
+            return;
+
+        Activation iAct = direction.getInput(originAct, currentAct);
+        Activation oAct = direction.getOutput(originAct, currentAct);
+
+        closeLoopIntern(v, iAct, oAct);
     }
 }
