@@ -19,11 +19,9 @@ package network.aika.neuron.activation;
 import network.aika.Config;
 import network.aika.Thought;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.sign.Sign;
-import network.aika.neuron.steps.VisitorStep;
 import network.aika.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +30,6 @@ import java.util.Comparator;
 
 import static network.aika.callbacks.VisitorEvent.AFTER;
 import static network.aika.callbacks.VisitorEvent.BEFORE;
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.sign.Sign.POS;
 
 /**
@@ -80,7 +76,7 @@ public class Link extends Element<Link> {
     public Fired getFired() {
         return output.getFired();
     }
-    
+
     public void count() {
         if(synapse != null)
             synapse.count(this);

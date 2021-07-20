@@ -18,12 +18,10 @@ package network.aika.neuron.activation.direction;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.TemplateNeuronInfo;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.scope.Scope;
 
-import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -35,6 +33,10 @@ public interface Direction {
     Direction OUTPUT = new Output();
 
     Direction invert();
+
+    Direction combine(Direction dir);
+
+    Scope transition(Scope current, Scope from, Scope to);
 
     Activation getInput(Activation fromAct, Activation toAct);
 

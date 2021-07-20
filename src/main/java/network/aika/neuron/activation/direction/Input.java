@@ -18,11 +18,10 @@ package network.aika.neuron.activation.direction;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.TemplateNeuronInfo;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.scope.Scope;
 
-import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -34,6 +33,18 @@ public class Input implements Direction {
     @Override
     public Direction invert() {
         return OUTPUT;
+    }
+
+    @Override
+    public Direction combine(Direction dir) {
+        return dir;
+    }
+
+    @Override
+    public Scope transition(Scope current, Scope from, Scope to) {
+        if(current == to)
+            return from;
+        return null;
     }
 
     @Override

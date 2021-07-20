@@ -22,6 +22,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.scope.Scope;
 import network.aika.neuron.steps.VisitorStep;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
@@ -43,7 +44,7 @@ public abstract class Visitor {
 
     private int downSteps = 0;
     private int upSteps = 0;
-    private int inputSteps = 0;
+    protected Scope scope = Scope.SAME;
 
     protected Visitor() {}
 
@@ -56,7 +57,7 @@ public abstract class Visitor {
         currentDir = v.currentDir;
         downSteps = v.downSteps;
         upSteps = v.upSteps;
-        inputSteps = v.inputSteps;
+        scope = v.scope;
     }
 
     public Synapse getTargetSynapse() {
@@ -66,8 +67,6 @@ public abstract class Visitor {
     public void switchDirection() {
         assert currentDir == INPUT;
         currentDir = currentDir.invert();
-
-        inputSteps = 0;
     }
 
     public Visitor getPreviousStep() {
@@ -90,8 +89,8 @@ public abstract class Visitor {
         return upSteps;
     }
 
-    public int getInputSteps() {
-        return inputSteps;
+    public Scope getScope() {
+        return scope;
     }
 
     public VisitorStep getVisitorStep() {
@@ -102,15 +101,11 @@ public abstract class Visitor {
         return origin.getActivation();
     }
 
-    public void incrementPathLength(boolean isInputStep) {
+    public void incrementPathLength() {
         if (currentDir == INPUT)
             downSteps++;
         else
             upSteps++;
-
-        if(isInputStep) {
-            inputSteps++;
-        }
     }
 
     public boolean getSelfRef() {
@@ -141,7 +136,7 @@ public abstract class Visitor {
         sb.append("DownUp:" + currentDir + ", ");
         sb.append("StartDir:" + startDir + ", ");
 
-        sb.append("Steps: (down:" + downSteps + "), (up:" + upSteps + "), (input:" + inputSteps + ")");
+        sb.append("Steps: (down:" + downSteps + "), (up:" + upSteps + "), (scope:" + scope + ")");
 
         return sb.toString();
     }

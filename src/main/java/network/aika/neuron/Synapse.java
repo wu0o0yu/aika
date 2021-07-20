@@ -25,6 +25,7 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
+import network.aika.neuron.scope.Scope;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.VisitorStep;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
@@ -70,12 +71,11 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     protected boolean allowTraining = true;
 
-
     public abstract LinkVisitor transition(ActVisitor v, Synapse s, Link l);
 
-    public void incrementPathLength(Visitor v) {
-        v.incrementPathLength(false);
-    }
+    public abstract LinkVisitor samePatternTransitionLoop(ActVisitor v, Link l);
+
+    public abstract LinkVisitor inputPatternTransitionLoop(ActVisitor v, Link l);
 
     public void setInput(I input) {
         this.input = input.getProvider();
@@ -180,13 +180,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void propagate(Activation fromAct, Direction dir, VisitorStep vs, boolean isSelfRef) {
-/*        LinkVisitor nv = v.getTargetSynapse()
-                .transition(v, this, null, true);
-
-        if(nv == null)
-            return;
-*/
-
         Activation toAct = fromAct.getThought()
                 .createActivation(
                         dir.getNeuron(this),

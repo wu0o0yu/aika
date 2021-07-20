@@ -76,7 +76,7 @@ public class Templates {
 
         PRIMARY_INPUT_SYNAPSE_TEMPLATE =
                 init(
-                        new InputBNSynapse(),
+                        new PrimaryBNSynapse(),
                         INPUT_PATTERN_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
                         "Primary Input Synapse",
@@ -87,7 +87,7 @@ public class Templates {
 
         RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE =
                 init(
-                        new InputBNSynapse(),
+                        new RelatedBNSynapse(),
                         INPUT_BINDING_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
                         "Related Input Synapse from Binding Neuron",
@@ -98,7 +98,7 @@ public class Templates {
 
         RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE =
                 init(
-                        new InputBNSynapse(),
+                        new RelatedBNSynapse(),
                         INHIBITORY_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
                         "Related Input Synapse from Inhibitory Neuron",
@@ -109,7 +109,7 @@ public class Templates {
 
         RELATED_RECURRENT_INPUT_TEMPLATE =
                 init(
-                        new InputBNSynapse(true),
+                        new RelatedBNSynapse(true),
                         INHIBITORY_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
                         "Related Input Synapse from Inhibitory Neuron",

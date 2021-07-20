@@ -25,6 +25,7 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
+import network.aika.neuron.scope.Scope;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -47,25 +48,18 @@ public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> 
     }
 
     public LinkVisitor transition(ActVisitor v, Synapse s, Link l) {
-        if(v.getInputSteps() >= 1) {
-            return null;
-        }
-
-        Templates t = getModel().getTemplates();
-
-        if(v.getStartDir() != v.getCurrentDir()) {
-            if (!s.isOfTemplate(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE)) {
-                return null;
-            }
-        } else {
-            if (s.isOfTemplate(t.NEGATIVE_SYNAPSE_TEMPLATE) || s.isOfTemplate(t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE) || s.isOfTemplate(t.SAME_PATTERN_SYNAPSE_TEMPLATE)) {
-                return null;
-            }
-        }
-
-        return new LinkVisitor(v, s, l);
+        return s.samePatternTransitionLoop(v, l);
     }
 
+    @Override
+    public LinkVisitor samePatternTransitionLoop(ActVisitor v, Link l) {
+        return null;
+    }
+
+    @Override
+    public LinkVisitor inputPatternTransitionLoop(ActVisitor v, Link l) {
+        return new LinkVisitor(v, this, l, v.getScope());
+    }
 
     public boolean checkTemplatePropagate(Direction dir, Activation act) {
         if (dir == INPUT && act.getNeuron().isInputNeuron()) {

@@ -20,6 +20,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.scope.Scope;
 
 import java.util.stream.Stream;
 
@@ -32,6 +33,17 @@ public class Output implements Direction {
     @Override
     public Direction invert() {
         return INPUT;
+    }
+
+    @Override
+    public Direction combine(Direction dir) {
+        return dir.invert();
+    }
+
+    public Scope transition(Scope current, Scope from, Scope to) {
+        if(current == from)
+            return to;
+        return null;
     }
 
     @Override

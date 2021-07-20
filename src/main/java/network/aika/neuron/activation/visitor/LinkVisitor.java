@@ -18,6 +18,7 @@ package network.aika.neuron.activation.visitor;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.scope.Scope;
 
 
 /**
@@ -31,8 +32,14 @@ public class LinkVisitor extends Visitor {
     public LinkVisitor(ActVisitor v, Synapse<?, ?> syn, Link l) {
         super(v);
         link = l;
-        syn.incrementPathLength(this);
+        incrementPathLength();
+
         onCandidateEvent(syn);
+    }
+
+    public LinkVisitor(ActVisitor v, Synapse<?, ?> syn, Link l, Scope ns) {
+        this(v, syn, l);
+        scope = ns;
     }
 
     public void setLink(Link link) {
