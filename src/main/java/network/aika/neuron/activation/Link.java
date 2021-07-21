@@ -21,6 +21,7 @@ import network.aika.Thought;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
+import network.aika.neuron.scope.Scope;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.Utils;
 import org.slf4j.Logger;
@@ -85,12 +86,18 @@ public class Link extends Element<Link> {
     }
 
     public void follow(ActVisitor v) {
-        LinkVisitor lv = v.getTargetSynapse().transition(v, getSynapse(), this);
+        follow(v, v.getScope());
+    }
+
+    public void follow(ActVisitor v, Scope ns) {
+        LinkVisitor lv = new LinkVisitor(v, getSynapse(), this);
+
+/*        LinkVisitor lv = v.getTargetSynapse().transition(v, getSynapse(), this);
         if(lv == null)
             return;
-
+*/
         lv.onEvent(BEFORE);
-        Activation toAct = v.getCurrentDir().getActivation(this);
+        Activation toAct = lv.getCurrentDir().getActivation(this);
 
         toAct.follow(
                 new ActVisitor(lv, toAct)

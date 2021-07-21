@@ -21,6 +21,7 @@ import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 import network.aika.neuron.inhibitory.PrimaryInhibitorySynapse;
+import network.aika.neuron.inhibitory.RegularInhibitorySynapse;
 
 import java.util.*;
 
@@ -40,16 +41,16 @@ public class Templates {
     public InhibitoryNeuron INHIBITORY_TEMPLATE = new InhibitoryNeuron();
 
 
-    public InputBNSynapse PRIMARY_INPUT_SYNAPSE_TEMPLATE;
-    public InputBNSynapse RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE;
-    public InputBNSynapse RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE;
-    public InputBNSynapse RELATED_RECURRENT_INPUT_TEMPLATE;
+    public PrimaryBNSynapse PRIMARY_INPUT_SYNAPSE_TEMPLATE;
+    public RelatedBNSynapse RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE;
+    public RelatedBNSynapse RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE;
+    public RelatedBNSynapse RELATED_RECURRENT_INPUT_TEMPLATE;
     public SameBNSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
-    public SameBNSynapse RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE;
+    public RecurrentSameBNSynapse RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE;
     public NegativeBNSynapse NEGATIVE_SYNAPSE_TEMPLATE;
     public PatternSynapse PATTERN_SYNAPSE_TEMPLATE;
     public PrimaryInhibitorySynapse PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE;
-    public InhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE;
+    public RegularInhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE;
 
     private Map<Byte, Neuron> templateNeuronIndex = new TreeMap<>();
     private Map<Byte, Synapse> templateSynapseIndex = new TreeMap<>();
@@ -120,7 +121,7 @@ public class Templates {
 
         SAME_PATTERN_SYNAPSE_TEMPLATE =
                 init(
-                        new SameBNSynapse(false),
+                        new SameBNSynapse(),
                         SAME_BINDING_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
                         "Same Pattern Synapse",
@@ -131,7 +132,7 @@ public class Templates {
 
         RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE =
                 init(
-                        new SameBNSynapse(true),
+                        new RecurrentSameBNSynapse(),
                         SAME_PATTERN_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
                         "Recurrent Same Pattern Synapse",
@@ -175,10 +176,10 @@ public class Templates {
 
         INHIBITORY_SYNAPSE_TEMPLATE =
                 init(
-                        new InhibitorySynapse(),
+                        new RegularInhibitorySynapse(),
                         SAME_BINDING_TEMPLATE,
                         INHIBITORY_TEMPLATE,
-                        "Inhibitory Synapse",
+                        "Regular Inhibitory Synapse",
                         9,
                         false,
                         true

@@ -71,11 +71,15 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     protected boolean allowTraining = true;
 
-    public abstract LinkVisitor transition(ActVisitor v, Synapse s, Link l);
+    public abstract void transition(ActVisitor v, Synapse s, Link l);
 
-    public abstract LinkVisitor samePatternTransitionLoop(ActVisitor v, Link l);
+    public abstract void samePatternTransitionLoop(ActVisitor v, Link l);
 
-    public abstract LinkVisitor inputPatternTransitionLoop(ActVisitor v, Link l);
+    public abstract void inputPatternTransitionLoop(ActVisitor v, Link l);
+
+    public abstract void patternTransitionLoop(ActVisitor v, Link l);
+
+    public abstract void inhibitoryTransitionLoop(ActVisitor v, Link l);
 
     public void setInput(I input) {
         this.input = input.getProvider();

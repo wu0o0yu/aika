@@ -35,7 +35,7 @@ import static network.aika.neuron.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
+public abstract class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
 
 
     @Override
@@ -43,20 +43,22 @@ public class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
         return false;
     }
 
-    public LinkVisitor transition(ActVisitor v, Synapse s, Link l) {
-        Templates t = getModel().getTemplates();
+    public void transition(ActVisitor v, Synapse s, Link l) {
+        s.inhibitoryTransitionLoop(v, l);
+    }
 
-        if (v.getStartDir() == v.getCurrentDir()) {
-            if (!s.isOfTemplate(t.PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE)) {
-                return null;
-            }
-        } else {
-            if (!s.isOfTemplate(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE)) {
-                return null;
-            }
-        }
+    @Override
+    public void samePatternTransitionLoop(ActVisitor v, Link l) {
+        l.follow(v);
+    }
 
-        return new LinkVisitor(v, s, l);
+    @Override
+    public void inputPatternTransitionLoop(ActVisitor v, Link l) {
+        l.follow(v);
+    }
+
+    @Override
+    public void patternTransitionLoop(ActVisitor v, Link l) {
     }
 
     public void updateSynapse(Link l, double delta) {

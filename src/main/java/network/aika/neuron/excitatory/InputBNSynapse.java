@@ -20,7 +20,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.LinkVisitor;
 
 /**
  * @author Lukas Molzberger
@@ -36,26 +35,7 @@ public abstract class InputBNSynapse<I extends Neuron<?>> extends BindingNeuronS
         super();
     }
 
-    public LinkVisitor transition(ActVisitor v, Synapse s, Link l) {
-        return s.inputPatternTransitionLoop(v, l);
-        /*
-        Templates t = getModel().getTemplates();
-
-        Scope ns = null;
-        if (v.getStartDir() != v.getCurrentDir()) {
-            if (!s.isOfTemplate(t.RELATED_RECURRENT_INPUT_TEMPLATE) && !s.isOfTemplate(t.RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE) && !s.isOfTemplate(t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE)) {
-                return null;
-            }
-            ns = s.getNextScope(v.getScope(), OUTPUT);
-        } else {
-            if (!s.isOfTemplate(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE)) {
-                return null;
-            }
-            ns = s.getNextScope(v.getScope(), OUTPUT);
-        }
-
-        return new LinkVisitor(v, s, l, ns);
-
-         */
+    public void transition(ActVisitor v, Synapse s, Link l) {
+        s.inputPatternTransitionLoop(v, l);
     }
 }

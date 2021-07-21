@@ -64,7 +64,9 @@ public abstract class VisitorStep {
                 .map(s -> new ActVisitor(this, startAct, s, startDir, startDir))
                 .forEach(v -> {
                             startAct.setMarked(true);
-                            l.follow(v);
+                            v.getTargetSynapse()
+                                    .transition(v, l.getSynapse(), l);
+//                            l.follow(v);
                             startAct.setMarked(false);
                         }
                 );

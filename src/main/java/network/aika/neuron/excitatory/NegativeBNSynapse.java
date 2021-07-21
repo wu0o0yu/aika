@@ -39,18 +39,26 @@ public class NegativeBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse
         this.isRecurrent = true;
     }
 
-    public LinkVisitor transition(ActVisitor v, Synapse s, Link l) {
-        return null;
+    public void transition(ActVisitor v, Synapse s, Link l) {
+        //Todo
     }
 
     @Override
-    public LinkVisitor samePatternTransitionLoop(ActVisitor v, Link l) {
-        return null;
+    public void samePatternTransitionLoop(ActVisitor v, Link l) {
     }
 
     @Override
-    public LinkVisitor inputPatternTransitionLoop(ActVisitor v, Link l) {
-        return null;
+    public void inputPatternTransitionLoop(ActVisitor v, Link l) {
+    }
+
+    @Override
+    public void patternTransitionLoop(ActVisitor v, Link l) {
+
+    }
+
+    @Override
+    public void inhibitoryTransitionLoop(ActVisitor v, Link l) {
+
     }
 
     public void updateSynapse(Link l, double delta) {

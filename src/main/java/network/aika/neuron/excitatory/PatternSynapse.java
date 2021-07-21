@@ -33,14 +33,25 @@ import network.aika.neuron.activation.visitor.Visitor;
  */
 public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, PatternNeuron> {
 
-    public LinkVisitor transition(ActVisitor v, Synapse s, Link l) {
-        Templates t = getModel().getTemplates();
+    public void transition(ActVisitor v, Synapse s, Link l) {
+        s.patternTransitionLoop(v, l);
+    }
 
-        if (!s.isOfTemplate(t.PATTERN_SYNAPSE_TEMPLATE) && !s.isOfTemplate(t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE)) {
-            return null;
-        }
+    @Override
+    public void samePatternTransitionLoop(ActVisitor v, Link l) {
+    }
 
-        return new LinkVisitor(v, s, l);
+    @Override
+    public void inputPatternTransitionLoop(ActVisitor v, Link l) {
+    }
+
+    @Override
+    public void patternTransitionLoop(ActVisitor v, Link l) {
+        l.follow(v);
+    }
+
+    @Override
+    public void inhibitoryTransitionLoop(ActVisitor v, Link l) {
     }
 
     @Override
