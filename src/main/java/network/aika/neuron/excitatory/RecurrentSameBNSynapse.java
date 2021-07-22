@@ -42,7 +42,7 @@ public class RecurrentSameBNSynapse extends BindingNeuronSynapse<PatternNeuron> 
     }
 
     public void transition(ActVisitor v, Synapse s, Link l) {
-        s.samePatternTransitionLoop(v, l);
+        s.patternTransitionLoop(v, l);
     }
 
     @Override
