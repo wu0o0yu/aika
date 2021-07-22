@@ -24,10 +24,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.excitatory.InputBNSynapse;
-import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.io.DataInput;
@@ -111,8 +108,8 @@ public class TextModel extends Model {
 
     private Synapse getRelSynapse(Neuron<?> n) {
         return n.getInputSynapses()
-                .filter(s -> s instanceof InputBNSynapse)
-                .map(s -> (InputBNSynapse) s)
+                .filter(s -> s instanceof RelatedBNSynapse)
+                .map(s -> (RelatedBNSynapse) s)
                 .findAny()
                 .orElse(null);
     }

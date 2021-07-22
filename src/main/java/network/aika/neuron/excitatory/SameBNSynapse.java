@@ -34,7 +34,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<BindingNeuron> {
+public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> {
 
     public SameBNSynapse() {
     }

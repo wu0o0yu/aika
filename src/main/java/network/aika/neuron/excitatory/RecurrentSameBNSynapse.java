@@ -31,7 +31,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class RecurrentSameBNSynapse extends BindingNeuronSynapse<PatternNeuron> {
+public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
 
     public RecurrentSameBNSynapse() {
         this.isRecurrent = true;
