@@ -21,6 +21,7 @@ import network.aika.callbacks.SuspensionCallback;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
@@ -155,7 +156,7 @@ public class TextModel extends Model {
         inRel.setInputNeuron(true);
         inRel.setLabel(label);
 
-        initRelatedRecurrentInputSynapse(in, inRel);
+        initRecurrentSamePatternSynapse(in, inRel);
         initRelatedInputSynapse(inRel, inhib, b);
 
         inRel.setBias(4.0);
@@ -163,8 +164,13 @@ public class TextModel extends Model {
     }
 
     private void initRelatedInputSynapse(BindingNeuron inRel, InhibitoryNeuron inhib, boolean recurrent) {
-        Synapse s = getTemplates().RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE
-                .instantiateTemplate(inhib, inRel);
+        Templates t = getTemplates();
+
+        Synapse ts = recurrent ?
+                t.RELATED_RECURRENT_INPUT_SYNAPSE_TEMPLATE :
+                t.RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE;
+
+        Synapse s = ts.instantiateTemplate(inhib, inRel);
 
         s.linkOutput();
         s.addWeight(10.0);
@@ -172,8 +178,8 @@ public class TextModel extends Model {
         inRel.addConjunctiveBias(-10.0, recurrent);
     }
 
-    private void initRelatedRecurrentInputSynapse(PatternNeuron in, BindingNeuron inRel) {
-        Synapse s = getTemplates().RELATED_RECURRENT_INPUT_TEMPLATE
+    private void initRecurrentSamePatternSynapse(PatternNeuron in, BindingNeuron inRel) {
+        Synapse s = getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE
                 .instantiateTemplate(in, inRel);
 
         s.linkInput();

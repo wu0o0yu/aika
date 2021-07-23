@@ -61,7 +61,6 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
 
     @Override
     public void inhibitoryTransitionLoop(ActVisitor v, Link l) {
-        l.follow(v);
     }
 
     public boolean checkTemplatePropagate(Direction dir, Activation act) {
