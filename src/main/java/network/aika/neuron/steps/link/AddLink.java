@@ -14,39 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.steps.activation;
+package network.aika.neuron.steps.link;
 
-import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.steps.Phase;
-import network.aika.utils.Utils;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class SumUpBias implements ActivationStep {
-
-    private double delta;
-
-    public SumUpBias(double delta) {
-        this.delta = delta;
-    }
+public class AddLink implements LinkStep {
 
     @Override
     public Phase getPhase() {
-        return Phase.LINKING;
+        return Phase.INIT;
     }
 
+    @Override
     public boolean checkIfQueued() {
         return false;
     }
 
     @Override
-    public void process(Activation act) {
-        act.updateNet(delta);
+    public void process(Link l) {
+        if(l.getInput() != null)
+            l.linkInput();
+
+        if(l.getOutput() != null)
+            l.linkOutput();
     }
 
     public String toString() {
-        return "Act-Step: Sum up Bias (" + Utils.round(delta) + ")";
+        return "Link-Step: Add Link";
     }
 }

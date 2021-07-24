@@ -40,7 +40,7 @@ public class NegativeBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse
     }
 
     public void transition(ActVisitor v, Synapse s, Link l) {
-        //Todo
+        s.negativeSynapseTransitionLoop(v, l);
     }
 
     @Override

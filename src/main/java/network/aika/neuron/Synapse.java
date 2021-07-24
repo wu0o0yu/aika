@@ -85,6 +85,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public void inhibitoryTransitionLoop(ActVisitor v, Link l) {
     }
 
+    public void negativeSynapseTransitionLoop(ActVisitor v, Link l) {
+    }
+
     public void setInput(I input) {
         this.input = input.getProvider();
     }

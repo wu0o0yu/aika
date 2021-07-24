@@ -68,13 +68,11 @@ public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> 
     }
 
     public boolean checkTemplatePropagate(Direction dir, Activation act) {
-        if (dir == INPUT && act.getNeuron().isInputNeuron()) {
+        if (dir == INPUT && act.getNeuron().isInputNeuron())
             return false;
-        }
 
-        if(dir == OUTPUT && isRecurrent) {
+        if(dir == OUTPUT && isRecurrent)
             return false;
-        }
 
         return super.checkTemplatePropagate(dir, act);
     }

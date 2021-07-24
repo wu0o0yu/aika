@@ -79,17 +79,15 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         super.write(out);
 
         out.writeBoolean(tokenLabel != null);
-        if(tokenLabel != null) {
+        if(tokenLabel != null)
             out.writeUTF(tokenLabel);
-        }
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws Exception {
         super.readFields(in, m);
 
-        if(in.readBoolean()) {
+        if(in.readBoolean())
             tokenLabel = in.readUTF();
-        }
     }
 }

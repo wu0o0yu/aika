@@ -25,6 +25,7 @@ import network.aika.neuron.steps.Step;
  */
 public interface LinkStep extends Step<Link> {
 
+    LinkStep ADD_LINK = new AddLink();
     LinkStep INDUCTION = new Induction();
     LinkStep LINKING = new Linking();
     LinkStep SHADOW_FACTOR = new ShadowFactor();

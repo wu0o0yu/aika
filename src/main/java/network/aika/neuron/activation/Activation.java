@@ -333,7 +333,6 @@ public class Activation extends Element<Activation> {
                         }
                 )
                 .forEach(l ->
-//                        l.follow(v)
                         targetSynapse.transition(v, l.getSynapse(), l)
                 );
 

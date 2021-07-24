@@ -32,6 +32,7 @@ import java.util.Comparator;
 import static network.aika.callbacks.VisitorEvent.AFTER;
 import static network.aika.callbacks.VisitorEvent.BEFORE;
 import static network.aika.neuron.sign.Sign.POS;
+import static network.aika.neuron.steps.link.LinkStep.ADD_LINK;
 
 /**
  *
@@ -62,11 +63,7 @@ public class Link extends Element<Link> {
         this.output = output;
         this.isSelfRef = isSelfRef;
 
-        if(input != null)
-            linkInput();
-
-        if(output != null)
-            linkOutput();
+        QueueEntry.add(this, ADD_LINK);
 
         getSynapse().updateReference(this);
 
@@ -90,12 +87,8 @@ public class Link extends Element<Link> {
     }
 
     public void follow(ActVisitor v, Scope ns) {
-        LinkVisitor lv = new LinkVisitor(v, getSynapse(), this);
+        LinkVisitor lv = new LinkVisitor(v, getSynapse(), this, ns);
 
-/*        LinkVisitor lv = v.getTargetSynapse().transition(v, getSynapse(), this);
-        if(lv == null)
-            return;
-*/
         lv.onEvent(BEFORE);
         Activation toAct = lv.getCurrentDir().getActivation(this);
 
@@ -191,12 +184,13 @@ public class Link extends Element<Link> {
     }
 
     public void linkInput() {
-        if(input != null) {
-            input.outputLinks.put(
-                    new OutputKey(output.getNeuronProvider(), output.getId()),
-                    this
-            );
-        }
+        if(input == null)
+            return;
+
+        input.outputLinks.put(
+                new OutputKey(output.getNeuronProvider(), output.getId()),
+                this
+        );
     }
 
     public void linkOutput() {

@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.inhibitory;
 
-
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
