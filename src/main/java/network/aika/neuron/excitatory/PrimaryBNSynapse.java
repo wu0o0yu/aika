@@ -2,6 +2,7 @@ package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.scope.Scope;
@@ -25,10 +26,11 @@ public class PrimaryBNSynapse<I extends Neuron<?>> extends InputBNSynapse<I> {
 
     @Override
     public void inputPatternTransitionLoop(ActVisitor v, Link l) {
-        if(v.getStartDir() == v.getCurrentDir())
+        Direction currentDir = v.getCurrentDir();
+        if(v.getStartDir() != currentDir)
             return;
 
-        Scope ns = INPUT.transition(v.getScope(), Scope.INPUT, Scope.SAME);
+        Scope ns = currentDir.transition(v.getScope(), Scope.INPUT, Scope.SAME);
         if(ns == null)
             return;
 
