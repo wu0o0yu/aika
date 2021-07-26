@@ -57,6 +57,11 @@ public abstract class VisitorStep implements VisitorTask {
 
     public abstract void getNextSteps(Link l);
 
+
+    public Synapse getTargetSynapse() {
+        return targetSynapse;
+    }
+
     @Override
     public void processTask(ActVisitor v) {
         /*
@@ -66,7 +71,8 @@ public abstract class VisitorStep implements VisitorTask {
         )
             return;
 */
-        assert v.getActivation() != v.getOriginAct();
+        if(v.getActivation() == v.getOriginAct())
+            return;
 
         if(targetSynapse.checkLoopClosure(v))
             return;

@@ -18,7 +18,6 @@ package network.aika.neuron.activation.visitor;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.steps.VisitorStep;
 
 /**
  *
@@ -36,8 +35,8 @@ public class ActVisitor extends Visitor {
         this.act = act;
     }
 
-    public ActVisitor(VisitorStep vp, Activation act, Direction startDir, Direction currentDir) {
-        this.visitorStep = vp;
+    public ActVisitor(VisitorTask task, Activation act, Direction startDir, Direction currentDir) {
+        this.task = task;
         this.origin = this;
         this.act = act;
         this.startDir = startDir;
