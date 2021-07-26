@@ -20,7 +20,7 @@ package network.aika.neuron.steps.link;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.visitor.LinkingVisitor;
+import network.aika.neuron.steps.visitor.LinkingTask;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 
@@ -30,7 +30,7 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
  *
  * @author Lukas Molzberger
  */
-public class Linking extends LinkingVisitor implements LinkStep {
+public class Linking extends LinkingTask implements LinkStep {
 
     public Linking() {
         super(INPUT);

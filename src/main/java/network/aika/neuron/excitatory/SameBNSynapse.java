@@ -67,6 +67,12 @@ public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> 
         l.follow(v);
     }
 
+    @Override
+    public boolean checkLoopClosure(ActVisitor v) {
+        return v.getScope() == Scope.SAME;
+    }
+
+    @Override
     public boolean checkTemplatePropagate(Direction dir, Activation act) {
         if (dir == INPUT && act.getNeuron().isInputNeuron())
             return false;

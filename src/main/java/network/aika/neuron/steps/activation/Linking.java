@@ -17,9 +17,8 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.visitor.LinkingVisitor;
+import network.aika.neuron.steps.visitor.LinkingTask;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
@@ -36,7 +35,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Linking extends LinkingVisitor implements ActivationStep {
+public class Linking extends LinkingTask implements ActivationStep {
 
     public Linking() {
         super(OUTPUT);

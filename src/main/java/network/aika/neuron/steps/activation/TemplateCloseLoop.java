@@ -18,9 +18,8 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.visitor.TemplateVisitor;
+import network.aika.neuron.steps.visitor.TemplateTask;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -31,7 +30,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class TemplateCloseLoop extends TemplateVisitor implements ActivationStep {
+public class TemplateCloseLoop extends TemplateTask implements ActivationStep {
 
     public static class TemplateCloseLoopInput extends TemplateCloseLoop {
         public TemplateCloseLoopInput() {

@@ -24,77 +24,63 @@ import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.steps.VisitorStep;
-import network.aika.neuron.steps.link.LinkStep;
 
-import java.util.Set;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
-import static network.aika.neuron.steps.activation.ActivationStep.INDUCTION;
+import static network.aika.neuron.steps.link.LinkStep.LINKING;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class TemplateVisitor extends VisitorStep {
+public abstract class LinkingTask extends VisitorStep {
 
-    public TemplateVisitor(Direction dir) {
+    public LinkingTask(Direction dir) {
         super(dir);
     }
 
     @Override
     public Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir) {
-        return act.getNeuron()
-                .getTemplateGroup().stream()
-                .flatMap(tn ->
-                        dir.getSynapses(tn)
-                )
-                .filter(s ->
-                        !exists(act, s, dir)
-                );
-    }
-
-    @Override
-    public boolean checkPropagate(Activation act, Synapse targetSynapse) {
-        return targetSynapse.checkTemplatePropagate(direction, act);
+         return dir.getSynapses(act.getNeuron())
+                 .filter(s -> !exists(act, s, dir));
     }
 
     @Override
     public boolean exists(Activation act, Synapse s, Direction dir) {
-        return act.templateLinkExists(dir, s);
+        return dir.linkExists(act, s);
+    }
+
+    @Override
+    public boolean checkPropagate(Activation act, Synapse targetSynapse) {
+        return true;
     }
 
     @Override
     protected boolean opposingNeuronMatches(Neuron<?> currentN, Neuron<?> targetN) {
-        return currentN.getTemplateGroup()
-                .stream()
-                .anyMatch(tn -> tn.getId() == targetN.getId());
+        return currentN.getId() == targetN.getId();
     }
 
     @Override
     public void getNextSteps(Activation act) {
-        QueueEntry.add(act, INDUCTION);
     }
 
     @Override
     public void getNextSteps(Link l) {
-        QueueEntry.add(l, LinkStep.TEMPLATE);
-        QueueEntry.add(l, LinkStep.INDUCTION);
+        QueueEntry.add(l, LINKING);
     }
 
     @Override
     public void closeLoopIntern(ActVisitor v, Activation iAct, Activation oAct) {
-        if(oAct.getNeuron().isInputNeuron())
+        if (!iAct.isActive(false))
             return;
 
-        Synapse ts = v.getTargetSynapse();
-
-        if(v.getCurrentDir() != OUTPUT && !ts.isRecurrent())
+        if(!(v.getCurrentDir() == OUTPUT || targetSynapse.isRecurrent()))
             return;
 
-        if(!iAct.isActive(ts.isRecurrent()))
-            return;
+        oAct = targetSynapse.branchIfNecessary(oAct, v);
 
-        ts.closeLoop(v, iAct, oAct);
+        if(oAct != null)
+            targetSynapse.closeLoop(this, v, iAct, oAct);
     }
 }

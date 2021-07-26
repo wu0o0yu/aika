@@ -321,7 +321,6 @@ public class Activation extends Element<Activation> {
         v.onEvent(BEFORE);
 
         Direction dir = v.getCurrentDir();
-        Synapse targetSynapse = v.getTargetSynapse();
 
         setMarked(true);
         dir.getLinks(this)
@@ -333,12 +332,15 @@ public class Activation extends Element<Activation> {
                         }
                 )
                 .forEach(l ->
-                        targetSynapse.transition(v, l.getSynapse(), l)
+                        v.getVisitorTask().transition(v, l.getSynapse(), l)
                 );
 
         setMarked(false);
 
-        v.tryToLink(this);
+//        v.tryToLink(this);
+
+        v.getVisitorTask()
+                .processTask(v);
 
         v.onEvent(AFTER);
     }

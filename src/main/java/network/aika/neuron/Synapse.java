@@ -174,6 +174,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         s.template = this;
     }
 
+    public boolean checkLoopClosure(ActVisitor v) {
+        return true;
+    }
+
     public Reference getReference(Link l) {
         return l.getInput().getReference();
     }
@@ -207,11 +211,11 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         );
     }
 
-    public void closeLoop(ActVisitor v, Activation iAct, Activation oAct) {
+    public void closeLoop(VisitorStep vs, ActVisitor v, Activation iAct, Activation oAct) {
         if (!checkCausality(iAct, oAct, v))
             return;
 
-        createLink(iAct, oAct, v.getVisitorStep(), v.getSelfRef());
+        createLink(iAct, oAct, vs, v.getSelfRef());
     }
 
     public void createLink(Activation iAct, Activation oAct, VisitorStep vs, boolean isSelfRef) {

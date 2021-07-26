@@ -16,12 +16,9 @@
  */
 package network.aika.neuron.activation.visitor;
 
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.VisitorStep;
-
-import java.util.stream.Stream;
 
 /**
  *
@@ -39,11 +36,10 @@ public class ActVisitor extends Visitor {
         this.act = act;
     }
 
-    public ActVisitor(VisitorStep vp, Activation act, Synapse targetSynapse, Direction startDir, Direction currentDir) {
+    public ActVisitor(VisitorStep vp, Activation act, Direction startDir, Direction currentDir) {
         this.visitorStep = vp;
         this.origin = this;
         this.act = act;
-        this.targetSynapse = targetSynapse;
         this.startDir = startDir;
         this.currentDir = currentDir;
     }
@@ -52,21 +48,10 @@ public class ActVisitor extends Visitor {
         return act;
     }
 
-    public void tryToLink(Activation act) {
-        if (
-                act == origin.act ||
-                act.isConflicting()
-        )
-            return;
-
-        visitorStep.closeLoop(this, act, getOriginAct());
-    }
-
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
         sb.append("Current:" + (act != null ? act.toShortString() : "X") + ", ");
-        sb.append("TargetSynapse:" + targetSynapse + ", ");
         sb.append("Origin:" + origin.act.toShortString() + ", ");
 
         sb.append(super.toString());

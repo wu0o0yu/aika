@@ -18,7 +18,7 @@ package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.visitor.TemplateVisitor;
+import network.aika.neuron.steps.visitor.TemplateTask;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 
@@ -28,7 +28,7 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
  *
  * @author Lukas Molzberger
  */
-public class Template extends TemplateVisitor implements LinkStep {
+public class Template extends TemplateTask implements LinkStep {
 
     public Template() {
         super(INPUT);

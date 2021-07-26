@@ -34,11 +34,9 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
  * @author Lukas Molzberger
  */
 public abstract class Visitor {
-    protected Synapse targetSynapse;
-
     protected ActVisitor origin;
     private Visitor previousStep;
-    protected VisitorStep visitorStep;
+    protected VisitorTask task;
     protected Direction startDir;
     protected Direction currentDir;
 
@@ -50,18 +48,13 @@ public abstract class Visitor {
 
     public Visitor(Visitor v) {
         previousStep = v;
-        targetSynapse = v.targetSynapse;
-        visitorStep = v.visitorStep;
+        task = v.task;
         origin = v.origin;
         startDir = v.startDir;
         currentDir = v.currentDir;
         downSteps = v.downSteps;
         upSteps = v.upSteps;
         scope = v.scope;
-    }
-
-    public Synapse getTargetSynapse() {
-        return targetSynapse;
     }
 
     public void switchDirection() {
@@ -93,8 +86,8 @@ public abstract class Visitor {
         return scope;
     }
 
-    public VisitorStep getVisitorStep() {
-        return visitorStep;
+    public VisitorTask getVisitorTask() {
+        return task;
     }
 
     public Activation getOriginAct() {
