@@ -48,6 +48,9 @@ public abstract class LinkingTask extends VisitorStep {
 
     @Override
     public boolean exists(Activation act, Synapse s, Direction dir, boolean invertRecurrent) {
+        if(invertRecurrent && s.isRecurrent())
+            dir = dir.invert();
+
         return dir.linkExists(act, s);
     }
 

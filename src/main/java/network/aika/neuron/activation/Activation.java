@@ -358,6 +358,9 @@ public class Activation extends Element<Activation> {
     }
 
     public boolean templateLinkExists(Direction dir, Synapse ts, boolean invertRecurrent) {
+        if(invertRecurrent && ts.isRecurrent())
+            dir = dir.invert();
+
         return dir.getLinks(this)
                 .map(l -> l.getSynapse())
                 .anyMatch(s -> s.isOfTemplate(ts));
