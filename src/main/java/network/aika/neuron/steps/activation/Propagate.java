@@ -58,7 +58,7 @@ public class Propagate extends LinkingTask implements ActivationStep {
     }
 
     @Override
-    public boolean exists(Activation act, Synapse s, Direction dir) {
+    public boolean exists(Activation act, Synapse s, Direction dir, boolean invertRecurrent) {
         return dir.linkExists(act, s);
     }
 

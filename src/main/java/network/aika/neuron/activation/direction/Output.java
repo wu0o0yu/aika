@@ -74,7 +74,8 @@ public class Output implements Direction {
         return act.outputLinkExists(s);
     }
 
-    public Stream<? extends Synapse> getSynapses(Neuron n) {
+    @Override
+    public Stream<? extends Synapse> getSynapses(Neuron<?> n) {
         return n.getOutputSynapses();
     }
 

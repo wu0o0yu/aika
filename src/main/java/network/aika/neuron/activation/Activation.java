@@ -357,7 +357,7 @@ public class Activation extends Element<Activation> {
         return inputLinks.containsKey(s.getPInput());
     }
 
-    public boolean templateLinkExists(Direction dir, Synapse ts) {
+    public boolean templateLinkExists(Direction dir, Synapse ts, boolean invertRecurrent) {
         return dir.getLinks(this)
                 .map(l -> l.getSynapse())
                 .anyMatch(s -> s.isOfTemplate(ts));

@@ -172,7 +172,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return inputSynapses.values().stream();
     }
 
-    public Stream<Synapse> getOutputSynapses() {
+    public Stream<? extends Synapse> getOutputSynapses() {
         return outputSynapses.values().stream();
     }
 

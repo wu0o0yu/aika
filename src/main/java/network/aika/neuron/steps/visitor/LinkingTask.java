@@ -41,13 +41,13 @@ public abstract class LinkingTask extends VisitorStep {
     }
 
     @Override
-    public Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir) {
-         return dir.getSynapses(act.getNeuron())
-                 .filter(s -> !exists(act, s, dir));
+    public Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir, boolean invertRecurrent) {
+         return dir.getSynapses(act.getNeuron(), invertRecurrent)
+                 .filter(s -> !exists(act, s, dir, invertRecurrent));
     }
 
     @Override
-    public boolean exists(Activation act, Synapse s, Direction dir) {
+    public boolean exists(Activation act, Synapse s, Direction dir, boolean invertRecurrent) {
         return dir.linkExists(act, s);
     }
 

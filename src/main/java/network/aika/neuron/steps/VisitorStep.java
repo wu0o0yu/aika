@@ -45,9 +45,9 @@ public abstract class VisitorStep implements VisitorTask {
 
     public abstract boolean checkPropagate(Activation act, Synapse targetSynapse);
 
-    public abstract Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir);
+    public abstract Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir, boolean invertRecurrent);
 
-    public abstract boolean exists(Activation act, Synapse s, Direction dir);
+    public abstract boolean exists(Activation act, Synapse s, Direction dir, boolean invertRecurrent);
 
     protected abstract boolean opposingNeuronMatches(Neuron<?> currentN, Neuron<?> targetN);
 
@@ -81,12 +81,16 @@ public abstract class VisitorStep implements VisitorTask {
         Activation originAct = v.getOriginAct();
 
         Neuron<?> currentN = currentAct.getNeuron();
-        Neuron<?> targetN = direction.getNeuron(targetSynapse);
+        Direction targetDir = targetSynapse.isRecurrent() ?
+                direction.invert() :
+                direction;
+
+        Neuron<?> targetN = targetDir.getNeuron(targetSynapse);
         if (!opposingNeuronMatches(currentN, targetN))
             return;
 
-        Activation iAct = direction.getInput(originAct, currentAct);
-        Activation oAct = direction.getOutput(originAct, currentAct);
+        Activation iAct = targetDir.getInput(originAct, currentAct);
+        Activation oAct = targetDir.getOutput(originAct, currentAct);
 
         closeLoopIntern(v, iAct, oAct);
     }
@@ -100,14 +104,14 @@ public abstract class VisitorStep implements VisitorTask {
         Direction startDir = l.getSynapse().getStartDir(direction);
         Activation startAct = startDir.invert().getActivation(l);
 
-        getTargetSynapses(startAct, direction) // startDir?
+        getTargetSynapses(startAct, direction, true) // startDir?
                 .forEach(ts ->
                         follow(l, startDir, startAct, ts)
                 );
     }
 
     public void link(Activation startAct) {
-        getTargetSynapses(startAct, direction)
+        getTargetSynapses(startAct, direction, true)
                 .forEach(ts ->
                         follow(startAct, ts)
                 );
@@ -132,7 +136,7 @@ public abstract class VisitorStep implements VisitorTask {
     }
 
     public void propagate(Activation act) {
-        getTargetSynapses(act, direction)
+        getTargetSynapses(act, direction, false)
                 .filter(s ->
                         checkPropagate(act, s)
                 )
