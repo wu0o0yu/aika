@@ -78,6 +78,6 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
             return false;
         }
 
-        return super.checkTemplatePropagate(dir, act);
+        return true;
     }
 }

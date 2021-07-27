@@ -63,7 +63,7 @@ public class PrimaryBNSynapse<I extends Neuron<?>> extends InputBNSynapse<I> {
 
     @Override
     public void inhibitoryTransitionLoop(ActVisitor v, Link l) {
-        if (v.getStartDir() != v.getCurrentDir())
+        if (v.getStartDir() == v.getCurrentDir())
             return;
 
         l.follow(v);

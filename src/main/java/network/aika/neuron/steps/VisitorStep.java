@@ -74,7 +74,7 @@ public abstract class VisitorStep implements VisitorTask {
         if(v.getActivation() == v.getOriginAct())
             return;
 
-        if(targetSynapse.checkLoopClosure(v))
+        if(!targetSynapse.checkLoopClosure(v))
             return;
 
         Activation currentAct = v.getActivation();
@@ -100,7 +100,7 @@ public abstract class VisitorStep implements VisitorTask {
         Direction startDir = l.getSynapse().getStartDir(direction);
         Activation startAct = startDir.invert().getActivation(l);
 
-        getTargetSynapses(startAct, startDir)
+        getTargetSynapses(startAct, direction) // startDir?
                 .forEach(ts ->
                         follow(l, startDir, startAct, ts)
                 );

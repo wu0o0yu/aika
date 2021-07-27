@@ -57,7 +57,7 @@ public class RelatedBNSynapse<I extends Neuron<?>> extends InputBNSynapse<I> {
 
     @Override
     public void inputPatternTransitionLoop(ActVisitor v, Link l) {
-        Direction currentDir = v.getCurrentDir();
+/*        Direction currentDir = v.getCurrentDir();
         if(v.getStartDir() == currentDir)
             return;
 
@@ -66,6 +66,7 @@ public class RelatedBNSynapse<I extends Neuron<?>> extends InputBNSynapse<I> {
             return;
 
         l.follow(v, ns);
+ */
     }
 
     @Override

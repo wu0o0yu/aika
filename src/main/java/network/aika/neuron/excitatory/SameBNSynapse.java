@@ -64,7 +64,7 @@ public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> 
 
     @Override
     public void inhibitoryTransitionLoop(ActVisitor v, Link l) {
-        l.follow(v);
+//        l.follow(v); // Causes B-A -> I-B creation
     }
 
     @Override

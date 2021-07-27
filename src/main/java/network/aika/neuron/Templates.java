@@ -80,9 +80,7 @@ public class Templates {
                         INPUT_PATTERN_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
                         "Primary Input Synapse",
-                        1,
-                        true,
-                        true
+                        1
                 );
 
         RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE =
@@ -91,9 +89,7 @@ public class Templates {
                         INPUT_BINDING_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
                         "Related Input Synapse from Binding Neuron",
-                        2,
-                        true,
-                        true
+                        2
                 );
 
         RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE =
@@ -102,9 +98,7 @@ public class Templates {
                         INHIBITORY_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
                         "Related Input Synapse from Inhibitory Neuron",
-                        3,
-                        true,
-                        true
+                        3
                 );
 
         RELATED_RECURRENT_INPUT_SYNAPSE_TEMPLATE =
@@ -113,9 +107,7 @@ public class Templates {
                         INHIBITORY_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
                         "Related Input Synapse from Inhibitory Neuron",
-                        10,
-                        true,
-                        true
+                        10
                 );
 
         SAME_PATTERN_SYNAPSE_TEMPLATE =
@@ -124,9 +116,7 @@ public class Templates {
                         SAME_BINDING_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
                         "Same Pattern Synapse",
-                        4,
-                        true,
-                        true
+                        4
                 );
 
         RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE =
@@ -135,9 +125,7 @@ public class Templates {
                         SAME_PATTERN_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
                         "Recurrent Same Pattern Synapse",
-                        5,
-                        true,
-                        true
+                        5
                 );
 
         NEGATIVE_SYNAPSE_TEMPLATE =
@@ -146,9 +134,7 @@ public class Templates {
                         INHIBITORY_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
                         "Negative Synapse",
-                        6,
-                        false,
-                        true
+                        6
                 );
 
         PATTERN_SYNAPSE_TEMPLATE =
@@ -157,9 +143,7 @@ public class Templates {
                         SAME_BINDING_TEMPLATE,
                         SAME_PATTERN_TEMPLATE,
                         "Pattern Synapse",
-                        7,
-                        true,
-                        true
+                        7
                 );
 
         PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE =
@@ -168,9 +152,7 @@ public class Templates {
                         INPUT_PATTERN_TEMPLATE,
                         INHIBITORY_TEMPLATE,
                         "Primary Inhibitory Synapse",
-                        8,
-                        true,
-                        true
+                        8
                 );
 
         INHIBITORY_SYNAPSE_TEMPLATE =
@@ -179,9 +161,7 @@ public class Templates {
                         SAME_BINDING_TEMPLATE,
                         INHIBITORY_TEMPLATE,
                         "Regular Inhibitory Synapse",
-                        9,
-                        false,
-                        true
+                        9
                 );
     }
 
@@ -208,7 +188,7 @@ public class Templates {
         return n;
     }
 
-    private <S extends Synapse> S init(S ts, Neuron input, Neuron output, String templateLabel, int templateSynapseId, boolean linkInput, boolean linkOutput) {
+    private <S extends Synapse> S init(S ts, Neuron input, Neuron output, String templateLabel, int templateSynapseId) {
         ts.setInput(input);
         ts.setOutput(output);
 
@@ -217,12 +197,9 @@ public class Templates {
         ti.setTemplateSynapseId((byte) templateSynapseId);
         templateSynapseIndex.put(ti.getTemplateSynapseId(), ts);
 
-        if(linkInput) {
-            ts.linkInput();
-        }
-        if(linkOutput) {
-            ts.linkOutput();
-        }
+        ts.linkInput();
+        ts.linkOutput();
+
         return ts;
     }
 
