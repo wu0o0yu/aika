@@ -138,8 +138,14 @@ public abstract class VisitorStep implements VisitorTask {
                 .filter(s ->
                         checkPropagate(act, s)
                 )
+                .filter(s ->
+                        !exists(act, s)
+                )
                 .forEach(s ->
                         s.propagate(act, direction, this, false)
                 );
     }
+
+    protected abstract boolean exists(Activation act, Synapse s);
+
 }

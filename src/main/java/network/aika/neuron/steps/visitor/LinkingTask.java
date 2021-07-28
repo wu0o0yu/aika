@@ -51,6 +51,11 @@ public abstract class LinkingTask extends VisitorStep {
     }
 
     @Override
+    protected boolean exists(Activation act, Synapse s) {
+        return act.outputLinkExists(s);
+    }
+
+    @Override
     protected boolean opposingNeuronMatches(Neuron<?> currentN, Neuron<?> targetN) {
         return currentN.getId() == targetN.getId();
     }

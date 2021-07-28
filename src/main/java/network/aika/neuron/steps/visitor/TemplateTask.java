@@ -57,6 +57,11 @@ public abstract class TemplateTask extends VisitorStep {
     }
 
     @Override
+    protected boolean exists(Activation act, Synapse s) {
+        return act.templateLinkExists(direction, s);
+    }
+
+    @Override
     protected boolean opposingNeuronMatches(Neuron<?> currentN, Neuron<?> targetN) {
         return currentN.getTemplateGroup()
                 .stream()

@@ -361,6 +361,12 @@ public class Activation extends Element<Activation> {
                 .anyMatch(s -> s.isOfTemplate(ts));
     }
 
+    public boolean templateLinkExists(Direction dir, Synapse ts) {
+        return dir.getLinks(this)
+                .map(l -> l.getSynapse())
+                .anyMatch(s -> s.isOfTemplate(ts));
+    }
+
     public boolean outputLinkExists(Activation oAct) {
         return outputLinks.containsKey(oAct.getOutputKey());
     }
