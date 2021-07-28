@@ -82,6 +82,10 @@ public class Link extends Element<Link> {
         hasBeenCounted = true;
     }
 
+    public static boolean synapseExists(Activation iAct, Activation oAct) {
+        return Synapse.synapseExists(iAct.getNeuron(), oAct.getNeuron());
+    }
+
     public void follow(ActVisitor v) {
         follow(v, v.getScope());
     }

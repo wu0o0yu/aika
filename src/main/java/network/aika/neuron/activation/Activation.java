@@ -337,8 +337,6 @@ public class Activation extends Element<Activation> {
 
         setMarked(false);
 
-//        v.tryToLink(this);
-
         v.getVisitorTask()
                 .processTask(v);
 
@@ -357,11 +355,8 @@ public class Activation extends Element<Activation> {
         return inputLinks.containsKey(s.getPInput());
     }
 
-    public boolean templateLinkExists(Direction dir, Synapse ts, boolean invertRecurrent) {
-        if(invertRecurrent && ts.isRecurrent())
-            dir = dir.invert();
-
-        return dir.getLinks(this)
+    public boolean templateInputLinkExists(Synapse ts) {
+        return getInputLinks()
                 .map(l -> l.getSynapse())
                 .anyMatch(s -> s.isOfTemplate(ts));
     }

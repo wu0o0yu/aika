@@ -48,20 +48,12 @@ public abstract class TemplateTask extends VisitorStep {
                 .getTemplateGroup().stream()
                 .flatMap(tn ->
                         dir.getSynapses(tn, invertRecurrent)
-                )
-                .filter(s ->
-                        !exists(act, s, dir, invertRecurrent)
                 );
     }
 
     @Override
     public boolean checkPropagate(Activation act, Synapse targetSynapse) {
         return targetSynapse.checkTemplatePropagate(direction, act);
-    }
-
-    @Override
-    public boolean exists(Activation act, Synapse s, Direction dir, boolean invertRecurrent) {
-        return act.templateLinkExists(dir, s, invertRecurrent);
     }
 
     @Override
@@ -91,6 +83,9 @@ public abstract class TemplateTask extends VisitorStep {
             return;
 
         if(!iAct.isActive(targetSynapse.isRecurrent()))
+            return;
+
+        if(oAct.templateInputLinkExists(targetSynapse))
             return;
 
         targetSynapse.closeLoop(this, v, iAct, oAct);

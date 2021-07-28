@@ -47,8 +47,6 @@ public abstract class VisitorStep implements VisitorTask {
 
     public abstract Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir, boolean invertRecurrent);
 
-    public abstract boolean exists(Activation act, Synapse s, Direction dir, boolean invertRecurrent);
-
     protected abstract boolean opposingNeuronMatches(Neuron<?> currentN, Neuron<?> targetN);
 
     protected abstract void closeLoopIntern(ActVisitor v, Activation iAct, Activation oAct);

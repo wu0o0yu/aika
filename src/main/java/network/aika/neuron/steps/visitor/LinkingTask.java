@@ -42,16 +42,7 @@ public abstract class LinkingTask extends VisitorStep {
 
     @Override
     public Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir, boolean invertRecurrent) {
-         return dir.getSynapses(act.getNeuron(), invertRecurrent)
-                 .filter(s -> !exists(act, s, dir, invertRecurrent));
-    }
-
-    @Override
-    public boolean exists(Activation act, Synapse s, Direction dir, boolean invertRecurrent) {
-        if(invertRecurrent && s.isRecurrent())
-            dir = dir.invert();
-
-        return dir.linkExists(act, s);
+         return dir.getSynapses(act.getNeuron(), invertRecurrent);
     }
 
     @Override
@@ -79,6 +70,10 @@ public abstract class LinkingTask extends VisitorStep {
             return;
 
         if(!(v.getCurrentDir() == OUTPUT || targetSynapse.isRecurrent()))
+            return;
+
+        Link existingLink = oAct.getInputLink(targetSynapse);
+        if(existingLink != null && existingLink.getInput() == iAct)
             return;
 
         oAct = targetSynapse.branchIfNecessary(oAct, v);
