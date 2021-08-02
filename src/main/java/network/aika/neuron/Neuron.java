@@ -151,11 +151,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return getSurprisal(POS, act.getReference());
     }
 
-    public double computeBiasLB(Activation iAct) {
-        return (iAct.getConfig().getLearnRate() * iAct.getNeuron().getCandidateGradient(iAct)) /
-                getBias();
-    }
-
     public SampleSpace getSampleSpace() {
         return sampleSpace;
     }

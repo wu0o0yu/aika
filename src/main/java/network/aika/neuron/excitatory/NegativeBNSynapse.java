@@ -43,24 +43,6 @@ public class NegativeBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse
         s.negativeSynapseTransitionLoop(v, l);
     }
 
-    @Override
-    public void samePatternTransitionLoop(ActVisitor v, Link l) {
-    }
-
-    @Override
-    public void inputPatternTransitionLoop(ActVisitor v, Link l) {
-    }
-
-    @Override
-    public void patternTransitionLoop(ActVisitor v, Link l) {
-
-    }
-
-    @Override
-    public void inhibitoryTransitionLoop(ActVisitor v, Link l) {
-
-    }
-
     public void updateSynapse(Link l, double delta) {
         if(l.getInput().isActive(true) && l.isSelfRef())
             addWeight(-delta);

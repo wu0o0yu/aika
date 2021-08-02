@@ -57,23 +57,5 @@ public class RelatedBNSynapse<I extends Neuron<?>> extends InputBNSynapse<I> {
 
     @Override
     public void inputPatternTransitionLoop(ActVisitor v, Link l) {
-/*        Direction currentDir = v.getCurrentDir();
-        if(v.getStartDir() == currentDir)
-            return;
-
-        Scope ns = currentDir.transition(v.getScope(), Scope.INPUT, Scope.SAME);
-        if(ns == null)
-            return;
-
-        l.follow(v, ns);
- */
-    }
-
-    @Override
-    public void patternTransitionLoop(ActVisitor v, Link l) {
-    }
-
-    @Override
-    public void inhibitoryTransitionLoop(ActVisitor v, Link l) {
     }
 }

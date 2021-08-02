@@ -25,10 +25,6 @@ import network.aika.neuron.activation.visitor.ActVisitor;
  */
 public class RegularInhibitorySynapse extends InhibitorySynapse {
 
-    @Override
-    public void inhibitoryTransitionLoop(ActVisitor v, Link l) {
-    }
-
     public void negativeSynapseTransitionLoop(ActVisitor v, Link l) {
         l.follow(v);
     }

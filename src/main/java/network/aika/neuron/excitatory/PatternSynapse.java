@@ -38,20 +38,8 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
     }
 
     @Override
-    public void samePatternTransitionLoop(ActVisitor v, Link l) {
-    }
-
-    @Override
-    public void inputPatternTransitionLoop(ActVisitor v, Link l) {
-    }
-
-    @Override
     public void patternTransitionLoop(ActVisitor v, Link l) {
         l.follow(v);
-    }
-
-    @Override
-    public void inhibitoryTransitionLoop(ActVisitor v, Link l) {
     }
 
     @Override

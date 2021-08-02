@@ -39,7 +39,6 @@ public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> 
     public SameBNSynapse() {
     }
 
-
     public Direction getStartDir(Direction dir) {
         return isRecurrent() ? dir.invert() : dir;
     }
@@ -49,12 +48,8 @@ public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> 
     }
 
     @Override
-    public void samePatternTransitionLoop(ActVisitor v, Link l) {
-    }
-
-    @Override
     public void inputPatternTransitionLoop(ActVisitor v, Link l) {
-        l.follow(v);
+//        l.follow(v); 2.8.21 *
     }
 
     @Override
@@ -72,14 +67,4 @@ public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> 
         return v.getScope() == Scope.SAME;
     }
 
-    @Override
-    public boolean checkTemplatePropagate(Direction dir, Activation act) {
-        if (dir == INPUT && act.getNeuron().isInputNeuron())
-            return false;
-
-        if(dir == OUTPUT && isRecurrent)
-            return false;
-
-        return super.checkTemplatePropagate(dir, act);
-    }
 }

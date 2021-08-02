@@ -77,8 +77,7 @@ public abstract class LinkingTask extends VisitorStep {
         if(!(v.getCurrentDir() == OUTPUT || targetSynapse.isRecurrent()))
             return;
 
-        Link existingLink = oAct.getInputLink(targetSynapse);
-        if(existingLink != null && existingLink.getInput() == iAct)
+        if (Link.linkExists(targetSynapse, iAct, oAct))
             return;
 
         oAct = targetSynapse.branchIfNecessary(oAct, v);

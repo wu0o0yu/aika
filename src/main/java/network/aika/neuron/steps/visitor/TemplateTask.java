@@ -90,7 +90,7 @@ public abstract class TemplateTask extends VisitorStep {
         if(!iAct.isActive(targetSynapse.isRecurrent()))
             return;
 
-        if(oAct.templateInputLinkExists(targetSynapse))
+        if(Link.templateLinkExists(targetSynapse, iAct, oAct))
             return;
 
         targetSynapse.closeLoop(this, v, iAct, oAct);

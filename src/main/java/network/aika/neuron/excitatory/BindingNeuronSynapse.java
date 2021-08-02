@@ -42,10 +42,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, BindingNeuron> {
 
-    public static double PROPAGATE_THRESHOLD_LB = 0.4;
-
     private static final Logger log = LoggerFactory.getLogger(BindingNeuronSynapse.class);
-
 
     public boolean isRecurrent;
 
@@ -55,15 +52,6 @@ public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends Excitato
 
     public BindingNeuronSynapse(boolean isRecurrent) {
         this.isRecurrent = isRecurrent;
-    }
-
-    public boolean checkTemplatePropagate(Direction dir, Activation act) {
-        if(dir == OUTPUT) {
-            log.info(act.getLabel() + " BiasLB:" + getOutput().computeBiasLB(act));
-        }
-
-        return dir == OUTPUT &&
-                getOutput().computeBiasLB(act) >= PROPAGATE_THRESHOLD_LB;
     }
 
     protected void initFromTemplate(Synapse s) {

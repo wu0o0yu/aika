@@ -17,19 +17,34 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.scope.Scope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public class PrimaryBNSynapse<I extends Neuron<?>> extends InputBNSynapse<I> {
+
+    private static final Logger log = LoggerFactory.getLogger(PrimaryBNSynapse.class);
+
+
+    public boolean checkTemplatePropagate(Direction dir, Activation act) {
+        if(dir == OUTPUT) {
+            log.info(act.getLabel() + " CandidateGradient:" + act.getNeuron().getCandidateGradient(act));
+        }
+
+        return dir == OUTPUT;
+    }
 
     @Override
     public void samePatternTransitionLoop(ActVisitor v, Link l) {

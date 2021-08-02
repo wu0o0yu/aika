@@ -57,10 +57,6 @@ public abstract class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeu
         l.follow(v);
     }
 
-    @Override
-    public void patternTransitionLoop(ActVisitor v, Link l) {
-    }
-
     public void updateSynapse(Link l, double delta) {
         if(l.getInput().isActive(true)) {
             addWeight(delta);

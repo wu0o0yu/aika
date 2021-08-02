@@ -73,6 +73,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract void transition(ActVisitor v, Synapse s, Link l);
 
+    public boolean checkTemplatePropagate(Direction dir, Activation act) {
+        return false;
+    }
+
     public void samePatternTransitionLoop(ActVisitor v, Link l) {
     }
 
@@ -123,8 +127,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public abstract void updateSynapse(Link l, double delta);
 
     protected abstract boolean checkCausality(Activation iAct, Activation oAct, Visitor v);
-
-    public abstract boolean checkTemplatePropagate(Direction dir, Activation act);
 
     public abstract void updateReference(Link l);
 

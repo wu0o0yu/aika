@@ -82,6 +82,18 @@ public class Link extends Element<Link> {
         hasBeenCounted = true;
     }
 
+    public static boolean linkExists(Synapse s, Activation iAct, Activation oAct) {
+        Link existingLink = oAct.getInputLink(s);
+        return existingLink != null && existingLink.getInput() == iAct;
+    }
+
+    public static boolean templateLinkExists(Synapse ts, Activation iAct, Activation oAct) {
+        Link l = oAct.getInputLink(iAct.getNeuron());
+        if(l == null)
+            return false;
+        return l.getSynapse().isOfTemplate(ts);
+    }
+
     public static boolean synapseExists(Activation iAct, Activation oAct) {
         return Synapse.synapseExists(iAct.getNeuron(), oAct.getNeuron());
     }
@@ -145,7 +157,6 @@ public class Link extends Element<Link> {
                         g
         );
     }
-
 
     public boolean isCausal() {
         return input == null || Fired.COMPARATOR.compare(input.getFired(), output.getFired()) <= 0;
