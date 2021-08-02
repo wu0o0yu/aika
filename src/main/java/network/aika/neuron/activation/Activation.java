@@ -280,7 +280,9 @@ public class Activation extends Element<Activation> {
             return true;
 
         return getOutputLinks()
-                .filter(l -> !l.isNegative() || l.isCausal())
+                .filter(l ->
+                        !l.isNegative() || l.isCausal()
+                )
                 .map(l -> l.getOutput())
                 .filter(act ->
                         act.fired != NOT_FIRED && Fired.COMPARATOR.compare(fired, act.fired) == -1
