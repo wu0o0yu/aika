@@ -16,6 +16,7 @@
  */
 package network.aika;
 
+import network.aika.debugger.AikaDebugger;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
@@ -40,7 +41,8 @@ public class MutualExclusionTest {
     @Test
     public void testPropagation() {
         Model m = new TextModel();
-        Templates t = new Templates(m);
+        m.init();
+        Templates t = m.getTemplates();
 
         PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
         in.setTokenLabel("I");
@@ -138,6 +140,12 @@ public class MutualExclusionTest {
 
         Document doc = new Document("test");
 
+        Config c = new TestConfig()
+                .setAlpha(0.99)
+                .setLearnRate(-0.011)
+                .setEnableTraining(true);
+        doc.setConfig(c);
+
         Activation act = doc.createActivation(in);
         act.setInputValue(1.0);
         act.setFired(0);
@@ -159,7 +167,8 @@ public class MutualExclusionTest {
     @Test
     public void testPropagationWithPrimaryLink() {
         Model m = new TextModel();
-        Templates t = new Templates(m);
+        m.init();
+        Templates t = m.getTemplates();
 
         PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
         in.setTokenLabel("I");
@@ -235,8 +244,16 @@ public class MutualExclusionTest {
 
         Document doc = new Document("test");
 
+        Config c = new TestConfig()
+                .setAlpha(0.99)
+                .setLearnRate(-0.011)
+                .setEnableTraining(true);
+        doc.setConfig(c);
+
         Activation act = doc.createActivation(in);
         act.initInput(new TextReference(doc, 0, 4));
+
+        AikaDebugger.createAndShowGUI(doc,m);
 
         doc.process(m);
 
