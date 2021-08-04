@@ -56,9 +56,6 @@ public class NegativeBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse
         if (getOutput().isInputNeuron())
             return null;
 
-        if(isRecurrent() && !v.getSelfRef())
-            return null;
-
         if (!v.getSelfRef())
             oAct = oAct.createBranch(this);
 
