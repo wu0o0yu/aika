@@ -103,7 +103,7 @@ public class Templates {
 
         RELATED_RECURRENT_INPUT_SYNAPSE_TEMPLATE =
                 init(
-                        new RelatedBNSynapse(true),
+                        new RelatedRecurrentBNSynapse(),
                         INHIBITORY_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
                         "Related Input Synapse from Inhibitory Neuron",

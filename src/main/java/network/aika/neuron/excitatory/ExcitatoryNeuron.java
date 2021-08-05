@@ -59,7 +59,6 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         super(model, addProvider);
     }
 
-
     protected void initFromTemplate(ExcitatoryNeuron n) {
         super.initFromTemplate(n);
         n.directConjunctiveBias = directConjunctiveBias;

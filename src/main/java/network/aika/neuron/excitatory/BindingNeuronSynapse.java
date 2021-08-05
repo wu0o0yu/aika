@@ -44,22 +44,6 @@ public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends Excitato
 
     private static final Logger log = LoggerFactory.getLogger(BindingNeuronSynapse.class);
 
-    public boolean isRecurrent;
-
-    public BindingNeuronSynapse() {
-        super();
-    }
-
-    public BindingNeuronSynapse(boolean isRecurrent) {
-        this.isRecurrent = isRecurrent;
-    }
-
-    protected void initFromTemplate(Synapse s) {
-        super.initFromTemplate(s);
-
-        BindingNeuronSynapse bns = (BindingNeuronSynapse) s;
-        bns.isRecurrent = isRecurrent;
-    }
 
     @Override
     protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
@@ -97,14 +81,10 @@ public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends Excitato
     @Override
     public Reference getReference(Link l) {
         return (
-                isRecurrent ?
+                isRecurrent() ?
                         l.getOutput() :
                         l.getInput()
         ).getReference();
-    }
-
-    public boolean isRecurrent() {
-        return isRecurrent;
     }
 
     public void setWeight(double weight) {
@@ -115,19 +95,5 @@ public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends Excitato
     public void addWeight(double weightDelta) {
         super.addWeight(weightDelta);
         output.getNeuron().setModified(true);
-    }
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-        super.write(out);
-
-        out.writeBoolean(isRecurrent);
-    }
-
-    @Override
-    public void readFields(DataInput in, Model m) throws IOException {
-        super.readFields(in, m);
-
-        isRecurrent = in.readBoolean();
     }
 }

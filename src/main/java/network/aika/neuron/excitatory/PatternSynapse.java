@@ -33,6 +33,7 @@ import network.aika.neuron.activation.visitor.Visitor;
  */
 public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, PatternNeuron> {
 
+    @Override
     public void transition(ActVisitor v, Synapse s, Link l) {
         s.patternTransitionLoop(v, l);
     }
@@ -64,9 +65,4 @@ public class PatternSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, Pa
         return true;
     }
 
-    public Activation branchIfNecessary(Activation oAct, Visitor v) {
-        return getOutput().isInputNeuron() ?
-                null :
-                oAct;
-    }
 }

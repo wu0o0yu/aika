@@ -14,31 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.inhibitory;
+package network.aika.neuron.excitatory;
 
-import network.aika.neuron.activation.Activation;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.LinkVisitor;
-import network.aika.neuron.activation.visitor.Visitor;
+import network.aika.neuron.scope.Scope;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PrimaryInhibitorySynapse extends InhibitorySynapse {
+public class RelatedRecurrentBNSynapse<I extends Neuron<?>> extends RelatedBNSynapse<I> {
+
 
     @Override
-    public boolean checkTemplatePropagate(Direction dir, Activation act) {
-        return dir == Direction.OUTPUT;
-    }
-
-    @Override
-    public void inhibitoryTransitionLoop(ActVisitor v, Link l) {
-        if (v.getStartDir() != v.getCurrentDir())
-            return;
-
-        l.follow(v);
+    public boolean isRecurrent() {
+        return true;
     }
 }

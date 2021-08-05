@@ -26,15 +26,7 @@ import network.aika.neuron.activation.visitor.ActVisitor;
  */
 public abstract class InputBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> {
 
-
-    public InputBNSynapse(boolean recurrent) {
-        super(recurrent);
-    }
-
-    public InputBNSynapse() {
-        super();
-    }
-
+    @Override
     public void transition(ActVisitor v, Synapse s, Link l) {
         s.inputPatternTransitionLoop(v, l);
     }

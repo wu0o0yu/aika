@@ -43,6 +43,7 @@ public abstract class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeu
         return false;
     }
 
+    @Override
     public void transition(ActVisitor v, Synapse s, Link l) {
         s.inhibitoryTransitionLoop(v, l);
     }

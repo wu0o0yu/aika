@@ -31,14 +31,6 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
  */
 public class RelatedBNSynapse<I extends Neuron<?>> extends InputBNSynapse<I> {
 
-    public RelatedBNSynapse() {
-        super();
-    }
-
-    public RelatedBNSynapse(boolean recurrent) {
-        super(recurrent);
-    }
-
     @Override
     public void samePatternTransitionLoop(ActVisitor v, Link l) {
         Direction currentDir = v.getCurrentDir();

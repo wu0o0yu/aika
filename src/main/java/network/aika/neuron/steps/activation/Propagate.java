@@ -22,6 +22,7 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.LinkingTask;
 
+import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 
@@ -50,6 +51,9 @@ public class Propagate extends LinkingTask implements ActivationStep {
 
     @Override
     public void process(Activation act) {
+        if(act.getFired() == NOT_FIRED)
+            return;
+
         propagate(act);
     }
 

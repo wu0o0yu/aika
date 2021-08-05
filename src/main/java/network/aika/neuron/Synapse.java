@@ -130,7 +130,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract void updateReference(Link l);
 
-    public abstract Activation branchIfNecessary(Activation oAct, Visitor v);
+    public Activation branchIfNecessary(Activation oAct, Visitor v) {
+        return oAct;
+    }
 
     public boolean isAllowTraining() {
         return allowTraining;

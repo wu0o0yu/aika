@@ -35,8 +35,9 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
 
-    public RecurrentSameBNSynapse() {
-        this.isRecurrent = true;
+    @Override
+    public boolean isRecurrent() {
+        return true;
     }
 
     @Override
@@ -78,7 +79,7 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
             return false;
         }
 
-        if(dir == OUTPUT && isRecurrent) {
+        if(dir == OUTPUT) {
             return false;
         }
 

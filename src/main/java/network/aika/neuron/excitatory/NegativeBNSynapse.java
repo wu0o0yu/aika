@@ -37,10 +37,12 @@ import static network.aika.neuron.sign.Sign.POS;
  */
 public class NegativeBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> {
 
-    public NegativeBNSynapse() {
-        this.isRecurrent = true;
+    @Override
+    public boolean isRecurrent() {
+        return true;
     }
 
+    @Override
     public void transition(ActVisitor v, Synapse s, Link l) {
         s.negativeSynapseTransitionLoop(v, l);
     }
@@ -50,11 +52,13 @@ public class NegativeBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse
         return true;
     }
 
+    @Override
     public void updateSynapse(Link l, double delta) {
         if(l.getInput().isActive(true) && l.isSelfRef())
             addWeight(-delta);
     }
 
+    @Override
     public void updateReference(Link l) {
     }
 

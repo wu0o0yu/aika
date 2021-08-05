@@ -35,14 +35,13 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  * @author Lukas Molzberger
  */
 public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> {
-
-    public SameBNSynapse() {
-    }
+    
 
     public Direction getStartDir(Direction dir) {
         return isRecurrent() ? dir.invert() : dir;
     }
 
+    @Override
     public void transition(ActVisitor v, Synapse s, Link l) {
         s.samePatternTransitionLoop(v, l);
     }
