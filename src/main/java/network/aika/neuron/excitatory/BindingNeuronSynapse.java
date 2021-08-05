@@ -62,6 +62,11 @@ public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends Excitato
     }
 
     @Override
+    protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
+        return fromAct.getFired() != NOT_FIRED && Fired.COMPARATOR.compare(fromAct.getFired(), toAct.getFired()) <= 0;
+    }
+
+    @Override
     public void updateReference(Link l) {
         if(l.getInput() == null)
             return;
@@ -75,15 +80,6 @@ public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends Excitato
         Templates t = getModel().getTemplates();
         if(ts != t.RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE && ts != t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE) {
             l.getOutput().propagateReference(iRef);
-        }
-    }
-
-    @Override
-    protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
-        if(!isRecurrent) {
-            return fromAct.getFired() != NOT_FIRED && Fired.COMPARATOR.compare(fromAct.getFired(), toAct.getFired()) <= 0;
-        } else {
-            return v.getSelfRef();
         }
     }
 

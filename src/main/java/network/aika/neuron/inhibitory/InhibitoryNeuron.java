@@ -22,6 +22,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
+import network.aika.neuron.activation.visitor.ActVisitor;
 
 /**
  *
@@ -39,6 +40,11 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
 
     private InhibitoryNeuron(Model model, boolean addProvider) {
         super(model, addProvider);
+    }
+
+
+    public ActVisitor transition(ActVisitor v) {
+        return v;
     }
 
     @Override

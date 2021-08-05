@@ -61,9 +61,9 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
         return n;
     }
 
-    @Override
-    public void transition(ActVisitor v) {
+    public ActVisitor transition(ActVisitor v) {
         v.switchDirection();
+        return v;
     }
 
     public void setTokenLabel(String tokenLabel) {

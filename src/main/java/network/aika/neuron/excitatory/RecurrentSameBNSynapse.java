@@ -18,11 +18,14 @@ package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.scope.Scope;
 
+import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
@@ -34,6 +37,11 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
 
     public RecurrentSameBNSynapse() {
         this.isRecurrent = true;
+    }
+
+    @Override
+    protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
+        return v.getSelfRef();
     }
 
     public Direction getStartDir(Direction dir) {

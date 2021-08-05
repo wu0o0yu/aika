@@ -19,6 +19,7 @@ package network.aika.neuron.excitatory;
 import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,13 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
 
     public BindingNeuron(Model model, boolean addProvider) {
         super(model, addProvider);
+    }
+
+
+    public ActVisitor transition(ActVisitor v) {
+//        if(v.getVisitorTask().enteringAlternateBranch(v))
+//            return null;
+        return v;
     }
 
     @Override

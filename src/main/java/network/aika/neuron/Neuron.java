@@ -107,6 +107,9 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract Neuron<?> instantiateTemplate(boolean addProvider);
 
+
+    public abstract ActVisitor transition(ActVisitor v);
+
     public abstract void addDummyLinks(Activation act);
 
     public abstract ActivationFunction getActivationFunction();
@@ -135,9 +138,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public Set<Neuron<?>> getTemplateGroup() {
         return getTemplate().getTemplateInfo().getTemplateGroup();
-    }
-
-    public void transition(ActVisitor v) {
     }
 
     public Synapse getOutputSynapse(NeuronProvider n) {

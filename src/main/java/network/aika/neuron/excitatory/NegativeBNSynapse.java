@@ -19,6 +19,7 @@ package network.aika.neuron.excitatory;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.visitor.ActVisitor;
@@ -26,6 +27,7 @@ import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.steps.link.SumUpLink;
 
+import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.sign.Sign.POS;
 
@@ -41,6 +43,11 @@ public class NegativeBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse
 
     public void transition(ActVisitor v, Synapse s, Link l) {
         s.negativeSynapseTransitionLoop(v, l);
+    }
+
+    @Override
+    protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
+        return true;
     }
 
     public void updateSynapse(Link l, double delta) {
