@@ -25,8 +25,6 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.LinkVisitor;
-import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.activation.PropagateValueChange;
@@ -163,6 +161,14 @@ public class Activation extends Element<Activation> {
 
     public void setFired(Fired f) {
         fired = f;
+    }
+
+    public Activation getMainBranch() {
+        return mainBranch;
+    }
+
+    public Set<Activation> getBranches() {
+        return branches;
     }
 
     public Thought getThought() {
@@ -317,26 +323,27 @@ public class Activation extends Element<Activation> {
                 );
     }
 
+    /*
     public void follow(ActVisitor av) {
         final ActVisitor v = getNeuron().transition(av);
-        if(v == null)
+        if (v == null)
             return;
 
+        followLinks(v);
+    }
+
+     */
+
+    public void followLinks(ActVisitor v) {
         v.onEvent(BEFORE);
 
         Direction dir = v.getCurrentDir();
 
         setMarked(true);
         dir.getLinks(this)
-                .filter(l -> {
-                            Activation nextAct = dir.getActivation(l);
-                            return !l.isNegative() &&
-                                    nextAct != null &&
-                                    !nextAct.isMarked();
-                        }
-                )
                 .forEach(l ->
-                        v.getVisitorTask().transition(v, l.getSynapse(), l)
+                        v.getVisitorTask()
+                                .synapseTransition(v, l.getSynapse(), l)
                 );
 
         setMarked(false);

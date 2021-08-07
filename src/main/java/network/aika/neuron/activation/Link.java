@@ -93,24 +93,29 @@ public class Link extends Element<Link> {
             return false;
         return l.getSynapse().isOfTemplate(ts);
     }
-
+/*
     public static boolean synapseExists(Activation iAct, Activation oAct) {
         return Synapse.synapseExists(iAct.getNeuron(), oAct.getNeuron());
     }
-
+*/
     public void follow(ActVisitor v) {
         follow(v, v.getScope());
     }
 
     public void follow(ActVisitor v, Scope ns) {
         LinkVisitor lv = new LinkVisitor(v, getSynapse(), this, ns);
-
-        lv.onEvent(BEFORE);
         Activation toAct = lv.getCurrentDir().getActivation(this);
 
-        toAct.follow(
-                new ActVisitor(lv, toAct)
+        if(toAct == null || toAct.isMarked())
+            return;
+
+        lv.onEvent(BEFORE);
+
+        v.getVisitorTask().neuronTransition(
+                new ActVisitor(lv, toAct),
+                toAct
         );
+
         lv.onEvent(AFTER);
     }
 

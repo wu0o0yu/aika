@@ -73,6 +73,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract void transition(ActVisitor v, Synapse s, Link l);
 
+    public void alternateBranchTransition(ActVisitor v, Synapse s, Link l) {
+
+    }
+
     public boolean checkTemplatePropagate(Direction dir, Activation act) {
         return false;
     }
@@ -142,10 +146,11 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         this.allowTraining = allowTraining;
     }
 
+    /*
     public static boolean synapseExists(Neuron iN, Neuron oN) {
         return oN.getInputSynapse(iN.getProvider()) != null;
     }
-
+*/
     public boolean isTemplate() {
         return template == null;
     }

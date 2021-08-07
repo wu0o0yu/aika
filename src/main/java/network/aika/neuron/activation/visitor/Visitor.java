@@ -44,9 +44,11 @@ public abstract class Visitor {
     private int upSteps = 0;
     protected Scope scope = Scope.SAME;
 
-    protected Visitor() {}
 
     public Visitor(Visitor v) {
+        if(v == null)
+            return;
+
         previousStep = v;
         task = v.task;
         origin = v.origin;

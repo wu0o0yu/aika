@@ -26,6 +26,7 @@ import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.steps.link.SumUpLink;
+import network.aika.neuron.steps.visitor.AlternateBranchTask;
 
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -45,6 +46,10 @@ public class NegativeBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse
     @Override
     public void transition(ActVisitor v, Synapse s, Link l) {
         s.negativeSynapseTransitionLoop(v, l);
+    }
+
+    public void alternateBranchTransition(ActVisitor v, Synapse s, Link l) {
+        l.follow(v);
     }
 
     @Override

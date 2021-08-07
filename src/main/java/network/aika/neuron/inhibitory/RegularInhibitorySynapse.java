@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.inhibitory;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.visitor.ActVisitor;
 
@@ -24,6 +25,10 @@ import network.aika.neuron.activation.visitor.ActVisitor;
  * @author Lukas Molzberger
  */
 public class RegularInhibitorySynapse extends InhibitorySynapse {
+
+    public void alternateBranchTransition(ActVisitor v, Synapse s, Link l) {
+        l.follow(v);
+    }
 
     public void negativeSynapseTransitionLoop(ActVisitor v, Link l) {
         l.follow(v);

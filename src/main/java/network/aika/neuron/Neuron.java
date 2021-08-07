@@ -22,6 +22,7 @@ import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.sign.Sign;
+import network.aika.neuron.steps.visitor.AlternateBranchTask;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
@@ -107,8 +108,10 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public abstract Neuron<?> instantiateTemplate(boolean addProvider);
 
+    public abstract void transition(ActVisitor v, Activation act);
 
-    public abstract ActVisitor transition(ActVisitor v);
+    public void alternateBranchTransition(ActVisitor v, Activation act) {
+    }
 
     public abstract void addDummyLinks(Activation act);
 

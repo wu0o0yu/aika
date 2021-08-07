@@ -43,8 +43,8 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
     }
 
 
-    public ActVisitor transition(ActVisitor v) {
-        return v;
+    public void transition(ActVisitor v, Activation act) {
+        act.followLinks(v);
     }
 
     @Override

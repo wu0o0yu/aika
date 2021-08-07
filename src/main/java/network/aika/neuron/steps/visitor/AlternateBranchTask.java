@@ -14,45 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation.visitor;
+package network.aika.neuron.steps.visitor;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.VisitorTask;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class ActVisitor extends Visitor {
+public class AlternateBranchTask implements VisitorTask {
 
-    private Activation act;
+    @Override
+    public void processTask(ActVisitor v) {
 
-    public ActVisitor(LinkVisitor v, Activation act) {
-        super(v);
-        this.act = act;
     }
 
-    public ActVisitor(Visitor v, VisitorTask task, Activation act, Direction startDir, Direction currentDir) {
-        super(v);
-        this.task = task;
-        this.origin = this;
-        this.act = act;
-        this.startDir = startDir;
-        this.currentDir = currentDir;
+    @Override
+    public void neuronTransition(ActVisitor v, Activation act) {
+        act.getNeuron()
+                .alternateBranchTransition(v, act);
     }
 
-    public Activation getActivation() {
-        return act;
+    @Override
+    public void synapseTransition(ActVisitor v, Synapse s, Link l) {
+        s.alternateBranchTransition(v, s, l);
     }
 
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("Current:" + (act != null ? act.toShortString() : "X") + ", ");
-        sb.append("Origin:" + origin.act.toShortString() + ", ");
-
-        sb.append(super.toString());
-
-        return sb.toString();
+    public boolean isAlternateBranch() {
+        return false;
     }
 }

@@ -18,11 +18,19 @@ package network.aika.neuron.excitatory;
 
 import network.aika.Model;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.steps.visitor.AlternateBranchTask;
 import network.aika.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  * @author Lukas Molzberger
@@ -39,10 +47,33 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
     }
 
 
-    public ActVisitor transition(ActVisitor v) {
-//        if(v.getVisitorTask().enteringAlternateBranch(v))
-//            return null;
-        return v;
+    public void transition(ActVisitor v, Activation act) {
+        if(v.getCurrentDir() == OUTPUT && enteringAlternateBranch(v))
+            return;
+
+        act.followLinks(v);
+    }
+
+    @Override
+    public void alternateBranchTransition(ActVisitor v, Activation act) {
+        AlternateBranchTask abTask = (AlternateBranchTask) v.getVisitorTask();
+       // abTask.set
+    }
+
+    public boolean enteringAlternateBranch(ActVisitor v) {
+        AlternateBranchTask abTask = new AlternateBranchTask();
+        ActVisitor abV = new ActVisitor(
+                v,
+                abTask,
+                v.getActivation(),
+                INPUT,
+                INPUT
+        );
+
+        v.getActivation()
+                .followLinks(abV);
+
+        return abTask.isAlternateBranch();
     }
 
     @Override

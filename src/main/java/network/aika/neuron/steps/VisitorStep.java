@@ -55,7 +55,6 @@ public abstract class VisitorStep implements VisitorTask {
 
     public abstract void getNextSteps(Link l);
 
-
     public Synapse getTargetSynapse() {
         return targetSynapse;
     }
@@ -94,7 +93,16 @@ public abstract class VisitorStep implements VisitorTask {
     }
 
     @Override
-    public void transition(ActVisitor v, Synapse s, Link l) {
+    public void neuronTransition(ActVisitor av, Activation act) {
+        act.getNeuron()
+                .transition(av, act);
+    }
+
+    @Override
+    public void synapseTransition(ActVisitor v, Synapse s, Link l) {
+        if(l.isNegative())
+            return;
+
         targetSynapse.transition(v, s, l);
     }
 
@@ -118,7 +126,7 @@ public abstract class VisitorStep implements VisitorTask {
     private void follow(Link l, Direction startDir, Activation startAct, Synapse ts) {
         startAct.setMarked(true);
         targetSynapse = ts;
-        ActVisitor v = new ActVisitor(this, startAct, startDir, startDir);
+        ActVisitor v = new ActVisitor(null, this, startAct, startDir, startDir);
         ts.transition(v, l.getSynapse(), l);
 
         targetSynapse = null;
@@ -127,8 +135,9 @@ public abstract class VisitorStep implements VisitorTask {
 
     private void follow(Activation startAct, Synapse ts) {
         targetSynapse = ts;
-        startAct.follow(
-                new ActVisitor(this, startAct, direction, INPUT)
+        neuronTransition(
+                new ActVisitor(null, this, startAct, direction, INPUT),
+                startAct
         );
         targetSynapse = null;
     }
