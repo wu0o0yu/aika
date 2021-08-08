@@ -50,23 +50,6 @@ public interface Direction {
 
     Stream<? extends Synapse> getSynapses(Neuron<?> n);
 
-    default Stream<? extends Synapse> getSynapsesInvertRecurrent(Neuron<?> n) {
-        return Stream.concat(
-                getSynapses(n)
-                        .filter(s -> !s.isRecurrent()),
-                invert().getSynapses(n)
-                        .filter(s -> s.isRecurrent())
-        );
-    }
-
-    default Stream<? extends Synapse> getSynapses(Neuron<?> n, boolean invertRecurrent) {
-        return invertRecurrent ?
-                getSynapsesInvertRecurrent(n) :
-                getSynapses(n);
-    }
-
-    boolean linkExists(Activation act, Synapse s);
-
     static int compare(Direction a, Direction b) {
         if(a == b) return 0;
         if(a == null && b != null) return -1;

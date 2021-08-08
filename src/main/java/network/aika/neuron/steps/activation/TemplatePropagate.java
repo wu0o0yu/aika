@@ -38,8 +38,8 @@ public class TemplatePropagate extends TemplateTask implements ActivationStep {
         }
     }
 
-    public static class TemplatePropagateOutput extends TemplatePropagate {
-        public TemplatePropagateOutput() {
+    public static class TemplateGradientPropagateOutput extends TemplatePropagate {
+        public TemplateGradientPropagateOutput() {
             super(OUTPUT);
         }
     }

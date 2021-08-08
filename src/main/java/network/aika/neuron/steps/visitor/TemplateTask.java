@@ -44,8 +44,8 @@ public abstract class TemplateTask extends VisitorStep {
 
 
     @Override
-    public Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir, boolean invertRecurrent) {
-        return super.getTemplateTargetSynapses(act, dir, invertRecurrent);
+    public Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir) {
+        return super.getTemplateTargetSynapses(act, dir);
     }
 
     @Override

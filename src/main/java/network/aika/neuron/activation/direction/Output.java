@@ -70,11 +70,6 @@ public class Output implements Direction {
     }
 
     @Override
-    public boolean linkExists(Activation act, Synapse s) {
-        return act.outputLinkExists(s);
-    }
-
-    @Override
     public Stream<? extends Synapse> getSynapses(Neuron<?> n) {
         return n.getOutputSynapses();
     }
