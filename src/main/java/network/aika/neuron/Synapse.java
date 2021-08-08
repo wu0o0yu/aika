@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.Neuron.BETA_THRESHOLD;
 import static network.aika.neuron.sign.Sign.NEG;
@@ -126,6 +127,17 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         }
         initFromTemplate(s);
         return s;
+    }
+
+    public Synapse getConcreteSynapse(Neuron<?> in, Neuron<?> on) {
+        if(on.getTemplate().getId() != output.getId())
+            return null;
+
+        Synapse cs = on.getInputSynapse(in.getProvider());
+        if(cs == null || cs.getTemplateSynapseId() != getTemplateSynapseId())
+            return null;
+
+        return cs;
     }
 
     public abstract void updateSynapse(Link l, double delta);

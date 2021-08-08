@@ -28,6 +28,8 @@ import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.steps.link.SumUpLink;
 
+import java.util.stream.Stream;
+
 import static network.aika.neuron.sign.Sign.POS;
 
 
@@ -41,6 +43,18 @@ public abstract class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeu
     @Override
     public boolean checkTemplatePropagate(Direction dir, Activation act) {
         return false;
+    }
+
+    @Override
+    public Synapse getConcreteSynapse(Neuron<?> in, Neuron<?> on) {
+        if(in.getTemplate().getId() != input.getId())
+            return null;
+
+        Synapse cs = in.getOutputSynapse(on.getProvider());
+        if(cs == null || cs.getTemplateSynapseId() != getTemplateSynapseId())
+            return null;
+
+        return cs;
     }
 
     @Override

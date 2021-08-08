@@ -42,7 +42,12 @@ public abstract class LinkingTask extends VisitorStep {
 
     @Override
     public Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir, boolean invertRecurrent) {
-         return dir.getSynapses(act.getNeuron(), invertRecurrent);
+        return dir.getSynapses(act.getNeuron(), invertRecurrent);
+    }
+
+    @Override
+    public Stream<? extends Synapse> getTemplateTargetSynapses(Activation act, Direction dir, boolean invertRecurrent) {
+         return super.getTemplateTargetSynapses(act, dir, invertRecurrent); // TODO: filter non existing non-template synapses
     }
 
     @Override
@@ -53,11 +58,6 @@ public abstract class LinkingTask extends VisitorStep {
     @Override
     protected boolean exists(Activation act, Synapse s) {
         return act.outputLinkExists(s);
-    }
-
-    @Override
-    protected boolean opposingNeuronMatches(Neuron<?> currentN, Neuron<?> targetN) {
-        return currentN.getId() == targetN.getId();
     }
 
     @Override
@@ -77,12 +77,17 @@ public abstract class LinkingTask extends VisitorStep {
         if(!(v.getCurrentDir() == OUTPUT || targetSynapse.isRecurrent()))
             return;
 
-        if (Link.linkExists(targetSynapse, iAct, oAct))
+ //           return dir.getSynapses(act.getNeuron(), invertRecurrent);
+        Synapse cs = targetSynapse.getConcreteSynapse(iAct.getNeuron(), oAct.getNeuron());
+        if(cs == null)
             return;
 
-        oAct = targetSynapse.branchIfNecessary(oAct, v);
+        if(Link.linkExists(cs, iAct, oAct))
+            return;
+
+        oAct = cs.branchIfNecessary(oAct, v);
 
         if(oAct != null)
-            targetSynapse.closeLoop(this, v, iAct, oAct);
+            cs.closeLoop(this, v, iAct, oAct);
     }
 }

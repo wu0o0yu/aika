@@ -42,13 +42,10 @@ public abstract class TemplateTask extends VisitorStep {
         super(dir);
     }
 
+
     @Override
     public Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir, boolean invertRecurrent) {
-        return act.getNeuron()
-                .getTemplateGroup().stream()
-                .flatMap(tn ->
-                        dir.getSynapses(tn, invertRecurrent)
-                );
+        return super.getTemplateTargetSynapses(act, dir, invertRecurrent);
     }
 
     @Override
@@ -61,8 +58,7 @@ public abstract class TemplateTask extends VisitorStep {
         return act.templateLinkExists(direction, s);
     }
 
-    @Override
-    protected boolean opposingNeuronMatches(Neuron<?> currentN, Neuron<?> targetN) {
+    private boolean neuronMatches(Neuron<?> currentN, Neuron<?> targetN) {
         return currentN.getTemplateGroup()
                 .stream()
                 .anyMatch(tn -> tn.getId() == targetN.getId());
@@ -85,6 +81,12 @@ public abstract class TemplateTask extends VisitorStep {
             return;
 
         if(v.getCurrentDir() != OUTPUT && !targetSynapse.isRecurrent())
+            return;
+
+        if (!neuronMatches(iAct.getNeuron(), targetSynapse.getInput()))
+            return;
+
+        if (!neuronMatches(oAct.getNeuron(), targetSynapse.getOutput()))
             return;
 
         if(!iAct.isActive(targetSynapse.isRecurrent()))

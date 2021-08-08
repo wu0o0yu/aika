@@ -323,17 +323,6 @@ public class Activation extends Element<Activation> {
                 );
     }
 
-    /*
-    public void follow(ActVisitor av) {
-        final ActVisitor v = getNeuron().transition(av);
-        if (v == null)
-            return;
-
-        followLinks(v);
-    }
-
-     */
-
     public void followLinks(ActVisitor v) {
         v.onEvent(BEFORE);
 

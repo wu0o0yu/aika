@@ -19,7 +19,6 @@ package network.aika.neuron.steps;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
@@ -28,7 +27,6 @@ import network.aika.neuron.activation.visitor.VisitorTask;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
@@ -37,7 +35,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 public abstract class VisitorStep implements VisitorTask {
 
     protected Direction direction;
-    protected Synapse targetSynapse;
+    protected Synapse<?, ?> targetSynapse;
 
     public VisitorStep(Direction dir) {
         this.direction = dir;
@@ -47,7 +45,15 @@ public abstract class VisitorStep implements VisitorTask {
 
     public abstract Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir, boolean invertRecurrent);
 
-    protected abstract boolean opposingNeuronMatches(Neuron<?> currentN, Neuron<?> targetN);
+    public Stream<? extends Synapse> getTemplateTargetSynapses(Activation act, Direction dir, boolean invertRecurrent) {
+        return act.getNeuron()
+                .getTemplateGroup().stream()
+                .flatMap(tn ->
+                        dir.getSynapses(tn, invertRecurrent)
+                );
+    }
+
+    protected abstract boolean exists(Activation act, Synapse s);
 
     protected abstract void closeLoopIntern(ActVisitor v, Activation iAct, Activation oAct);
 
@@ -77,14 +83,9 @@ public abstract class VisitorStep implements VisitorTask {
         Activation currentAct = v.getActivation();
         Activation originAct = v.getOriginAct();
 
-        Neuron<?> currentN = currentAct.getNeuron();
         Direction targetDir = targetSynapse.isRecurrent() ?
                 direction.invert() :
                 direction;
-
-        Neuron<?> targetN = targetDir.getNeuron(targetSynapse);
-        if (!opposingNeuronMatches(currentN, targetN))
-            return;
 
         Activation iAct = targetDir.getInput(originAct, currentAct);
         Activation oAct = targetDir.getOutput(originAct, currentAct);
@@ -110,14 +111,14 @@ public abstract class VisitorStep implements VisitorTask {
         Direction startDir = l.getSynapse().getStartDir(direction);
         Activation startAct = startDir.invert().getActivation(l);
 
-        getTargetSynapses(startAct, direction, true) // startDir?
+        getTemplateTargetSynapses(startAct, direction, true) // startDir?
                 .forEach(ts ->
                         follow(l, startDir, startAct, ts)
                 );
     }
 
     public void link(Activation startAct) {
-        getTargetSynapses(startAct, direction, true)
+        getTemplateTargetSynapses(startAct, direction, true)
                 .forEach(ts ->
                         follow(startAct, ts)
                 );
@@ -154,7 +155,4 @@ public abstract class VisitorStep implements VisitorTask {
                         s.propagate(act, direction, this, false)
                 );
     }
-
-    protected abstract boolean exists(Activation act, Synapse s);
-
 }
