@@ -66,6 +66,9 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
 
     @Override
     public void inputPatternTransitionLoop(ActVisitor v, Link l) {
+        if(v.getScope() == Scope.SAME)
+            return;
+
         l.follow(v);
     }
 
