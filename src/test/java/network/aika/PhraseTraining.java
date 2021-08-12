@@ -41,7 +41,8 @@ public class PhraseTraining {
                 ActivationStep.PROPAGATE_GRADIENTS_NET,
                 ActivationStep.PROPAGATE_GRADIENTS_SUM,
                 ActivationStep.INDUCTION,
-                LinkStep.TEMPLATE,
+                LinkStep.TEMPLATE_INPUT,
+                LinkStep.TEMPLATE_OUTPUT,
                 LinkStep.INDUCTION,
                 LinkStep.INFORMATION_GAIN_GRADIENT
         };

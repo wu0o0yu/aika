@@ -19,10 +19,12 @@ package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.visitor.LinkingTask;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 
 /**
@@ -32,8 +34,20 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
  */
 public class Linking extends LinkingTask implements LinkStep {
 
-    public Linking() {
-        super(INPUT);
+    public static class LinkingInput extends Linking {
+        public LinkingInput() {
+            super(INPUT);
+        }
+    }
+
+    public static class LinkingOutput extends Linking {
+        public LinkingOutput() {
+            super(OUTPUT);
+        }
+    }
+
+    public Linking(Direction dir) {
+        super(dir);
     }
 
     @Override
@@ -53,6 +67,6 @@ public class Linking extends LinkingTask implements LinkStep {
     }
 
     public String toString() {
-        return "Link-Step: Linking";
+        return "Link-Step: Linking (" + direction + ")";
     }
 }

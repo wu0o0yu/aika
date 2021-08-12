@@ -19,6 +19,7 @@ package network.aika.neuron.steps.visitor;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.direction.Direction;
@@ -31,6 +32,7 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.steps.activation.ActivationStep.INDUCTION;
+import static network.aika.neuron.steps.link.LinkStep.TEMPLATE_OUTPUT;
 
 /**
  *
@@ -71,7 +73,10 @@ public abstract class TemplateTask extends VisitorStep {
 
     @Override
     public void getNextSteps(Link l) {
-        QueueEntry.add(l, LinkStep.TEMPLATE);
+        QueueEntry.add(l, LinkStep.TEMPLATE_INPUT);
+        if(l.getOutput().getFired() != Fired.NOT_FIRED)
+            QueueEntry.add(l, TEMPLATE_OUTPUT);
+
         QueueEntry.add(l, LinkStep.INDUCTION);
     }
 

@@ -27,10 +27,12 @@ public interface LinkStep extends Step<Link> {
 
     LinkStep ADD_LINK = new AddLink();
     LinkStep INDUCTION = new Induction();
-    LinkStep LINKING = new Linking();
+    LinkStep LINKING_INPUT = new Linking.LinkingInput();
+    LinkStep LINKING_OUTPUT = new Linking.LinkingOutput();
     LinkStep SHADOW_FACTOR = new ShadowFactor();
     LinkStep INFORMATION_GAIN_GRADIENT = new InformationGainGradient();
-    LinkStep TEMPLATE = new Template();
+    LinkStep TEMPLATE_INPUT = new Template.TemplateInput();
+    LinkStep TEMPLATE_OUTPUT = new Template.TemplateOutput();
     LinkStep COMMIT = new Commit();
     LinkStep COUNTING = new Counting();
 }

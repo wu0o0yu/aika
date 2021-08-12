@@ -17,10 +17,13 @@
 package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.activation.TemplateCloseLoop;
 import network.aika.neuron.steps.visitor.TemplateTask;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
@@ -30,8 +33,20 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
  */
 public class Template extends TemplateTask implements LinkStep {
 
-    public Template() {
-        super(INPUT);
+    public static class TemplateInput extends Template {
+        public TemplateInput() {
+            super(INPUT);
+        }
+    }
+
+    public static class TemplateOutput extends Template {
+        public TemplateOutput() {
+            super(OUTPUT);
+        }
+    }
+
+    public Template(Direction dir) {
+        super(dir);
     }
 
     @Override
@@ -49,6 +64,6 @@ public class Template extends TemplateTask implements LinkStep {
     }
 
     public String toString() {
-        return "Link-Step: Template";
+        return "Link-Step: Template (" + direction + ")";
     }
 }
