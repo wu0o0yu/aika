@@ -211,10 +211,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return false;
     }
 
-    public Direction getStartDir(Direction dir) {
-        return dir;
-    }
-
     public void propagate(Activation fromAct, Direction dir, VisitorStep vs, boolean isSelfRef) {
         Activation toAct = fromAct.getThought()
                 .createActivation(
