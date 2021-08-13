@@ -18,13 +18,9 @@ package network.aika.neuron.excitatory;
 
 import network.aika.Model;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.steps.visitor.AlternateBranchTask;
+import network.aika.neuron.steps.tasks.AlternateBranchTask;
 import network.aika.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,15 +53,18 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
     @Override
     public void alternateBranchTransition(ActVisitor v, Activation act) {
         AlternateBranchTask abTask = (AlternateBranchTask) v.getVisitorTask();
-       // abTask.set
+
+        abTask.checkBranch(act);
     }
 
     public boolean enteringAlternateBranch(ActVisitor v) {
-        AlternateBranchTask abTask = new AlternateBranchTask();
+        Activation act = v.getActivation();
+
+        AlternateBranchTask abTask = new AlternateBranchTask(act.getMainBranch());
         ActVisitor abV = new ActVisitor(
                 v,
                 abTask,
-                v.getActivation(),
+                act,
                 INPUT,
                 INPUT
         );

@@ -20,7 +20,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.scope.Scope;
+import network.aika.neuron.activation.visitor.Scope;
 
 import java.util.stream.Stream;
 

@@ -18,7 +18,6 @@ package network.aika.neuron.activation.visitor;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.scope.Scope;
 
 
 /**

@@ -20,10 +20,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.LinkVisitor;
-import network.aika.neuron.scope.Scope;
-
-import static network.aika.neuron.activation.direction.Direction.INPUT;
+import network.aika.neuron.activation.visitor.Scope;
 
 /**
  *

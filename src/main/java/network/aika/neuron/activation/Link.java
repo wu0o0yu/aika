@@ -21,7 +21,7 @@ import network.aika.Thought;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
-import network.aika.neuron.scope.Scope;
+import network.aika.neuron.activation.visitor.Scope;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.Utils;
 import org.slf4j.Logger;

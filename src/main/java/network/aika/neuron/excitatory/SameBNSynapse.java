@@ -18,28 +18,15 @@ package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.Templates;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.LinkVisitor;
-import network.aika.neuron.activation.visitor.Visitor;
-import network.aika.neuron.scope.Scope;
-
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+import network.aika.neuron.activation.visitor.Scope;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public class SameBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> {
-    
-
-    public Direction getStartDir(Direction dir) {
-        return isRecurrent() ? dir.invert() : dir;
-    }
 
     @Override
     public void transition(ActVisitor v, Synapse s, Link l) {

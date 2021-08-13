@@ -23,9 +23,7 @@ import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
-import network.aika.neuron.scope.Scope;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.VisitorStep;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
@@ -38,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.stream.Stream;
 
 import static network.aika.neuron.Neuron.BETA_THRESHOLD;
 import static network.aika.neuron.sign.Sign.NEG;
@@ -209,10 +206,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public boolean isRecurrent() {
         return false;
-    }
-
-    public Direction getStartDir(Direction dir) {
-        return dir;
     }
 
     public void propagate(Activation fromAct, Direction dir, VisitorStep vs, boolean isSelfRef) {

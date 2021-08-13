@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.steps.visitor;
+package network.aika.neuron.steps.tasks;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -27,6 +27,17 @@ import network.aika.neuron.activation.visitor.VisitorTask;
  * @author Lukas Molzberger
  */
 public class AlternateBranchTask implements VisitorTask {
+
+    private Activation mainBranch;
+    private boolean isAlternateBranch;
+
+    public AlternateBranchTask(Activation mainBranch) {
+        this.mainBranch = mainBranch;
+    }
+
+    public void checkBranch(Activation act) {
+        isAlternateBranch = act == mainBranch;
+    }
 
     @Override
     public void processTask(ActVisitor v) {
@@ -45,6 +56,6 @@ public class AlternateBranchTask implements VisitorTask {
     }
 
     public boolean isAlternateBranch() {
-        return false;
+        return isAlternateBranch;
     }
 }
