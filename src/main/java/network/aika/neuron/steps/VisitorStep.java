@@ -104,12 +104,11 @@ public abstract class VisitorStep implements VisitorTask {
     }
 
     public void link(Link l) {
-        Direction startDir = l.getSynapse().getStartDir(direction);
-        Activation startAct = startDir.invert().getActivation(l);
+        Activation startAct = l.getOutput();
 
-        getTemplateTargetSynapses(startAct, direction) // startDir?
+        getTemplateTargetSynapses(startAct, direction)
                 .forEach(ts ->
-                        follow(l, startDir, startAct, ts)
+                        follow(l, INPUT, startAct, ts)
                 );
     }
 
