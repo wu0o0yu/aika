@@ -22,7 +22,6 @@ import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.sign.Sign;
-import network.aika.neuron.steps.visitor.AlternateBranchTask;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;

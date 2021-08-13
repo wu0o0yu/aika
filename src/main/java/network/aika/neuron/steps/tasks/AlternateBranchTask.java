@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.steps.visitor;
+package network.aika.neuron.steps.tasks;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;

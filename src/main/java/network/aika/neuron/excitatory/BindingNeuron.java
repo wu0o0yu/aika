@@ -18,13 +18,9 @@ package network.aika.neuron.excitatory;
 
 import network.aika.Model;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.steps.visitor.AlternateBranchTask;
+import network.aika.neuron.steps.tasks.AlternateBranchTask;
 import network.aika.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -21,7 +21,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.visitor.LinkingTask;
+import network.aika.neuron.steps.tasks.LinkingTask;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;

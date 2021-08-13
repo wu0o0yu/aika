@@ -18,12 +18,9 @@ package network.aika.neuron.activation.visitor;
 
 import network.aika.Thought;
 import network.aika.callbacks.VisitorEvent;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.scope.Scope;
-import network.aika.neuron.steps.VisitorStep;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 

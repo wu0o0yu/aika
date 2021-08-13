@@ -19,18 +19,9 @@ package network.aika.neuron.excitatory;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
-import network.aika.neuron.steps.link.SumUpLink;
-import network.aika.neuron.steps.visitor.AlternateBranchTask;
-
-import static network.aika.neuron.activation.Fired.NOT_FIRED;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
-import static network.aika.neuron.sign.Sign.POS;
 
 /**
  *

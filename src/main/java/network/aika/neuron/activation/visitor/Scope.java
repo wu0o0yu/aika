@@ -14,19 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
-
-import network.aika.neuron.Neuron;
+package network.aika.neuron.activation.visitor;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class RelatedRecurrentBNSynapse<I extends Neuron<?>> extends RelatedBNSynapse<I> {
-
-
-    @Override
-    public boolean isRecurrent() {
-        return true;
-    }
+public enum Scope {
+    SAME,
+    INPUT,
+    RELATED;
 }
