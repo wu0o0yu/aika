@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.steps;
 
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
@@ -149,5 +148,15 @@ public abstract class VisitorStep implements VisitorTask {
                 .forEach(s ->
                         s.propagate(act, direction, this, false)
                 );
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Direction: " + direction);
+        if (targetSynapse.isTemplate())
+            sb.append(targetSynapse.getTemplateInfo().getLabel() + " : ");
+
+        sb.append(targetSynapse.toString());
+        return sb.toString();
     }
 }

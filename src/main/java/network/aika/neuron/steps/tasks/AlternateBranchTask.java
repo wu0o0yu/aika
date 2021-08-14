@@ -39,6 +39,25 @@ public class AlternateBranchTask implements VisitorTask {
         isAlternateBranch = act == mainBranch;
     }
 
+
+    /*
+
+    public Stream<Activation> getConflictingMainBranches() {
+        if (mainBranch != null) {
+            return Stream.of(mainBranch);
+        }
+
+        return branches.stream()
+                .flatMap(act -> act.getInputLinks())
+                .filter(l -> l.isNegative())
+                .map(l -> l.getInput())
+                .filter(act -> act.getNeuron() instanceof InhibitoryNeuron)
+                .flatMap(act -> act.getInputLinks())
+                .map(l -> l.getInput());
+    }
+    */
+
+
     @Override
     public void processTask(ActVisitor v) {
 
@@ -57,5 +76,11 @@ public class AlternateBranchTask implements VisitorTask {
 
     public boolean isAlternateBranch() {
         return isAlternateBranch;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        return sb.toString();
     }
 }
