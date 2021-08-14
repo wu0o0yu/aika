@@ -55,22 +55,28 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
         AlternateBranchTask abTask = (AlternateBranchTask) v.getVisitorTask();
 
         abTask.checkBranch(act);
+
+        if(!abTask.isAlternateBranch())
+            act.followLinks(v);
     }
 
     public boolean enteringAlternateBranch(ActVisitor v) {
         Activation act = v.getActivation();
 
-        AlternateBranchTask abTask = new AlternateBranchTask(act.getMainBranch());
-        ActVisitor abV = new ActVisitor(
-                v,
-                abTask,
-                act,
-                INPUT,
-                INPUT
-        );
+        AlternateBranchTask abTask = new AlternateBranchTask();
 
-        v.getActivation()
-                .followLinks(abV);
+        act.getAllBranches().forEach(bAct ->
+                abTask.neuronTransition(
+                        new ActVisitor(
+                                v,
+                                abTask,
+                                bAct,
+                                INPUT,
+                                INPUT
+                        ),
+                        bAct
+                )
+        );
 
         return abTask.isAlternateBranch();
     }

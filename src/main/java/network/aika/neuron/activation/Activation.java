@@ -276,40 +276,11 @@ public class Activation extends Element<Activation> {
         return branchProbability;
     }
 
-    public boolean isConflicting() {
-        return getConflictingMainBranches()
-                .anyMatch(act -> act.searchWithinBranch());
-    }
-
-    public boolean searchWithinBranch() {
-        if (isMarked())
-            return true;
-
-        return getOutputLinks()
-                .filter(l ->
-                        !l.isNegative() || l.isCausal()
-                )
-                .map(l -> l.getOutput())
-                .filter(act ->
-                        act.fired != NOT_FIRED && Fired.COMPARATOR.compare(fired, act.fired) == -1
-                )
-                .anyMatch(act ->
-                        act.searchWithinBranch()
-                );
-    }
-
-    public Stream<Activation> getConflictingMainBranches() {
-        if (mainBranch != null) {
-            return Stream.of(mainBranch);
-        }
-
-        return branches.stream()
-                .flatMap(act -> act.getInputLinks())
-                .filter(l -> l.isNegative())
-                .map(l -> l.getInput())
-                .filter(act -> act.getNeuron() instanceof InhibitoryNeuron)
-                .flatMap(act -> act.getInputLinks())
-                .map(l -> l.getInput());
+    public Stream<Activation> getAllBranches() {
+        if (mainBranch != null)
+            return Stream.concat(Stream.of(mainBranch), branches.stream());
+        else
+            return branches.stream();
     }
 
     public void updateOutgoingLinks(double delta) {
