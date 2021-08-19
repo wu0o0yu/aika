@@ -58,6 +58,11 @@ public class NegativeBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse
     public void updateReference(Link l) {
     }
 
+    public void propagateActValue(Link l, double delta) {
+        if(!l.isSelfRef())
+            super.propagateActValue(l, delta);
+    }
+
     @Override
     public Activation branchIfNecessary(Activation oAct, Visitor v) {
         if (getOutput().isInputNeuron())

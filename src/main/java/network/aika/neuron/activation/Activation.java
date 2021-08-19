@@ -284,13 +284,8 @@ public class Activation extends Element<Activation> {
     }
 
     public void updateOutgoingLinks(double delta) {
-        getOutputLinks()
-                .filter(l -> !l.getSynapse().isZero())
-                .forEach(l -> {
-                            double w = l.getSynapse().getWeight();
-                            QueueEntry.add(l, new SumUpLink(delta * w));
-                            QueueEntry.add(l.getOutput(), USE_FINAL_BIAS);
-                        }
+        getOutputLinks().forEach(l ->
+                        l.getSynapse().propagateActValue(l, delta)
                 );
     }
 
@@ -359,13 +354,10 @@ public class Activation extends Element<Activation> {
                 isSelfRef
         );
 
-        double w = s.getWeight();
-
-        if (!Utils.belowTolerance(w))
-            QueueEntry.add(
-                    nl,
-                    new SumUpLink(w * Link.getInputValueDelta(POS, nl, ol))
-            );
+        s.propagateActValue(
+                nl,
+                Link.getInputValueDelta(POS, nl, ol)
+        );
 
         return nl;
     }

@@ -36,9 +36,9 @@ public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends Excitator
         if(l.getInput().isActive(true)) {
             addWeight(delta);
 
-            QueueEntry.add(
+            propagateActValue(
                     l,
-                    new SumUpLink(l.getInputValue(POS) * delta)
+                    l.getInputValue(POS) * delta
             );
         } else {
             addWeight(-delta);
@@ -48,9 +48,10 @@ public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends Excitator
                     l.getOutput(),
                     new SumUpBias(delta)
             );
-            QueueEntry.add(
+
+            propagateActValue(
                     l,
-                    new SumUpLink((l.getInputValue(POS) * -delta) + delta)
+                    (l.getInputValue(POS) * -delta) + delta
             );
         }
     }

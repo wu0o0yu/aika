@@ -55,8 +55,6 @@ public class Link extends Element<Link> {
 
     private double lastIGGradient;
 
-    private boolean hasBeenCounted = false;
-
     public Link(Synapse s, Activation input, Activation output, boolean isSelfRef) {
         this.synapse = s;
         this.input = input;
@@ -78,8 +76,6 @@ public class Link extends Element<Link> {
     public void count() {
         if(synapse != null)
             synapse.count(this);
-
-        hasBeenCounted = true;
     }
 
     public static boolean linkExists(Synapse s, Activation iAct, Activation oAct) {
@@ -93,11 +89,7 @@ public class Link extends Element<Link> {
             return false;
         return l.getSynapse().isOfTemplate(ts);
     }
-/*
-    public static boolean synapseExists(Activation iAct, Activation oAct) {
-        return Synapse.synapseExists(iAct.getNeuron(), oAct.getNeuron());
-    }
-*/
+
     public void follow(ActVisitor v) {
         follow(v, v.getScope());
     }

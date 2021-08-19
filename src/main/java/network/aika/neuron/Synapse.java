@@ -27,6 +27,7 @@ import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.VisitorStep;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
+import network.aika.neuron.steps.link.SumUpLink;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import org.apache.commons.math3.distribution.BetaDistribution;
@@ -40,6 +41,7 @@ import java.io.IOException;
 import static network.aika.neuron.Neuron.BETA_THRESHOLD;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
+import static network.aika.neuron.steps.activation.ActivationStep.USE_FINAL_BIAS;
 import static network.aika.neuron.steps.link.LinkStep.INFORMATION_GAIN_GRADIENT;
 
 /**
@@ -404,7 +406,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public boolean isZero() {
-        return Math.abs(weight) < TOLERANCE;
+        return Utils.belowTolerance(weight);
     }
 
     public void setWeight(double weight) {
@@ -415,6 +417,15 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     public void addWeight(double weightDelta) {
         this.weight += weightDelta;
         modified = true;
+    }
+
+    public void propagateActValue(Link l, double delta) {
+        if(l.getSynapse().isZero())
+            return;
+
+        double w = l.getSynapse().getWeight();
+        QueueEntry.add(l, new SumUpLink(delta * w));
+        QueueEntry.add(l.getOutput(), USE_FINAL_BIAS);
     }
 
     @Override
@@ -472,4 +483,5 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 "s(p,n):" + Utils.round(getSurprisal(POS, NEG, null)) + " " +
                 "s(n,n):" + Utils.round(getSurprisal(NEG, NEG, null)) + " \n";
     }
+
 }
