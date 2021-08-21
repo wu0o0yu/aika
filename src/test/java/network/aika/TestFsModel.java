@@ -41,7 +41,8 @@ public class TestFsModel {
             i = j + 1;
         }
 
-        AikaDebugger.createAndShowGUI(doc,m);
+        AikaDebugger debugger = AikaDebugger.createAndShowGUI(doc,m);
+        debugger.setStepMode(null);
 
         doc.process(m);
 

@@ -211,13 +211,11 @@ public class Link extends Element<Link> {
 
     public void unlinkInput() {
         OutputKey ok = output.getOutputKey();
-        boolean successful = input.outputLinks.remove(ok, this);
-        assert successful;
+        input.outputLinks.remove(ok, this);
     }
 
     public void unlinkOutput() {
-        boolean successful = output.inputLinks.remove(input.getNeuronProvider(), this);
-        assert successful;
+        output.inputLinks.remove(input.getNeuronProvider(), this);
     }
 
     public void sumUpLink(double delta) {

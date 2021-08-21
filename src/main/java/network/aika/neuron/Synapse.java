@@ -39,6 +39,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static network.aika.neuron.Neuron.BETA_THRESHOLD;
+import static network.aika.neuron.activation.Activation.OWN;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.neuron.steps.activation.ActivationStep.USE_FINAL_BIAS;
@@ -140,6 +141,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public abstract void updateSynapse(Link l, double delta);
+
+    public void propagateGradient(Link l, double[] gradient) {
+        l.propagateGradient(gradient[OWN]);
+    }
 
     protected abstract boolean checkCausality(Activation iAct, Activation oAct, Visitor v);
 
@@ -483,5 +488,4 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
                 "s(p,n):" + Utils.round(getSurprisal(POS, NEG, null)) + " " +
                 "s(n,n):" + Utils.round(getSurprisal(NEG, NEG, null)) + " \n";
     }
-
 }

@@ -476,7 +476,6 @@ public class Activation extends Element<Activation> {
                     new UpdateBias(getConfig().getLearnRate() * Utils.sum(g))
             );
 
-
         QueueEntry.add(this, TEMPLATE_CLOSE_LOOP_INPUT);
 
 //        addLinksToQueue(INPUT, LinkStep.TEMPLATE);
