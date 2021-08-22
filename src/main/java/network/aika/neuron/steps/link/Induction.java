@@ -50,7 +50,7 @@ public class Induction implements LinkStep {
         l.setSynapse(inducedSynapse);
         inducedSynapse.linkOutput();
 
-        QueueEntry.add(l, COMMIT);
+        QueueEntry.add(l, CLEANUP);
     }
 
     public String toString() {

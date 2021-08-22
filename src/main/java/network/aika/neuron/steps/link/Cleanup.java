@@ -24,7 +24,7 @@ import network.aika.neuron.steps.Phase;
  *
  * @author Lukas Molzberger
  */
-public class Commit implements LinkStep {
+public class Cleanup implements LinkStep {
 
     @Override
     public Phase getPhase() {

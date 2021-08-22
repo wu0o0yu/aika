@@ -33,6 +33,6 @@ public interface LinkStep extends Step<Link> {
     LinkStep INFORMATION_GAIN_GRADIENT = new InformationGainGradient();
     LinkStep TEMPLATE_INPUT = new Template.TemplateInput();
     LinkStep TEMPLATE_OUTPUT = new Template.TemplateOutput();
-    LinkStep COMMIT = new Commit();
+    LinkStep CLEANUP = new Cleanup();
     LinkStep COUNTING = new Counting();
 }
