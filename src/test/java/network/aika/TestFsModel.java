@@ -2,6 +2,7 @@ package network.aika;
 
 import network.aika.callbacks.FSSuspensionCallback;
 import network.aika.debugger.AikaDebugger;
+import network.aika.debugger.StepMode;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
@@ -42,7 +43,7 @@ public class TestFsModel {
         }
 
         AikaDebugger debugger = AikaDebugger.createAndShowGUI(doc,m);
-        debugger.setStepMode(null);
+        debugger.setStepMode(StepMode.DOCUMENT);
 
         doc.process(m);
 
