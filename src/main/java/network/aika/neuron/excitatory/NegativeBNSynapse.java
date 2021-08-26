@@ -16,18 +16,18 @@
  */
 package network.aika.neuron.excitatory;
 
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class NegativeBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> {
+public class NegativeBNSynapse extends BindingNeuronSynapse<InhibitoryNeuron> {
 
     @Override
     public boolean isRecurrent() {

@@ -22,12 +22,13 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
+import network.aika.neuron.excitatory.PatternNeuron;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PrimaryInhibitorySynapse extends InhibitorySynapse {
+public class PrimaryInhibitorySynapse extends InhibitorySynapse<PatternNeuron> {
 
     @Override
     public boolean checkTemplatePropagate(Direction dir, Activation act) {

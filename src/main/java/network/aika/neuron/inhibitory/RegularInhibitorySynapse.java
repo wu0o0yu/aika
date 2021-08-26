@@ -19,12 +19,13 @@ package network.aika.neuron.inhibitory;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.excitatory.BindingNeuron;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class RegularInhibitorySynapse extends InhibitorySynapse {
+public class RegularInhibitorySynapse extends InhibitorySynapse<BindingNeuron> {
 
     public void alternateBranchTransition(ActVisitor v, Synapse s, Link l) {
         l.follow(v);

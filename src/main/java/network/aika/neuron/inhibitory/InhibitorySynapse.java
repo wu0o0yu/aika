@@ -37,8 +37,7 @@ import static network.aika.neuron.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public abstract class InhibitorySynapse extends Synapse<Neuron<?>, InhibitoryNeuron> {
-
+public abstract class InhibitorySynapse<I extends Neuron<?>> extends Synapse<I, InhibitoryNeuron> {
 
     @Override
     public boolean checkTemplatePropagate(Direction dir, Activation act) {
