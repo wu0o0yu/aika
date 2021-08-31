@@ -25,12 +25,35 @@ public class TestFsModel {
         m.init();
         m.getTemplates().SAME_BINDING_TEMPLATE.setDirectConjunctiveBias(-0.32);
 
-        Document doc = new Document("arbeit fair arbeitsvermittlung ");
+        {
+            Document doc = generateDocument(m, "arbeit fair arbeitsvermittlung ", true);
+
+            AikaDebugger debugger = AikaDebugger.createAndShowGUI(doc, m);
+            debugger.setStepMode(StepMode.ACT);
+
+            doc.process(m);
+        }
+
+
+        {
+            Document doc = generateDocument(m, "arbeit fair arbeitsvermittlung ", false);
+
+            AikaDebugger debugger = AikaDebugger.createAndShowGUI(doc, m);
+            debugger.setStepMode(StepMode.ACT);
+
+            doc.process(m);
+        }
+
+        m.close();
+    }
+
+    private Document generateDocument(TextModel m, String txt, boolean train) {
+        Document doc = new Document(txt);
 
         Config c = new TestConfig()
                 .setAlpha(0.99)
                 .setLearnRate(-0.011)
-                .setEnableTraining(true);
+                .setEnableTraining(train);
         doc.setConfig(c);
 
         int i = 0;
@@ -41,12 +64,6 @@ public class TestFsModel {
 
             i = j + 1;
         }
-
-        AikaDebugger debugger = AikaDebugger.createAndShowGUI(doc,m);
-        debugger.setStepMode(StepMode.DOCUMENT);
-
-        doc.process(m);
-
-        m.close();
+        return doc;
     }
 }

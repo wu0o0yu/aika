@@ -122,7 +122,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
 
         sortedSynapses.addAll(inputSynapses.values());
 
-        double sum = getBias();
+        double sum = super.getBias();
         for(Synapse s: sortedSynapses) {
             if(s.getWeight() <= 0.0) break;
 
