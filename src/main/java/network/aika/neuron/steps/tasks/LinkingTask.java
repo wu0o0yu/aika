@@ -23,7 +23,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.steps.VisitorStep;
+import network.aika.neuron.steps.Linker;
 
 import java.util.stream.Stream;
 
@@ -35,7 +35,7 @@ import static network.aika.neuron.steps.link.LinkStep.LINKING_OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public abstract class LinkingTask extends VisitorStep {
+public abstract class LinkingTask extends Linker {
 
     public LinkingTask(Direction dir) {
         super(dir);
@@ -92,5 +92,9 @@ public abstract class LinkingTask extends VisitorStep {
 
         if(oAct != null)
             cs.closeLoop(this, v, iAct, oAct);
+    }
+
+    public String getTaskDescription() {
+        return this + " Target-Synapse:" + targetSynapse;
     }
 }

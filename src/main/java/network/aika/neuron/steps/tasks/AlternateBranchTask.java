@@ -61,4 +61,8 @@ public class AlternateBranchTask implements VisitorTask {
     public String toString() {
         return "AlternateBranchTask";
     }
+
+    public String getTaskDescription() {
+        return toString();
+    }
 }

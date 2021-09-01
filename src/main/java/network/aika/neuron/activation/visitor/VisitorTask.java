@@ -11,4 +11,6 @@ public interface VisitorTask {
     void neuronTransition(ActVisitor v, Activation act);
 
     void synapseTransition(ActVisitor v, Synapse synapse, Link l);
+
+    String getTaskDescription();
 }

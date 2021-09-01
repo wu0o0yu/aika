@@ -31,12 +31,12 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
  *
  * @author Lukas Molzberger
  */
-public abstract class VisitorStep implements VisitorTask {
+public abstract class Linker implements VisitorTask {
 
     protected Direction direction;
     protected Synapse<?, ?> targetSynapse;
 
-    public VisitorStep(Direction dir) {
+    public Linker(Direction dir) {
         this.direction = dir;
     }
 

@@ -124,7 +124,7 @@ public class PatternTest {
             }
 
             {
-                Synapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(lookupPPPT(m, nB), eB);
+                Synapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(lookupBindingNeuronPT(m, nB), eB);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -160,7 +160,7 @@ public class PatternTest {
             }
 
             {
-                Synapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(lookupPPPT(m, nC), eC);
+                Synapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(lookupBindingNeuronPT(m, nC), eC);
 
                 s.linkOutput();
                 s.addWeight(10.0);
@@ -207,7 +207,7 @@ public class PatternTest {
         return m;
     }
 
-    public BindingNeuron lookupPPPT(TextModel tm, PatternNeuron pn) {
+    public BindingNeuron lookupBindingNeuronPT(TextModel tm, PatternNeuron pn) {
         return (BindingNeuron) pn.getOutputSynapses()
                 .map(s -> s.getOutput())
                 .filter(n -> isPTNeuron(tm, n))

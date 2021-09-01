@@ -24,7 +24,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.steps.VisitorStep;
+import network.aika.neuron.steps.Linker;
 import network.aika.neuron.steps.link.LinkStep;
 
 import java.util.stream.Stream;
@@ -37,7 +37,7 @@ import static network.aika.neuron.steps.link.LinkStep.TEMPLATE_OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public abstract class TemplateTask extends VisitorStep {
+public abstract class TemplateTask extends Linker {
 
     public TemplateTask(Direction dir) {
         super(dir);
@@ -100,5 +100,9 @@ public abstract class TemplateTask extends VisitorStep {
             return;
 
         targetSynapse.closeLoop(this, v, iAct, oAct);
+    }
+
+    public String getTaskDescription() {
+        return this + " Target-Synapse:" + targetSynapse;
     }
 }

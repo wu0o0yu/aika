@@ -25,7 +25,7 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.sign.Sign;
-import network.aika.neuron.steps.VisitorStep;
+import network.aika.neuron.steps.Linker;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.neuron.steps.link.SumUpLink;
 import network.aika.utils.Utils;
@@ -215,7 +215,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return false;
     }
 
-    public void propagate(Activation fromAct, Direction dir, VisitorStep vs, boolean isSelfRef) {
+    public void propagate(Activation fromAct, Direction dir, Linker vs, boolean isSelfRef) {
         Activation toAct = fromAct.getThought()
                 .createActivation(
                         dir.getNeuron(this),
@@ -232,14 +232,14 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         );
     }
 
-    public void closeLoop(VisitorStep vs, ActVisitor v, Activation iAct, Activation oAct) {
+    public void closeLoop(Linker vs, ActVisitor v, Activation iAct, Activation oAct) {
         if (!checkCausality(iAct, oAct, v))
             return;
 
         createLink(iAct, oAct, vs, v.getSelfRef());
     }
 
-    public void createLink(Activation iAct, Activation oAct, VisitorStep vs, boolean isSelfRef) {
+    public void createLink(Activation iAct, Activation oAct, Linker vs, boolean isSelfRef) {
         Link nl = oAct.addLink(
                 this,
                 iAct,
