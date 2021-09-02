@@ -39,7 +39,7 @@ public abstract class Visitor {
 
     private int downSteps = 0;
     private int upSteps = 0;
-    protected Scope scope = Scope.SAME;
+    protected Scope scope;
 
 
     public Visitor(Visitor v) {

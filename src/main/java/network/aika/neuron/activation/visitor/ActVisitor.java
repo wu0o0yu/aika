@@ -32,13 +32,14 @@ public class ActVisitor extends Visitor {
         this.act = act;
     }
 
-    public ActVisitor(Visitor v, VisitorTask task, Activation act, Direction startDir, Direction currentDir) {
+    public ActVisitor(Visitor v, VisitorTask task, Activation act, Scope scope, Direction startDir, Direction currentDir) {
         super(v);
         this.task = task;
         this.origin = this;
         this.act = act;
         this.startDir = startDir;
         this.currentDir = currentDir;
+        this.scope = scope;
     }
 
     public Activation getActivation() {

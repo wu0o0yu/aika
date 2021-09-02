@@ -71,6 +71,7 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
                                 v,
                                 abTask,
                                 bAct,
+                                v.getScope(),
                                 INPUT,
                                 INPUT
                         ),

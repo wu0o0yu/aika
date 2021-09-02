@@ -21,6 +21,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.activation.visitor.Scope;
 import network.aika.neuron.activation.visitor.VisitorTask;
 
 import java.util.stream.Stream;
@@ -121,7 +122,8 @@ public abstract class Linker implements VisitorTask {
     private void follow(Link l, Direction startDir, Activation startAct, Synapse ts) {
         startAct.setMarked(true);
         targetSynapse = ts;
-        ActVisitor v = new ActVisitor(null, this, startAct, startDir, startDir);
+        Scope startScope = getStartScope(startDir, ts);
+        ActVisitor v = new ActVisitor(null, this, startAct, startScope, startDir, startDir);
         ts.transition(v, l.getSynapse(), l);
 
         targetSynapse = null;
@@ -130,11 +132,20 @@ public abstract class Linker implements VisitorTask {
 
     private void follow(Activation startAct, Synapse ts) {
         targetSynapse = ts;
+        Scope startScope = getStartScope(direction, ts);
         neuronTransition(
-                new ActVisitor(null, this, startAct, direction, INPUT),
+                new ActVisitor(null, this, startAct, startScope, direction, INPUT),
                 startAct
         );
         targetSynapse = null;
+    }
+
+    private Scope getStartScope(Direction dir, Synapse ts) {
+        return dir
+                .invert()
+                .getNeuron(ts)
+                .getTemplateInfo()
+                .getScope();
     }
 
     public void propagate(Activation act) {
