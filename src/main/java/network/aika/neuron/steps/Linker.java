@@ -77,6 +77,9 @@ public abstract class Linker implements VisitorTask {
         if(v.getActivation() == v.getOriginAct())
             return;
 
+        if(v.getScope() != getEndScope(v.getStartDir(), targetSynapse))
+            return;
+
         if(!targetSynapse.checkLoopClosure(v))
             return;
 
@@ -140,9 +143,16 @@ public abstract class Linker implements VisitorTask {
         targetSynapse = null;
     }
 
-    private Scope getStartScope(Direction dir, Synapse ts) {
+    public Scope getStartScope(Direction dir, Synapse ts) {
+        return getScope(dir.invert(), ts);
+    }
+
+    public Scope getEndScope(Direction dir, Synapse ts) {
+        return getScope(dir, ts);
+    }
+
+    private Scope getScope(Direction dir, Synapse ts) {
         return dir
-                .invert()
                 .getNeuron(ts)
                 .getTemplateInfo()
                 .getScope();
