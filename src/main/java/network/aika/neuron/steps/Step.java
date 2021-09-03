@@ -51,10 +51,6 @@ public abstract class Step<E extends Element> implements QueueKey {
         return getClass().getSimpleName();
     }
 
-    public long getTimeStamp() {
-        return timestamp;
-    }
-
     public abstract void process();
 
     public abstract Phase getPhase();
@@ -77,11 +73,11 @@ public abstract class Step<E extends Element> implements QueueKey {
         return fired;
     }
 
-    public long getTimestamp() {
+    public long getTimeStamp() {
         return timestamp;
     }
 
-    public void setTimestamp(long timestamp) {
+    public void setTimeStamp(long timestamp) {
         this.timestamp = timestamp;
     }
 

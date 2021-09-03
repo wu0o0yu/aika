@@ -157,7 +157,7 @@ public abstract class Thought {
         if(filters.contains(s))
             return;
 
-        s.setTimestamp(getNextTimestamp());
+        s.setTimeStamp(getNextTimestamp());
         queue.add(s);
     }
 
