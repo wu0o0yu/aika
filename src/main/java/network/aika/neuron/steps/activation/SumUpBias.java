@@ -18,17 +18,19 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 import network.aika.utils.Utils;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class SumUpBias implements ActivationStep {
+public class SumUpBias extends Step<Activation> {
 
     private double delta;
 
-    public SumUpBias(double delta) {
+    public SumUpBias(Activation act, double delta) {
+        super(act);
         this.delta = delta;
     }
 
@@ -42,8 +44,8 @@ public class SumUpBias implements ActivationStep {
     }
 
     @Override
-    public void process(Activation act) {
-        act.updateNet(delta);
+    public void process() {
+        getElement().updateNet(delta);
     }
 
     public String toString() {

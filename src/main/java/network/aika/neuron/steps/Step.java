@@ -17,19 +17,75 @@
 package network.aika.neuron.steps;
 
 import network.aika.neuron.activation.Element;
+import network.aika.neuron.activation.Fired;
+
+import java.util.Comparator;
 
 /**
  * @author Lukas Molzberger
  */
-public interface Step<E extends Element> {
+public abstract class Step<E extends Element> implements QueueKey {
 
-    void process(E e);
+    public static final Comparator<Step> COMPARATOR = Comparator
+            .<Step>comparingInt(s -> s.getPhase().ordinal())
+            .thenComparing(s -> s.fired)
+            .thenComparing(s -> s.timestamp);
 
-    Phase getPhase();
+    private E element;
 
-    boolean checkIfQueued();
+    private Fired fired;
+    private long timestamp;
+
+    public Step(E element) {
+        this.element = element;
+        this.fired = element.getFired();
+    }
+
+    public Step(E element, long timestamp) {
+        this.element = element;
+        this.fired = element.getFired();
+        this.timestamp = timestamp;
+    }
+
+    public String getStepName() {
+        return getClass().getSimpleName();
+    }
+
+    public long getTimeStamp() {
+        return timestamp;
+    }
+
+    public abstract void process();
+
+    public abstract Phase getPhase();
+
+    public abstract boolean checkIfQueued();
 
     static String toString(Step p) {
         return " (" + (p != null ? p.toString() : "X") + ")";
+    }
+
+    public static void add(Step s) {
+        if(s.checkIfQueued() && s.getElement().isQueued(s))
+            return;
+
+        s.getElement().addQueuedStep(s);
+        s.getElement().getThought().addStep(s);
+    }
+
+    public Fired getFired() {
+        return fired;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public E getElement() {
+        return element;
     }
 }

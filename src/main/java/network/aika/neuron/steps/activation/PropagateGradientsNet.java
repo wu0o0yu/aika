@@ -18,13 +18,18 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 
 /**
  * Propagates the gradient of this activation backwards to all its input-links.
  *
  * @author Lukas Molzberger
  */
-public class PropagateGradientsNet implements ActivationStep {
+public class PropagateGradientsNet extends Step<Activation> {
+
+    public PropagateGradientsNet(Activation element) {
+        super(element);
+    }
 
     @Override
     public Phase getPhase() {
@@ -36,7 +41,8 @@ public class PropagateGradientsNet implements ActivationStep {
     }
 
     @Override
-    public void process(Activation act) {
+    public void process() {
+        Activation act = getElement();
         act.propagateGradientsFromNetUpdate();
 
         act.markedNetUpdateOccurred = true;

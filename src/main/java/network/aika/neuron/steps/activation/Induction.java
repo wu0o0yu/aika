@@ -19,6 +19,7 @@ package network.aika.neuron.steps.activation;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 import network.aika.utils.Utils;
 
 /**
@@ -26,7 +27,11 @@ import network.aika.utils.Utils;
  *
  * @author Lukas Molzberger
  */
-public class Induction implements ActivationStep {
+public class Induction extends Step<Activation> {
+
+    public Induction(Activation element) {
+        super(element);
+    }
 
     @Override
     public Phase getPhase() {
@@ -38,7 +43,9 @@ public class Induction implements ActivationStep {
     }
 
     @Override
-    public void process(Activation act) {
+    public void process() {
+        Activation act = getElement();
+
         assert act.getNeuron().isTemplate();
 
         Neuron inducedNeuron = act.getNeuron().instantiateTemplate(true);

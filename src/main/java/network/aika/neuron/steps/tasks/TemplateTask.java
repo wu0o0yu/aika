@@ -21,23 +21,24 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.steps.Linker;
-import network.aika.neuron.steps.link.LinkStep;
+import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.activation.Induction;
+import network.aika.neuron.steps.link.LinkInduction;
+import network.aika.neuron.steps.link.Template;
 
 import java.util.stream.Stream;
 
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
-import static network.aika.neuron.steps.activation.ActivationStep.INDUCTION;
-import static network.aika.neuron.steps.link.LinkStep.TEMPLATE_OUTPUT;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class TemplateTask extends Linker {
+public class TemplateTask extends Linker {
 
     public TemplateTask(Direction dir) {
         super(dir);
@@ -67,16 +68,16 @@ public abstract class TemplateTask extends Linker {
 
     @Override
     public void getNextSteps(Activation act) {
-        QueueEntry.add(act, INDUCTION);
+        Step.add(new Induction(act));
     }
 
     @Override
     public void getNextSteps(Link l) {
-        QueueEntry.add(l, LinkStep.TEMPLATE_INPUT);
+        Step.add(new Template(l, INPUT));
         if(l.getOutput().getFired() != Fired.NOT_FIRED)
-            QueueEntry.add(l, TEMPLATE_OUTPUT);
+            Step.add(new Template(l, OUTPUT));
 
-        QueueEntry.add(l, LinkStep.INDUCTION);
+        Step.add(new LinkInduction(l));
     }
 
     @Override
@@ -102,7 +103,7 @@ public abstract class TemplateTask extends Linker {
         targetSynapse.closeLoop(this, v, iAct, oAct);
     }
 
-    public String getTaskDescription() {
-        return this + " Target-Synapse:" + targetSynapse;
+    public String toString() {
+        return "Template Task: (Target-Synapse:" + targetSynapse + ")";
     }
 }

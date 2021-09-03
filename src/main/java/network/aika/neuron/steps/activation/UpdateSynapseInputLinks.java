@@ -18,6 +18,7 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 
 
 /**
@@ -27,7 +28,11 @@ import network.aika.neuron.steps.Phase;
  *
  * @author Lukas Molzberger
  */
-public class UpdateSynapseInputLinks implements ActivationStep {
+public class UpdateSynapseInputLinks extends Step<Activation> {
+
+    public UpdateSynapseInputLinks(Activation element) {
+        super(element);
+    }
 
     @Override
     public Phase getPhase() {
@@ -39,7 +44,8 @@ public class UpdateSynapseInputLinks implements ActivationStep {
     }
 
     @Override
-    public void process(Activation act) {
+    public void process() {
+        Activation act = getElement();
         act.getNeuron().updateSynapseInputLinks();
         act.getNeuronProvider().save();
     }

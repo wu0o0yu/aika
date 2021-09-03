@@ -18,6 +18,7 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.tasks.LinkingTask;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -35,10 +36,12 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Linking extends LinkingTask implements ActivationStep {
+public class Linking extends Step<Activation> {
 
-    public Linking() {
-        super(OUTPUT);
+    private LinkingTask task = new LinkingTask(OUTPUT);
+
+    public Linking(Activation act) {
+        super(act);
     }
 
     @Override
@@ -51,15 +54,16 @@ public class Linking extends LinkingTask implements ActivationStep {
     }
 
     @Override
-    public void process(Activation act) {
+    public void process() {
+        Activation act = getElement();
         act.getThought().linkInputRelations(act);
 
-        link(act);
+        task.link(act);
 
         act.getModel().linkInputRelations(act, OUTPUT);
     }
 
     public String toString() {
-        return "Act-Step: Linking (" + direction + ")";
+        return "Act-Step: Linking (" + task + ")";
     }
 }

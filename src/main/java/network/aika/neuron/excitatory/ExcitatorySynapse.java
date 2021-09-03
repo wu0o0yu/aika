@@ -19,9 +19,8 @@ package network.aika.neuron.excitatory;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.QueueEntry;
+import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.activation.SumUpBias;
-import network.aika.neuron.steps.link.SumUpLink;
 
 import static network.aika.neuron.sign.Sign.POS;
 
@@ -44,10 +43,7 @@ public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends Excitator
             addWeight(-delta);
             getOutput().addConjunctiveBias(delta, !l.isCausal());
 
-            QueueEntry.add(
-                    l.getOutput(),
-                    new SumUpBias(delta)
-            );
+            Step.add(new SumUpBias(l.getOutput(), delta));
 
             propagateActValue(
                     l,

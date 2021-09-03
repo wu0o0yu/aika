@@ -26,7 +26,6 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.steps.Step;
 import network.aika.utils.BelowToleranceThresholdException;
@@ -47,9 +46,9 @@ public abstract class Thought {
     private long timestampCounter = 0;
     private int activationIdCounter = 0;
 
-    private final TreeSet<QueueEntry> queue = new TreeSet<>(QueueEntry.COMPARATOR);
+    private final TreeSet<Step> queue = new TreeSet<>(Step.COMPARATOR);
 
-    private Set<Step> filters = new TreeSet<>(Comparator.comparing(p -> p.getClass().getSimpleName()));
+    private Set<Class<Step>> filters = new TreeSet<>(Comparator.comparing(sc -> sc.getSimpleName()));
 
     private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
@@ -76,7 +75,7 @@ public abstract class Thought {
         this.config = config;
     }
 
-    public void addFilters(Step... p) {
+    public void addFilters(Class<Step>... p) {
         filters.addAll(Set.of(p));
     }
 
@@ -87,17 +86,17 @@ public abstract class Thought {
                 );
     }
 
-    public void beforeProcessedEvent(QueueEntry qe) {
+    public void beforeProcessedEvent(Step s) {
         getEventListeners()
                 .forEach(
-                        el -> el.beforeProcessedEvent(qe)
+                        el -> el.beforeProcessedEvent(s)
                 );
     }
 
-    public void afterProcessedEvent(QueueEntry qe) {
+    public void afterProcessedEvent(Step s) {
         getEventListeners()
                 .forEach(
-                        el -> el.afterProcessedEvent(qe)
+                        el -> el.afterProcessedEvent(s)
                 );
     }
 
@@ -154,43 +153,43 @@ public abstract class Thought {
         activationsById.put(act.getId(), act);
     }
 
-    public void addQueueEntry(QueueEntry qe) {
-        if(filters.contains(qe.getStep()))
+    public void addStep(Step s) {
+        if(filters.contains(s))
             return;
 
-        qe.setTimestamp(getNextTimestamp());
-        queue.add(qe);
+        s.setTimestamp(getNextTimestamp());
+        queue.add(s);
     }
 
-    public void removeQueueEntry(QueueEntry qe) {
-        boolean isRemoved = queue.remove(qe);
+    public void removeQueueEntry(Step s) {
+        boolean isRemoved = queue.remove(s);
         assert isRemoved;
     }
 
-    public void removeQueueEntries(Collection<QueueEntry> qe) {
-        queue.removeAll(qe);
+    public void removeQueueEntries(Collection<Step> s) {
+        queue.removeAll(s);
     }
 
-    public SortedSet<QueueEntry> getQueue() {
+    public SortedSet<Step> getQueue() {
         return queue;
     }
 
     public void process(Model m) {
         while (!queue.isEmpty()) {
-            QueueEntry qe = queue.pollFirst();
+            Step s = queue.pollFirst();
 
             timestampOnProcess = timestampCounter;
 
-            qe.getElement().removeQueuedPhase(qe);
+            s.getElement().removeQueuedPhase(s);
 
-            beforeProcessedEvent(qe);
+            beforeProcessedEvent(s);
 
             try {
-                qe.process();
+                s.process();
             } catch(BelowToleranceThresholdException e) {
             }
 
-            afterProcessedEvent(qe);
+            afterProcessedEvent(s);
         }
         m.addToN(length());
     }
@@ -206,8 +205,7 @@ public abstract class Thought {
     public <E extends Element> List<Step> getPhasesForElement(E element) {
         return queue
                 .stream()
-                .filter(qe -> qe.getElement() == element)
-                .map(qe -> qe.getStep())
+                .filter(s -> s.getElement() == element)
                 .collect(Collectors.toList());
     }
 

@@ -23,6 +23,8 @@ import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Scope;
 import network.aika.neuron.sign.Sign;
+import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.link.AddLink;
 import network.aika.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +34,6 @@ import java.util.Comparator;
 import static network.aika.callbacks.VisitorEvent.AFTER;
 import static network.aika.callbacks.VisitorEvent.BEFORE;
 import static network.aika.neuron.sign.Sign.POS;
-import static network.aika.neuron.steps.link.LinkStep.ADD_LINK;
 
 /**
  *
@@ -61,7 +62,7 @@ public class Link extends Element<Link> {
         this.output = output;
         this.isSelfRef = isSelfRef;
 
-        QueueEntry.add(this, ADD_LINK);
+        Step.add(new AddLink(this));
 
         getSynapse().updateReference(this);
 

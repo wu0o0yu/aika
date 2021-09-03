@@ -19,13 +19,15 @@ package network.aika.neuron;
 import network.aika.Model;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.Linker;
+import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.activation.UseFinalBias;
+import network.aika.neuron.steps.link.InformationGainGradient;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.neuron.steps.link.SumUpLink;
 import network.aika.utils.Utils;
@@ -42,8 +44,6 @@ import static network.aika.neuron.Neuron.BETA_THRESHOLD;
 import static network.aika.neuron.activation.Activation.OWN;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
-import static network.aika.neuron.steps.activation.ActivationStep.USE_FINAL_BIAS;
-import static network.aika.neuron.steps.link.LinkStep.INFORMATION_GAIN_GRADIENT;
 
 /**
  *
@@ -255,10 +255,10 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if(!nl.getConfig().isEnableTraining())
             return;
 
-        QueueEntry.add(nl, INFORMATION_GAIN_GRADIENT);
+        Step.add(new InformationGainGradient(nl));
 
         if (!Utils.belowTolerance(oAct.getOutputGradientSum()))
-            QueueEntry.add(nl, new PropagateGradientAndUpdateWeight(oAct.getOutputGradientSum()));
+            Step.add(new PropagateGradientAndUpdateWeight(nl, oAct.getOutputGradientSum()));
     }
 
     public void linkInput() {
@@ -429,8 +429,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
             return;
 
         double w = l.getSynapse().getWeight();
-        QueueEntry.add(l, new SumUpLink(delta * w));
-        QueueEntry.add(l.getOutput(), USE_FINAL_BIAS);
+        Step.add(new SumUpLink(l, delta * w));
+        Step.add(new UseFinalBias(l.getOutput()));
     }
 
     @Override

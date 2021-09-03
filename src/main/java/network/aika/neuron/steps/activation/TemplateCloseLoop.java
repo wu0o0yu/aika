@@ -19,6 +19,7 @@ package network.aika.neuron.steps.activation;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.tasks.TemplateTask;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
@@ -30,22 +31,18 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class TemplateCloseLoop extends TemplateTask implements ActivationStep {
+public class TemplateCloseLoop extends Step<Activation> {
 
-    public static class TemplateCloseLoopInput extends TemplateCloseLoop {
-        public TemplateCloseLoopInput() {
-            super(INPUT);
-        }
+    private TemplateTask task;
+
+    public TemplateCloseLoop(Activation act, Direction dir) {
+        super(act);
+        task = new TemplateTask(dir);
     }
 
-    public static class TemplateCloseLoopOutput extends TemplateCloseLoop {
-        public TemplateCloseLoopOutput() {
-            super(OUTPUT);
-        }
-    }
-
-    private TemplateCloseLoop(Direction dir) {
-        super(dir);
+    @Override
+    public String getStepName() {
+        return super.getStepName() + ":" + task.getDirection();
     }
 
     @Override
@@ -54,8 +51,8 @@ public class TemplateCloseLoop extends TemplateTask implements ActivationStep {
     }
 
     @Override
-    public void process(Activation act) {
-        link(act);
+    public void process() {
+        task.link(getElement());
     }
 
     public boolean checkIfQueued() {
@@ -63,6 +60,6 @@ public class TemplateCloseLoop extends TemplateTask implements ActivationStep {
     }
 
     public String toString() {
-        return "Act-Step: Template-CloseCycle (" + direction + ")";
+        return "Act-Step: Template-CloseCycle (" + task + ")";
     }
 }

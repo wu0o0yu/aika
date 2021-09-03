@@ -18,8 +18,8 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 import network.aika.utils.Utils;
 
 /**
@@ -29,7 +29,11 @@ import network.aika.utils.Utils;
  *
  * @author Lukas Molzberger
  */
-public class EntropyGradient implements ActivationStep {
+public class EntropyGradient extends Step<Activation> {
+
+    public EntropyGradient(Activation act) {
+        super(act);
+    }
 
     @Override
     public Phase getPhase() {
@@ -41,7 +45,9 @@ public class EntropyGradient implements ActivationStep {
     }
 
     @Override
-    public void process(Activation act) {
+    public void process() {
+        Activation act = getElement();
+
         Neuron n = act.getNeuron();
 
         if(n.isTemplate())
@@ -51,7 +57,7 @@ public class EntropyGradient implements ActivationStep {
 
         Utils.checkTolerance(act, act.getInputGradient());
 
-        QueueEntry.add(act, PROPAGATE_GRADIENTS_SUM);
+        Step.add(new PropagateGradientsSum(act));
     }
 
     public String toString() {

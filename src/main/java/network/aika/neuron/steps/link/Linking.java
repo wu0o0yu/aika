@@ -18,13 +18,10 @@ package network.aika.neuron.steps.link;
 
 
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.tasks.LinkingTask;
-
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 
 /**
@@ -32,22 +29,18 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Linking extends LinkingTask implements LinkStep {
+public class Linking extends Step<Link> {
 
-    public static class LinkingInput extends Linking {
-        public LinkingInput() {
-            super(INPUT);
-        }
+    private LinkingTask task;
+
+    public Linking(Link l, Direction dir) {
+        super(l);
+        task = new LinkingTask(dir);
     }
 
-    public static class LinkingOutput extends Linking {
-        public LinkingOutput() {
-            super(OUTPUT);
-        }
-    }
-
-    public Linking(Direction dir) {
-        super(dir);
+    @Override
+    public String getStepName() {
+        return super.getStepName() + ":" + task.getDirection();
     }
 
     @Override
@@ -60,13 +53,14 @@ public class Linking extends LinkingTask implements LinkStep {
     }
 
     @Override
-    public void process(Link l) {
-        link(l);
+    public void process() {
+        Link l = getElement();
+        task.link(l);
 
-        QueueEntry.add(l, COUNTING);
+        Step.add(new LinkCounting(l));
     }
 
     public String toString() {
-        return "Link-Step: Linking (" + direction + ")";
+        return "Link-Step: Linking (" + task + ")";
     }
 }

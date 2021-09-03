@@ -18,13 +18,18 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 
 /**
  * Check if there are positive recurrent links that have not been activated and thus need to be updated.
  *
  * @author Lukas Molzberger
  */
-public class UseFinalBias implements ActivationStep {
+public class UseFinalBias extends Step<Activation> {
+
+    public UseFinalBias(Activation element) {
+        super(element);
+    }
 
     @Override
     public Phase getPhase() {
@@ -36,7 +41,8 @@ public class UseFinalBias implements ActivationStep {
     }
 
     @Override
-    public void process(Activation act) {
+    public void process() {
+        Activation act = getElement();
         act.updateNet(
                 act.getNeuron().getRecurrentBias()
         );

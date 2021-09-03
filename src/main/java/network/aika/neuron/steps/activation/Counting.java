@@ -18,6 +18,7 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 
 
 /**
@@ -25,7 +26,11 @@ import network.aika.neuron.steps.Phase;
  *
  * @author Lukas Molzberger
  */
-public class Counting implements ActivationStep {
+public class Counting extends Step<Activation> {
+
+    public Counting(Activation element) {
+        super(element);
+    }
 
     @Override
     public Phase getPhase() {
@@ -33,8 +38,8 @@ public class Counting implements ActivationStep {
     }
 
     @Override
-    public void process(Activation act) {
-        act.getNeuron().count(act);
+    public void process() {
+        getElement().getNeuron().count(getElement());
     }
 
     public boolean checkIfQueued() {

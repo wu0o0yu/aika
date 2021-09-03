@@ -14,25 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.steps.link;
-
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.steps.Step;
+package network.aika.neuron.steps;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public interface LinkStep extends Step<Link> {
+public interface QueueKey {
 
-    LinkStep ADD_LINK = new AddLink();
-    LinkStep INDUCTION = new Induction();
-    LinkStep LINKING_INPUT = new Linking.LinkingInput();
-    LinkStep LINKING_OUTPUT = new Linking.LinkingOutput();
-    LinkStep SHADOW_FACTOR = new ShadowFactor();
-    LinkStep INFORMATION_GAIN_GRADIENT = new InformationGainGradient();
-    LinkStep TEMPLATE_INPUT = new Template.TemplateInput();
-    LinkStep TEMPLATE_OUTPUT = new Template.TemplateOutput();
-    LinkStep CLEANUP = new Cleanup();
-    LinkStep COUNTING = new Counting();
+    String getStepName();
+
+    long getTimeStamp();
+
+    class DummyStep implements QueueKey {
+        private Step s;
+        private long timestamp;
+
+        public DummyStep(Step s, long timestamp) {
+            this.s = s;
+            this.timestamp = timestamp;
+        }
+
+        @Override
+        public String getStepName() {
+            return s.getStepName();
+        }
+
+        @Override
+        public long getTimeStamp() {
+            return timestamp;
+        }
+    }
 }

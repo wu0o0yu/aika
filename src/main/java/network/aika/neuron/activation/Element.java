@@ -19,10 +19,9 @@ package network.aika.neuron.activation;
 import network.aika.Config;
 import network.aika.Thought;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.QueueKey;
 
-import java.util.Comparator;
-import java.util.NavigableSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -32,26 +31,27 @@ import java.util.stream.Stream;
  */
 public abstract class Element<E extends Element> implements Comparable<E> {
 
-    private NavigableSet<QueueEntry> queuedPhases = new TreeSet<>(Comparator
-            .<QueueEntry, String>comparing(qe -> qe.getStep().getClass().getSimpleName())
-            .thenComparing(qe -> qe.getTimestamp())
+    private NavigableMap<QueueKey, Step> queuedPhases = new TreeMap<>(
+            Comparator
+                    .<QueueKey, String>comparing(s -> s.getStepName())
+                    .thenComparing(s -> s.getTimeStamp())
     );
 
     public abstract Fired getFired();
 
-    public void addQueuedStep(QueueEntry qe) {
-        queuedPhases.add(qe);
+    public void addQueuedStep(Step s) {
+        queuedPhases.put(s, s);
     }
 
     public boolean isQueued(Step s) {
-        return !queuedPhases.subSet(
-                new QueueEntry(s, this, Long.MIN_VALUE),
-                new QueueEntry(s, this, Long.MAX_VALUE)
+        return !queuedPhases.subMap(
+                new QueueKey.DummyStep(s, Long.MIN_VALUE),
+                new QueueKey.DummyStep(s, Long.MAX_VALUE)
         ).isEmpty();
     }
 
-    public void removeQueuedPhase(QueueEntry qe) {
-        queuedPhases.remove(qe);
+    public void removeQueuedPhase(Step s) {
+        queuedPhases.remove(s);
     }
 
     public void replaceElement(Element newElement) {
@@ -61,17 +61,17 @@ public abstract class Element<E extends Element> implements Comparable<E> {
     }
 
     public void copyPhases(Element newElement) {
-        queuedPhases.stream().forEach(qe ->
-                QueueEntry.add(newElement, qe.getStep())
+        queuedPhases.values().stream().forEach(s ->
+                Step.add(s)
         );
     }
 
-    public Stream<QueueEntry> getQueuedEntries() {
-        return queuedPhases.stream();
+    public Stream<Step> getQueuedEntries() {
+        return queuedPhases.values().stream();
     }
 
     private void removeFromQueue() {
-        getThought().removeQueueEntries(queuedPhases);
+        getThought().removeQueueEntries(queuedPhases.values());
     }
 
     public abstract Thought getThought();

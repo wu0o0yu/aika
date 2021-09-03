@@ -19,12 +19,17 @@ package network.aika.neuron.steps.link;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Cleanup implements LinkStep {
+public class Cleanup extends Step<Link> {
+
+    public Cleanup(Link element) {
+        super(element);
+    }
 
     @Override
     public Phase getPhase() {
@@ -36,7 +41,9 @@ public class Cleanup implements LinkStep {
     }
 
     @Override
-    public void process(Link l) {
+    public void process() {
+        Link l = getElement();
+
         if(l.getOutput().getFired() != Fired.NOT_FIRED)
             return;
 

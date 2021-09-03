@@ -16,14 +16,20 @@
  */
 package network.aika.neuron.steps.link;
 
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class AddLink implements LinkStep {
+public class AddLink extends Step<Link> {
+
+    public AddLink(Link element) {
+        super(element);
+    }
 
     @Override
     public Phase getPhase() {
@@ -36,7 +42,9 @@ public class AddLink implements LinkStep {
     }
 
     @Override
-    public void process(Link l) {
+    public void process() {
+        Link l = getElement();
+
         if(l.getInput() != null)
             l.linkInput();
 

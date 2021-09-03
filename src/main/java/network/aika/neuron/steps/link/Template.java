@@ -19,6 +19,7 @@ package network.aika.neuron.steps.link;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.tasks.TemplateTask;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
@@ -30,22 +31,18 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Template extends TemplateTask implements LinkStep {
+public class Template extends Step<Link> {
 
-    public static class TemplateInput extends Template {
-        public TemplateInput() {
-            super(INPUT);
-        }
+    private TemplateTask task;
+
+    public Template(Link l, Direction dir) {
+        super(l);
+        task = new TemplateTask(dir);
     }
 
-    public static class TemplateOutput extends Template {
-        public TemplateOutput() {
-            super(OUTPUT);
-        }
-    }
-
-    public Template(Direction dir) {
-        super(dir);
+    @Override
+    public String getStepName() {
+        return super.getStepName() + ":" + task.getDirection();
     }
 
     @Override
@@ -54,8 +51,8 @@ public class Template extends TemplateTask implements LinkStep {
     }
 
     @Override
-    public void process(Link l) {
-        link(l);
+    public void process() {
+        task.link(getElement());
     }
 
     public boolean checkIfQueued() {
@@ -63,6 +60,6 @@ public class Template extends TemplateTask implements LinkStep {
     }
 
     public String toString() {
-        return "Link-Step: Template (" + direction + ")";
+        return "Link-Step: Template (" + task + ")";
     }
 }

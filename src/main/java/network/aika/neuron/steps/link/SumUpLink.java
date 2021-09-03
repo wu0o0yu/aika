@@ -18,23 +18,24 @@ package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.activation.CheckIfFired;
+import network.aika.neuron.steps.activation.PropagateGradientsNet;
 import network.aika.utils.Utils;
 
-import static network.aika.neuron.steps.activation.ActivationStep.CHECK_IF_FIRED;
-import static network.aika.neuron.steps.activation.ActivationStep.PROPAGATE_GRADIENTS_NET;
 
 /**
  * Uses the input activation value, and the synapse weight to update the net value of the output activation.
  *
  * @author Lukas Molzberger
  */
-public class SumUpLink implements LinkStep {
+public class SumUpLink extends Step<Link> {
 
     private double delta;
 
-    public SumUpLink(double delta) {
+    public SumUpLink(Link l, double delta) {
+        super(l);
         this.delta = delta;
     }
 
@@ -48,14 +49,14 @@ public class SumUpLink implements LinkStep {
     }
 
     @Override
-    public void process(Link l) {
-        l.sumUpLink(delta);
+    public void process() {
+        getElement().sumUpLink(delta);
 
-        Activation oAct = l.getOutput();
+        Activation oAct = getElement().getOutput();
 
         if(!oAct.markedNetUpdateOccurred)
-            QueueEntry.add(oAct, PROPAGATE_GRADIENTS_NET);
-        QueueEntry.add(oAct, CHECK_IF_FIRED);
+            Step.add(new PropagateGradientsNet(oAct));
+        Step.add(new CheckIfFired(oAct));
     }
 
     public String toString() {

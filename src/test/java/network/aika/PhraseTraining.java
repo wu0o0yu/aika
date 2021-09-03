@@ -2,8 +2,6 @@ package network.aika;
 
 import network.aika.debugger.AikaDebugger;
 import network.aika.neuron.steps.Step;
-import network.aika.neuron.steps.activation.ActivationStep;
-import network.aika.neuron.steps.link.LinkStep;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
@@ -33,7 +31,7 @@ public class PhraseTraining {
 
 
     private void process(TextModel m, int round) throws IOException {
-        Step[] countingOnlyFilters = new Step[]{
+/*        Step[] countingOnlyFilters = new Step[]{
                 ActivationStep.TEMPLATE_CLOSE_LOOP_OUTPUT,
                 ActivationStep.TEMPLATE_PROPAGATE_OUTPUT,
                 ActivationStep.TEMPLATE_PROPAGATE_INPUT,
@@ -45,7 +43,7 @@ public class PhraseTraining {
                 LinkStep.TEMPLATE_OUTPUT,
                 LinkStep.INDUCTION,
                 LinkStep.INFORMATION_GAIN_GRADIENT
-        };
+        };*/
         Util.loadExamplePhrases("phrases.txt")
                 .stream()
                 .filter(p -> !isBlank(p))
@@ -71,7 +69,7 @@ public class PhraseTraining {
                             }
 
                             if (round == 0) {
-                                doc.addFilters(countingOnlyFilters);
+      //                          doc.addFilters(countingOnlyFilters);
                             } else {
                                 AikaDebugger.createAndShowGUI(doc, m);
                             }

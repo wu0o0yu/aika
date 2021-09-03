@@ -19,24 +19,27 @@ package network.aika.neuron.steps.link;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.activation.UpdateSynapseInputLinks;
 import network.aika.utils.Utils;
 
 import static network.aika.neuron.activation.Activation.INCOMING;
 import static network.aika.neuron.activation.Activation.OWN;
-import static network.aika.neuron.steps.activation.ActivationStep.UPDATE_SYNAPSE_INPUT_LINKS;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  * Propagate the gradient backwards through the network.
  *
  * @author Lukas Molzberger
  */
-public class PropagateGradientAndUpdateWeight implements LinkStep {
+public class PropagateGradientAndUpdateWeight extends Step<Link> {
 
     private double[] gradient;
 
-    public PropagateGradientAndUpdateWeight(double[] gradient) {
+    public PropagateGradientAndUpdateWeight(Link l, double[] gradient) {
+        super(l);
         this.gradient = gradient;
     }
 
@@ -50,7 +53,8 @@ public class PropagateGradientAndUpdateWeight implements LinkStep {
     }
 
     @Override
-    public void process(Link l) {
+    public void process() {
+        Link l = getElement();
         Synapse s = l.getSynapse();
 
         if(l.getSynapse().isAllowTraining()) {
@@ -61,15 +65,15 @@ public class PropagateGradientAndUpdateWeight implements LinkStep {
             s.updateSynapse(l, weightDelta);
 
             if(oldWeightIsZero && !s.isZero() && l.getInput().isActive(true)) {
-                QueueEntry.add(l, LINKING_INPUT);
+                Step.add(new Linking(l, INPUT));
                 if(l.getOutput().getFired() != Fired.NOT_FIRED)
-                    QueueEntry.add(l, LINKING_OUTPUT);
+                    Step.add(new Linking(l, OUTPUT));
 
-                QueueEntry.add(l, TEMPLATE_INPUT);
+                Step.add(new Template(l, INPUT));
                 if(l.getOutput().getFired() != Fired.NOT_FIRED)
-                    QueueEntry.add(l, TEMPLATE_OUTPUT);
+                    Step.add(new Template(l, OUTPUT));
             }
-            QueueEntry.add(l.getOutput(), UPDATE_SYNAPSE_INPUT_LINKS);
+            Step.add(new UpdateSynapseInputLinks(l.getOutput()));
         }
 
         s.propagateGradient(l, gradient);

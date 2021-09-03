@@ -20,22 +20,22 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.steps.Linker;
+import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.link.Linking;
 
 import java.util.stream.Stream;
 
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
-import static network.aika.neuron.steps.link.LinkStep.LINKING_INPUT;
-import static network.aika.neuron.steps.link.LinkStep.LINKING_OUTPUT;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class LinkingTask extends Linker {
+public class LinkingTask extends Linker {
 
     public LinkingTask(Direction dir) {
         super(dir);
@@ -67,9 +67,13 @@ public abstract class LinkingTask extends Linker {
 
     @Override
     public void getNextSteps(Link l) {
-        QueueEntry.add(l, LINKING_INPUT);
+        addNextLinkerSteps(l);
+    }
+
+    public static void addNextLinkerSteps(Link l) {
+        Step.add(new Linking(l, INPUT));
         if(l.getOutput().getFired() != Fired.NOT_FIRED)
-            QueueEntry.add(l, LINKING_OUTPUT);
+            Step.add(new Linking(l, OUTPUT));
     }
 
     @Override
@@ -94,7 +98,7 @@ public abstract class LinkingTask extends Linker {
             cs.closeLoop(this, v, iAct, oAct);
     }
 
-    public String getTaskDescription() {
-        return this + " Target-Synapse:" + targetSynapse;
+    public String toString() {
+        return "Linking Task: (Target-Synapse:" + targetSynapse + ")";
     }
 }

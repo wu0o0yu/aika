@@ -18,6 +18,7 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 
 
 /**
@@ -26,7 +27,11 @@ import network.aika.neuron.steps.Phase;
  *
  * @author Lukas Molzberger
  */
-public class BranchProbability implements ActivationStep {
+public class BranchProbability extends Step<Activation> {
+
+    public BranchProbability(Activation element) {
+        super(element);
+    }
 
     @Override
     public Phase getPhase() {
@@ -34,8 +39,8 @@ public class BranchProbability implements ActivationStep {
     }
 
     @Override
-    public void process(Activation act) {
-        act.computeBranchProbability();
+    public void process() {
+        getElement().computeBranchProbability();
     }
 
     public boolean checkIfQueued() {

@@ -45,6 +45,10 @@ public abstract class Linker implements VisitorTask {
 
     public abstract Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir);
 
+    public Direction getDirection() {
+        return direction;
+    }
+
     public Stream<? extends Synapse> getTemplateTargetSynapses(Activation act, Direction dir) {
         return act.getNeuron()
                 .getTemplateGroup().stream()

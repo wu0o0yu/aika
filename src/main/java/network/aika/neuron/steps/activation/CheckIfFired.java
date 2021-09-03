@@ -18,15 +18,22 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class CheckIfFired implements ActivationStep {
+public class CheckIfFired extends Step<Activation> {
+
+    public CheckIfFired(Activation element) {
+        super(element);
+    }
 
     @Override
-    public void process(Activation act) {
+    public void process() {
+        Activation act = getElement();
+
         act.updateValue();
 
         if(!act.checkIfFired())

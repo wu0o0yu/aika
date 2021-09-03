@@ -18,15 +18,17 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 import network.aika.utils.Utils;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class UpdateBias implements ActivationStep {
+public class UpdateBias extends Step<Activation> {
 
-    public UpdateBias(double biasDelta) {
+    public UpdateBias(Activation act, double biasDelta) {
+        super(act);
         this.biasDelta = biasDelta;
     }
 
@@ -42,8 +44,8 @@ public class UpdateBias implements ActivationStep {
     }
 
     @Override
-    public void process(Activation act) {
-        act.getNeuron().updateBias(biasDelta);
+    public void process() {
+        getElement().getNeuron().updateBias(biasDelta);
     }
 
     public String toString() {

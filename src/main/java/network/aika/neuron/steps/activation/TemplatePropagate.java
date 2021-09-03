@@ -19,6 +19,7 @@ package network.aika.neuron.steps.activation;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.tasks.TemplateTask;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
@@ -30,22 +31,18 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class TemplatePropagate extends TemplateTask implements ActivationStep {
+public class TemplatePropagate extends Step<Activation> {
 
-    public static class TemplatePropagateInput extends TemplatePropagate {
-        public TemplatePropagateInput() {
-            super(INPUT);
-        }
+    private TemplateTask task;
+
+    public TemplatePropagate(Activation act, Direction dir) {
+        super(act);
+        task = new TemplateTask(dir);
     }
 
-    public static class TemplateGradientPropagateOutput extends TemplatePropagate {
-        public TemplateGradientPropagateOutput() {
-            super(OUTPUT);
-        }
-    }
-
-    private TemplatePropagate(Direction dir) {
-        super(dir);
+    @Override
+    public String getStepName() {
+        return super.getStepName() + ":" + task.getDirection();
     }
 
     @Override
@@ -58,14 +55,16 @@ public class TemplatePropagate extends TemplateTask implements ActivationStep {
     }
 
     @Override
-    public void process(Activation act) {
+    public void process() {
+        Activation act = getElement();
+
         if (!act.getNeuron().allowTemplatePropagate(act))
             return;
 
-        propagate(act);
+        task.propagate(act);
     }
 
     public String toString() {
-        return "Act-Step: Template-Propagate (" + direction + ")";
+        return "Act-Step: Template-Propagate (" + task + ")";
     }
 }

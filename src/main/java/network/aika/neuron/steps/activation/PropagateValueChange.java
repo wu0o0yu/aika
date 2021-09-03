@@ -18,6 +18,7 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.Step;
 import network.aika.utils.Utils;
 
 /**
@@ -26,7 +27,7 @@ import network.aika.utils.Utils;
  *
  * @author Lukas Molzberger
  */
-public class PropagateValueChange implements ActivationStep {
+public class PropagateValueChange extends Step<Activation> {
 
     private double valueDelta;
 
@@ -39,13 +40,14 @@ public class PropagateValueChange implements ActivationStep {
         return false;
     }
 
-    public PropagateValueChange(double valueDelta) {
+    public PropagateValueChange(Activation act, double valueDelta) {
+        super(act);
         this.valueDelta = valueDelta;
     }
 
     @Override
-    public void process(Activation act) {
-        act.updateOutgoingLinks(valueDelta);
+    public void process() {
+        getElement().updateOutgoingLinks(valueDelta);
     }
 
     public String toString() {

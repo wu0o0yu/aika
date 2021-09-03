@@ -18,17 +18,19 @@ package network.aika.neuron.steps.link;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.QueueEntry;
 import network.aika.neuron.steps.Phase;
-
-import static network.aika.neuron.steps.activation.ActivationStep.UPDATE_SYNAPSE_INPUT_LINKS;
+import network.aika.neuron.steps.Step;
 
 /**
  * Creates a new untrained synapse from a template link.
  *
  * @author Lukas Molzberger
  */
-public class Induction implements LinkStep {
+public class LinkInduction extends Step<Link> {
+
+    public LinkInduction(Link element) {
+        super(element);
+    }
 
     @Override
     public Phase getPhase() {
@@ -40,7 +42,9 @@ public class Induction implements LinkStep {
     }
 
     @Override
-    public void process(Link l) {
+    public void process() {
+        Link l = getElement();
+
         assert l.getSynapse().isTemplate();
 
         Synapse inducedSynapse = l.getSynapse()
@@ -52,7 +56,7 @@ public class Induction implements LinkStep {
         l.setSynapse(inducedSynapse);
         inducedSynapse.linkOutput();
 
-        QueueEntry.add(l, CLEANUP);
+        Step.add(new Cleanup(l));
     }
 
     public String toString() {
