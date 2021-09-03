@@ -31,7 +31,7 @@ public class UpdateSynapseInputLinks implements ActivationStep {
 
     @Override
     public Phase getPhase() {
-        return Phase.LINKING;
+        return Phase.FINAL_LINKING;
     }
 
     public boolean checkIfQueued() {
