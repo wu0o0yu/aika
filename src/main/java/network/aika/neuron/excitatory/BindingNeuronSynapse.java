@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.excitatory;
 
-import network.aika.Model;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
@@ -24,26 +23,15 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
-import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.Visitor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, BindingNeuron> {
-
-    private static final Logger log = LoggerFactory.getLogger(BindingNeuronSynapse.class);
-
 
     @Override
     protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {

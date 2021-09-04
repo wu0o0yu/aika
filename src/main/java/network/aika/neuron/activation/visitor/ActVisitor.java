@@ -25,7 +25,7 @@ import network.aika.neuron.activation.direction.Direction;
  */
 public class ActVisitor extends Visitor {
 
-    private Activation act;
+    private final Activation act;
 
     public ActVisitor(LinkVisitor v, Activation act) {
         super(v);
@@ -47,13 +47,8 @@ public class ActVisitor extends Visitor {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("Current:" + (act != null ? act.toShortString() : "X") + ", ");
-        sb.append("Origin:" + origin.act.toShortString() + ", ");
-
-        sb.append(super.toString());
-
-        return sb.toString();
+        return "Current:" + (act != null ? act.toShortString() : "X") + ", " +
+                "Origin:" + origin.act.toShortString() + ", " +
+                super.toString();
     }
 }

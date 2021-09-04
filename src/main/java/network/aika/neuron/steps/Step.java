@@ -47,6 +47,16 @@ public abstract class Step<E extends Element> implements QueueKey {
         this.timestamp = timestamp;
     }
 
+    public Step copy(Element newElement) {
+        Step newStep = null;
+        try {
+            newStep = (Step) clone();
+        } catch (CloneNotSupportedException e) {
+        }
+        newStep.element = newElement;
+        return newStep;
+    }
+
     public String getStepName() {
         return getClass().getSimpleName();
     }

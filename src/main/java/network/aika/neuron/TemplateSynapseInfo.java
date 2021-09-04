@@ -26,7 +26,6 @@ public class TemplateSynapseInfo {
 
     private String label;
 
-
     public String getLabel() {
         return label;
     }

@@ -29,8 +29,6 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.steps.Step;
 import network.aika.utils.BelowToleranceThresholdException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,22 +38,20 @@ import java.util.stream.Collectors;
  * @author Lukas Molzberger
  */
 public abstract class Thought {
-    private static final Logger log = LoggerFactory.getLogger(Thought.class);
-
     private long timestampOnProcess = 0;
     private long timestampCounter = 0;
     private int activationIdCounter = 0;
 
     private final TreeSet<Step> queue = new TreeSet<>(Step.COMPARATOR);
 
-    private Set<Class<Step>> filters = new TreeSet<>(Comparator.comparing(sc -> sc.getSimpleName()));
+    private final Set<Class<Step>> filters = new TreeSet<>(Comparator.comparing(Class::getSimpleName));
 
-    private TreeMap<Integer, Activation> activationsById = new TreeMap<>();
+    private final TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
     private Map<NeuronProvider, SortedSet<Activation>> actsPerNeuron = null;
 
-    private List<EventListener> eventListeners = new ArrayList<>();
-    private List<VisitorEventListener> visitorEventListeners = new ArrayList<>();
+    private final List<EventListener> eventListeners = new ArrayList<>();
+    private final List<VisitorEventListener> visitorEventListeners = new ArrayList<>();
 
     private Config config;
 
@@ -122,9 +118,7 @@ public abstract class Thought {
     }
 
     public synchronized Collection<EventListener> getEventListeners() {
-        return eventListeners
-                .stream()
-                .collect(Collectors.toList());
+        return new ArrayList<>(eventListeners);
     }
 
     public synchronized void addEventListener(EventListener l) {

@@ -47,8 +47,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public static double BETA_THRESHOLD = 0.95;
 
-    private static final Logger log = LoggerFactory.getLogger(Neuron.class);
-
     volatile long retrievalCount = 0;
 
     private volatile boolean modified;
@@ -261,21 +259,12 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public void addConjunctiveBias(double b, boolean recurrent) {
     }
 
-    public void setBias(double b) {
-        bias += b;
-        limitBias();
-
-        modified = true;
-    }
-
     public void addBias(double biasDelta) {
         bias += biasDelta;
-        limitBias();
-
         modified = true;
     }
 
-    protected void limitBias() {
+    public void limitBias() {
         bias = Math.min(0.0, bias);
     }
 
@@ -285,17 +274,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     public double getRecurrentBias() {
         return 0.0;
-    }
-
-    public double updateBias(double biasDelta) {
-        addBias(biasDelta);
-
-        double finalBias = getBias();
-        if(finalBias > 0.0) {
-            addBias(-finalBias);
-        }
-
-        return biasDelta;
     }
 
     public ReadWriteLock getLock() {
@@ -339,11 +317,9 @@ public abstract class Neuron<S extends Synapse> implements Writable {
                 getFrequency(s.invert(), n) + 1
         );
 
-        double p = dist.inverseCumulativeProbability(
+        return dist.inverseCumulativeProbability(
                 BETA_THRESHOLD
         );
-
-        return p;
     }
 
     public double getFrequency() {
@@ -367,7 +343,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public void suspend() {
     }
 
-    public void updateSynapseInputLinks() {
+    public void updateSynapseInputConnections() {
     }
 
     @Override
@@ -448,7 +424,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public String toDetailedString() {
-        return "n " + getClass().getSimpleName() + " " + toString() + " b:" + Utils.round(bias);
+        return "n " + getClass().getSimpleName() + " " + this + " b:" + Utils.round(bias);
     }
 
     public String statToString() {

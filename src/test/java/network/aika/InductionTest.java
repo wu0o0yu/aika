@@ -54,7 +54,7 @@ public class InductionTest {
         BindingNeuron targetN = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
         targetN.setLabel("OUT-Target");
 
-        targetN.setBias(0.0);
+        targetN.addBias(0.0);
         targetN.setDirectConjunctiveBias(0.0);
         targetN.setRecurrentConjunctiveBias(0.0);
 

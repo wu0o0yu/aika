@@ -21,7 +21,7 @@ import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
-import network.aika.neuron.steps.activation.UpdateSynapseInputLinks;
+import network.aika.neuron.steps.activation.PostTraining;
 import network.aika.utils.Utils;
 
 import static network.aika.neuron.activation.Activation.INCOMING;
@@ -36,7 +36,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class PropagateGradientAndUpdateWeight extends Step<Link> {
 
-    private double[] gradient;
+    private final double[] gradient;
 
     public PropagateGradientAndUpdateWeight(Link l, double[] gradient) {
         super(l);
@@ -73,7 +73,7 @@ public class PropagateGradientAndUpdateWeight extends Step<Link> {
                 if(l.getOutput().getFired() != Fired.NOT_FIRED)
                     Step.add(new Template(l, OUTPUT));
             }
-            Step.add(new UpdateSynapseInputLinks(l.getOutput()));
+            Step.add(new PostTraining(l.getOutput()));
         }
 
         s.propagateGradient(l, gradient);

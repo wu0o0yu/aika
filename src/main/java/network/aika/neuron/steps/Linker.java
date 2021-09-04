@@ -52,9 +52,7 @@ public abstract class Linker implements VisitorTask {
     public Stream<? extends Synapse> getTemplateTargetSynapses(Activation act, Direction dir) {
         return act.getNeuron()
                 .getTemplateGroup().stream()
-                .flatMap(tn ->
-                        dir.getSynapses(tn)
-                );
+                .flatMap(dir::getSynapses);
     }
 
     protected abstract boolean exists(Activation act, Synapse s);

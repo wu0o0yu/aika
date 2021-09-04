@@ -160,7 +160,7 @@ public class TextModel extends Model {
         initRecurrentSamePatternSynapse(in, inRel);
         initRelatedInputSynapse(inRel, inhib, b);
 
-        inRel.setBias(4.0);
+        inRel.addBias(4.0);
         inRel.setAllowTraining(false);
     }
 

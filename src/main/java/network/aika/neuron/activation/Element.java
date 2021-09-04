@@ -62,7 +62,7 @@ public abstract class Element<E extends Element> implements Comparable<E> {
 
     public void copyPhases(Element newElement) {
         queuedPhases.values().stream().forEach(s ->
-                Step.add(s)
+                Step.add(s.copy(newElement))
         );
     }
 

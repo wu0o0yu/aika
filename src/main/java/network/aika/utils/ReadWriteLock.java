@@ -29,7 +29,7 @@ public class ReadWriteLock {
     private int waitForReadLock = 0;
     private int waitForWriteLock = 0;
 
-    private Object writeLock = new Object();
+    private final Object writeLock = new Object();
 
     public void acquireWriteLock() {
         try {

@@ -33,7 +33,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class Template extends Step<Link> {
 
-    private TemplateTask task;
+    private final TemplateTask task;
 
     public Template(Link l, Direction dir) {
         super(l);

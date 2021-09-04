@@ -33,8 +33,6 @@ import java.io.IOException;
  */
 public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
-    private static final Logger log = LoggerFactory.getLogger(PatternNeuron.class);
-
     private String tokenLabel;
 
     public PatternNeuron() {

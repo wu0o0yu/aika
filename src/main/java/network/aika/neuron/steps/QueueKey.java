@@ -26,8 +26,8 @@ public interface QueueKey {
     long getTimeStamp();
 
     class DummyStep implements QueueKey {
-        private Step s;
-        private long timestamp;
+        private final Step s;
+        private final long timestamp;
 
         public DummyStep(Step s, long timestamp) {
             this.s = s;

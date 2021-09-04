@@ -23,17 +23,11 @@ import network.aika.neuron.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.utils.Writable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -46,18 +40,16 @@ import java.util.stream.Stream;
  */
 public abstract class Model implements Writable {
 
-    private static final Logger log = LoggerFactory.getLogger(Model.class);
-
     private long N = 0;
 
     private SuspensionCallback suspensionCallback;
-    private AtomicLong retrievalCounter = new AtomicLong(0);
+    private final AtomicLong retrievalCounter = new AtomicLong(0);
 
     // Important: the id field needs to be referenced by the provider!
-    private WeakHashMap<Long, WeakReference<NeuronProvider>> providers = new WeakHashMap<>();
-    public Map<Long, NeuronProvider> activeProviders = new TreeMap<>();
+    private final WeakHashMap<Long, WeakReference<NeuronProvider>> providers = new WeakHashMap<>();
+    public final Map<Long, NeuronProvider> activeProviders = new TreeMap<>();
 
-    private Templates templates = new Templates(this);
+    private final Templates templates = new Templates(this);
 
     private Supplier<Writable> customDataInstanceSupplier;
 
@@ -106,10 +98,7 @@ public abstract class Model implements Writable {
     }
 
     public Collection<NeuronProvider> getActiveNeurons() {
-        return activeProviders
-                .values()
-                .stream()
-                .collect(Collectors.toList());
+        return new ArrayList<>(activeProviders.values());
     }
 
     public NeuronProvider lookupNeuronProvider(String tokenLabel, NeuronProducer onNewCallback) {
@@ -138,9 +127,7 @@ public abstract class Model implements Writable {
     public Stream<NeuronProvider> getAllNeurons() {
         return suspensionCallback
                 .getAllIds().stream()
-                .map(id ->
-                        lookupNeuron(id)
-                );
+                .map(this::lookupNeuron);
     }
 
     public void applyMovingAverage(Config trainingConfig) {
@@ -197,13 +184,11 @@ public abstract class Model implements Writable {
         suspendUnusedNeurons(Integer.MAX_VALUE, sm);
     }
 
-    private boolean suspend(long retrievalCount, NeuronProvider p, SuspensionMode sm) {
+    private void suspend(long retrievalCount, NeuronProvider p, SuspensionMode sm) {
         Neuron an = p.getIfNotSuspended();
         if (an != null && an.getRetrievalCount() < retrievalCount) {
             p.suspend(sm);
-            return true;
         }
-        return false;
     }
 
     public void registerWeakReference(NeuronProvider p) {
@@ -250,13 +235,11 @@ public abstract class Model implements Writable {
     }
 
     public String statToString() {
-        StringBuilder sb = new StringBuilder();
-        providers.values().stream()
-                .map(n -> n.get())
-                .map(n -> n.getNeuron())
-                .forEach(n -> sb.append(n.statToString() + "\n"));
-
-        return sb.toString();
+        return providers.values().stream()
+                .map(Reference::get)
+                .map(NeuronProvider::getNeuron)
+                .map(n -> n.statToString() + "\n")
+                .collect(Collectors.joining());
     }
 
     public String toString() {

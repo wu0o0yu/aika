@@ -23,17 +23,15 @@ import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.LinkVisitor;
 import network.aika.neuron.activation.visitor.Scope;
 import network.aika.neuron.sign.Sign;
-import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.link.AddLink;
 import network.aika.utils.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 
 import static network.aika.callbacks.VisitorEvent.AFTER;
 import static network.aika.callbacks.VisitorEvent.BEFORE;
 import static network.aika.neuron.sign.Sign.POS;
+import static network.aika.neuron.steps.Step.*;
 
 /**
  *
@@ -41,18 +39,16 @@ import static network.aika.neuron.sign.Sign.POS;
  */
 public class Link extends Element<Link> {
 
-    private static final Logger log = LoggerFactory.getLogger(Link.class);
-
     public static final Comparator<Link> COMPARE = Comparator.
             <Link, Activation>comparing(l -> l.output)
             .thenComparing(l -> l.input);
 
     private Synapse synapse;
 
-    private Activation input;
-    private Activation output;
+    private final Activation input;
+    private final Activation output;
 
-    private boolean isSelfRef;
+    private final boolean isSelfRef;
 
     private double lastIGGradient;
 
@@ -62,7 +58,7 @@ public class Link extends Element<Link> {
         this.output = output;
         this.isSelfRef = isSelfRef;
 
-        Step.add(new AddLink(this));
+        add(new AddLink(this));
 
         getSynapse().updateReference(this);
 

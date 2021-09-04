@@ -32,7 +32,7 @@ import network.aika.utils.Utils;
  */
 public class SumUpLink extends Step<Link> {
 
-    private double delta;
+    private final double delta;
 
     public SumUpLink(Link l, double delta) {
         super(l);

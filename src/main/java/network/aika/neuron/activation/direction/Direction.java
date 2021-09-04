@@ -52,8 +52,8 @@ public interface Direction {
 
     static int compare(Direction a, Direction b) {
         if(a == b) return 0;
-        if(a == null && b != null) return -1;
-        if(a != null && b == null) return 1;
+        if(a == null) return -1;
+        if(b == null) return 1;
         if(a == INPUT && b == OUTPUT) return -1;
         if(a == OUTPUT && b == INPUT) return 1;
         throw new IllegalStateException();

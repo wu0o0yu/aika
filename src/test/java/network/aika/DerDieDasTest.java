@@ -33,7 +33,7 @@ public class DerDieDasTest {
         PatternNeuron out = t.SAME_PATTERN_TEMPLATE.instantiateTemplate(true);
         out.setTokenLabel(token);
         out.setLabel("P-" + token);
-        out.setBias(0.1);
+        out.addBias(0.1);
 
         BindingNeuron prevPPN = null;
 
@@ -118,7 +118,7 @@ public class DerDieDasTest {
             s.addWeight(0.1);
             ppN.addConjunctiveBias(-0.1, true);
         }
-        ppN.setBias(0.1);
+        ppN.addBias(0.1);
     }
 
     public BindingNeuron lookupPPPT(PatternNeuron pn) {

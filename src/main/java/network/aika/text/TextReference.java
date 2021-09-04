@@ -26,9 +26,9 @@ import network.aika.neuron.activation.Reference;
  */
 public class TextReference implements Reference {
 
-    private Document doc;
-    private int begin;
-    private int end;
+    private final Document doc;
+    private final int begin;
+    private final int end;
 
     private TextReference previous;
     private TextReference next;

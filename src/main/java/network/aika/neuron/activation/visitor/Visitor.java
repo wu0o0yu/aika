@@ -73,14 +73,6 @@ public abstract class Visitor {
         return currentDir;
     }
 
-    public int getDownSteps() {
-        return downSteps;
-    }
-
-    public int getUpSteps() {
-        return upSteps;
-    }
-
     public Scope getScope() {
         return scope;
     }
@@ -123,13 +115,8 @@ public abstract class Visitor {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("DownUp:" + currentDir + ", ");
-        sb.append("StartDir:" + startDir + ", ");
-
-        sb.append("Steps: (down:" + downSteps + "), (up:" + upSteps + "), (scope:" + scope + ")");
-
-        return sb.toString();
+        return "DownUp:" + currentDir + ", " +
+                "StartDir:" + startDir + ", " +
+                "Steps: (down:" + downSteps + "), (up:" + upSteps + "), (scope:" + scope + ")";
     }
 }

@@ -32,7 +32,7 @@ public class UpdateBias extends Step<Activation> {
         this.biasDelta = biasDelta;
     }
 
-    private double biasDelta;
+    private final double biasDelta;
 
     @Override
     public Phase getPhase() {
@@ -45,7 +45,12 @@ public class UpdateBias extends Step<Activation> {
 
     @Override
     public void process() {
-        getElement().getNeuron().updateBias(biasDelta);
+        getElement()
+                .getNeuron()
+                .addBias(biasDelta);
+
+        if(biasDelta > 0.0)
+            Step.add(new PostTraining(getElement()));
     }
 
     public String toString() {

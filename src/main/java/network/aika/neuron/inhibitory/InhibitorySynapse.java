@@ -42,7 +42,7 @@ public abstract class InhibitorySynapse<I extends Neuron<?>> extends Synapse<I, 
 
     @Override
     public Synapse getConcreteSynapse(Neuron<?> in, Neuron<?> on) {
-        if(in.getTemplate().getId() != input.getId())
+        if(in.getTemplate().getId().intValue() != input.getId().intValue())
             return null;
 
         Synapse cs = in.getOutputSynapse(on.getProvider());

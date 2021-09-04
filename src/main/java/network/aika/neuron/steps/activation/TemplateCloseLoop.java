@@ -33,7 +33,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class TemplateCloseLoop extends Step<Activation> {
 
-    private TemplateTask task;
+    private final TemplateTask task;
 
     public TemplateCloseLoop(Activation act, Direction dir) {
         super(act);

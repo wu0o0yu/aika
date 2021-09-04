@@ -31,7 +31,7 @@ import network.aika.neuron.steps.tasks.LinkingTask;
  */
 public class Linking extends Step<Link> {
 
-    private LinkingTask task;
+    private final LinkingTask task;
 
     public Linking(Link l, Direction dir) {
         super(l);

@@ -27,7 +27,7 @@ import network.aika.utils.Utils;
  */
 public class SumUpBias extends Step<Activation> {
 
-    private double delta;
+    private final double delta;
 
     public SumUpBias(Activation act, double delta) {
         super(act);

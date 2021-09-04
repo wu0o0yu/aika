@@ -39,7 +39,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class Propagate extends Step<Activation> {
 
-    private LinkingTask task = new LinkingTask(OUTPUT);
+    private final LinkingTask task = new LinkingTask(OUTPUT);
 
     public Propagate(Activation act) {
         super(act);

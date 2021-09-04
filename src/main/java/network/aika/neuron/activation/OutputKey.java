@@ -30,8 +30,8 @@ public class OutputKey {
             .<OutputKey, NeuronProvider>comparing(ok -> ok.n)
             .thenComparingInt(ok -> ok.actId);
 
-    private NeuronProvider n;
-    private Integer actId;
+    private final NeuronProvider n;
+    private final Integer actId;
 
     public OutputKey(NeuronProvider n, Integer actId) {
         this.n = n;

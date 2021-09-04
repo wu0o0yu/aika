@@ -50,13 +50,8 @@ public class LinkVisitor extends Visitor {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("Current:" + (link != null ? link : "X") + ", ");
-        sb.append("Origin:" + origin.getActivation().toShortString() + ", ");
-
-        sb.append(super.toString());
-
-        return sb.toString();
+        return "Current:" + (link != null ? link : "X") + ", " +
+                "Origin:" + origin.getActivation().toShortString() + ", " +
+                super.toString();
     }
 }

@@ -20,6 +20,7 @@ import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
 
 /**
@@ -52,7 +53,7 @@ public class Document extends Thought {
             ref.nextTokenIAct = act;
             ref.nextTokenBAct = act.getInputLinks()
                     .findAny()
-                    .map(l -> l.getInput())
+                    .map(Link::getInput)
                     .orElse(null);
         }
     }
@@ -90,13 +91,11 @@ public class Document extends Thought {
     }
 
     public Activation addInput(Neuron n, int begin, int end) {
-        //TODO:
-        return null;
+        return addInput(n, new TextReference(this, begin, end));
     }
 
     public Activation addInput(NeuronProvider n, int begin, int end) {
-        //TODO:
-        return null;
+        return addInput(n.getNeuron(), begin, end);
     }
 
     public Activation addInput(Neuron n, Reference ref) {

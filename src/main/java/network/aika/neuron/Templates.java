@@ -32,7 +32,7 @@ import java.util.*;
 public class Templates {
 
 
-    private Model model;
+    private final Model model;
 
     public BindingNeuron INPUT_BINDING_TEMPLATE = new BindingNeuron();
     public BindingNeuron SAME_BINDING_TEMPLATE = new BindingNeuron();
@@ -52,8 +52,8 @@ public class Templates {
     public PrimaryInhibitorySynapse PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE;
     public RegularInhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE;
 
-    private Map<Byte, Neuron> templateNeuronIndex = new TreeMap<>();
-    private Map<Byte, Synapse> templateSynapseIndex = new TreeMap<>();
+    private final Map<Byte, Neuron> templateNeuronIndex = new TreeMap<>();
+    private final Map<Byte, Synapse> templateSynapseIndex = new TreeMap<>();
 
     public Templates(Model m) {
         model = m;
@@ -176,7 +176,7 @@ public class Templates {
         );
     }
 
-    private <N extends Neuron> N init(N n, int id, String label, Scope s, double x, double y) {
+    private <N extends Neuron> void init(N n, int id, String label, Scope s, double x, double y) {
         NeuronProvider np = new NeuronProvider(model, id);
         templateNeuronIndex.put((byte) id, n);
         np.setNeuron(n);
@@ -187,7 +187,6 @@ public class Templates {
         templateInfo.setYCoord(y);
         templateInfo.setLabel(label);
         templateInfo.setScope(s);
-        return n;
     }
 
     private <S extends Synapse> S init(S ts, Neuron input, Neuron output, String templateLabel, int templateSynapseId) {
@@ -206,10 +205,10 @@ public class Templates {
     }
 
     public Neuron getTemplateNeuron(byte templateNeuronId) {
-        return templateNeuronIndex.get(Byte.valueOf(templateNeuronId));
+        return templateNeuronIndex.get(templateNeuronId);
     }
 
     public Synapse getTemplateSynapse(byte templateSynapseId) {
-        return templateSynapseIndex.get(Byte.valueOf(templateSynapseId));
+        return templateSynapseIndex.get(templateSynapseId);
     }
 }

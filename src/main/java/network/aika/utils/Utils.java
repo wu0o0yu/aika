@@ -76,22 +76,4 @@ public class Utils {
     public static double round(double x) {
         return Math.round(x * 1000.0) / 1000.0;
     }
-
-    public static String collapseText(String txt, int length) {
-        if (txt.length() <= 2 * length) {
-            return txt;
-        } else {
-            return txt.substring(0, length) + "..." + txt.substring(txt.length() - length);
-        }
-    }
-
-    public static String addPadding(String s, int targetSize) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(s);
-        for(int i = s.length(); i < targetSize; i++) {
-            sb.append(' ');
-        }
-
-        return sb.toString();
-    }
 }

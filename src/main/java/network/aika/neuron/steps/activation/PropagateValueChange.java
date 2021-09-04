@@ -29,7 +29,7 @@ import network.aika.utils.Utils;
  */
 public class PropagateValueChange extends Step<Activation> {
 
-    private double valueDelta;
+    private final double valueDelta;
 
     @Override
     public Phase getPhase() {

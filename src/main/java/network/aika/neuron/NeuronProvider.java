@@ -36,7 +36,7 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
     public static final NeuronProvider MAX_NEURON = new NeuronProvider(Long.MAX_VALUE);
 
     private Model model;
-    private Long id;
+    private final Long id;
 
     private volatile Neuron neuron;
 
@@ -164,7 +164,7 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
 
     @Override
     public boolean equals(Object o) {
-        return id == ((NeuronProvider) o).id;
+        return id.intValue() == ((NeuronProvider) o).id.intValue();
     }
 
     @Override

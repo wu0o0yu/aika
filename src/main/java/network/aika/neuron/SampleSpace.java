@@ -37,8 +37,7 @@ public class SampleSpace implements Writable {
 
     private static final Logger log = LoggerFactory.getLogger(SampleSpace.class);
 
-
-    private Model m;
+    private final Model m;
     private double N = 0;
     private Long lastPos;
 

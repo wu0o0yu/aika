@@ -50,7 +50,7 @@ public class PropagateTest {
         s.linkOutput();
         s.addWeight(10.0);
         out.addConjunctiveBias(-10.0, false);
-        out.setBias(1.0);
+        out.addBias(1.0);
 
         Document doc = new Document("test");
 

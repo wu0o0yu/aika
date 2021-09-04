@@ -22,8 +22,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.steps.tasks.AlternateBranchTask;
 import network.aika.utils.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -32,7 +30,6 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  * @author Lukas Molzberger
  */
 public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
-    private static final Logger log = LoggerFactory.getLogger(BindingNeuron.class);
 
     public BindingNeuron() {
         super();

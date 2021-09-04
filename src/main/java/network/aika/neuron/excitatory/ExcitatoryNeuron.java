@@ -25,14 +25,13 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 
@@ -41,8 +40,6 @@ import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGEN
  * @author Lukas Molzberger
  */
 public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neuron<S> {
-
-    private static final Logger log = LoggerFactory.getLogger(ExcitatoryNeuron.class);
 
     private volatile double directConjunctiveBias;
     private volatile double recurrentConjunctiveBias;
@@ -80,10 +77,9 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         } else {
             directConjunctiveBias += b;
         }
-        limitBias();
     }
 
-    protected void limitBias() {
+    public void limitBias() {
         bias = Math.min(-directConjunctiveBias, bias);
     }
 
@@ -114,19 +110,23 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         return recurrentConjunctiveBias;
     }
 
-    public void updateSynapseInputLinks() {
+    public void updateSynapseInputConnections() {
         TreeSet<Synapse> sortedSynapses = new TreeSet<>(
-                Comparator.<Synapse>comparingDouble(s -> s.getWeight()).reversed()
-                        .thenComparing(s -> s.getPInput())
+                Comparator.<Synapse>comparingDouble(Synapse::getWeight).reversed()
+                        .thenComparing(Synapse::getPInput)
         );
 
         sortedSynapses.addAll(inputSynapses.values());
 
         double sum = super.getBias();
         for(Synapse s: sortedSynapses) {
-            if(s.getWeight() <= 0.0) break;
+            if(s.getWeight() <= 0.0)
+                break;
 
-            s.updateInputLink(sum > 0.0);
+            if(sum > 0.0)
+                s.linkInput();
+            else
+                s.unlinkInput();
 
             sum -= s.getWeight();
         }
@@ -161,38 +161,31 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
     }
 
     public String statToString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(super.statToString());
-
-        sb.append(inStatToString());
-        sb.append(outStatToString());
-
-        return sb.toString();
+        return super.statToString() +
+                inStatToString() +
+                outStatToString();
     }
 
     public String inStatToString() {
-        StringBuilder sb = new StringBuilder();
-        inputSynapses.values().forEach(s ->
-                sb.append("  in " +
+        return inputSynapses.values().stream()
+                .map(s ->
+                        "  in " +
                         s.getInput().getId() +
                         ":" + s.getInput().getLabel() +
                         " " + s.statToString()
                 )
-        );
-        return sb.toString();
+                .collect(Collectors.joining());
     }
 
     public String outStatToString() {
-        StringBuilder sb = new StringBuilder();
-        outputSynapses.values().stream()
+        return outputSynapses.values().stream()
                 .filter(s -> s instanceof InhibitorySynapse)
-                .forEach(s ->
-                        sb.append("  out " +
-                                s.getOutput().getId() +
-                                ":" + s.getOutput().getLabel() +
-                                "  " + s.statToString())
-                );
-        return sb.toString();
+                .map(s ->
+                        "  out " +
+                        s.getOutput().getId() +
+                        ":" + s.getOutput().getLabel() +
+                        "  " + s.statToString()
+                )
+                .collect(Collectors.joining());
     }
 }

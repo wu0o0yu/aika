@@ -59,7 +59,7 @@ public class Activation extends Element<Activation> {
     private Fired fired = NOT_FIRED;
     private boolean marked;
 
-    private int id;
+    private final int id;
     private Neuron<?> neuron;
     private Thought thought;
 
@@ -68,7 +68,7 @@ public class Activation extends Element<Activation> {
     Map<NeuronProvider, Link> inputLinks;
     NavigableMap<OutputKey, Link> outputLinks;
 
-    private Set<Activation> branches = new TreeSet<>();
+    private final Set<Activation> branches = new TreeSet<>();
     private Activation mainBranch;
 
     private Reference reference;
@@ -77,13 +77,13 @@ public class Activation extends Element<Activation> {
     public final static int INCOMING = 1;
 
     private double lastEntropyGradient = 0.0;
-    private double inputGradient[] = new double[2];
+    private double[] inputGradient = new double[2];
 
     /**
      * Accumulates all gradients in case a new link is added that needs be get informed about the gradient.
      */
-    private double outputGradientSum[];
-    private double inputGradientSum[];
+    private double[] outputGradientSum;
+    private double[] inputGradientSum;
 
     public boolean markedNetUpdateOccurred; // Temporary hack
 
@@ -322,7 +322,7 @@ public class Activation extends Element<Activation> {
 
     public boolean templateLinkExists(Direction dir, Synapse ts) {
         return dir.getLinks(this)
-                .map(l -> l.getSynapse())
+                .map(Link::getSynapse)
                 .anyMatch(s -> s.isOfTemplate(ts));
     }
 
@@ -423,7 +423,7 @@ public class Activation extends Element<Activation> {
             Step.add(new BranchProbability(this));
 
         Step.add(new Counting(this));
-        addLinksToQueue(INPUT, l -> new LinkCounting(l));
+        addLinksToQueue(INPUT, LinkCounting::new);
 
         if(Utils.belowTolerance(outputGradientSum))
             return;
@@ -498,25 +498,25 @@ public class Activation extends Element<Activation> {
     public void linkInputs() {
         inputLinks
                 .values()
-                .forEach(l -> l.linkInput());
+                .forEach(Link::linkInput);
     }
 
     public void unlinkInputs() {
         inputLinks
                 .values()
-                .forEach(l -> l.unlinkInput());
+                .forEach(Link::unlinkInput);
     }
 
     public void linkOutputs() {
         outputLinks
                 .values()
-                .forEach(l -> l.linkOutput());
+                .forEach(Link::linkOutput);
     }
 
     public void unlinkOutputs() {
         outputLinks
                 .values()
-                .forEach(l -> l.unlinkOutput());
+                .forEach(Link::unlinkOutput);
     }
 
     public void link() {
@@ -532,10 +532,10 @@ public class Activation extends Element<Activation> {
     public void computeBranchProbability() {
         Set<Activation> conflictingActs = branches
                 .stream()
-                .flatMap(bAct -> bAct.getInputLinks())
-                .filter(l -> l.isNegative())
+                .flatMap(Activation::getInputLinks)
+                .filter(Link::isNegative)
                 .flatMap(l -> l.getInput().getInputLinks())  // Walk through to the inhib. Activation.
-                .map(l -> l.getInput())
+                .map(Link::getInput)
                 .collect(Collectors.toSet());
 
         double offset = conflictingActs
@@ -587,11 +587,10 @@ public class Activation extends Element<Activation> {
         StringBuilder sb = new StringBuilder();
 
         inputLinks.values()
-                .forEach(l ->
-                        sb.append(
-                                l.gradientsToString() + " \n"
-                        )
-                );
+                .forEach(l -> {
+                    sb.append(l.gradientsToString());
+                    sb.append(" \n");
+                });
 
         sb.append("\n");
         return sb.toString();
@@ -603,12 +602,11 @@ public class Activation extends Element<Activation> {
 
     public String toString(boolean includeLink) {
         StringBuilder sb = new StringBuilder();
-        sb.append("act " +
-                toShortString() +
-                " value:" + (value != null ? Utils.round(value) : "X") +
-                " net:" + Utils.round(net) +
-                " bp:" + Utils.round(branchProbability)
-        );
+        sb.append("act ");
+        sb.append(toShortString());
+        sb.append(" value:" + (value != null ? Utils.round(value) : "X"));
+        sb.append(" net:" + Utils.round(net));
+        sb.append(" bp:" + Utils.round(branchProbability));
 
         if (includeLink) {
             sb.append("\n");

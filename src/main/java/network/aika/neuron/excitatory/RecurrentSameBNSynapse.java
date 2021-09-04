@@ -83,14 +83,9 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
     }
 
     public boolean checkTemplatePropagate(Direction dir, Activation act) {
-        if (dir == INPUT && act.getNeuron().isInputNeuron()) {
+        if (dir == INPUT && act.getNeuron().isInputNeuron())
             return false;
-        }
 
-        if(dir == OUTPUT) {
-            return false;
-        }
-
-        return true;
+        return dir != OUTPUT;
     }
 }

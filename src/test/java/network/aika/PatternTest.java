@@ -102,7 +102,7 @@ public class PatternTest {
                 s.setWeight(10.0);
                 eA.addConjunctiveBias(-10.0, true);
             }
-            eA.setBias(4.0);
+            eA.addBias(4.0);
         }
 
         {
@@ -138,7 +138,7 @@ public class PatternTest {
                 s.addWeight(10.0);
                 eB.addConjunctiveBias(-10.0, true);
             }
-            eB.setBias(4.0);
+            eB.addBias(4.0);
         }
 
         {
@@ -174,7 +174,7 @@ public class PatternTest {
                 s.addWeight(10.0);
                 eC.addConjunctiveBias(-10.0, true);
             }
-            eC.setBias(4.0);
+            eC.addBias(4.0);
         }
 
         {
@@ -202,7 +202,7 @@ public class PatternTest {
                 s.addWeight(10.0);
                 out.addConjunctiveBias(-10.0, false);
             }
-            out.setBias(4.0);
+            out.addBias(4.0);
         }
         return m;
     }
