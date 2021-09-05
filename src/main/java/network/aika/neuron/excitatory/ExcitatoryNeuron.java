@@ -62,25 +62,25 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         n.recurrentConjunctiveBias = recurrentConjunctiveBias;
     }
 
-    public void setDirectConjunctiveBias(double b) {
-        directConjunctiveBias = b;
-        limitBias();
-    }
-
-    public void setRecurrentConjunctiveBias(double b) {
-        recurrentConjunctiveBias = b;
-    }
-
     public void addConjunctiveBias(double b, boolean recurrent) {
-        if(recurrent) {
+        if(recurrent)
             recurrentConjunctiveBias += b;
-        } else {
+        else
             directConjunctiveBias += b;
-        }
     }
 
     public void limitBias() {
-        bias = Math.min(-directConjunctiveBias, bias);
+        double weightSum = inputSynapses
+                .values()
+                .stream()
+                .filter(s -> !s.isRecurrent())
+                .mapToDouble(s -> s.getWeight())
+                .sum();
+
+        bias = Math.min(weightSum, bias);
+
+        if(bias + directConjunctiveBias > 0.0)
+            directConjunctiveBias = -bias;
     }
 
     public void addDummyLinks(Activation act) {

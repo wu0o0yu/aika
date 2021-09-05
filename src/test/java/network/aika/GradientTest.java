@@ -30,7 +30,7 @@ public class GradientTest {
 
         processDoc(m, doc);
 
-        m.getTemplates().SAME_BINDING_TEMPLATE.setDirectConjunctiveBias(-0.32);
+        m.getTemplates().SAME_BINDING_TEMPLATE.addConjunctiveBias(-0.32, false);
 
         Neuron nA = m.getNeuron("A");
         nA.setFrequency(53.0);
@@ -69,7 +69,7 @@ public class GradientTest {
 
         processDoc(m, doc);
 
-        m.getTemplates().SAME_BINDING_TEMPLATE.setDirectConjunctiveBias(-0.32);
+        m.getTemplates().SAME_BINDING_TEMPLATE.addConjunctiveBias(-0.32, false);
 
         Neuron nA = m.getNeuron("A");
         nA.setFrequency(53.0);
@@ -102,7 +102,7 @@ public class GradientTest {
         TextModel m = new TextModel();
 
         m.setN(912);
-        m.getTemplates().SAME_BINDING_TEMPLATE.setDirectConjunctiveBias(-0.32);
+        m.getTemplates().SAME_BINDING_TEMPLATE.addConjunctiveBias(-0.32, false);
         m.init();
 
         Document doc1 = new Document("A B ");
