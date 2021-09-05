@@ -69,6 +69,10 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
             directConjunctiveBias += b;
     }
 
+    /**
+     * If the complete bias exceeds the threshold of 0 by itself, the neuron would become constantly active. The training
+     * should account for that and reduce the bias back to a level, where the neuron can be blocked again by its input synapses.
+     */
     public void limitBias() {
         double weightSum = inputSynapses
                 .values()
