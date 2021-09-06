@@ -24,7 +24,7 @@ import java.util.Comparator;
 /**
  * @author Lukas Molzberger
  */
-public abstract class Step<E extends Element> implements QueueKey {
+public abstract class Step<E extends Element> implements QueueKey, Cloneable {
 
     public static final Comparator<Step> COMPARATOR = Comparator
             .<Step>comparingInt(s -> s.getPhase().ordinal())

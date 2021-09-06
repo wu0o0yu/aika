@@ -73,6 +73,14 @@ public abstract class Visitor {
         return currentDir;
     }
 
+    public int getDownSteps() {
+        return downSteps;
+    }
+
+    public int getUpSteps() {
+        return upSteps;
+    }
+
     public Scope getScope() {
         return scope;
     }

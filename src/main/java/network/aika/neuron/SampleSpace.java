@@ -69,7 +69,7 @@ public class SampleSpace implements Writable {
         N += getNegativeInstancesSinceLastPos(ref);
 
         Long newPos = getAbsoluteEnd(m, ref);
-        assert lastPos == null || newPos > lastPos;
+   //     assert lastPos == null || newPos > lastPos;
 
         lastPos = newPos;
     }
