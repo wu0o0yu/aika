@@ -74,17 +74,24 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
      * should account for that and reduce the bias back to a level, where the neuron can be blocked again by its input synapses.
      */
     public void limitBias() {
-        double weightSum = inputSynapses
+        double weightSumDirect = getWeightsSum(false);
+        double weightSumRecurrent = getWeightsSum(true);
+
+        bias = Math.min(weightSumDirect + weightSumRecurrent, bias);
+
+        if(bias + directConjunctiveBias + recurrentConjunctiveBias > 0.0) {
+            directConjunctiveBias = Math.max(-weightSumDirect, -bias);
+            recurrentConjunctiveBias = Math.max(-weightSumRecurrent, -bias);
+        }
+    }
+
+    private double getWeightsSum(boolean recurrent) {
+        return inputSynapses
                 .values()
                 .stream()
-                .filter(s -> !s.isRecurrent())
+                .filter(s -> s.isRecurrent() == recurrent)
                 .mapToDouble(s -> s.getWeight())
                 .sum();
-
-        bias = Math.min(weightSum, bias);
-
-        if(bias + directConjunctiveBias > 0.0)
-            directConjunctiveBias = -bias;
     }
 
     public void addDummyLinks(Activation act) {
