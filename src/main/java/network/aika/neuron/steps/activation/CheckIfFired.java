@@ -19,6 +19,12 @@ package network.aika.neuron.steps.activation;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.link.LinkCounting;
+import network.aika.utils.Utils;
+
+import static network.aika.neuron.activation.Fired.NOT_FIRED;
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
@@ -40,10 +46,31 @@ public class CheckIfFired extends Step<Activation> {
 
         act.updateValue();
 
-        if(!act.checkIfFired())
+        if (act.getFired() != NOT_FIRED || act.getValue(0.0) <= 0.0)
             return;
 
-        act.propagate();
+        act.setFired();
+        propagate(act);
+        EntropyGradient.add(this);
+    }
+
+    public static void propagate(Activation act) {
+        Linking.add(act);
+        Propagate.add(act);
+        SetFinalMode.add(act);
+
+        BranchProbability.add(act);
+
+        Counting.add(act);
+        act.getInputLinks().forEach(l -> LinkCounting.add(l));
+
+        if(Utils.belowTolerance(act.getOutputGradientSum()))
+            return;
+
+        TemplatePropagate.add(act, INPUT);
+
+        TemplateCloseLoop.add(act, OUTPUT);
+        TemplatePropagate.add(act, OUTPUT);
     }
 
     @Override

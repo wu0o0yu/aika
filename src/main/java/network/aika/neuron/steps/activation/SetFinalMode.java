@@ -25,7 +25,7 @@ import network.aika.neuron.steps.Step;
  *
  * @author Lukas Molzberger
  */
-public class SetFinalMode extends Step<Activation> {
+public class SetFinalMode extends UpdateNet {
 
     public static void add(Activation act) {
         if(act.isFinalMode())
@@ -52,9 +52,7 @@ public class SetFinalMode extends Step<Activation> {
         Activation act = getElement();
 
         act.setFinalMode(true);
-        act.updateNet(
-                act.getNeuron().getRecurrentBias()
-        );
+        updateNet(act.getNeuron().getRecurrentBias());
 
         act.updateValue();
     }

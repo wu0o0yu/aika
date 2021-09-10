@@ -22,6 +22,7 @@ import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.activation.CheckIfFired;
 import network.aika.neuron.steps.activation.PropagateGradientsNet;
+import network.aika.neuron.steps.activation.UpdateNet;
 import network.aika.utils.Utils;
 
 import static network.aika.neuron.sign.Sign.POS;
@@ -59,12 +60,7 @@ public class SumUpLink extends Step<Link> {
 
     @Override
     public void process() {
-        getElement().sumUpLink(delta);
-
-        Activation oAct = getElement().getOutput();
-
-        PropagateGradientsNet.add(oAct);
-        CheckIfFired.add(oAct);
+        UpdateNet.updateNet(getElement().getOutput(), delta);
     }
 
     public String toString() {

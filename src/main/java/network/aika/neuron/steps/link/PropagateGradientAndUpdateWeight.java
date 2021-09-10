@@ -85,7 +85,7 @@ public class PropagateGradientAndUpdateWeight extends Step<Link> {
             Linking.add(l);
             Template.add(l);
         }
-        Step.add(new PostTraining(l.getOutput()));
+        PostTraining.add(l.getOutput());
 
         s.propagateGradient(l, gradient);
     }

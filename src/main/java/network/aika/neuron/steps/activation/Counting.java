@@ -43,7 +43,12 @@ public class Counting extends Step<Activation> {
 
     @Override
     public void process() {
-        getElement().getNeuron().count(getElement());
+        Activation act = getElement();
+
+        if(!act.isActive(false))
+            return;
+
+        act.getNeuron().count(act);
     }
 
     public boolean checkIfQueued() {

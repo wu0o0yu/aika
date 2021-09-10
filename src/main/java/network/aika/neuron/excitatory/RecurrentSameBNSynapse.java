@@ -36,6 +36,14 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
 
     @Override
+    public void propagateActValue(Link l, double delta) {
+        if(!l.getOutput().isFinalMode())
+            return;
+
+        super.propagateActValue(l, delta);
+    }
+
+    @Override
     public void propagateGradient(Link l, double[] gradient) {
         l.propagateGradient(gradient[INCOMING] + gradient[OWN]);
     }

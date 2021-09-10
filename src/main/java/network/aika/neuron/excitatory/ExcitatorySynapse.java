@@ -32,14 +32,6 @@ import static network.aika.neuron.sign.Sign.POS;
 public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron<?>> extends Synapse<I, O> {
 
 
-    public void propagateActValue(Link l, double delta) {
-        if(isRecurrent() && !l.getOutput().isFinalMode())
-            return;
-
-        super.propagateActValue(l, delta);
-    }
-
-
     @Override
     public void updateSynapse(Link l, double delta) {
         if(l.getInput().isActive(true)) {
@@ -53,7 +45,7 @@ public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends Excitator
             addWeight(-delta);
             getOutput().addConjunctiveBias(delta, !l.isCausal());
             if(delta < 0.0)
-                Step.add(new PostTraining(l.getOutput()));
+                PostTraining.add(l.getOutput());
 
             SumUpBias.add(l.getOutput(), delta);
 

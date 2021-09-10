@@ -56,8 +56,10 @@ public class UpdateBias extends Step<Activation> {
                 .getNeuron()
                 .addBias(biasDelta);
 
-        if(biasDelta > 0.0)
-            Step.add(new PostTraining(getElement()));
+        if(biasDelta <= 0.0)
+            return;
+
+        PostTraining.add(getElement());
     }
 
     public String toString() {

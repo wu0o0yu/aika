@@ -32,9 +32,10 @@ import network.aika.neuron.steps.Step;
 public class PostTraining extends Step<Activation> {
 
     public static void add(Activation act) {
+        Step.add(new PostTraining(act));
     }
 
-    public PostTraining(Activation act) {
+    private PostTraining(Activation act) {
         super(act);
     }
 

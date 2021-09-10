@@ -129,15 +129,15 @@ public class Activation extends Element<Activation> {
 
         EntropyGradient.add(this);
 
-        propagate();
+        CheckIfFired.propagate(this);
     }
 
     public int getId() {
         return id;
     }
 
-    public Double getValue() {
-        return value;
+    public Double getValue(Double defaultValue) {
+        return value != null ? value : defaultValue;
     }
 
     public double getNet() {
@@ -162,6 +162,15 @@ public class Activation extends Element<Activation> {
 
     public void setFired(Fired f) {
         fired = f;
+    }
+
+    public void setFired() {
+        Fired latestFired = inputLinks.values().stream()
+                .map(il -> il.getInput().getFired())
+                .max(Fired.COMPARATOR)
+                .orElse(null);
+
+        setFired(neuron.incrementFired(latestFired));
     }
 
     public boolean isFinalMode() {
@@ -231,6 +240,10 @@ public class Activation extends Element<Activation> {
         return getThought().getConfig();
     }
 
+    public void setBranchProbability(double p) {
+        branchProbability = p;
+    }
+
     public NeuronProvider getNeuronProvider() {
         return neuron.getProvider();
     }
@@ -265,7 +278,7 @@ public class Activation extends Element<Activation> {
                 .filter(l -> l.getSynapse() != excludedSyn)
                 .forEach(l -> {
                             Link nl = new Link(l.getSynapse(), l.getInput(), clonedAct, l.isSelfRef());
-                            nl.sumUpLink(nl.getInputValue(POS));
+                            clonedAct.updateNet(nl.getInputValue(POS));
                         }
                 );
     }
@@ -361,11 +374,6 @@ public class Activation extends Element<Activation> {
         double oldNet = net;
         net += netDelta;
         logChange(neuron, oldNet, net, "updateNet: net");
-
-        Utils.checkTolerance(this, netDelta);
-
-        PropagateGradientsNet.add(this);
-        CheckIfFired.add(this);
     }
 
     private double computeValue() {
@@ -384,21 +392,6 @@ public class Activation extends Element<Activation> {
         PropagateValueChange.add(this, value - oldValue);
     }
 
-    public boolean checkIfFired() {
-        if (fired == NOT_FIRED && value != null && value > 0.0) {
-            setFired(neuron.incrementFired(getLatestFired()));
-            return true;
-        }
-        return false;
-    }
-
-    private Fired getLatestFired() {
-        return inputLinks.values().stream()
-                .map(il -> il.getInput().getFired())
-                .max(Fired.COMPARATOR)
-                .orElse(null);
-    }
-
     public void initEntropyGradient() {
         double g = getNeuron().getSurprisal(
                         Sign.getSign(this),
@@ -409,70 +402,30 @@ public class Activation extends Element<Activation> {
         lastEntropyGradient = g;
     }
 
-    public void propagate() {
-        Linking.add(this);
-        Propagate.add(this);
-        SetFinalMode.add(this);
-
-        BranchProbability.add(this);
-
-        Counting.add(this);
-        getInputLinks().forEach(l -> LinkCounting.add(l));
-
-        if(Utils.belowTolerance(outputGradientSum))
-            return;
-
-        TemplatePropagate.add(this, INPUT);
-
-        TemplateCloseLoop.add(this, OUTPUT);
-        TemplatePropagate.add(this, OUTPUT);
-    }
-
-    public void propagateGradientsFromSumUpdate() {
+    public double[] gradientsFromSumUpdate() {
         ActivationFunction actF = getActivationFunction();
 
         inputGradientSum = Utils.add(inputGradientSum, inputGradient);
         double[] g = inputGradient;
         inputGradient = new double[2];
 
-        g = Utils.scale(g, actF.outerGrad(lastNet));
-
-        propagateGradientsOut(g);
+        return Utils.scale(g, actF.outerGrad(lastNet));
     }
 
-    public void propagateGradientsFromNetUpdate() {
+    public double[] gradientsFromNetUpdate() {
         if(inputGradientSum == null)
-            return;
+            return null;
 
         ActivationFunction actF = getActivationFunction();
 
         double g = actF.outerGrad(net) - actF.outerGrad(lastNet);
         lastNet = net;
 
-        propagateGradientsOut(
-                Utils.scale(inputGradientSum, g)
-        );
+        return Utils.scale(inputGradientSum, g);
     }
 
-    public void propagateGradientsOut(double[] g) {
-        Utils.checkTolerance(this, g);
-
+    public void updateOutputGradientSum(double[] g) {
         outputGradientSum = Utils.add(outputGradientSum, g);
-
-        PropagateGradientAndUpdateWeight.addInputs(this, g);
-
-        UpdateBias.add(this, getConfig().getLearnRate() * Utils.sum(g));
-
-        TemplateCloseLoop.add(this, INPUT);
-
-//        addLinksToQueue(INPUT, LinkStep.TEMPLATE);
-
-        if(!isActive(false))
-            return;
-
-        TemplatePropagate.add(this, INPUT);
-        TemplateCloseLoop.add(this, OUTPUT);
-        TemplatePropagate.add(this, OUTPUT);
     }
 
     public void propagateGradientIn(double g) {
@@ -516,35 +469,6 @@ public class Activation extends Element<Activation> {
     public void unlink() {
         unlinkInputs();
         unlinkOutputs();
-    }
-
-    public void computeBranchProbability() {
-        Set<Activation> conflictingActs = branches
-                .stream()
-                .flatMap(Activation::getInputLinks)
-                .filter(Link::isNegative)
-                .flatMap(l -> l.getInput().getInputLinks())  // Walk through to the inhib. Activation.
-                .map(Link::getInput)
-                .collect(Collectors.toSet());
-
-        double offset = conflictingActs
-                .stream()
-                .mapToDouble(cAct -> cAct.net)
-                .min()
-                .getAsDouble();
-
-        double norm = Math.exp(net - offset);
-        norm += conflictingActs
-                .stream()
-                .mapToDouble(cAct -> Math.exp(cAct.net - offset))
-                .sum();
-
-        double p = Math.exp(net - offset) / norm;
-
-        Utils.checkTolerance(this, p - getBranchProbability());
-
-        Activation cAct = clone(null);
-        cAct.branchProbability = p;
     }
 
     public Stream<Link> getInputLinks() {

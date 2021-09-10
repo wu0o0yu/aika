@@ -17,42 +17,42 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.utils.Utils;
 
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+
 /**
+ * Propagates the gradient of this activation backwards to all its input-links.
  *
  * @author Lukas Molzberger
  */
-public class SumUpBias extends UpdateNet {
+public abstract class PropagateGradients extends Step<Activation>  {
 
-    private final double delta;
-
-    public static void add(Activation act, double delta) {
-        Step.add(new SumUpBias(act, delta));
-    }
-
-    private SumUpBias(Activation act, double delta) {
+    protected PropagateGradients(Activation act) {
         super(act);
-        this.delta = delta;
     }
 
-    @Override
-    public Phase getPhase() {
-        return Phase.LINKING;
-    }
+    protected void propagateGradientsOut(Activation act, double[] g) {
+        Utils.checkTolerance(act, g);
 
-    public boolean checkIfQueued() {
-        return false;
-    }
+        act.updateOutputGradientSum(g);
 
-    @Override
-    public void process() {
-        updateNet(delta);
-    }
+        PropagateGradientAndUpdateWeight.addInputs(act, g);
 
-    public String toString() {
-        return "Act-Step: Sum up Bias (" + Utils.round(delta) + ")";
+        UpdateBias.add(act, act.getConfig().getLearnRate() * Utils.sum(g));
+
+        TemplateCloseLoop.add(act, INPUT);
+
+//        addLinksToQueue(INPUT, LinkStep.TEMPLATE);
+
+        if(!act.isActive(false))
+            return;
+
+        TemplatePropagate.add(act, INPUT);
+        TemplateCloseLoop.add(act, OUTPUT);
+        TemplatePropagate.add(act, OUTPUT);
     }
 }

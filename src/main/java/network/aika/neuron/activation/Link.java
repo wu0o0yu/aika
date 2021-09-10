@@ -70,11 +70,6 @@ public class Link extends Element<Link> {
         return output.getFired();
     }
 
-    public void count() {
-        if(synapse != null)
-            synapse.count(this);
-    }
-
     public static boolean linkExists(Synapse s, Activation iAct, Activation oAct) {
         Link existingLink = oAct.getInputLink(s);
         return existingLink != null && existingLink.getInput() == iAct;
@@ -165,11 +160,11 @@ public class Link extends Element<Link> {
     }
 
     public double getInputValue(Sign s) {
-        return s.getValue(input != null ? input.getValue() : Double.valueOf(0.0));
+        return s.getValue(input != null ? input.getValue(null) : Double.valueOf(0.0));
     }
 
     public double getOutputValue(Sign s) {
-        return s.getValue(output != null ? output.getValue() : Double.valueOf(0.0));
+        return s.getValue(output != null ? output.getValue(null) : Double.valueOf(0.0));
     }
 
     public Synapse getSynapse() {
@@ -215,10 +210,6 @@ public class Link extends Element<Link> {
         output.inputLinks.remove(input.getNeuronProvider(), this);
     }
 
-    public void sumUpLink(double delta) {
-        getOutput().updateNet(delta);
-    }
-
     public boolean isNegative() {
         return synapse.isNegative();
     }
@@ -246,7 +237,10 @@ public class Link extends Element<Link> {
 
     public String toDetailedString() {
         return "in:[" + input.toShortString() +
-                " v:" + Utils.round(input.getValue()) + "] - s:[" + synapse.toString() + "] - out:[" + input.toShortString() + " v:" + Utils.round(input.getValue()) + "]";
+                " v:" + Utils.round(input.getValue(0.0)) +
+                "] - s:[" + synapse.toString() +
+                "] - out:[" + input.toShortString() +
+                " v:" + Utils.round(input.getValue(0.0)) + "]";
     }
 
     public String getIdString() {

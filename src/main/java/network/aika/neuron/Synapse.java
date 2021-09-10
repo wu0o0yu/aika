@@ -257,7 +257,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
             return;
 
         InformationGainGradient.add(nl);
-
         PropagateGradientAndUpdateWeight.add(nl, oAct.getOutputGradientSum());
     }
 

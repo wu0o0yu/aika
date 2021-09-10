@@ -17,42 +17,29 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.utils.Utils;
+
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class SumUpBias extends UpdateNet {
+public abstract class UpdateNet extends Step<Activation> {
 
-    private final double delta;
-
-    public static void add(Activation act, double delta) {
-        Step.add(new SumUpBias(act, delta));
-    }
-
-    private SumUpBias(Activation act, double delta) {
+    public UpdateNet(Activation act) {
         super(act);
-        this.delta = delta;
     }
 
-    @Override
-    public Phase getPhase() {
-        return Phase.LINKING;
+    public void updateNet(double netDelta) {
+        updateNet(getElement(), netDelta);
     }
 
-    public boolean checkIfQueued() {
-        return false;
-    }
+    public static void updateNet(Activation act, double netDelta) {
+        act.updateNet(netDelta);
+        Utils.checkTolerance(act, netDelta);
 
-    @Override
-    public void process() {
-        updateNet(delta);
-    }
-
-    public String toString() {
-        return "Act-Step: Sum up Bias (" + Utils.round(delta) + ")";
+        PropagateGradientsNet.add(act);
+        CheckIfFired.add(act);
     }
 }

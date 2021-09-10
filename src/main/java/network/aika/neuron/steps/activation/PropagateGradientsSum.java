@@ -25,7 +25,7 @@ import network.aika.neuron.steps.Step;
  *
  * @author Lukas Molzberger
  */
-public class PropagateGradientsSum extends Step<Activation> {
+public class PropagateGradientsSum extends PropagateGradients {
 
     public static void add(Activation act) {
         Step.add(new PropagateGradientsSum(act));
@@ -46,7 +46,10 @@ public class PropagateGradientsSum extends Step<Activation> {
 
     @Override
     public void process() {
-        getElement().propagateGradientsFromSumUpdate();
+        Activation act = getElement();
+
+        double[] g = act.gradientsFromSumUpdate();
+        propagateGradientsOut(act, g);
     }
 
     public String toString() {
