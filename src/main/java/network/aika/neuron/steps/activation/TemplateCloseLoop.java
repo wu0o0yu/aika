@@ -35,7 +35,11 @@ public class TemplateCloseLoop extends Step<Activation> {
 
     private final TemplateTask task;
 
-    public TemplateCloseLoop(Activation act, Direction dir) {
+    public static void add(Activation act, Direction dir) {
+        Step.add(new TemplateCloseLoop(act, dir));
+    }
+
+    private TemplateCloseLoop(Activation act, Direction dir) {
         super(act);
         task = new TemplateTask(dir);
     }

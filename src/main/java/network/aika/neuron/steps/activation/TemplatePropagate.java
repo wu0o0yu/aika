@@ -35,7 +35,11 @@ public class TemplatePropagate extends Step<Activation> {
 
     private final TemplateTask task;
 
-    public TemplatePropagate(Activation act, Direction dir) {
+    public static void add(Activation act, Direction dir) {
+        Step.add(new TemplatePropagate(act, dir));
+    }
+
+    private TemplatePropagate(Activation act, Direction dir) {
         super(act);
         task = new TemplateTask(dir);
     }

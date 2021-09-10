@@ -29,7 +29,11 @@ public class SumUpBias extends Step<Activation> {
 
     private final double delta;
 
-    public SumUpBias(Activation act, double delta) {
+    public static void add(Activation act, double delta) {
+        Step.add(new SumUpBias(act, delta));
+    }
+
+    private SumUpBias(Activation act, double delta) {
         super(act);
         this.delta = delta;
     }

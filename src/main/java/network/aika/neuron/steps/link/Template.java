@@ -35,6 +35,9 @@ public class Template extends Step<Link> {
 
     private final TemplateTask task;
 
+    public static void add(Link l, Direction dir) {
+    }
+
     public Template(Link l, Direction dir) {
         super(l);
         task = new TemplateTask(dir);

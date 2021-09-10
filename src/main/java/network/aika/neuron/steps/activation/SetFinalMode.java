@@ -25,10 +25,15 @@ import network.aika.neuron.steps.Step;
  *
  * @author Lukas Molzberger
  */
-public class UseFinalBias extends Step<Activation> {
+public class SetFinalMode extends Step<Activation> {
 
-    public UseFinalBias(Activation element) {
-        super(element);
+    public static void add(Activation act) {
+        if(!act.isFinalMode())
+            Step.add(new SetFinalMode(act));
+    }
+
+    private SetFinalMode(Activation act) {
+        super(act);
     }
 
     @Override
@@ -43,6 +48,8 @@ public class UseFinalBias extends Step<Activation> {
     @Override
     public void process() {
         Activation act = getElement();
+
+        act.setFinalMode(true);
         act.updateNet(
                 act.getNeuron().getRecurrentBias()
         );

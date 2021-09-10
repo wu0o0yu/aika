@@ -29,7 +29,12 @@ import network.aika.neuron.steps.Step;
  */
 public class BranchProbability extends Step<Activation> {
 
-    public BranchProbability(Activation element) {
+    public static void add(Activation act) {
+        if (act.hasBranches())
+            Step.add(new BranchProbability(act));
+    }
+
+    private BranchProbability(Activation element) {
         super(element);
     }
 

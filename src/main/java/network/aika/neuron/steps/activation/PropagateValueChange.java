@@ -31,6 +31,17 @@ public class PropagateValueChange extends Step<Activation> {
 
     private final double valueDelta;
 
+    public static void add(Activation act, double valueDelta) {
+        Utils.checkTolerance(act, valueDelta);
+
+        Step.add(new PropagateValueChange(act, valueDelta));
+    }
+
+    public PropagateValueChange(Activation act, double valueDelta) {
+        super(act);
+        this.valueDelta = valueDelta;
+    }
+
     @Override
     public Phase getPhase() {
         return Phase.LINKING;
@@ -38,11 +49,6 @@ public class PropagateValueChange extends Step<Activation> {
 
     public boolean checkIfQueued() {
         return false;
-    }
-
-    public PropagateValueChange(Activation act, double valueDelta) {
-        super(act);
-        this.valueDelta = valueDelta;
     }
 
     @Override

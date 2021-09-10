@@ -27,8 +27,12 @@ import network.aika.neuron.steps.Step;
  */
 public class Cleanup extends Step<Link> {
 
-    public Cleanup(Link element) {
-        super(element);
+    public static void add(Link l) {
+        Step.add(new Cleanup(l));
+    }
+
+    private Cleanup(Link l) {
+        super(l);
     }
 
     @Override

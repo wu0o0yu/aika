@@ -27,8 +27,15 @@ import network.aika.neuron.steps.Step;
  */
 public class PropagateGradientsNet extends Step<Activation> {
 
-    public PropagateGradientsNet(Activation element) {
-        super(element);
+    public static void add(Activation act) {
+        if(act.markedNetUpdateOccurred)
+            return;
+
+        Step.add(new PropagateGradientsNet(act));
+    }
+
+    private PropagateGradientsNet(Activation act) {
+        super(act);
     }
 
     @Override

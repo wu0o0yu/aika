@@ -17,6 +17,7 @@
 package network.aika.neuron.steps.link;
 
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.steps.Phase;
@@ -38,7 +39,18 @@ public class PropagateGradientAndUpdateWeight extends Step<Link> {
 
     private final double[] gradient;
 
-    public PropagateGradientAndUpdateWeight(Link l, double[] gradient) {
+    public static void add(Link l, double[] gradient) {
+        Step.add(new PropagateGradientAndUpdateWeight(l, gradient));
+    }
+
+    public static void addInputs(Activation act, double[] gradient) {
+        if(act.getNeuron().isInputNeuron())
+            return;
+
+        act.getInputLinks().forEach(l -> PropagateGradientAndUpdateWeight.add(l, gradient));
+    }
+
+    private PropagateGradientAndUpdateWeight(Link l, double[] gradient) {
         super(l);
         this.gradient = gradient;
     }

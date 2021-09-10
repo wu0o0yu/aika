@@ -34,6 +34,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+import static network.aika.utils.Utils.logChange;
 
 /**
  *
@@ -63,10 +64,16 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
     }
 
     public void addConjunctiveBias(double b, boolean recurrent) {
-        if(recurrent)
+        if(recurrent) {
+            double oldRCB = recurrentConjunctiveBias;
             recurrentConjunctiveBias += b;
-        else
+            logChange(this, oldRCB, recurrentConjunctiveBias, "limitBias: recurrentConjunctiveBias");
+        }
+        else {
+            double oldDCB = directConjunctiveBias;
             directConjunctiveBias += b;
+            logChange(this, oldDCB, directConjunctiveBias, "limitBias: directConjunctiveBias");
+        }
     }
 
     /**
@@ -80,8 +87,14 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         bias = Math.min(weightSumDirect + weightSumRecurrent, bias);
 
         if(bias + directConjunctiveBias + recurrentConjunctiveBias > 0.0) {
+            double oldDCB = directConjunctiveBias;
+            double oldRCB = recurrentConjunctiveBias;
+
             directConjunctiveBias = Math.max(-weightSumDirect, -bias);
             recurrentConjunctiveBias = Math.max(-weightSumRecurrent, -bias);
+
+            logChange(this, oldDCB, directConjunctiveBias, "limitBias: directConjunctiveBias");
+            logChange(this, oldRCB, recurrentConjunctiveBias, "limitBias: recurrentConjunctiveBias");
         }
     }
 
@@ -89,8 +102,9 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         return inputSynapses
                 .values()
                 .stream()
+                .filter(s -> !s.isNegative())
                 .filter(s -> s.isRecurrent() == recurrent)
-                .mapToDouble(s -> s.getWeight())
+                .mapToDouble(Synapse::getWeight)
                 .sum();
     }
 

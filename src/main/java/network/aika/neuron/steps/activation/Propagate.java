@@ -41,7 +41,11 @@ public class Propagate extends Step<Activation> {
 
     private final LinkingTask task = new LinkingTask(OUTPUT);
 
-    public Propagate(Activation act) {
+    public static void add(Activation act) {
+        Step.add(new Propagate(act));
+    }
+
+    private Propagate(Activation act) {
         super(act);
     }
 

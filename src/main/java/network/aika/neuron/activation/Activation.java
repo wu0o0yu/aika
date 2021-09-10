@@ -33,6 +33,7 @@ import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.utils.Utils;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -44,6 +45,7 @@ import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.sign.Sign.POS;
+import static network.aika.utils.Utils.logChange;
 
 /**
  * @author Lukas Molzberger
@@ -57,6 +59,7 @@ public class Activation extends Element<Activation> {
     private double net;
     private double lastNet = 0.0;
     private Fired fired = NOT_FIRED;
+    private boolean finalMode = false;
     private boolean marked;
 
     private final int id;
@@ -124,8 +127,7 @@ public class Activation extends Element<Activation> {
 
         updateValue();
 
-        if(getConfig().isEnableTraining())
-            Step.add(new EntropyGradient(this));
+        EntropyGradient.add(this);
 
         propagate();
     }
@@ -160,6 +162,14 @@ public class Activation extends Element<Activation> {
 
     public void setFired(Fired f) {
         fired = f;
+    }
+
+    public boolean isFinalMode() {
+        return finalMode;
+    }
+
+    public void setFinalMode(boolean finalMode) {
+        this.finalMode = finalMode;
     }
 
     public Activation getMainBranch() {
@@ -362,13 +372,14 @@ public class Activation extends Element<Activation> {
     }
 
     public void updateNet(double netDelta) {
+        double oldNet = net;
         net += netDelta;
+        logChange(neuron, oldNet, net, "updateNet: net");
 
         Utils.checkTolerance(this, netDelta);
 
-        if(!markedNetUpdateOccurred)
-            Step.add(new PropagateGradientsNet(this));
-        Step.add(new CheckIfFired(this));
+        PropagateGradientsNet.add(this);
+        CheckIfFired.add(this);
     }
 
     private double computeValue() {
@@ -376,17 +387,15 @@ public class Activation extends Element<Activation> {
     }
 
     public void updateValue() {
-        Double oldValue = value;
+        double oldValue = value != null ? value : 0.0;
 
         value = inputValue != null ?
                 inputValue :
                 computeValue();
 
-        double valueDelta = value - (oldValue != null ? oldValue : 0.0);
+        logChange(neuron, oldValue, value, "updateValue: value");
 
-        Utils.checkTolerance(this, valueDelta);
-
-        Step.add(new PropagateValueChange(this,valueDelta));
+        PropagateValueChange.add(this, value - oldValue);
     }
 
     public boolean checkIfFired() {
@@ -415,23 +424,22 @@ public class Activation extends Element<Activation> {
     }
 
     public void propagate() {
-        Step.add(new Linking(this));
-        Step.add(new Propagate(this));
-        Step.add(new UseFinalBias(this));
+        Linking.add(this);
+        Propagate.add(this);
+        SetFinalMode.add(this);
 
-        if (hasBranches())
-            Step.add(new BranchProbability(this));
+        BranchProbability.add(this);
 
-        Step.add(new Counting(this));
-        addLinksToQueue(INPUT, LinkCounting::new);
+        Counting.add(this);
+        getInputLinks().forEach(l -> LinkCounting.add(l));
 
         if(Utils.belowTolerance(outputGradientSum))
             return;
 
-        Step.add(new TemplatePropagate(this, INPUT));
+        TemplatePropagate.add(this, INPUT);
 
-        Step.add(new TemplateCloseLoop(this, OUTPUT));
-        Step.add(new TemplatePropagate(this, OUTPUT));
+        TemplateCloseLoop.add(this, OUTPUT);
+        TemplatePropagate.add(this, OUTPUT);
     }
 
     public void propagateGradientsFromSumUpdate() {
@@ -465,25 +473,20 @@ public class Activation extends Element<Activation> {
 
         outputGradientSum = Utils.add(outputGradientSum, g);
 
-        if(!getNeuron().isInputNeuron())
-            addLinksToQueue(INPUT, l -> new PropagateGradientAndUpdateWeight(l, g));
+        PropagateGradientAndUpdateWeight.addInputs(this, g);
 
-        if (getNeuron().isAllowTraining())
-            Step.add(new UpdateBias(this,
-                    getConfig().getLearnRate() * Utils.sum(g)
-            ));
+        UpdateBias.add(this, getConfig().getLearnRate() * Utils.sum(g));
 
-        Step.add(new TemplateCloseLoop(this, INPUT));
+        TemplateCloseLoop.add(this, INPUT);
 
 //        addLinksToQueue(INPUT, LinkStep.TEMPLATE);
 
         if(!isActive(false))
             return;
 
-        Step.add(new TemplatePropagate(this, INPUT));
-
-        Step.add(new TemplateCloseLoop(this, OUTPUT));
-        Step.add(new TemplatePropagate(this, OUTPUT));
+        TemplatePropagate.add(this, INPUT);
+        TemplateCloseLoop.add(this, OUTPUT);
+        TemplatePropagate.add(this, OUTPUT);
     }
 
     public void propagateGradientIn(double g) {
@@ -492,7 +495,7 @@ public class Activation extends Element<Activation> {
         if(Utils.belowTolerance(inputGradient))
             return;
 
-        Step.add(new PropagateGradientsSum(this));
+        PropagateGradientsSum.add(this);
     }
 
     public void linkInputs() {
@@ -556,13 +559,6 @@ public class Activation extends Element<Activation> {
 
         Activation cAct = clone(null);
         cAct.branchProbability = p;
-    }
-
-    public void addLinksToQueue(Direction dir, Function<Link, Step> s) {
-        dir.getLinks(this)
-                .forEach(l ->
-                        Step.add(s.apply(l))
-                );
     }
 
     public Stream<Link> getInputLinks() {

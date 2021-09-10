@@ -27,6 +27,13 @@ import network.aika.utils.Utils;
  */
 public class UpdateBias extends Step<Activation> {
 
+    public static void add(Activation act, double biasDelta) {
+        if (!act.getNeuron().isAllowTraining())
+            return;
+
+        Step.add(new UpdateBias(act, biasDelta));
+    }
+
     public UpdateBias(Activation act, double biasDelta) {
         super(act);
         this.biasDelta = biasDelta;

@@ -28,8 +28,12 @@ import network.aika.neuron.steps.Step;
  */
 public class LinkCounting extends Step<Link> {
 
-    public LinkCounting(Link element) {
-        super(element);
+    public static void add(Link l) {
+        Step.add(new LinkCounting(l));
+    }
+
+    private LinkCounting(Link l) {
+        super(l);
     }
 
     @Override

@@ -30,8 +30,12 @@ import network.aika.neuron.steps.Step;
  */
 public class InformationGainGradient extends Step<Link> {
 
-    public InformationGainGradient(Link element) {
-        super(element);
+    public static void add(Link l) {
+        Step.add(new InformationGainGradient(l));
+    }
+
+    private InformationGainGradient(Link l) {
+        super(l);
     }
 
     @Override

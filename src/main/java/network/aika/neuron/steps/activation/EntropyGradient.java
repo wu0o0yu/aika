@@ -31,7 +31,14 @@ import network.aika.utils.Utils;
  */
 public class EntropyGradient extends Step<Activation> {
 
-    public EntropyGradient(Activation act) {
+    public static void add(Activation act) {
+        if(!act.getConfig().isEnableTraining())
+            return;
+
+        Step.add(new EntropyGradient(act));
+    }
+
+    private EntropyGradient(Activation act) {
         super(act);
     }
 
@@ -57,7 +64,7 @@ public class EntropyGradient extends Step<Activation> {
 
         Utils.checkTolerance(act, act.getInputGradient());
 
-        Step.add(new PropagateGradientsSum(act));
+        PropagateGradientsSum.add(act);
     }
 
     public String toString() {

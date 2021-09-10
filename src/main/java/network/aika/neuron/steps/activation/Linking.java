@@ -40,7 +40,11 @@ public class Linking extends Step<Activation> {
 
     private LinkingTask task = new LinkingTask(OUTPUT);
 
-    public Linking(Activation act) {
+    public static void add(Activation act) {
+        Step.add(new Linking(act));
+    }
+
+    private Linking(Activation act) {
         super(act);
     }
 

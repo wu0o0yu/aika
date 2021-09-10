@@ -34,6 +34,9 @@ public class SumUpLink extends Step<Link> {
 
     private final double delta;
 
+    public static void add(Link l, double delta) {
+    }
+
     public SumUpLink(Link l, double delta) {
         super(l);
         this.delta = delta;
@@ -54,9 +57,8 @@ public class SumUpLink extends Step<Link> {
 
         Activation oAct = getElement().getOutput();
 
-        if(!oAct.markedNetUpdateOccurred)
-            Step.add(new PropagateGradientsNet(oAct));
-        Step.add(new CheckIfFired(oAct));
+        PropagateGradientsNet.add(oAct);
+        CheckIfFired.add(oAct);
     }
 
     public String toString() {

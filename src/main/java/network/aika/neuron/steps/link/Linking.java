@@ -33,6 +33,9 @@ public class Linking extends Step<Link> {
 
     private final LinkingTask task;
 
+    public static void add(Link l, Direction dir) {
+    }
+
     public Linking(Link l, Direction dir) {
         super(l);
         task = new LinkingTask(dir);
@@ -57,7 +60,7 @@ public class Linking extends Step<Link> {
         Link l = getElement();
         task.link(l);
 
-        Step.add(new LinkCounting(l));
+        LinkCounting.add(l);
     }
 
     public String toString() {

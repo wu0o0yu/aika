@@ -26,7 +26,7 @@ import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.Linker;
 import network.aika.neuron.steps.Step;
-import network.aika.neuron.steps.activation.UseFinalBias;
+import network.aika.neuron.steps.activation.SetFinalMode;
 import network.aika.neuron.steps.link.InformationGainGradient;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.neuron.steps.link.SumUpLink;
@@ -44,6 +44,7 @@ import static network.aika.neuron.Neuron.BETA_THRESHOLD;
 import static network.aika.neuron.activation.Activation.OWN;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
+import static network.aika.utils.Utils.logChange;
 
 /**
  *
@@ -255,7 +256,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if(!nl.getConfig().isEnableTraining())
             return;
 
-        Step.add(new InformationGainGradient(nl));
+        InformationGainGradient.add(nl);
 
         if (!Utils.belowTolerance(oAct.getOutputGradientSum()))
             Step.add(new PropagateGradientAndUpdateWeight(nl, oAct.getOutputGradientSum()));
@@ -406,13 +407,19 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return Utils.belowTolerance(weight);
     }
 
+    public boolean isNegative() {
+        return getWeight() < 0.0;
+    }
+
     public void setWeight(double weight) {
         this.weight = weight;
         modified = true;
     }
 
     public void addWeight(double weightDelta) {
+        double oldWeight = weight;
         this.weight += weightDelta;
+        logChange(getOutput(), oldWeight, this.weight, "addWeight: weight");
         modified = true;
     }
 
@@ -422,7 +429,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         double w = l.getSynapse().getWeight();
         Step.add(new SumUpLink(l, delta * w));
-        Step.add(new UseFinalBias(l.getOutput()));
+        SetFinalMode.add(l.getOutput());
     }
 
     @Override

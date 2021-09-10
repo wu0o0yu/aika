@@ -28,8 +28,12 @@ import network.aika.neuron.steps.Step;
  */
 public class Counting extends Step<Activation> {
 
-    public Counting(Activation element) {
-        super(element);
+    public static void add(Activation act) {
+        Step.add(new Counting(act));
+    }
+
+    private Counting(Activation act) {
+        super(act);
     }
 
     @Override

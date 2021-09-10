@@ -29,8 +29,12 @@ import network.aika.utils.Utils;
  */
 public class Induction extends Step<Activation> {
 
-    public Induction(Activation element) {
-        super(element);
+    public static void add(Activation act) {
+        Step.add(new Induction(act));
+    }
+
+    private Induction(Activation act) {
+        super(act);
     }
 
     @Override

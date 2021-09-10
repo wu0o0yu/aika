@@ -58,7 +58,7 @@ public class Link extends Element<Link> {
         this.output = output;
         this.isSelfRef = isSelfRef;
 
-        add(new AddLink(this));
+        AddLink.add(this);
 
         getSynapse().updateReference(this);
 
@@ -220,7 +220,7 @@ public class Link extends Element<Link> {
     }
 
     public boolean isNegative() {
-        return synapse.getWeight() < 0.0;
+        return synapse.isNegative();
     }
 
     @Override

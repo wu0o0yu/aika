@@ -70,7 +70,7 @@ public class TemplateTask extends Linker {
 
     @Override
     public void getNextSteps(Activation act) {
-        Step.add(new Induction(act));
+        Induction.add(act);
     }
 
     @Override

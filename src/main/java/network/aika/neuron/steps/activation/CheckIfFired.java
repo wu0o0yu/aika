@@ -26,8 +26,12 @@ import network.aika.neuron.steps.Step;
  */
 public class CheckIfFired extends Step<Activation> {
 
-    public CheckIfFired(Activation element) {
-        super(element);
+    public static void add(Activation act) {
+        Step.add(new CheckIfFired(act));
+    }
+
+    private CheckIfFired(Activation act) {
+        super(act);
     }
 
     @Override

@@ -46,7 +46,7 @@ public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends Excitator
             if(delta < 0.0)
                 Step.add(new PostTraining(l.getOutput()));
 
-            Step.add(new SumUpBias(l.getOutput(), delta));
+            SumUpBias.add(l.getOutput(), delta);
 
             propagateActValue(
                     l,

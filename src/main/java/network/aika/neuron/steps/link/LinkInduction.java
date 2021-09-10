@@ -28,8 +28,11 @@ import network.aika.neuron.steps.Step;
  */
 public class LinkInduction extends Step<Link> {
 
-    public LinkInduction(Link element) {
-        super(element);
+    public static void add(Link l) {
+    }
+
+    public LinkInduction(Link l) {
+        super(l);
     }
 
     @Override
@@ -56,7 +59,7 @@ public class LinkInduction extends Step<Link> {
         l.setSynapse(inducedSynapse);
         inducedSynapse.linkOutput();
 
-        Step.add(new Cleanup(l));
+        Cleanup.add(l);
     }
 
     public String toString() {

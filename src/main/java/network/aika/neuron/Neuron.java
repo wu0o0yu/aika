@@ -38,6 +38,7 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
+import static network.aika.utils.Utils.logChange;
 
 /**
  *
@@ -260,12 +261,16 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     }
 
     public void addBias(double biasDelta) {
+        double oldBias = bias;
         bias += biasDelta;
+        logChange(this, oldBias, bias, "addBias : bias");
         modified = true;
     }
 
     public void limitBias() {
+        double oldBias = bias;
         bias = Math.min(0.0, bias);
+        logChange(this, oldBias, bias, "limitBias : bias");
     }
 
     public double getBias() {
