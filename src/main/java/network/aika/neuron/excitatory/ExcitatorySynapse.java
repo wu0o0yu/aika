@@ -31,6 +31,15 @@ import static network.aika.neuron.sign.Sign.POS;
  */
 public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends ExcitatoryNeuron<?>> extends Synapse<I, O> {
 
+
+    public void propagateActValue(Link l, double delta) {
+        if(isRecurrent() && !l.getOutput().isFinalMode())
+            return;
+
+        super.propagateActValue(l, delta);
+    }
+
+
     @Override
     public void updateSynapse(Link l, double delta) {
         if(l.getInput().isActive(true)) {

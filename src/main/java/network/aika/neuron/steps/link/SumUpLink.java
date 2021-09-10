@@ -24,6 +24,8 @@ import network.aika.neuron.steps.activation.CheckIfFired;
 import network.aika.neuron.steps.activation.PropagateGradientsNet;
 import network.aika.utils.Utils;
 
+import static network.aika.neuron.sign.Sign.POS;
+
 
 /**
  * Uses the input activation value, and the synapse weight to update the net value of the output activation.
@@ -35,9 +37,13 @@ public class SumUpLink extends Step<Link> {
     private final double delta;
 
     public static void add(Link l, double delta) {
+        if (Utils.belowTolerance(delta))
+            return;
+
+        Step.add(new SumUpLink(l, delta));
     }
 
-    public SumUpLink(Link l, double delta) {
+    private SumUpLink(Link l, double delta) {
         super(l);
         this.delta = delta;
     }

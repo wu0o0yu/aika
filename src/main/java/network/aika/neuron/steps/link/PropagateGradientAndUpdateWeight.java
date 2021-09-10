@@ -40,6 +40,9 @@ public class PropagateGradientAndUpdateWeight extends Step<Link> {
     private final double[] gradient;
 
     public static void add(Link l, double[] gradient) {
+        if (Utils.belowTolerance(gradient))
+            return;
+
         Step.add(new PropagateGradientAndUpdateWeight(l, gradient));
     }
 
@@ -69,24 +72,20 @@ public class PropagateGradientAndUpdateWeight extends Step<Link> {
         Link l = getElement();
         Synapse s = l.getSynapse();
 
-        if(l.getSynapse().isAllowTraining()) {
-            double g = gradient[OWN] + gradient[INCOMING];
-            double weightDelta = l.getConfig().getLearnRate() * g;
-            boolean oldWeightIsZero = s.isZero();
+        if(!l.getSynapse().isAllowTraining())
+            return;
 
-            s.updateSynapse(l, weightDelta);
+        double g = gradient[OWN] + gradient[INCOMING];
+        double weightDelta = l.getConfig().getLearnRate() * g;
+        boolean oldWeightIsZero = s.isZero();
 
-            if(oldWeightIsZero && !s.isZero() && l.getInput().isActive(true)) {
-                Step.add(new Linking(l, INPUT));
-                if(l.getOutput().getFired() != Fired.NOT_FIRED)
-                    Step.add(new Linking(l, OUTPUT));
+        s.updateSynapse(l, weightDelta);
 
-                Step.add(new Template(l, INPUT));
-                if(l.getOutput().getFired() != Fired.NOT_FIRED)
-                    Step.add(new Template(l, OUTPUT));
-            }
-            Step.add(new PostTraining(l.getOutput()));
+        if (oldWeightIsZero && !s.isZero() && l.getInput().isActive(true)) {
+            Linking.add(l);
+            Template.add(l);
         }
+        Step.add(new PostTraining(l.getOutput()));
 
         s.propagateGradient(l, gradient);
     }

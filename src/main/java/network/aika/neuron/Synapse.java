@@ -258,8 +258,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
         InformationGainGradient.add(nl);
 
-        if (!Utils.belowTolerance(oAct.getOutputGradientSum()))
-            Step.add(new PropagateGradientAndUpdateWeight(nl, oAct.getOutputGradientSum()));
+        PropagateGradientAndUpdateWeight.add(nl, oAct.getOutputGradientSum());
     }
 
     public void linkInput() {
@@ -424,11 +423,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void propagateActValue(Link l, double delta) {
-        if(l.getSynapse().isZero())
-            return;
-
-        double w = l.getSynapse().getWeight();
-        Step.add(new SumUpLink(l, delta * w));
+        SumUpLink.add(l, delta * l.getSynapse().getWeight());
         SetFinalMode.add(l.getOutput());
     }
 

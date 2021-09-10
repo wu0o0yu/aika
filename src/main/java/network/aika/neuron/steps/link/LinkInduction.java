@@ -29,9 +29,10 @@ import network.aika.neuron.steps.Step;
 public class LinkInduction extends Step<Link> {
 
     public static void add(Link l) {
+        Step.add(new LinkInduction(l));
     }
 
-    public LinkInduction(Link l) {
+    private LinkInduction(Link l) {
         super(l);
     }
 

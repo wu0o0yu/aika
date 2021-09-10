@@ -63,7 +63,7 @@ public class Induction extends Step<Activation> {
 
         Utils.checkTolerance(act, inducedNeuron.getBias());
 
-//        QueueEntry.add(act, new SumUpBias(inducedNeuron.getBias()));
+//        SumUpBias.add(act, inducedNeuron.getBias()));
     }
 
     public String toString() {

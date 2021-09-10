@@ -75,11 +75,8 @@ public class TemplateTask extends Linker {
 
     @Override
     public void getNextSteps(Link l) {
-        Step.add(new Template(l, INPUT));
-        if(l.getOutput().getFired() != Fired.NOT_FIRED)
-            Step.add(new Template(l, OUTPUT));
-
-        Step.add(new LinkInduction(l));
+        Template.add(l);
+        LinkInduction.add(l);
     }
 
     @Override

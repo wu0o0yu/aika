@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.steps.link;
 
+import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
@@ -35,10 +36,15 @@ public class Template extends Step<Link> {
 
     private final TemplateTask task;
 
-    public static void add(Link l, Direction dir) {
+    public static void add(Link l) {
+        Step.add(new Template(l, INPUT));
+        if(l.getOutput().getFired() == Fired.NOT_FIRED)
+            return;
+
+        Step.add(new Template(l, OUTPUT));
     }
 
-    public Template(Link l, Direction dir) {
+    private Template(Link l, Direction dir) {
         super(l);
         task = new TemplateTask(dir);
     }

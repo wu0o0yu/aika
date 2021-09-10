@@ -292,12 +292,6 @@ public class Activation extends Element<Activation> {
             return branches.stream();
     }
 
-    public void updateOutgoingLinks(double delta) {
-        getOutputLinks().forEach(l ->
-                        l.getSynapse().propagateActValue(l, delta)
-                );
-    }
-
     public void followLinks(ActVisitor v) {
         v.onEvent(BEFORE);
 
@@ -334,14 +328,6 @@ public class Activation extends Element<Activation> {
         return dir.getLinks(this)
                 .map(Link::getSynapse)
                 .anyMatch(s -> s.isOfTemplate(ts));
-    }
-
-    public boolean outputLinkExists(Activation oAct) {
-        return outputLinks.containsKey(oAct.getOutputKey());
-    }
-
-    public boolean outputLinkExists(Synapse s) {
-        return !getOutputLinks(s).isEmpty();
     }
 
     public SortedMap<OutputKey, Link> getOutputLinks(Synapse s) {

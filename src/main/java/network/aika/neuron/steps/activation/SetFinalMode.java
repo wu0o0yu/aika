@@ -28,8 +28,10 @@ import network.aika.neuron.steps.Step;
 public class SetFinalMode extends Step<Activation> {
 
     public static void add(Activation act) {
-        if(!act.isFinalMode())
-            Step.add(new SetFinalMode(act));
+        if(act.isFinalMode())
+            return;
+
+        Step.add(new SetFinalMode(act));
     }
 
     private SetFinalMode(Activation act) {

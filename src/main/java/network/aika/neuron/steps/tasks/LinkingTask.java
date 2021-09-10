@@ -58,7 +58,7 @@ public class LinkingTask extends Linker {
 
     @Override
     protected boolean exists(Activation act, Synapse s) {
-        return act.outputLinkExists(s);
+        return !act.getOutputLinks(s).isEmpty();
     }
 
     @Override
@@ -71,9 +71,7 @@ public class LinkingTask extends Linker {
     }
 
     public static void addNextLinkerSteps(Link l) {
-        Step.add(new Linking(l, INPUT));
-        if(l.getOutput().getFired() != Fired.NOT_FIRED)
-            Step.add(new Linking(l, OUTPUT));
+        Linking.add(l);
     }
 
     @Override

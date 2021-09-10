@@ -53,7 +53,11 @@ public class PropagateValueChange extends Step<Activation> {
 
     @Override
     public void process() {
-        getElement().updateOutgoingLinks(valueDelta);
+        getElement()
+                .getOutputLinks()
+                .forEach(l ->
+                        l.getSynapse().propagateActValue(l, valueDelta)
+                );
     }
 
     public String toString() {

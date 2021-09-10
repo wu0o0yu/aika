@@ -28,6 +28,7 @@ import network.aika.neuron.steps.Step;
 public class ShadowFactor extends Step<Link> {
 
     public static void add(Link l) {
+        Step.add(new ShadowFactor(l));
     }
 
     public ShadowFactor(Link l) {
