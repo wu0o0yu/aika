@@ -52,7 +52,7 @@ public class DerDieDasTest {
                 s.linkInput();
                 s.linkOutput();
                 s.addWeight(0.1);
-                out.addConjunctiveBias(-0.1, false);
+                out.addConjunctiveBias(-0.1);
             }
 
             prevPPN = ppN;
@@ -91,7 +91,7 @@ public class DerDieDasTest {
 
             s.linkInput();
             s.addWeight(0.1);
-            ppN.addConjunctiveBias(-0.1, false);
+            ppN.addConjunctiveBias(-0.1);
         }
 
         if(prevPP != null) {
@@ -99,7 +99,7 @@ public class DerDieDasTest {
 
             s.linkOutput();
             s.addWeight(0.1);
-            ppN.addConjunctiveBias(-0.1, false);
+            ppN.addConjunctiveBias(-0.1);
         }
 
         BindingNeuron nextPP = lookupPPPT(inN);
@@ -108,7 +108,7 @@ public class DerDieDasTest {
 
             s.linkOutput();
             s.addWeight(0.1);
-            ppN.addConjunctiveBias(-0.1, false);
+            ppN.addConjunctiveBias(-0.1);
         }
 
         {
@@ -116,7 +116,7 @@ public class DerDieDasTest {
 
             s.linkOutput();
             s.addWeight(0.1);
-            ppN.addConjunctiveBias(-0.1, true);
+            ppN.addConjunctiveBias(-0.1);
         }
         ppN.addBias(0.1);
     }

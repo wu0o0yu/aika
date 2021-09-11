@@ -75,13 +75,9 @@ public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends Excitato
         ).getReference();
     }
 
-    public void setWeight(double weight) {
-        super.setWeight(weight);
-        output.getNeuron().setModified(true);
-    }
-
     public void addWeight(double weightDelta) {
         super.addWeight(weightDelta);
-        output.getNeuron().setModified(true);
+
+        getOutput().setModified(true);
     }
 }

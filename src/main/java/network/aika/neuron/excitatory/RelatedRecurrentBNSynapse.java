@@ -37,4 +37,11 @@ public class RelatedRecurrentBNSynapse<I extends Neuron<?>> extends RelatedBNSyn
     public boolean isRecurrent() {
         return true;
     }
+
+    @Override
+    public void addWeight(double weightDelta) {
+        super.addWeight(weightDelta);
+
+        getOutput().addAssumedWeights(weightDelta);
+    }
 }

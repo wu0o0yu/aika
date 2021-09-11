@@ -257,9 +257,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         this.modified = modified;
     }
 
-    public void addConjunctiveBias(double b, boolean recurrent) {
-    }
-
     public void addBias(double biasDelta) {
         double oldBias = bias;
         bias += biasDelta;
@@ -277,7 +274,11 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return bias;
     }
 
-    public double getRecurrentBias() {
+    public double getInitialNet() {
+        return bias;
+    }
+
+    public double getAssumedActiveSum() {
         return 0.0;
     }
 

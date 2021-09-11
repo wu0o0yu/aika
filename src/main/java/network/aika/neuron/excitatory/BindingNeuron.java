@@ -23,6 +23,10 @@ import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.steps.tasks.AlternateBranchTask;
 import network.aika.utils.Utils;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
@@ -30,6 +34,8 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  * @author Lukas Molzberger
  */
 public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
+
+    private double assumedActiveSum;
 
     public BindingNeuron() {
         super();
@@ -39,6 +45,19 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
         super(model, addProvider);
     }
 
+    @Override
+    public double getAssumedActiveSum() {
+        return assumedActiveSum;
+    }
+
+    @Override
+    public double getInitialNet() {
+        return super.getInitialNet() + assumedActiveSum;
+    }
+
+    public void addAssumedWeights(double weightDelta) {
+        assumedActiveSum += weightDelta;
+    }
 
     public void transition(ActVisitor v, Activation act) {
         if(v.getCurrentDir() == OUTPUT && enteringAlternateBranch(v))
@@ -97,5 +116,19 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
         initFromTemplate(n);
 
         return n;
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+
+        out.writeDouble(assumedActiveSum);
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws Exception {
+        super.readFields(in, m);
+
+        assumedActiveSum = in.readDouble();
     }
 }

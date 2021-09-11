@@ -96,4 +96,11 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
 
         return dir != OUTPUT;
     }
+
+    @Override
+    public void addWeight(double weightDelta) {
+        super.addWeight(weightDelta);
+
+        getOutput().addAssumedWeights(weightDelta);
+    }
 }

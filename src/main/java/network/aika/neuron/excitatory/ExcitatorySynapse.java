@@ -43,7 +43,7 @@ public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends Excitator
             );
         } else {
             addWeight(-delta);
-            getOutput().addConjunctiveBias(delta, !l.isCausal());
+            getOutput().addConjunctiveBias(delta);
             if(delta < 0.0)
                 PostTraining.add(l.getOutput());
 

@@ -240,7 +240,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         createLink(iAct, oAct, vs, v.getSelfRef());
     }
 
-    public void createLink(Activation iAct, Activation oAct, Linker vs, boolean isSelfRef) {
+    public void createLink(Activation iAct, Activation oAct, Linker task, boolean isSelfRef) {
         Link nl = oAct.addLink(
                 this,
                 iAct,
@@ -251,13 +251,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         if (s.getWeight() <= 0.0 && !s.isTemplate())
             return;
 
-        vs.getNextSteps(nl);
-
-        if(!nl.getConfig().isEnableTraining())
-            return;
-
-        InformationGainGradient.add(nl);
-        PropagateGradientAndUpdateWeight.add(nl, oAct.getOutputGradientSum());
+        task.getNextSteps(nl);
     }
 
     public void linkInput() {
@@ -410,8 +404,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void setWeight(double weight) {
-        this.weight = weight;
-        modified = true;
+        addWeight(weight - this.weight);
     }
 
     public void addWeight(double weightDelta) {

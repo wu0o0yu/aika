@@ -42,8 +42,7 @@ import static network.aika.utils.Utils.logChange;
  */
 public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neuron<S> {
 
-    private volatile double directConjunctiveBias;
-    private volatile double recurrentConjunctiveBias;
+    private volatile double conjunctiveBias;
 
     public ExcitatoryNeuron() {
         super();
@@ -59,21 +58,13 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
 
     protected void initFromTemplate(ExcitatoryNeuron n) {
         super.initFromTemplate(n);
-        n.directConjunctiveBias = directConjunctiveBias;
-        n.recurrentConjunctiveBias = recurrentConjunctiveBias;
+        n.conjunctiveBias = conjunctiveBias;
     }
 
-    public void addConjunctiveBias(double b, boolean recurrent) {
-        if(recurrent) {
-            double oldRCB = recurrentConjunctiveBias;
-            recurrentConjunctiveBias += b;
-            logChange(this, oldRCB, recurrentConjunctiveBias, "limitBias: recurrentConjunctiveBias");
-        }
-        else {
-            double oldDCB = directConjunctiveBias;
-            directConjunctiveBias += b;
-            logChange(this, oldDCB, directConjunctiveBias, "limitBias: directConjunctiveBias");
-        }
+    public void addConjunctiveBias(double b) {
+        double oldCB = conjunctiveBias;
+        conjunctiveBias += b;
+        logChange(this, oldCB, conjunctiveBias, "limitBias: conjunctiveBias");
     }
 
     /**
@@ -81,29 +72,24 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
      * should account for that and reduce the bias back to a level, where the neuron can be blocked again by its input synapses.
      */
     public void limitBias() {
-        double weightSumDirect = getWeightsSum(false);
-        double weightSumRecurrent = getWeightsSum(true);
+        double weightSum = getWeightsSum();
 
-        bias = Math.min(weightSumDirect + weightSumRecurrent, bias);
+        bias = Math.min(weightSum, bias);
 
-        if(bias + directConjunctiveBias + recurrentConjunctiveBias > 0.0) {
-            double oldDCB = directConjunctiveBias;
-            double oldRCB = recurrentConjunctiveBias;
+        if(bias + conjunctiveBias > 0.0) {
+            double oldCB = conjunctiveBias;
 
-            directConjunctiveBias = Math.max(-weightSumDirect, -bias);
-            recurrentConjunctiveBias = Math.max(-weightSumRecurrent, -bias);
+            conjunctiveBias = Math.max(-weightSum, -bias);
 
-            logChange(this, oldDCB, directConjunctiveBias, "limitBias: directConjunctiveBias");
-            logChange(this, oldRCB, recurrentConjunctiveBias, "limitBias: recurrentConjunctiveBias");
+            logChange(this, oldCB, conjunctiveBias, "limitBias: conjunctiveBias");
         }
     }
 
-    private double getWeightsSum(boolean recurrent) {
+    private double getWeightsSum() {
         return inputSynapses
                 .values()
                 .stream()
                 .filter(s -> !s.isNegative())
-                .filter(s -> s.isRecurrent() == recurrent)
                 .mapToDouble(Synapse::getWeight)
                 .sum();
     }
@@ -127,12 +113,9 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
         return new Fired(f.getInputTimestamp(), f.getFired() + 1);
     }
 
-    public double getBias() {
-        return super.getBias() + directConjunctiveBias;
-    }
-
-    public double getRecurrentBias() {
-        return recurrentConjunctiveBias;
+    @Override
+    public double getInitialNet() {
+        return bias + conjunctiveBias;
     }
 
     public void updateSynapseInputConnections() {
@@ -161,16 +144,14 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neur
     public void write(DataOutput out) throws IOException {
         super.write(out);
 
-        out.writeDouble(directConjunctiveBias);
-        out.writeDouble(recurrentConjunctiveBias);
+        out.writeDouble(conjunctiveBias);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws Exception {
         super.readFields(in, m);
 
-        directConjunctiveBias = in.readDouble();
-        recurrentConjunctiveBias = in.readDouble();
+        conjunctiveBias = in.readDouble();
     }
 
     public String toStringWithSynapses() {

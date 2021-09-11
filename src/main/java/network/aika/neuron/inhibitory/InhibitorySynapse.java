@@ -87,11 +87,7 @@ public abstract class InhibitorySynapse<I extends Neuron<?>> extends Synapse<I, 
         return oAct;
     }
 
-    public void setWeight(double weight) {
-        super.setWeight(weight);
-        input.getNeuron().setModified(true);
-    }
-
+    @Override
     public void addWeight(double weightDelta) {
         super.addWeight(weightDelta);
         input.getNeuron().setModified(true);

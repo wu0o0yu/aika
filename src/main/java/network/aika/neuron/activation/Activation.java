@@ -101,7 +101,7 @@ public class Activation extends Element<Activation> {
         this.thought = t;
 
         lastNet = n.isTemplate() || n.isInputNeuron() ? 0.0 : -1.0;
-        net = n.getBias();
+        net = n.getInitialNet();
 
         thought.registerActivation(this);
 
