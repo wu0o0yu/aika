@@ -17,8 +17,11 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
+
+import static network.aika.neuron.steps.activation.CheckIfFired.propagate;
 
 /**
  * Check if there are positive recurrent links that have not been activated and thus need to be updated.
@@ -54,10 +57,24 @@ public class SetFinalMode extends UpdateNet {
         act.setFinalMode(true);
         updateNet(act.getNeuron().getRecurrentBias());
 
+        act.getInputLinks()
+                .filter(l -> l.getSynapse().isRecurrent())
+                .filter(l -> !l.isNegative())
+                .forEach(l ->
+                        l.getSynapse()
+                                .propagateActValue(l, l.getInputValue(Sign.POS))
+                );
+
         act.updateValue();
+
+        if (!act.isFired() || act.getValue() > 0.0)
+            return;
+
+        act.setFired(null);
+        propagate(act);
     }
 
     public String toString() {
-        return "Act-Step: Use Final Bias";
+        return "Act-Step: Set final Mode";
     }
 }

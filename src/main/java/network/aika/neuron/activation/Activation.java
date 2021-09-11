@@ -54,7 +54,7 @@ public class Activation extends Element<Activation> {
 
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(act -> act.id);
 
-    private Double value = null;
+    private double value = 0.0;
     private Double inputValue = null;
     private double net;
     private double lastNet = 0.0;
@@ -136,8 +136,8 @@ public class Activation extends Element<Activation> {
         return id;
     }
 
-    public Double getValue(Double defaultValue) {
-        return value != null ? value : defaultValue;
+    public double getValue() {
+        return value;
     }
 
     public double getNet() {
@@ -154,6 +154,10 @@ public class Activation extends Element<Activation> {
 
     public Fired getFired() {
         return fired;
+    }
+
+    public boolean isFired() {
+        return fired != NOT_FIRED;
     }
 
     public void setFired(int inputTimestamp) {
@@ -259,7 +263,7 @@ public class Activation extends Element<Activation> {
     }
 
     public Activation clone(Synapse excludedSyn) {
-        if (value == null)
+        if (!isFired())
             return this;
 
         Activation clonedAct = new Activation(id, thought, neuron, null);
@@ -285,13 +289,6 @@ public class Activation extends Element<Activation> {
 
     public void setInputValue(double v) {
         inputValue = v;
-    }
-
-    public boolean isActive(boolean defaultValue) {
-        if(value == null)
-            return defaultValue;
-
-        return value > 0.0;
     }
 
     public double getBranchProbability() {
@@ -381,7 +378,7 @@ public class Activation extends Element<Activation> {
     }
 
     public void updateValue() {
-        double oldValue = value != null ? value : 0.0;
+        double oldValue = value;
 
         value = inputValue != null ?
                 inputValue :
@@ -510,7 +507,7 @@ public class Activation extends Element<Activation> {
         StringBuilder sb = new StringBuilder();
         sb.append("act ");
         sb.append(toShortString());
-        sb.append(" value:" + (value != null ? Utils.round(value) : "X"));
+        sb.append(" value:" + value);
         sb.append(" net:" + Utils.round(net));
         sb.append(" bp:" + Utils.round(branchProbability));
 

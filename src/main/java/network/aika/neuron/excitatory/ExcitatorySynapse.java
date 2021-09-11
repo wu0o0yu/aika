@@ -34,7 +34,7 @@ public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends Excitator
 
     @Override
     public void updateSynapse(Link l, double delta) {
-        if(l.getInput().isActive(true)) {
+        if(l.getInput().isFired()) {
             addWeight(delta);
 
             propagateActValue(

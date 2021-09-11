@@ -50,7 +50,7 @@ public class NegativeBNSynapse extends BindingNeuronSynapse<InhibitoryNeuron> {
 
     @Override
     public void updateSynapse(Link l, double delta) {
-        if(l.getInput().isActive(true) && l.isSelfRef())
+        if(l.getInput().isFired() && l.isSelfRef())
             addWeight(-delta);
     }
 

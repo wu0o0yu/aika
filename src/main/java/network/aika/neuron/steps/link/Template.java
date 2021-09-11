@@ -38,7 +38,7 @@ public class Template extends Step<Link> {
 
     public static void add(Link l) {
         Step.add(new Template(l, INPUT));
-        if(l.getOutput().getFired() == Fired.NOT_FIRED)
+        if(!l.getOutput().isFired())
             return;
 
         Step.add(new Template(l, OUTPUT));

@@ -48,7 +48,7 @@ public class Cleanup extends Step<Link> {
     public void process() {
         Link l = getElement();
 
-        if(l.getOutput().getFired() != Fired.NOT_FIRED)
+        if(l.getOutput().isFired())
             return;
 
         l.unlinkInput();

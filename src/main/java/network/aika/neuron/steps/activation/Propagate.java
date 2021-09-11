@@ -56,7 +56,7 @@ public class Propagate extends Step<Activation> {
 
     @Override
     public void process() {
-        if(getElement().getFired() == NOT_FIRED)
+        if(!getElement().isFired())
             return;
 
         task.propagate(getElement());

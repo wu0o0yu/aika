@@ -244,7 +244,7 @@ public abstract class Thought {
         Map<NeuronProvider, SortedSet<Activation>> results = new TreeMap<>();
 
         activationsById.values().stream()
-                .filter(act -> act.isActive(false))
+                .filter(act -> act.isFired())
                 .forEach(act -> {
                     Set<Activation> acts = results.computeIfAbsent(
                             act.getNeuronProvider(),

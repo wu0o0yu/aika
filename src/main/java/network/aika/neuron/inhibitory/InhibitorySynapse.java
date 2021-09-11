@@ -68,7 +68,7 @@ public abstract class InhibitorySynapse<I extends Neuron<?>> extends Synapse<I, 
     }
 
     public void updateSynapse(Link l, double delta) {
-        if(!l.getInput().isActive(true))
+        if(!l.getInput().isFired())
             return;
 
         addWeight(delta);

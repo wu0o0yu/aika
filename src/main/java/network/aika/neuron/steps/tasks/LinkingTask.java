@@ -76,7 +76,7 @@ public class LinkingTask extends Linker {
 
     @Override
     public void closeLoopIntern(ActVisitor v, Activation iAct, Activation oAct) {
-        if (!iAct.isActive(false))
+        if (!iAct.isFired())
             return;
 
         if(!(v.getCurrentDir() == OUTPUT || targetSynapse.isRecurrent()))

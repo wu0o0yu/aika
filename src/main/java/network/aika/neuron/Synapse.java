@@ -348,8 +348,8 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void count(Link l) {
-        boolean iActive = l.getInput().isActive(false);
-        boolean oActive = l.getOutput().isActive(false);
+        boolean iActive = l.getInput().isFired();
+        boolean oActive = l.getOutput().isFired();
 
         sampleSpace.countSkippedInstances(l.getInput().getReference());
 

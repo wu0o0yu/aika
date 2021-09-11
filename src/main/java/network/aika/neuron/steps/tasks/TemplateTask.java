@@ -93,7 +93,7 @@ public class TemplateTask extends Linker {
         if (!neuronMatches(oAct.getNeuron(), targetSynapse.getOutput()))
             return;
 
-        if(!iAct.isActive(targetSynapse.isRecurrent()))
+        if(!iAct.isFired())
             return;
 
         if(Link.templateLinkExists(targetSynapse, iAct, oAct))

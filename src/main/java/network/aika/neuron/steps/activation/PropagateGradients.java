@@ -48,7 +48,7 @@ public abstract class PropagateGradients extends Step<Activation>  {
 
 //        addLinksToQueue(INPUT, LinkStep.TEMPLATE);
 
-        if(!act.isActive(false))
+        if(!act.isFired())
             return;
 
         TemplatePropagate.add(act, INPUT);

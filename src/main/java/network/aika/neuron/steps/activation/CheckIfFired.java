@@ -46,7 +46,7 @@ public class CheckIfFired extends Step<Activation> {
 
         act.updateValue();
 
-        if (act.getFired() != NOT_FIRED || act.getValue(0.0) <= 0.0)
+        if (act.isFired() || act.getValue() <= 0.0)
             return;
 
         act.setFired();

@@ -40,7 +40,7 @@ public class Linking extends Step<Link> {
     public static void add(Link l) {
         Step.add(new Linking(l, INPUT));
 
-        if(l.getOutput().getFired() == Fired.NOT_FIRED)
+        if(!l.getOutput().isFired())
             return;
 
         Step.add(new Linking(l, OUTPUT));
