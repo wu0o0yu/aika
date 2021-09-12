@@ -39,7 +39,8 @@ public abstract class UpdateNet extends Step<Activation> {
 
     public static void updateNet(Activation act, double netDelta) {
         act.updateNet(netDelta);
-        Utils.checkTolerance(act, netDelta);
+        if(Utils.belowTolerance(netDelta))
+            return;
 
         PropagateGradientsNet.add(act);
         CheckIfFired.add(act);

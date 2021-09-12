@@ -28,7 +28,6 @@ import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.steps.Step;
-import network.aika.utils.BelowToleranceThresholdException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -178,10 +177,7 @@ public abstract class Thought {
 
             beforeProcessedEvent(s);
 
-            try {
-                s.process();
-            } catch(BelowToleranceThresholdException e) {
-            }
+            s.process();
 
             afterProcessedEvent(s);
         }

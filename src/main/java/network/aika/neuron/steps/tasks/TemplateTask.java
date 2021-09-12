@@ -111,6 +111,8 @@ public class TemplateTask extends Linker {
     }
 
     public String toString() {
-        return "Template Task: (Target-Synapse:" + targetSynapse + ")";
+        return "Template Task:" +
+                " " + direction +
+                (targetSynapse != null ? " (Target-Synapse:" + targetSynapse + ")" : "");
     }
 }

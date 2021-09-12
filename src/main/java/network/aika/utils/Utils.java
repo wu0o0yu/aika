@@ -73,16 +73,6 @@ public class Utils {
         return Math.abs(x) < TOLERANCE;
     }
 
-    public static void checkTolerance(Element e, double[] x) {
-        if(Math.abs(sum(x)) < TOLERANCE)
-            throw new BelowToleranceThresholdException(e);
-    }
-
-    public static void checkTolerance(Element e, double x) {
-        if(Math.abs(x) < TOLERANCE)
-            throw new BelowToleranceThresholdException(e);
-    }
-
     public static double round(double x) {
         return Math.round(x * 1000.0) / 1000.0;
     }

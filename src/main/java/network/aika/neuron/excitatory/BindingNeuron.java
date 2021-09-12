@@ -105,7 +105,8 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
         if(n.isInputNeuron())
             return false;
 
-        Utils.checkTolerance(act, act.getOutputGradientSum());
+        if(Utils.belowTolerance(act.getOutputGradientSum()))
+            return false;
 
         return true;
     }

@@ -32,7 +32,8 @@ public class PropagateValueChange extends Step<Activation> {
     private final double valueDelta;
 
     public static void add(Activation act, double valueDelta) {
-        Utils.checkTolerance(act, valueDelta);
+        if(Utils.belowTolerance(valueDelta))
+            return;
 
         Step.add(new PropagateValueChange(act, valueDelta));
     }

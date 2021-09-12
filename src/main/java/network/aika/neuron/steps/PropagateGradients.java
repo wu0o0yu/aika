@@ -39,7 +39,8 @@ public abstract class PropagateGradients extends Step<Activation>  {
     }
 
     protected void propagateGradientsOut(Activation act, double[] g) {
-        Utils.checkTolerance(act, g);
+        if(Utils.belowTolerance(g))
+            return;
 
         act.updateOutputGradientSum(g);
 

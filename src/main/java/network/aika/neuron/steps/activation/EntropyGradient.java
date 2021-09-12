@@ -62,7 +62,8 @@ public class EntropyGradient extends Step<Activation> {
 
         act.initEntropyGradient();
 
-        Utils.checkTolerance(act, act.getInputGradient());
+        if(Utils.belowTolerance(act.getInputGradient()))
+            return;
 
         PropagateGradientsSum.add(act);
     }

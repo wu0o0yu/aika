@@ -105,6 +105,8 @@ public class LinkingTask extends Linker {
     }
 
     public String toString() {
-        return "Linking Task: (Target-Synapse:" + targetSynapse + ")";
+        return "Linking Task" +
+                " " + direction +
+                (targetSynapse != null ? ": (Target-Synapse:" + targetSynapse + ")" : "");
     }
 }

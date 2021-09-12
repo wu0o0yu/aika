@@ -73,7 +73,8 @@ public class BranchProbability extends Step<Activation> {
 
         double p = Math.exp(act.getNet() - offset) / norm;
 
-        Utils.checkTolerance(act, p - act.getBranchProbability());
+        if(Utils.belowTolerance(p - act.getBranchProbability()))
+            return;
 
         Activation cAct = act.clone(null);
         cAct.setBranchProbability(p);
