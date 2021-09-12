@@ -24,6 +24,7 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.UpdateNet;
 import network.aika.neuron.steps.link.SumUpLink;
 
 import static network.aika.neuron.sign.Sign.POS;
@@ -72,7 +73,8 @@ public abstract class InhibitorySynapse<I extends Neuron<?>> extends Synapse<I, 
             return;
 
         addWeight(delta);
-        SumUpLink.add(l, l.getInputValue(POS) * delta);
+        UpdateNet.updateNet(l.getOutput(), delta * l.getInputValue(POS));
+//        SumUpLink.add(l, l.getInputValue(POS) * delta);
     }
 
     @Override

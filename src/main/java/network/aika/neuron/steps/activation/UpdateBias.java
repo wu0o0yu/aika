@@ -19,16 +19,20 @@ package network.aika.neuron.steps.activation;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.UpdateNet;
 import network.aika.utils.Utils;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class UpdateBias extends Step<Activation> {
+public class UpdateBias extends UpdateNet {
 
     public static void add(Activation act, double biasDelta) {
         if (!act.getNeuron().isAllowTraining())
+            return;
+
+        if(Utils.belowTolerance(biasDelta))
             return;
 
         Step.add(new UpdateBias(act, biasDelta));

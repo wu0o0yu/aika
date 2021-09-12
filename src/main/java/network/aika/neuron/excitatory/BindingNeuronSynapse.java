@@ -20,12 +20,9 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.visitor.Visitor;
-
-import static network.aika.neuron.activation.Fired.NOT_FIRED;
 
 /**
  *
@@ -34,8 +31,21 @@ import static network.aika.neuron.activation.Fired.NOT_FIRED;
 public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, BindingNeuron> {
 
     @Override
+    public void updateOutputNet(Link l, double delta) {
+        if(
+                isRecurrent() &&
+                !isNegative() &&
+                !l.getOutput().isFinalMode() &&
+                !l.isForward()
+        )
+            return;
+
+        super.updateOutputNet(l, delta);
+    }
+
+    @Override
     protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
-        return fromAct.getFired() != NOT_FIRED && Fired.COMPARATOR.compare(fromAct.getFired(), toAct.getFired()) <= 0;
+        return Link.isForward(fromAct, toAct);
     }
 
     @Override

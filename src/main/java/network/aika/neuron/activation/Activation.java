@@ -26,16 +26,10 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.sign.Sign;
-import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.activation.*;
-import network.aika.neuron.steps.link.LinkCounting;
-import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.utils.Utils;
 
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
@@ -43,7 +37,6 @@ import static network.aika.callbacks.VisitorEvent.AFTER;
 import static network.aika.callbacks.VisitorEvent.BEFORE;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.utils.Utils.logChange;
 
@@ -359,8 +352,7 @@ public class Activation extends Element<Activation> {
                 isSelfRef
         );
 
-        s.propagateActValue(
-                nl,
+        nl.updateNetByInputValue(
                 Link.getInputValueDelta(POS, nl, ol)
         );
 

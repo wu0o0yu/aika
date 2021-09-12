@@ -16,16 +16,11 @@
  */
 package network.aika.neuron.steps.link;
 
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
-import network.aika.neuron.steps.activation.CheckIfFired;
-import network.aika.neuron.steps.activation.PropagateGradientsNet;
-import network.aika.neuron.steps.activation.UpdateNet;
+import network.aika.neuron.steps.UpdateNet;
 import network.aika.utils.Utils;
-
-import static network.aika.neuron.sign.Sign.POS;
 
 
 /**

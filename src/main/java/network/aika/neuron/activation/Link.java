@@ -187,6 +187,17 @@ public class Link extends Element<Link> {
         return isSelfRef;
     }
 
+    public boolean isForward() {
+        return isForward(input, output);
+    }
+
+    public static boolean isForward(Activation iAct, Activation oAct) {
+        if(!iAct.isFired())
+            return false;
+
+        return Fired.COMPARATOR.compare(iAct.getFired(), oAct.getFired()) <= 0;
+    }
+
     public void linkInput() {
         if(input == null)
             return;
@@ -195,6 +206,14 @@ public class Link extends Element<Link> {
                 new OutputKey(output.getNeuronProvider(), output.getId()),
                 this
         );
+    }
+
+    public void updateNetByWeight(double weightDelta) {
+        synapse.updateOutputNet(this, getInputValue(POS) * weightDelta);
+    }
+
+    public void updateNetByInputValue(double inputValueDelta) {
+        synapse.updateOutputNet(this, inputValueDelta * synapse.getWeight());
     }
 
     public void linkOutput() {
@@ -254,4 +273,5 @@ public class Link extends Element<Link> {
     public String toShortString() {
         return toString();
     }
+
 }

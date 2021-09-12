@@ -26,6 +26,7 @@ import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.Linker;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.UpdateNet;
 import network.aika.neuron.steps.activation.SetFinalMode;
 import network.aika.neuron.steps.link.InformationGainGradient;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
@@ -248,7 +249,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         );
 
         Synapse s = nl.getSynapse();
-        if (s.getWeight() <= 0.0 && !s.isTemplate())
+        if (s.isNegative() && !s.isTemplate())
             return;
 
         task.getNextSteps(nl);
@@ -414,8 +415,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         modified = true;
     }
 
-    public void propagateActValue(Link l, double delta) {
-        SumUpLink.add(l, delta * l.getSynapse().getWeight());
+    public void updateOutputNet(Link l, double delta) {
+//        SumUpLink.add(l, actValueDelta * l.getSynapse().getWeight());
+        UpdateNet.updateNet(l.getOutput(), delta * l.getSynapse().getWeight());
         SetFinalMode.add(l.getOutput());
     }
 

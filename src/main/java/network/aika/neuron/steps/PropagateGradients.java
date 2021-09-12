@@ -14,10 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.steps.activation;
+package network.aika.neuron.steps;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.activation.TemplateCloseLoop;
+import network.aika.neuron.steps.activation.TemplatePropagate;
+import network.aika.neuron.steps.activation.UpdateBias;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.utils.Utils;
 

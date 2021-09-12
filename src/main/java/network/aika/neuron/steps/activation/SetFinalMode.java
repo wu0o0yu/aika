@@ -17,11 +17,11 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.UpdateNet;
 
 import java.util.stream.Stream;
 
@@ -62,9 +62,9 @@ public class SetFinalMode extends UpdateNet {
         updateNet(act.getNeuron().getAssumedActiveSum() - computeForwardLinkedRecurrentInputs(act));
 
         getPositiveRecurrentInputLinks(act)
+                .filter(l -> !l.isForward())
                 .forEach(l ->
-                        l.getSynapse()
-                                .propagateActValue(l, l.getInputValue(Sign.POS))
+                        l.updateNetByInputValue(l.getInputValue(Sign.POS))
                 );
 
         act.updateValue();
@@ -78,8 +78,7 @@ public class SetFinalMode extends UpdateNet {
 
     private double computeForwardLinkedRecurrentInputs(Activation act) {
         return getPositiveRecurrentInputLinks(act)
-                .filter(l -> l.getInput().isFired())
-                .filter(l -> Fired.COMPARATOR.compare(l.getInput().getFired(), l.getOutput().getFired()) < 0)
+                .filter(l -> l.isForward())
                 .mapToDouble(l -> l.getSynapse().getWeight())
                 .sum();
     }

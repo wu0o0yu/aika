@@ -56,7 +56,7 @@ public class PropagateValueChange extends Step<Activation> {
         getElement()
                 .getOutputLinks()
                 .forEach(l ->
-                        l.getSynapse().propagateActValue(l, valueDelta)
+                        l.updateNetByInputValue(valueDelta)
                 );
     }
 

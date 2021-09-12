@@ -25,13 +25,6 @@ import network.aika.neuron.activation.Link;
  */
 public class RelatedRecurrentBNSynapse<I extends Neuron<?>> extends RelatedBNSynapse<I> {
 
-    @Override
-    public void propagateActValue(Link l, double delta) {
-        if(!l.getOutput().isFinalMode())
-            return;
-
-        super.propagateActValue(l, delta);
-    }
 
     @Override
     public boolean isRecurrent() {
