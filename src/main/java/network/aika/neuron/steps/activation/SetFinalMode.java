@@ -21,6 +21,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.StepType;
 import network.aika.neuron.steps.UpdateNet;
 
 import java.util.stream.Stream;
@@ -48,6 +49,11 @@ public class SetFinalMode extends UpdateNet {
     @Override
     public Phase getPhase() {
         return Phase.FINAL_LINKING;
+    }
+
+    @Override
+    public StepType getStepType() {
+        return StepType.INFERENCE;
     }
 
     public boolean checkIfQueued() {

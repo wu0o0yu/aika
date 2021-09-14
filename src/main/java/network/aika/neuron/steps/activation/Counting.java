@@ -19,6 +19,7 @@ package network.aika.neuron.steps.activation;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.StepType;
 
 
 /**
@@ -39,6 +40,11 @@ public class Counting extends Step<Activation> {
     @Override
     public Phase getPhase() {
         return Phase.COUNTING;
+    }
+
+    @Override
+    public StepType getStepType() {
+        return StepType.COUNTING;
     }
 
     @Override

@@ -20,6 +20,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.PropagateGradients;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.StepType;
 
 /**
  * Propagates the gradient of this activation backwards to all its input-links.
@@ -42,6 +43,11 @@ public class PropagateGradientsNet extends PropagateGradients {
     @Override
     public Phase getPhase() {
         return Phase.FINAL_LINKING;
+    }
+
+    @Override
+    public StepType getStepType() {
+        return StepType.TRAINING;
     }
 
     public boolean checkIfQueued() {

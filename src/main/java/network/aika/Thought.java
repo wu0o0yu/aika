@@ -28,6 +28,7 @@ import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.StepType;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,7 +46,7 @@ public abstract class Thought {
 
     private final TreeSet<Step> queue = new TreeSet<>(Step.COMPARATOR);
 
-    private final Set<Class<Step>> filters = new TreeSet<>(Comparator.comparing(Class::getSimpleName));
+    private final Set<StepType> filters = new TreeSet<>();
 
     private final TreeMap<Integer, Activation> activationsById = new TreeMap<>();
 
@@ -72,8 +73,8 @@ public abstract class Thought {
         this.config = config;
     }
 
-    public void addFilters(Class<Step>... p) {
-        filters.addAll(Set.of(p));
+    public void addFilters(StepType... st) {
+        filters.addAll(Set.of(st));
     }
 
     public void onActivationCreationEvent(Activation act, Activation originAct) {
@@ -149,7 +150,7 @@ public abstract class Thought {
     }
 
     public void addStep(Step s) {
-        if(filters.contains(s))
+        if(filters.contains(s.getStepType()))
             return;
 
         s.setTimeStamp(getNextTimestamp());

@@ -20,6 +20,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.StepType;
 
 /**
  *
@@ -38,6 +39,11 @@ public class AddLink extends Step<Link> {
     @Override
     public Phase getPhase() {
         return Phase.INIT;
+    }
+
+    @Override
+    public StepType getStepType() {
+        return StepType.INFERENCE;
     }
 
     @Override

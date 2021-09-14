@@ -19,6 +19,7 @@ package network.aika.neuron.steps.link;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.StepType;
 import network.aika.neuron.steps.UpdateNet;
 import network.aika.utils.Utils;
 
@@ -47,6 +48,11 @@ public class SumUpLink extends Step<Link> {
     @Override
     public Phase getPhase() {
         return Phase.LINKING;
+    }
+
+    @Override
+    public StepType getStepType() {
+        return StepType.INFERENCE;
     }
 
     public boolean checkIfQueued() {

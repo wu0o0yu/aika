@@ -20,6 +20,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.StepType;
 import network.aika.utils.Utils;
 
 /**
@@ -45,6 +46,11 @@ public class EntropyGradient extends Step<Activation> {
     @Override
     public Phase getPhase() {
         return Phase.LINKING;
+    }
+
+    @Override
+    public StepType getStepType() {
+        return StepType.TRAINING;
     }
 
     public boolean checkIfQueued() {

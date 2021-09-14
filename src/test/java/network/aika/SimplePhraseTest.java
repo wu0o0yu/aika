@@ -42,7 +42,7 @@ public class SimplePhraseTest {
                                 .orElse(null);
 
                         if(n instanceof BindingNeuron) {
-                            return "PP-" + trimPrefix(iAct.getLabel());
+                            return "B-" + trimPrefix(iAct.getLabel());
                         } else if (n instanceof PatternNeuron) {
                             return "P-" + ((Document)act.getThought()).getContent();
                         } else {

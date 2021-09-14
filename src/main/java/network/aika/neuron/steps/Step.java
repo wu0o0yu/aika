@@ -65,6 +65,8 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
 
     public abstract Phase getPhase();
 
+    public abstract StepType getStepType();
+
     public abstract boolean checkIfQueued();
 
     static String toString(Step p) {

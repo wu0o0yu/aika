@@ -22,6 +22,7 @@ import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.StepType;
 import network.aika.neuron.steps.activation.PostTraining;
 import network.aika.utils.Utils;
 
@@ -65,6 +66,11 @@ public class PropagateGradientAndUpdateWeight extends Step<Link> {
     @Override
     public Phase getPhase() {
         return Phase.LINKING;
+    }
+
+    @Override
+    public StepType getStepType() {
+        return StepType.TRAINING;
     }
 
     @Override

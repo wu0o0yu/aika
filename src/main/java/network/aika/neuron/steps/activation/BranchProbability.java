@@ -20,6 +20,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.StepType;
 import network.aika.utils.Utils;
 
 import java.util.Set;
@@ -46,6 +47,11 @@ public class BranchProbability extends Step<Activation> {
     @Override
     public Phase getPhase() {
         return Phase.LINKING;
+    }
+
+    @Override
+    public StepType getStepType() {
+        return StepType.INFERENCE;
     }
 
     @Override

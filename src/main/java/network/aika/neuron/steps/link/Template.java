@@ -21,6 +21,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.StepType;
 import network.aika.neuron.steps.tasks.TemplateTask;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
@@ -57,6 +58,11 @@ public class Template extends Step<Link> {
     @Override
     public Phase getPhase() {
         return Phase.LINKING;
+    }
+
+    @Override
+    public StepType getStepType() {
+        return StepType.TEMPLATE;
     }
 
     @Override

@@ -46,8 +46,6 @@ public class Config {
         return this;
     }
 
-
-
     public boolean isEnableTraining() {
         return enableTraining;
     }
@@ -60,7 +58,6 @@ public class Config {
     public String getLabel(Activation act) {
         return "";
     }
-
 
 
     public String toString() {

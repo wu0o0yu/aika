@@ -19,6 +19,7 @@ package network.aika.neuron.steps.activation;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
+import network.aika.neuron.steps.StepType;
 import network.aika.utils.Utils;
 
 /**
@@ -46,6 +47,11 @@ public class PropagateValueChange extends Step<Activation> {
     @Override
     public Phase getPhase() {
         return Phase.LINKING;
+    }
+
+    @Override
+    public StepType getStepType() {
+        return StepType.INFERENCE;
     }
 
     public boolean checkIfQueued() {
