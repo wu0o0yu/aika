@@ -18,12 +18,12 @@ public class TestFsModel {
     public void testOpenModel() throws IOException {
 
         TextModel m = new TextModel(
-                new FSSuspensionCallback(new File("F:/Model").toPath(), "AIKA-2.0-5", true)
+                new FSSuspensionCallback(new File("/Users/lukas.molzberger/models").toPath(), "AIKA-2.0-6", true)
         );
 
         m.open(false);
         m.init();
-        m.getTemplates().SAME_BINDING_TEMPLATE.addConjunctiveBias(-0.32);
+//        m.getTemplates().SAME_BINDING_TEMPLATE.addConjunctiveBias(-0.32);
 
         {
             Document doc = generateDocument(m, "arbeit fair arbeitsvermittlung ", true);

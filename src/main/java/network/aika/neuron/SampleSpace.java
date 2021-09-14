@@ -78,7 +78,7 @@ public class SampleSpace implements Writable {
         if(ref == null)
             return 0;
 
-        long n = ref.getAbsoluteBegin() - (offset != null ? offset : 0);
+        long n = offset != null ? ref.getAbsoluteBegin() - offset : 0;
 
         n /= ref.length();
         return n;
