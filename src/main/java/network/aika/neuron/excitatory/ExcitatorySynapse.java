@@ -36,12 +36,6 @@ public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends Excitator
         if(l.getInput().isFired()) {
             addWeight(delta);
             l.updateNetByWeight(delta);
-
-/*            updateOutputNet(
-                    l,
-                    l.getInputValue(POS) * delta
-            );
- */
         } else {
             addWeight(-delta);
             l.updateNetByWeight(-delta);
@@ -50,14 +44,13 @@ public abstract class ExcitatorySynapse<I extends Neuron<?>, O extends Excitator
             if(delta < 0.0)
                 PostTraining.add(l.getOutput());
 
-//            SumUpBias.add(l.getOutput(), delta);
             UpdateNet.updateNet(l.getOutput(), delta);
-
-/*            updateOutputNet(
-                    l,
-                    (l.getInputValue(POS) * -delta) + delta
-            );
- */
         }
+
+        checkConstraints();
+    }
+
+    protected void checkConstraints() {
+        assert !isNegative();
     }
 }

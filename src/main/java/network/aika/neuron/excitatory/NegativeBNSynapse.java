@@ -73,4 +73,8 @@ public class NegativeBNSynapse extends BindingNeuronSynapse<InhibitoryNeuron> {
 
         return oAct;
     }
+
+    protected void checkConstraints() {
+        assert isNegative();
+    }
 }
