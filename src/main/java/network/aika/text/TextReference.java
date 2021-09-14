@@ -16,7 +16,6 @@
  */
 package network.aika.text;
 
-import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Reference;
 
@@ -24,7 +23,7 @@ import network.aika.neuron.activation.Reference;
  *
  * @author Lukas Molzberger
  */
-public class TextReference implements Reference {
+public class TextReference implements Reference<Document> {
 
     private final Document doc;
     private final int begin;
@@ -44,12 +43,20 @@ public class TextReference implements Reference {
         this.end = end;
     }
 
-    public int getBegin() {
+    public int getRelativeBegin() {
         return begin;
     }
 
-    public int getEnd() {
+    public int getRelativeEnd() {
         return end;
+    }
+
+    public long getAbsoluteBegin() {
+        return doc.getAbsoluteBegin() + begin;
+    }
+
+    public long getAbsoluteEnd() {
+        return doc.getAbsoluteBegin() + end;
     }
 
     public String getText() {
@@ -81,13 +88,13 @@ public class TextReference implements Reference {
     public Reference add(Reference ir) {
         return new TextReference(
                 doc,
-                Math.min(begin, ir.getBegin()),
-                Math.max(end, ir.getEnd())
+                Math.min(begin, ir.getRelativeBegin()),
+                Math.max(end, ir.getRelativeEnd())
         );
     }
 
     @Override
-    public Thought getThought() {
+    public Document getThought() {
         return doc;
     }
 

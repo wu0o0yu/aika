@@ -22,15 +22,19 @@ import network.aika.Thought;
  *
  * @author Lukas Molzberger
  */
-public interface Reference {
+public interface Reference<T> {
 
-    int getBegin();
+    int getRelativeBegin();
 
-    int getEnd();
+    int getRelativeEnd();
+
+    long getAbsoluteBegin();
+
+    long getAbsoluteEnd();
 
     double length();
 
     Reference add(Reference ir);
 
-    Thought getThought();
+    T getThought();
 }

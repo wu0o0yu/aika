@@ -37,6 +37,8 @@ import java.util.stream.Collectors;
  * @author Lukas Molzberger
  */
 public abstract class Thought {
+    private long absoluteBegin;
+
     private long timestampOnProcess = 0;
     private long timestampCounter = 0;
     private int activationIdCounter = 0;
@@ -167,7 +169,13 @@ public abstract class Thought {
         return queue;
     }
 
+    public long getAbsoluteBegin() {
+        return absoluteBegin;
+    }
+
     public void process(Model m) {
+        absoluteBegin = m.getN();
+
         while (!queue.isEmpty()) {
             Step s = queue.pollFirst();
 

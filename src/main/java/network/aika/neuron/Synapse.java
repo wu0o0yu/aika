@@ -65,7 +65,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     protected double weight;
 
-    protected SampleSpace sampleSpace;
+    protected SampleSpace sampleSpace = new SampleSpace();
 
     protected double frequencyIPosOPos;
     protected double frequencyIPosONeg;
@@ -107,10 +107,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         this.output = output.getProvider();
     }
 
-    private void init(Model m) {
-        sampleSpace = new SampleSpace(m);
-    }
-
     public Synapse<I, O> instantiateTemplate(I input, O output) {
         Synapse<I, O> s = instantiateTemplate();
 
@@ -123,7 +119,6 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         Synapse<I, O> s;
         try {
             s = getClass().getConstructor().newInstance();
-            s.init(getModel());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

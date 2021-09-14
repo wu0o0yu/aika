@@ -66,7 +66,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     protected final ReadWriteLock lock = new ReadWriteLock();
 
     protected double frequency;
-    protected SampleSpace sampleSpace;
+    protected SampleSpace sampleSpace = new SampleSpace();
 
     protected boolean isInputNeuron; // Input Neurons won't be trained!
 
@@ -86,7 +86,6 @@ public abstract class Neuron<S extends Synapse> implements Writable {
     public Neuron(Model m, boolean addProvider) {
         if(addProvider)
             provider = new NeuronProvider(m, this);
-        sampleSpace = new SampleSpace(m);
         modified = true;
     }
 

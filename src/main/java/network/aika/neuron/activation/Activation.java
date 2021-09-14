@@ -116,7 +116,7 @@ public class Activation extends Element<Activation> {
         setReference(ref);
 
         setInputValue(1.0);
-        setFired(ref.getBegin());
+        setFired(ref.getRelativeBegin());
 
         updateValue();
 

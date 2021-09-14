@@ -37,12 +37,10 @@ public class SampleSpace implements Writable {
 
     private static final Logger log = LoggerFactory.getLogger(SampleSpace.class);
 
-    private final Model m;
     private double N = 0;
-    private Long lastPos;
+    private Long offset;
 
-    public SampleSpace(Model m) {
-        this.m = m;
+    public SampleSpace() {
     }
 
     public double getN(Reference ref) {
@@ -53,12 +51,12 @@ public class SampleSpace implements Writable {
         this.N = N;
     }
 
-    public Long getLastPos() {
-        return lastPos;
+    public Long getOffset() {
+        return offset;
     }
 
-    public void setLastPos(Long lastPos) {
-        this.lastPos = lastPos;
+    public void setOffset(Long offset) {
+        this.offset = offset;
     }
 
     public void applyMovingAverage(double alpha) {
@@ -66,12 +64,10 @@ public class SampleSpace implements Writable {
     }
 
     public void countSkippedInstances(Reference ref) {
+        if(offset == null)
+            offset = ref.getAbsoluteBegin();
+
         N += getNegativeInstancesSinceLastPos(ref);
-
-        Long newPos = getAbsoluteEnd(m, ref);
-   //     assert lastPos == null || newPos > lastPos;
-
-        lastPos = newPos;
     }
 
     public void count() {
@@ -82,38 +78,22 @@ public class SampleSpace implements Writable {
         if(ref == null)
             return 0;
 
-        long n = 0;
-
-        if(lastPos != null)
-            n = getAbsoluteBegin(m, ref) - lastPos;
-
-        if(n < 0) {
-            log.warn("getNegativeInstancesSinceLastPos is not allowed to be called after update.");
-            return 0;
-        }
+        long n = ref.getAbsoluteBegin() - (offset != null ? offset : 0);
 
         n /= ref.length();
         return n;
     }
 
-    public long getAbsoluteBegin(Model m, Reference ref) {
-        return m.getN() + (ref != null ? ref.getBegin() : 0);
-    }
-
-    public long getAbsoluteEnd(Model m, Reference ref) {
-        return m.getN() + (ref != null ? ref.getEnd() : 0);
-    }
-
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeDouble(N);
-        out.writeBoolean(lastPos != null);
-        if(lastPos != null)
-            out.writeLong(lastPos);
+        out.writeBoolean(offset != null);
+        if(offset != null)
+            out.writeLong(offset);
     }
 
     public static SampleSpace read(DataInput in, Model m) throws IOException {
-        SampleSpace sampleSpace = new SampleSpace(m);
+        SampleSpace sampleSpace = new SampleSpace();
         sampleSpace.readFields(in, m);
         return sampleSpace;
     }
@@ -122,10 +102,10 @@ public class SampleSpace implements Writable {
     public void readFields(DataInput in, Model m) throws IOException {
         N = in.readDouble();
         if(in.readBoolean())
-            lastPos = in.readLong();
+            offset = in.readLong();
     }
 
     public String toString() {
-        return "N:" + N + " lastPos:" + lastPos;
+        return "N:" + N + " offset:" + offset;
     }
 }
