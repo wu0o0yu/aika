@@ -499,7 +499,7 @@ public class Activation extends Element<Activation> {
         StringBuilder sb = new StringBuilder();
         sb.append("act ");
         sb.append(toShortString());
-        sb.append(" value:" + value);
+        sb.append(" value:" + Utils.round(value, 10000.0));
         sb.append(" net:" + Utils.round(net));
         sb.append(" bp:" + Utils.round(branchProbability));
 
