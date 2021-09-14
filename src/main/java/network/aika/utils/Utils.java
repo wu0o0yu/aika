@@ -74,6 +74,10 @@ public class Utils {
     }
 
     public static double round(double x) {
-        return Math.round(x * 1000.0) / 1000.0;
+        return round(x, 1000.0);
+    }
+
+    public static double round(double x, double precision) {
+        return Math.round(x * precision) / precision;
     }
 }
