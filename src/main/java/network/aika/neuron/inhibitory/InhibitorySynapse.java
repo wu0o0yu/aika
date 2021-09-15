@@ -23,9 +23,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
-import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.UpdateNet;
-import network.aika.neuron.steps.link.SumUpLink;
 
 import static network.aika.neuron.sign.Sign.POS;
 

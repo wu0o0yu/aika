@@ -25,12 +25,8 @@ import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.Linker;
-import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.UpdateNet;
 import network.aika.neuron.steps.activation.SetFinalMode;
-import network.aika.neuron.steps.link.InformationGainGradient;
-import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
-import network.aika.neuron.steps.link.SumUpLink;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import org.apache.commons.math3.distribution.BetaDistribution;
@@ -54,8 +50,6 @@ import static network.aika.utils.Utils.logChange;
 public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implements Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Synapse.class);
-
-    public static double TOLERANCE = 0.0000001;
 
     protected NeuronProvider input;
     protected NeuronProvider output;
@@ -119,6 +113,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         Synapse<I, O> s;
         try {
             s = getClass().getConstructor().newInstance();
+            s.weight = weight;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -412,7 +407,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public void updateOutputNet(Link l, double delta) {
 //        SumUpLink.add(l, actValueDelta * l.getSynapse().getWeight());
-        UpdateNet.updateNet(l.getOutput(), delta * l.getSynapse().getWeight());
+        UpdateNet.updateNet(l.getOutput(), delta);
         SetFinalMode.add(l.getOutput());
     }
 
