@@ -83,7 +83,7 @@ public class Activation<N extends Neuron> extends Element<Activation> {
         this.neuron = n;
     }
 
-    public Activation(int id, Thought t, N n, Activation fromAct) {
+    public Activation(int id, Thought t, N n) {
         this(id, n);
         this.thought = t;
 
@@ -94,8 +94,6 @@ public class Activation<N extends Neuron> extends Element<Activation> {
 
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
-
-        t.onActivationCreationEvent(this, fromAct);
     }
 
     public boolean isMarked() {
@@ -225,11 +223,12 @@ public class Activation<N extends Neuron> extends Element<Activation> {
         if (!isFired())
             return this;
 
-        Activation clonedAct = new Activation(id, thought, neuron, null);
+        Activation clonedAct = new Activation(id, thought, neuron);
 
         replaceElement(clonedAct);
 
         linkClone(clonedAct, excludedSyn);
+        thought.onActivationCreationEvent(clonedAct, this);
 
         return clonedAct;
     }

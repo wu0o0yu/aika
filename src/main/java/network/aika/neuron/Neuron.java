@@ -104,11 +104,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         n.template = this;
     }
 
-    public A createActivation(Thought t) {
-        return createActivation(t, null);
-    }
-
-    public abstract A createActivation(Thought t, Activation fromAct);
+    public abstract A createActivation(Thought t);
 
     public abstract Neuron<?, ?> instantiateTemplate(boolean addProvider);
 

@@ -40,8 +40,8 @@ public class BindingActivation extends Activation<BindingNeuron> {
     private double branchProbability = 1.0;
 
 
-    public BindingActivation(int id, Thought t, BindingNeuron n, Activation fromAct) {
-        super(id, t, n, fromAct);
+    public BindingActivation(int id, Thought t, BindingNeuron n) {
+        super(id, t, n);
     }
 
     public BindingActivation createBranch(Synapse excludedSyn) {
@@ -51,6 +51,8 @@ public class BindingActivation extends Activation<BindingNeuron> {
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
         linkClone(clonedAct, excludedSyn);
+        thought.onActivationCreationEvent(clonedAct, this);
+
         return clonedAct;
     }
 

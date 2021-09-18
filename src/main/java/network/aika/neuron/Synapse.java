@@ -17,6 +17,7 @@
 package network.aika.neuron;
 
 import network.aika.Model;
+import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
@@ -207,11 +208,11 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     }
 
     public void propagate(Activation fromAct, Direction dir, Linker vs, boolean isSelfRef) {
+        Thought t = fromAct.getThought();
         Activation toAct =
-                dir.getNeuron(this).createActivation(
-                        fromAct.getThought(),
-                        fromAct
-                );
+                dir.getNeuron(this).createActivation(t);
+
+        t.onActivationCreationEvent(toAct, fromAct);
 
         vs.getNextSteps(toAct);
 

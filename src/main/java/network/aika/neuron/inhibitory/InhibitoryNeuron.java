@@ -43,8 +43,9 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse, Activation> {
         super(model, addProvider);
     }
 
-    public Activation createActivation(Thought t, Activation fromAct) {
-        return new Activation(t.createActivationId(), t, this, fromAct);
+    @Override
+    public Activation createActivation(Thought t) {
+        return new Activation(t.createActivationId(), t, this);
     }
 
     public void transition(ActVisitor v, Activation act) {

@@ -47,8 +47,9 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, Bindin
         super(model, addProvider);
     }
 
-    public BindingActivation createActivation(Thought t, Activation fromAct) {
-        return new BindingActivation(t.createActivationId(), t, this, fromAct);
+    @Override
+    public BindingActivation createActivation(Thought t) {
+        return new BindingActivation(t.createActivationId(), t, this);
     }
 
     @Override
