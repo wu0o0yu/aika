@@ -319,7 +319,7 @@ public class Activation<N extends Neuron> extends Element<Activation> {
         logChange(neuron, oldNet, net, "updateNet: net");
     }
 
-    private double computeValue() {
+    protected double computeValue() {
         return getActivationFunction().f(net);
     }
 

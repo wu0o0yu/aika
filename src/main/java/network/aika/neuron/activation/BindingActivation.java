@@ -97,7 +97,8 @@ public class BindingActivation extends Activation<BindingNeuron> {
         branchProbability = p;
     }
 
-    private double computeValue() {
+    @Override
+    protected double computeValue() {
         return branchProbability * getActivationFunction().f(net);
     }
 
