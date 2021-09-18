@@ -40,7 +40,7 @@ import static network.aika.utils.Utils.logChange;
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse> extends Neuron<S> {
+public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Activation> extends Neuron<S, A> {
 
     private volatile double conjunctiveBias;
 

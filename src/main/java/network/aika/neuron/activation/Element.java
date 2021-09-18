@@ -18,6 +18,8 @@ package network.aika.neuron.activation;
 
 import network.aika.Config;
 import network.aika.Thought;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.excitatory.NegativeBNSynapse;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.QueueKey;
 

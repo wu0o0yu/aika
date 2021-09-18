@@ -215,7 +215,7 @@ public class PatternTest {
                 .orElse(null);
     }
 
-    private boolean isPTNeuron(TextModel tm, Neuron<?> n) {
+    private boolean isPTNeuron(TextModel tm, Neuron<?, ?> n) {
         return n.getOutputSynapses()
                 .map(s -> s.getOutput())
                 .anyMatch(in -> in == tm.getPrevTokenInhib());

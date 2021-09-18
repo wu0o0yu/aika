@@ -30,7 +30,7 @@ import network.aika.neuron.steps.StepType;
  */
 public class LinkCounting extends Step<Link> {
 
-    public static void add(Link l) {
+    public static void add(Link<?> l) {
         Step.add(new LinkCounting(l));
     }
 

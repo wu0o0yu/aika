@@ -29,7 +29,7 @@ public class TemplateNeuronInfo {
 
     private String label;
     private Scope scope;
-    private Set<Neuron<?>> templateGroup;
+    private Set<Neuron> templateGroup;
 
     private double xCoord;
     private double yCoord;
@@ -59,11 +59,11 @@ public class TemplateNeuronInfo {
         this.yCoord = yCoord;
     }
 
-    public Set<Neuron<?>> getTemplateGroup() {
+    public Set<Neuron> getTemplateGroup() {
         return templateGroup;
     }
 
-    public void setTemplateGroup(Set<Neuron<?>> templateGroup) {
+    public void setTemplateGroup(Set<Neuron> templateGroup) {
         this.templateGroup = templateGroup;
     }
 

@@ -1,5 +1,6 @@
 package network.aika;
 
+import network.aika.neuron.activation.Reference;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TextReference;
@@ -30,7 +31,7 @@ public class CharBasedTraining {
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.charAt(i);
 
-            lastRef = doc.processToken(model, lastRef, i, i + 1, "" + c).getReference();
+            lastRef = (TextReference) doc.processToken(model, lastRef, i, i + 1, "" + c).getReference();
         }
         doc.process(model);
 

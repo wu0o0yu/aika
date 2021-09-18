@@ -18,6 +18,7 @@ package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.Visitor;
@@ -64,7 +65,7 @@ public class NegativeBNSynapse extends BindingNeuronSynapse<InhibitoryNeuron> {
     }
 
     @Override
-    public Activation branchIfNecessary(Activation oAct, Visitor v) {
+    public BindingActivation branchIfNecessary(BindingActivation oAct, Visitor v) {
         if (getOutput().isInputNeuron())
             return null;
 

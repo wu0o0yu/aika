@@ -17,6 +17,7 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.Model;
+import network.aika.Thought;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.visitor.ActVisitor;
@@ -31,7 +32,7 @@ import java.io.IOException;
  *
  * @author Lukas Molzberger
  */
-public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
+public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse, Activation> {
 
     private String tokenLabel;
 
@@ -45,6 +46,10 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse> {
 
     public PatternNeuron(Model model, boolean addProvider) {
         super(model, addProvider);
+    }
+
+    public Activation createActivation(Thought t, Activation fromAct) {
+        return new Activation(t.createActivationId(), t, this, fromAct);
     }
 
     @Override

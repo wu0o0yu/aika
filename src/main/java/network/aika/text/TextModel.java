@@ -78,7 +78,7 @@ public class TextModel extends Model {
     }
 
     @Override
-    public void linkInputRelations(Activation fromAct, Direction dir) {
+    public void linkInputRelations(Activation<?> fromAct, Direction dir) {
         TextReference ref = fromAct.getReference();
         TextReference lastRef = ref.getPrevious();
         if(lastRef == null) return;
@@ -108,7 +108,7 @@ public class TextModel extends Model {
         addNextLinkerSteps(nl);
     }
 
-    private Synapse getRelSynapse(Neuron<?> n) {
+    private Synapse getRelSynapse(Neuron<?, ?> n) {
         return n.getInputSynapses()
                 .filter(s -> s instanceof RelatedBNSynapse)
                 .map(s -> (RelatedBNSynapse) s)
@@ -116,7 +116,7 @@ public class TextModel extends Model {
                 .orElse(null);
     }
 
-    private boolean isPrevTokenBinding(Neuron<?> n) {
+    private boolean isPrevTokenBinding(Neuron<?, ?> n) {
         return n.getOutputSynapses()
                 .anyMatch(s -> prevTokenInhib.getId().equals(s.getOutput().getId()));
     }

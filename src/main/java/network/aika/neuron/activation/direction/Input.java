@@ -73,7 +73,7 @@ public class Input implements Direction {
     }
 
     @Override
-    public Stream<? extends Synapse> getSynapses(Neuron<?> n) {
+    public Stream<? extends Synapse> getSynapses(Neuron n) {
         return n.getInputSynapses();
     }
 

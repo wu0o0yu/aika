@@ -27,9 +27,9 @@ import network.aika.utils.Utils;
  *
  * @author Lukas Molzberger
  */
-public abstract class UpdateNet extends Step<Activation> {
+public abstract class UpdateNet<A extends Activation> extends Step<A> {
 
-    public UpdateNet(Activation act) {
+    public UpdateNet(A act) {
         super(act);
     }
 

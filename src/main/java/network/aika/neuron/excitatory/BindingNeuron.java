@@ -17,8 +17,10 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.Model;
+import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.steps.tasks.AlternateBranchTask;
 import network.aika.utils.Utils;
@@ -33,7 +35,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 /**
  * @author Lukas Molzberger
  */
-public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
+public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, BindingActivation> {
 
     private double assumedActiveSum;
 
@@ -43,6 +45,10 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
 
     public BindingNeuron(Model model, boolean addProvider) {
         super(model, addProvider);
+    }
+
+    public BindingActivation createActivation(Thought t, Activation fromAct) {
+        return new BindingActivation(t.createActivationId(), t, this, fromAct);
     }
 
     @Override
@@ -77,7 +83,7 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse> {
     }
 
     public boolean enteringAlternateBranch(ActVisitor v) {
-        Activation act = v.getActivation();
+        BindingActivation act = (BindingActivation) v.getActivation();
 
         AlternateBranchTask abTask = new AlternateBranchTask();
 

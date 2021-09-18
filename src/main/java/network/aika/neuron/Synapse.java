@@ -26,7 +26,6 @@ import network.aika.neuron.activation.visitor.Visitor;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.Linker;
 import network.aika.neuron.steps.UpdateNet;
-import network.aika.neuron.steps.activation.SetFinalMode;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import org.apache.commons.math3.distribution.BetaDistribution;
@@ -47,7 +46,7 @@ import static network.aika.utils.Utils.logChange;
  *
  * @author Lukas Molzberger
  */
-public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implements Writable {
+public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extends Activation> implements Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Synapse.class);
 
@@ -101,16 +100,16 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         this.output = output.getProvider();
     }
 
-    public Synapse<I, O> instantiateTemplate(I input, O output) {
-        Synapse<I, O> s = instantiateTemplate();
+    public Synapse<I, O, A> instantiateTemplate(I input, O output) {
+        Synapse<I, O, A> s = instantiateTemplate();
 
         s.input = input.getProvider();
         s.output = output.getProvider();
         return s;
     }
 
-    public Synapse<I, O> instantiateTemplate() {
-        Synapse<I, O> s;
+    public Synapse<I, O, A> instantiateTemplate() {
+        Synapse<I, O, A> s;
         try {
             s = getClass().getConstructor().newInstance();
             s.weight = weight;
@@ -121,7 +120,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         return s;
     }
 
-    public Synapse getConcreteSynapse(Neuron<?> in, Neuron<?> on) {
+    public Synapse getConcreteSynapse(Neuron<?, ?> in, Neuron<?, ?> on) {
         if(on.getTemplate().getId() != output.getId())
             return null;
 
@@ -142,7 +141,7 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
 
     public abstract void updateReference(Link l);
 
-    public Activation branchIfNecessary(Activation oAct, Visitor v) {
+    public A branchIfNecessary(A oAct, Visitor v) {
         return oAct;
     }
 
@@ -208,9 +207,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
     }
 
     public void propagate(Activation fromAct, Direction dir, Linker vs, boolean isSelfRef) {
-        Activation toAct = fromAct.getThought()
-                .createActivation(
-                        dir.getNeuron(this),
+        Activation toAct =
+                dir.getNeuron(this).createActivation(
+                        fromAct.getThought(),
                         fromAct
                 );
 
@@ -405,10 +404,9 @@ public abstract class Synapse<I extends Neuron<?>, O extends Neuron<?>> implemen
         modified = true;
     }
 
-    public void updateOutputNet(Link l, double delta) {
+    public void updateOutputNet(Link<A> l, double delta) {
 //        SumUpLink.add(l, actValueDelta * l.getSynapse().getWeight());
         UpdateNet.updateNet(l.getOutput(), delta);
-        SetFinalMode.add(l.getOutput());
     }
 
     @Override

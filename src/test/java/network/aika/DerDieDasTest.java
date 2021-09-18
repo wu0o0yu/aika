@@ -129,7 +129,7 @@ public class DerDieDasTest {
                 .orElse(null);
     }
 
-    private boolean isPTNeuron(Neuron<?> n) {
+    private boolean isPTNeuron(Neuron<?, ?> n) {
         return n.getOutputSynapses()
                 .map(s -> s.getOutput())
                 .anyMatch(in -> in == charBasedTrainings.getModel().getPrevTokenInhib());

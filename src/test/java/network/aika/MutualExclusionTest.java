@@ -146,7 +146,7 @@ public class MutualExclusionTest {
                 .setEnableTraining(true);
         doc.setConfig(c);
 
-        Activation act = doc.createActivation(in);
+        Activation act = in.createActivation(doc);
         act.setInputValue(1.0);
         act.setFired(0);
 
@@ -250,7 +250,7 @@ public class MutualExclusionTest {
                 .setEnableTraining(true);
         doc.setConfig(c);
 
-        Activation act = doc.createActivation(in);
+        Activation act = in.createActivation(doc);
         act.initInput(new TextReference(doc, 0, 4));
 
         AikaDebugger.createAndShowGUI(doc,m);

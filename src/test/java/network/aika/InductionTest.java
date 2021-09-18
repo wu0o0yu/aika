@@ -29,7 +29,7 @@ public class InductionTest {
 
         Document doc = new Document("");
 
-        Activation act = doc.createActivation(in);
+        Activation act = in.createActivation(doc);
         act.initInput(new TextReference(doc, 0, 1));
 
         doc.process(m);
@@ -85,9 +85,9 @@ public class InductionTest {
 
         Document doc = new Document("");
 
-        Activation actA = doc.createActivation(inA);
-        Activation actB = doc.createActivation(inB);
-        Activation actTarget = doc.createActivation(targetN);
+        Activation actA = inA.createActivation(doc);
+        Activation actB = inB.createActivation(doc);
+        Activation actTarget = targetN.createActivation(doc);
 
         actA.setReference(new TextReference(doc, 0, 1));
         actA.setInputValue(1.0);
@@ -119,8 +119,8 @@ public class InductionTest {
         );
         System.out.println("  " + phrase);
 
-        Activation actDer = doc.processToken(model, null, 0, 4, "der");
-        Activation actHund = doc.processToken(model, actDer.getReference(), 4, 8, "Hund");
+        Activation<?> actDer = doc.processToken(model, null, 0, 4, "der");
+        Activation<?> actHund = doc.processToken(model, actDer.getReference(), 4, 8, "Hund");
 
         model.setN(1000);
         actDer.getNeuron().setFrequency(50);

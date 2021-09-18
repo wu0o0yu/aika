@@ -27,7 +27,7 @@ import network.aika.utils.Utils;
  *
  * @author Lukas Molzberger
  */
-public class UpdateBias extends UpdateNet {
+public class UpdateBias extends UpdateNet<Activation> {
 
     public static void add(Activation act, double biasDelta) {
         if (!act.getNeuron().isAllowTraining())

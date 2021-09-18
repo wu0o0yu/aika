@@ -32,7 +32,7 @@ import static network.aika.neuron.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public abstract class InhibitorySynapse<I extends Neuron<?>> extends Synapse<I, InhibitoryNeuron> {
+public abstract class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNeuron, Activation> {
 
     @Override
     public boolean checkTemplatePropagate(Direction dir, Activation act) {
@@ -40,7 +40,7 @@ public abstract class InhibitorySynapse<I extends Neuron<?>> extends Synapse<I, 
     }
 
     @Override
-    public Synapse getConcreteSynapse(Neuron<?> in, Neuron<?> on) {
+    public Synapse getConcreteSynapse(Neuron<?, ?> in, Neuron<?, ?> on) {
         if(in.getTemplate().getId().intValue() != input.getId().intValue())
             return null;
 

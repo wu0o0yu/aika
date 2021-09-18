@@ -62,7 +62,7 @@ public class TemplateTask extends Linker {
         return act.templateLinkExists(direction, s);
     }
 
-    private boolean neuronMatches(Neuron<?> currentN, Neuron<?> targetN) {
+    private boolean neuronMatches(Neuron<?, ?> currentN, Neuron<?, ?> targetN) {
         return currentN.getTemplateGroup()
                 .stream()
                 .anyMatch(tn ->

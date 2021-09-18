@@ -17,6 +17,7 @@
 package network.aika.neuron;
 
 import network.aika.Model;
+import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Reference;
@@ -44,7 +45,7 @@ import static network.aika.utils.Utils.logChange;
  *
  * @author Lukas Molzberger
  */
-public abstract class Neuron<S extends Synapse> implements Writable {
+public abstract class Neuron<S extends Synapse, A extends Activation> implements Writable {
 
     public static double BETA_THRESHOLD = 0.95;
 
@@ -72,7 +73,7 @@ public abstract class Neuron<S extends Synapse> implements Writable {
 
     protected boolean allowTraining = true;
 
-    private Neuron<?> template;
+    private Neuron<?, ?> template;
 
     private TemplateNeuronInfo templateInfo;
 
@@ -103,7 +104,13 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         n.template = this;
     }
 
-    public abstract Neuron<?> instantiateTemplate(boolean addProvider);
+    public A createActivation(Thought t) {
+        return createActivation(t, null);
+    }
+
+    public abstract A createActivation(Thought t, Activation fromAct);
+
+    public abstract Neuron<?, ?> instantiateTemplate(boolean addProvider);
 
     public abstract void transition(ActVisitor v, Activation act);
 
@@ -130,13 +137,13 @@ public abstract class Neuron<S extends Synapse> implements Writable {
         return getId() < 0;
     }
 
-    public Neuron<?> getTemplate() {
+    public Neuron<?, ?> getTemplate() {
         if(isTemplate())
             return this;
         return template;
     }
 
-    public Set<Neuron<?>> getTemplateGroup() {
+    public Set<Neuron> getTemplateGroup() {
         return getTemplate().getTemplateInfo().getTemplateGroup();
     }
 

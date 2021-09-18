@@ -79,7 +79,7 @@ public abstract class Model implements Writable {
         this.customDataInstanceSupplier = customDataInstanceSupplier;
     }
 
-    public abstract void linkInputRelations(Activation originAct, Direction dir);
+    public abstract void linkInputRelations(Activation<?> originAct, Direction dir);
 
     public long getCurrentRetrievalCount() {
         return retrievalCounter.longValue();
@@ -104,7 +104,7 @@ public abstract class Model implements Writable {
     public NeuronProvider lookupNeuronProvider(String tokenLabel, NeuronProducer onNewCallback) {
         Long id = suspensionCallback.getIdByLabel(tokenLabel);
         if (id == null) {
-            Neuron<?> n = onNewCallback.createNeuron(tokenLabel);
+            Neuron<?, ?> n = onNewCallback.createNeuron(tokenLabel);
             NeuronProvider p = n.getProvider();
 
             suspensionCallback.putLabel(tokenLabel, p.getId());

@@ -55,7 +55,7 @@ public class Config {
         return this;
     }
 
-    public String getLabel(Activation act) {
+    public String getLabel(Activation<?> act) {
         return "";
     }
 

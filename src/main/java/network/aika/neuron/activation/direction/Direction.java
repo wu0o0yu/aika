@@ -48,7 +48,7 @@ public interface Direction {
 
     Stream<Link> getLinks(Activation act);
 
-    Stream<? extends Synapse> getSynapses(Neuron<?> n);
+    Stream<? extends Synapse> getSynapses(Neuron n);
 
     static int compare(Direction a, Direction b) {
         if(a == b) return 0;

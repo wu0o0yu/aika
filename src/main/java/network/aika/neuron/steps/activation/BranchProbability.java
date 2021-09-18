@@ -17,6 +17,7 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
@@ -25,6 +26,7 @@ import network.aika.utils.Utils;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -33,14 +35,14 @@ import java.util.stream.Collectors;
  *
  * @author Lukas Molzberger
  */
-public class BranchProbability extends Step<Activation> {
+public class BranchProbability extends Step<BindingActivation> {
 
-    public static void add(Activation act) {
+    public static void add(BindingActivation act) {
         if (act.hasBranches())
             Step.add(new BranchProbability(act));
     }
 
-    private BranchProbability(Activation element) {
+    private BranchProbability(BindingActivation element) {
         super(element);
     }
 
@@ -56,13 +58,15 @@ public class BranchProbability extends Step<Activation> {
 
     @Override
     public void process() {
-        Activation act = getElement();
-        Set<Activation> conflictingActs = act.getBranches()
+        BindingActivation act = getElement();
+        Stream<Link> linksStream = act.getBranches()
                 .stream()
                 .flatMap(Activation::getInputLinks)
                 .filter(Link::isNegative)
-                .flatMap(l -> l.getInput().getInputLinks())  // Walk through to the inhib. Activation.
-                .map(Link::getInput)
+                .flatMap(l -> l.getInput().getInputLinks());  // Walk through to the inhib. Activation.
+
+        Set<BindingActivation> conflictingActs = linksStream
+                .map(l -> (BindingActivation) l.getInput())
                 .collect(Collectors.toSet());
 
         double offset = conflictingActs
@@ -81,9 +85,9 @@ public class BranchProbability extends Step<Activation> {
 
         if(Utils.belowTolerance(p - act.getBranchProbability()))
             return;
-
-        Activation cAct = act.clone(null);
-        cAct.setBranchProbability(p);
+// TODO
+//        BindingActivation cAct = act.clone(null);
+//        cAct.setBranchProbability(p);
     }
 
     public boolean checkIfQueued() {

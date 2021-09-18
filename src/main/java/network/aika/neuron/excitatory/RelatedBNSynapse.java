@@ -17,6 +17,7 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
@@ -26,7 +27,7 @@ import network.aika.neuron.activation.visitor.Scope;
  *
  * @author Lukas Molzberger
  */
-public class RelatedBNSynapse<I extends Neuron<?>> extends InputBNSynapse<I> {
+public class RelatedBNSynapse<I extends Neuron> extends InputBNSynapse<I> {
 
     @Override
     public void samePatternTransitionLoop(ActVisitor v, Link l) {

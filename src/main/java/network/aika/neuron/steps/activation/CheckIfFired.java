@@ -55,12 +55,11 @@ public class CheckIfFired extends Step<Activation> {
         EntropyGradient.add(this);
     }
 
-    public static void propagate(Activation act) {
+    public static void propagate(Activation<?> act) {
         Linking.add(act);
         Propagate.add(act);
-        SetFinalMode.add(act);
 
-        BranchProbability.add(act);
+        act.addFeedbackSteps();
 
         Counting.add(act);
         act.getInputLinks().forEach(l -> LinkCounting.add(l));

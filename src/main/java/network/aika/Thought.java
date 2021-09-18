@@ -63,7 +63,7 @@ public abstract class Thought {
 
     public abstract int length();
 
-    public abstract void linkInputRelations(Activation act);
+    public abstract void linkInputRelations(Activation<?> act);
 
     public Config getConfig() {
         return config;
@@ -210,14 +210,6 @@ public abstract class Thought {
 
     public int createActivationId() {
         return activationIdCounter++;
-    }
-
-    public Activation createActivation(Neuron n) {
-        return createActivation(n, null);
-    }
-
-    public Activation createActivation(Neuron n, Activation fromAct) {
-        return new Activation(createActivationId(), this, n, fromAct);
     }
 
     public Activation getActivation(Integer id) {

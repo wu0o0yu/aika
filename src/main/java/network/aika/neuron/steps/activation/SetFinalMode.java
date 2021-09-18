@@ -17,6 +17,7 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.Phase;
@@ -33,16 +34,16 @@ import static network.aika.neuron.steps.activation.CheckIfFired.propagate;
  *
  * @author Lukas Molzberger
  */
-public class SetFinalMode extends UpdateNet {
+public class SetFinalMode extends UpdateNet<BindingActivation> {
 
-    public static void add(Activation act) {
+    public static void add(BindingActivation act) {
         if(act.isFinalMode())
             return;
 
         Step.add(new SetFinalMode(act));
     }
 
-    private SetFinalMode(Activation act) {
+    private SetFinalMode(BindingActivation act) {
         super(act);
     }
 
@@ -62,7 +63,7 @@ public class SetFinalMode extends UpdateNet {
 
     @Override
     public void process() {
-        Activation act = getElement();
+        BindingActivation act = getElement();
 
         act.setFinalMode(true);
         updateNet(act.getNeuron().getAssumedActiveSum() - computeForwardLinkedRecurrentInputs(act));
@@ -82,14 +83,14 @@ public class SetFinalMode extends UpdateNet {
         propagate(act);
     }
 
-    private double computeForwardLinkedRecurrentInputs(Activation act) {
+    private double computeForwardLinkedRecurrentInputs(BindingActivation act) {
         return getPositiveRecurrentInputLinks(act)
                 .filter(l -> l.isForward())
                 .mapToDouble(l -> l.getSynapse().getWeight())
                 .sum();
     }
 
-    private Stream<Link> getPositiveRecurrentInputLinks(Activation act) {
+    private Stream<Link> getPositiveRecurrentInputLinks(BindingActivation act) {
         return act.getInputLinks()
                 .filter(l -> l.getSynapse().isRecurrent())
                 .filter(l -> !l.isNegative());

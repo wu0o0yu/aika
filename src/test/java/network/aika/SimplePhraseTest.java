@@ -34,7 +34,7 @@ public class SimplePhraseTest {
     public void simplePhraseTest() {
         TextModel model = new TextModel();
         Config c = new Config() {
-                    public String getLabel(Activation act) {
+                    public String getLabel(Activation<?> act) {
                         Neuron n = act.getNeuron();
                         Activation iAct = act.getInputLinks()
                                 .findFirst()

@@ -18,13 +18,14 @@ package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.visitor.ActVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class InputBNSynapse<I extends Neuron<?>> extends BindingNeuronSynapse<I> {
+public abstract class InputBNSynapse<I extends Neuron> extends BindingNeuronSynapse<I> {
 
     @Override
     public void transition(ActVisitor v, Synapse s, Link l) {

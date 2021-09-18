@@ -28,7 +28,7 @@ import network.aika.neuron.activation.visitor.Visitor;
  *
  * @author Lukas Molzberger
  */
-public class PatternSynapse extends ExcitatorySynapse<BindingNeuron, PatternNeuron> {
+public class PatternSynapse extends ExcitatorySynapse<BindingNeuron, PatternNeuron, Activation> {
 
     @Override
     public void transition(ActVisitor v, Synapse s, Link l) {

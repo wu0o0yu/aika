@@ -43,29 +43,23 @@ import static network.aika.utils.Utils.logChange;
 /**
  * @author Lukas Molzberger
  */
-public class Activation extends Element<Activation> {
+public class Activation<N extends Neuron> extends Element<Activation> {
 
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(act -> act.id);
 
-    private double value = 0.0;
-    private Double inputValue = null;
-    private double net;
-    private double lastNet = 0.0;
-    private Fired fired = NOT_FIRED;
-    private boolean finalMode = false;
-    private boolean marked;
+    protected double value = 0.0;
+    protected Double inputValue = null;
+    protected double net;
+    protected double lastNet = 0.0;
+    protected Fired fired = NOT_FIRED;
+    protected boolean marked;
 
-    private final int id;
-    private Neuron<?> neuron;
-    private Thought thought;
-
-    private double branchProbability = 1.0;
+    protected final int id;
+    protected N neuron;
+    protected Thought thought;
 
     Map<NeuronProvider, Link> inputLinks;
     NavigableMap<OutputKey, Link> outputLinks;
-
-    private final Set<Activation> branches = new TreeSet<>();
-    private Activation mainBranch;
 
     private Reference reference;
 
@@ -84,12 +78,12 @@ public class Activation extends Element<Activation> {
     public boolean markedNetUpdateOccurred; // Temporary hack
 
 
-    private Activation(int id, Neuron<?> n) {
+    private Activation(int id, N n) {
         this.id = id;
         this.neuron = n;
     }
 
-    public Activation(int id, Thought t, Neuron<?> n, Activation fromAct) {
+    public Activation(int id, Thought t, N n, Activation fromAct) {
         this(id, n);
         this.thought = t;
 
@@ -124,6 +118,8 @@ public class Activation extends Element<Activation> {
 
         CheckIfFired.propagate(this);
     }
+
+    public void addFeedbackSteps() {}
 
     public int getId() {
         return id;
@@ -170,22 +166,6 @@ public class Activation extends Element<Activation> {
         setFired(neuron.incrementFired(latestFired));
     }
 
-    public boolean isFinalMode() {
-        return finalMode;
-    }
-
-    public void setFinalMode(boolean finalMode) {
-        this.finalMode = finalMode;
-    }
-
-    public Activation getMainBranch() {
-        return mainBranch;
-    }
-
-    public Set<Activation> getBranches() {
-        return branches;
-    }
-
     public Thought getThought() {
         return thought;
     }
@@ -217,11 +197,11 @@ public class Activation extends Element<Activation> {
         getModel().linkInputRelations(this, INPUT);
     }
 
-    public Neuron<?> getNeuron() {
+    public N getNeuron() {
         return neuron;
     }
 
-    public void setNeuron(Neuron n) {
+    public void setNeuron(N n) {
         this.neuron = n;
     }
 
@@ -237,22 +217,8 @@ public class Activation extends Element<Activation> {
         return getThought().getConfig();
     }
 
-    public void setBranchProbability(double p) {
-        branchProbability = p;
-    }
-
     public NeuronProvider getNeuronProvider() {
         return neuron.getProvider();
-    }
-
-    public Activation createBranch(Synapse excludedSyn) {
-        Activation clonedAct = thought.createActivation(neuron);
-
-        copyPhases(clonedAct);
-        branches.add(clonedAct);
-        clonedAct.mainBranch = this;
-        linkClone(clonedAct, excludedSyn);
-        return clonedAct;
     }
 
     public Activation clone(Synapse excludedSyn) {
@@ -268,7 +234,7 @@ public class Activation extends Element<Activation> {
         return clonedAct;
     }
 
-    private void linkClone(Activation clonedAct, Synapse excludedSyn) {
+    protected void linkClone(Activation clonedAct, Synapse excludedSyn) {
         inputLinks
                 .values()
                 .stream()
@@ -282,17 +248,6 @@ public class Activation extends Element<Activation> {
 
     public void setInputValue(double v) {
         inputValue = v;
-    }
-
-    public double getBranchProbability() {
-        return branchProbability;
-    }
-
-    public Stream<Activation> getAllBranches() {
-        if (mainBranch != null)
-            return Stream.concat(Stream.of(mainBranch), branches.stream());
-        else
-            return branches.stream();
     }
 
     public void followLinks(ActVisitor v) {
@@ -366,7 +321,7 @@ public class Activation extends Element<Activation> {
     }
 
     private double computeValue() {
-        return branchProbability * getActivationFunction().f(net);
+        return getActivationFunction().f(net);
     }
 
     public void updateValue() {
@@ -468,10 +423,6 @@ public class Activation extends Element<Activation> {
         return outputLinks.values().stream();
     }
 
-    public boolean hasBranches() {
-        return !branches.isEmpty();
-    }
-
     public String toShortString() {
         return "Act id:" +
                 getId() +
@@ -501,7 +452,6 @@ public class Activation extends Element<Activation> {
         sb.append(toShortString());
         sb.append(" value:" + Utils.round(value, 10000.0));
         sb.append(" net:" + Utils.round(net));
-        sb.append(" bp:" + Utils.round(branchProbability));
 
         if (includeLink) {
             sb.append("\n");

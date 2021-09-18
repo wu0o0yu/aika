@@ -17,6 +17,7 @@
 package network.aika.neuron.inhibitory;
 
 import network.aika.Model;
+import network.aika.Thought;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
@@ -28,7 +29,7 @@ import network.aika.neuron.activation.visitor.ActVisitor;
  *
  * @author Lukas Molzberger
  */
-public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
+public class InhibitoryNeuron extends Neuron<InhibitorySynapse, Activation> {
 
     public InhibitoryNeuron() {
         super();
@@ -42,6 +43,9 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse> {
         super(model, addProvider);
     }
 
+    public Activation createActivation(Thought t, Activation fromAct) {
+        return new Activation(t.createActivationId(), t, this, fromAct);
+    }
 
     public void transition(ActVisitor v, Activation act) {
         act.followLinks(v);

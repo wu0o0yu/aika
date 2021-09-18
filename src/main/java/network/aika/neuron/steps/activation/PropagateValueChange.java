@@ -28,18 +28,18 @@ import network.aika.utils.Utils;
  *
  * @author Lukas Molzberger
  */
-public class PropagateValueChange extends Step<Activation> {
+public class PropagateValueChange extends Step<Activation<?>> {
 
     private final double valueDelta;
 
-    public static void add(Activation act, double valueDelta) {
+    public static void add(Activation<?> act, double valueDelta) {
         if(Utils.belowTolerance(valueDelta))
             return;
 
         Step.add(new PropagateValueChange(act, valueDelta));
     }
 
-    public PropagateValueChange(Activation act, double valueDelta) {
+    public PropagateValueChange(Activation<?> act, double valueDelta) {
         super(act);
         this.valueDelta = valueDelta;
     }

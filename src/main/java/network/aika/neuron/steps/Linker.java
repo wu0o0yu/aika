@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.steps;
 
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
@@ -24,6 +25,7 @@ import network.aika.neuron.activation.visitor.ActVisitor;
 import network.aika.neuron.activation.visitor.Scope;
 import network.aika.neuron.activation.visitor.VisitorTask;
 
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
@@ -35,7 +37,7 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
 public abstract class Linker implements VisitorTask {
 
     protected Direction direction;
-    protected Synapse<?, ?> targetSynapse;
+    protected Synapse<?, ?, ?> targetSynapse;
 
     public Linker(Direction dir) {
         this.direction = dir;
@@ -50,9 +52,8 @@ public abstract class Linker implements VisitorTask {
     }
 
     public Stream<? extends Synapse> getTemplateTargetSynapses(Activation act, Direction dir) {
-        return act.getNeuron()
-                .getTemplateGroup().stream()
-                .flatMap(dir::getSynapses);
+        Stream<Neuron<?, ?>> s = act.getNeuron().getTemplateGroup().stream();
+        return s.flatMap(dir::getSynapses);
     }
 
     protected abstract boolean exists(Activation act, Synapse s);

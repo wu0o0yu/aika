@@ -18,6 +18,7 @@ package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.visitor.ActVisitor;
@@ -31,7 +32,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class PrimaryBNSynapse<I extends Neuron<?>> extends InputBNSynapse<I> {
+public class PrimaryBNSynapse<I extends Neuron> extends InputBNSynapse<I> {
 
     private static final Logger log = LoggerFactory.getLogger(PrimaryBNSynapse.class);
 

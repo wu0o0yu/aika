@@ -14,7 +14,7 @@ public class TestConfig extends Config {
     }
 
 
-    public String getLabel(Activation act) {
+    public String getLabel(Activation<?> act) {
         Neuron n = act.getNeuron();
         Activation iAct = act.getInputLinks()
                 .findFirst()

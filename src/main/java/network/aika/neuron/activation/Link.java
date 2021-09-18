@@ -37,22 +37,22 @@ import static network.aika.neuron.steps.Step.*;
  *
  * @author Lukas Molzberger
  */
-public class Link extends Element<Link> {
+public class Link<A extends Activation> extends Element<Link> {
 
     public static final Comparator<Link> COMPARE = Comparator.
-            <Link, Activation>comparing(l -> l.output)
+            <Link, Activation<?>>comparing(l -> l.output)
             .thenComparing(l -> l.input);
 
     private Synapse synapse;
 
     private final Activation input;
-    private final Activation output;
+    private final A output;
 
     private final boolean isSelfRef;
 
     private double lastIGGradient;
 
-    public Link(Synapse s, Activation input, Activation output, boolean isSelfRef) {
+    public Link(Synapse s, Activation input, A output, boolean isSelfRef) {
         this.synapse = s;
         this.input = input;
         this.output = output;
@@ -180,7 +180,7 @@ public class Link extends Element<Link> {
         return input;
     }
 
-    public Activation getOutput() {
+    public A getOutput() {
         return output;
     }
 

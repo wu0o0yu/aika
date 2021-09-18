@@ -46,9 +46,10 @@ public class Document extends Thought {
     }
 
     @Override
-    public void linkInputRelations(Activation act) {
+    public void linkInputRelations(Activation<?> act) {
         TextReference ref = act.getReference();
-        TextModel tm = act.getNeuron().getModel();
+        Neuron<?, ?> n = act.getNeuron();
+        TextModel tm = n.getModel();
         if(tm.getNextTokenInhib().getId().equals(act.getNeuron().getId())) {
             ref.nextTokenIAct = act;
             ref.nextTokenBAct = act.getInputLinks()
@@ -85,7 +86,7 @@ public class Document extends Thought {
         }
     }
 
-    public static String getText(Activation act) {
+    public static String getText(Activation<?> act) {
         TextReference ref = act.getReference();
         return ref.getText();
     }
@@ -99,7 +100,7 @@ public class Document extends Thought {
     }
 
     public Activation addInput(Neuron n, Reference ref) {
-        Activation act = createActivation(n);
+        Activation act = n.createActivation(this);
         act.initInput(ref);
         return act;
     }
@@ -109,7 +110,7 @@ public class Document extends Thought {
     }
 
     @Deprecated
-    public Activation processToken(TextModel m, TextReference lastRef, int begin, int end, String tokenLabel) {
+    public Activation<?> processToken(TextModel m, TextReference lastRef, int begin, int end, String tokenLabel) {
         TextReference ref = new TextReference(this, begin, end);
         Neuron tokenN = m.lookupToken(tokenLabel);
         Activation tokenPatternAct = addInput(tokenN, ref);

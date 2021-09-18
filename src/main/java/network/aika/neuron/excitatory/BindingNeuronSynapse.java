@@ -20,18 +20,20 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.visitor.Visitor;
+import network.aika.neuron.steps.activation.SetFinalMode;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends ExcitatorySynapse<I, BindingNeuron> {
+public abstract class BindingNeuronSynapse<I extends Neuron> extends ExcitatorySynapse<I, BindingNeuron, BindingActivation> {
 
     @Override
-    public void updateOutputNet(Link l, double delta) {
+    public void updateOutputNet(Link<BindingActivation> l, double delta) {
         if(
                 isRecurrent() &&
                 !isNegative() &&
@@ -41,6 +43,7 @@ public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends Excitato
             return;
 
         super.updateOutputNet(l, delta);
+        SetFinalMode.add(l.getOutput());
     }
 
     @Override
@@ -66,7 +69,7 @@ public abstract class BindingNeuronSynapse<I extends Neuron<?>> extends Excitato
     }
 
     @Override
-    public Activation branchIfNecessary(Activation oAct, Visitor v) {
+    public BindingActivation branchIfNecessary(BindingActivation oAct, Visitor v) {
         if (getOutput().isInputNeuron())
             return null;
 
