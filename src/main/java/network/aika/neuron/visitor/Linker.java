@@ -14,17 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.steps;
+package network.aika.neuron.visitor;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.Scope;
-import network.aika.neuron.activation.visitor.VisitorTask;
+import network.aika.neuron.visitor.tasks.VisitorTask;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -36,20 +35,13 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
  */
 public abstract class Linker implements VisitorTask {
 
-    protected Direction direction;
-    protected Synapse<?, ?, ?> targetSynapse;
+    protected Direction startDirection;
+    protected Synapse targetSynapse;
 
-    public Linker(Direction dir) {
-        this.direction = dir;
-    }
 
     public abstract boolean checkPropagate(Activation act, Synapse targetSynapse);
 
     public abstract Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir);
-
-    public Direction getDirection() {
-        return direction;
-    }
 
     public Stream<? extends Synapse> getTemplateTargetSynapses(Activation act, Direction dir) {
         Stream<Neuron<?, ?>> s = act.getNeuron().getTemplateGroup().stream();
@@ -89,8 +81,8 @@ public abstract class Linker implements VisitorTask {
         Activation currentAct = v.getActivation();
         Activation originAct = v.getOriginAct();
 
-        Activation iAct = direction.getInput(originAct, currentAct);
-        Activation oAct = direction.getOutput(originAct, currentAct);
+        Activation iAct = startDirection.getInput(originAct, currentAct);
+        Activation oAct = startDirection.getOutput(originAct, currentAct);
 
         closeLoopIntern(v, iAct, oAct);
     }
@@ -109,40 +101,48 @@ public abstract class Linker implements VisitorTask {
         targetSynapse.transition(v, s, l);
     }
 
-    public void link(Link l) {
+    public void link(Link l, List<Direction> directions) {
         Activation startAct = l.getOutput();
 
-        getTemplateTargetSynapses(startAct, direction)
-                .forEach(ts ->
-                        follow(l, INPUT, startAct, ts)
-                );
+        directions.forEach(dir ->
+                getTemplateTargetSynapses(startAct, dir)
+                        .forEach(ts ->
+                                follow(l, INPUT, startAct, ts)
+                        )
+        );
     }
 
-    public void link(Activation startAct) {
-        getTemplateTargetSynapses(startAct, direction)
-                .forEach(ts ->
-                        follow(startAct, ts)
-                );
+    public void link(Activation startAct, List<Direction> directions) {
+        directions.forEach(dir ->
+                getTemplateTargetSynapses(startAct, dir)
+                        .forEach(ts ->
+                                follow(dir, startAct, ts)
+                        )
+        );
     }
 
     private void follow(Link l, Direction startDir, Activation startAct, Synapse ts) {
         startAct.setMarked(true);
         targetSynapse = ts;
-        Scope startScope = getStartScope(startDir, ts);
+        startDirection = startDir;
+        Scope startScope = getStartScope(startDirection, ts);
         ActVisitor v = new ActVisitor(null, this, startAct, startScope, startDir, startDir);
         ts.transition(v, l.getSynapse(), l);
 
+        startDirection = null;
         targetSynapse = null;
         startAct.setMarked(false);
     }
 
-    private void follow(Activation startAct, Synapse ts) {
+    private void follow(Direction startDir, Activation startAct, Synapse ts) {
         targetSynapse = ts;
-        Scope startScope = getStartScope(direction, ts);
+        startDirection = startDir;
+        Scope startScope = getStartScope(startDirection, ts);
         neuronTransition(
-                new ActVisitor(null, this, startAct, startScope, direction, INPUT),
+                new ActVisitor(null, this, startAct, startScope, startDirection, INPUT),
                 startAct
         );
+        startDirection = null;
         targetSynapse = null;
     }
 
@@ -161,8 +161,9 @@ public abstract class Linker implements VisitorTask {
                 .getScope();
     }
 
-    public void propagate(Activation act) {
-        getTargetSynapses(act, direction)
+    public void propagate(Direction dir, Activation act) {
+        startDirection = dir;
+        getTargetSynapses(act, startDirection)
                 .filter(s ->
                         checkPropagate(act, s)
                 )
@@ -170,13 +171,14 @@ public abstract class Linker implements VisitorTask {
                         !exists(act, s)
                 )
                 .forEach(s ->
-                        s.propagate(act, direction, this, false)
+                        s.propagate(act, startDirection, this, false)
                 );
+        startDirection = null;
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Direction: " + direction);
+        sb.append("Direction: " + startDirection);
         if (targetSynapse.isTemplate())
             sb.append(targetSynapse.getTemplateInfo().getLabel() + " : ");
 

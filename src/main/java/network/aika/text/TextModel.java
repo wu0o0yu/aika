@@ -27,7 +27,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.steps.tasks.LinkingTask;
+import network.aika.neuron.visitor.tasks.LinkingTask;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -35,7 +35,7 @@ import java.io.IOException;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
-import static network.aika.neuron.steps.tasks.LinkingTask.addNextLinkerSteps;
+import static network.aika.neuron.visitor.tasks.LinkingTask.addNextLinkerSteps;
 
 /**
  *

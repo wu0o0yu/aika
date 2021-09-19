@@ -20,9 +20,12 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
-import network.aika.neuron.steps.tasks.LinkingTask;
+import network.aika.neuron.steps.VisitorStep;
+import network.aika.neuron.visitor.tasks.LinkingTask;
 
-import static network.aika.neuron.activation.Fired.NOT_FIRED;
+import java.util.List;
+import java.util.Set;
+
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 
@@ -38,16 +41,15 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Propagate extends Step<Activation> {
+public class Propagate extends VisitorStep<Activation, LinkingTask> {
 
-    private final LinkingTask task = new LinkingTask(OUTPUT);
 
     public static void add(Activation act) {
         Step.add(new Propagate(act));
     }
 
     private Propagate(Activation act) {
-        super(act);
+        super(act, new LinkingTask(), List.of(OUTPUT));
     }
 
     @Override
@@ -65,7 +67,7 @@ public class Propagate extends Step<Activation> {
         if(!getElement().isFired())
             return;
 
-        task.propagate(getElement());
+        task.propagate(OUTPUT, getElement());
     }
 
     public boolean checkIfQueued() {
@@ -73,6 +75,6 @@ public class Propagate extends Step<Activation> {
     }
 
     public String toString() {
-        return "Act-Step: Propagate (" + task + ")";
+        return "Act-Step: Propagate (" + task + ", " + directions + ")";
     }
 }

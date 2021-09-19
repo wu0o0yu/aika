@@ -23,6 +23,9 @@ import network.aika.neuron.steps.StepType;
 import network.aika.neuron.steps.link.LinkCounting;
 import network.aika.utils.Utils;
 
+import java.util.List;
+import java.util.Set;
+
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -67,10 +70,8 @@ public class CheckIfFired extends Step<Activation> {
         if(Utils.belowTolerance(act.getOutputGradientSum()))
             return;
 
-        TemplatePropagate.add(act, INPUT);
-
-        TemplateCloseLoop.add(act, OUTPUT);
-        TemplatePropagate.add(act, OUTPUT);
+        TemplatePropagate.add(act, List.of(INPUT, OUTPUT));
+        TemplateCloseLoop.add(act, List.of(OUTPUT));
     }
 
     @Override

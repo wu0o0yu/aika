@@ -17,13 +17,16 @@
 package network.aika.neuron.steps.link;
 
 
-import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
-import network.aika.neuron.steps.tasks.LinkingTask;
+import network.aika.neuron.steps.VisitorStep;
+import network.aika.neuron.visitor.tasks.LinkingTask;
+
+import java.util.List;
+import java.util.Set;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -34,27 +37,18 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Linking extends Step<Link> {
-
-    private final LinkingTask task;
+public class Linking extends VisitorStep<Link, LinkingTask> {
 
     public static void add(Link l) {
-        Step.add(new Linking(l, INPUT));
-
-        if(!l.getOutput().isFired())
-            return;
-
-        Step.add(new Linking(l, OUTPUT));
+        Step.add(new Linking(l,
+                l.getOutput().isFired() ?
+                        List.of(INPUT, OUTPUT) :
+                        List.of(INPUT))
+        );
     }
 
-    public Linking(Link l, Direction dir) {
-        super(l);
-        task = new LinkingTask(dir);
-    }
-
-    @Override
-    public String getStepName() {
-        return super.getStepName() + ":" + task.getDirection();
+    public Linking(Link l, List<Direction> dirs) {
+        super(l, new LinkingTask(), dirs);
     }
 
     @Override
@@ -74,12 +68,12 @@ public class Linking extends Step<Link> {
     @Override
     public void process() {
         Link l = getElement();
-        task.link(l);
+        task.link(l, directions);
 
         LinkCounting.add(l);
     }
 
     public String toString() {
-        return "Link-Step: Linking (" + task + ")";
+        return "Link-Step: Linking (" + task + ", " + directions + ")";
     }
 }

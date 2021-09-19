@@ -21,14 +21,12 @@ import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Reference;
-import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.visitor.ActVisitor;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import org.apache.commons.math3.distribution.BetaDistribution;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;

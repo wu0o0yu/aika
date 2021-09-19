@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation.visitor;
+package network.aika.neuron.visitor;
 
 import network.aika.Thought;
 import network.aika.callbacks.VisitorEvent;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.visitor.tasks.VisitorTask;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 
@@ -36,7 +37,6 @@ public abstract class Visitor {
     protected VisitorTask task;
     protected Direction startDir;
     protected Direction currentDir;
-
     private int downSteps = 0;
     private int upSteps = 0;
     protected Scope scope;
@@ -61,10 +61,6 @@ public abstract class Visitor {
         currentDir = currentDir.invert();
     }
 
-    public Visitor getPreviousStep() {
-        return previousStep;
-    }
-
     public Direction getStartDir() {
         return startDir;
     }
@@ -73,16 +69,20 @@ public abstract class Visitor {
         return currentDir;
     }
 
+    public Scope getScope() {
+        return scope;
+    }
+
+    public Visitor getPreviousStep() {
+        return previousStep;
+    }
+
     public int getDownSteps() {
         return downSteps;
     }
 
     public int getUpSteps() {
         return upSteps;
-    }
-
-    public Scope getScope() {
-        return scope;
     }
 
     public VisitorTask getVisitorTask() {

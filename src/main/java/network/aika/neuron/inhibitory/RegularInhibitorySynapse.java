@@ -18,7 +18,7 @@ package network.aika.neuron.inhibitory;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.visitor.ActVisitor;
 import network.aika.neuron.excitatory.BindingNeuron;
 
 /**

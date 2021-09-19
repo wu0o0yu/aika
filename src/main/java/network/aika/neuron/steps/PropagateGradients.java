@@ -24,6 +24,9 @@ import network.aika.neuron.steps.activation.UpdateBias;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.utils.Utils;
 
+import java.util.List;
+import java.util.Set;
+
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
@@ -45,18 +48,9 @@ public abstract class PropagateGradients extends Step<Activation>  {
         act.updateOutputGradientSum(g);
 
         PropagateGradientAndUpdateWeight.addInputs(act, g);
-
         UpdateBias.add(act, act.getConfig().getLearnRate() * Utils.sum(g));
-
-        TemplateCloseLoop.add(act, INPUT);
-
-//        addLinksToQueue(INPUT, LinkStep.TEMPLATE);
-
-        if(!act.isFired())
-            return;
-
-        TemplatePropagate.add(act, INPUT);
-        TemplateCloseLoop.add(act, OUTPUT);
-        TemplatePropagate.add(act, OUTPUT);
+        TemplateCloseLoop.add(act, act.isFired() ? List.of(INPUT, OUTPUT) : List.of(INPUT));
+        if(act.isFired())
+            TemplatePropagate.add(act, List.of(INPUT, OUTPUT));
     }
 }

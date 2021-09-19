@@ -20,9 +20,9 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.Visitor;
-import network.aika.neuron.activation.visitor.Scope;
+import network.aika.neuron.visitor.ActVisitor;
+import network.aika.neuron.visitor.Visitor;
+import network.aika.neuron.visitor.Scope;
 
 import static network.aika.neuron.activation.Activation.INCOMING;
 import static network.aika.neuron.activation.Activation.OWN;

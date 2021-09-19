@@ -26,7 +26,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.visitor.Visitor;
+import network.aika.neuron.visitor.Visitor;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
 

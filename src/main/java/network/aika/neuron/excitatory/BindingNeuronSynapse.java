@@ -23,7 +23,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
-import network.aika.neuron.activation.visitor.Visitor;
+import network.aika.neuron.visitor.Visitor;
 import network.aika.neuron.steps.activation.SetFinalMode;
 
 /**

@@ -17,7 +17,7 @@
 package network.aika.neuron;
 
 
-import network.aika.neuron.activation.visitor.Scope;
+import network.aika.neuron.visitor.Scope;
 
 import java.util.Set;
 

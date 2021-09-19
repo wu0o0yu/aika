@@ -21,10 +21,11 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
-import network.aika.neuron.steps.tasks.TemplateTask;
+import network.aika.neuron.steps.VisitorStep;
+import network.aika.neuron.visitor.tasks.TemplateTask;
 
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
@@ -32,22 +33,14 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class TemplatePropagate extends Step<Activation> {
+public class TemplatePropagate extends VisitorStep<Activation, TemplateTask> {
 
-    private final TemplateTask task;
-
-    public static void add(Activation act, Direction dir) {
-        Step.add(new TemplatePropagate(act, dir));
+    public static void add(Activation act, List<Direction> dirs) {
+        Step.add(new TemplatePropagate(act, dirs));
     }
 
-    private TemplatePropagate(Activation act, Direction dir) {
-        super(act);
-        task = new TemplateTask(dir);
-    }
-
-    @Override
-    public String getStepName() {
-        return super.getStepName() + ":" + task.getDirection();
+    private TemplatePropagate(Activation act, List<Direction> dirs) {
+        super(act, new TemplateTask(), dirs);
     }
 
     @Override
@@ -71,10 +64,12 @@ public class TemplatePropagate extends Step<Activation> {
         if (!act.getNeuron().allowTemplatePropagate(act))
             return;
 
-        task.propagate(act);
+        directions.forEach(dir ->
+                task.propagate(dir, act)
+        );
     }
 
     public String toString() {
-        return "Act-Step: Template-Propagate (" + task + ")";
+        return "Act-Step: Template-Propagate (" + task + ", " + directions + ")";
     }
 }

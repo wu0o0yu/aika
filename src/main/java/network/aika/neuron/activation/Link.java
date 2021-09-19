@@ -19,9 +19,9 @@ package network.aika.neuron.activation;
 import network.aika.Config;
 import network.aika.Thought;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.LinkVisitor;
-import network.aika.neuron.activation.visitor.Scope;
+import network.aika.neuron.visitor.ActVisitor;
+import network.aika.neuron.visitor.LinkVisitor;
+import network.aika.neuron.visitor.Scope;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.link.AddLink;
 import network.aika.utils.Utils;
@@ -31,7 +31,6 @@ import java.util.Comparator;
 import static network.aika.callbacks.VisitorEvent.AFTER;
 import static network.aika.callbacks.VisitorEvent.BEFORE;
 import static network.aika.neuron.sign.Sign.POS;
-import static network.aika.neuron.steps.Step.*;
 
 /**
  *

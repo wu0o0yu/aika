@@ -19,7 +19,7 @@ package network.aika.neuron.inhibitory;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.visitor.ActVisitor;
 import network.aika.neuron.excitatory.PatternNeuron;
 
 /**

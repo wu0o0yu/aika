@@ -1,8 +1,9 @@
-package network.aika.neuron.activation.visitor;
+package network.aika.neuron.visitor.tasks;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.visitor.ActVisitor;
 
 public interface VisitorTask {
 

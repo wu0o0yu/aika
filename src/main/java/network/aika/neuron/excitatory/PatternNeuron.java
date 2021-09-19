@@ -20,9 +20,7 @@ import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.visitor.ActVisitor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import network.aika.neuron.visitor.ActVisitor;
 
 import java.io.DataInput;
 import java.io.DataOutput;

@@ -14,23 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.steps.tasks;
+package network.aika.neuron.visitor.tasks;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.steps.Linker;
-import network.aika.neuron.steps.Step;
+import network.aika.neuron.visitor.ActVisitor;
+import network.aika.neuron.visitor.Linker;
 import network.aika.neuron.steps.link.InformationGainGradient;
 import network.aika.neuron.steps.link.Linking;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 
 import java.util.stream.Stream;
 
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
@@ -39,9 +36,6 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class LinkingTask extends Linker {
 
-    public LinkingTask(Direction dir) {
-        super(dir);
-    }
 
     @Override
     public Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir) {
@@ -106,7 +100,7 @@ public class LinkingTask extends Linker {
 
     public String toString() {
         return "Linking Task" +
-                " " + direction +
+                " " + startDirection +
                 (targetSynapse != null ? ": (Target-Synapse:" + targetSynapse + ")" : "");
     }
 }

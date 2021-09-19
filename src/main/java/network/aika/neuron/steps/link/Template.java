@@ -16,13 +16,16 @@
  */
 package network.aika.neuron.steps.link;
 
-import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
-import network.aika.neuron.steps.tasks.TemplateTask;
+import network.aika.neuron.steps.VisitorStep;
+import network.aika.neuron.visitor.tasks.TemplateTask;
+
+import java.util.List;
+import java.util.Set;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -33,26 +36,18 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Template extends Step<Link> {
-
-    private final TemplateTask task;
+public class Template extends VisitorStep<Link, TemplateTask> {
 
     public static void add(Link l) {
-        Step.add(new Template(l, INPUT));
-        if(!l.getOutput().isFired())
-            return;
-
-        Step.add(new Template(l, OUTPUT));
+        Step.add(new Template(l,
+                l.getOutput().isFired() ?
+                        List.of(INPUT, OUTPUT) :
+                        List.of(INPUT))
+        );
     }
 
-    private Template(Link l, Direction dir) {
-        super(l);
-        task = new TemplateTask(dir);
-    }
-
-    @Override
-    public String getStepName() {
-        return super.getStepName() + ":" + task.getDirection();
+    private Template(Link l, List<Direction> dirs) {
+        super(l, new TemplateTask(), dirs);
     }
 
     @Override
@@ -67,7 +62,7 @@ public class Template extends Step<Link> {
 
     @Override
     public void process() {
-        task.link(getElement());
+        task.link(getElement(), directions);
     }
 
     public boolean checkIfQueued() {
@@ -75,6 +70,6 @@ public class Template extends Step<Link> {
     }
 
     public String toString() {
-        return "Link-Step: Template (" + task + ")";
+        return "Link-Step: Template (" + task + ", " + directions + ")";
     }
 }

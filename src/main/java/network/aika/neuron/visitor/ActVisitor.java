@@ -14,44 +14,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation.visitor;
+package network.aika.neuron.visitor;
 
-import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Link;
-
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.visitor.tasks.VisitorTask;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class LinkVisitor extends Visitor {
+public class ActVisitor extends Visitor {
 
-    private Link link;
+    private final Activation act;
 
-    public LinkVisitor(ActVisitor v, Synapse syn, Link l) {
+    public ActVisitor(LinkVisitor v, Activation act) {
         super(v);
-        link = l;
-        incrementPathLength();
-
-        onCandidateEvent(syn);
+        this.act = act;
     }
 
-    public LinkVisitor(ActVisitor v, Synapse syn, Link l, Scope ns) {
-        this(v, syn, l);
-        scope = ns;
+    public ActVisitor(Visitor v, VisitorTask task, Activation act, Scope scope, Direction startDir, Direction currentDir) {
+        super(v);
+        this.task = task;
+        this.origin = this;
+        this.act = act;
+        this.startDir = startDir;
+        this.currentDir = currentDir;
+        this.scope = scope;
     }
 
-    public void setLink(Link link) {
-        this.link = link;
-    }
-
-    public Link getLink() {
-        return link;
+    public Activation getActivation() {
+        return act;
     }
 
     public String toString() {
-        return "Current:" + (link != null ? link : "X") + ", " +
-                "Origin:" + origin.getActivation().toShortString() + ", " +
+        return "Current:" + (act != null ? act.toShortString() : "X") + ", " +
+                "Origin:" + origin.act.toShortString() + ", " +
                 super.toString();
     }
 }

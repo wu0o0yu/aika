@@ -21,8 +21,8 @@ import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.steps.tasks.AlternateBranchTask;
+import network.aika.neuron.visitor.ActVisitor;
+import network.aika.neuron.visitor.tasks.AlternateBranchTask;
 import network.aika.utils.Utils;
 
 import java.io.DataInput;

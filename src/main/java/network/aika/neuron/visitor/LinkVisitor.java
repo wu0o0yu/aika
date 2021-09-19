@@ -14,51 +14,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.steps.tasks;
+package network.aika.neuron.visitor;
 
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.visitor.ActVisitor;
-import network.aika.neuron.activation.visitor.VisitorTask;
+
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class AlternateBranchTask implements VisitorTask {
+public class LinkVisitor extends Visitor {
 
-    private boolean isAlternateBranch;
+    private Link link;
 
-    public AlternateBranchTask() {
+    public LinkVisitor(ActVisitor v, Synapse syn, Link l) {
+        super(v);
+        link = l;
+        incrementPathLength();
+
+        onCandidateEvent(syn);
     }
 
-    public void checkBranch(Activation act) {
-        if(act.isMarked())
-            isAlternateBranch = true;
+    public LinkVisitor(ActVisitor v, Synapse syn, Link l, Scope ns) {
+        this(v, syn, l);
+        scope = ns;
     }
 
-    @Override
-    public void processTask(ActVisitor v) {
-
+    public void setLink(Link link) {
+        this.link = link;
     }
 
-    @Override
-    public void neuronTransition(ActVisitor v, Activation act) {
-        act.getNeuron()
-                .alternateBranchTransition(v, act);
-    }
-
-    @Override
-    public void synapseTransition(ActVisitor v, Synapse s, Link l) {
-        s.alternateBranchTransition(v, s, l);
-    }
-
-    public boolean isAlternateBranch() {
-        return isAlternateBranch;
+    public Link getLink() {
+        return link;
     }
 
     public String toString() {
-        return "AlternateBranchTask";
+        return "Current:" + (link != null ? link : "X") + ", " +
+                "Origin:" + origin.getActivation().toShortString() + ", " +
+                super.toString();
     }
 }

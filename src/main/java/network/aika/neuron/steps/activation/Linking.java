@@ -20,7 +20,10 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
-import network.aika.neuron.steps.tasks.LinkingTask;
+import network.aika.neuron.steps.VisitorStep;
+import network.aika.neuron.visitor.tasks.LinkingTask;
+
+import java.util.List;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
@@ -37,16 +40,14 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Linking extends Step<Activation> {
-
-    private LinkingTask task = new LinkingTask(OUTPUT);
+public class Linking extends VisitorStep<Activation, LinkingTask> {
 
     public static void add(Activation act) {
         Step.add(new Linking(act));
     }
 
     private Linking(Activation act) {
-        super(act);
+        super(act, new LinkingTask(), List.of(OUTPUT));
     }
 
     @Override
@@ -68,12 +69,12 @@ public class Linking extends Step<Activation> {
         Activation act = getElement();
         act.getThought().linkInputRelations(act);
 
-        task.link(act);
+        task.link(act, directions);
 
         act.getModel().linkInputRelations(act, OUTPUT);
     }
 
     public String toString() {
-        return "Act-Step: Linking (" + task + ")";
+        return "Act-Step: Linking (" + task + ", " + directions + ")";
     }
 }

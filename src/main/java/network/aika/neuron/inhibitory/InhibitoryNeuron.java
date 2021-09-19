@@ -23,7 +23,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
-import network.aika.neuron.activation.visitor.ActVisitor;
+import network.aika.neuron.visitor.ActVisitor;
 
 /**
  *
