@@ -17,7 +17,9 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.linker.LinkingTask;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
@@ -25,6 +27,9 @@ import network.aika.neuron.steps.LinkerStep;
 import network.aika.neuron.linker.TemplateTask;
 
 import java.util.List;
+import java.util.Map;
+
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
@@ -32,14 +37,18 @@ import java.util.List;
  *
  * @author Lukas Molzberger
  */
-public class TemplateCloseLoop extends LinkerStep<Activation, TemplateTask> {
+public class TemplateLinking extends LinkerStep<Activation, TemplateTask> {
 
     public static void add(Activation act, List<Direction> dirs) {
-        Step.add(new TemplateCloseLoop(act, dirs));
+        Step.add(new TemplateLinking(act, act.getPatternBindingSignals(), dirs));
     }
 
-    private TemplateCloseLoop(Activation act, List<Direction> dirs) {
-        super(act, new TemplateTask(), dirs);
+    public static void add(Activation act, Map<PatternActivation, Byte> bindingSignal, List<Direction> dirs) {
+        Step.add(new TemplateLinking(act, bindingSignal, dirs));
+    }
+
+    private TemplateLinking(Activation act, Map<PatternActivation, Byte> bindingSignals, List<Direction> dirs) {
+        super(act, bindingSignals, new TemplateTask(), dirs);
     }
 
     @Override
@@ -54,7 +63,7 @@ public class TemplateCloseLoop extends LinkerStep<Activation, TemplateTask> {
 
     @Override
     public void process() {
-        task.link(getElement(), directions);
+        task.link(getElement(), bindingSignals, directions);
     }
 
     public boolean checkIfQueued() {

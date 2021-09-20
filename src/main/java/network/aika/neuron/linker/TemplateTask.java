@@ -24,12 +24,10 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.activation.Induction;
 import network.aika.neuron.steps.link.InformationGainGradient;
 import network.aika.neuron.steps.link.LinkInduction;
+import network.aika.neuron.steps.link.PropagateBindingSignal;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
-import network.aika.neuron.steps.link.Template;
 
 import java.util.stream.Stream;
-
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
@@ -68,7 +66,7 @@ public class TemplateTask extends AbstractLinker {
 
     @Override
     public void getNextSteps(Link l) {
-        Template.add(l);
+        PropagateBindingSignal.add(l);
         LinkInduction.add(l);
 
         if(!l.getConfig().isEnableTraining())

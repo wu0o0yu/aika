@@ -18,11 +18,8 @@ package network.aika;
 
 
 import network.aika.callbacks.EventListener;
-import network.aika.callbacks.VisitorEvent;
-import network.aika.callbacks.VisitorEventListener;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;

@@ -17,7 +17,6 @@
 package network.aika.neuron;
 
 import network.aika.Model;
-import network.aika.neuron.linker.Scope;
 import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.PrimaryInhibitorySynapse;

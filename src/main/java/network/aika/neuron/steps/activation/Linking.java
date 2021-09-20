@@ -17,6 +17,7 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
@@ -24,6 +25,7 @@ import network.aika.neuron.steps.LinkerStep;
 import network.aika.neuron.linker.LinkingTask;
 
 import java.util.List;
+import java.util.Map;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
@@ -43,11 +45,15 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 public class Linking extends LinkerStep<Activation, LinkingTask> {
 
     public static void add(Activation act) {
-        Step.add(new Linking(act));
+        Step.add(new Linking(act, act.getPatternBindingSignals()));
     }
 
-    private Linking(Activation act) {
-        super(act, new LinkingTask(), List.of(OUTPUT));
+    public static void add(Activation act, Map<PatternActivation, Byte> bindingSignals) {
+        Step.add(new Linking(act, bindingSignals));
+    }
+
+    private Linking(Activation act, Map<PatternActivation, Byte> bindingSignals) {
+        super(act, bindingSignals, new LinkingTask(), List.of(OUTPUT));
     }
 
     @Override
@@ -69,7 +75,7 @@ public class Linking extends LinkerStep<Activation, LinkingTask> {
         Activation act = getElement();
         act.getThought().linkInputRelations(act);
 
-        task.link(act, directions);
+        task.link(act, bindingSignals, directions);
 
         act.getModel().linkInputRelations(act, OUTPUT);
     }

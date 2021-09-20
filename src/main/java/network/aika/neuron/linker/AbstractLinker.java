@@ -24,9 +24,9 @@ import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.direction.Direction;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 
 /**
  *
@@ -76,51 +76,43 @@ public abstract class AbstractLinker {
         getNextSteps(nl);
     }
 
-    public void link(Activation<?> fromAct, Direction dir, Synapse targetSynapse) {
-        fromAct.getPatternBindingSignals().entrySet().stream()
-                .forEach(e -> link(fromAct, dir, e.getKey(), e.getValue(), targetSynapse));
+    public void link(Activation<?> fromAct, Map<PatternActivation, Byte> bindingSignals, List<Direction> dirs) {
+        bindingSignals.entrySet().stream()
+                .forEach(e ->
+                        link(fromAct, dirs, e.getKey(), e.getValue())
+                );
+    }
+
+    public void link(Activation<?> fromAct, List<Direction> dirs, PatternActivation bindingSignal, Byte scope) {
+        dirs.forEach(dir ->
+            getTargetSynapses(fromAct, dir)
+                    .forEach(ts ->
+                            link(fromAct, dir, bindingSignal, scope, ts)
+                    )
+        );
     }
 
     public void link(Activation<?> fromAct, Direction dir, PatternActivation bindingSignal, Byte scope, Synapse targetSynapse) {
         searchRelatedCandidates(scope, dir, bindingSignal, targetSynapse)
-                .forEach(toAct -> link(fromAct, toAct, dir, targetSynapse));
+                .forEach(toAct ->
+                        link(fromAct, toAct, dir, targetSynapse)
+                );
     }
 
-    public void link(Activation<?> fromAct, Activation<?> toAct, Direction dir, Synapse targetSynapse) {
+    private void link(Activation<?> fromAct, Activation<?> toAct, Direction dir, Synapse targetSynapse) {
         if(fromAct == toAct)
             return;
 
         Activation iAct = dir.getInput(fromAct, toAct);
         Activation oAct = dir.getOutput(fromAct, toAct);
 
-        if(!targetSynapse.checkCausality(iAct, oAct))
-
-        linkIntern(iAct, oAct, targetSynapse);
+        if(targetSynapse.checkCausality(iAct, oAct))
+            linkIntern(iAct, oAct, targetSynapse);
     }
 
     private Stream<Activation> searchRelatedCandidates(Byte fromScope, Direction dir, PatternActivation bs, Synapse targetSynapse) {
         return bs.getReverseBindingSignals().entrySet().stream()
                 .filter(e -> targetSynapse.transitionScope(fromScope, dir) == e.getValue())
                 .map(e -> e.getKey());
-    }
-
-    public void link(Link l, List<Direction> directions) {
-        Activation startAct = l.getOutput();
-
-        directions.forEach(dir ->
-                getTargetSynapses(startAct, dir)
-                        .forEach(ts ->
-                                follow(l, INPUT, startAct, ts)
-                        )
-        );
-    }
-
-    public void link(Activation fromAct, List<Direction> directions) {
-        directions.forEach(dir ->
-                getTargetSynapses(fromAct, dir)
-                        .forEach(ts ->
-                                link(fromAct, dir, ts)
-                        )
-        );
     }
 }

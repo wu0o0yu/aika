@@ -17,15 +17,13 @@
 package network.aika.neuron.steps;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.steps.Step;
-import network.aika.neuron.steps.activation.TemplateCloseLoop;
+import network.aika.neuron.steps.activation.TemplateLinking;
 import network.aika.neuron.steps.activation.TemplatePropagate;
 import network.aika.neuron.steps.activation.UpdateBias;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.utils.Utils;
 
 import java.util.List;
-import java.util.Set;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -49,7 +47,7 @@ public abstract class PropagateGradients extends Step<Activation>  {
 
         PropagateGradientAndUpdateWeight.addInputs(act, g);
         UpdateBias.add(act, act.getConfig().getLearnRate() * Utils.sum(g));
-        TemplateCloseLoop.add(act, act.isFired() ? List.of(INPUT, OUTPUT) : List.of(INPUT));
+        TemplateLinking.add(act, act.isFired() ? List.of(INPUT, OUTPUT) : List.of(INPUT));
         if(act.isFired())
             TemplatePropagate.add(act, List.of(INPUT, OUTPUT));
     }

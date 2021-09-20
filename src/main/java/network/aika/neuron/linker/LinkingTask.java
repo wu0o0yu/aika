@@ -21,12 +21,10 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.link.InformationGainGradient;
-import network.aika.neuron.steps.link.Linking;
+import network.aika.neuron.steps.link.PropagateBindingSignal;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 
 import java.util.stream.Stream;
-
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
@@ -60,7 +58,7 @@ public class LinkingTask extends AbstractLinker {
     }
 
     public static void addNextLinkerSteps(Link l) {
-        Linking.add(l);
+        PropagateBindingSignal.add(l);
 
         if(!l.getConfig().isEnableTraining())
             return;

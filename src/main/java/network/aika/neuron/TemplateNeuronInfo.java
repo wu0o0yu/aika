@@ -16,9 +16,6 @@
  */
 package network.aika.neuron;
 
-
-import network.aika.neuron.linker.Scope;
-
 import java.util.Set;
 
 /**
