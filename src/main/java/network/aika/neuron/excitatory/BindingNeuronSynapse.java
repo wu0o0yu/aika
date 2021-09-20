@@ -23,7 +23,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
-import network.aika.neuron.visitor.Visitor;
 import network.aika.neuron.steps.activation.SetFinalMode;
 
 /**
@@ -47,8 +46,8 @@ public abstract class BindingNeuronSynapse<I extends Neuron> extends ExcitatoryS
     }
 
     @Override
-    protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
-        return Link.isForward(fromAct, toAct);
+    public boolean checkCausality(Activation<?> iAct, Activation<?> oAct) {
+        return Link.isForward(iAct, oAct);
     }
 
     @Override
@@ -69,11 +68,11 @@ public abstract class BindingNeuronSynapse<I extends Neuron> extends ExcitatoryS
     }
 
     @Override
-    public BindingActivation branchIfNecessary(BindingActivation oAct, Visitor v) {
+    public BindingActivation branchIfNecessary(Activation iAct, BindingActivation oAct) {
         if (getOutput().isInputNeuron())
             return null;
 
-        if(isRecurrent() && !v.getSelfRef())
+        if(isRecurrent() && !oAct.isSelfRef(iAct))
             return null;
 
         return oAct;

@@ -14,15 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.visitor.tasks;
+package network.aika.neuron.linker;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.visitor.ActVisitor;
-import network.aika.neuron.visitor.Linker;
 import network.aika.neuron.steps.activation.Induction;
 import network.aika.neuron.steps.link.InformationGainGradient;
 import network.aika.neuron.steps.link.LinkInduction;
@@ -37,21 +35,22 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class TemplateTask extends Linker {
+public class TemplateTask extends AbstractLinker {
 
     @Override
     public Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir) {
-        return super.getTemplateTargetSynapses(act, dir);
+        Stream<Neuron<?, ?>> s = act.getNeuron().getTemplateGroup().stream();
+        return s.flatMap(dir::getSynapses);
     }
 
     @Override
-    public boolean checkPropagate(Activation act, Synapse targetSynapse) {
-        return targetSynapse.checkTemplatePropagate(startDirection, act);
+    public boolean checkPropagate(Activation act, Direction dir, Synapse targetSynapse) {
+        return targetSynapse.checkTemplatePropagate(dir, act);
     }
 
     @Override
-    protected boolean exists(Activation act, Synapse s) {
-        return act.templateLinkExists(startDirection, s);
+    protected boolean exists(Activation act, Direction dir, Synapse s) {
+        return act.templateLinkExists(dir, s);
     }
 
     private boolean neuronMatches(Neuron<?, ?> currentN, Neuron<?, ?> targetN) {
@@ -80,11 +79,8 @@ public class TemplateTask extends Linker {
     }
 
     @Override
-    public void closeLoopIntern(ActVisitor v, Activation iAct, Activation oAct) {
+    public void linkIntern(Activation iAct, Activation oAct, Synapse targetSynapse) {
         if(oAct.getNeuron().isInputNeuron())
-            return;
-
-        if(v.getCurrentDir() != OUTPUT && !targetSynapse.isRecurrent())
             return;
 
         if (!neuronMatches(iAct.getNeuron(), targetSynapse.getInput()))
@@ -99,12 +95,6 @@ public class TemplateTask extends Linker {
         if(Link.templateLinkExists(targetSynapse, iAct, oAct))
             return;
 
-        targetSynapse.closeLoop(this, v, iAct, oAct);
-    }
-
-    public String toString() {
-        return "Template Task:" +
-                " " + startDirection +
-                (targetSynapse != null ? " (Target-Synapse:" + targetSynapse + ")" : "");
+        targetSynapse.createLink(iAct, oAct, oAct.isSelfRef(iAct));
     }
 }

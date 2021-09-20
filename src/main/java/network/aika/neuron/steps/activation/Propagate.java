@@ -20,11 +20,10 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
-import network.aika.neuron.steps.VisitorStep;
-import network.aika.neuron.visitor.tasks.LinkingTask;
+import network.aika.neuron.steps.LinkerStep;
+import network.aika.neuron.linker.LinkingTask;
 
 import java.util.List;
-import java.util.Set;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
@@ -41,7 +40,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Propagate extends VisitorStep<Activation, LinkingTask> {
+public class Propagate extends LinkerStep<Activation, LinkingTask> {
 
 
     public static void add(Activation act) {

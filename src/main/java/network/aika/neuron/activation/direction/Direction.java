@@ -20,7 +20,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.visitor.Scope;
 
 import java.util.stream.Stream;
 
@@ -36,7 +35,7 @@ public interface Direction {
 
     Direction combine(Direction dir);
 
-    Scope transition(Scope current, Scope from, Scope to);
+    Byte transitionScope(Byte fromScope);
 
     Activation getInput(Activation fromAct, Activation toAct);
 

@@ -14,14 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.visitor.tasks;
+package network.aika.neuron.linker;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.visitor.ActVisitor;
-import network.aika.neuron.visitor.Linker;
 import network.aika.neuron.steps.link.InformationGainGradient;
 import network.aika.neuron.steps.link.Linking;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
@@ -34,7 +32,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class LinkingTask extends Linker {
+public class LinkingTask extends AbstractLinker {
 
 
     @Override
@@ -43,17 +41,12 @@ public class LinkingTask extends Linker {
     }
 
     @Override
-    public Stream<? extends Synapse> getTemplateTargetSynapses(Activation act, Direction dir) {
-         return super.getTemplateTargetSynapses(act, dir); // TODO: filter non existing non-template synapses
-    }
-
-    @Override
-    public boolean checkPropagate(Activation act, Synapse targetSynapse) {
+    public boolean checkPropagate(Activation act, Direction dir, Synapse targetSynapse) {
         return true;
     }
 
     @Override
-    protected boolean exists(Activation act, Synapse s) {
+    protected boolean exists(Activation act, Direction dir, Synapse s) {
         return !act.getOutputLinks(s).isEmpty();
     }
 
@@ -77,30 +70,18 @@ public class LinkingTask extends Linker {
     }
 
     @Override
-    public void closeLoopIntern(ActVisitor v, Activation iAct, Activation oAct) {
+    public void linkIntern(Activation iAct, Activation oAct, Synapse targetSynapse) {
         if (!iAct.isFired())
             return;
 
-        if(!(v.getCurrentDir() == OUTPUT || targetSynapse.isRecurrent()))
-            return;
-
  //           return dir.getSynapses(act.getNeuron(), invertRecurrent);
-        Synapse cs = targetSynapse.getConcreteSynapse(iAct.getNeuron(), oAct.getNeuron());
-        if(cs == null)
+
+        if(Link.linkExists(targetSynapse, iAct, oAct))
             return;
 
-        if(Link.linkExists(cs, iAct, oAct))
-            return;
-
-        oAct = cs.branchIfNecessary(oAct, v);
+        oAct = targetSynapse.branchIfNecessary(iAct, oAct);
 
         if(oAct != null)
-            cs.closeLoop(this, v, iAct, oAct);
-    }
-
-    public String toString() {
-        return "Linking Task" +
-                " " + startDirection +
-                (targetSynapse != null ? ": (Target-Synapse:" + targetSynapse + ")" : "");
+            targetSynapse.createLink(iAct, oAct, oAct.isSelfRef(iAct));
     }
 }

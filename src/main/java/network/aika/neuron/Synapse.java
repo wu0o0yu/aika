@@ -22,10 +22,8 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.visitor.ActVisitor;
-import network.aika.neuron.visitor.Visitor;
 import network.aika.neuron.sign.Sign;
-import network.aika.neuron.visitor.Linker;
+import network.aika.neuron.linker.AbstractLinker;
 import network.aika.neuron.steps.UpdateNet;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
@@ -68,29 +66,12 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
 
     protected boolean allowTraining = true;
 
-    public abstract void transition(ActVisitor v, Synapse s, Link l);
-
-    public void alternateBranchTransition(ActVisitor v, Synapse s, Link l) {
-
+    public Byte transitionScope(Byte fromScope, Direction dir) {
+        return fromScope;
     }
 
     public boolean checkTemplatePropagate(Direction dir, Activation act) {
         return false;
-    }
-
-    public void samePatternTransitionLoop(ActVisitor v, Link l) {
-    }
-
-    public void inputPatternTransitionLoop(ActVisitor v, Link l) {
-    }
-
-    public void patternTransitionLoop(ActVisitor v, Link l) {
-    }
-
-    public void inhibitoryTransitionLoop(ActVisitor v, Link l) {
-    }
-
-    public void negativeSynapseTransitionLoop(ActVisitor v, Link l) {
     }
 
     public void setInput(I input) {
@@ -121,28 +102,17 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return s;
     }
 
-    public Synapse getConcreteSynapse(Neuron<?, ?> in, Neuron<?, ?> on) {
-        if(on.getTemplate().getId() != output.getId())
-            return null;
-
-        Synapse cs = on.getInputSynapse(in.getProvider());
-        if(cs == null || cs.getTemplateSynapseId() != getTemplateSynapseId())
-            return null;
-
-        return cs;
-    }
-
     public abstract void updateSynapse(Link l, double delta);
 
     public void propagateGradient(Link l, double[] gradient) {
         l.propagateGradient(gradient[OWN]);
     }
 
-    protected abstract boolean checkCausality(Activation iAct, Activation oAct, Visitor v);
+    public abstract boolean checkCausality(Activation<?> iAct, Activation<?> oAct);
 
     public abstract void updateReference(Link l);
 
-    public A branchIfNecessary(A oAct, Visitor v) {
+    public A branchIfNecessary(Activation iAct, A oAct) {
         return oAct;
     }
 
@@ -154,11 +124,6 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         this.allowTraining = allowTraining;
     }
 
-    /*
-    public static boolean synapseExists(Neuron iN, Neuron oN) {
-        return oN.getInputSynapse(iN.getProvider()) != null;
-    }
-*/
     public boolean isTemplate() {
         return template == null;
     }
@@ -191,10 +156,6 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         s.template = this;
     }
 
-    public boolean checkLoopClosure(ActVisitor v) {
-        return true;
-    }
-
     public Reference getReference(Link l) {
         return l.getInput().getReference();
     }
@@ -207,31 +168,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return false;
     }
 
-    public void propagate(Activation fromAct, Direction dir, Linker vs, boolean isSelfRef) {
-        Thought t = fromAct.getThought();
-        Activation toAct =
-                dir.getNeuron(this).createActivation(t);
-
-        t.onActivationCreationEvent(toAct, fromAct);
-
-        vs.getNextSteps(toAct);
-
-        createLink(
-                dir.getInput(fromAct, toAct),
-                dir.getOutput(fromAct, toAct),
-                vs,
-                isSelfRef
-        );
-    }
-
-    public void closeLoop(Linker vs, ActVisitor v, Activation iAct, Activation oAct) {
-        if (!checkCausality(iAct, oAct, v))
-            return;
-
-        createLink(iAct, oAct, vs, v.getSelfRef());
-    }
-
-    public void createLink(Activation iAct, Activation oAct, Linker task, boolean isSelfRef) {
+    public Link createLink(Activation iAct, Activation oAct, boolean isSelfRef) {
         Link nl = oAct.addLink(
                 this,
                 iAct,
@@ -240,9 +177,9 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
 
         Synapse s = nl.getSynapse();
         if (s.isNegative() && !s.isTemplate())
-            return;
+            return null;
 
-        task.getNextSteps(nl);
+        return nl;
     }
 
     public void linkInput() {

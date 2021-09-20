@@ -17,7 +17,7 @@
 package network.aika.neuron;
 
 import network.aika.Model;
-import network.aika.neuron.visitor.Scope;
+import network.aika.neuron.linker.Scope;
 import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.neuron.inhibitory.PrimaryInhibitorySynapse;
@@ -58,11 +58,11 @@ public class Templates {
     public Templates(Model m) {
         model = m;
 
-        init(INPUT_BINDING_TEMPLATE, -1, "Input Binding Neuron", Scope.INPUT, -1.0, -1.0);
-        init(SAME_BINDING_TEMPLATE, -2, "Same Binding Neuron", Scope.SAME, 0.0, 0.0);
-        init(INPUT_PATTERN_TEMPLATE, -3, "Input Pattern Neuron", Scope.INPUT, 1.0, -1.0);
-        init(SAME_PATTERN_TEMPLATE, -4, "Same Pattern Neuron", Scope.SAME, -1.0, 1.0);
-        init(INHIBITORY_TEMPLATE, -5, "Inhibitory Neuron", Scope.SAME, 1.0, 1.0);
+        init(INPUT_BINDING_TEMPLATE, -1, "Input Binding Neuron", -1.0, -1.0);
+        init(SAME_BINDING_TEMPLATE, -2, "Same Binding Neuron", 0.0, 0.0);
+        init(INPUT_PATTERN_TEMPLATE, -3, "Input Pattern Neuron", 1.0, -1.0);
+        init(SAME_PATTERN_TEMPLATE, -4, "Same Pattern Neuron", -1.0, 1.0);
+        init(INHIBITORY_TEMPLATE, -5, "Inhibitory Neuron", 1.0, 1.0);
 
 
         Set<Neuron> BINDING_NEURON_TEMPLATE_GROUP = Set.of(INPUT_BINDING_TEMPLATE, SAME_BINDING_TEMPLATE);
@@ -186,7 +186,7 @@ public class Templates {
         );
     }
 
-    private <N extends Neuron> void init(N n, int id, String label, Scope s, double x, double y) {
+    private <N extends Neuron> void init(N n, int id, String label, double x, double y) {
         NeuronProvider np = new NeuronProvider(model, id);
         templateNeuronIndex.put((byte) id, n);
         np.setNeuron(n);
@@ -196,7 +196,6 @@ public class Templates {
         templateInfo.setXCoord(x);
         templateInfo.setYCoord(y);
         templateInfo.setLabel(label);
-        templateInfo.setScope(s);
     }
 
     private <S extends Synapse> S init(S ts, Neuron input, Neuron output, String templateLabel, int templateSynapseId, double initialWeight) {

@@ -17,10 +17,8 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.visitor.ActVisitor;
-import network.aika.neuron.visitor.Scope;
+import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.linker.Scope;
 
 /**
  *
@@ -28,29 +26,5 @@ import network.aika.neuron.visitor.Scope;
  */
 public class SameBNSynapse<I extends Neuron> extends BindingNeuronSynapse<I> {
 
-    @Override
-    public void transition(ActVisitor v, Synapse s, Link l) {
-        s.samePatternTransitionLoop(v, l);
-    }
-
-    @Override
-    public void inputPatternTransitionLoop(ActVisitor v, Link l) {
-//        l.follow(v); 2.8.21 *
-    }
-
-    @Override
-    public void patternTransitionLoop(ActVisitor v, Link l) {
-        l.follow(v);
-    }
-
-    @Override
-    public void inhibitoryTransitionLoop(ActVisitor v, Link l) {
-//        l.follow(v); // Causes B-A -> I-B creation
-    }
-
-    @Override
-    public boolean checkLoopClosure(ActVisitor v) {
-        return v.getScope() == Scope.SAME;
-    }
 
 }

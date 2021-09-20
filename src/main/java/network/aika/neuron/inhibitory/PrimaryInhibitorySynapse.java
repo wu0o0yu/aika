@@ -17,9 +17,7 @@
 package network.aika.neuron.inhibitory;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.visitor.ActVisitor;
 import network.aika.neuron.excitatory.PatternNeuron;
 
 /**
@@ -33,11 +31,4 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse<PatternNeuron> {
         return dir == Direction.OUTPUT;
     }
 
-    @Override
-    public void inhibitoryTransitionLoop(ActVisitor v, Link l) {
-        if (v.getStartDir() != v.getCurrentDir())
-            return;
-
-        l.follow(v);
-    }
 }

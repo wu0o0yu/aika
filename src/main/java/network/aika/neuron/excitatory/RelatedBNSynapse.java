@@ -17,10 +17,6 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.visitor.ActVisitor;
-import network.aika.neuron.visitor.Scope;
 
 /**
  *
@@ -28,23 +24,4 @@ import network.aika.neuron.visitor.Scope;
  */
 public class RelatedBNSynapse<I extends Neuron> extends InputBNSynapse<I> {
 
-    @Override
-    public void samePatternTransitionLoop(ActVisitor v, Link l) {
-        Direction currentDir = v.getCurrentDir();
-        if(v.getStartDir() == currentDir)
-            return;
-
-        Scope ns = currentDir.transition(v.getScope(), Scope.RELATED, Scope.SAME);
-        if(ns == null)
-            ns = currentDir.transition(v.getScope(), Scope.INPUT, Scope.RELATED);
-
-        if(ns == null)
-            return;
-
-        l.follow(v, ns);
-    }
-
-    @Override
-    public void inputPatternTransitionLoop(ActVisitor v, Link l) {
-    }
 }

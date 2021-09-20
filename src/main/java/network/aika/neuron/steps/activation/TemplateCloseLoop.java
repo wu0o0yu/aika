@@ -21,11 +21,10 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
-import network.aika.neuron.steps.VisitorStep;
-import network.aika.neuron.visitor.tasks.TemplateTask;
+import network.aika.neuron.steps.LinkerStep;
+import network.aika.neuron.linker.TemplateTask;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
@@ -33,7 +32,7 @@ import java.util.Set;
  *
  * @author Lukas Molzberger
  */
-public class TemplateCloseLoop extends VisitorStep<Activation, TemplateTask> {
+public class TemplateCloseLoop extends LinkerStep<Activation, TemplateTask> {
 
     public static void add(Activation act, List<Direction> dirs) {
         Step.add(new TemplateCloseLoop(act, dirs));

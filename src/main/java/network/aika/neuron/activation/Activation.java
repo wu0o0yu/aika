@@ -24,7 +24,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.visitor.ActVisitor;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.activation.*;
 import network.aika.utils.Utils;
@@ -33,8 +32,6 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.callbacks.VisitorEvent.AFTER;
-import static network.aika.callbacks.VisitorEvent.BEFORE;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.sign.Sign.POS;
@@ -52,7 +49,6 @@ public class Activation<N extends Neuron> extends Element<Activation> {
     protected double net;
     protected double lastNet = 0.0;
     protected Fired fired = NOT_FIRED;
-    protected boolean marked;
 
     protected final int id;
     protected N neuron;
@@ -62,6 +58,9 @@ public class Activation<N extends Neuron> extends Element<Activation> {
     NavigableMap<OutputKey, Link> outputLinks;
 
     private Reference reference;
+
+    protected Map<PatternActivation, Byte> patternBindingSignals = new TreeMap<>();
+    protected Map<BindingActivation, Byte> branchBindingSignals = new TreeMap<>();
 
     public final static int OWN = 0;
     public final static int INCOMING = 1;
@@ -94,14 +93,6 @@ public class Activation<N extends Neuron> extends Element<Activation> {
 
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
-    }
-
-    public boolean isMarked() {
-        return marked;
-    }
-
-    public void setMarked(boolean marked) {
-        this.marked = marked;
     }
 
     public void initInput(Reference ref) {
@@ -166,6 +157,23 @@ public class Activation<N extends Neuron> extends Element<Activation> {
 
     public Thought getThought() {
         return thought;
+    }
+
+    public boolean isSelfRef(Activation iAct) {
+        return false;
+    }
+
+    public void addPatternBindingSignal(PatternActivation bindingSignal, Byte scope) {
+        patternBindingSignals.put(bindingSignal, scope);
+        bindingSignal.reverseBindingSignals.put(this, scope);
+    }
+
+    public Map<PatternActivation, Byte> getPatternBindingSignals() {
+        return patternBindingSignals;
+    }
+
+    public Map<BindingActivation, Byte> getBranchBindingSignals() {
+        return branchBindingSignals;
     }
 
     @Override
@@ -247,26 +255,6 @@ public class Activation<N extends Neuron> extends Element<Activation> {
 
     public void setInputValue(double v) {
         inputValue = v;
-    }
-
-    public void followLinks(ActVisitor v) {
-        v.onEvent(BEFORE);
-
-        Direction dir = v.getCurrentDir();
-
-        setMarked(true);
-        dir.getLinks(this)
-                .forEach(l ->
-                        v.getVisitorTask()
-                                .synapseTransition(v, l.getSynapse(), l)
-                );
-
-        setMarked(false);
-
-        v.getVisitorTask()
-                .processTask(v);
-
-        v.onEvent(AFTER);
     }
 
     public Link getInputLink(Neuron n) {

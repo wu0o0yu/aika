@@ -17,7 +17,7 @@
 package network.aika.neuron;
 
 
-import network.aika.neuron.visitor.Scope;
+import network.aika.neuron.linker.Scope;
 
 import java.util.Set;
 
@@ -28,7 +28,6 @@ import java.util.Set;
 public class TemplateNeuronInfo {
 
     private String label;
-    private Scope scope;
     private Set<Neuron> templateGroup;
 
     private double xCoord;
@@ -65,13 +64,5 @@ public class TemplateNeuronInfo {
 
     public void setTemplateGroup(Set<Neuron> templateGroup) {
         this.templateGroup = templateGroup;
-    }
-
-    public Scope getScope() {
-        return scope;
-    }
-
-    public void setScope(Scope s) {
-        this.scope = s;
     }
 }

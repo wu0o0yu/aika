@@ -21,8 +21,6 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.visitor.ActVisitor;
-import network.aika.neuron.visitor.Visitor;
 import network.aika.neuron.steps.UpdateNet;
 
 import static network.aika.neuron.sign.Sign.POS;
@@ -37,33 +35,6 @@ public abstract class InhibitorySynapse<I extends Neuron> extends Synapse<I, Inh
     @Override
     public boolean checkTemplatePropagate(Direction dir, Activation act) {
         return false;
-    }
-
-    @Override
-    public Synapse getConcreteSynapse(Neuron<?, ?> in, Neuron<?, ?> on) {
-        if(in.getTemplate().getId().intValue() != input.getId().intValue())
-            return null;
-
-        Synapse cs = in.getOutputSynapse(on.getProvider());
-        if(cs == null || cs.getTemplateSynapseId() != getTemplateSynapseId())
-            return null;
-
-        return cs;
-    }
-
-    @Override
-    public void transition(ActVisitor v, Synapse s, Link l) {
-        s.inhibitoryTransitionLoop(v, l);
-    }
-
-    @Override
-    public void samePatternTransitionLoop(ActVisitor v, Link l) {
-        l.follow(v);
-    }
-
-    @Override
-    public void inputPatternTransitionLoop(ActVisitor v, Link l) {
-        l.follow(v);
     }
 
     public void updateSynapse(Link l, double delta) {
@@ -83,7 +54,7 @@ public abstract class InhibitorySynapse<I extends Neuron> extends Synapse<I, Inh
     }
 
     @Override
-    public Activation branchIfNecessary(Activation oAct, Visitor v) {
+    public Activation branchIfNecessary(Activation iAct, Activation oAct) {
         return oAct;
     }
 
@@ -94,7 +65,7 @@ public abstract class InhibitorySynapse<I extends Neuron> extends Synapse<I, Inh
     }
 
     @Override
-    protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
+    public boolean checkCausality(Activation<?> iAct, Activation<?> oAct) {
         return true;
     }
 }

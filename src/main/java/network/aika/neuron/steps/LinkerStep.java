@@ -2,17 +2,16 @@ package network.aika.neuron.steps;
 
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.visitor.tasks.VisitorTask;
+import network.aika.neuron.linker.AbstractLinker;
 
 import java.util.List;
-import java.util.Set;
 
-public abstract class VisitorStep<E extends Element, T extends VisitorTask> extends Step<E> {
+public abstract class LinkerStep<E extends Element, L extends AbstractLinker> extends Step<E> {
 
-    protected final T task;
+    protected final L task;
     protected final List<Direction> directions;
 
-    public VisitorStep(E element, T task, List<Direction> dirs) {
+    public LinkerStep(E element, L task, List<Direction> dirs) {
         super(element);
         this.task = task;
         this.directions = dirs;

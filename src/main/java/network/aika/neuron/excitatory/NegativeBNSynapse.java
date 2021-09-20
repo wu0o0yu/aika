@@ -16,12 +16,9 @@
  */
 package network.aika.neuron.excitatory;
 
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.visitor.ActVisitor;
-import network.aika.neuron.visitor.Visitor;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 /**
@@ -35,17 +32,9 @@ public class NegativeBNSynapse extends BindingNeuronSynapse<InhibitoryNeuron> {
         return true;
     }
 
-    @Override
-    public void transition(ActVisitor v, Synapse s, Link l) {
-        s.negativeSynapseTransitionLoop(v, l);
-    }
-
-    public void alternateBranchTransition(ActVisitor v, Synapse s, Link l) {
-        l.follow(v);
-    }
 
     @Override
-    protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
+    public boolean checkCausality(Activation<?> iAct, Activation<?> oAct) {
         return true;
     }
 
@@ -65,11 +54,11 @@ public class NegativeBNSynapse extends BindingNeuronSynapse<InhibitoryNeuron> {
     }
 
     @Override
-    public BindingActivation branchIfNecessary(BindingActivation oAct, Visitor v) {
+    public BindingActivation branchIfNecessary(Activation iAct, BindingActivation oAct) {
         if (getOutput().isInputNeuron())
             return null;
 
-        if (!v.getSelfRef())
+        if (!oAct.isSelfRef(iAct))
             oAct = oAct.createBranch(this);
 
         return oAct;
