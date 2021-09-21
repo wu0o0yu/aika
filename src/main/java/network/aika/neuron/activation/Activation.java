@@ -168,6 +168,13 @@ public class Activation<N extends Neuron> extends Element<Activation> {
         bindingSignal.reverseBindingSignals.put(this, scope);
     }
 
+    public void addPatternBindingSignals(Map<PatternActivation, Byte> bindingsSignals) {
+        patternBindingSignals.putAll(bindingsSignals);
+        bindingsSignals.entrySet().stream().forEach(e ->
+                e.getKey().reverseBindingSignals.put(this, e.getValue())
+        );
+    }
+
     public Map<PatternActivation, Byte> getPatternBindingSignals() {
         return patternBindingSignals;
     }
@@ -449,5 +456,18 @@ public class Activation<N extends Neuron> extends Element<Activation> {
         }
 
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Activation)) return false;
+        Activation<?> that = (Activation<?>) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

@@ -26,6 +26,6 @@ public abstract class InputBNSynapse<I extends Neuron> extends BindingNeuronSyna
 
     @Override
     public Byte transitionScope(Byte fromScope, Direction dir) {
-        return fromScope;
+        return dir.transitionScope(fromScope);
     }
 }

@@ -10,9 +10,9 @@ public class PatternActivation extends Activation<PatternNeuron> {
 
     protected Map<Activation, Byte> reverseBindingSignals = new TreeMap<>();
 
-
     public PatternActivation(int id, Thought t, PatternNeuron patternNeuron) {
         super(id, t, patternNeuron);
+        addPatternBindingSignal(this, (byte) 0);
     }
 
     public Map<Activation, Byte> getReverseBindingSignals() {

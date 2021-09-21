@@ -24,6 +24,7 @@ import network.aika.neuron.steps.StepType;
 import network.aika.neuron.steps.LinkerStep;
 import network.aika.neuron.linker.LinkingTask;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +47,10 @@ public class Linking extends LinkerStep<Activation, LinkingTask> {
 
     public static void add(Activation act) {
         Step.add(new Linking(act, act.getPatternBindingSignals()));
+    }
+
+    public static void add(Activation act, PatternActivation bindingSignal, Byte scope) {
+        Step.add(new Linking(act, Collections.singletonMap(bindingSignal, scope)));
     }
 
     public static void add(Activation act, Map<PatternActivation, Byte> bindingSignals) {

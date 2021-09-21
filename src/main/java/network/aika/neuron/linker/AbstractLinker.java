@@ -106,8 +106,16 @@ public abstract class AbstractLinker {
         Activation iAct = dir.getInput(fromAct, toAct);
         Activation oAct = dir.getOutput(fromAct, toAct);
 
-        if(targetSynapse.checkCausality(iAct, oAct))
-            linkIntern(iAct, oAct, targetSynapse);
+        if(!targetSynapse.checkCausality(iAct, oAct))
+            return;
+
+        if(!iAct.getNeuron().typeMatches(targetSynapse.getInput()))
+            return;
+
+        if(!oAct.getNeuron().typeMatches(targetSynapse.getOutput()))
+            return;
+
+        linkIntern(iAct, oAct, targetSynapse);
     }
 
     private Stream<Activation> searchRelatedCandidates(Byte fromScope, Direction dir, PatternActivation bs, Synapse targetSynapse) {

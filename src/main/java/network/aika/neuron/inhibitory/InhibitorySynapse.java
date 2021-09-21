@@ -43,7 +43,6 @@ public abstract class InhibitorySynapse<I extends Neuron> extends Synapse<I, Inh
 
         addWeight(delta);
         UpdateNet.updateNet(l.getOutput(), delta * l.getInputValue(POS));
-//        SumUpLink.add(l, l.getInputValue(POS) * delta);
     }
 
     @Override

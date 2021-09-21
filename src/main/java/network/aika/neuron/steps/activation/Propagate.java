@@ -24,6 +24,7 @@ import network.aika.neuron.steps.StepType;
 import network.aika.neuron.steps.LinkerStep;
 import network.aika.neuron.linker.LinkingTask;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -47,10 +48,6 @@ public class Propagate extends LinkerStep<Activation, LinkingTask> {
 
     public static void add(Activation act) {
         Step.add(new Propagate(act, act.getPatternBindingSignals()));
-    }
-
-    public static void add(Activation act, Map<PatternActivation, Byte> bindingSignal) {
-        Step.add(new Propagate(act, bindingSignal));
     }
 
     private Propagate(Activation act, Map<PatternActivation, Byte> bindingSignal) {

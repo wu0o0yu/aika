@@ -25,6 +25,7 @@ import network.aika.neuron.steps.StepType;
 import network.aika.neuron.steps.LinkerStep;
 import network.aika.neuron.linker.TemplateTask;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -36,13 +37,8 @@ import java.util.Map;
  */
 public class TemplatePropagate extends LinkerStep<Activation, TemplateTask> {
 
-
     public static void add(Activation act, List<Direction> dirs) {
         Step.add(new TemplatePropagate(act, act.getPatternBindingSignals(), dirs));
-    }
-
-    public static void add(Activation act, Map<PatternActivation, Byte> bindingSignal, List<Direction> dirs) {
-        Step.add(new TemplatePropagate(act, bindingSignal, dirs));
     }
 
     private TemplatePropagate(Activation act, Map<PatternActivation, Byte> bindingSignal, List<Direction> dirs) {

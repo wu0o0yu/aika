@@ -16,10 +16,22 @@
  */
 package network.aika.neuron.steps.link;
 
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
+import network.aika.neuron.steps.activation.Linking;
+import network.aika.neuron.steps.activation.TemplateLinking;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
@@ -27,12 +39,25 @@ import network.aika.neuron.steps.StepType;
  */
 public class PropagateBindingSignal extends Step<Link> {
 
+    private Map<PatternActivation, Byte> outputBindingSignals;
+
     public static void add(Link l) {
-        Step.add(new PropagateBindingSignal(l));
+        Step.add(new PropagateBindingSignal(l, l.getInput().getPatternBindingSignals()));
     }
 
-    private PropagateBindingSignal(Link l) {
+    public static void add(Link l, PatternActivation bindingSignal, Byte scope) {
+        Step.add(new PropagateBindingSignal(l, Collections.singletonMap(bindingSignal, scope)));
+    }
+
+    private PropagateBindingSignal(Link l, Map<PatternActivation, Byte> inputBindingSignals) {
         super(l);
+        this.outputBindingSignals = inputBindingSignals.entrySet().stream()
+                .collect(
+                        Collectors.toMap(
+                                e -> e.getKey(),
+                                e -> l.getSynapse().transitionScope(e.getValue(), OUTPUT)
+                        )
+                );
     }
 
     @Override
@@ -51,8 +76,12 @@ public class PropagateBindingSignal extends Step<Link> {
 
     @Override
     public void process() {
-        Link l = getElement();
+        Activation oAct = getElement().getOutput();
 
+        oAct.addPatternBindingSignals(outputBindingSignals);
+
+        Linking.add(oAct, outputBindingSignals);
+        TemplateLinking.add(oAct, outputBindingSignals, List.of(INPUT, OUTPUT));
     }
 
     public String toString() {
