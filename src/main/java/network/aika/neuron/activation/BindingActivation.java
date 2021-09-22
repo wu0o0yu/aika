@@ -19,11 +19,14 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.excitatory.BindingNeuron;
+import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.steps.activation.BranchProbability;
 import network.aika.neuron.steps.activation.SetFinalMode;
 import network.aika.utils.Utils;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
@@ -31,6 +34,10 @@ import java.util.stream.Stream;
  * @author Lukas Molzberger
  */
 public class BindingActivation extends Activation<BindingNeuron> {
+
+    public static PatternActivation MIN_BINDING_ACT = new PatternActivation(0, null);
+    public static PatternActivation MAX_BINDING_ACT = new PatternActivation(Integer.MAX_VALUE, null);
+
 
     private boolean finalMode = false;
 
@@ -40,8 +47,23 @@ public class BindingActivation extends Activation<BindingNeuron> {
     private double branchProbability = 1.0;
 
 
+    protected BindingActivation(int id, BindingNeuron n) {
+        super(id, n);
+    }
+
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
+        addBindingSignal(this, (byte) 0);
+    }
+
+    @Override
+    protected Activation newInstance() {
+        return new BindingActivation(id, thought, neuron);
+    }
+
+    @Override
+    public byte getType() {
+        return 1;
     }
 
     public BindingActivation createBranch(Synapse excludedSyn) {

@@ -17,6 +17,7 @@
 package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.steps.Phase;
@@ -37,20 +38,25 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class PropagateBindingSignal extends Step<Link> {
+public class PropagateBindingSignal<A extends Activation> extends Step<Link> {
 
-    private Map<PatternActivation, Byte> outputBindingSignals;
+    protected Map<A, Byte> outputBindingSignals;
 
-    public static void add(Link l) {
-        Step.add(new PropagateBindingSignal(l, l.getInput().getPatternBindingSignals()));
+
+    public static void add(Link l, byte type) {
+        Step.add(new PropagateBindingSignal(l, l.getInput().getBindingSignals(type)));
     }
 
-    public static void add(Link l, PatternActivation bindingSignal, Byte scope) {
+    public static void add(Link l, Activation bindingSignal, Byte scope) {
         Step.add(new PropagateBindingSignal(l, Collections.singletonMap(bindingSignal, scope)));
     }
 
-    private PropagateBindingSignal(Link l, Map<PatternActivation, Byte> inputBindingSignals) {
+    protected PropagateBindingSignal(Link l, Map<A, Byte> inputBindingSignals) {
         super(l);
+        transitionScopes(l, inputBindingSignals);
+    }
+
+    protected void transitionScopes(Link l, Map<A, Byte> inputBindingSignals) {
         this.outputBindingSignals = inputBindingSignals.entrySet().stream()
                 .collect(
                         Collectors.toMap(
@@ -58,6 +64,16 @@ public class PropagateBindingSignal extends Step<Link> {
                                 e -> l.getSynapse().transitionScope(e.getValue(), OUTPUT)
                         )
                 );
+    }
+
+    @Override
+    public void process() {
+        Activation oAct = getElement().getOutput();
+
+        oAct.addBindingSignals(outputBindingSignals);
+
+        Linking.add(oAct, outputBindingSignals);
+        TemplateLinking.add(oAct, outputBindingSignals, List.of(INPUT, OUTPUT));
     }
 
     @Override
@@ -72,19 +88,5 @@ public class PropagateBindingSignal extends Step<Link> {
 
     public boolean checkIfQueued() {
         return true;
-    }
-
-    @Override
-    public void process() {
-        Activation oAct = getElement().getOutput();
-
-        oAct.addPatternBindingSignals(outputBindingSignals);
-
-        Linking.add(oAct, outputBindingSignals);
-        TemplateLinking.add(oAct, outputBindingSignals, List.of(INPUT, OUTPUT));
-    }
-
-    public String toString() {
-        return "Link-Step: PropagateBindingSignal";
     }
 }

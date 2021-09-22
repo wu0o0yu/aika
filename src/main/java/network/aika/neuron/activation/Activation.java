@@ -33,6 +33,8 @@ import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
+import static network.aika.neuron.activation.PatternActivation.MAX_PATTERN_ACT;
+import static network.aika.neuron.activation.PatternActivation.MIN_PATTERN_ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.utils.Utils.logChange;
@@ -40,9 +42,9 @@ import static network.aika.utils.Utils.logChange;
 /**
  * @author Lukas Molzberger
  */
-public class Activation<N extends Neuron> extends Element<Activation> {
+public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
-    public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(act -> act.id);
+    public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(Activation::getId);
 
     protected double value = 0.0;
     protected Double inputValue = null;
@@ -59,8 +61,11 @@ public class Activation<N extends Neuron> extends Element<Activation> {
 
     private Reference reference;
 
-    protected Map<PatternActivation, Byte> patternBindingSignals = new TreeMap<>();
-    protected Map<BindingActivation, Byte> branchBindingSignals = new TreeMap<>();
+    protected SortedMap<Activation, Byte> bindingSignals = new TreeMap<>(
+            Comparator.<Activation, Byte>comparing(act -> act.getType())
+                    .thenComparing(Activation::getId)
+    );
+    protected Map<Activation, Byte> reverseBindingSignals = new TreeMap<>();
 
     public final static int OWN = 0;
     public final static int INCOMING = 1;
@@ -77,7 +82,7 @@ public class Activation<N extends Neuron> extends Element<Activation> {
     public boolean markedNetUpdateOccurred; // Temporary hack
 
 
-    private Activation(int id, N n) {
+    protected Activation(int id, N n) {
         this.id = id;
         this.neuron = n;
     }
@@ -94,6 +99,8 @@ public class Activation<N extends Neuron> extends Element<Activation> {
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
     }
+
+    public abstract byte getType();
 
     public void initInput(Reference ref) {
         setReference(ref);
@@ -163,24 +170,26 @@ public class Activation<N extends Neuron> extends Element<Activation> {
         return false;
     }
 
-    public void addPatternBindingSignal(PatternActivation bindingSignal, Byte scope) {
-        patternBindingSignals.put(bindingSignal, scope);
+
+    public void addBindingSignal(Activation bindingSignal, Byte scope) {
+        bindingSignals.put(bindingSignal, scope);
         bindingSignal.reverseBindingSignals.put(this, scope);
     }
 
-    public void addPatternBindingSignals(Map<PatternActivation, Byte> bindingsSignals) {
-        patternBindingSignals.putAll(bindingsSignals);
+    public void addBindingSignals(Map<Activation, Byte> bindingsSignals) {
+        bindingSignals.putAll(bindingsSignals);
         bindingsSignals.entrySet().stream().forEach(e ->
                 e.getKey().reverseBindingSignals.put(this, e.getValue())
         );
     }
 
-    public Map<PatternActivation, Byte> getPatternBindingSignals() {
-        return patternBindingSignals;
+
+    public Stream<Map.Entry<Activation, Byte>> getPatternBindingSignals() {
+        return bindingSignals.subMap(MIN_PATTERN_ACT, MAX_PATTERN_ACT).entrySet().stream();
     }
 
-    public Map<BindingActivation, Byte> getBranchBindingSignals() {
-        return branchBindingSignals;
+    public Stream<Map.Entry<Activation, Byte>> getBranchBindingSignals() {
+        return bindingSignals.subMap(MIN_PATTERN_ACT, MAX_PATTERN_ACT).entrySet().stream();
     }
 
     @Override
@@ -238,7 +247,7 @@ public class Activation<N extends Neuron> extends Element<Activation> {
         if (!isFired())
             return this;
 
-        Activation clonedAct = new Activation(id, thought, neuron);
+        Activation clonedAct = newInstance();
 
         replaceElement(clonedAct);
 
@@ -247,6 +256,8 @@ public class Activation<N extends Neuron> extends Element<Activation> {
 
         return clonedAct;
     }
+
+    protected abstract Activation newInstance();
 
     protected void linkClone(Activation clonedAct, Synapse excludedSyn) {
         inputLinks

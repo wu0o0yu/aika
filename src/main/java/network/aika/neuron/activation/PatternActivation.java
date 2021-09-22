@@ -8,16 +8,30 @@ import java.util.TreeMap;
 
 public class PatternActivation extends Activation<PatternNeuron> {
 
-    protected Map<Activation, Byte> reverseBindingSignals = new TreeMap<>();
+    public static PatternActivation MIN_PATTERN_ACT = new PatternActivation(0, null);
+    public static PatternActivation MAX_PATTERN_ACT = new PatternActivation(Integer.MAX_VALUE, null);
+
+    protected PatternActivation(int id, PatternNeuron n) {
+        super(id, n);
+    }
 
     public PatternActivation(int id, Thought t, PatternNeuron patternNeuron) {
         super(id, t, patternNeuron);
-        addPatternBindingSignal(this, (byte) 0);
+        addBindingSignal(this, (byte) 0);
     }
 
-    public Map<Activation, Byte> getReverseBindingSignals() {
-        return reverseBindingSignals;
+
+    @Override
+    protected Activation newInstance() {
+        return new PatternActivation(id, thought, neuron);
     }
+
+    @Override
+    public byte getType() {
+        return 0;
+    }
+
+
 
     public boolean isSelfRef(Activation iAct) {
         return reverseBindingSignals.containsKey(iAct);
