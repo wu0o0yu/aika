@@ -176,7 +176,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public void addBindingSignal(Activation bindingSignal, Byte scope) {
         bindingSignals.put(bindingSignal, scope);
-        registerBindingSignal(this, scope);
+        bindingSignal.registerBindingSignal(this, scope);
     }
 
     public void addBindingSignals(Map<Activation, Byte> bindingsSignals) {

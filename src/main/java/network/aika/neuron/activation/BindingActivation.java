@@ -19,14 +19,11 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.steps.activation.BranchProbability;
 import network.aika.neuron.steps.activation.SetFinalMode;
 import network.aika.utils.Utils;
 
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
@@ -125,6 +122,6 @@ public class BindingActivation extends Activation<BindingNeuron> {
     }
 
     public String toString(boolean includeLink) {
-        return super.toString() + " bp:" + Utils.round(branchProbability);
+        return super.toString(includeLink) + " bp:" + Utils.round(branchProbability);
     }
 }
