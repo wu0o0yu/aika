@@ -6,19 +6,16 @@ import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.linker.AbstractLinker;
 
 import java.util.List;
-import java.util.Map;
 
-public abstract class LinkerStep<E extends Element, L extends AbstractLinker> extends Step<E> {
+public abstract class LinkerStep<E extends Element, T extends AbstractLinker> extends TaskStep<E, T> {
 
-    protected final L task;
-    protected final List<Direction> directions;
-    protected final Map<PatternActivation, Byte> bindingSignals;
+    protected final PatternActivation bindingSignal;
+    protected final Byte scope;
 
-    public LinkerStep(E element, Map<PatternActivation, Byte> bindingSignals, L task, List<Direction> dirs) {
-        super(element);
-        this.bindingSignals = bindingSignals;
-        this.task = task;
-        this.directions = dirs;
+    public LinkerStep(E element, PatternActivation bindingSignal, Byte scope, T task, List<Direction> dirs) {
+        super(element, task, dirs);
+        this.bindingSignal = bindingSignal;
+        this.scope = scope;
     }
 
     @Override

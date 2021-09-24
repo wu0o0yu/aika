@@ -33,7 +33,7 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
 
     private E element;
 
-    private Fired fired;
+    protected Fired fired;
     private long timestamp;
 
     public Step(E element) {

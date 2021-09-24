@@ -36,6 +36,7 @@ import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.PatternActivation.MAX_PATTERN_ACT;
 import static network.aika.neuron.activation.PatternActivation.MIN_PATTERN_ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.utils.Utils.logChange;
 
@@ -108,6 +109,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         setInputValue(1.0);
         setFired(ref.getRelativeBegin());
 
+        addBindingSignal(this, (byte) 0);
+
         updateValue();
 
         EntropyGradient.add(this);
@@ -173,23 +176,34 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public void addBindingSignal(Activation bindingSignal, Byte scope) {
         bindingSignals.put(bindingSignal, scope);
-        bindingSignal.reverseBindingSignals.put(this, scope);
+        registerBindingSignal(this, scope);
     }
 
     public void addBindingSignals(Map<Activation, Byte> bindingsSignals) {
         bindingSignals.putAll(bindingsSignals);
         bindingsSignals.entrySet().stream().forEach(e ->
-                e.getKey().reverseBindingSignals.put(this, e.getValue())
+                e.getKey().registerBindingSignal(this, e.getValue())
         );
     }
 
-
-    public Stream<Map.Entry<Activation, Byte>> getPatternBindingSignals() {
-        return bindingSignals.subMap(MIN_PATTERN_ACT, MAX_PATTERN_ACT).entrySet().stream();
+    protected void registerBindingSignal(Activation targetAct, Byte scope) {
+        reverseBindingSignals.put(this, scope);
     }
 
-    public Stream<Map.Entry<Activation, Byte>> getBranchBindingSignals() {
-        return bindingSignals.subMap(MIN_PATTERN_ACT, MAX_PATTERN_ACT).entrySet().stream();
+    public Map<Activation, Byte> getBindingSignals() {
+        return bindingSignals;
+    }
+
+    public Map<Activation, Byte> getPatternBindingSignals() {
+        return bindingSignals.subMap(MIN_PATTERN_ACT, MAX_PATTERN_ACT);
+    }
+
+    public Map<Activation, Byte> getBranchBindingSignals() {
+        return bindingSignals.subMap(MIN_PATTERN_ACT, MAX_PATTERN_ACT);
+    }
+
+    public Map<Activation, Byte> getReverseBindingSignals() {
+        return reverseBindingSignals;
     }
 
     @Override

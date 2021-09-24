@@ -17,46 +17,45 @@
 package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
-import network.aika.neuron.steps.activation.Linking;
-import network.aika.neuron.steps.activation.TemplateLinking;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PropagateBindingSignal<A extends Activation> extends Step<Link> {
+public class PropagateBindingSignal extends Step<Link> {
 
-    protected Map<A, Byte> outputBindingSignals;
+    protected Map<Activation, Byte> outputBindingSignals;
 
 
-    public static void add(Link l, byte type) {
-        Step.add(new PropagateBindingSignal(l, l.getInput().getBindingSignals(type)));
+    public static void add(Link l) {
+        Step.add(new PropagateBindingSignal(l, l.getInput().getBindingSignals()));
+    }
+
+    public static void add(Link l, Map<Activation, Byte> inputBindingSignals) {
+        Step.add(new PropagateBindingSignal(l, inputBindingSignals));
     }
 
     public static void add(Link l, Activation bindingSignal, Byte scope) {
         Step.add(new PropagateBindingSignal(l, Collections.singletonMap(bindingSignal, scope)));
     }
 
-    protected PropagateBindingSignal(Link l, Map<A, Byte> inputBindingSignals) {
+    protected PropagateBindingSignal(Link l, Map<Activation, Byte> inputBindingSignals) {
         super(l);
+        fired = l.getInput().getFired();
         transitionScopes(l, inputBindingSignals);
     }
 
-    protected void transitionScopes(Link l, Map<A, Byte> inputBindingSignals) {
+    protected void transitionScopes(Link l, Map<Activation, Byte> inputBindingSignals) {
         this.outputBindingSignals = inputBindingSignals.entrySet().stream()
                 .collect(
                         Collectors.toMap(
@@ -71,9 +70,6 @@ public class PropagateBindingSignal<A extends Activation> extends Step<Link> {
         Activation oAct = getElement().getOutput();
 
         oAct.addBindingSignals(outputBindingSignals);
-
-        Linking.add(oAct, outputBindingSignals);
-        TemplateLinking.add(oAct, outputBindingSignals, List.of(INPUT, OUTPUT));
     }
 
     @Override

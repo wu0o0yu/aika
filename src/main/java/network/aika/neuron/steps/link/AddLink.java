@@ -60,6 +60,8 @@ public class AddLink extends Step<Link> {
 
         if(l.getOutput() != null)
             l.linkOutput();
+
+        PropagateBindingSignal.add(l);
     }
 
     public String toString() {

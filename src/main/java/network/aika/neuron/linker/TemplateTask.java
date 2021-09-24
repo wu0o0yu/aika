@@ -63,7 +63,7 @@ public class TemplateTask extends AbstractLinker {
 
     @Override
     public void getNextSteps(Link l) {
-        PropagatePatternBindingSignal.add(l);
+        PropagateBindingSignal.add(l);
         LinkInduction.add(l);
 
         if(!l.getConfig().isEnableTraining())

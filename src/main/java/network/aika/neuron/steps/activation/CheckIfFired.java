@@ -21,6 +21,7 @@ import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
 import network.aika.neuron.steps.link.LinkCounting;
+import network.aika.neuron.steps.link.PropagateBindingSignal;
 import network.aika.utils.Utils;
 
 import java.util.List;
@@ -57,7 +58,6 @@ public class CheckIfFired extends Step<Activation> {
     }
 
     public static void propagate(Activation<?> act) {
-        Linking.add(act);
         Propagate.add(act);
 
         act.addFeedbackSteps();
@@ -69,7 +69,6 @@ public class CheckIfFired extends Step<Activation> {
             return;
 
         TemplatePropagate.add(act, List.of(INPUT, OUTPUT));
-        TemplateLinking.add(act, List.of(OUTPUT));
     }
 
     @Override
