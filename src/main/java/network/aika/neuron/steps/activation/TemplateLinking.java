@@ -68,6 +68,6 @@ public class TemplateLinking extends LinkerStep<Activation, TemplateTask> {
     }
 
     public String toString() {
-        return "Act-Step: Template-CloseCycle (" + task + ", " + directions + ")";
+        return "Act-Step: Template-Linking (" + task + ", " + directions + ")";
     }
 }

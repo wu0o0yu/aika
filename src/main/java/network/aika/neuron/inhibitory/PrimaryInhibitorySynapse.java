@@ -31,4 +31,8 @@ public class PrimaryInhibitorySynapse extends InhibitorySynapse<PatternNeuron> {
         return dir == Direction.OUTPUT;
     }
 
+    @Override
+    public Byte transitionScope(Byte fromScope, Direction dir) {
+        return dir.transitionScope(fromScope);
+    }
 }

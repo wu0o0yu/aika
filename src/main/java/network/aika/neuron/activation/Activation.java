@@ -170,7 +170,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public boolean isSelfRef(Activation iAct) {
-        return false;
+        return bindingSignals.containsKey(iAct);
     }
 
 
@@ -187,7 +187,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     protected void registerBindingSignal(Activation targetAct, Byte scope) {
-        reverseBindingSignals.put(this, scope);
+        reverseBindingSignals.put(targetAct, scope);
     }
 
     public Map<Activation, Byte> getBindingSignals() {

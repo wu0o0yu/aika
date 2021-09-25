@@ -43,7 +43,7 @@ public class Output implements Direction {
         if(fromScope >= 2)
             return null;
 
-        return fromScope++;
+        return ++fromScope;
     }
 
     @Override
