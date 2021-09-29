@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.linker;
 
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
@@ -41,6 +42,10 @@ public class LinkingTask extends AbstractLinker {
     @Override
     public boolean checkPropagate(Activation act, Direction dir, Synapse targetSynapse) {
         return true;
+    }
+
+    public Neuron getPropagateTargetNeuron(Direction dir, Synapse targetSynapse, Activation act) {
+        return dir.getNeuron(targetSynapse);
     }
 
     @Override

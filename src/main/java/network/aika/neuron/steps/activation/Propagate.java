@@ -74,6 +74,6 @@ public class Propagate extends TaskStep<Activation, LinkingTask> {
     }
 
     public String toString() {
-        return "Act-Step: Propagate (" + task + ", " + directions + ")";
+        return "Act-Step: Propagate (" + directions + ")";
     }
 }

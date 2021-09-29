@@ -23,6 +23,9 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.UpdateNet;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static network.aika.neuron.sign.Sign.POS;
 
 
@@ -30,11 +33,23 @@ import static network.aika.neuron.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public abstract class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNeuron, Activation> {
+public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNeuron, Activation> {
 
     @Override
-    public boolean checkTemplatePropagate(Direction dir, Activation act) {
+    public boolean checkTemplatePropagate(Direction dir, Activation iAct) {
         return false;
+    }
+
+    public Neuron getTemplatePropagateTargetNeuron(Direction dir, Activation<?> act) {
+
+        List<Activation<?>> candidates = act.getPatternBindingSignals().entrySet().stream()
+                .map(e -> e.getKey())
+                .flatMap(bAct -> bAct.getReverseBindingSignals().entrySet().stream())
+                .map(e -> e.getKey())
+                .filter(relAct -> relAct.getNeuron() instanceof InhibitoryNeuron)
+                .collect(Collectors.toList());
+
+        return dir.getNeuron(this);
     }
 
     public void updateSynapse(Link l, double delta) {

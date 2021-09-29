@@ -62,11 +62,11 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     private Reference reference;
 
-    protected SortedMap<Activation, Byte> bindingSignals = new TreeMap<>(
+    protected SortedMap<Activation<?>, Byte> bindingSignals = new TreeMap<>(
             Comparator.<Activation, Byte>comparing(act -> act.getType())
                     .thenComparing(Activation::getId)
     );
-    protected Map<Activation, Byte> reverseBindingSignals = new TreeMap<>();
+    protected Map<Activation<?>, Byte> reverseBindingSignals = new TreeMap<>();
 
     public final static int OWN = 0;
     public final static int INCOMING = 1;
@@ -179,7 +179,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         bindingSignal.registerBindingSignal(this, scope);
     }
 
-    public void addBindingSignals(Map<Activation, Byte> bindingsSignals) {
+    public void addBindingSignals(Map<Activation<?>, Byte> bindingsSignals) {
         bindingSignals.putAll(bindingsSignals);
         bindingsSignals.entrySet().stream().forEach(e ->
                 e.getKey().registerBindingSignal(this, e.getValue())
@@ -190,19 +190,19 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         reverseBindingSignals.put(targetAct, scope);
     }
 
-    public Map<Activation, Byte> getBindingSignals() {
+    public Map<Activation<?>, Byte> getBindingSignals() {
         return bindingSignals;
     }
 
-    public Map<Activation, Byte> getPatternBindingSignals() {
+    public Map<Activation<?>, Byte> getPatternBindingSignals() {
         return bindingSignals.subMap(MIN_PATTERN_ACT, MAX_PATTERN_ACT);
     }
 
-    public Map<Activation, Byte> getBranchBindingSignals() {
+    public Map<Activation<?>, Byte> getBranchBindingSignals() {
         return bindingSignals.subMap(MIN_PATTERN_ACT, MAX_PATTERN_ACT);
     }
 
-    public Map<Activation, Byte> getReverseBindingSignals() {
+    public Map<Activation<?>, Byte> getReverseBindingSignals() {
         return reverseBindingSignals;
     }
 

@@ -17,6 +17,7 @@
 package network.aika.neuron.linker;
 
 import network.aika.Thought;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
@@ -35,6 +36,8 @@ import java.util.stream.Stream;
 public abstract class AbstractLinker {
 
     public abstract boolean checkPropagate(Activation act, Direction dir, Synapse targetSynapse);
+
+    public abstract Neuron getPropagateTargetNeuron(Direction dir, Synapse targetSynapse, Activation iAct);
 
     public abstract Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir);
 
@@ -55,14 +58,14 @@ public abstract class AbstractLinker {
                         !exists(act, dir, s)
                 )
                 .forEach(s ->
-                        propagate(act, dir, s, false)
+                        propagate(act, dir, s, getPropagateTargetNeuron(dir, s, act), false)
                 );
     }
 
-    public void propagate(Activation fromAct, Direction dir, Synapse targetSynapse, boolean isSelfRef) {
+    public void propagate(Activation fromAct, Direction dir, Synapse targetSynapse, Neuron targetNeuron, boolean isSelfRef) {
         Thought t = fromAct.getThought();
         Activation toAct =
-                dir.getNeuron(targetSynapse).createActivation(t);
+                targetNeuron.createActivation(t);
 
         t.onActivationCreationEvent(toAct, fromAct);
 

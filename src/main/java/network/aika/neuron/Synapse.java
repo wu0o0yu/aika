@@ -168,6 +168,10 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return false;
     }
 
+    public Neuron getTemplatePropagateTargetNeuron(Direction dir, Activation<?> act) {
+        return dir.getNeuron(this);
+    }
+
     public Link createLink(Activation iAct, Activation oAct, boolean isSelfRef) {
         Link nl = oAct.addLink(
                 this,

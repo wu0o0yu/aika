@@ -19,8 +19,7 @@ package network.aika.neuron;
 import network.aika.Model;
 import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.PrimaryInhibitorySynapse;
-import network.aika.neuron.inhibitory.RegularInhibitorySynapse;
+import network.aika.neuron.inhibitory.InhibitorySynapse;
 
 import java.util.*;
 
@@ -48,8 +47,7 @@ public class Templates {
     public RecurrentSameBNSynapse RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE;
     public NegativeBNSynapse NEGATIVE_SYNAPSE_TEMPLATE;
     public PatternSynapse PATTERN_SYNAPSE_TEMPLATE;
-    public PrimaryInhibitorySynapse PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE;
-    public RegularInhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE;
+    public InhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE;
 
     private final Map<Byte, Neuron> templateNeuronIndex = new TreeMap<>();
     private final Map<Byte, Synapse> templateSynapseIndex = new TreeMap<>();
@@ -154,23 +152,13 @@ public class Templates {
                         0.002 // Needs to be above the tolerance
                 );
 
-        PRIMARY_INHIBITORY_SYNAPSE_TEMPLATE =
+        INHIBITORY_SYNAPSE_TEMPLATE =
                 init(
-                        new PrimaryInhibitorySynapse(),
+                        new InhibitorySynapse(),
                         INPUT_PATTERN_TEMPLATE,
                         INHIBITORY_TEMPLATE,
                         "Primary Inhibitory Synapse",
                         8,
-                        0.0
-                );
-
-        INHIBITORY_SYNAPSE_TEMPLATE =
-                init(
-                        new RegularInhibitorySynapse(),
-                        SAME_BINDING_TEMPLATE,
-                        INHIBITORY_TEMPLATE,
-                        "Regular Inhibitory Synapse",
-                        9,
                         0.0
                 );
     }

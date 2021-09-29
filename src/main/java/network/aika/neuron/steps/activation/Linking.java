@@ -76,6 +76,6 @@ public class Linking extends LinkerStep<Activation, LinkingTask> {
     }
 
     public String toString() {
-        return "Act-Step: Linking (" + task + ", " + directions + ")";
+        return "Act-Step: Linking (" + directions + ")";
     }
 }

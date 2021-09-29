@@ -43,6 +43,10 @@ public class TemplateTask extends AbstractLinker {
         return targetSynapse.checkTemplatePropagate(dir, act);
     }
 
+    public Neuron getPropagateTargetNeuron(Direction dir, Synapse targetSynapse, Activation act) {
+        return targetSynapse.getTemplatePropagateTargetNeuron(dir, act);
+    }
+
     @Override
     protected boolean exists(Activation act, Direction dir, Synapse s) {
         return act.templateLinkExists(dir, s);

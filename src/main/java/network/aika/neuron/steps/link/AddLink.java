@@ -55,13 +55,13 @@ public class AddLink extends Step<Link> {
     public void process() {
         Link l = getElement();
 
-        if(l.getInput() != null)
+        if(l.getInput() != null) {
             l.linkInput();
+            PropagateBindingSignal.add(l);
+        }
 
         if(l.getOutput() != null)
             l.linkOutput();
-
-        PropagateBindingSignal.add(l);
     }
 
     public String toString() {
