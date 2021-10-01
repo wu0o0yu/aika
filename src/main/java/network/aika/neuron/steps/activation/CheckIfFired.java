@@ -30,6 +30,7 @@ import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
+ * Checks whether the net value exceeds the threshold of 0. If that is the case, the neuron will be fired.
  *
  * @author Lukas Molzberger
  */
