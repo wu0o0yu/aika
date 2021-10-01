@@ -38,6 +38,10 @@ public class NegativeBNSynapse extends BindingNeuronSynapse<InhibitoryNeuron> {
         return true;
     }
 
+    public boolean checkTemplateLink(Activation iAct, Activation oAct) {
+        return iAct.getNeuron().getInputSynapse(oAct.getNeuronProvider()) != null;
+    }
+
     @Override
     public void updateSynapse(Link l, double delta) {
         if(l.getInput().isFired() && l.isSelfRef())

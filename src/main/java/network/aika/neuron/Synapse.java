@@ -124,6 +124,10 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         this.allowTraining = allowTraining;
     }
 
+    public boolean checkTemplateLink(Activation iAct, Activation oAct) {
+        return true;
+    }
+
     public boolean isTemplate() {
         return template == null;
     }

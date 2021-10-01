@@ -44,7 +44,7 @@ public class Input implements Direction {
         if(fromScope <= -2)
             return null;
 
-        return fromScope--;
+        return --fromScope;
     }
 
     @Override

@@ -88,6 +88,9 @@ public class TemplateTask extends AbstractLinker {
         if (!neuronMatches(oAct.getNeuron(), targetSynapse.getOutput()))
             return;
 
+        if(!targetSynapse.checkTemplateLink(iAct, oAct))
+            return;
+
         if(!iAct.isFired())
             return;
 

@@ -175,14 +175,17 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
 
     public void addBindingSignal(Activation bindingSignal, Byte scope) {
+        Byte existingBSScope = bindingSignals.get(bindingSignal);
+        if(existingBSScope != null && existingBSScope <= scope)
+            return;
+
         bindingSignals.put(bindingSignal, scope);
         bindingSignal.registerBindingSignal(this, scope);
     }
 
     public void addBindingSignals(Map<Activation<?>, Byte> bindingsSignals) {
-        bindingSignals.putAll(bindingsSignals);
         bindingsSignals.entrySet().stream().forEach(e ->
-                e.getKey().registerBindingSignal(this, e.getValue())
+                addBindingSignal(e.getKey(), e.getValue())
         );
     }
 
