@@ -24,5 +24,4 @@ import network.aika.neuron.Neuron;
  */
 public class SameBNSynapse<I extends Neuron> extends BindingNeuronSynapse<I> {
 
-
 }

@@ -48,7 +48,7 @@ public class Propagate extends TaskStep<Activation, LinkingTask> {
     }
 
     private Propagate(Activation act) {
-        super(act, new LinkingTask(), List.of(OUTPUT));
+        super(act, new LinkingTask());
     }
 
     @Override
@@ -66,7 +66,7 @@ public class Propagate extends TaskStep<Activation, LinkingTask> {
         if(!getElement().isFired())
             return;
 
-        task.propagate(OUTPUT, getElement());
+        task.propagate(getElement());
     }
 
     public boolean checkIfQueued() {
@@ -74,6 +74,6 @@ public class Propagate extends TaskStep<Activation, LinkingTask> {
     }
 
     public String toString() {
-        return "Act-Step: Propagate (" + directions + ")";
+        return "Act-Step: Propagate)";
     }
 }

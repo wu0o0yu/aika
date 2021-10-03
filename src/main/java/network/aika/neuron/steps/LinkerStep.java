@@ -12,14 +12,9 @@ public abstract class LinkerStep<E extends Element, T extends AbstractLinker> ex
     protected final PatternActivation bindingSignal;
     protected final Byte scope;
 
-    public LinkerStep(E element, PatternActivation bindingSignal, Byte scope, T task, List<Direction> dirs) {
-        super(element, task, dirs);
+    public LinkerStep(E element, PatternActivation bindingSignal, Byte scope, T task) {
+        super(element, task);
         this.bindingSignal = bindingSignal;
         this.scope = scope;
-    }
-
-    @Override
-    public String getStepName() {
-        return super.getStepName() + ":" + directions;
     }
 }

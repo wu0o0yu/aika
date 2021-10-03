@@ -34,12 +34,12 @@ import java.util.Map;
  */
 public class TemplatePropagate extends TaskStep<Activation, TemplateTask> {
 
-    public static void add(Activation act, List<Direction> dirs) {
-        Step.add(new TemplatePropagate(act, dirs));
+    public static void add(Activation act) {
+        Step.add(new TemplatePropagate(act));
     }
 
-    private TemplatePropagate(Activation act, List<Direction> dirs) {
-        super(act, new TemplateTask(), dirs);
+    private TemplatePropagate(Activation act) {
+        super(act, new TemplateTask());
     }
 
     @Override
@@ -63,12 +63,10 @@ public class TemplatePropagate extends TaskStep<Activation, TemplateTask> {
         if (!act.getNeuron().allowTemplatePropagate(act))
             return;
 
-        directions.forEach(dir ->
-                task.propagate(dir, act)
-        );
+        task.propagate(act);
     }
 
     public String toString() {
-        return "Act-Step: Template-Propagate (" + directions + ")";
+        return "Act-Step: Template-Propagate";
     }
 }

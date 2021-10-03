@@ -69,7 +69,7 @@ public class CheckIfFired extends Step<Activation> {
         if(Utils.belowTolerance(act.getOutputGradientSum()))
             return;
 
-        TemplatePropagate.add(act, List.of(INPUT, OUTPUT));
+        TemplatePropagate.add(act);
     }
 
     @Override

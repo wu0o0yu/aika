@@ -40,12 +40,15 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class TemplateLinking extends LinkerStep<Activation, TemplateTask> {
 
+    private List<Direction> directions;
+
     public static void add(Activation act, PatternActivation bindingSignal, Byte scope, List<Direction> dirs) {
         Step.add(new TemplateLinking(act, bindingSignal, scope, dirs));
     }
 
     private TemplateLinking(Activation act, PatternActivation bindingSignal, Byte scope, List<Direction> dirs) {
-        super(act, bindingSignal, scope, new TemplateTask(), dirs);
+        super(act, bindingSignal, scope, new TemplateTask());
+        directions = dirs;
     }
 
     @Override
@@ -64,10 +67,10 @@ public class TemplateLinking extends LinkerStep<Activation, TemplateTask> {
     }
 
     public boolean checkIfQueued() {
-        return true;
+        return false;
     }
 
     public String toString() {
-        return "Act-Step: Template-Linking (" + directions + ")";
+        return "Act-Step: Template-Linking (Binding-Signal:" + bindingSignal.getId() + ":" + bindingSignal.getLabel()  + ", " + directions + ")";
     }
 }

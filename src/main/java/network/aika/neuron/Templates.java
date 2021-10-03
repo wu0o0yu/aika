@@ -149,15 +149,15 @@ public class Templates {
                         SAME_PATTERN_TEMPLATE,
                         "Pattern Synapse",
                         7,
-                        0.002 // Needs to be above the tolerance
+                        1.0 // Needs to be above the tolerance
                 );
 
         INHIBITORY_SYNAPSE_TEMPLATE =
                 init(
                         new InhibitorySynapse(),
-                        INPUT_PATTERN_TEMPLATE,
+                        SAME_BINDING_TEMPLATE,
                         INHIBITORY_TEMPLATE,
-                        "Primary Inhibitory Synapse",
+                        "Inhibitory Synapse",
                         8,
                         0.0
                 );

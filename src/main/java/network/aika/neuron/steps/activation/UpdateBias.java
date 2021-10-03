@@ -27,7 +27,7 @@ import network.aika.utils.Utils;
  *
  * @author Lukas Molzberger
  */
-public class UpdateBias extends UpdateNet<Activation> {
+public class UpdateBias extends Step<Activation> {
 
     public static void add(Activation act, double biasDelta) {
         if (!act.getNeuron().isAllowTraining())
@@ -62,14 +62,17 @@ public class UpdateBias extends UpdateNet<Activation> {
 
     @Override
     public void process() {
-        getElement()
-                .getNeuron()
+        Activation act = getElement();
+
+        act.getNeuron()
                 .addBias(biasDelta);
 
         if(biasDelta <= 0.0)
             return;
 
-        PostTraining.add(getElement());
+        UpdateNet.updateNet(act, biasDelta);
+
+        PostTraining.add(act);
     }
 
     public String toString() {

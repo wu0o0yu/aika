@@ -41,8 +41,8 @@ public class PatternSynapse extends ExcitatorySynapse<BindingNeuron, PatternNeur
     }
 
     @Override
-    public boolean checkTemplatePropagate(Direction dir, Activation act) {
-        return false;
+    public boolean checkTemplatePropagate(Activation act) {
+        return true;
     }
 
     @Override

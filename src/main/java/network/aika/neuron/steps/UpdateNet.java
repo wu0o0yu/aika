@@ -27,15 +27,7 @@ import network.aika.utils.Utils;
  *
  * @author Lukas Molzberger
  */
-public abstract class UpdateNet<A extends Activation> extends Step<A> {
-
-    public UpdateNet(A act) {
-        super(act);
-    }
-
-    public void updateNet(double netDelta) {
-        updateNet(getElement(), netDelta);
-    }
+public abstract class UpdateNet {
 
     public static void updateNet(Activation act, double netDelta) {
         act.updateNet(netDelta);

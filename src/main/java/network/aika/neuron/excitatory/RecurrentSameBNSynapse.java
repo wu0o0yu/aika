@@ -19,12 +19,9 @@ package network.aika.neuron.excitatory;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.direction.Direction;
 
 import static network.aika.neuron.activation.Activation.INCOMING;
 import static network.aika.neuron.activation.Activation.OWN;
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
@@ -49,11 +46,8 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
                 oAct.isSelfRef(iAct);
     }
 
-    public boolean checkTemplatePropagate(Direction dir, Activation act) {
-        if (dir == INPUT && act.getNeuron().isInputNeuron())
-            return false;
-
-        return dir != OUTPUT;
+    public boolean checkTemplatePropagate(Activation act) {
+        return false;
     }
 
     @Override

@@ -33,11 +33,9 @@ public class PrimaryBNSynapse<I extends Neuron> extends InputBNSynapse<I> {
     private static final Logger log = LoggerFactory.getLogger(PrimaryBNSynapse.class);
 
 
-    public boolean checkTemplatePropagate(Direction dir, Activation act) {
-        if(dir == OUTPUT) {
-            log.info(act.getLabel() + " CandidateGradient:" + act.getNeuron().getCandidateGradient(act));
-        }
+    public boolean checkTemplatePropagate(Activation act) {
+        log.info(act.getLabel() + " CandidateGradient:" + act.getNeuron().getCandidateGradient(act));
 
-        return dir == OUTPUT;
+        return true;
     }
 }

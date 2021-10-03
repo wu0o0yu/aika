@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+
 
 /**
  *
@@ -35,9 +37,9 @@ import java.util.stream.Stream;
  */
 public abstract class AbstractLinker {
 
-    public abstract boolean checkPropagate(Activation act, Direction dir, Synapse targetSynapse);
+    public abstract boolean checkPropagate(Activation act, Synapse targetSynapse);
 
-    public abstract Neuron getPropagateTargetNeuron(Direction dir, Synapse targetSynapse, Activation iAct);
+    public abstract Neuron getPropagateTargetNeuron(Synapse targetSynapse, Activation iAct);
 
     public abstract Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir);
 
@@ -49,33 +51,30 @@ public abstract class AbstractLinker {
 
     public abstract void getNextSteps(Link l);
 
-    public void propagate(Direction dir, Activation act) {
-        getTargetSynapses(act, dir)
+    public void propagate(Activation act) {
+        getTargetSynapses(act, OUTPUT)
                 .filter(s ->
-                        checkPropagate(act, dir, s)
+                        checkPropagate(act, s)
                 )
                 .filter(s ->
-                        !exists(act, dir, s)
+                        !exists(act, OUTPUT, s)
                 )
                 .forEach(s ->
-                        propagate(act, dir, s, getPropagateTargetNeuron(dir, s, act), false)
+                        propagate(act, s, getPropagateTargetNeuron(s, act), false)
                 );
     }
 
-    public void propagate(Activation fromAct, Direction dir, Synapse targetSynapse, Neuron targetNeuron, boolean isSelfRef) {
+    public void propagate(Activation fromAct, Synapse targetSynapse, Neuron targetNeuron, boolean isSelfRef) {
         Thought t = fromAct.getThought();
-        Activation toAct =
-                targetNeuron.createActivation(t);
+
+        Activation toAct = targetNeuron.createActivation(t);
 
         t.onActivationCreationEvent(toAct, fromAct);
 
         getNextSteps(toAct);
 
-        Link nl = targetSynapse.createLink(
-                dir.getInput(fromAct, toAct),
-                dir.getOutput(fromAct, toAct),
-                isSelfRef
-        );
+        Link nl = targetSynapse.createLink(fromAct, toAct, isSelfRef);
+
         getNextSteps(nl);
     }
 

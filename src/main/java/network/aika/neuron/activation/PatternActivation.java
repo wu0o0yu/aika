@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.steps.activation.Linking;
 import network.aika.neuron.steps.activation.TemplateLinking;
@@ -56,8 +57,9 @@ public class PatternActivation extends Activation<PatternNeuron> {
 
     protected void registerBindingSignal(Activation targetAct, Byte scope) {
         super.registerBindingSignal(targetAct, scope);
-        Linking.add(targetAct, this, scope);
-        TemplateLinking.add(targetAct, this, scope, List.of(INPUT, OUTPUT));
+        List<Direction> dirs = List.of(INPUT, OUTPUT);
+        Linking.add(targetAct, this, scope, dirs);
+        TemplateLinking.add(targetAct, this, scope, dirs);
     }
 
     public boolean isSelfRef(Activation iAct) {

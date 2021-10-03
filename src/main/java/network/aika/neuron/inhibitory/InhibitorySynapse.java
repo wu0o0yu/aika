@@ -36,11 +36,11 @@ import static network.aika.neuron.sign.Sign.POS;
 public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNeuron, Activation> {
 
     @Override
-    public boolean checkTemplatePropagate(Direction dir, Activation iAct) {
-        return false;
+    public boolean checkTemplatePropagate(Activation iAct) {
+        return true;
     }
 
-    public Neuron getTemplatePropagateTargetNeuron(Direction dir, Activation<?> act) {
+    public Neuron getTemplatePropagateTargetNeuron(Activation<?> act) {
 
         List<Activation<?>> candidates = act.getPatternBindingSignals().entrySet().stream()
                 .map(e -> e.getKey())
@@ -49,7 +49,7 @@ public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNe
                 .filter(relAct -> relAct.getNeuron() instanceof InhibitoryNeuron)
                 .collect(Collectors.toList());
 
-        return dir.getNeuron(this);
+        return getOutput();
     }
 
     public void updateSynapse(Link l, double delta) {

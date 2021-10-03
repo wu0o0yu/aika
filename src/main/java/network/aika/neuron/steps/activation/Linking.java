@@ -18,6 +18,7 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
@@ -43,12 +44,16 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class Linking extends LinkerStep<Activation, LinkingTask> {
 
-    public static void add(Activation act, PatternActivation bindingSignal, Byte scope) {
-        Step.add(new Linking(act, bindingSignal, scope));
+    private List<Direction> directions;
+
+    public static void add(Activation act, PatternActivation bindingSignal, Byte scope, List<Direction> dirs) {
+        Step.add(new Linking(act, bindingSignal, scope, dirs));
     }
 
-    private Linking(Activation act, PatternActivation bindingSignal, Byte scope) {
-        super(act, bindingSignal, scope, new LinkingTask(), List.of(OUTPUT));
+    private Linking(Activation act, PatternActivation bindingSignal, Byte scope, List<Direction> dirs) {
+        super(act, bindingSignal, scope, new LinkingTask());
+
+        directions = dirs;
     }
 
     @Override
@@ -62,7 +67,7 @@ public class Linking extends LinkerStep<Activation, LinkingTask> {
     }
 
     public boolean checkIfQueued() {
-        return true;
+        return false;
     }
 
     @Override
@@ -76,6 +81,6 @@ public class Linking extends LinkerStep<Activation, LinkingTask> {
     }
 
     public String toString() {
-        return "Act-Step: Linking (" + directions + ")";
+        return "Act-Step: Linking (" + bindingSignal.getId() + ":" + bindingSignal.getLabel() + ", " + directions + ")";
     }
 }

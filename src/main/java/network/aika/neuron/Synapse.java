@@ -70,7 +70,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return fromScope;
     }
 
-    public boolean checkTemplatePropagate(Direction dir, Activation act) {
+    public boolean checkTemplatePropagate(Activation act) {
         return false;
     }
 
@@ -172,8 +172,8 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return false;
     }
 
-    public Neuron getTemplatePropagateTargetNeuron(Direction dir, Activation<?> act) {
-        return dir.getNeuron(this);
+    public Neuron getTemplatePropagateTargetNeuron(Activation<?> act) {
+        return getOutput();
     }
 
     public Link createLink(Activation iAct, Activation oAct, boolean isSelfRef) {
