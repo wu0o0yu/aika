@@ -56,6 +56,6 @@ public class ShadowFactor extends Step<Link> {
     }
 
     public String toString() {
-        return "Link-Step: Shadow Factor";
+        return "Link-Step: Shadow Factor " + getElement().toShortString();
     }
 }

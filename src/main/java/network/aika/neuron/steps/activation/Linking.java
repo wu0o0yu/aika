@@ -81,6 +81,6 @@ public class Linking extends LinkerStep<Activation, LinkingTask> {
     }
 
     public String toString() {
-        return "Act-Step: Linking (" + bindingSignal.getId() + ":" + bindingSignal.getLabel() + ", " + directions + ")";
+        return "Act-Step: Linking " + getElement().toShortString() + " ([" + bindingSignal.getId() + ":" + bindingSignal.getLabel() + "], " + directions + ")";
     }
 }

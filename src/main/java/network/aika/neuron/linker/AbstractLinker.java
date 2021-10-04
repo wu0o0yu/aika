@@ -51,6 +51,8 @@ public abstract class AbstractLinker {
 
     public abstract void getNextSteps(Link l);
 
+    protected abstract boolean neuronMatches(Neuron<?, ?> currentN, Neuron<?, ?> targetN);
+
     public void propagate(Activation act) {
         getTargetSynapses(act, OUTPUT)
                 .filter(s ->
@@ -111,10 +113,10 @@ public abstract class AbstractLinker {
         if(!targetSynapse.checkCausality(iAct, oAct))
             return;
 
-        if(!iAct.getNeuron().typeMatches(targetSynapse.getInput()))
+        if (!neuronMatches(iAct.getNeuron(), targetSynapse.getInput()))
             return;
 
-        if(!oAct.getNeuron().typeMatches(targetSynapse.getOutput()))
+        if (!neuronMatches(oAct.getNeuron(), targetSynapse.getOutput()))
             return;
 
         linkIntern(iAct, oAct, targetSynapse);
@@ -122,7 +124,7 @@ public abstract class AbstractLinker {
 
     private Stream<Activation> searchRelatedCandidates(Byte fromScope, Direction dir, PatternActivation bs, Synapse targetSynapse) {
         return bs.getReverseBindingSignals().entrySet().stream()
-                .filter(e -> targetSynapse.transitionScope(fromScope, dir) == e.getValue())
+                .filter(e -> targetSynapse.checkScope(fromScope, e.getValue(), dir))
                 .map(e -> e.getKey());
     }
 }

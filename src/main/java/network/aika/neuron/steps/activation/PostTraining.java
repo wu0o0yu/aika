@@ -64,6 +64,6 @@ public class PostTraining extends Step<Activation> {
     }
 
     public String toString() {
-        return "Act-Step: Update Synapse Input Connections";
+        return "Act-Step: Update Synapse Input Connections " + getElement().toShortString();
     }
 }

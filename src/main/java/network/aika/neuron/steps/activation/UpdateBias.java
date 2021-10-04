@@ -76,6 +76,6 @@ public class UpdateBias extends Step<Activation> {
     }
 
     public String toString() {
-        return "Act-Step: Update Bias (" + Utils.round(biasDelta) + ")";
+        return "Act-Step: Update Bias " + getElement().toShortString() + " (Delta:" + Utils.round(biasDelta) + ")";
     }
 }

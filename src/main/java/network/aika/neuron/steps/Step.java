@@ -69,10 +69,6 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
 
     public abstract boolean checkIfQueued();
 
-    static String toString(Step p) {
-        return " (" + (p != null ? p.toString() : "X") + ")";
-    }
-
     public static void add(Step s) {
         if(s.checkIfQueued() && s.getElement().isQueued(s))
             return;

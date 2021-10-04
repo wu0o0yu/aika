@@ -67,6 +67,6 @@ public class TemplatePropagate extends TaskStep<Activation, TemplateTask> {
     }
 
     public String toString() {
-        return "Act-Step: Template-Propagate";
+        return "Act-Step: Template-Propagate " + getElement().toShortString();
     }
 }

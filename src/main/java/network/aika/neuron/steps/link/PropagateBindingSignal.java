@@ -85,4 +85,8 @@ public class PropagateBindingSignal extends Step<Link> {
     public boolean checkIfQueued() {
         return true;
     }
+
+    public String toString() {
+        return "Link-Step: Propagate Binding Signal " + getElement().toShortString();
+    }
 }

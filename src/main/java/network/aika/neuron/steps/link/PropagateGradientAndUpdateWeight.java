@@ -93,6 +93,6 @@ public class PropagateGradientAndUpdateWeight extends Step<Link> {
     }
 
     public String toString() {
-        return "Link-Step: Propagate Gradient (Own:" + Utils.round(gradient[OWN]) + ", Incoming:" + Utils.round(gradient[INCOMING]) + ")";
+        return "Link-Step: Propagate Gradient " + getElement().toShortString() + " (Own:" + Utils.round(gradient[OWN]) + ", Incoming:" + Utils.round(gradient[INCOMING]) + ")";
     }
 }

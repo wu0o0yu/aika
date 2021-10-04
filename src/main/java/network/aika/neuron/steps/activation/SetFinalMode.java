@@ -97,6 +97,6 @@ public class SetFinalMode extends Step<BindingActivation> {
     }
 
     public String toString() {
-        return "Act-Step: Set final Mode";
+        return "Act-Step: Set final Mode " + getElement().toShortString();
     }
 }

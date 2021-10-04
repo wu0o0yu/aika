@@ -70,6 +70,6 @@ public class LinkInduction extends Step<Link> {
     }
 
     public String toString() {
-        return "Link-Step: Induction";
+        return "Link-Step: Induction " + getElement().toShortString();
     }
 }

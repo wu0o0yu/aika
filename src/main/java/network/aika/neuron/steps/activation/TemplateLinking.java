@@ -71,6 +71,6 @@ public class TemplateLinking extends LinkerStep<Activation, TemplateTask> {
     }
 
     public String toString() {
-        return "Act-Step: Template-Linking (Binding-Signal:" + bindingSignal.getId() + ":" + bindingSignal.getLabel()  + ", " + directions + ")";
+        return "Act-Step: Template-Linking " + getElement().toShortString() + " (Binding-Signal:[" + bindingSignal.getId() + ":" + bindingSignal.getLabel()  + "], " + directions + ")";
     }
 }

@@ -52,7 +52,8 @@ public class TemplateTask extends AbstractLinker {
         return act.templateLinkExists(dir, s);
     }
 
-    private boolean neuronMatches(Neuron<?, ?> currentN, Neuron<?, ?> targetN) {
+    @Override
+    protected boolean neuronMatches(Neuron<?, ?> currentN, Neuron<?, ?> targetN) {
         return currentN.getTemplateGroup()
                 .stream()
                 .anyMatch(tn ->
@@ -80,12 +81,6 @@ public class TemplateTask extends AbstractLinker {
     @Override
     public void linkIntern(Activation iAct, Activation oAct, Synapse targetSynapse) {
         if(oAct.getNeuron().isInputNeuron())
-            return;
-
-        if (!neuronMatches(iAct.getNeuron(), targetSynapse.getInput()))
-            return;
-
-        if (!neuronMatches(oAct.getNeuron(), targetSynapse.getOutput()))
             return;
 
         if(!targetSynapse.checkTemplateLink(iAct, oAct))

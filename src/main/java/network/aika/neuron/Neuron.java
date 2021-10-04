@@ -344,10 +344,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     public void updateSynapseInputConnections() {
     }
 
-    public boolean typeMatches(Neuron n) {
-        return getClass() == n.getClass();
-    }
-
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeByte((byte) getTemplate().getId().intValue());

@@ -36,7 +36,6 @@ import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.PatternActivation.MAX_PATTERN_ACT;
 import static network.aika.neuron.activation.PatternActivation.MIN_PATTERN_ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.utils.Utils.logChange;
 

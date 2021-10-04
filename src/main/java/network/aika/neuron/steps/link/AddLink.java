@@ -65,6 +65,6 @@ public class AddLink extends Step<Link> {
     }
 
     public String toString() {
-        return "Link-Step: Add Link";
+        return "Link-Step: Add Link " + getElement().toShortString();
     }
 }

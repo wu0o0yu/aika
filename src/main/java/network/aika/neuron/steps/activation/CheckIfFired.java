@@ -87,6 +87,6 @@ public class CheckIfFired extends Step<Activation> {
     }
 
     public String toString() {
-        return "Act-Step: CheckIfFired";
+        return "Act-Step: CheckIfFired " + getElement().toShortString();
     }
 }

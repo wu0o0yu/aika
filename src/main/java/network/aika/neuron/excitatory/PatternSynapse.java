@@ -41,6 +41,11 @@ public class PatternSynapse extends ExcitatorySynapse<BindingNeuron, PatternNeur
     }
 
     @Override
+    public boolean checkScope(Byte fromScope, Byte toScope, Direction dir) {
+        return fromScope == 0 && toScope == 0;
+    }
+
+    @Override
     public boolean checkTemplatePropagate(Activation act) {
         return true;
     }

@@ -70,6 +70,10 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return fromScope;
     }
 
+    public boolean checkScope(Byte fromScope, Byte toScope, Direction dir) {
+        return transitionScope(fromScope, dir) == toScope;
+    }
+
     public boolean checkTemplatePropagate(Activation act) {
         return false;
     }

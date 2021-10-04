@@ -62,6 +62,11 @@ public class LinkingTask extends AbstractLinker {
         addNextLinkerSteps(l);
     }
 
+    @Override
+    protected boolean neuronMatches(Neuron<?, ?> currentN, Neuron<?, ?> targetN) {
+        return currentN.getId().intValue() == targetN.getId().intValue();
+    }
+
     public static void addNextLinkerSteps(Link l) {
         PropagateBindingSignal.add(l);
 

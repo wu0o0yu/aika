@@ -74,6 +74,6 @@ public class Propagate extends TaskStep<Activation, LinkingTask> {
     }
 
     public String toString() {
-        return "Act-Step: Propagate)";
+        return "Act-Step: Propagate " + getElement().toShortString();
     }
 }
