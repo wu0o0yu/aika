@@ -23,7 +23,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
-import network.aika.neuron.visitor.ActVisitor;
+import network.aika.neuron.activation.InhibitoryActivation;
 
 /**
  *
@@ -45,21 +45,12 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse, Activation> {
 
     @Override
     public Activation createActivation(Thought t) {
-        return new Activation(t.createActivationId(), t, this);
-    }
-
-    public void transition(ActVisitor v, Activation act) {
-        act.followLinks(v);
+        return new InhibitoryActivation(t.createActivationId(), t, this);
     }
 
     @Override
     public boolean allowTemplatePropagate(Activation act) {
         return false;
-    }
-
-    @Override
-    public void alternateBranchTransition(ActVisitor v, Activation act) {
-        act.followLinks(v);
     }
 
     @Override

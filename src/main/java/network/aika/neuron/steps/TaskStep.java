@@ -14,44 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.visitor;
+package network.aika.neuron.steps;
 
-import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Link;
-
+import network.aika.neuron.activation.Element;
+import network.aika.neuron.linker.AbstractLinker;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class LinkVisitor extends Visitor {
+public abstract class TaskStep<E extends Element, L extends AbstractLinker> extends Step<E> {
 
-    private Link link;
+    protected final L task;
 
-    public LinkVisitor(ActVisitor v, Synapse syn, Link l) {
-        super(v);
-        link = l;
-        incrementPathLength();
-
-        onCandidateEvent(syn);
-    }
-
-    public LinkVisitor(ActVisitor v, Synapse syn, Link l, Scope ns) {
-        this(v, syn, l);
-        scope = ns;
-    }
-
-    public void setLink(Link link) {
-        this.link = link;
-    }
-
-    public Link getLink() {
-        return link;
-    }
-
-    public String toString() {
-        return "Current:" + (link != null ? link : "X") + ", " +
-                "Origin:" + origin.getActivation().toShortString() + ", " +
-                super.toString();
+    public TaskStep(E element, L task) {
+        super(element);
+        this.task = task;
     }
 }

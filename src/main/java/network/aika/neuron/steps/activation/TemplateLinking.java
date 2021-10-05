@@ -14,20 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.steps.link;
+package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.linker.LinkingTask;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
-import network.aika.neuron.steps.VisitorStep;
-import network.aika.neuron.visitor.tasks.TemplateTask;
+import network.aika.neuron.steps.LinkerStep;
+import network.aika.neuron.linker.TemplateTask;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
@@ -36,18 +38,17 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Template extends VisitorStep<Link, TemplateTask> {
+public class TemplateLinking extends LinkerStep<Activation, TemplateTask> {
 
-    public static void add(Link l) {
-        Step.add(new Template(l,
-                l.getOutput().isFired() ?
-                        List.of(INPUT, OUTPUT) :
-                        List.of(INPUT))
-        );
+    private List<Direction> directions;
+
+    public static void add(Activation act, PatternActivation bindingSignal, Byte scope, List<Direction> dirs) {
+        Step.add(new TemplateLinking(act, bindingSignal, scope, dirs));
     }
 
-    private Template(Link l, List<Direction> dirs) {
-        super(l, new TemplateTask(), dirs);
+    private TemplateLinking(Activation act, PatternActivation bindingSignal, Byte scope, List<Direction> dirs) {
+        super(act, bindingSignal, scope, new TemplateTask());
+        directions = dirs;
     }
 
     @Override
@@ -62,14 +63,14 @@ public class Template extends VisitorStep<Link, TemplateTask> {
 
     @Override
     public void process() {
-        task.link(getElement(), directions);
+        task.link(getElement(), directions, bindingSignal, scope);
     }
 
     public boolean checkIfQueued() {
-        return true;
+        return false;
     }
 
     public String toString() {
-        return "Link-Step: Template (" + task + ", " + directions + ")";
+        return "Act-Step: Template-Linking " + getElement().toShortString() + " (Binding-Signal:[" + bindingSignal.getId() + ":" + bindingSignal.getLabel()  + "], " + directions + ")";
     }
 }

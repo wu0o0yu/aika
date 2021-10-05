@@ -34,7 +34,7 @@ import static network.aika.neuron.steps.activation.CheckIfFired.propagate;
  *
  * @author Lukas Molzberger
  */
-public class SetFinalMode extends UpdateNet<BindingActivation> {
+public class SetFinalMode extends Step<BindingActivation> {
 
     public static void add(BindingActivation act) {
         if(act.isFinalMode())
@@ -66,7 +66,7 @@ public class SetFinalMode extends UpdateNet<BindingActivation> {
         BindingActivation act = getElement();
 
         act.setFinalMode(true);
-        updateNet(act.getNeuron().getAssumedActiveSum() - computeForwardLinkedRecurrentInputs(act));
+        UpdateNet.updateNet(act, act.getNeuron().getAssumedActiveSum() - computeForwardLinkedRecurrentInputs(act));
 
         getPositiveRecurrentInputLinks(act)
                 .filter(l -> !l.isForward())
@@ -97,6 +97,6 @@ public class SetFinalMode extends UpdateNet<BindingActivation> {
     }
 
     public String toString() {
-        return "Act-Step: Set final Mode";
+        return "Act-Step: Set final Mode " + getElement().toShortString();
     }
 }

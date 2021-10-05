@@ -33,7 +33,7 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
 
     private E element;
 
-    private Fired fired;
+    protected Fired fired;
     private long timestamp;
 
     public Step(E element) {
@@ -68,10 +68,6 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
     public abstract StepType getStepType();
 
     public abstract boolean checkIfQueued();
-
-    static String toString(Step p) {
-        return " (" + (p != null ? p.toString() : "X") + ")";
-    }
 
     public static void add(Step s) {
         if(s.checkIfQueued() && s.getElement().isQueued(s))

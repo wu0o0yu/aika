@@ -62,6 +62,6 @@ public class Cleanup extends Step<Link> {
     }
 
     public String toString() {
-        return "Link-Step: Commit";
+        return "Link-Step: Commit " + getElement().toShortString();
     }
 }

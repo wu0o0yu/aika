@@ -18,15 +18,11 @@ package network.aika;
 
 
 import network.aika.callbacks.EventListener;
-import network.aika.callbacks.VisitorEvent;
-import network.aika.callbacks.VisitorEventListener;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.visitor.Visitor;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
 
@@ -53,7 +49,6 @@ public abstract class Thought {
     private Map<NeuronProvider, SortedSet<Activation>> actsPerNeuron = null;
 
     private final List<EventListener> eventListeners = new ArrayList<>();
-    private final List<VisitorEventListener> visitorEventListeners = new ArrayList<>();
 
     private Config config;
 
@@ -105,20 +100,6 @@ public abstract class Thought {
                 );
     }
 
-    public void onVisitorEvent(Visitor v, VisitorEvent ve) {
-        getVisitorEventListeners()
-                .forEach(
-                        el -> el.onVisitorEvent(v, ve)
-                );
-    }
-
-    public void onVisitorCandidateEvent(Visitor v, Synapse s) {
-        getVisitorEventListeners()
-                .forEach(
-                        el -> el.onVisitorCandidateEvent(v, s)
-                );
-    }
-
     public synchronized Collection<EventListener> getEventListeners() {
         return new ArrayList<>(eventListeners);
     }
@@ -129,20 +110,6 @@ public abstract class Thought {
 
     public synchronized void removeEventListener(EventListener l) {
         eventListeners.remove(l);
-    }
-
-    public synchronized void addVisitorEventListener(VisitorEventListener l) {
-        visitorEventListeners.add(l);
-    }
-
-    public synchronized void removeVisitorEventListener(VisitorEventListener l) {
-        visitorEventListeners.remove(l);
-    }
-
-    public synchronized Collection<VisitorEventListener> getVisitorEventListeners() {
-        return visitorEventListeners
-                .stream()
-                .collect(Collectors.toList());
     }
 
     public void registerActivation(Activation act) {

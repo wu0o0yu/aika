@@ -64,6 +64,6 @@ public class LinkCounting extends Step<Link> {
     }
 
     public String toString() {
-        return "Link-Step: Counting";
+        return "Link-Step: Counting " + getElement().toShortString();
     }
 }

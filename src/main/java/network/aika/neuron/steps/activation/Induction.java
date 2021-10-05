@@ -74,6 +74,6 @@ public class Induction extends Step<Activation> {
     }
 
     public String toString() {
-        return "Act-Step: Induction";
+        return "Act-Step: Induction " + getElement().toShortString();
     }
 }

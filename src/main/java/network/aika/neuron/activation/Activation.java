@@ -24,7 +24,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.visitor.ActVisitor;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.activation.*;
 import network.aika.utils.Utils;
@@ -33,9 +32,9 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.callbacks.VisitorEvent.AFTER;
-import static network.aika.callbacks.VisitorEvent.BEFORE;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
+import static network.aika.neuron.activation.PatternActivation.MAX_PATTERN_ACT;
+import static network.aika.neuron.activation.PatternActivation.MIN_PATTERN_ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.utils.Utils.logChange;
@@ -43,16 +42,15 @@ import static network.aika.utils.Utils.logChange;
 /**
  * @author Lukas Molzberger
  */
-public class Activation<N extends Neuron> extends Element<Activation> {
+public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
-    public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(act -> act.id);
+    public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(Activation::getId);
 
     protected double value = 0.0;
     protected Double inputValue = null;
     protected double net;
     protected double lastNet = 0.0;
     protected Fired fired = NOT_FIRED;
-    protected boolean marked;
 
     protected final int id;
     protected N neuron;
@@ -62,6 +60,12 @@ public class Activation<N extends Neuron> extends Element<Activation> {
     NavigableMap<OutputKey, Link> outputLinks;
 
     private Reference reference;
+
+    protected SortedMap<Activation<?>, Byte> bindingSignals = new TreeMap<>(
+            Comparator.<Activation, Byte>comparing(act -> act.getType())
+                    .thenComparing(Activation::getId)
+    );
+    protected Map<Activation<?>, Byte> reverseBindingSignals = new TreeMap<>();
 
     public final static int OWN = 0;
     public final static int INCOMING = 1;
@@ -78,7 +82,7 @@ public class Activation<N extends Neuron> extends Element<Activation> {
     public boolean markedNetUpdateOccurred; // Temporary hack
 
 
-    private Activation(int id, N n) {
+    protected Activation(int id, N n) {
         this.id = id;
         this.neuron = n;
     }
@@ -96,19 +100,15 @@ public class Activation<N extends Neuron> extends Element<Activation> {
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
     }
 
-    public boolean isMarked() {
-        return marked;
-    }
-
-    public void setMarked(boolean marked) {
-        this.marked = marked;
-    }
+    public abstract byte getType();
 
     public void initInput(Reference ref) {
         setReference(ref);
 
         setInputValue(1.0);
         setFired(ref.getRelativeBegin());
+
+        addBindingSignal(this, (byte) 0);
 
         updateValue();
 
@@ -168,6 +168,46 @@ public class Activation<N extends Neuron> extends Element<Activation> {
         return thought;
     }
 
+    public boolean isSelfRef(Activation iAct) {
+        return bindingSignals.containsKey(iAct);
+    }
+
+
+    public void addBindingSignal(Activation bindingSignal, Byte scope) {
+        Byte existingBSScope = bindingSignals.get(bindingSignal);
+        if(existingBSScope != null && existingBSScope <= scope)
+            return;
+
+        bindingSignals.put(bindingSignal, scope);
+        bindingSignal.registerBindingSignal(this, scope);
+    }
+
+    public void addBindingSignals(Map<Activation<?>, Byte> bindingsSignals) {
+        bindingsSignals.entrySet().stream().forEach(e ->
+                addBindingSignal(e.getKey(), e.getValue())
+        );
+    }
+
+    protected void registerBindingSignal(Activation targetAct, Byte scope) {
+        reverseBindingSignals.put(targetAct, scope);
+    }
+
+    public Map<Activation<?>, Byte> getBindingSignals() {
+        return bindingSignals;
+    }
+
+    public Map<Activation<?>, Byte> getPatternBindingSignals() {
+        return bindingSignals.subMap(MIN_PATTERN_ACT, MAX_PATTERN_ACT);
+    }
+
+    public Map<Activation<?>, Byte> getBranchBindingSignals() {
+        return bindingSignals.subMap(MIN_PATTERN_ACT, MAX_PATTERN_ACT);
+    }
+
+    public Map<Activation<?>, Byte> getReverseBindingSignals() {
+        return reverseBindingSignals;
+    }
+
     @Override
     public int compareTo(Activation act) {
         return ID_COMPARATOR.compare(this, act);
@@ -223,7 +263,7 @@ public class Activation<N extends Neuron> extends Element<Activation> {
         if (!isFired())
             return this;
 
-        Activation clonedAct = new Activation(id, thought, neuron);
+        Activation clonedAct = newInstance();
 
         replaceElement(clonedAct);
 
@@ -232,6 +272,8 @@ public class Activation<N extends Neuron> extends Element<Activation> {
 
         return clonedAct;
     }
+
+    protected abstract Activation newInstance();
 
     protected void linkClone(Activation clonedAct, Synapse excludedSyn) {
         inputLinks
@@ -247,26 +289,6 @@ public class Activation<N extends Neuron> extends Element<Activation> {
 
     public void setInputValue(double v) {
         inputValue = v;
-    }
-
-    public void followLinks(ActVisitor v) {
-        v.onEvent(BEFORE);
-
-        Direction dir = v.getCurrentDir();
-
-        setMarked(true);
-        dir.getLinks(this)
-                .forEach(l ->
-                        v.getVisitorTask()
-                                .synapseTransition(v, l.getSynapse(), l)
-                );
-
-        setMarked(false);
-
-        v.getVisitorTask()
-                .processTask(v);
-
-        v.onEvent(AFTER);
     }
 
     public Link getInputLink(Neuron n) {
@@ -461,5 +483,18 @@ public class Activation<N extends Neuron> extends Element<Activation> {
         }
 
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Activation)) return false;
+        Activation<?> that = (Activation<?>) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

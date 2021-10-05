@@ -68,6 +68,6 @@ public class PropagateValueChange extends Step<Activation<?>> {
     }
 
     public String toString() {
-        return "Act-Step: Propagate Change (" + Utils.round(valueDelta) + ")";
+        return "Act-Step: Propagate Change" + getElement().toShortString() + " (Delta:" + Utils.round(valueDelta) + ") ";
     }
 }

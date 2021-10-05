@@ -14,24 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.inhibitory;
+package network.aika.neuron.activation;
 
-import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.visitor.ActVisitor;
-import network.aika.neuron.excitatory.BindingNeuron;
+import network.aika.Thought;
+import network.aika.neuron.Neuron;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class RegularInhibitorySynapse extends InhibitorySynapse<BindingNeuron> {
+public class InhibitoryActivation extends Activation {
 
-    public void alternateBranchTransition(ActVisitor v, Synapse s, Link l) {
-        l.follow(v);
+    public InhibitoryActivation(int id, Thought t, Neuron neuron) {
+        super(id, t, neuron);
     }
 
-    public void negativeSynapseTransitionLoop(ActVisitor v, Link l) {
-        l.follow(v);
+    @Override
+    protected Activation newInstance() {
+        return new InhibitoryActivation(id, thought, neuron);
+    }
+
+    @Override
+    public byte getType() {
+        return 2;
     }
 }

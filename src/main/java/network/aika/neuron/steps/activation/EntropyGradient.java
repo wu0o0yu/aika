@@ -75,6 +75,6 @@ public class EntropyGradient extends Step<Activation> {
     }
 
     public String toString() {
-        return "Act-Step: Entropy Gradient";
+        return "Act-Step: Entropy Gradient " + getElement().toShortString();
     }
 }

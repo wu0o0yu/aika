@@ -21,16 +21,16 @@ import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
 import network.aika.neuron.steps.link.LinkCounting;
+import network.aika.neuron.steps.link.PropagateBindingSignal;
 import network.aika.utils.Utils;
 
 import java.util.List;
-import java.util.Set;
 
-import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
+ * Checks whether the net value exceeds the threshold of 0. If that is the case, the neuron will be fired.
  *
  * @author Lukas Molzberger
  */
@@ -59,7 +59,6 @@ public class CheckIfFired extends Step<Activation> {
     }
 
     public static void propagate(Activation<?> act) {
-        Linking.add(act);
         Propagate.add(act);
 
         act.addFeedbackSteps();
@@ -70,8 +69,7 @@ public class CheckIfFired extends Step<Activation> {
         if(Utils.belowTolerance(act.getOutputGradientSum()))
             return;
 
-        TemplatePropagate.add(act, List.of(INPUT, OUTPUT));
-        TemplateCloseLoop.add(act, List.of(OUTPUT));
+        TemplatePropagate.add(act);
     }
 
     @Override
@@ -89,6 +87,6 @@ public class CheckIfFired extends Step<Activation> {
     }
 
     public String toString() {
-        return "Act-Step: CheckIfFired";
+        return "Act-Step: CheckIfFired " + getElement().toShortString();
     }
 }

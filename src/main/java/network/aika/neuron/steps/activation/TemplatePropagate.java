@@ -17,15 +17,14 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.Step;
-import network.aika.neuron.steps.StepType;
-import network.aika.neuron.steps.VisitorStep;
-import network.aika.neuron.visitor.tasks.TemplateTask;
+import network.aika.neuron.steps.*;
+import network.aika.neuron.linker.TemplateTask;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
@@ -33,14 +32,14 @@ import java.util.Set;
  *
  * @author Lukas Molzberger
  */
-public class TemplatePropagate extends VisitorStep<Activation, TemplateTask> {
+public class TemplatePropagate extends TaskStep<Activation, TemplateTask> {
 
-    public static void add(Activation act, List<Direction> dirs) {
-        Step.add(new TemplatePropagate(act, dirs));
+    public static void add(Activation act) {
+        Step.add(new TemplatePropagate(act));
     }
 
-    private TemplatePropagate(Activation act, List<Direction> dirs) {
-        super(act, new TemplateTask(), dirs);
+    private TemplatePropagate(Activation act) {
+        super(act, new TemplateTask());
     }
 
     @Override
@@ -64,12 +63,10 @@ public class TemplatePropagate extends VisitorStep<Activation, TemplateTask> {
         if (!act.getNeuron().allowTemplatePropagate(act))
             return;
 
-        directions.forEach(dir ->
-                task.propagate(dir, act)
-        );
+        task.propagate(act);
     }
 
     public String toString() {
-        return "Act-Step: Template-Propagate (" + task + ", " + directions + ")";
+        return "Act-Step: Template-Propagate " + getElement().toShortString();
     }
 }

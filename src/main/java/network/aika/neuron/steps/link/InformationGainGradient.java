@@ -59,6 +59,6 @@ public class InformationGainGradient extends Step<Link> {
     }
 
     public String toString() {
-        return "Link-Step: Information-Gain Gradient";
+        return "Link-Step: Information-Gain Gradient " + getElement().toShortString();
     }
 }

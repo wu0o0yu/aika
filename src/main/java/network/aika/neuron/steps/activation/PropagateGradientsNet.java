@@ -67,6 +67,6 @@ public class PropagateGradientsNet extends PropagateGradients {
     }
 
     public String toString() {
-        return "Act-Step: Propagate Gradients from Net Update";
+        return "Act-Step: Propagate Gradients from Net Update " + getElement().toShortString();
     }
 }

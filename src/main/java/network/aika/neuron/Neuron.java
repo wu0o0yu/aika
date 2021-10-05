@@ -21,7 +21,6 @@ import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Reference;
-import network.aika.neuron.visitor.ActVisitor;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;
@@ -105,11 +104,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     public abstract A createActivation(Thought t);
 
     public abstract Neuron<?, ?> instantiateTemplate(boolean addProvider);
-
-    public abstract void transition(ActVisitor v, Activation act);
-
-    public void alternateBranchTransition(ActVisitor v, Activation act) {
-    }
 
     public abstract void addDummyLinks(Activation act);
 

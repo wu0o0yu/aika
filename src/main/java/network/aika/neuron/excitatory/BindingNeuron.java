@@ -21,16 +21,12 @@ import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.visitor.ActVisitor;
-import network.aika.neuron.visitor.tasks.AlternateBranchTask;
 import network.aika.utils.Utils;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  * @author Lukas Molzberger
@@ -64,45 +60,6 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, Bindin
 
     public void addAssumedWeights(double weightDelta) {
         assumedActiveSum += weightDelta;
-    }
-
-    public void transition(ActVisitor v, Activation act) {
-        if(v.getCurrentDir() == OUTPUT && enteringAlternateBranch(v))
-            return;
-
-        act.followLinks(v);
-    }
-
-    @Override
-    public void alternateBranchTransition(ActVisitor v, Activation act) {
-        AlternateBranchTask abTask = (AlternateBranchTask) v.getVisitorTask();
-
-        abTask.checkBranch(act);
-
-        if(!abTask.isAlternateBranch())
-            act.followLinks(v);
-    }
-
-    public boolean enteringAlternateBranch(ActVisitor v) {
-        BindingActivation act = (BindingActivation) v.getActivation();
-
-        AlternateBranchTask abTask = new AlternateBranchTask();
-
-        act.getAllBranches().forEach(bAct ->
-                abTask.neuronTransition(
-                        new ActVisitor(
-                                v,
-                                abTask,
-                                bAct,
-                                v.getScope(),
-                                INPUT,
-                                INPUT
-                        ),
-                        bAct
-                )
-        );
-
-        return abTask.isAlternateBranch();
     }
 
     @Override

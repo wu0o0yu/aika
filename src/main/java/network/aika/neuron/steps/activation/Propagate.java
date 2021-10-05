@@ -17,14 +17,13 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.Step;
-import network.aika.neuron.steps.StepType;
-import network.aika.neuron.steps.VisitorStep;
-import network.aika.neuron.visitor.tasks.LinkingTask;
+import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.steps.*;
+import network.aika.neuron.linker.LinkingTask;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
@@ -41,7 +40,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Propagate extends VisitorStep<Activation, LinkingTask> {
+public class Propagate extends TaskStep<Activation, LinkingTask> {
 
 
     public static void add(Activation act) {
@@ -49,7 +48,7 @@ public class Propagate extends VisitorStep<Activation, LinkingTask> {
     }
 
     private Propagate(Activation act) {
-        super(act, new LinkingTask(), List.of(OUTPUT));
+        super(act, new LinkingTask());
     }
 
     @Override
@@ -67,7 +66,7 @@ public class Propagate extends VisitorStep<Activation, LinkingTask> {
         if(!getElement().isFired())
             return;
 
-        task.propagate(OUTPUT, getElement());
+        task.propagate(getElement());
     }
 
     public boolean checkIfQueued() {
@@ -75,6 +74,6 @@ public class Propagate extends VisitorStep<Activation, LinkingTask> {
     }
 
     public String toString() {
-        return "Act-Step: Propagate (" + task + ", " + directions + ")";
+        return "Act-Step: Propagate " + getElement().toShortString();
     }
 }

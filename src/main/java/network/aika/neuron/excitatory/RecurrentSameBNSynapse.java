@@ -16,18 +16,12 @@
  */
 package network.aika.neuron.excitatory;
 
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.visitor.ActVisitor;
-import network.aika.neuron.visitor.Visitor;
-import network.aika.neuron.visitor.Scope;
 
 import static network.aika.neuron.activation.Activation.INCOMING;
 import static network.aika.neuron.activation.Activation.OWN;
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
@@ -47,47 +41,13 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
     }
 
     @Override
-    protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
-        return v.getSelfRef();
+    public boolean checkCausality(Activation<?> iAct, Activation<?> oAct) {
+        return Fired.COMPARATOR.compare(iAct.getFired(), oAct.getFired()) < 0 ||
+                oAct.isSelfRef(iAct);
     }
 
-    public Direction getStartDir(Direction dir) {
-        return isRecurrent() ? dir.invert() : dir;
-    }
-
-    public void transition(ActVisitor v, Synapse s, Link l) {
-        s.patternTransitionLoop(v, l);
-    }
-
-    @Override
-    public void samePatternTransitionLoop(ActVisitor v, Link l) {
-        if(v.getStartDir() == v.getCurrentDir())
-            return;
-
-        if(v.getScope() != Scope.INPUT)
-            return;
-
-        l.follow(v);
-    }
-
-    @Override
-    public void inputPatternTransitionLoop(ActVisitor v, Link l) {
-        if(v.getScope() != Scope.INPUT)
-            return;
-
-        l.follow(v);
-    }
-
-    @Override
-    public void patternTransitionLoop(ActVisitor v, Link l) {
-        l.follow(v);
-    }
-
-    public boolean checkTemplatePropagate(Direction dir, Activation act) {
-        if (dir == INPUT && act.getNeuron().isInputNeuron())
-            return false;
-
-        return dir != OUTPUT;
+    public boolean checkTemplatePropagate(Activation act) {
+        return false;
     }
 
     @Override

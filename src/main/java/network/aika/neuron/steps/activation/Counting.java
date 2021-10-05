@@ -62,6 +62,6 @@ public class Counting extends Step<Activation> {
     }
 
     public String toString() {
-        return "Act-Step: Counting";
+        return "Act-Step: Counting " + getElement().toShortString();
     }
 }

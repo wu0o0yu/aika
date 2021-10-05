@@ -19,17 +19,12 @@ package network.aika.neuron.activation;
 import network.aika.Config;
 import network.aika.Thought;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.visitor.ActVisitor;
-import network.aika.neuron.visitor.LinkVisitor;
-import network.aika.neuron.visitor.Scope;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.link.AddLink;
 import network.aika.utils.Utils;
 
 import java.util.Comparator;
 
-import static network.aika.callbacks.VisitorEvent.AFTER;
-import static network.aika.callbacks.VisitorEvent.BEFORE;
 import static network.aika.neuron.sign.Sign.POS;
 
 /**
@@ -79,27 +74,6 @@ public class Link<A extends Activation> extends Element<Link> {
         if(l == null)
             return false;
         return l.getSynapse().isOfTemplate(ts);
-    }
-
-    public void follow(ActVisitor v) {
-        follow(v, v.getScope());
-    }
-
-    public void follow(ActVisitor v, Scope ns) {
-        LinkVisitor lv = new LinkVisitor(v, getSynapse(), this, ns);
-        Activation toAct = lv.getCurrentDir().getActivation(this);
-
-        if(toAct == null || toAct.isMarked())
-            return;
-
-        lv.onEvent(BEFORE);
-
-        v.getVisitorTask().neuronTransition(
-                new ActVisitor(lv, toAct),
-                toAct
-        );
-
-        lv.onEvent(AFTER);
     }
 
     public void computeInformationGainGradient() {

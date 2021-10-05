@@ -32,6 +32,10 @@ import java.util.stream.Stream;
  */
 public class BindingActivation extends Activation<BindingNeuron> {
 
+    public static PatternActivation MIN_BINDING_ACT = new PatternActivation(0, null);
+    public static PatternActivation MAX_BINDING_ACT = new PatternActivation(Integer.MAX_VALUE, null);
+
+
     private boolean finalMode = false;
 
     private final Set<BindingActivation> branches = new TreeSet<>();
@@ -40,8 +44,23 @@ public class BindingActivation extends Activation<BindingNeuron> {
     private double branchProbability = 1.0;
 
 
+    protected BindingActivation(int id, BindingNeuron n) {
+        super(id, n);
+    }
+
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
+        addBindingSignal(this, (byte) 0);
+    }
+
+    @Override
+    protected Activation newInstance() {
+        return new BindingActivation(id, thought, neuron);
+    }
+
+    @Override
+    public byte getType() {
+        return 1;
     }
 
     public BindingActivation createBranch(Synapse excludedSyn) {
@@ -103,6 +122,6 @@ public class BindingActivation extends Activation<BindingNeuron> {
     }
 
     public String toString(boolean includeLink) {
-        return super.toString() + " bp:" + Utils.round(branchProbability);
+        return super.toString(includeLink) + " bp:" + Utils.round(branchProbability);
     }
 }

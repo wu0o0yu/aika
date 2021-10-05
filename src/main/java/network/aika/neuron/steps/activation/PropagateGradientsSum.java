@@ -60,6 +60,6 @@ public class PropagateGradientsSum extends PropagateGradients {
     }
 
     public String toString() {
-        return "Act-Step: Propagate Gradients from Gradient Sum Update";
+        return "Act-Step: Propagate Gradients from Gradient Sum Update " + getElement().toShortString();
     }
 }

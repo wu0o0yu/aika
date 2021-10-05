@@ -21,9 +21,10 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.visitor.ActVisitor;
-import network.aika.neuron.visitor.Visitor;
 import network.aika.neuron.steps.UpdateNet;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static network.aika.neuron.sign.Sign.POS;
 
@@ -32,38 +33,23 @@ import static network.aika.neuron.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public abstract class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNeuron, Activation> {
+public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNeuron, Activation> {
 
     @Override
-    public boolean checkTemplatePropagate(Direction dir, Activation act) {
-        return false;
+    public boolean checkTemplatePropagate(Activation iAct) {
+        return true;
     }
 
-    @Override
-    public Synapse getConcreteSynapse(Neuron<?, ?> in, Neuron<?, ?> on) {
-        if(in.getTemplate().getId().intValue() != input.getId().intValue())
-            return null;
+    public Neuron getTemplatePropagateTargetNeuron(Activation<?> act) {
 
-        Synapse cs = in.getOutputSynapse(on.getProvider());
-        if(cs == null || cs.getTemplateSynapseId() != getTemplateSynapseId())
-            return null;
+        List<Activation<?>> candidates = act.getPatternBindingSignals().entrySet().stream()
+                .map(e -> e.getKey())
+                .flatMap(bAct -> bAct.getReverseBindingSignals().entrySet().stream())
+                .map(e -> e.getKey())
+                .filter(relAct -> relAct.getNeuron() instanceof InhibitoryNeuron)
+                .collect(Collectors.toList());
 
-        return cs;
-    }
-
-    @Override
-    public void transition(ActVisitor v, Synapse s, Link l) {
-        s.inhibitoryTransitionLoop(v, l);
-    }
-
-    @Override
-    public void samePatternTransitionLoop(ActVisitor v, Link l) {
-        l.follow(v);
-    }
-
-    @Override
-    public void inputPatternTransitionLoop(ActVisitor v, Link l) {
-        l.follow(v);
+        return getOutput();
     }
 
     public void updateSynapse(Link l, double delta) {
@@ -72,7 +58,6 @@ public abstract class InhibitorySynapse<I extends Neuron> extends Synapse<I, Inh
 
         addWeight(delta);
         UpdateNet.updateNet(l.getOutput(), delta * l.getInputValue(POS));
-//        SumUpLink.add(l, l.getInputValue(POS) * delta);
     }
 
     @Override
@@ -83,7 +68,7 @@ public abstract class InhibitorySynapse<I extends Neuron> extends Synapse<I, Inh
     }
 
     @Override
-    public Activation branchIfNecessary(Activation oAct, Visitor v) {
+    public Activation branchIfNecessary(Activation iAct, Activation oAct) {
         return oAct;
     }
 
@@ -94,7 +79,7 @@ public abstract class InhibitorySynapse<I extends Neuron> extends Synapse<I, Inh
     }
 
     @Override
-    protected boolean checkCausality(Activation fromAct, Activation toAct, Visitor v) {
+    public boolean checkCausality(Activation<?> iAct, Activation<?> oAct) {
         return true;
     }
 }

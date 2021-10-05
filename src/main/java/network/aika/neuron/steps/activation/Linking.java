@@ -17,11 +17,13 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
-import network.aika.neuron.steps.VisitorStep;
-import network.aika.neuron.visitor.tasks.LinkingTask;
+import network.aika.neuron.steps.LinkerStep;
+import network.aika.neuron.linker.LinkingTask;
 
 import java.util.List;
 
@@ -40,14 +42,18 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Linking extends VisitorStep<Activation, LinkingTask> {
+public class Linking extends LinkerStep<Activation, LinkingTask> {
 
-    public static void add(Activation act) {
-        Step.add(new Linking(act));
+    private List<Direction> directions;
+
+    public static void add(Activation act, PatternActivation bindingSignal, Byte scope, List<Direction> dirs) {
+        Step.add(new Linking(act, bindingSignal, scope, dirs));
     }
 
-    private Linking(Activation act) {
-        super(act, new LinkingTask(), List.of(OUTPUT));
+    private Linking(Activation act, PatternActivation bindingSignal, Byte scope, List<Direction> dirs) {
+        super(act, bindingSignal, scope, new LinkingTask());
+
+        directions = dirs;
     }
 
     @Override
@@ -61,7 +67,7 @@ public class Linking extends VisitorStep<Activation, LinkingTask> {
     }
 
     public boolean checkIfQueued() {
-        return true;
+        return false;
     }
 
     @Override
@@ -69,12 +75,12 @@ public class Linking extends VisitorStep<Activation, LinkingTask> {
         Activation act = getElement();
         act.getThought().linkInputRelations(act);
 
-        task.link(act, directions);
+        task.link(act, directions, bindingSignal, scope);
 
         act.getModel().linkInputRelations(act, OUTPUT);
     }
 
     public String toString() {
-        return "Act-Step: Linking (" + task + ", " + directions + ")";
+        return "Act-Step: Linking " + getElement().toShortString() + " ([" + bindingSignal.getId() + ":" + bindingSignal.getLabel() + "], " + directions + ")";
     }
 }
