@@ -32,8 +32,8 @@ import java.util.stream.Stream;
  */
 public class BindingActivation extends Activation<BindingNeuron> {
 
-    public static PatternActivation MIN_BINDING_ACT = new PatternActivation(0, null);
-    public static PatternActivation MAX_BINDING_ACT = new PatternActivation(Integer.MAX_VALUE, null);
+    public static BindingActivation MIN_BINDING_ACT = new BindingActivation(0, null);
+    public static BindingActivation MAX_BINDING_ACT = new BindingActivation(Integer.MAX_VALUE, null);
 
 
     private boolean finalMode = false;

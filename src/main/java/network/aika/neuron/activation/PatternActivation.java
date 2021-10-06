@@ -42,8 +42,9 @@ public class PatternActivation extends Activation<PatternNeuron> {
 
     public PatternActivation(int id, Thought t, PatternNeuron patternNeuron) {
         super(id, t, patternNeuron);
-    }
 
+        addBindingSignal(this, (byte) 0);
+    }
 
     @Override
     protected Activation newInstance() {

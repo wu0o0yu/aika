@@ -32,6 +32,8 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
+import static network.aika.neuron.activation.BindingActivation.MAX_BINDING_ACT;
+import static network.aika.neuron.activation.BindingActivation.MIN_BINDING_ACT;
 import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.PatternActivation.MAX_PATTERN_ACT;
 import static network.aika.neuron.activation.PatternActivation.MIN_PATTERN_ACT;
@@ -107,8 +109,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         setInputValue(1.0);
         setFired(ref.getRelativeBegin());
-
-        addBindingSignal(this, (byte) 0);
 
         updateValue();
 
@@ -201,7 +201,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public Map<Activation<?>, Byte> getBranchBindingSignals() {
-        return bindingSignals.subMap(MIN_PATTERN_ACT, MAX_PATTERN_ACT);
+        return bindingSignals.subMap(MIN_BINDING_ACT, MAX_BINDING_ACT);
     }
 
     public Map<Activation<?>, Byte> getReverseBindingSignals() {
