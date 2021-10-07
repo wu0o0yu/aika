@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
@@ -40,15 +41,13 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class TemplateLinking extends LinkerStep<Activation, TemplateTask> {
 
-    private List<Direction> directions;
 
-    public static void add(Activation act, PatternActivation bindingSignal, Byte scope, List<Direction> dirs) {
-        Step.add(new TemplateLinking(act, bindingSignal, scope, dirs));
+    public static void add(Activation act, PatternActivation bindingSignal, Byte scope) {
+        Step.add(new TemplateLinking(act, bindingSignal, scope));
     }
 
-    private TemplateLinking(Activation act, PatternActivation bindingSignal, Byte scope, List<Direction> dirs) {
+    private TemplateLinking(Activation act, PatternActivation bindingSignal, Byte scope) {
         super(act, bindingSignal, scope, new TemplateTask());
-        directions = dirs;
     }
 
     @Override
@@ -63,7 +62,7 @@ public class TemplateLinking extends LinkerStep<Activation, TemplateTask> {
 
     @Override
     public void process() {
-        task.link(getElement(), directions, bindingSignal, scope);
+        task.link(getElement(), getDirections(), bindingSignal, scope);
     }
 
     public boolean checkIfQueued() {
@@ -71,6 +70,6 @@ public class TemplateLinking extends LinkerStep<Activation, TemplateTask> {
     }
 
     public String toString() {
-        return "Act-Step: Template-Linking " + getElement().toShortString() + " (Binding-Signal:[" + bindingSignal.getId() + ":" + bindingSignal.getLabel()  + "], " + directions + ")";
+        return "Act-Step: Template-Linking " + getElement().toShortString() + " Binding-Signal:[" + bindingSignal.getId() + ":" + bindingSignal.getLabel()  + "]";
     }
 }

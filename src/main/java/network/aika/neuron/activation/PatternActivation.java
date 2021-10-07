@@ -58,9 +58,9 @@ public class PatternActivation extends Activation<PatternNeuron> {
 
     protected void registerBindingSignal(Activation targetAct, Byte scope) {
         super.registerBindingSignal(targetAct, scope);
-        List<Direction> dirs = List.of(INPUT, OUTPUT);
-        Linking.add(targetAct, this, scope, dirs);
-        TemplateLinking.add(targetAct, this, scope, dirs);
+
+        Linking.add(targetAct, this, scope);
+        TemplateLinking.add(targetAct, this, scope);
     }
 
     public boolean isSelfRef(Activation iAct) {

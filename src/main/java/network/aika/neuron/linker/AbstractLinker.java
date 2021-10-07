@@ -23,6 +23,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.inhibitory.InhibitorySynapse;
 
 import java.util.List;
 import java.util.Map;
@@ -90,6 +91,7 @@ public abstract class AbstractLinker {
     public void link(Activation<?> fromAct, List<Direction> dirs, PatternActivation bindingSignal, Byte scope) {
         dirs.forEach(dir ->
             getTargetSynapses(fromAct, dir)
+                    .filter(ts -> !(ts instanceof InhibitorySynapse))
                     .forEach(ts ->
                             link(fromAct, dir, bindingSignal, scope, ts)
                     )

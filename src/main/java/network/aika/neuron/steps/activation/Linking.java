@@ -27,6 +27,7 @@ import network.aika.neuron.linker.LinkingTask;
 
 import java.util.List;
 
+import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 
@@ -44,16 +45,12 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class Linking extends LinkerStep<Activation, LinkingTask> {
 
-    private List<Direction> directions;
-
-    public static void add(Activation act, PatternActivation bindingSignal, Byte scope, List<Direction> dirs) {
-        Step.add(new Linking(act, bindingSignal, scope, dirs));
+    public static void add(Activation act, PatternActivation bindingSignal, Byte scope) {
+        Step.add(new Linking(act, bindingSignal, scope));
     }
 
-    private Linking(Activation act, PatternActivation bindingSignal, Byte scope, List<Direction> dirs) {
+    private Linking(Activation act, PatternActivation bindingSignal, Byte scope) {
         super(act, bindingSignal, scope, new LinkingTask());
-
-        directions = dirs;
     }
 
     @Override
@@ -75,12 +72,12 @@ public class Linking extends LinkerStep<Activation, LinkingTask> {
         Activation act = getElement();
         act.getThought().linkInputRelations(act);
 
-        task.link(act, directions, bindingSignal, scope);
+        task.link(act, getDirections(), bindingSignal, scope);
 
         act.getModel().linkInputRelations(act, OUTPUT);
     }
 
     public String toString() {
-        return "Act-Step: Linking " + getElement().toShortString() + " ([" + bindingSignal.getId() + ":" + bindingSignal.getLabel() + "], " + directions + ")";
+        return "Act-Step: Linking " + getElement().toShortString() + " Binding-Signal:[" + bindingSignal.getId() + ":" + bindingSignal.getLabel() + "]";
     }
 }
