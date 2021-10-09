@@ -80,26 +80,26 @@ public abstract class AbstractLinker {
 
         getNextSteps(nl);
     }
-
+/*
     public void link(Activation<?> fromAct, Map<PatternActivation, Byte> bindingSignals, List<Direction> dirs) {
         bindingSignals.entrySet().stream()
                 .forEach(e ->
                         link(fromAct, dirs, e.getKey(), e.getValue())
                 );
     }
-
-    public void link(Activation<?> fromAct, List<Direction> dirs, PatternActivation bindingSignal, Byte scope) {
+*/
+    public void link(Activation<?> fromAct, List<Direction> dirs, Activation bindingSignal, Byte scope) {
         dirs.forEach(dir ->
             getTargetSynapses(fromAct, dir)
-                    .filter(ts -> !(ts instanceof InhibitorySynapse))
+                    .filter(ts -> ts.allowLinking(bindingSignal))
                     .forEach(ts ->
                             link(fromAct, dir, bindingSignal, scope, ts)
                     )
         );
     }
 
-    public void link(Activation<?> fromAct, Direction dir, PatternActivation bindingSignal, Byte scope, Synapse targetSynapse) {
-        searchRelatedCandidates(scope, dir, bindingSignal, targetSynapse)
+    public void link(Activation<?> fromAct, Direction dir, Activation bindingSignal, Byte scope, Synapse<?, ?, ?> targetSynapse) {
+        targetSynapse.searchRelatedCandidates(scope, dir, bindingSignal)
                 .forEach(toAct ->
                         link(fromAct, toAct, dir, targetSynapse)
                 );
@@ -115,6 +115,9 @@ public abstract class AbstractLinker {
         if(!targetSynapse.checkCausality(iAct, oAct))
             return;
 
+        if(Link.linkExists(iAct, oAct))
+            return;
+
         if (!neuronMatches(iAct.getNeuron(), targetSynapse.getInput()))
             return;
 
@@ -122,11 +125,5 @@ public abstract class AbstractLinker {
             return;
 
         linkIntern(iAct, oAct, targetSynapse);
-    }
-
-    private Stream<Activation> searchRelatedCandidates(Byte fromScope, Direction dir, PatternActivation bs, Synapse targetSynapse) {
-        return bs.getReverseBindingSignals().entrySet().stream()
-                .filter(e -> targetSynapse.checkScope(fromScope, e.getValue(), dir))
-                .map(e -> e.getKey());
     }
 }

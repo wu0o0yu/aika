@@ -20,6 +20,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.steps.UpdateNet;
 import network.aika.neuron.steps.activation.PostTraining;
 
@@ -31,6 +32,10 @@ import static network.aika.neuron.sign.Sign.POS;
  */
 public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNeuron<?, A>, A extends Activation> extends Synapse<I, O, A> {
 
+    @Override
+    public boolean allowLinking(Activation bindingSignal) {
+        return bindingSignal instanceof PatternActivation;
+    }
 
     @Override
     public void updateSynapse(Link l, double delta) {

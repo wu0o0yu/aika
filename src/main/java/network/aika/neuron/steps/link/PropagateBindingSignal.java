@@ -58,12 +58,14 @@ public class PropagateBindingSignal extends Step<Link> {
     protected void transitionScopes(Link l, Map<Activation, Byte> inputBindingSignals) {
         this.outputBindingSignals = inputBindingSignals.entrySet().stream()
                 .filter(e -> e.getKey().getType() != l.getOutput().getType())
-                .collect(
-                        Collectors.toMap(
-                                e -> e.getKey(),
-                                e -> l.getSynapse().transitionScope(e.getValue(), OUTPUT)
-                        )
-                );
+                .map(e -> {
+                    Byte oScope = l.getSynapse().transitionScope(e.getValue(), OUTPUT);
+                    if(oScope == null)
+                        return null;
+                    return Map.entry(e.getKey(), oScope);
+                })
+                .filter(e -> e != null)
+                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
     }
 
     @Override

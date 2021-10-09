@@ -20,6 +20,7 @@ import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.sign.Sign;
@@ -34,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.Neuron.BETA_THRESHOLD;
 import static network.aika.neuron.activation.Activation.OWN;
@@ -74,9 +76,17 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return transitionScope(fromScope, dir) == toScope;
     }
 
+    public Stream<Activation> searchRelatedCandidates(Byte fromScope, Direction dir, Activation<?> bs) {
+        return bs.getReverseBindingSignals().entrySet().stream()
+                .filter(e -> checkScope(fromScope, e.getValue(), dir))
+                .map(e -> e.getKey());
+    }
+
     public boolean checkTemplatePropagate(Activation act) {
         return false;
     }
+
+    public abstract boolean allowLinking(Activation bindingSignal);
 
     public void setInput(I input) {
         this.input = input.getProvider();

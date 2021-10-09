@@ -42,8 +42,8 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
 
     @Override
     public boolean checkCausality(Activation<?> iAct, Activation<?> oAct) {
-        return Fired.COMPARATOR.compare(iAct.getFired(), oAct.getFired()) < 0 ||
-                oAct.isSelfRef(iAct);
+        return true; //Fired.COMPARATOR.compare(iAct.getFired(), oAct.getFired()) < 0 ||
+                //oAct.isSelfRef(iAct);
     }
 
     public boolean checkTemplatePropagate(Activation act) {

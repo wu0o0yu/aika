@@ -190,6 +190,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     protected void registerBindingSignal(Activation targetAct, Byte scope) {
         reverseBindingSignals.put(targetAct, scope);
+
+        Linking.add(targetAct, this, scope);
+        TemplateLinking.add(targetAct, this, scope);
     }
 
     public Map<Activation<?>, Byte> getBindingSignals() {

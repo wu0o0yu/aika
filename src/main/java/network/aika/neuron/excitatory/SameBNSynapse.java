@@ -17,6 +17,7 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.direction.Direction;
 
 /**
  *
@@ -24,4 +25,21 @@ import network.aika.neuron.Neuron;
  */
 public class SameBNSynapse<I extends Neuron> extends BindingNeuronSynapse<I> {
 
+    @Override
+    public Byte transitionScope(Byte fromScope, Direction dir) {
+        if(fromScope == 0)
+            return fromScope;
+
+        return dir.transitionScope(fromScope);
+    }
+
+    public boolean checkScope(Byte fromScope, Byte toScope, Direction dir) {
+        if(fromScope == 0 && toScope == 0)
+            return true;
+
+        if(dir.getInputScope(fromScope, toScope) == 1 && dir.getOutputScope(fromScope, toScope) == 2)
+            return true;
+
+        return false;
+    }
 }

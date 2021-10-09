@@ -48,6 +48,16 @@ public class Input implements Direction {
     }
 
     @Override
+    public Byte getInputScope(Byte fromScope, Byte toScope) {
+        return toScope;
+    }
+
+    @Override
+    public Byte getOutputScope(Byte fromScope, Byte toScope) {
+        return fromScope;
+    }
+
+    @Override
     public Activation getInput(Activation fromAct, Activation toAct) {
         return toAct;
     }

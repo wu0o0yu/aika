@@ -17,6 +17,7 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.direction.Direction;
 
 /**
  *
@@ -24,4 +25,10 @@ import network.aika.neuron.Neuron;
  */
 public class RelatedBNSynapse<I extends Neuron> extends InputBNSynapse<I> {
 
+    public boolean checkScope(Byte fromScope, Byte toScope, Direction dir) {
+        if(fromScope >= 2 || toScope >= 2)
+            return false;
+
+        return super.checkScope(fromScope, toScope, dir);
+    }
 }

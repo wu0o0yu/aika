@@ -1,5 +1,6 @@
 package network.aika.neuron.steps;
 
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.InhibitoryActivation;
 import network.aika.neuron.activation.PatternActivation;
@@ -13,10 +14,10 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 public abstract class LinkerStep<E extends Element, T extends AbstractLinker> extends TaskStep<E, T> {
 
-    protected final PatternActivation bindingSignal;
+    protected final Activation bindingSignal;
     protected final Byte scope;
 
-    public LinkerStep(E element, PatternActivation bindingSignal, Byte scope, T task) {
+    public LinkerStep(E element, Activation bindingSignal, Byte scope, T task) {
         super(element, task);
         this.bindingSignal = bindingSignal;
         this.scope = scope;

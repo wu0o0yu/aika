@@ -56,13 +56,6 @@ public class PatternActivation extends Activation<PatternNeuron> {
         return 0;
     }
 
-    protected void registerBindingSignal(Activation targetAct, Byte scope) {
-        super.registerBindingSignal(targetAct, scope);
-
-        Linking.add(targetAct, this, scope);
-        TemplateLinking.add(targetAct, this, scope);
-    }
-
     public boolean isSelfRef(Activation iAct) {
         return reverseBindingSignals.containsKey(iAct);
     }

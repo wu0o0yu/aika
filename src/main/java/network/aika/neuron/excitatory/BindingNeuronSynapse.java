@@ -19,17 +19,25 @@ package network.aika.neuron.excitatory;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Reference;
+import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.activation.SetFinalMode;
+
+import java.util.stream.Stream;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public abstract class BindingNeuronSynapse<I extends Neuron> extends ExcitatorySynapse<I, BindingNeuron, BindingActivation> {
+
+    @Override
+    public boolean allowLinking(Activation bindingSignal) {
+        if(isRecurrent())
+            return bindingSignal instanceof BindingActivation;
+        else
+            return super.allowLinking(bindingSignal);
+    }
 
     @Override
     public void updateOutputNet(Link<BindingActivation> l, double delta) {

@@ -21,6 +21,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.inhibitory.InhibitorySynapse;
 
 /**
  *

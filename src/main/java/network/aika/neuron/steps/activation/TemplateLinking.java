@@ -42,11 +42,11 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 public class TemplateLinking extends LinkerStep<Activation, TemplateTask> {
 
 
-    public static void add(Activation act, PatternActivation bindingSignal, Byte scope) {
+    public static void add(Activation act, Activation bindingSignal, Byte scope) {
         Step.add(new TemplateLinking(act, bindingSignal, scope));
     }
 
-    private TemplateLinking(Activation act, PatternActivation bindingSignal, Byte scope) {
+    private TemplateLinking(Activation act, Activation bindingSignal, Byte scope) {
         super(act, bindingSignal, scope, new TemplateTask());
     }
 

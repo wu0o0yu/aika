@@ -40,6 +40,11 @@ public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNe
         return true;
     }
 
+    @Override
+    public boolean allowLinking(Activation bindingSignal) {
+        return false;
+    }
+
     public Neuron getTemplatePropagateTargetNeuron(Activation<?> act) {
 
         List<Activation<?>> candidates = act.getPatternBindingSignals().entrySet().stream()

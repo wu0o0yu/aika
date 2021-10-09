@@ -64,8 +64,8 @@ public class Link<A extends Activation> extends Element<Link> {
         return output.getFired();
     }
 
-    public static boolean linkExists(Synapse s, Activation iAct, Activation oAct) {
-        Link existingLink = oAct.getInputLink(s);
+    public static boolean linkExists(Activation iAct, Activation oAct) {
+        Link existingLink = oAct.getInputLink(iAct.getNeuron());
         return existingLink != null && existingLink.getInput() == iAct;
     }
 

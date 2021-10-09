@@ -37,6 +37,10 @@ public interface Direction {
 
     Byte transitionScope(Byte fromScope);
 
+    Byte getInputScope(Byte fromScope, Byte toScope);
+
+    Byte getOutputScope(Byte fromScope, Byte toScope);
+
     Activation getInput(Activation fromAct, Activation toAct);
 
     Activation getOutput(Activation fromAct, Activation toAct);

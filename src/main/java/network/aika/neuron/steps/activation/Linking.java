@@ -45,11 +45,11 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class Linking extends LinkerStep<Activation, LinkingTask> {
 
-    public static void add(Activation act, PatternActivation bindingSignal, Byte scope) {
+    public static void add(Activation act, Activation bindingSignal, Byte scope) {
         Step.add(new Linking(act, bindingSignal, scope));
     }
 
-    private Linking(Activation act, PatternActivation bindingSignal, Byte scope) {
+    private Linking(Activation act, Activation bindingSignal, Byte scope) {
         super(act, bindingSignal, scope, new LinkingTask());
     }
 
