@@ -69,8 +69,9 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return fromScope;
     }
 
-    public boolean checkScope(BindingSignal fromScope, BindingSignal toScope, Direction dir) {
-        return transitionScope(fromScope.getScope(), dir) == toScope.getScope();
+    public boolean checkScope(BindingSignal fromBS, BindingSignal toBS, Direction dir) {
+        Byte targetScope = transitionScope(fromBS.getScope(), dir);
+        return targetScope != null && targetScope.byteValue() == toBS.getScope();
     }
 
     public Stream<Activation> searchRelatedCandidates(BindingSignal fromBS, Direction dir, Activation<?> bs) {
