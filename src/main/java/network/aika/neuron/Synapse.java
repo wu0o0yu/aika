@@ -18,10 +18,7 @@ package network.aika.neuron;
 
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.activation.Reference;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.linker.AbstractLinker;
@@ -72,13 +69,13 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return fromScope;
     }
 
-    public boolean checkScope(Byte fromScope, Byte toScope, Direction dir) {
-        return transitionScope(fromScope, dir) == toScope;
+    public boolean checkScope(BindingSignal fromScope, BindingSignal toScope, Direction dir) {
+        return transitionScope(fromScope.getScope(), dir) == toScope.getScope();
     }
 
-    public Stream<Activation> searchRelatedCandidates(Byte fromScope, Direction dir, Activation<?> bs) {
+    public Stream<Activation> searchRelatedCandidates(BindingSignal fromBS, Direction dir, Activation<?> bs) {
         return bs.getReverseBindingSignals().entrySet().stream()
-                .filter(e -> checkScope(fromScope, e.getValue(), dir))
+                .filter(e -> checkScope(fromBS, e.getValue(), dir))
                 .map(e -> e.getKey());
     }
 

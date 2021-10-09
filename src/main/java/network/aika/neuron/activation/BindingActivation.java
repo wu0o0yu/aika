@@ -50,7 +50,7 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
-        addBindingSignal(this, (byte) 0);
+        addBindingSignal(new BindingSignal(this, (byte) 0));
     }
 
     @Override

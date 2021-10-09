@@ -16,10 +16,7 @@
  */
 package network.aika.neuron.excitatory;
 
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.activation.Reference;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 
@@ -42,8 +39,8 @@ public class PatternSynapse extends ExcitatorySynapse<BindingNeuron, PatternNeur
     }
 
     @Override
-    public boolean checkScope(Byte fromScope, Byte toScope, Direction dir) {
-        return fromScope == 0 && toScope == 0;
+    public boolean checkScope(BindingSignal fromBS, BindingSignal toBS, Direction dir) {
+        return fromBS.getScope() == 0 && toBS.getScope() == 0;
     }
 
     @Override

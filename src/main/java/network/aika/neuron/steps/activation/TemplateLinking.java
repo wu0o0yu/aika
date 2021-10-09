@@ -17,21 +17,12 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.linker.LinkingTask;
+import network.aika.neuron.activation.BindingSignal;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
 import network.aika.neuron.steps.LinkerStep;
 import network.aika.neuron.linker.TemplateTask;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  * Uses the Template Network defined in the {@link network.aika.neuron.Templates} to induce new template
@@ -42,11 +33,11 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 public class TemplateLinking extends LinkerStep<Activation, TemplateTask> {
 
 
-    public static void add(Activation act, Activation bindingSignal, Byte scope) {
+    public static void add(Activation act, Activation bindingSignal, BindingSignal scope) {
         Step.add(new TemplateLinking(act, bindingSignal, scope));
     }
 
-    private TemplateLinking(Activation act, Activation bindingSignal, Byte scope) {
+    private TemplateLinking(Activation act, Activation bindingSignal, BindingSignal scope) {
         super(act, bindingSignal, scope, new TemplateTask());
     }
 
@@ -62,7 +53,7 @@ public class TemplateLinking extends LinkerStep<Activation, TemplateTask> {
 
     @Override
     public void process() {
-        task.link(getElement(), getDirections(), bindingSignal, scope);
+        task.link(getElement(), getDirections(), bindingSignalAct, bindingSignal);
     }
 
     public boolean checkIfQueued() {
@@ -70,6 +61,6 @@ public class TemplateLinking extends LinkerStep<Activation, TemplateTask> {
     }
 
     public String toString() {
-        return "Act-Step: Template-Linking " + getElement().toShortString() + " Binding-Signal:[" + bindingSignal.getId() + ":" + bindingSignal.getLabel()  + "]";
+        return "Act-Step: Template-Linking " + getElement().toShortString() + " Binding-Signal:[" + bindingSignalAct.getId() + ":" + bindingSignalAct.getLabel()  + "]";
     }
 }

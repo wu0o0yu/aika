@@ -20,6 +20,7 @@ import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingSignal;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.direction.Direction;
@@ -88,18 +89,18 @@ public abstract class AbstractLinker {
                 );
     }
 */
-    public void link(Activation<?> fromAct, List<Direction> dirs, Activation bindingSignal, Byte scope) {
+    public void link(Activation<?> fromAct, List<Direction> dirs, Activation bindingSignalAct, BindingSignal bindingSignal) {
         dirs.forEach(dir ->
             getTargetSynapses(fromAct, dir)
-                    .filter(ts -> ts.allowLinking(bindingSignal))
+                    .filter(ts -> ts.allowLinking(bindingSignalAct))
                     .forEach(ts ->
-                            link(fromAct, dir, bindingSignal, scope, ts)
+                            link(fromAct, dir, bindingSignalAct, bindingSignal, ts)
                     )
         );
     }
 
-    public void link(Activation<?> fromAct, Direction dir, Activation bindingSignal, Byte scope, Synapse<?, ?, ?> targetSynapse) {
-        targetSynapse.searchRelatedCandidates(scope, dir, bindingSignal)
+    public void link(Activation<?> fromAct, Direction dir, Activation bindingSignalAct, BindingSignal bindingSignal, Synapse<?, ?, ?> targetSynapse) {
+        targetSynapse.searchRelatedCandidates(bindingSignal, dir, bindingSignalAct)
                 .forEach(toAct ->
                         link(fromAct, toAct, dir, targetSynapse)
                 );

@@ -17,12 +17,15 @@
 package network.aika.neuron.steps.link;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingSignal;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -34,38 +37,41 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class PropagateBindingSignal extends Step<Link> {
 
-    protected Map<Activation, Byte> outputBindingSignals;
+    protected List<BindingSignal> outputBindingSignals;
 
 
     public static void add(Link l) {
-        Step.add(new PropagateBindingSignal(l, l.getInput().getBindingSignals()));
+        Step.add(new PropagateBindingSignal(l, l.getInput().getBindingSignals().values()));
     }
 
-    public static void add(Link l, Map<Activation, Byte> inputBindingSignals) {
+    public static void add(Link l, Collection<BindingSignal> inputBindingSignals) {
         Step.add(new PropagateBindingSignal(l, inputBindingSignals));
     }
 
-    public static void add(Link l, Activation bindingSignal, Byte scope) {
-        Step.add(new PropagateBindingSignal(l, Collections.singletonMap(bindingSignal, scope)));
+    public static void add(Link l, BindingSignal bindingSignal) {
+        Step.add(new PropagateBindingSignal(l, Collections.singletonList(bindingSignal)));
     }
 
-    protected PropagateBindingSignal(Link l, Map<Activation, Byte> inputBindingSignals) {
+    protected PropagateBindingSignal(Link l, Collection<BindingSignal> inputBindingSignals) {
         super(l);
         fired = l.getInput().getFired();
         transitionScopes(l, inputBindingSignals);
     }
 
-    protected void transitionScopes(Link l, Map<Activation, Byte> inputBindingSignals) {
-        this.outputBindingSignals = inputBindingSignals.entrySet().stream()
-                .filter(e -> e.getKey().getType() != l.getOutput().getType())
-                .map(e -> {
-                    Byte oScope = l.getSynapse().transitionScope(e.getValue(), OUTPUT);
-                    if(oScope == null)
-                        return null;
-                    return Map.entry(e.getKey(), oScope);
-                })
+    protected void transitionScopes(Link l, Collection<BindingSignal> inputBindingSignals) {
+        this.outputBindingSignals = inputBindingSignals.stream()
+                .filter(bs -> bs.getAct().getType() != l.getOutput().getType())
+                .map(bs -> propagateBindingSignal(l, bs))
                 .filter(e -> e != null)
-                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+                .collect(Collectors.toList());
+    }
+
+    private BindingSignal propagateBindingSignal(Link l, BindingSignal bs) {
+        Byte oScope = l.getSynapse().transitionScope(bs.getScope(), OUTPUT);
+        if(oScope == null)
+            return null;
+
+        return new BindingSignal(bs.getAct(), oScope);
     }
 
     @Override

@@ -63,11 +63,11 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     private Reference reference;
 
-    protected SortedMap<Activation<?>, Byte> bindingSignals = new TreeMap<>(
+    protected SortedMap<Activation<?>, BindingSignal> bindingSignals = new TreeMap<>(
             Comparator.<Activation, Byte>comparing(act -> act.getType())
                     .thenComparing(Activation::getId)
     );
-    protected Map<Activation<?>, Byte> reverseBindingSignals = new TreeMap<>();
+    protected Map<Activation<?>, BindingSignal> reverseBindingSignals = new TreeMap<>();
 
     public final static int OWN = 0;
     public final static int INCOMING = 1;
@@ -173,41 +173,39 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
 
-    public void addBindingSignal(Activation bindingSignal, Byte scope) {
-        Byte existingBSScope = bindingSignals.get(bindingSignal);
-        if(existingBSScope != null && existingBSScope <= scope)
+    public void addBindingSignal(BindingSignal bindingSignal) {
+        BindingSignal existingBSScope = bindingSignals.get(bindingSignal.getAct());
+        if(existingBSScope != null && existingBSScope.getScope() <= bindingSignal.getScope())
             return;
 
-        bindingSignals.put(bindingSignal, scope);
-        bindingSignal.registerBindingSignal(this, scope);
+        bindingSignals.put(bindingSignal.getAct(), bindingSignal);
+        bindingSignal.getAct().registerBindingSignal(this, bindingSignal);
     }
 
-    public void addBindingSignals(Map<Activation<?>, Byte> bindingsSignals) {
-        bindingsSignals.entrySet().stream().forEach(e ->
-                addBindingSignal(e.getKey(), e.getValue())
-        );
+    public void addBindingSignals(List<BindingSignal> bindingsSignals) {
+        bindingsSignals.forEach(this::addBindingSignal);
     }
 
-    protected void registerBindingSignal(Activation targetAct, Byte scope) {
+    protected void registerBindingSignal(Activation targetAct, BindingSignal scope) {
         reverseBindingSignals.put(targetAct, scope);
 
         Linking.add(targetAct, this, scope);
         TemplateLinking.add(targetAct, this, scope);
     }
 
-    public Map<Activation<?>, Byte> getBindingSignals() {
+    public Map<Activation<?>, BindingSignal> getBindingSignals() {
         return bindingSignals;
     }
 
-    public Map<Activation<?>, Byte> getPatternBindingSignals() {
+    public Map<Activation<?>, BindingSignal> getPatternBindingSignals() {
         return bindingSignals.subMap(MIN_PATTERN_ACT, MAX_PATTERN_ACT);
     }
 
-    public Map<Activation<?>, Byte> getBranchBindingSignals() {
+    public Map<Activation<?>, BindingSignal> getBranchBindingSignals() {
         return bindingSignals.subMap(MIN_BINDING_ACT, MAX_BINDING_ACT);
     }
 
-    public Map<Activation<?>, Byte> getReverseBindingSignals() {
+    public Map<Activation<?>, BindingSignal> getReverseBindingSignals() {
         return reverseBindingSignals;
     }
 

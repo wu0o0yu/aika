@@ -17,17 +17,13 @@
 package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.BindingSignal;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
 import network.aika.neuron.steps.LinkerStep;
 import network.aika.neuron.linker.LinkingTask;
 
-import java.util.List;
-
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 
@@ -45,12 +41,12 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class Linking extends LinkerStep<Activation, LinkingTask> {
 
-    public static void add(Activation act, Activation bindingSignal, Byte scope) {
-        Step.add(new Linking(act, bindingSignal, scope));
+    public static void add(Activation act, Activation bindingSignalAct, BindingSignal bindingSignal) {
+        Step.add(new Linking(act, bindingSignalAct, bindingSignal));
     }
 
-    private Linking(Activation act, Activation bindingSignal, Byte scope) {
-        super(act, bindingSignal, scope, new LinkingTask());
+    private Linking(Activation act, Activation bindingSignalAct, BindingSignal scope) {
+        super(act, bindingSignalAct, scope, new LinkingTask());
     }
 
     @Override
@@ -72,12 +68,12 @@ public class Linking extends LinkerStep<Activation, LinkingTask> {
         Activation act = getElement();
         act.getThought().linkInputRelations(act);
 
-        task.link(act, getDirections(), bindingSignal, scope);
+        task.link(act, getDirections(), bindingSignalAct, bindingSignal);
 
         act.getModel().linkInputRelations(act, OUTPUT);
     }
 
     public String toString() {
-        return "Act-Step: Linking " + getElement().toShortString() + " Binding-Signal:[" + bindingSignal.getId() + ":" + bindingSignal.getLabel() + "]";
+        return "Act-Step: Linking " + getElement().toShortString() + " Binding-Signal:[" + bindingSignalAct.getId() + ":" + bindingSignalAct.getLabel() + "]";
     }
 }

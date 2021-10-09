@@ -14,22 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
-
-import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.BindingSignal;
-import network.aika.neuron.activation.direction.Direction;
+package network.aika.neuron.activation;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class RelatedBNSynapse<I extends Neuron> extends InputBNSynapse<I> {
+public class BindingSignal {
 
-    public boolean checkScope(BindingSignal fromBS, BindingSignal toBS, Direction dir) {
-        if(fromBS.getScope() >= 2 || toBS.getScope() >= 2)
-            return false;
+    private Activation act;
+    private byte scope;
 
-        return super.checkScope(fromBS, toBS, dir);
+    public BindingSignal(Activation act, byte scope) {
+        this.act = act;
+        this.scope = scope;
+    }
+
+    public Activation getAct() {
+        return act;
+    }
+
+    public byte getScope() {
+        return scope;
+    }
+
+    public String toString() {
+        return "[" + act.getId() + ":" + scope + "]";
     }
 }
