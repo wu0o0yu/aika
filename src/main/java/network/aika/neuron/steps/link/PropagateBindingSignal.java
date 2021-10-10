@@ -25,9 +25,6 @@ import network.aika.neuron.steps.StepType;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -61,7 +58,7 @@ public class PropagateBindingSignal extends Step<Link> {
 
     protected Stream<BindingSignal> transitionScopes(Link l, Collection<BindingSignal> bindingSignals) {
         return bindingSignals.stream()
-                .filter(bs -> bs.getAct().getType() != l.getOutput().getType())
+                .filter(bs -> bs.getBindingSignalAct().getType() != l.getOutput().getType())
                 .map(bs -> propagateBindingSignal(l, bs))
                 .filter(e -> e != null);
     }
@@ -71,7 +68,13 @@ public class PropagateBindingSignal extends Step<Link> {
         if(oScope == null)
             return null;
 
-        return new BindingSignal(bs.getAct(), oScope, (byte) (bs.getDepth() + 1));
+        return new BindingSignal(
+                bs,
+                bs.getBindingSignalAct(),
+                l.getInput(),
+                oScope,
+                (byte) (bs.getDepth() + 1)
+        );
     }
 
     @Override

@@ -19,6 +19,7 @@ package network.aika.neuron.activation.direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingSignal;
 import network.aika.neuron.activation.Link;
 
 import java.util.stream.Stream;
@@ -47,13 +48,13 @@ public class Output implements Direction {
     }
 
     @Override
-    public Byte getInputScope(Byte fromScope, Byte toScope) {
-        return fromScope;
+    public BindingSignal getInputBindingSignal(BindingSignal fromBindingSignal, BindingSignal toBindingSignal) {
+        return fromBindingSignal;
     }
 
     @Override
-    public Byte getOutputScope(Byte fromScope, Byte toScope) {
-        return toScope;
+    public BindingSignal getOutputBindingSignal(BindingSignal fromBindingSignal, BindingSignal toBindingSignal) {
+        return toBindingSignal;
     }
 
     @Override

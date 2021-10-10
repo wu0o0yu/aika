@@ -22,12 +22,9 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingSignal;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -85,7 +82,7 @@ public abstract class AbstractLinker {
     public void link(Activation<?> fromAct, List<Direction> dirs, BindingSignal bindingSignal) {
         dirs.forEach(dir ->
             getTargetSynapses(fromAct, dir)
-                    .filter(ts -> ts.allowLinking(bindingSignal.getAct()))
+                    .filter(ts -> ts.allowLinking(bindingSignal.getBindingSignalAct()))
                     .forEach(ts ->
                             link(fromAct, dir, bindingSignal, ts)
                     )

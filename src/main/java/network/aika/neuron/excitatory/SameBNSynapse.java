@@ -34,11 +34,11 @@ public class SameBNSynapse<I extends Neuron> extends BindingNeuronSynapse<I> {
         return dir.transitionScope(fromScope);
     }
 
-    public boolean checkScope(BindingSignal fromBS, BindingSignal toBS, Direction dir) {
-        if(fromBS.getScope() == 0 && toBS.getScope() == 0)
+    public boolean checkScope(BindingSignal iBS, BindingSignal oBS) {
+        if(iBS.getScope() == 0 && oBS.getScope() == 0)
             return true;
 
-        if(dir.getInputScope(fromBS.getScope(), toBS.getScope()) == 1 && dir.getOutputScope(fromBS.getScope(), toBS.getScope()) == 2)
+        if(iBS.getScope() == 1 && iBS.getDepth() == 1 && oBS.getScope() == 2)
             return true;
 
         return false;

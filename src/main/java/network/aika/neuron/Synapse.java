@@ -17,11 +17,9 @@
 package network.aika.neuron;
 
 import network.aika.Model;
-import network.aika.Thought;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.sign.Sign;
-import network.aika.neuron.linker.AbstractLinker;
 import network.aika.neuron.steps.UpdateNet;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
@@ -36,6 +34,7 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.Neuron.BETA_THRESHOLD;
 import static network.aika.neuron.activation.Activation.OWN;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.utils.Utils.logChange;
@@ -69,13 +68,22 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return fromScope;
     }
 
+
+
     public boolean checkScope(BindingSignal fromBS, BindingSignal toBS, Direction dir) {
-        Byte targetScope = transitionScope(fromBS.getScope(), dir);
-        return targetScope != null && targetScope.byteValue() == toBS.getScope();
+        return checkScope(
+                dir.getInputBindingSignal(fromBS, toBS),
+                dir.getOutputBindingSignal(fromBS, toBS)
+        );
+    }
+
+    public boolean checkScope(BindingSignal iBS, BindingSignal oBS) {
+        Byte targetOutputScope = transitionScope(iBS.getScope(), OUTPUT);
+        return targetOutputScope != null && targetOutputScope.byteValue() == oBS.getScope();
     }
 
     public Stream<Activation> searchRelatedCandidates(BindingSignal fromBS, Direction dir) {
-        return fromBS.getAct().getReverseBindingSignals().entrySet().stream()
+        return fromBS.getBindingSignalAct().getReverseBindingSignals().entrySet().stream()
                 .filter(e -> checkScope(fromBS, e.getValue(), dir))
                 .map(e -> e.getKey());
     }

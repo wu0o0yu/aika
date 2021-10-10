@@ -194,7 +194,7 @@ public class TextModel extends Model {
                 .instantiateTemplate(inRelPT, prevTokenInhib);
 
         s.linkInput();
-        s.addWeight(1.0);
+        s.addWeight(2.0);
         s.setAllowTraining(false);
     }
 

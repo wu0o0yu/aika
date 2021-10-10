@@ -26,10 +26,10 @@ import network.aika.neuron.activation.direction.Direction;
  */
 public class RelatedBNSynapse<I extends Neuron> extends InputBNSynapse<I> {
 
-    public boolean checkScope(BindingSignal fromBS, BindingSignal toBS, Direction dir) {
-        if(fromBS.getScope() >= 2 || toBS.getScope() >= 2)
+    public boolean checkScope(BindingSignal iBS, BindingSignal oBS) {
+        if(iBS.getScope() >= 2 || oBS.getScope() >= 2)
             return false;
 
-        return super.checkScope(fromBS, toBS, dir);
+        return super.checkScope(iBS, oBS);
     }
 }

@@ -46,12 +46,14 @@ import static network.aika.utils.Utils.logChange;
  */
 public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
+    public static double INITIAL_NET = -0.001;
+
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(Activation::getId);
 
     protected double value = 0.0;
     protected Double inputValue = null;
     protected double net;
-    protected double lastNet = 0.0;
+    protected double lastNet = INITIAL_NET;
     protected Fired fired = NOT_FIRED;
 
     protected final int id;
@@ -93,7 +95,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
-        lastNet = n.isTemplate() || n.isInputNeuron() ? 0.0 : -1.0;
+//        lastNet = n.isTemplate() || n.isInputNeuron() ? INITIAL_NET : -1.0;
         net = n.getInitialNet();
 
         thought.registerActivation(this);
@@ -173,7 +175,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void addBindingSignal(byte scope) {
-        addBindingSignal(new BindingSignal(this, scope, (byte) 0));
+        addBindingSignal(new BindingSignal(null, this, this, scope, (byte) 0));
     }
 
     public void addBindingSignals(Stream<BindingSignal> bindingsSignals) {
@@ -181,12 +183,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     private void addBindingSignal(BindingSignal bindingSignal) {
-        BindingSignal existingBSScope = bindingSignals.get(bindingSignal.getAct());
+        BindingSignal existingBSScope = bindingSignals.get(bindingSignal.getBindingSignalAct());
         if(existingBSScope != null && existingBSScope.getScope() <= bindingSignal.getScope())
             return;
 
-        bindingSignals.put(bindingSignal.getAct(), bindingSignal);
-        bindingSignal.getAct().registerBindingSignal(this, bindingSignal);
+        bindingSignals.put(bindingSignal.getBindingSignalAct(), bindingSignal);
+        bindingSignal.getBindingSignalAct().registerBindingSignal(this, bindingSignal);
     }
 
     protected void registerBindingSignal(Activation targetAct, BindingSignal bindingSignal) {

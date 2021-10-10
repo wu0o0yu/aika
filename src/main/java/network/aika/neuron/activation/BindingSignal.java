@@ -21,18 +21,23 @@ package network.aika.neuron.activation;
  */
 public class BindingSignal {
 
-    private Activation act;
+    private BindingSignal parent; // debugging
+    private Activation currentAct; // debugging
+
+    private Activation bindingSignalAct;
     private byte scope;
     private byte depth;
 
-    public BindingSignal(Activation act, byte scope, byte depth) {
-        this.act = act;
+    public BindingSignal(BindingSignal parent, Activation bsAct, Activation currentAct, byte scope, byte depth) {
+        this.parent = parent;
+        this.bindingSignalAct = bsAct;
+        this.currentAct = currentAct;
         this.scope = scope;
         this.depth = depth;
     }
 
-    public Activation<?> getAct() {
-        return act;
+    public Activation<?> getBindingSignalAct() {
+        return bindingSignalAct;
     }
 
     public byte getScope() {
@@ -44,6 +49,6 @@ public class BindingSignal {
     }
 
     public String toString() {
-        return "[id:" + act.getId() + ", scope:" + scope + ", depth:" + depth + "]";
+        return "[id:" + bindingSignalAct.getId() + ", scope:" + scope + ", depth:" + depth + "]";
     }
 }
