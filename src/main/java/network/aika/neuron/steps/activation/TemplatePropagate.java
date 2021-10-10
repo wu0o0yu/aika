@@ -21,6 +21,7 @@ import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.*;
 import network.aika.neuron.linker.TemplateTask;
+import network.aika.utils.Utils;
 
 import java.util.Collections;
 import java.util.List;

@@ -47,6 +47,7 @@ public abstract class PropagateGradients extends Step<Activation>  {
 
         PropagateGradientAndUpdateWeight.addInputs(act, g);
         UpdateBias.add(act, act.getConfig().getLearnRate() * Utils.sum(g));
+
         if(act.isFired())
             TemplatePropagate.add(act);
     }

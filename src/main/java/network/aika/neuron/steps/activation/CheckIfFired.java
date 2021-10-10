@@ -66,9 +66,6 @@ public class CheckIfFired extends Step<Activation> {
         Counting.add(act);
         act.getInputLinks().forEach(l -> LinkCounting.add(l));
 
-        if(Utils.belowTolerance(act.getOutputGradientSum()))
-            return;
-
         TemplatePropagate.add(act);
     }
 
