@@ -81,26 +81,19 @@ public abstract class AbstractLinker {
 
         getNextSteps(nl);
     }
-/*
-    public void link(Activation<?> fromAct, Map<PatternActivation, Byte> bindingSignals, List<Direction> dirs) {
-        bindingSignals.entrySet().stream()
-                .forEach(e ->
-                        link(fromAct, dirs, e.getKey(), e.getValue())
-                );
-    }
-*/
-    public void link(Activation<?> fromAct, List<Direction> dirs, Activation bindingSignalAct, BindingSignal bindingSignal) {
+
+    public void link(Activation<?> fromAct, List<Direction> dirs, BindingSignal bindingSignal) {
         dirs.forEach(dir ->
             getTargetSynapses(fromAct, dir)
-                    .filter(ts -> ts.allowLinking(bindingSignalAct))
+                    .filter(ts -> ts.allowLinking(bindingSignal.getAct()))
                     .forEach(ts ->
-                            link(fromAct, dir, bindingSignalAct, bindingSignal, ts)
+                            link(fromAct, dir, bindingSignal, ts)
                     )
         );
     }
 
-    public void link(Activation<?> fromAct, Direction dir, Activation bindingSignalAct, BindingSignal bindingSignal, Synapse<?, ?, ?> targetSynapse) {
-        targetSynapse.searchRelatedCandidates(bindingSignal, dir, bindingSignalAct)
+    public void link(Activation<?> fromAct, Direction dir, BindingSignal bindingSignal, Synapse<?, ?, ?> targetSynapse) {
+        targetSynapse.searchRelatedCandidates(bindingSignal, dir)
                 .forEach(toAct ->
                         link(fromAct, toAct, dir, targetSynapse)
                 );

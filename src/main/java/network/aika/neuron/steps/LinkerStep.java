@@ -11,12 +11,10 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 public abstract class LinkerStep<E extends Element, T extends AbstractLinker> extends TaskStep<E, T> {
 
-    protected final Activation bindingSignalAct;
     protected final BindingSignal bindingSignal;
 
-    public LinkerStep(E element, Activation bindingSignalAct, BindingSignal bindingSignal, T task) {
+    public LinkerStep(E element, BindingSignal bindingSignal, T task) {
         super(element, task);
-        this.bindingSignalAct = bindingSignalAct;
         this.bindingSignal = bindingSignal;
     }
 

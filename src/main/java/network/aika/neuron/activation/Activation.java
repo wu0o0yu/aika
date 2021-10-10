@@ -172,8 +172,15 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return bindingSignals.containsKey(iAct);
     }
 
+    public void addBindingSignal(byte scope) {
+        addBindingSignal(new BindingSignal(this, scope, (byte) 0));
+    }
 
-    public void addBindingSignal(BindingSignal bindingSignal) {
+    public void addBindingSignals(Stream<BindingSignal> bindingsSignals) {
+        bindingsSignals.forEach(this::addBindingSignal);
+    }
+
+    private void addBindingSignal(BindingSignal bindingSignal) {
         BindingSignal existingBSScope = bindingSignals.get(bindingSignal.getAct());
         if(existingBSScope != null && existingBSScope.getScope() <= bindingSignal.getScope())
             return;
@@ -182,15 +189,11 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         bindingSignal.getAct().registerBindingSignal(this, bindingSignal);
     }
 
-    public void addBindingSignals(List<BindingSignal> bindingsSignals) {
-        bindingsSignals.forEach(this::addBindingSignal);
-    }
+    protected void registerBindingSignal(Activation targetAct, BindingSignal bindingSignal) {
+        reverseBindingSignals.put(targetAct, bindingSignal);
 
-    protected void registerBindingSignal(Activation targetAct, BindingSignal scope) {
-        reverseBindingSignals.put(targetAct, scope);
-
-        Linking.add(targetAct, this, scope);
-        TemplateLinking.add(targetAct, this, scope);
+        Linking.add(targetAct, bindingSignal);
+        TemplateLinking.add(targetAct, bindingSignal);
     }
 
     public Map<Activation<?>, BindingSignal> getBindingSignals() {

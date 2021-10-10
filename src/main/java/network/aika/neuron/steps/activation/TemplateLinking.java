@@ -33,12 +33,12 @@ import network.aika.neuron.linker.TemplateTask;
 public class TemplateLinking extends LinkerStep<Activation, TemplateTask> {
 
 
-    public static void add(Activation act, Activation bindingSignal, BindingSignal scope) {
-        Step.add(new TemplateLinking(act, bindingSignal, scope));
+    public static void add(Activation act, BindingSignal bindingSignal) {
+        Step.add(new TemplateLinking(act, bindingSignal));
     }
 
-    private TemplateLinking(Activation act, Activation bindingSignal, BindingSignal scope) {
-        super(act, bindingSignal, scope, new TemplateTask());
+    private TemplateLinking(Activation act, BindingSignal bindingSignal) {
+        super(act, bindingSignal, new TemplateTask());
     }
 
     @Override
@@ -53,7 +53,7 @@ public class TemplateLinking extends LinkerStep<Activation, TemplateTask> {
 
     @Override
     public void process() {
-        task.link(getElement(), getDirections(), bindingSignalAct, bindingSignal);
+        task.link(getElement(), getDirections(), bindingSignal);
     }
 
     public boolean checkIfQueued() {
@@ -61,6 +61,6 @@ public class TemplateLinking extends LinkerStep<Activation, TemplateTask> {
     }
 
     public String toString() {
-        return "Act-Step: Template-Linking " + getElement().toShortString() + " Binding-Signal:[" + bindingSignalAct.getId() + ":" + bindingSignalAct.getLabel()  + "]";
+        return "Act-Step: Template-Linking " + getElement().toShortString() + " Binding-Signal:" + bindingSignal;
     }
 }

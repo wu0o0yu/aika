@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
@@ -37,7 +38,7 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class PropagateBindingSignal extends Step<Link> {
 
-    protected List<BindingSignal> outputBindingSignals;
+    protected Collection<BindingSignal> inputBindingSignals;
 
 
     public static void add(Link l) {
@@ -55,15 +56,14 @@ public class PropagateBindingSignal extends Step<Link> {
     protected PropagateBindingSignal(Link l, Collection<BindingSignal> inputBindingSignals) {
         super(l);
         fired = l.getInput().getFired();
-        transitionScopes(l, inputBindingSignals);
+        this.inputBindingSignals = inputBindingSignals;
     }
 
-    protected void transitionScopes(Link l, Collection<BindingSignal> inputBindingSignals) {
-        this.outputBindingSignals = inputBindingSignals.stream()
+    protected Stream<BindingSignal> transitionScopes(Link l, Collection<BindingSignal> bindingSignals) {
+        return bindingSignals.stream()
                 .filter(bs -> bs.getAct().getType() != l.getOutput().getType())
                 .map(bs -> propagateBindingSignal(l, bs))
-                .filter(e -> e != null)
-                .collect(Collectors.toList());
+                .filter(e -> e != null);
     }
 
     private BindingSignal propagateBindingSignal(Link l, BindingSignal bs) {
@@ -71,14 +71,16 @@ public class PropagateBindingSignal extends Step<Link> {
         if(oScope == null)
             return null;
 
-        return new BindingSignal(bs.getAct(), oScope);
+        return new BindingSignal(bs.getAct(), oScope, (byte) (bs.getDepth() + 1));
     }
 
     @Override
     public void process() {
         Activation oAct = getElement().getOutput();
 
-        oAct.addBindingSignals(outputBindingSignals);
+        oAct.addBindingSignals(
+                transitionScopes(getElement(), inputBindingSignals)
+        );
     }
 
     @Override

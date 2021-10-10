@@ -84,9 +84,6 @@ public class LinkingTask extends AbstractLinker {
 
  //           return dir.getSynapses(act.getNeuron(), invertRecurrent);
 
-//        if(Link.linkExists(iAct, oAct))
-//            return;
-
         oAct = targetSynapse.branchIfNecessary(iAct, oAct);
 
         if(oAct != null)

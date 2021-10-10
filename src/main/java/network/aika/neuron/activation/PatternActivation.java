@@ -43,7 +43,7 @@ public class PatternActivation extends Activation<PatternNeuron> {
     public PatternActivation(int id, Thought t, PatternNeuron patternNeuron) {
         super(id, t, patternNeuron);
 
-        addBindingSignal(new BindingSignal(this, (byte)0));
+        addBindingSignal((byte)0);
     }
 
     @Override

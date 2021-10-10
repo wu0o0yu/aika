@@ -74,8 +74,8 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return targetScope != null && targetScope.byteValue() == toBS.getScope();
     }
 
-    public Stream<Activation> searchRelatedCandidates(BindingSignal fromBS, Direction dir, Activation<?> bs) {
-        return bs.getReverseBindingSignals().entrySet().stream()
+    public Stream<Activation> searchRelatedCandidates(BindingSignal fromBS, Direction dir) {
+        return fromBS.getAct().getReverseBindingSignals().entrySet().stream()
                 .filter(e -> checkScope(fromBS, e.getValue(), dir))
                 .map(e -> e.getKey());
     }

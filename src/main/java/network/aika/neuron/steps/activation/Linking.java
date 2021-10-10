@@ -41,12 +41,12 @@ import static network.aika.neuron.activation.direction.Direction.OUTPUT;
  */
 public class Linking extends LinkerStep<Activation, LinkingTask> {
 
-    public static void add(Activation act, Activation bindingSignalAct, BindingSignal bindingSignal) {
-        Step.add(new Linking(act, bindingSignalAct, bindingSignal));
+    public static void add(Activation act, BindingSignal bindingSignal) {
+        Step.add(new Linking(act, bindingSignal));
     }
 
-    private Linking(Activation act, Activation bindingSignalAct, BindingSignal scope) {
-        super(act, bindingSignalAct, scope, new LinkingTask());
+    private Linking(Activation act, BindingSignal bindingSignal) {
+        super(act, bindingSignal, new LinkingTask());
     }
 
     @Override
@@ -68,12 +68,12 @@ public class Linking extends LinkerStep<Activation, LinkingTask> {
         Activation act = getElement();
         act.getThought().linkInputRelations(act);
 
-        task.link(act, getDirections(), bindingSignalAct, bindingSignal);
+        task.link(act, getDirections(), bindingSignal);
 
         act.getModel().linkInputRelations(act, OUTPUT);
     }
 
     public String toString() {
-        return "Act-Step: Linking " + getElement().toShortString() + " Binding-Signal:[" + bindingSignalAct.getId() + ":" + bindingSignalAct.getLabel() + "]";
+        return "Act-Step: Linking " + getElement().toShortString() + " Binding-Signal:" + bindingSignal;
     }
 }

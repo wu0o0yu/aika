@@ -23,13 +23,15 @@ public class BindingSignal {
 
     private Activation act;
     private byte scope;
+    private byte depth;
 
-    public BindingSignal(Activation act, byte scope) {
+    public BindingSignal(Activation act, byte scope, byte depth) {
         this.act = act;
         this.scope = scope;
+        this.depth = depth;
     }
 
-    public Activation getAct() {
+    public Activation<?> getAct() {
         return act;
     }
 
@@ -37,7 +39,11 @@ public class BindingSignal {
         return scope;
     }
 
+    public byte getDepth() {
+        return depth;
+    }
+
     public String toString() {
-        return "[" + act.getId() + ":" + scope + "]";
+        return "[id:" + act.getId() + ", scope:" + scope + ", depth:" + depth + "]";
     }
 }
