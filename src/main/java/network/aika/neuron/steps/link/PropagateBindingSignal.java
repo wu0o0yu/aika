@@ -84,7 +84,11 @@ public class PropagateBindingSignal extends Step<Link> {
         Activation<?> oAct = getElement().getOutput();
 
         List<BindingSignal> outputBindingSignals = transitionScopes(getElement(), inputBindingSignals)
+                .filter(bs -> !oAct.checkIfBindingSignalExists(bs))
                 .collect(Collectors.toList());
+
+        if(outputBindingSignals.isEmpty())
+            return;
 
         oAct.addBindingSignals(outputBindingSignals.stream());
 

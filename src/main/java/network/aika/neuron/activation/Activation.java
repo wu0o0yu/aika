@@ -181,12 +181,16 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     private void addBindingSignal(BindingSignal bindingSignal) {
-        BindingSignal existingBSScope = bindingSignals.get(bindingSignal.getBindingSignalAct());
-        if(existingBSScope != null && existingBSScope.getScope() <= bindingSignal.getScope())
+        if (checkIfBindingSignalExists(bindingSignal))
             return;
 
         bindingSignals.put(bindingSignal.getBindingSignalAct(), bindingSignal);
         bindingSignal.getBindingSignalAct().registerBindingSignal(this, bindingSignal);
+    }
+
+    public boolean checkIfBindingSignalExists(BindingSignal bindingSignal) {
+        BindingSignal existingBSScope = bindingSignals.get(bindingSignal.getBindingSignalAct());
+        return existingBSScope != null && existingBSScope.getScope() <= bindingSignal.getScope();
     }
 
     protected void registerBindingSignal(Activation targetAct, BindingSignal bindingSignal) {
