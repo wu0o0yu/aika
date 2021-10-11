@@ -49,6 +49,6 @@ public class BindingSignal {
     }
 
     public String toString() {
-        return "[id:" + bindingSignalAct.getId() + ", scope:" + scope + ", depth:" + depth + "]";
+        return "[id:" + bindingSignalAct.getId() + ",s:" + scope + ",d:" + depth + "]";
     }
 }

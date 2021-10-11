@@ -18,7 +18,7 @@ public class TestFsModel {
     public void testOpenModel() throws IOException {
 
         TextModel m = new TextModel(
-                new FSSuspensionCallback(new File("F:/Model").toPath(), "AIKA-2.0-8", true)
+                new FSSuspensionCallback(new File("F:/Model").toPath(), "AIKA-2.0-9", true)
         );
 
         m.open(false);

@@ -76,6 +76,15 @@ public class Link<A extends Activation> extends Element<Link> {
         return l.getSynapse().isOfTemplate(ts);
     }
 
+    private double computeGradient(Sign si, Sign so) {
+        Reference ref = getInput().getReference();
+        double s = getSynapse().getSurprisal(si, so, ref);
+        s -= input.getNeuron().getSurprisal(si, ref);
+        s -= output.getNeuron().getSurprisal(so, ref);
+
+        return s * getInputValue(si) * getOutputValue(so);
+    }
+
     public void computeInformationGainGradient() {
         if(isNegative())
             return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
@@ -83,12 +92,7 @@ public class Link<A extends Activation> extends Element<Link> {
         double igGradient = 0.0;
         for(Sign si: Sign.SIGNS) {
             for (Sign so : Sign.SIGNS) {
-                Reference ref = getInput().getReference();
-                double s = getSynapse().getSurprisal(si, so, ref);
-                s -= input.getNeuron().getSurprisal(si, ref);
-                s -= output.getNeuron().getSurprisal(so, ref);
-
-                igGradient += s * getInputValue(si) * getOutputValue(so);
+                igGradient += computeGradient(si, so);
             }
         }
 
@@ -99,6 +103,7 @@ public class Link<A extends Activation> extends Element<Link> {
         getOutput().propagateGradientIn(igGradientDelta);
         lastIGGradient = igGradient;
     }
+
 
 /*
     public void removeGradientDependencies() {

@@ -55,7 +55,6 @@ public class CheckIfFired extends Step<Activation> {
 
         act.setFired();
         propagate(act);
-        EntropyGradient.add(this);
     }
 
     public static void propagate(Activation<?> act) {
@@ -67,6 +66,7 @@ public class CheckIfFired extends Step<Activation> {
         act.getInputLinks().forEach(l -> LinkCounting.add(l));
 
         TemplatePropagate.add(act);
+        EntropyGradient.add(act);
     }
 
     @Override

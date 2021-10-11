@@ -25,6 +25,8 @@ import network.aika.neuron.steps.StepType;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -45,11 +47,11 @@ public class PropagateBindingSignal extends Step<Link> {
     public static void add(Link l, Collection<BindingSignal> inputBindingSignals) {
         Step.add(new PropagateBindingSignal(l, inputBindingSignals));
     }
-
+/*
     public static void add(Link l, BindingSignal bindingSignal) {
         Step.add(new PropagateBindingSignal(l, Collections.singletonList(bindingSignal)));
     }
-
+*/
     protected PropagateBindingSignal(Link l, Collection<BindingSignal> inputBindingSignals) {
         super(l);
         fired = l.getInput().getFired();
@@ -79,10 +81,15 @@ public class PropagateBindingSignal extends Step<Link> {
 
     @Override
     public void process() {
-        Activation oAct = getElement().getOutput();
+        Activation<?> oAct = getElement().getOutput();
 
-        oAct.addBindingSignals(
-                transitionScopes(getElement(), inputBindingSignals)
+        List<BindingSignal> outputBindingSignals = transitionScopes(getElement(), inputBindingSignals)
+                .collect(Collectors.toList());
+
+        oAct.addBindingSignals(outputBindingSignals.stream());
+
+        oAct.getOutputLinks().forEach(l ->
+                add(l, outputBindingSignals)
         );
     }
 

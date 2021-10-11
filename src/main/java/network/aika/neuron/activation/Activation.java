@@ -114,8 +114,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         updateValue();
 
-        EntropyGradient.add(this);
-
         CheckIfFired.propagate(this);
     }
 
