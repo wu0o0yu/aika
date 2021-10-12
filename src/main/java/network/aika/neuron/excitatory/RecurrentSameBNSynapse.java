@@ -17,6 +17,7 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingSignal;
 import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 
@@ -29,6 +30,12 @@ import static network.aika.neuron.activation.Activation.OWN;
  */
 public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
 
+    public boolean checkScope(BindingSignal iBS, BindingSignal oBS) {
+        if(iBS.getScope() == 0 && oBS.getScope() == 0)
+            return true;
+
+        return super.checkScope(iBS, oBS);
+    }
 
     @Override
     public void propagateGradient(Link l, double[] gradient) {
@@ -42,8 +49,7 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
 
     @Override
     public boolean checkCausality(Activation<?> iAct, Activation<?> oAct) {
-        return true; //Fired.COMPARATOR.compare(iAct.getFired(), oAct.getFired()) < 0 ||
-                //oAct.isSelfRef(iAct);
+        return true;
     }
 
     public boolean checkTemplatePropagate(Activation act) {

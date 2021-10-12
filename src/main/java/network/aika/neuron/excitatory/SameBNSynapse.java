@@ -35,12 +35,6 @@ public class SameBNSynapse<I extends Neuron> extends BindingNeuronSynapse<I> {
     }
 
     public boolean checkScope(BindingSignal iBS, BindingSignal oBS) {
-        if(iBS.getScope() == 0 && oBS.getScope() == 0)
-            return true;
-
-        if(iBS.getScope() == 1 && iBS.getDepth() == 1 && oBS.getScope() == 2)
-            return true;
-
-        return false;
+        return iBS.getScope() == 1 && iBS.getDepth() == 1 && oBS.getScope() == 2;
     }
 }
