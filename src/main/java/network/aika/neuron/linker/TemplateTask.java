@@ -79,19 +79,19 @@ public class TemplateTask extends AbstractLinker {
     }
 
     @Override
-    public void linkIntern(Activation iAct, Activation oAct, Synapse targetSynapse) {
+    public Link createLink(Activation iAct, Activation oAct, Synapse targetSynapse) {
         if(oAct.getNeuron().isInputNeuron())
-            return;
+            return null;
 
         if(!targetSynapse.checkTemplateLink(iAct, oAct))
-            return;
+            return null;
 
         if(!iAct.isFired())
-            return;
+            return null;
 
         if(Link.templateLinkExists(targetSynapse, iAct, oAct))
-            return;
+            return null;
 
-        targetSynapse.createLink(iAct, oAct, oAct.isSelfRef(iAct));
+        return targetSynapse.createLink(iAct, oAct, oAct.isSelfRef(iAct));
     }
 }

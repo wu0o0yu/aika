@@ -44,7 +44,7 @@ public abstract class AbstractLinker {
 
     protected abstract boolean exists(Activation act, Direction dir, Synapse s);
 
-    protected abstract void linkIntern(Activation iAct, Activation oAct, Synapse targetSynapse);
+    protected abstract Link createLink(Activation iAct, Activation oAct, Synapse targetSynapse);
 
     public abstract void getNextSteps(Activation act);
 
@@ -69,13 +69,10 @@ public abstract class AbstractLinker {
         Thought t = fromAct.getThought();
 
         Activation toAct = targetNeuron.createActivation(t);
-
         t.onActivationCreationEvent(toAct, fromAct);
-
         getNextSteps(toAct);
 
         Link nl = targetSynapse.createLink(fromAct, toAct, isSelfRef);
-
         getNextSteps(nl);
     }
 
@@ -115,6 +112,8 @@ public abstract class AbstractLinker {
         if (!neuronMatches(oAct.getNeuron(), targetSynapse.getOutput()))
             return;
 
-        linkIntern(iAct, oAct, targetSynapse);
+        Link nl = createLink(iAct, oAct, targetSynapse);
+        if(nl != null)
+            getNextSteps(nl);
     }
 }

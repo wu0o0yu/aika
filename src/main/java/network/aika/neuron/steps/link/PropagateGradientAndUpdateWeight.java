@@ -82,6 +82,7 @@ public class PropagateGradientAndUpdateWeight extends Step<Link> {
         double weightDelta = l.getConfig().getLearnRate() * g;
         boolean oldWeightIsZero = s.isZero();
 
+        assert !s.isTemplate();
         s.updateSynapse(l, weightDelta);
 
         if (oldWeightIsZero && !s.isZero() && l.getInput().isFired()) {

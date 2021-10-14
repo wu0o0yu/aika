@@ -78,15 +78,14 @@ public class LinkingTask extends AbstractLinker {
     }
 
     @Override
-    public void linkIntern(Activation iAct, Activation oAct, Synapse targetSynapse) {
+    public Link createLink(Activation iAct, Activation oAct, Synapse targetSynapse) {
         if (!iAct.isFired())
-            return;
-
- //           return dir.getSynapses(act.getNeuron(), invertRecurrent);
+            return null;
 
         oAct = targetSynapse.branchIfNecessary(iAct, oAct);
+        if(oAct == null)
+            return null;
 
-        if(oAct != null)
-            targetSynapse.createLink(iAct, oAct, oAct.isSelfRef(iAct));
+        return targetSynapse.createLink(iAct, oAct, oAct.isSelfRef(iAct));
     }
 }
