@@ -99,7 +99,7 @@ public class PropagateBindingSignal extends Step<Link> {
 
     @Override
     public Phase getPhase() {
-        return Phase.LINKING;
+        return Phase.BINDING_SIGNAL;
     }
 
     @Override

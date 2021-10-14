@@ -59,4 +59,9 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
     protected void checkConstraints() {
         assert !isNegative();
     }
+
+    @Override
+    public void setModified() {
+        getOutput().setModified();
+    }
 }

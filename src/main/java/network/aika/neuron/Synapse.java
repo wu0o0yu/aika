@@ -60,15 +60,12 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     protected double frequencyIPosOPos;
     protected double frequencyIPosONeg;
     protected double frequencyINegOPos;
-    private volatile boolean modified;
 
     protected boolean allowTraining = true;
 
     public Byte transitionScope(Byte fromScope, Direction dir) {
         return fromScope;
     }
-
-
 
     public boolean checkScope(BindingSignal fromBS, BindingSignal toBS, Direction dir) {
         return checkScope(
@@ -87,6 +84,8 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
                 .filter(e -> checkScope(fromBS, e.getValue(), dir))
                 .map(e -> e.getKey());
     }
+
+    public abstract void setModified();
 
     public boolean checkTemplatePropagate(Activation act) {
         return false;
@@ -286,7 +285,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         } else {
             throw new UnsupportedOperationException();
         }
-        modified = true;
+        setModified();
     }
 
     public void applyMovingAverage(double alpha) {
@@ -294,7 +293,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         frequencyIPosOPos *= alpha;
         frequencyIPosONeg *= alpha;
         frequencyINegOPos *= alpha;
-        modified = true;
+        setModified();
     }
 
     public void count(Link l) {
@@ -313,13 +312,13 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
 
         if(iActive && oActive) {
             frequencyIPosOPos += 1.0;
-            modified = true;
+            setModified();
         } else if(iActive && !oActive) {
             frequencyIPosONeg += 1.0;
-            modified = true;
+            setModified();
         } else if(!iActive && oActive) {
             frequencyINegOPos += 1.0;
-            modified = true;
+            setModified();
         }
     }
 
@@ -367,7 +366,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         double oldWeight = weight;
         this.weight += weightDelta;
         logChange(getOutput(), oldWeight, this.weight, "addWeight: weight");
-        modified = true;
+        setModified();
     }
 
     public void updateOutputNet(Link<A> l, double delta) {

@@ -30,8 +30,6 @@ public class GradientTest {
 
         processDoc(m, doc);
 
-        m.getTemplates().SAME_BINDING_TEMPLATE.addConjunctiveBias(-0.32);
-
         Neuron nA = m.getNeuron("A");
         nA.setFrequency(53.0);
         nA.getSampleSpace().setN(299);

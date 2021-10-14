@@ -84,7 +84,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     public Neuron(Model m, boolean addProvider) {
         if(addProvider)
             provider = new NeuronProvider(m, this);
-        modified = true;
+        setModified();
     }
 
     public TemplateNeuronInfo getTemplateInfo() {
@@ -192,27 +192,25 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     public void addInputSynapse(S s) {
         S os = inputSynapses.put(s.getPInput(), s);
         if(os != s) {
-            setModified(true);
+            setModified();
         }
     }
 
     public void removeInputSynapse(S s) {
         if(inputSynapses.remove(s.getPInput()) != null) {
-            setModified(true);
+            setModified();
         }
     }
 
     public void addOutputSynapse(Synapse s) {
         Synapse os = outputSynapses.put(s.getPOutput(), s);
-        if(os != s) {
-            setModified(true);
-        }
+        if(os != s)
+            setModified();
     }
 
     public void removeOutputSynapse(Synapse s) {
-        if(outputSynapses.remove(s.getPOutput()) != null) {
-            setModified(true);
-        }
+        if(outputSynapses.remove(s.getPOutput()) != null)
+            setModified();
     }
 
     public Long getId() {
@@ -243,19 +241,23 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return retrievalCount;
     }
 
-    public boolean isModified() {
-        return modified;
+    public void setModified() {
+        this.modified = true;
     }
 
-    public void setModified(boolean modified) {
-        this.modified = modified;
+    public void resetModified() {
+        this.modified = false;
+    }
+
+    public boolean isModified() {
+        return modified;
     }
 
     public void addBias(double biasDelta) {
         double oldBias = bias;
         bias += biasDelta;
         logChange(this, oldBias, bias, "addBias : bias");
-        modified = true;
+        setModified();
     }
 
     public void limitBias() {
@@ -291,13 +293,13 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
         sampleSpace.count();
         frequency += 1.0;
-        modified = true;
+        setModified();
     }
 
     public void applyMovingAverage(double alpha) {
         sampleSpace.applyMovingAverage(alpha);
         frequency *= alpha;
-        modified = true;
+        setModified();
     }
 
     public double getSurprisal(Sign s, Reference ref) {
@@ -330,7 +332,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public void setFrequency(double f) {
         frequency = f;
-        modified = true;
+        setModified();
     }
 
     public void reactivate(Model m) {

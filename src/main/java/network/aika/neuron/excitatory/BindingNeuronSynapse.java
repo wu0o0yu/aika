@@ -94,10 +94,4 @@ public abstract class BindingNeuronSynapse<I extends Neuron> extends ExcitatoryS
                         l.getInput()
         ).getReference();
     }
-
-    public void addWeight(double weightDelta) {
-        super.addWeight(weightDelta);
-
-        getOutput().setModified(true);
-    }
 }

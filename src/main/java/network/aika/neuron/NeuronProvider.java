@@ -109,25 +109,26 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
     }
 
     public void save() {
-        if (neuron.isModified()) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try (DataOutputStream dos = getDataOutputStream(
-                    baos,
-                    ENABLE_COMPRESSION
-            )) {
-                neuron.write(dos);
+        if(!neuron.isModified())
+            return;
 
-                model.getSuspensionHook().store(
-                        id,
-                        neuron.getLabel(),
-                        neuron.getCustomData(),
-                        baos.toByteArray()
-                );
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (DataOutputStream dos = getDataOutputStream(
+                baos,
+                ENABLE_COMPRESSION
+        )) {
+            neuron.write(dos);
+
+            model.getSuspensionHook().store(
+                    id,
+                    neuron.getLabel(),
+                    neuron.getCustomData(),
+                    baos.toByteArray()
+            );
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        neuron.setModified(false);
+        neuron.resetModified();
     }
 
     private void reactivate() {

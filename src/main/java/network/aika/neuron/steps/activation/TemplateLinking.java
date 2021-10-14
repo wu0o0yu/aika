@@ -43,7 +43,7 @@ public class TemplateLinking extends LinkerStep<Activation, TemplateTask> {
 
     @Override
     public Phase getPhase() {
-        return Phase.LINKING;
+        return Phase.TEMPLATE;
     }
 
     @Override

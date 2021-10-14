@@ -78,13 +78,12 @@ public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNe
     }
 
     @Override
-    public void addWeight(double weightDelta) {
-        super.addWeight(weightDelta);
-        input.getNeuron().setModified(true);
+    public boolean checkCausality(Activation<?> iAct, Activation<?> oAct) {
+        return true;
     }
 
     @Override
-    public boolean checkCausality(Activation<?> iAct, Activation<?> oAct) {
-        return true;
+    public void setModified() {
+        getInput().setModified();
     }
 }
