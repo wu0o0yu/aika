@@ -276,7 +276,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         replaceElement(clonedAct);
 
         linkClone(clonedAct, excludedSyn);
-        thought.onActivationCreationEvent(clonedAct, this);
+        thought.onActivationCreationEvent(clonedAct, null, this);
 
         return clonedAct;
     }

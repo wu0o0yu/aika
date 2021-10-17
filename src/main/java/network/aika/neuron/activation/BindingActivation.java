@@ -70,7 +70,7 @@ public class BindingActivation extends Activation<BindingNeuron> {
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
         linkClone(clonedAct, excludedSyn);
-        thought.onActivationCreationEvent(clonedAct, this);
+        thought.onActivationCreationEvent(clonedAct, null, this);
 
         return clonedAct;
     }

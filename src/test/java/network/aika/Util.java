@@ -18,6 +18,7 @@ package network.aika;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.Document;
@@ -42,7 +43,7 @@ public class Util {
                 Neuron n = act.getNeuron();
                 Activation iAct = act.getInputLinks()
                         .findFirst()
-                        .map(l -> l.getInput())
+                        .map(Link::getInput)
                         .orElse(null);
 
                 if(n instanceof BindingNeuron) {

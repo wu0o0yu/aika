@@ -23,7 +23,6 @@ public class TestFsModel {
 
         m.open(false);
         m.init();
-//        m.getTemplates().SAME_BINDING_TEMPLATE.addConjunctiveBias(-0.32);
 
         {
             Document doc = generateDocument(m, "arbeit fair arbeitsvermittlung ", true);

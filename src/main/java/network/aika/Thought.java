@@ -20,6 +20,7 @@ package network.aika;
 import network.aika.callbacks.EventListener;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;
@@ -72,10 +73,10 @@ public abstract class Thought {
         filters.addAll(Set.of(st));
     }
 
-    public void onActivationCreationEvent(Activation act, Activation originAct) {
+    public void onActivationCreationEvent(Activation act, Synapse originSynapse, Activation originAct) {
         getEventListeners()
                 .forEach(
-                        el -> el.onActivationCreationEvent(act, originAct)
+                        el -> el.onActivationCreationEvent(act, originSynapse, originAct)
                 );
     }
 
