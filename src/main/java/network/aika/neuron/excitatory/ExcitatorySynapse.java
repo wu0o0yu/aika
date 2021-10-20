@@ -24,13 +24,32 @@ import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.steps.UpdateNet;
 import network.aika.neuron.steps.activation.PostTraining;
 
-import static network.aika.neuron.sign.Sign.POS;
-
 /**
  *
  * @author Lukas Molzberger
  */
 public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNeuron<?, A>, A extends Activation> extends Synapse<I, O, A> {
+
+
+    @Override
+    public boolean isWeak() {
+        return isWeak(getOutput().getWeightsSum());
+    }
+
+    public boolean isWeak(double weightSum) {
+        boolean weightIsAbleToExceedThreshold = weight + getOutput().getInitialNet() > 0.0;
+        boolean weightSumIsAbleToExceedThreshold = weightSum + getOutput().getInitialNet() > 0.0;
+        boolean weightIsAbleToSuppressThresholdExceededByWeightSum = (weightSum - weight) + getOutput().getInitialNet() <= 0.0;
+
+        return !(weightIsAbleToExceedThreshold ||
+                (weightSumIsAbleToExceedThreshold && weightIsAbleToSuppressThresholdExceededByWeightSum));
+    }
+
+    @Override
+    public void addWeight(double weightDelta) {
+        super.addWeight(weightDelta);
+        getOutput().addWeight(weightDelta);
+    }
 
     @Override
     public boolean allowLinking(Activation bindingSignal) {

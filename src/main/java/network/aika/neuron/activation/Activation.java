@@ -95,7 +95,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
-//        lastNet = n.isTemplate() || n.isInputNeuron() ? INITIAL_NET : -1.0;
         net = n.getInitialNet();
 
         thought.registerActivation(this);

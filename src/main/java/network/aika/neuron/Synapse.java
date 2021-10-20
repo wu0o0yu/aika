@@ -346,6 +346,11 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         );
     }
 
+    /**
+     * Determines whether this synapse is able to influence the boolean decision of its output neuron.
+     */
+    public abstract boolean isWeak();
+
     public double getWeight() {
         return weight;
     }
@@ -363,6 +368,10 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     }
 
     public void addWeight(double weightDelta) {
+        addWeightInternal(weightDelta);
+    }
+
+    protected void addWeightInternal(double weightDelta) {
         double oldWeight = weight;
         this.weight += weightDelta;
         logChange(getOutput(), oldWeight, this.weight, "addWeight: weight");

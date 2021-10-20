@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.excitatory;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
@@ -27,11 +28,16 @@ import network.aika.neuron.inhibitory.InhibitoryNeuron;
  */
 public class NegativeBNSynapse extends BindingNeuronSynapse<InhibitoryNeuron> {
 
+
+    @Override
+    public void addWeight(double weightDelta) {
+        addWeightInternal(weightDelta);
+    }
+
     @Override
     public boolean isRecurrent() {
         return true;
     }
-
 
     @Override
     public boolean checkCausality(Activation<?> iAct, Activation<?> oAct) {
