@@ -33,7 +33,7 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
 
     @Override
     public boolean isWeak() {
-        return isWeak(getOutput().getWeightsSum());
+        return isWeak(getOutput().getWeightSum());
     }
 
     public boolean isWeak(double weightSum) {

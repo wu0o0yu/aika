@@ -43,7 +43,7 @@ import static network.aika.utils.Utils.logChange;
 public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Activation> extends Neuron<S, A> {
 
     private volatile double conjunctiveBias;
-    private volatile double weightsSum;
+    private volatile double weightSum;
 
     public ExcitatoryNeuron() {
         super();
@@ -57,12 +57,12 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
         super(model, addProvider);
     }
 
-    public double getWeightsSum() {
-        return weightsSum;
+    public double getWeightSum() {
+        return weightSum;
     }
 
     public void addWeight(double weightDelta) {
-        weightsSum += weightDelta;
+        weightSum += weightDelta;
     }
 
     protected void initFromTemplate(ExcitatoryNeuron n) {
@@ -81,12 +81,12 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
      * should account for that and reduce the bias back to a level, where the neuron can be blocked again by its input synapses.
      */
     public void limitBias() {
-        bias = Math.min(weightsSum, bias);
+        bias = Math.min(weightSum, bias);
 
         if(bias + conjunctiveBias > 0.0) {
             double oldCB = conjunctiveBias;
 
-            conjunctiveBias = Math.max(-weightsSum, -bias);
+            conjunctiveBias = Math.max(-weightSum, -bias);
 
             logChange(this, oldCB, conjunctiveBias, "limitBias: conjunctiveBias");
         }
@@ -124,7 +124,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
 
         sortedSynapses.addAll(inputSynapses.values());
 
-        double sum = getWeightsSum();
+        double sum = getWeightSum();
         for(ExcitatorySynapse s: sortedSynapses) {
             if(s.getWeight() <= 0.0)
                 break;
@@ -143,7 +143,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
         super.write(out);
 
         out.writeDouble(conjunctiveBias);
-        out.writeDouble(weightsSum);
+        out.writeDouble(weightSum);
     }
 
     @Override
@@ -151,7 +151,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
         super.readFields(in, m);
 
         conjunctiveBias = in.readDouble();
-        weightsSum = in.readDouble();
+        weightSum = in.readDouble();
     }
 
     public String toStringWithSynapses() {
