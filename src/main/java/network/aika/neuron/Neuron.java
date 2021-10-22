@@ -327,7 +327,10 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public double getFrequency(Sign s, double n) {
-        return (s == POS ? frequency : n - frequency);
+        return (s == POS ?
+                frequency :
+                Math.max(n - frequency, 0) // TODO
+        );
     }
 
     public void setFrequency(double f) {

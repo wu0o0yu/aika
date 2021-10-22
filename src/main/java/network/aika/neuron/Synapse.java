@@ -272,7 +272,8 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
             return frequencyINegOPos;
         }
 
-        return n - (frequencyIPosOPos + frequencyIPosONeg + frequencyINegOPos);
+        //TODO:
+        return Math.max(n - (frequencyIPosOPos + frequencyIPosONeg + frequencyINegOPos), 0);
     }
 
     public void setFrequency(Sign is, Sign os, double f) {
