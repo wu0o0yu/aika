@@ -60,4 +60,8 @@ public class AddInputActivation extends Step<Activation> {
     public boolean checkIfQueued() {
         return true;
     }
+
+    public String toString() {
+        return "Act-Step: Add Input Activation " + getElement().toShortString();
+    }
 }
