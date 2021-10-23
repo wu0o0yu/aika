@@ -165,11 +165,15 @@ public abstract class Thought {
         return timestampOnProcess;
     }
 
+    public long getCurrentTimestamp() {
+        return timestampCounter;
+    }
+
     public long getNextTimestamp() {
         return timestampCounter++;
     }
 
-    public <E extends Element> List<Step> getPhasesForElement(E element) {
+    public <E extends Element> List<Step> getStepsByElement(E element) {
         return queue
                 .stream()
                 .filter(s -> s.getElement() == element)

@@ -69,7 +69,8 @@ public abstract class AbstractLinker {
         Thought t = fromAct.getThought();
 
         Activation toAct = targetNeuron.createActivation(t);
-        t.onActivationCreationEvent(toAct, targetSynapse, fromAct);
+        toAct.init(targetSynapse, fromAct);
+
         getNextSteps(toAct);
 
         Link nl = targetSynapse.createLink(fromAct, toAct, isSelfRef);

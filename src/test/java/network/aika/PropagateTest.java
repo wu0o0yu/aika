@@ -54,8 +54,7 @@ public class PropagateTest {
 
         Document doc = new Document("test");
 
-        Activation act = in.createActivation(doc);
-        act.initInput(new TextReference(doc, 0, 4));
+        doc.addInput(in, new TextReference(doc, 0, 4));
 
         System.out.println(doc);
     }

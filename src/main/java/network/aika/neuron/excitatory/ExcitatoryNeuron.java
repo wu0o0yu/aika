@@ -22,7 +22,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 
@@ -104,11 +103,6 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
 
     public ActivationFunction getActivationFunction() {
         return RECTIFIED_HYPERBOLIC_TANGENT;
-    }
-
-    @Override
-    public Fired incrementFired(Fired f) {
-        return new Fired(f.getInputTimestamp(), f.getFired() + 1);
     }
 
     @Override

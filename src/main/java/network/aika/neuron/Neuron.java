@@ -19,7 +19,6 @@ package network.aika.neuron;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Reference;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.ReadWriteLock;
@@ -108,8 +107,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     public abstract void addDummyLinks(Activation act);
 
     public abstract ActivationFunction getActivationFunction();
-
-    public abstract Fired incrementFired(Fired f);
 
     public abstract boolean allowTemplatePropagate(Activation act);
 

@@ -17,9 +17,10 @@
 package network.aika.neuron.steps;
 
 import network.aika.neuron.activation.Element;
-import network.aika.neuron.activation.Fired;
 
 import java.util.Comparator;
+
+import static network.aika.neuron.activation.Activation.NOT_SET;
 
 /**
  * @author Lukas Molzberger
@@ -28,12 +29,13 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
 
     public static final Comparator<Step> COMPARATOR = Comparator
             .<Step>comparingInt(s -> s.getPhase().ordinal())
-            .thenComparing(s -> s.fired)
+            .thenComparingInt(s -> s.fired == NOT_SET ? 0 : 1)
+            .thenComparingLong(s -> s.fired)
             .thenComparing(s -> s.timestamp);
 
     private E element;
 
-    protected Fired fired;
+    protected long fired;
     private long timestamp;
 
     public Step(E element) {
@@ -77,7 +79,7 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
         s.getElement().getThought().addStep(s);
     }
 
-    public Fired getFired() {
+    public long getFired() {
         return fired;
     }
 

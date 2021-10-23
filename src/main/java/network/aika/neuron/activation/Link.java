@@ -60,7 +60,7 @@ public class Link<A extends Activation> extends Element<Link> {
     }
 
     @Override
-    public Fired getFired() {
+    public long getFired() {
         return output.getFired();
     }
 
@@ -126,10 +126,6 @@ public class Link<A extends Activation> extends Element<Link> {
         );
     }
 
-    public boolean isCausal() {
-        return input == null || Fired.COMPARATOR.compare(input.getFired(), output.getFired()) <= 0;
-    }
-
     public static double getInputValue(Sign s, Link l) {
         return l != null ? l.getInputValue(s) : 0.0;
     }
@@ -166,6 +162,10 @@ public class Link<A extends Activation> extends Element<Link> {
         return isSelfRef;
     }
 
+    public boolean isCausal() {
+        return input == null || input.getFired() < output.getFired();
+    }
+
     public boolean isForward() {
         return isForward(input, output);
     }
@@ -174,7 +174,7 @@ public class Link<A extends Activation> extends Element<Link> {
         if(!iAct.isFired())
             return false;
 
-        return Fired.COMPARATOR.compare(iAct.getFired(), oAct.getFired()) <= 0;
+        return iAct.getFired() < oAct.getFired();
     }
 
     public void linkInput() {

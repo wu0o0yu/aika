@@ -18,7 +18,6 @@ package network.aika.neuron.excitatory;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingSignal;
-import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.Link;
 
 import static network.aika.neuron.activation.Activation.INCOMING;

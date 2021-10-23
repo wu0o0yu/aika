@@ -29,8 +29,7 @@ public class InductionTest {
 
         Document doc = new Document("");
 
-        Activation act = in.createActivation(doc);
-        act.initInput(new TextReference(doc, 0, 1));
+        doc.addInput(in, new TextReference(doc, 0, 1));
 
         doc.process(m);
 

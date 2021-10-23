@@ -37,6 +37,7 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
 
     private boolean finalMode = false;
+    private long finalTimestamp = NOT_SET;
 
     private final Set<BindingActivation> branches = new TreeSet<>();
     private BindingActivation mainBranch;
@@ -50,12 +51,12 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
-        addBindingSignal((byte) 0);
     }
 
     @Override
-    protected Activation newInstance() {
-        return new BindingActivation(id, thought, neuron);
+    public void init(Synapse originSynapse, Activation originAct) {
+        super.init(originSynapse, originAct);
+        addBindingSignal((byte) 0);
     }
 
     @Override
@@ -66,12 +67,12 @@ public class BindingActivation extends Activation<BindingNeuron> {
     public BindingActivation createBranch(Synapse excludedSyn) {
         BindingActivation clonedAct = getNeuron().createActivation(getThought());
 
-        copyPhases(clonedAct);
+        copySteps(clonedAct);
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
         linkClone(clonedAct, excludedSyn);
-        thought.onActivationCreationEvent(clonedAct, null, this);
 
+        clonedAct.init(null, this);
         return clonedAct;
     }
 
@@ -88,6 +89,13 @@ public class BindingActivation extends Activation<BindingNeuron> {
         this.finalMode = finalMode;
     }
 
+    public long getFinalTimestamp() {
+        return finalTimestamp;
+    }
+
+    public void setFinalTimestamp() {
+        this.finalTimestamp = getThought().getCurrentTimestamp();
+    }
 
     public BindingActivation getMainBranch() {
         return mainBranch;

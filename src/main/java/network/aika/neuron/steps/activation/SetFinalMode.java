@@ -27,6 +27,7 @@ import network.aika.neuron.steps.UpdateNet;
 
 import java.util.stream.Stream;
 
+import static network.aika.neuron.activation.Activation.NOT_SET;
 import static network.aika.neuron.steps.activation.CheckIfFired.propagate;
 
 /**
@@ -75,11 +76,12 @@ public class SetFinalMode extends Step<BindingActivation> {
                 );
 
         act.updateValue();
+        act.setFinalTimestamp();
 
         if (!act.isFired() || act.getValue() > 0.0)
             return;
 
-        act.setFired(null);
+        act.setFired(NOT_SET);
         propagate(act);
     }
 

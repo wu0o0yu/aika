@@ -22,7 +22,6 @@ import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Fired;
 import network.aika.neuron.activation.InhibitoryActivation;
 
 /**
@@ -62,11 +61,6 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse, Activation> {
 
     @Override
     public void addDummyLinks(Activation act) {
-    }
-
-    @Override
-    public Fired incrementFired(Fired f) {
-        return f;
     }
 
     public ActivationFunction getActivationFunction() {

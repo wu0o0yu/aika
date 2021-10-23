@@ -44,7 +44,7 @@ public class SampleSpace implements Writable {
     }
 
     public double getN(Reference ref) {
-        return N + getNegativeInstancesSinceLastPos(ref);
+        return Math.max(N + getInactiveInstancesSinceLastPos(ref), 0);
     }
 
     public void setN(int N) {
@@ -67,14 +67,14 @@ public class SampleSpace implements Writable {
         if(offset == null)
             offset = ref.getAbsoluteBegin();
 
-        N += getNegativeInstancesSinceLastPos(ref);
+        N += getInactiveInstancesSinceLastPos(ref);
     }
 
     public void count() {
         N += 1;
     }
 
-    public long getNegativeInstancesSinceLastPos(Reference ref) {
+    public long getInactiveInstancesSinceLastPos(Reference ref) {
         if(ref == null)
             return 0;
 

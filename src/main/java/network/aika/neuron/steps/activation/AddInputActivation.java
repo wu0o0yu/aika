@@ -14,30 +14,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.steps.link;
+package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
+
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Cleanup extends Step<Link> {
+public class AddInputActivation extends Step<Activation> {
 
-    public static void add(Link l) {
-        Step.add(new Cleanup(l));
+    public AddInputActivation(Activation element) {
+        super(element);
     }
 
-    private Cleanup(Link l) {
-        super(l);
+    public static void add(Activation act) {
+        Step.add(new AddInputActivation(act));
+    }
+
+    @Override
+    public void process() {
+        Activation act = getElement();
+
+        act.updateValue();
+        act.init(null, null);
+        act.setFired();
+        CheckIfFired.propagate(act);
     }
 
     @Override
     public Phase getPhase() {
-        return Phase.COUNTING;
+        return Phase.ADD_INPUT;
     }
 
     @Override
@@ -45,22 +56,8 @@ public class Cleanup extends Step<Link> {
         return StepType.INFERENCE;
     }
 
+    @Override
     public boolean checkIfQueued() {
         return true;
-    }
-
-    @Override
-    public void process() {
-        Link l = getElement();
-
-        if(l.getOutput().isFired())
-            return;
-
-        l.unlinkInput();
-        l.unlinkOutput();
-    }
-
-    public String toString() {
-        return "Link-Step: Commit " + getElement().toShortString();
     }
 }

@@ -22,6 +22,7 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Reference;
+import network.aika.neuron.steps.activation.AddInputActivation;
 
 /**
  * The {@code Document} class represents a single document which may be either used for processing a text or as
@@ -101,7 +102,11 @@ public class Document extends Thought {
 
     public Activation addInput(Neuron n, Reference ref) {
         Activation act = n.createActivation(this);
-        act.initInput(ref);
+
+        act.setReference(ref);
+        act.setInputValue(1.0);
+
+        AddInputActivation.add(act);
         return act;
     }
 

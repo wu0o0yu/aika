@@ -30,11 +30,6 @@ public class InhibitoryActivation extends Activation {
     }
 
     @Override
-    protected Activation newInstance() {
-        return new InhibitoryActivation(id, thought, neuron);
-    }
-
-    @Override
     public byte getType() {
         return 2;
     }

@@ -34,7 +34,6 @@ import java.util.stream.Stream;
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.neuron.activation.BindingActivation.MAX_BINDING_ACT;
 import static network.aika.neuron.activation.BindingActivation.MIN_BINDING_ACT;
-import static network.aika.neuron.activation.Fired.NOT_FIRED;
 import static network.aika.neuron.activation.PatternActivation.MAX_PATTERN_ACT;
 import static network.aika.neuron.activation.PatternActivation.MIN_PATTERN_ACT;
 import static network.aika.neuron.activation.direction.Direction.INPUT;
@@ -47,14 +46,22 @@ import static network.aika.utils.Utils.logChange;
 public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public static double INITIAL_NET = -0.001;
+    public static long NOT_SET = -1;
 
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(Activation::getId);
+
+    public static final Comparator<Long> TIMESTAMP_COMPARATOR_NF_FIRST = Comparator
+            .<Long>comparingInt(ts -> ts == NOT_SET ? 0 : 1)
+            .thenComparingLong(ts -> ts);
+
 
     protected double value = 0.0;
     protected Double inputValue = null;
     protected double net;
     protected double lastNet = INITIAL_NET;
-    protected Fired fired = NOT_FIRED;
+
+    protected long creationTimestamp = NOT_SET;
+    protected long fired = NOT_SET;
 
     protected final int id;
     protected N neuron;
@@ -103,18 +110,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
     }
 
-    public abstract byte getType();
-
-    public void initInput(Reference ref) {
-        setReference(ref);
-
-        setInputValue(1.0);
-        setFired(ref.getRelativeBegin());
-
-        updateValue();
-
-        CheckIfFired.propagate(this);
+    public void init(Synapse originSynapse, Activation originAct) {
+        setCreationTimestamp();
+        thought.onActivationCreationEvent(this, originSynapse, originAct);
     }
+
+    public abstract byte getType();
 
     public void addFeedbackSteps() {}
 
@@ -138,29 +139,28 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return outputGradientSum;
     }
 
-    public Fired getFired() {
+    public long getCreationTimestamp() {
+        return creationTimestamp;
+    }
+
+    public void setCreationTimestamp() {
+        this.creationTimestamp = thought.getCurrentTimestamp();
+    }
+
+    public long getFired() {
         return fired;
     }
 
     public boolean isFired() {
-        return fired != NOT_FIRED;
+        return fired != NOT_SET;
     }
 
-    public void setFired(int inputTimestamp) {
-        setFired(new Fired(inputTimestamp, 0));
-    }
-
-    public void setFired(Fired f) {
+    public void setFired(long f) {
         fired = f;
     }
 
     public void setFired() {
-        Fired latestFired = inputLinks.values().stream()
-                .map(il -> il.getInput().getFired())
-                .max(Fired.COMPARATOR)
-                .orElse(null);
-
-        setFired(neuron.incrementFired(latestFired));
+        setFired(thought.getCurrentTimestamp());
     }
 
     public Thought getThought() {
@@ -265,22 +265,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     public NeuronProvider getNeuronProvider() {
         return neuron.getProvider();
     }
-
-    public Activation clone(Synapse excludedSyn) {
-        if (!isFired())
-            return this;
-
-        Activation clonedAct = newInstance();
-
-        replaceElement(clonedAct);
-
-        linkClone(clonedAct, excludedSyn);
-        thought.onActivationCreationEvent(clonedAct, null, this);
-
-        return clonedAct;
-    }
-
-    protected abstract Activation newInstance();
 
     protected void linkClone(Activation clonedAct, Synapse excludedSyn) {
         inputLinks
@@ -498,6 +482,10 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         if (!(o instanceof Activation)) return false;
         Activation<?> that = (Activation<?>) o;
         return id == that.id;
+    }
+
+    public static String timestampToString(long timestamp) {
+        return timestamp == NOT_SET ? "[NOT_SET]" : "" + timestamp;
     }
 
     @Override

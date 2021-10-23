@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.steps.activation.Linking;
@@ -42,13 +43,12 @@ public class PatternActivation extends Activation<PatternNeuron> {
 
     public PatternActivation(int id, Thought t, PatternNeuron patternNeuron) {
         super(id, t, patternNeuron);
-
-        addBindingSignal((byte)0);
     }
 
     @Override
-    protected Activation newInstance() {
-        return new PatternActivation(id, thought, neuron);
+    public void init(Synapse originSynapse, Activation originAct) {
+        super.init(originSynapse, originAct);
+        addBindingSignal((byte) 0);
     }
 
     @Override
