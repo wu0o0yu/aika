@@ -114,11 +114,11 @@ public class Document extends Thought {
         return getTextSegment(act.getStatBegin(), act.getStatEnd());
     }
 
-    public PatternActivation addToken(TextModel m, String token, int begin, int end) {
+    public TokenActivation addToken(TextModel m, String token, int begin, int end) {
         return addToken(m.lookupToken(token), begin, end);
     }
 
-    public PatternActivation addToken(PatternNeuron n, int begin, int end) {
+    public TokenActivation addToken(PatternNeuron n, int begin, int end) {
         TokenActivation act = new TokenActivation(createActivationId(), begin, end, this, n);
 
         act.setInputValue(1.0);

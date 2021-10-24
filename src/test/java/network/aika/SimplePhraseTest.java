@@ -6,7 +6,7 @@ import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
-import network.aika.text.TextReference;
+import network.aika.text.TokenActivation;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -64,11 +64,13 @@ public class SimplePhraseTest {
             doc.getConfig().setEnableTraining(k > 100);
 
             int i = 0;
-            TextReference lastRef = null;
+            TokenActivation lastToken = null;
             for(String t: doc.getContent().split(" ")) {
                 int j = i + t.length();
-                lastRef = doc.processToken(model, lastRef, i, j, t).getReference();
+                TokenActivation currentToken = doc.addToken(model, t, i, j);
+                TokenActivation.addRelation(lastToken, currentToken);
 
+                lastToken = currentToken;
                 i = j + 1;
             }
 

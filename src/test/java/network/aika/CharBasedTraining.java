@@ -2,6 +2,7 @@ package network.aika;
 
 import network.aika.text.Document;
 import network.aika.text.TextModel;
+import network.aika.text.TokenActivation;
 
 public class CharBasedTraining {
 
@@ -25,11 +26,14 @@ public class CharBasedTraining {
 
         System.out.println("  " + word);
 
-        TextReference lastRef = null;
+        TokenActivation lastToken = null;
         for(int i = 0; i < doc.length(); i++) {
             char c = doc.charAt(i);
 
-            lastRef = (TextReference) doc.processToken(model, lastRef, i, i + 1, "" + c).getReference();
+            TokenActivation currentToken = doc.addToken(model, "" + c, i, i + 1);
+            TokenActivation.addRelation(lastToken, currentToken);
+
+            lastToken = currentToken;
         }
         doc.process(model);
 

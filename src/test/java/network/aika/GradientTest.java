@@ -2,12 +2,9 @@ package network.aika;
 
 import network.aika.debugger.AikaDebugger;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
-import network.aika.text.TextReference;
+import network.aika.text.TokenActivation;
 import org.junit.jupiter.api.Test;
 
 public class GradientTest {
@@ -150,11 +147,13 @@ public class GradientTest {
 
     private void processDoc(TextModel m, Document doc) {
         int i = 0;
-        TextReference lastRef = null;
+        TokenActivation lastToken = null;
         for(String t: doc.getContent().split(" ")) {
             int j = i + t.length();
-            lastRef = doc.processToken(m, lastRef, i, j, t).getReference();
+            TokenActivation currentToken = doc.addToken(m, t, i, j);
+            TokenActivation.addRelation(lastToken, currentToken);
 
+            lastToken = currentToken;
             i = j + 1;
         }
     }

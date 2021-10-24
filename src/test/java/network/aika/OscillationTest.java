@@ -7,7 +7,6 @@ import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
-import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
 
 public class OscillationTest {
@@ -49,7 +48,7 @@ public class OscillationTest {
 
         AikaDebugger.createAndShowGUI(doc,m);
 
-        doc.addInput(nA, new TextReference(doc, 0, 1));
+        doc.addToken(nA, 0, 1);
 
         doc.process(m);
 

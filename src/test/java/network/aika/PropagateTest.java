@@ -18,12 +18,10 @@ package network.aika;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
-import network.aika.text.TextReference;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -54,7 +52,7 @@ public class PropagateTest {
 
         Document doc = new Document("test");
 
-        doc.addInput(in, new TextReference(doc, 0, 4));
+        doc.addToken(in, 0, 4);
 
         System.out.println(doc);
     }

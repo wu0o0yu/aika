@@ -23,7 +23,7 @@ import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
-import network.aika.text.TextReference;
+import network.aika.text.TokenActivation;
 import org.junit.jupiter.api.Test;
 
 
@@ -39,9 +39,11 @@ public class PatternTest {
 
         Document doc = new Document("ABC");
 
-        TextReference refA = doc.processToken(m, null, 0, 1,  "A").getReference();
-        TextReference refB = doc.processToken(m, refA, 1, 2,  "B").getReference();
-        TextReference refC = doc.processToken(m, refB, 2, 3,  "C").getReference();
+        TokenActivation refA = doc.addToken(m,  "A", 0, 1);
+        TokenActivation refB = doc.addToken(m,  "B", 1, 2);
+        TokenActivation refC = doc.addToken(m,  "C", 2, 3);
+        TokenActivation.addRelation(refA, refB);
+        TokenActivation.addRelation(refB, refC);
 
         System.out.println(doc);
 
@@ -57,8 +59,9 @@ public class PatternTest {
 
         Document doc = new Document("ABC");
 
-        TextReference refA = doc.processToken(m, null, 0, 1,  "A").getReference();
-        TextReference refB = doc.processToken(m, refA, 1, 2,  "B").getReference();
+        TokenActivation refA = doc.addToken(m,  "A", 0, 1);
+        TokenActivation refB = doc.addToken(m,  "B", 1, 2);
+        TokenActivation.addRelation(refA, refB);
 
         doc.process(m);
 

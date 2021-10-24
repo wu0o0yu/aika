@@ -7,7 +7,7 @@ import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
-import network.aika.text.TextReference;
+import network.aika.text.TokenActivation;
 import org.junit.jupiter.api.Test;
 
 public class InductionTest {
@@ -29,7 +29,7 @@ public class InductionTest {
 
         Document doc = new Document("");
 
-        doc.addInput(in, new TextReference(doc, 0, 1));
+        doc.addToken(in, 0, 1);
 
         doc.process(m);
 
@@ -88,10 +88,8 @@ public class InductionTest {
         Activation actB = inB.createActivation(doc);
         Activation actTarget = targetN.createActivation(doc);
 
-        actA.setReference(new TextReference(doc, 0, 1));
         actA.setInputValue(1.0);
 
-        actB.setReference(new TextReference(doc, 0, 1));
         actB.setInputValue(1.0);
 
         actTarget.addLink(sA, actA, false);
@@ -118,8 +116,9 @@ public class InductionTest {
         );
         System.out.println("  " + phrase);
 
-        Activation<?> actDer = doc.processToken(model, null, 0, 4, "der");
-        Activation<?> actHund = doc.processToken(model, actDer.getReference(), 4, 8, "Hund");
+        TokenActivation actDer = doc.addToken(model, "der", 0, 4);
+        TokenActivation actHund = doc.addToken(model, "Hund", 4, 8);
+        TokenActivation.addRelation(actDer, actHund);
 
         model.setN(1000);
         actDer.getNeuron().setFrequency(50);

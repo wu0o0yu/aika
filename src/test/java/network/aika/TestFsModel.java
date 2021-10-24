@@ -5,7 +5,7 @@ import network.aika.debugger.AikaDebugger;
 import network.aika.debugger.StepMode;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
-import network.aika.text.TextReference;
+import network.aika.text.TokenActivation;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -18,7 +18,7 @@ public class TestFsModel {
     public void testOpenModel() throws IOException {
 
         TextModel m = new TextModel(
-                new FSSuspensionCallback(new File("F:/Model").toPath(), "AIKA-2.0-9", true)
+                new FSSuspensionCallback(new File("/Users/lukas.molzberger/models").toPath(), "AIKA-2.0-10", true)
         );
 
         m.open(false);
@@ -56,11 +56,13 @@ public class TestFsModel {
         doc.setConfig(c);
 
         int i = 0;
-        TextReference lastRef = null;
+        TokenActivation lastToken = null;
         for(String t: doc.getContent().split(" ")) {
             int j = i + t.length();
-            lastRef = doc.processToken(m, lastRef, i, j, "W-" + t).getReference();
+            TokenActivation currentToken = doc.addToken(m,"W-" + t, i, j);
+            TokenActivation.addRelation(lastToken, currentToken);
 
+            lastToken = currentToken;
             i = j + 1;
         }
         return doc;

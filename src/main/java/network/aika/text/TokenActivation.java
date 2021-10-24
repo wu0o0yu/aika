@@ -40,6 +40,9 @@ public class TokenActivation extends PatternActivation {
     }
 
     public static void addRelation(TokenActivation prev, TokenActivation next) {
+        if(prev == null || next == null)
+            return;
+
         prev.nextToken = next;
         next.previousToken = prev;
     }
