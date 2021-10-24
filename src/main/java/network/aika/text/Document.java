@@ -41,11 +41,6 @@ public class Document extends Thought {
 
     private final StringBuilder content;
 
-    private Map<PatternActivation, int[]> actToRange = new TreeMap<>();
-    private Map<Integer, PatternActivation> rangeBeginToAct = new TreeMap<>();
-    private Map<Integer, PatternActivation> rangeEndToAct = new TreeMap<>();
-
-
     public Document(String content) {
         super();
         this.content = new StringBuilder();
@@ -66,14 +61,24 @@ public class Document extends Thought {
         }
     }
 
-    private void addRelationBindingSignal(Activation act, Direction dir) {
+    private void addRelationBindingSignal(Activation<?> act, Direction dir) {
+        BindingSignal currentBS = act.getPatternBindingSignals().values().stream()
+                .filter(bs -> bs.getScope() == 0)
+                .findFirst()
+                .orElse(null);
+
+        TokenActivation currentToken = (TokenActivation) currentBS.getBindingSignalAct();
+        TokenActivation relToken = dir == INPUT ?
+                currentToken.getPreviousToken() :
+                currentToken.getNextToken();
+
         act.addBindingSignal(
                 new BindingSignal(
                         null,
+                        relToken,
                         act,
-                        l.getInput(),
-                        1,
-                        1
+                        (byte)1,
+                        (byte)1
                 )
         );
     }
@@ -114,10 +119,7 @@ public class Document extends Thought {
     }
 
     public PatternActivation addToken(PatternNeuron n, int begin, int end) {
-        PatternActivation act = n.createActivation(this);
-        actToRange.put(act, new int[] {begin, end});
-        rangeBeginToAct.put(begin, act);
-        rangeEndToAct.put(end, act);
+        TokenActivation act = new TokenActivation(createActivationId(), begin, end, this, n);
 
         act.setInputValue(1.0);
 
