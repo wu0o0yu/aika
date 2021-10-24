@@ -54,8 +54,6 @@ public class Link<A extends Activation> extends Element<Link> {
 
         AddLink.add(this);
 
-        getSynapse().updateReference(this);
-
         getThought().onLinkCreationEvent(this);
     }
 
@@ -77,10 +75,9 @@ public class Link<A extends Activation> extends Element<Link> {
     }
 
     private double computeGradient(Sign si, Sign so) {
-        Reference ref = getInput().getReference();
-        double s = getSynapse().getSurprisal(si, so, ref);
-        s -= input.getNeuron().getSurprisal(si, ref);
-        s -= output.getNeuron().getSurprisal(so, ref);
+        double s = getSynapse().getSurprisal(si, so, this);
+        s -= input.getNeuron().getSurprisal(si, input);
+        s -= output.getNeuron().getSurprisal(so, input);
 
         return s * getInputValue(si) * getOutputValue(so);
     }

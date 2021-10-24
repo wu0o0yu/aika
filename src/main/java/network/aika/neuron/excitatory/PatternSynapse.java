@@ -27,18 +27,6 @@ import network.aika.neuron.inhibitory.InhibitorySynapse;
 public class PatternSynapse extends ExcitatorySynapse<BindingNeuron, PatternNeuron, PatternActivation> {
 
     @Override
-    public void updateReference(Link l) {
-        Reference or = l.getOutput().getReference();
-        Reference ir = l.getInput().getReference();
-
-        l.getOutput().propagateReference(
-                or == null ?
-                        ir :
-                        or.add(ir)
-        );
-    }
-
-    @Override
     public boolean checkScope(BindingSignal fromBS, BindingSignal toBS, Direction dir) {
         return fromBS.getScope() == 0 && toBS.getScope() == 0;
     }

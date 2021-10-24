@@ -1,9 +1,7 @@
 package network.aika;
 
-import network.aika.neuron.activation.Reference;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
-import network.aika.text.TextReference;
 
 public class CharBasedTraining {
 

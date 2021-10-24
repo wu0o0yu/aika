@@ -59,23 +59,6 @@ public abstract class BindingNeuronSynapse<I extends Neuron> extends ExcitatoryS
     }
 
     @Override
-    public void updateReference(Link l) {
-        if(l.getInput() == null)
-            return;
-
-        Reference iRef = l.getInput().getReference();
-        if(iRef == null)
-            return;
-
-        // TODO: find a better solution.
-        Synapse ts = l.getSynapse().getTemplate();
-        Templates t = getModel().getTemplates();
-        if(ts != t.RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE && ts != t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE) {
-            l.getOutput().propagateReference(iRef);
-        }
-    }
-
-    @Override
     public BindingActivation branchIfNecessary(Activation iAct, BindingActivation oAct) {
         if (getOutput().isInputNeuron())
             return null;
@@ -84,14 +67,5 @@ public abstract class BindingNeuronSynapse<I extends Neuron> extends ExcitatoryS
             return null;
 
         return oAct;
-    }
-
-    @Override
-    public Reference getReference(Link l) {
-        return (
-                isRecurrent() ?
-                        l.getOutput() :
-                        l.getInput()
-        ).getReference();
     }
 }

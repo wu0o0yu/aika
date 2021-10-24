@@ -33,4 +33,14 @@ public class InhibitoryActivation extends Activation {
     public byte getType() {
         return 2;
     }
+
+    @Override
+    public int getStatBegin() {
+        return 0;
+    }
+
+    @Override
+    public int getStatEnd() {
+        return 0;
+    }
 }

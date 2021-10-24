@@ -79,8 +79,6 @@ public abstract class Model implements Writable {
         this.customDataInstanceSupplier = customDataInstanceSupplier;
     }
 
-    public abstract void linkInputRelations(Activation<?> originAct, Direction dir);
-
     public long getCurrentRetrievalCount() {
         return retrievalCounter.longValue();
     }

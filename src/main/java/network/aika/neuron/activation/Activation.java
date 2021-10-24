@@ -36,7 +36,6 @@ import static network.aika.neuron.activation.BindingActivation.MAX_BINDING_ACT;
 import static network.aika.neuron.activation.BindingActivation.MIN_BINDING_ACT;
 import static network.aika.neuron.activation.PatternActivation.MAX_PATTERN_ACT;
 import static network.aika.neuron.activation.PatternActivation.MIN_PATTERN_ACT;
-import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.utils.Utils.logChange;
 
@@ -69,8 +68,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     Map<NeuronProvider, Link> inputLinks;
     NavigableMap<OutputKey, Link> outputLinks;
-
-    private Reference reference;
 
     protected SortedMap<Activation<?>, BindingSignal> bindingSignals = new TreeMap<>(
             Comparator.<Activation, Byte>comparing(act -> act.getType())
@@ -171,7 +168,15 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return bindingSignals.containsKey(iAct);
     }
 
-    public void addBindingSignal(byte scope) {
+    public abstract int getStatBegin();
+
+    public abstract int getStatEnd();
+
+    public long getStatLength() {
+        return getStatEnd() - getStatBegin();
+    }
+
+    public void addSelfBindingSignal(byte scope) {
         addBindingSignal(new BindingSignal(null, this, this, scope, (byte) 0));
     }
 
@@ -179,7 +184,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         bindingsSignals.forEach(this::addBindingSignal);
     }
 
-    private void addBindingSignal(BindingSignal bindingSignal) {
+    public void addBindingSignal(BindingSignal bindingSignal) {
         if (checkIfBindingSignalExists(bindingSignal))
             return;
 
@@ -226,20 +231,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public String getLabel() {
         return getNeuron().getLabel();
-    }
-
-    public <R extends Reference> R getReference() {
-        return (R) reference;
-    }
-
-    public void setReference(Reference ref) {
-        assert ref.getThought() == getThought();
-        this.reference = ref;
-    }
-
-    public void propagateReference(Reference ref) {
-        setReference(ref);
-        getModel().linkInputRelations(this, INPUT);
     }
 
     public N getNeuron() {
@@ -351,7 +342,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     public void initEntropyGradient() {
         double g = getNeuron().getSurprisal(
                         Sign.getSign(this),
-                        getReference()
+                        this
                 );
 
         inputGradient[OWN] += g - lastEntropyGradient;
@@ -492,4 +483,5 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     public int hashCode() {
         return Objects.hash(id);
     }
+
 }

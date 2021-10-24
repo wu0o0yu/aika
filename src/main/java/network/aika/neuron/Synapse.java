@@ -129,8 +129,6 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
 
     public abstract boolean checkCausality(Activation<?> iAct, Activation<?> oAct);
 
-    public abstract void updateReference(Link l);
-
     public A branchIfNecessary(Activation iAct, A oAct) {
         return oAct;
     }
@@ -177,10 +175,6 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     protected void initFromTemplate(Synapse s) {
         s.weight = weight;
         s.template = this;
-    }
-
-    public Reference getReference(Link l) {
-        return l.getInput().getReference();
     }
 
     public boolean isInputLinked() {
@@ -301,7 +295,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         boolean iActive = l.getInput().isFired();
         boolean oActive = l.getOutput().isFired();
 
-        sampleSpace.countSkippedInstances(l.getInput().getReference());
+        sampleSpace.countSkippedInstances(l.getInput());
 
         if(oActive) {
             Double alpha = l.getConfig().getAlpha();
@@ -327,8 +321,8 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return getPOutput().getModel();
     }
 
-    public double getSurprisal(Sign si, Sign so, Reference ref) {
-        double N = sampleSpace.getN(ref);
+    public double getSurprisal(Sign si, Sign so, Link l) {
+        double N = sampleSpace.getN(l.getInput());
         if(isTemplate() || N == 0.0)
             return 0.0;
 

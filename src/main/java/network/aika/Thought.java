@@ -59,8 +59,6 @@ public abstract class Thought {
 
     public abstract int length();
 
-    public abstract void linkInputRelations(Activation<?> act);
-
     public Config getConfig() {
         return config;
     }
@@ -153,9 +151,7 @@ public abstract class Thought {
             s.getElement().removeQueuedPhase(s);
 
             beforeProcessedEvent(s);
-
             s.process();
-
             afterProcessedEvent(s);
         }
         m.addToN(length());

@@ -56,7 +56,7 @@ public class BindingActivation extends Activation<BindingNeuron> {
     @Override
     public void init(Synapse originSynapse, Activation originAct) {
         super.init(originSynapse, originAct);
-        addBindingSignal((byte) 0);
+        addSelfBindingSignal((byte) 0);
     }
 
     @Override
@@ -79,6 +79,16 @@ public class BindingActivation extends Activation<BindingNeuron> {
     public void addFeedbackSteps() {
         SetFinalMode.add(this);
         BranchProbability.add(this);
+    }
+
+    @Override
+    public int getStatBegin() {
+        return 0;
+    }
+
+    @Override
+    public int getStatEnd() {
+        return 0;
     }
 
     public boolean isFinalMode() {

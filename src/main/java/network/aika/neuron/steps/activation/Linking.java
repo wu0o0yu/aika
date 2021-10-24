@@ -65,12 +65,11 @@ public class Linking extends LinkerStep<Activation, LinkingTask> {
 
     @Override
     public void process() {
-        Activation act = getElement();
-        act.getThought().linkInputRelations(act);
-
-        task.link(act, getDirections(), bindingSignal);
-
-        act.getModel().linkInputRelations(act, OUTPUT);
+        task.link(
+                getElement(),
+                getDirections(),
+                bindingSignal
+        );
     }
 
     public String toString() {

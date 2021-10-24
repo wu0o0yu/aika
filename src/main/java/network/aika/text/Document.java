@@ -18,11 +18,18 @@ package network.aika.text;
 
 import network.aika.Thought;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Reference;
+import network.aika.neuron.activation.BindingSignal;
+import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.steps.activation.AddInputActivation;
+
+import java.util.Map;
+import java.util.TreeMap;
+
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  * The {@code Document} class represents a single document which may be either used for processing a text or as
@@ -34,6 +41,11 @@ public class Document extends Thought {
 
     private final StringBuilder content;
 
+    private Map<PatternActivation, int[]> actToRange = new TreeMap<>();
+    private Map<Integer, PatternActivation> rangeBeginToAct = new TreeMap<>();
+    private Map<Integer, PatternActivation> rangeEndToAct = new TreeMap<>();
+
+
     public Document(String content) {
         super();
         this.content = new StringBuilder();
@@ -44,20 +56,26 @@ public class Document extends Thought {
 
     public void registerActivation(Activation act) {
         super.registerActivation(act);
+        TextModel model = (TextModel) act.getModel();
+
+        Neuron n = act.getNeuron();
+        if(n == model.getPrevTokenInhib()) {
+            addRelationBindingSignal(act, INPUT);
+        } else if(n == model.getNextTokenInhib()) {
+            addRelationBindingSignal(act, OUTPUT);
+        }
     }
 
-    @Override
-    public void linkInputRelations(Activation<?> act) {
-        TextReference ref = act.getReference();
-        Neuron<?, ?> n = act.getNeuron();
-        TextModel tm = n.getModel();
-        if(tm.getNextTokenInhib().getId().equals(act.getNeuron().getId())) {
-            ref.nextTokenIAct = act;
-            ref.nextTokenBAct = act.getInputLinks()
-                    .findAny()
-                    .map(Link::getInput)
-                    .orElse(null);
-        }
+    private void addRelationBindingSignal(Activation act, Direction dir) {
+        act.addBindingSignal(
+                new BindingSignal(
+                        null,
+                        act,
+                        l.getInput(),
+                        1,
+                        1
+                )
+        );
     }
 
     public void append(String txt) {
@@ -87,48 +105,24 @@ public class Document extends Thought {
         }
     }
 
-    public static String getText(Activation<?> act) {
-        TextReference ref = act.getReference();
-        return ref.getText();
+    public String getText(Activation<?> act) {
+        return getTextSegment(act.getStatBegin(), act.getStatEnd());
     }
 
-    public Activation addInput(Neuron n, int begin, int end) {
-        return addInput(n, new TextReference(this, begin, end));
+    public PatternActivation addToken(TextModel m, String token, int begin, int end) {
+        return addToken(m.lookupToken(token), begin, end);
     }
 
-    public Activation addInput(NeuronProvider n, int begin, int end) {
-        return addInput(n.getNeuron(), begin, end);
-    }
+    public PatternActivation addToken(PatternNeuron n, int begin, int end) {
+        PatternActivation act = n.createActivation(this);
+        actToRange.put(act, new int[] {begin, end});
+        rangeBeginToAct.put(begin, act);
+        rangeEndToAct.put(end, act);
 
-    public Activation addInput(Neuron n, Reference ref) {
-        Activation act = n.createActivation(this);
-
-        act.setReference(ref);
         act.setInputValue(1.0);
 
         AddInputActivation.add(act);
         return act;
-    }
-
-    public Activation addInput(NeuronProvider n, Reference ref) {
-        return addInput(n.getNeuron(), ref);
-    }
-
-    @Deprecated
-    public Activation<?> processToken(TextModel m, TextReference lastRef, int begin, int end, String tokenLabel) {
-        TextReference ref = new TextReference(this, begin, end);
-        Neuron tokenN = m.lookupToken(tokenLabel);
-        Activation tokenPatternAct = addInput(tokenN, ref);
-        linkConsecutiveTokens(lastRef, ref);
-
-        return tokenPatternAct;
-    }
-
-    public void linkConsecutiveTokens(TextReference prevToken, TextReference nextToken) {
-        if (prevToken == null)
-            return;
-        prevToken.setNext(nextToken);
-        nextToken.setPrevious(prevToken);
     }
 
     public String toString() {

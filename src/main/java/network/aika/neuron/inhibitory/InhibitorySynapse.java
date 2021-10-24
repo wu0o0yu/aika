@@ -71,13 +71,6 @@ public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNe
     }
 
     @Override
-    public void updateReference(Link l) {
-        l.getOutput().propagateReference(
-                l.getInput().getReference()
-        );
-    }
-
-    @Override
     public Activation branchIfNecessary(Activation iAct, Activation oAct) {
         return oAct;
     }

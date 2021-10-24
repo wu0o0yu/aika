@@ -19,7 +19,6 @@ package network.aika.neuron;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Reference;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;
@@ -140,7 +139,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public double getCandidateGradient(Activation act) {
-        return getSurprisal(POS, act.getReference());
+        return getSurprisal(POS, act);
     }
 
     public SampleSpace getSampleSpace() {
@@ -282,7 +281,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     public void count(Activation act) {
         addDummyLinks(act);
 
-        sampleSpace.countSkippedInstances(act.getReference());
+        sampleSpace.countSkippedInstances(act);
 
         Double alpha = act.getConfig().getAlpha();
         if (alpha != null)
@@ -299,8 +298,8 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         setModified();
     }
 
-    public double getSurprisal(Sign s, Reference ref) {
-        double N = sampleSpace.getN(ref);
+    public double getSurprisal(Sign s, Activation act) {
+        double N = sampleSpace.getN(act);
         if(isTemplate() || N == 0.0)
             return 0.0;
 

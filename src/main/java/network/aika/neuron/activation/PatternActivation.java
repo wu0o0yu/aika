@@ -18,15 +18,7 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.excitatory.PatternNeuron;
-import network.aika.neuron.steps.activation.Linking;
-import network.aika.neuron.steps.activation.TemplateLinking;
-
-import java.util.List;
-
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
  *
@@ -48,7 +40,7 @@ public class PatternActivation extends Activation<PatternNeuron> {
     @Override
     public void init(Synapse originSynapse, Activation originAct) {
         super.init(originSynapse, originAct);
-        addBindingSignal((byte) 0);
+        addSelfBindingSignal((byte) 0);
     }
 
     @Override
@@ -58,5 +50,15 @@ public class PatternActivation extends Activation<PatternNeuron> {
 
     public boolean isSelfRef(Activation iAct) {
         return reverseBindingSignals.containsKey(iAct);
+    }
+
+    @Override
+    public int getStatBegin() {
+        return 0;
+    }
+
+    @Override
+    public int getStatEnd() {
+        return 0;
     }
 }

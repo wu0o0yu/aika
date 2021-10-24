@@ -47,11 +47,7 @@ public class PropagateBindingSignal extends Step<Link> {
     public static void add(Link l, Collection<BindingSignal> inputBindingSignals) {
         Step.add(new PropagateBindingSignal(l, inputBindingSignals));
     }
-/*
-    public static void add(Link l, BindingSignal bindingSignal) {
-        Step.add(new PropagateBindingSignal(l, Collections.singletonList(bindingSignal)));
-    }
-*/
+
     protected PropagateBindingSignal(Link l, Collection<BindingSignal> inputBindingSignals) {
         super(l);
         fired = l.getInput().getFired();

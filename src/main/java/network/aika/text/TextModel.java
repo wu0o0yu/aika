@@ -76,50 +76,6 @@ public class TextModel extends Model {
         return np;
     }
 
-    @Override
-    public void linkInputRelations(Activation<?> fromAct, Direction dir) {
-        TextReference ref = fromAct.getReference();
-        TextReference lastRef = ref.getPrevious();
-        if(lastRef == null) return;
-
-        if (dir == OUTPUT) {
-            if (fromAct.getNeuron().isInputNeuron() && prevTokenInhib.getId().equals(fromAct.getNeuron().getId()) && lastRef.nextTokenBAct != null) {
-                Synapse s = getRelSynapse(lastRef.nextTokenBAct.getNeuron());
-                addLink(s, fromAct, lastRef.nextTokenBAct);
-            }
-        } else if (dir == INPUT) {
-            Neuron n = fromAct.getNeuron();
-            if (n instanceof ExcitatoryNeuron) {
-                Synapse s = getRelSynapse(n);
-
-                if (s != null) {
-                    if (isPrevTokenBinding(fromAct.getNeuron()) && lastRef.nextTokenIAct != null) {
-                        addLink(s, lastRef.nextTokenIAct, fromAct);
-                    }
-                }
-            }
-        }
-    }
-
-    private static void addLink(Synapse s, Activation iAct, Activation oAct) {
-        Link nl = oAct.addLink(s, iAct, false);
-
-        addNextLinkerSteps(nl);
-    }
-
-    private Synapse getRelSynapse(Neuron<?, ?> n) {
-        return n.getInputSynapses()
-                .filter(s -> s instanceof RelatedBNSynapse)
-                .map(s -> (RelatedBNSynapse) s)
-                .findAny()
-                .orElse(null);
-    }
-
-    private boolean isPrevTokenBinding(Neuron<?, ?> n) {
-        return n.getOutputSynapses()
-                .anyMatch(s -> prevTokenInhib.getId().equals(s.getOutput().getId()));
-    }
-
     public PatternNeuron lookupToken(String tokenLabel) {
         Neuron inProv = getNeuron(tokenLabel);
         if(inProv != null) {
