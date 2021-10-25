@@ -82,13 +82,20 @@ public class BindingActivation extends Activation<BindingNeuron> {
     }
 
     @Override
-    public int getStatBegin() {
-        return 0;
+    public int[] getRange() {
+        BindingSignal bs = getPrimaryPatternBindingSignal();
+        if(bs == null)
+            return null;
+
+        return bs.getBindingSignalAct()
+                .getRange();
     }
 
-    @Override
-    public int getStatEnd() {
-        return 0;
+    private BindingSignal getPrimaryPatternBindingSignal() {
+        return getPatternBindingSignals().values().stream()
+                .filter(bs -> bs.getScope() == 1)
+                .findFirst()
+                .orElse(null);
     }
 
     public boolean isFinalMode() {

@@ -18,14 +18,15 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class InhibitoryActivation extends Activation {
+public class InhibitoryActivation extends Activation<InhibitoryNeuron> {
 
-    public InhibitoryActivation(int id, Thought t, Neuron neuron) {
+    public InhibitoryActivation(int id, Thought t, InhibitoryNeuron neuron) {
         super(id, t, neuron);
     }
 
@@ -35,12 +36,16 @@ public class InhibitoryActivation extends Activation {
     }
 
     @Override
-    public int getStatBegin() {
-        return 0;
+    public int[] getRange() {
+        return getPrimaryBranchBindingSignal()
+                .getBindingSignalAct()
+                .getRange();
     }
 
-    @Override
-    public int getStatEnd() {
-        return 0;
+    private BindingSignal getPrimaryBranchBindingSignal() {
+        return getBranchBindingSignals().values().stream()
+                .filter(bs -> bs.getScope() == 0)
+                .findFirst()
+                .orElse(null);
     }
 }

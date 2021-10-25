@@ -53,12 +53,12 @@ public class PatternActivation extends Activation<PatternNeuron> {
     }
 
     @Override
-    public int getStatBegin() {
-        return 0;
-    }
-
-    @Override
-    public int getStatEnd() {
-        return 0;
+    public int[] getRange() {
+        return getBranchBindingSignals().values().stream()
+                .map(s -> s.getBindingSignalAct().getRange())
+                .reduce(
+                        new int[] {0, 0},
+                        (a, s) -> new int[] {Math.min(a[0], s[0]), Math.max(a[1], s[1])}
+                );
     }
 }

@@ -139,7 +139,10 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public double getCandidateGradient(Activation act) {
-        return getSurprisal(POS, act);
+        int[] range = act.getRange();
+        assert range != null;
+
+        return getSurprisal(POS, range);
     }
 
     public SampleSpace getSampleSpace() {
@@ -279,9 +282,12 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public void count(Activation act) {
+        int[] range = act.getRange();
+        assert range != null;
+
         addDummyLinks(act);
 
-        sampleSpace.countSkippedInstances(act);
+        sampleSpace.countSkippedInstances(act.getThought(), range);
 
         Double alpha = act.getConfig().getAlpha();
         if (alpha != null)
@@ -298,8 +304,8 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         setModified();
     }
 
-    public double getSurprisal(Sign s, Activation act) {
-        double N = sampleSpace.getN(act);
+    public double getSurprisal(Sign s, int[] range) {
+        double N = sampleSpace.getN(range);
         if(isTemplate() || N == 0.0)
             return 0.0;
 

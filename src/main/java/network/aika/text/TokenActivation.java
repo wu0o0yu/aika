@@ -16,7 +16,6 @@
  */
 package network.aika.text;
 
-import network.aika.Thought;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.excitatory.PatternNeuron;
 
@@ -53,5 +52,10 @@ public class TokenActivation extends PatternActivation {
 
     public TokenActivation getNextToken() {
         return nextToken;
+    }
+
+    @Override
+    public int[] getRange() {
+        return new int[]{rangeBegin, rangeEnd};
     }
 }

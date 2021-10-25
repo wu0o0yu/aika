@@ -20,13 +20,9 @@ import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingSignal;
-import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.steps.activation.AddInputActivation;
-
-import java.util.Map;
-import java.util.TreeMap;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
@@ -111,7 +107,8 @@ public class Document extends Thought {
     }
 
     public String getText(Activation<?> act) {
-        return getTextSegment(act.getStatBegin(), act.getStatEnd());
+        int[] r = act.getRange();
+        return getTextSegment(r[0], r[1]);
     }
 
     public TokenActivation addToken(TextModel m, String token, int begin, int end) {

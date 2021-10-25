@@ -295,7 +295,10 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         boolean iActive = l.getInput().isFired();
         boolean oActive = l.getOutput().isFired();
 
-        sampleSpace.countSkippedInstances(l.getInput());
+        int[] range = l.getInput().getRange();
+        assert range != null;
+
+        sampleSpace.countSkippedInstances(l.getThought(), range);
 
         if(oActive) {
             Double alpha = l.getConfig().getAlpha();
@@ -321,8 +324,8 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return getPOutput().getModel();
     }
 
-    public double getSurprisal(Sign si, Sign so, Link l) {
-        double N = sampleSpace.getN(l.getInput());
+    public double getSurprisal(Sign si, Sign so, int[] range) {
+        double N = sampleSpace.getN(range);
         if(isTemplate() || N == 0.0)
             return 0.0;
 

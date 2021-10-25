@@ -17,6 +17,7 @@
 package network.aika.neuron;
 
 import network.aika.Model;
+import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
 import network.aika.utils.Writable;
 import org.slf4j.Logger;
@@ -43,8 +44,8 @@ public class SampleSpace implements Writable {
     public SampleSpace() {
     }
 
-    public double getN(Activation act) {
-        return Math.max(N + getInactiveInstancesSinceLastPos(act), 0);
+    public double getN(int[] range) {
+        return Math.max(N + getInactiveInstancesSinceLastPos(range), 0);
     }
 
     public void setN(int N) {
@@ -63,24 +64,24 @@ public class SampleSpace implements Writable {
         N *= alpha;
     }
 
-    public void countSkippedInstances(Activation act) {
+    public void countSkippedInstances(Thought t, int[] range) {
         if(offset == null)
-            offset = act.getThought().getAbsoluteBegin() + act.getStatBegin();
+            offset = t.getAbsoluteBegin() + range[0];
 
-        N += getInactiveInstancesSinceLastPos(act);
+        N += getInactiveInstancesSinceLastPos(range);
     }
 
     public void count() {
         N += 1;
     }
 
-    public long getInactiveInstancesSinceLastPos(Activation act) {
-        if(act == null)
+    public long getInactiveInstancesSinceLastPos(int[] range) {
+        if(range == null)
             return 0;
 
-        long n = offset != null ? act.getStatBegin() - offset : 0;
+        long n = offset != null ? range[0] - offset : 0;
 
-        n /= act.getStatLength();
+        n /= range[1] - range[0];
         return n;
     }
 

@@ -168,12 +168,14 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return bindingSignals.containsKey(iAct);
     }
 
-    public abstract int getStatBegin();
+    public abstract int[] getRange();
 
-    public abstract int getStatEnd();
+    public Long getRangeLength() {
+        int[] range = getRange();
+        if(range == null)
+            return null;
 
-    public long getStatLength() {
-        return getStatEnd() - getStatBegin();
+        return Long.valueOf(range[1] - range[0]);
     }
 
     public void addSelfBindingSignal(byte scope) {
@@ -340,9 +342,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void initEntropyGradient() {
+        int[] range = getRange();
+        assert range != null;
+
         double g = getNeuron().getSurprisal(
                         Sign.getSign(this),
-                        this
+                        range
                 );
 
         inputGradient[OWN] += g - lastEntropyGradient;
