@@ -60,6 +60,10 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
         return weightSum;
     }
 
+    public double getConjunctiveBias() {
+        return conjunctiveBias;
+    }
+
     public void addWeight(double weightDelta) {
         weightSum += weightDelta;
     }
@@ -188,5 +192,4 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
                 )
                 .collect(Collectors.joining());
     }
-
 }
