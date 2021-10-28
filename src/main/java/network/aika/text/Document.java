@@ -44,7 +44,7 @@ public class Document extends Thought {
             this.content.append(content);
         }
     }
-
+/*
     public void registerActivation(Activation act) {
         super.registerActivation(act);
         TextModel model = (TextModel) act.getModel();
@@ -56,14 +56,20 @@ public class Document extends Thought {
             addRelationBindingSignal(act, OUTPUT);
         }
     }
+    */
+    public void registerBindingSignal(Activation act, BindingSignal bs) {
+        TextModel model = (TextModel) act.getModel();
 
-    private void addRelationBindingSignal(Activation<?> act, Direction dir) {
-        BindingSignal currentBS = act.getPatternBindingSignals().values().stream()
-                .filter(bs -> bs.getScope() == 0)
-                .findFirst()
-                .orElse(null);
+        Neuron n = act.getNeuron();
+        if(n == model.getPrevTokenInhib()) {
+            addRelationBindingSignal(act, bs, INPUT);
+        } else if(n == model.getNextTokenInhib()) {
+            addRelationBindingSignal(act, bs, OUTPUT);
+        }
+    }
 
-        TokenActivation currentToken = (TokenActivation) currentBS.getBindingSignalAct();
+    private void addRelationBindingSignal(Activation<?> act, BindingSignal bs, Direction dir) {
+        TokenActivation currentToken = (TokenActivation) bs.getBindingSignalAct();
         TokenActivation relToken = dir == INPUT ?
                 currentToken.getPreviousToken() :
                 currentToken.getNextToken();

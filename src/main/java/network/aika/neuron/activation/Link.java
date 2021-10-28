@@ -25,6 +25,7 @@ import network.aika.utils.Utils;
 
 import java.util.Comparator;
 
+import static network.aika.neuron.activation.Activation.NOT_SET;
 import static network.aika.neuron.sign.Sign.POS;
 
 /**
@@ -174,7 +175,7 @@ public class Link<A extends Activation> extends Element<Link> {
         if(!iAct.isFired())
             return false;
 
-        return iAct.getFired() < oAct.getFired();
+        return oAct.getFired() == NOT_SET || iAct.getFired() < oAct.getFired();
     }
 
     public void linkInput() {

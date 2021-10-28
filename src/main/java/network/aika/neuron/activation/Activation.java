@@ -192,6 +192,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         bindingSignals.put(bindingSignal.getBindingSignalAct(), bindingSignal);
         bindingSignal.getBindingSignalAct().registerBindingSignal(this, bindingSignal);
+        thought.registerBindingSignal(this, bindingSignal);
     }
 
     public boolean checkIfBindingSignalExists(BindingSignal bindingSignal) {

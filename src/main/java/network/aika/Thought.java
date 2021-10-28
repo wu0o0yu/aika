@@ -22,6 +22,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingSignal;
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.steps.Step;
@@ -113,6 +114,9 @@ public abstract class Thought {
 
     public void registerActivation(Activation act) {
         activationsById.put(act.getId(), act);
+    }
+
+    public void registerBindingSignal(Activation act, BindingSignal bs) {
     }
 
     public void addStep(Step s) {
