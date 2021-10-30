@@ -69,10 +69,16 @@ public class Document extends Thought {
     }
 
     private void addRelationBindingSignal(Activation<?> act, BindingSignal bs, Direction dir) {
+        if(!(bs.getBindingSignalAct() instanceof TokenActivation))
+            return;
+
         TokenActivation currentToken = (TokenActivation) bs.getBindingSignalAct();
         TokenActivation relToken = dir == INPUT ?
                 currentToken.getPreviousToken() :
                 currentToken.getNextToken();
+
+        if(relToken == null)
+            return;
 
         act.addBindingSignal(
                 new BindingSignal(

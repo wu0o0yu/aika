@@ -37,8 +37,11 @@ public class InhibitoryActivation extends Activation<InhibitoryNeuron> {
 
     @Override
     public int[] getRange() {
-        return getPrimaryBranchBindingSignal()
-                .getBindingSignalAct()
+        BindingSignal bs = getPrimaryBranchBindingSignal();
+        if(bs == null)
+            return null;
+
+        return bs.getBindingSignalAct()
                 .getRange();
     }
 

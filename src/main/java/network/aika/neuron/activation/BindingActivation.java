@@ -91,6 +91,7 @@ public class BindingActivation extends Activation<BindingNeuron> {
                 .getRange();
     }
 
+
     private BindingSignal getPrimaryPatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
                 .filter(bs -> bs.getScope() == 1)

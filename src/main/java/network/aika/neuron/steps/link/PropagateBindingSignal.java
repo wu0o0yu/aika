@@ -69,7 +69,7 @@ public class PropagateBindingSignal extends Step<Link> {
         return new BindingSignal(
                 bs,
                 bs.getBindingSignalAct(),
-                l.getInput(),
+                l.getOutput(),
                 oScope,
                 (byte) (bs.getDepth() + 1)
         );
