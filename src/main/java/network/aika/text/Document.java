@@ -80,15 +80,13 @@ public class Document extends Thought {
         if(relToken == null)
             return;
 
-        act.addBindingSignal(
-                new BindingSignal(
-                        null,
-                        relToken,
-                        act,
-                        (byte)1,
-                        (byte)1
-                )
-        );
+        new BindingSignal(
+                null,
+                relToken,
+                act,
+                (byte) 1,
+                (byte) 1
+        ).link();
     }
 
     public void append(String txt) {

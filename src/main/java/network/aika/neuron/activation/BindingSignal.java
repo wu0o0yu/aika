@@ -22,8 +22,8 @@ package network.aika.neuron.activation;
 public class BindingSignal {
 
     private BindingSignal parent; // debugging
-    private Activation currentAct; // debugging
 
+    private Activation currentAct;
     private Activation bindingSignalAct;
     private byte scope;
     private byte depth;
@@ -34,6 +34,11 @@ public class BindingSignal {
         this.currentAct = currentAct;
         this.scope = scope;
         this.depth = depth;
+    }
+
+    public void link() {
+        currentAct.bindingSignals.put(getBindingSignalAct(), this);
+        getBindingSignalAct().registerBindingSignal(currentAct, this);
     }
 
     public Activation<?> getBindingSignalAct() {
