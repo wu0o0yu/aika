@@ -23,6 +23,7 @@ import network.aika.neuron.steps.activation.BranchProbability;
 import network.aika.neuron.steps.activation.SetFinalMode;
 import network.aika.utils.Utils;
 
+import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Stream;
@@ -94,8 +95,7 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
     private BindingSignal getPrimaryPatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
-                .filter(bs -> bs.getScope() == 1)
-                .findFirst()
+                .min(Comparator.comparing(bs -> bs.getBindingSignalAct().getFired()))
                 .orElse(null);
     }
 
