@@ -16,18 +16,21 @@
  */
 package network.aika.text;
 
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingSignal;
-import network.aika.neuron.activation.InhibitoryActivation;
-import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.excitatory.BindingNeuron;
+import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.excitatory.RelatedBNSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.util.Optional;
 
 import static network.aika.neuron.activation.direction.Direction.INPUT;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+import static network.aika.neuron.linker.LinkingTask.addNextLinkerSteps;
 
 
 /**
@@ -48,6 +51,16 @@ public class TokenActivation extends PatternActivation {
         rangeEnd = end;
     }
 
+    private static void addLink(Synapse s, Activation iAct, Activation oAct) {
+        Link nl = oAct.addLink(s, iAct, false);
+
+        addNextLinkerSteps(nl);
+    }
+
+    private static RelatedBNSynapse getRelSynapse(BindingNeuron n, InhibitoryNeuron relInhib) {
+        return (RelatedBNSynapse) n.getInputSynapse(relInhib.getProvider());
+    }
+
     public static void addRelation(TokenActivation prev, TokenActivation next) {
         if(prev == null || next == null)
             return;
@@ -56,12 +69,26 @@ public class TokenActivation extends PatternActivation {
         next.previousToken = prev;
 
         TextModel model = (TextModel) prev.getModel();
-        InhibitoryActivation inhibActPrev = next.getInhibTokenAct(model.getPrevTokenInhib());
+
         InhibitoryActivation inhibActNext = prev.getInhibTokenAct(model.getNextTokenInhib());
+        BindingActivation relActNext = getRelAct(inhibActNext);
+        RelatedBNSynapse relSynNext = getRelSynapse(relActNext.getNeuron(), model.getPrevTokenInhib());
 
+        InhibitoryActivation inhibActPrev = next.getInhibTokenAct(model.getPrevTokenInhib());
+        BindingActivation relActPrev = getRelAct(inhibActPrev);
+        RelatedBNSynapse relSynPrev = getRelSynapse(relActPrev.getNeuron(), model.getNextTokenInhib());
 
+        addLink(relSynNext, inhibActPrev, relActNext);
+        addLink(relSynPrev, inhibActNext, relActPrev);
     }
 
+    private static BindingActivation getRelAct(InhibitoryActivation inhibAct) {
+        return (BindingActivation) inhibAct
+                .getInputLinks()
+                .findFirst()
+                .orElse(null)
+                .getInput();
+    }
 
     private InhibitoryActivation getInhibTokenAct(InhibitoryNeuron inhibitoryNeuron) {
         return (InhibitoryActivation) reverseBindingSignals
