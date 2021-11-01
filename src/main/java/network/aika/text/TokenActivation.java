@@ -16,8 +16,18 @@
  */
 package network.aika.text;
 
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingSignal;
+import network.aika.neuron.activation.InhibitoryActivation;
 import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.inhibitory.InhibitoryNeuron;
+
+import java.util.Optional;
+
+import static network.aika.neuron.activation.direction.Direction.INPUT;
+import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 
 /**
@@ -44,6 +54,23 @@ public class TokenActivation extends PatternActivation {
 
         prev.nextToken = next;
         next.previousToken = prev;
+
+        TextModel model = (TextModel) prev.getModel();
+        InhibitoryActivation inhibActPrev = next.getInhibTokenAct(model.getPrevTokenInhib());
+        InhibitoryActivation inhibActNext = prev.getInhibTokenAct(model.getNextTokenInhib());
+
+
+    }
+
+
+    private InhibitoryActivation getInhibTokenAct(InhibitoryNeuron inhibitoryNeuron) {
+        return (InhibitoryActivation) reverseBindingSignals
+                .values()
+                .stream()
+                .map(bs -> bs.getCurrentAct())
+                .filter(act -> act.getNeuron() == inhibitoryNeuron)
+                .findFirst()
+                .orElse(null);
     }
 
     public TokenActivation getPreviousToken() {

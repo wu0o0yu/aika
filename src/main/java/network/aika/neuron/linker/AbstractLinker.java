@@ -55,9 +55,7 @@ public abstract class AbstractLinker {
     public void propagate(Activation act) {
         getTargetSynapses(act, OUTPUT)
                 .filter(s ->
-                        checkPropagate(act, s)
-                )
-                .filter(s ->
+                        checkPropagate(act, s) &&
                         !exists(act, OUTPUT, s)
                 )
                 .forEach(s ->
@@ -80,7 +78,9 @@ public abstract class AbstractLinker {
     public void link(Activation<?> fromAct, List<Direction> dirs, BindingSignal bindingSignal) {
         dirs.forEach(dir ->
             getTargetSynapses(fromAct, dir)
-                    .filter(ts -> ts.allowLinking(bindingSignal.getBindingSignalAct()))
+                    .filter(ts ->
+                            ts.allowLinking(bindingSignal.getBindingSignalAct())
+                    )
                     .forEach(ts ->
                             link(fromAct, dir, bindingSignal, ts)
                     )

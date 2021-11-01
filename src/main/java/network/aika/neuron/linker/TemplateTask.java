@@ -54,8 +54,7 @@ public class TemplateTask extends AbstractLinker {
 
     @Override
     protected boolean neuronMatches(Neuron<?, ?> currentN, Neuron<?, ?> targetN) {
-        return currentN.getTemplateGroup()
-                .stream()
+        return currentN.getTemplateGroup().stream()
                 .anyMatch(tn ->
                         tn.getId().intValue() == targetN.getId().intValue()
                 );

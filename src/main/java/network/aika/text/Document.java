@@ -44,59 +44,6 @@ public class Document extends Thought {
         }
     }
 
-    public void registerActivation(Activation act) {
-        super.registerActivation(act);
-
-        TokenActivation prevToken = getPreviousTokenActivation(act);
-        if(prevToken == null)
-            return;
-
-        TextModel model = (TextModel) act.getModel();
-        Optional<Activation> tokenInhibAct = prevToken.getReverseBindingSignals()
-                .values()
-                .stream()
-                .filter(bs -> bs.getBindingSignalAct().getNeuron() == model.getNextTokenInhib())
-                .map(bs -> bs.getCurrentAct())
-                .findFirst();
-
-        if(!tokenInhibAct.isPresent())
-            return;
-
-        addRelationBindingSignal((TokenActivation) act, (InhibitoryActivation) tokenInhibAct.get());
-    }
-
-    public void registerBindingSignal(Activation act, BindingSignal bs) {
-        TextModel model = (TextModel) act.getModel();
-
-        if(act.getNeuron() != model.getPrevTokenInhib())
-            return;
-
-        TokenActivation prevToken = getPreviousTokenActivation(bs.getBindingSignalAct());
-        if (prevToken == null)
-            return;
-
-        addRelationBindingSignal(prevToken, (InhibitoryActivation) act);
-    }
-
-    private TokenActivation getPreviousTokenActivation(Activation act) {
-        if(!(act instanceof TokenActivation))
-            return null;
-
-        TokenActivation currentToken = (TokenActivation) act;
-        TokenActivation prevToken = currentToken.getPreviousToken();
-        return prevToken;
-    }
-
-    private void addRelationBindingSignal(TokenActivation relToken, InhibitoryActivation currentAct) {
-        new BindingSignal(
-                null,
-                relToken,
-                currentAct,
-                (byte) 1,
-                (byte) 1
-        ).link();
-    }
-
     public void append(String txt) {
         content.append(txt);
     }

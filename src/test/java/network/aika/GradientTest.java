@@ -24,9 +24,7 @@ public class GradientTest {
                 .setLearnRate(-0.1)
                 .setEnableTraining(true)
         );
-
-        processDoc(m, doc);
-
+/*
         Neuron nA = m.getNeuron("A");
         nA.setFrequency(53.0);
         nA.getSampleSpace().setN(299);
@@ -37,11 +35,11 @@ public class GradientTest {
         nB.setFrequency(10.0);
         nB.getSampleSpace().setN(121);
         nB.getSampleSpace().setOffset(739l);
-
+*/
 
         AikaDebugger.createAndShowGUI(doc,m);
 
-        doc.process(m);
+        processDoc(m, doc);
 
         System.out.println();
     }
@@ -63,8 +61,6 @@ public class GradientTest {
         );
 
         processDoc(m, doc);
-
-        m.getTemplates().SAME_BINDING_TEMPLATE.addConjunctiveBias(-0.32);
 
         Neuron nA = m.getNeuron("A");
         nA.setFrequency(53.0);
@@ -151,7 +147,10 @@ public class GradientTest {
         for(String t: doc.getContent().split(" ")) {
             int j = i + t.length();
             TokenActivation currentToken = doc.addToken(m, t, i, j);
+            doc.process(m);
+
             TokenActivation.addRelation(lastToken, currentToken);
+            doc.process(m);
 
             lastToken = currentToken;
             i = j + 1;
