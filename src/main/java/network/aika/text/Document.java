@@ -17,15 +17,14 @@
 package network.aika.text;
 
 import network.aika.Thought;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingSignal;
-import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.InhibitoryActivation;
 import network.aika.neuron.excitatory.PatternNeuron;
-import network.aika.neuron.steps.activation.AddInputActivation;
+import network.aika.neuron.steps.activation.CheckIfFired;
 
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
+import java.util.Optional;
+
 
 /**
  * The {@code Document} class represents a single document which may be either used for processing a text or as
@@ -44,46 +43,55 @@ public class Document extends Thought {
             this.content.append(content);
         }
     }
-/*
+
     public void registerActivation(Activation act) {
         super.registerActivation(act);
-        TextModel model = (TextModel) act.getModel();
 
-        Neuron n = act.getNeuron();
-        if(n == model.getPrevTokenInhib()) {
-            addRelationBindingSignal(act, INPUT);
-        } else if(n == model.getNextTokenInhib()) {
-            addRelationBindingSignal(act, OUTPUT);
-        }
+        TokenActivation prevToken = getPreviousTokenActivation(act);
+        if(prevToken == null)
+            return;
+
+        TextModel model = (TextModel) act.getModel();
+        Optional<Activation> tokenInhibAct = prevToken.getReverseBindingSignals()
+                .values()
+                .stream()
+                .filter(bs -> bs.getBindingSignalAct().getNeuron() == model.getNextTokenInhib())
+                .map(bs -> bs.getCurrentAct())
+                .findFirst();
+
+        if(!tokenInhibAct.isPresent())
+            return;
+
+        addRelationBindingSignal((TokenActivation) act, (InhibitoryActivation) tokenInhibAct.get());
     }
-    */
+
     public void registerBindingSignal(Activation act, BindingSignal bs) {
         TextModel model = (TextModel) act.getModel();
 
-        Neuron n = act.getNeuron();
-        if(n == model.getPrevTokenInhib()) {
-            addRelationBindingSignal(act, bs, INPUT);
-        } else if(n == model.getNextTokenInhib()) {
-            addRelationBindingSignal(act, bs, OUTPUT);
-        }
+        if(act.getNeuron() != model.getPrevTokenInhib())
+            return;
+
+        TokenActivation prevToken = getPreviousTokenActivation(bs.getBindingSignalAct());
+        if (prevToken == null)
+            return;
+
+        addRelationBindingSignal(prevToken, (InhibitoryActivation) act);
     }
 
-    private void addRelationBindingSignal(Activation<?> act, BindingSignal bs, Direction dir) {
-        if(!(bs.getBindingSignalAct() instanceof TokenActivation))
-            return;
+    private TokenActivation getPreviousTokenActivation(Activation act) {
+        if(!(act instanceof TokenActivation))
+            return null;
 
-        TokenActivation currentToken = (TokenActivation) bs.getBindingSignalAct();
-        TokenActivation relToken = dir == INPUT ?
-                currentToken.getPreviousToken() :
-                currentToken.getNextToken();
+        TokenActivation currentToken = (TokenActivation) act;
+        TokenActivation prevToken = currentToken.getPreviousToken();
+        return prevToken;
+    }
 
-        if(relToken == null)
-            return;
-
+    private void addRelationBindingSignal(TokenActivation relToken, InhibitoryActivation currentAct) {
         new BindingSignal(
                 null,
                 relToken,
-                act,
+                currentAct,
                 (byte) 1,
                 (byte) 1
         ).link();
@@ -130,7 +138,11 @@ public class Document extends Thought {
 
         act.setInputValue(1.0);
 
-        AddInputActivation.add(act);
+        act.updateValue();
+        act.init(null, null);
+        act.setFired();
+        CheckIfFired.propagate(act);
+
         return act;
     }
 

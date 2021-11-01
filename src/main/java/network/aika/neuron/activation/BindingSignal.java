@@ -45,6 +45,10 @@ public class BindingSignal {
         return bindingSignalAct;
     }
 
+    public Activation getCurrentAct() {
+        return currentAct;
+    }
+
     public byte getScope() {
         return scope;
     }
