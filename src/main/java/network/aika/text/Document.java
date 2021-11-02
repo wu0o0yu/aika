@@ -17,6 +17,7 @@
 package network.aika.text;
 
 import network.aika.Thought;
+import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingSignal;
 import network.aika.neuron.activation.InhibitoryActivation;
@@ -71,13 +72,17 @@ public class Document extends Thought {
         }
     }
 
-    public String getText(Activation<?> act) {
+    public static String getText(Activation<?> act) {
         int[] r = act.getRange();
-        return getTextSegment(r[0], r[1]);
+        return ((Document)act.getThought()).getTextSegment(r[0], r[1]);
     }
 
     public TokenActivation addToken(TextModel m, String token, int begin, int end) {
         return addToken(m.lookupToken(token), begin, end);
+    }
+
+    public TokenActivation addToken(NeuronProvider n, int begin, int end) {
+        return addToken((PatternNeuron) n.getNeuron(), begin, end);
     }
 
     public TokenActivation addToken(PatternNeuron n, int begin, int end) {
