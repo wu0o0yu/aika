@@ -426,14 +426,4 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
                 " in:[" + input.getNeuron() + "](" + (isInputLinked() ? "+" : "-") + ")" +
                 " --> out:[" + output.getNeuron() + "](" + (isOutputLinked() ? "+" : "-") + ")";
     }
-
-    public String statToString() {
-        long n = getModel().getN();
-        return "f:" + Utils.round(getInput().getFrequency()) + " " +
-                "N:" + Utils.round(n) + " " +
-                "s(p,p):" + Utils.round(getSurprisal(POS, POS, null)) + " " +
-                "s(n,p):" + Utils.round(getSurprisal(NEG, POS, null)) + " " +
-                "s(p,n):" + Utils.round(getSurprisal(POS, NEG, null)) + " " +
-                "s(n,n):" + Utils.round(getSurprisal(NEG, NEG, null)) + " \n";
-    }
 }

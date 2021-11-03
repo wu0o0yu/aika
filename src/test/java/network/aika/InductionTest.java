@@ -77,7 +77,6 @@ public class InductionTest {
         targetN.getSampleSpace().setN(100);
         targetN.setFrequency(0.0);
 
-        System.out.println(targetN.statToString());
         System.out.println();
 
         // -----------------------------------------

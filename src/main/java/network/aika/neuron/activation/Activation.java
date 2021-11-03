@@ -36,6 +36,7 @@ import static network.aika.neuron.activation.BindingActivation.MAX_BINDING_ACT;
 import static network.aika.neuron.activation.BindingActivation.MIN_BINDING_ACT;
 import static network.aika.neuron.activation.PatternActivation.MAX_PATTERN_ACT;
 import static network.aika.neuron.activation.PatternActivation.MIN_PATTERN_ACT;
+import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.sign.Sign.POS;
 import static network.aika.utils.Utils.logChange;
 
@@ -45,22 +46,16 @@ import static network.aika.utils.Utils.logChange;
 public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public static double INITIAL_NET = -0.001;
-    public static long NOT_SET = -1;
 
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(Activation::getId);
-
-    public static final Comparator<Long> TIMESTAMP_COMPARATOR_NF_FIRST = Comparator
-            .<Long>comparingInt(ts -> ts == NOT_SET ? 0 : 1)
-            .thenComparingLong(ts -> ts);
-
 
     protected double value = 0.0;
     protected Double inputValue = null;
     protected double net;
     protected double lastNet = INITIAL_NET;
 
-    protected long creationTimestamp = NOT_SET;
-    protected long fired = NOT_SET;
+    protected Timestamp creationTimestamp = NOT_SET;
+    protected Timestamp fired = NOT_SET;
 
     protected final int id;
     protected N neuron;
@@ -136,7 +131,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return outputGradientSum;
     }
 
-    public long getCreationTimestamp() {
+    public Timestamp getCreationTimestamp() {
         return creationTimestamp;
     }
 
@@ -144,7 +139,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this.creationTimestamp = thought.getCurrentTimestamp();
     }
 
-    public long getFired() {
+    public Timestamp getFired() {
         return fired;
     }
 
@@ -152,7 +147,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return fired != NOT_SET;
     }
 
-    public void setFired(long f) {
+    public void setFired(Timestamp f) {
         fired = f;
     }
 
@@ -478,10 +473,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         if (!(o instanceof Activation)) return false;
         Activation<?> that = (Activation<?>) o;
         return id == that.id;
-    }
-
-    public static String timestampToString(long timestamp) {
-        return timestamp == NOT_SET ? "[NOT_SET]" : "" + timestamp;
     }
 
     @Override

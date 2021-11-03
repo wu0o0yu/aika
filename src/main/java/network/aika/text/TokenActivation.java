@@ -94,6 +94,7 @@ public class TokenActivation extends PatternActivation {
         return (InhibitoryActivation) reverseBindingSignals
                 .values()
                 .stream()
+                .filter(bs -> bs.getScope() == 0)
                 .map(bs -> bs.getCurrentAct())
                 .filter(act -> act.getNeuron() == inhibitoryNeuron)
                 .findFirst()

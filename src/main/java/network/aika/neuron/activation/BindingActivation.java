@@ -28,6 +28,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.activation.Timestamp.NOT_SET;
+
 /**
  * @author Lukas Molzberger
  */
@@ -38,7 +40,7 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
 
     private boolean finalMode = false;
-    private long finalTimestamp = NOT_SET;
+    private Timestamp finalTimestamp = NOT_SET;
 
     private final Set<BindingActivation> branches = new TreeSet<>();
     private BindingActivation mainBranch;
@@ -92,7 +94,6 @@ public class BindingActivation extends Activation<BindingNeuron> {
                 .getRange();
     }
 
-
     private BindingSignal getPrimaryPatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
                 .min(Comparator.comparing(bs -> bs.getBindingSignalAct().getFired()))
@@ -107,7 +108,7 @@ public class BindingActivation extends Activation<BindingNeuron> {
         this.finalMode = finalMode;
     }
 
-    public long getFinalTimestamp() {
+    public Timestamp getFinalTimestamp() {
         return finalTimestamp;
     }
 

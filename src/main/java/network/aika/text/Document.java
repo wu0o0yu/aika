@@ -58,14 +58,13 @@ public class Document extends Thought {
     }
 
     public String getTextSegment(Integer begin, Integer end) {
-        if(begin != null && end != null) {
-            return content.substring(
-                    Math.max(0, Math.min(begin, length())),
-                    Math.max(0, Math.min(end, length()))
-            );
-        } else {
+        if(begin == null || end == null)
             return "";
-        }
+
+        return content.substring(
+                Math.max(0, Math.min(begin, length())),
+                Math.max(0, Math.min(end, length()))
+        );
     }
 
     public static String getText(Activation<?> act) {
@@ -85,7 +84,6 @@ public class Document extends Thought {
         TokenActivation act = new TokenActivation(createActivationId(), begin, end, this, n);
 
         act.setInputValue(1.0);
-
         act.updateValue();
         act.init(null, null);
         act.setFired();

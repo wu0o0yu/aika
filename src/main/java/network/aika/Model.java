@@ -232,14 +232,6 @@ public abstract class Model implements Writable {
         N = in.readLong();
     }
 
-    public String statToString() {
-        return providers.values().stream()
-                .map(Reference::get)
-                .map(NeuronProvider::getNeuron)
-                .map(n -> n.statToString() + "\n")
-                .collect(Collectors.joining());
-    }
-
     public String toString() {
         return "N:" + N;
     }

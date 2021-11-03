@@ -58,6 +58,6 @@ public class BindingSignal {
     }
 
     public String toString() {
-        return "[id:" + bindingSignalAct.getId() + ",s:" + scope + ",d:" + depth + "]";
+        return "[" + bindingSignalAct.getId() + ":" + bindingSignalAct.getLabel() + ",s:" + scope + ",d:" + depth + "]";
     }
 }

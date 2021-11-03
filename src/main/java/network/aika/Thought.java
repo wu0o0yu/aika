@@ -21,10 +21,7 @@ import network.aika.callbacks.EventListener;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingSignal;
-import network.aika.neuron.activation.Element;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
 
@@ -38,7 +35,7 @@ import java.util.stream.Collectors;
 public abstract class Thought {
     private long absoluteBegin;
 
-    private long timestampOnProcess = 0;
+    private Timestamp timestampOnProcess = new Timestamp(0);
     private long timestampCounter = 0;
     private int activationIdCounter = 0;
 
@@ -150,7 +147,7 @@ public abstract class Thought {
         while (!queue.isEmpty()) {
             Step s = queue.pollFirst();
 
-            timestampOnProcess = timestampCounter;
+            timestampOnProcess = getCurrentTimestamp();
 
             s.getElement().removeQueuedPhase(s);
 
@@ -161,16 +158,16 @@ public abstract class Thought {
         m.addToN(length());
     }
 
-    public long getTimestampOnProcess() {
+    public Timestamp getTimestampOnProcess() {
         return timestampOnProcess;
     }
 
-    public long getCurrentTimestamp() {
-        return timestampCounter;
+    public Timestamp getCurrentTimestamp() {
+        return new Timestamp(timestampCounter);
     }
 
-    public long getNextTimestamp() {
-        return timestampCounter++;
+    public Timestamp getNextTimestamp() {
+        return new Timestamp(timestampCounter++);
     }
 
     public <E extends Element> List<Step> getStepsByElement(E element) {

@@ -57,7 +57,7 @@ public class BranchProbability extends Step<BindingActivation> {
     }
 
     @Override
-    public void process() {
+    public void process() { // TODO: Use branch binding signal
         BindingActivation act = getElement();
         Stream<Link> linksStream = act.getBranches()
                 .stream()

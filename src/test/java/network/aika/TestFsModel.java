@@ -49,7 +49,7 @@ public class TestFsModel {
     private Document generateDocument(TextModel m, String txt, boolean train) {
         Document doc = new Document(txt);
 
-        Config c = new TestConfig()
+        Config c = Util.getTestConfig()
                 .setAlpha(0.99)
                 .setLearnRate(-0.011)
                 .setEnableTraining(train);

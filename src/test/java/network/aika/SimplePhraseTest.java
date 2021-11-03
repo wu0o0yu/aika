@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
+import static network.aika.Util.getTestConfig;
+
 public class SimplePhraseTest {
 
     public String[] phrases = new String[]{
@@ -33,23 +35,7 @@ public class SimplePhraseTest {
     @Test
     public void simplePhraseTest() {
         TextModel model = new TextModel();
-        Config c = new Config() {
-                    public String getLabel(Activation<?> act) {
-                        Neuron n = act.getNeuron();
-                        Activation iAct = act.getInputLinks()
-                                .findFirst()
-                                .map(l -> l.getInput())
-                                .orElse(null);
-
-                        if(n instanceof BindingNeuron) {
-                            return "B-" + trimPrefix(iAct.getLabel());
-                        } else if (n instanceof PatternNeuron) {
-                            return "P-" + ((Document)act.getThought()).getContent();
-                        } else {
-                            return "I-" + trimPrefix(iAct.getLabel());
-                        }
-                    }
-                }
+        Config c = getTestConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
                         .setEnableTraining(false);
@@ -61,7 +47,8 @@ public class SimplePhraseTest {
             System.out.println("  " + phrase);
 
             Document doc = new Document(phrase);
-            doc.getConfig().setEnableTraining(k > 100);
+            doc.setConfig(c);
+            c.setEnableTraining(k > 100);
 
             int i = 0;
             TokenActivation lastToken = null;

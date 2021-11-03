@@ -25,7 +25,7 @@ import network.aika.utils.Utils;
 
 import java.util.Comparator;
 
-import static network.aika.neuron.activation.Activation.NOT_SET;
+import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.sign.Sign.POS;
 
 /**
@@ -59,7 +59,7 @@ public class Link<A extends Activation> extends Element<Link> {
     }
 
     @Override
-    public long getFired() {
+    public Timestamp getFired() {
         return output.getFired();
     }
 
@@ -164,7 +164,7 @@ public class Link<A extends Activation> extends Element<Link> {
     }
 
     public boolean isCausal() {
-        return input == null || input.getFired() < output.getFired();
+        return input == null || input.getFired().compareTo(output.getFired()) < 0;
     }
 
     public boolean isForward() {
@@ -175,7 +175,7 @@ public class Link<A extends Activation> extends Element<Link> {
         if(!iAct.isFired())
             return false;
 
-        return oAct.getFired() == NOT_SET || iAct.getFired() < oAct.getFired();
+        return oAct.getFired() == NOT_SET || iAct.getFired().compareTo(oAct.getFired()) < 0;
     }
 
     public void linkInput() {

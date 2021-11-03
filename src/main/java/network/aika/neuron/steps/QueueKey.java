@@ -16,6 +16,8 @@
  */
 package network.aika.neuron.steps;
 
+import network.aika.neuron.activation.Timestamp;
+
 /**
  * @author Lukas Molzberger
  */
@@ -23,13 +25,13 @@ public interface QueueKey {
 
     String getStepName();
 
-    long getTimeStamp();
+    Timestamp getTimestamp();
 
     class DummyStep implements QueueKey {
         private final Step s;
-        private final long timestamp;
+        private final Timestamp timestamp;
 
-        public DummyStep(Step s, long timestamp) {
+        public DummyStep(Step s, Timestamp timestamp) {
             this.s = s;
             this.timestamp = timestamp;
         }
@@ -40,7 +42,7 @@ public interface QueueKey {
         }
 
         @Override
-        public long getTimeStamp() {
+        public Timestamp getTimestamp() {
             return timestamp;
         }
     }

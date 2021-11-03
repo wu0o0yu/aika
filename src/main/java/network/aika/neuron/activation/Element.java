@@ -34,10 +34,10 @@ public abstract class Element<E extends Element> implements Comparable<E> {
     private NavigableMap<QueueKey, Step> queuedSteps = new TreeMap<>(
             Comparator
                     .<QueueKey, String>comparing(s -> s.getStepName())
-                    .thenComparing(s -> s.getTimeStamp())
+                    .thenComparing(s -> s.getTimestamp())
     );
 
-    public abstract long getFired();
+    public abstract Timestamp getFired();
 
     public void addQueuedStep(Step s) {
         queuedSteps.put(s, s);
@@ -45,8 +45,8 @@ public abstract class Element<E extends Element> implements Comparable<E> {
 
     public boolean isQueued(Step s) {
         return !queuedSteps.subMap(
-                new QueueKey.DummyStep(s, Long.MIN_VALUE),
-                new QueueKey.DummyStep(s, Long.MAX_VALUE)
+                new QueueKey.DummyStep(s, Timestamp.MIN),
+                new QueueKey.DummyStep(s, Timestamp.MAX)
         ).isEmpty();
     }
 

@@ -108,12 +108,12 @@ public class TextModel extends Model {
         return in;
     }
 
-    private void initRelationNeuron(String label, PatternNeuron in, BindingNeuron inRel, InhibitoryNeuron inhib, boolean b) {
+    private void initRelationNeuron(String label, PatternNeuron in, BindingNeuron inRel, InhibitoryNeuron inhib, boolean recurrent) {
         inRel.setInputNeuron(true);
         inRel.setLabel(label);
 
         initRecurrentSamePatternSynapse(in, inRel);
-        initRelatedInputSynapse(inRel, inhib, b);
+        initRelatedInputSynapse(inRel, inhib, recurrent);
 
         inRel.addBias(4.0);
         inRel.setAllowTraining(false);

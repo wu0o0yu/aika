@@ -151,45 +151,4 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
         conjunctiveBias = in.readDouble();
         weightSum = in.readDouble();
     }
-
-    public String toStringWithSynapses() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(toDetailedString());
-        sb.append("\n");
-        for (Synapse s : inputSynapses.values()) {
-            sb.append("  ");
-            sb.append(s.toString());
-            sb.append("\n");
-        }
-        return sb.toString();
-    }
-
-    public String statToString() {
-        return super.statToString() +
-                inStatToString() +
-                outStatToString();
-    }
-
-    public String inStatToString() {
-        return inputSynapses.values().stream()
-                .map(s ->
-                        "  in " +
-                        s.getInput().getId() +
-                        ":" + s.getInput().getLabel() +
-                        " " + s.statToString()
-                )
-                .collect(Collectors.joining());
-    }
-
-    public String outStatToString() {
-        return outputSynapses.values().stream()
-                .filter(s -> s instanceof InhibitorySynapse)
-                .map(s ->
-                        "  out " +
-                        s.getOutput().getId() +
-                        ":" + s.getOutput().getLabel() +
-                        "  " + s.statToString()
-                )
-                .collect(Collectors.joining());
-    }
 }

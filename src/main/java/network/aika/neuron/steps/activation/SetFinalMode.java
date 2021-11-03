@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.steps.activation;
 
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.sign.Sign;
@@ -27,7 +26,7 @@ import network.aika.neuron.steps.UpdateNet;
 
 import java.util.stream.Stream;
 
-import static network.aika.neuron.activation.Activation.NOT_SET;
+import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.steps.activation.CheckIfFired.propagate;
 
 /**

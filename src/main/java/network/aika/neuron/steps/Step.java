@@ -17,10 +17,12 @@
 package network.aika.neuron.steps;
 
 import network.aika.neuron.activation.Element;
+import network.aika.neuron.activation.Timestamp;
 
 import java.util.Comparator;
 
-import static network.aika.neuron.activation.Activation.NOT_SET;
+import static network.aika.neuron.activation.Timestamp.NOT_SET;
+
 
 /**
  * @author Lukas Molzberger
@@ -30,20 +32,21 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
     public static final Comparator<Step> COMPARATOR = Comparator
             .<Step>comparingInt(s -> s.getPhase().ordinal())
             .thenComparingInt(s -> s.fired == NOT_SET ? 0 : 1)
-            .thenComparingLong(s -> s.fired)
+            .thenComparing(s -> s.fired)
             .thenComparing(s -> s.timestamp);
 
     private E element;
 
-    protected long fired;
-    private long timestamp;
+    protected Timestamp fired;
+    private Timestamp timestamp;
 
     public Step(E element) {
         this.element = element;
         this.fired = element.getFired();
+        this.timestamp = NOT_SET;
     }
 
-    public Step(E element, long timestamp) {
+    public Step(E element, Timestamp timestamp) {
         this.element = element;
         this.fired = element.getFired();
         this.timestamp = timestamp;
@@ -79,15 +82,15 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
         s.getElement().getThought().addStep(s);
     }
 
-    public long getFired() {
+    public Timestamp getFired() {
         return fired;
     }
 
-    public long getTimeStamp() {
+    public Timestamp getTimestamp() {
         return timestamp;
     }
 
-    public void setTimeStamp(long timestamp) {
+    public void setTimeStamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
 

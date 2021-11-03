@@ -139,7 +139,7 @@ public class MutualExclusionTest {
 
         Document doc = new Document("test");
 
-        Config c = new TestConfig()
+        Config c = Util.getTestConfig()
                 .setAlpha(0.99)
                 .setLearnRate(-0.011)
                 .setEnableTraining(true);
@@ -239,7 +239,7 @@ public class MutualExclusionTest {
 
         Document doc = new Document("test");
 
-        Config c = new TestConfig()
+        Config c = Util.getTestConfig()
                 .setAlpha(0.99)
                 .setLearnRate(-0.011)
                 .setEnableTraining(true);
