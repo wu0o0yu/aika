@@ -19,12 +19,8 @@ package network.aika.text;
 import network.aika.Thought;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingSignal;
-import network.aika.neuron.activation.InhibitoryActivation;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.steps.activation.CheckIfFired;
-
-import java.util.Optional;
 
 
 /**
