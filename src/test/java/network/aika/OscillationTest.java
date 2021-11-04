@@ -17,7 +17,7 @@ public class OscillationTest {
 
         m.setN(912);
 
-        Document doc = new Document("A ");
+        Document doc = new Document(m, "A ");
         doc.setConfig(
                 new Config() {
                     public String getLabel(Activation act) {
@@ -50,7 +50,8 @@ public class OscillationTest {
 
         doc.addToken(nA, 0, 1);
 
-        doc.process(m);
+        doc.process();
+        doc.updateModel();
 
         System.out.println();
     }

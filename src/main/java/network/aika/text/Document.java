@@ -29,12 +29,12 @@ import network.aika.neuron.steps.activation.CheckIfFired;
  *
  * @author Lukas Molzberger
  */
-public class Document extends Thought {
+public class Document extends Thought<TextModel> {
 
     private final StringBuilder content;
 
-    public Document(String content) {
-        super();
+    public Document(TextModel model, String content) {
+        super(model);
         this.content = new StringBuilder();
         if(content != null) {
             this.content.append(content);
@@ -72,8 +72,8 @@ public class Document extends Thought {
         return ((Document)act.getThought()).getTextSegment(r[0], r[1]);
     }
 
-    public TokenActivation addToken(TextModel m, String token, int begin, int end) {
-        return addToken(m.lookupToken(token), begin, end);
+    public TokenActivation addToken(String token, int begin, int end) {
+        return addToken(model.lookupToken(token), begin, end);
     }
 
     public TokenActivation addToken(NeuronProvider n, int begin, int end) {

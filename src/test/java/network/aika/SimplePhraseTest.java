@@ -46,7 +46,7 @@ public class SimplePhraseTest {
             String phrase = phrases[r.nextInt(phrases.length)];
             System.out.println("  " + phrase);
 
-            Document doc = new Document(phrase);
+            Document doc = new Document(model, phrase);
             doc.setConfig(c);
             c.setEnableTraining(k > 100);
 
@@ -54,14 +54,15 @@ public class SimplePhraseTest {
             TokenActivation lastToken = null;
             for(String t: doc.getContent().split(" ")) {
                 int j = i + t.length();
-                TokenActivation currentToken = doc.addToken(model, t, i, j);
+                TokenActivation currentToken = doc.addToken(t, i, j);
                 TokenActivation.addRelation(lastToken, currentToken);
 
                 lastToken = currentToken;
                 i = j + 1;
             }
 
-            doc.process(model);
+            doc.process();
+            doc.updateModel();
 
             System.out.println(doc.toString(true));
         }

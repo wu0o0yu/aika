@@ -39,7 +39,7 @@ public class MutualExclusionTest {
 
     @Test
     public void testPropagation() {
-        Model m = new TextModel();
+        TextModel m = new TextModel();
         m.init();
         Templates t = m.getTemplates();
 
@@ -137,7 +137,7 @@ public class MutualExclusionTest {
         }
 
 
-        Document doc = new Document("test");
+        Document doc = new Document(m, "test");
 
         Config c = Util.getTestConfig()
                 .setAlpha(0.99)
@@ -147,7 +147,8 @@ public class MutualExclusionTest {
 
         doc.addToken(in, 0, 4);
 
-        doc.process(m);
+        doc.process();
+        doc.updateModel();
 
         System.out.println(doc);
 
@@ -161,7 +162,7 @@ public class MutualExclusionTest {
 
     @Test
     public void testPropagationWithPrimaryLink() {
-        Model m = new TextModel();
+        TextModel m = new TextModel();
         m.init();
         Templates t = m.getTemplates();
 
@@ -237,7 +238,7 @@ public class MutualExclusionTest {
         }
 
 
-        Document doc = new Document("test");
+        Document doc = new Document(m, "test");
 
         Config c = Util.getTestConfig()
                 .setAlpha(0.99)
@@ -249,7 +250,8 @@ public class MutualExclusionTest {
 
         AikaDebugger.createAndShowGUI(doc,m);
 
-        doc.process(m);
+        doc.process();
+        doc.updateModel();
 
         System.out.println(doc);
         System.out.println();

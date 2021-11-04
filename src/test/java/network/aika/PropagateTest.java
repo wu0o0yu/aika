@@ -32,7 +32,7 @@ public class PropagateTest {
 
     @Test
     public void testPropagation() {
-        Model m = new TextModel();
+        TextModel m = new TextModel();
         Templates t = new Templates(m);
 
         PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
@@ -50,7 +50,7 @@ public class PropagateTest {
         out.addConjunctiveBias(-10.0);
         out.addBias(1.0);
 
-        Document doc = new Document("test");
+        Document doc = new Document(m, "test");
 
         doc.addToken(in, 0, 4);
 

@@ -30,7 +30,8 @@ public class TestFsModel {
             AikaDebugger debugger = AikaDebugger.createAndShowGUI(doc, m);
             debugger.setStepMode(StepMode.ACT);
 
-            doc.process(m);
+            doc.process();
+            doc.updateModel();
         }
 
 
@@ -40,14 +41,15 @@ public class TestFsModel {
             AikaDebugger debugger = AikaDebugger.createAndShowGUI(doc, m);
             debugger.setStepMode(StepMode.ACT);
 
-            doc.process(m);
+            doc.process();
+            doc.updateModel();
         }
 
         m.close();
     }
 
     private Document generateDocument(TextModel m, String txt, boolean train) {
-        Document doc = new Document(txt);
+        Document doc = new Document(m, txt);
 
         Config c = Util.getTestConfig()
                 .setAlpha(0.99)
@@ -59,7 +61,7 @@ public class TestFsModel {
         TokenActivation lastToken = null;
         for(String t: doc.getContent().split(" ")) {
             int j = i + t.length();
-            TokenActivation currentToken = doc.addToken(m,"W-" + t, i, j);
+            TokenActivation currentToken = doc.addToken("W-" + t, i, j);
             TokenActivation.addRelation(lastToken, currentToken);
 
             lastToken = currentToken;

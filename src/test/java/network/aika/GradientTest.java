@@ -17,7 +17,7 @@ public class GradientTest {
         m.setN(912);
         m.init();
 
-        Document doc = new Document("A B ");
+        Document doc = new Document(m, "A B ");
         doc.setConfig(
                 Util.getTestConfig()
                 .setAlpha(0.99)
@@ -39,7 +39,7 @@ public class GradientTest {
 
         AikaDebugger.createAndShowGUI(doc,m);
 
-        processDoc(m, doc);
+        processDoc(doc);
 
         System.out.println();
     }
@@ -52,7 +52,7 @@ public class GradientTest {
         m.setN(912);
         m.init();
 
-        Document doc = new Document("A B C ");
+        Document doc = new Document(m, "A B C ");
         doc.setConfig(
                 Util.getTestConfig()
                         .setAlpha(0.99)
@@ -60,7 +60,7 @@ public class GradientTest {
                         .setEnableTraining(true)
         );
 
-        processDoc(m, doc);
+        processDoc(doc);
 
         Neuron nA = m.getNeuron("A");
         nA.setFrequency(53.0);
@@ -82,7 +82,8 @@ public class GradientTest {
 
         AikaDebugger.createAndShowGUI(doc,m);
 
-        doc.process(m);
+        doc.process();
+        doc.updateModel();
 
         System.out.println();
     }
@@ -96,14 +97,14 @@ public class GradientTest {
         m.getTemplates().SAME_BINDING_TEMPLATE.addConjunctiveBias(-0.32);
         m.init();
 
-        Document doc1 = new Document("A B ");
+        Document doc1 = new Document(m, "A B ");
         doc1.setConfig(
                 Util.getTestConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
                         .setEnableTraining(true)
         );
-        processDoc(m, doc1);
+        processDoc(doc1);
 
         Neuron nA = m.getNeuron("A");
         nA.setFrequency(53.0);
@@ -117,17 +118,17 @@ public class GradientTest {
 
         AikaDebugger.createAndShowGUI(doc1,m);
 
-        doc1.process(m);
+        doc1.process();
+        doc1.updateModel();
 
-
-        Document doc2 = new Document("A C ");
+        Document doc2 = new Document(m, "A C ");
         doc2.setConfig(
                 Util.getTestConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
                         .setEnableTraining(true)
         );
-        processDoc(m, doc2);
+        processDoc(doc2);
 
         Neuron nC = m.getNeuron("C");
         nC.setFrequency(30.0);
@@ -136,24 +137,27 @@ public class GradientTest {
 
         AikaDebugger.createAndShowGUI(doc2,m);
 
-        doc2.process(m);
+        doc2.process();
+        doc2.updateModel();
 
         System.out.println();
     }
 
-    private void processDoc(TextModel m, Document doc) {
+    private void processDoc(Document doc) {
         int i = 0;
         TokenActivation lastToken = null;
         for(String t: doc.getContent().split(" ")) {
             int j = i + t.length();
-            TokenActivation currentToken = doc.addToken(m, t, i, j);
-            doc.process(m);
+            TokenActivation currentToken = doc.addToken(t, i, j);
+            doc.process();
 
             TokenActivation.addRelation(lastToken, currentToken);
-            doc.process(m);
+            doc.process();
 
             lastToken = currentToken;
             i = j + 1;
         }
+
+        doc.updateModel();
     }
 }

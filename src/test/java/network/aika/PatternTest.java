@@ -37,17 +37,18 @@ public class PatternTest {
     public void testPatternPos() {
         TextModel m = initModel();
 
-        Document doc = new Document("ABC");
+        Document doc = new Document(m, "ABC");
 
-        TokenActivation refA = doc.addToken(m,  "A", 0, 1);
-        TokenActivation refB = doc.addToken(m,  "B", 1, 2);
-        TokenActivation refC = doc.addToken(m,  "C", 2, 3);
+        TokenActivation refA = doc.addToken("A", 0, 1);
+        TokenActivation refB = doc.addToken("B", 1, 2);
+        TokenActivation refC = doc.addToken("C", 2, 3);
         TokenActivation.addRelation(refA, refB);
         TokenActivation.addRelation(refB, refC);
 
         System.out.println(doc);
 
-        doc.process(m);
+        doc.process();
+        doc.updateModel();
 
         System.out.println(doc);
     }
@@ -57,13 +58,14 @@ public class PatternTest {
     public void testPatternNeg() {
         TextModel m = initModel();
 
-        Document doc = new Document("ABC");
+        Document doc = new Document(m, "ABC");
 
-        TokenActivation refA = doc.addToken(m,  "A", 0, 1);
-        TokenActivation refB = doc.addToken(m,  "B", 1, 2);
+        TokenActivation refA = doc.addToken("A", 0, 1);
+        TokenActivation refB = doc.addToken("B", 1, 2);
         TokenActivation.addRelation(refA, refB);
 
-        doc.process(m);
+        doc.process();
+        doc.updateModel();
 
         System.out.println(doc);
     }

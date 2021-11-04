@@ -32,7 +32,9 @@ import java.util.stream.Collectors;
  *
  * @author Lukas Molzberger
  */
-public abstract class Thought {
+public abstract class Thought<M extends Model> {
+
+    protected final M model;
     private long absoluteBegin;
 
     private Timestamp timestampOnProcess = new Timestamp(0);
@@ -52,7 +54,17 @@ public abstract class Thought {
     private Config config;
 
 
-    public Thought() {
+    public Thought(M m) {
+        model = m;
+        absoluteBegin = m.getN();
+    }
+
+    public void updateModel() {
+        model.addToN(length());
+    }
+
+    public M getModel() {
+        return model;
     }
 
     public abstract int length();
@@ -141,9 +153,7 @@ public abstract class Thought {
         return absoluteBegin;
     }
 
-    public void process(Model m) {
-        absoluteBegin = m.getN();
-
+    public void process() {
         while (!queue.isEmpty()) {
             Step s = queue.pollFirst();
 
@@ -155,7 +165,6 @@ public abstract class Thought {
             s.process();
             afterProcessedEvent(s);
         }
-        m.addToN(length());
     }
 
     public Timestamp getTimestampOnProcess() {

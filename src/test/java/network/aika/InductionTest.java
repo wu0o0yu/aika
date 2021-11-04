@@ -14,7 +14,7 @@ public class InductionTest {
 
     @Test
     public void testInduceFromMaturePattern() {
-        Model m = new TextModel();
+        TextModel m = new TextModel();
         Templates t = new Templates(m);
 
         PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
@@ -27,18 +27,19 @@ public class InductionTest {
         in.getSampleSpace().setN(200);
         m.setN(200);
 
-        Document doc = new Document("");
+        Document doc = new Document(m, "");
 
         doc.addToken(in, 0, 1);
 
-        doc.process(m);
+        doc.process();
+        doc.updateModel();
 
         System.out.println(doc);
     }
 
     @Test
     public void initialGradientTest() {
-        Model m = new TextModel();
+        TextModel m = new TextModel();
 
         Templates t = new Templates(m);
 
@@ -81,7 +82,7 @@ public class InductionTest {
 
         // -----------------------------------------
 
-        Document doc = new Document("");
+        Document doc = new Document(m, "");
 
         Activation actA = inA.createActivation(doc);
         Activation actB = inB.createActivation(doc);
@@ -106,7 +107,7 @@ public class InductionTest {
 
         String phrase = "der Hund";
 
-        Document doc = new Document(phrase);
+        Document doc = new Document(model, phrase);
         doc.setConfig(
                 Util.getTestConfig()
                         .setAlpha(0.99)
@@ -115,8 +116,8 @@ public class InductionTest {
         );
         System.out.println("  " + phrase);
 
-        TokenActivation actDer = doc.addToken(model, "der", 0, 4);
-        TokenActivation actHund = doc.addToken(model, "Hund", 4, 8);
+        TokenActivation actDer = doc.addToken("der", 0, 4);
+        TokenActivation actHund = doc.addToken("Hund", 4, 8);
         TokenActivation.addRelation(actDer, actHund);
 
         model.setN(1000);
@@ -125,7 +126,8 @@ public class InductionTest {
         actHund.getNeuron().setFrequency(10);
         actHund.getNeuron().getSampleSpace().setN(1000);
 
-        doc.process(model);
+        doc.process();
+        doc.updateModel();
 
         System.out.println(doc);
         System.out.println(doc.gradientsToString());
