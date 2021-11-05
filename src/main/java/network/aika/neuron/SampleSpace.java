@@ -36,6 +36,9 @@ import java.io.IOException;
  */
 public class SampleSpace implements Writable {
 
+    public static final int RANGE_BEGIN = 0;
+    public static final int RANGE_END = 1;
+
     private static final Logger log = LoggerFactory.getLogger(SampleSpace.class);
 
     private double N = 0;
@@ -64,10 +67,7 @@ public class SampleSpace implements Writable {
         N *= alpha;
     }
 
-    public void countSkippedInstances(Thought t, int[] range) {
-        if(offset == null)
-            offset = t.getAbsoluteBegin() + range[0];
-
+    public void countSkippedInstances(int[] range) {
         N += getInactiveInstancesSinceLastPos(range);
     }
 
@@ -75,14 +75,18 @@ public class SampleSpace implements Writable {
         N += 1;
     }
 
+    public void initOffset(Thought t, int[] range) {
+        if(offset != null)
+            return;
+
+        offset = t.getAbsoluteBegin() + range[RANGE_END];
+    }
+
     public long getInactiveInstancesSinceLastPos(int[] range) {
-        if(range == null)
+        if(range == null || offset == null)
             return 0;
 
-        long n = offset != null ? range[0] - offset : 0;
-
-        n /= range[1] - range[0];
-        return n;
+        return (range[RANGE_END] - offset) / (range[RANGE_END] - range[RANGE_BEGIN]);
     }
 
     @Override
