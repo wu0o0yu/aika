@@ -19,10 +19,7 @@ package network.aika.neuron.activation;
 import network.aika.Config;
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.neuron.ActivationFunction;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Synapse;
+import network.aika.neuron.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.activation.*;
@@ -163,15 +160,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return bindingSignals.containsKey(iAct);
     }
 
-    public abstract int[] getRange();
-
-    public Long getRangeLength() {
-        int[] range = getRange();
-        if(range == null)
-            return null;
-
-        return Long.valueOf(range[1] - range[0]);
-    }
+    public abstract Range getRange();
 
     public void addSelfBindingSignal(byte scope) {
         addBindingSignal(new BindingSignal(null, this, this, scope, (byte) 0));
@@ -337,7 +326,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void initEntropyGradient() {
-        int[] range = getRange();
+        Range range = getRange();
         assert range != null;
 
         double g = getNeuron().getSurprisal(

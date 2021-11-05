@@ -18,6 +18,7 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Range;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 /**
@@ -36,7 +37,7 @@ public class InhibitoryActivation extends Activation<InhibitoryNeuron> {
     }
 
     @Override
-    public int[] getRange() {
+    public Range getRange() {
         BindingSignal bs = getPrimaryBranchBindingSignal();
         if(bs == null)
             return null;

@@ -18,6 +18,7 @@ package network.aika.text;
 
 import network.aika.Thought;
 import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.Range;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.steps.activation.CheckIfFired;
@@ -68,8 +69,8 @@ public class Document extends Thought<TextModel> {
     }
 
     public static String getText(Activation<?> act) {
-        int[] r = act.getRange();
-        return ((Document)act.getThought()).getTextSegment(r[0], r[1]);
+        Range r = act.getRange();
+        return ((Document)act.getThought()).getTextSegment(r.getBegin(), r.getEnd());
     }
 
     public TokenActivation addToken(String token, int begin, int end) {

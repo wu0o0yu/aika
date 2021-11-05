@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.steps.activation.BranchProbability;
@@ -85,7 +86,7 @@ public class BindingActivation extends Activation<BindingNeuron> {
     }
 
     @Override
-    public int[] getRange() {
+    public Range getRange() {
         BindingSignal bs = getPrimaryPatternBindingSignal();
         if(bs == null)
             return null;

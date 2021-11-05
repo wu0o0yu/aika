@@ -65,19 +65,19 @@ public class GradientTest {
         Neuron nA = m.getNeuron("A");
         nA.setFrequency(53.0);
         nA.getSampleSpace().setN(299);
-        nA.getSampleSpace().setOffset(899l);
+        nA.getSampleSpace().setLastPosition(899l);
 
 
         Neuron nB = m.getNeuron("B");
         nB.setFrequency(10.0);
         nB.getSampleSpace().setN(121);
-        nB.getSampleSpace().setOffset(739l);
+        nB.getSampleSpace().setLastPosition(739l);
 
 
         Neuron nC = m.getNeuron("C");
         nC.setFrequency(30.0);
         nC.getSampleSpace().setN(234);
-        nC.getSampleSpace().setOffset(867l);
+        nC.getSampleSpace().setLastPosition(867l);
 
 
         AikaDebugger.createAndShowGUI(doc);
@@ -109,12 +109,12 @@ public class GradientTest {
         Neuron nA = m.getNeuron("A");
         nA.setFrequency(53.0);
         nA.getSampleSpace().setN(299);
-        nA.getSampleSpace().setOffset(899l);
+        nA.getSampleSpace().setLastPosition(899l);
 
         Neuron nB = m.getNeuron("B");
         nB.setFrequency(10.0);
         nB.getSampleSpace().setN(121);
-        nB.getSampleSpace().setOffset(739l);
+        nB.getSampleSpace().setLastPosition(739l);
 
         AikaDebugger.createAndShowGUI(doc1);
 
@@ -133,7 +133,7 @@ public class GradientTest {
         Neuron nC = m.getNeuron("C");
         nC.setFrequency(30.0);
         nC.getSampleSpace().setN(234);
-        nC.getSampleSpace().setOffset(867l);
+        nC.getSampleSpace().setLastPosition(867l);
 
         AikaDebugger.createAndShowGUI(doc2);
 

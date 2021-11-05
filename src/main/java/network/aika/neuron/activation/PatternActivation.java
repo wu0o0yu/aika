@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.excitatory.PatternNeuron;
 
@@ -53,12 +54,12 @@ public class PatternActivation extends Activation<PatternNeuron> {
     }
 
     @Override
-    public int[] getRange() {
+    public Range getRange() {
         return getBranchBindingSignals().values().stream()
                 .map(s -> s.getBindingSignalAct().getRange())
                 .reduce(
-                        new int[] {0, 0},
-                        (a, s) -> new int[] {Math.min(a[0], s[0]), Math.max(a[1], s[1])}
+                        new Range(0, 0),
+                        (a, s) -> Range.join(a, s)
                 );
     }
 }

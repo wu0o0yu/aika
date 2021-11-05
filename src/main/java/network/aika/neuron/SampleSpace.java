@@ -18,7 +18,6 @@ package network.aika.neuron;
 
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.neuron.activation.Activation;
 import network.aika.utils.Writable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,18 +35,15 @@ import java.io.IOException;
  */
 public class SampleSpace implements Writable {
 
-    public static final int RANGE_BEGIN = 0;
-    public static final int RANGE_END = 1;
-
     private static final Logger log = LoggerFactory.getLogger(SampleSpace.class);
 
     private double N = 0;
-    private Long offset;
+    private Long lastPosition;
 
     public SampleSpace() {
     }
 
-    public double getN(int[] range) {
+    public double getN(Range range) {
         return Math.max(N + getInactiveInstancesSinceLastPos(range), 0);
     }
 
@@ -55,19 +51,19 @@ public class SampleSpace implements Writable {
         this.N = N;
     }
 
-    public Long getOffset() {
-        return offset;
+    public Long getLastPosition() {
+        return lastPosition;
     }
 
-    public void setOffset(Long offset) {
-        this.offset = offset;
+    public void setLastPosition(Long lastPosition) {
+        this.lastPosition = lastPosition;
     }
 
     public void applyMovingAverage(double alpha) {
         N *= alpha;
     }
 
-    public void countSkippedInstances(int[] range) {
+    public void countSkippedInstances(Range range) {
         N += getInactiveInstancesSinceLastPos(range);
     }
 
@@ -75,26 +71,23 @@ public class SampleSpace implements Writable {
         N += 1;
     }
 
-    public void initOffset(Thought t, int[] range) {
-        if(offset != null)
-            return;
-
-        offset = t.getAbsoluteBegin() + range[RANGE_END];
+    public void updateLastPosition(Thought t, Range range) {
+        lastPosition = t.getAbsoluteBegin() + range.getEnd();
     }
 
-    public long getInactiveInstancesSinceLastPos(int[] range) {
-        if(range == null || offset == null)
+    public long getInactiveInstancesSinceLastPos(Range range) {
+        if(range == null || lastPosition == null)
             return 0;
 
-        return (range[RANGE_END] - offset) / (range[RANGE_END] - range[RANGE_BEGIN]);
+        return (range.getBegin() - lastPosition) / range.length();
     }
 
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeDouble(N);
-        out.writeBoolean(offset != null);
-        if(offset != null)
-            out.writeLong(offset);
+        out.writeBoolean(lastPosition != null);
+        if(lastPosition != null)
+            out.writeLong(lastPosition);
     }
 
     public static SampleSpace read(DataInput in, Model m) throws IOException {
@@ -107,10 +100,10 @@ public class SampleSpace implements Writable {
     public void readFields(DataInput in, Model m) throws IOException {
         N = in.readDouble();
         if(in.readBoolean())
-            offset = in.readLong();
+            lastPosition = in.readLong();
     }
 
     public String toString() {
-        return "N:" + N + " offset:" + offset;
+        return "N:" + N + " lastPosition:" + (lastPosition != null ? lastPosition : "X");
     }
 }

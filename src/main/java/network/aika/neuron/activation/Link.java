@@ -18,6 +18,7 @@ package network.aika.neuron.activation;
 
 import network.aika.Config;
 import network.aika.Thought;
+import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.link.AddLink;
@@ -76,7 +77,7 @@ public class Link<A extends Activation> extends Element<Link> {
     }
 
     private double computeGradient(Sign si, Sign so) {
-        int[] range = input.getRange();
+        Range range = input.getRange();
         assert range != null;
 
         double s = getSynapse().getSurprisal(si, so, range);

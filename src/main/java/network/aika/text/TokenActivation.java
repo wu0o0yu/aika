@@ -17,6 +17,7 @@
 package network.aika.text;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
@@ -39,16 +40,14 @@ import static network.aika.neuron.linker.LinkingTask.addNextLinkerSteps;
  */
 public class TokenActivation extends PatternActivation {
 
-    private int rangeBegin;
-    private int rangeEnd;
+    private Range range;
     private TokenActivation previousToken;
     private TokenActivation nextToken;
 
 
     public TokenActivation(int id, int begin, int end, Document doc, PatternNeuron patternNeuron) {
         super(id, doc, patternNeuron);
-        rangeBegin = begin;
-        rangeEnd = end;
+        range = new Range(begin, end);
     }
 
     private static void addLink(Synapse s, Activation iAct, Activation oAct) {
@@ -110,7 +109,7 @@ public class TokenActivation extends PatternActivation {
     }
 
     @Override
-    public int[] getRange() {
-        return new int[]{rangeBegin, rangeEnd};
+    public Range getRange() {
+        return range;
     }
 }
