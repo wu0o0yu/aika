@@ -27,7 +27,7 @@ public class TestFsModel {
         {
             Document doc = generateDocument(m, "arbeit fair arbeitsvermittlung ", true);
 
-            AikaDebugger debugger = AikaDebugger.createAndShowGUI(doc, m);
+            AikaDebugger debugger = AikaDebugger.createAndShowGUI(doc);
             debugger.setStepMode(StepMode.ACT);
 
             doc.process();
@@ -38,7 +38,7 @@ public class TestFsModel {
         {
             Document doc = generateDocument(m, "arbeit fair arbeitsvermittlung ", false);
 
-            AikaDebugger debugger = AikaDebugger.createAndShowGUI(doc, m);
+            AikaDebugger debugger = AikaDebugger.createAndShowGUI(doc);
             debugger.setStepMode(StepMode.ACT);
 
             doc.process();

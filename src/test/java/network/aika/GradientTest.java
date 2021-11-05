@@ -37,7 +37,7 @@ public class GradientTest {
         nB.getSampleSpace().setOffset(739l);
 */
 
-        AikaDebugger.createAndShowGUI(doc,m);
+        AikaDebugger.createAndShowGUI(doc);
 
         processDoc(doc);
 
@@ -80,7 +80,7 @@ public class GradientTest {
         nC.getSampleSpace().setOffset(867l);
 
 
-        AikaDebugger.createAndShowGUI(doc,m);
+        AikaDebugger.createAndShowGUI(doc);
 
         doc.process();
         doc.updateModel();
@@ -116,7 +116,7 @@ public class GradientTest {
         nB.getSampleSpace().setN(121);
         nB.getSampleSpace().setOffset(739l);
 
-        AikaDebugger.createAndShowGUI(doc1,m);
+        AikaDebugger.createAndShowGUI(doc1);
 
         doc1.process();
         doc1.updateModel();
@@ -135,7 +135,7 @@ public class GradientTest {
         nC.getSampleSpace().setN(234);
         nC.getSampleSpace().setOffset(867l);
 
-        AikaDebugger.createAndShowGUI(doc2,m);
+        AikaDebugger.createAndShowGUI(doc2);
 
         doc2.process();
         doc2.updateModel();

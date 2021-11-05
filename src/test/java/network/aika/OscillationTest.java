@@ -46,7 +46,7 @@ public class OscillationTest {
         s.linkInput();
         s.linkOutput();
 
-        AikaDebugger.createAndShowGUI(doc,m);
+        AikaDebugger.createAndShowGUI(doc);
 
         doc.addToken(nA, 0, 1);
 

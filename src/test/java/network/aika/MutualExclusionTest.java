@@ -248,7 +248,7 @@ public class MutualExclusionTest {
 
         doc.addToken(in, 0, 4);
 
-        AikaDebugger.createAndShowGUI(doc,m);
+        AikaDebugger.createAndShowGUI(doc);
 
         doc.process();
         doc.updateModel();
