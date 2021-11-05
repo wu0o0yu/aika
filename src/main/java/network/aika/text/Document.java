@@ -58,19 +58,16 @@ public class Document extends Thought<TextModel> {
         return content.length();
     }
 
-    public String getTextSegment(Integer begin, Integer end) {
-        if(begin == null || end == null)
+    public String getTextSegment(Range range) {
+        if(range == null)
             return "";
 
-        return content.substring(
-                Math.max(0, Math.min(begin, length())),
-                Math.max(0, Math.min(end, length()))
-        );
+        Range r = range.limit(new Range(0, length()));
+        return content.substring((int) r.getBegin(), (int) r.getEnd());
     }
 
     public static String getText(Activation<?> act) {
-        Range r = act.getRange();
-        return ((Document)act.getThought()).getTextSegment(r.getBegin(), r.getEnd());
+        return ((Document)act.getThought()).getTextSegment(act.getRange());
     }
 
     public TokenActivation addToken(String token, int begin, int end) {

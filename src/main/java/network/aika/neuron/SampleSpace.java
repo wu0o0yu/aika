@@ -71,15 +71,15 @@ public class SampleSpace implements Writable {
         N += 1;
     }
 
-    public void updateLastPosition(Thought t, Range range) {
-        lastPosition = t.getAbsoluteBegin() + range.getEnd();
+    public void updateLastPosition(Range absoluteRange) {
+        lastPosition = absoluteRange.getEnd();
     }
 
-    public long getInactiveInstancesSinceLastPos(Range range) {
-        if(range == null || lastPosition == null)
+    public long getInactiveInstancesSinceLastPos(Range absoluteRange) {
+        if(absoluteRange == null || lastPosition == null)
             return 0;
 
-        return (range.getBegin() - lastPosition) / range.length();
+        return (absoluteRange.getBegin() - lastPosition) / absoluteRange.length();
     }
 
     @Override

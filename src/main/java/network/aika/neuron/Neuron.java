@@ -287,7 +287,8 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
         addDummyLinks(act);
 
-        sampleSpace.countSkippedInstances(range);
+        Range absoluteRange = range.getAbsoluteRange(act.getThought().getRange());
+        sampleSpace.countSkippedInstances(absoluteRange);
 
         Double alpha = act.getConfig().getAlpha();
         if (alpha != null)
@@ -296,7 +297,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         sampleSpace.count();
         frequency += 1.0;
 
-        sampleSpace.updateLastPosition(act.getThought(), range);
+        sampleSpace.updateLastPosition(absoluteRange);
         setModified();
     }
 

@@ -20,6 +20,7 @@ package network.aika;
 import network.aika.callbacks.EventListener;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.steps.Step;
@@ -149,8 +150,8 @@ public abstract class Thought<M extends Model> {
         return queue;
     }
 
-    public long getAbsoluteBegin() {
-        return absoluteBegin;
+    public Range getRange() {
+        return new Range(absoluteBegin, absoluteBegin + length());
     }
 
     public void process() {

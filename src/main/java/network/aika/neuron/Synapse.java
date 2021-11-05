@@ -298,7 +298,9 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         Range range = l.getInput().getRange();
         assert range != null;
 
-        sampleSpace.countSkippedInstances(range);
+        Range absoluteRange = range.getAbsoluteRange(l.getThought().getRange());
+
+        sampleSpace.countSkippedInstances(absoluteRange);
 
         if(oActive) {
             Double alpha = l.getConfig().getAlpha();
@@ -319,7 +321,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
             setModified();
         }
 
-        sampleSpace.updateLastPosition(l.getThought(), range);
+        sampleSpace.updateLastPosition(absoluteRange);
     }
 
     public Model getModel() {

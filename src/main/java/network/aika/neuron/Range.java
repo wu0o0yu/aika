@@ -22,10 +22,10 @@ package network.aika.neuron;
  * @author Lukas Molzberger
  */
 public class Range {
-    private int begin;
-    private int end;
+    private long begin;
+    private long end;
 
-    public Range(int begin, int end) {
+    public Range(long begin, long end) {
         this.begin = begin;
         this.end = end;
     }
@@ -37,15 +37,29 @@ public class Range {
         );
     }
 
-    public int getBegin() {
+    public Range getAbsoluteRange(Range referenceRange) {
+        return new Range(
+                referenceRange.getBegin() + begin,
+                referenceRange.getBegin() + end
+        );
+    }
+
+    public Range limit(Range referenceRange) {
+        return new Range(
+                Math.max(referenceRange.begin, Math.min(begin, referenceRange.end)),
+                Math.max(referenceRange.begin, Math.min(end, referenceRange.end))
+        );
+    }
+
+    public long getBegin() {
         return begin;
     }
 
-    public int getEnd() {
+    public long getEnd() {
         return end;
     }
 
-    public int length() {
+    public long length() {
         return end - begin;
     }
 
