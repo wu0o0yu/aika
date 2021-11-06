@@ -77,7 +77,7 @@ public class Link<A extends Activation> extends Element<Link> {
     }
 
     private double computeGradient(Sign si, Sign so) {
-        Range range = input.getRange();
+        Range range = input.getAbsoluteRange();
         assert range != null;
 
         double s = getSynapse().getSurprisal(si, so, range);

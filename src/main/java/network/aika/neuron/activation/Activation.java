@@ -162,6 +162,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public abstract Range getRange();
 
+    public Range getAbsoluteRange() {
+        Range r = getRange();
+        if(r == null) return null;
+        return r.getAbsoluteRange(thought.getRange());
+    }
+
     public void addSelfBindingSignal(byte scope) {
         addBindingSignal(new BindingSignal(null, this, this, scope, (byte) 0));
     }
@@ -326,7 +332,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void initEntropyGradient() {
-        Range range = getRange();
+        Range range = getAbsoluteRange();
         assert range != null;
 
         double g = getNeuron().getSurprisal(

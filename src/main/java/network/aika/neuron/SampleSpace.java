@@ -44,7 +44,9 @@ public class SampleSpace implements Writable {
     }
 
     public double getN(Range range) {
-        return Math.max(N + getInactiveInstancesSinceLastPos(range), 0);
+        double result = N + getInactiveInstancesSinceLastPos(range);
+        assert result >= 0.0;
+        return result;
     }
 
     public void setN(int N) {
@@ -79,7 +81,10 @@ public class SampleSpace implements Writable {
         if(absoluteRange == null || lastPosition == null)
             return 0;
 
-        return (absoluteRange.getBegin() - lastPosition) / absoluteRange.length();
+        long x = (absoluteRange.getBegin() - lastPosition);
+        assert x >= 0;
+
+        return x / absoluteRange.length();
     }
 
     @Override

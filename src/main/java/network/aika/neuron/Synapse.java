@@ -295,10 +295,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         boolean iActive = l.getInput().isFired();
         boolean oActive = l.getOutput().isFired();
 
-        Range range = l.getInput().getRange();
-        assert range != null;
-
-        Range absoluteRange = range.getAbsoluteRange(l.getThought().getRange());
+        Range absoluteRange = l.getInput().getAbsoluteRange();
 
         sampleSpace.countSkippedInstances(absoluteRange);
 
@@ -313,10 +310,10 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         if(iActive && oActive) {
             frequencyIPosOPos += 1.0;
             setModified();
-        } else if(iActive && !oActive) {
+        } else if(iActive) {
             frequencyIPosONeg += 1.0;
             setModified();
-        } else if(!iActive && oActive) {
+        } else if(oActive) {
             frequencyINegOPos += 1.0;
             setModified();
         }

@@ -139,7 +139,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public double getCandidateGradient(Activation act) {
-        Range range = act.getRange();
+        Range range = act.getAbsoluteRange();
         assert range != null;
 
         return getSurprisal(POS, range);
@@ -282,12 +282,9 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public void count(Activation act) {
-        Range range = act.getRange();
-        assert range != null;
-
         addDummyLinks(act);
 
-        Range absoluteRange = range.getAbsoluteRange(act.getThought().getRange());
+        Range absoluteRange = act.getAbsoluteRange();
         sampleSpace.countSkippedInstances(absoluteRange);
 
         Double alpha = act.getConfig().getAlpha();
