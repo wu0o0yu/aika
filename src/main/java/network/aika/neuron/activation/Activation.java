@@ -70,14 +70,21 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     public final static int OWN = 0;
     public final static int INCOMING = 1;
 
-    private double lastEntropyGradient = 0.0;
-    private double[] inputGradient = new double[2];
+    private Gradient entropy = new Gradient();
+
+    private Gradient ownInputGradient = new Gradient();
+    private Gradient incomingInputGradient = new Gradient();
+
+    private Gradient ownOutputGradient = new Gradient();
+    private Gradient incomingOutputGradient = new Gradient();
+
+ //   private double[] inputGradient = new double[2];
 
     /**
      * Accumulates all gradients in case a new link is added that needs be get informed about the gradient.
      */
-    private double[] outputGradientSum;
-    private double[] inputGradientSum;
+ //   private double[] outputGradientSum;
+ //  private double[] inputGradientSum;
 
     public boolean markedNetUpdateOccurred; // Temporary hack
 
@@ -119,7 +126,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     public double getNet() {
         return net;
     }
-
+/*
     public double[] getInputGradient() {
         return inputGradient;
     }
@@ -127,7 +134,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     public double[] getOutputGradientSum() {
         return outputGradientSum;
     }
-
+*/
     public Timestamp getCreationTimestamp() {
         return creationTimestamp;
     }
@@ -335,13 +342,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         Range range = getAbsoluteRange();
         assert range != null;
 
-        double g = getNeuron().getSurprisal(
+        entropy.set(getNeuron().getSurprisal(
                         Sign.getSign(this),
                         range
-                );
+                ));
 
-        inputGradient[OWN] += g - lastEntropyGradient;
-        lastEntropyGradient = g;
+        entropy.propagate(ownInputGradient);
     }
 
     public double[] gradientsFromSumUpdate() {
@@ -351,7 +357,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         double[] g = inputGradient;
         inputGradient = new double[2];
 
-        return Utils.scale(g, actF.outerGrad(lastNet));
+        return Utils.scale(g, actF.outerGrad(net));
+
+        outputGradient.set();
     }
 
     public double[] gradientsFromNetUpdate() {
@@ -364,6 +372,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         lastNet = net;
 
         return Utils.scale(inputGradientSum, g);
+
+        outputGradient.set();
     }
 
     public void updateOutputGradientSum(double[] g) {

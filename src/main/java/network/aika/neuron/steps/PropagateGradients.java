@@ -43,9 +43,9 @@ public abstract class PropagateGradients extends Step<Activation>  {
         if(Utils.belowTolerance(g))
             return;
 
-        act.updateOutputGradientSum(g);
+ //       act.updateOutputGradientSum(g);
 
-        PropagateGradientAndUpdateWeight.addInputs(act, g);
+ //       PropagateGradientAndUpdateWeight.addInputs(act, g);
         UpdateBias.add(act, act.getConfig().getLearnRate() * Utils.sum(g));
 
         if(act.isFired())
