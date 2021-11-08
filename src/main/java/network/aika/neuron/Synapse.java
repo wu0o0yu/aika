@@ -19,6 +19,7 @@ package network.aika.neuron;
 import network.aika.Model;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.fields.Field;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.UpdateNet;
 import network.aika.utils.Utils;
@@ -33,7 +34,6 @@ import java.io.IOException;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.Neuron.BETA_THRESHOLD;
-import static network.aika.neuron.activation.Activation.OWN;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
@@ -53,7 +53,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     private Synapse template;
     private TemplateSynapseInfo templateInfo;
 
-    protected double weight;
+    protected Field weight = new Field();
 
     protected SampleSpace sampleSpace = new SampleSpace();
 
@@ -389,7 +389,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         out.writeLong(input.getId());
         out.writeLong(output.getId());
 
-        out.writeDouble(weight);
+        weight.write(out);
 
         out.writeDouble(frequencyIPosOPos);
         out.writeDouble(frequencyIPosONeg);
@@ -411,7 +411,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         input = m.lookupNeuron(in.readLong());
         output = m.lookupNeuron(in.readLong());
 
-        weight = in.readDouble();
+        weight.readFields(in, m);
 
         frequencyIPosOPos = in.readDouble();
         frequencyIPosONeg = in.readDouble();

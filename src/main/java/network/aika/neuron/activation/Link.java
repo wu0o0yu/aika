@@ -20,6 +20,7 @@ import network.aika.Config;
 import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.fields.Field;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.link.AddLink;
 import network.aika.utils.Utils;
@@ -46,7 +47,7 @@ public class Link<A extends Activation> extends Element<Link> {
 
     private final boolean isSelfRef;
 
-    private double lastIGGradient;
+    private Field igGradient;
 
     public Link(Synapse s, Activation input, A output, boolean isSelfRef) {
         this.synapse = s;
@@ -87,26 +88,26 @@ public class Link<A extends Activation> extends Element<Link> {
         return s * getInputValue(si) * getOutputValue(so);
     }
 
-    public void computeInformationGainGradient() {
+    public void updateInformationGainGradient() {
         if(isNegative())
             return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
 
-        double igGradient = 0.0;
+        double igGrad = 0.0;
         for(Sign si: Sign.SIGNS) {
             for (Sign so : Sign.SIGNS) {
-                igGradient += computeGradient(si, so);
+                igGrad += computeGradient(si, so);
             }
         }
 
-        double igGradientDelta = igGradient - lastIGGradient;
-        if(Utils.belowTolerance(igGradientDelta))
-            return;
-
-        getOutput().propagateGradientIn(igGradientDelta);
-        lastIGGradient = igGradient;
+        igGradient.add(igGrad);
     }
 
 
+    public void propagateIGGradient() {
+        igGradient.propagateUpdate(u ->
+                getOutput().receiveOwnGradientUpdate(u)
+        );
+    }
 /*
     public void removeGradientDependencies() {
         output.getInputLinks()

@@ -55,7 +55,9 @@ public class InformationGainGradient extends Step<Link> {
 
     @Override
     public void process() {
-        getElement().computeInformationGainGradient();
+        Link l = getElement();
+        l.updateInformationGainGradient();
+        l.propagateIGGradient();
     }
 
     public String toString() {

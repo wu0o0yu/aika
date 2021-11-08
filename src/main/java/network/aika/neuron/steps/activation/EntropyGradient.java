@@ -21,7 +21,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
-import network.aika.utils.Utils;
 
 /**
  * Computes the gradient of the entropy function for this activation.
@@ -66,10 +65,11 @@ public class EntropyGradient extends Step<Activation> {
         if(n.isTemplate())
             return;
 
-        act.initEntropyGradient();
+        act.updateEntropyGradient();
+        act.propagateEntropyGradient();
 
-        if(Utils.belowTolerance(act.getInputGradient()))
-            return;
+//        if(Utils.belowTolerance(act.getInputGradient()))
+//            return;
 
         PropagateGradientsSum.add(act);
     }

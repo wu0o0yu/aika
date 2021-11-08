@@ -19,6 +19,7 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.fields.Field;
 import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.steps.activation.BranchProbability;
 import network.aika.neuron.steps.activation.SetFinalMode;
@@ -47,6 +48,8 @@ public class BindingActivation extends Activation<BindingNeuron> {
     private BindingActivation mainBranch;
 
     private double branchProbability = 1.0;
+
+    private Field ownInputGradient = new Field();
 
 
     protected BindingActivation(int id, BindingNeuron n) {
@@ -142,6 +145,12 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
     public void setBranchProbability(double p) {
         branchProbability = p;
+    }
+
+
+    public void receiveOwnGradientUpdate(double u) {
+        super.receiveOwnGradientUpdate(u);
+        ownInputGradient.add(u);
     }
 
     @Override
