@@ -18,7 +18,6 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.PropagateGradients;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
 
@@ -27,16 +26,13 @@ import network.aika.neuron.steps.StepType;
  *
  * @author Lukas Molzberger
  */
-public class PropagateGradientsNet extends PropagateGradients {
+public class PropagateGradients extends network.aika.neuron.steps.PropagateGradients {
 
     public static void add(Activation act) {
-        if(act.markedNetUpdateOccurred)
-            return;
-
-        Step.add(new PropagateGradientsNet(act));
+        Step.add(new PropagateGradients(act));
     }
 
-    private PropagateGradientsNet(Activation act) {
+    private PropagateGradients(Activation act) {
         super(act);
     }
 
@@ -62,8 +58,6 @@ public class PropagateGradientsNet extends PropagateGradients {
             return;
 
         propagateGradientsOut(act, g);
-
-        act.markedNetUpdateOccurred = true;
     }
 
     public String toString() {

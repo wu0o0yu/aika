@@ -17,9 +17,8 @@
 package network.aika.neuron.steps;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.activation.CheckIfFired;
-import network.aika.neuron.steps.activation.PropagateGradientsNet;
+import network.aika.neuron.steps.activation.PropagateGradients;
 import network.aika.utils.Utils;
 
 
@@ -34,7 +33,7 @@ public abstract class UpdateNet {
         if(Utils.belowTolerance(netDelta))
             return;
 
-        PropagateGradientsNet.add(act);
+        PropagateGradients.add(act);
         CheckIfFired.add(act);
     }
 }

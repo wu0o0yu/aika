@@ -19,13 +19,39 @@ package network.aika.neuron.activation.fields;
 /**
  * @author Lukas Molzberger
  */
-public interface FieldOutput {
+public class FieldMultiplication implements FieldOutput {
+    private FieldOutput in1;
+    private FieldOutput in2;
 
-    double getOldValue();
+    public FieldMultiplication(FieldOutput in1, FieldOutput in2) {
+        this.in1 = in1;
+        this.in2 = in2;
+    }
 
-    double getNewValue();
+    @Override
+    public double getOldValue() {
+        return in1.getOldValue() * in2.getOldValue();
+    }
 
-    boolean updateAvailable();
+    @Override
+    public double getNewValue() {
+        return in1.getNewValue() * in2.getNewValue();
+    }
 
-    double getUpdate();
+    @Override
+    public boolean updateAvailable() {
+        return in1.updateAvailable() || in2.updateAvailable();
+    }
+
+    @Override
+    public double getUpdate() {
+        double result = 0.0;
+        if(in1.updateAvailable())
+            result += in1.getUpdate() * in2.getOldValue();
+
+        if(in2.updateAvailable())
+            result += in2.getUpdate() * in1.getOldValue();
+
+        return result;
+    }
 }

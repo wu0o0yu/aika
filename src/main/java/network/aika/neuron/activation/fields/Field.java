@@ -1,19 +1,36 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package network.aika.neuron.activation.fields;
 
 import network.aika.Model;
-import network.aika.neuron.Synapse;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.function.Consumer;
 
+/**
+ * @author Lukas Molzberger
+ */
 public class Field implements FieldInput, FieldOutput, Writable {
 
-    private double accumulated = 0.0;
-    private double update = 0.0;
+    private double oldValue = 0.0;
+    private Double update;
 
     private FieldUpdateEvent fieldListener;
 
@@ -25,65 +42,88 @@ public class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public Field(double x) {
-        this.accumulated = x;
+        this.oldValue = x;
     }
 
     public Field(double x, FieldUpdateEvent fieldListener) {
-        this.accumulated = x;
+        this.oldValue = x;
         this.fieldListener = fieldListener;
     }
 
-    public double getAccumulated() {
-        return accumulated;
+    public double getOldValue() {
+        return oldValue;
     }
 
-    public void set(double g) {
-        update = g - accumulated;
+    @Override
+    public double getNewValue() {
+        if(updateAvailable())
+            return oldValue + update;
+        else
+            return oldValue;
+    }
 
-        if(fieldListener == null || Utils.belowTolerance(update))
+    public void set(double v) {
+        if(Utils.belowTolerance( v - oldValue))
             return;
 
-        fieldListener.updated();
-    }
+        update = v - oldValue;
 
-    public void add(double g) {
-        update += g;
-
-        if(fieldListener == null || Utils.belowTolerance(update))
+        if(fieldListener == null)
             return;
 
-        fieldListener.updated();
+        fieldListener.updated(update);
     }
 
-    public void propagateUpdate(FieldInput to) {
-        propagateUpdate(u -> to.add(u));
-    }
-
-    public void propagateUpdate(Consumer<Double> to) {
-        Double u = propagateUpdate();
-        if(u == null)
+    public void add(double u) {
+        if(Utils.belowTolerance(u))
             return;
 
-        to.accept(u);
+        update += u;
+
+        if(fieldListener == null)
+            return;
+
+        fieldListener.updated(update);
     }
 
-    private Double propagateUpdate() {
-        if(Utils.belowTolerance(update))
-            return null;
+    public boolean updateAvailable() {
+        return update != null;
+    }
+
+    public double getUpdate() {
+        if(update == null)
+            throw new RuntimeException("No Field Update Available!");
 
         double result = update;
-        accumulated += update;
+        oldValue += update;
         update = 0.0;
         return result;
     }
 
     @Override
     public void write(DataOutput out) throws IOException {
-
+        out.writeDouble(oldValue);
+        out.writeBoolean(update != null);
+        if(update != null)
+            out.writeDouble(update);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
+        oldValue = in.readDouble();
+        update = null;
+        if(in.readBoolean())
+            update = in.readDouble();
+    }
 
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        if(update != null)
+            sb.append(Utils.round(update));
+        else sb.append("X");
+        sb.append(getOldValue());
+        sb.append("]");
+        return sb.toString();
     }
 }

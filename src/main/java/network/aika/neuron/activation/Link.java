@@ -47,7 +47,7 @@ public class Link<A extends Activation> extends Element<Link> {
 
     private final boolean isSelfRef;
 
-    private Field igGradient;
+    private Field igGradient = new Field(getOutput().receiveOwnGradientUpdate(igGradient.getUpdate()));
 
     public Link(Synapse s, Activation input, A output, boolean isSelfRef) {
         this.synapse = s;

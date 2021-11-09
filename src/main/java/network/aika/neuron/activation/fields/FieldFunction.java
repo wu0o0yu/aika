@@ -16,16 +16,36 @@
  */
 package network.aika.neuron.activation.fields;
 
+import java.util.function.Function;
+
 /**
  * @author Lukas Molzberger
  */
-public interface FieldOutput {
+public class FieldFunction implements FieldOutput {
 
-    double getOldValue();
+    Function<Double, Double> function;
 
-    double getNewValue();
+    public FieldFunction(FieldOutput in, Function<Double, Double> f) {
 
-    boolean updateAvailable();
+    }
 
-    double getUpdate();
+    @Override
+    public double getOldValue() {
+        return 0;
+    }
+
+    @Override
+    public double getNewValue() {
+        return 0;
+    }
+
+    @Override
+    public boolean updateAvailable() {
+        return false;
+    }
+
+    @Override
+    public double getUpdate() {
+        return 0;
+    }
 }

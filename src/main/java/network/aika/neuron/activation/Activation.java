@@ -22,6 +22,9 @@ import network.aika.Thought;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.fields.Field;
+import network.aika.neuron.activation.fields.FieldOutput;
+import network.aika.neuron.activation.fields.FieldFunction;
+import network.aika.neuron.activation.fields.FieldMultiplication;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.activation.*;
 import network.aika.utils.Utils;
@@ -48,7 +51,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(Activation::getId);
 
-    protected double value = 0.0;
+    protected Field value = new Field();
     protected Double inputValue = null;
     protected Field net = new Field(INITIAL_NET);
 //    protected double lastNet = INITIAL_NET;
@@ -70,13 +73,14 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected Map<Activation<?>, BindingSignal> reverseBindingSignals = new TreeMap<>();
 
     private Field entropy = new Field();
-    private Field inputGradient = new Field();
-    private
+    private Field inputGradient = new Field(() -> PropagateGradients.add(this));
 
-    private Field outputGradient = new Field();
-
-
-    public boolean markedNetUpdateOccurred; // Temporary hack
+    private FieldOutput outputGradient = new FieldMultiplication(
+            inputGradient,
+            new FieldFunction(net, x ->
+                    getNeuron().getActivationFunction().outerGrad(x)
+            )
+    );
 
 
     protected Activation(int id, N n) {
@@ -337,12 +341,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void propagateGradientIn(double g) {
-        inputGradient[INCOMING] += g;
-
-        if(Utils.belowTolerance(inputGradient))
-            return;
-
-        PropagateGradientsSum.add(this);
+        inputGradient.add(g);
     }
 
 
@@ -361,7 +360,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public void updateGradient(UpdateMode m) {
         if(m == UpdateMode.NET) {
-            updateOutputGradient(net.propagateUpdate() * inputGradient.getAccumulated());
+            updateOutputGradient(net.getUpdate() * inputGradient.getOldValue());
         } else {
 
         }
@@ -369,14 +368,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public void updateOutputGradient(double u) {
 
-    }
-
-
-    public static void mul(Field in1, Field in2, Consumer<Double> to, int arg) {
-        Field accGrad = arg == 1 ? in2 : in1;
-        Field updateGrad = arg == 1 ? in1 : in2;
-
-        updateGrad.propagateUpdate(u -> to.accept(u * accGrad.accumulated));
     }
 
     public double[] gradientsFromSumUpdate() {
@@ -480,8 +471,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         StringBuilder sb = new StringBuilder();
         sb.append("act ");
         sb.append(toShortString());
-        sb.append(" value:" + Utils.round(value, 10000.0));
-        sb.append(" net:" + Utils.round(net));
+        sb.append(" value:" + value);
+        sb.append(" net:" + net);
 
         if (includeLink) {
             sb.append("\n");
