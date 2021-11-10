@@ -23,29 +23,31 @@ import java.util.function.Function;
  */
 public class FieldFunction implements FieldOutput {
 
+    FieldOutput input;
     Function<Double, Double> function;
 
     public FieldFunction(FieldOutput in, Function<Double, Double> f) {
-
+        this.input = in;
+        this.function = f;
     }
 
     @Override
     public double getOldValue() {
-        return 0;
+        return function.apply(input.getOldValue());
     }
 
     @Override
     public double getNewValue() {
-        return 0;
+        return function.apply(input.getNewValue());
     }
 
     @Override
     public boolean updateAvailable() {
-        return false;
+        return input.updateAvailable();
     }
 
     @Override
     public double getUpdate() {
-        return 0;
+        return getNewValue() - getOldValue();
     }
 }

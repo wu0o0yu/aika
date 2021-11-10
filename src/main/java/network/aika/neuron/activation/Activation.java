@@ -27,10 +27,8 @@ import network.aika.neuron.activation.fields.FieldFunction;
 import network.aika.neuron.activation.fields.FieldMultiplication;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.activation.*;
-import network.aika.utils.Utils;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
@@ -54,7 +52,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected Field value = new Field();
     protected Double inputValue = null;
     protected Field net = new Field(INITIAL_NET);
-//    protected double lastNet = INITIAL_NET;
 
     protected Timestamp creationTimestamp = NOT_SET;
     protected Timestamp fired = NOT_SET;
@@ -72,8 +69,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     );
     protected Map<Activation<?>, BindingSignal> reverseBindingSignals = new TreeMap<>();
 
-    private Field entropy = new Field();
+    private Field entropy = new Field(this::receiveOwnGradientUpdate);
     private Field inputGradient = new Field(u -> PropagateGradients.add(this));
+
 
     private FieldOutput outputGradient = new FieldMultiplication(
             inputGradient,
@@ -302,6 +300,11 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return nl;
     }
 
+
+    public FieldOutput getOutputGradient() {
+        return outputGradient;
+    }
+
     public void updateNet(double netDelta) {
         double oldNet = net;
         net += netDelta;
@@ -334,12 +337,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 ));
     }
 
-    public void propagateEntropyGradient() {
-        entropy.propagateUpdate(
-                this::receiveOwnGradientUpdate
-        );
-    }
-
     public void propagateGradientIn(double g) {
         inputGradient.add(g);
     }
@@ -353,23 +350,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         inputGradient.add(u);
     }
 
-    private enum UpdateMode {
-        NET,
-        INPUT_GRADIENT
+    public void updateOutputGradient() {
+        double g = outputGradient.getUpdate();
+        UpdateBias.add(this, getConfig().getLearnRate() * g);
     }
 
-    public void updateGradient(UpdateMode m) {
-        if(m == UpdateMode.NET) {
-            updateOutputGradient(net.getUpdate() * inputGradient.getOldValue());
-        } else {
-
-        }
-    }
-
-    public void updateOutputGradient(double u) {
-
-    }
-
+/*
     public double[] gradientsFromSumUpdate() {
         ActivationFunction actF = getActivationFunction();
 
@@ -399,7 +385,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     public void updateOutputGradientSum(double[] g) {
         outputGradientSum = Utils.add(outputGradientSum, g);
     }
-
+*/
 
 
     public void linkInputs() {

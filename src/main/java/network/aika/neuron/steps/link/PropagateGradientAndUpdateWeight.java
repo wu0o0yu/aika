@@ -44,15 +44,6 @@ public class PropagateGradientAndUpdateWeight extends Step<Link> {
         Step.add(new PropagateGradientAndUpdateWeight(l, gradient));
     }
 
-    public static void addInputs(Activation<?> act, double[] gradient) {
-        if(act.getNeuron().isInputNeuron())
-            return;
-
-        act.getInputLinks().forEach(l ->
-                PropagateGradientAndUpdateWeight.add(l, gradient)
-        );
-    }
-
     private PropagateGradientAndUpdateWeight(Link l, double[] gradient) {
         super(l);
         this.gradient = gradient;
