@@ -37,9 +37,9 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
     }
 
     public boolean isWeak(double weightSum) {
-        boolean weightIsAbleToExceedThreshold = weight + getOutput().getInitialNet() > 0.0;
+        boolean weightIsAbleToExceedThreshold = weight.getOldValue() + getOutput().getInitialNet() > 0.0;
         boolean weightSumIsAbleToExceedThreshold = weightSum + getOutput().getInitialNet() > 0.0;
-        boolean weightIsAbleToSuppressThresholdExceededByWeightSum = (weightSum - weight) + getOutput().getInitialNet() <= 0.0;
+        boolean weightIsAbleToSuppressThresholdExceededByWeightSum = (weightSum - weight.getOldValue()) + getOutput().getInitialNet() <= 0.0;
 
         return !(weightIsAbleToExceedThreshold ||
                 (weightSumIsAbleToExceedThreshold && weightIsAbleToSuppressThresholdExceededByWeightSum));

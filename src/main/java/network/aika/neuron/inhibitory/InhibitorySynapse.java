@@ -47,7 +47,7 @@ public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNe
 
     @Override
     public boolean isWeak() {
-        return weight + getOutput().getBias() < 0.0;
+        return weight.getOldValue() + getOutput().getBias() < 0.0;
     }
 
     public Neuron getTemplatePropagateTargetNeuron(Activation<?> act) {

@@ -21,14 +21,12 @@ import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.fields.Field;
 import network.aika.utils.Utils;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.stream.Stream;
 
 
 /**
@@ -36,7 +34,7 @@ import java.util.stream.Stream;
  */
 public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, BindingActivation> {
 
-    private double assumedActiveSum;
+    private Field assumedActiveSum;
 
     public BindingNeuron() {
         super();
@@ -52,17 +50,17 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, Bindin
     }
 
     @Override
-    public double getAssumedActiveSum() {
+    public Field getAssumedActiveSum() {
         return assumedActiveSum;
     }
 
     @Override
     public double getInitialNet() {
-        return super.getInitialNet() + assumedActiveSum;
+        return super.getInitialNet() + assumedActiveSum.getOldValue();
     }
 
     public void addAssumedWeights(double weightDelta) {
-        assumedActiveSum += weightDelta;
+        assumedActiveSum.add(weightDelta);
     }
 
     @Override
@@ -90,13 +88,13 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, Bindin
     public void write(DataOutput out) throws IOException {
         super.write(out);
 
-        out.writeDouble(assumedActiveSum);
+        assumedActiveSum.write(out);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws Exception {
         super.readFields(in, m);
 
-        assumedActiveSum = in.readDouble();
+        assumedActiveSum.readFields(in, m);
     }
 }

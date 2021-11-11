@@ -19,6 +19,7 @@ package network.aika.neuron;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.fields.Field;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;
@@ -54,7 +55,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Writable customData;
 
-    protected volatile double bias;
+    protected Field bias = new Field(u -> setModified());
 
     protected TreeMap<NeuronProvider, S> inputSynapses = new TreeMap<>();
     protected TreeMap<NeuronProvider, Synapse> outputSynapses = new TreeMap<>();
@@ -253,10 +254,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public void addBias(double biasDelta) {
-        double oldBias = bias;
-        bias += biasDelta;
-        logChange(this, oldBias, bias, "addBias : bias");
-        setModified();
+        bias.add(biasDelta);
     }
 
     public void limitBias() {
@@ -265,16 +263,16 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         logChange(this, oldBias, bias, "limitBias : bias");
     }
 
-    public double getBias() {
+    public Field getBias() {
         return bias;
     }
 
     public double getInitialNet() {
-        return bias;
+        return bias.getOldValue();
     }
 
-    public double getAssumedActiveSum() {
-        return 0.0;
+    public Field getAssumedActiveSum() {
+        return null;
     }
 
     public ReadWriteLock getLock() {

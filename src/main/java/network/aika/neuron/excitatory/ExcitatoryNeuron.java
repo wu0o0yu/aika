@@ -23,6 +23,7 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.fields.Field;
 import network.aika.neuron.inhibitory.InhibitorySynapse;
 
 import java.io.DataInput;
@@ -41,8 +42,8 @@ import static network.aika.utils.Utils.logChange;
  */
 public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Activation> extends Neuron<S, A> {
 
-    private volatile double conjunctiveBias;
-    private volatile double weightSum;
+    private volatile Field conjunctiveBias;
+    private volatile Field weightSum;
 
     public ExcitatoryNeuron() {
         super();
@@ -56,16 +57,16 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
         super(model, addProvider);
     }
 
-    public double getWeightSum() {
+    public Field getWeightSum() {
         return weightSum;
     }
 
-    public double getConjunctiveBias() {
+    public Field getConjunctiveBias() {
         return conjunctiveBias;
     }
 
     public void addWeight(double weightDelta) {
-        weightSum += weightDelta;
+        weightSum.add(weightDelta);
     }
 
     protected void initFromTemplate(ExcitatoryNeuron n) {
@@ -74,9 +75,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
     }
 
     public void addConjunctiveBias(double b) {
-        double oldCB = conjunctiveBias;
-        conjunctiveBias += b;
-        logChange(this, oldCB, conjunctiveBias, "limitBias: conjunctiveBias");
+        conjunctiveBias.add(b);
     }
 
     /**
@@ -111,7 +110,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
 
     @Override
     public double getInitialNet() {
-        return bias + conjunctiveBias;
+        return bias.getOldValue() + conjunctiveBias.getOldValue();
     }
 
     public void updateSynapseInputConnections() {
@@ -140,15 +139,15 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
     public void write(DataOutput out) throws IOException {
         super.write(out);
 
-        out.writeDouble(conjunctiveBias);
-        out.writeDouble(weightSum);
+        conjunctiveBias.write(out);
+        weightSum.write(out);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws Exception {
         super.readFields(in, m);
 
-        conjunctiveBias = in.readDouble();
-        weightSum = in.readDouble();
+        conjunctiveBias.readFields(in, m);
+        weightSum.readFields(in, m);
     }
 }

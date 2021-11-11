@@ -27,6 +27,7 @@ import network.aika.neuron.activation.fields.FieldFunction;
 import network.aika.neuron.activation.fields.FieldMultiplication;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.activation.*;
+import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -73,7 +74,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     private Field inputGradient = new Field(u -> PropagateGradients.add(this));
 
 
-    private FieldOutput outputGradient = new FieldMultiplication(
+    protected FieldOutput outputGradient = new FieldMultiplication(
             inputGradient,
             new FieldFunction(net, x ->
                     getNeuron().getActivationFunction().outerGrad(x)
@@ -353,40 +354,11 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     public void updateOutputGradient() {
         double g = outputGradient.getUpdate();
         UpdateBias.add(this, getConfig().getLearnRate() * g);
+
+        inputLinks.values().forEach(l ->
+            PropagateGradientAndUpdateWeight.add(l, g)
+        );
     }
-
-/*
-    public double[] gradientsFromSumUpdate() {
-        ActivationFunction actF = getActivationFunction();
-
-        inputGradientSum = Utils.add(inputGradientSum, inputGradient);
-        double[] g = inputGradient;
-        inputGradient = new double[2];
-
-        return Utils.scale(g, actF.outerGrad(net));
-
-        outputGradient.set();
-    }
-
-    public double[] gradientsFromNetUpdate() {
-        if(inputGradientSum == null)
-            return null;
-
-        ActivationFunction actF = getActivationFunction();
-
-        double g = actF.outerGrad(net) - actF.outerGrad(lastNet);
-        lastNet = net;
-
-        return Utils.scale(inputGradientSum, g);
-
-        outputGradient.set();
-    }
-
-    public void updateOutputGradientSum(double[] g) {
-        outputGradientSum = Utils.add(outputGradientSum, g);
-    }
-*/
-
 
     public void linkInputs() {
         inputLinks

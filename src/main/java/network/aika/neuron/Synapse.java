@@ -53,7 +53,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     private Synapse template;
     private TemplateSynapseInfo templateInfo;
 
-    protected Field weight = new Field();
+    protected Field weight = new Field(u -> setModified());
 
     protected SampleSpace sampleSpace = new SampleSpace();
 
@@ -123,8 +123,8 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
 
     public abstract void updateSynapse(Link l, double delta);
 
-    public void propagateGradient(Link l, double[] gradient) {
-        l.propagateGradient(gradient[OWN]);
+    public void propagateGradient(Link l, double gradient) {
+        l.propagateGradient(gradient);
     }
 
     public abstract boolean checkCausality(Activation<?> iAct, Activation<?> oAct);
@@ -350,7 +350,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
      */
     public abstract boolean isWeak();
 
-    public double getWeight() {
+    public Field getWeight() {
         return weight;
     }
 
@@ -371,10 +371,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     }
 
     protected void addWeightInternal(double weightDelta) {
-        double oldWeight = weight;
-        this.weight += weightDelta;
-        logChange(getOutput(), oldWeight, this.weight, "addWeight: weight");
-        setModified();
+        weight.add(weightDelta);
     }
 
     public void updateOutputNet(Link<A> l, double delta) {

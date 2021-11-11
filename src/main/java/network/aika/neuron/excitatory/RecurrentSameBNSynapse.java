@@ -20,9 +20,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingSignal;
 import network.aika.neuron.activation.Link;
 
-import static network.aika.neuron.activation.Activation.INCOMING;
-import static network.aika.neuron.activation.Activation.OWN;
-
 /**
  *
  * @author Lukas Molzberger
@@ -37,8 +34,8 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
     }
 
     @Override
-    public void propagateGradient(Link l, double[] gradient) {
-        l.propagateGradient(gradient[INCOMING] + gradient[OWN]);
+    public void propagateGradient(Link l, double gradient) {
+        l.propagateGradient(gradient);
     }
 
     @Override

@@ -160,6 +160,10 @@ public class Link<A extends Activation> extends Element<Link> {
         return isSelfRef;
     }
 
+    public boolean isRecurrent() {
+        return synapse.isRecurrent();
+    }
+
     public boolean isCausal() {
         return input == null || input.getFired().compareTo(output.getFired()) < 0;
     }

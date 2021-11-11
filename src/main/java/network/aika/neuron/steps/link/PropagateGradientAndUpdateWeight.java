@@ -17,16 +17,12 @@
 package network.aika.neuron.steps.link;
 
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
 import network.aika.neuron.steps.activation.PostTraining;
 import network.aika.utils.Utils;
-
-import static network.aika.neuron.activation.Activation.INCOMING;
-import static network.aika.neuron.activation.Activation.OWN;
 
 /**
  * Propagate the gradient backwards through the network.
@@ -35,16 +31,16 @@ import static network.aika.neuron.activation.Activation.OWN;
  */
 public class PropagateGradientAndUpdateWeight extends Step<Link> {
 
-    private final double[] gradient;
+    private final double gradient;
 
-    public static void add(Link l, double[] gradient) {
+    public static void add(Link l, double gradient) {
         if (Utils.belowTolerance(gradient))
             return;
 
         Step.add(new PropagateGradientAndUpdateWeight(l, gradient));
     }
 
-    private PropagateGradientAndUpdateWeight(Link l, double[] gradient) {
+    private PropagateGradientAndUpdateWeight(Link l, double gradient) {
         super(l);
         this.gradient = gradient;
     }
@@ -71,22 +67,22 @@ public class PropagateGradientAndUpdateWeight extends Step<Link> {
         if(!l.getSynapse().isAllowTraining())
             return;
 
-        double g = gradient[OWN] + gradient[INCOMING];
+        double g = gradient;
         double weightDelta = l.getConfig().getLearnRate() * g;
         boolean oldWeightIsZero = s.isZero();
 
         assert !s.isTemplate();
         s.updateSynapse(l, weightDelta);
 
-        if (oldWeightIsZero && !s.isZero() && l.getInput().isFired()) {
+        if (oldWeightIsZero && !s.isZero() && l.getInput().isFired())
             PropagateBindingSignal.add(l);
-        }
+
         PostTraining.add(l.getOutput());
 
         s.propagateGradient(l, gradient);
     }
 
     public String toString() {
-        return "Link-Step: Propagate Gradient " + getElement().toShortString() + " (Own:" + Utils.round(gradient[OWN]) + ", Incoming:" + Utils.round(gradient[INCOMING]) + ")";
+        return "Link-Step: Propagate Gradient " + getElement().toShortString() + " (Gradient:" + Utils.round(gradient) + ")";
     }
 }
