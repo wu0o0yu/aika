@@ -82,7 +82,6 @@ public class Document extends Thought<TextModel> {
         TokenActivation act = new TokenActivation(createActivationId(), begin, end, this, n);
 
         act.setInputValue(1.0);
-        act.updateValue();
         act.init(null, null);
         act.setFired();
         CheckIfFired.propagate(act);

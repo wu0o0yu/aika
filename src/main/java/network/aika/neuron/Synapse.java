@@ -21,7 +21,6 @@ import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.fields.Field;
 import network.aika.neuron.sign.Sign;
-import network.aika.neuron.steps.UpdateNet;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import org.apache.commons.math3.distribution.BetaDistribution;
@@ -52,7 +51,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     private Synapse template;
     private TemplateSynapseInfo templateInfo;
 
-    protected Field weight = new Field(u -> setModified());
+    protected Field weight = new Field((u, v) -> setModified());
 
     protected SampleSpace sampleSpace = new SampleSpace();
 
@@ -362,7 +361,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     }
 
     public void setWeight(double w) {
-        weight.set(w);
+        weight.setAndTriggerUpdate(w);
     }
 
     public void addWeight(double weightDelta) {
@@ -370,12 +369,12 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     }
 
     protected void addWeightInternal(double weightDelta) {
-        weight.add(weightDelta);
+        weight.addAndTriggerUpdate(weightDelta);
     }
 
     public void updateOutputNet(Link<A> l, double delta) {
 //        SumUpLink.add(l, actValueDelta * l.getSynapse().getWeight());
-        UpdateNet.updateNet(l.getOutput(), delta);
+        l.getOutput().getNet().addAndTriggerUpdate(delta);
     }
 
     @Override

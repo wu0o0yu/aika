@@ -25,4 +25,15 @@ public interface FieldInput {
 
     void add(double g);
 
+    void triggerUpdate();
+
+    default void setAndTriggerUpdate(double v) {
+        set(v);
+        triggerUpdate();
+    }
+
+    default void addAndTriggerUpdate(double g) {
+        add(g);
+        triggerUpdate();
+    }
 }

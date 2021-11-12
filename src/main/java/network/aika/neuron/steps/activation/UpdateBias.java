@@ -20,7 +20,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
-import network.aika.neuron.steps.UpdateNet;
 import network.aika.utils.Utils;
 
 /**
@@ -70,7 +69,7 @@ public class UpdateBias extends Step<Activation> {
         if(biasDelta <= 0.0)
             return;
 
-        UpdateNet.updateNet(act, biasDelta);
+        act.getNet().addAndTriggerUpdate(biasDelta);
 
         PostTraining.add(act);
     }

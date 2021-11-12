@@ -22,8 +22,6 @@ import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
-import network.aika.neuron.steps.UpdateNet;
-
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
@@ -66,7 +64,9 @@ public class SetFinalMode extends Step<BindingActivation> {
         BindingActivation act = getElement();
 
         act.setFinalMode(true);
-        UpdateNet.updateNet(act, act.getNeuron().getAssumedActiveSum() - computeForwardLinkedRecurrentInputs(act));
+
+        double assumedActiveSum = act.getNeuron().getAssumedActiveSum().getNewValueAndAcknowledgePropagated();
+        act.getNet().addAndTriggerUpdate(assumedActiveSum - computeForwardLinkedRecurrentInputs(act));
 
         getPositiveRecurrentInputLinks(act)
                 .filter(l -> !l.isForward())
@@ -74,7 +74,6 @@ public class SetFinalMode extends Step<BindingActivation> {
                         l.updateNetByInputValue(l.getInputValue(Sign.POS))
                 );
 
-        act.updateValue();
         act.setFinalTimestamp();
 
         if (!act.isFired() || act.getNet().getOldValue() > 0.0)

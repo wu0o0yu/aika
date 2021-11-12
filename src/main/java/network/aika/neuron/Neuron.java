@@ -54,7 +54,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Writable customData;
 
-    protected Field bias = new Field(u -> setModified());
+    protected Field bias = new Field((u, v) -> setModified());
 
     protected TreeMap<NeuronProvider, S> inputSynapses = new TreeMap<>();
     protected TreeMap<NeuronProvider, Synapse> outputSynapses = new TreeMap<>();
@@ -253,12 +253,12 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public void addBias(double biasDelta) {
-        bias.add(biasDelta);
+        bias.addAndTriggerUpdate(biasDelta);
     }
 
     public void limitBias() {
-        double oldBias = bias;
-        bias = Math.min(0.0, bias);
+        if(bias.getOldValue() > 0.0)
+            bias.setAndTriggerUpdate(0.0);
     }
 
     public Field getBias() {
@@ -355,7 +355,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         if(label != null)
             out.writeUTF(label);
 
-        out.writeDouble(bias);
+        bias.write(out);
 
         for (Synapse s : inputSynapses.values()) {
             if (s.getInput() != null) {
@@ -397,7 +397,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
             label = in.readUTF();
 
 
-        bias = in.readDouble();
+        bias.readFields(in, m);
 
         while (in.readBoolean()) {
             S syn = (S) Synapse.read(in, m);
@@ -425,7 +425,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public String toDetailedString() {
-        return "n " + getClass().getSimpleName() + " " + this + " b:" + Utils.round(bias);
+        return "n " + getClass().getSimpleName() + " " + this + " b:" + bias;
     }
 
     public String statToString() {

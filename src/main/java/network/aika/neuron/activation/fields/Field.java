@@ -68,11 +68,9 @@ public class Field implements FieldInput, FieldOutput, Writable {
 
         update = v - oldValue;
 
-        if(fieldListener == null)
-            return;
-
-        fieldListener.updated(update, getNewValue());
+        triggerUpdate();
     }
+
 
     public void add(double u) {
         if(Utils.belowTolerance(u))
@@ -80,7 +78,12 @@ public class Field implements FieldInput, FieldOutput, Writable {
 
         update += u;
 
-        if(fieldListener == null)
+        triggerUpdate();
+    }
+
+
+    public void triggerUpdate() {
+        if (fieldListener == null)
             return;
 
         fieldListener.updated(update, getNewValue());

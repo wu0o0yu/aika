@@ -24,7 +24,6 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.fields.Field;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -64,7 +63,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
     }
 
     public void addWeight(double weightDelta) {
-        weightSum.add(weightDelta);
+        weightSum.addAndTriggerUpdate(weightDelta);
     }
 
     protected void initFromTemplate(ExcitatoryNeuron n) {
@@ -73,7 +72,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
     }
 
     public void addConjunctiveBias(double b) {
-        conjunctiveBias.add(b);
+        conjunctiveBias.addAndTriggerUpdate(b);
     }
 
     /**
@@ -81,12 +80,11 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
      * should account for that and reduce the bias back to a level, where the neuron can be blocked again by its input synapses.
      */
     public void limitBias() {
-        bias = Math.min(weightSum, bias);
+        if(bias.getOldValue() > weightSum.getOldValue())
+            bias.setAndTriggerUpdate(weightSum.getOldValue());
 
-        if(bias + conjunctiveBias > 0.0) {
-            double oldCB = conjunctiveBias;
-
-            conjunctiveBias = Math.max(-weightSum, -bias);
+        if(bias.getNewValue() + conjunctiveBias.getOldValue() > 0.0) {
+            conjunctiveBias.setAndTriggerUpdate(Math.max(-weightSum.getOldValue(), -bias.getNewValue()));
         }
     }
 
@@ -117,9 +115,9 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
 
         sortedSynapses.addAll(inputSynapses.values());
 
-        double sum = getWeightSum();
+        double sum = getWeightSum().getOldValue();
         for(ExcitatorySynapse s: sortedSynapses) {
-            if(s.getWeight() <= 0.0)
+            if(s.getWeight().getOldValue() <= 0.0)
                 break;
 
             if(s.isWeak(sum))
@@ -127,7 +125,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
             else
                 s.linkInput();
 
-            sum -= s.getWeight();
+            sum -= s.getWeight().getOldValue();
         }
     }
 

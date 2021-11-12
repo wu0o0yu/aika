@@ -48,8 +48,6 @@ public class CheckIfFired extends Step<Activation> {
     public void process() {
         Activation act = getElement();
 
-        act.updateValue();
-
         if (act.isFired() || act.getNet().getOldValue() <= 0.0)
             return;
 

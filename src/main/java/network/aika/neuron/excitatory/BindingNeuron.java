@@ -60,7 +60,7 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, Bindin
     }
 
     public void addAssumedWeights(double weightDelta) {
-        assumedActiveSum.add(weightDelta);
+        assumedActiveSum.addAndTriggerUpdate(weightDelta);
     }
 
     @Override

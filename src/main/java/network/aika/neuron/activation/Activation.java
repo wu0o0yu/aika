@@ -53,7 +53,10 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected boolean isInput;
     protected Field net = new Field(INITIAL_NET, (u, v) -> {
         if(!isInput)
-            value.set(getBranchProbability() * getActivationFunction().f(v));
+            value.setAndTriggerUpdate(getBranchProbability() * getActivationFunction().f(v));
+
+        PropagateGradients.add(this);
+        CheckIfFired.add(this);
     });
 
     protected Timestamp creationTimestamp = NOT_SET;
@@ -93,7 +96,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
-        net.set(n.getInitialNet());
+        net.setAndTriggerUpdate(n.getInitialNet());
 
         thought.registerActivation(this);
 
@@ -258,13 +261,13 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 .filter(l -> l.getSynapse() != excludedSyn)
                 .forEach(l -> {
                             Link nl = new Link(l.getSynapse(), l.getInput(), clonedAct, l.isSelfRef());
-                            clonedAct.updateNet(nl.getInputValue(POS));
+                            clonedAct.net.addAndTriggerUpdate(nl.getInputValue(POS));
                         }
                 );
     }
 
     public void setInputValue(double v) {
-        value.set(v);
+        value.setAndTriggerUpdate(v);
         isInput = true;
     }
 
@@ -317,10 +320,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return outputGradient;
     }
 
-    public void updateNet(double netDelta) {
-        net.add(netDelta);
-    }
-
     public double getBranchProbability() {
         return 1.0;
     }
@@ -329,23 +328,23 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         Range range = getAbsoluteRange();
         assert range != null;
 
-        entropy.set(getNeuron().getSurprisal(
+        entropy.setAndTriggerUpdate(getNeuron().getSurprisal(
                         Sign.getSign(this),
                         range
                 ));
     }
 
     public void propagateGradientIn(double g) {
-        inputGradient.add(g);
+        inputGradient.addAndTriggerUpdate(g);
     }
 
 
     public void receiveOwnGradientUpdate(double u) {
-        inputGradient.add(u);
+        inputGradient.addAndTriggerUpdate(u);
     }
 
     public void receiveBackPropagatedGradientUpdate(double u) {
-        inputGradient.add(u);
+        inputGradient.addAndTriggerUpdate(u);
     }
 
     public void updateOutputGradient() {

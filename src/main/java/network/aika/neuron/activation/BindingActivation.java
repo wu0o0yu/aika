@@ -153,7 +153,7 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
     public void receiveOwnGradientUpdate(double u) {
         super.receiveOwnGradientUpdate(u);
-        ownInputGradient.add(u);
+        ownInputGradient.addAndTriggerUpdate(u);
     }
 
     // should ownGrad only used for backpropagation or also for the weight update?

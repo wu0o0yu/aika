@@ -20,11 +20,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.steps.UpdateNet;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static network.aika.neuron.sign.Sign.POS;
 
@@ -47,7 +42,7 @@ public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNe
 
     @Override
     public boolean isWeak() {
-        return weight.getOldValue() + getOutput().getBias() < 0.0;
+        return weight.getOldValue() + getOutput().getBias().getOldValue() < 0.0;
     }
 
     public Neuron getTemplatePropagateTargetNeuron(Activation<?> act) {
@@ -67,7 +62,7 @@ public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNe
             return;
 
         addWeight(delta);
-        UpdateNet.updateNet(l.getOutput(), delta * l.getInputValue(POS));
+        l.getOutput().getNet().addAndTriggerUpdate(delta * l.getInputValue(POS));
     }
 
     @Override

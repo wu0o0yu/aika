@@ -21,7 +21,6 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.steps.UpdateNet;
 import network.aika.neuron.steps.activation.PostTraining;
 
 /**
@@ -33,7 +32,7 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
 
     @Override
     public boolean isWeak() {
-        return isWeak(getOutput().getWeightSum());
+        return isWeak(getOutput().getWeightSum().getOldValue());
     }
 
     public boolean isWeak(double weightSum) {
@@ -69,7 +68,7 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
             if(delta < 0.0)
                 PostTraining.add(l.getOutput());
 
-            UpdateNet.updateNet(l.getOutput(), delta);
+            l.getOutput().getNet().addAndTriggerUpdate(delta);
         }
 
         checkConstraints();
