@@ -50,4 +50,9 @@ public class FieldFunction implements FieldOutput {
     public double getUpdate() {
         return getNewValue() - getOldValue();
     }
+
+    @Override
+    public void acknowledgePropagated() {
+        input.acknowledgePropagated();
+    }
 }

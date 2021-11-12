@@ -37,7 +37,6 @@ import static network.aika.neuron.Neuron.BETA_THRESHOLD;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
-import static network.aika.utils.Utils.logChange;
 
 /**
  *
@@ -355,15 +354,15 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     }
 
     public boolean isZero() {
-        return Utils.belowTolerance(weight);
+        return Utils.belowTolerance(weight.getOldValue());
     }
 
     public boolean isNegative() {
-        return getWeight() < 0.0;
+        return weight.getOldValue() < 0.0;
     }
 
-    public void setWeight(double weight) {
-        addWeight(weight - this.weight);
+    public void setWeight(double w) {
+        weight.set(w);
     }
 
     public void addWeight(double weightDelta) {
@@ -420,7 +419,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     public String toString() {
         return "S " +
                 getClass().getSimpleName() +
-                "  w:" + Utils.round(getWeight()) +
+                "  w:" + getWeight() +
                 " in:[" + input.getNeuron() + "](" + (isInputLinked() ? "+" : "-") + ")" +
                 " --> out:[" + output.getNeuron() + "](" + (isOutputLinked() ? "+" : "-") + ")";
     }

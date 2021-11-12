@@ -77,7 +77,7 @@ public class SetFinalMode extends Step<BindingActivation> {
         act.updateValue();
         act.setFinalTimestamp();
 
-        if (!act.isFired() || act.getValue() > 0.0)
+        if (!act.isFired() || act.getNet().getOldValue() > 0.0)
             return;
 
         act.setFired(NOT_SET);
@@ -87,7 +87,7 @@ public class SetFinalMode extends Step<BindingActivation> {
     private double computeForwardLinkedRecurrentInputs(BindingActivation act) {
         return getPositiveRecurrentInputLinks(act)
                 .filter(l -> l.isForward())
-                .mapToDouble(l -> l.getSynapse().getWeight())
+                .mapToDouble(l -> l.getSynapse().getWeight().getOldValue())
                 .sum();
     }
 

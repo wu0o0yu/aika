@@ -31,10 +31,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
-import static network.aika.utils.Utils.logChange;
 
 /**
  *
@@ -89,8 +87,6 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
             double oldCB = conjunctiveBias;
 
             conjunctiveBias = Math.max(-weightSum, -bias);
-
-            logChange(this, oldCB, conjunctiveBias, "limitBias: conjunctiveBias");
         }
     }
 

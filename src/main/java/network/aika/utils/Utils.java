@@ -27,15 +27,6 @@ public class Utils {
 
     public static double TOLERANCE = 0.001;
 
-    static int dbgCounter = 0;
-
-    public static void logChange(Neuron n, double oldValue, double newValue, String field) {
-        if(belowTolerance(newValue - oldValue) || !n.getLabel().startsWith("B-fair"))
-            return;
-
-        System.out.println("oldValue:" + oldValue + " newValue:" + newValue + " : " + field + " cnt:" + (dbgCounter++));
-    }
-
     public static double[] add(double[] a, double[] b) {
         if(a == null)
             return b;

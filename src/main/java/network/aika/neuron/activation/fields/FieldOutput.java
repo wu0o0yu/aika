@@ -28,4 +28,21 @@ public interface FieldOutput {
     boolean updateAvailable();
 
     double getUpdate();
+
+    void acknowledgePropagated();
+
+    default double getUpdateAndAcknowledgePropagated() {
+        Double update = getUpdate();
+        if(update == null)
+            throw new RuntimeException("No Field Update Available!");
+
+        acknowledgePropagated();
+        return update;
+    }
+
+    default double getNewValueAndAcknowledgePropagated() {
+        double newValue = getNewValue();
+        acknowledgePropagated();
+        return newValue;
+    }
 }

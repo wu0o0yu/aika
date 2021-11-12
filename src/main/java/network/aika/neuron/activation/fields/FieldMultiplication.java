@@ -47,11 +47,17 @@ public class FieldMultiplication implements FieldOutput {
     public double getUpdate() {
         double result = 0.0;
         if(in1.updateAvailable())
-            result += in1.getUpdate() * in2.getOldValue();
+            result += in1.getUpdateAndAcknowledgePropagated() * in2.getOldValue();
 
         if(in2.updateAvailable())
-            result += in2.getUpdate() * in1.getOldValue();
+            result += in2.getUpdateAndAcknowledgePropagated() * in1.getOldValue();
 
         return result;
+    }
+
+    @Override
+    public void acknowledgePropagated() {
+        in1.acknowledgePropagated();
+        in2.acknowledgePropagated();
     }
 }

@@ -39,7 +39,6 @@ import static network.aika.neuron.activation.PatternActivation.MAX_PATTERN_ACT;
 import static network.aika.neuron.activation.PatternActivation.MIN_PATTERN_ACT;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.sign.Sign.POS;
-import static network.aika.utils.Utils.logChange;
 
 /**
  * @author Lukas Molzberger
@@ -50,9 +49,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(Activation::getId);
 
-    protected Field value = new Field();
-    protected Double inputValue = null;
-    protected Field net = new Field(INITIAL_NET);
+    protected Field value = new Field((u, v) -> PropagateValueChange.add(this, u));
+    protected boolean isInput;
+    protected Field net = new Field(INITIAL_NET, (u, v) -> {
+        if(!isInput)
+            value.set(getBranchProbability() * getActivationFunction().f(v));
+    });
 
     protected Timestamp creationTimestamp = NOT_SET;
     protected Timestamp fired = NOT_SET;
@@ -70,8 +72,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     );
     protected Map<Activation<?>, BindingSignal> reverseBindingSignals = new TreeMap<>();
 
-    private Field entropy = new Field(this::receiveOwnGradientUpdate);
-    private Field inputGradient = new Field(u -> PropagateGradients.add(this));
+    private Field entropy = new Field((u,v) -> receiveOwnGradientUpdate(u));
+    private Field inputGradient = new Field((u,v) -> PropagateGradients.add(this));
 
 
     protected FieldOutput outputGradient = new FieldMultiplication(
@@ -91,7 +93,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
-        net = n.getInitialNet();
+        net.set(n.getInitialNet());
 
         thought.registerActivation(this);
 
@@ -112,11 +114,19 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return id;
     }
 
-    public double getValue() {
+    public Field getValue() {
         return value;
     }
 
-    public double getNet() {
+    public boolean isInput() {
+        return isInput;
+    }
+
+    public void setInput(boolean input) {
+        isInput = input;
+    }
+
+    public Field getNet() {
         return net;
     }
 
@@ -254,7 +264,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void setInputValue(double v) {
-        inputValue = v;
+        value.set(v);
+        isInput = true;
     }
 
     public Link getInputLink(Neuron n) {
@@ -307,25 +318,11 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void updateNet(double netDelta) {
-        double oldNet = net;
-        net += netDelta;
-        logChange(neuron, oldNet, net, "updateNet: net");
+        net.add(netDelta);
     }
 
-    protected double computeValue() {
-        return getActivationFunction().f(net);
-    }
-
-    public void updateValue() {
-        double oldValue = value;
-
-        value = inputValue != null ?
-                inputValue :
-                computeValue();
-
-        logChange(neuron, oldValue, value, "updateValue: value");
-
-        PropagateValueChange.add(this, value - oldValue);
+    public double getBranchProbability() {
+        return 1.0;
     }
 
     public void updateEntropyGradient() {
@@ -352,7 +349,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void updateOutputGradient() {
-        double g = outputGradient.getUpdate();
+        double g = outputGradient.getUpdateAndAcknowledgePropagated();
         UpdateBias.add(this, getConfig().getLearnRate() * g);
 
         inputLinks.values().forEach(l ->

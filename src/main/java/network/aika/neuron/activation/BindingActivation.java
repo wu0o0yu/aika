@@ -141,6 +141,7 @@ public class BindingActivation extends Activation<BindingNeuron> {
             return branches.stream();
     }
 
+    @Override
     public double getBranchProbability() {
         return branchProbability;
     }
@@ -157,18 +158,13 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
     // should ownGrad only used for backpropagation or also for the weight update?
     public void updateOutputGradient() {
-        double grad = outputGradient.getUpdate();
-        double ownGrad = ownInputGradient.getUpdate();
+        double grad = outputGradient.getUpdateAndAcknowledgePropagated();
+        double ownGrad = ownInputGradient.getUpdateAndAcknowledgePropagated();
         UpdateBias.add(this, getConfig().getLearnRate() * grad);
 
         inputLinks.values().forEach(l ->
                 PropagateGradientAndUpdateWeight.add(l, l.getSynapse().isRecurrent() ? ownGrad : grad)
         );
-    }
-
-    @Override
-    protected double computeValue() {
-        return branchProbability * getActivationFunction().f(net);
     }
 
     public String toString(boolean includeLink) {

@@ -71,7 +71,7 @@ public class Field implements FieldInput, FieldOutput, Writable {
         if(fieldListener == null)
             return;
 
-        fieldListener.updated(update);
+        fieldListener.updated(update, getNewValue());
     }
 
     public void add(double u) {
@@ -83,7 +83,7 @@ public class Field implements FieldInput, FieldOutput, Writable {
         if(fieldListener == null)
             return;
 
-        fieldListener.updated(update);
+        fieldListener.updated(update, getNewValue());
     }
 
     public boolean updateAvailable() {
@@ -91,13 +91,12 @@ public class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public double getUpdate() {
-        if(update == null)
-            throw new RuntimeException("No Field Update Available!");
+        return update;
+    }
 
-        double result = update;
+    public void acknowledgePropagated() {
         oldValue += update;
         update = 0.0;
-        return result;
     }
 
     @Override
@@ -118,11 +117,12 @@ public class Field implements FieldInput, FieldOutput, Writable {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("[");
+        sb.append("[d:");
         if(update != null)
             sb.append(Utils.round(update));
         else sb.append("X");
-        sb.append(getOldValue());
+        sb.append(",v:");
+        sb.append(Utils.round(oldValue));
         sb.append("]");
         return sb.toString();
     }
