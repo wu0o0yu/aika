@@ -32,12 +32,12 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
 
         return super.checkScope(iBS, oBS);
     }
-
+/*
     @Override
     public void propagateGradient(Link l, double gradient) {
         l.propagateGradient(gradient);
     }
-
+*/
     @Override
     public boolean isRecurrent() {
         return true;

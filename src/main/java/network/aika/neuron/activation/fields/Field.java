@@ -67,8 +67,6 @@ public class Field implements FieldInput, FieldOutput, Writable {
             return;
 
         update = v - oldValue;
-
-        triggerUpdate();
     }
 
 
@@ -77,12 +75,14 @@ public class Field implements FieldInput, FieldOutput, Writable {
             return;
 
         update += u;
-
-        triggerUpdate();
     }
 
 
     public void triggerUpdate() {
+        triggerInternal();
+    }
+
+    protected void triggerInternal() {
         if (fieldListener == null)
             return;
 

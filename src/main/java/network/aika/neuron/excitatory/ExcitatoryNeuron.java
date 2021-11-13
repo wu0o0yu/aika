@@ -109,7 +109,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
 
     public void updateSynapseInputConnections() {
         TreeSet<ExcitatorySynapse> sortedSynapses = new TreeSet<>(
-                Comparator.<ExcitatorySynapse>comparingDouble(Synapse::getWeight).reversed()
+                Comparator.<ExcitatorySynapse>comparingDouble(s -> s.getWeight().getOldValue()).reversed()
                         .thenComparing(Synapse::getPInput)
         );
 

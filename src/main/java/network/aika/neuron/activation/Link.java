@@ -21,6 +21,8 @@ import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.fields.Field;
+import network.aika.neuron.activation.fields.FieldMultiplication;
+import network.aika.neuron.activation.fields.FieldOutput;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.link.AddLink;
 import network.aika.utils.Utils;
@@ -47,13 +49,19 @@ public class Link<A extends Activation> extends Element<Link> {
 
     private final boolean isSelfRef;
 
-    private Field igGradient = new Field((u, v) -> getOutput().receiveOwnGradientUpdate(u));
+    private Field igGradient;
+    private FieldOutput weightedInput;
+    private FieldOutput backPropGradient;
 
     public Link(Synapse s, Activation input, A output, boolean isSelfRef) {
         this.synapse = s;
         this.input = input;
         this.output = output;
         this.isSelfRef = isSelfRef;
+
+        igGradient = new Field((u, v) -> output.receiveOwnGradientUpdate(u));
+        weightedInput = new FieldMultiplication(input.getValue(), synapse.getWeight());
+        backPropGradient = new FieldMultiplication(output.outputGradient, synapse.getWeight());
 
         AddLink.add(this);
 
@@ -113,7 +121,7 @@ public class Link<A extends Activation> extends Element<Link> {
                 });
     }
 */
-
+/*
     public void propagateGradient(double g) {
         if(input == null)
             return;
@@ -123,7 +131,8 @@ public class Link<A extends Activation> extends Element<Link> {
                         g
         );
     }
-
+ */
+/*
     public static double getInputValue(Sign s, Link l) {
         return l != null ? l.getInputValue(s) : 0.0;
     }
@@ -131,7 +140,7 @@ public class Link<A extends Activation> extends Element<Link> {
     public static double getInputValueDelta(Sign s, Link nl, Link ol) {
         return nl.getInputValue(s) - Link.getInputValue(s, ol);
     }
-
+*/
     public double getInputValue(Sign s) {
         return s.getValue(input != null ? input.getValue() : 0.0);
     }
@@ -189,6 +198,7 @@ public class Link<A extends Activation> extends Element<Link> {
         );
     }
 
+    /*
     public void updateNetByWeight(double weightDelta) {
         synapse.updateOutputNet(this, getInputValue(POS) * weightDelta);
     }
@@ -196,6 +206,7 @@ public class Link<A extends Activation> extends Element<Link> {
     public void updateNetByInputValue(double inputValueDelta) {
         synapse.updateOutputNet(this, inputValueDelta * synapse.getWeight());
     }
+*/
 
     public void linkOutput() {
         output.inputLinks.put(input != null ? input.getNeuronProvider() : synapse.getPInput(), this);
@@ -236,9 +247,9 @@ public class Link<A extends Activation> extends Element<Link> {
     }
 
     public String toDetailedString() {
-        return "in:[" + input.toShortString() + " v:" + Utils.round(input.getValue()) + "] - " +
+        return "in:[" + input.toShortString() + " v:" + input.getValue() + "] - " +
                 "s:[" + synapse.toString() + "] - " +
-                "out:[" + input.toShortString() + " v:" + Utils.round(input.getValue()) + "]";
+                "out:[" + input.toShortString() + " v:" + input.getValue() + "]";
     }
 
     public String getIdString() {
