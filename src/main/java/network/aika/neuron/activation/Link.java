@@ -207,6 +207,10 @@ public class Link<A extends Activation> extends Element<Link> {
     }
 */
 
+    public void updateInputValue(Double u, double v) {
+
+    }
+
     public void linkOutput() {
         output.inputLinks.put(input != null ? input.getNeuronProvider() : synapse.getPInput(), this);
     }
@@ -264,4 +268,5 @@ public class Link<A extends Activation> extends Element<Link> {
     public String toShortString() {
         return toString();
     }
+
 }

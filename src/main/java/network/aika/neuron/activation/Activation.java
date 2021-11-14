@@ -49,7 +49,10 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(Activation::getId);
 
-    protected Field value = new Field((u, v) -> PropagateValueChange.add(this, u));
+    protected Field value = new Field((u, v) ->
+            getOutputLinks()
+                    .forEach(l -> l.updateInputValue(u, v))
+    );
     protected boolean isInput;
     protected Field net = new Field(INITIAL_NET, (u, v) -> {
         if(!isInput)

@@ -65,11 +65,9 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
     @Override
     public void updateSynapse(Link l, double delta) {
         if(l.getInput().isFired()) {
-            addWeight(delta);
-            l.updateNetByWeight(delta);
+            weight.add(delta);
         } else {
-            addWeight(-delta);
-            l.updateNetByWeight(-delta);
+            weight.add(-delta);
 
             getOutput().addConjunctiveBias(delta);
             if(delta < 0.0)
