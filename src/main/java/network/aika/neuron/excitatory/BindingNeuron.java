@@ -59,9 +59,10 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, Bindin
         return super.getInitialNet() + assumedActiveSum.getOldValue();
     }
 
+    /*
     public void addAssumedWeights(double weightDelta) {
         assumedActiveSum.addAndTriggerUpdate(weightDelta);
-    }
+    }*/
 
     @Override
     public boolean allowTemplatePropagate(Activation act) {
@@ -70,7 +71,7 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, Bindin
         if(n.isInputNeuron())
             return false;
 
-        if(Utils.belowTolerance(act.getOutputGradientSum()))
+        if(act.getOutputGradient().updateAvailable())
             return false;
 
         return true;

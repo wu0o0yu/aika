@@ -129,7 +129,7 @@ public class TextModel extends Model {
         Synapse s = ts.instantiateTemplate(inhib, inRel);
 
         s.linkOutput();
-        s.addWeight(10.0);
+        s.getWeight().add(10.0);
         s.setAllowTraining(false);
         inRel.addConjunctiveBias(-10.0);
     }
@@ -140,7 +140,7 @@ public class TextModel extends Model {
 
         s.linkInput();
         s.linkOutput();
-        s.setWeight(11.0);
+        s.getWeight().set(11.0);
         s.setAllowTraining(false);
         inRel.addConjunctiveBias(-11.0);
     }
@@ -150,7 +150,7 @@ public class TextModel extends Model {
                 .instantiateTemplate(inRelPT, prevTokenInhib);
 
         s.linkInput();
-        s.addWeight(2.0);
+        s.getWeight().add(2.0);
         s.setAllowTraining(false);
     }
 

@@ -17,6 +17,9 @@
 package network.aika.neuron;
 
 import network.aika.Model;
+import network.aika.neuron.activation.Element;
+import network.aika.neuron.activation.fields.Field;
+import network.aika.neuron.steps.Step;
 
 import java.io.*;
 import java.util.zip.GZIPInputStream;

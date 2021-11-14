@@ -41,12 +41,14 @@ public class Field implements FieldInput, FieldOutput, Writable {
         this.fieldListener = fieldListener;
     }
 
-    public Field(double x) {
-        this.oldValue = x;
+    public Field(double v) {
+        this.oldValue = v;
+        if(!Utils.belowTolerance(v))
+            update = v;
     }
 
-    public Field(double x, FieldUpdateEvent fieldListener) {
-        this.oldValue = x;
+    public Field(double v, FieldUpdateEvent fieldListener) {
+        this(v);
         this.fieldListener = fieldListener;
     }
 
@@ -99,7 +101,7 @@ public class Field implements FieldInput, FieldOutput, Writable {
 
     public void acknowledgePropagated() {
         oldValue += update;
-        update = 0.0;
+        update = null;
     }
 
     @Override

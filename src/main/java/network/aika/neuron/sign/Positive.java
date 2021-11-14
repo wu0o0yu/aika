@@ -16,6 +16,9 @@
  */
 package network.aika.neuron.sign;
 
+import network.aika.neuron.activation.fields.Field;
+import network.aika.neuron.activation.fields.FieldOutput;
+
 /**
  *
  * @author Lukas Molzberger
@@ -27,8 +30,13 @@ public class Positive implements Sign {
     }
 
     @Override
-    public double getValue(Double x) {
-        return x != null ? x : 0.0;
+    public FieldOutput getValue(FieldOutput v) {
+        return v;
+    }
+
+    @Override
+    public int index() {
+        return 0;
     }
 
     public String toString() {

@@ -46,7 +46,7 @@ public class PropagateTest {
 
         s.linkInput();
         s.linkOutput();
-        s.addWeight(10.0);
+        s.getWeight().add(10.0);
         out.addConjunctiveBias(-10.0);
         out.addBias(1.0);
 

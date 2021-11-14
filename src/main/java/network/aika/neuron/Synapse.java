@@ -51,7 +51,8 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     private Synapse template;
     private TemplateSynapseInfo templateInfo;
 
-    protected Field weight = new Field((u, v) -> setModified());
+    protected Field weight = new Field((u, v) -> weightUpdate(u, v));
+
 
     protected SampleSpace sampleSpace = new SampleSpace();
 
@@ -324,6 +325,14 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return getPOutput().getModel();
     }
 
+    public double getCompleteSurprisal(Sign si, Sign so, Range range) {
+        double s = getSurprisal(si, so, range);
+        s -= getInput().getSurprisal(si, range);
+        s -= getOutput().getSurprisal(so, range);
+
+        return s;
+    }
+
     public double getSurprisal(Sign si, Sign so, Range range) {
         double N = sampleSpace.getN(range);
         if(isTemplate() || N == 0.0)
@@ -360,7 +369,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     public boolean isNegative() {
         return weight.getOldValue() < 0.0;
     }
-
+/*
     public void setWeight(double w) {
         weight.setAndTriggerUpdate(w);
     }
@@ -371,6 +380,10 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
 
     protected void addWeightInternal(double weightDelta) {
         weight.addAndTriggerUpdate(weightDelta);
+    }
+*/
+    protected void weightUpdate(Double u, double v) {
+        setModified();
     }
 
     public void updateOutputNet(Link<A> l, double delta) {

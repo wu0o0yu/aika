@@ -26,6 +26,7 @@ import network.aika.neuron.activation.Link;
  */
 public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
 
+
     public boolean checkScope(BindingSignal iBS, BindingSignal oBS) {
         if(iBS.getScope() == 0 && oBS.getScope() == 0)
             return true;
@@ -52,10 +53,17 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
         return false;
     }
 
+    /*
     @Override
     public void addWeight(double weightDelta) {
-        super.addWeight(weightDelta);
+        supergetWeight().add(weightDelta);
 
         getOutput().addAssumedWeights(weightDelta);
+    }*/
+
+    @Override
+    protected void weightUpdate(Double u, double v) {
+        super.weightUpdate(u, v);
+        getOutput().getAssumedActiveSum().add(u);
     }
 }

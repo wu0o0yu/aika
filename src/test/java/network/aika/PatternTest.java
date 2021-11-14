@@ -95,7 +95,7 @@ public class PatternTest {
 
                 s.linkInput();
                 s.linkOutput();
-                s.addWeight(10.0);
+                s.getWeight().add(10.0);
                 eA.addConjunctiveBias(-10.0);
             }
 
@@ -104,7 +104,7 @@ public class PatternTest {
 
                 s.linkInput();
                 s.linkOutput();
-                s.setWeight(10.0);
+                s.getWeight().set(10.0);
                 eA.addConjunctiveBias(-10.0);
             }
             eA.addBias(4.0);
@@ -116,7 +116,7 @@ public class PatternTest {
 
                 s.linkInput();
                 s.linkOutput();
-                s.addWeight(10.0);
+                s.getWeight().add(10.0);
                 eB.addConjunctiveBias(-10.0);
             }
 
@@ -124,7 +124,7 @@ public class PatternTest {
                 Synapse s = t.SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eA, eB);
 
                 s.linkOutput();
-                s.addWeight(10.0);
+                s.getWeight().add(10.0);
                 eB.addConjunctiveBias(-10.0);
             }
 
@@ -132,7 +132,7 @@ public class PatternTest {
                 Synapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(lookupBindingNeuronPT(m, nB), eB);
 
                 s.linkOutput();
-                s.addWeight(10.0);
+                s.getWeight().add(10.0);
                 eB.addConjunctiveBias(-10.0);
             }
 
@@ -140,7 +140,7 @@ public class PatternTest {
                 Synapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eB);
 
                 s.linkOutput();
-                s.addWeight(10.0);
+                s.getWeight().add(10.0);
                 eB.addConjunctiveBias(-10.0);
             }
             eB.addBias(4.0);
@@ -152,7 +152,7 @@ public class PatternTest {
 
                 s.linkInput();
                 s.linkOutput();
-                s.addWeight(10.0);
+                s.getWeight().add(10.0);
                 eC.addConjunctiveBias(-10.0);
             }
 
@@ -160,7 +160,7 @@ public class PatternTest {
                 Synapse s = t.SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eB, eC);
 
                 s.linkOutput();
-                s.addWeight(10.0);
+                s.getWeight().add(10.0);
                 eC.addConjunctiveBias(-10.0);
             }
 
@@ -168,7 +168,7 @@ public class PatternTest {
                 Synapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(lookupBindingNeuronPT(m, nC), eC);
 
                 s.linkOutput();
-                s.addWeight(10.0);
+                s.getWeight().add(10.0);
                 eC.addConjunctiveBias(-10.0);
             }
 
@@ -176,7 +176,7 @@ public class PatternTest {
                 Synapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eC);
 
                 s.linkOutput();
-                s.addWeight(10.0);
+                s.getWeight().add(10.0);
                 eC.addConjunctiveBias(-10.0);
             }
             eC.addBias(4.0);
@@ -188,7 +188,7 @@ public class PatternTest {
 
                 s.linkInput();
                 s.linkOutput();
-                s.addWeight(10.0);
+                s.getWeight().add(10.0);
                 out.addConjunctiveBias(-10.0);
             }
             {
@@ -196,7 +196,7 @@ public class PatternTest {
 
                 s.linkInput();
                 s.linkOutput();
-                s.addWeight(10.0);
+                s.getWeight().add(10.0);
                 out.addConjunctiveBias(-10.0);
             }
             {
@@ -204,7 +204,7 @@ public class PatternTest {
 
                 s.linkInput();
                 s.linkOutput();
-                s.addWeight(10.0);
+                s.getWeight().add(10.0);
                 out.addConjunctiveBias(-10.0);
             }
             out.addBias(4.0);

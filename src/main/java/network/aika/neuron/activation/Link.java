@@ -30,7 +30,9 @@ import network.aika.utils.Utils;
 import java.util.Comparator;
 
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
+import static network.aika.neuron.activation.fields.ConstantField.ZERO;
 import static network.aika.neuron.sign.Sign.POS;
+import static network.aika.neuron.sign.Sign.SIGNS;
 
 /**
  *
@@ -52,6 +54,7 @@ public class Link<A extends Activation> extends Element<Link> {
     private Field igGradient;
     private FieldOutput weightedInput;
     private FieldOutput backPropGradient;
+    private FieldOutput[][] activationValue = new FieldOutput[2][2];
 
     public Link(Synapse s, Activation input, A output, boolean isSelfRef) {
         this.synapse = s;
@@ -62,6 +65,10 @@ public class Link<A extends Activation> extends Element<Link> {
         igGradient = new Field((u, v) -> output.receiveOwnGradientUpdate(u));
         weightedInput = new FieldMultiplication(input.getValue(), synapse.getWeight());
         backPropGradient = new FieldMultiplication(output.outputGradient, synapse.getWeight());
+
+        for(Sign si: SIGNS)
+            for(Sign so: SIGNS)
+                activationValue[si.index()][so.index()] = new FieldMultiplication(getInputValue(si), getOutputValue(so));
 
         AddLink.add(this);
 
@@ -85,25 +92,17 @@ public class Link<A extends Activation> extends Element<Link> {
         return l.getSynapse().isOfTemplate(ts);
     }
 
-    private double computeGradient(Sign si, Sign so) {
-        Range range = input.getAbsoluteRange();
-        assert range != null;
-
-        double s = getSynapse().getSurprisal(si, so, range);
-        s -= input.getNeuron().getSurprisal(si, range);
-        s -= output.getNeuron().getSurprisal(so, range);
-
-        return s * getInputValue(si) * getOutputValue(so);
-    }
-
     public void updateInformationGainGradient() {
         if(isNegative())
             return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
 
+        Range range = input.getAbsoluteRange();
+        assert range != null;
+
         double igGrad = 0.0;
         for(Sign si: Sign.SIGNS) {
             for (Sign so : Sign.SIGNS) {
-                igGrad += computeGradient(si, so);
+                igGrad += synapse.getSurprisal(si, so, range) * activationValue[si.index()][so.index()].getOldValue();
             }
         }
 
@@ -141,12 +140,12 @@ public class Link<A extends Activation> extends Element<Link> {
         return nl.getInputValue(s) - Link.getInputValue(s, ol);
     }
 */
-    public double getInputValue(Sign s) {
-        return s.getValue(input != null ? input.getValue() : 0.0);
+    public FieldOutput getInputValue(Sign s) {
+        return s.getValue(input != null ? input.getValue() : ZERO);
     }
 
-    public double getOutputValue(Sign s) {
-        return s.getValue(output != null ? output.getValue() : 0.0);
+    public FieldOutput getOutputValue(Sign s) {
+        return s.getValue(output != null ? output.getValue() : ZERO);
     }
 
     public Synapse getSynapse() {
@@ -258,12 +257,11 @@ public class Link<A extends Activation> extends Element<Link> {
 
     public String gradientsToString() {
         return "   " + getIdString() +
-                " x:" + Utils.round(getInputValue(POS)) +
+                " x:" + getInputValue(POS) +
                 " w:" + getSynapse().getWeight();
     }
 
     public String toShortString() {
         return toString();
     }
-
 }
