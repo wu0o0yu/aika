@@ -21,10 +21,7 @@ import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.fields.Field;
-import network.aika.neuron.activation.fields.FieldOutput;
-import network.aika.neuron.activation.fields.FieldFunction;
-import network.aika.neuron.activation.fields.FieldMultiplication;
+import network.aika.neuron.activation.fields.*;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.activation.*;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
@@ -38,7 +35,6 @@ import static network.aika.neuron.activation.BindingActivation.MIN_BINDING_ACT;
 import static network.aika.neuron.activation.PatternActivation.MAX_PATTERN_ACT;
 import static network.aika.neuron.activation.PatternActivation.MIN_PATTERN_ACT;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
-import static network.aika.neuron.sign.Sign.POS;
 
 /**
  * @author Lukas Molzberger
@@ -49,16 +45,17 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(Activation::getId);
 
-    protected Field value = new Field((u, v) ->
+    protected Field value = new Field(() ->
             getOutputLinks()
-                    .forEach(l -> l.updateInputValue(u, v))
+                    .forEach(l -> l.updateInputValue())
     );
     protected boolean isInput;
-    protected Field net = new Field(INITIAL_NET, (u, v) -> {
+    protected Field net = new QueueField(INITIAL_NET, () -> {
+        double v = getNet().getNewValueAndAcknowledge();
         if(!isInput)
             value.setAndTriggerUpdate(getBranchProbability() * getActivationFunction().f(v));
 
-        PropagateGradients.add(this);
+//        PropagateGradients.add(this);
         CheckIfFired.add(this);
     });
 
@@ -78,8 +75,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     );
     protected Map<Activation<?>, BindingSignal> reverseBindingSignals = new TreeMap<>();
 
-    private Field entropy = new Field((u,v) -> receiveOwnGradientUpdate(u));
-    private Field inputGradient = new Field((u,v) -> PropagateGradients.add(this));
+    private Field entropy = new Field();
+    private Field inputGradient = new QueueField();
 
 
     protected FieldOutput outputGradient = new FieldMultiplication(
@@ -88,7 +85,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                     getNeuron().getActivationFunction().outerGrad(x)
             )
     );
-
 
     protected Activation(int id, N n) {
         this.id = id;
@@ -100,6 +96,20 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this.thought = t;
 
         net.setAndTriggerUpdate(n.getInitialNet());
+
+        entropy.setFieldListener(() -> receiveOwnGradientUpdate(entropy.getUpdateAndAcknowledge()));
+
+        inputGradient.setFieldListener(() -> {
+            double g = outputGradient.getUpdateAndAcknowledge();
+            getNeuron().getBias().add(getConfig().getLearnRate() * g);
+
+            inputLinks.values().forEach(l ->
+                    l.propagateGradient(g)
+            );
+
+            if(isFired())
+                TemplatePropagate.add(this);
+        });
 
         thought.registerActivation(this);
 
@@ -352,14 +362,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         inputGradient.addAndTriggerUpdate(u);
     }
 
-    public void updateOutputGradient() {
-        double g = outputGradient.getUpdateAndAcknowledgePropagated();
-        UpdateBias.add(this, getConfig().getLearnRate() * g);
-
-        inputLinks.values().forEach(l ->
-            PropagateGradientAndUpdateWeight.add(l, g)
-        );
-    }
 
     public void linkInputs() {
         inputLinks

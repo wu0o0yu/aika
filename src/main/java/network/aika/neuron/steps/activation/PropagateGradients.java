@@ -57,11 +57,13 @@ public class PropagateGradients extends Step<Activation> {
     @Override
     public void process() {
         Activation act = getElement();
-
+/*
         act.updateOutputGradient();
 
         if(act.isFired())
             TemplatePropagate.add(act);
+
+ */
     }
 
     public String toString() {

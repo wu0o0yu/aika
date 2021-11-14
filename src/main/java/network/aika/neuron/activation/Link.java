@@ -24,8 +24,9 @@ import network.aika.neuron.activation.fields.Field;
 import network.aika.neuron.activation.fields.FieldMultiplication;
 import network.aika.neuron.activation.fields.FieldOutput;
 import network.aika.neuron.sign.Sign;
+import network.aika.neuron.steps.activation.PostTraining;
 import network.aika.neuron.steps.link.AddLink;
-import network.aika.utils.Utils;
+import network.aika.neuron.steps.link.PropagateBindingSignal;
 
 import java.util.Comparator;
 
@@ -51,8 +52,9 @@ public class Link<A extends Activation> extends Element<Link> {
 
     private final boolean isSelfRef;
 
-    private Field igGradient;
+    private Field igGradient = new Field();
     private FieldOutput weightedInput;
+
     private FieldOutput backPropGradient;
     private FieldOutput[][] activationValue = new FieldOutput[2][2];
 
@@ -62,7 +64,7 @@ public class Link<A extends Activation> extends Element<Link> {
         this.output = output;
         this.isSelfRef = isSelfRef;
 
-        igGradient = new Field((u, v) -> output.receiveOwnGradientUpdate(u));
+        igGradient.setFieldListener(() -> output.receiveOwnGradientUpdate(igGradient.getUpdateAndAcknowledge()));
         weightedInput = new FieldMultiplication(input.getValue(), synapse.getWeight());
         backPropGradient = new FieldMultiplication(output.outputGradient, synapse.getWeight());
 
@@ -73,6 +75,32 @@ public class Link<A extends Activation> extends Element<Link> {
         AddLink.add(this);
 
         getThought().onLinkCreationEvent(this);
+    }
+
+    public FieldOutput getWeightedInput() {
+        return weightedInput;
+    }
+
+    public FieldOutput getBackPropGradient() {
+        return backPropGradient;
+    }
+
+    public void propagateGradient(double g) {
+        if(!synapse.isAllowTraining())
+            return;
+
+        double weightDelta = getConfig().getLearnRate() * g;
+        boolean oldWeightIsZero = synapse.isZero();
+
+        assert !synapse.isTemplate();
+        synapse.updateSynapse(this, weightDelta);
+
+        if (oldWeightIsZero && !synapse.isZero() && getInput().isFired())
+            PropagateBindingSignal.add(this);
+
+        PostTraining.add(getOutput());
+
+   //     synapse.propagateGradient(l, gradient);
     }
 
     @Override
@@ -207,7 +235,7 @@ public class Link<A extends Activation> extends Element<Link> {
     }
 */
 
-    public void updateInputValue(Double u, double v) {
+    public void updateInputValue() {
 
     }
 

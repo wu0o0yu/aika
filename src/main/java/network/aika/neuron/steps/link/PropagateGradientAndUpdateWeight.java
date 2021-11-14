@@ -63,7 +63,7 @@ public class PropagateGradientAndUpdateWeight extends Step<Link> {
     public void process() {
         Link l = getElement();
         Synapse s = l.getSynapse();
-
+/*
         if(!l.getSynapse().isAllowTraining())
             return;
 
@@ -80,6 +80,8 @@ public class PropagateGradientAndUpdateWeight extends Step<Link> {
         PostTraining.add(l.getOutput());
 
         s.propagateGradient(l, gradient);
+
+ */
     }
 
     public String toString() {

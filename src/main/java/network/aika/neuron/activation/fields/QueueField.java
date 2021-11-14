@@ -9,6 +9,18 @@ public class QueueField extends Field {
     private boolean isQueued;
     private FieldStep step;
 
+    public QueueField() {
+        super();
+    }
+
+    public QueueField(FieldUpdateEvent fieldListener) {
+        super(fieldListener);
+    }
+
+    public QueueField(double v, FieldUpdateEvent fieldListener) {
+        super(v, fieldListener);
+    }
+
     public void setStep(FieldStep s) {
         this.step = s;
     }

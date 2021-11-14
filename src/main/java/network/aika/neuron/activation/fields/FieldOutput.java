@@ -31,7 +31,7 @@ public interface FieldOutput {
 
     void acknowledgePropagated();
 
-    default double getUpdateAndAcknowledgePropagated() {
+    default double getUpdateAndAcknowledge() {
         Double update = getUpdate();
         if(update == null)
             throw new RuntimeException("No Field Update Available!");
@@ -40,7 +40,7 @@ public interface FieldOutput {
         return update;
     }
 
-    default double getNewValueAndAcknowledgePropagated() {
+    default double getNewValueAndAcknowledge() {
         double newValue = getNewValue();
         acknowledgePropagated();
         return newValue;

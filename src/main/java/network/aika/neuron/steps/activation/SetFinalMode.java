@@ -65,7 +65,7 @@ public class SetFinalMode extends Step<BindingActivation> {
 
         act.setFinalMode(true);
 
-        double assumedActiveSum = act.getNeuron().getAssumedActiveSum().getNewValueAndAcknowledgePropagated();
+        double assumedActiveSum = act.getNeuron().getAssumedActiveSum().getNewValueAndAcknowledge();
         act.getNet().addAndTriggerUpdate(assumedActiveSum - computeForwardLinkedRecurrentInputs(act));
 
         getPositiveRecurrentInputLinks(act)

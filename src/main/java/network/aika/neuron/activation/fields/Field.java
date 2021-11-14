@@ -52,6 +52,10 @@ public class Field implements FieldInput, FieldOutput, Writable {
         this.fieldListener = fieldListener;
     }
 
+    public void setFieldListener(FieldUpdateEvent fieldListener) {
+        this.fieldListener = fieldListener;
+    }
+
     public double getOldValue() {
         return oldValue;
     }
@@ -88,7 +92,7 @@ public class Field implements FieldInput, FieldOutput, Writable {
         if (fieldListener == null)
             return;
 
-        fieldListener.updated(update, getNewValue());
+        fieldListener.updated();
     }
 
     public boolean updateAvailable() {

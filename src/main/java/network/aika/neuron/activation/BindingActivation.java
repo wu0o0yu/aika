@@ -23,7 +23,6 @@ import network.aika.neuron.activation.fields.Field;
 import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.steps.activation.BranchProbability;
 import network.aika.neuron.steps.activation.SetFinalMode;
-import network.aika.neuron.steps.activation.UpdateBias;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.utils.Utils;
 
@@ -158,12 +157,13 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
     // should ownGrad only used for backpropagation or also for the weight update?
     public void updateOutputGradient() {
-        double grad = outputGradient.getUpdateAndAcknowledgePropagated();
-        double ownGrad = ownInputGradient.getUpdateAndAcknowledgePropagated();
-        UpdateBias.add(this, getConfig().getLearnRate() * grad);
+        double grad = outputGradient.getUpdateAndAcknowledge();
+        double ownGrad = ownInputGradient.getUpdateAndAcknowledge();
+//        UpdateBias.add(this, getConfig().getLearnRate() * grad);
+        getNeuron().getBias().add(getConfig().getLearnRate() * grad);
 
         inputLinks.values().forEach(l ->
-                PropagateGradientAndUpdateWeight.add(l, l.getSynapse().isRecurrent() ? ownGrad : grad)
+                l.propagateGradient(l.getSynapse().isRecurrent() ? ownGrad : grad)
         );
     }
 
