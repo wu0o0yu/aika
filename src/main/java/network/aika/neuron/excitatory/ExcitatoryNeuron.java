@@ -39,8 +39,8 @@ import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGEN
  */
 public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Activation> extends Neuron<S, A> {
 
-    private volatile Field conjunctiveBias;
-    private volatile Field weightSum;
+    private volatile Field conjunctiveBias = new Field();
+    private volatile Field weightSum = new Field();
 
     public ExcitatoryNeuron() {
         super();

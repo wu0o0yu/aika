@@ -34,7 +34,7 @@ import java.io.IOException;
  */
 public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, BindingActivation> {
 
-    private Field assumedActiveSum;
+    private Field assumedActiveSum = new Field();
 
     public BindingNeuron() {
         super();
@@ -58,11 +58,6 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, Bindin
     public double getInitialNet() {
         return super.getInitialNet() + assumedActiveSum.getOldValue();
     }
-
-    /*
-    public void addAssumedWeights(double weightDelta) {
-        assumedActiveSum.addAndTriggerUpdate(weightDelta);
-    }*/
 
     @Override
     public boolean allowTemplatePropagate(Activation act) {

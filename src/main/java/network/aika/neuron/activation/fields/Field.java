@@ -80,7 +80,10 @@ public class Field implements FieldInput, FieldOutput, Writable {
         if(Utils.belowTolerance(u))
             return;
 
-        update += u;
+        if(update == null)
+            update = u;
+        else
+            update += u;
     }
 
 
