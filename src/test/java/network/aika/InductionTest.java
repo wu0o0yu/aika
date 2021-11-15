@@ -61,14 +61,14 @@ public class InductionTest {
 
         sA.linkInput();
         sA.linkOutput();
-        sA.setWeight(0.1);
+        sA.getWeight().set(0.1);
         targetN.addConjunctiveBias(-0.1);
 
         Synapse sB = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inB, targetN);
 
         sB.linkInput();
         sB.linkOutput();
-        sB.setWeight(0.0);
+        sB.getWeight().set(0.0);
 
 
         m.setN(100);

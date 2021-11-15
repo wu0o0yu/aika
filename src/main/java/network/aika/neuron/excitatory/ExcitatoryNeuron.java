@@ -62,9 +62,6 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
         return conjunctiveBias;
     }
 
-    public void addWeight(double weightDelta) {
-        weightSum.addAndTriggerUpdate(weightDelta);
-    }
 
     protected void initFromTemplate(ExcitatoryNeuron n) {
         super.initFromTemplate(n);

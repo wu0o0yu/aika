@@ -71,7 +71,7 @@ public class SetFinalMode extends Step<BindingActivation> {
         getPositiveRecurrentInputLinks(act)
                 .filter(l -> !l.isForward())
                 .forEach(l ->
-                        l.updateNetByInputValue(l.getInputValue(Sign.POS))
+                        l.updateInputValue()
                 );
 
         act.setFinalTimestamp();

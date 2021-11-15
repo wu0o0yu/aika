@@ -43,18 +43,11 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
         return !(weightIsAbleToExceedThreshold ||
                 (weightSumIsAbleToExceedThreshold && weightIsAbleToSuppressThresholdExceededByWeightSum));
     }
-/*
-    @Override
-    public void addWeight(double weightDelta) {
-        supergetWeight().add(weightDelta);
-        getOutput()getWeight().add(weightDelta);
-    }
-*/
 
     @Override
-    protected void weightUpdate(Double u, double v) {
-        super.weightUpdate(u, v);
-        getOutput().getWeightSum().add(u);
+    protected void weightUpdate() {
+        super.weightUpdate();
+        getOutput().getWeightSum().add(weight.getUpdate());
     }
 
     @Override
