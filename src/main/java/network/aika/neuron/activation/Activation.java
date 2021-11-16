@@ -23,6 +23,8 @@ import network.aika.neuron.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.activation.fields.*;
 import network.aika.neuron.sign.Sign;
+import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.StepType;
 import network.aika.neuron.steps.activation.*;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 
@@ -50,14 +52,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                     .forEach(l -> l.updateInputValue())
     );
     protected boolean isInput;
-    protected Field net = new QueueField(INITIAL_NET, () -> {
-        double v = getNet().getNewValueAndAcknowledge();
-        if(!isInput)
-            value.setAndTriggerUpdate(getBranchProbability() * getActivationFunction().f(v));
-
-//        PropagateGradients.add(this);
-        CheckIfFired.add(this);
-    });
+    protected Field net = new QueueField(this, "net", Phase.LINKING, StepType.TRAINING);
 
     protected Timestamp creationTimestamp = NOT_SET;
     protected Timestamp fired = NOT_SET;
@@ -76,7 +71,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected Map<Activation<?>, BindingSignal> reverseBindingSignals = new TreeMap<>();
 
     private Field entropy = new Field();
-    private Field inputGradient = new QueueField();
+    private Field inputGradient = new QueueField(this, "net", Phase.LINKING, StepType.TRAINING);
 
 
     protected FieldOutput outputGradient = new FieldMultiplication(
@@ -95,13 +90,19 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
-        net.setAndTriggerUpdate(n.getInitialNet());
-
         entropy.setFieldListener(() -> receiveOwnGradientUpdate(entropy.getUpdateAndAcknowledge()));
 
+        net.setFieldListener(() -> {
+            double v = net.getNewValueAndAcknowledge();
+            if(!isInput)
+                value.setAndTriggerUpdate(getBranchProbability() * getActivationFunction().f(v));
+
+//        PropagateGradients.add(this);
+            CheckIfFired.add(this);
+        });
         inputGradient.setFieldListener(() -> {
             double g = outputGradient.getUpdateAndAcknowledge();
-            getNeuron().getBias().add(getConfig().getLearnRate() * g);
+            getNeuron().getBias().addAndTriggerUpdate(getConfig().getLearnRate() * g);
 
             inputLinks.values().forEach(l ->
                     l.propagateGradient(g)
@@ -115,6 +116,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
+
+        //    net.set(INITIAL_NET);
+        net.setAndTriggerUpdate(n.getInitialNet());
     }
 
     public void init(Synapse originSynapse, Activation originAct) {
@@ -352,7 +356,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     public void propagateGradientIn(double g) {
         inputGradient.addAndTriggerUpdate(g);
     }
-
 
     public void receiveOwnGradientUpdate(double u) {
         inputGradient.addAndTriggerUpdate(u);

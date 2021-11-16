@@ -75,11 +75,12 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
     public abstract boolean checkIfQueued();
 
     public static void add(Step s) {
-        if(s.checkIfQueued() && s.getElement().isQueued(s))
+        Element e = s.getElement();
+        if(s.checkIfQueued() && e.isQueued(s))
             return;
 
-        s.getElement().addQueuedStep(s);
-        s.getElement().getThought().addStep(s);
+        e.addQueuedStep(s);
+        e.getThought().addStep(s);
     }
 
     public Timestamp getFired() {

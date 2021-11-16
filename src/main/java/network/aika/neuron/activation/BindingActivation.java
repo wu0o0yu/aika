@@ -160,7 +160,7 @@ public class BindingActivation extends Activation<BindingNeuron> {
         double grad = outputGradient.getUpdateAndAcknowledge();
         double ownGrad = ownInputGradient.getUpdateAndAcknowledge();
 //        UpdateBias.add(this, getConfig().getLearnRate() * grad);
-        getNeuron().getBias().add(getConfig().getLearnRate() * grad);
+        getNeuron().getBias().addAndTriggerUpdate(getConfig().getLearnRate() * grad);
 
         inputLinks.values().forEach(l ->
                 l.propagateGradient(l.getSynapse().isRecurrent() ? ownGrad : grad)

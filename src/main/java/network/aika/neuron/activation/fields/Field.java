@@ -41,17 +41,6 @@ public class Field implements FieldInput, FieldOutput, Writable {
         this.fieldListener = fieldListener;
     }
 
-    public Field(double v) {
-        this.oldValue = v;
-        if(!Utils.belowTolerance(v))
-            update = v;
-    }
-
-    public Field(double v, FieldUpdateEvent fieldListener) {
-        this(v);
-        this.fieldListener = fieldListener;
-    }
-
     public void setFieldListener(FieldUpdateEvent fieldListener) {
         this.fieldListener = fieldListener;
     }

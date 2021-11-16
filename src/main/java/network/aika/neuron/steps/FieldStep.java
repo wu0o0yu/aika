@@ -5,7 +5,7 @@ import network.aika.neuron.activation.fields.QueueField;
 
 public class FieldStep<E extends Element> extends Step<E> {
 
-    private QueueField qf;
+    private QueueField field;
     private String label;
     private Phase phase;
     private StepType stepType;
@@ -16,12 +16,13 @@ public class FieldStep<E extends Element> extends Step<E> {
         this.label = label;
         this.phase = p;
         this.stepType = st;
-        qf.setStep(this);
+        this.field = qf;
+        this.field.setStep(this);
     }
 
     @Override
     public void process() {
-        qf.process();
+        field.process();
     }
 
     @Override
@@ -37,5 +38,9 @@ public class FieldStep<E extends Element> extends Step<E> {
     @Override
     public boolean checkIfQueued() {
         return false;
+    }
+
+    public String toString() {
+        return "Field-Step: " + label + "  " + getElement().toShortString();
     }
 }
