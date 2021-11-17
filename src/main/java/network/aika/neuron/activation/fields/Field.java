@@ -57,22 +57,26 @@ public class Field implements FieldInput, FieldOutput, Writable {
             return oldValue;
     }
 
-    public void set(double v) {
+    public boolean set(double v) {
         if(Utils.belowTolerance( v - oldValue))
-            return;
+            return false;
 
         update = v - oldValue;
+
+        return true;
     }
 
 
-    public void add(double u) {
+    public boolean add(double u) {
         if(Utils.belowTolerance(u))
-            return;
+            return false;
 
         if(update == null)
             update = u;
         else
             update += u;
+
+        return true;
     }
 
 
@@ -96,6 +100,9 @@ public class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public void acknowledgePropagated() {
+        if(update == null)
+            return;
+
         oldValue += update;
         update = null;
     }
@@ -118,10 +125,10 @@ public class Field implements FieldInput, FieldOutput, Writable {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("[d:");
+        sb.append("[u:");
         if(update != null)
             sb.append(Utils.round(update));
-        else sb.append("X");
+        else sb.append("-");
         sb.append(",v:");
         sb.append(Utils.round(oldValue));
         sb.append("]");

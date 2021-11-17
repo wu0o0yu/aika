@@ -32,9 +32,10 @@ public interface FieldOutput {
     void acknowledgePropagated();
 
     default double getUpdateAndAcknowledge() {
-        Double update = getUpdate();
-        if(update == null)
+        if(!updateAvailable())
             throw new RuntimeException("No Field Update Available!");
+
+        Double update = getUpdate();
 
         acknowledgePropagated();
         return update;

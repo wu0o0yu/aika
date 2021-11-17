@@ -26,7 +26,6 @@ import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.StepType;
 import network.aika.neuron.steps.activation.*;
-import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -47,19 +46,21 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(Activation::getId);
 
-    protected Field value = new Field(() ->
-            getOutputLinks()
-                    .forEach(l -> l.updateInputValue())
-    );
-    protected boolean isInput;
-    protected Field net = new QueueField(this, "net", Phase.LINKING, StepType.TRAINING);
+    protected final int id;
+    protected N neuron;
+    protected Thought thought;
 
     protected Timestamp creationTimestamp = NOT_SET;
     protected Timestamp fired = NOT_SET;
 
-    protected final int id;
-    protected N neuron;
-    protected Thought thought;
+    protected boolean isInput;
+
+    protected Field value = new Field(() ->
+            getOutputLinks()
+                    .forEach(l -> l.updateInputValue())
+    );
+
+    protected Field net = new QueueField(this, "net", Phase.LINKING, StepType.TRAINING);
 
     Map<NeuronProvider, Link> inputLinks;
     NavigableMap<OutputKey, Link> outputLinks;
@@ -72,7 +73,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     private Field entropy = new Field();
     private Field inputGradient = new QueueField(this, "net", Phase.LINKING, StepType.TRAINING);
-
 
     protected FieldOutput outputGradient = new FieldMultiplication(
             inputGradient,

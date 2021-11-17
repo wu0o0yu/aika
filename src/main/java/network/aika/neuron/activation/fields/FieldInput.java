@@ -21,19 +21,19 @@ package network.aika.neuron.activation.fields;
  */
 public interface FieldInput {
 
-    void set(double g);
+    boolean set(double g);
 
-    void add(double g);
+    boolean add(double g);
 
     void triggerUpdate();
 
     default void setAndTriggerUpdate(double v) {
-        set(v);
-        triggerUpdate();
+        if(set(v))
+            triggerUpdate();
     }
 
     default void addAndTriggerUpdate(double g) {
-        add(g);
-        triggerUpdate();
+        if(add(g))
+            triggerUpdate();
     }
 }
