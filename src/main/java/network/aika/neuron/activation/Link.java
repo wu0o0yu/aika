@@ -64,7 +64,7 @@ public class Link<A extends Activation> extends Element<Link> {
         this.output = output;
         this.isSelfRef = isSelfRef;
 
-        igGradient.setFieldListener(() -> output.receiveOwnGradientUpdate(igGradient.getUpdateAndAcknowledge()));
+        igGradient.setFieldListener(u -> output.receiveOwnGradientUpdate(u));
         weightedInput = new FieldMultiplication(input.getValue(), synapse.getWeight());
         backPropGradient = new FieldMultiplication(output.outputGradient, synapse.getWeight());
 
@@ -148,26 +148,7 @@ public class Link<A extends Activation> extends Element<Link> {
                 });
     }
 */
-/*
-    public void propagateGradient(double g) {
-        if(input == null)
-            return;
 
-        input.propagateGradientIn(
-                synapse.getWeight() *
-                        g
-        );
-    }
- */
-/*
-    public static double getInputValue(Sign s, Link l) {
-        return l != null ? l.getInputValue(s) : 0.0;
-    }
-
-    public static double getInputValueDelta(Sign s, Link nl, Link ol) {
-        return nl.getInputValue(s) - Link.getInputValue(s, ol);
-    }
-*/
     public FieldOutput getInputValue(Sign s) {
         return s.getValue(input != null ? input.getValue() : ZERO);
     }
@@ -225,18 +206,10 @@ public class Link<A extends Activation> extends Element<Link> {
         );
     }
 
-    /*
-    public void updateNetByWeight(double weightDelta) {
-        synapse.updateOutputNet(this, getInputValue(POS) * weightDelta);
-    }
-
-    public void updateNetByInputValue(double inputValueDelta) {
-        synapse.updateOutputNet(this, inputValueDelta * synapse.getWeight());
-    }
-*/
-
     public void updateInputValue() {
-
+        output.getNet().addAndTriggerUpdate(
+                weightedInput.getUpdate()
+        );
     }
 
     public void linkOutput() {

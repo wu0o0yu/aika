@@ -21,5 +21,5 @@ package network.aika.neuron.activation.fields;
  */
 public interface FieldUpdateEvent {
 
-    void updated();
+    void updated(double u);
 }

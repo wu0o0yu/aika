@@ -104,7 +104,7 @@ public class PatternTest {
 
                 s.linkInput();
                 s.linkOutput();
-                s.getWeight().set(10.0);
+                s.getWeight().setInitialValue(10.0);
                 eA.addConjunctiveBias(-10.0);
             }
             eA.addBias(4.0);

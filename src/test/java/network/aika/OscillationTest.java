@@ -41,7 +41,7 @@ public class OscillationTest {
 
         Synapse s = m.getTemplates().PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nA, nPPA);
 
-        s.getWeight().set(0.3);
+        s.getWeight().setInitialValue(0.3);
 
         s.linkInput();
         s.linkOutput();

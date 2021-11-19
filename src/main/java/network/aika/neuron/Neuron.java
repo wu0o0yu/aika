@@ -54,7 +54,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Writable customData;
 
-    protected Field bias = new Field(() -> setModified());
+    protected Field bias = new Field(u -> setModified());
 
     protected TreeMap<NeuronProvider, S> inputSynapses = new TreeMap<>();
     protected TreeMap<NeuronProvider, Synapse> outputSynapses = new TreeMap<>();

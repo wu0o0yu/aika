@@ -188,7 +188,7 @@ public class Templates {
     private <S extends Synapse> S init(S ts, Neuron input, Neuron output, String templateLabel, int templateSynapseId, double initialWeight) {
         ts.setInput(input);
         ts.setOutput(output);
-        ts.getWeight().set(initialWeight);
+        ts.getWeight().setInitialValue(initialWeight);
 
         TemplateSynapseInfo ti = ts.getTemplateInfo();
         ti.setLabel(templateLabel);

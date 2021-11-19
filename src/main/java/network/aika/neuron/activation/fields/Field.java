@@ -31,6 +31,7 @@ public class Field implements FieldInput, FieldOutput, Writable {
 
     private double oldValue = 0.0;
     private Double update;
+    private boolean allowUpdate;
 
     private FieldUpdateEvent fieldListener;
 
@@ -57,6 +58,11 @@ public class Field implements FieldInput, FieldOutput, Writable {
             return oldValue;
     }
 
+    public void setInitialValue(double v) {
+        oldValue = v;
+        update = null;
+    }
+
     public boolean set(double v) {
         if(Utils.belowTolerance( v - oldValue))
             return false;
@@ -65,7 +71,6 @@ public class Field implements FieldInput, FieldOutput, Writable {
 
         return true;
     }
-
 
     public boolean add(double u) {
         if(Utils.belowTolerance(u))
@@ -88,7 +93,10 @@ public class Field implements FieldInput, FieldOutput, Writable {
         if (fieldListener == null)
             return;
 
-        fieldListener.updated();
+        allowUpdate = true;
+        fieldListener.updated(update);
+        acknowledgePropagated();
+        allowUpdate = false;
     }
 
     public boolean updateAvailable() {
@@ -96,6 +104,8 @@ public class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public double getUpdate() {
+        assert allowUpdate;
+
         return update;
     }
 
@@ -103,6 +113,7 @@ public class Field implements FieldInput, FieldOutput, Writable {
         if(update == null)
             return;
 
+        assert allowUpdate;
         oldValue += update;
         update = null;
     }
@@ -110,17 +121,12 @@ public class Field implements FieldInput, FieldOutput, Writable {
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeDouble(oldValue);
-        out.writeBoolean(update != null);
-        if(update != null)
-            out.writeDouble(update);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         oldValue = in.readDouble();
         update = null;
-        if(in.readBoolean())
-            update = in.readDouble();
     }
 
     public String toString() {

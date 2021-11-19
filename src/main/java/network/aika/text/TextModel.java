@@ -140,7 +140,7 @@ public class TextModel extends Model {
 
         s.linkInput();
         s.linkOutput();
-        s.getWeight().set(11.0);
+        s.getWeight().setInitialValue(11.0);
         s.setAllowTraining(false);
         inRel.addConjunctiveBias(-11.0);
     }

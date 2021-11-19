@@ -21,6 +21,8 @@ package network.aika.neuron.activation.fields;
  */
 public interface FieldInput {
 
+    void setInitialValue(double v);
+
     boolean set(double g);
 
     boolean add(double g);

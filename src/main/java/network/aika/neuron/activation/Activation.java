@@ -55,7 +55,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     protected boolean isInput;
 
-    protected Field value = new Field(() ->
+    protected Field value = new Field(u ->
             getOutputLinks()
                     .forEach(l -> l.updateInputValue())
     );
@@ -90,9 +90,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
-        entropy.setFieldListener(() -> receiveOwnGradientUpdate(entropy.getUpdateAndAcknowledge()));
+        entropy.setFieldListener(u -> receiveOwnGradientUpdate(u));
 
-        net.setFieldListener(() -> {
+        net.setFieldListener(u -> {
             double v = net.getNewValueAndAcknowledge();
             if(!isInput)
                 value.setAndTriggerUpdate(getBranchProbability() * getActivationFunction().f(v));
@@ -100,7 +100,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 //        PropagateGradients.add(this);
             CheckIfFired.add(this);
         });
-        inputGradient.setFieldListener(() -> {
+        inputGradient.setFieldListener(u -> {
             double g = outputGradient.getUpdateAndAcknowledge();
             getNeuron().getBias().addAndTriggerUpdate(getConfig().getLearnRate() * g);
 

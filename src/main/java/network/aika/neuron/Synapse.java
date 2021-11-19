@@ -51,7 +51,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     private Synapse template;
     private TemplateSynapseInfo templateInfo;
 
-    protected Field weight = new Field(() -> weightUpdate());
+    protected Field weight = new Field(u -> weightUpdate());
 
 
     protected SampleSpace sampleSpace = new SampleSpace();
