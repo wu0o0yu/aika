@@ -152,7 +152,7 @@ public class MutualExclusionTest {
 
         System.out.println(doc);
 
-        Set<Activation> nbActs = doc.getActivations(nb);
+        Set<Activation<?>> nbActs = doc.getActivations(nb);
         Activation nbAct = nbActs.iterator().next();
 
         assertTrue(nbAct.getValue().getOldValue() > 0.38);

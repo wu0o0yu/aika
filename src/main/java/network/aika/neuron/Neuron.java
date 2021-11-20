@@ -54,7 +54,15 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Writable customData;
 
-    protected Field bias = new Field(u -> setModified());
+    protected Field bias = new Field(u -> {
+        getModel()
+                .getCurrentThought()
+                .getActivations(this)
+                .forEach(act ->
+                        act.getNet().addAndTriggerUpdate(u)
+                );
+        setModified();
+    });
 
     protected TreeMap<NeuronProvider, S> inputSynapses = new TreeMap<>();
     protected TreeMap<NeuronProvider, Synapse> outputSynapses = new TreeMap<>();

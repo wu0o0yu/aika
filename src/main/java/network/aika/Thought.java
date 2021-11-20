@@ -47,9 +47,7 @@ public abstract class Thought<M extends Model> {
     private final Set<StepType> filters = new TreeSet<>();
 
     private final TreeMap<Integer, Activation> activationsById = new TreeMap<>();
-
-    private Map<NeuronProvider, SortedSet<Activation>> actsPerNeuron = null;
-
+    private final Map<NeuronProvider, SortedSet<Activation<?>>> actsPerNeuron = new HashMap<>();
     private final List<EventListener> eventListeners = new ArrayList<>();
 
     private Config config;
@@ -58,6 +56,7 @@ public abstract class Thought<M extends Model> {
     public Thought(M m) {
         model = m;
         absoluteBegin = m.getN();
+        m.setCurrentThought(this);
     }
 
     public void updateModel() {
@@ -124,6 +123,13 @@ public abstract class Thought<M extends Model> {
 
     public void registerActivation(Activation act) {
         activationsById.put(act.getId(), act);
+
+        Set<Activation<?>> acts = actsPerNeuron
+                .computeIfAbsent(
+                        act.getNeuronProvider(),
+                        n -> new TreeSet<>()
+                );
+        acts.add(act);
     }
 
     public void registerBindingSignal(Activation act, BindingSignal bs) {
@@ -203,33 +209,13 @@ public abstract class Thought<M extends Model> {
         return activationsById.size();
     }
 
-    public Set<Activation> getActivations(NeuronProvider n) {
+    public Set<Activation<?>> getActivations(NeuronProvider n) {
         return getActivations(n.getNeuron());
     }
 
-    public Set<Activation> getActivations(Neuron n) {
-        if(actsPerNeuron == null) {
-            actsPerNeuron = getActivationsPerNeuron();
-        }
-
-        Set<Activation> acts = actsPerNeuron.get(n.getProvider());
+    public Set<Activation<?>> getActivations(Neuron<?, ?> n) {
+        Set<Activation<?>> acts = actsPerNeuron.get(n.getProvider());
         return acts != null ? acts : Collections.emptySet();
-    }
-
-    private Map<NeuronProvider, SortedSet<Activation>> getActivationsPerNeuron() {
-        Map<NeuronProvider, SortedSet<Activation>> results = new TreeMap<>();
-
-        activationsById.values().stream()
-                .filter(act -> act.isFired())
-                .forEach(act -> {
-                    Set<Activation> acts = results.computeIfAbsent(
-                            act.getNeuronProvider(),
-                            n -> new TreeSet<>()
-                    );
-                    acts.add(act);
-                });
-
-        return results;
     }
 
     public String toString() {
