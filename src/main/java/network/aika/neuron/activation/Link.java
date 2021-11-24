@@ -56,7 +56,6 @@ public class Link<A extends Activation> extends Element<Link> {
     private FieldOutput weightedInput;
 
     private FieldOutput backPropGradient;
-    private FieldOutput[][] activationValue = new FieldOutput[2][2];
 
     public Link(Synapse s, Activation input, A output, boolean isSelfRef) {
         this.synapse = s;
@@ -67,10 +66,6 @@ public class Link<A extends Activation> extends Element<Link> {
         igGradient.setFieldListener(u -> output.receiveOwnGradientUpdate(u));
         weightedInput = new FieldMultiplication(input.getValue(), synapse.getWeight());
         backPropGradient = new FieldMultiplication(output.outputGradient, synapse.getWeight());
-
-        for(Sign si: SIGNS)
-            for(Sign so: SIGNS)
-                activationValue[si.index()][so.index()] = new FieldMultiplication(getInputValue(si), getOutputValue(so));
 
         AddLink.add(this);
 
@@ -130,13 +125,12 @@ public class Link<A extends Activation> extends Element<Link> {
         double igGrad = 0.0;
         for(Sign si: Sign.SIGNS) {
             for (Sign so : Sign.SIGNS) {
-                igGrad += synapse.getSurprisal(si, so, range) * activationValue[si.index()][so.index()].getOldValue();
+                igGrad += synapse.getSurprisal(si, so, range) * getInputValue(si).getCurrentValue();
             }
         }
 
-        igGradient.addAndTriggerUpdate(igGrad);
+        igGradient.setAndTriggerUpdate(igGrad);
     }
-
 
 /*
     public void removeGradientDependencies() {

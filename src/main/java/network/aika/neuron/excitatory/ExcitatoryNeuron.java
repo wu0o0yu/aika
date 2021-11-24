@@ -39,7 +39,6 @@ import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGEN
  */
 public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Activation> extends Neuron<S, A> {
 
-    private volatile Field conjunctiveBias = new Field();
     private volatile Field weightSum = new Field();
 
     public ExcitatoryNeuron() {
@@ -58,18 +57,9 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
         return weightSum;
     }
 
-    public Field getConjunctiveBias() {
-        return conjunctiveBias;
-    }
-
 
     protected void initFromTemplate(ExcitatoryNeuron n) {
         super.initFromTemplate(n);
-        n.conjunctiveBias = conjunctiveBias;
-    }
-
-    public void addConjunctiveBias(double b) {
-        conjunctiveBias.addAndTriggerUpdate(b);
     }
 
     /**
@@ -77,12 +67,8 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
      * should account for that and reduce the bias back to a level, where the neuron can be blocked again by its input synapses.
      */
     public void limitBias() {
-        if(bias.getOldValue() > weightSum.getOldValue())
-            bias.setAndTriggerUpdate(weightSum.getOldValue());
-
-        if(bias.getNewValue() + conjunctiveBias.getOldValue() > 0.0) {
-            conjunctiveBias.setAndTriggerUpdate(Math.max(-weightSum.getOldValue(), -bias.getNewValue()));
-        }
+        if(bias.getCurrentValue() > weightSum.getCurrentValue())
+            bias.setAndTriggerUpdate(weightSum.getCurrentValue());
     }
 
     public void addDummyLinks(Activation act) {
@@ -99,22 +85,24 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
         return RECTIFIED_HYPERBOLIC_TANGENT;
     }
 
+    /*
     @Override
     public double getInitialNet() {
-        return bias.getOldValue() + conjunctiveBias.getOldValue();
+        return bias.getCurrentValue();
     }
+*/
 
     public void updateSynapseInputConnections() {
         TreeSet<ExcitatorySynapse> sortedSynapses = new TreeSet<>(
-                Comparator.<ExcitatorySynapse>comparingDouble(s -> s.getWeight().getOldValue()).reversed()
+                Comparator.<ExcitatorySynapse>comparingDouble(s -> s.getWeight().getCurrentValue()).reversed()
                         .thenComparing(Synapse::getPInput)
         );
 
         sortedSynapses.addAll(inputSynapses.values());
 
-        double sum = getWeightSum().getOldValue();
+        double sum = getWeightSum().getCurrentValue();
         for(ExcitatorySynapse s: sortedSynapses) {
-            if(s.getWeight().getOldValue() <= 0.0)
+            if(s.getWeight().getCurrentValue() <= 0.0)
                 break;
 
             if(s.isWeak(sum))
@@ -122,7 +110,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
             else
                 s.linkInput();
 
-            sum -= s.getWeight().getOldValue();
+            sum -= s.getWeight().getCurrentValue();
         }
     }
 
@@ -130,7 +118,6 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
     public void write(DataOutput out) throws IOException {
         super.write(out);
 
-        conjunctiveBias.write(out);
         weightSum.write(out);
     }
 
@@ -138,7 +125,6 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
     public void readFields(DataInput in, Model m) throws Exception {
         super.readFields(in, m);
 
-        conjunctiveBias.readFields(in, m);
         weightSum.readFields(in, m);
     }
 }

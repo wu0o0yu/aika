@@ -21,7 +21,7 @@ package network.aika.neuron.activation.fields;
  */
 public interface FieldOutput {
 
-    double getOldValue();
+    double getCurrentValue();
 
     double getNewValue();
 

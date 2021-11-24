@@ -96,7 +96,7 @@ public class PatternTest {
                 s.linkInput();
                 s.linkOutput();
                 s.getWeight().add(10.0);
-                eA.addConjunctiveBias(-10.0);
+                eA.addBias(-10.0);
             }
 
             {
@@ -105,7 +105,7 @@ public class PatternTest {
                 s.linkInput();
                 s.linkOutput();
                 s.getWeight().setInitialValue(10.0);
-                eA.addConjunctiveBias(-10.0);
+                eA.addBias(-10.0);
             }
             eA.addBias(4.0);
         }
@@ -117,7 +117,7 @@ public class PatternTest {
                 s.linkInput();
                 s.linkOutput();
                 s.getWeight().add(10.0);
-                eB.addConjunctiveBias(-10.0);
+                eB.addBias(-10.0);
             }
 
             {
@@ -125,7 +125,7 @@ public class PatternTest {
 
                 s.linkOutput();
                 s.getWeight().add(10.0);
-                eB.addConjunctiveBias(-10.0);
+                eB.addBias(-10.0);
             }
 
             {
@@ -133,7 +133,7 @@ public class PatternTest {
 
                 s.linkOutput();
                 s.getWeight().add(10.0);
-                eB.addConjunctiveBias(-10.0);
+                eB.addBias(-10.0);
             }
 
             {
@@ -141,7 +141,7 @@ public class PatternTest {
 
                 s.linkOutput();
                 s.getWeight().add(10.0);
-                eB.addConjunctiveBias(-10.0);
+                eB.addBias(-10.0);
             }
             eB.addBias(4.0);
         }
@@ -153,7 +153,7 @@ public class PatternTest {
                 s.linkInput();
                 s.linkOutput();
                 s.getWeight().add(10.0);
-                eC.addConjunctiveBias(-10.0);
+                eC.addBias(-10.0);
             }
 
             {
@@ -161,7 +161,7 @@ public class PatternTest {
 
                 s.linkOutput();
                 s.getWeight().add(10.0);
-                eC.addConjunctiveBias(-10.0);
+                eC.addBias(-10.0);
             }
 
             {
@@ -169,7 +169,7 @@ public class PatternTest {
 
                 s.linkOutput();
                 s.getWeight().add(10.0);
-                eC.addConjunctiveBias(-10.0);
+                eC.addBias(-10.0);
             }
 
             {
@@ -177,7 +177,7 @@ public class PatternTest {
 
                 s.linkOutput();
                 s.getWeight().add(10.0);
-                eC.addConjunctiveBias(-10.0);
+                eC.addBias(-10.0);
             }
             eC.addBias(4.0);
         }
@@ -189,7 +189,7 @@ public class PatternTest {
                 s.linkInput();
                 s.linkOutput();
                 s.getWeight().add(10.0);
-                out.addConjunctiveBias(-10.0);
+                out.addBias(-10.0);
             }
             {
                 Synapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eB, out);
@@ -197,7 +197,7 @@ public class PatternTest {
                 s.linkInput();
                 s.linkOutput();
                 s.getWeight().add(10.0);
-                out.addConjunctiveBias(-10.0);
+                out.addBias(-10.0);
             }
             {
                 Synapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eC, out);
@@ -205,7 +205,7 @@ public class PatternTest {
                 s.linkInput();
                 s.linkOutput();
                 s.getWeight().add(10.0);
-                out.addConjunctiveBias(-10.0);
+                out.addBias(-10.0);
             }
             out.addBias(4.0);
         }

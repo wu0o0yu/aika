@@ -32,13 +32,16 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
 
     @Override
     public boolean isWeak() {
-        return isWeak(getOutput().getWeightSum().getOldValue());
+        return isWeak(getOutput().getWeightSum().getCurrentValue());
     }
 
     public boolean isWeak(double weightSum) {
-        boolean weightIsAbleToExceedThreshold = weight.getOldValue() + getOutput().getInitialNet() > 0.0;
-        boolean weightSumIsAbleToExceedThreshold = weightSum + getOutput().getInitialNet() > 0.0;
-        boolean weightIsAbleToSuppressThresholdExceededByWeightSum = (weightSum - weight.getOldValue()) + getOutput().getInitialNet() <= 0.0;
+        double bias = getOutput().getBias().getCurrentValue();
+        double w = weight.getCurrentValue();
+
+        boolean weightIsAbleToExceedThreshold = w + bias > 0.0;
+        boolean weightSumIsAbleToExceedThreshold = weightSum + bias > 0.0;
+        boolean weightIsAbleToSuppressThresholdExceededByWeightSum = (weightSum - w) + bias <= 0.0;
 
         return !(weightIsAbleToExceedThreshold ||
                 (weightSumIsAbleToExceedThreshold && weightIsAbleToSuppressThresholdExceededByWeightSum));
@@ -61,12 +64,10 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
             weight.add(delta);
         } else {
             weight.add(-delta);
+            getOutput().getBias().addAndTriggerUpdate(delta);
 
-            getOutput().addConjunctiveBias(delta);
             if(delta < 0.0)
                 PostTraining.add(l.getOutput());
-
-            l.getOutput().getNet().addAndTriggerUpdate(delta);
         }
 
         checkConstraints();

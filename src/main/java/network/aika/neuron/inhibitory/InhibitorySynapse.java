@@ -21,8 +21,6 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 
-import static network.aika.neuron.sign.Sign.POS;
-
 
 /**
  *
@@ -42,7 +40,7 @@ public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNe
 
     @Override
     public boolean isWeak() {
-        return weight.getOldValue() + getOutput().getBias().getOldValue() < 0.0;
+        return weight.getCurrentValue() + getOutput().getBias().getCurrentValue() < 0.0;
     }
 
     public Neuron getTemplatePropagateTargetNeuron(Activation<?> act) {

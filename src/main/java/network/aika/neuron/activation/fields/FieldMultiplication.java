@@ -29,8 +29,8 @@ public class FieldMultiplication implements FieldOutput {
     }
 
     @Override
-    public double getOldValue() {
-        return in1.getOldValue() * in2.getOldValue();
+    public double getCurrentValue() {
+        return in1.getCurrentValue() * in2.getCurrentValue();
     }
 
     @Override
@@ -47,10 +47,10 @@ public class FieldMultiplication implements FieldOutput {
     public double getUpdate() {
         double result = 0.0;
         if(in1.updateAvailable())
-            result += in1.getUpdateAndAcknowledge() * in2.getOldValue();
+            result += in1.getUpdateAndAcknowledge() * in2.getCurrentValue();
 
         if(in2.updateAvailable())
-            result += in2.getUpdateAndAcknowledge() * in1.getOldValue();
+            result += in2.getUpdateAndAcknowledge() * in1.getCurrentValue();
 
         return result;
     }

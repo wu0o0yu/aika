@@ -63,7 +63,7 @@ public class MutualExclusionTest {
                 s.linkInput();
                 s.linkOutput();
                 s.getWeight().add(10.0);
-                na.addConjunctiveBias(-10.0);
+                na.addBias(-10.0);
             }
 
             {
@@ -83,7 +83,7 @@ public class MutualExclusionTest {
                 s.linkInput();
                 s.linkOutput();
                 s.getWeight().add(10.0);
-                nb.addConjunctiveBias(-10.0);
+                nb.addBias(-10.0);
             }
 
             {
@@ -103,7 +103,7 @@ public class MutualExclusionTest {
                 s.linkInput();
                 s.linkOutput();
                 s.getWeight().add(10.0);
-                nc.addConjunctiveBias(-10.0);
+                nc.addBias(-10.0);
             }
 
             {
@@ -155,7 +155,7 @@ public class MutualExclusionTest {
         Set<Activation<?>> nbActs = doc.getActivations(nb);
         Activation nbAct = nbActs.iterator().next();
 
-        assertTrue(nbAct.getValue().getOldValue() > 0.38);
+        assertTrue(nbAct.getValue().getCurrentValue() > 0.38);
     }
 
 
@@ -184,7 +184,7 @@ public class MutualExclusionTest {
                 s.linkInput();
                 s.linkOutput();
                 s.getWeight().add(10.0);
-                na.addConjunctiveBias(-10.0);
+                na.addBias(-10.0);
             }
 
             {
@@ -204,7 +204,7 @@ public class MutualExclusionTest {
                 s.linkInput();
                 s.linkOutput();
                 s.getWeight().add(10.0);
-                nb.addConjunctiveBias(-10.0);
+                nb.addBias(-10.0);
             }
 
             {

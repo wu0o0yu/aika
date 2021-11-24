@@ -13,7 +13,7 @@ public class ConstantField implements FieldOutput {
     }
 
     @Override
-    public double getOldValue() {
+    public double getCurrentValue() {
         return value;
     }
 

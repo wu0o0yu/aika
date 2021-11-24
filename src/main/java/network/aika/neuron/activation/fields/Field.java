@@ -29,7 +29,7 @@ import java.io.IOException;
  */
 public class Field implements FieldInput, FieldOutput, Writable {
 
-    private double oldValue = 0.0;
+    private double currentValue = 0.0;
     private Double update;
     private boolean allowUpdate;
 
@@ -42,32 +42,37 @@ public class Field implements FieldInput, FieldOutput, Writable {
         this.fieldListener = fieldListener;
     }
 
+
+    public FieldUpdateEvent getFieldListener() {
+        return fieldListener;
+    }
+
     public void setFieldListener(FieldUpdateEvent fieldListener) {
         this.fieldListener = fieldListener;
     }
 
-    public double getOldValue() {
-        return oldValue;
+    public double getCurrentValue() {
+        return currentValue;
     }
 
     @Override
     public double getNewValue() {
         if(updateAvailable())
-            return oldValue + update;
+            return currentValue + update;
         else
-            return oldValue;
+            return currentValue;
     }
 
     public void setInitialValue(double v) {
-        oldValue = v;
+        currentValue = v;
         update = null;
     }
 
     public boolean set(double v) {
-        if(Utils.belowTolerance( v - oldValue))
+        if(Utils.belowTolerance( v - currentValue))
             return false;
 
-        update = v - oldValue;
+        update = v - currentValue;
 
         return true;
     }
@@ -114,18 +119,18 @@ public class Field implements FieldInput, FieldOutput, Writable {
             return;
 
         assert allowUpdate;
-        oldValue += update;
+        currentValue += update;
         update = null;
     }
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeDouble(oldValue);
+        out.writeDouble(currentValue);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-        oldValue = in.readDouble();
+        currentValue = in.readDouble();
         update = null;
     }
 
@@ -136,7 +141,7 @@ public class Field implements FieldInput, FieldOutput, Writable {
             sb.append(Utils.round(update));
         else sb.append("-");
         sb.append(",v:");
-        sb.append(Utils.round(oldValue));
+        sb.append(Utils.round(currentValue));
         sb.append("]");
         return sb.toString();
     }

@@ -18,7 +18,7 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.sign.Sign;
+import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
@@ -65,8 +65,13 @@ public class SetFinalMode extends Step<BindingActivation> {
 
         act.setFinalMode(true);
 
-        double assumedActiveSum = act.getNeuron().getAssumedActiveSum().getNewValueAndAcknowledge();
-        act.getNet().addAndTriggerUpdate(assumedActiveSum - computeForwardLinkedRecurrentInputs(act));
+        BindingNeuron n = act.getNeuron();
+
+        double biasDelta = n.getFinalBias().getCurrentValue() - n.getBias().getCurrentValue();
+        n.getFinalBias().setFieldListener(n.getBias().getFieldListener());
+        n.getBias().setFieldListener(null);
+
+        act.getNet().addAndTriggerUpdate(biasDelta - computeForwardLinkedRecurrentInputs(act));
 
         getPositiveRecurrentInputLinks(act)
                 .filter(l -> !l.isForward())
@@ -76,7 +81,7 @@ public class SetFinalMode extends Step<BindingActivation> {
 
         act.setFinalTimestamp();
 
-        if (!act.isFired() || act.getNet().getOldValue() > 0.0)
+        if (!act.isFired() || act.getNet().getCurrentValue() > 0.0)
             return;
 
         act.setFired(NOT_SET);
@@ -86,7 +91,7 @@ public class SetFinalMode extends Step<BindingActivation> {
     private double computeForwardLinkedRecurrentInputs(BindingActivation act) {
         return getPositiveRecurrentInputLinks(act)
                 .filter(l -> l.isForward())
-                .mapToDouble(l -> l.getSynapse().getWeight().getOldValue())
+                .mapToDouble(l -> l.getSynapse().getWeight().getCurrentValue())
                 .sum();
     }
 

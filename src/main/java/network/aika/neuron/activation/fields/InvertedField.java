@@ -1,7 +1,5 @@
 package network.aika.neuron.activation.fields;
 
-import java.util.function.Function;
-
 public class InvertedField implements FieldOutput {
 
     FieldOutput input;
@@ -11,8 +9,8 @@ public class InvertedField implements FieldOutput {
     }
 
     @Override
-    public double getOldValue() {
-        return 1.0 - input.getOldValue();
+    public double getCurrentValue() {
+        return 1.0 - input.getCurrentValue();
     }
 
     @Override
@@ -27,7 +25,7 @@ public class InvertedField implements FieldOutput {
 
     @Override
     public double getUpdate() {
-        return getNewValue() - getOldValue();
+        return getNewValue() - getCurrentValue();
     }
 
     @Override

@@ -363,11 +363,11 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     }
 
     public boolean isZero() {
-        return Utils.belowTolerance(weight.getOldValue());
+        return Utils.belowTolerance(weight.getCurrentValue());
     }
 
     public boolean isNegative() {
-        return weight.getOldValue() < 0.0;
+        return weight.getCurrentValue() < 0.0;
     }
 /*
     public void setWeight(double w) {

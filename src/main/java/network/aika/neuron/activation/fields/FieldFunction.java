@@ -32,8 +32,8 @@ public class FieldFunction implements FieldOutput {
     }
 
     @Override
-    public double getOldValue() {
-        return function.apply(input.getOldValue());
+    public double getCurrentValue() {
+        return function.apply(input.getCurrentValue());
     }
 
     @Override
@@ -48,7 +48,7 @@ public class FieldFunction implements FieldOutput {
 
     @Override
     public double getUpdate() {
-        return getNewValue() - getOldValue();
+        return getNewValue() - getCurrentValue();
     }
 
     @Override

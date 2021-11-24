@@ -22,7 +22,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.fields.Field;
-import network.aika.utils.Utils;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -34,7 +33,7 @@ import java.io.IOException;
  */
 public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, BindingActivation> {
 
-    private Field assumedActiveSum = new Field();
+    private Field finalBias = new Field();
 
     public BindingNeuron() {
         super();
@@ -49,14 +48,8 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, Bindin
         return new BindingActivation(t.createActivationId(), t, this);
     }
 
-    @Override
-    public Field getAssumedActiveSum() {
-        return assumedActiveSum;
-    }
-
-    @Override
-    public double getInitialNet() {
-        return super.getInitialNet() + assumedActiveSum.getOldValue();
+    public Field getFinalBias() {
+        return finalBias;
     }
 
     @Override
@@ -84,13 +77,13 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, Bindin
     public void write(DataOutput out) throws IOException {
         super.write(out);
 
-        assumedActiveSum.write(out);
+        finalBias.write(out);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws Exception {
         super.readFields(in, m);
 
-        assumedActiveSum.readFields(in, m);
+        finalBias.readFields(in, m);
     }
 }

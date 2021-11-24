@@ -329,12 +329,12 @@
 
 				If we combine the equation 26 and 28, we get:
 
-			$$net = {b_c + \sum\limits_{i=0}^N{x_j w_{j} - b_j}}$$
+			$$net = {b_c + \sum\limits_{j=0}^N{x_j w_{j} - b_j}}$$
 
 				If we then chose the value of these counterweight biases to be equal to the synapse weights, that is \(b_j = w_j\)
 				we get the following equation:
 
-			$$net = {b_c + \sum\limits_{i=0}^N{-w_{j} (1 - x_j)}}$$
+			$$net = {b_c + \sum\limits_{j=0}^N{-w_{j} (1 - x_j)}}$$
 
 				For the negative case we need to take into account that we have assumed \(b_j\) to be equal to \(w_j\) and
 				therefore needs to be adjusted at the same time.

@@ -260,25 +260,13 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return modified;
     }
 
-    public void addBias(double biasDelta) {
-        bias.addAndTriggerUpdate(biasDelta);
-    }
-
     public void limitBias() {
-        if(bias.getOldValue() > 0.0)
+        if(bias.getCurrentValue() > 0.0)
             bias.setAndTriggerUpdate(0.0);
     }
 
     public Field getBias() {
         return bias;
-    }
-
-    public double getInitialNet() {
-        return bias.getOldValue();
-    }
-
-    public Field getAssumedActiveSum() {
-        return null;
     }
 
     public ReadWriteLock getLock() {
@@ -403,7 +391,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     public void readFields(DataInput in, Model m) throws Exception {
         if(in.readBoolean())
             label = in.readUTF();
-
 
         bias.readFields(in, m);
 

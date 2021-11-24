@@ -42,7 +42,7 @@ import static network.aika.neuron.activation.Timestamp.NOT_SET;
  */
 public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
-    public static double INITIAL_NET = -0.001;
+//    public static double INITIAL_NET = -0.001;
 
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(Activation::getId);
 
@@ -62,8 +62,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     protected Field net = new QueueField(this, "net", Phase.LINKING, StepType.TRAINING);
 
-    Map<NeuronProvider, Link> inputLinks;
-    NavigableMap<OutputKey, Link> outputLinks;
+    protected Map<NeuronProvider, Link> inputLinks;
+    protected NavigableMap<OutputKey, Link> outputLinks;
 
     protected SortedMap<Activation<?>, BindingSignal> bindingSignals = new TreeMap<>(
             Comparator.<Activation, Byte>comparing(act -> act.getType())
@@ -92,6 +92,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         entropy.setFieldListener(u -> receiveOwnGradientUpdate(u));
 
+        net.add(getNeuron().getBias().getCurrentValue());
+
         net.setFieldListener(u -> {
             double v = net.getNewValueAndAcknowledge();
             if(!isInput)
@@ -118,12 +120,16 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
 
         //    net.set(INITIAL_NET);
-        net.setAndTriggerUpdate(n.getInitialNet());
+  //      net.setAndTriggerUpdate(n.getInitialNet());
     }
 
     public void init(Synapse originSynapse, Activation originAct) {
         setCreationTimestamp();
         thought.onActivationCreationEvent(this, originSynapse, originAct);
+    }
+
+    public void initInputGradient(Link l) {
+
     }
 
     public abstract byte getType();

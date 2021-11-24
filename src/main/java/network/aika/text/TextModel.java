@@ -131,7 +131,7 @@ public class TextModel extends Model {
         s.linkOutput();
         s.getWeight().add(10.0);
         s.setAllowTraining(false);
-        inRel.addConjunctiveBias(-10.0);
+        inRel.addBias(-10.0);
     }
 
     private void initRecurrentSamePatternSynapse(PatternNeuron in, BindingNeuron inRel) {
@@ -142,7 +142,7 @@ public class TextModel extends Model {
         s.linkOutput();
         s.getWeight().setInitialValue(11.0);
         s.setAllowTraining(false);
-        inRel.addConjunctiveBias(-11.0);
+        inRel.addBias(-11.0);
     }
 
     private void initInhibitorySynapse(BindingNeuron inRelPT, InhibitoryNeuron prevTokenInhib) {
