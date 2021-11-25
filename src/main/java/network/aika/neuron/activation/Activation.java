@@ -55,11 +55,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     protected boolean isInput;
 
-    protected Field value = new Field(u ->
-            getOutputLinks()
-                    .forEach(l -> l.updateInputValue())
-    );
-
+    protected Field value = new Field();
     protected Field net = new QueueField(this, "net", Phase.LINKING, StepType.TRAINING);
 
     protected Map<NeuronProvider, Link> inputLinks;
@@ -72,7 +68,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected Map<Activation<?>, BindingSignal> reverseBindingSignals = new TreeMap<>();
 
     private Field entropy = new Field();
-    private Field inputGradient = new QueueField(this, "net", Phase.LINKING, StepType.TRAINING);
+    protected Field inputGradient = new QueueField(this, "net", Phase.LINKING, StepType.TRAINING);
 
     protected FieldOutput outputGradient = new FieldMultiplication(
             inputGradient,
@@ -102,17 +98,16 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 //        PropagateGradients.add(this);
             CheckIfFired.add(this);
         });
-        inputGradient.setFieldListener(u -> {
-            double g = outputGradient.getUpdateAndAcknowledge();
-            getNeuron().getBias().addAndTriggerUpdate(getConfig().getLearnRate() * g);
 
-            inputLinks.values().forEach(l ->
-                    l.propagateGradient(g)
-            );
+        value.setFieldListener(u ->
+                getOutputLinks()
+                        .forEach(l -> l.updateInputValue())
+        );
 
-            if(isFired())
-                TemplatePropagate.add(this);
-        });
+
+        inputGradient.setFieldListener(u ->
+            propagateGradient(outputGradient.getUpdate(), true, true)
+        );
 
         thought.registerActivation(this);
 
@@ -123,6 +118,17 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
   //      net.setAndTriggerUpdate(n.getInitialNet());
     }
 
+    protected void propagateGradient(double g, boolean updateWeights, boolean backPropagate) {
+        getNeuron().getBias().addAndTriggerUpdate(getConfig().getLearnRate() * g);
+
+        inputLinks.values().forEach(l ->
+                l.propagateGradient(g, true, true)
+        );
+
+        if(isFired())
+            TemplatePropagate.add(this);
+    }
+
     public void init(Synapse originSynapse, Activation originAct) {
         setCreationTimestamp();
         thought.onActivationCreationEvent(this, originSynapse, originAct);
@@ -130,6 +136,11 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public void initInputGradient(Link l) {
 
+    }
+
+
+    public Field getInputGradient() {
+        return inputGradient;
     }
 
     public abstract byte getType();

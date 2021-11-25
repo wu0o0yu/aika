@@ -23,9 +23,9 @@ public interface FieldInput {
 
     void setInitialValue(double v);
 
-    boolean set(double g);
+    boolean set(double v);
 
-    boolean add(double g);
+    boolean add(double u);
 
     void triggerUpdate();
 
@@ -34,8 +34,8 @@ public interface FieldInput {
             triggerUpdate();
     }
 
-    default void addAndTriggerUpdate(double g) {
-        if(add(g))
+    default void addAndTriggerUpdate(double u) {
+        if(add(u))
             triggerUpdate();
     }
 }

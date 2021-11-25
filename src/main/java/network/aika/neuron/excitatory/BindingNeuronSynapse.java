@@ -59,7 +59,7 @@ public abstract class BindingNeuronSynapse<I extends Neuron> extends ExcitatoryS
         super.updateSynapse(l, delta);
 
         if(isRecurrent() && !l.getInput().isFired()) {
-            getOutput().getFinalBias().add(delta);
+            getOutput().getFinalBias().addAndTriggerUpdate(delta);
         }
     }
 

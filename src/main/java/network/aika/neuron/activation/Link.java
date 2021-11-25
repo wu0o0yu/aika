@@ -53,9 +53,8 @@ public class Link<A extends Activation> extends Element<Link> {
     private final boolean isSelfRef;
 
     private Field igGradient = new Field();
-    private FieldOutput weightedInput;
-
-    private FieldOutput backPropGradient;
+    private FieldMultiplication weightedInput;
+    private FieldMultiplication backPropGradient;
 
     public Link(Synapse s, Activation input, A output, boolean isSelfRef) {
         this.synapse = s;
@@ -72,30 +71,45 @@ public class Link<A extends Activation> extends Element<Link> {
         getThought().onLinkCreationEvent(this);
     }
 
-    public FieldOutput getWeightedInput() {
+    public FieldMultiplication getWeightedInput() {
         return weightedInput;
     }
 
-    public FieldOutput getBackPropGradient() {
+    public FieldMultiplication getBackPropGradient() {
         return backPropGradient;
     }
 
-    public void propagateGradient(double g) {
+    public void propagateGradient(double g, boolean updateWeights, boolean backPropagate) {
         if(!synapse.isAllowTraining())
             return;
 
-        double weightDelta = getConfig().getLearnRate() * g;
-        boolean oldWeightIsZero = synapse.isZero();
+        if(updateWeights) {
+            double weightDelta = getConfig().getLearnRate() * g;
+            boolean oldWeightIsZero = synapse.isZero();
 
-        assert !synapse.isTemplate();
-        synapse.updateSynapse(this, weightDelta);
+            assert !synapse.isTemplate();
+            synapse.updateSynapse(this, weightDelta);
 
-        if (oldWeightIsZero && !synapse.isZero() && getInput().isFired())
-            PropagateBindingSignal.add(this);
+            if (oldWeightIsZero && !synapse.isZero() && getInput().isFired())
+                PropagateBindingSignal.add(this);
 
-        PostTraining.add(getOutput());
+            PostTraining.add(getOutput());
+        }
 
-   //     synapse.propagateGradient(l, gradient);
+        if(backPropagate) {
+            input.getInputGradient().addAndTriggerUpdate(
+                    backPropGradient.getUpdate(1)
+            );
+        }
+    }
+
+    public void weightUpdate() {
+        output.getNet().addAndTriggerUpdate(
+                weightedInput.getUpdate(2)
+        );
+        input.getInputGradient().addAndTriggerUpdate(
+                backPropGradient.getUpdate(2)
+        );
     }
 
     @Override
@@ -202,7 +216,7 @@ public class Link<A extends Activation> extends Element<Link> {
 
     public void updateInputValue() {
         output.getNet().addAndTriggerUpdate(
-                weightedInput.getUpdate()
+                weightedInput.getUpdate(1)
         );
     }
 

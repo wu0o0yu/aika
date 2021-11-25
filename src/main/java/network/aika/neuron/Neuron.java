@@ -55,13 +55,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     private Writable customData;
 
     protected Field bias = new Field(u -> {
-        getModel()
-                .getCurrentThought()
-                .getActivations(this)
-                .forEach(act ->
-                        act.getNet().addAndTriggerUpdate(u)
-                );
-        setModified();
+        biasUpdate(u);
     });
 
     protected TreeMap<NeuronProvider, S> inputSynapses = new TreeMap<>();
@@ -144,6 +138,17 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         Synapse s = outputSynapses.get(n);
         lock.releaseReadLock();
         return s;
+    }
+
+
+    protected void biasUpdate(double u) {
+        getModel()
+                .getCurrentThought()
+                .getActivations(this)
+                .forEach(act ->
+                        act.getNet().addAndTriggerUpdate(u)
+                );
+        setModified();
     }
 
     public double getCandidateGradient(Activation act) {

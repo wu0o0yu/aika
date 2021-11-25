@@ -48,9 +48,9 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
     }
 
     @Override
-    protected void weightUpdate() {
-        super.weightUpdate();
-        getOutput().getWeightSum().add(weight.getUpdate());
+    protected void weightUpdate(double u) {
+        super.weightUpdate(u);
+        getOutput().getWeightSum().addAndTriggerUpdate(u);
     }
 
     @Override
@@ -61,9 +61,9 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
     @Override
     public void updateSynapse(Link l, double delta) {
         if(l.getInput().isFired()) {
-            weight.add(delta);
+            weight.addAndTriggerUpdate(delta);
         } else {
-            weight.add(-delta);
+            weight.addAndTriggerUpdate(-delta);
             getOutput().getBias().addAndTriggerUpdate(delta);
 
             if(delta < 0.0)

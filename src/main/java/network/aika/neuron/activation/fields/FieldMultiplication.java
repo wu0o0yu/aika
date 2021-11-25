@@ -45,15 +45,30 @@ public class FieldMultiplication implements FieldOutput {
 
     @Override
     public double getUpdate() {
-        double result = 0.0;
+        throw new UnsupportedOperationException();
+/*        double result = 0.0;
         if(in1.updateAvailable())
             result += in1.getUpdateAndAcknowledge() * in2.getCurrentValue();
 
         if(in2.updateAvailable())
             result += in2.getUpdateAndAcknowledge() * in1.getCurrentValue();
 
+        return result;*/
+    }
+
+
+    public double getUpdate(int updateArg) {
+        double result = 0.0;
+        if(updateArg == 1) {
+            if (in1.updateAvailable())
+                result += in1.getUpdateAndAcknowledge() * in2.getCurrentValue();
+        } else if(updateArg == 2) {
+            if (in2.updateAvailable())
+                result += in2.getUpdateAndAcknowledge() * in1.getCurrentValue();
+        }
         return result;
     }
+
 
     @Override
     public void acknowledgePropagated() {

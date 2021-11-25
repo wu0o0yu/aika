@@ -61,9 +61,4 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
         getOutput().addAssumedWeights(weightDelta);
     }*/
 
-    @Override
-    protected void weightUpdate() {
-        super.weightUpdate();
-        getOutput().getAssumedActiveSum().add(weight.getUpdate());
-    }
 }

@@ -20,9 +20,13 @@ import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.fields.Field;
+import network.aika.neuron.activation.fields.FieldFunction;
+import network.aika.neuron.activation.fields.FieldMultiplication;
+import network.aika.neuron.activation.fields.FieldOutput;
 import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.steps.activation.BranchProbability;
 import network.aika.neuron.steps.activation.SetFinalMode;
+import network.aika.neuron.steps.activation.TemplatePropagate;
 import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.utils.Utils;
 
@@ -52,6 +56,12 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
     private Field ownInputGradient = new Field();
 
+    protected FieldOutput ownOutputGradient = new FieldMultiplication(
+            ownInputGradient,
+            new FieldFunction(net, x ->
+                    getNeuron().getActivationFunction().outerGrad(x)
+            )
+    );
 
     protected BindingActivation(int id, BindingNeuron n) {
         super(id, n);
@@ -59,6 +69,14 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
+
+        inputGradient.setFieldListener(u ->
+                propagateGradient(outputGradient.getUpdate(), true, false)
+        );
+
+        ownInputGradient.setFieldListener(u ->
+                propagateGradient(ownOutputGradient.getUpdate(), false, true)
+        );
     }
 
     @Override
@@ -70,6 +88,12 @@ public class BindingActivation extends Activation<BindingNeuron> {
     @Override
     public byte getType() {
         return 1;
+    }
+
+    @Override
+    protected void propagateGradient(double g, boolean updateWeights, boolean backPropagate) {
+        getNeuron().getFinalBias().addAndTriggerUpdate(getConfig().getLearnRate() * g);
+        super.propagateGradient(g, updateWeights, backPropagate);
     }
 
     public BindingActivation createBranch(Synapse excludedSyn) {
@@ -153,18 +177,6 @@ public class BindingActivation extends Activation<BindingNeuron> {
     public void receiveOwnGradientUpdate(double u) {
         super.receiveOwnGradientUpdate(u);
         ownInputGradient.addAndTriggerUpdate(u);
-    }
-
-    // should ownGrad only used for backpropagation or also for the weight update?
-    public void updateOutputGradient() {
-        double grad = outputGradient.getUpdateAndAcknowledge();
-        double ownGrad = ownInputGradient.getUpdateAndAcknowledge();
-//        UpdateBias.add(this, getConfig().getLearnRate() * grad);
-        getNeuron().getBias().addAndTriggerUpdate(getConfig().getLearnRate() * grad);
-
-        inputLinks.values().forEach(l ->
-                l.propagateGradient(l.getSynapse().isRecurrent() ? ownGrad : grad)
-        );
     }
 
     public String toString(boolean includeLink) {

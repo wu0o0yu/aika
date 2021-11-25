@@ -51,7 +51,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     private Synapse template;
     private TemplateSynapseInfo templateInfo;
 
-    protected Field weight = new Field(u -> weightUpdate());
+    protected Field weight = new Field(u -> weightUpdate(u));
 
 
     protected SampleSpace sampleSpace = new SampleSpace();
@@ -382,7 +382,14 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         weight.addAndTriggerUpdate(weightDelta);
     }
 */
-    protected void weightUpdate() {
+    protected void weightUpdate(double u) {
+        getModel()
+                .getCurrentThought()
+                .getActivations(output)
+                .stream()
+                .map(act -> act.getInputLink(this))
+                .filter(l -> l != null)
+                .forEach(l -> l.weightUpdate());
         setModified();
     }
 

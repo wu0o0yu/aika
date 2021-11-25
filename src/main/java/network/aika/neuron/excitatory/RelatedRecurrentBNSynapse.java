@@ -32,9 +32,4 @@ public class RelatedRecurrentBNSynapse<I extends Neuron> extends RelatedBNSynaps
         return true;
     }
 
-    @Override
-    protected void weightUpdate() {
-        super.weightUpdate();
-        getOutput().getAssumedActiveSum().add(weight.getUpdate());
-    }
 }
