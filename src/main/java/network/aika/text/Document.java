@@ -23,6 +23,8 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.steps.activation.CheckIfFired;
 
+import java.util.stream.Stream;
+
 
 /**
  * The {@code Document} class represents a single document which may be either used for processing a text or as
@@ -87,6 +89,24 @@ public class Document extends Thought<TextModel> {
         CheckIfFired.propagate(act);
 
         return act;
+    }
+
+    public void processTokens(Iterable<String> tokens) {
+        int i = 0;
+        TokenActivation lastToken = null;
+        for(String t: tokens) {
+            int j = i + t.length();
+            TokenActivation currentToken = addToken(t, i, j);
+            process();
+
+            TokenActivation.addRelation(lastToken, currentToken);
+            process();
+
+            lastToken = currentToken;
+            i = j + 1;
+        }
+
+        updateModel();
     }
 
     public String toString() {

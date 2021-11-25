@@ -53,7 +53,6 @@ public class BindingActivation extends Activation<BindingNeuron> {
     private BindingActivation mainBranch;
 
     private double branchProbability = 1.0;
-
     private Field ownInputGradient = new Field();
 
     protected FieldOutput ownOutputGradient = new FieldMultiplication(
@@ -127,6 +126,14 @@ public class BindingActivation extends Activation<BindingNeuron> {
         return getPatternBindingSignals().values().stream()
                 .min(Comparator.comparing(bs -> bs.getBindingSignalAct().getFired()))
                 .orElse(null);
+    }
+
+    public Field getOwnInputGradient() {
+        return ownInputGradient;
+    }
+
+    public FieldOutput getOwnOutputGradient() {
+        return ownOutputGradient;
     }
 
     public boolean isFinalMode() {
