@@ -56,11 +56,17 @@ public class Field implements FieldInput, FieldOutput, Writable {
     }
 
     @Override
-    public double getNewValue() {
+    public double getNewValue(boolean ack) {
+        double r;
         if(updateAvailable())
-            return currentValue + update;
+            r = currentValue + update;
         else
-            return currentValue;
+            r = currentValue;
+
+        if(ack)
+            acknowledgePropagated();
+
+        return r;
     }
 
     public void setInitialValue(double v) {
@@ -101,6 +107,7 @@ public class Field implements FieldInput, FieldOutput, Writable {
         allowUpdate = true;
         fieldListener.updated(update);
         acknowledgePropagated();
+
         allowUpdate = false;
     }
 
@@ -108,10 +115,14 @@ public class Field implements FieldInput, FieldOutput, Writable {
         return update != null;
     }
 
-    public double getUpdate() {
+    public double getUpdate(int updateArg, boolean ack) {
         assert allowUpdate;
 
-        return update;
+        double r = update;
+        if(ack)
+            acknowledgePropagated();
+
+        return r;
     }
 
     public void acknowledgePropagated() {

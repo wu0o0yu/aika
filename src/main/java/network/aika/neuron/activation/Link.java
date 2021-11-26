@@ -20,6 +20,7 @@ import network.aika.Config;
 import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.fields.ConstantField;
 import network.aika.neuron.activation.fields.Field;
 import network.aika.neuron.activation.fields.FieldMultiplication;
 import network.aika.neuron.activation.fields.FieldOutput;
@@ -53,8 +54,8 @@ public class Link<A extends Activation> extends Element<Link> {
     private final boolean isSelfRef;
 
     private Field igGradient = new Field();
-    private FieldMultiplication weightedInput;
-    private FieldMultiplication backPropGradient;
+    private FieldOutput weightedInput;
+    private FieldOutput backPropGradient;
 
     public Link(Synapse s, Activation input, A output, boolean isSelfRef) {
         this.synapse = s;
@@ -63,7 +64,11 @@ public class Link<A extends Activation> extends Element<Link> {
         this.isSelfRef = isSelfRef;
 
         igGradient.setFieldListener(u -> output.receiveOwnGradientUpdate(u));
-        weightedInput = new FieldMultiplication(input.getValue(), synapse.getWeight());
+        if(input != null)
+            weightedInput = new FieldMultiplication(input.getValue(), synapse.getWeight());
+        else
+            weightedInput = ZERO;
+
         backPropGradient = new FieldMultiplication(output.outputGradient, synapse.getWeight());
 
         AddLink.add(this);
@@ -71,11 +76,11 @@ public class Link<A extends Activation> extends Element<Link> {
         getThought().onLinkCreationEvent(this);
     }
 
-    public FieldMultiplication getWeightedInput() {
+    public FieldOutput getWeightedInput() {
         return weightedInput;
     }
 
-    public FieldMultiplication getBackPropGradient() {
+    public FieldOutput getBackPropGradient() {
         return backPropGradient;
     }
 
@@ -98,17 +103,17 @@ public class Link<A extends Activation> extends Element<Link> {
 
         if(backPropagate) {
             input.getInputGradient().addAndTriggerUpdate(
-                    backPropGradient.getUpdate(1)
+                    backPropGradient.getUpdate(1, true)
             );
         }
     }
 
     public void weightUpdate() {
         output.getNet().addAndTriggerUpdate(
-                weightedInput.getUpdate(2)
+                weightedInput.getUpdate(2, true)
         );
         input.getInputGradient().addAndTriggerUpdate(
-                backPropGradient.getUpdate(2)
+                backPropGradient.getUpdate(2, true)
         );
     }
 
@@ -216,7 +221,7 @@ public class Link<A extends Activation> extends Element<Link> {
 
     public void updateInputValue() {
         output.getNet().addAndTriggerUpdate(
-                weightedInput.getUpdate(1)
+                weightedInput.getUpdate(1, true)
         );
     }
 
@@ -277,5 +282,4 @@ public class Link<A extends Activation> extends Element<Link> {
     public String toShortString() {
         return toString();
     }
-
 }

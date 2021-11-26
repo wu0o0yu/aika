@@ -37,8 +37,8 @@ public class FieldFunction implements FieldOutput {
     }
 
     @Override
-    public double getNewValue() {
-        return function.apply(input.getNewValue());
+    public double getNewValue(boolean ack) {
+        return function.apply(input.getNewValue(ack));
     }
 
     @Override
@@ -47,8 +47,8 @@ public class FieldFunction implements FieldOutput {
     }
 
     @Override
-    public double getUpdate() {
-        return getNewValue() - getCurrentValue();
+    public double getUpdate(int updateArg, boolean ack) {
+        return getNewValue(ack) - getCurrentValue();
     }
 
     @Override

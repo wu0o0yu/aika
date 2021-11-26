@@ -18,7 +18,7 @@ public class ConstantField implements FieldOutput {
     }
 
     @Override
-    public double getNewValue() {
+    public double getNewValue(boolean ack) {
         return value;
     }
 
@@ -28,7 +28,9 @@ public class ConstantField implements FieldOutput {
     }
 
     @Override
-    public double getUpdate() {
+    public double getUpdate(int updateArg, boolean ack) {
+        if(ack)
+            acknowledgePropagated();
         return !initialized ? value : 0.0;
     }
 

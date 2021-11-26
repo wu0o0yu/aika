@@ -62,6 +62,10 @@ public class AddLink extends Step<Link> {
 
         if(l.getOutput() != null)
             l.linkOutput();
+
+        l.getOutput().getNet().addAndTriggerUpdate(
+                l.getWeightedInput().getCurrentValue()
+        );
     }
 
     public String toString() {

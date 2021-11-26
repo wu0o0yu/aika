@@ -59,7 +59,7 @@ public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNe
         if(!l.getInput().isFired())
             return;
 
-        weight.add(delta);
+        weight.addAndTriggerUpdate(delta);
     }
 
     @Override

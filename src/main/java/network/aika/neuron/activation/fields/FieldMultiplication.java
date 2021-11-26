@@ -16,6 +16,8 @@
  */
 package network.aika.neuron.activation.fields;
 
+import network.aika.utils.Utils;
+
 /**
  * @author Lukas Molzberger
  */
@@ -34,8 +36,8 @@ public class FieldMultiplication implements FieldOutput {
     }
 
     @Override
-    public double getNewValue() {
-        return in1.getNewValue() * in2.getNewValue();
+    public double getNewValue(boolean ack) {
+        return in1.getNewValue(ack) * in2.getNewValue(ack);
     }
 
     @Override
@@ -44,35 +46,44 @@ public class FieldMultiplication implements FieldOutput {
     }
 
     @Override
-    public double getUpdate() {
-        throw new UnsupportedOperationException();
-/*        double result = 0.0;
+    public double getUpdate(boolean ack) {
+        double result = 0.0;
         if(in1.updateAvailable())
-            result += in1.getUpdateAndAcknowledge() * in2.getCurrentValue();
+            result += in1.getUpdate(ack) * in2.getCurrentValue();
 
         if(in2.updateAvailable())
-            result += in2.getUpdateAndAcknowledge() * in1.getCurrentValue();
+            result += in2.getUpdate(ack) * in1.getCurrentValue();
 
-        return result;*/
-    }
-
-
-    public double getUpdate(int updateArg) {
-        double result = 0.0;
-        if(updateArg == 1) {
-            if (in1.updateAvailable())
-                result += in1.getUpdateAndAcknowledge() * in2.getCurrentValue();
-        } else if(updateArg == 2) {
-            if (in2.updateAvailable())
-                result += in2.getUpdateAndAcknowledge() * in1.getCurrentValue();
-        }
         return result;
     }
 
+    public double getUpdate(int updateArg, boolean ack) {
+        double result = 0.0;
+        if(updateArg == 1) {
+            if (in1.updateAvailable())
+                result += in1.getUpdate(ack) * in2.getCurrentValue();
+        } else if(updateArg == 2) {
+            if (in2.updateAvailable())
+                result += in2.getUpdate(ack) * in1.getCurrentValue();
+        }
+        return result;
+    }
 
     @Override
     public void acknowledgePropagated() {
         in1.acknowledgePropagated();
         in2.acknowledgePropagated();
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[u:");
+        if(updateAvailable())
+            sb.append(Utils.round(getUpdate(false)));
+        else sb.append("-");
+        sb.append(",v:");
+        sb.append(Utils.round(getCurrentValue()));
+        sb.append("]");
+        return sb.toString();
     }
 }

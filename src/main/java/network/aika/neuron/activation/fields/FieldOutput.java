@@ -23,27 +23,15 @@ public interface FieldOutput {
 
     double getCurrentValue();
 
-    double getNewValue();
+    double getNewValue(boolean ack);
 
     boolean updateAvailable();
 
-    double getUpdate();
+    double getUpdate(int updateArg, boolean ack);
+
+    default double getUpdate(boolean ack) {
+        return getUpdate(1, ack);
+    }
 
     void acknowledgePropagated();
-
-    default double getUpdateAndAcknowledge() {
-        if(!updateAvailable())
-            throw new RuntimeException("No Field Update Available!");
-
-        Double update = getUpdate();
-
-        acknowledgePropagated();
-        return update;
-    }
-
-    default double getNewValueAndAcknowledge() {
-        double newValue = getNewValue();
-        acknowledgePropagated();
-        return newValue;
-    }
 }

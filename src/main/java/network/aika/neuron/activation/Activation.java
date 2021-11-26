@@ -91,7 +91,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         net.add(getNeuron().getBias().getCurrentValue());
 
         net.setFieldListener(u -> {
-            double v = net.getNewValueAndAcknowledge();
+            double v = net.getNewValue(true);
             if(!isInput)
                 value.setAndTriggerUpdate(getBranchProbability() * getActivationFunction().f(v));
 
@@ -106,7 +106,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
 
         inputGradient.setFieldListener(u ->
-            propagateGradient(outputGradient.getUpdate(), true, true)
+            propagateGradient(outputGradient.getUpdate(true), true, true)
         );
 
         thought.registerActivation(this);

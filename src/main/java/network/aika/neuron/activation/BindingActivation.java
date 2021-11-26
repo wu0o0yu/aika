@@ -70,11 +70,11 @@ public class BindingActivation extends Activation<BindingNeuron> {
         super(id, t, n);
 
         inputGradient.setFieldListener(u ->
-                propagateGradient(outputGradient.getUpdate(), true, false)
+                propagateGradient(outputGradient.getUpdate(true), true, false)
         );
 
         ownInputGradient.setFieldListener(u ->
-                propagateGradient(ownOutputGradient.getUpdate(), false, true)
+                propagateGradient(ownOutputGradient.getUpdate(true), false, true)
         );
     }
 
