@@ -26,9 +26,9 @@ import network.aika.neuron.activation.*;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.QueueKey;
 import network.aika.neuron.steps.Step;
-import network.aika.neuron.steps.StepType;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -45,8 +45,6 @@ public abstract class Thought<M extends Model> {
     private int activationIdCounter = 0;
 
     private final NavigableMap<QueueKey, Step> queue = new TreeMap<>(QueueKey.COMPARATOR);
-
-    private final Set<StepType> filters = new TreeSet<>();
 
     private final TreeMap<Integer, Activation> activationsById = new TreeMap<>();
     private final Map<NeuronProvider, SortedSet<Activation<?>>> actsPerNeuron = new HashMap<>();
@@ -79,29 +77,26 @@ public abstract class Thought<M extends Model> {
         this.config = config;
     }
 
-    public void addFilters(StepType... st) {
-        filters.addAll(Set.of(st));
-    }
-
     public void onActivationCreationEvent(Activation act, Synapse originSynapse, Activation originAct) {
-        getEventListeners()
-                .forEach(
-                        el -> el.onActivationCreationEvent(act, originSynapse, originAct)
-                );
+        callEventListener(el ->
+                el.onActivationCreationEvent(act, originSynapse, originAct)
+        );
     }
 
     public void beforeProcessedEvent(Step s) {
-        getEventListeners()
-                .forEach(
-                        el -> el.beforeProcessedEvent(s)
-                );
+        callEventListener(el ->
+                el.beforeProcessedEvent(s)
+        );
     }
 
     public void afterProcessedEvent(Step s) {
-        getEventListeners()
-                .forEach(
-                        el -> el.afterProcessedEvent(s)
-                );
+        callEventListener(el ->
+                el.afterProcessedEvent(s)
+        );
+    }
+
+    private void callEventListener(Consumer<EventListener> el) {
+        getEventListeners().forEach(el);
     }
 
     public void onLinkCreationEvent(Link l) {
@@ -138,9 +133,6 @@ public abstract class Thought<M extends Model> {
     }
 
     public void addStep(Step s) {
-        if(filters.contains(s.getStepType()))
-            return;
-
         s.setTimeStamp(getNextTimestamp());
         queue.put(s, s);
     }
@@ -149,11 +141,7 @@ public abstract class Thought<M extends Model> {
         Step removedStep = queue.remove(s);
         assert removedStep != null;
     }
-/*
-    public void removeQueueEntries(Collection<Step> s) {
-        queue.removeAll(s);
-    }
-*/
+
     public Collection<Step> getQueue() {
         return queue.values();
     }
