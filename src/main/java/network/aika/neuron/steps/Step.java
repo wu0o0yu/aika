@@ -29,16 +29,11 @@ import static network.aika.neuron.activation.Timestamp.NOT_SET;
  */
 public abstract class Step<E extends Element> implements QueueKey, Cloneable {
 
-    public static final Comparator<Step> COMPARATOR = Comparator
-            .<Step>comparingInt(s -> s.getPhase().ordinal())
-            .thenComparingInt(s -> s.fired == NOT_SET ? 0 : 1)
-            .thenComparing(s -> s.fired)
-            .thenComparing(s -> s.timestamp);
-
     private E element;
 
     protected Timestamp fired;
     private Timestamp timestamp;
+
 
     public Step(E element) {
         this.element = element;

@@ -293,10 +293,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 .values()
                 .stream()
                 .filter(l -> l.getSynapse() != excludedSyn)
-                .forEach(l -> {
-                            Link nl = new Link(l.getSynapse(), l.getInput(), clonedAct, l.isSelfRef());
-//                            clonedAct.net.addAndTriggerUpdate(nl.getInputValue(POS));
-                        }
+                .forEach(l ->
+                        new Link(l.getSynapse(), l.getInput(), clonedAct, l.isSelfRef())
                 );
     }
 
@@ -337,18 +335,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         Link ol = getInputLink(s);
         assert ol == null;
 
-        Link nl = new Link(
+        return new Link(
                 s,
                 input,
                 this,
                 isSelfRef
         );
-/*
-        nl.updateNetByInputValue(
-                Link.getInputValueDelta(POS, nl, ol)
-        );
-*/
-        return nl;
     }
 
 

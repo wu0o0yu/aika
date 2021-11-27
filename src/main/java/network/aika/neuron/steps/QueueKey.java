@@ -18,27 +18,63 @@ package network.aika.neuron.steps;
 
 import network.aika.neuron.activation.Timestamp;
 
+import java.util.Comparator;
+
+import static network.aika.neuron.activation.Timestamp.NOT_SET;
+
 /**
  * @author Lukas Molzberger
  */
 public interface QueueKey {
 
+    Comparator<QueueKey> COMPARATOR = Comparator
+            .<QueueKey>comparingInt(k -> k.getPhase().ordinal())
+            .thenComparingInt(k -> k.getFired() == NOT_SET ? 0 : 1)
+            .thenComparing(k -> k.getFired())
+            .thenComparing(k -> k.getStepName())
+            .thenComparing(k -> k.getTimestamp());
+
+    Phase getPhase();
+
+    Timestamp getFired();
+
     String getStepName();
 
     Timestamp getTimestamp();
 
-    class DummyStep implements QueueKey {
-        private final Step s;
+    class Key implements QueueKey {
+        private final Phase p;
+        private final Timestamp fired;
+        private final String stepName;
         private final Timestamp timestamp;
 
-        public DummyStep(Step s, Timestamp timestamp) {
-            this.s = s;
+        public Key(Phase p, Timestamp fired) {
+            this.p = p;
+            this.fired = fired;
+            this.stepName = "";
+            this.timestamp = NOT_SET;
+        }
+
+        public Key(Step s, Timestamp timestamp) {
+            this.p = s.getPhase();
+            this.fired = s.getFired();
+            this.stepName = s.getStepName();
             this.timestamp = timestamp;
         }
 
         @Override
+        public Phase getPhase() {
+            return p;
+        }
+
+        @Override
+        public Timestamp getFired() {
+            return fired;
+        }
+
+        @Override
         public String getStepName() {
-            return s.getStepName();
+            return stepName;
         }
 
         @Override

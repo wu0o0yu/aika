@@ -23,6 +23,8 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.QueueKey;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
 
@@ -42,7 +44,7 @@ public abstract class Thought<M extends Model> {
     private long timestampCounter = 0;
     private int activationIdCounter = 0;
 
-    private final TreeSet<Step> queue = new TreeSet<>(Step.COMPARATOR);
+    private final NavigableMap<QueueKey, Step> queue = new TreeMap<>(QueueKey.COMPARATOR);
 
     private final Set<StepType> filters = new TreeSet<>();
 
@@ -140,29 +142,45 @@ public abstract class Thought<M extends Model> {
             return;
 
         s.setTimeStamp(getNextTimestamp());
-        queue.add(s);
+        queue.put(s, s);
     }
 
     public void removeQueueEntry(Step s) {
-        boolean isRemoved = queue.remove(s);
-        assert isRemoved;
+        Step removedStep = queue.remove(s);
+        assert removedStep != null;
     }
-
+/*
     public void removeQueueEntries(Collection<Step> s) {
         queue.removeAll(s);
     }
-
-    public SortedSet<Step> getQueue() {
-        return queue;
+*/
+    public Collection<Step> getQueue() {
+        return queue.values();
     }
 
     public Range getRange() {
         return new Range(absoluteBegin, absoluteBegin + length());
     }
 
+    private NavigableMap<QueueKey, Step> getFilteredQueue(Phase maxPhase) {
+        if(maxPhase == null)
+            return queue;
+
+        return queue.headMap(
+                new QueueKey.Key(maxPhase, Timestamp.MAX),
+                true
+        );
+    }
+
     public void process() {
-        while (!queue.isEmpty()) {
-            Step s = queue.pollFirst();
+        process(null);
+    }
+
+    public void process(Phase maxPhase) {
+        NavigableMap<QueueKey, Step> filteredQueue = getFilteredQueue(maxPhase);
+
+        while (!filteredQueue.isEmpty()) {
+            Step s = filteredQueue.pollFirstEntry().getValue();
 
             timestampOnProcess = getCurrentTimestamp();
 
@@ -188,6 +206,7 @@ public abstract class Thought<M extends Model> {
 
     public <E extends Element> List<Step> getStepsByElement(E element) {
         return queue
+                .values()
                 .stream()
                 .filter(s -> s.getElement() == element)
                 .collect(Collectors.toList());

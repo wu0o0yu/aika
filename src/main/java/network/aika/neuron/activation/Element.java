@@ -31,11 +31,7 @@ import java.util.stream.Stream;
  */
 public abstract class Element<E extends Element> implements Comparable<E> {
 
-    private NavigableMap<QueueKey, Step> queuedSteps = new TreeMap<>(
-            Comparator
-                    .<QueueKey, String>comparing(s -> s.getStepName())
-                    .thenComparing(s -> s.getTimestamp())
-    );
+    private NavigableMap<QueueKey, Step> queuedSteps = new TreeMap<>(QueueKey.COMPARATOR);
 
     public abstract Timestamp getFired();
 
@@ -45,21 +41,21 @@ public abstract class Element<E extends Element> implements Comparable<E> {
 
     public boolean isQueued(Step s) {
         return !queuedSteps.subMap(
-                new QueueKey.DummyStep(s, Timestamp.MIN),
-                new QueueKey.DummyStep(s, Timestamp.MAX)
+                new QueueKey.Key(s, Timestamp.MIN),
+                new QueueKey.Key(s, Timestamp.MAX)
         ).isEmpty();
     }
 
     public void removeQueuedPhase(Step s) {
         queuedSteps.remove(s);
     }
-
+/*
     public void replaceElement(Element newElement) {
         removeFromQueue();
         copySteps(newElement);
         queuedSteps.clear();
     }
-
+*/
     public void copySteps(Element newElement) {
         getQueuedSteps().forEach(s ->
                 Step.add(s.copy(newElement))
@@ -69,11 +65,11 @@ public abstract class Element<E extends Element> implements Comparable<E> {
     public Stream<Step> getQueuedSteps() {
         return queuedSteps.values().stream();
     }
-
+/*
     private void removeFromQueue() {
         getThought().removeQueueEntries(queuedSteps.values());
     }
-
+*/
     public abstract Thought getThought();
 
     public abstract Config getConfig();
