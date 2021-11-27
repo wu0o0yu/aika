@@ -134,11 +134,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         thought.onActivationCreationEvent(this, originSynapse, originAct);
     }
 
-    public void initInputGradient(Link l) {
-
-    }
-
-
     public Field getInputGradient() {
         return inputGradient;
     }

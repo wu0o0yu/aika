@@ -115,7 +115,7 @@ public class TextModel extends Model {
         initRecurrentSamePatternSynapse(in, inRel);
         initRelatedInputSynapse(inRel, inhib, recurrent);
 
-        inRel.getBias().add(4.0);
+        inRel.getBias().addAndTriggerUpdate(4.0);
         inRel.setAllowTraining(false);
     }
 
