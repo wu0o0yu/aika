@@ -43,6 +43,8 @@ public class GradientTest {
 
         processDoc(doc);
 
+        doc.process();
+
         System.out.println();
     }
 
