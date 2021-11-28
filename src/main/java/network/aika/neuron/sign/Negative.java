@@ -16,6 +16,9 @@
  */
 package network.aika.neuron.sign;
 
+import network.aika.neuron.activation.fields.FieldOutput;
+import network.aika.neuron.activation.fields.InvertedField;
+
 /**
  *
  * @author Lukas Molzberger
@@ -27,8 +30,13 @@ public class Negative implements Sign {
     }
 
     @Override
-    public double getValue(Double x) {
-        return x != null ? 1.0 - x : 1.0;
+    public FieldOutput getValue(FieldOutput v) {
+        return new InvertedField(v);
+    }
+
+    @Override
+    public int index() {
+        return 1;
     }
 
     public String toString() {

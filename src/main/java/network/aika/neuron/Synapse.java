@@ -19,8 +19,8 @@ package network.aika.neuron;
 import network.aika.Model;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.fields.Field;
 import network.aika.neuron.sign.Sign;
-import network.aika.neuron.steps.UpdateNet;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import org.apache.commons.math3.distribution.BetaDistribution;
@@ -33,11 +33,9 @@ import java.io.IOException;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.Neuron.BETA_THRESHOLD;
-import static network.aika.neuron.activation.Activation.OWN;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
-import static network.aika.utils.Utils.logChange;
 
 /**
  *
@@ -53,7 +51,8 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     private Synapse template;
     private TemplateSynapseInfo templateInfo;
 
-    protected double weight;
+    protected Field weight = new Field(u -> weightUpdate(u));
+
 
     protected SampleSpace sampleSpace = new SampleSpace();
 
@@ -123,10 +122,6 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
 
     public abstract void updateSynapse(Link l, double delta);
 
-    public void propagateGradient(Link l, double[] gradient) {
-        l.propagateGradient(gradient[OWN]);
-    }
-
     public abstract boolean checkCausality(Activation<?> iAct, Activation<?> oAct);
 
     public A branchIfNecessary(Activation iAct, A oAct) {
@@ -173,7 +168,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     }
 
     protected void initFromTemplate(Synapse s) {
-        s.weight = weight;
+        s.weight.setInitialValue(weight.getCurrentValue());
         s.template = this;
     }
 
@@ -325,6 +320,14 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return getPOutput().getModel();
     }
 
+    public double getCompleteSurprisal(Sign si, Sign so, Range range) {
+        double s = getSurprisal(si, so, range);
+        s -= getInput().getSurprisal(si, range);
+        s -= getOutput().getSurprisal(so, range);
+
+        return s;
+    }
+
     public double getSurprisal(Sign si, Sign so, Range range) {
         double N = sampleSpace.getN(range);
         if(isTemplate() || N == 0.0)
@@ -350,20 +353,20 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
      */
     public abstract boolean isWeak();
 
-    public double getWeight() {
+    public Field getWeight() {
         return weight;
     }
 
     public boolean isZero() {
-        return Utils.belowTolerance(weight);
+        return Utils.belowTolerance(weight.getCurrentValue());
     }
 
     public boolean isNegative() {
-        return getWeight() < 0.0;
+        return weight.getCurrentValue() < 0.0;
     }
-
-    public void setWeight(double weight) {
-        addWeight(weight - this.weight);
+/*
+    public void setWeight(double w) {
+        weight.setAndTriggerUpdate(w);
     }
 
     public void addWeight(double weightDelta) {
@@ -371,15 +374,23 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     }
 
     protected void addWeightInternal(double weightDelta) {
-        double oldWeight = weight;
-        this.weight += weightDelta;
-        logChange(getOutput(), oldWeight, this.weight, "addWeight: weight");
+        weight.addAndTriggerUpdate(weightDelta);
+    }
+*/
+    protected void weightUpdate(double u) {
+        getModel()
+                .getCurrentThought()
+                .getActivations(output)
+                .stream()
+                .map(act -> act.getInputLink(this))
+                .filter(l -> l != null)
+                .forEach(l -> l.weightUpdate());
         setModified();
     }
 
     public void updateOutputNet(Link<A> l, double delta) {
 //        SumUpLink.add(l, actValueDelta * l.getSynapse().getWeight());
-        UpdateNet.updateNet(l.getOutput(), delta);
+        l.getOutput().getNet().addAndTriggerUpdate(delta);
     }
 
     @Override
@@ -389,7 +400,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         out.writeLong(input.getId());
         out.writeLong(output.getId());
 
-        out.writeDouble(weight);
+        weight.write(out);
 
         out.writeDouble(frequencyIPosOPos);
         out.writeDouble(frequencyIPosONeg);
@@ -411,7 +422,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         input = m.lookupNeuron(in.readLong());
         output = m.lookupNeuron(in.readLong());
 
-        weight = in.readDouble();
+        weight.readFields(in, m);
 
         frequencyIPosOPos = in.readDouble();
         frequencyIPosONeg = in.readDouble();
@@ -423,7 +434,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     public String toString() {
         return "S " +
                 getClass().getSimpleName() +
-                "  w:" + Utils.round(getWeight()) +
+                "  w:" + getWeight() +
                 " in:[" + input.getNeuron() + "](" + (isInputLinked() ? "+" : "-") + ")" +
                 " --> out:[" + output.getNeuron() + "](" + (isOutputLinked() ? "+" : "-") + ")";
     }

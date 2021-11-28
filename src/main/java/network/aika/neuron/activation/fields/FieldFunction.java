@@ -14,32 +14,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.sign;
+package network.aika.neuron.activation.fields;
 
-import network.aika.neuron.activation.fields.Field;
-import network.aika.neuron.activation.fields.FieldOutput;
+import java.util.function.Function;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class Positive implements Sign {
-    @Override
-    public Sign invert() {
-        return NEG;
+public class FieldFunction implements FieldOutput {
+
+    FieldOutput input;
+    Function<Double, Double> function;
+
+    public FieldFunction(FieldOutput in, Function<Double, Double> f) {
+        this.input = in;
+        this.function = f;
     }
 
     @Override
-    public FieldOutput getValue(FieldOutput v) {
-        return v;
+    public double getCurrentValue() {
+        return function.apply(input.getCurrentValue());
     }
 
     @Override
-    public int index() {
-        return 0;
+    public double getNewValue(boolean ack) {
+        return function.apply(input.getNewValue(ack));
     }
 
-    public String toString() {
-        return "POS";
+    @Override
+    public boolean updateAvailable() {
+        return input.updateAvailable();
+    }
+
+    @Override
+    public double getUpdate(int updateArg, boolean ack) {
+        return getNewValue(ack) - getCurrentValue();
+    }
+
+    @Override
+    public void acknowledgePropagated() {
+        input.acknowledgePropagated();
     }
 }

@@ -14,27 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.steps;
-
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.steps.Step;
-import network.aika.neuron.steps.activation.CheckIfFired;
-import network.aika.neuron.steps.activation.PropagateGradientsNet;
-import network.aika.utils.Utils;
-
+package network.aika.neuron.activation.fields;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public abstract class UpdateNet {
+public interface FieldUpdateEvent {
 
-    public static void updateNet(Activation act, double netDelta) {
-        act.updateNet(netDelta);
-        if(Utils.belowTolerance(netDelta))
-            return;
-
-        PropagateGradientsNet.add(act);
-        CheckIfFired.add(act);
-    }
+    void updated(double u);
 }

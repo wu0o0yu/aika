@@ -51,6 +51,8 @@ public abstract class Model implements Writable {
 
     private final Templates templates = new Templates(this);
 
+    private Thought currentThought;
+
     private Supplier<Writable> customDataInstanceSupplier;
 
     public Model() {
@@ -93,6 +95,14 @@ public abstract class Model implements Writable {
 
     public Templates getTemplates() {
         return templates;
+    }
+
+    public Thought<?> getCurrentThought() {
+        return currentThought;
+    }
+
+    public void setCurrentThought(Thought<?> currentThought) {
+        this.currentThought = currentThought;
     }
 
     public Collection<NeuronProvider> getActiveNeurons() {

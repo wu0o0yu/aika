@@ -23,10 +23,12 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.steps.Phase;
+import network.aika.neuron.steps.QueueKey;
 import network.aika.neuron.steps.Step;
-import network.aika.neuron.steps.StepType;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -42,14 +44,10 @@ public abstract class Thought<M extends Model> {
     private long timestampCounter = 0;
     private int activationIdCounter = 0;
 
-    private final TreeSet<Step> queue = new TreeSet<>(Step.COMPARATOR);
-
-    private final Set<StepType> filters = new TreeSet<>();
+    private final NavigableMap<QueueKey, Step> queue = new TreeMap<>(QueueKey.COMPARATOR);
 
     private final TreeMap<Integer, Activation> activationsById = new TreeMap<>();
-
-    private Map<NeuronProvider, SortedSet<Activation>> actsPerNeuron = null;
-
+    private final Map<NeuronProvider, SortedSet<Activation<?>>> actsPerNeuron = new HashMap<>();
     private final List<EventListener> eventListeners = new ArrayList<>();
 
     private Config config;
@@ -58,6 +56,7 @@ public abstract class Thought<M extends Model> {
     public Thought(M m) {
         model = m;
         absoluteBegin = m.getN();
+        m.setCurrentThought(this);
     }
 
     public void updateModel() {
@@ -78,29 +77,26 @@ public abstract class Thought<M extends Model> {
         this.config = config;
     }
 
-    public void addFilters(StepType... st) {
-        filters.addAll(Set.of(st));
-    }
-
     public void onActivationCreationEvent(Activation act, Synapse originSynapse, Activation originAct) {
-        getEventListeners()
-                .forEach(
-                        el -> el.onActivationCreationEvent(act, originSynapse, originAct)
-                );
+        callEventListener(el ->
+                el.onActivationCreationEvent(act, originSynapse, originAct)
+        );
     }
 
     public void beforeProcessedEvent(Step s) {
-        getEventListeners()
-                .forEach(
-                        el -> el.beforeProcessedEvent(s)
-                );
+        callEventListener(el ->
+                el.beforeProcessedEvent(s)
+        );
     }
 
     public void afterProcessedEvent(Step s) {
-        getEventListeners()
-                .forEach(
-                        el -> el.afterProcessedEvent(s)
-                );
+        callEventListener(el ->
+                el.afterProcessedEvent(s)
+        );
+    }
+
+    private void callEventListener(Consumer<EventListener> el) {
+        getEventListeners().forEach(el);
     }
 
     public void onLinkCreationEvent(Link l) {
@@ -124,39 +120,55 @@ public abstract class Thought<M extends Model> {
 
     public void registerActivation(Activation act) {
         activationsById.put(act.getId(), act);
+
+        Set<Activation<?>> acts = actsPerNeuron
+                .computeIfAbsent(
+                        act.getNeuronProvider(),
+                        n -> new TreeSet<>()
+                );
+        acts.add(act);
     }
 
     public void registerBindingSignal(Activation act, BindingSignal bs) {
     }
 
     public void addStep(Step s) {
-        if(filters.contains(s.getStepType()))
-            return;
-
         s.setTimeStamp(getNextTimestamp());
-        queue.add(s);
+        queue.put(s, s);
     }
 
     public void removeQueueEntry(Step s) {
-        boolean isRemoved = queue.remove(s);
-        assert isRemoved;
+        Step removedStep = queue.remove(s);
+        assert removedStep != null;
     }
 
-    public void removeQueueEntries(Collection<Step> s) {
-        queue.removeAll(s);
-    }
-
-    public SortedSet<Step> getQueue() {
-        return queue;
+    public Collection<Step> getQueue() {
+        return queue.values();
     }
 
     public Range getRange() {
         return new Range(absoluteBegin, absoluteBegin + length());
     }
 
+    private NavigableMap<QueueKey, Step> getFilteredQueue(Phase maxPhase) {
+        if(maxPhase == null)
+            return queue;
+
+        return queue.headMap(
+                new QueueKey.Key(maxPhase, Timestamp.MAX),
+                true
+        );
+    }
+
     public void process() {
-        while (!queue.isEmpty()) {
-            Step s = queue.pollFirst();
+        process(null);
+    }
+
+    public void process(Phase maxPhase) {
+        NavigableMap<QueueKey, Step> filteredQueue = getFilteredQueue(maxPhase);
+
+        while (!filteredQueue.isEmpty()) {
+            Step s = filteredQueue.pollFirstEntry().getValue();
 
             timestampOnProcess = getCurrentTimestamp();
 
@@ -182,6 +194,7 @@ public abstract class Thought<M extends Model> {
 
     public <E extends Element> List<Step> getStepsByElement(E element) {
         return queue
+                .values()
                 .stream()
                 .filter(s -> s.getElement() == element)
                 .collect(Collectors.toList());
@@ -203,33 +216,13 @@ public abstract class Thought<M extends Model> {
         return activationsById.size();
     }
 
-    public Set<Activation> getActivations(NeuronProvider n) {
+    public Set<Activation<?>> getActivations(NeuronProvider n) {
         return getActivations(n.getNeuron());
     }
 
-    public Set<Activation> getActivations(Neuron n) {
-        if(actsPerNeuron == null) {
-            actsPerNeuron = getActivationsPerNeuron();
-        }
-
-        Set<Activation> acts = actsPerNeuron.get(n.getProvider());
+    public Set<Activation<?>> getActivations(Neuron<?, ?> n) {
+        Set<Activation<?>> acts = actsPerNeuron.get(n.getProvider());
         return acts != null ? acts : Collections.emptySet();
-    }
-
-    private Map<NeuronProvider, SortedSet<Activation>> getActivationsPerNeuron() {
-        Map<NeuronProvider, SortedSet<Activation>> results = new TreeMap<>();
-
-        activationsById.values().stream()
-                .filter(act -> act.isFired())
-                .forEach(act -> {
-                    Set<Activation> acts = results.computeIfAbsent(
-                            act.getNeuronProvider(),
-                            n -> new TreeSet<>()
-                    );
-                    acts.add(act);
-                });
-
-        return results;
     }
 
     public String toString() {

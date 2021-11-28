@@ -62,18 +62,18 @@ public class MutualExclusionTest {
 
                 s.linkInput();
                 s.linkOutput();
-                s.addWeight(10.0);
-                na.addConjunctiveBias(-10.0);
+                s.getWeight().add(10.0);
+                na.getBias().add(-10.0);
             }
 
             {
                 Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, na);
 
                 s.linkOutput();
-                s.addWeight(-100.0);
+                s.getWeight().add(-100.0);
             }
 
-            na.addBias(1.0);
+            na.getBias().add(1.0);
         }
 
         {
@@ -82,17 +82,17 @@ public class MutualExclusionTest {
 
                 s.linkInput();
                 s.linkOutput();
-                s.addWeight(10.0);
-                nb.addConjunctiveBias(-10.0);
+                s.getWeight().add(10.0);
+                nb.getBias().add(-10.0);
             }
 
             {
                 Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, nb);
 
                 s.linkOutput();
-                s.addWeight(-100.0);
+                s.getWeight().add(-100.0);
             }
-            nb.addBias(1.5);
+            nb.getBias().add(1.5);
         }
 
 
@@ -102,38 +102,38 @@ public class MutualExclusionTest {
 
                 s.linkInput();
                 s.linkOutput();
-                s.addWeight(10.0);
-                nc.addConjunctiveBias(-10.0);
+                s.getWeight().add(10.0);
+                nc.getBias().add(-10.0);
             }
 
             {
                 Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, nc);
 
                 s.linkOutput();
-                s.addWeight(-100.0);
+                s.getWeight().add(-100.0);
             }
 
-            nc.addBias(1.2);
+            nc.getBias().add(1.2);
         }
 
         {
             {
                 Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(na, inhib);
                 s.linkInput();
-                s.addWeight(1.0);
+                s.getWeight().add(1.0);
             }
             {
                 Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(nb, inhib);
                 s.linkInput();
-                s.addWeight(1.0);
+                s.getWeight().add(1.0);
             }
             {
                 Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(nc, inhib);
                 s.linkInput();
-                s.addWeight(1.0);
+                s.getWeight().add(1.0);
             }
 
-            inhib.addBias(0.0);
+            inhib.getBias().set(0.0);
         }
 
 
@@ -152,10 +152,10 @@ public class MutualExclusionTest {
 
         System.out.println(doc);
 
-        Set<Activation> nbActs = doc.getActivations(nb);
+        Set<Activation<?>> nbActs = doc.getActivations(nb);
         Activation nbAct = nbActs.iterator().next();
 
-        assertTrue(nbAct.getValue() > 0.38);
+        assertTrue(nbAct.getValue().getCurrentValue() > 0.38);
     }
 
 
@@ -183,18 +183,18 @@ public class MutualExclusionTest {
 
                 s.linkInput();
                 s.linkOutput();
-                s.addWeight(10.0);
-                na.addConjunctiveBias(-10.0);
+                s.getWeight().add(10.0);
+                na.getBias().add(-10.0);
             }
 
             {
                 Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, na);
 
                 s.linkOutput();
-                s.addWeight(-100.0);
+                s.getWeight().add(-100.0);
             }
 
-            na.addBias(1.0);
+            na.getBias().add(1.0);
         }
 
         {
@@ -203,38 +203,38 @@ public class MutualExclusionTest {
 
                 s.linkInput();
                 s.linkOutput();
-                s.addWeight(10.0);
-                nb.addConjunctiveBias(-10.0);
+                s.getWeight().add(10.0);
+                nb.getBias().add(-10.0);
             }
 
             {
                 Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, nb);
 
                 s.linkOutput();
-                s.addWeight(-100.0);
+                s.getWeight().add(-100.0);
             }
-            nb.addBias(1.5);
+            nb.getBias().add(1.5);
         }
 
         {
 /*            {
                 InhibitorySynapse s = new InhibitorySynapse(in, inhib);
                 s.linkInput();
-                s.addWeight(1.0);
+                s.getWeight().add(1.0);
             }
 */
             {
                 Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(na, inhib);
                 s.linkInput();
-                s.addWeight(1.0);
+                s.getWeight().add(1.0);
             }
             {
                 Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(nb, inhib);
                 s.linkInput();
-                s.addWeight(1.0);
+                s.getWeight().add(1.0);
             }
 
-            inhib.addBias(0.0);
+            inhib.getBias().set(0.0);
         }
 
 

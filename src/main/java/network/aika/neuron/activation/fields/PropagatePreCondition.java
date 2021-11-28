@@ -14,22 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
-
-import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.Link;
+package network.aika.neuron.activation.fields;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class RelatedRecurrentBNSynapse<I extends Neuron> extends RelatedBNSynapse<I> {
+public interface PropagatePreCondition {
 
-
-    @Override
-    public boolean isRecurrent() {
-        return true;
-    }
-
+    boolean check(double cv, double nv, double u);
 }

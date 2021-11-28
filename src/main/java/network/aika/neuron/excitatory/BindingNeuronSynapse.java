@@ -21,6 +21,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.steps.activation.PostTraining;
 import network.aika.neuron.steps.activation.SetFinalMode;
 
 import java.util.stream.Stream;
@@ -51,6 +52,15 @@ public abstract class BindingNeuronSynapse<I extends Neuron> extends ExcitatoryS
 
         super.updateOutputNet(l, delta);
         SetFinalMode.add(l.getOutput());
+    }
+
+    @Override
+    public void updateSynapse(Link l, double delta) {
+        super.updateSynapse(l, delta);
+
+        if(isRecurrent() && !l.getInput().isFired()) {
+            getOutput().getFinalBias().addAndTriggerUpdate(delta);
+        }
     }
 
     @Override

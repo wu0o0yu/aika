@@ -23,17 +23,15 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
+import network.aika.neuron.activation.fields.Field;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
-import static network.aika.utils.Utils.logChange;
 
 /**
  *
@@ -41,8 +39,7 @@ import static network.aika.utils.Utils.logChange;
  */
 public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Activation> extends Neuron<S, A> {
 
-    private volatile double conjunctiveBias;
-    private volatile double weightSum;
+    private volatile Field weightSum = new Field();
 
     public ExcitatoryNeuron() {
         super();
@@ -56,27 +53,13 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
         super(model, addProvider);
     }
 
-    public double getWeightSum() {
+    public Field getWeightSum() {
         return weightSum;
     }
 
-    public double getConjunctiveBias() {
-        return conjunctiveBias;
-    }
-
-    public void addWeight(double weightDelta) {
-        weightSum += weightDelta;
-    }
 
     protected void initFromTemplate(ExcitatoryNeuron n) {
         super.initFromTemplate(n);
-        n.conjunctiveBias = conjunctiveBias;
-    }
-
-    public void addConjunctiveBias(double b) {
-        double oldCB = conjunctiveBias;
-        conjunctiveBias += b;
-        logChange(this, oldCB, conjunctiveBias, "limitBias: conjunctiveBias");
     }
 
     /**
@@ -84,15 +67,8 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
      * should account for that and reduce the bias back to a level, where the neuron can be blocked again by its input synapses.
      */
     public void limitBias() {
-        bias = Math.min(weightSum, bias);
-
-        if(bias + conjunctiveBias > 0.0) {
-            double oldCB = conjunctiveBias;
-
-            conjunctiveBias = Math.max(-weightSum, -bias);
-
-            logChange(this, oldCB, conjunctiveBias, "limitBias: conjunctiveBias");
-        }
+        if(bias.getCurrentValue() > weightSum.getCurrentValue())
+            bias.setAndTriggerUpdate(weightSum.getCurrentValue());
     }
 
     public void addDummyLinks(Activation act) {
@@ -109,22 +85,24 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
         return RECTIFIED_HYPERBOLIC_TANGENT;
     }
 
+    /*
     @Override
     public double getInitialNet() {
-        return bias + conjunctiveBias;
+        return bias.getCurrentValue();
     }
+*/
 
     public void updateSynapseInputConnections() {
         TreeSet<ExcitatorySynapse> sortedSynapses = new TreeSet<>(
-                Comparator.<ExcitatorySynapse>comparingDouble(Synapse::getWeight).reversed()
+                Comparator.<ExcitatorySynapse>comparingDouble(s -> s.getWeight().getCurrentValue()).reversed()
                         .thenComparing(Synapse::getPInput)
         );
 
         sortedSynapses.addAll(inputSynapses.values());
 
-        double sum = getWeightSum();
+        double sum = getWeightSum().getCurrentValue();
         for(ExcitatorySynapse s: sortedSynapses) {
-            if(s.getWeight() <= 0.0)
+            if(s.getWeight().getCurrentValue() <= 0.0)
                 break;
 
             if(s.isWeak(sum))
@@ -132,7 +110,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
             else
                 s.linkInput();
 
-            sum -= s.getWeight();
+            sum -= s.getWeight().getCurrentValue();
         }
     }
 
@@ -140,15 +118,13 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
     public void write(DataOutput out) throws IOException {
         super.write(out);
 
-        out.writeDouble(conjunctiveBias);
-        out.writeDouble(weightSum);
+        weightSum.write(out);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws Exception {
         super.readFields(in, m);
 
-        conjunctiveBias = in.readDouble();
-        weightSum = in.readDouble();
+        weightSum.readFields(in, m);
     }
 }

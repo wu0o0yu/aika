@@ -20,14 +20,12 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingSignal;
 import network.aika.neuron.activation.Link;
 
-import static network.aika.neuron.activation.Activation.INCOMING;
-import static network.aika.neuron.activation.Activation.OWN;
-
 /**
  *
  * @author Lukas Molzberger
  */
 public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
+
 
     public boolean checkScope(BindingSignal iBS, BindingSignal oBS) {
         if(iBS.getScope() == 0 && oBS.getScope() == 0)
@@ -35,12 +33,12 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
 
         return super.checkScope(iBS, oBS);
     }
-
+/*
     @Override
-    public void propagateGradient(Link l, double[] gradient) {
-        l.propagateGradient(gradient[INCOMING] + gradient[OWN]);
+    public void propagateGradient(Link l, double gradient) {
+        l.propagateGradient(gradient);
     }
-
+*/
     @Override
     public boolean isRecurrent() {
         return true;
@@ -55,10 +53,12 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
         return false;
     }
 
+    /*
     @Override
     public void addWeight(double weightDelta) {
-        super.addWeight(weightDelta);
+        supergetWeight().add(weightDelta);
 
         getOutput().addAssumedWeights(weightDelta);
-    }
+    }*/
+
 }

@@ -21,7 +21,6 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.steps.UpdateNet;
 import network.aika.neuron.steps.activation.PostTraining;
 
 /**
@@ -33,22 +32,25 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
 
     @Override
     public boolean isWeak() {
-        return isWeak(getOutput().getWeightSum());
+        return isWeak(getOutput().getWeightSum().getCurrentValue());
     }
 
     public boolean isWeak(double weightSum) {
-        boolean weightIsAbleToExceedThreshold = weight + getOutput().getInitialNet() > 0.0;
-        boolean weightSumIsAbleToExceedThreshold = weightSum + getOutput().getInitialNet() > 0.0;
-        boolean weightIsAbleToSuppressThresholdExceededByWeightSum = (weightSum - weight) + getOutput().getInitialNet() <= 0.0;
+        double bias = getOutput().getBias().getCurrentValue();
+        double w = weight.getCurrentValue();
+
+        boolean weightIsAbleToExceedThreshold = w + bias > 0.0;
+        boolean weightSumIsAbleToExceedThreshold = weightSum + bias > 0.0;
+        boolean weightIsAbleToSuppressThresholdExceededByWeightSum = (weightSum - w) + bias <= 0.0;
 
         return !(weightIsAbleToExceedThreshold ||
                 (weightSumIsAbleToExceedThreshold && weightIsAbleToSuppressThresholdExceededByWeightSum));
     }
 
     @Override
-    public void addWeight(double weightDelta) {
-        super.addWeight(weightDelta);
-        getOutput().addWeight(weightDelta);
+    protected void weightUpdate(double u) {
+        super.weightUpdate(u);
+        getOutput().getWeightSum().addAndTriggerUpdate(u);
     }
 
     @Override
@@ -59,17 +61,13 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
     @Override
     public void updateSynapse(Link l, double delta) {
         if(l.getInput().isFired()) {
-            addWeight(delta);
-            l.updateNetByWeight(delta);
+            weight.addAndTriggerUpdate(delta);
         } else {
-            addWeight(-delta);
-            l.updateNetByWeight(-delta);
+            weight.addAndTriggerUpdate(-delta);
+            getOutput().getBias().addAndTriggerUpdate(delta);
 
-            getOutput().addConjunctiveBias(delta);
             if(delta < 0.0)
                 PostTraining.add(l.getOutput());
-
-            UpdateNet.updateNet(l.getOutput(), delta);
         }
 
         checkConstraints();

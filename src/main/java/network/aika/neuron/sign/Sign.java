@@ -17,6 +17,8 @@
 package network.aika.neuron.sign;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.fields.Field;
+import network.aika.neuron.activation.fields.FieldOutput;
 
 
 /**
@@ -36,5 +38,7 @@ public interface Sign {
         return act.isFired() ? POS : NEG;
     }
 
-    double getValue(Double x);
+    FieldOutput getValue(FieldOutput v);
+
+    int index();
 }

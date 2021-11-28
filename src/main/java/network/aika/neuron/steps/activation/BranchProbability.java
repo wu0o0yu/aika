@@ -71,17 +71,17 @@ public class BranchProbability extends Step<BindingActivation> {
 
         double offset = conflictingActs
                 .stream()
-                .mapToDouble(cAct -> cAct.getNet())
+                .mapToDouble(cAct -> cAct.getNet().getCurrentValue())
                 .min()
                 .getAsDouble();
 
-        double norm = Math.exp(act.getNet() - offset);
+        double norm = Math.exp(act.getNet().getCurrentValue() - offset);
         norm += conflictingActs
                 .stream()
-                .mapToDouble(cAct -> Math.exp(cAct.getNet() - offset))
+                .mapToDouble(cAct -> Math.exp(cAct.getNet().getCurrentValue() - offset))
                 .sum();
 
-        double p = Math.exp(act.getNet() - offset) / norm;
+        double p = Math.exp(act.getNet().getCurrentValue() - offset) / norm;
 
         if(Utils.belowTolerance(p - act.getBranchProbability()))
             return;

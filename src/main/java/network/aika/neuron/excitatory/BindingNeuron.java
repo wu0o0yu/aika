@@ -21,14 +21,11 @@ import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.activation.direction.Direction;
-import network.aika.utils.Utils;
+import network.aika.neuron.activation.fields.Field;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.stream.Stream;
 
 
 /**
@@ -36,7 +33,7 @@ import java.util.stream.Stream;
  */
 public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, BindingActivation> {
 
-    private double assumedActiveSum;
+    private Field finalBias = new Field();
 
     public BindingNeuron() {
         super();
@@ -51,18 +48,8 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, Bindin
         return new BindingActivation(t.createActivationId(), t, this);
     }
 
-    @Override
-    public double getAssumedActiveSum() {
-        return assumedActiveSum;
-    }
-
-    @Override
-    public double getInitialNet() {
-        return super.getInitialNet() + assumedActiveSum;
-    }
-
-    public void addAssumedWeights(double weightDelta) {
-        assumedActiveSum += weightDelta;
+    public Field getFinalBias() {
+        return finalBias;
     }
 
     @Override
@@ -72,7 +59,7 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, Bindin
         if(n.isInputNeuron())
             return false;
 
-        if(Utils.belowTolerance(act.getOutputGradientSum()))
+        if(act.getOutputGradient().updateAvailable())
             return false;
 
         return true;
@@ -90,13 +77,13 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, Bindin
     public void write(DataOutput out) throws IOException {
         super.write(out);
 
-        out.writeDouble(assumedActiveSum);
+        finalBias.write(out);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws Exception {
         super.readFields(in, m);
 
-        assumedActiveSum = in.readDouble();
+        finalBias.readFields(in, m);
     }
 }

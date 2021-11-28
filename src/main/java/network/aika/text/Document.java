@@ -21,7 +21,10 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.activation.CheckIfFired;
+
+import java.util.stream.Stream;
 
 
 /**
@@ -82,12 +85,29 @@ public class Document extends Thought<TextModel> {
         TokenActivation act = new TokenActivation(createActivationId(), begin, end, this, n);
 
         act.setInputValue(1.0);
-        act.updateValue();
         act.init(null, null);
         act.setFired();
         CheckIfFired.propagate(act);
 
         return act;
+    }
+
+    public void processTokens(Iterable<String> tokens) {
+        int i = 0;
+        TokenActivation lastToken = null;
+        for(String t: tokens) {
+            int j = i + t.length();
+            TokenActivation currentToken = addToken(t, i, j);
+            process(Phase.ADD_INPUT);
+
+            TokenActivation.addRelation(lastToken, currentToken);
+            process(Phase.ADD_INPUT);
+
+            lastToken = currentToken;
+            i = j + 1;
+        }
+
+        updateModel();
     }
 
     public String toString() {

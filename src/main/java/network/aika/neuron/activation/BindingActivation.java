@@ -19,9 +19,15 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.fields.Field;
+import network.aika.neuron.activation.fields.FieldFunction;
+import network.aika.neuron.activation.fields.FieldMultiplication;
+import network.aika.neuron.activation.fields.FieldOutput;
 import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.steps.activation.BranchProbability;
 import network.aika.neuron.steps.activation.SetFinalMode;
+import network.aika.neuron.steps.activation.TemplatePropagate;
+import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.utils.Utils;
 
 import java.util.Comparator;
@@ -47,7 +53,14 @@ public class BindingActivation extends Activation<BindingNeuron> {
     private BindingActivation mainBranch;
 
     private double branchProbability = 1.0;
+    private Field ownInputGradient = new Field();
 
+    protected FieldOutput ownOutputGradient = new FieldMultiplication(
+            ownInputGradient,
+            new FieldFunction(net, x ->
+                    getNeuron().getActivationFunction().outerGrad(x)
+            )
+    );
 
     protected BindingActivation(int id, BindingNeuron n) {
         super(id, n);
@@ -55,6 +68,14 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
+
+        inputGradient.setFieldListener(u ->
+                propagateGradient(outputGradient.getUpdate(true), true, false)
+        );
+
+        ownInputGradient.setFieldListener(u ->
+                propagateGradient(ownOutputGradient.getUpdate(true), false, true)
+        );
     }
 
     @Override
@@ -66,6 +87,12 @@ public class BindingActivation extends Activation<BindingNeuron> {
     @Override
     public byte getType() {
         return 1;
+    }
+
+    @Override
+    protected void propagateGradient(double g, boolean updateWeights, boolean backPropagate) {
+        getNeuron().getFinalBias().addAndTriggerUpdate(getConfig().getLearnRate() * g);
+        super.propagateGradient(g, updateWeights, backPropagate);
     }
 
     public BindingActivation createBranch(Synapse excludedSyn) {
@@ -99,6 +126,14 @@ public class BindingActivation extends Activation<BindingNeuron> {
         return getPatternBindingSignals().values().stream()
                 .min(Comparator.comparing(bs -> bs.getBindingSignalAct().getFired()))
                 .orElse(null);
+    }
+
+    public Field getOwnInputGradient() {
+        return ownInputGradient;
+    }
+
+    public FieldOutput getOwnOutputGradient() {
+        return ownOutputGradient;
     }
 
     public boolean isFinalMode() {
@@ -136,6 +171,7 @@ public class BindingActivation extends Activation<BindingNeuron> {
             return branches.stream();
     }
 
+    @Override
     public double getBranchProbability() {
         return branchProbability;
     }
@@ -144,9 +180,10 @@ public class BindingActivation extends Activation<BindingNeuron> {
         branchProbability = p;
     }
 
-    @Override
-    protected double computeValue() {
-        return branchProbability * getActivationFunction().f(net);
+
+    public void receiveOwnGradientUpdate(double u) {
+        super.receiveOwnGradientUpdate(u);
+        ownInputGradient.addAndTriggerUpdate(u);
     }
 
     public String toString(boolean includeLink) {

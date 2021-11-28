@@ -19,6 +19,7 @@ package network.aika.neuron;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.fields.Field;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;
@@ -34,7 +35,6 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.sign.Sign.NEG;
 import static network.aika.neuron.sign.Sign.POS;
-import static network.aika.utils.Utils.logChange;
 
 /**
  *
@@ -54,7 +54,9 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Writable customData;
 
-    protected volatile double bias;
+    protected Field bias = new Field(u -> {
+        biasUpdate(u);
+    });
 
     protected TreeMap<NeuronProvider, S> inputSynapses = new TreeMap<>();
     protected TreeMap<NeuronProvider, Synapse> outputSynapses = new TreeMap<>();
@@ -95,7 +97,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     protected void initFromTemplate(Neuron n) {
-        n.bias = bias;
+        n.bias.setInitialValue(bias.getCurrentValue());
         n.template = this;
     }
 
@@ -136,6 +138,17 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         Synapse s = outputSynapses.get(n);
         lock.releaseReadLock();
         return s;
+    }
+
+
+    protected void biasUpdate(double u) {
+        getModel()
+                .getCurrentThought()
+                .getActivations(this)
+                .forEach(act ->
+                        act.getNet().addAndTriggerUpdate(u)
+                );
+        setModified();
     }
 
     public double getCandidateGradient(Activation act) {
@@ -252,29 +265,13 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return modified;
     }
 
-    public void addBias(double biasDelta) {
-        double oldBias = bias;
-        bias += biasDelta;
-        logChange(this, oldBias, bias, "addBias : bias");
-        setModified();
-    }
-
     public void limitBias() {
-        double oldBias = bias;
-        bias = Math.min(0.0, bias);
-        logChange(this, oldBias, bias, "limitBias : bias");
+        if(bias.getCurrentValue() > 0.0)
+            bias.setAndTriggerUpdate(0.0);
     }
 
-    public double getBias() {
+    public Field getBias() {
         return bias;
-    }
-
-    public double getInitialNet() {
-        return bias;
-    }
-
-    public double getAssumedActiveSum() {
-        return 0.0;
     }
 
     public ReadWriteLock getLock() {
@@ -359,7 +356,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         if(label != null)
             out.writeUTF(label);
 
-        out.writeDouble(bias);
+        bias.write(out);
 
         for (Synapse s : inputSynapses.values()) {
             if (s.getInput() != null) {
@@ -400,8 +397,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         if(in.readBoolean())
             label = in.readUTF();
 
-
-        bias = in.readDouble();
+        bias.readFields(in, m);
 
         while (in.readBoolean()) {
             S syn = (S) Synapse.read(in, m);
@@ -429,7 +425,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public String toDetailedString() {
-        return "n " + getClass().getSimpleName() + " " + this + " b:" + Utils.round(bias);
+        return "n " + getClass().getSimpleName() + " " + this + " b:" + bias;
     }
 
     public String statToString() {

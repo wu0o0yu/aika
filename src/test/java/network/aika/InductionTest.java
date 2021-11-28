@@ -54,21 +54,20 @@ public class InductionTest {
         BindingNeuron targetN = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
         targetN.setLabel("OUT-Target");
 
-        targetN.addBias(0.0);
-        targetN.addConjunctiveBias(0.0);
+        targetN.getBias().set(0.0);
 
         Synapse sA = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inA, targetN);
 
         sA.linkInput();
         sA.linkOutput();
-        sA.setWeight(0.1);
-        targetN.addConjunctiveBias(-0.1);
+        sA.getWeight().setInitialValue(0.1);
+        targetN.getBias().set(-0.1);
 
         Synapse sB = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inB, targetN);
 
         sB.linkInput();
         sB.linkOutput();
-        sB.setWeight(0.0);
+        sB.getWeight().setInitialValue(0.0);
 
 
         m.setN(100);
@@ -95,7 +94,7 @@ public class InductionTest {
         actTarget.addLink(sA, actA, false);
         actTarget.addLink(sB, actB, false);
 
-        actTarget.initEntropyGradient();
+        actTarget.updateEntropyGradient();
  //       actTarget.computeInitialLinkGradients();
 
         System.out.println(actTarget.gradientsToString());

@@ -18,12 +18,10 @@ package network.aika.neuron.steps.activation;
 
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.sign.Sign;
+import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.Step;
 import network.aika.neuron.steps.StepType;
-import network.aika.neuron.steps.UpdateNet;
-
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
@@ -66,18 +64,24 @@ public class SetFinalMode extends Step<BindingActivation> {
         BindingActivation act = getElement();
 
         act.setFinalMode(true);
-        UpdateNet.updateNet(act, act.getNeuron().getAssumedActiveSum() - computeForwardLinkedRecurrentInputs(act));
+
+        BindingNeuron n = act.getNeuron();
+
+        double biasDelta = n.getFinalBias().getCurrentValue() - n.getBias().getCurrentValue();
+        n.getFinalBias().setFieldListener(n.getBias().getFieldListener());
+        n.getBias().setFieldListener(null);
+
+        act.getNet().addAndTriggerUpdate(biasDelta - computeForwardLinkedRecurrentInputs(act));
 
         getPositiveRecurrentInputLinks(act)
                 .filter(l -> !l.isForward())
                 .forEach(l ->
-                        l.updateNetByInputValue(l.getInputValue(Sign.POS))
+                        l.updateInputValue()
                 );
 
-        act.updateValue();
         act.setFinalTimestamp();
 
-        if (!act.isFired() || act.getValue() > 0.0)
+        if (!act.isFired() || act.getNet().getCurrentValue() > 0.0)
             return;
 
         act.setFired(NOT_SET);
@@ -87,7 +91,7 @@ public class SetFinalMode extends Step<BindingActivation> {
     private double computeForwardLinkedRecurrentInputs(BindingActivation act) {
         return getPositiveRecurrentInputLinks(act)
                 .filter(l -> l.isForward())
-                .mapToDouble(l -> l.getSynapse().getWeight())
+                .mapToDouble(l -> l.getSynapse().getWeight().getCurrentValue())
                 .sum();
     }
 

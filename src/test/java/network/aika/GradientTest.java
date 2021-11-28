@@ -7,6 +7,8 @@ import network.aika.text.TextModel;
 import network.aika.text.TokenActivation;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 public class GradientTest {
 
 
@@ -40,6 +42,8 @@ public class GradientTest {
         AikaDebugger.createAndShowGUI(doc);
 
         processDoc(doc);
+
+        doc.process();
 
         System.out.println();
     }
@@ -94,7 +98,7 @@ public class GradientTest {
         TextModel m = new TextModel();
 
         m.setN(912);
-        m.getTemplates().SAME_BINDING_TEMPLATE.addConjunctiveBias(-0.32);
+        m.getTemplates().SAME_BINDING_TEMPLATE.getBias().add(-0.32);
         m.init();
 
         Document doc1 = new Document(m, "A B ");
@@ -144,20 +148,6 @@ public class GradientTest {
     }
 
     private void processDoc(Document doc) {
-        int i = 0;
-        TokenActivation lastToken = null;
-        for(String t: doc.getContent().split(" ")) {
-            int j = i + t.length();
-            TokenActivation currentToken = doc.addToken(t, i, j);
-            doc.process();
-
-            TokenActivation.addRelation(lastToken, currentToken);
-            doc.process();
-
-            lastToken = currentToken;
-            i = j + 1;
-        }
-
-        doc.updateModel();
+        doc.processTokens(Arrays.asList(doc.getContent().split(" ")));
     }
 }
