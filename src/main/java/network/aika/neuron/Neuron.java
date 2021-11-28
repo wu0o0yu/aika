@@ -97,7 +97,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     protected void initFromTemplate(Neuron n) {
-        n.bias = bias;
+        n.bias.setInitialValue(bias.getCurrentValue());
         n.template = this;
     }
 

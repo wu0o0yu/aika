@@ -25,6 +25,7 @@ import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
+import network.aika.neuron.activation.fields.Field;
 import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
@@ -116,12 +117,14 @@ public class TextModel extends Model {
         initRelatedInputSynapse(inRel, inhib, recurrent);
 
         inRel.getBias().addAndTriggerUpdate(4.0);
+        inRel.getFinalBias().addAndTriggerUpdate(4.0);
         inRel.setAllowTraining(false);
     }
 
     private void initRelatedInputSynapse(BindingNeuron inRel, InhibitoryNeuron inhib, boolean recurrent) {
         Templates t = getTemplates();
 
+        double w = 10.0;
         Synapse ts = recurrent ?
                 t.RELATED_RECURRENT_INPUT_SYNAPSE_TEMPLATE :
                 t.RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE;
@@ -129,20 +132,25 @@ public class TextModel extends Model {
         Synapse s = ts.instantiateTemplate(inhib, inRel);
 
         s.linkOutput();
-        s.getWeight().setInitialValue(10.0);
+        s.getWeight().setInitialValue(w);
         s.setAllowTraining(false);
-        inRel.getBias().add(-10.0);
+
+        if(!recurrent)
+            inRel.getBias().add(-w);
+        inRel.getFinalBias().add(-w);
     }
 
     private void initRecurrentSamePatternSynapse(PatternNeuron in, BindingNeuron inRel) {
         Synapse s = getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE
                 .instantiateTemplate(in, inRel);
 
+        double w = 11.0;
+
         s.linkInput();
         s.linkOutput();
-        s.getWeight().setInitialValue(11.0);
+        s.getWeight().setInitialValue(w);
         s.setAllowTraining(false);
-        inRel.getBias().add(-11.0);
+        inRel.getFinalBias().add(-w);
     }
 
     private void initInhibitorySynapse(BindingNeuron inRelPT, InhibitoryNeuron prevTokenInhib) {

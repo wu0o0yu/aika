@@ -122,11 +122,6 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
 
     public abstract void updateSynapse(Link l, double delta);
 
-    /*
-    public void propagateGradient(Link l, double gradient) {
-        l.propagateGradient(gradient);
-    }
-*/
     public abstract boolean checkCausality(Activation<?> iAct, Activation<?> oAct);
 
     public A branchIfNecessary(Activation iAct, A oAct) {
@@ -173,7 +168,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     }
 
     protected void initFromTemplate(Synapse s) {
-        s.weight = weight;
+        s.weight.setInitialValue(weight.getCurrentValue());
         s.template = this;
     }
 

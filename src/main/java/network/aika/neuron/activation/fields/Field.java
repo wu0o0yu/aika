@@ -33,15 +33,25 @@ public class Field implements FieldInput, FieldOutput, Writable {
     private Double update;
     private boolean allowUpdate;
 
+    private PropagatePreCondition propagatePreCondition;
     private FieldUpdateEvent fieldListener;
 
     public Field() {
+        this.propagatePreCondition = (cv, nv, u) -> !Utils.belowTolerance(u);
     }
 
     public Field(FieldUpdateEvent fieldListener) {
+        this();
         this.fieldListener = fieldListener;
     }
 
+    public PropagatePreCondition getPropagatePreCondition() {
+        return propagatePreCondition;
+    }
+
+    public void setPropagatePreCondition(PropagatePreCondition propagatePreCondition) {
+        this.propagatePreCondition = propagatePreCondition;
+    }
 
     public FieldUpdateEvent getFieldListener() {
         return fieldListener;
@@ -75,7 +85,7 @@ public class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public boolean set(double v) {
-        if(Utils.belowTolerance( v - currentValue))
+        if(!propagatePreCondition.check(currentValue, v, v - currentValue))
             return false;
 
         update = v - currentValue;
@@ -84,7 +94,7 @@ public class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public boolean add(double u) {
-        if(Utils.belowTolerance(u))
+        if(!propagatePreCondition.check(currentValue, currentValue + u, u))
             return false;
 
         if(update == null)

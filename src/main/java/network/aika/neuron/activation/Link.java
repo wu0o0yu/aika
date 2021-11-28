@@ -63,17 +63,32 @@ public class Link<A extends Activation> extends Element<Link> {
         this.output = output;
         this.isSelfRef = isSelfRef;
 
-        igGradient.setFieldListener(u -> output.receiveOwnGradientUpdate(u));
-        if(input != null)
-            weightedInput = new FieldMultiplication(input.getValue(), synapse.getWeight());
-        else
-            weightedInput = ZERO;
+        initInformationGain();
+        initWeightedInput();
 
-        backPropGradient = new FieldMultiplication(output.outputGradient, synapse.getWeight());
+        initBackPropGradient(output);
 
         AddLink.add(this);
 
         getThought().onLinkCreationEvent(this);
+    }
+
+
+    private void initInformationGain() {
+        igGradient.setFieldListener(u ->
+                output.receiveOwnGradientUpdate(u)
+        );
+    }
+
+    private void initWeightedInput() {
+        if(input != null)
+            weightedInput = new FieldMultiplication(input.getValue(), synapse.getWeight());
+        else
+            weightedInput = ZERO;
+    }
+
+    private void initBackPropGradient(A output) {
+        backPropGradient = new FieldMultiplication(output.outputGradient, synapse.getWeight());
     }
 
     public FieldOutput getWeightedInput() {

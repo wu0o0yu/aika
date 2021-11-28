@@ -18,6 +18,7 @@ public class QueueField extends Field {
         step = new FieldStep(e, this, label, p, st);
     }
 
+
     public QueueField(FieldUpdateEvent fieldListener, Element e, String label, Phase p, StepType st) {
         this(e, label, p, st);
         setFieldListener(fieldListener);

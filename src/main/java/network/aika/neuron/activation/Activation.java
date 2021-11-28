@@ -26,6 +26,7 @@ import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.StepType;
 import network.aika.neuron.steps.activation.*;
+import network.aika.utils.Utils;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -56,7 +57,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected boolean isInput;
 
     protected Field value = new Field();
-    protected Field net = new QueueField(this, "net", Phase.LINKING, StepType.TRAINING);
+    protected Field net = new QueueField(this, "net", Phase.LINKING, StepType.INFERENCE);
 
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
@@ -86,8 +87,38 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
-        entropy.setFieldListener(u -> receiveOwnGradientUpdate(u));
+        initEntropy();
+        initNet();
+        initValue();
+        initInputGradient();
 
+        thought.registerActivation(this);
+
+        inputLinks = new TreeMap<>();
+        outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
+    }
+
+    private void initEntropy() {
+        entropy.setFieldListener(u -> receiveOwnGradientUpdate(u));
+    }
+
+    private void initInputGradient() {
+        inputGradient.setFieldListener(u ->
+                propagateGradient(outputGradient.getUpdate(true), true, true)
+        );
+    }
+
+    private void initValue() {
+        value.setFieldListener(u ->
+                getOutputLinks()
+                        .forEach(l -> l.updateInputValue())
+        );
+    }
+
+    private void initNet() {
+        net.setPropagatePreCondition((cv, nv, u) ->
+                !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0)
+        );
         net.add(getNeuron().getBias().getCurrentValue());
 
         net.setFieldListener(u -> {
@@ -98,24 +129,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 //        PropagateGradients.add(this);
             CheckIfFired.add(this);
         });
-
-        value.setFieldListener(u ->
-                getOutputLinks()
-                        .forEach(l -> l.updateInputValue())
-        );
-
-
-        inputGradient.setFieldListener(u ->
-            propagateGradient(outputGradient.getUpdate(true), true, true)
-        );
-
-        thought.registerActivation(this);
-
-        inputLinks = new TreeMap<>();
-        outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
-
-        //    net.set(INITIAL_NET);
-  //      net.setAndTriggerUpdate(n.getInitialNet());
     }
 
     protected void propagateGradient(double g, boolean updateWeights, boolean backPropagate) {
