@@ -26,6 +26,7 @@ import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.StepType;
 import network.aika.neuron.steps.activation.*;
+import network.aika.neuron.steps.link.LinkCounting;
 import network.aika.utils.Utils;
 
 import java.util.*;
@@ -127,8 +128,24 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 value.setAndTriggerUpdate(getBranchProbability() * getActivationFunction().f(v));
 
 //        PropagateGradients.add(this);
-            CheckIfFired.add(this);
+            if (isFired() || net.getCurrentValue() <= 0.0)
+                return;
+
+            setFired();
+            propagate();
         });
+    }
+
+    private void propagate() {
+        Propagate.add(this);
+
+        addFeedbackSteps();
+
+        Counting.add(this);
+        getInputLinks().forEach(l -> LinkCounting.add(l));
+
+        TemplatePropagate.add(this);
+        EntropyGradient.add(this);
     }
 
     protected void propagateGradient(double g, boolean updateWeights, boolean backPropagate) {
