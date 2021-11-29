@@ -22,7 +22,6 @@ import network.aika.neuron.Range;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.activation.CheckIfFired;
 
 import java.util.stream.Stream;
 
@@ -87,7 +86,7 @@ public class Document extends Thought<TextModel> {
         act.setInputValue(1.0);
         act.init(null, null);
         act.setFired();
-        CheckIfFired.propagate(act);
+        act.propagate();
 
         return act;
     }

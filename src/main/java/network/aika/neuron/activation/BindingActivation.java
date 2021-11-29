@@ -26,8 +26,6 @@ import network.aika.neuron.activation.fields.FieldOutput;
 import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.steps.activation.BranchProbability;
 import network.aika.neuron.steps.activation.SetFinalMode;
-import network.aika.neuron.steps.activation.TemplatePropagate;
-import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 import network.aika.utils.Utils;
 
 import java.util.Comparator;

@@ -25,7 +25,6 @@ import network.aika.neuron.steps.StepType;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
-import static network.aika.neuron.steps.activation.CheckIfFired.propagate;
 
 /**
  * Check if there are positive recurrent links that have not been activated and thus need to be updated.
@@ -85,7 +84,7 @@ public class SetFinalMode extends Step<BindingActivation> {
             return;
 
         act.setFired(NOT_SET);
-        propagate(act);
+        act.propagate();
     }
 
     private double computeForwardLinkedRecurrentInputs(BindingActivation act) {

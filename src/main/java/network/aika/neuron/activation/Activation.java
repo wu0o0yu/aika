@@ -136,7 +136,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         });
     }
 
-    private void propagate() {
+    public void propagate() {
         Propagate.add(this);
 
         addFeedbackSteps();

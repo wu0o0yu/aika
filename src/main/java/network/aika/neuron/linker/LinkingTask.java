@@ -23,7 +23,6 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.steps.link.InformationGainGradient;
 import network.aika.neuron.steps.link.PropagateBindingSignal;
-import network.aika.neuron.steps.link.PropagateGradientAndUpdateWeight;
 
 import java.util.stream.Stream;
 
