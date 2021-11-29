@@ -29,6 +29,7 @@ import network.aika.neuron.steps.Step;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -51,6 +52,7 @@ public abstract class Thought<M extends Model> {
     private final List<EventListener> eventListeners = new ArrayList<>();
 
     private Config config;
+    private Predicate<Step> queueFilter = null;
 
 
     public Thought(M m) {
@@ -75,6 +77,14 @@ public abstract class Thought<M extends Model> {
 
     public void setConfig(Config config) {
         this.config = config;
+    }
+
+    public Predicate<Step> getQueueFilter() {
+        return queueFilter;
+    }
+
+    public void setQueueFilter(Predicate<Step> queueFilter) {
+        this.queueFilter = queueFilter;
     }
 
     public void onActivationCreationEvent(Activation act, Synapse originSynapse, Activation originAct) {
@@ -169,6 +179,9 @@ public abstract class Thought<M extends Model> {
 
         while (!filteredQueue.isEmpty()) {
             Step s = filteredQueue.pollFirstEntry().getValue();
+
+            if(queueFilter != null && queueFilter.test(s))
+                continue;
 
             timestampOnProcess = getCurrentTimestamp();
 
