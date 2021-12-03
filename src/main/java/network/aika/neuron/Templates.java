@@ -79,7 +79,7 @@ public class Templates {
                         SAME_BINDING_TEMPLATE,
                         "Primary Input Synapse",
                         1,
-                        0.001
+                        0.01
                 );
 
         RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE =
