@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
 
 /**
+ * Propagates the binding signal to the next activation.
  *
  * @author Lukas Molzberger
  */
