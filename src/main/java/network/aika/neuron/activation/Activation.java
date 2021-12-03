@@ -93,7 +93,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         initValue();
         initInputGradient();
 
-        thought.registerActivation(this);
+        thought.register(this);
+        neuron.register(this);
 
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);

@@ -29,8 +29,7 @@ import org.apache.commons.math3.distribution.BetaDistribution;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.sign.Sign.NEG;
@@ -74,6 +73,8 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private TemplateNeuronInfo templateInfo;
 
+    private WeakHashMap<Long, SortedSet<A>> activations = new WeakHashMap<>();
+
     protected Neuron() {
     }
 
@@ -85,6 +86,29 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         if(addProvider)
             provider = new NeuronProvider(m, this);
         setModified();
+    }
+
+    public void register(A act) {
+        Thought t = act.getThought();
+        synchronized (activations) {
+            activations
+                    .computeIfAbsent(
+                            t.getId(),
+                            n -> initActivationsSet(t)
+                    )
+                    .add(act);
+        }
+    }
+
+    private TreeSet<A> initActivationsSet(Thought t) {
+        TreeSet<A> acts = new TreeSet<>();
+        t.register(provider, acts);
+        return acts;
+    }
+
+    public SortedSet<A> getActivations(Thought t) {
+        SortedSet<A> acts = activations.get(t.getId());
+        return acts != null ? acts : Collections.emptyNavigableSet();
     }
 
     public TemplateNeuronInfo getTemplateInfo() {
@@ -140,11 +164,8 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return s;
     }
 
-
     protected void biasUpdate(double u) {
-        getModel()
-                .getCurrentThought()
-                .getActivations(this)
+        getActivations(getModel().getCurrentThought())
                 .forEach(act ->
                         act.getNet().addAndTriggerUpdate(u)
                 );

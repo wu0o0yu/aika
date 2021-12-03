@@ -378,9 +378,8 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     }
 */
     protected void weightUpdate(double u) {
-        getModel()
-                .getCurrentThought()
-                .getActivations(output)
+        getOutput()
+                .getActivations(getModel().getCurrentThought())
                 .stream()
                 .map(act -> act.getInputLink(this))
                 .filter(l -> l != null)

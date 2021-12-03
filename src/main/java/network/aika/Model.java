@@ -44,6 +44,7 @@ public abstract class Model implements Writable {
 
     private SuspensionCallback suspensionCallback;
     private final AtomicLong retrievalCounter = new AtomicLong(0);
+    private final AtomicLong thoughtIdCounter = new AtomicLong(0);
 
     // Important: the id field needs to be referenced by the provider!
     private final WeakHashMap<Long, WeakReference<NeuronProvider>> providers = new WeakHashMap<>();
@@ -244,6 +245,10 @@ public abstract class Model implements Writable {
 
     public String toString() {
         return "N:" + N;
+    }
+
+    public long createThoughtId() {
+        return retrievalCounter.addAndGet(1);
     }
 
     public interface NeuronProducer {

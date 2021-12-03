@@ -39,6 +39,8 @@ import java.util.stream.Collectors;
 public abstract class Thought<M extends Model> {
 
     protected final M model;
+
+    private long id;
     private long absoluteBegin;
 
     private Timestamp timestampOnProcess = new Timestamp(0);
@@ -57,8 +59,13 @@ public abstract class Thought<M extends Model> {
 
     public Thought(M m) {
         model = m;
+        id = model.createThoughtId();
         absoluteBegin = m.getN();
         m.setCurrentThought(this);
+    }
+
+    public long getId() {
+        return id;
     }
 
     public void updateModel() {
@@ -128,15 +135,12 @@ public abstract class Thought<M extends Model> {
         eventListeners.remove(l);
     }
 
-    public void registerActivation(Activation act) {
+    public void register(Activation act) {
         activationsById.put(act.getId(), act);
+    }
 
-        Set<Activation<?>> acts = actsPerNeuron
-                .computeIfAbsent(
-                        act.getNeuronProvider(),
-                        n -> new TreeSet<>()
-                );
-        acts.add(act);
+    public void register(NeuronProvider np, SortedSet<Activation<?>> acts) {
+        actsPerNeuron.put(np, acts);
     }
 
     public void registerBindingSignal(Activation act, BindingSignal bs) {
@@ -227,15 +231,6 @@ public abstract class Thought<M extends Model> {
 
     public int getNumberOfActivations() {
         return activationsById.size();
-    }
-
-    public Set<Activation<?>> getActivations(NeuronProvider n) {
-        return getActivations(n.getNeuron());
-    }
-
-    public Set<Activation<?>> getActivations(Neuron<?, ?> n) {
-        Set<Activation<?>> acts = actsPerNeuron.get(n.getProvider());
-        return acts != null ? acts : Collections.emptySet();
     }
 
     public String toString() {

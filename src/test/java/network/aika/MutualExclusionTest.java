@@ -20,6 +20,7 @@ import network.aika.debugger.AikaDebugger;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
@@ -152,7 +153,7 @@ public class MutualExclusionTest {
 
         System.out.println(doc);
 
-        Set<Activation<?>> nbActs = doc.getActivations(nb);
+        Set<BindingActivation> nbActs = nb.getActivations(doc);
         Activation nbAct = nbActs.iterator().next();
 
         assertTrue(nbAct.getValue().getCurrentValue() > 0.38);
