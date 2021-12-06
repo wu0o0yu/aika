@@ -2,7 +2,7 @@ package network.aika.neuron.activation;
 
 public class Timestamp implements Comparable<Timestamp> {
 
-    public static Timestamp NOT_SET = new Timestamp(-1);
+    public static Timestamp NOT_SET = new Timestamp(Long.MAX_VALUE);
 
     public static Timestamp MIN = new Timestamp(0);
     public static Timestamp MAX = new Timestamp(Long.MAX_VALUE);

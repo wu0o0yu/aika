@@ -122,7 +122,8 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
     private BindingSignal getPrimaryPatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
-                .min(Comparator.comparing(bs -> bs.getBindingSignalAct().getFired()))
+                .filter(bs -> bs.getBindingSignalAct().getFired().compareTo(fired) < 0)
+                .min(Comparator.comparing(bs -> bs.getScope()))
                 .orElse(null);
     }
 
