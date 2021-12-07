@@ -70,7 +70,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected Map<Activation<?>, BindingSignal> reverseBindingSignals = new TreeMap<>();
 
     private Field entropy = new Field();
-    protected Field inputGradient = new QueueField(this, "net", Phase.LINKING, StepType.TRAINING);
+    protected Field inputGradient = new QueueField(this, "inputGradient", Phase.LINKING, StepType.TRAINING);
 
     protected FieldOutput outputGradient = new FieldMultiplication(
             inputGradient,
