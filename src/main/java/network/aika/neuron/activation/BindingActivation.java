@@ -67,11 +67,11 @@ public class BindingActivation extends Activation<BindingNeuron> {
         super(id, t, n);
 
         inputGradient.setFieldListener(u ->
-                propagateGradient(outputGradient.getUpdate(true), true, false)
+                propagateGradient(outputGradient.getUpdate(1, true), true, false)
         );
 
         ownInputGradient.setFieldListener(u ->
-                propagateGradient(ownOutputGradient.getUpdate(true), false, true)
+                propagateGradient(ownOutputGradient.getUpdate(1, true), false, true)
         );
     }
 
@@ -79,6 +79,11 @@ public class BindingActivation extends Activation<BindingNeuron> {
     public void init(Synapse originSynapse, Activation originAct) {
         super.init(originSynapse, originAct);
         addSelfBindingSignal((byte) 0);
+    }
+
+    protected void propagateGradient() {
+        propagateGradient(outputGradient.getUpdate(2, true), true, false);
+        propagateGradient(ownOutputGradient.getUpdate(2, true), false, true);
     }
 
     @Override

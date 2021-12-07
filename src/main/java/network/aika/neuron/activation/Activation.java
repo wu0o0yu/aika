@@ -106,7 +106,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     private void initInputGradient() {
         inputGradient.setFieldListener(u ->
-                propagateGradient(outputGradient.getUpdate(true), true, true)
+                propagateGradient(outputGradient.getUpdate(1, true), true, true)
         );
     }
 
@@ -128,13 +128,18 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
             if(!isInput)
                 value.setAndTriggerUpdate(getBranchProbability() * getActivationFunction().f(v));
 
-//        PropagateGradients.add(this);
+            propagateGradient();
+
             if (isFired() || net.getCurrentValue() <= 0.0)
                 return;
 
             setFired();
             propagate();
         });
+    }
+
+    protected void propagateGradient() {
+        propagateGradient(outputGradient.getUpdate(2, true), true, true);
     }
 
     public void propagate() {
