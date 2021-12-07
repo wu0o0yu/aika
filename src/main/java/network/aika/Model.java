@@ -248,7 +248,7 @@ public abstract class Model implements Writable {
     }
 
     public long createThoughtId() {
-        return retrievalCounter.addAndGet(1);
+        return thoughtIdCounter.addAndGet(1);
     }
 
     public interface NeuronProducer {

@@ -17,8 +17,11 @@
 package network.aika.neuron.activation.fields;
 
 import network.aika.Model;
+import network.aika.neuron.Synapse;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -28,6 +31,9 @@ import java.io.IOException;
  * @author Lukas Molzberger
  */
 public class Field implements FieldInput, FieldOutput, Writable {
+
+    private static final Logger log = LoggerFactory.getLogger(Field.class);
+
 
     private double currentValue = 0.0;
     private Double update;
@@ -126,7 +132,9 @@ public class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public double getUpdate(int updateArg, boolean ack) {
-        assert allowUpdate;
+
+        if(!allowUpdate)
+            log.warn("field is not allowed to retrieve update value");
 
         double r = update;
         if(ack)
