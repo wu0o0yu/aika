@@ -40,7 +40,7 @@ public class LinkingTask extends AbstractLinker {
 
     @Override
     public boolean checkPropagate(Activation act, Synapse targetSynapse) {
-        return true;
+        return !targetSynapse.isNegative();
     }
 
     public Neuron getPropagateTargetNeuron(Synapse targetSynapse, Activation act) {
