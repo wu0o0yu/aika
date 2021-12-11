@@ -73,11 +73,14 @@ public class Link<A extends Activation> extends Element<Link> {
         getThought().onLinkCreationEvent(this);
     }
 
-
     private void initInformationGain() {
         igGradient.setFieldListener(u ->
                 output.receiveOwnGradientUpdate(u)
         );
+    }
+
+    public Field getInformationGainGradient() {
+        return igGradient;
     }
 
     private void initWeightedInput() {

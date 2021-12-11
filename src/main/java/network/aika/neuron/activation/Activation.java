@@ -173,6 +173,10 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         thought.onActivationCreationEvent(this, originSynapse, originAct);
     }
 
+    public Field getEntropy() {
+        return entropy;
+    }
+
     public Field getInputGradient() {
         return inputGradient;
     }
