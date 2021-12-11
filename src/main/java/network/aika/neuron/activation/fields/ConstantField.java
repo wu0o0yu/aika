@@ -24,6 +24,11 @@ public class ConstantField implements FieldOutput {
 
     @Override
     public boolean updateAvailable() {
+        return updateAvailable(1);
+    }
+
+    @Override
+    public boolean updateAvailable(int updateArg) {
         return !initialized;
     }
 

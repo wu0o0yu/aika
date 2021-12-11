@@ -27,6 +27,8 @@ public interface FieldOutput {
 
     boolean updateAvailable();
 
+    boolean updateAvailable(int updateArg);
+
     double getUpdate(int updateArg, boolean ack);
 
     default double getUpdate(boolean ack) {

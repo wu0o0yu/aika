@@ -66,12 +66,16 @@ public class BindingActivation extends Activation<BindingNeuron> {
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
 
-        inputGradient.setFieldListener(u ->
-                propagateGradient(outputGradient.getUpdate(1, true), true, false)
+        inputGradient.setFieldListener(u -> {
+                    if (outputGradient.updateAvailable(1))
+                        propagateGradient(outputGradient.getUpdate(1, true), true, false);
+                }
         );
 
-        ownInputGradient.setFieldListener(u ->
-                propagateGradient(ownOutputGradient.getUpdate(1, true), false, true)
+        ownInputGradient.setFieldListener(u -> {
+                    if (ownOutputGradient.updateAvailable(1))
+                        propagateGradient(ownOutputGradient.getUpdate(1, true), false, true);
+                }
         );
     }
 
@@ -82,8 +86,11 @@ public class BindingActivation extends Activation<BindingNeuron> {
     }
 
     protected void propagateGradient() {
-        propagateGradient(outputGradient.getUpdate(2, true), true, false);
-        propagateGradient(ownOutputGradient.getUpdate(2, true), false, true);
+        if (outputGradient.updateAvailable(2))
+            propagateGradient(outputGradient.getUpdate(2, true), true, false);
+
+        if (ownOutputGradient.updateAvailable(2))
+            propagateGradient(ownOutputGradient.getUpdate(2, true), false, true);
     }
 
     @Override

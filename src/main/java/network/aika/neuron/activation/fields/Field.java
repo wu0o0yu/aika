@@ -127,7 +127,12 @@ public class Field implements FieldInput, FieldOutput, Writable {
         allowUpdate = false;
     }
 
+
     public boolean updateAvailable() {
+        return updateAvailable(1);
+    }
+
+    public boolean updateAvailable(int updateArg) {
         return update != null;
     }
 

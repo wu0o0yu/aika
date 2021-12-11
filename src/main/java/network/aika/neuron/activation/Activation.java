@@ -105,8 +105,10 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     private void initInputGradient() {
-        inputGradient.setFieldListener(u ->
-                propagateGradient(outputGradient.getUpdate(1, true), true, true)
+        inputGradient.setFieldListener(u -> {
+                    if (outputGradient.updateAvailable(1))
+                        propagateGradient(outputGradient.getUpdate(1, true), true, true);
+                }
         );
     }
 
@@ -139,7 +141,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     protected void propagateGradient() {
-        propagateGradient(outputGradient.getUpdate(2, true), true, true);
+        if(outputGradient.updateAvailable(2))
+            propagateGradient(outputGradient.getUpdate(2, true), true, true);
     }
 
     public void propagate() {

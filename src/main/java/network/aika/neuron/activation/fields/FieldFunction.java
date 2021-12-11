@@ -47,6 +47,11 @@ public class FieldFunction implements FieldOutput {
     }
 
     @Override
+    public boolean updateAvailable(int updateArg) {
+        return input.updateAvailable(updateArg);
+    }
+
+    @Override
     public double getUpdate(int updateArg, boolean ack) {
         return getNewValue(ack) - getCurrentValue();
     }

@@ -42,7 +42,7 @@ public class FieldMultiplication implements FieldOutput {
 
     @Override
     public boolean updateAvailable() {
-        return in1.updateAvailable() || in2.updateAvailable();
+        return updateAvailable(1) || updateAvailable(2);
     }
 
     @Override
@@ -55,6 +55,17 @@ public class FieldMultiplication implements FieldOutput {
             result += in2.getUpdate(ack) * in1.getCurrentValue();
 
         return result;
+    }
+
+    public boolean updateAvailable(int updateArg) {
+        switch (updateArg) {
+            case 1:
+                return !Utils.belowTolerance(in2.getCurrentValue()) && in1.updateAvailable();
+            case 2:
+                return !Utils.belowTolerance(in1.getCurrentValue()) && in2.updateAvailable();
+            default:
+                return false;
+        }
     }
 
     public double getUpdate(int updateArg, boolean ack) {
