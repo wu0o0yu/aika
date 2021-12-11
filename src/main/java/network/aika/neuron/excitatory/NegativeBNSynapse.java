@@ -28,12 +28,6 @@ import network.aika.neuron.inhibitory.InhibitoryNeuron;
  */
 public class NegativeBNSynapse extends BindingNeuronSynapse<InhibitoryNeuron> {
 
-/*
-    @Override
-    public void addWeight(double weightDelta) {
-        addWeightInternal(weightDelta);
-    }
-*/
     @Override
     public boolean isRecurrent() {
         return true;

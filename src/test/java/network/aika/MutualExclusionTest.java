@@ -24,6 +24,7 @@ import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.steps.StepType;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
@@ -70,6 +71,7 @@ public class MutualExclusionTest {
             {
                 Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, na);
 
+                s.linkInput();
                 s.linkOutput();
                 s.getWeight().add(-100.0);
             }
@@ -90,6 +92,7 @@ public class MutualExclusionTest {
             {
                 Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, nb);
 
+                s.linkInput();
                 s.linkOutput();
                 s.getWeight().add(-100.0);
             }
@@ -110,6 +113,7 @@ public class MutualExclusionTest {
             {
                 Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, nc);
 
+                s.linkInput();
                 s.linkOutput();
                 s.getWeight().add(-100.0);
             }
@@ -184,18 +188,23 @@ public class MutualExclusionTest {
 
                 s.linkInput();
                 s.linkOutput();
-                s.getWeight().add(10.0);
+                s.getWeight().setInitialValue(10.0);
                 na.getBias().add(-10.0);
+                na.getFinalBias().add(-10.0);
             }
 
             {
                 Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, na);
 
+                s.linkInput();
                 s.linkOutput();
-                s.getWeight().add(-100.0);
+                s.getWeight().setInitialValue(-100.0);
             }
 
             na.getBias().add(1.0);
+            na.getBias().triggerUpdate();
+            na.getFinalBias().add(1.0);
+            na.getFinalBias().triggerUpdate();
         }
 
         {
@@ -204,17 +213,22 @@ public class MutualExclusionTest {
 
                 s.linkInput();
                 s.linkOutput();
-                s.getWeight().add(10.0);
+                s.getWeight().setInitialValue(10.0);
                 nb.getBias().add(-10.0);
+                nb.getFinalBias().add(-10.0);
             }
 
             {
                 Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, nb);
 
+                s.linkInput();
                 s.linkOutput();
-                s.getWeight().add(-100.0);
+                s.getWeight().setInitialValue(-100.0);
             }
             nb.getBias().add(1.5);
+            nb.getBias().triggerUpdate();
+            nb.getFinalBias().add(1.5);
+            nb.getFinalBias().triggerUpdate();
         }
 
         {
@@ -227,15 +241,15 @@ public class MutualExclusionTest {
             {
                 Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(na, inhib);
                 s.linkInput();
-                s.getWeight().add(1.0);
+                s.getWeight().setInitialValue(1.0);
             }
             {
                 Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(nb, inhib);
                 s.linkInput();
-                s.getWeight().add(1.0);
+                s.getWeight().setInitialValue(1.0);
             }
 
-            inhib.getBias().set(0.0);
+            inhib.getBias().setInitialValue(0.0);
         }
 
 
@@ -247,10 +261,13 @@ public class MutualExclusionTest {
                 .setEnableTraining(true);
         doc.setConfig(c);
 
-        doc.addToken(in, 0, 4);
+        doc.setQueueFilter(s ->
+                s.getStepType() == StepType.TEMPLATE || s.getStepType() == StepType.TRAINING
+        );
 
         AikaDebugger.createAndShowGUI(doc);
 
+        doc.addToken(in, 0, 4);
         doc.process();
         doc.updateModel();
 

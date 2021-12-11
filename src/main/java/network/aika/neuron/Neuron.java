@@ -107,6 +107,9 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public SortedSet<A> getActivations(Thought t) {
+        if(t == null)
+            return Collections.emptySortedSet();
+
         SortedSet<A> acts = activations.get(t.getId());
         return acts != null ? acts : Collections.emptyNavigableSet();
     }
