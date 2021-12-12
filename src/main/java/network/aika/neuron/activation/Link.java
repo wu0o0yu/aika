@@ -64,9 +64,11 @@ public class Link<A extends Activation> extends Element<Link> {
         this.isSelfRef = isSelfRef;
 
         initInformationGain();
-        initWeightedInput();
 
-        initBackPropGradient(output);
+        weightedInput = input != null ?
+                new FieldMultiplication(input.getValue(), synapse.getWeight()) :
+                ZERO;
+        backPropGradient = new FieldMultiplication(output.outputGradient, synapse.getWeight());
 
         AddLink.add(this);
 
@@ -83,17 +85,6 @@ public class Link<A extends Activation> extends Element<Link> {
         return igGradient;
     }
 
-    private void initWeightedInput() {
-        if(input != null)
-            weightedInput = new FieldMultiplication(input.getValue(), synapse.getWeight());
-        else
-            weightedInput = ZERO;
-    }
-
-    private void initBackPropGradient(A output) {
-        backPropGradient = new FieldMultiplication(output.outputGradient, synapse.getWeight());
-    }
-
     public FieldOutput getWeightedInput() {
         return weightedInput;
     }
@@ -102,31 +93,26 @@ public class Link<A extends Activation> extends Element<Link> {
         return backPropGradient;
     }
 
-    public void propagateGradient(double g, boolean updateWeights, boolean backPropagate) {
-        if(!synapse.isAllowTraining())
-            return;
+    public void updateWeight(double g) {
+        double weightDelta = getConfig().getLearnRate() * g;
+        boolean oldWeightIsZero = synapse.isZero();
 
-        if(updateWeights) {
-            double weightDelta = getConfig().getLearnRate() * g;
-            boolean oldWeightIsZero = synapse.isZero();
+        assert !synapse.isTemplate();
+        synapse.updateSynapse(this, weightDelta);
 
-            assert !synapse.isTemplate();
-            synapse.updateSynapse(this, weightDelta);
+        if (oldWeightIsZero && !synapse.isZero() && getInput().isFired())
+            PropagateBindingSignal.add(this);
 
-            if (oldWeightIsZero && !synapse.isZero() && getInput().isFired())
-                PropagateBindingSignal.add(this);
-
-            PostTraining.add(getOutput());
-        }
-
-        if(backPropagate) {
-            input.getInputGradient().addAndTriggerUpdate(
-                    backPropGradient.getUpdate(1, true)
-            );
-        }
+        PostTraining.add(getOutput());
     }
 
-    public void weightUpdate() {
+    public void backPropagate() {
+        input.getInputGradient().addAndTriggerUpdate(
+                backPropGradient.getUpdate(1, true)
+        );
+    }
+
+    public void receiveWeightUpdate() {
         output.getNet().addAndTriggerUpdate(
                 weightedInput.getUpdate(2, true)
         );

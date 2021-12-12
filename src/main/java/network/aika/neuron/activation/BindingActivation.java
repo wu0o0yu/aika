@@ -30,6 +30,7 @@ import network.aika.utils.Utils;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
@@ -42,7 +43,6 @@ public class BindingActivation extends Activation<BindingNeuron> {
     public static BindingActivation MIN_BINDING_ACT = new BindingActivation(0, null);
     public static BindingActivation MAX_BINDING_ACT = new BindingActivation(Integer.MAX_VALUE, null);
 
-
     private boolean finalMode = false;
     private Timestamp finalTimestamp = NOT_SET;
 
@@ -50,7 +50,7 @@ public class BindingActivation extends Activation<BindingNeuron> {
     private BindingActivation mainBranch;
 
     private double branchProbability = 1.0;
-    private Field ownInputGradient = new QueueField(this, "ownInputGradient",Phase.LINKING, StepType.TRAINING);
+    private Field ownInputGradient = new QueueField(this, "ownInputGradient", Phase.LINKING, StepType.TRAINING);
 
     protected FieldOutput ownOutputGradient = new FieldMultiplication(
             ownInputGradient,
@@ -150,10 +150,6 @@ public class BindingActivation extends Activation<BindingNeuron> {
         return finalMode;
     }
 
-    public void setFinalMode(boolean finalMode) {
-        this.finalMode = finalMode;
-    }
-
     public Timestamp getFinalTimestamp() {
         return finalTimestamp;
     }
@@ -181,6 +177,45 @@ public class BindingActivation extends Activation<BindingNeuron> {
             return branches.stream();
     }
 
+    public void setFinalMode() {
+        finalMode = true;
+
+        BindingNeuron n = getNeuron();
+
+        double biasDelta = n.getFinalBias().getCurrentValue() - n.getBias().getCurrentValue();
+        n.getFinalBias().setFieldListener(n.getBias().getFieldListener());
+        n.getBias().setFieldListener(null);
+
+        getNet().addAndTriggerUpdate(biasDelta - computeForwardLinkedRecurrentInputs(this));
+
+        getPositiveRecurrentInputLinks(this)
+                .filter(l -> !l.isForward())
+                .forEach(l ->
+                        l.propagateValue()
+                );
+
+        setFinalTimestamp();
+
+        if (!isFired() || getNet().getCurrentValue() > 0.0)
+            return;
+
+        setFired(NOT_SET);
+        propagate();
+    }
+
+    private double computeForwardLinkedRecurrentInputs(BindingActivation act) {
+        return getPositiveRecurrentInputLinks(act)
+                .filter(l -> l.isForward())
+                .mapToDouble(l -> l.getSynapse().getWeight().getCurrentValue())
+                .sum();
+    }
+
+    private Stream<Link> getPositiveRecurrentInputLinks(BindingActivation act) {
+        return act.getInputLinks()
+                .filter(l -> l.getSynapse().isRecurrent())
+                .filter(l -> !l.isNegative());
+    }
+
     @Override
     public double getBranchProbability() {
         return branchProbability;
@@ -188,6 +223,38 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
     public void setBranchProbability(double p) {
         branchProbability = p;
+    }
+
+    public void computeBranchProbability() {
+        Stream<Link> linksStream = getBranches()
+                .stream()
+                .flatMap(Activation::getInputLinks)
+                .filter(Link::isNegative)
+                .flatMap(l -> l.getInput().getInputLinks());  // Walk through to the inhib. Activation.
+
+        Set<BindingActivation> conflictingActs = linksStream
+                .map(l -> (BindingActivation) l.getInput())
+                .collect(Collectors.toSet());
+
+        double offset = conflictingActs
+                .stream()
+                .mapToDouble(cAct -> cAct.getNet().getCurrentValue())
+                .min()
+                .getAsDouble();
+
+        double norm = Math.exp(getNet().getCurrentValue() - offset);
+        norm += conflictingActs
+                .stream()
+                .mapToDouble(cAct -> Math.exp(cAct.getNet().getCurrentValue() - offset))
+                .sum();
+
+        double p = Math.exp(getNet().getCurrentValue() - offset) / norm;
+
+        if(Utils.belowTolerance(p - getBranchProbability()))
+            return;
+// TODO
+//        BindingActivation cAct = act.clone(null);
+//        cAct.setBranchProbability(p);
     }
 
     public void receiveOwnGradientUpdate(double u) {

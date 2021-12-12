@@ -160,8 +160,16 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected void propagateGradient(double g, boolean updateWeights, boolean backPropagate) {
         getNeuron().getBias().addAndTriggerUpdate(getConfig().getLearnRate() * g);
 
-        inputLinks.values().forEach(l ->
-                l.propagateGradient(g, true, true)
+        inputLinks.values().forEach(l -> {
+                    if (!l.getSynapse().isAllowTraining())
+                        return;
+
+                    if (updateWeights)
+                        l.updateWeight(g);
+
+                    if (backPropagate)
+                        l.backPropagate();
+                }
         );
 
         if(isFired())
@@ -394,24 +402,17 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         Range range = getAbsoluteRange();
         assert range != null;
 
-        entropy.setAndTriggerUpdate(getNeuron().getSurprisal(
+        entropy.setAndTriggerUpdate(
+                getNeuron().getSurprisal(
                         Sign.getSign(this),
                         range
-                ));
-    }
-
-    public void propagateGradientIn(double g) {
-        inputGradient.addAndTriggerUpdate(g);
+                )
+        );
     }
 
     public void receiveOwnGradientUpdate(double u) {
         inputGradient.addAndTriggerUpdate(u);
     }
-
-    public void receiveBackPropagatedGradientUpdate(double u) {
-        inputGradient.addAndTriggerUpdate(u);
-    }
-
 
     public void linkInputs() {
         inputLinks
@@ -508,5 +509,4 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     public int hashCode() {
         return Objects.hash(id);
     }
-
 }

@@ -32,9 +32,10 @@ public class SaveNeuron extends Step<Activation> {
 
     @Override
     public void process() {
-        Neuron n = getElement().getNeuron();
-
-        n.getProvider().save();
+        getElement()
+                .getNeuron()
+                .getProvider()
+                .save();
     }
 
     public String toString() {

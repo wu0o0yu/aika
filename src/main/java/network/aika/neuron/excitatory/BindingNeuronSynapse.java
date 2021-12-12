@@ -34,10 +34,9 @@ public abstract class BindingNeuronSynapse<I extends Neuron> extends ExcitatoryS
 
     @Override
     public boolean allowLinking(Activation bindingSignal) {
-        if(isRecurrent())
-            return bindingSignal instanceof BindingActivation;
-        else
-            return super.allowLinking(bindingSignal);
+        return isRecurrent() ?
+                bindingSignal instanceof BindingActivation :
+                super.allowLinking(bindingSignal);
     }
 
     @Override

@@ -60,44 +60,7 @@ public class SetFinalMode extends Step<BindingActivation> {
 
     @Override
     public void process() {
-        BindingActivation act = getElement();
-
-        act.setFinalMode(true);
-
-        BindingNeuron n = act.getNeuron();
-
-        double biasDelta = n.getFinalBias().getCurrentValue() - n.getBias().getCurrentValue();
-        n.getFinalBias().setFieldListener(n.getBias().getFieldListener());
-        n.getBias().setFieldListener(null);
-
-        act.getNet().addAndTriggerUpdate(biasDelta - computeForwardLinkedRecurrentInputs(act));
-
-        getPositiveRecurrentInputLinks(act)
-                .filter(l -> !l.isForward())
-                .forEach(l ->
-                        l.propagateValue()
-                );
-
-        act.setFinalTimestamp();
-
-        if (!act.isFired() || act.getNet().getCurrentValue() > 0.0)
-            return;
-
-        act.setFired(NOT_SET);
-        act.propagate();
-    }
-
-    private double computeForwardLinkedRecurrentInputs(BindingActivation act) {
-        return getPositiveRecurrentInputLinks(act)
-                .filter(l -> l.isForward())
-                .mapToDouble(l -> l.getSynapse().getWeight().getCurrentValue())
-                .sum();
-    }
-
-    private Stream<Link> getPositiveRecurrentInputLinks(BindingActivation act) {
-        return act.getInputLinks()
-                .filter(l -> l.getSynapse().isRecurrent())
-                .filter(l -> !l.isNegative());
+        getElement().setFinalMode();
     }
 
     public String toString() {

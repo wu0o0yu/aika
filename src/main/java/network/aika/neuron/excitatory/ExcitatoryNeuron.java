@@ -57,7 +57,6 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
         return weightSum;
     }
 
-
     protected void initFromTemplate(ExcitatoryNeuron n) {
         super.initFromTemplate(n);
     }
@@ -84,13 +83,6 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
     public ActivationFunction getActivationFunction() {
         return RECTIFIED_HYPERBOLIC_TANGENT;
     }
-
-    /*
-    @Override
-    public double getInitialNet() {
-        return bias.getCurrentValue();
-    }
-*/
 
     public void updateSynapseInputConnections() {
         TreeSet<ExcitatorySynapse> sortedSynapses = new TreeSet<>(

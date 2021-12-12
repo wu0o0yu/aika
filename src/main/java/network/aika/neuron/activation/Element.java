@@ -49,13 +49,7 @@ public abstract class Element<E extends Element> implements Comparable<E> {
     public void removeQueuedPhase(Step s) {
         queuedSteps.remove(s);
     }
-/*
-    public void replaceElement(Element newElement) {
-        removeFromQueue();
-        copySteps(newElement);
-        queuedSteps.clear();
-    }
-*/
+
     public void copySteps(Element newElement) {
         getQueuedSteps().forEach(s ->
                 Step.add(s.copy(newElement))
@@ -65,11 +59,7 @@ public abstract class Element<E extends Element> implements Comparable<E> {
     public Stream<Step> getQueuedSteps() {
         return queuedSteps.values().stream();
     }
-/*
-    private void removeFromQueue() {
-        getThought().removeQueueEntries(queuedSteps.values());
-    }
-*/
+
     public abstract Thought getThought();
 
     public abstract Config getConfig();

@@ -26,10 +26,8 @@ import network.aika.neuron.activation.Link;
  */
 public class RelatedRecurrentBNSynapse<I extends Neuron> extends RelatedBNSynapse<I> {
 
-
     @Override
     public boolean isRecurrent() {
         return true;
     }
-
 }

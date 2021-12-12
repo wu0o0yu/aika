@@ -371,7 +371,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
                 .stream()
                 .map(act -> act.getInputLink(this))
                 .filter(l -> l != null)
-                .forEach(l -> l.weightUpdate());
+                .forEach(l -> l.receiveWeightUpdate());
         setModified();
     }
 

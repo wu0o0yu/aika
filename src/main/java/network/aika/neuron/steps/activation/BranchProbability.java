@@ -58,36 +58,8 @@ public class BranchProbability extends Step<BindingActivation> {
 
     @Override
     public void process() { // TODO: Use branch binding signal
-        BindingActivation act = getElement();
-        Stream<Link> linksStream = act.getBranches()
-                .stream()
-                .flatMap(Activation::getInputLinks)
-                .filter(Link::isNegative)
-                .flatMap(l -> l.getInput().getInputLinks());  // Walk through to the inhib. Activation.
-
-        Set<BindingActivation> conflictingActs = linksStream
-                .map(l -> (BindingActivation) l.getInput())
-                .collect(Collectors.toSet());
-
-        double offset = conflictingActs
-                .stream()
-                .mapToDouble(cAct -> cAct.getNet().getCurrentValue())
-                .min()
-                .getAsDouble();
-
-        double norm = Math.exp(act.getNet().getCurrentValue() - offset);
-        norm += conflictingActs
-                .stream()
-                .mapToDouble(cAct -> Math.exp(cAct.getNet().getCurrentValue() - offset))
-                .sum();
-
-        double p = Math.exp(act.getNet().getCurrentValue() - offset) / norm;
-
-        if(Utils.belowTolerance(p - act.getBranchProbability()))
-            return;
-// TODO
-//        BindingActivation cAct = act.clone(null);
-//        cAct.setBranchProbability(p);
+        getElement()
+                .computeBranchProbability();
     }
 
     public boolean checkIfQueued() {

@@ -29,7 +29,6 @@ import network.aika.neuron.steps.activation.PostTraining;
  */
 public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNeuron<?, A>, A extends Activation> extends Synapse<I, O, A> {
 
-
     @Override
     public boolean isWeak() {
         return isWeak(getOutput().getWeightSum().getCurrentValue());

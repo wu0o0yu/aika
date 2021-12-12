@@ -74,7 +74,6 @@ public class TemplateTask extends AbstractLinker {
             return;
 
         InformationGainGradient.add(l);
-//        PropagateGradientAndUpdateWeight.add(l, l.getOutput().getOutputGradientSum());
     }
 
     @Override
