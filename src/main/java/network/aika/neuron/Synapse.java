@@ -320,7 +320,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return getPOutput().getModel();
     }
 
-    public double getCompleteSurprisal(Sign si, Sign so, Range range) {
+    public double getRelativeSurprisal(Sign si, Sign so, Range range) {
         double s = getSurprisal(si, so, range);
         s -= getInput().getSurprisal(si, range);
         s -= getOutput().getSurprisal(so, range);
@@ -364,19 +364,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     public boolean isNegative() {
         return weight.getCurrentValue() < 0.0;
     }
-/*
-    public void setWeight(double w) {
-        weight.setAndTriggerUpdate(w);
-    }
 
-    public void addWeight(double weightDelta) {
-        addWeightInternal(weightDelta);
-    }
-
-    protected void addWeightInternal(double weightDelta) {
-        weight.addAndTriggerUpdate(weightDelta);
-    }
-*/
     protected void weightUpdate(double u) {
         getOutput()
                 .getActivations(getModel().getCurrentThought())
@@ -387,9 +375,8 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         setModified();
     }
 
-    public void updateOutputNet(Link<A> l, double delta) {
-//        SumUpLink.add(l, actValueDelta * l.getSynapse().getWeight());
-        l.getOutput().getNet().addAndTriggerUpdate(delta);
+    public boolean propagateValue(Link<A> l) {
+        return true;
     }
 
     @Override

@@ -115,7 +115,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     private void initValue() {
         value.setFieldListener(u ->
                 getOutputLinks()
-                        .forEach(l -> l.updateInputValue())
+                        .forEach(l -> l.propagateValue())
         );
     }
 

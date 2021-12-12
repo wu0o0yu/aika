@@ -41,17 +41,10 @@ public abstract class BindingNeuronSynapse<I extends Neuron> extends ExcitatoryS
     }
 
     @Override
-    public void updateOutputNet(Link<BindingActivation> l, double delta) {
-        if(
-                isRecurrent() &&
-                !isNegative() &&
-                !l.getOutput().isFinalMode() &&
-                !l.isForward()
-        )
-            return;
-
-        super.updateOutputNet(l, delta);
-        SetFinalMode.add(l.getOutput());
+    public boolean propagateValue(Link<BindingActivation> l) {
+        return !isRecurrent() ||
+                l.getOutput().isFinalMode() ||
+                l.isForward();
     }
 
     @Override

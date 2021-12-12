@@ -75,7 +75,7 @@ public class SetFinalMode extends Step<BindingActivation> {
         getPositiveRecurrentInputLinks(act)
                 .filter(l -> !l.isForward())
                 .forEach(l ->
-                        l.updateInputValue()
+                        l.propagateValue()
                 );
 
         act.setFinalTimestamp();

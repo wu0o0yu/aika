@@ -48,9 +48,9 @@ public class NegativeBNSynapse extends BindingNeuronSynapse<InhibitoryNeuron> {
             weight.addAndTriggerUpdate(-delta);
     }
 
-    public void updateOutputNet(Link l, double delta) {
-        if(!l.isSelfRef())
-            super.updateOutputNet(l, delta);
+    @Override
+    public boolean propagateValue(Link<BindingActivation> l) {
+        return !l.isSelfRef();
     }
 
     @Override

@@ -153,18 +153,13 @@ public class Link<A extends Activation> extends Element<Link> {
     }
 
     public void updateInformationGainGradient() {
-        if(isNegative())
-            return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
-
         Range range = input.getAbsoluteRange();
         assert range != null;
 
         double igGrad = 0.0;
-        for(Sign si: Sign.SIGNS) {
-            for (Sign so : Sign.SIGNS) {
-                igGrad += synapse.getSurprisal(si, so, range) * getInputValue(si).getCurrentValue();
-            }
-        }
+        for(Sign si: Sign.SIGNS)
+            for (Sign so : Sign.SIGNS)
+                igGrad += synapse.getRelativeSurprisal(si, so, range) * getInputValue(si).getCurrentValue();
 
         igGradient.setAndTriggerUpdate(igGrad);
     }
@@ -237,7 +232,10 @@ public class Link<A extends Activation> extends Element<Link> {
         );
     }
 
-    public void updateInputValue() {
+    public void propagateValue() {
+        if(!synapse.propagateValue(this))
+            return;
+
         output.getNet().addAndTriggerUpdate(
                 weightedInput.getUpdate(1, true)
         );

@@ -32,6 +32,9 @@ import network.aika.neuron.steps.StepType;
 public class InformationGainGradient extends Step<Link> {
 
     public static void add(Link l) {
+        if(l.isNegative())
+            return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
+
         Step.add(new InformationGainGradient(l));
     }
 
@@ -55,8 +58,7 @@ public class InformationGainGradient extends Step<Link> {
 
     @Override
     public void process() {
-        Link l = getElement();
-        l.updateInformationGainGradient();
+        getElement().updateInformationGainGradient();
     }
 
     public String toString() {
