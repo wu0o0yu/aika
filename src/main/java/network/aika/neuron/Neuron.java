@@ -20,7 +20,7 @@ import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
 import network.aika.fields.Field;
-import network.aika.neuron.sign.Sign;
+import network.aika.sign.Sign;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
@@ -32,8 +32,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.sign.Sign.NEG;
-import static network.aika.neuron.sign.Sign.POS;
+import static network.aika.sign.Sign.NEG;
+import static network.aika.sign.Sign.POS;
 
 /**
  *

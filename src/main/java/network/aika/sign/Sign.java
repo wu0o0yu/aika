@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.sign;
+package network.aika.sign;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.fields.Field;

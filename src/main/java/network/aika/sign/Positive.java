@@ -14,32 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.sign;
+package network.aika.sign;
 
+import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
-import network.aika.fields.InvertedField;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Negative implements Sign {
+public class Positive implements Sign {
     @Override
     public Sign invert() {
-        return POS;
+        return NEG;
     }
 
     @Override
     public FieldOutput getValue(FieldOutput v) {
-        return new InvertedField(v);
+        return v;
     }
 
     @Override
     public int index() {
-        return 1;
+        return 0;
     }
 
     public String toString() {
-        return "NEG";
+        return "POS";
     }
 }

@@ -20,7 +20,7 @@ import network.aika.Model;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.direction.Direction;
 import network.aika.fields.Field;
-import network.aika.neuron.sign.Sign;
+import network.aika.sign.Sign;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import org.apache.commons.math3.distribution.BetaDistribution;
@@ -34,8 +34,8 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.Neuron.BETA_THRESHOLD;
 import static network.aika.neuron.activation.direction.Direction.OUTPUT;
-import static network.aika.neuron.sign.Sign.NEG;
-import static network.aika.neuron.sign.Sign.POS;
+import static network.aika.sign.Sign.NEG;
+import static network.aika.sign.Sign.POS;
 
 /**
  *
