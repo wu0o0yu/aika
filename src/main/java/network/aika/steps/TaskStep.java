@@ -14,21 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.steps;
 
-import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.BindingSignal;
+import network.aika.neuron.activation.Element;
+import network.aika.linker.AbstractLinker;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class RelatedBNSynapse<I extends Neuron> extends InputBNSynapse<I> {
+public abstract class TaskStep<E extends Element, L extends AbstractLinker> extends Step<E> {
 
-    public boolean checkScope(BindingSignal iBS, BindingSignal oBS) {
-        if(iBS.getScope() >= 2 || oBS.getScope() >= 2)
-            return false;
+    protected final L task;
 
-        return super.checkScope(iBS, oBS);
+    public TaskStep(E element, L task) {
+        super(element);
+        this.task = task;
     }
 }

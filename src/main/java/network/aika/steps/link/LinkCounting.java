@@ -14,24 +14,56 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.callbacks;
+package network.aika.steps.link;
 
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.steps.Phase;
 import network.aika.steps.Step;
+import network.aika.steps.StepType;
 
 /**
+ * Counts the number of input or output activations a particular synapse has encountered.
+ * The four different cases are counted separately.
  *
  * @author Lukas Molzberger
  */
-public interface EventListener {
+public class LinkCounting extends Step<Link> {
 
-    void beforeProcessedEvent(Step s);
+    public static void add(Link<?> l) {
+        Step.add(new LinkCounting(l));
+    }
 
-    void afterProcessedEvent(Step s);
+    private LinkCounting(Link l) {
+        super(l);
+    }
 
-    void onActivationCreationEvent(Activation act, Synapse originSynapse, Activation originAct);
+    @Override
+    public Phase getPhase() {
+        return Phase.COUNTING;
+    }
 
-    void onLinkCreationEvent(Link l);
+    @Override
+    public StepType getStepType() {
+        return StepType.COUNTING;
+    }
+
+    public boolean checkIfQueued() {
+        return true;
+    }
+
+    @Override
+    public void process() {
+        Link l = getElement();
+        Synapse s = l.getSynapse();
+
+        if(s == null)
+            return;
+
+        s.count(l);
+    }
+
+    public String toString() {
+        return "Link-Step: Counting " + getElement().toShortString();
+    }
 }

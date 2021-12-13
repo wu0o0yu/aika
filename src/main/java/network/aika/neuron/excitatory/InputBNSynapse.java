@@ -17,7 +17,7 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.direction.Direction;
+import network.aika.direction.Direction;
 
 /**
  * @author Lukas Molzberger

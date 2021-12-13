@@ -18,8 +18,8 @@ package network.aika.neuron.activation;
 
 import network.aika.Config;
 import network.aika.Thought;
-import network.aika.neuron.steps.Step;
-import network.aika.neuron.steps.QueueKey;
+import network.aika.steps.Step;
+import network.aika.steps.QueueKey;
 
 import java.util.*;
 import java.util.stream.Stream;

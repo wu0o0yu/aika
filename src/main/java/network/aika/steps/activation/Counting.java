@@ -14,29 +14,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.steps.activation;
 
-import network.aika.neuron.activation.*;
-import network.aika.direction.Direction;
+import network.aika.neuron.activation.Activation;
+import network.aika.steps.Phase;
+import network.aika.steps.Step;
+import network.aika.steps.StepType;
+
 
 /**
+ * Counts the number of activations a particular neuron has encountered.
  *
  * @author Lukas Molzberger
  */
-public class PatternSynapse extends ExcitatorySynapse<BindingNeuron, PatternNeuron, PatternActivation> {
+public class Counting extends Step<Activation> {
 
-    @Override
-    public boolean checkScope(BindingSignal fromBS, BindingSignal toBS, Direction dir) {
-        return fromBS.getScope() == 0 && toBS.getScope() == 0;
+    public static void add(Activation act) {
+        Step.add(new Counting(act));
+    }
+
+    private Counting(Activation act) {
+        super(act);
     }
 
     @Override
-    public boolean checkTemplatePropagate(Activation act) {
-        return true;
+    public Phase getPhase() {
+        return Phase.COUNTING;
     }
 
     @Override
-    public boolean checkCausality(Activation<?> iAct, Activation<?> oAct) {
+    public StepType getStepType() {
+        return StepType.COUNTING;
+    }
+
+    @Override
+    public void process() {
+        Activation act = getElement();
+
+        if(!act.isFired())
+            return;
+
+        act.getNeuron().count(act);
+    }
+
+    public boolean checkIfQueued() {
         return true;
+    }
+
+    public String toString() {
+        return "Act-Step: Counting " + getElement().toShortString();
     }
 }

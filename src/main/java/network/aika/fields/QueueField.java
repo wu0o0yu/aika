@@ -2,10 +2,10 @@ package network.aika.fields;
 
 
 import network.aika.neuron.activation.Element;
-import network.aika.neuron.steps.FieldStep;
-import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.Step;
-import network.aika.neuron.steps.StepType;
+import network.aika.steps.FieldStep;
+import network.aika.steps.Phase;
+import network.aika.steps.Step;
+import network.aika.steps.StepType;
 
 public class QueueField extends Field {
 

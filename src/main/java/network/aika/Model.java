@@ -20,12 +20,9 @@ package network.aika;
 import network.aika.callbacks.InMemorySuspensionCallback;
 import network.aika.callbacks.SuspensionCallback;
 import network.aika.neuron.*;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.direction.Direction;
 import network.aika.utils.Writable;
 
 import java.io.*;
-import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;

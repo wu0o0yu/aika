@@ -14,27 +14,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.steps.link;
 
-import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.BindingSignal;
-import network.aika.direction.Direction;
+import network.aika.neuron.activation.Link;
+import network.aika.steps.Phase;
+import network.aika.steps.Step;
+import network.aika.steps.StepType;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class SameBNSynapse<I extends Neuron> extends BindingNeuronSynapse<I> {
+public class Cleanup extends Step<Link> {
 
-    @Override
-    public Byte transitionScope(Byte fromScope, Direction dir) {
-        if(fromScope == 0)
-            return fromScope;
-
-        return dir.transitionScope(fromScope);
+    public static void add(Link l) {
+        Step.add(new Cleanup(l));
     }
 
-    public boolean checkScope(BindingSignal iBS, BindingSignal oBS) {
-        return iBS.getScope() == 1 && iBS.getDepth() == 1 && oBS.getScope() == 2;
+    private Cleanup(Link l) {
+        super(l);
+    }
+
+    @Override
+    public Phase getPhase() {
+        return Phase.COUNTING;
+    }
+
+    @Override
+    public StepType getStepType() {
+        return StepType.INFERENCE;
+    }
+
+    public boolean checkIfQueued() {
+        return true;
+    }
+
+    @Override
+    public void process() {
+        Link l = getElement();
+
+        if(l.getOutput().isFired())
+            return;
+
+        l.unlinkInput();
+        l.unlinkOutput();
+    }
+
+    public String toString() {
+        return "Link-Step: Commit " + getElement().toShortString();
     }
 }

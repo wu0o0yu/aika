@@ -24,7 +24,7 @@ import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.steps.StepType;
+import network.aika.steps.StepType;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;

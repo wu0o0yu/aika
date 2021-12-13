@@ -20,14 +20,13 @@ import network.aika.Config;
 import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
-import network.aika.fields.ConstantField;
 import network.aika.fields.Field;
 import network.aika.fields.FieldMultiplication;
 import network.aika.fields.FieldOutput;
 import network.aika.sign.Sign;
-import network.aika.neuron.steps.activation.PostTraining;
-import network.aika.neuron.steps.link.AddLink;
-import network.aika.neuron.steps.link.PropagateBindingSignal;
+import network.aika.steps.activation.PostTraining;
+import network.aika.steps.link.AddLink;
+import network.aika.steps.link.PropagateBindingSignal;
 
 import java.util.Comparator;
 

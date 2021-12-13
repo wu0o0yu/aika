@@ -18,14 +18,13 @@ package network.aika;
 
 
 import network.aika.callbacks.EventListener;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.QueueKey;
-import network.aika.neuron.steps.Step;
+import network.aika.steps.Phase;
+import network.aika.steps.QueueKey;
+import network.aika.steps.Step;
 
 import java.util.*;
 import java.util.function.Consumer;

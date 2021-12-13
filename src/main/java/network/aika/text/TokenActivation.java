@@ -16,22 +16,15 @@
  */
 package network.aika.text;
 
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.activation.direction.Direction;
 import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.neuron.excitatory.RelatedBNSynapse;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
-import java.util.Optional;
-
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
-import static network.aika.neuron.linker.LinkingTask.addNextLinkerSteps;
+import static network.aika.linker.LinkingTask.addNextLinkerSteps;
 
 
 /**

@@ -14,29 +14,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.steps.link;
 
-import network.aika.neuron.activation.*;
-import network.aika.direction.Direction;
+import network.aika.neuron.activation.Link;
+import network.aika.steps.Phase;
+import network.aika.steps.Step;
+import network.aika.steps.StepType;
 
 /**
+ * Avoid that synapses which access the same source information generate twice the gradient.
  *
  * @author Lukas Molzberger
  */
-public class PatternSynapse extends ExcitatorySynapse<BindingNeuron, PatternNeuron, PatternActivation> {
+public class ShadowFactor extends Step<Link> {
 
-    @Override
-    public boolean checkScope(BindingSignal fromBS, BindingSignal toBS, Direction dir) {
-        return fromBS.getScope() == 0 && toBS.getScope() == 0;
+    public static void add(Link l) {
+        Step.add(new ShadowFactor(l));
+    }
+
+    public ShadowFactor(Link l) {
+        super(l);
     }
 
     @Override
-    public boolean checkTemplatePropagate(Activation act) {
+    public Phase getPhase() {
+        return Phase.LINKING;
+    }
+
+    @Override
+    public StepType getStepType() {
+        return StepType.TRAINING;
+    }
+
+    public boolean checkIfQueued() {
         return true;
     }
 
     @Override
-    public boolean checkCausality(Activation<?> iAct, Activation<?> oAct) {
-        return true;
+    public void process() {
+    //    getElement().removeGradientDependencies();
+    }
+
+    public String toString() {
+        return "Link-Step: Shadow Factor " + getElement().toShortString();
     }
 }

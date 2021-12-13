@@ -21,10 +21,10 @@ import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.fields.*;
 import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.neuron.steps.Phase;
-import network.aika.neuron.steps.StepType;
-import network.aika.neuron.steps.activation.BranchProbability;
-import network.aika.neuron.steps.activation.SetFinalMode;
+import network.aika.steps.Phase;
+import network.aika.steps.StepType;
+import network.aika.steps.activation.BranchProbability;
+import network.aika.steps.activation.SetFinalMode;
 import network.aika.utils.Utils;
 
 import java.util.Comparator;

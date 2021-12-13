@@ -21,7 +21,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.steps.activation.PostTraining;
+import network.aika.steps.activation.PostTraining;
 
 /**
  *

@@ -21,9 +21,7 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.excitatory.PatternNeuron;
-import network.aika.neuron.steps.Phase;
-
-import java.util.stream.Stream;
+import network.aika.steps.Phase;
 
 
 /**
