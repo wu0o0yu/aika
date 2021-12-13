@@ -44,7 +44,7 @@ public class TokenActivation extends PatternActivation {
     }
 
     private static void addLink(Synapse s, Activation iAct, Activation oAct) {
-        Link nl = oAct.addLink(s, iAct, false);
+        Link nl = oAct.addLink(s, iAct);
 
         addNextLinkerSteps(nl);
     }

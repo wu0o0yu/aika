@@ -90,6 +90,6 @@ public class TemplateTask extends AbstractLinker {
         if(Link.templateLinkExists(targetSynapse, iAct, oAct))
             return null;
 
-        return targetSynapse.createLink(iAct, oAct, oAct.isSelfRef(iAct));
+        return targetSynapse.createLink(iAct, oAct);
     }
 }

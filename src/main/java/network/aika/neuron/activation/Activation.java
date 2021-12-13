@@ -246,7 +246,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public boolean isSelfRef(Activation iAct) {
-        return bindingSignals.containsKey(iAct);
+        return iAct.bindingSignals.containsKey(this);
     }
 
     public abstract Range getRange();
@@ -344,7 +344,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 .stream()
                 .filter(l -> l.getSynapse() != excludedSyn)
                 .forEach(l ->
-                        new Link(l.getSynapse(), l.getInput(), clonedAct, l.isSelfRef())
+                        new Link(l.getSynapse(), l.getInput(), clonedAct)
                 );
     }
 
@@ -381,18 +381,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 );
     }
 
-    public Link addLink(Synapse s, Activation input, boolean isSelfRef) {
+    public Link addLink(Synapse s, Activation input) {
         Link ol = getInputLink(s);
         assert ol == null;
 
-        return new Link(
-                s,
-                input,
-                this,
-                isSelfRef
-        );
+        return new Link(s, input, this);
     }
-
 
     public FieldOutput getOutputGradient() {
         return outputGradient;

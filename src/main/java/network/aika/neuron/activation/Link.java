@@ -49,17 +49,14 @@ public class Link<A extends Activation> extends Element<Link> {
     private final Activation input;
     private final A output;
 
-    private final boolean isSelfRef;
-
     private Field igGradient = new Field();
     private FieldOutput weightedInput;
     private FieldOutput backPropGradient;
 
-    public Link(Synapse s, Activation input, A output, boolean isSelfRef) {
+    public Link(Synapse s, Activation input, A output) {
         this.synapse = s;
         this.input = input;
         this.output = output;
-        this.isSelfRef = isSelfRef;
 
         initInformationGain();
 
@@ -184,7 +181,7 @@ public class Link<A extends Activation> extends Element<Link> {
     }
 
     public boolean isSelfRef() {
-        return isSelfRef;
+        return output.isSelfRef(input);
     }
 
     public boolean isRecurrent() {

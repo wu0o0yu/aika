@@ -59,11 +59,11 @@ public abstract class AbstractLinker {
                         !exists(act, OUTPUT, s)
                 )
                 .forEach(s ->
-                        propagate(act, s, getPropagateTargetNeuron(s, act), false)
+                        propagate(act, s, getPropagateTargetNeuron(s, act))
                 );
     }
 
-    public void propagate(Activation fromAct, Synapse targetSynapse, Neuron targetNeuron, boolean isSelfRef) {
+    public void propagate(Activation fromAct, Synapse targetSynapse, Neuron targetNeuron) {
         Thought t = fromAct.getThought();
 
         Activation toAct = targetNeuron.createActivation(t);
@@ -71,7 +71,7 @@ public abstract class AbstractLinker {
 
         getNextSteps(toAct);
 
-        Link nl = targetSynapse.createLink(fromAct, toAct, isSelfRef);
+        Link nl = targetSynapse.createLink(fromAct, toAct);
         getNextSteps(nl);
     }
 

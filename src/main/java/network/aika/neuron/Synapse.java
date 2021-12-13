@@ -184,12 +184,8 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return getOutput();
     }
 
-    public Link createLink(Activation iAct, Activation oAct, boolean isSelfRef) {
-        Link nl = oAct.addLink(
-                this,
-                iAct,
-                isSelfRef
-        );
+    public Link createLink(Activation iAct, Activation oAct) {
+        Link nl = oAct.addLink(this, iAct);
 
         Synapse s = nl.getSynapse();
         if (s.isNegative() && !s.isTemplate())

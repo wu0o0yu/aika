@@ -106,11 +106,11 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
     public BindingActivation createBranch(Synapse excludedSyn) {
         BindingActivation clonedAct = getNeuron().createActivation(getThought());
+        branches.add(clonedAct);
+        clonedAct.mainBranch = this;
         clonedAct.init(null, this);
 
         copySteps(clonedAct);
-        branches.add(clonedAct);
-        clonedAct.mainBranch = this;
         linkClone(clonedAct, excludedSyn);
 
         return clonedAct;

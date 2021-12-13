@@ -164,7 +164,6 @@ public class MutualExclusionTest {
     }
 
 
-
     @Test
     public void testPropagationWithPrimaryLink() {
         TextModel m = new TextModel();
