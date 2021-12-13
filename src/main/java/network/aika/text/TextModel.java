@@ -22,20 +22,13 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.fields.Field;
+import network.aika.fields.Field;
 import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-
-import static network.aika.neuron.activation.direction.Direction.INPUT;
-import static network.aika.neuron.activation.direction.Direction.OUTPUT;
-import static network.aika.neuron.linker.LinkingTask.addNextLinkerSteps;
 
 /**
  *

@@ -19,7 +19,7 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.fields.*;
+import network.aika.fields.*;
 import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.StepType;

@@ -1,4 +1,4 @@
-package network.aika.neuron.activation.fields;
+package network.aika.fields;
 
 
 import network.aika.neuron.activation.Element;

@@ -16,8 +16,8 @@
  */
 package network.aika.neuron.sign;
 
-import network.aika.neuron.activation.fields.FieldOutput;
-import network.aika.neuron.activation.fields.InvertedField;
+import network.aika.fields.FieldOutput;
+import network.aika.fields.InvertedField;
 
 /**
  *

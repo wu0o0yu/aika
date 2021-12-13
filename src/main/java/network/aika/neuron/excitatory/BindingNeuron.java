@@ -21,7 +21,7 @@ import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.fields.Field;
+import network.aika.fields.Field;
 
 import java.io.DataInput;
 import java.io.DataOutput;

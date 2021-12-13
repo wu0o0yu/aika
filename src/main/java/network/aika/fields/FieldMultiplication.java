@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation.fields;
+package network.aika.fields;
 
 import network.aika.utils.Utils;
 

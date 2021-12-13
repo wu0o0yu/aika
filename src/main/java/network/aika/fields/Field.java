@@ -14,10 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation.fields;
+package network.aika.fields;
 
 import network.aika.Model;
-import network.aika.neuron.Synapse;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import org.slf4j.Logger;

@@ -23,7 +23,7 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.fields.Field;
+import network.aika.fields.Field;
 
 import java.io.DataInput;
 import java.io.DataOutput;

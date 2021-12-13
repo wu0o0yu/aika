@@ -19,7 +19,7 @@ package network.aika.neuron;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.fields.Field;
+import network.aika.fields.Field;
 import network.aika.neuron.sign.Sign;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;

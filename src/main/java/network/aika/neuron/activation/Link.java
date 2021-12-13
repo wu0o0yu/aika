@@ -20,10 +20,10 @@ import network.aika.Config;
 import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.fields.ConstantField;
-import network.aika.neuron.activation.fields.Field;
-import network.aika.neuron.activation.fields.FieldMultiplication;
-import network.aika.neuron.activation.fields.FieldOutput;
+import network.aika.fields.ConstantField;
+import network.aika.fields.Field;
+import network.aika.fields.FieldMultiplication;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.activation.PostTraining;
 import network.aika.neuron.steps.link.AddLink;
@@ -32,9 +32,8 @@ import network.aika.neuron.steps.link.PropagateBindingSignal;
 import java.util.Comparator;
 
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
-import static network.aika.neuron.activation.fields.ConstantField.ZERO;
+import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.neuron.sign.Sign.POS;
-import static network.aika.neuron.sign.Sign.SIGNS;
 
 /**
  *

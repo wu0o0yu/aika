@@ -21,7 +21,7 @@ import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.direction.Direction;
-import network.aika.neuron.activation.fields.*;
+import network.aika.fields.*;
 import network.aika.neuron.sign.Sign;
 import network.aika.neuron.steps.Phase;
 import network.aika.neuron.steps.StepType;

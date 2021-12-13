@@ -14,28 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation.fields;
+package network.aika.fields;
 
 /**
  * @author Lukas Molzberger
  */
-public interface FieldInput {
+public interface FieldOutput {
 
-    void setInitialValue(double v);
+    double getCurrentValue();
 
-    boolean set(double v);
+    double getNewValue(boolean ack);
 
-    boolean add(double u);
+    boolean updateAvailable();
 
-    void triggerUpdate();
+    boolean updateAvailable(int updateArg);
 
-    default void setAndTriggerUpdate(double v) {
-        if(set(v))
-            triggerUpdate();
+    double getUpdate(int updateArg, boolean ack);
+
+    default double getUpdate(boolean ack) {
+        return getUpdate(1, ack);
     }
 
-    default void addAndTriggerUpdate(double u) {
-        if(add(u))
-            triggerUpdate();
-    }
+    void acknowledgePropagated();
 }
