@@ -189,9 +189,13 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return inputGradient;
     }
 
-    public abstract byte getType();
+    public void updateBias(double u, boolean isFinalBias) {
+        getNet().addAndTriggerUpdate(u);
+    }
 
     public void addFeedbackSteps() {}
+
+    public abstract byte getType();
 
     public int getId() {
         return id;

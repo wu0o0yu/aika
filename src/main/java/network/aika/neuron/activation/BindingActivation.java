@@ -146,6 +146,11 @@ public class BindingActivation extends Activation<BindingNeuron> {
         return ownOutputGradient;
     }
 
+    public void updateBias(double u, boolean isFinalBias) {
+        if(finalMode == isFinalBias)
+            getNet().addAndTriggerUpdate(u);
+    }
+
     public boolean isFinalMode() {
         return finalMode;
     }
@@ -183,8 +188,6 @@ public class BindingActivation extends Activation<BindingNeuron> {
         BindingNeuron n = getNeuron();
 
         double biasDelta = n.getFinalBias().getCurrentValue() - n.getBias().getCurrentValue();
-        n.getFinalBias().setFieldListener(n.getBias().getFieldListener());
-        n.getBias().setFieldListener(null);
 
         getNet().addAndTriggerUpdate(biasDelta - computeForwardLinkedRecurrentInputs(this));
 

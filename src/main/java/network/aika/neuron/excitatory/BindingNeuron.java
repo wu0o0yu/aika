@@ -33,7 +33,9 @@ import java.io.IOException;
  */
 public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, BindingActivation> {
 
-    private Field finalBias = new Field();
+    private Field finalBias = new Field(u ->
+        biasUpdate(u, true)
+    );
 
     public BindingNeuron() {
         super();

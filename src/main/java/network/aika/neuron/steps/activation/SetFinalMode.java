@@ -60,7 +60,8 @@ public class SetFinalMode extends Step<BindingActivation> {
 
     @Override
     public void process() {
-        getElement().setFinalMode();
+        getElement()
+                .setFinalMode();
     }
 
     public String toString() {
