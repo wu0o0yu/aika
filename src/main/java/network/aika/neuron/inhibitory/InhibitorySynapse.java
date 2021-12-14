@@ -34,11 +34,6 @@ public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNe
     }
 
     @Override
-    public boolean checkBindingSignalType(Activation bindingSignal) {
-        return false;
-    }
-
-    @Override
     public boolean isWeak() {
         return weight.getCurrentValue() + getOutput().getBias().getCurrentValue() < 0.0;
     }
