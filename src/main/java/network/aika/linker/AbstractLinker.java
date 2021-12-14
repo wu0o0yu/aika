@@ -71,7 +71,7 @@ public abstract class AbstractLinker {
 
         getNextSteps(toAct);
 
-        Link nl = targetSynapse.createLink(fromAct, toAct);
+        Link nl = toAct.addLink(targetSynapse, fromAct);
         getNextSteps(nl);
     }
 

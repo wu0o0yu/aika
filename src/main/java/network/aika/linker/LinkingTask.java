@@ -84,6 +84,6 @@ public class LinkingTask extends AbstractLinker {
         if(oAct == null)
             return null;
 
-        return targetSynapse.createLink(iAct, oAct);
+        return oAct.addLink(targetSynapse, iAct);
     }
 }
