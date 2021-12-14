@@ -52,8 +52,8 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, Bindin
     }
 
     @Override
-    public Class<? extends Activation> getBindingSignalType() {
-        return PatternActivation.class;
+    public boolean checkBindingSignalType(Activation bsAct) {
+        return bsAct instanceof PatternActivation;
     }
 
     public Field getFinalBias() {

@@ -53,8 +53,8 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse, Activation> {
     }
 
     @Override
-    public Class<? extends Activation> getBindingSignalType() {
-        return null;
+    public boolean checkBindingSignalType(Activation bsAct) {
+        return false;
     }
 
     @Override

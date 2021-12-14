@@ -138,7 +138,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public abstract boolean allowTemplatePropagate(Activation act);
 
-    public abstract Class<? extends Activation> getBindingSignalType();
+    public abstract boolean checkBindingSignalType(Activation bsAct);
 
     public boolean isAllowTraining() {
         return allowTraining;
