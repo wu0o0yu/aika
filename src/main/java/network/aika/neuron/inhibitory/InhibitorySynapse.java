@@ -34,7 +34,7 @@ public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNe
     }
 
     @Override
-    public boolean allowLinking(Activation bindingSignal) {
+    public boolean checkBindingSignalType(Activation bindingSignal) {
         return false;
     }
 

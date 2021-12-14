@@ -53,6 +53,11 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse, Activation> {
     }
 
     @Override
+    public Class<? extends Activation> getBindingSignalType() {
+        return null;
+    }
+
+    @Override
     public InhibitoryNeuron instantiateTemplate(boolean addProvider) {
         InhibitoryNeuron n = new InhibitoryNeuron(getModel(), addProvider);
         initFromTemplate(n);

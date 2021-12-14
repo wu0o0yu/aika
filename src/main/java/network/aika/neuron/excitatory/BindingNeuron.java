@@ -22,6 +22,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.fields.Field;
+import network.aika.neuron.activation.PatternActivation;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -48,6 +49,11 @@ public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, Bindin
     @Override
     public BindingActivation createActivation(Thought t) {
         return new BindingActivation(t.createActivationId(), t, this);
+    }
+
+    @Override
+    public Class<? extends Activation> getBindingSignalType() {
+        return PatternActivation.class;
     }
 
     public Field getFinalBias() {

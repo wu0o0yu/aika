@@ -20,6 +20,7 @@ import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PatternActivation;
 
 import java.io.DataInput;
@@ -54,6 +55,11 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse, PatternActiv
     @Override
     public boolean allowTemplatePropagate(Activation act) {
         return true; //getCandidateGradient(act) >= 1.4;
+    }
+
+    @Override
+    public Class<? extends Activation> getBindingSignalType() {
+        return BindingActivation.class;
     }
 
     @Override

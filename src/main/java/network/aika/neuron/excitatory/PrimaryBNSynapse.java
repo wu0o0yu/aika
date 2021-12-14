@@ -29,7 +29,6 @@ public class PrimaryBNSynapse<I extends Neuron> extends InputBNSynapse<I> {
 
     private static final Logger log = LoggerFactory.getLogger(PrimaryBNSynapse.class);
 
-
     public boolean checkTemplatePropagate(Activation act) {
         log.info(act.getLabel() + " CandidateGradient:" + act.getNeuron().getCandidateGradient(act));
 

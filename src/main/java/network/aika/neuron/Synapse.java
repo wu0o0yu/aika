@@ -90,8 +90,6 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return false;
     }
 
-    public abstract boolean allowLinking(Activation bindingSignal);
-
     public void setInput(I input) {
         this.input = input.getProvider();
     }

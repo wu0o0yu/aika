@@ -26,13 +26,6 @@ import network.aika.neuron.activation.*;
 public abstract class BindingNeuronSynapse<I extends Neuron> extends ExcitatorySynapse<I, BindingNeuron, BindingActivation> {
 
     @Override
-    public boolean allowLinking(Activation bindingSignal) {
-        return isRecurrent() ?
-                bindingSignal instanceof BindingActivation :
-                super.allowLinking(bindingSignal);
-    }
-
-    @Override
     public boolean propagateValue(Link<BindingActivation> l) {
         return !isRecurrent() ||
                 l.getOutput().isFinalMode() ||

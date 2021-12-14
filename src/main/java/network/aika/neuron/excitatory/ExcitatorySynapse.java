@@ -19,6 +19,7 @@ package network.aika.neuron.excitatory;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.steps.activation.PostTraining;
@@ -50,11 +51,6 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
     protected void weightUpdate(double u) {
         super.weightUpdate(u);
         getOutput().getWeightSum().addAndTriggerUpdate(u);
-    }
-
-    @Override
-    public boolean allowLinking(Activation bindingSignal) {
-        return bindingSignal instanceof PatternActivation;
     }
 
     @Override

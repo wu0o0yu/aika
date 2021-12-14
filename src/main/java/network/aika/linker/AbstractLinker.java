@@ -79,7 +79,7 @@ public abstract class AbstractLinker {
         dirs.forEach(dir ->
             getTargetSynapses(fromAct, dir)
                     .filter(ts ->
-                            ts.allowLinking(bindingSignal.getBindingSignalAct())
+                            bindingSignal.getBindingSignalAct().getClass() == ts.getOutput().getBindingSignalType()
                     )
                     .forEach(ts ->
                             link(fromAct, dir, bindingSignal, ts)
