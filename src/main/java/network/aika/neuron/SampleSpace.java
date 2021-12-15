@@ -82,8 +82,10 @@ public class SampleSpace implements Writable {
             return 0;
 
         long x = (absoluteRange.getBegin() - lastPosition);
-        if(x < 0)
-            throw new IllegalStateException("Inactive instances are not allowed to be negative: " + x);
+        if(x < 0) {
+            log.warn("Inactive instances are not allowed to be negative: " + x);
+            return 0;
+        }
 
         return x / absoluteRange.length();
     }
