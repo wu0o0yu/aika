@@ -56,7 +56,10 @@ public class PropagateBindingSignal extends Step<Link> {
 
     protected Stream<BindingSignal> transitionScopes(Link l, Collection<BindingSignal> bindingSignals) {
         return bindingSignals.stream()
-                .filter(bs -> bs.getBindingSignalAct().getType() != l.getOutput().getType())
+                .filter(bs -> // Block Binding-Signal from propagating too far.
+                        bs.getCurrentAct() == l.getInput() ||
+                                bs.getBindingSignalAct().getType() != l.getInput().getType()
+                )
                 .map(bs -> propagateBindingSignal(l, bs))
                 .filter(e -> e != null);
     }
