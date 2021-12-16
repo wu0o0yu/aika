@@ -5,6 +5,7 @@ import network.aika.neuron.Neuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TokenActivation;
+import network.aika.utils.TestUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -21,7 +22,7 @@ public class GradientTest {
 
         Document doc = new Document(m, "A B ");
         doc.setConfig(
-                Util.getTestConfig()
+                TestUtils.getConfig()
                 .setAlpha(0.99)
                 .setLearnRate(-0.1)
                 .setEnableTraining(true)
@@ -58,7 +59,7 @@ public class GradientTest {
 
         Document doc = new Document(m, "A B C ");
         doc.setConfig(
-                Util.getTestConfig()
+                TestUtils.getConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
                         .setEnableTraining(true)
@@ -103,7 +104,7 @@ public class GradientTest {
 
         Document doc1 = new Document(m, "A B ");
         doc1.setConfig(
-                Util.getTestConfig()
+                TestUtils.getConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
                         .setEnableTraining(true)
@@ -127,7 +128,7 @@ public class GradientTest {
 
         Document doc2 = new Document(m, "A C ");
         doc2.setConfig(
-                Util.getTestConfig()
+                TestUtils.getConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
                         .setEnableTraining(true)

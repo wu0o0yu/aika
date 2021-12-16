@@ -3,11 +3,11 @@ package network.aika;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TokenActivation;
+import network.aika.utils.TestUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static network.aika.Util.getTestConfig;
 
 public class SimplePhraseTest {
 
@@ -31,7 +31,7 @@ public class SimplePhraseTest {
     @Test
     public void simplePhraseTest() {
         TextModel model = new TextModel();
-        Config c = getTestConfig()
+        Config c = TestUtils.getConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
                         .setEnableTraining(false);

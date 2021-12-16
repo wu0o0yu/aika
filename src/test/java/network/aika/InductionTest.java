@@ -8,6 +8,7 @@ import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TokenActivation;
+import network.aika.utils.TestUtils;
 import org.junit.jupiter.api.Test;
 
 public class InductionTest {
@@ -108,7 +109,7 @@ public class InductionTest {
 
         Document doc = new Document(model, phrase);
         doc.setConfig(
-                Util.getTestConfig()
+                TestUtils.getConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
                         .setEnableTraining(true)

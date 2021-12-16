@@ -6,6 +6,7 @@ import network.aika.debugger.stepmanager.StepMode;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TokenActivation;
+import network.aika.utils.TestUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -51,7 +52,7 @@ public class TestFsModel {
     private Document generateDocument(TextModel m, String txt, boolean train) {
         Document doc = new Document(m, txt);
 
-        Config c = Util.getTestConfig()
+        Config c = TestUtils.getConfig()
                 .setAlpha(0.99)
                 .setLearnRate(-0.011)
                 .setEnableTraining(train);

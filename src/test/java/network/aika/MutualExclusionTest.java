@@ -27,10 +27,12 @@ import network.aika.neuron.inhibitory.InhibitoryNeuron;
 import network.aika.steps.StepType;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
+import network.aika.utils.TestUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
+import static network.aika.utils.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -45,106 +47,32 @@ public class MutualExclusionTest {
         m.init();
         Templates t = m.getTemplates();
 
-        PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
-        in.setTokenLabel("I");
-        in.setInputNeuron(true);
-        in.setLabel("IN");
-        BindingNeuron na = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
-        na.setLabel("A");
-        BindingNeuron nb = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
-        nb.setLabel("B");
-        BindingNeuron nc = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
-        nc.setLabel("C");
-        InhibitoryNeuron inhib = t.INHIBITORY_TEMPLATE.instantiateTemplate(true);
-        inhib.setLabel("I");
+        PatternNeuron in = createNeuron(t.INPUT_PATTERN_TEMPLATE, "I", true);
+        BindingNeuron na = createNeuron(t.SAME_BINDING_TEMPLATE, "A");
+        BindingNeuron nb = createNeuron(t.SAME_BINDING_TEMPLATE, "B");
+        BindingNeuron nc = createNeuron(t.SAME_BINDING_TEMPLATE, "C");
+        InhibitoryNeuron inhib = createNeuron(t.INHIBITORY_TEMPLATE, "I");
 
-        {
-            {
-                Synapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, na);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, na, 10.0);
+        createSynapse(t.NEGATIVE_SYNAPSE_TEMPLATE, inhib, na, -100.0);
+        TestUtils.updateBias(na, 1.0);
 
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                na.getBias().add(-10.0);
-            }
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, nb, 10.0);
+        createSynapse(t.NEGATIVE_SYNAPSE_TEMPLATE, inhib, nb, -100.0);
+        TestUtils.updateBias(nb, 1.5);
 
-            {
-                Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, na);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, nc, 10.0);
+        createSynapse(t.NEGATIVE_SYNAPSE_TEMPLATE, inhib, nc, -100.0);
+        TestUtils.updateBias(nc, 1.2);
 
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(-100.0);
-            }
-
-            na.getBias().add(1.0);
-        }
-
-        {
-            {
-                Synapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, nb);
-
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                nb.getBias().add(-10.0);
-            }
-
-            {
-                Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, nb);
-
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(-100.0);
-            }
-            nb.getBias().add(1.5);
-        }
-
-
-        {
-            {
-                Synapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, nc);
-
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                nc.getBias().add(-10.0);
-            }
-
-            {
-                Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, nc);
-
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(-100.0);
-            }
-
-            nc.getBias().add(1.2);
-        }
-
-        {
-            {
-                Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(na, inhib);
-                s.linkInput();
-                s.getWeight().add(1.0);
-            }
-            {
-                Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(nb, inhib);
-                s.linkInput();
-                s.getWeight().add(1.0);
-            }
-            {
-                Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(nc, inhib);
-                s.linkInput();
-                s.getWeight().add(1.0);
-            }
-
-            inhib.getBias().set(0.0);
-        }
+        createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, na, inhib, 1.0);
+        createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, nb, inhib, 1.0);
+        createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, nc, inhib, 1.0);
 
 
         Document doc = new Document(m, "test");
 
-        Config c = Util.getTestConfig()
+        Config c = getConfig()
                 .setAlpha(0.99)
                 .setLearnRate(-0.011)
                 .setEnableTraining(true);
@@ -170,89 +98,29 @@ public class MutualExclusionTest {
         m.init();
         Templates t = m.getTemplates();
 
-        PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
-        in.setTokenLabel("I");
-        in.setInputNeuron(true);
-        in.setLabel("IN");
-        BindingNeuron na = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
-        na.setLabel("A");
-        BindingNeuron nb = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
-        nb.setLabel("B");
-        InhibitoryNeuron inhib = t.INHIBITORY_TEMPLATE.instantiateTemplate(true);
-        inhib.setLabel("I");
+        PatternNeuron in = createNeuron(t.INPUT_PATTERN_TEMPLATE, "I", true);
+        BindingNeuron na = createNeuron(t.SAME_BINDING_TEMPLATE, "A");
+        BindingNeuron nb = createNeuron(t.SAME_BINDING_TEMPLATE, "B");
+        InhibitoryNeuron inhib = createNeuron(t.INHIBITORY_TEMPLATE, "I");
 
-        {
-            {
-                Synapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, na);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, na, 10.0);
+        createSynapse(t.NEGATIVE_SYNAPSE_TEMPLATE, inhib, na, -100.0);
+        updateBias(na, 1.0);
 
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().setInitialValue(10.0);
-                na.getBias().add(-10.0);
-                na.getFinalBias().add(-10.0);
-            }
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, nb, 10.0);
+        createSynapse(t.NEGATIVE_SYNAPSE_TEMPLATE, inhib, nb, -100.0);
+        updateBias(nb, 1.5);
 
-            {
-                Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, na);
-
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().setInitialValue(-100.0);
-            }
-
-            na.getBias().add(1.0);
-            na.getBias().triggerUpdate();
-            na.getFinalBias().add(1.0);
-            na.getFinalBias().triggerUpdate();
-        }
-
-        {
-            {
-                Synapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, nb);
-
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().setInitialValue(10.0);
-                nb.getBias().add(-10.0);
-                nb.getFinalBias().add(-10.0);
-            }
-
-            {
-                Synapse s = t.NEGATIVE_SYNAPSE_TEMPLATE.instantiateTemplate(inhib, nb);
-
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().setInitialValue(-100.0);
-            }
-            nb.getBias().add(1.5);
-            nb.getBias().triggerUpdate();
-            nb.getFinalBias().add(1.5);
-            nb.getFinalBias().triggerUpdate();
-        }
-
-        {
-            {
-                Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(na, inhib);
-                s.linkInput();
-                s.getWeight().setInitialValue(1.0);
-            }
-            {
-                Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(nb, inhib);
-                s.linkInput();
-                s.getWeight().setInitialValue(1.0);
-            }
-
-            inhib.getBias().setInitialValue(0.0);
-        }
-
+        createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, na, inhib, 1.0);
+        createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, nb, inhib, 1.0);
 
         Document doc = new Document(m, "test");
-
-        Config c = Util.getTestConfig()
-                .setAlpha(0.99)
-                .setLearnRate(-0.011)
-                .setEnableTraining(true);
-        doc.setConfig(c);
+        doc.setConfig(
+                getConfig()
+                        .setAlpha(0.99)
+                        .setLearnRate(-0.011)
+                        .setEnableTraining(true)
+        );
 
         doc.setQueueFilter(s ->
                 s.getStepType() == StepType.TEMPLATE || s.getStepType() == StepType.TRAINING
