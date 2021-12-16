@@ -231,12 +231,6 @@ public class MutualExclusionTest {
         }
 
         {
-/*            {
-                InhibitorySynapse s = new InhibitorySynapse(in, inhib);
-                s.linkInput();
-                s.getWeight().add(1.0);
-            }
-*/
             {
                 Synapse s = t.INHIBITORY_SYNAPSE_TEMPLATE.instantiateTemplate(na, inhib);
                 s.linkInput();
