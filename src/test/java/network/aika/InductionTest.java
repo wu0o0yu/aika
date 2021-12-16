@@ -11,6 +11,9 @@ import network.aika.text.TokenActivation;
 import network.aika.utils.TestUtils;
 import org.junit.jupiter.api.Test;
 
+import static network.aika.utils.TestUtils.createNeuron;
+import static network.aika.utils.TestUtils.createSynapse;
+
 public class InductionTest {
 
     @Test
@@ -44,31 +47,14 @@ public class InductionTest {
 
         Templates t = new Templates(m);
 
-        PatternNeuron inA = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
-        inA.setTokenLabel("A");
-        inA.setInputNeuron(true);
-        inA.setLabel("IN-A");
-        PatternNeuron inB = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
-        inB.setTokenLabel("B");
-        inB.setInputNeuron(true);
-        inB.setLabel("IN-B");
-        BindingNeuron targetN = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
-        targetN.setLabel("OUT-Target");
+        PatternNeuron inA = createNeuron(t.INPUT_PATTERN_TEMPLATE, "IN-A");
+        PatternNeuron inB = createNeuron(t.INPUT_PATTERN_TEMPLATE, "IN-B");
+        BindingNeuron targetN = createNeuron(t.SAME_BINDING_TEMPLATE, "OUT-Target");
 
         targetN.getBias().set(0.0);
 
-        Synapse sA = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inA, targetN);
-
-        sA.linkInput();
-        sA.linkOutput();
-        sA.getWeight().setInitialValue(0.1);
-        targetN.getBias().set(-0.1);
-
-        Synapse sB = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(inB, targetN);
-
-        sB.linkInput();
-        sB.linkOutput();
-        sB.getWeight().setInitialValue(0.0);
+        Synapse sA = createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, inA, targetN, 0.1);
+        Synapse sB = createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, inB, targetN, 0.0);
 
 
         m.setN(100);

@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
+import static network.aika.utils.TestUtils.getConfig;
+
 public class GradientTest {
 
 
@@ -22,7 +24,7 @@ public class GradientTest {
 
         Document doc = new Document(m, "A B ");
         doc.setConfig(
-                TestUtils.getConfig()
+                getConfig()
                 .setAlpha(0.99)
                 .setLearnRate(-0.1)
                 .setEnableTraining(true)
@@ -59,7 +61,7 @@ public class GradientTest {
 
         Document doc = new Document(m, "A B C ");
         doc.setConfig(
-                TestUtils.getConfig()
+                getConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
                         .setEnableTraining(true)
@@ -104,7 +106,7 @@ public class GradientTest {
 
         Document doc1 = new Document(m, "A B ");
         doc1.setConfig(
-                TestUtils.getConfig()
+                getConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
                         .setEnableTraining(true)
@@ -128,7 +130,7 @@ public class GradientTest {
 
         Document doc2 = new Document(m, "A C ");
         doc2.setConfig(
-                TestUtils.getConfig()
+                getConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
                         .setEnableTraining(true)

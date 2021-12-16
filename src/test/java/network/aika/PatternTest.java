@@ -24,7 +24,10 @@ import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TokenActivation;
+import network.aika.utils.TestUtils;
 import org.junit.jupiter.api.Test;
+
+import static network.aika.utils.TestUtils.*;
 
 
 /**
@@ -78,137 +81,36 @@ public class PatternTest {
         PatternNeuron nB = m.lookupToken("B");
         PatternNeuron nC = m.lookupToken( "C");
 
-        BindingNeuron eA = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
-        eA.setLabel("E A");
-        BindingNeuron eB = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
-        eB.setLabel("E B");
-        BindingNeuron eC = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
-        eC.setLabel("E C");
+        BindingNeuron eA = createNeuron(t.SAME_BINDING_TEMPLATE, "E A");
+        BindingNeuron eB = createNeuron(t.SAME_BINDING_TEMPLATE, "E B");
+        BindingNeuron eC = createNeuron(t.SAME_BINDING_TEMPLATE, "E C");
 
-        PatternNeuron out = t.SAME_PATTERN_TEMPLATE.instantiateTemplate(true);
+        PatternNeuron out = createNeuron(t.SAME_PATTERN_TEMPLATE, "OUT");
         out.setTokenLabel("ABC");
-        out.setLabel("OUT");
 
-        {
-            {
-                Synapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nA, eA);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, nA, eA, 10.0);
+        createSynapse(t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE, out, eA, 10.0);
+        updateBias(eA, 4.0);
 
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eA.getBias().add(-10.0);
-            }
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, nB, eB, 10.0);
+        createSynapse( t.SAME_PATTERN_SYNAPSE_TEMPLATE, eA, eB, 10.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE, lookupBindingNeuronPT(m, nB), eB, 10.0);
+        createSynapse(t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE, out, eB, 10.0);
+        updateBias(eB, 4.0);
 
-            {
-                Synapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eA);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, nC, eC, 10.0);
+        createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, eB, eC, 10.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE, lookupBindingNeuronPT(m, nC), eC, 10.0);
+        createSynapse(t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE, out, eC, 10.0);
 
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().setInitialValue(10.0);
-                eA.getBias().add(-10.0);
-            }
-            eA.getBias().add(4.0);
-        }
+        updateBias(eC, 4.0);
 
-        {
-            {
-                Synapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nB, eB);
+        createSynapse(t.PATTERN_SYNAPSE_TEMPLATE, eA, out, 10.0);
+        createSynapse(t.PATTERN_SYNAPSE_TEMPLATE, eB, out, 10.0);
+        createSynapse(t.PATTERN_SYNAPSE_TEMPLATE, eC, out, 10.0);
 
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eB.getBias().add(-10.0);
-            }
+        updateBias(out,4.0);
 
-            {
-                Synapse s = t.SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eA, eB);
-
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eB.getBias().add(-10.0);
-            }
-
-            {
-                Synapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(lookupBindingNeuronPT(m, nB), eB);
-
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eB.getBias().add(-10.0);
-            }
-
-            {
-                Synapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eB);
-
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eB.getBias().add(-10.0);
-            }
-            eB.getBias().add(4.0);
-        }
-
-        {
-            {
-                Synapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(nC, eC);
-
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eC.getBias().add(-10.0);
-            }
-
-            {
-                Synapse s = t.SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eB, eC);
-
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eC.getBias().add(-10.0);
-            }
-
-            {
-                Synapse s = t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE.instantiateTemplate(lookupBindingNeuronPT(m, nC), eC);
-
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eC.getBias().add(-10.0);
-            }
-
-            {
-                Synapse s = t.RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(out, eC);
-
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eC.getBias().add(-10.0);
-            }
-            eC.getBias().add(4.0);
-        }
-
-        {
-            {
-                Synapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eA, out);
-
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                out.getBias().add(-10.0);
-            }
-            {
-                Synapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eB, out);
-
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                out.getBias().add(-10.0);
-            }
-            {
-                Synapse s = t.PATTERN_SYNAPSE_TEMPLATE.instantiateTemplate(eC, out);
-
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                out.getBias().add(-10.0);
-            }
-            out.getBias().add(4.0);
-        }
         return m;
     }
 
