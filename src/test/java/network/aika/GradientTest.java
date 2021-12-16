@@ -14,7 +14,6 @@ import static network.aika.utils.TestUtils.getConfig;
 
 public class GradientTest {
 
-
     @Test
     public void gradientAndInduction2() {
         TextModel m = new TextModel();

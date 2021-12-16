@@ -16,13 +16,14 @@
  */
 package network.aika;
 
-import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
 import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
+
+import static network.aika.utils.TestUtils.*;
 
 /**
  *
@@ -35,24 +36,14 @@ public class PropagateTest {
         TextModel m = new TextModel();
         Templates t = new Templates(m);
 
-        PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
-        in.setTokenLabel("A");
-        in.setInputNeuron(true);
-        in.setLabel("IN");
-        BindingNeuron out = t.SAME_BINDING_TEMPLATE.instantiateTemplate(true);
-        out.setLabel("OUT");
+        PatternNeuron in = createNeuron(t.INPUT_PATTERN_TEMPLATE, "IN", true);
+        BindingNeuron out = createNeuron(t.SAME_BINDING_TEMPLATE, "OUT");
 
-        Synapse s = t.PRIMARY_INPUT_SYNAPSE_TEMPLATE.instantiateTemplate(in, out);
-
-        s.linkInput();
-        s.linkOutput();
-        s.getWeight().add(10.0);
-        out.getBias().add(-9.0);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, out, 10.0);
+        updateBias(out, 1.0);
 
         Document doc = new Document(m, "test");
-
         doc.addToken(in, 0, 4);
-
         System.out.println(doc);
     }
 }

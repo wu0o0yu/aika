@@ -17,7 +17,6 @@
 package network.aika;
 
 import network.aika.debugger.AikaDebugger;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;

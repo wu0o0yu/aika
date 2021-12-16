@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
+import static network.aika.utils.TestUtils.getConfig;
+
 
 public class SimplePhraseTest {
 
@@ -24,14 +26,10 @@ public class SimplePhraseTest {
             "der Jaguar"
     };
 
-    private String trimPrefix(String l) {
-        return l.substring(l.indexOf("-") + 1);
-    }
-
     @Test
     public void simplePhraseTest() {
         TextModel model = new TextModel();
-        Config c = TestUtils.getConfig()
+        Config c = getConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
                         .setEnableTraining(false);

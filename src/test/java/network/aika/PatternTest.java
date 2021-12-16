@@ -17,14 +17,12 @@
 package network.aika;
 
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
 import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TokenActivation;
-import network.aika.utils.TestUtils;
 import org.junit.jupiter.api.Test;
 
 import static network.aika.utils.TestUtils.*;
