@@ -2,7 +2,7 @@ package network.aika;
 
 import network.aika.callbacks.FSSuspensionCallback;
 import network.aika.debugger.AikaDebugger;
-import network.aika.debugger.StepMode;
+import network.aika.debugger.stepmanager.StepMode;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TokenActivation;
