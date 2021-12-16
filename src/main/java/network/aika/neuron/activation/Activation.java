@@ -246,7 +246,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public boolean isSelfRef(Activation iAct) {
-        return iAct.bindingSignals.containsKey(this);
+        return iAct != null && iAct.bindingSignals.containsKey(this);
     }
 
     public abstract Range getRange();
