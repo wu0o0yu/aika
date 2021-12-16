@@ -102,16 +102,16 @@ public abstract class AbstractLinker {
         Activation iAct = dir.getInput(fromAct, toAct);
         Activation oAct = dir.getOutput(fromAct, toAct);
 
-        if(!targetSynapse.checkCausality(iAct, oAct))
-            return;
-
-        if(Link.linkExists(iAct, oAct))
-            return;
-
         if (!neuronMatches(iAct.getNeuron(), targetSynapse.getInput()))
             return;
 
         if (!neuronMatches(oAct.getNeuron(), targetSynapse.getOutput()))
+            return;
+
+        if(!targetSynapse.checkCausality(iAct, oAct))
+            return;
+
+        if(Link.linkExists(iAct, oAct))
             return;
 
         if(isSeparateBranch(iAct, oAct))
