@@ -3,7 +3,6 @@ package network.aika;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TokenActivation;
-import network.aika.utils.TestUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 
 import static network.aika.utils.TestUtils.getConfig;
+import static network.aika.utils.TestUtils.setStatistic;
 
 public class GradientTest {
 
@@ -69,21 +70,13 @@ public class GradientTest {
         processDoc(doc);
 
         Neuron nA = m.getNeuron("A");
-        nA.setFrequency(53.0);
-        nA.getSampleSpace().setN(299);
-        nA.getSampleSpace().setLastPosition(899l);
-
+        setStatistic(nA, 53.0,299,899l);
 
         Neuron nB = m.getNeuron("B");
-        nB.setFrequency(10.0);
-        nB.getSampleSpace().setN(121);
-        nB.getSampleSpace().setLastPosition(739l);
-
+        setStatistic(nB, 10.0, 121, 739l);
 
         Neuron nC = m.getNeuron("C");
-        nC.setFrequency(30.0);
-        nC.getSampleSpace().setN(234);
-        nC.getSampleSpace().setLastPosition(867l);
+        setStatistic(nC, 30.0, 234, 867l);
 
 
         AikaDebugger.createAndShowGUI(doc);
@@ -113,14 +106,10 @@ public class GradientTest {
         processDoc(doc1);
 
         Neuron nA = m.getNeuron("A");
-        nA.setFrequency(53.0);
-        nA.getSampleSpace().setN(299);
-        nA.getSampleSpace().setLastPosition(899l);
+        setStatistic(nA, 53.0, 299, 899l);
 
         Neuron nB = m.getNeuron("B");
-        nB.setFrequency(10.0);
-        nB.getSampleSpace().setN(121);
-        nB.getSampleSpace().setLastPosition(739l);
+        setStatistic(nB, 10.0, 121, 739l);
 
         AikaDebugger.createAndShowGUI(doc1);
 
@@ -137,9 +126,7 @@ public class GradientTest {
         processDoc(doc2);
 
         Neuron nC = m.getNeuron("C");
-        nC.setFrequency(30.0);
-        nC.getSampleSpace().setN(234);
-        nC.getSampleSpace().setLastPosition(867l);
+        setStatistic(nC, 30.0, 234, 867l);
 
         AikaDebugger.createAndShowGUI(doc2);
 
