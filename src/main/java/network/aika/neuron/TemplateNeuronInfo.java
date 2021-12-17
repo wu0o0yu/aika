@@ -27,9 +27,6 @@ public class TemplateNeuronInfo {
     private String label;
     private Set<Neuron> templateGroup;
 
-    private double xCoord;
-    private double yCoord;
-
 
     public String getLabel() {
         return label;
@@ -37,22 +34,6 @@ public class TemplateNeuronInfo {
 
     public void setLabel(String label) {
         this.label = label;
-    }
-
-    public double getXCoord() {
-        return xCoord;
-    }
-
-    public void setXCoord(double xCoord) {
-        this.xCoord = xCoord;
-    }
-
-    public double getYCoord() {
-        return yCoord;
-    }
-
-    public void setYCoord(double yCoord) {
-        this.yCoord = yCoord;
     }
 
     public Set<Neuron> getTemplateGroup() {

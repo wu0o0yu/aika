@@ -55,12 +55,11 @@ public class Templates {
     public Templates(Model m) {
         model = m;
 
-        init(INPUT_BINDING_TEMPLATE, -1, "Input Binding Neuron", -1.0, -1.0);
-        init(SAME_BINDING_TEMPLATE, -2, "Same Binding Neuron", 0.0, 0.0);
-        init(INPUT_PATTERN_TEMPLATE, -3, "Input Pattern Neuron", 1.0, -1.0);
-        init(SAME_PATTERN_TEMPLATE, -4, "Same Pattern Neuron", -1.0, 1.0);
-        init(INHIBITORY_TEMPLATE, -5, "Inhibitory Neuron", 1.0, 1.0);
-
+        init(INPUT_BINDING_TEMPLATE, -1, "Input Binding Neuron");
+        init(SAME_BINDING_TEMPLATE, -2, "Same Binding Neuron");
+        init(INPUT_PATTERN_TEMPLATE, -3, "Input Pattern Neuron");
+        init(SAME_PATTERN_TEMPLATE, -4, "Same Pattern Neuron");
+        init(INHIBITORY_TEMPLATE, -5, "Inhibitory Neuron");
 
         Set<Neuron> BINDING_NEURON_TEMPLATE_GROUP = Set.of(INPUT_BINDING_TEMPLATE, SAME_BINDING_TEMPLATE);
         INPUT_BINDING_TEMPLATE.getTemplateInfo().setTemplateGroup(BINDING_NEURON_TEMPLATE_GROUP);
@@ -173,15 +172,13 @@ public class Templates {
         );
     }
 
-    private <N extends Neuron> void init(N n, int id, String label, double x, double y) {
+    private <N extends Neuron> void init(N n, int id, String label) {
         NeuronProvider np = new NeuronProvider(model, id);
         templateNeuronIndex.put((byte) id, n);
         np.setNeuron(n);
         n.setProvider(np);
         n.setLabel(label);
         TemplateNeuronInfo templateInfo = n.getTemplateInfo();
-        templateInfo.setXCoord(x);
-        templateInfo.setYCoord(y);
         templateInfo.setLabel(label);
     }
 
