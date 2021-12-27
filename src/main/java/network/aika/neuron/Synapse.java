@@ -122,6 +122,10 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
 
     public abstract boolean checkCausality(Activation<?> iAct, Activation<?> oAct);
 
+    public Neuron getBSReferenceNeuron() {
+        return isRecurrent() ? getInput() : getOutput();
+    }
+
     public A branchIfNecessary(Activation iAct, A oAct) {
         return oAct;
     }
