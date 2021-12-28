@@ -17,7 +17,6 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
@@ -42,7 +41,7 @@ public class InhibitoryActivation extends Activation<InhibitoryNeuron> {
         if(bs == null)
             return null;
 
-        return bs.getBindingSignalAct()
+        return bs.getOriginActivation()
                 .getRange();
     }
 

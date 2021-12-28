@@ -25,10 +25,10 @@ import network.aika.neuron.activation.BindingSignal;
  */
 public class RelatedBNSynapse<I extends Neuron> extends InputBNSynapse<I> {
 
-    public boolean checkScope(BindingSignal iBS, BindingSignal oBS) {
+    public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
         if(iBS.getScope() >= 2 || oBS.getScope() >= 2)
             return false;
 
-        return super.checkScope(iBS, oBS);
+        return super.checkRelatedBindingSignal(iBS, oBS);
     }
 }

@@ -16,37 +16,74 @@
  */
 package network.aika.neuron.activation;
 
+import java.util.Collection;
+import java.util.stream.Stream;
+
+import static network.aika.direction.Direction.OUTPUT;
+
 /**
  * @author Lukas Molzberger
  */
 public class BindingSignal {
 
-    private BindingSignal parent; // debugging
-
-    private Activation currentAct;
-    private Activation bindingSignalAct;
+    private Activation activation;
+    private BindingSignal origin;
     private byte scope;
     private byte depth;
 
-    public BindingSignal(BindingSignal parent, Activation bsAct, Activation currentAct, byte scope, byte depth) {
-        this.parent = parent;
-        this.bindingSignalAct = bsAct;
-        this.currentAct = currentAct;
+    public BindingSignal(Activation act, byte scope) {
+        this.origin = this;
+        this.activation = act;
+        this.scope = scope;
+        this.depth = 0;
+    }
+
+    public BindingSignal(BindingSignal origin, Activation activation, byte scope, byte depth) {
+        this.origin = origin;
+        this.activation = activation;
         this.scope = scope;
         this.depth = depth;
     }
 
+    public static Stream<BindingSignal> propagateBindingSignals(Link l, Collection<BindingSignal> bindingSignals) {
+        return bindingSignals.stream()
+                .filter(bs -> // Block Binding-Signal from propagating too far.
+                        bs.getActivation() == l.getInput() ||
+                                bs.getOriginActivation().getType() != l.getInput().getType()
+                )
+                .map(bs -> bs.propagateBindingSignal(l))
+                .filter(e -> e != null)
+                .filter(bs -> !l.getOutput().checkIfBindingSignalExists(bs));
+    }
+
+    private BindingSignal propagateBindingSignal(Link l) {
+        Byte oScope = l.getSynapse().transitionScope(getScope(), OUTPUT);
+        if(oScope == null)
+            return null;
+
+        return new BindingSignal(
+                getOrigin(),
+                l.getOutput(),
+                oScope,
+                (byte) (getDepth() + 1)
+        );
+    }
+
     public void link() {
-        currentAct.bindingSignals.put(getBindingSignalAct(), this);
-        getBindingSignalAct().registerBindingSignal(currentAct, this);
+        activation.bindingSignals.put(getOriginActivation(), this);
+        getOriginActivation().registerBindingSignal(activation, this);
     }
 
-    public Activation<?> getBindingSignalAct() {
-        return bindingSignalAct;
+    public BindingSignal getOrigin() {
+        return origin;
     }
 
-    public Activation getCurrentAct() {
-        return currentAct;
+    public Activation<?> getOriginActivation() {
+        return origin.getActivation();
+    }
+
+    public Activation getActivation() {
+        return activation;
     }
 
     public byte getScope() {
@@ -58,6 +95,6 @@ public class BindingSignal {
     }
 
     public String toString() {
-        return "[" + bindingSignalAct.getId() + ":" + bindingSignalAct.getLabel() + ",s:" + scope + ",d:" + depth + "]";
+        return "[" + getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ",s:" + scope + ",d:" + depth + "]";
     }
 }

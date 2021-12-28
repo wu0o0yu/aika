@@ -80,25 +80,26 @@ public abstract class AbstractLinker {
         dirs.forEach(dir ->
             getTargetSynapses(fromAct, dir)
                     .filter(ts ->
-                            ts.getBSReferenceNeuron().checkBindingSignalType(bindingSignal.getBindingSignalAct())
+                            ts.checkBindingSignal(bindingSignal, dir)
                     )
                     .forEach(ts ->
-                            link(fromAct, dir, bindingSignal, ts)
+                            link(ts, fromAct, dir, bindingSignal)
                     )
         );
     }
 
-    public void link(Activation<?> fromAct, Direction dir, BindingSignal bindingSignal, Synapse<?, ?, ?> targetSynapse) {
-        targetSynapse.searchRelatedCandidates(bindingSignal, dir)
+    public void link(Synapse<?, ?, ?> targetSynapse, Activation<?> fromAct, Direction dir, BindingSignal fromBindingSignal) {
+        fromBindingSignal.getOriginActivation()
+                .getReverseBindingSignals().values().stream()
+                .filter(toBindingSignal -> targetSynapse.checkRelatedBindingSignal(fromBindingSignal, toBindingSignal, dir))
+                .map(toBindingSignal -> toBindingSignal.getActivation())
+                .filter(toAct -> fromAct != toAct)
                 .forEach(toAct ->
-                        link(fromAct, toAct, dir, targetSynapse)
+                        link(targetSynapse, fromAct, toAct, dir)
                 );
     }
 
-    private void link(Activation<?> fromAct, Activation<?> toAct, Direction dir, Synapse targetSynapse) {
-        if(fromAct == toAct)
-            return;
-
+    private void link(Synapse targetSynapse, Activation<?> fromAct, Activation<?> toAct, Direction dir) {
         Activation iAct = dir.getInput(fromAct, toAct);
         Activation oAct = dir.getOutput(fromAct, toAct);
 
@@ -131,7 +132,7 @@ public abstract class AbstractLinker {
 
         return branchBindingSignal.isPresent() &&
                 !iAct.getBranchBindingSignals().containsKey(
-                        branchBindingSignal.get().getBindingSignalAct()
+                        branchBindingSignal.get().getOriginActivation()
                 );
     }
 }

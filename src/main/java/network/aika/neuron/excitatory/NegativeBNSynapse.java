@@ -16,9 +16,11 @@
  */
 package network.aika.neuron.excitatory;
 
+import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.BindingSignal;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
@@ -27,6 +29,11 @@ import network.aika.neuron.inhibitory.InhibitoryNeuron;
  * @author Lukas Molzberger
  */
 public class NegativeBNSynapse extends BindingNeuronSynapse<InhibitoryNeuron> {
+
+    @Override
+    public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
+        return fromBS.getOriginActivation().getNeuron() instanceof BindingNeuron;
+    }
 
     @Override
     public boolean isRecurrent() {

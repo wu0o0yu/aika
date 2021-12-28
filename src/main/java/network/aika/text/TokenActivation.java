@@ -87,7 +87,7 @@ public class TokenActivation extends PatternActivation {
                 .values()
                 .stream()
                 .filter(bs -> bs.getScope() == 0)
-                .map(bs -> bs.getCurrentAct())
+                .map(bs -> bs.getActivation())
                 .filter(act -> act.getNeuron() == inhibitoryNeuron)
                 .findFirst()
                 .orElse(null);

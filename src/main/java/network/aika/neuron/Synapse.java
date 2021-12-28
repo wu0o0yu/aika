@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.stream.Stream;
 
 import static network.aika.neuron.Neuron.BETA_THRESHOLD;
 import static network.aika.direction.Direction.OUTPUT;
@@ -62,26 +61,22 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
 
     protected boolean allowTraining = true;
 
-    public Byte transitionScope(Byte fromScope, Direction dir) {
-        return fromScope;
-    }
+    public abstract boolean checkBindingSignal(BindingSignal fromBS, Direction dir);
 
-    public boolean checkScope(BindingSignal fromBS, BindingSignal toBS, Direction dir) {
-        return checkScope(
+    public boolean checkRelatedBindingSignal(BindingSignal fromBS, BindingSignal toBS, Direction dir) {
+        return checkRelatedBindingSignal(
                 dir.getInputBindingSignal(fromBS, toBS),
                 dir.getOutputBindingSignal(fromBS, toBS)
         );
     }
 
-    public boolean checkScope(BindingSignal iBS, BindingSignal oBS) {
+    public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
         Byte targetOutputScope = transitionScope(iBS.getScope(), OUTPUT);
         return targetOutputScope != null && targetOutputScope.byteValue() == oBS.getScope();
     }
 
-    public Stream<Activation> searchRelatedCandidates(BindingSignal fromBS, Direction dir) {
-        return fromBS.getBindingSignalAct().getReverseBindingSignals().entrySet().stream()
-                .filter(e -> checkScope(fromBS, e.getValue(), dir))
-                .map(e -> e.getKey());
+    public Byte transitionScope(Byte fromScope, Direction dir) {
+        return fromScope;
     }
 
     public abstract void setModified();
@@ -121,10 +116,6 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     public abstract void updateSynapse(Link l, double delta);
 
     public abstract boolean checkCausality(Activation<?> iAct, Activation<?> oAct);
-
-    public Neuron getBSReferenceNeuron() {
-        return isRecurrent() ? getInput() : getOutput();
-    }
 
     public A branchIfNecessary(Activation iAct, A oAct) {
         return oAct;

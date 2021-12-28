@@ -258,7 +258,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void addSelfBindingSignal(byte scope) {
-        addBindingSignal(new BindingSignal(null, this, this, scope, (byte) 0));
+        addBindingSignal(new BindingSignal(this, scope));
     }
 
     public void addBindingSignals(Stream<BindingSignal> bindingsSignals) {
@@ -274,7 +274,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public boolean checkIfBindingSignalExists(BindingSignal bindingSignal) {
-        BindingSignal existingBSScope = bindingSignals.get(bindingSignal.getBindingSignalAct());
+        BindingSignal existingBSScope = bindingSignals.get(bindingSignal.getOriginActivation());
         return existingBSScope != null && existingBSScope.getScope() <= bindingSignal.getScope();
     }
 

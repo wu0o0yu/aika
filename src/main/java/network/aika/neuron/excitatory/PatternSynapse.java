@@ -26,8 +26,13 @@ import network.aika.direction.Direction;
 public class PatternSynapse extends ExcitatorySynapse<BindingNeuron, PatternNeuron, PatternActivation> {
 
     @Override
-    public boolean checkScope(BindingSignal fromBS, BindingSignal toBS, Direction dir) {
-        return fromBS.getScope() == 0 && toBS.getScope() == 0;
+    public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
+        return fromBS.getOriginActivation().getNeuron() instanceof PatternNeuron;
+    }
+
+    @Override
+    public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
+        return oBS == iBS.getOrigin();
     }
 
     @Override
@@ -37,6 +42,6 @@ public class PatternSynapse extends ExcitatorySynapse<BindingNeuron, PatternNeur
 
     @Override
     public boolean checkCausality(Activation<?> iAct, Activation<?> oAct) {
-        return !oAct.isSelfRef(iAct);
+        return true;
     }
 }

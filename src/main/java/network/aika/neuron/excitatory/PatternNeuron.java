@@ -58,11 +58,6 @@ public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse, PatternActiv
     }
 
     @Override
-    public boolean checkBindingSignalType(Activation bsAct) {
-        return bsAct instanceof BindingActivation;
-    }
-
-    @Override
     public PatternNeuron instantiateTemplate(boolean addProvider) {
         PatternNeuron n = new PatternNeuron(getModel(), addProvider);
         initFromTemplate(n);

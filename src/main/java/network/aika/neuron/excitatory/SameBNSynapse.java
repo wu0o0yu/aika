@@ -34,7 +34,7 @@ public class SameBNSynapse<I extends Neuron> extends BindingNeuronSynapse<I> {
         return dir.transitionScope(fromScope);
     }
 
-    public boolean checkScope(BindingSignal iBS, BindingSignal oBS) {
+    public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
         return iBS.getScope() == 1 && iBS.getDepth() == 1 && oBS.getScope() == 2;
     }
 }

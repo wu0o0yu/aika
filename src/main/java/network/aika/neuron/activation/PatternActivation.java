@@ -56,7 +56,7 @@ public class PatternActivation extends Activation<PatternNeuron> {
     @Override
     public Range getRange() {
         return getBranchBindingSignals().values().stream()
-                .map(s -> s.getBindingSignalAct().getRange())
+                .map(s -> s.getOriginActivation().getRange())
                 .reduce(
                         new Range(0, 0),
                         (a, s) -> Range.join(a, s)

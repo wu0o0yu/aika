@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.neuron.activation.BindingSignal.propagateBindingSignals;
 
 /**
  * Propagates the binding signal to the next activation.
@@ -54,36 +55,11 @@ public class PropagateBindingSignal extends Step<Link> {
         this.inputBindingSignals = inputBindingSignals;
     }
 
-    protected Stream<BindingSignal> transitionScopes(Link l, Collection<BindingSignal> bindingSignals) {
-        return bindingSignals.stream()
-                .filter(bs -> // Block Binding-Signal from propagating too far.
-                        bs.getCurrentAct() == l.getInput() ||
-                                bs.getBindingSignalAct().getType() != l.getInput().getType()
-                )
-                .map(bs -> propagateBindingSignal(l, bs))
-                .filter(e -> e != null);
-    }
-
-    private BindingSignal propagateBindingSignal(Link l, BindingSignal bs) {
-        Byte oScope = l.getSynapse().transitionScope(bs.getScope(), OUTPUT);
-        if(oScope == null)
-            return null;
-
-        return new BindingSignal(
-                bs,
-                bs.getBindingSignalAct(),
-                l.getOutput(),
-                oScope,
-                (byte) (bs.getDepth() + 1)
-        );
-    }
-
     @Override
     public void process() {
         Activation<?> oAct = getElement().getOutput();
 
-        List<BindingSignal> outputBindingSignals = transitionScopes(getElement(), inputBindingSignals)
-                .filter(bs -> !oAct.checkIfBindingSignalExists(bs))
+        List<BindingSignal> outputBindingSignals = propagateBindingSignals(getElement(), inputBindingSignals)
                 .collect(Collectors.toList());
 
         if(outputBindingSignals.isEmpty())
