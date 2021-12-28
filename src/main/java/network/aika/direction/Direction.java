@@ -36,8 +36,6 @@ public interface Direction {
 
     Direction combine(Direction dir);
 
-    Byte transitionScope(Byte fromScope);
-
     BindingSignal getInputBindingSignal(BindingSignal fromBindingSignal, BindingSignal toBindingSignal);
 
     BindingSignal getOutputBindingSignal(BindingSignal fromBindingSignal, BindingSignal toBindingSignal);

@@ -41,14 +41,6 @@ public class Input implements Direction {
     }
 
     @Override
-    public Byte transitionScope(Byte fromScope) {
-        if(fromScope <= -2)
-            return null;
-
-        return --fromScope;
-    }
-
-    @Override
     public BindingSignal getInputBindingSignal(BindingSignal fromBindingSignal, BindingSignal toBindingSignal) {
         return toBindingSignal;
     }

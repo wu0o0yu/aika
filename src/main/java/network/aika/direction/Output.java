@@ -40,13 +40,6 @@ public class Output implements Direction {
         return dir.invert();
     }
 
-    public Byte transitionScope(Byte fromScope) {
-        if(fromScope >= 2)
-            return null;
-
-        return ++fromScope;
-    }
-
     @Override
     public BindingSignal getInputBindingSignal(BindingSignal fromBindingSignal, BindingSignal toBindingSignal) {
         return fromBindingSignal;

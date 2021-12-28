@@ -25,7 +25,10 @@ import network.aika.direction.Direction;
 public abstract class InputBNSynapse<I extends Neuron> extends BindingNeuronSynapse<I> {
 
     @Override
-    public Byte transitionScope(Byte fromScope, Direction dir) {
-        return dir.transitionScope(fromScope);
+    public Byte transitionScope(Byte fromScope) {
+        if(fromScope >= 2)
+            return null;
+
+        return ++fromScope;
     }
 }
