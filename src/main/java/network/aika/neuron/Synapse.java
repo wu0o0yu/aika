@@ -75,6 +75,14 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return targetOutputScope != null && targetOutputScope.byteValue() == oBS.getScope();
     }
 
+    public BindingSignal propagateBindingSignal(Link l, BindingSignal bs) {
+        Byte oScope = l.getSynapse().transitionScope(bs.getScope(), OUTPUT);
+        if(oScope == null)
+            return null;
+
+        return new BindingSignal(bs, l.getOutput(), oScope);
+    }
+
     public Byte transitionScope(Byte fromScope, Direction dir) {
         return fromScope;
     }

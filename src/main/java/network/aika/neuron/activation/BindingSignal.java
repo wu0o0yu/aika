@@ -38,11 +38,11 @@ public class BindingSignal {
         this.depth = 0;
     }
 
-    public BindingSignal(BindingSignal origin, Activation activation, byte scope, byte depth) {
-        this.origin = origin;
+    public BindingSignal(BindingSignal parent, Activation activation, byte scope) {
+        this.origin = parent.getOrigin();
         this.activation = activation;
         this.scope = scope;
-        this.depth = depth;
+        this.depth = (byte) (getDepth() + 1);
     }
 
     public static Stream<BindingSignal> propagateBindingSignals(Link l, Collection<BindingSignal> bindingSignals) {
@@ -51,22 +51,9 @@ public class BindingSignal {
                         bs.getActivation() == l.getInput() ||
                                 bs.getOriginActivation().getType() != l.getInput().getType()
                 )
-                .map(bs -> bs.propagateBindingSignal(l))
+                .map(bs -> l.getSynapse().propagateBindingSignal(l, bs))
                 .filter(e -> e != null)
                 .filter(bs -> !l.getOutput().checkIfBindingSignalExists(bs));
-    }
-
-    private BindingSignal propagateBindingSignal(Link l) {
-        Byte oScope = l.getSynapse().transitionScope(getScope(), OUTPUT);
-        if(oScope == null)
-            return null;
-
-        return new BindingSignal(
-                getOrigin(),
-                l.getOutput(),
-                oScope,
-                (byte) (getDepth() + 1)
-        );
     }
 
     public void link() {
