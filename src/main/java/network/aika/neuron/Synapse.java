@@ -70,21 +70,14 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         );
     }
 
-    public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
-        Byte targetOutputScope = transitionScope(iBS.getScope());
-        return targetOutputScope != null && targetOutputScope.byteValue() == oBS.getScope();
-    }
+    public abstract boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS);
 
     public BindingSignal propagateBindingSignal(Link l, BindingSignal iBS) {
-        Byte oScope = l.getSynapse().transitionScope(iBS.getScope());
-        if(oScope == null)
+        if(iBS.getActivation() != l.getInput() &&
+                iBS.getOriginActivation().getType() == l.getInput().getType())
             return null;
 
         return new BindingSignal(iBS, l.getOutput(), iBS.getScope());
-    }
-
-    public Byte transitionScope(Byte fromScope) {
-        return fromScope;
     }
 
     public abstract void setModified();

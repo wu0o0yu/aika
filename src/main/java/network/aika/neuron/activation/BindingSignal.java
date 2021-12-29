@@ -47,13 +47,9 @@ public class BindingSignal {
 
     public static Stream<BindingSignal> propagateBindingSignals(Link l, Collection<BindingSignal> bindingSignals) {
         return bindingSignals.stream()
-                .filter(bs -> // Block Binding-Signal from propagating too far.
-                        bs.getActivation() == l.getInput() ||
-                                bs.getOriginActivation().getType() != l.getInput().getType()
-                )
-                .map(bs -> l.getSynapse().propagateBindingSignal(l, bs))
-                .filter(e -> e != null)
-                .filter(bs -> !l.getOutput().checkIfBindingSignalExists(bs));
+                .map(iBS -> l.getSynapse().propagateBindingSignal(l, iBS))
+                .filter(oBS -> oBS != null)
+                .filter(oBS -> !l.getOutput().checkIfBindingSignalExists(oBS));
     }
 
     public void link() {

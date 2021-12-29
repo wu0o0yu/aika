@@ -26,17 +26,6 @@ import network.aika.direction.Direction;
  */
 public class SameBNSynapse<I extends Neuron> extends BindingNeuronSynapse<I> {
 
-    @Override
-    public Byte transitionScope(Byte fromScope) {
-        if(fromScope == 0)
-            return fromScope;
-
-        if(fromScope >= 2)
-            return null;
-
-        return ++fromScope;
-    }
-
     public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
         return iBS.getScope() == 1 && iBS.getDepth() == 1 && oBS.getScope() == 2;
     }

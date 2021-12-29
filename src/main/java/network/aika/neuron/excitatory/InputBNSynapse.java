@@ -18,17 +18,26 @@ package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
 import network.aika.direction.Direction;
+import network.aika.neuron.activation.BindingSignal;
+import network.aika.neuron.activation.Link;
 
 /**
  * @author Lukas Molzberger
  */
 public abstract class InputBNSynapse<I extends Neuron> extends BindingNeuronSynapse<I> {
 
-    @Override
-    public Byte transitionScope(Byte fromScope) {
-        if(fromScope >= 2)
+    public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
+        return (byte) (iBS.getScope() + 1) == oBS.getScope();
+    }
+
+    public BindingSignal propagateBindingSignal(Link l, BindingSignal iBS) {
+        if(iBS.getActivation() != l.getInput() &&
+                iBS.getOriginActivation().getType() == l.getInput().getType())
             return null;
 
-        return ++fromScope;
+        if(iBS.getScope() >= 2)
+            return null;
+
+        return new BindingSignal(iBS, l.getOutput(), (byte) (iBS.getScope() + 1));
     }
 }

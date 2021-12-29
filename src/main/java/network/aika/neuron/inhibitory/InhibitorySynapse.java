@@ -35,6 +35,10 @@ public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNe
         return false;
     }
 
+    public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
+        return false;
+    }
+
     @Override
     public boolean checkTemplatePropagate(Activation iAct) {
         return true;

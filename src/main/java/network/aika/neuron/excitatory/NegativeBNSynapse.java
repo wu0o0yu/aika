@@ -30,9 +30,15 @@ import network.aika.neuron.inhibitory.InhibitoryNeuron;
  */
 public class NegativeBNSynapse extends BindingNeuronSynapse<InhibitoryNeuron> {
 
+
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
         return fromBS.getOriginActivation().getNeuron() instanceof BindingNeuron;
+    }
+
+    @Override
+    public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
+        return iBS.getScope() == oBS.getScope();
     }
 
     @Override
