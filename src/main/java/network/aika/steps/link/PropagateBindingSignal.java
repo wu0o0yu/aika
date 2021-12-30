@@ -17,19 +17,16 @@
 package network.aika.steps.link;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingSignal;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 import network.aika.steps.StepType;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.neuron.activation.BindingSignal.propagateBindingSignals;
+import static network.aika.neuron.bindingsignal.BindingSignal.transitionBindingSignals;
 
 /**
  * Propagates the binding signal to the next activation.
@@ -42,7 +39,7 @@ public class PropagateBindingSignal extends Step<Link> {
 
 
     public static void add(Link l) {
-        Step.add(new PropagateBindingSignal(l, l.getInput().getBindingSignals().values()));
+        Step.add(new PropagateBindingSignal(l, l.getInput().getBindingSignals()));
     }
 
     public static void add(Link l, Collection<BindingSignal> inputBindingSignals) {
@@ -59,16 +56,18 @@ public class PropagateBindingSignal extends Step<Link> {
     public void process() {
         Activation<?> oAct = getElement().getOutput();
 
-        List<BindingSignal> outputBindingSignals = propagateBindingSignals(getElement(), inputBindingSignals)
+        Collection<BindingSignal> outgoingBindingSignals =
+                transitionBindingSignals(getElement(), inputBindingSignals)
+                .map(bs -> oAct.addBindingSignal(bs))
+                .filter(bs -> bs != null)
+                .filter(bs -> bs.checkPropagate())
                 .collect(Collectors.toList());
 
-        if(outputBindingSignals.isEmpty())
+        if(outgoingBindingSignals.isEmpty())
             return;
 
-        oAct.addBindingSignals(outputBindingSignals.stream());
-
         oAct.getOutputLinks().forEach(l ->
-                add(l, outputBindingSignals)
+                add(l, outgoingBindingSignals)
         );
     }
 

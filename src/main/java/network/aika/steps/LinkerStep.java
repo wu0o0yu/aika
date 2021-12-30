@@ -3,6 +3,7 @@ package network.aika.steps;
 import network.aika.neuron.activation.*;
 import network.aika.direction.Direction;
 import network.aika.linker.AbstractLinker;
+import network.aika.neuron.bindingsignal.BindingSignal;
 
 import java.util.List;
 

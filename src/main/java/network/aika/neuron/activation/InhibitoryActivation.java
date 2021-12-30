@@ -18,7 +18,10 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.neuron.Range;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
+
+import java.util.stream.Stream;
 
 /**
  *
@@ -30,9 +33,8 @@ public class InhibitoryActivation extends Activation<InhibitoryNeuron> {
         super(id, t, neuron);
     }
 
-    @Override
-    public byte getType() {
-        return 2;
+    public boolean isSelfRef(Activation iAct) {
+        return false;
     }
 
     @Override
@@ -45,9 +47,14 @@ public class InhibitoryActivation extends Activation<InhibitoryNeuron> {
                 .getRange();
     }
 
+    @Override
+    public Stream<? extends BindingSignal<?>> getReverseBindingSignals() {
+        return null;
+    }
+
     private BindingSignal getPrimaryBranchBindingSignal() {
         return getBranchBindingSignals().values().stream()
-                .filter(bs -> bs.getScope() == 0)
+                .filter(bs -> bs.getDepth() == 1)
                 .findFirst()
                 .orElse(null);
     }

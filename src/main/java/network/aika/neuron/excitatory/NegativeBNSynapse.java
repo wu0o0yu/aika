@@ -17,11 +17,11 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.direction.Direction;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.BindingSignal;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 /**
@@ -30,15 +30,14 @@ import network.aika.neuron.inhibitory.InhibitoryNeuron;
  */
 public class NegativeBNSynapse extends BindingNeuronSynapse<InhibitoryNeuron> {
 
-
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
-        return fromBS.getOriginActivation().getNeuron() instanceof BindingNeuron;
+        return fromBS instanceof BranchBindingSignal;
     }
 
     @Override
-    public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
-        return iBS.getScope() == oBS.getScope();
+    public boolean checkRelatedBranchBindingSignal(BranchBindingSignal iBS, BranchBindingSignal oBS) {
+        return iBS.getOrigin() == oBS;
     }
 
     @Override

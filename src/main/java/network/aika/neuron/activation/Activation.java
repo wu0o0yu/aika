@@ -22,6 +22,9 @@ import network.aika.Thought;
 import network.aika.fields.*;
 import network.aika.neuron.*;
 import network.aika.direction.Direction;
+import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.BranchBindingSignal;
+import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.sign.Sign;
 import network.aika.steps.Phase;
 import network.aika.steps.StepType;
@@ -30,13 +33,10 @@ import network.aika.steps.link.LinkCounting;
 import network.aika.utils.Utils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.neuron.activation.BindingActivation.MAX_BINDING_ACT;
-import static network.aika.neuron.activation.BindingActivation.MIN_BINDING_ACT;
-import static network.aika.neuron.activation.PatternActivation.MAX_PATTERN_ACT;
-import static network.aika.neuron.activation.PatternActivation.MIN_PATTERN_ACT;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 
 /**
@@ -63,11 +63,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
 
-    protected SortedMap<Activation<?>, BindingSignal> bindingSignals = new TreeMap<>(
-            Comparator.<Activation, Byte>comparing(act -> act.getType())
-                    .thenComparing(Activation::getId)
+    protected SortedMap<Activation<?>, PatternBindingSignal> patternBindingSignals = new TreeMap<>(
+            Comparator.comparing(Activation::getId)
     );
-    protected Map<Activation<?>, BindingSignal> reverseBindingSignals = new TreeMap<>();
+    protected SortedMap<Activation<?>, BranchBindingSignal> branchBindingSignals = new TreeMap<>(
+            Comparator.comparing(Activation::getId)
+    );
 
     private Field entropy = new Field();
     protected Field inputGradient = new QueueField(this, "inputGradient", Phase.LINKING, StepType.TRAINING);
@@ -98,6 +99,21 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
+    }
+
+    public boolean checkPropagatePatternBindingSignal(PatternBindingSignal bs) {
+        return true;
+    }
+
+    public boolean checkPropagateBranchBindingSignal(BranchBindingSignal bs) {
+        return true;
+    }
+
+    public Collection<? extends BindingSignal> getBindingSignals() {
+        return Stream.concat(
+                getPatternBindingSignals().values().stream(),
+                getBranchBindingSignals().values().stream()
+        ).collect(Collectors.toList());
     }
 
     private void initEntropy() {
@@ -195,8 +211,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public void addFeedbackSteps() {}
 
-    public abstract byte getType();
-
     public int getId() {
         return id;
     }
@@ -245,9 +259,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return thought;
     }
 
-    public boolean isSelfRef(Activation iAct) {
-        return iAct != null && iAct.bindingSignals.containsKey(this);
-    }
+    public abstract boolean isSelfRef(Activation iAct);
 
     public abstract Range getRange();
 
@@ -257,49 +269,32 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return r.getAbsoluteRange(thought.getRange());
     }
 
-    public void addSelfBindingSignal(byte scope) {
-        addBindingSignal(new BindingSignal(this, scope));
-    }
-
-    public void addBindingSignals(Stream<BindingSignal> bindingsSignals) {
-        bindingsSignals.forEach(this::addBindingSignal);
-    }
-
-    public void addBindingSignal(BindingSignal bindingSignal) {
-        if (checkIfBindingSignalExists(bindingSignal))
-            return;
+    public BindingSignal addBindingSignal(BindingSignal bindingSignal) {
+        if (bindingSignal.exists())
+            return null;
 
         bindingSignal.link();
         thought.registerBindingSignal(this, bindingSignal);
+        return bindingSignal;
     }
 
-    public boolean checkIfBindingSignalExists(BindingSignal bindingSignal) {
-        BindingSignal existingBSScope = bindingSignals.get(bindingSignal.getOriginActivation());
-        return existingBSScope != null && existingBSScope.getScope() <= bindingSignal.getScope();
+    public void registerPatternBindingSignal(PatternBindingSignal bs) {
+        patternBindingSignals.put(bs.getOriginActivation(), bs);
     }
 
-    protected void registerBindingSignal(Activation targetAct, BindingSignal bindingSignal) {
-        reverseBindingSignals.put(targetAct, bindingSignal);
-
-        Linking.add(targetAct, bindingSignal);
-        TemplateLinking.add(targetAct, bindingSignal);
+    public void registerBranchBindingSignal(BranchBindingSignal bs) {
+        branchBindingSignals.put(bs.getOriginActivation(), bs);
     }
 
-    public Map<Activation<?>, BindingSignal> getBindingSignals() {
-        return bindingSignals;
+    public Map<Activation<?>, PatternBindingSignal> getPatternBindingSignals() {
+        return patternBindingSignals;
     }
 
-    public Map<Activation<?>, BindingSignal> getPatternBindingSignals() {
-        return bindingSignals.subMap(MIN_PATTERN_ACT, MAX_PATTERN_ACT);
+    public Map<Activation<?>, BranchBindingSignal> getBranchBindingSignals() {
+        return branchBindingSignals;
     }
 
-    public Map<Activation<?>, BindingSignal> getBranchBindingSignals() {
-        return bindingSignals.subMap(MIN_BINDING_ACT, MAX_BINDING_ACT);
-    }
-
-    public Map<Activation<?>, BindingSignal> getReverseBindingSignals() {
-        return reverseBindingSignals;
-    }
+    public abstract Stream<? extends BindingSignal<?>> getReverseBindingSignals();
 
     @Override
     public int compareTo(Activation act) {

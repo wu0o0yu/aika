@@ -18,8 +18,8 @@ package network.aika.neuron.excitatory;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingSignal;
-import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.BranchBindingSignal;
 
 /**
  *
@@ -29,14 +29,12 @@ public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
 
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
-        return fromBS.getOriginActivation().getNeuron() instanceof BindingNeuron;
+        return fromBS instanceof BranchBindingSignal;
     }
 
-    public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
-        if(iBS.getScope() == 0 && oBS.getScope() == 0)
-            return true;
-
-        return super.checkRelatedBindingSignal(iBS, oBS);
+    @Override
+    public boolean checkRelatedBranchBindingSignal(BranchBindingSignal iBS, BranchBindingSignal oBS) {
+        return iBS.getOrigin() == oBS;
     }
 
     @Override

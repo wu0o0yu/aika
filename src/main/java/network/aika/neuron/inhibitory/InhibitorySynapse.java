@@ -20,7 +20,7 @@ import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingSignal;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
 
 

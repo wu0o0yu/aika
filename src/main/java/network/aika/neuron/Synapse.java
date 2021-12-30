@@ -20,6 +20,9 @@ import network.aika.Model;
 import network.aika.neuron.activation.*;
 import network.aika.direction.Direction;
 import network.aika.fields.Field;
+import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.BranchBindingSignal;
+import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.sign.Sign;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
@@ -32,7 +35,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static network.aika.neuron.Neuron.BETA_THRESHOLD;
-import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
 
@@ -63,21 +65,20 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
 
     public abstract boolean checkBindingSignal(BindingSignal fromBS, Direction dir);
 
-    public boolean checkRelatedBindingSignal(BindingSignal fromBS, BindingSignal toBS, Direction dir) {
-        return checkRelatedBindingSignal(
-                dir.getInputBindingSignal(fromBS, toBS),
-                dir.getOutputBindingSignal(fromBS, toBS)
-        );
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
+        return false;
     }
 
-    public abstract boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS);
+    public boolean checkRelatedBranchBindingSignal(BranchBindingSignal iBS, BranchBindingSignal oBS) {
+        return false;
+    }
 
-    public BindingSignal propagateBindingSignal(Link l, BindingSignal iBS) {
-        if(iBS.getActivation() != l.getInput() &&
-                iBS.getOriginActivation().getType() == l.getInput().getType())
-            return null;
+    public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
+        return new PatternBindingSignal(iBS, l.getOutput(), iBS.getScope());
+    }
 
-        return new BindingSignal(iBS, l.getOutput(), iBS.getScope());
+    public BranchBindingSignal propagateBranchBindingSignal(Link l, BranchBindingSignal iBS) {
+        return new BranchBindingSignal(iBS, l.getOutput());
     }
 
     public abstract void setModified();

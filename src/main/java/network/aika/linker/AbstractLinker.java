@@ -20,9 +20,10 @@ import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingSignal;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
 import network.aika.direction.Direction;
+import network.aika.neuron.bindingsignal.BranchBindingSignal;
 
 import java.util.List;
 import java.util.Optional;
@@ -88,10 +89,10 @@ public abstract class AbstractLinker {
         );
     }
 
-    public void link(Synapse<?, ?, ?> targetSynapse, Activation<?> fromAct, Direction dir, BindingSignal fromBindingSignal) {
+    public void link(Synapse<?, ?, ?> targetSynapse, Activation<?> fromAct, Direction dir, BindingSignal<?> fromBindingSignal) {
         fromBindingSignal.getOriginActivation()
-                .getReverseBindingSignals().values().stream()
-                .filter(toBindingSignal -> targetSynapse.checkRelatedBindingSignal(fromBindingSignal, toBindingSignal, dir))
+                .getReverseBindingSignals()
+                .filter(toBindingSignal -> fromBindingSignal.checkRelatedBindingSignal(targetSynapse, toBindingSignal, dir))
                 .map(toBindingSignal -> toBindingSignal.getActivation())
                 .filter(toAct -> fromAct != toAct)
                 .forEach(toAct ->
@@ -124,7 +125,7 @@ public abstract class AbstractLinker {
     }
 
     protected boolean isSeparateBranch(Activation<?> iAct, Activation<?> oAct) {
-        Optional<BindingSignal> branchBindingSignal = oAct.getBranchBindingSignals()
+        Optional<BranchBindingSignal> branchBindingSignal = oAct.getBranchBindingSignals()
                 .values()
                 .stream()
                 .filter(bs -> bs.getDepth() > 0)

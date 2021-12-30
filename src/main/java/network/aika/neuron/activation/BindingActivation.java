@@ -20,16 +20,18 @@ import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.fields.*;
+import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.steps.Phase;
 import network.aika.steps.StepType;
 import network.aika.steps.activation.BranchProbability;
+import network.aika.steps.activation.Linking;
 import network.aika.steps.activation.SetFinalMode;
+import network.aika.steps.activation.TemplateLinking;
 import network.aika.utils.Utils;
 
-import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,8 +42,7 @@ import static network.aika.neuron.activation.Timestamp.NOT_SET;
  */
 public class BindingActivation extends Activation<BindingNeuron> {
 
-    public static BindingActivation MIN_BINDING_ACT = new BindingActivation(0, null);
-    public static BindingActivation MAX_BINDING_ACT = new BindingActivation(Integer.MAX_VALUE, null);
+    protected Map<Activation<?>, BranchBindingSignal> reverseBindingSignals = new TreeMap<>();
 
     private boolean finalMode = false;
     private Timestamp finalTimestamp = NOT_SET;
@@ -79,10 +80,30 @@ public class BindingActivation extends Activation<BindingNeuron> {
         );
     }
 
+    public void registerReverseBindingSignal(Activation targetAct, BranchBindingSignal bindingSignal) {
+        reverseBindingSignals.put(targetAct, bindingSignal);
+
+        Linking.add(targetAct, bindingSignal);
+        TemplateLinking.add(targetAct, bindingSignal);
+    }
+
+    @Override
+    public Stream<BranchBindingSignal> getReverseBindingSignals() {
+        return reverseBindingSignals.values().stream();
+    }
+
     @Override
     public void init(Synapse originSynapse, Activation originAct) {
         super.init(originSynapse, originAct);
-        addSelfBindingSignal((byte) 0);
+        addBindingSignal(new BranchBindingSignal(this));
+    }
+
+    public boolean checkPropagateBranchBindingSignal(BranchBindingSignal bs) {
+        return bs.getOriginActivation() == this;
+    }
+
+    public boolean isSelfRef(Activation iAct) {
+        return iAct != null && iAct.branchBindingSignals.containsKey(this);
     }
 
     protected void propagateGradient() {
@@ -91,11 +112,6 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
         if (ownOutputGradient.updateAvailable(2))
             propagateGradient(ownOutputGradient.getUpdate(2, true), false, true);
-    }
-
-    @Override
-    public byte getType() {
-        return 1;
     }
 
     @Override

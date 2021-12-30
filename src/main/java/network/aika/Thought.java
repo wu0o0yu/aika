@@ -22,6 +22,7 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.steps.Phase;
 import network.aika.steps.QueueKey;
 import network.aika.steps.Step;

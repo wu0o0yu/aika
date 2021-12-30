@@ -18,6 +18,8 @@ package network.aika.neuron.excitatory;
 
 import network.aika.neuron.activation.*;
 import network.aika.direction.Direction;
+import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.PatternBindingSignal;
 
 /**
  *
@@ -27,12 +29,12 @@ public class PatternSynapse extends ExcitatorySynapse<BindingNeuron, PatternNeur
 
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
-        return fromBS.getOriginActivation().getNeuron() instanceof PatternNeuron;
+        return fromBS instanceof PatternBindingSignal;
     }
 
     @Override
-    public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
-        return oBS == iBS.getOrigin();
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
+        return iBS.getOrigin() == oBS;
     }
 
     @Override

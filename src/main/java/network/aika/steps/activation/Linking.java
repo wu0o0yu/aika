@@ -17,7 +17,7 @@
 package network.aika.steps.activation;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingSignal;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 import network.aika.steps.StepType;
