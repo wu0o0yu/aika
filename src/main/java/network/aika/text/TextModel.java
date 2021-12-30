@@ -22,7 +22,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
-import network.aika.fields.Field;
 import network.aika.neuron.excitatory.*;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
@@ -134,7 +133,7 @@ public class TextModel extends Model {
     }
 
     private void initRecurrentSamePatternSynapse(PatternNeuron in, BindingNeuron inRel) {
-        Synapse s = getTemplates().RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE
+        Synapse s = getTemplates().POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE
                 .instantiateTemplate(in, inRel);
 
         double w = 11.0;

@@ -44,8 +44,8 @@ public class Templates {
     public RelatedBNSynapse RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE;
     public RelatedRecurrentBNSynapse RELATED_RECURRENT_INPUT_SYNAPSE_TEMPLATE;
     public SameBNSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
-    public RecurrentSameBNSynapse RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE;
-    public NegativeBNSynapse NEGATIVE_SYNAPSE_TEMPLATE;
+    public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE;
+    public NegativeFeedbackSynapse NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE;
     public PatternSynapse PATTERN_SYNAPSE_TEMPLATE;
     public InhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE;
 
@@ -121,22 +121,22 @@ public class Templates {
                         0.0
                 );
 
-        RECURRENT_SAME_PATTERN_SYNAPSE_TEMPLATE =
+        POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE =
                 init(
-                        new RecurrentSameBNSynapse(),
+                        new PositiveFeedbackSynapse(),
                         SAME_PATTERN_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
-                        "Recurrent Same Pattern Synapse",
+                        "Positive Feedback Synapse",
                         5,
                         0.0
                 );
 
-        NEGATIVE_SYNAPSE_TEMPLATE =
+        NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE =
                 init(
-                        new NegativeBNSynapse(),
+                        new NegativeFeedbackSynapse(),
                         INHIBITORY_TEMPLATE,
                         SAME_BINDING_TEMPLATE,
-                        "Negative Synapse",
+                        "Negative Feedback Synapse",
                         6,
                         0.0
                 );

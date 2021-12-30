@@ -53,15 +53,15 @@ public class MutualExclusionTest {
         InhibitoryNeuron inhib = createNeuron(t.INHIBITORY_TEMPLATE, "I");
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, na, 10.0);
-        createSynapse(t.NEGATIVE_SYNAPSE_TEMPLATE, inhib, na, -100.0);
+        createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, na, -100.0);
         TestUtils.updateBias(na, 1.0);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, nb, 10.0);
-        createSynapse(t.NEGATIVE_SYNAPSE_TEMPLATE, inhib, nb, -100.0);
+        createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, nb, -100.0);
         TestUtils.updateBias(nb, 1.5);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, nc, 10.0);
-        createSynapse(t.NEGATIVE_SYNAPSE_TEMPLATE, inhib, nc, -100.0);
+        createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, nc, -100.0);
         TestUtils.updateBias(nc, 1.2);
 
         createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, na, inhib, 1.0);
@@ -103,11 +103,11 @@ public class MutualExclusionTest {
         InhibitoryNeuron inhib = createNeuron(t.INHIBITORY_TEMPLATE, "I");
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, na, 10.0);
-        createSynapse(t.NEGATIVE_SYNAPSE_TEMPLATE, inhib, na, -100.0);
+        createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, na, -100.0);
         updateBias(na, 1.0);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, nb, 10.0);
-        createSynapse(t.NEGATIVE_SYNAPSE_TEMPLATE, inhib, nb, -100.0);
+        createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, nb, -100.0);
         updateBias(nb, 1.5);
 
         createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, na, inhib, 1.0);

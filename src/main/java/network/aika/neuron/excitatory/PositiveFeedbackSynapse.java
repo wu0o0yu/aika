@@ -25,7 +25,7 @@ import network.aika.neuron.bindingsignal.BranchBindingSignal;
  *
  * @author Lukas Molzberger
  */
-public class RecurrentSameBNSynapse extends SameBNSynapse<PatternNeuron> {
+public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PatternNeuron> {
 
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {

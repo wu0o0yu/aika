@@ -28,7 +28,7 @@ import network.aika.neuron.inhibitory.InhibitoryNeuron;
  *
  * @author Lukas Molzberger
  */
-public class NegativeBNSynapse extends BindingNeuronSynapse<InhibitoryNeuron> {
+public class NegativeFeedbackSynapse extends BindingNeuronSynapse<InhibitoryNeuron> {
 
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
