@@ -79,7 +79,6 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
         return l.getSynapse().propagatePatternBindingSignal(l, this);
     }
 
-
     public PBSType getType() {
         return type;
     }
