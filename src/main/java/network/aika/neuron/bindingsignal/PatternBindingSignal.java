@@ -27,20 +27,23 @@ import network.aika.neuron.activation.PatternActivation;
  */
 public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
 
+    private PBSType type;
     private byte scope;
 
     public PatternBindingSignal(PatternActivation act, byte scope) {
         this.origin = this;
         this.activation = act;
 
+        this.type = null;
         this.scope = scope;
     }
 
-    public PatternBindingSignal(PatternBindingSignal parent, Activation activation, byte scope) {
+    public PatternBindingSignal(PatternBindingSignal parent, Activation activation, PBSType type, byte scope) {
         this.origin = parent.getOrigin();
         this.activation = activation;
         this.depth = (byte) (getDepth() + 1);
 
+        this.type = type;
         this.scope = scope;
     }
 
@@ -76,11 +79,16 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
         return l.getSynapse().propagatePatternBindingSignal(l, this);
     }
 
+
+    public PBSType getType() {
+        return type;
+    }
+
     public byte getScope() {
         return scope;
     }
 
     public String toString() {
-        return "[" + getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ",s:" + scope + ",d:" + getDepth() + "]";
+        return "[" + getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ",t:" + type + ",s:" + scope + ",d:" + getDepth() + "]";
     }
 }

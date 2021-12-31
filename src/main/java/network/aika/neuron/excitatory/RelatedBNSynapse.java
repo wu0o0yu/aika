@@ -20,6 +20,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
+import network.aika.neuron.bindingsignal.PBSType;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 
 /**
@@ -27,6 +28,13 @@ import network.aika.neuron.bindingsignal.PatternBindingSignal;
  * @author Lukas Molzberger
  */
 public class RelatedBNSynapse<I extends Neuron> extends InputBNSynapse<I> {
+
+    public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
+        if(iBS.getScope() >= 2 || iBS.getType() == PBSType.PRIMARY)
+            return null;
+
+        return new PatternBindingSignal(iBS, l.getOutput(), PBSType.SECONDARY, (byte) (iBS.getScope() + 1));
+    }
 
     public BranchBindingSignal propagateBranchBindingSignal(Link l, BranchBindingSignal iBS) {
         return null;

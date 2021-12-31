@@ -29,11 +29,4 @@ public abstract class InputBNSynapse<I extends Neuron> extends BindingNeuronSyna
     public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
         return (byte) (iBS.getScope() + 1) == oBS.getScope();
     }
-
-    public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
-        if(iBS.getScope() >= 2)
-            return null;
-
-        return new PatternBindingSignal(iBS, l.getOutput(), (byte) (iBS.getScope() + 1));
-    }
 }

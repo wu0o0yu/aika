@@ -60,7 +60,7 @@ public class PostTraining extends Step<Activation> {
 
         n.limitBias();
         n.updateSynapseInputConnections();
-        SaveNeuron.add(getElement());
+        Save.add(getElement());
     }
 
     public String toString() {

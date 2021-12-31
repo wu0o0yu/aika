@@ -45,16 +45,16 @@ import static network.aika.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Linking extends Step<Activation> {
+public class Link extends Step<Activation> {
 
     public static void add(Activation act, BindingSignal bindingSignal, boolean template) {
-        Step.add(new Linking(act, bindingSignal, template));
+        Step.add(new Link(act, bindingSignal, template));
     }
 
     private final AbstractLinker linker;
     private boolean template;
 
-    private Linking(Activation act, BindingSignal bindingSignal, boolean template) {
+    private Link(Activation act, BindingSignal bindingSignal, boolean template) {
         super(act);
 
         this.template = template;

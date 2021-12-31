@@ -14,34 +14,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.steps.activation;
 
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.bindingsignal.PBSType;
-import network.aika.neuron.bindingsignal.PatternBindingSignal;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import network.aika.steps.Phase;
+import network.aika.steps.Step;
+import network.aika.steps.StepType;
 
 /**
+ * Store model
  *
  * @author Lukas Molzberger
  */
-public class PrimaryBNSynapse<I extends Neuron> extends InputBNSynapse<I> {
+public class Save extends Step<Activation> {
 
-    private static final Logger log = LoggerFactory.getLogger(PrimaryBNSynapse.class);
-
-    public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
-        if(iBS.getScope() >= 2 || iBS.getType() == PBSType.SECONDARY)
-            return null;
-
-        return new PatternBindingSignal(iBS, l.getOutput(), PBSType.PRIMARY, (byte) (iBS.getScope() + 1));
+    public static void add(Activation act) {
+        Step.add(new Save(act));
     }
 
-    public boolean checkTemplatePropagate(Activation act) {
-        log.info(act.getLabel() + " CandidateGradient:" + act.getNeuron().getCandidateGradient(act));
+    private Save(Activation act) {
+        super(act);
+    }
 
+    @Override
+    public Phase getPhase() {
+        return Phase.COUNTING;
+    }
+
+    @Override
+    public StepType getStepType() {
+        return StepType.TRAINING;
+    }
+
+    public boolean checkIfQueued() {
         return true;
+    }
+
+    @Override
+    public void process() {
+        getElement()
+                .getNeuron()
+                .getProvider()
+                .save();
+    }
+
+    public String toString() {
+        return "Act-Step: Store neuron " + getElement().toShortString();
     }
 }

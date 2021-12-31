@@ -26,7 +26,7 @@ import network.aika.neuron.excitatory.BindingNeuron;
 import network.aika.steps.Phase;
 import network.aika.steps.StepType;
 import network.aika.steps.activation.BranchProbability;
-import network.aika.steps.activation.Linking;
+import network.aika.steps.activation.Link;
 import network.aika.steps.activation.SetFinalMode;
 import network.aika.utils.Utils;
 
@@ -82,8 +82,8 @@ public class BindingActivation extends Activation<BindingNeuron> {
     public void registerReverseBindingSignal(Activation targetAct, BranchBindingSignal bindingSignal) {
         reverseBindingSignals.put(targetAct, bindingSignal);
 
-        Linking.add(targetAct, bindingSignal, false);
-        Linking.add(targetAct, bindingSignal, true);
+        Link.add(targetAct, bindingSignal, false);
+        Link.add(targetAct, bindingSignal, true);
     }
 
     @Override
@@ -228,7 +228,7 @@ public class BindingActivation extends Activation<BindingNeuron> {
                 .sum();
     }
 
-    private Stream<Link> getPositiveRecurrentInputLinks(BindingActivation act) {
+    private Stream<network.aika.neuron.activation.Link> getPositiveRecurrentInputLinks(BindingActivation act) {
         return act.getInputLinks()
                 .filter(l -> l.getSynapse().isRecurrent())
                 .filter(l -> !l.isNegative());
@@ -244,10 +244,10 @@ public class BindingActivation extends Activation<BindingNeuron> {
     }
 
     public void computeBranchProbability() {
-        Stream<Link> linksStream = getBranches()
+        Stream<network.aika.neuron.activation.Link> linksStream = getBranches()
                 .stream()
                 .flatMap(Activation::getInputLinks)
-                .filter(Link::isNegative)
+                .filter(network.aika.neuron.activation.Link::isNegative)
                 .flatMap(l -> l.getInput().getInputLinks());  // Walk through to the inhib. Activation.
 
         Set<BindingActivation> conflictingActs = linksStream
