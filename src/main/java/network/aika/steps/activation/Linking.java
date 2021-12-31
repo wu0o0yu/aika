@@ -16,13 +16,21 @@
  */
 package network.aika.steps.activation;
 
+import network.aika.direction.Direction;
+import network.aika.linker.AbstractLinker;
+import network.aika.linker.TemplateTask;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.InhibitoryActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 import network.aika.steps.StepType;
-import network.aika.steps.LinkerStep;
 import network.aika.linker.LinkingTask;
+
+import java.util.List;
+
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
 
 
 /**
@@ -37,24 +45,40 @@ import network.aika.linker.LinkingTask;
  *
  * @author Lukas Molzberger
  */
-public class Linking extends LinkerStep<Activation, LinkingTask> {
+public class Linking extends Step<Activation> {
 
-    public static void add(Activation act, BindingSignal bindingSignal) {
-        Step.add(new Linking(act, bindingSignal));
+    public static void add(Activation act, BindingSignal bindingSignal, boolean template) {
+        Step.add(new Linking(act, bindingSignal, template));
     }
 
-    private Linking(Activation act, BindingSignal bindingSignal) {
-        super(act, bindingSignal, new LinkingTask());
+    private final AbstractLinker linker;
+    private boolean template;
+
+    private Linking(Activation act, BindingSignal bindingSignal, boolean template) {
+        super(act);
+
+        this.template = template;
+        this.linker = template ? new TemplateTask() : new LinkingTask();
+        this.bindingSignal = bindingSignal;
+    }
+
+    protected final BindingSignal bindingSignal;
+
+    protected List<Direction> getDirections() {
+        if(getElement() instanceof InhibitoryActivation)
+            return List.of(OUTPUT);
+
+        return List.of(INPUT, OUTPUT);
     }
 
     @Override
     public Phase getPhase() {
-        return Phase.LINKING;
+        return template ? Phase.TEMPLATE : Phase.LINKING;
     }
 
     @Override
     public StepType getStepType() {
-        return StepType.INFERENCE;
+        return template ? StepType.TEMPLATE : StepType.INFERENCE;
     }
 
     public boolean checkIfQueued() {
@@ -63,7 +87,7 @@ public class Linking extends LinkerStep<Activation, LinkingTask> {
 
     @Override
     public void process() {
-        task.link(
+        linker.link(
                 getElement(),
                 getDirections(),
                 bindingSignal
@@ -71,6 +95,6 @@ public class Linking extends LinkerStep<Activation, LinkingTask> {
     }
 
     public String toString() {
-        return "Act-Step: Linking " + getElement().toShortString() + " Binding-Signal:" + bindingSignal;
+        return "Act-Step: " + (template ? "Template-" : "") + "Linking " + getElement().toShortString() + " Binding-Signal:" + bindingSignal;
     }
 }

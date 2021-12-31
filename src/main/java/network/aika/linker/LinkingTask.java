@@ -32,10 +32,14 @@ import java.util.stream.Stream;
  */
 public class LinkingTask extends AbstractLinker {
 
-
     @Override
     public Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir) {
         return dir.getSynapses(act.getNeuron());
+    }
+
+    @Override
+    public boolean checkPropagate(Activation act) {
+        return act.isFired();
     }
 
     @Override

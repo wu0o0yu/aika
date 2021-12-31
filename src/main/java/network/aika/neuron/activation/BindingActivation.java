@@ -28,7 +28,6 @@ import network.aika.steps.StepType;
 import network.aika.steps.activation.BranchProbability;
 import network.aika.steps.activation.Linking;
 import network.aika.steps.activation.SetFinalMode;
-import network.aika.steps.activation.TemplateLinking;
 import network.aika.utils.Utils;
 
 import java.util.*;
@@ -83,8 +82,8 @@ public class BindingActivation extends Activation<BindingNeuron> {
     public void registerReverseBindingSignal(Activation targetAct, BranchBindingSignal bindingSignal) {
         reverseBindingSignals.put(targetAct, bindingSignal);
 
-        Linking.add(targetAct, bindingSignal);
-        TemplateLinking.add(targetAct, bindingSignal);
+        Linking.add(targetAct, bindingSignal, false);
+        Linking.add(targetAct, bindingSignal, true);
     }
 
     @Override

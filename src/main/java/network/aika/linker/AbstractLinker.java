@@ -38,6 +38,8 @@ import static network.aika.direction.Direction.OUTPUT;
  */
 public abstract class AbstractLinker {
 
+    public abstract boolean checkPropagate(Activation act);
+
     public abstract boolean checkPropagate(Activation act, Synapse targetSynapse);
 
     public abstract Neuron getPropagateTargetNeuron(Synapse targetSynapse, Activation iAct);
@@ -55,6 +57,9 @@ public abstract class AbstractLinker {
     protected abstract boolean neuronMatches(Neuron<?, ?> currentN, Neuron<?, ?> targetN);
 
     public void propagate(Activation act) {
+        if(!checkPropagate(act))
+            return;
+
         getTargetSynapses(act, OUTPUT)
                 .filter(s ->
                         checkPropagate(act, s) &&

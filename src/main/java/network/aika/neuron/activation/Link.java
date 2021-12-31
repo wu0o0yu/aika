@@ -172,7 +172,7 @@ public class Link<A extends Activation> extends Element<Link> {
         this.synapse = synapse;
     }
 
-    public Activation getInput() {
+    public Activation<?> getInput() {
         return input;
     }
 

@@ -19,12 +19,9 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.steps.activation.Linking;
-import network.aika.steps.activation.TemplateLinking;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -50,8 +47,8 @@ public class PatternActivation extends Activation<PatternNeuron> {
     public void registerReverseBindingSignal(Activation targetAct, PatternBindingSignal bindingSignal) {
         reverseBindingSignals.put(targetAct, bindingSignal);
 
-        Linking.add(targetAct, bindingSignal);
-        TemplateLinking.add(targetAct, bindingSignal);
+        Linking.add(targetAct, bindingSignal, false);
+        Linking.add(targetAct, bindingSignal, true);
     }
 
     @Override

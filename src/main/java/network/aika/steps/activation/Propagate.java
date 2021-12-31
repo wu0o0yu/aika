@@ -16,6 +16,8 @@
  */
 package network.aika.steps.activation;
 
+import network.aika.linker.AbstractLinker;
+import network.aika.linker.TemplateTask;
 import network.aika.neuron.activation.Activation;
 import network.aika.steps.*;
 import network.aika.linker.LinkingTask;
@@ -33,33 +35,37 @@ import network.aika.linker.LinkingTask;
  *
  * @author Lukas Molzberger
  */
-public class Propagate extends TaskStep<Activation, LinkingTask> {
+public class Propagate extends Step<Activation> {
 
 
-    public static void add(Activation act) {
-        Step.add(new Propagate(act));
+    public static void add(Activation act, boolean template) {
+        Step.add(new Propagate(act, template));
     }
 
-    private Propagate(Activation act) {
-        super(act, new LinkingTask());
+    private final AbstractLinker linker;
+    private boolean template;
+
+
+    private Propagate(Activation act, boolean template) {
+        super(act);
+
+        this.template = template;
+        this.linker = template ? new TemplateTask() : new LinkingTask();
     }
 
     @Override
     public Phase getPhase() {
-        return Phase.LINKING;
+        return template ? Phase.TEMPLATE : Phase.LINKING;
     }
 
     @Override
     public StepType getStepType() {
-        return StepType.INFERENCE;
+        return template ? StepType.TEMPLATE : StepType.INFERENCE;
     }
 
     @Override
     public void process() {
-        if(!getElement().isFired())
-            return;
-
-        task.propagate(getElement());
+        linker.propagate(getElement());
     }
 
     public boolean checkIfQueued() {
@@ -67,6 +73,6 @@ public class Propagate extends TaskStep<Activation, LinkingTask> {
     }
 
     public String toString() {
-        return "Act-Step: Propagate " + getElement().toShortString();
+        return "Act-Step: " + (template ? "Template-" : "") + "Propagate " + getElement().toShortString();
     }
 }

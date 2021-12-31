@@ -162,14 +162,14 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void propagate() {
-        Propagate.add(this);
+        Propagate.add(this, false);
 
         addFeedbackSteps();
 
         Counting.add(this);
         getInputLinks().forEach(l -> LinkCounting.add(l));
 
-        TemplatePropagate.add(this);
+        Propagate.add(this, true);
         EntropyGradient.add(this);
     }
 
@@ -189,7 +189,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         );
 
         if(isFired())
-            TemplatePropagate.add(this);
+            Propagate.add(this, true);
     }
 
     public void init(Synapse originSynapse, Activation originAct) {

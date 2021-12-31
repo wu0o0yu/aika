@@ -25,6 +25,7 @@ import network.aika.steps.StepType;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.BindingSignal.transitionBindingSignals;
 
@@ -38,12 +39,26 @@ public class PropagateBindingSignal extends Step<Link> {
     protected Collection<BindingSignal> inputBindingSignals;
 
 
-    public static void add(Link l) {
-        Step.add(new PropagateBindingSignal(l, l.getInput().getBindingSignals()));
+    public static void add(Link<?> l) {
+        Step.add(new PropagateBindingSignal(l,
+                l.getInput().getBindingSignals()
+                        .stream()
+                        .filter(bs -> bs.checkPropagate())
+                        .collect(Collectors.toList()))
+        );
     }
 
-    public static void add(Link l, Collection<BindingSignal> inputBindingSignals) {
-        Step.add(new PropagateBindingSignal(l, inputBindingSignals));
+    public static void add(Activation<?> act, Stream<BindingSignal> bindingSignals) {
+        Collection<BindingSignal> outgoingBindingSignals = bindingSignals
+                .filter(bs -> bs.checkPropagate())
+                .collect(Collectors.toList());
+
+        if(outgoingBindingSignals.isEmpty())
+            return;
+
+        act.getOutputLinks().forEach(l ->
+                Step.add(new PropagateBindingSignal(l, outgoingBindingSignals))
+        );
     }
 
     protected PropagateBindingSignal(Link l, Collection<BindingSignal> inputBindingSignals) {
@@ -56,19 +71,9 @@ public class PropagateBindingSignal extends Step<Link> {
     public void process() {
         Activation<?> oAct = getElement().getOutput();
 
-        Collection<BindingSignal> outgoingBindingSignals =
-                transitionBindingSignals(getElement(), inputBindingSignals)
+        add(oAct, transitionBindingSignals(getElement(), inputBindingSignals)
                 .map(bs -> oAct.addBindingSignal(bs))
-                .filter(bs -> bs != null)
-                .filter(bs -> bs.checkPropagate())
-                .collect(Collectors.toList());
-
-        if(outgoingBindingSignals.isEmpty())
-            return;
-
-        oAct.getOutputLinks().forEach(l ->
-                add(l, outgoingBindingSignals)
-        );
+                .filter(bs -> bs != null));
     }
 
     @Override
