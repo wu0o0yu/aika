@@ -74,11 +74,11 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     }
 
     public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
-        return new PatternBindingSignal(iBS, l.getOutput(), iBS.getType(), iBS.getScope());
+        return iBS.next(l.getOutput(), false);
     }
 
     public BranchBindingSignal propagateBranchBindingSignal(Link l, BranchBindingSignal iBS) {
-        return new BranchBindingSignal(iBS, l.getOutput());
+        return iBS.next(l.getOutput());
     }
 
     public abstract void setModified();

@@ -33,10 +33,15 @@ public class BranchBindingSignal extends BindingSignal<BranchBindingSignal> {
         this.depth = 0;
     }
 
-    public BranchBindingSignal(BranchBindingSignal parent, Activation activation) {
+    private BranchBindingSignal(BranchBindingSignal parent, Activation activation) {
+        this.parent = parent;
         this.origin = parent.getOrigin();
         this.activation = activation;
         this.depth = (byte) (getDepth() + 1);
+    }
+
+    public BranchBindingSignal next(Activation act) {
+        return new BranchBindingSignal(this, act);
     }
 
     @Override

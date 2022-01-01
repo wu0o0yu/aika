@@ -29,6 +29,7 @@ import java.util.stream.Stream;
  */
 public abstract class BindingSignal<B extends BindingSignal> {
 
+    protected BindingSignal parent;
     protected Activation activation;
     protected B origin;
     protected byte depth;

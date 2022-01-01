@@ -27,26 +27,33 @@ import network.aika.neuron.activation.PatternActivation;
  */
 public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
 
-    private PBSType type;
-    private byte scope;
+    protected int scope;
 
-    public PatternBindingSignal(PatternActivation act, byte scope) {
+    public PatternBindingSignal(PatternActivation act) {
         this.origin = this;
         this.activation = act;
-
-        this.type = null;
-        this.scope = scope;
+        this.scope = 0;
     }
 
-    public PatternBindingSignal(PatternBindingSignal parent, Activation activation, PBSType type, byte scope) {
+    protected PatternBindingSignal(PatternBindingSignal parent, Activation activation, boolean scopeTransition) {
+        this.parent = parent;
         this.origin = parent.getOrigin();
         this.activation = activation;
+        this.scope = scopeTransition ? parent.scope + 1 : parent.scope;
         this.depth = (byte) (getDepth() + 1);
-
-        this.type = type;
-        this.scope = scope;
     }
 
+    public PatternBindingSignal next(Activation act, boolean scopeTransition) {
+        return new PatternBindingSignal(this, act, scopeTransition);
+    }
+
+    public PrimaryPatternBindingSignal nextPrimary(Activation act, boolean scopeTransition) {
+        return new PrimaryPatternBindingSignal(this, act, scopeTransition);
+    }
+
+    public SecondaryPatternBindingSignal nextSecondary(Activation act, boolean scopeTransition) {
+        return new SecondaryPatternBindingSignal(this, act, scopeTransition);
+    }
 
     public PatternActivation getOriginActivation() {
         return (PatternActivation) origin.getActivation();
@@ -67,7 +74,10 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
 
     public boolean exists() {
         PatternBindingSignal existingBSScope = getActivation().getPatternBindingSignals().get(getOriginActivation());
-        return existingBSScope != null && existingBSScope.getScope() <= getScope();
+        if(existingBSScope == null)
+            return false;
+
+        return existingBSScope.getScope() <= getScope();
     }
 
     @Override
@@ -79,15 +89,11 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
         return l.getSynapse().propagatePatternBindingSignal(l, this);
     }
 
-    public PBSType getType() {
-        return type;
-    }
-
-    public byte getScope() {
+    public int getScope() {
         return scope;
     }
 
     public String toString() {
-        return "[" + getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ",t:" + type + ",s:" + scope + ",d:" + getDepth() + "]";
+        return "[" + getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ",s:" + scope + ",d:" + getDepth() + "]";
     }
 }

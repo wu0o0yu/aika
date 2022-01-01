@@ -14,34 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.neuron.bindingsignal;
 
-import network.aika.neuron.Neuron;
+import network.aika.direction.Direction;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.bindingsignal.PatternBindingSignal;
-import network.aika.neuron.bindingsignal.SecondaryPatternBindingSignal;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import network.aika.neuron.activation.PatternActivation;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class PrimaryBNSynapse<I extends Neuron> extends InputBNSynapse<I> {
+public class SecondaryPatternBindingSignal extends PatternBindingSignal {
 
-    private static final Logger log = LoggerFactory.getLogger(PrimaryBNSynapse.class);
-
-    public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
-        if(iBS.getScope() >= 2 || iBS instanceof SecondaryPatternBindingSignal)
-            return null;
-
-        return iBS.nextPrimary(l.getOutput(), true);
+    public SecondaryPatternBindingSignal(PatternActivation act) {
+        super(act);
     }
 
-    public boolean checkTemplatePropagate(Activation act) {
-        log.info(act.getLabel() + " CandidateGradient:" + act.getNeuron().getCandidateGradient(act));
+    protected SecondaryPatternBindingSignal(PatternBindingSignal parent, Activation act, boolean scopeTransition) {
+        super(parent, act, scopeTransition);
+    }
 
-        return true;
+    public SecondaryPatternBindingSignal next(Activation act, boolean scopeTransition) {
+        return nextSecondary(act, scopeTransition);
+    }
+
+    public String toString() {
+        return "[SECONDARY:" + getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ",s:" + scope + ",d:" + getDepth() + "]";
     }
 }

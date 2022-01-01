@@ -19,7 +19,6 @@ package network.aika.neuron.excitatory;
 import network.aika.neuron.activation.*;
 import network.aika.direction.Direction;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.PBSType;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 
 /**

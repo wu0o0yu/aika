@@ -59,7 +59,7 @@ public class PatternActivation extends Activation<PatternNeuron> {
     @Override
     public void init(Synapse originSynapse, Activation originAct) {
         super.init(originSynapse, originAct);
-        addBindingSignal(new PatternBindingSignal(this, (byte) 0));
+        addBindingSignal(new PatternBindingSignal(this));
     }
 
     public boolean checkPropagatePatternBindingSignal(PatternBindingSignal bs) {
