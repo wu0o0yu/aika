@@ -21,6 +21,7 @@ import network.aika.linker.AbstractLinker;
 import network.aika.linker.TemplateTask;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.InhibitoryActivation;
+import network.aika.neuron.activation.Timestamp;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
@@ -60,6 +61,10 @@ public class Link extends Step<Activation> {
         this.template = template;
         this.linker = template ? new TemplateTask() : new LinkingTask();
         this.bindingSignal = bindingSignal;
+
+        Timestamp bsFired = bindingSignal.getOriginActivation().getFired();
+        if(act.getFired().compareTo(bsFired) >= 0)
+            this.fired = bsFired;
     }
 
     protected final BindingSignal bindingSignal;
@@ -95,6 +100,6 @@ public class Link extends Step<Activation> {
     }
 
     public String toString() {
-        return "Act-Step: " + (template ? "Template-" : "") + "Linking " + getElement().toShortString() + " Binding-Signal:" + bindingSignal;
+        return "Act-Step: " + (template ? "Template-" : "") + "Link " + getElement().toShortString() + " Binding-Signal:" + bindingSignal;
     }
 }
