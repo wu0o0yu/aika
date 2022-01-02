@@ -76,6 +76,6 @@ public class BranchBindingSignal extends BindingSignal<BranchBindingSignal> {
     }
 
     public String toString() {
-        return "[" + getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ",d:" + getDepth() + "]";
+        return "[BRANCH:" + getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ",d:" + getDepth() + "]";
     }
 }

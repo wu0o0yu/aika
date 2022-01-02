@@ -38,6 +38,6 @@ public class PrimaryPatternBindingSignal extends PatternBindingSignal {
     }
 
     public String toString() {
-        return "[PRIMARY:" + getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ",s:" + scope + ",d:" + getDepth() + "]";
+        return "[PRIMARY-PATTERN:" + getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ",s:" + scope + ",d:" + getDepth() + "]";
     }
 }

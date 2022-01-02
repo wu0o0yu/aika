@@ -94,6 +94,6 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
     }
 
     public String toString() {
-        return "[" + getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ",s:" + scope + ",d:" + getDepth() + "]";
+        return "[PATTERN:" + getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ",s:" + scope + ",d:" + getDepth() + "]";
     }
 }

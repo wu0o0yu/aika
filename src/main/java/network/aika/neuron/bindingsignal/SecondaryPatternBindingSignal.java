@@ -40,6 +40,6 @@ public class SecondaryPatternBindingSignal extends PatternBindingSignal {
     }
 
     public String toString() {
-        return "[SECONDARY:" + getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ",s:" + scope + ",d:" + getDepth() + "]";
+        return "[SECONDARY-PATTERN:" + getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ",s:" + scope + ",d:" + getDepth() + "]";
     }
 }
