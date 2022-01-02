@@ -22,6 +22,7 @@ import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
+import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
 /**
@@ -32,7 +33,12 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<InhibitoryNeur
 
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
-        return fromBS instanceof BranchBindingSignal;
+        return fromBS instanceof PatternBindingSignal;
+    }
+
+    @Override
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
+        return iBS.getScope() == oBS.getScope();
     }
 
     @Override
