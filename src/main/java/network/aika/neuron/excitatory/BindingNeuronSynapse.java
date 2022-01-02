@@ -50,7 +50,7 @@ public abstract class BindingNeuronSynapse<I extends Neuron> extends ExcitatoryS
     }
 
     @Override
-    public boolean checkCausality(Activation<?> iAct, Activation<?> oAct) {
+    public boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct) {
         return Link.isForward(iAct, oAct);
     }
 

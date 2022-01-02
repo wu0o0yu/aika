@@ -43,7 +43,7 @@ public class PatternSynapse extends ExcitatorySynapse<BindingNeuron, PatternNeur
     }
 
     @Override
-    public boolean checkCausality(Activation<?> iAct, Activation<?> oAct) {
+    public boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct) {
         return true;
     }
 }

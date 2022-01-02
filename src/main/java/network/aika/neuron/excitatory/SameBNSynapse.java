@@ -17,10 +17,13 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.bindingsignal.PrimaryPatternBindingSignal;
 import network.aika.neuron.bindingsignal.SecondaryPatternBindingSignal;
+
+import static network.aika.neuron.bindingsignal.BranchBindingSignal.isSeparateBranch;
 
 /**
  *
@@ -38,5 +41,13 @@ public class SameBNSynapse<I extends Neuron> extends BindingNeuronSynapse<I> {
     public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
         return iBS instanceof PrimaryPatternBindingSignal &&
                 oBS instanceof SecondaryPatternBindingSignal && oBS.getScope() == 2;
+    }
+
+    @Override
+    public boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct) {
+        if(isSeparateBranch(iAct, oAct))
+            return false;
+
+        return super.checkCausalityAndBranchConsistency(iAct, oAct);
     }
 }

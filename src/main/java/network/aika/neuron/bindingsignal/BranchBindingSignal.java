@@ -22,6 +22,8 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 
+import java.util.Optional;
+
 /**
  * @author Lukas Molzberger
  */
@@ -38,6 +40,19 @@ public class BranchBindingSignal extends BindingSignal<BranchBindingSignal> {
         this.origin = parent.getOrigin();
         this.activation = activation;
         this.depth = (byte) (getDepth() + 1);
+    }
+
+    public static boolean isSeparateBranch(Activation<?> iAct, Activation<?> oAct) {
+        Optional<BranchBindingSignal> branchBindingSignal = oAct.getBranchBindingSignals()
+                .values()
+                .stream()
+                .filter(bs -> bs.getDepth() > 0)
+                .findAny();
+
+        return branchBindingSignal.isPresent() &&
+                !iAct.getBranchBindingSignals().containsKey(
+                        branchBindingSignal.get().getOriginActivation()
+                );
     }
 
     public BranchBindingSignal next(Activation act) {

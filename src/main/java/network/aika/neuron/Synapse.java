@@ -117,7 +117,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
 
     public abstract void updateSynapse(Link l, double delta);
 
-    public abstract boolean checkCausality(Activation<?> iAct, Activation<?> oAct);
+    public abstract boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct);
 
     public A branchIfNecessary(Activation iAct, A oAct) {
         return oAct;

@@ -74,7 +74,7 @@ public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNe
     }
 
     @Override
-    public boolean checkCausality(Activation<?> iAct, Activation<?> oAct) {
+    public boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct) {
         return true;
     }
 

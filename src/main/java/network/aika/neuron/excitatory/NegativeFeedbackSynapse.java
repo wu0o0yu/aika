@@ -25,6 +25,8 @@ import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.inhibitory.InhibitoryNeuron;
 
+import static network.aika.neuron.bindingsignal.BranchBindingSignal.isSeparateBranch;
+
 /**
  *
  * @author Lukas Molzberger
@@ -52,8 +54,8 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<InhibitoryNeur
     }
 
     @Override
-    public boolean checkCausality(Activation<?> iAct, Activation<?> oAct) {
-        return true;
+    public boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct) {
+        return !isSeparateBranch(iAct, oAct);
     }
 
     public boolean checkTemplateLink(Activation iAct, Activation oAct) {

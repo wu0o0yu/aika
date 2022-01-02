@@ -23,10 +23,8 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
 import network.aika.direction.Direction;
-import network.aika.neuron.bindingsignal.BranchBindingSignal;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.OUTPUT;
@@ -115,30 +113,14 @@ public abstract class AbstractLinker {
         if (!neuronMatches(oAct.getNeuron(), targetSynapse.getOutput()))
             return;
 
-        if(!targetSynapse.checkCausality(iAct, oAct))
+        if(!targetSynapse.checkCausalityAndBranchConsistency(iAct, oAct))
             return;
 
         if(Link.linkExists(iAct, oAct))
             return;
 
-        if(isSeparateBranch(iAct, oAct))
-            return;
-
         Link nl = createLink(iAct, oAct, targetSynapse);
         if(nl != null)
             getNextSteps(nl);
-    }
-
-    protected boolean isSeparateBranch(Activation<?> iAct, Activation<?> oAct) {
-        Optional<BranchBindingSignal> branchBindingSignal = oAct.getBranchBindingSignals()
-                .values()
-                .stream()
-                .filter(bs -> bs.getDepth() > 0)
-                .findAny();
-
-        return branchBindingSignal.isPresent() &&
-                !iAct.getBranchBindingSignals().containsKey(
-                        branchBindingSignal.get().getOriginActivation()
-                );
     }
 }
