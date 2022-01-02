@@ -23,7 +23,10 @@ import network.aika.neuron.excitatory.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TokenActivation;
+import network.aika.utils.TestUtils;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static network.aika.utils.TestUtils.*;
 
@@ -40,11 +43,14 @@ public class PatternTest {
 
         Document doc = new Document(m, "ABC");
 
-        TokenActivation refA = doc.addToken("A", 0, 1);
-        TokenActivation refB = doc.addToken("B", 1, 2);
-        TokenActivation refC = doc.addToken("C", 2, 3);
-        TokenActivation.addRelation(refA, refB);
-        TokenActivation.addRelation(refB, refC);
+        doc.setConfig(
+                TestUtils.getConfig()
+                .setAlpha(0.99)
+                .setLearnRate(-0.011)
+                .setEnableTraining(false)
+        );
+
+        doc.processTokens(List.of("A", "B", "C"));
 
         System.out.println(doc);
 
