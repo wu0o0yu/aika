@@ -47,9 +47,9 @@ public class MutualExclusionTest {
         Templates t = m.getTemplates();
 
         PatternNeuron in = createNeuron(t.INPUT_PATTERN_TEMPLATE, "I", true);
-        BindingNeuron na = createNeuron(t.SAME_BINDING_TEMPLATE, "A");
-        BindingNeuron nb = createNeuron(t.SAME_BINDING_TEMPLATE, "B");
-        BindingNeuron nc = createNeuron(t.SAME_BINDING_TEMPLATE, "C");
+        BindingNeuron na = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "A");
+        BindingNeuron nb = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "B");
+        BindingNeuron nc = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "C");
         InhibitoryNeuron inhib = createNeuron(t.INHIBITORY_TEMPLATE, "I");
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, na, 10.0);
@@ -98,8 +98,8 @@ public class MutualExclusionTest {
         Templates t = m.getTemplates();
 
         PatternNeuron in = createNeuron(t.INPUT_PATTERN_TEMPLATE, "I", true);
-        BindingNeuron na = createNeuron(t.SAME_BINDING_TEMPLATE, "A");
-        BindingNeuron nb = createNeuron(t.SAME_BINDING_TEMPLATE, "B");
+        BindingNeuron na = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "A");
+        BindingNeuron nb = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "B");
         InhibitoryNeuron inhib = createNeuron(t.INHIBITORY_TEMPLATE, "I");
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, na, 10.0);

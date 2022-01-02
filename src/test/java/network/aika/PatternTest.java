@@ -73,17 +73,18 @@ public class PatternTest {
 
     public TextModel initModel() {
         TextModel m = new TextModel();
-        Templates t = new Templates(m);
+        m.init();
+        Templates t = m.getTemplates();
 
         PatternNeuron nA = m.lookupToken("A");
         PatternNeuron nB = m.lookupToken("B");
         PatternNeuron nC = m.lookupToken( "C");
 
-        BindingNeuron eA = createNeuron(t.SAME_BINDING_TEMPLATE, "E A");
-        BindingNeuron eB = createNeuron(t.SAME_BINDING_TEMPLATE, "E B");
-        BindingNeuron eC = createNeuron(t.SAME_BINDING_TEMPLATE, "E C");
+        BindingNeuron eA = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "E A");
+        BindingNeuron eB = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "E B");
+        BindingNeuron eC = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "E C");
 
-        PatternNeuron out = createNeuron(t.SAME_PATTERN_TEMPLATE, "OUT");
+        PatternNeuron out = createNeuron(t.OUTPUT_PATTERN_TEMPLATE, "OUT");
         out.setTokenLabel("ABC");
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, nA, eA, 10.0);

@@ -49,7 +49,7 @@ public class InductionTest {
 
         PatternNeuron inA = createNeuron(t.INPUT_PATTERN_TEMPLATE, "IN-A");
         PatternNeuron inB = createNeuron(t.INPUT_PATTERN_TEMPLATE, "IN-B");
-        BindingNeuron targetN = createNeuron(t.SAME_BINDING_TEMPLATE, "OUT-Target");
+        BindingNeuron targetN = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "OUT-Target");
 
         targetN.getBias().set(0.0);
 

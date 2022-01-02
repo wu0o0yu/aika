@@ -37,7 +37,7 @@ public class PropagateTest {
         Templates t = new Templates(m);
 
         PatternNeuron in = createNeuron(t.INPUT_PATTERN_TEMPLATE, "IN", true);
-        BindingNeuron out = createNeuron(t.SAME_BINDING_TEMPLATE, "OUT");
+        BindingNeuron out = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "OUT");
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, out, 10.0);
         updateBias(out, 1.0);

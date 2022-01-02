@@ -4,8 +4,6 @@ import network.aika.debugger.AikaDebugger;
 import network.aika.neuron.Neuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
-import network.aika.text.TokenActivation;
-import network.aika.utils.TestUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -93,7 +91,7 @@ public class GradientTest {
         TextModel m = new TextModel();
 
         m.setN(912);
-        m.getTemplates().SAME_BINDING_TEMPLATE.getBias().add(-0.32);
+        m.getTemplates().OUTPUT_BINDING_TEMPLATE.getBias().add(-0.32);
         m.init();
 
         Document doc1 = new Document(m, "A B ");

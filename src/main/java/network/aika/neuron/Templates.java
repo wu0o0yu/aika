@@ -33,9 +33,9 @@ public class Templates {
     private final Model model;
 
     public BindingNeuron INPUT_BINDING_TEMPLATE = new BindingNeuron();
-    public BindingNeuron SAME_BINDING_TEMPLATE = new BindingNeuron();
+    public BindingNeuron OUTPUT_BINDING_TEMPLATE = new BindingNeuron();
     public PatternNeuron INPUT_PATTERN_TEMPLATE = new PatternNeuron();
-    public PatternNeuron SAME_PATTERN_TEMPLATE = new PatternNeuron();
+    public PatternNeuron OUTPUT_PATTERN_TEMPLATE = new PatternNeuron();
     public InhibitoryNeuron INHIBITORY_TEMPLATE = new InhibitoryNeuron();
 
 
@@ -56,18 +56,18 @@ public class Templates {
         model = m;
 
         init(INPUT_BINDING_TEMPLATE, -1, "Input Binding Neuron");
-        init(SAME_BINDING_TEMPLATE, -2, "Same Binding Neuron");
+        init(OUTPUT_BINDING_TEMPLATE, -2, "Output Binding Neuron");
         init(INPUT_PATTERN_TEMPLATE, -3, "Input Pattern Neuron");
-        init(SAME_PATTERN_TEMPLATE, -4, "Same Pattern Neuron");
+        init(OUTPUT_PATTERN_TEMPLATE, -4, "Output Pattern Neuron");
         init(INHIBITORY_TEMPLATE, -5, "Inhibitory Neuron");
 
-        Set<Neuron> BINDING_NEURON_TEMPLATE_GROUP = Set.of(INPUT_BINDING_TEMPLATE, SAME_BINDING_TEMPLATE);
+        Set<Neuron> BINDING_NEURON_TEMPLATE_GROUP = Set.of(INPUT_BINDING_TEMPLATE, OUTPUT_BINDING_TEMPLATE);
         INPUT_BINDING_TEMPLATE.getTemplateInfo().setTemplateGroup(BINDING_NEURON_TEMPLATE_GROUP);
-        SAME_BINDING_TEMPLATE.getTemplateInfo().setTemplateGroup(BINDING_NEURON_TEMPLATE_GROUP);
+        OUTPUT_BINDING_TEMPLATE.getTemplateInfo().setTemplateGroup(BINDING_NEURON_TEMPLATE_GROUP);
 
-        Set<Neuron> PATTERN_NEURON_TEMPLATE_GROUP = Set.of(INPUT_PATTERN_TEMPLATE, SAME_PATTERN_TEMPLATE);
+        Set<Neuron> PATTERN_NEURON_TEMPLATE_GROUP = Set.of(INPUT_PATTERN_TEMPLATE, OUTPUT_PATTERN_TEMPLATE);
         INPUT_PATTERN_TEMPLATE.getTemplateInfo().setTemplateGroup(PATTERN_NEURON_TEMPLATE_GROUP);
-        SAME_PATTERN_TEMPLATE.getTemplateInfo().setTemplateGroup(PATTERN_NEURON_TEMPLATE_GROUP);
+        OUTPUT_PATTERN_TEMPLATE.getTemplateInfo().setTemplateGroup(PATTERN_NEURON_TEMPLATE_GROUP);
 
         INHIBITORY_TEMPLATE.getTemplateInfo().setTemplateGroup(Set.of(INHIBITORY_TEMPLATE));
 
@@ -75,7 +75,7 @@ public class Templates {
                 init(
                         new PrimaryBNSynapse(),
                         INPUT_PATTERN_TEMPLATE,
-                        SAME_BINDING_TEMPLATE,
+                        OUTPUT_BINDING_TEMPLATE,
                         "Primary Input Synapse",
                         1,
                         0.01
@@ -85,7 +85,7 @@ public class Templates {
                 init(
                         new RelatedBNSynapse(),
                         INPUT_BINDING_TEMPLATE,
-                        SAME_BINDING_TEMPLATE,
+                        OUTPUT_BINDING_TEMPLATE,
                         "Related Input Synapse from Binding Neuron",
                         2,
                         0.0
@@ -95,7 +95,7 @@ public class Templates {
                 init(
                         new RelatedBNSynapse(),
                         INHIBITORY_TEMPLATE,
-                        SAME_BINDING_TEMPLATE,
+                        OUTPUT_BINDING_TEMPLATE,
                         "Related Input Synapse from Inhibitory Neuron",
                         3,
                         0.0
@@ -105,7 +105,7 @@ public class Templates {
                 init(
                         new RelatedRecurrentBNSynapse(),
                         INHIBITORY_TEMPLATE,
-                        SAME_BINDING_TEMPLATE,
+                        OUTPUT_BINDING_TEMPLATE,
                         "Related Input Synapse from Inhibitory Neuron",
                         10,
                         0.0
@@ -114,8 +114,8 @@ public class Templates {
         SAME_PATTERN_SYNAPSE_TEMPLATE =
                 init(
                         new SameBNSynapse(),
-                        SAME_BINDING_TEMPLATE,
-                        SAME_BINDING_TEMPLATE,
+                        OUTPUT_BINDING_TEMPLATE,
+                        OUTPUT_BINDING_TEMPLATE,
                         "Same Pattern Synapse",
                         4,
                         0.0
@@ -124,8 +124,8 @@ public class Templates {
         POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE =
                 init(
                         new PositiveFeedbackSynapse(),
-                        SAME_PATTERN_TEMPLATE,
-                        SAME_BINDING_TEMPLATE,
+                        OUTPUT_PATTERN_TEMPLATE,
+                        OUTPUT_BINDING_TEMPLATE,
                         "Positive Feedback Synapse",
                         5,
                         0.0
@@ -135,7 +135,7 @@ public class Templates {
                 init(
                         new NegativeFeedbackSynapse(),
                         INHIBITORY_TEMPLATE,
-                        SAME_BINDING_TEMPLATE,
+                        OUTPUT_BINDING_TEMPLATE,
                         "Negative Feedback Synapse",
                         6,
                         0.0
@@ -144,8 +144,8 @@ public class Templates {
         PATTERN_SYNAPSE_TEMPLATE =
                 init(
                         new PatternSynapse(),
-                        SAME_BINDING_TEMPLATE,
-                        SAME_PATTERN_TEMPLATE,
+                        OUTPUT_BINDING_TEMPLATE,
+                        OUTPUT_PATTERN_TEMPLATE,
                         "Pattern Synapse",
                         7,
                         1.0 // Needs to be above the tolerance
@@ -154,7 +154,7 @@ public class Templates {
         INHIBITORY_SYNAPSE_TEMPLATE =
                 init(
                         new InhibitorySynapse(),
-                        SAME_BINDING_TEMPLATE,
+                        OUTPUT_BINDING_TEMPLATE,
                         INHIBITORY_TEMPLATE,
                         "Inhibitory Synapse",
                         8,
@@ -165,9 +165,9 @@ public class Templates {
     public Collection<Neuron> getAllTemplates() {
         return Arrays.asList(
                 INPUT_BINDING_TEMPLATE,
-                SAME_BINDING_TEMPLATE,
+                OUTPUT_BINDING_TEMPLATE,
                 INPUT_PATTERN_TEMPLATE,
-                SAME_PATTERN_TEMPLATE,
+                OUTPUT_PATTERN_TEMPLATE,
                 INHIBITORY_TEMPLATE
         );
     }
