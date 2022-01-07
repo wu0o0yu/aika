@@ -140,7 +140,7 @@ public class Link<A extends Activation> extends Element<Link> {
         double igGrad = 0.0;
         for(Sign si: Sign.SIGNS)
             for (Sign so : Sign.SIGNS)
-                igGrad += synapse.getRelativeSurprisal(si, so, range) * getInputValue(si).getCurrentValue();
+                igGrad += synapse.getRelativeSurprisal(this, si, so, range) * getInputValue(si).getCurrentValue();
 
         igGradient.setAndTriggerUpdate(igGrad);
     }

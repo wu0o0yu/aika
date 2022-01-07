@@ -397,6 +397,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         entropy.setAndTriggerUpdate(
                 getNeuron().getSurprisal(
+                        this,
                         Sign.getSign(this),
                         range
                 )

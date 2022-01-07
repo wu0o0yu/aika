@@ -58,14 +58,7 @@ public class EntropyGradient extends Step<Activation> {
 
     @Override
     public void process() {
-        Activation act = getElement();
-
-        Neuron n = act.getNeuron();
-
-        if(n.isTemplate())
-            return;
-
-        act.updateEntropyGradient();
+        getElement().updateEntropyGradient();
     }
 
     public String toString() {

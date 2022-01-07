@@ -34,14 +34,13 @@ import java.util.stream.Stream;
 
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
+import static network.aika.utils.Utils.probabilityUB;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public abstract class Neuron<S extends Synapse, A extends Activation> implements Writable {
-
-    public static double BETA_THRESHOLD = 0.95;
 
     volatile long retrievalCount = 0;
 
@@ -179,7 +178,10 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         Range range = act.getAbsoluteRange();
         assert range != null;
 
-        return getSurprisal(POS, range);
+        if(isTemplate())
+            return 0.0;
+
+        return getSurprisal(act, POS, range);
     }
 
     public SampleSpace getSampleSpace() {
@@ -325,24 +327,22 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         setModified();
     }
 
-    public double getSurprisal(Sign s, Range range) {
-        double N = sampleSpace.getN(range);
-        if(isTemplate() || N == 0.0)
-            return 0.0;
-
-        double p = getP(s, N);
-        return -Math.log(p);
+    public double getSurprisal(Activation act, Sign s, Range range) {
+        double n = sampleSpace.getN(range);
+        double p = getP(act, s, n);
+        return Utils.surprisal(p);
     }
 
-    public double getP(Sign s, double n) {
-        BetaDistribution dist = new BetaDistribution(
-                getFrequency(s, n) + 1,
-                getFrequency(s.invert(), n) + 1
-        );
+    public double getP(Activation act, Sign s, double n) {
+        double f = getFrequency(s, n);
+        if(act != null) {
+            if (s == Sign.getSign(act)) {
+                f += 1.0;
+            }
+            n += 1.0;
+        }
 
-        return dist.inverseCumulativeProbability(
-                BETA_THRESHOLD
-        );
+        return probabilityUB(f, n);
     }
 
     public double getFrequency() {
@@ -350,10 +350,9 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public double getFrequency(Sign s, double n) {
-        return (s == POS ?
+        return s == POS ?
                 frequency :
-                Math.max(n - frequency, 0) // TODO
-        );
+                n - frequency;
     }
 
     public void setFrequency(double f) {
@@ -457,9 +456,9 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
                 getId() + ":" + getLabel() + " " +
                 "f:" + Utils.round(frequency) + " " +
                 "N:" + Utils.round(sampleSpace.getN(null)) + " " +
-                "p:" + Utils.round(getP(POS, sampleSpace.getN(null))) + " " +
-                "s(p):" + Utils.round(getSurprisal(POS, null)) + " " +
-                "s(n):" + Utils.round(getSurprisal(NEG, null)) + " " +
+                "p:" + Utils.round(getP(null, POS, sampleSpace.getN(null))) + " " +
+                "s(p):" + Utils.round(getSurprisal(null, POS, null)) + " " +
+                "s(n):" + Utils.round(getSurprisal(null, NEG, null)) + " " +
                 "\n";
     }
 }

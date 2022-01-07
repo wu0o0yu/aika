@@ -26,7 +26,6 @@ import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.sign.Sign;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
-import org.apache.commons.math3.distribution.BetaDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,9 +33,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static network.aika.neuron.Neuron.BETA_THRESHOLD;
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
+import static network.aika.utils.Utils.probabilityUB;
 
 /**
  *
@@ -301,32 +300,35 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return getPOutput().getModel();
     }
 
-    public double getRelativeSurprisal(Sign si, Sign so, Range range) {
-        double s = getSurprisal(si, so, range);
-        s -= getInput().getSurprisal(si, range);
-        s -= getOutput().getSurprisal(so, range);
+    public double getRelativeSurprisal(Link l, Sign si, Sign so, Range range) {
+        double s = getSurprisal(l, si, so, range);
+        s -= getInput().getSurprisal(l.getInput(), si, range);
+        s -= getOutput().getSurprisal(l.getOutput(), so, range);
 
         return s;
     }
 
-    public double getSurprisal(Sign si, Sign so, Range range) {
-        double N = sampleSpace.getN(range);
-        if(isTemplate() || N == 0.0)
-            return 0.0;
-
-        double p = getP(si, so, N);
-        return -Math.log(p);
+    public double getSurprisal(Link l, Sign si, Sign so, Range range) {
+        double n = sampleSpace.getN(range);
+        double p = getP(l, si, so, n);
+        return Utils.surprisal(p);
     }
 
-    public double getP(Sign si, Sign so, double n) {
-        BetaDistribution dist = new BetaDistribution(
-                getFrequency(si, so, n) + 1,
-                n + 1
-        );
+    public double getP(Link l, Sign si, Sign so, double n) {
+        double f = getFrequency(si, so, n);
 
-        return dist.inverseCumulativeProbability(
-                BETA_THRESHOLD
-        );
+        // Add the current instance
+        if(l != null) {
+            if (
+                    si == Sign.getSign(l.getInput()) &&
+                    so == Sign.getSign(l.getOutput())
+            ) {
+                f += 1.0;
+            }
+            n += 1.0;
+        }
+
+        return probabilityUB(f, n);
     }
 
     /**
