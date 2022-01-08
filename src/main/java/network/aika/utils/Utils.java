@@ -25,24 +25,10 @@ import org.apache.commons.math3.distribution.BetaDistribution;
 public class Utils {
 
     public static double TOLERANCE = 0.001;
-    public static double BETA_THRESHOLD = 0.95;
 
 
     public static double surprisal(double p) {
         return -Math.log(p);
-    }
-
-    public static double probabilityUB(double f, double n) {
-        assert n > 0.0;
-
-        BetaDistribution dist = new BetaDistribution(
-                f + 1,
-                (n - f) + 1
-        );
-
-        return dist.inverseCumulativeProbability(
-                BETA_THRESHOLD
-        );
     }
 
     public static double[] add(double[] a, double[] b) {

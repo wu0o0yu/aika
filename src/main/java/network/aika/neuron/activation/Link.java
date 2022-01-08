@@ -133,14 +133,22 @@ public class Link<A extends Activation> extends Element<Link> {
         return l.getSynapse().isOfTemplate(ts);
     }
 
+    public double getRelativeSurprisal(Sign si, Sign so, Range range) {
+        double s = synapse.getSurprisal(this, si, so, range);
+        s -= input.getNeuron().getSurprisal(input, si, range);
+        s -= output.getNeuron().getSurprisal(output, so, range);
+
+        return s;
+    }
+
     public void updateInformationGainGradient() {
         Range range = input.getAbsoluteRange();
         assert range != null;
 
-        double igGrad = 0.0;
-        for(Sign si: Sign.SIGNS)
-            for (Sign so : Sign.SIGNS)
-                igGrad += synapse.getRelativeSurprisal(this, si, so, range) * getInputValue(si).getCurrentValue();
+        Sign si = Sign.getSign(input);
+        Sign so = Sign.getSign(output);
+
+        double igGrad = getRelativeSurprisal(si, so, range) * getInputValue(si).getCurrentValue();
 
         igGradient.setAndTriggerUpdate(igGrad);
     }

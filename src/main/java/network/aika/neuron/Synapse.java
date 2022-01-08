@@ -24,6 +24,7 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.sign.Sign;
+import network.aika.utils.Bound;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import org.slf4j.Logger;
@@ -35,7 +36,6 @@ import java.io.IOException;
 
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
-import static network.aika.utils.Utils.probabilityUB;
 
 /**
  *
@@ -300,21 +300,13 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         return getPOutput().getModel();
     }
 
-    public double getRelativeSurprisal(Link l, Sign si, Sign so, Range range) {
-        double s = getSurprisal(l, si, so, range);
-        s -= getInput().getSurprisal(l.getInput(), si, range);
-        s -= getOutput().getSurprisal(l.getOutput(), so, range);
-
-        return s;
-    }
-
     public double getSurprisal(Link l, Sign si, Sign so, Range range) {
         double n = sampleSpace.getN(range);
-        double p = getP(l, si, so, n);
+        double p = getProbability(l, si, so, n);
         return Utils.surprisal(p);
     }
 
-    public double getP(Link l, Sign si, Sign so, double n) {
+    public double getProbability(Link l, Sign si, Sign so, double n) {
         double f = getFrequency(si, so, n);
 
         // Add the current instance
@@ -328,7 +320,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
             n += 1.0;
         }
 
-        return probabilityUB(f, n);
+        return Bound.UPPER.probability(f, n);
     }
 
     /**

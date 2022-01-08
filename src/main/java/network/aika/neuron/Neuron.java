@@ -21,10 +21,10 @@ import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
 import network.aika.fields.Field;
 import network.aika.sign.Sign;
+import network.aika.utils.Bound;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
-import org.apache.commons.math3.distribution.BetaDistribution;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -34,7 +34,6 @@ import java.util.stream.Stream;
 
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
-import static network.aika.utils.Utils.probabilityUB;
 
 /**
  *
@@ -329,11 +328,11 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public double getSurprisal(Activation act, Sign s, Range range) {
         double n = sampleSpace.getN(range);
-        double p = getP(act, s, n);
+        double p = getProbability(act, s, n);
         return Utils.surprisal(p);
     }
 
-    public double getP(Activation act, Sign s, double n) {
+    public double getProbability(Activation act, Sign s, double n) {
         double f = getFrequency(s, n);
         if(act != null) {
             if (s == Sign.getSign(act)) {
@@ -342,7 +341,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
             n += 1.0;
         }
 
-        return probabilityUB(f, n);
+        return Bound.UPPER.probability(f, n);
     }
 
     public double getFrequency() {
@@ -456,7 +455,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
                 getId() + ":" + getLabel() + " " +
                 "f:" + Utils.round(frequency) + " " +
                 "N:" + Utils.round(sampleSpace.getN(null)) + " " +
-                "p:" + Utils.round(getP(null, POS, sampleSpace.getN(null))) + " " +
+                "p:" + Utils.round(getProbability(null, POS, sampleSpace.getN(null))) + " " +
                 "s(p):" + Utils.round(getSurprisal(null, POS, null)) + " " +
                 "s(n):" + Utils.round(getSurprisal(null, NEG, null)) + " " +
                 "\n";
