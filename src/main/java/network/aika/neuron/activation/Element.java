@@ -31,7 +31,7 @@ import java.util.stream.Stream;
  */
 public abstract class Element<E extends Element> implements Comparable<E> {
 
-    private NavigableMap<QueueKey, Step> queuedSteps = new TreeMap<>(QueueKey.COMPARATOR);
+    private NavigableMap<QueueKey, Step> queuedSteps = new TreeMap<>(QueueKey.ELEMENT_COMPARATOR);
 
     public abstract Timestamp getFired();
 
@@ -40,10 +40,7 @@ public abstract class Element<E extends Element> implements Comparable<E> {
     }
 
     public boolean isQueued(Step s) {
-        return !queuedSteps.subMap(
-                new QueueKey.Key(s, Timestamp.MIN),
-                new QueueKey.Key(s, Timestamp.MAX)
-        ).isEmpty();
+        return queuedSteps.containsKey(s);
     }
 
     public void removeQueuedPhase(Step s) {

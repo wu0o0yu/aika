@@ -30,8 +30,13 @@ public interface QueueKey {
     Comparator<QueueKey> COMPARATOR = Comparator
             .<QueueKey>comparingInt(k -> k.getPhase().ordinal())
             .thenComparingInt(k -> k.getFired() == NOT_SET ? 0 : 1)
-            .thenComparing(k -> k.getFired())
-            .thenComparing(k -> k.getStepName())
+            .thenComparing(k -> k.getFired());
+
+    Comparator<QueueKey> THOUGHT_COMPARATOR = COMPARATOR
+            .thenComparing(k -> k.getTimestamp());
+
+    Comparator<QueueKey> ELEMENT_COMPARATOR = COMPARATOR
+            .thenComparing(k -> k.getStepName())  // Needed to check if the entry is already on the queue.
             .thenComparing(k -> k.getTimestamp());
 
     Phase getPhase();
@@ -58,8 +63,14 @@ public interface QueueKey {
         public Key(Step s, Timestamp timestamp) {
             this.p = s.getPhase();
             this.fired = s.getFired();
-            this.stepName = s.getStepName();
-            this.timestamp = timestamp;
+
+            if(s.checkIfQueued()) {
+                this.stepName = s.getStepName();
+                this.timestamp = NOT_SET;
+            } else {
+                this.stepName = "";
+                this.timestamp = timestamp;
+            }
         }
 
         @Override

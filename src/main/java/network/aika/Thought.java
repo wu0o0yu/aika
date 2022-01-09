@@ -47,7 +47,7 @@ public abstract class Thought<M extends Model> {
     private long timestampCounter = 0;
     private int activationIdCounter = 0;
 
-    private final NavigableMap<QueueKey, Step> queue = new TreeMap<>(QueueKey.COMPARATOR);
+    private final NavigableMap<QueueKey, Step> queue = new TreeMap<>(QueueKey.THOUGHT_COMPARATOR);
 
     private final TreeMap<Integer, Activation> activationsById = new TreeMap<>();
     private final Map<NeuronProvider, SortedSet<Activation<?>>> actsPerNeuron = new HashMap<>();
@@ -151,7 +151,7 @@ public abstract class Thought<M extends Model> {
         queue.put(s, s);
     }
 
-    public void removeQueueEntry(Step s) {
+    public void removeStep(Step s) {
         Step removedStep = queue.remove(s);
         assert removedStep != null;
     }
