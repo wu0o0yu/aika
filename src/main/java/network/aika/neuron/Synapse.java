@@ -320,8 +320,10 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
             n += 1.0;
         }
 
-        return Bound.UPPER.probability(f, n);
+        return getProbabilityBound(si, so).probability(f, n);
     }
+
+    protected abstract Bound getProbabilityBound(Sign si, Sign so);
 
     /**
      * Determines whether this synapse is able to influence the boolean decision of its output neuron.

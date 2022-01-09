@@ -22,7 +22,9 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
+import network.aika.sign.Sign;
 import network.aika.steps.activation.PostTraining;
+import network.aika.utils.Bound;
 
 /**
  *
@@ -70,6 +72,11 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
 
     protected void checkConstraints() {
         assert !isNegative();
+    }
+
+    @Override
+    protected Bound getProbabilityBound(Sign si, Sign so) {
+        return si == Sign.POS ? Bound.LOWER : Bound.UPPER;
     }
 
     @Override

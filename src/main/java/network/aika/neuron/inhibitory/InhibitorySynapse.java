@@ -22,6 +22,8 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
+import network.aika.sign.Sign;
+import network.aika.utils.Bound;
 
 
 /**
@@ -76,6 +78,11 @@ public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNe
     @Override
     public boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct) {
         return true;
+    }
+
+    @Override
+    protected Bound getProbabilityBound(Sign si, Sign so) {
+        return so == Sign.POS ? Bound.LOWER : Bound.UPPER;
     }
 
     @Override
