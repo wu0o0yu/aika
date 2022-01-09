@@ -33,7 +33,6 @@ public class Field implements FieldInput, FieldOutput, Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Field.class);
 
-
     private double currentValue = 0.0;
     private Double update;
     private boolean allowUpdate;
@@ -136,7 +135,6 @@ public class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public double getUpdate(int updateArg, boolean ack) {
-
         if(!allowUpdate)
             log.warn("field is not allowed to retrieve update value");
 

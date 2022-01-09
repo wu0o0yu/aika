@@ -34,8 +34,6 @@ public interface Direction {
 
     Direction invert();
 
-    Direction combine(Direction dir);
-
     BindingSignal getInputBindingSignal(BindingSignal fromBindingSignal, BindingSignal toBindingSignal);
 
     BindingSignal getOutputBindingSignal(BindingSignal fromBindingSignal, BindingSignal toBindingSignal);

@@ -36,11 +36,6 @@ public class Output implements Direction {
     }
 
     @Override
-    public Direction combine(Direction dir) {
-        return dir.invert();
-    }
-
-    @Override
     public BindingSignal getInputBindingSignal(BindingSignal fromBindingSignal, BindingSignal toBindingSignal) {
         return fromBindingSignal;
     }
