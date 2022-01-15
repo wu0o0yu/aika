@@ -47,7 +47,7 @@ public class PatternTest {
                 TestUtils.getConfig()
                 .setAlpha(0.99)
                 .setLearnRate(-0.011)
-                .setEnableTraining(false)
+                .setTrainingEnabled(false)
         );
 
         doc.processTokens(List.of("A", "B", "C"));

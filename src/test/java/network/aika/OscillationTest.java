@@ -24,7 +24,7 @@ public class OscillationTest {
                 getConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
-                        .setEnableTraining(true)
+                        .setTrainingEnabled(true)
         );
 
         PatternNeuron nA = createNeuron(t.OUTPUT_PATTERN_TEMPLATE, "P-A");

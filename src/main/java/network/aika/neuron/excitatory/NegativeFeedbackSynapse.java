@@ -19,6 +19,7 @@ package network.aika.neuron.excitatory;
 import network.aika.direction.Direction;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.InhibitoryActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
@@ -31,7 +32,7 @@ import static network.aika.neuron.bindingsignal.BranchBindingSignal.isSeparateBr
  *
  * @author Lukas Molzberger
  */
-public class NegativeFeedbackSynapse extends BindingNeuronSynapse<InhibitoryNeuron> {
+public class NegativeFeedbackSynapse extends BindingNeuronSynapse<InhibitoryNeuron, InhibitoryActivation> {
 
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
@@ -69,7 +70,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<InhibitoryNeur
     }
 
     @Override
-    public boolean propagateValue(Link<BindingActivation> l) {
+    public boolean propagateValue(Link<InhibitoryActivation, BindingActivation> l) {
         return !l.isSelfRef();
     }
 

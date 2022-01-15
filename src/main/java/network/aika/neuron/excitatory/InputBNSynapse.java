@@ -17,6 +17,7 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
@@ -24,7 +25,7 @@ import network.aika.neuron.bindingsignal.PatternBindingSignal;
 /**
  * @author Lukas Molzberger
  */
-public abstract class InputBNSynapse<I extends Neuron> extends BindingNeuronSynapse<I> {
+public abstract class InputBNSynapse<I extends Neuron, IA extends Activation> extends BindingNeuronSynapse<I, IA> {
 
     public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
         return (byte) (iBS.getScope() + 1) == oBS.getScope();

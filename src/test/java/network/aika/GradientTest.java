@@ -25,7 +25,7 @@ public class GradientTest {
                 getConfig()
                 .setAlpha(0.99)
                 .setLearnRate(-0.1)
-                .setEnableTraining(true)
+                .setTrainingEnabled(true)
         );
 /*
         Neuron nA = m.getNeuron("A");
@@ -62,7 +62,7 @@ public class GradientTest {
                 getConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
-                        .setEnableTraining(true)
+                        .setTrainingEnabled(true)
         );
 
         processDoc(doc);
@@ -99,7 +99,7 @@ public class GradientTest {
                 getConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
-                        .setEnableTraining(true)
+                        .setTrainingEnabled(true)
         );
         processDoc(doc1);
 
@@ -119,7 +119,7 @@ public class GradientTest {
                 getConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
-                        .setEnableTraining(true)
+                        .setTrainingEnabled(true)
         );
         processDoc(doc2);
 

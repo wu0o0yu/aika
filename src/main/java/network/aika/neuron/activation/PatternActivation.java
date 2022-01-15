@@ -21,7 +21,7 @@ import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.excitatory.PatternNeuron;
-import network.aika.steps.activation.Link;
+import network.aika.steps.activation.Linking;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -35,6 +35,7 @@ public class PatternActivation extends Activation<PatternNeuron> {
 
     protected Map<Activation<?>, PatternBindingSignal> reverseBindingSignals = new TreeMap<>();
 
+    private boolean finalMode = false;
 
     protected PatternActivation(int id, PatternNeuron n) {
         super(id, n);
@@ -44,11 +45,17 @@ public class PatternActivation extends Activation<PatternNeuron> {
         super(id, t, patternNeuron);
     }
 
+    public boolean isFinalMode() {
+        return finalMode;
+    }
+
+    public void setFinalMode() {
+        finalMode = true;
+    }
+
     public void registerReverseBindingSignal(Activation targetAct, PatternBindingSignal bindingSignal) {
         reverseBindingSignals.put(targetAct, bindingSignal);
-
-        Link.add(targetAct, bindingSignal, false);
-        Link.add(targetAct, bindingSignal, true);
+        Linking.add(targetAct, bindingSignal);
     }
 
     @Override

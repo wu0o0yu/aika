@@ -25,7 +25,6 @@ import network.aika.neuron.activation.Timestamp;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
-import network.aika.steps.StepType;
 import network.aika.linker.LinkingTask;
 
 import java.util.List;
@@ -46,16 +45,17 @@ import static network.aika.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Link extends Step<Activation> {
+public class Linking extends Step<Activation> {
 
-    public static void add(Activation act, BindingSignal bindingSignal, boolean template) {
-        Step.add(new Link(act, bindingSignal, template));
+    public static void add(Activation act, BindingSignal bindingSignal) {
+        Step.add(new Linking(act, bindingSignal, false));
+        Step.add(new Linking(act, bindingSignal, true));
     }
 
     private final AbstractLinker linker;
     private boolean template;
 
-    private Link(Activation act, BindingSignal bindingSignal, boolean template) {
+    private Linking(Activation act, BindingSignal bindingSignal, boolean template) {
         super(act);
 
         this.template = template;
@@ -78,12 +78,7 @@ public class Link extends Step<Activation> {
 
     @Override
     public Phase getPhase() {
-        return template ? Phase.TEMPLATE : Phase.LINKING;
-    }
-
-    @Override
-    public StepType getStepType() {
-        return template ? StepType.TEMPLATE : StepType.INFERENCE;
+        return Phase.PROCESSING;
     }
 
     public boolean checkIfQueued() {

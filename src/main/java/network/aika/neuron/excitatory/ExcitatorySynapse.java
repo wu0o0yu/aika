@@ -19,9 +19,7 @@ package network.aika.neuron.excitatory;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.PatternActivation;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.PostTraining;
 import network.aika.utils.Bound;
@@ -30,7 +28,7 @@ import network.aika.utils.Bound;
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNeuron<?, A>, A extends Activation> extends Synapse<I, O, A> {
+public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNeuron<?, OA>, IA extends Activation, OA extends Activation> extends Synapse<I, O, IA, OA> {
 
     @Override
     public boolean isWeak() {

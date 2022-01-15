@@ -26,9 +26,8 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.sign.Sign;
-import network.aika.steps.Phase;
-import network.aika.steps.StepType;
 import network.aika.steps.activation.*;
+import network.aika.steps.link.InformationGainGradient;
 import network.aika.steps.link.LinkCounting;
 import network.aika.utils.Utils;
 
@@ -44,8 +43,6 @@ import static network.aika.neuron.activation.Timestamp.NOT_SET;
  */
 public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
-//    public static double INITIAL_NET = -0.001;
-
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(Activation::getId);
 
     protected final int id;
@@ -58,7 +55,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected boolean isInput;
 
     protected Field value = new Field();
-    protected Field net = new QueueField(this, "net", Phase.LINKING, StepType.INFERENCE);
+    protected Field net = new QueueField(this, "net");
 
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
@@ -71,7 +68,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     );
 
     private Field entropy = new Field();
-    protected Field inputGradient = new QueueField(this, "inputGradient", Phase.LINKING, StepType.TRAINING);
+    protected Field inputGradient = new QueueField(this, "inputGradient");
 
     protected FieldOutput outputGradient = new FieldMultiplication(
             inputGradient,
@@ -143,17 +140,30 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         net.setFieldListener(u -> {
             double v = net.getNewValue(true);
-            if(!isInput)
-                value.setAndTriggerUpdate(getBranchProbability() * getActivationFunction().f(v));
+            updateValue(v);
 
             propagateGradient();
 
             if (isFired() || net.getCurrentValue() <= 0.0)
                 return;
 
+            addInformationGainStep();
+
             setFired();
             propagate();
         });
+    }
+
+    protected void updateValue(double net) {
+        if(!isInput)
+            value.setAndTriggerUpdate(getActivationFunction().f(net));
+    }
+
+    protected void addInformationGainStep() {
+        inputLinks.values()
+                .forEach(l ->
+                        InformationGainGradient.add(l)
+                );
     }
 
     protected void propagateGradient() {
@@ -385,10 +395,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public FieldOutput getOutputGradient() {
         return outputGradient;
-    }
-
-    public double getBranchProbability() {
-        return 1.0;
     }
 
     public void updateEntropyGradient() {

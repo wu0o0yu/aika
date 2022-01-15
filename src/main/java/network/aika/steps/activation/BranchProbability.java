@@ -19,7 +19,6 @@ package network.aika.steps.activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
-import network.aika.steps.StepType;
 
 
 /**
@@ -41,22 +40,13 @@ public class BranchProbability extends Step<BindingActivation> {
 
     @Override
     public Phase getPhase() {
-        return Phase.LINKING;
-    }
-
-    @Override
-    public StepType getStepType() {
-        return StepType.INFERENCE;
+        return Phase.PROCESSING;
     }
 
     @Override
     public void process() { // TODO: Use branch binding signal
         getElement()
                 .computeBranchProbability();
-    }
-
-    public boolean checkIfQueued() {
-        return true;
     }
 
     public String toString() {

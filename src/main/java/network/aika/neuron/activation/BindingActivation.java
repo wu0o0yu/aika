@@ -23,10 +23,8 @@ import network.aika.fields.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.steps.Phase;
-import network.aika.steps.StepType;
 import network.aika.steps.activation.BranchProbability;
-import network.aika.steps.activation.Link;
+import network.aika.steps.activation.Linking;
 import network.aika.steps.activation.SetFinalMode;
 import network.aika.utils.Utils;
 
@@ -43,14 +41,13 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
     protected Map<Activation<?>, BranchBindingSignal> reverseBindingSignals = new TreeMap<>();
 
-    private boolean finalMode = false;
     private Timestamp finalTimestamp = NOT_SET;
 
     private final Set<BindingActivation> branches = new TreeSet<>();
     private BindingActivation mainBranch;
 
     private double branchProbability = 1.0;
-    private Field ownInputGradient = new QueueField(this, "ownInputGradient", Phase.LINKING, StepType.TRAINING);
+    private Field ownInputGradient = new QueueField(this, "ownInputGradient");
 
     protected FieldOutput ownOutputGradient = new FieldMultiplication(
             ownInputGradient,
@@ -81,9 +78,7 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
     public void registerReverseBindingSignal(Activation targetAct, BranchBindingSignal bindingSignal) {
         reverseBindingSignals.put(targetAct, bindingSignal);
-
-        Link.add(targetAct, bindingSignal, false);
-        Link.add(targetAct, bindingSignal, true);
+        Linking.add(targetAct, bindingSignal);
     }
 
     @Override
@@ -99,6 +94,11 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
     public boolean checkPropagateBranchBindingSignal(BranchBindingSignal bs) {
         return bs.getOriginActivation() == this;
+    }
+
+    protected void updateValue(double net) {
+        if(!isInput)
+            value.setAndTriggerUpdate(getBranchProbability() * getActivationFunction().f(net));
     }
 
     public boolean isSelfRef(Activation iAct) {
@@ -161,13 +161,8 @@ public class BindingActivation extends Activation<BindingNeuron> {
         return ownOutputGradient;
     }
 
-    public void updateBias(double u, boolean isFinalBias) {
-        if(finalMode == isFinalBias)
-            getNet().addAndTriggerUpdate(u);
-    }
-
-    public boolean isFinalMode() {
-        return finalMode;
+    public void updateBias(double u) {
+        getNet().addAndTriggerUpdate(u);
     }
 
     public Timestamp getFinalTimestamp() {
@@ -197,44 +192,6 @@ public class BindingActivation extends Activation<BindingNeuron> {
             return branches.stream();
     }
 
-    public void setFinalMode() {
-        finalMode = true;
-
-        BindingNeuron n = getNeuron();
-
-        double biasDelta = n.getFinalBias().getCurrentValue() - n.getBias().getCurrentValue();
-
-        getNet().addAndTriggerUpdate(biasDelta - computeForwardLinkedRecurrentInputs(this));
-
-        getPositiveRecurrentInputLinks(this)
-                .filter(l -> !l.isForward())
-                .forEach(l ->
-                        l.propagateValue()
-                );
-
-        setFinalTimestamp();
-
-        if (!isFired() || getNet().getCurrentValue() > 0.0)
-            return;
-
-        setFired(NOT_SET);
-        propagate();
-    }
-
-    private double computeForwardLinkedRecurrentInputs(BindingActivation act) {
-        return getPositiveRecurrentInputLinks(act)
-                .filter(l -> l.isForward())
-                .mapToDouble(l -> l.getSynapse().getWeight().getCurrentValue())
-                .sum();
-    }
-
-    private Stream<network.aika.neuron.activation.Link> getPositiveRecurrentInputLinks(BindingActivation act) {
-        return act.getInputLinks()
-                .filter(l -> l.getSynapse().isRecurrent())
-                .filter(l -> !l.isNegative());
-    }
-
-    @Override
     public double getBranchProbability() {
         return branchProbability;
     }
@@ -244,10 +201,10 @@ public class BindingActivation extends Activation<BindingNeuron> {
     }
 
     public void computeBranchProbability() {
-        Stream<network.aika.neuron.activation.Link> linksStream = getBranches()
+        Stream<Link> linksStream = getBranches()
                 .stream()
                 .flatMap(Activation::getInputLinks)
-                .filter(network.aika.neuron.activation.Link::isNegative)
+                .filter(Link::isNegative)
                 .flatMap(l -> l.getInput().getInputLinks());  // Walk through to the inhib. Activation.
 
         Set<BindingActivation> conflictingActs = linksStream

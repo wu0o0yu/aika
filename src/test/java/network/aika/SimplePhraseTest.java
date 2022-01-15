@@ -31,7 +31,7 @@ public class SimplePhraseTest {
         Config c = getConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
-                        .setEnableTraining(false);
+                        .setTrainingEnabled(false);
 
         Random r = new Random(1);
 
@@ -41,7 +41,7 @@ public class SimplePhraseTest {
 
             Document doc = new Document(model, phrase);
             doc.setConfig(c);
-            c.setEnableTraining(k > 100);
+            c.setTrainingEnabled(k > 100);
 
             int i = 0;
             TokenActivation lastToken = null;

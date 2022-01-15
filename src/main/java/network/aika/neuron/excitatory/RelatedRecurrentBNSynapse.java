@@ -17,6 +17,7 @@
 package network.aika.neuron.excitatory;
 
 import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 
@@ -24,7 +25,7 @@ import network.aika.neuron.activation.Link;
  *
  * @author Lukas Molzberger
  */
-public class RelatedRecurrentBNSynapse<I extends Neuron> extends RelatedBNSynapse<I> {
+public class RelatedRecurrentBNSynapse<I extends Neuron, IA extends Activation> extends RelatedBNSynapse<I, IA> {
 
     @Override
     public boolean isRecurrent() {

@@ -26,7 +26,7 @@ import network.aika.neuron.bindingsignal.PatternBindingSignal;
  *
  * @author Lukas Molzberger
  */
-public abstract class BindingNeuronSynapse<I extends Neuron> extends ExcitatorySynapse<I, BindingNeuron, BindingActivation> {
+public abstract class BindingNeuronSynapse<I extends Neuron, IA extends Activation> extends ExcitatorySynapse<I, BindingNeuron, IA, BindingActivation> {
 
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
@@ -34,9 +34,8 @@ public abstract class BindingNeuronSynapse<I extends Neuron> extends ExcitatoryS
     }
 
     @Override
-    public boolean propagateValue(Link<BindingActivation> l) {
+    public boolean propagateValue(Link<IA, BindingActivation> l) {
         return !isRecurrent() ||
-                l.getOutput().isFinalMode() ||
                 l.isForward();
     }
 

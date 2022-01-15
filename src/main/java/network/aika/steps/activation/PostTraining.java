@@ -20,7 +20,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
-import network.aika.steps.StepType;
 
 
 /**
@@ -42,16 +41,7 @@ public class PostTraining extends Step<Activation> {
 
     @Override
     public Phase getPhase() {
-        return Phase.FINAL_LINKING;
-    }
-
-    @Override
-    public StepType getStepType() {
-        return StepType.TRAINING;
-    }
-
-    public boolean checkIfQueued() {
-        return true;
+        return Phase.PROCESSING;
     }
 
     @Override

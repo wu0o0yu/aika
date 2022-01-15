@@ -20,6 +20,7 @@ import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.InhibitoryActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
 import network.aika.sign.Sign;
@@ -30,14 +31,10 @@ import network.aika.utils.Bound;
  *
  * @author Lukas Molzberger
  */
-public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNeuron, Activation> {
+public class InhibitorySynapse<I extends Neuron, IA extends Activation> extends Synapse<I, InhibitoryNeuron, IA, InhibitoryActivation> {
 
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
-        return false;
-    }
-
-    public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
         return false;
     }
 
@@ -68,11 +65,6 @@ public class InhibitorySynapse<I extends Neuron> extends Synapse<I, InhibitoryNe
             return;
 
         weight.addAndTriggerUpdate(delta);
-    }
-
-    @Override
-    public Activation branchIfNecessary(Activation iAct, Activation oAct) {
-        return oAct;
     }
 
     @Override

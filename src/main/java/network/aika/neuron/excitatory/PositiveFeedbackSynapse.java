@@ -18,6 +18,9 @@ package network.aika.neuron.excitatory;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 
@@ -25,7 +28,14 @@ import network.aika.neuron.bindingsignal.BranchBindingSignal;
  *
  * @author Lukas Molzberger
  */
-public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PatternNeuron> {
+public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PatternNeuron, PatternActivation> {
+
+    @Override
+    public boolean propagateValue(Link<PatternActivation, BindingActivation> l) {
+        return !isRecurrent() ||
+                l.getInput().isFinalMode() ||
+                l.isForward();
+    }
 
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {

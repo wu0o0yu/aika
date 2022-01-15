@@ -98,7 +98,7 @@ public class InductionTest {
                 TestUtils.getConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
-                        .setEnableTraining(true)
+                        .setTrainingEnabled(true)
         );
         System.out.println("  " + phrase);
 

@@ -304,8 +304,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public void count(Activation act) {
-        addDummyLinks(act);
-
         Range absoluteRange = act.getAbsoluteRange();
         sampleSpace.countSkippedInstances(absoluteRange);
 

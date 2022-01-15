@@ -45,7 +45,6 @@ public class Propagate extends Step<Activation> {
     private final AbstractLinker linker;
     private boolean template;
 
-
     private Propagate(Activation act, boolean template) {
         super(act);
 
@@ -55,21 +54,12 @@ public class Propagate extends Step<Activation> {
 
     @Override
     public Phase getPhase() {
-        return template ? Phase.TEMPLATE : Phase.LINKING;
-    }
-
-    @Override
-    public StepType getStepType() {
-        return template ? StepType.TEMPLATE : StepType.INFERENCE;
+        return Phase.PROCESSING;
     }
 
     @Override
     public void process() {
         linker.propagate(getElement());
-    }
-
-    public boolean checkIfQueued() {
-        return true;
     }
 
     public String toString() {

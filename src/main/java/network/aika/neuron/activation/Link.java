@@ -38,7 +38,7 @@ import static network.aika.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public class Link<A extends Activation> extends Element<Link> {
+public class Link<I extends Activation, O extends Activation> extends Element<Link> {
 
     public static final Comparator<Link> COMPARE = Comparator.
             <Link, Activation<?>>comparing(l -> l.output)
@@ -46,14 +46,14 @@ public class Link<A extends Activation> extends Element<Link> {
 
     private Synapse synapse;
 
-    private final Activation input;
-    private final A output;
+    private final I input;
+    private final O output;
 
     private Field igGradient = new Field();
     private FieldOutput weightedInput;
     private FieldOutput backPropGradient;
 
-    public Link(Synapse s, Activation input, A output) {
+    public Link(Synapse s, I input, O output) {
         this.synapse = s;
         this.input = input;
         this.output = output;
@@ -180,11 +180,11 @@ public class Link<A extends Activation> extends Element<Link> {
         this.synapse = synapse;
     }
 
-    public Activation<?> getInput() {
+    public I getInput() {
         return input;
     }
 
-    public A getOutput() {
+    public O getOutput() {
         return output;
     }
 

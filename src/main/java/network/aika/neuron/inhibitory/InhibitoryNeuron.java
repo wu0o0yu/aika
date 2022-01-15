@@ -28,7 +28,7 @@ import network.aika.neuron.activation.InhibitoryActivation;
  *
  * @author Lukas Molzberger
  */
-public class InhibitoryNeuron extends Neuron<InhibitorySynapse, Activation> {
+public class InhibitoryNeuron extends Neuron<InhibitorySynapse, InhibitoryActivation> {
 
     public InhibitoryNeuron() {
         super();
@@ -43,7 +43,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse, Activation> {
     }
 
     @Override
-    public Activation createActivation(Thought t) {
+    public InhibitoryActivation createActivation(Thought t) {
         return new InhibitoryActivation(t.createActivationId(), t, this);
     }
 

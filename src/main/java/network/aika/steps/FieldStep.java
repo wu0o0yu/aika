@@ -7,15 +7,10 @@ public class FieldStep<E extends Element> extends Step<E> {
 
     private QueueField field;
     private String label;
-    private Phase phase;
-    private StepType stepType;
 
-
-    public FieldStep(E e, QueueField qf, String label, Phase p, StepType st) {
+    public FieldStep(E e, QueueField qf, String label) {
         super(e);
         this.label = label;
-        this.phase = p;
-        this.stepType = st;
         this.field = qf;
         this.field.setStep(this);
     }
@@ -27,12 +22,7 @@ public class FieldStep<E extends Element> extends Step<E> {
 
     @Override
     public Phase getPhase() {
-        return phase;
-    }
-
-    @Override
-    public StepType getStepType() {
-        return stepType;
+        return Phase.PROCESSING;
     }
 
     @Override

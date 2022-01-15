@@ -19,7 +19,6 @@ package network.aika.steps.link;
 import network.aika.neuron.activation.Link;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
-import network.aika.steps.StepType;
 
 /**
  *
@@ -37,16 +36,7 @@ public class Cleanup extends Step<Link> {
 
     @Override
     public Phase getPhase() {
-        return Phase.COUNTING;
-    }
-
-    @Override
-    public StepType getStepType() {
-        return StepType.INFERENCE;
-    }
-
-    public boolean checkIfQueued() {
-        return true;
+        return Phase.POST_PROCESSING;
     }
 
     @Override

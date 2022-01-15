@@ -3,9 +3,7 @@ package network.aika.fields;
 
 import network.aika.neuron.activation.Element;
 import network.aika.steps.FieldStep;
-import network.aika.steps.Phase;
 import network.aika.steps.Step;
-import network.aika.steps.StepType;
 
 public class QueueField extends Field {
 
@@ -13,14 +11,13 @@ public class QueueField extends Field {
     private FieldStep step;
 
 
-    public QueueField(Element e, String label, Phase p, StepType st) {
+    public QueueField(Element e, String label) {
         super();
-        step = new FieldStep(e, this, label, p, st);
+        step = new FieldStep(e, this, label);
     }
 
-
-    public QueueField(FieldUpdateEvent fieldListener, Element e, String label, Phase p, StepType st) {
-        this(e, label, p, st);
+    public QueueField(FieldUpdateEvent fieldListener, Element e, String label) {
+        this(e, label);
         setFieldListener(fieldListener);
     }
 

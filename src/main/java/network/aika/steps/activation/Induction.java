@@ -20,7 +20,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
-import network.aika.steps.StepType;
 import network.aika.utils.Utils;
 
 /**
@@ -40,16 +39,7 @@ public class Induction extends Step<Activation> {
 
     @Override
     public Phase getPhase() {
-        return Phase.LINKING;
-    }
-
-    @Override
-    public StepType getStepType() {
-        return StepType.TEMPLATE;
-    }
-
-    public boolean checkIfQueued() {
-        return true;
+        return Phase.PROCESSING;
     }
 
     @Override

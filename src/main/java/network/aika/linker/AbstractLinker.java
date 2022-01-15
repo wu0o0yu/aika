@@ -92,7 +92,7 @@ public abstract class AbstractLinker {
         );
     }
 
-    public void link(Synapse<?, ?, ?> targetSynapse, Activation<?> fromAct, Direction dir, BindingSignal<?> fromBindingSignal) {
+    public void link(Synapse targetSynapse, Activation<?> fromAct, Direction dir, BindingSignal<?> fromBindingSignal) {
         fromBindingSignal.getOriginActivation()
                 .getReverseBindingSignals()
                 .filter(toBindingSignal -> fromBindingSignal.checkRelatedBindingSignal(targetSynapse, toBindingSignal, dir))

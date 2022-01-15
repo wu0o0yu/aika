@@ -21,7 +21,6 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
-import network.aika.steps.StepType;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -39,9 +38,10 @@ public class PropagateBindingSignal extends Step<Link> {
     protected Collection<BindingSignal> inputBindingSignals;
 
 
-    public static void add(Link<?> l) {
+    public static void add(Link l) {
+        Activation<?> iAct = l.getInput();
         Step.add(new PropagateBindingSignal(l,
-                l.getInput().getBindingSignals()
+                iAct.getBindingSignals()
                         .stream()
                         .filter(bs -> bs.checkPropagate())
                         .collect(Collectors.toList()))
@@ -68,26 +68,17 @@ public class PropagateBindingSignal extends Step<Link> {
     }
 
     @Override
+    public Phase getPhase() {
+        return Phase.PROCESSING;
+    }
+
+    @Override
     public void process() {
         Activation<?> oAct = getElement().getOutput();
 
         add(oAct, transitionBindingSignals(getElement(), inputBindingSignals)
                 .map(bs -> oAct.addBindingSignal(bs))
                 .filter(bs -> bs != null));
-    }
-
-    @Override
-    public Phase getPhase() {
-        return Phase.BINDING_SIGNAL;
-    }
-
-    @Override
-    public StepType getStepType() {
-        return StepType.INFERENCE;
-    }
-
-    public boolean checkIfQueued() {
-        return true;
     }
 
     public String toString() {

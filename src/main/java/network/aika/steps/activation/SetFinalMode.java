@@ -17,40 +17,31 @@
 package network.aika.steps.activation;
 
 import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
-import network.aika.steps.StepType;
 
 /**
  * Check if there are positive recurrent links that have not been activated and thus need to be updated.
  *
  * @author Lukas Molzberger
  */
-public class SetFinalMode extends Step<BindingActivation> {
+public class SetFinalMode extends Step<PatternActivation> {
 
-    public static void add(BindingActivation act) {
+    public static void add(PatternActivation act) {
         if(act.isFinalMode())
             return;
 
         Step.add(new SetFinalMode(act));
     }
 
-    private SetFinalMode(BindingActivation act) {
+    private SetFinalMode(PatternActivation act) {
         super(act);
     }
 
     @Override
     public Phase getPhase() {
-        return Phase.FINAL_LINKING;
-    }
-
-    @Override
-    public StepType getStepType() {
-        return StepType.INFERENCE;
-    }
-
-    public boolean checkIfQueued() {
-        return true;
+        return Phase.PROCESSING;
     }
 
     @Override

@@ -19,8 +19,6 @@ package network.aika.steps.activation;
 import network.aika.neuron.activation.Activation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
-import network.aika.steps.StepType;
-
 
 /**
  * Counts the number of activations a particular neuron has encountered.
@@ -39,26 +37,15 @@ public class Counting extends Step<Activation> {
 
     @Override
     public Phase getPhase() {
-        return Phase.COUNTING;
-    }
-
-    @Override
-    public StepType getStepType() {
-        return StepType.COUNTING;
+        return Phase.POST_PROCESSING;
     }
 
     @Override
     public void process() {
         Activation act = getElement();
 
-        if(!act.isFired())
-            return;
-
+        assert act.isFired();
         act.getNeuron().count(act);
-    }
-
-    public boolean checkIfQueued() {
-        return true;
     }
 
     public String toString() {

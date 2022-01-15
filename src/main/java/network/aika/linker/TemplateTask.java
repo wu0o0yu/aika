@@ -75,7 +75,7 @@ public class TemplateTask extends AbstractLinker {
         PropagateBindingSignal.add(l);
         LinkInduction.add(l);
 
-        if(!l.getConfig().isEnableTraining())
+        if(!l.getConfig().isTrainingEnabled())
             return;
 
         InformationGainGradient.add(l);

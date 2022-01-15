@@ -74,7 +74,7 @@ public class MutualExclusionTest {
         Config c = getConfig()
                 .setAlpha(0.99)
                 .setLearnRate(-0.011)
-                .setEnableTraining(true);
+                .setTrainingEnabled(true);
         doc.setConfig(c);
 
         doc.addToken(in, 0, 4);
@@ -118,13 +118,14 @@ public class MutualExclusionTest {
                 getConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.011)
-                        .setEnableTraining(true)
+                        .setTrainingEnabled(true)
         );
-
+/*
+TODO: Counting Mode
         doc.setQueueFilter(s ->
                 s.getStepType() == StepType.TEMPLATE || s.getStepType() == StepType.TRAINING
         );
-
+*/
         AikaDebugger.createAndShowGUI(doc);
 
         doc.addToken(in, 0, 4);

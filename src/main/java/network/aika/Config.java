@@ -26,7 +26,8 @@ public class Config {
     private Double alpha = null; //0.99;
     private double learnRate;
 
-    private boolean enableTraining;
+    private boolean trainingEnabled;
+    private boolean templatesEnabled;
 
     public double getLearnRate() {
         return learnRate;
@@ -46,15 +47,23 @@ public class Config {
         return this;
     }
 
-    public boolean isEnableTraining() {
-        return enableTraining;
+    public boolean isTrainingEnabled() {
+        return trainingEnabled;
     }
 
-    public Config setEnableTraining(boolean enableTraining) {
-        this.enableTraining = enableTraining;
+    public Config setTrainingEnabled(boolean trainingEnabled) {
+        this.trainingEnabled = trainingEnabled;
         return this;
     }
 
+    public boolean isTemplatesEnabled() {
+        return templatesEnabled;
+    }
+
+    public Config setTemplatesEnabled(boolean templatesEnabled) {
+        this.templatesEnabled = templatesEnabled;
+        return this;
+    }
     public String getLabel(Activation<?> act) {
         return "";
     }

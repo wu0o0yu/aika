@@ -35,12 +35,12 @@ public abstract class Element<E extends Element> implements Comparable<E> {
 
     public abstract Timestamp getFired();
 
-    public void addQueuedStep(Step s) {
-        queuedSteps.put(s, s);
-    }
+    public void addToQueue(Step s) {
+        if(s.checkIfQueued() && queuedSteps.containsKey(s))
+            return;
 
-    public boolean isQueued(Step s) {
-        return queuedSteps.containsKey(s);
+        queuedSteps.put(s, s);
+        getThought().addStep(s);
     }
 
     public void removeQueuedPhase(Step s) {

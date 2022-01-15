@@ -41,7 +41,7 @@ import static network.aika.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extends Activation> implements Writable {
+public abstract class Synapse<I extends Neuron, O extends Neuron<?, OA>, IA extends Activation, OA extends Activation> implements Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Synapse.class);
 
@@ -61,6 +61,11 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
     protected double frequencyINegOPos;
 
     protected boolean allowTraining = true;
+
+    public boolean propagateValue(Link<IA, OA> l) {
+        return true;
+    }
+
 
     public abstract boolean checkBindingSignal(BindingSignal fromBS, Direction dir);
 
@@ -94,16 +99,16 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
         this.output = output.getProvider();
     }
 
-    public Synapse<I, O, A> instantiateTemplate(I input, O output) {
-        Synapse<I, O, A> s = instantiateTemplate();
+    public Synapse<I, O, IA, OA> instantiateTemplate(I input, O output) {
+        Synapse<I, O, IA, OA> s = instantiateTemplate();
 
         s.input = input.getProvider();
         s.output = output.getProvider();
         return s;
     }
 
-    public Synapse<I, O, A> instantiateTemplate() {
-        Synapse<I, O, A> s;
+    public Synapse<I, O, IA, OA> instantiateTemplate() {
+        Synapse<I, O, IA, OA> s;
         try {
             s = getClass().getConstructor().newInstance();
             s.weight = weight;
@@ -118,7 +123,7 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
 
     public abstract boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct);
 
-    public A branchIfNecessary(Activation iAct, A oAct) {
+    public OA branchIfNecessary(Activation iAct, OA oAct) {
         return oAct;
     }
 
@@ -350,10 +355,6 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, A>, A extend
                 .filter(l -> l != null)
                 .forEach(l -> l.receiveWeightUpdate());
         setModified();
-    }
-
-    public boolean propagateValue(Link<A> l) {
-        return true;
     }
 
     @Override

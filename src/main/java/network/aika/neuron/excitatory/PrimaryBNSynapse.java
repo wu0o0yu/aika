@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Lukas Molzberger
  */
-public class PrimaryBNSynapse<I extends Neuron> extends InputBNSynapse<I> {
+public class PrimaryBNSynapse<I extends Neuron, IA extends Activation> extends InputBNSynapse<I, IA> {
 
     private static final Logger log = LoggerFactory.getLogger(PrimaryBNSynapse.class);
 

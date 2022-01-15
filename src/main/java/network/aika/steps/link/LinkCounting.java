@@ -20,7 +20,6 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Link;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
-import network.aika.steps.StepType;
 
 /**
  * Counts the number of input or output activations a particular synapse has encountered.
@@ -30,7 +29,7 @@ import network.aika.steps.StepType;
  */
 public class LinkCounting extends Step<Link> {
 
-    public static void add(Link<?> l) {
+    public static void add(Link l) {
         Step.add(new LinkCounting(l));
     }
 
@@ -40,16 +39,7 @@ public class LinkCounting extends Step<Link> {
 
     @Override
     public Phase getPhase() {
-        return Phase.COUNTING;
-    }
-
-    @Override
-    public StepType getStepType() {
-        return StepType.COUNTING;
-    }
-
-    public boolean checkIfQueued() {
-        return true;
+        return Phase.POST_PROCESSING;
     }
 
     @Override
