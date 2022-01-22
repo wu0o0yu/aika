@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.neuron.conjunctive;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 
@@ -26,7 +27,7 @@ import network.aika.neuron.bindingsignal.PatternBindingSignal;
  *
  * @author Lukas Molzberger
  */
-public abstract class BindingNeuronSynapse<I extends Neuron, IA extends Activation> extends ExcitatorySynapse<I, BindingNeuron, IA, BindingActivation> {
+public abstract class BindingNeuronSynapse<I extends Neuron & Axon, IA extends Activation> extends ConjunctiveSynapse<I, BindingNeuron, IA, BindingActivation> {
 
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {

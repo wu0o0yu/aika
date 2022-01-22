@@ -14,41 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
-import network.aika.neuron.bindingsignal.PrimaryPatternBindingSignal;
-import network.aika.neuron.bindingsignal.SecondaryPatternBindingSignal;
-
-import static network.aika.neuron.bindingsignal.BranchBindingSignal.isSeparateBranch;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class SameBNSynapse extends BindingNeuronSynapse<BindingNeuron, BindingActivation> {
-
-    public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
-        if(iBS.getScope() > 0)
-            return null;
-
-        return iBS.next(l.getOutput(), false);
-    }
+public abstract class InputBNSynapse<I extends Neuron & Axon, IA extends Activation> extends BindingNeuronSynapse<I, IA> {
 
     public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
-        return iBS instanceof PrimaryPatternBindingSignal &&
-                oBS instanceof SecondaryPatternBindingSignal && oBS.getScope() == 2;
-    }
-
-    @Override
-    public boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct) {
-        if(isSeparateBranch(iAct, oAct))
-            return false;
-
-        return super.checkCausalityAndBranchConsistency(iAct, oAct);
+        return (byte) (iBS.getScope() + 1) == oBS.getScope();
     }
 }

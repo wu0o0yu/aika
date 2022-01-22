@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
 import network.aika.Thought;
@@ -22,7 +22,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.fields.Field;
-import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.axons.BindingAxon;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -32,7 +32,7 @@ import java.io.IOException;
 /**
  * @author Lukas Molzberger
  */
-public class BindingNeuron extends ExcitatoryNeuron<BindingNeuronSynapse, BindingActivation> {
+public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, BindingActivation> implements BindingAxon {
 
     private Field finalBias = new Field(u ->
         biasUpdate(u, true)

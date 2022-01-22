@@ -14,15 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.inhibitory;
+package network.aika.neuron.disjunctive;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.DisjunctiveActivation;
 import network.aika.neuron.activation.InhibitoryActivation;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.axons.Axon;
+import network.aika.neuron.axons.BindingAxon;
+import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.sign.Sign;
 import network.aika.utils.Bound;
 
@@ -31,7 +35,7 @@ import network.aika.utils.Bound;
  *
  * @author Lukas Molzberger
  */
-public class InhibitorySynapse<I extends Neuron, IA extends Activation> extends Synapse<I, InhibitoryNeuron, IA, InhibitoryActivation> {
+public class DisjunctiveSynapse<I extends Neuron & Axon, O extends DisjunctiveNeuron<?, OA>, IA extends Activation, OA extends DisjunctiveActivation> extends Synapse<I, O, IA, OA> {
 
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
@@ -39,7 +43,7 @@ public class InhibitorySynapse<I extends Neuron, IA extends Activation> extends 
     }
 
     @Override
-    public boolean checkTemplatePropagate(Activation iAct) {
+    public boolean allowPropagate() {
         return true;
     }
 
@@ -60,6 +64,7 @@ public class InhibitorySynapse<I extends Neuron, IA extends Activation> extends 
         return getOutput();
     }
 
+    @Override
     public void updateSynapse(Link l, double delta) {
         if(!l.getInput().isFired())
             return;

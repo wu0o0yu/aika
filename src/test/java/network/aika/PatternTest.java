@@ -16,10 +16,10 @@
  */
 package network.aika;
 
-import network.aika.neuron.Neuron;
+import network.aika.debugger.AikaDebugger;
 import network.aika.neuron.Templates;
-import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TokenActivation;
@@ -45,10 +45,13 @@ public class PatternTest {
 
         doc.setConfig(
                 TestUtils.getConfig()
-                .setAlpha(0.99)
-                .setLearnRate(-0.011)
-                .setTrainingEnabled(false)
+                        .setAlpha(0.99)
+                        .setLearnRate(-0.011)
+                        .setTrainingEnabled(false)
+                        .setTemplatesEnabled(true)
         );
+
+        AikaDebugger.createAndShowGUI(doc);
 
         doc.processTokens(List.of("A", "B", "C"));
 
@@ -86,26 +89,26 @@ public class PatternTest {
         PatternNeuron nB = m.lookupToken("B");
         PatternNeuron nC = m.lookupToken( "C");
 
-        BindingNeuron eA = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "E A");
-        BindingNeuron eB = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "E B");
-        BindingNeuron eC = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "E C");
+        BindingNeuron eA = createNeuron(t.BINDING_TEMPLATE, "E A");
+        BindingNeuron eB = createNeuron(t.BINDING_TEMPLATE, "E B");
+        BindingNeuron eC = createNeuron(t.BINDING_TEMPLATE, "E C");
 
-        PatternNeuron out = createNeuron(t.OUTPUT_PATTERN_TEMPLATE, "OUT");
+        PatternNeuron out = createNeuron(t.PATTERN_TEMPLATE, "OUT");
         out.setTokenLabel("ABC");
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, nA, eA, 10.0);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, nA, eA, 10.0);
         createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE, out, eA, 10.0);
         updateBias(eA, 4.0);
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, nB, eB, 10.0);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, nB, eB, 10.0);
         createSynapse( t.SAME_PATTERN_SYNAPSE_TEMPLATE, eA, eB, 10.0);
-        createSynapse(t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE, lookupBindingNeuronPT(m, nB), eB, 10.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_FROM_BINDING_TEMPLATE, lookupBindingNeuronPT(nB, "PT"), eB, 10.0);
         createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE, out, eB, 10.0);
         updateBias(eB, 4.0);
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, nC, eC, 10.0);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, nC, eC, 10.0);
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, eB, eC, 10.0);
-        createSynapse(t.RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE, lookupBindingNeuronPT(m, nC), eC, 10.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_FROM_BINDING_TEMPLATE, lookupBindingNeuronPT(nC, "PT"), eC, 10.0);
         createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE, out, eC, 10.0);
 
         updateBias(eC, 4.0);
@@ -119,17 +122,12 @@ public class PatternTest {
         return m;
     }
 
-    public BindingNeuron lookupBindingNeuronPT(TextModel tm, PatternNeuron pn) {
+    public BindingNeuron lookupBindingNeuronPT(PatternNeuron pn, String direction) {
         return (BindingNeuron) pn.getOutputSynapses()
                 .map(s -> s.getOutput())
-                .filter(n -> isPTNeuron(tm, n))
+                .filter(n -> n.getLabel().contains(direction))
                 .findAny()
                 .orElse(null);
     }
 
-    private boolean isPTNeuron(TextModel tm, Neuron<?, ?> n) {
-        return n.getOutputSynapses()
-                .map(s -> s.getOutput())
-                .anyMatch(in -> in == tm.getPrevTokenInhib());
-    }
 }

@@ -14,21 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.neuron.conjunctive;
 
+import network.aika.Model;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.SampleSpace;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.axons.Axon;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.PostTraining;
 import network.aika.utils.Bound;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNeuron<?, OA>, IA extends Activation, OA extends Activation> extends Synapse<I, O, IA, OA> {
+public abstract class ConjunctiveSynapse<I extends Neuron & Axon, O extends ConjunctiveNeuron<?, OA>, IA extends Activation, OA extends Activation> extends Synapse<I, O, IA, OA> {
+
+    private boolean allowPropagate;
 
     @Override
     public boolean isWeak() {
@@ -51,6 +60,15 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
     protected void weightUpdate(double u) {
         super.weightUpdate(u);
         getOutput().getWeightSum().addAndTriggerUpdate(u);
+    }
+
+    @Override
+    public boolean allowPropagate() {
+        return allowPropagate;
+    }
+
+    public void setAllowPropagate(boolean allowPropagate) {
+        this.allowPropagate = allowPropagate;
     }
 
     @Override
@@ -80,5 +98,19 @@ public abstract class ExcitatorySynapse<I extends Neuron, O extends ExcitatoryNe
     @Override
     public void setModified() {
         getOutput().setModified();
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+
+        out.writeBoolean(allowPropagate);
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws IOException {
+        super.readFields(in, m);
+
+        allowPropagate = in.readBoolean();
     }
 }

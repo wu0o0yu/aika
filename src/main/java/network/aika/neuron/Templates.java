@@ -17,9 +17,11 @@
 package network.aika.neuron;
 
 import network.aika.Model;
-import network.aika.neuron.excitatory.*;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.neuron.inhibitory.InhibitorySynapse;
+import network.aika.neuron.conjunctive.*;
+import network.aika.neuron.disjunctive.CategoryNeuron;
+import network.aika.neuron.disjunctive.CategorySynapse;
+import network.aika.neuron.disjunctive.InhibitoryNeuron;
+import network.aika.neuron.disjunctive.InhibitorySynapse;
 
 import java.util.*;
 
@@ -33,21 +35,22 @@ public class Templates {
     private final Model model;
 
     public BindingNeuron INPUT_BINDING_TEMPLATE = new BindingNeuron();
-    public BindingNeuron OUTPUT_BINDING_TEMPLATE = new BindingNeuron();
+    public BindingNeuron BINDING_TEMPLATE = new BindingNeuron();
     public PatternNeuron INPUT_PATTERN_TEMPLATE = new PatternNeuron();
-    public PatternNeuron OUTPUT_PATTERN_TEMPLATE = new PatternNeuron();
+    public PatternNeuron PATTERN_TEMPLATE = new PatternNeuron();
     public InhibitoryNeuron INHIBITORY_TEMPLATE = new InhibitoryNeuron();
+    public CategoryNeuron CATEGORY_TEMPLATE = new CategoryNeuron();
 
 
-    public PrimaryBNSynapse PRIMARY_INPUT_SYNAPSE_TEMPLATE;
-    public RelatedBNSynapse RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE;
-    public RelatedBNSynapse RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE;
-    public RelatedRecurrentBNSynapse RELATED_RECURRENT_INPUT_SYNAPSE_TEMPLATE;
-    public SameBNSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
+    public PrimaryInputBNSynapse PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE;
+    public PrimaryInputBNSynapse PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE;
+    public RelatedInputBNSynapse RELATED_INPUT_SYNAPSE_FROM_BINDING_TEMPLATE;
+    public SamePatternBNSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
     public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE;
     public NegativeFeedbackSynapse NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE;
     public PatternSynapse PATTERN_SYNAPSE_TEMPLATE;
     public InhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE;
+    public CategorySynapse CATEGORY_SYNAPSE_TEMPLATE;
 
     private final Map<Byte, Neuron> templateNeuronIndex = new TreeMap<>();
     private final Map<Byte, Synapse> templateSynapseIndex = new TreeMap<>();
@@ -56,66 +59,58 @@ public class Templates {
         model = m;
 
         init(INPUT_BINDING_TEMPLATE, -1, "Input Binding Neuron");
-        init(OUTPUT_BINDING_TEMPLATE, -2, "Output Binding Neuron");
+        init(BINDING_TEMPLATE, -2, "Binding Neuron");
         init(INPUT_PATTERN_TEMPLATE, -3, "Input Pattern Neuron");
-        init(OUTPUT_PATTERN_TEMPLATE, -4, "Output Pattern Neuron");
+        init(PATTERN_TEMPLATE, -4, "Pattern Neuron");
         init(INHIBITORY_TEMPLATE, -5, "Inhibitory Neuron");
+        init(CATEGORY_TEMPLATE, -6, "Category Neuron");
 
-        Set<Neuron> BINDING_NEURON_TEMPLATE_GROUP = Set.of(INPUT_BINDING_TEMPLATE, OUTPUT_BINDING_TEMPLATE);
+        Set<Neuron> BINDING_NEURON_TEMPLATE_GROUP = Set.of(INPUT_BINDING_TEMPLATE, BINDING_TEMPLATE);
         INPUT_BINDING_TEMPLATE.getTemplateInfo().setTemplateGroup(BINDING_NEURON_TEMPLATE_GROUP);
-        OUTPUT_BINDING_TEMPLATE.getTemplateInfo().setTemplateGroup(BINDING_NEURON_TEMPLATE_GROUP);
+        BINDING_TEMPLATE.getTemplateInfo().setTemplateGroup(BINDING_NEURON_TEMPLATE_GROUP);
 
-        Set<Neuron> PATTERN_NEURON_TEMPLATE_GROUP = Set.of(INPUT_PATTERN_TEMPLATE, OUTPUT_PATTERN_TEMPLATE);
+        Set<Neuron> PATTERN_NEURON_TEMPLATE_GROUP = Set.of(INPUT_PATTERN_TEMPLATE, PATTERN_TEMPLATE);
         INPUT_PATTERN_TEMPLATE.getTemplateInfo().setTemplateGroup(PATTERN_NEURON_TEMPLATE_GROUP);
-        OUTPUT_PATTERN_TEMPLATE.getTemplateInfo().setTemplateGroup(PATTERN_NEURON_TEMPLATE_GROUP);
+        PATTERN_TEMPLATE.getTemplateInfo().setTemplateGroup(PATTERN_NEURON_TEMPLATE_GROUP);
 
         INHIBITORY_TEMPLATE.getTemplateInfo().setTemplateGroup(Set.of(INHIBITORY_TEMPLATE));
+        CATEGORY_TEMPLATE.getTemplateInfo().setTemplateGroup(Set.of(CATEGORY_TEMPLATE));
 
-        PRIMARY_INPUT_SYNAPSE_TEMPLATE =
+        PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE =
                 init(
-                        new PrimaryBNSynapse(),
+                        new PrimaryInputBNSynapse(),
                         INPUT_PATTERN_TEMPLATE,
-                        OUTPUT_BINDING_TEMPLATE,
-                        "Primary Input Synapse",
+                        BINDING_TEMPLATE,
+                        "Primary Input Synapse from Pattern",
                         1,
                         0.01
                 );
 
-        RELATED_INPUT_SYNAPSE_FROM_B_TEMPLATE =
+        PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE =
                 init(
-                        new RelatedBNSynapse(),
+                        new PrimaryInputBNSynapse(),
+                        CATEGORY_TEMPLATE,
+                        BINDING_TEMPLATE,
+                        "Primary Input Synapse from Category",
+                        1,
+                        0.01
+                );
+
+        RELATED_INPUT_SYNAPSE_FROM_BINDING_TEMPLATE =
+                init(
+                        new RelatedInputBNSynapse(),
                         INPUT_BINDING_TEMPLATE,
-                        OUTPUT_BINDING_TEMPLATE,
+                        BINDING_TEMPLATE,
                         "Related Input Synapse from Binding Neuron",
                         2,
                         0.0
                 );
 
-        RELATED_INPUT_SYNAPSE_FROM_INHIBITORY_TEMPLATE =
-                init(
-                        new RelatedBNSynapse(),
-                        INHIBITORY_TEMPLATE,
-                        OUTPUT_BINDING_TEMPLATE,
-                        "Related Input Synapse from Inhibitory Neuron",
-                        3,
-                        0.0
-                );
-
-        RELATED_RECURRENT_INPUT_SYNAPSE_TEMPLATE =
-                init(
-                        new RelatedRecurrentBNSynapse(),
-                        INHIBITORY_TEMPLATE,
-                        OUTPUT_BINDING_TEMPLATE,
-                        "Related Input Synapse from Inhibitory Neuron",
-                        10,
-                        0.0
-                );
-
         SAME_PATTERN_SYNAPSE_TEMPLATE =
                 init(
-                        new SameBNSynapse(),
-                        OUTPUT_BINDING_TEMPLATE,
-                        OUTPUT_BINDING_TEMPLATE,
+                        new SamePatternBNSynapse(),
+                        BINDING_TEMPLATE,
+                        BINDING_TEMPLATE,
                         "Same Pattern Synapse",
                         4,
                         0.0
@@ -124,8 +119,8 @@ public class Templates {
         POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE =
                 init(
                         new PositiveFeedbackSynapse(),
-                        OUTPUT_PATTERN_TEMPLATE,
-                        OUTPUT_BINDING_TEMPLATE,
+                        PATTERN_TEMPLATE,
+                        BINDING_TEMPLATE,
                         "Positive Feedback Synapse",
                         5,
                         0.0
@@ -135,7 +130,7 @@ public class Templates {
                 init(
                         new NegativeFeedbackSynapse(),
                         INHIBITORY_TEMPLATE,
-                        OUTPUT_BINDING_TEMPLATE,
+                        BINDING_TEMPLATE,
                         "Negative Feedback Synapse",
                         6,
                         0.0
@@ -144,8 +139,8 @@ public class Templates {
         PATTERN_SYNAPSE_TEMPLATE =
                 init(
                         new PatternSynapse(),
-                        OUTPUT_BINDING_TEMPLATE,
-                        OUTPUT_PATTERN_TEMPLATE,
+                        BINDING_TEMPLATE,
+                        PATTERN_TEMPLATE,
                         "Pattern Synapse",
                         7,
                         1.0 // Needs to be above the tolerance
@@ -154,10 +149,20 @@ public class Templates {
         INHIBITORY_SYNAPSE_TEMPLATE =
                 init(
                         new InhibitorySynapse(),
-                        OUTPUT_BINDING_TEMPLATE,
+                        BINDING_TEMPLATE,
                         INHIBITORY_TEMPLATE,
                         "Inhibitory Synapse",
                         8,
+                        0.0
+                );
+
+        CATEGORY_SYNAPSE_TEMPLATE =
+                init(
+                        new CategorySynapse(),
+                        PATTERN_TEMPLATE,
+                        CATEGORY_TEMPLATE,
+                        "Category Synapse",
+                        9,
                         0.0
                 );
     }
@@ -165,10 +170,11 @@ public class Templates {
     public Collection<Neuron> getAllTemplates() {
         return Arrays.asList(
                 INPUT_BINDING_TEMPLATE,
-                OUTPUT_BINDING_TEMPLATE,
+                BINDING_TEMPLATE,
                 INPUT_PATTERN_TEMPLATE,
-                OUTPUT_PATTERN_TEMPLATE,
-                INHIBITORY_TEMPLATE
+                PATTERN_TEMPLATE,
+                INHIBITORY_TEMPLATE,
+                CATEGORY_TEMPLATE
         );
     }
 

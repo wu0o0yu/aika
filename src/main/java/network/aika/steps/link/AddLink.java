@@ -36,7 +36,7 @@ public class AddLink extends Step<Link> {
 
     @Override
     public Phase getPhase() {
-        return Phase.PROCESSING;
+        return Phase.INIT;
     }
 
     @Override

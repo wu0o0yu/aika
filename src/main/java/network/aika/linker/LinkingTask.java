@@ -42,10 +42,6 @@ public class LinkingTask extends AbstractLinker {
         return act.isFired();
     }
 
-    @Override
-    public boolean checkPropagate(Activation act, Synapse targetSynapse) {
-        return !targetSynapse.isNegative();
-    }
 
     public Neuron getPropagateTargetNeuron(Synapse targetSynapse, Activation act) {
         return targetSynapse.getOutput();

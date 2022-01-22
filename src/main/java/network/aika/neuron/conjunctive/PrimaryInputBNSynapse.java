@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.bindingsignal.SecondaryPatternBindingSignal;
 import org.slf4j.Logger;
@@ -28,9 +29,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author Lukas Molzberger
  */
-public class PrimaryBNSynapse<I extends Neuron, IA extends Activation> extends InputBNSynapse<I, IA> {
+public class PrimaryInputBNSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends InputBNSynapse<I, IA> {
 
-    private static final Logger log = LoggerFactory.getLogger(PrimaryBNSynapse.class);
+    private static final Logger log = LoggerFactory.getLogger(PrimaryInputBNSynapse.class);
 
     public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
         if(iBS.getScope() >= 2 || iBS instanceof SecondaryPatternBindingSignal)
@@ -39,7 +40,7 @@ public class PrimaryBNSynapse<I extends Neuron, IA extends Activation> extends I
         return iBS.nextPrimary(l.getOutput(), true);
     }
 
-    public boolean checkTemplatePropagate(Activation act) {
+    public boolean allowPropagate(Activation act) {
         log.info(act.getLabel() + " CandidateGradient:" + act.getNeuron().getCandidateGradient(act));
 
         return true;

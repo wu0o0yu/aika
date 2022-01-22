@@ -43,10 +43,6 @@ public class TemplateTask extends AbstractLinker {
         return act.getNeuron().allowTemplatePropagate(act);
     }
 
-    @Override
-    public boolean checkPropagate(Activation act, Synapse targetSynapse) {
-        return !targetSynapse.isNegative() && targetSynapse.checkTemplatePropagate(act);
-    }
 
     public Neuron getPropagateTargetNeuron(Synapse targetSynapse, Activation act) {
         return targetSynapse.getTemplatePropagateTargetNeuron(act);

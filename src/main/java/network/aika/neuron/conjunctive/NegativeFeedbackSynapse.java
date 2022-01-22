@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.neuron.conjunctive;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.activation.Activation;
@@ -24,7 +24,7 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.disjunctive.InhibitoryNeuron;
 
 import static network.aika.neuron.bindingsignal.BranchBindingSignal.isSeparateBranch;
 

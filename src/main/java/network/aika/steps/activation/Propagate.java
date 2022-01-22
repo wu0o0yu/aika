@@ -37,9 +37,11 @@ import network.aika.linker.LinkingTask;
  */
 public class Propagate extends Step<Activation> {
 
+    public static void add(Activation act) {
+        Step.add(new Propagate(act, false));
 
-    public static void add(Activation act, boolean template) {
-        Step.add(new Propagate(act, template));
+        if(act.getConfig().isTemplatesEnabled())
+            Step.add(new Propagate(act, true));
     }
 
     private final AbstractLinker linker;
@@ -54,7 +56,7 @@ public class Propagate extends Step<Activation> {
 
     @Override
     public Phase getPhase() {
-        return Phase.PROCESSING;
+        return template ? Phase.LATE : Phase.PROCESSING;
     }
 
     @Override

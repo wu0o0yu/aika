@@ -14,36 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.neuron.activation;
 
-import network.aika.neuron.activation.*;
-import network.aika.direction.Direction;
+import network.aika.Thought;
+import network.aika.neuron.Range;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.PatternBindingSignal;
+import network.aika.neuron.disjunctive.CategoryNeuron;
+
+import java.util.Comparator;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class PatternSynapse extends ExcitatorySynapse<BindingNeuron, PatternNeuron, BindingActivation, PatternActivation> {
+public class CategoryActivation extends DisjunctiveActivation<CategoryNeuron> {
 
-    @Override
-    public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
-        return fromBS instanceof PatternBindingSignal;
+    public CategoryActivation(int id, Thought t, CategoryNeuron neuron) {
+        super(id, t, neuron);
     }
 
     @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
-        return iBS.getOrigin() == oBS;
+    public Range getRange() {
+        BindingSignal bs = getPrimaryPatternBindingSignal();
+        if(bs == null)
+            return null;
+
+        return bs.getOriginActivation()
+                .getRange();
     }
 
-    @Override
-    public boolean checkTemplatePropagate(Activation act) {
-        return true;
-    }
-
-    @Override
-    public boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct) {
-        return true;
+    private BindingSignal getPrimaryPatternBindingSignal() {
+        return getPatternBindingSignals().values().stream()
+                .filter(bs -> bs.getOriginActivation().getFired().compareTo(fired) < 0)
+                .min(Comparator.comparing(bs -> bs.getScope()))
+                .orElse(null);
     }
 }

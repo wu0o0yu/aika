@@ -19,12 +19,15 @@ package network.aika.text;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.neuron.excitatory.PatternNeuron;
-import network.aika.neuron.excitatory.RelatedBNSynapse;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.neuron.conjunctive.PrimaryInputBNSynapse;
+import network.aika.neuron.conjunctive.RelatedInputBNSynapse;
+import network.aika.neuron.disjunctive.CategoryNeuron;
 
 import static network.aika.linker.LinkingTask.addNextLinkerSteps;
+import static network.aika.text.TextModel.REL_NEXT_TOKEN_LABEL;
+import static network.aika.text.TextModel.REL_PREVIOUS_TOKEN_LABEL;
 
 
 /**
@@ -49,8 +52,8 @@ public class TokenActivation extends PatternActivation {
         addNextLinkerSteps(nl);
     }
 
-    private static RelatedBNSynapse getRelSynapse(BindingNeuron n, InhibitoryNeuron relInhib) {
-        return (RelatedBNSynapse) n.getInputSynapse(relInhib.getProvider());
+    private static PrimaryInputBNSynapse getRelatedSynapse(CategoryNeuron input, BindingNeuron output) {
+        return (PrimaryInputBNSynapse) output.getInputSynapse(input.getProvider());
     }
 
     public static void addRelation(TokenActivation prev, TokenActivation next) {
@@ -62,33 +65,35 @@ public class TokenActivation extends PatternActivation {
 
         TextModel model = (TextModel) prev.getModel();
 
-        InhibitoryActivation inhibActNext = prev.getInhibTokenAct(model.getNextTokenInhib());
-        BindingActivation relActNext = getRelAct(inhibActNext);
-        RelatedBNSynapse relSynNext = getRelSynapse(relActNext.getNeuron(), model.getPrevTokenInhib());
+        CategoryActivation prevCatAct = prev.getCategoryTokenAct(model.getTokenCategory());
+        BindingActivation relActNext = getRelationActivation(prev, REL_NEXT_TOKEN_LABEL);
 
-        InhibitoryActivation inhibActPrev = next.getInhibTokenAct(model.getPrevTokenInhib());
-        BindingActivation relActPrev = getRelAct(inhibActPrev);
-        RelatedBNSynapse relSynPrev = getRelSynapse(relActPrev.getNeuron(), model.getNextTokenInhib());
+        CategoryActivation nextCatAct = next.getCategoryTokenAct(model.getTokenCategory());
+        BindingActivation relActPrev = getRelationActivation(next, REL_PREVIOUS_TOKEN_LABEL);
 
-        addLink(relSynNext, inhibActPrev, relActNext);
-        addLink(relSynPrev, inhibActNext, relActPrev);
+        PrimaryInputBNSynapse relSynNext = getRelatedSynapse(nextCatAct.getNeuron(), relActNext.getNeuron());
+        addLink(relSynNext, nextCatAct, relActNext);
+
+        PrimaryInputBNSynapse relSynPrev = getRelatedSynapse(prevCatAct.getNeuron(), relActPrev.getNeuron());
+        addLink(relSynPrev, prevCatAct, relActPrev);
     }
 
-    private static BindingActivation getRelAct(InhibitoryActivation inhibAct) {
-        return (BindingActivation) inhibAct
-                .getInputLinks()
+    private static BindingActivation getRelationActivation(PatternActivation patternAct, String direction) {
+        return (BindingActivation) patternAct
+                .getOutputLinks()
+                .filter(l -> l.getOutput().getLabel().contains(direction))
                 .findFirst()
                 .orElse(null)
-                .getInput();
+                .getOutput();
     }
 
-    private InhibitoryActivation getInhibTokenAct(InhibitoryNeuron inhibitoryNeuron) {
-        return (InhibitoryActivation) reverseBindingSignals
+    private CategoryActivation getCategoryTokenAct(CategoryNeuron categoryNeuron) {
+        return (CategoryActivation) reverseBindingSignals
                 .values()
                 .stream()
                 .filter(bs -> bs.getScope() == 0)
                 .map(bs -> bs.getActivation())
-                .filter(act -> act.getNeuron() == inhibitoryNeuron)
+                .filter(act -> act.getNeuron() == categoryNeuron)
                 .findFirst()
                 .orElse(null);
     }

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
 import network.aika.neuron.ActivationFunction;
@@ -37,19 +37,19 @@ import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGEN
  *
  * @author Lukas Molzberger
  */
-public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Activation> extends Neuron<S, A> {
+public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends Activation> extends Neuron<S, A> {
 
     private volatile Field weightSum = new Field();
 
-    public ExcitatoryNeuron() {
+    public ConjunctiveNeuron() {
         super();
     }
 
-    public ExcitatoryNeuron(NeuronProvider p) {
+    public ConjunctiveNeuron(NeuronProvider p) {
         super(p);
     }
 
-    public ExcitatoryNeuron(Model model, boolean addProvider) {
+    public ConjunctiveNeuron(Model model, boolean addProvider) {
         super(model, addProvider);
     }
 
@@ -57,7 +57,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
         return weightSum;
     }
 
-    protected void initFromTemplate(ExcitatoryNeuron n) {
+    protected void initFromTemplate(ConjunctiveNeuron n) {
         super.initFromTemplate(n);
     }
 
@@ -70,7 +70,7 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
             bias.setAndTriggerUpdate(weightSum.getCurrentValue());
     }
 
-    public void addDummyLinks(Activation act) {
+    public void addInactiveLinks(Activation act) {
         inputSynapses
                 .values()
                 .stream()
@@ -85,22 +85,19 @@ public abstract class ExcitatoryNeuron<S extends ExcitatorySynapse, A extends Ac
     }
 
     public void updateSynapseInputConnections() {
-        TreeSet<ExcitatorySynapse> sortedSynapses = new TreeSet<>(
-                Comparator.<ExcitatorySynapse>comparingDouble(s -> s.getWeight().getCurrentValue()).reversed()
+        TreeSet<ConjunctiveSynapse> sortedSynapses = new TreeSet<>(
+                Comparator.<ConjunctiveSynapse>comparingDouble(s -> s.getWeight().getCurrentValue()).reversed()
                         .thenComparing(Synapse::getPInput)
         );
 
         sortedSynapses.addAll(inputSynapses.values());
 
         double sum = getWeightSum().getCurrentValue();
-        for(ExcitatorySynapse s: sortedSynapses) {
+        for(ConjunctiveSynapse s: sortedSynapses) {
             if(s.getWeight().getCurrentValue() <= 0.0)
                 break;
 
-            if(s.isWeak(sum))
-                s.unlinkInput();
-            else
-                s.linkInput();
+            s.setAllowPropagate(!s.isWeak(sum));
 
             sum -= s.getWeight().getCurrentValue();
         }

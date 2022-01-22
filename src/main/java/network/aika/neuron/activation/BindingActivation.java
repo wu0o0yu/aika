@@ -22,10 +22,9 @@ import network.aika.neuron.Synapse;
 import network.aika.fields.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
-import network.aika.neuron.excitatory.BindingNeuron;
+import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.steps.activation.BranchProbability;
 import network.aika.steps.activation.Linking;
-import network.aika.steps.activation.SetFinalMode;
 import network.aika.utils.Utils;
 
 import java.util.*;
@@ -131,8 +130,8 @@ public class BindingActivation extends Activation<BindingNeuron> {
         return clonedAct;
     }
 
+    @Override
     public void addFeedbackSteps() {
-        SetFinalMode.add(this);
         BranchProbability.add(this);
     }
 

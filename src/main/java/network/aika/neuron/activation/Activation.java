@@ -147,10 +147,11 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
             if (isFired() || net.getCurrentValue() <= 0.0)
                 return;
 
-            addInformationGainStep();
-
+            addEntropySteps();
             setFired();
-            propagate();
+            Propagate.add(this);
+            addFeedbackSteps();
+            addCountingSteps();
         });
     }
 
@@ -159,7 +160,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
             value.setAndTriggerUpdate(getActivationFunction().f(net));
     }
 
-    protected void addInformationGainStep() {
+    protected void addEntropySteps() {
+        EntropyGradient.add(this);
+
         inputLinks.values()
                 .forEach(l ->
                         InformationGainGradient.add(l)
@@ -171,16 +174,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
             propagateGradient(outputGradient.getUpdate(2, true), true, true);
     }
 
-    public void propagate() {
-        Propagate.add(this, false);
-
-        addFeedbackSteps();
-
+    public void addCountingSteps() {
+        InactiveLinks.add(this);
         Counting.add(this);
-        getInputLinks().forEach(l -> LinkCounting.add(l));
-
-        Propagate.add(this, true);
-        EntropyGradient.add(this);
+        getInputLinks().forEach(l ->
+                LinkCounting.add(l)
+        );
     }
 
     protected void propagateGradient(double g, boolean updateWeights, boolean backPropagate) {
@@ -199,7 +198,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         );
 
         if(isFired())
-            Propagate.add(this, true);
+            Propagate.add(this); // Previously only the propagate template step was added.
     }
 
     public void init(Synapse originSynapse, Activation originAct) {
@@ -388,7 +387,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public Link addLink(Synapse s, Activation input) {
         Link ol = getInputLink(s);
-        assert ol == null;
+        assert ol == null || ol.getInput() == null;
 
         return new Link(s, input, this);
     }

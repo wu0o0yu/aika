@@ -14,50 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.neuron.conjunctive;
 
+import network.aika.neuron.activation.*;
 import network.aika.direction.Direction;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.BranchBindingSignal;
+import network.aika.neuron.bindingsignal.PatternBindingSignal;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PatternNeuron, PatternActivation> {
-
-    @Override
-    public boolean propagateValue(Link<PatternActivation, BindingActivation> l) {
-        return !isRecurrent() ||
-                l.getInput().isFinalMode() ||
-                l.isForward();
-    }
+public class PatternSynapse extends ConjunctiveSynapse<BindingNeuron, PatternNeuron, BindingActivation, PatternActivation> {
 
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
-        return fromBS instanceof BranchBindingSignal;
+        return fromBS instanceof PatternBindingSignal;
     }
 
     @Override
-    public boolean checkRelatedBranchBindingSignal(BranchBindingSignal iBS, BranchBindingSignal oBS) {
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
         return iBS.getOrigin() == oBS;
     }
 
     @Override
-    public boolean isRecurrent() {
+    public boolean allowPropagate() {
         return true;
     }
 
     @Override
     public boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct) {
         return true;
-    }
-
-    public boolean checkTemplatePropagate(Activation act) {
-        return false;
     }
 }

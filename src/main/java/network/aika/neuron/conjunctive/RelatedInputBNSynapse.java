@@ -14,10 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.neuron.conjunctive;
 
-import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
@@ -27,7 +26,7 @@ import network.aika.neuron.bindingsignal.PrimaryPatternBindingSignal;
  *
  * @author Lukas Molzberger
  */
-public class RelatedBNSynapse<I extends Neuron, IA extends Activation> extends InputBNSynapse<I, IA> {
+public class RelatedInputBNSynapse extends InputBNSynapse<BindingNeuron, BindingActivation> {
 
     public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
         if(iBS.getScope() >= 2 || iBS instanceof PrimaryPatternBindingSignal)

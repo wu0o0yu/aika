@@ -91,7 +91,7 @@ public class GradientTest {
         TextModel m = new TextModel();
 
         m.setN(912);
-        m.getTemplates().OUTPUT_BINDING_TEMPLATE.getBias().add(-0.32);
+        m.getTemplates().BINDING_TEMPLATE.getBias().add(-0.32);
         m.init();
 
         Document doc1 = new Document(m, "A B ");

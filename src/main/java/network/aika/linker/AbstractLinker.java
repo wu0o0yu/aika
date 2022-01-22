@@ -38,8 +38,6 @@ public abstract class AbstractLinker {
 
     public abstract boolean checkPropagate(Activation act);
 
-    public abstract boolean checkPropagate(Activation act, Synapse targetSynapse);
-
     public abstract Neuron getPropagateTargetNeuron(Synapse targetSynapse, Activation iAct);
 
     public abstract Stream<? extends Synapse> getTargetSynapses(Activation act, Direction dir);
@@ -60,7 +58,7 @@ public abstract class AbstractLinker {
 
         getTargetSynapses(act, OUTPUT)
                 .filter(s ->
-                        checkPropagate(act, s) &&
+                        s.allowPropagate() &&
                         !exists(act, OUTPUT, s)
                 )
                 .forEach(s ->

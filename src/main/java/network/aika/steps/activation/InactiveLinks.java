@@ -5,13 +5,13 @@ import network.aika.neuron.activation.Activation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
-public class DummyLinks extends Step<Activation> {
+public class InactiveLinks extends Step<Activation> {
 
     public static void add(Activation act) {
-        Step.add(new DummyLinks(act));
+        Step.add(new InactiveLinks(act));
     }
 
-    public DummyLinks(Activation act) {
+    public InactiveLinks(Activation act) {
         super(act);
     }
 
@@ -25,10 +25,10 @@ public class DummyLinks extends Step<Activation> {
         Activation act = getElement();
         Neuron n = act.getNeuron();
 
-        n.addDummyLinks(act);
+        n.addInactiveLinks(act);
     }
 
     public String toString() {
-        return "Act-Step: Add dummy links " + getElement().toShortString();
+        return "Act-Step: Add inactive links " + getElement().toShortString();
     }
 }

@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.axons.PatternAxon;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -31,7 +31,7 @@ import java.io.IOException;
  *
  * @author Lukas Molzberger
  */
-public class PatternNeuron extends ExcitatoryNeuron<PatternSynapse, PatternActivation> {
+public class PatternNeuron extends ConjunctiveNeuron<PatternSynapse, PatternActivation> implements PatternAxon {
 
     private String tokenLabel;
 

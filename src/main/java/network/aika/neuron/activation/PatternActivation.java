@@ -20,8 +20,9 @@ import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
-import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.steps.activation.Linking;
+import network.aika.steps.activation.SetFinalMode;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -67,6 +68,10 @@ public class PatternActivation extends Activation<PatternNeuron> {
     public void init(Synapse originSynapse, Activation originAct) {
         super.init(originSynapse, originAct);
         addBindingSignal(new PatternBindingSignal(this));
+    }
+
+    public void addFeedbackSteps() {
+        SetFinalMode.add(this);
     }
 
     public boolean checkPropagatePatternBindingSignal(PatternBindingSignal bs) {

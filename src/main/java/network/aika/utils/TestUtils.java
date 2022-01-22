@@ -21,9 +21,9 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.neuron.excitatory.ExcitatoryNeuron;
-import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.ConjunctiveNeuron;
+import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.text.Document;
 
 
@@ -83,7 +83,7 @@ public class TestUtils {
 
         s.linkInput();
         s.getWeight().setInitialValue(weight);
-        if(output instanceof ExcitatoryNeuron) {
+        if(output instanceof ConjunctiveNeuron) {
             s.linkOutput();
 
             if(weight >= 0.0) {

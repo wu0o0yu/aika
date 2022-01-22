@@ -49,7 +49,9 @@ public class Linking extends Step<Activation> {
 
     public static void add(Activation act, BindingSignal bindingSignal) {
         Step.add(new Linking(act, bindingSignal, false));
-        Step.add(new Linking(act, bindingSignal, true));
+
+        if(act.getConfig().isTemplatesEnabled())
+            Step.add(new Linking(act, bindingSignal, true));
     }
 
     private final AbstractLinker linker;

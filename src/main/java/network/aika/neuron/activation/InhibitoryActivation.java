@@ -19,7 +19,7 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
+import network.aika.neuron.disjunctive.InhibitoryNeuron;
 
 import java.util.stream.Stream;
 
@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  *
  * @author Lukas Molzberger
  */
-public class InhibitoryActivation extends Activation<InhibitoryNeuron> {
+public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron> {
 
     public InhibitoryActivation(int id, Thought t, InhibitoryNeuron neuron) {
         super(id, t, neuron);

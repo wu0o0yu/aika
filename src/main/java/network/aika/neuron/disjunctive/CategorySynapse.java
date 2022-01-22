@@ -14,21 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.excitatory;
+package network.aika.neuron.disjunctive;
 
 import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.CategoryActivation;
+import network.aika.neuron.activation.DisjunctiveActivation;
+import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.axons.PatternAxon;
+
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class RelatedRecurrentBNSynapse<I extends Neuron, IA extends Activation> extends RelatedBNSynapse<I, IA> {
-
-    @Override
-    public boolean isRecurrent() {
-        return true;
-    }
+public class CategorySynapse<N extends Neuron & PatternAxon> extends DisjunctiveSynapse<N, CategoryNeuron, PatternActivation, CategoryActivation> {
 }

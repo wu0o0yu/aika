@@ -17,8 +17,8 @@
 package network.aika;
 
 import network.aika.neuron.Templates;
-import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
@@ -37,9 +37,9 @@ public class PropagateTest {
         Templates t = new Templates(m);
 
         PatternNeuron in = createNeuron(t.INPUT_PATTERN_TEMPLATE, "IN", true);
-        BindingNeuron out = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "OUT");
+        BindingNeuron out = createNeuron(t.BINDING_TEMPLATE, "OUT");
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, out, 10.0);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, in, out, 10.0);
         updateBias(out, 1.0);
 
         Document doc = new Document(m, "test");

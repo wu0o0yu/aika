@@ -20,10 +20,9 @@ import network.aika.debugger.AikaDebugger;
 import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.neuron.excitatory.PatternNeuron;
-import network.aika.neuron.inhibitory.InhibitoryNeuron;
-import network.aika.steps.StepType;
+import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.utils.TestUtils;
@@ -47,26 +46,26 @@ public class MutualExclusionTest {
         Templates t = m.getTemplates();
 
         PatternNeuron in = createNeuron(t.INPUT_PATTERN_TEMPLATE, "I", true);
-        BindingNeuron na = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "A");
-        BindingNeuron nb = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "B");
-        BindingNeuron nc = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "C");
+        BindingNeuron na = createNeuron(t.BINDING_TEMPLATE, "A");
+        BindingNeuron nb = createNeuron(t.BINDING_TEMPLATE, "B");
+        BindingNeuron nc = createNeuron(t.BINDING_TEMPLATE, "C");
         InhibitoryNeuron inhib = createNeuron(t.INHIBITORY_TEMPLATE, "I");
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, na, 10.0);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, in, na, 10.0);
         createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, na, -100.0);
         TestUtils.updateBias(na, 1.0);
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, nb, 10.0);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, in, nb, 10.0);
         createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, nb, -100.0);
         TestUtils.updateBias(nb, 1.5);
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, nc, 10.0);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, in, nc, 10.0);
         createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, nc, -100.0);
         TestUtils.updateBias(nc, 1.2);
 
-        createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, na, inhib, 1.0);
-        createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, nb, inhib, 1.0);
-        createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, nc, inhib, 1.0);
+        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, na, inhib, 1.0);
+        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, nb, inhib, 1.0);
+        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, nc, inhib, 1.0);
 
 
         Document doc = new Document(m, "test");
@@ -98,20 +97,20 @@ public class MutualExclusionTest {
         Templates t = m.getTemplates();
 
         PatternNeuron in = createNeuron(t.INPUT_PATTERN_TEMPLATE, "I", true);
-        BindingNeuron na = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "A");
-        BindingNeuron nb = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "B");
+        BindingNeuron na = createNeuron(t.BINDING_TEMPLATE, "A");
+        BindingNeuron nb = createNeuron(t.BINDING_TEMPLATE, "B");
         InhibitoryNeuron inhib = createNeuron(t.INHIBITORY_TEMPLATE, "I");
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, na, 10.0);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, in, na, 10.0);
         createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, na, -100.0);
         updateBias(na, 1.0);
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, in, nb, 10.0);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, in, nb, 10.0);
         createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, nb, -100.0);
         updateBias(nb, 1.5);
 
-        createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, na, inhib, 1.0);
-        createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, nb, inhib, 1.0);
+        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, na, inhib, 1.0);
+        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, nb, inhib, 1.0);
 
         Document doc = new Document(m, "test");
         doc.setConfig(

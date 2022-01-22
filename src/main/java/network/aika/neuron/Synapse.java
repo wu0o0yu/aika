@@ -20,6 +20,7 @@ import network.aika.Model;
 import network.aika.neuron.activation.*;
 import network.aika.direction.Direction;
 import network.aika.fields.Field;
+import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
@@ -41,7 +42,7 @@ import static network.aika.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public abstract class Synapse<I extends Neuron, O extends Neuron<?, OA>, IA extends Activation, OA extends Activation> implements Writable {
+public abstract class Synapse<I extends Neuron & Axon, O extends Neuron<?, OA>, IA extends Activation, OA extends Activation> implements Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Synapse.class);
 
@@ -66,7 +67,6 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, OA>, IA exte
         return true;
     }
 
-
     public abstract boolean checkBindingSignal(BindingSignal fromBS, Direction dir);
 
     public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
@@ -87,8 +87,8 @@ public abstract class Synapse<I extends Neuron, O extends Neuron<?, OA>, IA exte
 
     public abstract void setModified();
 
-    public boolean checkTemplatePropagate(Activation act) {
-        return false;
+    public boolean allowPropagate() {
+        return true;
     }
 
     public void setInput(I input) {

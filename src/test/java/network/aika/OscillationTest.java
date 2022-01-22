@@ -2,8 +2,8 @@ package network.aika;
 
 import network.aika.debugger.AikaDebugger;
 import network.aika.neuron.Templates;
-import network.aika.neuron.excitatory.BindingNeuron;
-import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
@@ -27,14 +27,14 @@ public class OscillationTest {
                         .setTrainingEnabled(true)
         );
 
-        PatternNeuron nA = createNeuron(t.OUTPUT_PATTERN_TEMPLATE, "P-A");
+        PatternNeuron nA = createNeuron(t.PATTERN_TEMPLATE, "P-A");
 
         nA.setFrequency(53.0);
         nA.getSampleSpace().setN(299);
         nA.getSampleSpace().setLastPosition(899l);
 
-        BindingNeuron nPPA = createNeuron(t.OUTPUT_BINDING_TEMPLATE, "B-A");
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_TEMPLATE, nA, nPPA, 0.3);
+        BindingNeuron nPPA = createNeuron(t.BINDING_TEMPLATE, "B-A");
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, nA, nPPA, 0.3);
 
         AikaDebugger.createAndShowGUI(doc);
 

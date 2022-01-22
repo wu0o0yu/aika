@@ -20,7 +20,8 @@ import network.aika.Thought;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.excitatory.PatternNeuron;
+import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.steps.activation.Propagate;
 
 
 /**
@@ -83,7 +84,8 @@ public class Document extends Thought<TextModel> {
         act.setInputValue(1.0);
         act.init(null, null);
         act.setFired();
-        act.propagate();
+        Propagate.add(act);
+        act.addCountingSteps();
 
         return act;
     }

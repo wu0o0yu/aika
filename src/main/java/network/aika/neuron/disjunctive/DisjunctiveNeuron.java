@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.inhibitory;
+package network.aika.neuron.disjunctive;
 
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.InhibitoryActivation;
 
@@ -28,23 +29,18 @@ import network.aika.neuron.activation.InhibitoryActivation;
  *
  * @author Lukas Molzberger
  */
-public class InhibitoryNeuron extends Neuron<InhibitorySynapse, InhibitoryActivation> {
+public abstract class DisjunctiveNeuron<S extends DisjunctiveSynapse, A extends Activation> extends Neuron<S, A> {
 
-    public InhibitoryNeuron() {
+    public DisjunctiveNeuron() {
         super();
     }
 
-    public InhibitoryNeuron(NeuronProvider p) {
+    public DisjunctiveNeuron(NeuronProvider p) {
         super(p);
     }
 
-    private InhibitoryNeuron(Model model, boolean addProvider) {
+    protected DisjunctiveNeuron(Model model, boolean addProvider) {
         super(model, addProvider);
-    }
-
-    @Override
-    public InhibitoryActivation createActivation(Thought t) {
-        return new InhibitoryActivation(t.createActivationId(), t, this);
     }
 
     @Override
@@ -53,14 +49,7 @@ public class InhibitoryNeuron extends Neuron<InhibitorySynapse, InhibitoryActiva
     }
 
     @Override
-    public InhibitoryNeuron instantiateTemplate(boolean addProvider) {
-        InhibitoryNeuron n = new InhibitoryNeuron(getModel(), addProvider);
-        initFromTemplate(n);
-        return n;
-    }
-
-    @Override
-    public void addDummyLinks(Activation act) {
+    public void addInactiveLinks(Activation act) {
     }
 
     public ActivationFunction getActivationFunction() {
