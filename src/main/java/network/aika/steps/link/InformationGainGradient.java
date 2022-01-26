@@ -31,6 +31,9 @@ import network.aika.steps.Step;
 public class InformationGainGradient extends Step<Link> {
 
     public static void add(Link l) {
+        if(!l.getConfig().isTrainingEnabled())
+            return;
+
         if(l.isNegative())
             return; // TODO: Check under which conditions negative synapses could contribute to the cost function.
 

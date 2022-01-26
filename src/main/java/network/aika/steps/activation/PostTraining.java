@@ -48,6 +48,8 @@ public class PostTraining extends Step<Activation> {
     public void process() {
         Neuron n = getElement().getNeuron();
 
+        assert !n.isTemplate();
+
         n.limitBias();
         n.updateSynapseInputConnections();
         Save.add(getElement());
