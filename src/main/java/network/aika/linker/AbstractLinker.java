@@ -23,6 +23,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
 import network.aika.direction.Direction;
+import network.aika.neuron.bindingsignal.BranchBindingSignal;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -46,9 +47,9 @@ public abstract class AbstractLinker {
 
     protected abstract Link createLink(Activation iAct, Activation oAct, Synapse targetSynapse);
 
-    public abstract void getNextSteps(Activation act);
+    public abstract void addNextStepsToQueue(Activation act);
 
-    public abstract void getNextSteps(Link l);
+    public abstract void addNextStepsToQueue(Link l);
 
     protected abstract boolean neuronMatches(Neuron<?, ?> currentN, Neuron<?, ?> targetN);
 
@@ -72,10 +73,10 @@ public abstract class AbstractLinker {
         Activation toAct = targetNeuron.createActivation(t);
         toAct.init(targetSynapse, fromAct);
 
-        getNextSteps(toAct);
+        addNextStepsToQueue(toAct);
 
         Link nl = toAct.addLink(targetSynapse, fromAct);
-        getNextSteps(nl);
+        addNextStepsToQueue(nl);
     }
 
     public void link(Activation<?> fromAct, List<Direction> dirs, BindingSignal bindingSignal) {
@@ -93,7 +94,15 @@ public abstract class AbstractLinker {
     public void link(Synapse targetSynapse, Activation<?> fromAct, Direction dir, BindingSignal<?> fromBindingSignal) {
         fromBindingSignal.getOriginActivation()
                 .getReverseBindingSignals()
-                .filter(toBindingSignal -> fromBindingSignal.checkRelatedBindingSignal(targetSynapse, toBindingSignal, dir))
+                .filter(toBindingSignal -> {
+                            //           fromBindingSignal.checkRelatedBindingSignal(targetSynapse, toBindingSignal, dir)
+                            BindingSignal inputBS = dir.getInputBindingSignal(fromBindingSignal, toBindingSignal);
+                            BindingSignal outputBS = dir.getOutputBindingSignal(fromBindingSignal, toBindingSignal);
+                            Activation toAct = toBindingSignal.getActivation();
+                            Activation oAct = dir.getOutput(fromAct, toAct);
+                            return inputBS.checkRelatedBindingSignal(targetSynapse, outputBS, oAct);
+                        }
+                )
                 .map(toBindingSignal -> toBindingSignal.getActivation())
                 .filter(toAct -> fromAct != toAct)
                 .forEach(toAct ->
@@ -119,6 +128,6 @@ public abstract class AbstractLinker {
 
         Link nl = createLink(iAct, oAct, targetSynapse);
         if(nl != null)
-            getNextSteps(nl);
+            addNextStepsToQueue(nl);
     }
 }

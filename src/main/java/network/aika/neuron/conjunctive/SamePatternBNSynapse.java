@@ -32,6 +32,7 @@ import static network.aika.neuron.bindingsignal.BranchBindingSignal.isSeparateBr
  */
 public class SamePatternBNSynapse extends BindingNeuronSynapse<BindingNeuron, BindingActivation> {
 
+    @Override
     public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
         if(iBS.getScope() > 0)
             return null;
@@ -39,7 +40,8 @@ public class SamePatternBNSynapse extends BindingNeuronSynapse<BindingNeuron, Bi
         return iBS.next(l.getOutput(), false);
     }
 
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
+    @Override
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, Activation oAct) {
         return iBS instanceof PrimaryPatternBindingSignal &&
                 oBS instanceof SecondaryPatternBindingSignal && oBS.getScope() == 2;
     }

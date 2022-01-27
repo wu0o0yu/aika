@@ -22,8 +22,6 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.bindingsignal.SecondaryPatternBindingSignal;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -31,18 +29,19 @@ import org.slf4j.LoggerFactory;
  */
 public class PrimaryInputBNSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends InputBNSynapse<I, IA> {
 
-    private static final Logger log = LoggerFactory.getLogger(PrimaryInputBNSynapse.class);
+    @Override
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, Activation<?> oAct) {
+        if(oAct.checkIfPrimaryPatternBindingSignalAlreadyExists())
+            return false;
 
+        return super.checkRelatedPatternBindingSignal(iBS, oBS, oAct);
+    }
+
+    @Override
     public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
         if(iBS.getScope() >= 2 || iBS instanceof SecondaryPatternBindingSignal)
             return null;
 
         return iBS.nextPrimary(l.getOutput(), true);
-    }
-
-    public boolean allowPropagate(Activation act) {
-        log.info(act.getLabel() + " CandidateGradient:" + act.getNeuron().getCandidateGradient(act));
-
-        return true;
     }
 }

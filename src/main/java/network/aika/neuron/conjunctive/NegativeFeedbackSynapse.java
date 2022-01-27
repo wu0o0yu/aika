@@ -40,7 +40,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<InhibitoryNeur
     }
 
     @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, Activation oAct) {
         return iBS.getScope() == oBS.getScope();
     }
 
@@ -59,6 +59,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<InhibitoryNeur
         return !isSeparateBranch(iAct, oAct);
     }
 
+    @Override
     public boolean checkTemplateLink(Activation iAct, Activation oAct) {
         return iAct.getNeuron().getInputSynapse(oAct.getNeuronProvider()) != null;
     }
@@ -85,6 +86,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<InhibitoryNeur
         return oAct;
     }
 
+    @Override
     protected void checkConstraints() {
         assert isNegative();
     }

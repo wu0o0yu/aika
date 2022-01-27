@@ -56,8 +56,4 @@ public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PatternNeuron,
     public boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct) {
         return true;
     }
-
-    public boolean allowPropagate(Activation act) {
-        return false;
-    }
 }

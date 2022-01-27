@@ -44,7 +44,7 @@ public abstract class BindingSignal<B extends BindingSignal> {
 
     protected abstract BindingSignal propagate(Link l);
 
-    public abstract boolean checkRelatedBindingSignal(Synapse s, BindingSignal toBS, Direction dir);
+    public abstract boolean checkRelatedBindingSignal(Synapse s, BindingSignal outputBS, Activation oAct);
 
     public abstract boolean exists();
 

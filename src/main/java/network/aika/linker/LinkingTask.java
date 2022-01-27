@@ -52,27 +52,22 @@ public class LinkingTask extends AbstractLinker {
         return !act.getOutputLinks(s).isEmpty();
     }
 
-
     @Override
     protected boolean neuronMatches(Neuron<?, ?> currentN, Neuron<?, ?> targetN) {
         return currentN.getId().intValue() == targetN.getId().intValue();
     }
 
     @Override
-    public void getNextSteps(Activation act) {
+    public void addNextStepsToQueue(Activation act) {
     }
 
     @Override
-    public void getNextSteps(Link l) {
+    public void addNextStepsToQueue(Link l) {
         addNextLinkerSteps(l);
     }
 
     public static void addNextLinkerSteps(Link l) {
         PropagateBindingSignal.add(l);
-
-        if(!l.getConfig().isTrainingEnabled())
-            return;
-
         InformationGainGradient.add(l);
     }
 

@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
@@ -28,6 +29,7 @@ import network.aika.neuron.bindingsignal.PrimaryPatternBindingSignal;
  */
 public class RelatedInputBNSynapse extends InputBNSynapse<BindingNeuron, BindingActivation> {
 
+    @Override
     public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
         if(iBS.getScope() >= 2 || iBS instanceof PrimaryPatternBindingSignal)
             return null;
@@ -35,14 +37,16 @@ public class RelatedInputBNSynapse extends InputBNSynapse<BindingNeuron, Binding
         return iBS.nextSecondary(l.getOutput(), true);
     }
 
+    @Override
     public BranchBindingSignal propagateBranchBindingSignal(Link l, BranchBindingSignal iBS) {
         return null;
     }
 
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
+    @Override
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, Activation oAct) {
         if(iBS.getScope() >= 2 || oBS.getScope() >= 2)
             return false;
 
-        return super.checkRelatedPatternBindingSignal(iBS, oBS);
+        return super.checkRelatedPatternBindingSignal(iBS, oBS, oAct);
     }
 }

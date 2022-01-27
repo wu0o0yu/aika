@@ -65,11 +65,8 @@ public class BranchBindingSignal extends BindingSignal<BranchBindingSignal> {
     }
 
 
-    public boolean checkRelatedBindingSignal(Synapse s, BindingSignal toBS, Direction dir) {
-        return s.checkRelatedBranchBindingSignal(
-                (BranchBindingSignal) dir.getInputBindingSignal(this, toBS),
-                (BranchBindingSignal) dir.getOutputBindingSignal(this, toBS)
-        );
+    public boolean checkRelatedBindingSignal(Synapse s, BindingSignal outputBS, Activation oAct) {
+        return s.checkRelatedBranchBindingSignal(this, (BranchBindingSignal) outputBS);
     }
 
     protected BindingSignal propagate(Link l) {

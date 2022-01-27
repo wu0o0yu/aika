@@ -43,7 +43,6 @@ public class TemplateTask extends AbstractLinker {
         return act.getNeuron().allowTemplatePropagate(act);
     }
 
-
     public Neuron getPropagateTargetNeuron(Synapse targetSynapse, Activation act) {
         return targetSynapse.getTemplatePropagateTargetNeuron(act);
     }
@@ -62,12 +61,12 @@ public class TemplateTask extends AbstractLinker {
     }
 
     @Override
-    public void getNextSteps(Activation act) {
+    public void addNextStepsToQueue(Activation act) {
         Induction.add(act);
     }
 
     @Override
-    public void getNextSteps(Link l) {
+    public void addNextStepsToQueue(Link l) {
         PropagateBindingSignal.add(l);
         LinkInduction.add(l);
         InformationGainGradient.add(l);
