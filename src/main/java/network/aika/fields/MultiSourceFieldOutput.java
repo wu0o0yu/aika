@@ -16,43 +16,16 @@
  */
 package network.aika.fields;
 
-import java.util.function.Function;
-
 /**
  * @author Lukas Molzberger
  */
-public class FieldFunction implements FieldOutput {
+public interface MultiSourceFieldOutput {
 
-    FieldOutput input;
-    Function<Double, Double> function;
+    double getCurrentValue();
 
-    public FieldFunction(FieldOutput in, Function<Double, Double> f) {
-        this.input = in;
-        this.function = f;
-    }
+    boolean updateAvailable(int updateArg);
 
-    @Override
-    public double getCurrentValue() {
-        return function.apply(input.getCurrentValue());
-    }
+    double getUpdate(int updateArg);
 
-    @Override
-    public double getNewValue() {
-        return function.apply(input.getNewValue());
-    }
-
-    @Override
-    public boolean updateAvailable() {
-        return input.updateAvailable();
-    }
-
-    @Override
-    public double getUpdate() {
-        return getNewValue() - getCurrentValue();
-    }
-
-    @Override
-    public void acknowledgePropagated() {
-        input.acknowledgePropagated();
-    }
+    void acknowledgePropagated(int updateArg);
 }

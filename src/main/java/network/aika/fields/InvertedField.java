@@ -14,8 +14,8 @@ public class InvertedField implements FieldOutput {
     }
 
     @Override
-    public double getNewValue(boolean ack) {
-        return 1.0 - input.getNewValue(ack);
+    public double getNewValue() {
+        return 1.0 - input.getNewValue();
     }
 
     @Override
@@ -24,13 +24,8 @@ public class InvertedField implements FieldOutput {
     }
 
     @Override
-    public boolean updateAvailable(int updateArg) {
-        return input.updateAvailable(updateArg);
-    }
-
-    @Override
-    public double getUpdate(int updateArg, boolean ack) {
-        return getNewValue(ack) - getCurrentValue();
+    public double getUpdate() {
+        return getNewValue() - getCurrentValue();
     }
 
     @Override

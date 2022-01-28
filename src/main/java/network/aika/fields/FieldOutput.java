@@ -23,17 +23,11 @@ public interface FieldOutput {
 
     double getCurrentValue();
 
-    double getNewValue(boolean ack);
+    double getNewValue();
 
     boolean updateAvailable();
 
-    boolean updateAvailable(int updateArg);
-
-    double getUpdate(int updateArg, boolean ack);
-
-    default double getUpdate(boolean ack) {
-        return getUpdate(1, ack);
-    }
+    double getUpdate();
 
     void acknowledgePropagated();
 }

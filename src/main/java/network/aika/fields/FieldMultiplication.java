@@ -21,7 +21,7 @@ import network.aika.utils.Utils;
 /**
  * @author Lukas Molzberger
  */
-public class FieldMultiplication implements FieldOutput {
+public class FieldMultiplication implements MultiSourceFieldOutput {
     private FieldOutput in1;
     private FieldOutput in2;
 
@@ -34,7 +34,7 @@ public class FieldMultiplication implements FieldOutput {
     public double getCurrentValue() {
         return in1.getCurrentValue() * in2.getCurrentValue();
     }
-
+/*
     @Override
     public double getNewValue(boolean ack) {
         return in1.getNewValue(ack) * in2.getNewValue(ack);
@@ -56,7 +56,7 @@ public class FieldMultiplication implements FieldOutput {
 
         return result;
     }
-
+*/
     public boolean updateAvailable(int updateArg) {
         switch (updateArg) {
             case 1:
@@ -68,33 +68,26 @@ public class FieldMultiplication implements FieldOutput {
         }
     }
 
-    public double getUpdate(int updateArg, boolean ack) {
+    public double getUpdate(int updateArg) {
         double result = 0.0;
         if(updateArg == 1) {
             if (in1.updateAvailable())
-                result += in1.getUpdate(ack) * in2.getCurrentValue();
+                result += in1.getUpdate() * in2.getCurrentValue();
         } else if(updateArg == 2) {
             if (in2.updateAvailable())
-                result += in2.getUpdate(ack) * in1.getCurrentValue();
+                result += in2.getUpdate() * in1.getCurrentValue();
         }
         return result;
     }
 
     @Override
-    public void acknowledgePropagated() {
-        in1.acknowledgePropagated();
-        in2.acknowledgePropagated();
-    }
-
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[u:");
-        if(updateAvailable())
-            sb.append(Utils.round(getUpdate(false)));
-        else sb.append("-");
-        sb.append(",v:");
-        sb.append(Utils.round(getCurrentValue()));
-        sb.append("]");
-        return sb.toString();
+    public void acknowledgePropagated(int updateArg) {
+        switch (updateArg) {
+            case 1:
+                in1.acknowledgePropagated();
+                break;
+            case 2:
+                in2.acknowledgePropagated();
+        }
     }
 }

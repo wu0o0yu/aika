@@ -65,29 +65,31 @@ public class Field implements FieldInput, FieldOutput, Writable {
         this.fieldListener = fieldListener;
     }
 
+    @Override
     public double getCurrentValue() {
         return currentValue;
     }
 
     @Override
-    public double getNewValue(boolean ack) {
+    public double getNewValue() {
         double r;
         if(updateAvailable())
             r = currentValue + update;
         else
             r = currentValue;
 
-        if(ack)
-            acknowledgePropagated();
+        acknowledgePropagated();
 
         return r;
     }
 
+    @Override
     public void setInitialValue(double v) {
         currentValue = v;
         update = null;
     }
 
+    @Override
     public boolean set(double v) {
         if(!propagatePreCondition.check(currentValue, v, v - currentValue))
             return false;
@@ -97,6 +99,7 @@ public class Field implements FieldInput, FieldOutput, Writable {
         return true;
     }
 
+    @Override
     public boolean add(double u) {
         if(!propagatePreCondition.check(currentValue, currentValue + u, u))
             return false;
@@ -109,7 +112,7 @@ public class Field implements FieldInput, FieldOutput, Writable {
         return true;
     }
 
-
+    @Override
     public void triggerUpdate() {
         triggerInternal();
     }
@@ -125,26 +128,23 @@ public class Field implements FieldInput, FieldOutput, Writable {
         allowUpdate = false;
     }
 
-
+    @Override
     public boolean updateAvailable() {
-        return updateAvailable(1);
-    }
-
-    public boolean updateAvailable(int updateArg) {
         return update != null;
     }
 
-    public double getUpdate(int updateArg, boolean ack) {
+    @Override
+    public double getUpdate() {
         if(!allowUpdate)
             log.warn("field is not allowed to retrieve update value");
 
         double r = update;
-        if(ack)
-            acknowledgePropagated();
+        acknowledgePropagated();
 
         return r;
     }
 
+    @Override
     public void acknowledgePropagated() {
         if(update == null)
             return;

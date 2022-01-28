@@ -71,12 +71,13 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     private Field entropy = new Field();
     protected Field inputGradient = new QueueField(this, "inputGradient");
 
-    protected FieldOutput outputGradient = new FieldMultiplication(
+    protected MultiSourceFieldOutput outputGradientMul = new FieldMultiplication(
             inputGradient,
             new FieldFunction(net, x ->
                     getNeuron().getActivationFunction().outerGrad(x)
             )
     );
+    protected Field outputGradient = new QueueField(this, "outputGradient");
 
     protected Activation(int id, N n) {
         this.id = id;
@@ -87,16 +88,53 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
-        initEntropy();
+        entropy.setFieldListener(u -> receiveOwnGradientUpdate(u));
+
         initNet();
-        initValue();
-        initInputGradient();
+
+        value.setFieldListener(u ->
+                getOutputLinks()
+                        .forEach(l -> l.propagateValue())
+        );
+
+        inputGradient.setFieldListener(u -> {
+                    if (outputGradientMul.updateAvailable(1))
+                        outputGradient.addAndTriggerUpdate(outputGradientMul.getUpdate(1));
+                }
+        );
+
+        outputGradient.setFieldListener(u ->
+                propagateGradient(u, true, true)
+        );
 
         thought.register(this);
         neuron.register(this);
 
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
+    }
+
+    private void initNet() {
+        net.setPropagatePreCondition((cv, nv, u) ->
+                !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0)
+        );
+        net.add(getNeuron().getBias().getCurrentValue());
+
+        net.setFieldListener(u -> {
+            double v = net.getNewValue();
+            updateValue(v);
+
+            propagateGradient();
+
+            if (isFired() || net.getCurrentValue() <= 0.0)
+                return;
+
+            addEntropySteps();
+            setFired();
+            Propagate.add(this);
+            addFeedbackSteps();
+            addCountingSteps();
+        });
     }
 
     public boolean checkPropagatePatternBindingSignal(PatternBindingSignal bs) {
@@ -114,48 +152,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         ).collect(Collectors.toList());
     }
 
-    private void initEntropy() {
-        entropy.setFieldListener(u -> receiveOwnGradientUpdate(u));
-    }
-
-    private void initInputGradient() {
-        inputGradient.setFieldListener(u -> {
-                    if (outputGradient.updateAvailable(1))
-                        propagateGradient(outputGradient.getUpdate(1, true), true, true);
-                }
-        );
-    }
-
-    private void initValue() {
-        value.setFieldListener(u ->
-                getOutputLinks()
-                        .forEach(l -> l.propagateValue())
-        );
-    }
-
-    private void initNet() {
-        net.setPropagatePreCondition((cv, nv, u) ->
-                !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0)
-        );
-        net.add(getNeuron().getBias().getCurrentValue());
-
-        net.setFieldListener(u -> {
-            double v = net.getNewValue(true);
-            updateValue(v);
-
-            propagateGradient();
-
-            if (isFired() || net.getCurrentValue() <= 0.0)
-                return;
-
-            addEntropySteps();
-            setFired();
-            Propagate.add(this);
-            addFeedbackSteps();
-            addCountingSteps();
-        });
-    }
-
     protected void updateValue(double net) {
         if(!isInput)
             value.setAndTriggerUpdate(getActivationFunction().f(net));
@@ -171,8 +167,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     protected void propagateGradient() {
-        if(outputGradient.updateAvailable(2))
-            propagateGradient(outputGradient.getUpdate(2, true), true, true);
+        if(outputGradientMul.updateAvailable(2))
+            outputGradient.addAndTriggerUpdate(outputGradientMul.getUpdate(2));
     }
 
     public void addCountingSteps() {

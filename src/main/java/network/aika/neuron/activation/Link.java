@@ -18,6 +18,7 @@ package network.aika.neuron.activation;
 
 import network.aika.Config;
 import network.aika.Thought;
+import network.aika.fields.MultiSourceFieldOutput;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.fields.Field;
@@ -50,8 +51,8 @@ public class Link<I extends Activation, O extends Activation> extends Element<Li
     private final O output;
 
     private Field igGradient = new Field();
-    private FieldOutput weightedInput;
-    private FieldOutput backPropGradient;
+    private MultiSourceFieldOutput weightedInput;
+    private MultiSourceFieldOutput backPropGradient;
 
     public Link(Synapse s, I input, O output) {
         this.synapse = s;
@@ -80,12 +81,8 @@ public class Link<I extends Activation, O extends Activation> extends Element<Li
         return igGradient;
     }
 
-    public FieldOutput getWeightedInput() {
+    public MultiSourceFieldOutput getWeightedInput() {
         return weightedInput;
-    }
-
-    public FieldOutput getBackPropGradient() {
-        return backPropGradient;
     }
 
     public void updateWeight(double g) {
@@ -103,16 +100,16 @@ public class Link<I extends Activation, O extends Activation> extends Element<Li
 
     public void backPropagate() {
         input.getInputGradient().addAndTriggerUpdate(
-                backPropGradient.getUpdate(1, true)
+                backPropGradient.getUpdate(1)
         );
     }
 
     public void receiveWeightUpdate() {
         output.getNet().addAndTriggerUpdate(
-                weightedInput.getUpdate(2, true)
+                weightedInput.getUpdate(2)
         );
         input.getInputGradient().addAndTriggerUpdate(
-                backPropGradient.getUpdate(2, true)
+                backPropGradient.getUpdate(2)
         );
     }
 
@@ -226,7 +223,7 @@ public class Link<I extends Activation, O extends Activation> extends Element<Li
             return;
 
         output.getNet().addAndTriggerUpdate(
-                weightedInput.getUpdate(1, true)
+                weightedInput.getUpdate(1)
         );
     }
 

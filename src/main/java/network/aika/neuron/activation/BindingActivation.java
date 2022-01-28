@@ -48,12 +48,13 @@ public class BindingActivation extends Activation<BindingNeuron> {
     private double branchProbability = 1.0;
     private Field ownInputGradient = new QueueField(this, "ownInputGradient");
 
-    protected FieldOutput ownOutputGradient = new FieldMultiplication(
+    protected MultiSourceFieldOutput ownOutputGradientMul = new FieldMultiplication(
             ownInputGradient,
             new FieldFunction(net, x ->
                     getNeuron().getActivationFunction().outerGrad(x)
             )
     );
+    protected Field ownOutputGradient = new QueueField(this, "ownOutputGradient");
 
     protected BindingActivation(int id, BindingNeuron n) {
         super(id, n);
@@ -62,16 +63,18 @@ public class BindingActivation extends Activation<BindingNeuron> {
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
 
-        inputGradient.setFieldListener(u -> {
-                    if (outputGradient.updateAvailable(1))
-                        propagateGradient(outputGradient.getUpdate(1, true), true, false);
+        ownInputGradient.setFieldListener(u -> {
+                    if (ownOutputGradientMul.updateAvailable(1))
+                        ownOutputGradient.addAndTriggerUpdate(ownOutputGradientMul.getUpdate(1));
                 }
         );
 
-        ownInputGradient.setFieldListener(u -> {
-                    if (ownOutputGradient.updateAvailable(1))
-                        propagateGradient(ownOutputGradient.getUpdate(1, true), false, true);
-                }
+        outputGradient.setFieldListener(u ->
+                propagateGradient(u, true, false)
+        );
+
+        ownOutputGradient.setFieldListener(u ->
+                propagateGradient(u, false, true)
         );
     }
 
@@ -105,11 +108,10 @@ public class BindingActivation extends Activation<BindingNeuron> {
     }
 
     protected void propagateGradient() {
-        if (outputGradient.updateAvailable(2))
-            propagateGradient(outputGradient.getUpdate(2, true), true, false);
+        super.propagateGradient();
 
-        if (ownOutputGradient.updateAvailable(2))
-            propagateGradient(ownOutputGradient.getUpdate(2, true), false, true);
+        if(ownOutputGradientMul.updateAvailable(2))
+            ownOutputGradient.addAndTriggerUpdate(ownOutputGradientMul.getUpdate(2));
     }
 
     @Override
