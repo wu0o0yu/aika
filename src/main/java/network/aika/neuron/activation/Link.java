@@ -59,7 +59,9 @@ public class Link<I extends Activation, O extends Activation> extends Element<Li
         this.input = input;
         this.output = output;
 
-        initInformationGain();
+        igGradient.setFieldListener(u ->
+                output.receiveOwnGradientUpdate(u)
+        );
 
         weightedInput = input != null ?
                 new FieldMultiplication(input.getValue(), synapse.getWeight()) :
@@ -71,18 +73,16 @@ public class Link<I extends Activation, O extends Activation> extends Element<Li
         getThought().onLinkCreationEvent(this);
     }
 
-    private void initInformationGain() {
-        igGradient.setFieldListener(u ->
-                output.receiveOwnGradientUpdate(u)
-        );
-    }
-
     public Field getInformationGainGradient() {
         return igGradient;
     }
 
     public MultiSourceFieldOutput getWeightedInput() {
         return weightedInput;
+    }
+
+    public MultiSourceFieldOutput getBackPropGradient() {
+        return backPropGradient;
     }
 
     public void updateWeight(double g) {
