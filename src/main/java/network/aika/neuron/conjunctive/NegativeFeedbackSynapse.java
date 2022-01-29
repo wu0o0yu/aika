@@ -40,7 +40,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<InhibitoryNeur
     }
 
     @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, Activation oAct) {
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, InhibitoryActivation iAct, BindingActivation oAct) {
         return iBS.getScope() == oBS.getScope();
     }
 

@@ -18,6 +18,7 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 
@@ -27,7 +28,7 @@ import network.aika.neuron.bindingsignal.PatternBindingSignal;
 public abstract class InputBNSynapse<I extends Neuron & Axon, IA extends Activation> extends BindingNeuronSynapse<I, IA> {
 
     @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, Activation<?> oAct) {
-        return (byte) (iBS.getScope() + 1) == oBS.getScope();
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, IA iAct, BindingActivation oAct) {
+        return iBS.getScope().next() == oBS.getScope();
     }
 }

@@ -69,7 +69,7 @@ public abstract class Synapse<I extends Neuron & Axon, O extends Neuron<?, OA>, 
 
     public abstract boolean checkBindingSignal(BindingSignal fromBS, Direction dir);
 
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, Activation<?> oAct) {
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, IA iAct, OA oAct) {
         return false;
     }
 

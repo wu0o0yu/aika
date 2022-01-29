@@ -26,6 +26,7 @@ import network.aika.neuron.conjunctive.RelatedInputBNSynapse;
 import network.aika.neuron.disjunctive.CategoryNeuron;
 
 import static network.aika.linker.LinkingTask.addNextLinkerSteps;
+import static network.aika.neuron.bindingsignal.Scope.SAME;
 import static network.aika.text.TextModel.REL_NEXT_TOKEN_LABEL;
 import static network.aika.text.TextModel.REL_PREVIOUS_TOKEN_LABEL;
 
@@ -91,7 +92,7 @@ public class TokenActivation extends PatternActivation {
         return (CategoryActivation) reverseBindingSignals
                 .values()
                 .stream()
-                .filter(bs -> bs.getScope() == 0)
+                .filter(bs -> bs.getScope() == SAME)
                 .map(bs -> bs.getActivation())
                 .filter(act -> act.getNeuron() == categoryNeuron)
                 .findFirst()

@@ -22,6 +22,7 @@ import network.aika.neuron.Synapse;
 import network.aika.fields.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
+import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.steps.activation.BranchProbability;
 import network.aika.steps.activation.Linking;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
+import static network.aika.neuron.bindingsignal.Scope.SAME;
 
 /**
  * @author Lukas Molzberger
@@ -139,7 +141,7 @@ public class BindingActivation extends Activation<BindingNeuron> {
 
     @Override
     public Range getRange() {
-        BindingSignal bs = getPrimaryPatternBindingSignal();
+        PatternBindingSignal bs = getPrimaryPatternBindingSignal();
         if(bs == null)
             return null;
 
@@ -147,10 +149,17 @@ public class BindingActivation extends Activation<BindingNeuron> {
                 .getRange();
     }
 
-    private BindingSignal getPrimaryPatternBindingSignal() {
+    private PatternBindingSignal getPrimaryPatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
                 .filter(bs -> bs.getOriginActivation().getFired().compareTo(fired) < 0)
                 .min(Comparator.comparing(bs -> bs.getScope()))
+                .orElse(null);
+    }
+
+    public PatternBindingSignal getSamePatternBindingSignal() {
+        return getPatternBindingSignals().values().stream()
+                .filter(bs -> bs.getScope() == SAME)
+                .findAny()
                 .orElse(null);
     }
 

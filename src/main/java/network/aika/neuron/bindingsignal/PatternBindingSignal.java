@@ -16,30 +16,31 @@
  */
 package network.aika.neuron.bindingsignal;
 
-import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
+
+import static network.aika.neuron.bindingsignal.Scope.SAME;
 
 /**
  * @author Lukas Molzberger
  */
 public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
 
-    protected int scope;
+    protected Scope scope;
 
     public PatternBindingSignal(PatternActivation act) {
         this.origin = this;
         this.activation = act;
-        this.scope = 0;
+        this.scope = SAME;
     }
 
     protected PatternBindingSignal(PatternBindingSignal parent, Activation activation, boolean scopeTransition) {
         this.parent = parent;
         this.origin = parent.getOrigin();
         this.activation = activation;
-        this.scope = scopeTransition ? parent.scope + 1 : parent.scope;
+        this.scope = scopeTransition ? parent.scope.next() : parent.scope;
         this.depth = (byte) (getDepth() + 1);
     }
 
@@ -47,20 +48,12 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
         return new PatternBindingSignal(this, act, scopeTransition);
     }
 
-    public PrimaryPatternBindingSignal nextPrimary(Activation act, boolean scopeTransition) {
-        return new PrimaryPatternBindingSignal(this, act, scopeTransition);
-    }
-
-    public SecondaryPatternBindingSignal nextSecondary(Activation act, boolean scopeTransition) {
-        return new SecondaryPatternBindingSignal(this, act, scopeTransition);
-    }
-
     public PatternActivation getOriginActivation() {
         return (PatternActivation) origin.getActivation();
     }
 
-    public boolean checkRelatedBindingSignal(Synapse s, BindingSignal outputBS, Activation oAct) {
-        return s.checkRelatedPatternBindingSignal(this, (PatternBindingSignal) outputBS, oAct);
+    public boolean checkRelatedBindingSignal(Synapse s, BindingSignal outputBS, Activation iAct, Activation oAct) {
+        return s.checkRelatedPatternBindingSignal(this, (PatternBindingSignal) outputBS, iAct, oAct);
     }
 
     @Override
@@ -74,7 +67,7 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
         if(existingBSScope == null)
             return false;
 
-        return existingBSScope.getScope() <= getScope();
+        return existingBSScope.getScope().ordinal() <= getScope().ordinal();
     }
 
     @Override
@@ -86,7 +79,7 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
         return l.getSynapse().propagatePatternBindingSignal(l, this);
     }
 
-    public int getScope() {
+    public Scope getScope() {
         return scope;
     }
 

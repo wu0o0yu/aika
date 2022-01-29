@@ -23,7 +23,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
 import network.aika.direction.Direction;
-import network.aika.neuron.bindingsignal.BranchBindingSignal;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -94,20 +93,24 @@ public abstract class AbstractLinker {
     public void link(Synapse targetSynapse, Activation<?> fromAct, Direction dir, BindingSignal<?> fromBindingSignal) {
         fromBindingSignal.getOriginActivation()
                 .getReverseBindingSignals()
-                .filter(toBindingSignal -> {
-                            //           fromBindingSignal.checkRelatedBindingSignal(targetSynapse, toBindingSignal, dir)
-                            BindingSignal inputBS = dir.getInputBindingSignal(fromBindingSignal, toBindingSignal);
-                            BindingSignal outputBS = dir.getOutputBindingSignal(fromBindingSignal, toBindingSignal);
-                            Activation toAct = toBindingSignal.getActivation();
-                            Activation oAct = dir.getOutput(fromAct, toAct);
-                            return inputBS.checkRelatedBindingSignal(targetSynapse, outputBS, oAct);
-                        }
+                .filter(toBindingSignal ->
+                        checkRelatedBindingSignal(targetSynapse, fromAct, dir, fromBindingSignal, toBindingSignal)
                 )
                 .map(toBindingSignal -> toBindingSignal.getActivation())
                 .filter(toAct -> fromAct != toAct)
                 .forEach(toAct ->
                         link(targetSynapse, fromAct, toAct, dir)
                 );
+    }
+
+    private boolean checkRelatedBindingSignal(Synapse targetSynapse, Activation<?> fromAct, Direction dir, BindingSignal<?> fromBindingSignal, BindingSignal<?> toBindingSignal) {
+        //           fromBindingSignal.checkRelatedBindingSignal(targetSynapse, toBindingSignal, dir)
+        BindingSignal inputBS = dir.getInputBindingSignal(fromBindingSignal, toBindingSignal);
+        BindingSignal outputBS = dir.getOutputBindingSignal(fromBindingSignal, toBindingSignal);
+        Activation toAct = toBindingSignal.getActivation();
+        Activation iAct = dir.getInput(fromAct, toAct);
+        Activation oAct = dir.getOutput(fromAct, toAct);
+        return inputBS.checkRelatedBindingSignal(targetSynapse, outputBS, iAct, oAct);
     }
 
     private void link(Synapse targetSynapse, Activation<?> fromAct, Activation<?> toAct, Direction dir) {

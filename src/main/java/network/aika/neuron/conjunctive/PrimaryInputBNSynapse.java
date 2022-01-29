@@ -18,10 +18,13 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
-import network.aika.neuron.bindingsignal.SecondaryPatternBindingSignal;
+import network.aika.neuron.bindingsignal.Scope;
+
+import static network.aika.neuron.bindingsignal.Scope.RELATED;
 
 /**
  *
@@ -30,18 +33,18 @@ import network.aika.neuron.bindingsignal.SecondaryPatternBindingSignal;
 public class PrimaryInputBNSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends InputBNSynapse<I, IA> {
 
     @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, Activation<?> oAct) {
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, IA iAct, BindingActivation oAct) {
         if(oAct.checkIfPrimaryPatternBindingSignalAlreadyExists())
             return false;
 
-        return super.checkRelatedPatternBindingSignal(iBS, oBS, oAct);
+        return super.checkRelatedPatternBindingSignal(iBS, oBS, iAct, oAct);
     }
 
     @Override
     public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
-        if(iBS.getScope() >= 2 || iBS instanceof SecondaryPatternBindingSignal)
+        if(iBS.getScope() == RELATED)
             return null;
 
-        return iBS.nextPrimary(l.getOutput(), true);
+        return iBS.next(l.getOutput(), true);
     }
 }

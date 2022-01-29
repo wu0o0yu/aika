@@ -20,10 +20,9 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
-import network.aika.neuron.bindingsignal.PrimaryPatternBindingSignal;
-import network.aika.neuron.bindingsignal.SecondaryPatternBindingSignal;
 
 import static network.aika.neuron.bindingsignal.BranchBindingSignal.isSeparateBranch;
+import static network.aika.neuron.bindingsignal.Scope.*;
 
 /**
  * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
@@ -34,16 +33,21 @@ public class SamePatternBNSynapse extends BindingNeuronSynapse<BindingNeuron, Bi
 
     @Override
     public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
-        if(iBS.getScope() > 0)
+        if(iBS.getScope() != SAME)
             return null;
 
         return iBS.next(l.getOutput(), false);
     }
 
     @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, Activation oAct) {
-        return iBS instanceof PrimaryPatternBindingSignal &&
-                oBS instanceof SecondaryPatternBindingSignal && oBS.getScope() == 2;
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, BindingActivation iAct, BindingActivation oAct) {
+        PatternBindingSignal iSamePBS = iAct.getSamePatternBindingSignal();
+        PatternBindingSignal oSamePBS = oAct.getSamePatternBindingSignal();
+
+        if(oSamePBS != null && oSamePBS != iSamePBS)
+            return false; // The Input and Output BindingActivations belong to different Patterns.
+
+        return iBS.getScope() == INPUT && oBS.getScope() == RELATED;
     }
 
     @Override

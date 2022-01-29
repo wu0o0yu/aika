@@ -25,7 +25,7 @@ import network.aika.direction.Direction;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
-import network.aika.neuron.bindingsignal.PrimaryPatternBindingSignal;
+import network.aika.neuron.bindingsignal.Scope;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.*;
 import network.aika.steps.link.InformationGainGradient;
@@ -304,10 +304,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public boolean checkIfPrimaryPatternBindingSignalAlreadyExists() {
         return getPatternBindingSignals().values().stream()
-                .anyMatch(mainBS ->
-                        mainBS.getScope() == 1 &&
-                                mainBS instanceof PrimaryPatternBindingSignal
-                );
+                .anyMatch(mainBS -> mainBS.getScope() == Scope.INPUT);
     }
 
     @Override
