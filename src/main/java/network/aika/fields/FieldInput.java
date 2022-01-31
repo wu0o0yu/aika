@@ -21,8 +21,6 @@ package network.aika.fields;
  */
 public interface FieldInput {
 
-    void setInitialValue(double v);
-
     boolean set(double v);
 
     boolean add(double u);

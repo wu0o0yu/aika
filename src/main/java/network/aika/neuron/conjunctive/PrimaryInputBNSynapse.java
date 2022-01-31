@@ -33,11 +33,8 @@ import static network.aika.neuron.bindingsignal.Scope.RELATED;
 public class PrimaryInputBNSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends InputBNSynapse<I, IA> {
 
     @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, IA iAct, BindingActivation oAct) {
-        if(oAct.checkIfPrimaryPatternBindingSignalAlreadyExists())
-            return false;
-
-        return super.checkRelatedPatternBindingSignal(iBS, oBS, iAct, oAct);
+    public boolean checkLinkingPreConditions(IA iAct, BindingActivation oAct) {
+        return !oAct.checkIfPrimaryPatternBindingSignalAlreadyExists();
     }
 
     @Override

@@ -20,8 +20,14 @@ import network.aika.Thought;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.steps.activation.Propagate;
+
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.stream.Stream;
 
 
 /**
@@ -34,12 +40,31 @@ public class Document extends Thought<TextModel> {
 
     private final StringBuilder content;
 
+    private NavigableMap<Long, PatternBindingSignal> beginPBSIndex = new TreeMap<>();
+    private NavigableMap<Long, PatternBindingSignal> endPBSIndex = new TreeMap<>();
+
     public Document(TextModel model, String content) {
         super(model);
         this.content = new StringBuilder();
         if(content != null) {
             this.content.append(content);
         }
+    }
+
+    public void registerPatternBindingSignalSource(Activation act, PatternBindingSignal pbs) {
+        Range r = pbs.getOriginActivation().getRange();
+
+        beginPBSIndex.put(r.getBegin(), pbs);
+        endPBSIndex.put(r.getEnd(), pbs);
+    }
+
+    public Stream<PatternBindingSignal> getLooselyRelatedBindingSignals(BindingSignal<?> fromBindingSignal, Integer looseLinkingRange) {
+        Range r = fromBindingSignal.getOriginActivation().getRange();
+
+        return Stream.concat(
+            beginPBSIndex.subMap(r.getEnd(), r.getEnd() + looseLinkingRange).values().stream(),
+            endPBSIndex.subMap(r.getBegin() - looseLinkingRange, r.getBegin()).values().stream()
+        );
     }
 
     public void append(String txt) {

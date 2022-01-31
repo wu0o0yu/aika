@@ -280,12 +280,11 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
             return null;
 
         bindingSignal.link();
-        thought.registerBindingSignal(this, bindingSignal);
         return bindingSignal;
     }
 
-    public void registerPatternBindingSignal(PatternBindingSignal bs) {
-        patternBindingSignals.put(bs.getOriginActivation(), bs);
+    public void registerPatternBindingSignal(PatternBindingSignal pbs) {
+        patternBindingSignals.put(pbs.getOriginActivation(), pbs);
     }
 
     public void registerBranchBindingSignal(BranchBindingSignal bs) {

@@ -73,11 +73,6 @@ public class DisjunctiveSynapse<I extends Neuron & Axon, O extends DisjunctiveNe
     }
 
     @Override
-    public boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct) {
-        return true;
-    }
-
-    @Override
     protected Bound getProbabilityBound(Sign si, Sign so) {
         return so == Sign.POS ? Bound.LOWER : Bound.UPPER;
     }

@@ -23,14 +23,15 @@ import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.steps.Phase;
 import network.aika.steps.QueueKey;
 import network.aika.steps.Step;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -134,7 +135,7 @@ public abstract class Thought<M extends Model> {
         actsPerNeuron.put(np, acts);
     }
 
-    public void registerBindingSignal(Activation act, BindingSignal bs) {
+    public void registerPatternBindingSignalSource(Activation act, PatternBindingSignal pbs) {
     }
 
     public void addStep(Step s) {
@@ -245,5 +246,9 @@ public abstract class Thought<M extends Model> {
                 .forEach(act -> sb.append(act.gradientsToString()));
 
         return sb.toString();
+    }
+
+    public Stream<PatternBindingSignal> getLooselyRelatedBindingSignals(BindingSignal<?> fromBindingSignal, Integer looseLinkingRange) {
+        return Stream.empty();
     }
 }

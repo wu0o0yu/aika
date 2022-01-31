@@ -112,7 +112,7 @@ public class TextModel extends Model {
         double w = 10.0;
 
         s.linkOutput();
-        s.getWeight().setInitialValue(w);
+        s.getWeight().setAndTriggerUpdate(w);
         s.setAllowTraining(false);
 
         relBN.getBias().add(-w);
@@ -127,7 +127,7 @@ public class TextModel extends Model {
 
         s.linkInput();
         s.linkOutput();
-        s.getWeight().setInitialValue(w);
+        s.getWeight().setAndTriggerUpdate(w);
         s.setAllowTraining(false);
         inRel.getFinalBias().add(-w);
     }
@@ -137,7 +137,7 @@ public class TextModel extends Model {
                 .instantiateTemplate(tokenNeuron, tokenCat);
 
         s.linkInput();
-        s.getWeight().setInitialValue(2.0);
+        s.getWeight().setAndTriggerUpdate(2.0);
         s.setAllowTraining(false);
     }
 

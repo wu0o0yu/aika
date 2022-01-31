@@ -52,8 +52,8 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
         return (PatternActivation) origin.getActivation();
     }
 
-    public boolean checkRelatedBindingSignal(Synapse s, BindingSignal outputBS, Activation iAct, Activation oAct) {
-        return s.checkRelatedPatternBindingSignal(this, (PatternBindingSignal) outputBS, iAct, oAct);
+    public boolean checkRelatedBindingSignal(Synapse s, BindingSignal outputBS) {
+        return s.checkRelatedPatternBindingSignal(this, (PatternBindingSignal) outputBS);
     }
 
     @Override

@@ -33,12 +33,7 @@ public class PatternSynapse extends ConjunctiveSynapse<BindingNeuron, PatternNeu
     }
 
     @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, BindingActivation iAct, PatternActivation oAct) {
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
         return iBS.getOrigin() == oBS;
-    }
-
-    @Override
-    public boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct) {
-        return true;
     }
 }

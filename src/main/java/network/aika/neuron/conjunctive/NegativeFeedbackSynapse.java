@@ -17,6 +17,7 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.direction.Direction;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.InhibitoryActivation;
@@ -40,7 +41,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<InhibitoryNeur
     }
 
     @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, InhibitoryActivation iAct, BindingActivation oAct) {
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
         return iBS.getScope() == oBS.getScope();
     }
 
@@ -55,8 +56,12 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<InhibitoryNeur
     }
 
     @Override
-    public boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct) {
+    public boolean checkLinkingPreConditions(InhibitoryActivation iAct, BindingActivation oAct) {
         return !isSeparateBranch(iAct, oAct);
+    }
+
+    @Override
+    protected void weightSumUpdate(double u) {
     }
 
     @Override

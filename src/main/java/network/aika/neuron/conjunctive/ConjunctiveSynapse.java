@@ -59,6 +59,10 @@ public abstract class ConjunctiveSynapse<I extends Neuron & Axon, O extends Conj
     @Override
     protected void weightUpdate(double u) {
         super.weightUpdate(u);
+        weightSumUpdate(u);
+    }
+
+    protected void weightSumUpdate(double u) {
         getOutput().getWeightSum().addAndTriggerUpdate(u);
     }
 

@@ -54,6 +54,14 @@ public class PatternActivation extends Activation<PatternNeuron> {
         finalMode = true;
     }
 
+    @Override
+    public void registerPatternBindingSignal(PatternBindingSignal pbs) {
+        super.registerPatternBindingSignal(pbs);
+
+        if(pbs.getOriginActivation() == this)
+            thought.registerPatternBindingSignalSource(this, pbs);
+    }
+
     public void registerReverseBindingSignal(Activation targetAct, PatternBindingSignal bindingSignal) {
         reverseBindingSignals.put(targetAct, bindingSignal);
         Linking.add(targetAct, bindingSignal);

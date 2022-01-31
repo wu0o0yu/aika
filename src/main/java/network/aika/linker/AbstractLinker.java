@@ -91,26 +91,37 @@ public abstract class AbstractLinker {
     }
 
     public void link(Synapse targetSynapse, Activation<?> fromAct, Direction dir, BindingSignal<?> fromBindingSignal) {
-        fromBindingSignal.getOriginActivation()
-                .getReverseBindingSignals()
-                .filter(toBindingSignal ->
-                        checkRelatedBindingSignal(targetSynapse, fromAct, dir, fromBindingSignal, toBindingSignal)
+        getRelatedBindingSignal(targetSynapse, fromBindingSignal)
+                .filter(toBS -> fromBindingSignal != toBS)
+                .filter(toBS ->
+                        checkRelatedBindingSignal(targetSynapse, fromAct, dir, fromBindingSignal, toBS)
                 )
-                .map(toBindingSignal -> toBindingSignal.getActivation())
+                .map(toBS -> toBS.getActivation())
                 .filter(toAct -> fromAct != toAct)
                 .forEach(toAct ->
                         link(targetSynapse, fromAct, toAct, dir)
                 );
     }
 
+    private Stream<? extends BindingSignal<?>> getRelatedBindingSignal(Synapse targetSynapse, BindingSignal<?> fromBindingSignal) {
+        Activation originAct = fromBindingSignal.getOriginActivation();
+        Stream<? extends BindingSignal<?>> relatedBindingSignals = originAct.getReverseBindingSignals();
+
+        if(targetSynapse.allowLooseLinking()) {
+            relatedBindingSignals = Stream.concat(
+                    relatedBindingSignals,
+                    originAct.getThought().getLooselyRelatedBindingSignals(fromBindingSignal, targetSynapse.getLooseLinkingRange())
+            );
+        }
+
+        return relatedBindingSignals;
+    }
+
     private boolean checkRelatedBindingSignal(Synapse targetSynapse, Activation<?> fromAct, Direction dir, BindingSignal<?> fromBindingSignal, BindingSignal<?> toBindingSignal) {
         //           fromBindingSignal.checkRelatedBindingSignal(targetSynapse, toBindingSignal, dir)
         BindingSignal inputBS = dir.getInputBindingSignal(fromBindingSignal, toBindingSignal);
         BindingSignal outputBS = dir.getOutputBindingSignal(fromBindingSignal, toBindingSignal);
-        Activation toAct = toBindingSignal.getActivation();
-        Activation iAct = dir.getInput(fromAct, toAct);
-        Activation oAct = dir.getOutput(fromAct, toAct);
-        return inputBS.checkRelatedBindingSignal(targetSynapse, outputBS, iAct, oAct);
+        return inputBS.checkRelatedBindingSignal(targetSynapse, outputBS);
     }
 
     private void link(Synapse targetSynapse, Activation<?> fromAct, Activation<?> toAct, Direction dir) {
@@ -123,7 +134,7 @@ public abstract class AbstractLinker {
         if (!neuronMatches(oAct.getNeuron(), targetSynapse.getOutput()))
             return;
 
-        if(!targetSynapse.checkCausalityAndBranchConsistency(iAct, oAct))
+        if(!targetSynapse.checkLinkingPreConditions(iAct, oAct))
             return;
 
         if(Link.linkExists(iAct, oAct))

@@ -54,7 +54,6 @@ public abstract class Synapse<I extends Neuron & Axon, O extends Neuron<?, OA>, 
 
     protected Field weight = new Field(u -> weightUpdate(u));
 
-
     protected SampleSpace sampleSpace = new SampleSpace();
 
     protected double frequencyIPosOPos;
@@ -69,8 +68,20 @@ public abstract class Synapse<I extends Neuron & Axon, O extends Neuron<?, OA>, 
 
     public abstract boolean checkBindingSignal(BindingSignal fromBS, Direction dir);
 
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, IA iAct, OA oAct) {
+    public Integer getLooseLinkingRange() {
+        return null;
+    }
+
+    public boolean allowLooseLinking() {
         return false;
+    }
+
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
+        return false;
+    }
+
+    public boolean checkLinkingPreConditions(IA iAct, OA oAct) {
+        return true;
     }
 
     public boolean checkRelatedBranchBindingSignal(BranchBindingSignal iBS, BranchBindingSignal oBS) {
@@ -104,24 +115,27 @@ public abstract class Synapse<I extends Neuron & Axon, O extends Neuron<?, OA>, 
 
         s.input = input.getProvider();
         s.output = output.getProvider();
-        return s;
-    }
 
-    public Synapse<I, O, IA, OA> instantiateTemplate() {
-        Synapse<I, O, IA, OA> s;
-        try {
-            s = getClass().getConstructor().newInstance();
-            s.weight = weight;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
         initFromTemplate(s);
         return s;
     }
 
-    public abstract void updateSynapse(Link l, double delta);
+    private Synapse<I, O, IA, OA> instantiateTemplate() {
+        Synapse<I, O, IA, OA> s;
+        try {
+            s = getClass().getConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return s;
+    }
 
-    public abstract boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct);
+    protected void initFromTemplate(Synapse s) {
+        s.weight.setAndTriggerUpdate(weight.getCurrentValue());
+        s.template = this;
+    }
+
+    public abstract void updateSynapse(Link l, double delta);
 
     public OA branchIfNecessary(Activation iAct, OA oAct) {
         return oAct;
@@ -164,11 +178,6 @@ public abstract class Synapse<I extends Neuron & Axon, O extends Neuron<?, OA>, 
 
     public byte getTemplateSynapseId() {
         return getTemplate().getTemplateInfo().getTemplateSynapseId();
-    }
-
-    protected void initFromTemplate(Synapse s) {
-        s.weight.setInitialValue(weight.getCurrentValue());
-        s.template = this;
     }
 
     public boolean isInputLinked() {

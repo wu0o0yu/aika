@@ -64,11 +64,12 @@ public class BranchBindingSignal extends BindingSignal<BranchBindingSignal> {
         return getActivation().checkPropagateBranchBindingSignal(this);
     }
 
-
-    public boolean checkRelatedBindingSignal(Synapse s, BindingSignal outputBS, Activation oAct) {
+    @Override
+    public boolean checkRelatedBindingSignal(Synapse s, BindingSignal outputBS) {
         return s.checkRelatedBranchBindingSignal(this, (BranchBindingSignal) outputBS);
     }
 
+    @Override
     protected BindingSignal propagate(Link l) {
         return l.getSynapse().propagateBranchBindingSignal(l, this);
     }

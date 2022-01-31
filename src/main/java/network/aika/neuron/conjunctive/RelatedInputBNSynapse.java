@@ -45,10 +45,10 @@ public class RelatedInputBNSynapse extends InputBNSynapse<BindingNeuron, Binding
     }
 
     @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, BindingActivation iAct, BindingActivation oAct) {
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
         if(iBS.getScope() == RELATED || oBS.getScope() == RELATED)
             return false;
 
-        return super.checkRelatedPatternBindingSignal(iBS, oBS, iAct, oAct);
+        return super.checkRelatedPatternBindingSignal(iBS, oBS);
     }
 }

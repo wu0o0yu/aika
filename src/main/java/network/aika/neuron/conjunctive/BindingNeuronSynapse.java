@@ -50,7 +50,7 @@ public abstract class BindingNeuronSynapse<I extends Neuron & Axon, IA extends A
     }
 
     @Override
-    public boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct) {
+    public boolean checkLinkingPreConditions(IA iAct, BindingActivation oAct) {
         return Link.isForward(iAct, oAct);
     }
 

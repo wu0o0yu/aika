@@ -84,12 +84,6 @@ public class Field implements FieldInput, FieldOutput, Writable {
     }
 
     @Override
-    public void setInitialValue(double v) {
-        currentValue = v;
-        update = null;
-    }
-
-    @Override
     public boolean set(double v) {
         if(!propagatePreCondition.check(currentValue, v, v - currentValue))
             return false;
@@ -118,11 +112,11 @@ public class Field implements FieldInput, FieldOutput, Writable {
     }
 
     protected void triggerInternal() {
-        if (fieldListener == null)
-            return;
-
         allowUpdate = true;
-        fieldListener.updated(update);
+
+        if (fieldListener != null)
+            fieldListener.updated(update);
+
         acknowledgePropagated();
 
         allowUpdate = false;

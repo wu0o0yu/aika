@@ -28,7 +28,7 @@ import network.aika.neuron.bindingsignal.PatternBindingSignal;
 public abstract class InputBNSynapse<I extends Neuron & Axon, IA extends Activation> extends BindingNeuronSynapse<I, IA> {
 
     @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, IA iAct, BindingActivation oAct) {
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
         return iBS.getScope().next() == oBS.getScope();
     }
 }

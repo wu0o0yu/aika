@@ -53,7 +53,7 @@ public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PatternNeuron,
     }
 
     @Override
-    public boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct) {
+    public boolean checkLinkingPreConditions(PatternActivation iAct, BindingActivation oAct) {
         return true;
     }
 }

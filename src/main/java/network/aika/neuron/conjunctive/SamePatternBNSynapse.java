@@ -16,10 +16,15 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.Model;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import static network.aika.neuron.bindingsignal.BranchBindingSignal.isSeparateBranch;
 import static network.aika.neuron.bindingsignal.Scope.*;
@@ -31,6 +36,25 @@ import static network.aika.neuron.bindingsignal.Scope.*;
  */
 public class SamePatternBNSynapse extends BindingNeuronSynapse<BindingNeuron, BindingActivation> {
 
+    private int looseLinkingRange;
+    private boolean allowLooseLinking;
+
+    public void setLooseLinkingRange(int looseLinkingRange) {
+        this.looseLinkingRange = looseLinkingRange;
+    }
+
+    public Integer getLooseLinkingRange() {
+        return looseLinkingRange;
+    }
+
+    public void setAllowLooseLinking(boolean allowLooseLinking) {
+        this.allowLooseLinking = allowLooseLinking;
+    }
+
+    public boolean allowLooseLinking() {
+        return allowLooseLinking;
+    }
+
     @Override
     public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
         if(iBS.getScope() != SAME)
@@ -40,21 +64,42 @@ public class SamePatternBNSynapse extends BindingNeuronSynapse<BindingNeuron, Bi
     }
 
     @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS, BindingActivation iAct, BindingActivation oAct) {
-        PatternBindingSignal iSamePBS = iAct.getSamePatternBindingSignal();
-        PatternBindingSignal oSamePBS = oAct.getSamePatternBindingSignal();
-
-        if(oSamePBS != null && oSamePBS != iSamePBS)
-            return false; // The Input and Output BindingActivations belong to different Patterns.
-
-        return iBS.getScope() == INPUT && oBS.getScope() == RELATED;
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
+        if(allowLooseLinking) {
+            return iBS.getOrigin() != oBS.getOrigin() && iBS.getScope() == INPUT && oBS.getScope() == INPUT;
+        } else {
+            return iBS.getScope() == INPUT && oBS.getScope() == RELATED;
+        }
     }
 
     @Override
-    public boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct) {
+    public boolean checkLinkingPreConditions(BindingActivation iAct, BindingActivation oAct) {
         if(isSeparateBranch(iAct, oAct))
             return false;
 
-        return super.checkCausalityAndBranchConsistency(iAct, oAct);
+        if(!super.checkLinkingPreConditions(iAct, oAct))
+            return false;
+
+        PatternBindingSignal iSamePBS = iAct.getSamePatternBindingSignal();
+        PatternBindingSignal oSamePBS = oAct.getSamePatternBindingSignal();
+
+        // The Input and Output BindingActivations belong to different Patterns.
+        return oSamePBS == null || oSamePBS == iSamePBS;
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+
+        out.writeBoolean(allowLooseLinking);
+        out.writeInt(looseLinkingRange);
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws IOException {
+        super.readFields(in, m);
+
+        allowLooseLinking = in.readBoolean();
+        looseLinkingRange = in.readInt();
     }
 }

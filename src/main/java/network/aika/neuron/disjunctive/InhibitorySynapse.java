@@ -51,12 +51,6 @@ public class InhibitorySynapse<N extends BindingNeuron & BindingAxon> extends Di
         return getOutput();
     }
 
-
-    @Override
-    public boolean checkCausalityAndBranchConsistency(Activation<?> iAct, Activation<?> oAct) {
-        return true;
-    }
-
     @Override
     protected Bound getProbabilityBound(Sign si, Sign so) {
         return so == Sign.POS ? Bound.LOWER : Bound.UPPER;
@@ -66,5 +60,4 @@ public class InhibitorySynapse<N extends BindingNeuron & BindingAxon> extends Di
     public void setModified() {
         getInput().setModified();
     }
-
 }

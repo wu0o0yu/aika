@@ -51,7 +51,7 @@ public class InductionTest {
         PatternNeuron inB = createNeuron(t.INPUT_PATTERN_TEMPLATE, "IN-B");
         BindingNeuron targetN = createNeuron(t.BINDING_TEMPLATE, "OUT-Target");
 
-        targetN.getBias().set(0.0);
+        targetN.getBias().setAndTriggerUpdate(0.0);
 
         Synapse sA = createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, inA, targetN, 0.1);
         Synapse sB = createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, inB, targetN, 0.0);

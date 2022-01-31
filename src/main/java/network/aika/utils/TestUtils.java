@@ -19,11 +19,14 @@ package network.aika.utils;
 import network.aika.Config;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.neuron.disjunctive.CategoryNeuron;
+import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import network.aika.text.Document;
 
 
@@ -46,6 +49,8 @@ public class TestUtils {
                     return "B-" + trimPrefix(iAct.getLabel());
                 } else if (n instanceof PatternNeuron) {
                     return "P-" + ((Document)act.getThought()).getContent();
+                }else if (n instanceof CategoryNeuron) {
+                    return "C-" + ((Document)act.getThought()).getContent();
                 } else {
                     return "I-" + trimPrefix(iAct.getLabel());
                 }
@@ -55,6 +60,36 @@ public class TestUtils {
 
     private static String trimPrefix(String l) {
         return l.substring(l.indexOf("-") + 1);
+    }
+
+    public static CategoryNeuron initCategory(Templates t, String label, PatternNeuron... inputPatterns) {
+        CategoryNeuron categoryN = createNeuron(t.CATEGORY_TEMPLATE, "C-" + label);
+
+        for (PatternNeuron pn : inputPatterns) {
+            createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, pn, categoryN, 1.0);
+        }
+
+        return categoryN;
+    }
+
+    public static InhibitoryNeuron initInhibitoryLoop(Templates t, String label, BindingNeuron... bns) {
+        InhibitoryNeuron inhibN = createNeuron(t.INHIBITORY_TEMPLATE, "I-" + label);
+
+        for(BindingNeuron bn: bns) {
+            createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, bn, inhibN, 1.0);
+            createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhibN, bn, -100.0);
+        }
+        return inhibN;
+    }
+
+    public static PatternNeuron initPatternLoop(Templates t, String label, BindingNeuron... bns) {
+        PatternNeuron patternN = createNeuron(t.PATTERN_TEMPLATE, "P-" + label);
+
+        for(BindingNeuron bn: bns) {
+            createSynapse(t.PATTERN_SYNAPSE_TEMPLATE, bn, patternN, 10.0);
+            createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE, patternN, bn, 10.0);
+        }
+        return patternN;
     }
 
     public static <N extends Neuron> N createNeuron(Neuron templateNeuron, String label, boolean inputNeuron) {
@@ -76,13 +111,16 @@ public class TestUtils {
             BindingNeuron bn = (BindingNeuron) n;
             bn.getFinalBias().addAndTriggerUpdate(bias);
         }
+
+        n.limitBias();
+        n.updateSynapseInputConnections();
     }
 
-    public static Synapse createSynapse(Synapse templateSynapse, Neuron input, Neuron output, double weight) {
+    public static <S extends Synapse> S createSynapse(Synapse templateSynapse, Neuron input, Neuron output, double weight) {
         Synapse s = templateSynapse.instantiateTemplate(input, output);
 
         s.linkInput();
-        s.getWeight().setInitialValue(weight);
+        s.getWeight().setAndTriggerUpdate(weight);
         if(output instanceof ConjunctiveNeuron) {
             s.linkOutput();
 
@@ -95,7 +133,10 @@ public class TestUtils {
                 }
             }
         }
-        return s;
+
+        output.limitBias();
+        output.updateSynapseInputConnections();
+        return (S) s;
     }
 
     public static void setStatistic(Neuron n, double frequency, int N, long lastPosition) {
