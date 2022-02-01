@@ -57,7 +57,7 @@ public class AddLink extends Step<Link> {
             l.linkOutput();
 
         l.getOutput().getNet().addAndTriggerUpdate(
-                l.getWeightedInput().getCurrentValue()
+                l.getSynapse().getInitialWeightedInput(l)
         );
     }
 
