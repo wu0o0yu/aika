@@ -32,8 +32,7 @@ public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PatternNeuron,
 
     @Override
     public boolean propagateValue(Link<PatternActivation, BindingActivation> l) {
-        return !isRecurrent() ||
-                l.getInput().isFinalMode() ||
+        return l.getInput().isFinalMode() ||
                 l.isForward();
     }
 

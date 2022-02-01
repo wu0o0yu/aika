@@ -32,7 +32,7 @@ import java.util.stream.Stream;
  *
  * @author Lukas Molzberger
  */
-public class PatternActivation extends Activation<PatternNeuron> {
+public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     protected Map<Activation<?>, PatternBindingSignal> reverseBindingSignals = new TreeMap<>();
 

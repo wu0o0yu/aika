@@ -22,6 +22,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.fields.Field;
 
@@ -37,7 +38,7 @@ import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGEN
  *
  * @author Lukas Molzberger
  */
-public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends Activation> extends Neuron<S, A> {
+public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends ConjunctiveActivation> extends Neuron<S, A> {
 
     private volatile Field weightSum = new Field();
 

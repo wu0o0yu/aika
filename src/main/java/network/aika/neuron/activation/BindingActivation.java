@@ -38,7 +38,7 @@ import static network.aika.neuron.bindingsignal.Scope.SAME;
 /**
  * @author Lukas Molzberger
  */
-public class BindingActivation extends Activation<BindingNeuron> {
+public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     protected Map<Activation<?>, BranchBindingSignal> reverseBindingSignals = new TreeMap<>();
 

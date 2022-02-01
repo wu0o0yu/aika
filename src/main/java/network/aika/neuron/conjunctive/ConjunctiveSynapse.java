@@ -21,6 +21,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.SampleSpace;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.axons.Axon;
 import network.aika.sign.Sign;
@@ -35,7 +36,7 @@ import java.io.IOException;
  *
  * @author Lukas Molzberger
  */
-public abstract class ConjunctiveSynapse<I extends Neuron & Axon, O extends ConjunctiveNeuron<?, OA>, IA extends Activation, OA extends Activation> extends Synapse<I, O, IA, OA> {
+public abstract class ConjunctiveSynapse<I extends Neuron & Axon, O extends ConjunctiveNeuron<?, OA>, IA extends Activation, OA extends ConjunctiveActivation> extends Synapse<I, O, IA, OA> {
 
     private boolean allowPropagate;
 
