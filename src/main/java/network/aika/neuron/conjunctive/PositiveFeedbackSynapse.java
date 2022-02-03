@@ -31,11 +31,6 @@ import network.aika.neuron.bindingsignal.BranchBindingSignal;
 public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PatternNeuron, PatternActivation> {
 
     @Override
-    public double getInitialWeightedInput(Link l) {
-        return getWeight().getCurrentValue();
-    }
-
-    @Override
     public boolean propagateValue(Link<PatternActivation, BindingActivation> l) {
         return l.getInput().isFinalMode() ||
                 l.isForward();

@@ -356,10 +356,6 @@ public abstract class Synapse<I extends Neuron & Axon, O extends Neuron<?, OA>, 
         return weight.getCurrentValue() < 0.0;
     }
 
-    public double getInitialWeightedInput(Link l) {
-        return l.getWeightedInput().getCurrentValue();
-    }
-
     protected void weightUpdate(double u) {
         getOutput()
                 .getActivations(getModel().getCurrentThought())
@@ -369,7 +365,6 @@ public abstract class Synapse<I extends Neuron & Axon, O extends Neuron<?, OA>, 
                 .forEach(l -> l.receiveWeightUpdate());
         setModified();
     }
-
 
     @Override
     public void write(DataOutput out) throws IOException {

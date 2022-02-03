@@ -35,6 +35,12 @@ public abstract class BindingNeuronSynapse<I extends Neuron & Axon, IA extends A
     }
 
     @Override
+    public boolean propagateValue(Link<IA, BindingActivation> l) {
+        return !isRecurrent() ||
+                l.isForward();
+    }
+
+    @Override
     public void updateSynapse(Link l, double delta) {
         super.updateSynapse(l, delta);
 

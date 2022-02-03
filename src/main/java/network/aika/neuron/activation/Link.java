@@ -63,8 +63,10 @@ public class Link<I extends Activation, O extends Activation> extends Element<Li
                 output.receiveOwnGradientUpdate(u)
         );
 
-        weightedInput = new FieldMultiplication(input != null ? input.getValue() : ZERO, synapse.getWeight());
-        backPropGradient = new FieldMultiplication(output != null ? output.outputGradient : ZERO, synapse.getWeight());
+        weightedInput = input != null ?
+                new FieldMultiplication(input.getValue(), synapse.getWeight()) :
+                ZERO;
+        backPropGradient = new FieldMultiplication(output.outputGradient, synapse.getWeight());
 
         AddLink.add(this);
 

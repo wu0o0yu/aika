@@ -1,6 +1,6 @@
 package network.aika.fields;
 
-public class ConstantField implements FieldOutput {
+public class ConstantField implements FieldOutput, MultiSourceFieldOutput {
 
     public static final ConstantField ZERO = new ConstantField(0.0);
     public static final ConstantField ONE = new ConstantField(1.0);
@@ -28,12 +28,27 @@ public class ConstantField implements FieldOutput {
     }
 
     @Override
+    public boolean updateAvailable(int updateArg) {
+        return updateAvailable();
+    }
+    @Override
     public double getUpdate() {
-        return 0;
+        acknowledgePropagated();
+        return !initialized ? value : 0.0;
+    }
+
+    @Override
+    public double getUpdate(int updateArg) {
+        return getUpdate();
     }
 
     @Override
     public void acknowledgePropagated() {
         initialized = true;
+    }
+
+    @Override
+    public void acknowledgePropagated(int updateArg) {
+        acknowledgePropagated();
     }
 }
