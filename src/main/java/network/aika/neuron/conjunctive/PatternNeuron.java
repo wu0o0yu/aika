@@ -47,6 +47,18 @@ public class PatternNeuron extends ConjunctiveNeuron<PatternSynapse, PatternActi
         super(model, addProvider);
     }
 
+    public void biasUpdateOnFinalActivations(PositiveFeedbackSynapse s, double u) {
+        getActivations(getModel().getCurrentThought()).stream()
+                .filter(act -> act.isFinalMode())
+                .flatMap(act -> act.getOutputLinks())
+                .filter(l -> l.getSynapse() == s)
+                .map(l -> l.getOutput())
+                .forEach(act ->
+                        act.updateBias(u)
+                );
+        setModified();
+    }
+
     @Override
     public PatternActivation createActivation(Thought t) {
         return new PatternActivation(t.createActivationId(), t, this);

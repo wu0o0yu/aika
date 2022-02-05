@@ -35,7 +35,7 @@ import network.aika.utils.Bound;
  *
  * @author Lukas Molzberger
  */
-public class DisjunctiveSynapse<I extends Neuron & Axon, O extends DisjunctiveNeuron<?, OA>, IA extends Activation, OA extends DisjunctiveActivation> extends Synapse<I, O, IA, OA> {
+public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends Neuron & Axon, O extends DisjunctiveNeuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation, OA extends DisjunctiveActivation> extends Synapse<S, I, O, L, IA, OA> {
 
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
@@ -48,11 +48,7 @@ public class DisjunctiveSynapse<I extends Neuron & Axon, O extends DisjunctiveNe
     }
 
     @Override
-    public boolean isWeak() {
-        return weight.getCurrentValue() + getOutput().getBias().getCurrentValue() < 0.0;
-    }
-
-    public Neuron getTemplatePropagateTargetNeuron(Activation<?> act) {
+    public O getTemplatePropagateTargetNeuron(OA act) {
 /*
         List<Activation<?>> candidates = act.getPatternBindingSignals().entrySet().stream()
                 .map(e -> e.getKey())
@@ -65,7 +61,7 @@ public class DisjunctiveSynapse<I extends Neuron & Axon, O extends DisjunctiveNe
     }
 
     @Override
-    public void updateSynapse(Link l, double delta) {
+    public void updateWeight(Link l, double delta) {
         if(!l.getInput().isFired())
             return;
 

@@ -116,12 +116,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
             ownOutputGradient.addAndTriggerUpdate(ownOutputGradientMul.getUpdate(2));
     }
 
-    @Override
-    protected void propagateGradient(double g, boolean updateWeights, boolean backPropagate) {
-        getNeuron().getFinalBias().addAndTriggerUpdate(getConfig().getLearnRate() * g);
-        super.propagateGradient(g, updateWeights, backPropagate);
-    }
-
     public BindingActivation createBranch(Synapse excludedSyn) {
         BindingActivation clonedAct = getNeuron().createActivation(getThought());
         branches.add(clonedAct);

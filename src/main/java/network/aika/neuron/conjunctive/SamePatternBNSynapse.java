@@ -17,9 +17,8 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.SamePatternBNLink;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 
 import java.io.DataInput;
@@ -34,10 +33,24 @@ import static network.aika.neuron.bindingsignal.Scope.*;
  *
  * @author Lukas Molzberger
  */
-public class SamePatternBNSynapse extends BindingNeuronSynapse<BindingNeuron, BindingActivation> {
+public class SamePatternBNSynapse extends BindingNeuronSynapse<SamePatternBNSynapse, BindingNeuron, SamePatternBNLink, BindingActivation> {
 
     private int looseLinkingRange;
     private boolean allowLooseLinking;
+
+
+    @Override
+    public SamePatternBNLink createLink(BindingActivation input, BindingActivation output) {
+        return new SamePatternBNLink(this, input, output);
+    }
+
+    @Override
+    protected double getSortingWeight() {
+        if(allowLooseLinking)
+            return 0.0;
+
+        return super.getSortingWeight();
+    }
 
     public void setLooseLinkingRange(int looseLinkingRange) {
         this.looseLinkingRange = looseLinkingRange;
@@ -56,7 +69,7 @@ public class SamePatternBNSynapse extends BindingNeuronSynapse<BindingNeuron, Bi
     }
 
     @Override
-    public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
+    public PatternBindingSignal propagatePatternBindingSignal(SamePatternBNLink l, PatternBindingSignal iBS) {
         if(iBS.getScope() != SAME)
             return null;
 

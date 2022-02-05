@@ -34,10 +34,6 @@ import java.io.IOException;
  */
 public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, BindingActivation> implements BindingAxon {
 
-    private Field finalBias = new Field(u ->
-        biasUpdate(u, true)
-    );
-
     public BindingNeuron() {
         super();
     }
@@ -49,10 +45,6 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
     @Override
     public BindingActivation createActivation(Thought t) {
         return new BindingActivation(t.createActivationId(), t, this);
-    }
-
-    public Field getFinalBias() {
-        return finalBias;
     }
 
     @Override
@@ -74,19 +66,5 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
         initFromTemplate(n);
 
         return n;
-    }
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-        super.write(out);
-
-        finalBias.write(out);
-    }
-
-    @Override
-    public void readFields(DataInput in, Model m) throws Exception {
-        super.readFields(in, m);
-
-        finalBias.readFields(in, m);
     }
 }

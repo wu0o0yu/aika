@@ -25,7 +25,12 @@ import network.aika.neuron.bindingsignal.PatternBindingSignal;
  *
  * @author Lukas Molzberger
  */
-public class PatternSynapse extends ConjunctiveSynapse<BindingNeuron, PatternNeuron, BindingActivation, PatternActivation> {
+public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNeuron, PatternNeuron, PatternLink, BindingActivation, PatternActivation> {
+
+    @Override
+    public PatternLink createLink(BindingActivation input, PatternActivation output) {
+        return new PatternLink(this, input, output);
+    }
 
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {

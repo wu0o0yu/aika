@@ -42,14 +42,14 @@ import static network.aika.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public abstract class Synapse<I extends Neuron & Axon, O extends Neuron<?, OA>, IA extends Activation, OA extends Activation> implements Writable {
+public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O extends Neuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation, OA extends Activation> implements Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Synapse.class);
 
     protected NeuronProvider input;
     protected NeuronProvider output;
 
-    private Synapse template;
+    protected S template;
     private TemplateSynapseInfo templateInfo;
 
     protected Field weight = new Field(u -> weightUpdate(u));
@@ -61,10 +61,6 @@ public abstract class Synapse<I extends Neuron & Axon, O extends Neuron<?, OA>, 
     protected double frequencyINegOPos;
 
     protected boolean allowTraining = true;
-
-    public boolean propagateValue(Link<IA, OA> l) {
-        return true;
-    }
 
     public abstract boolean checkBindingSignal(BindingSignal fromBS, Direction dir);
 
@@ -81,18 +77,48 @@ public abstract class Synapse<I extends Neuron & Axon, O extends Neuron<?, OA>, 
     }
 
     public boolean checkLinkingPreConditions(IA iAct, OA oAct) {
+        return checkCommonLinkingPreConditions(iAct, oAct);
+    }
+
+    protected boolean checkCommonLinkingPreConditions(IA iAct, OA oAct) {
+        if (!iAct.getNeuron().neuronMatches(getInput()))
+            return false;
+
+        if (!oAct.getNeuron().neuronMatches(getOutput()))
+            return false;
+
+        if(Link.linkExists(iAct, oAct))
+            return false;
+
+        if(!iAct.isFired())
+            return false;
+
+        if(isTemplate() && !checkTemplateLinkingPreConditions(iAct, oAct))
+            return false;
+
         return true;
     }
+
+    public boolean checkTemplateLinkingPreConditions(IA iAct, OA oAct) {
+        if(oAct.getNeuron().isInputNeuron())
+            return false;
+
+        if(Link.templateLinkExists(this, iAct, oAct))
+            return false;
+
+        return true;
+    }
+
 
     public boolean checkRelatedBranchBindingSignal(BranchBindingSignal iBS, BranchBindingSignal oBS) {
         return false;
     }
 
-    public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
+    public PatternBindingSignal propagatePatternBindingSignal(L l, PatternBindingSignal iBS) {
         return iBS.next(l.getOutput(), false);
     }
 
-    public BranchBindingSignal propagateBranchBindingSignal(Link l, BranchBindingSignal iBS) {
+    public BranchBindingSignal propagateBranchBindingSignal(L l, BranchBindingSignal iBS) {
         return iBS.next(l.getOutput());
     }
 
@@ -110,8 +136,8 @@ public abstract class Synapse<I extends Neuron & Axon, O extends Neuron<?, OA>, 
         this.output = output.getProvider();
     }
 
-    public Synapse<I, O, IA, OA> instantiateTemplate(I input, O output) {
-        Synapse<I, O, IA, OA> s = instantiateTemplate();
+    public S instantiateTemplate(I input, O output) {
+        S s = instantiateTemplate();
 
         s.input = input.getProvider();
         s.output = output.getProvider();
@@ -120,26 +146,28 @@ public abstract class Synapse<I extends Neuron & Axon, O extends Neuron<?, OA>, 
         return s;
     }
 
-    private Synapse<I, O, IA, OA> instantiateTemplate() {
-        Synapse<I, O, IA, OA> s;
+    private S instantiateTemplate() {
+        S s;
         try {
-            s = getClass().getConstructor().newInstance();
+            s = (S) getClass().getConstructor().newInstance();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return s;
     }
 
-    protected void initFromTemplate(Synapse s) {
+    public abstract L createLink(IA input, OA output);
+
+    protected void initFromTemplate(S s) {
         s.weight.setAndTriggerUpdate(weight.getCurrentValue());
         s.template = this;
     }
 
-    public abstract void updateSynapse(Link l, double delta);
-
-    public OA branchIfNecessary(Activation iAct, OA oAct) {
-        return oAct;
+    public void setWeight(double w) {
+        weight.setAndTriggerUpdate(w);
     }
+
+    public abstract void updateWeight(L l, double delta);
 
     public boolean isAllowTraining() {
         return allowTraining;
@@ -147,10 +175,6 @@ public abstract class Synapse<I extends Neuron & Axon, O extends Neuron<?, OA>, 
 
     public void setAllowTraining(boolean allowTraining) {
         this.allowTraining = allowTraining;
-    }
-
-    public boolean checkTemplateLink(Activation iAct, Activation oAct) {
-        return true;
     }
 
     public boolean isTemplate() {
@@ -184,11 +208,7 @@ public abstract class Synapse<I extends Neuron & Axon, O extends Neuron<?, OA>, 
         return getInput().containsOutputSynapse(this);
     }
 
-    public boolean isRecurrent() {
-        return false;
-    }
-
-    public Neuron getTemplatePropagateTargetNeuron(Activation<?> act) {
+    public O getTemplatePropagateTargetNeuron(OA act) {
         return getOutput();
     }
 
@@ -338,11 +358,6 @@ public abstract class Synapse<I extends Neuron & Axon, O extends Neuron<?, OA>, 
     }
 
     protected abstract Bound getProbabilityBound(Sign si, Sign so);
-
-    /**
-     * Determines whether this synapse is able to influence the boolean decision of its output neuron.
-     */
-    public abstract boolean isWeak();
 
     public Field getWeight() {
         return weight;

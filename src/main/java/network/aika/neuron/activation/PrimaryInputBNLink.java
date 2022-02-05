@@ -14,22 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.disjunctive;
+package network.aika.neuron.activation;
 
-import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.*;
-import network.aika.neuron.axons.PatternAxon;
-
+import network.aika.neuron.conjunctive.PrimaryInputBNSynapse;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class CategorySynapse<N extends Neuron & PatternAxon> extends DisjunctiveSynapse<CategorySynapse, N, CategoryNeuron, CategoryLink, PatternActivation, CategoryActivation> {
+public class PrimaryInputBNLink<IA extends Activation> extends BindingNeuronLink<PrimaryInputBNSynapse, IA> {
 
-
-    @Override
-    public CategoryLink createLink(PatternActivation input, CategoryActivation output) {
-        return new CategoryLink(this, input, output);
+    public PrimaryInputBNLink(PrimaryInputBNSynapse s, IA input, BindingActivation output) {
+        super(s, input, output);
     }
 }

@@ -21,7 +21,6 @@ import network.aika.callbacks.SuspensionCallback;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.Templates;
 import network.aika.neuron.conjunctive.*;
 import network.aika.neuron.disjunctive.CategoryNeuron;
 
@@ -100,9 +99,8 @@ public class TextModel extends Model {
         initRelatedInputSynapse(relTokenCat, inRel);
 
         inRel.getBias().addAndTriggerUpdate(4.0);
-        inRel.getFinalBias().addAndTriggerUpdate(4.0);
         inRel.setAllowTraining(false);
-        inRel.updateSynapseInputConnections();
+        inRel.updateAllowPropagate();
     }
 
     private void initRelatedInputSynapse(CategoryNeuron relTokenCat, BindingNeuron relBN) {
@@ -116,7 +114,6 @@ public class TextModel extends Model {
         s.setAllowTraining(false);
 
         relBN.getBias().add(-w);
-        relBN.getFinalBias().add(-w);
     }
 
     private void initFeedbackSamePatternSynapse(PatternNeuron in, BindingNeuron inRel) {
@@ -129,7 +126,7 @@ public class TextModel extends Model {
         s.linkOutput();
         s.getWeight().setAndTriggerUpdate(w);
         s.setAllowTraining(false);
-        inRel.getFinalBias().add(-w);
+        inRel.getBias().add(-w);
     }
 
     private void initCategorySynapse(PatternNeuron tokenNeuron, CategoryNeuron tokenCat) {

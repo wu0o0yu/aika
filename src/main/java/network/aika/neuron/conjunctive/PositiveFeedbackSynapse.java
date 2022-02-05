@@ -17,10 +17,14 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.direction.Direction;
-import network.aika.neuron.activation.Activation;
+import network.aika.fields.Field;
+import network.aika.fields.FieldInput;
+import network.aika.fields.FieldOutput;
+import network.aika.fields.SwitchField;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.activation.PositiveFeedbackLink;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 
@@ -28,12 +32,23 @@ import network.aika.neuron.bindingsignal.BranchBindingSignal;
  *
  * @author Lukas Molzberger
  */
-public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PatternNeuron, PatternActivation> {
+public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PositiveFeedbackSynapse, PatternNeuron, PositiveFeedbackLink, PatternActivation> {
 
-    @Override
-    public boolean propagateValue(Link<PatternActivation, BindingActivation> l) {
-        return l.getInput().isFinalMode() ||
-                l.isForward();
+    private Field feedbackWeight = new Field();
+    private Field feedbackBias = new Field(u ->
+            getInput().biasUpdateOnFinalActivations(this, u)
+    );
+
+    public PositiveFeedbackLink createLink(PatternActivation input, BindingActivation output) {
+        return new PositiveFeedbackLink(this, input, output);
+    }
+
+    public Field getFeedbackWeight() {
+        return feedbackWeight;
+    }
+
+    public Field getFeedbackBias() {
+        return feedbackBias;
     }
 
     @Override
@@ -47,12 +62,7 @@ public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PatternNeuron,
     }
 
     @Override
-    public boolean isRecurrent() {
-        return true;
-    }
-
-    @Override
     public boolean checkLinkingPreConditions(PatternActivation iAct, BindingActivation oAct) {
-        return true;
+        return checkCommonLinkingPreConditions(iAct, oAct); // Skip BindingNeuronSynapse.checkLinkingPreConditions
     }
 }

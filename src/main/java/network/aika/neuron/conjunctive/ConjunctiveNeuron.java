@@ -40,8 +40,6 @@ import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGEN
  */
 public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends ConjunctiveActivation> extends Neuron<S, A> {
 
-    private volatile Field weightSum = new Field();
-
     public ConjunctiveNeuron() {
         super();
     }
@@ -54,10 +52,6 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         super(model, addProvider);
     }
 
-    public Field getWeightSum() {
-        return weightSum;
-    }
-
     protected void initFromTemplate(ConjunctiveNeuron n) {
         super.initFromTemplate(n);
     }
@@ -67,8 +61,8 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
      * should account for that and reduce the bias back to a level, where the neuron can be blocked again by its input synapses.
      */
     public void limitBias() {
-        if(bias.getCurrentValue() > weightSum.getCurrentValue())
-            bias.setAndTriggerUpdate(weightSum.getCurrentValue());
+        if(bias.getCurrentValue() > 0.0)
+            bias.setAndTriggerUpdate(0.0);
     }
 
     public void addInactiveLinks(Activation act) {
@@ -77,7 +71,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
                 .stream()
                 .filter(s -> !act.inputLinkExists(s))
                 .forEach(s ->
-                        new Link(s, null, act)
+                        s.createLink(null, act)
                 );
     }
 
@@ -85,36 +79,21 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         return RECTIFIED_HYPERBOLIC_TANGENT;
     }
 
-    public void updateSynapseInputConnections() {
+    public void updateAllowPropagate() {
         TreeSet<ConjunctiveSynapse> sortedSynapses = new TreeSet<>(
-                Comparator.<ConjunctiveSynapse>comparingDouble(s -> s.getWeight().getCurrentValue()).reversed()
+                Comparator.<ConjunctiveSynapse>comparingDouble(s -> s.getSortingWeight())
                         .thenComparing(Synapse::getPInput)
         );
-
         sortedSynapses.addAll(inputSynapses.values());
 
-        double sum = getWeightSum().getCurrentValue();
+        double sum = getBias().getCurrentValue();
         for(ConjunctiveSynapse s: sortedSynapses) {
             if(s.getWeight().getCurrentValue() <= 0.0)
-                break;
+                continue;
 
-            s.setAllowPropagate(!s.isWeak(sum));
+            sum += s.getWeight().getCurrentValue();
 
-            sum -= s.getWeight().getCurrentValue();
+            s.setAllowPropagate(sum > 0.0);
         }
-    }
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-        super.write(out);
-
-        weightSum.write(out);
-    }
-
-    @Override
-    public void readFields(DataInput in, Model m) throws Exception {
-        super.readFields(in, m);
-
-        weightSum.readFields(in, m);
     }
 }

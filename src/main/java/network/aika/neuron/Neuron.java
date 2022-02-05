@@ -52,7 +52,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     private Writable customData;
 
     protected Field bias = new Field(u ->
-        biasUpdate(u, false)
+        biasUpdate(u)
     );
 
     protected TreeMap<NeuronProvider, S> inputSynapses = new TreeMap<>();
@@ -95,6 +95,17 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
                             n -> initActivationsSet(t)
                     )
                     .add(act);
+        }
+    }
+
+    public boolean neuronMatches(Neuron<?, ?> targetN) {
+        if(isTemplate()) {
+            return getTemplateGroup().stream()
+                    .anyMatch(tn ->
+                            tn.getId().intValue() == targetN.getId().intValue()
+                    );
+        } else {
+            return getId().intValue() == targetN.getId().intValue();
         }
     }
 
@@ -165,10 +176,10 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return s;
     }
 
-    protected void biasUpdate(double u, boolean isFinalBias) {
+    protected void biasUpdate(double u) {
         getActivations(getModel().getCurrentThought())
                 .forEach(act ->
-                        act.updateBias(u, isFinalBias)
+                        act.updateBias(u)
                 );
         setModified();
     }
@@ -365,7 +376,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     public void suspend() {
     }
 
-    public void updateSynapseInputConnections() {
+    public void updateAllowPropagate() {
     }
 
     @Override

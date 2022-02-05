@@ -51,7 +51,7 @@ public class PostTraining extends Step<Activation> {
         assert !n.isTemplate();
 
         n.limitBias();
-        n.updateSynapseInputConnections();
+        n.updateAllowPropagate();
         Save.add(getElement());
     }
 

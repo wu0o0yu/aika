@@ -42,7 +42,6 @@ public class LinkingTask extends AbstractLinker {
         return act.isFired();
     }
 
-
     public Neuron getPropagateTargetNeuron(Synapse targetSynapse, Activation act) {
         return targetSynapse.getOutput();
     }
@@ -50,11 +49,6 @@ public class LinkingTask extends AbstractLinker {
     @Override
     protected boolean exists(Activation act, Direction dir, Synapse s) {
         return !act.getOutputLinks(s).isEmpty();
-    }
-
-    @Override
-    protected boolean neuronMatches(Neuron<?, ?> currentN, Neuron<?, ?> targetN) {
-        return currentN.getId().intValue() == targetN.getId().intValue();
     }
 
     @Override
@@ -69,17 +63,5 @@ public class LinkingTask extends AbstractLinker {
     public static void addNextLinkerSteps(Link l) {
         PropagateBindingSignal.add(l);
         InformationGainGradient.add(l);
-    }
-
-    @Override
-    public Link createLink(Activation iAct, Activation oAct, Synapse targetSynapse) {
-        if (!iAct.isFired())
-            return null;
-
-        oAct = targetSynapse.branchIfNecessary(iAct, oAct);
-        if(oAct == null)
-            return null;
-
-        return oAct.addLink(targetSynapse, iAct);
     }
 }

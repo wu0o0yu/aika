@@ -211,7 +211,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return inputGradient;
     }
 
-    public void updateBias(double u, boolean isFinalBias) {
+    public void updateBias(double u) {
         getNet().addAndTriggerUpdate(u);
     }
 
@@ -349,7 +349,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 .stream()
                 .filter(l -> l.getSynapse() != excludedSyn)
                 .forEach(l ->
-                        new Link(l.getSynapse(), l.getInput(), clonedAct)
+                        l.getSynapse().createLink(l.getInput(), clonedAct)
                 );
     }
 
@@ -384,13 +384,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                         new OutputKey(s.getOutput().getProvider(), MAX_VALUE),
                         true
                 );
-    }
-
-    public Link addLink(Synapse s, Activation input) {
-        Link ol = getInputLink(s);
-        assert ol == null || ol.getInput() == null;
-
-        return new Link(s, input, this);
     }
 
     public FieldOutput getOutputGradient() {

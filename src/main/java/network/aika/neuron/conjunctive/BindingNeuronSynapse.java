@@ -27,7 +27,7 @@ import network.aika.neuron.bindingsignal.PatternBindingSignal;
  *
  * @author Lukas Molzberger
  */
-public abstract class BindingNeuronSynapse<I extends Neuron & Axon, IA extends Activation> extends ConjunctiveSynapse<I, BindingNeuron, IA, BindingActivation> {
+public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I extends Neuron & Axon, L extends Link<S, IA, BindingActivation>, IA extends Activation> extends ConjunctiveSynapse<S, I, BindingNeuron, L, IA, BindingActivation> {
 
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
@@ -35,33 +35,10 @@ public abstract class BindingNeuronSynapse<I extends Neuron & Axon, IA extends A
     }
 
     @Override
-    public boolean propagateValue(Link<IA, BindingActivation> l) {
-        return !isRecurrent() ||
-                l.isForward();
-    }
-
-    @Override
-    public void updateSynapse(Link l, double delta) {
-        super.updateSynapse(l, delta);
-
-        if(isRecurrent() && !l.getInput().isFired()) {
-            getOutput().getFinalBias().addAndTriggerUpdate(delta);
-        }
-    }
-
-    @Override
     public boolean checkLinkingPreConditions(IA iAct, BindingActivation oAct) {
-        return Link.isForward(iAct, oAct);
-    }
+        if(Link.isForward(iAct, oAct))
+            return false;
 
-    @Override
-    public BindingActivation branchIfNecessary(Activation iAct, BindingActivation oAct) {
-        if (getOutput().isInputNeuron())
-            return null;
-
-        if(isRecurrent() && !oAct.isSelfRef(iAct))
-            return null;
-
-        return oAct;
+        return super.checkLinkingPreConditions(iAct, oAct);
     }
 }

@@ -56,9 +56,6 @@ public class Induction extends Step<Activation> {
         act.setNeuron(inducedNeuron);
 
         act.link();
-
-        if(Utils.belowTolerance(inducedNeuron.getBias().getCurrentValue()))
-            return;
     }
 
     public String toString() {

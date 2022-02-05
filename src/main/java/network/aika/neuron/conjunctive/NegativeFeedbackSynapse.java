@@ -18,11 +18,8 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.InhibitoryActivation;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
@@ -33,7 +30,12 @@ import static network.aika.neuron.bindingsignal.BranchBindingSignal.isSeparateBr
  *
  * @author Lukas Molzberger
  */
-public class NegativeFeedbackSynapse extends BindingNeuronSynapse<InhibitoryNeuron, InhibitoryActivation> {
+public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedbackSynapse, InhibitoryNeuron, NegativeFeedbackLink, InhibitoryActivation> {
+
+    @Override
+    public NegativeFeedbackLink createLink(InhibitoryActivation input, BindingActivation output) {
+        return new NegativeFeedbackLink(this, input, output);
+    }
 
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
@@ -51,44 +53,31 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<InhibitoryNeur
     }
 
     @Override
-    public boolean isRecurrent() {
-        return true;
-    }
-
-    @Override
     public boolean checkLinkingPreConditions(InhibitoryActivation iAct, BindingActivation oAct) {
-        return !isSeparateBranch(iAct, oAct);
+        if(isSeparateBranch(iAct, oAct))
+            return false;
+
+        return checkCommonLinkingPreConditions(iAct, oAct);  // Skip BindingNeuronSynapse.checkLinkingPreConditions
     }
 
     @Override
-    protected void weightSumUpdate(double u) {
+    public boolean checkTemplateLinkingPreConditions(InhibitoryActivation iAct, BindingActivation oAct) {
+        if(iAct.getNeuron().getInputSynapse(oAct.getNeuronProvider()) == null) // TODO: should this be selfRef?
+            return false;
+
+        return super.checkTemplateLinkingPreConditions(iAct, oAct);
     }
 
     @Override
-    public boolean checkTemplateLink(Activation iAct, Activation oAct) {
-        return iAct.getNeuron().getInputSynapse(oAct.getNeuronProvider()) != null;
+    public void setWeight(double w) {
+        weight.addAndTriggerUpdate(w);
     }
 
     @Override
-    public void updateSynapse(Link l, double delta) {
-        if(l.getInput().isFired() && l.isSelfRef())
+    public void updateWeight(NegativeFeedbackLink l, double delta) {
+        if(l.getInput().isFired() && l.isSelfRef()) {
             weight.addAndTriggerUpdate(-delta);
-    }
-
-    @Override
-    public boolean propagateValue(Link<InhibitoryActivation, BindingActivation> l) {
-        return !l.isSelfRef();
-    }
-
-    @Override
-    public BindingActivation branchIfNecessary(Activation iAct, BindingActivation oAct) {
-        if (getOutput().isInputNeuron())
-            return null;
-
-        if (!oAct.isSelfRef(iAct))
-            oAct = oAct.createBranch(this);
-
-        return oAct;
+        }
     }
 
     @Override

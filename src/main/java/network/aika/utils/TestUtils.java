@@ -107,35 +107,22 @@ public class TestUtils {
     public static void updateBias(Neuron n, double bias) {
         n.getBias().addAndTriggerUpdate(bias);
 
-        if(n instanceof BindingNeuron) {
-            BindingNeuron bn = (BindingNeuron) n;
-            bn.getFinalBias().addAndTriggerUpdate(bias);
-        }
-
         n.limitBias();
-        n.updateSynapseInputConnections();
+        n.updateAllowPropagate();
     }
 
     public static <S extends Synapse> S createSynapse(Synapse templateSynapse, Neuron input, Neuron output, double weight) {
         Synapse s = templateSynapse.instantiateTemplate(input, output);
 
         s.linkInput();
-        s.getWeight().setAndTriggerUpdate(weight);
         if(output instanceof ConjunctiveNeuron) {
             s.linkOutput();
-
-            if(weight >= 0.0) {
-                output.getBias().addAndTriggerUpdate(-weight);
-
-                if (output instanceof BindingNeuron) {
-                    BindingNeuron bn = (BindingNeuron) output;
-                    bn.getFinalBias().addAndTriggerUpdate(-weight);
-                }
-            }
         }
 
+        s.setWeight(weight);
+
         output.limitBias();
-        output.updateSynapseInputConnections();
+        output.updateAllowPropagate();
         return (S) s;
     }
 

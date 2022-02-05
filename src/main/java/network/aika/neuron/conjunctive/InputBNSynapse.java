@@ -19,13 +19,14 @@ package network.aika.neuron.conjunctive;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class InputBNSynapse<I extends Neuron & Axon, IA extends Activation> extends BindingNeuronSynapse<I, IA> {
+public abstract class InputBNSynapse<S extends InputBNSynapse, I extends Neuron & Axon, L extends Link<S, IA, BindingActivation>, IA extends Activation> extends BindingNeuronSynapse<S, I, L, IA> {
 
     @Override
     public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {

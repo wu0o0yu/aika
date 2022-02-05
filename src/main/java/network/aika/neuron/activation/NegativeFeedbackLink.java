@@ -14,22 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.disjunctive;
+package network.aika.neuron.activation;
 
-import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.*;
-import network.aika.neuron.axons.PatternAxon;
-
+import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class CategorySynapse<N extends Neuron & PatternAxon> extends DisjunctiveSynapse<CategorySynapse, N, CategoryNeuron, CategoryLink, PatternActivation, CategoryActivation> {
+public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSynapse, InhibitoryActivation> {
 
+    public NegativeFeedbackLink(NegativeFeedbackSynapse s, InhibitoryActivation input, BindingActivation output) {
+        super(s,
+                input,
+                output.isSelfRef(input) ?
+                        output :
+                        output.createBranch(s)
+        );
+    }
 
     @Override
-    public CategoryLink createLink(PatternActivation input, CategoryActivation output) {
-        return new CategoryLink(this, input, output);
+    public double getOutputValue() {
+        if(isSelfRef())
+            return 0.0;
+
+        return super.getOutputValue();
     }
 }

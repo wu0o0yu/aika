@@ -18,12 +18,9 @@ package network.aika.neuron.activation;
 
 import network.aika.Config;
 import network.aika.Thought;
-import network.aika.fields.MultiSourceFieldOutput;
+import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
-import network.aika.fields.Field;
-import network.aika.fields.FieldMultiplication;
-import network.aika.fields.FieldOutput;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.PostTraining;
 import network.aika.steps.link.AddLink;
@@ -39,22 +36,22 @@ import static network.aika.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public class Link<I extends Activation, O extends Activation> extends Element<Link> {
+public class Link<S extends Synapse, I extends Activation, O extends Activation> extends Element<Link> {
 
     public static final Comparator<Link> COMPARE = Comparator.
             <Link, Activation<?>>comparing(l -> l.output)
             .thenComparing(l -> l.input);
 
-    private Synapse synapse;
+    protected S synapse;
 
-    private final I input;
-    private final O output;
+    protected final I input;
+    protected final O output;
 
     private Field igGradient = new Field();
     private MultiSourceFieldOutput weightedInput;
     private MultiSourceFieldOutput backPropGradient;
 
-    public Link(Synapse s, I input, O output) {
+    public Link(S s, I input, O output) {
         this.synapse = s;
         this.input = input;
         this.output = output;
@@ -64,9 +61,9 @@ public class Link<I extends Activation, O extends Activation> extends Element<Li
         );
 
         weightedInput = input != null ?
-                new FieldMultiplication(input.getValue(), synapse.getWeight()) :
+                new FieldMultiplication(input.getValue(), getWeightOutput()) :
                 ZERO;
-        backPropGradient = new FieldMultiplication(output.outputGradient, synapse.getWeight());
+        backPropGradient = new FieldMultiplication(output.outputGradient, getWeightOutput());
 
         AddLink.add(this);
 
@@ -75,6 +72,14 @@ public class Link<I extends Activation, O extends Activation> extends Element<Li
 
     public Field getInformationGainGradient() {
         return igGradient;
+    }
+
+    public FieldInput getWeightInput() {
+        return synapse.getWeight();
+    }
+
+    public FieldOutput getWeightOutput() {
+        return synapse.getWeight();
     }
 
     public MultiSourceFieldOutput getWeightedInput() {
@@ -90,7 +95,7 @@ public class Link<I extends Activation, O extends Activation> extends Element<Li
         boolean oldWeightIsZero = synapse.isZero();
 
         assert !synapse.isTemplate();
-        synapse.updateSynapse(this, weightDelta);
+        synapse.updateWeight(this, weightDelta);
 
         if (oldWeightIsZero && !synapse.isZero() && getInput().isFired())
             PropagateBindingSignal.add(this);
@@ -169,11 +174,11 @@ public class Link<I extends Activation, O extends Activation> extends Element<Li
         return s.getValue(output != null ? output.getValue() : ZERO);
     }
 
-    public Synapse getSynapse() {
+    public S getSynapse() {
         return synapse;
     }
 
-    public void setSynapse(Synapse synapse) {
+    public void setSynapse(S synapse) {
         this.synapse = synapse;
     }
 
@@ -187,10 +192,6 @@ public class Link<I extends Activation, O extends Activation> extends Element<Li
 
     public boolean isSelfRef() {
         return output.isSelfRef(input);
-    }
-
-    public boolean isRecurrent() {
-        return synapse.isRecurrent();
     }
 
     public boolean isCausal() {
@@ -219,12 +220,16 @@ public class Link<I extends Activation, O extends Activation> extends Element<Li
     }
 
     public void propagateValue() {
-        if(!synapse.propagateValue(this))
-            return;
-
         output.getNet().addAndTriggerUpdate(
-                weightedInput.getUpdate(1)
+                getOutputValue()
         );
+    }
+
+    protected double getOutputValue() {
+        return getWeightedInput().getUpdate(1);
+    }
+
+    public void setFinalMode() {
     }
 
     public void linkOutput() {
@@ -278,7 +283,7 @@ public class Link<I extends Activation, O extends Activation> extends Element<Li
     public String gradientsToString() {
         return "   " + getIdString() +
                 " x:" + getInputValue(POS) +
-                " w:" + getSynapse().getWeight();
+                " w:" + getWeightOutput();
     }
 
     public String toShortString() {

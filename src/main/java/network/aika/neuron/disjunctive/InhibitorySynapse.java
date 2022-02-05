@@ -18,9 +18,7 @@ package network.aika.neuron.disjunctive;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.InhibitoryActivation;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.axons.BindingAxon;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.BindingNeuron;
@@ -32,14 +30,20 @@ import network.aika.utils.Bound;
  *
  * @author Lukas Molzberger
  */
-public class InhibitorySynapse<N extends BindingNeuron & BindingAxon> extends DisjunctiveSynapse<N, InhibitoryNeuron, BindingActivation, InhibitoryActivation> {
+public class InhibitorySynapse<N extends BindingNeuron & BindingAxon> extends DisjunctiveSynapse<InhibitorySynapse, N, InhibitoryNeuron, InhibitoryLink, BindingActivation, InhibitoryActivation> {
+
+
+    @Override
+    public InhibitoryLink createLink(BindingActivation input, InhibitoryActivation output) {
+        return new InhibitoryLink(this, input, output);
+    }
 
     @Override
     public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
         return false;
     }
 
-    public Neuron getTemplatePropagateTargetNeuron(Activation<?> act) {
+    public InhibitoryNeuron getTemplatePropagateTargetNeuron(InhibitoryActivation act) {
 /*
         List<Activation<?>> candidates = act.getPatternBindingSignals().entrySet().stream()
                 .map(e -> e.getKey())

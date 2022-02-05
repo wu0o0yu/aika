@@ -36,35 +36,12 @@ import java.io.IOException;
  *
  * @author Lukas Molzberger
  */
-public abstract class ConjunctiveSynapse<I extends Neuron & Axon, O extends ConjunctiveNeuron<?, OA>, IA extends Activation, OA extends ConjunctiveActivation> extends Synapse<I, O, IA, OA> {
+public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends Neuron & Axon, O extends ConjunctiveNeuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation, OA extends ConjunctiveActivation> extends Synapse<S, I, O, L, IA, OA> {
 
     private boolean allowPropagate;
 
-    @Override
-    public boolean isWeak() {
-        return isWeak(getOutput().getWeightSum().getCurrentValue());
-    }
-
-    public boolean isWeak(double weightSum) {
-        double bias = getOutput().getBias().getCurrentValue();
-        double w = weight.getCurrentValue();
-
-        boolean weightIsAbleToExceedThreshold = w + bias > 0.0;
-        boolean weightSumIsAbleToExceedThreshold = weightSum + bias > 0.0;
-        boolean weightIsAbleToSuppressThresholdExceededByWeightSum = (weightSum - w) + bias <= 0.0;
-
-        return !(weightIsAbleToExceedThreshold ||
-                (weightSumIsAbleToExceedThreshold && weightIsAbleToSuppressThresholdExceededByWeightSum));
-    }
-
-    @Override
-    protected void weightUpdate(double u) {
-        super.weightUpdate(u);
-        weightSumUpdate(u);
-    }
-
-    protected void weightSumUpdate(double u) {
-        getOutput().getWeightSum().addAndTriggerUpdate(u);
+    protected double getSortingWeight() {
+        return getWeight().getCurrentValue();
     }
 
     @Override
@@ -77,18 +54,22 @@ public abstract class ConjunctiveSynapse<I extends Neuron & Axon, O extends Conj
     }
 
     @Override
-    public void updateSynapse(Link l, double delta) {
+    public void updateWeight(L l, double delta) {
         if(l.getInput().isFired()) {
             weight.addAndTriggerUpdate(delta);
         } else {
             weight.addAndTriggerUpdate(-delta);
-            getOutput().getBias().addAndTriggerUpdate(delta);
+            updateBias(delta);
 
             if(delta < 0.0)
                 PostTraining.add(l.getOutput());
         }
 
         checkConstraints();
+    }
+
+    private void updateBias(double delta) {
+        getOutput().getBias().addAndTriggerUpdate(delta);
     }
 
     protected void checkConstraints() {

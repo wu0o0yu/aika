@@ -51,7 +51,13 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     }
 
     public void setFinalMode() {
+        if(finalMode)
+            return;
         finalMode = true;
+
+        outputLinks.values().forEach(l ->
+                l.setFinalMode()
+        );
     }
 
     @Override

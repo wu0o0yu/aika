@@ -44,13 +44,9 @@ public abstract class AbstractLinker {
 
     protected abstract boolean exists(Activation act, Direction dir, Synapse s);
 
-    protected abstract Link createLink(Activation iAct, Activation oAct, Synapse targetSynapse);
-
     public abstract void addNextStepsToQueue(Activation act);
 
     public abstract void addNextStepsToQueue(Link l);
-
-    protected abstract boolean neuronMatches(Neuron<?, ?> currentN, Neuron<?, ?> targetN);
 
     public void propagate(Activation act) {
         if(!checkPropagate(act))
@@ -74,7 +70,7 @@ public abstract class AbstractLinker {
 
         addNextStepsToQueue(toAct);
 
-        Link nl = toAct.addLink(targetSynapse, fromAct);
+        Link nl = targetSynapse.createLink(fromAct, toAct);
         addNextStepsToQueue(nl);
     }
 
@@ -94,7 +90,7 @@ public abstract class AbstractLinker {
         getRelatedBindingSignal(targetSynapse, fromBindingSignal)
                 .filter(toBS -> fromBindingSignal != toBS)
                 .filter(toBS ->
-                        checkRelatedBindingSignal(targetSynapse, fromAct, dir, fromBindingSignal, toBS)
+                        checkRelatedBindingSignal(targetSynapse, dir, fromBindingSignal, toBS)
                 )
                 .map(toBS -> toBS.getActivation())
                 .filter(toAct -> fromAct != toAct)
@@ -117,7 +113,7 @@ public abstract class AbstractLinker {
         return relatedBindingSignals;
     }
 
-    private boolean checkRelatedBindingSignal(Synapse targetSynapse, Activation<?> fromAct, Direction dir, BindingSignal<?> fromBindingSignal, BindingSignal<?> toBindingSignal) {
+    private boolean checkRelatedBindingSignal(Synapse targetSynapse, Direction dir, BindingSignal<?> fromBindingSignal, BindingSignal<?> toBindingSignal) {
         //           fromBindingSignal.checkRelatedBindingSignal(targetSynapse, toBindingSignal, dir)
         BindingSignal inputBS = dir.getInputBindingSignal(fromBindingSignal, toBindingSignal);
         BindingSignal outputBS = dir.getOutputBindingSignal(fromBindingSignal, toBindingSignal);
@@ -128,19 +124,10 @@ public abstract class AbstractLinker {
         Activation iAct = dir.getInput(fromAct, toAct);
         Activation oAct = dir.getOutput(fromAct, toAct);
 
-        if (!neuronMatches(iAct.getNeuron(), targetSynapse.getInput()))
-            return;
-
-        if (!neuronMatches(oAct.getNeuron(), targetSynapse.getOutput()))
-            return;
-
         if(!targetSynapse.checkLinkingPreConditions(iAct, oAct))
             return;
 
-        if(Link.linkExists(iAct, oAct))
-            return;
-
-        Link nl = createLink(iAct, oAct, targetSynapse);
+        Link nl = targetSynapse.createLink(iAct, oAct);
         if(nl != null)
             addNextStepsToQueue(nl);
     }

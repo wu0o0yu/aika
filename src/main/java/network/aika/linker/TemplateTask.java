@@ -52,13 +52,6 @@ public class TemplateTask extends AbstractLinker {
         return act.templateLinkExists(dir, s);
     }
 
-    @Override
-    protected boolean neuronMatches(Neuron<?, ?> currentN, Neuron<?, ?> targetN) {
-        return currentN.getTemplateGroup().stream()
-                .anyMatch(tn ->
-                        tn.getId().intValue() == targetN.getId().intValue()
-                );
-    }
 
     @Override
     public void addNextStepsToQueue(Activation act) {
@@ -70,22 +63,5 @@ public class TemplateTask extends AbstractLinker {
         PropagateBindingSignal.add(l);
         LinkInduction.add(l);
         InformationGainGradient.add(l);
-    }
-
-    @Override
-    public Link createLink(Activation iAct, Activation oAct, Synapse targetSynapse) {
-        if(oAct.getNeuron().isInputNeuron())
-            return null;
-
-        if(!targetSynapse.checkTemplateLink(iAct, oAct))
-            return null;
-
-        if(!iAct.isFired())
-            return null;
-
-        if(Link.templateLinkExists(targetSynapse, iAct, oAct))
-            return null;
-
-        return oAct.addLink(targetSynapse, iAct);
     }
 }

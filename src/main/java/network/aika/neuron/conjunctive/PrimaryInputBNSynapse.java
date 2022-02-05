@@ -19,10 +19,9 @@ package network.aika.neuron.conjunctive;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.PrimaryInputBNLink;
 import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
-import network.aika.neuron.bindingsignal.Scope;
 
 import static network.aika.neuron.bindingsignal.Scope.RELATED;
 
@@ -30,15 +29,22 @@ import static network.aika.neuron.bindingsignal.Scope.RELATED;
  *
  * @author Lukas Molzberger
  */
-public class PrimaryInputBNSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends InputBNSynapse<I, IA> {
+public class PrimaryInputBNSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends InputBNSynapse<PrimaryInputBNSynapse, I, PrimaryInputBNLink<IA>, IA> {
 
-    @Override
-    public boolean checkLinkingPreConditions(IA iAct, BindingActivation oAct) {
-        return !oAct.checkIfPrimaryPatternBindingSignalAlreadyExists();
+    public PrimaryInputBNLink createLink(IA input, BindingActivation output) {
+        return new PrimaryInputBNLink(this, input, output);
     }
 
     @Override
-    public PatternBindingSignal propagatePatternBindingSignal(Link l, PatternBindingSignal iBS) {
+    public boolean checkLinkingPreConditions(IA iAct, BindingActivation oAct) {
+        if(oAct.checkIfPrimaryPatternBindingSignalAlreadyExists())
+            return false;
+
+        return super.checkLinkingPreConditions(iAct, oAct);
+    }
+
+    @Override
+    public PatternBindingSignal propagatePatternBindingSignal(PrimaryInputBNLink l, PatternBindingSignal iBS) {
         if(iBS.getScope() == RELATED)
             return null;
 
