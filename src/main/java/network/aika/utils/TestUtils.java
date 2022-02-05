@@ -25,6 +25,7 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 import network.aika.neuron.disjunctive.CategoryNeuron;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import network.aika.text.Document;
@@ -87,7 +88,7 @@ public class TestUtils {
 
         for(BindingNeuron bn: bns) {
             createSynapse(t.PATTERN_SYNAPSE_TEMPLATE, bn, patternN, 10.0);
-            createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE, patternN, bn, 10.0);
+            createPositiveFeedbackSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE, patternN, bn, 0.0, 10.0);
         }
         return patternN;
     }
@@ -111,15 +112,32 @@ public class TestUtils {
         n.updateAllowPropagate();
     }
 
+    public static <S extends Synapse> S createPositiveFeedbackSynapse(PositiveFeedbackSynapse templateSynapse, PatternNeuron input, BindingNeuron output, double weight, double feedbackWeight) {
+        PositiveFeedbackSynapse s = templateSynapse.instantiateTemplate(input, output);
+
+        s.setWeight(weight);
+
+        s.linkInput();
+        s.linkOutput();
+        s.getOutput().getBias().addAndTriggerUpdate(-weight);
+        s.getFeedbackWeight().setAndTriggerUpdate(10.0);
+        s.getFeedbackBias().addAndTriggerUpdate(-10.0);
+        output.limitBias();
+        output.updateAllowPropagate();
+        return (S) s;
+    }
+
     public static <S extends Synapse> S createSynapse(Synapse templateSynapse, Neuron input, Neuron output, double weight) {
         Synapse s = templateSynapse.instantiateTemplate(input, output);
+
+        s.setWeight(weight);
 
         s.linkInput();
         if(output instanceof ConjunctiveNeuron) {
             s.linkOutput();
+            if(weight > 0.0)
+                s.getOutput().getBias().addAndTriggerUpdate(-weight);
         }
-
-        s.setWeight(weight);
 
         output.limitBias();
         output.updateAllowPropagate();

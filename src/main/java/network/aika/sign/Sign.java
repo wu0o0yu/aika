@@ -35,7 +35,7 @@ public interface Sign {
     Sign invert();
 
     static Sign getSign(Activation act) {
-        return act.isFired() ? POS : NEG;
+        return act != null && act.isFired() ? POS : NEG;
     }
 
     FieldOutput getValue(FieldOutput v);
