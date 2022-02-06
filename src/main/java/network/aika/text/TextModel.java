@@ -56,7 +56,7 @@ public class TextModel extends Model {
 
     private NeuronProvider initCategoryNeuron(String label) {
         CategoryNeuron n = getTemplates().CATEGORY_TEMPLATE.instantiateTemplate(true);
-        n.setInputNeuron(true);
+        n.setNetworkInput(true);
         n.setLabel(label);
         NeuronProvider np = n.getProvider();
         np.save();
@@ -74,7 +74,7 @@ public class TextModel extends Model {
         BindingNeuron inRelNT = getTemplates().INPUT_BINDING_TEMPLATE.instantiateTemplate(true);
 
         in.setTokenLabel(tokenLabel);
-        in.setInputNeuron(true);
+        in.setNetworkInput(true);
         in.setLabel(tokenLabel);
         in.setAllowTraining(false);
         putLabel(tokenLabel, in.getId());
@@ -92,7 +92,7 @@ public class TextModel extends Model {
     }
 
     private void initRelationNeuron(String label, PatternNeuron in, CategoryNeuron relTokenCat, BindingNeuron inRel) {
-        inRel.setInputNeuron(true);
+        inRel.setNetworkInput(true);
         inRel.setLabel(label);
 
         initFeedbackSamePatternSynapse(in, inRel);

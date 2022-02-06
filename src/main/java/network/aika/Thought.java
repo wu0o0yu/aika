@@ -223,16 +223,12 @@ public abstract class Thought<M extends Model> {
     }
 
     public String toString() {
-        return toString(false);
-    }
-
-    public String toString(boolean includeLink) {
         StringBuilder sb = new StringBuilder();
         for(Activation act: activationsById.values()) {
 /*            if(!act.isActive())
                 continue;
 */
-            sb.append(act.toString(includeLink));
+            sb.append(act.toString());
             sb.append("\n");
         }
 

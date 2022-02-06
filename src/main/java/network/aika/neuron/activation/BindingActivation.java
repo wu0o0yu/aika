@@ -254,7 +254,4 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         ownInputGradient.addAndTriggerUpdate(u);
     }
 
-    public String toString(boolean includeLink) {
-        return super.toString(includeLink) + " bp:" + Utils.round(branchProbability);
-    }
 }

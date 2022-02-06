@@ -57,7 +57,7 @@ public class SimplePhraseTest {
             doc.process();
             doc.updateModel();
 
-            System.out.println(doc.toString(true));
+            System.out.println(doc);
         }
     }
 }

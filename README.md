@@ -1,8 +1,17 @@
-# About the Aika Neural Network
+# About the AIKA Neural Network
+AIKA (**A**rtificial **I**ntelligence for **K**nowledge **A**cquisition) is a new type of artificial neural network designed to more closely mimic the behavior of a biological brain and to bridge the gap to classical AI. A key design decision in the AIKA network is to conceptually separate the activations from their neurons, meaning that there are two separate graphs. One graph consisting of neurons and synapses representing the knowledge the network has already acquired and another graph consisting of activations and links describing the information the network was able to infer about a concrete input data set. There is a one-to-many relation between the neurons and the activations. For example, there might be a neuron representing a word or a specific meaning of a word, but there might be several activations of this neuron, each representing an occurrence of this word within the input data set. A consequence of this decision is that we must give up on the idea of a fixed layered topology for the network, since the sequence in which the activations are fired depends on the input data set. Within the activation network, each activation is grounded within the input data set, even if there are several activations in between. This means links between activations server multiple purposes:
+- They propagate the activation value.
+- They propagate the binding-signal, that is used for the linking process.
+- They establish an approximate causal relation through the fired timestamps of their input and output activations.
+- They allow the training gradient to be propagated backwards.
+- Negative feedback links create mutually exclusive branches within the activations network.
+- Positive feedback links allow the binding neurons of a pattern neuron ensemble to support each other.
 
-Aika is a new type of artificial neural network designed to more closely mimic the behavior of a biological brain and to bridge the gap to classical AI. A key design decision in the Aika network is to conceptually separate the activations from their neurons, meaning that there are two separate graphs. One graph consisting of neurons and synapses representing the knowledge the network has already acquired and another graph consisting of activations and links describing the information the network was able to infer about a concrete input data set. There is a one-to-many relation between the neurons and the activations. For example, there might be a neuron representing a word or a specific meaning of a word, but there might be several activations of this neuron, each representing an occurrence of this word within the input data set. A consequence of this decision is that we have to give up on the idea of a fixed layered topology for the network, since the sequence in which the activations are fired depends on the input data set. Within the activation network, each activation is grounded within the input data set, even if there are several activations in between. This means links between activations serve two purposes. On the one hand, they are used to sum up the synapse weights and, on the other hand they propagate the identity to higher level activations.
+The AIKA network uses four different types of neurons:
+- Pattern-Neurons
+- Binding-Neurons
+- Inhibitory-Neurons
+- Category-Neurons
 
-A good starting point to get familiar with this project are probably the following three test cases:
-- PatternTest (Demonstrates how a pattern like a word or a phrase can be matched)
-- MutualExclusionTest (Demonstrates a negative feed back loop)
-- InductionTest (Demonstrates how new neurons are induced)
+The Pattern-Neurons and the Binding-Neurons are both conjunctive in nature while the Inhibitory-Neurons and the Category-Neurons are disjunctive. The Binding-Neurons are kind of the glue code of the whole network. On the one hand, they bind the input-features of a pattern to the pattern-neuron and on the receive negative feedback synapses from the inhibitory neurons which allow them to either be suppressed by an opposing pattern or allow themselves suppress another conflicting pattern. 
+

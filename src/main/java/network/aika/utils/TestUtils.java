@@ -95,7 +95,7 @@ public class TestUtils {
 
     public static <N extends Neuron> N createNeuron(Neuron templateNeuron, String label, boolean inputNeuron) {
         Neuron n = createNeuron(templateNeuron, label);
-        n.setInputNeuron(inputNeuron);
+        n.setNetworkInput(inputNeuron);
         return (N) n;
     }
 

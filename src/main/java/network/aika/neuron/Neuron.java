@@ -64,7 +64,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     protected double frequency;
     protected SampleSpace sampleSpace = new SampleSpace();
 
-    protected boolean isInputNeuron; // Input Neurons won't be trained!
+    protected boolean isNetworkInput; // Input Neurons won't be trained!
 
     protected boolean allowTraining = true;
 
@@ -213,12 +213,12 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return outputSynapses.values().stream();
     }
 
-    public void setInputNeuron(boolean inputNeuron) {
-        isInputNeuron = inputNeuron;
+    public void setNetworkInput(boolean networkInput) {
+        isNetworkInput = networkInput;
     }
 
     public boolean isNetworkInput() {
-        return isInputNeuron;
+        return isNetworkInput;
     }
 
     public boolean containsInputSynapse(Synapse s) {
@@ -413,7 +413,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         out.writeDouble(frequency);
         sampleSpace.write(out);
 
-        out.writeBoolean(isInputNeuron);
+        out.writeBoolean(isNetworkInput);
 
         out.writeBoolean(customData != null);
         if(customData != null)
@@ -448,7 +448,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         frequency = in.readDouble();
         sampleSpace = SampleSpace.read(in, m);
 
-        isInputNeuron = in.readBoolean();
+        isNetworkInput = in.readBoolean();
 
         if(in.readBoolean()) {
             customData = m.getCustomDataInstanceSupplier().get();
@@ -456,12 +456,16 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         }
     }
 
-    public String toString() {
+    public String toShortString() {
+        return (isTemplate() ? "t" : "") + toKeyString();
+    }
+
+    private String toKeyString() {
         return getId() + ":" + getLabel();
     }
 
-    public String toDetailedString() {
-        return (isTemplate() ? "Template-" : "") + "neuron " + getClass().getSimpleName() + " " + this + " b:" + bias;
+    public String toString() {
+        return (isTemplate() ? "Template-" : "") + getClass().getSimpleName() + " b:" + bias;
     }
 
     public String statToString() {

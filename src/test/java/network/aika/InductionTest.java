@@ -23,7 +23,7 @@ public class InductionTest {
 
         PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
         in.setTokenLabel("A");
-        in.setInputNeuron(true);
+        in.setNetworkInput(true);
         in.setLabel("IN");
 
         in.setFrequency(12);

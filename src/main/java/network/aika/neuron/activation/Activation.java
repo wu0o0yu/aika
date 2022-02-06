@@ -465,12 +465,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return outputLinks.values().stream();
     }
 
-    public String toShortString() {
-        return "Act id:" +
-                getId() +
-                " n:[" + getNeuron() + "]";
-    }
-
     public String gradientsToString() {
         StringBuilder sb = new StringBuilder();
 
@@ -484,24 +478,27 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return sb.toString();
     }
 
-    public String toString() {
-        return toString(false);
+    public String toShortString() {
+        return "act " + toKeyString();
     }
 
-    public String toString(boolean includeLink) {
+    public String toKeyString() {
+        return "id:" + getId() + " n:[" + getNeuron().toShortString() + "]";
+    }
+
+    @Override
+    public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("act ");
-        sb.append(toShortString());
+        sb.append(getClass().getSimpleName());
+        sb.append(toKeyString());
         sb.append(" value:" + value);
         sb.append(" net:" + net);
 
-        if (includeLink) {
-            sb.append("\n");
-            getInputLinks().forEach(l ->
-                    sb.append("   " + l.toDetailedString() + "\n")
-            );
-            sb.append("\n");
-        }
+        sb.append("\n");
+        getInputLinks().forEach(l ->
+            sb.append("   " + l.toString() + "\n")
+        );
+        sb.append("\n");
 
         return sb.toString();
     }

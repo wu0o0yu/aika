@@ -268,29 +268,24 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         return COMPARE.compare(this, l);
     }
 
-    public String toString() {
+    public String toShortString() {
         return getClass().getSimpleName() +
-                ": " + getIdString() +
+                " " + getKeyString() +
                 " --> " + output.toShortString();
     }
 
-    public String toDetailedString() {
-        return "in:[" + input.toShortString() + " v:" + input.getValue() + "] - " +
-                "s:[" + synapse.toString() + "] - " +
+    public String toString() {
+        return getClass().getSimpleName() + " in:[" + input.toShortString() + " v:" + input.getValue() + "] - " +
                 "out:[" + output.toShortString() + " v:" + output.getValue() + "]";
     }
 
-    public String getIdString() {
+    public String getKeyString() {
         return (input != null ? input.toShortString() : "X:" + synapse.getInput());
     }
 
     public String gradientsToString() {
-        return "   " + getIdString() +
+        return "   " + getKeyString() +
                 " x:" + getInputValue(POS) +
                 " w:" + getWeightOutput();
-    }
-
-    public String toShortString() {
-        return toString();
     }
 }
