@@ -17,17 +17,18 @@
 package network.aika.steps.activation;
 
 import network.aika.direction.Direction;
-import network.aika.linker.AbstractLinker;
-import network.aika.linker.TemplateTask;
+import network.aika.neuron.Linker;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.InhibitoryActivation;
 import network.aika.neuron.activation.Timestamp;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
-import network.aika.linker.LinkingTask;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
@@ -54,14 +55,13 @@ public class Linking extends Step<Activation> {
             Step.add(new Linking(act, bindingSignal, true));
     }
 
-    private final AbstractLinker linker;
     private boolean template;
 
     private Linking(Activation act, BindingSignal bindingSignal, boolean template) {
         super(act);
 
         this.template = template;
-        this.linker = template ? new TemplateTask() : new LinkingTask();
+
         this.bindingSignal = bindingSignal;
 
         Timestamp bsFired = bindingSignal.getOriginActivation().getFired();
@@ -89,11 +89,60 @@ public class Linking extends Step<Activation> {
 
     @Override
     public void process() {
-        linker.link(
-                getElement(),
-                getDirections(),
-                bindingSignal
+        Neuron<?, ?> fromN = getElement().getNeuron();
+        getDirections().forEach(dir ->
+                fromN.getTargetSynapses(dir, template)
+                        .filter(ts ->
+                                ts.checkBindingSignal(bindingSignal, dir)
+                        )
+                        .forEach(ts ->
+                                link(ts, getElement(), dir, bindingSignal)
+                        )
         );
+    }
+
+    public void link(Synapse targetSynapse, Activation<?> fromAct, Direction dir, BindingSignal<?> fromBindingSignal) {
+        getRelatedBindingSignal(targetSynapse, fromBindingSignal)
+                .filter(toBS -> fromBindingSignal != toBS)
+                .filter(toBS ->
+                        checkRelatedBindingSignal(targetSynapse, dir, fromBindingSignal, toBS)
+                )
+                .map(toBS -> toBS.getActivation())
+                .filter(toAct -> fromAct != toAct)
+                .forEach(toAct ->
+                        link(targetSynapse, fromAct, toAct, dir)
+                );
+    }
+
+    private Stream<? extends BindingSignal<?>> getRelatedBindingSignal(Synapse targetSynapse, BindingSignal<?> fromBindingSignal) {
+        Activation originAct = fromBindingSignal.getOriginActivation();
+        Stream<? extends BindingSignal<?>> relatedBindingSignals = originAct.getReverseBindingSignals();
+
+        if(targetSynapse.allowLooseLinking()) {
+            relatedBindingSignals = Stream.concat(
+                    relatedBindingSignals,
+                    originAct.getThought().getLooselyRelatedBindingSignals(fromBindingSignal, targetSynapse.getLooseLinkingRange())
+            );
+        }
+
+        return relatedBindingSignals;
+    }
+
+    private boolean checkRelatedBindingSignal(Synapse targetSynapse, Direction dir, BindingSignal<?> fromBindingSignal, BindingSignal<?> toBindingSignal) {
+        //           fromBindingSignal.checkRelatedBindingSignal(targetSynapse, toBindingSignal, dir)
+        BindingSignal inputBS = dir.getInputBindingSignal(fromBindingSignal, toBindingSignal);
+        BindingSignal outputBS = dir.getOutputBindingSignal(fromBindingSignal, toBindingSignal);
+        return inputBS.checkRelatedBindingSignal(targetSynapse, outputBS);
+    }
+
+    private void link(Synapse targetSynapse, Activation<?> fromAct, Activation<?> toAct, Direction dir) {
+        Activation iAct = dir.getInput(fromAct, toAct);
+        Activation oAct = dir.getOutput(fromAct, toAct);
+
+        if(!targetSynapse.checkLinkingPreConditions(iAct, oAct))
+            return;
+
+        targetSynapse.createLink(iAct, oAct);
     }
 
     public String toString() {

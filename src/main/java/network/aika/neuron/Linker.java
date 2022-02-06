@@ -14,37 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.neuron;
 
 import network.aika.Thought;
-import network.aika.neuron.Range;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.disjunctive.DisjunctiveNeuron;
-import network.aika.neuron.disjunctive.InhibitoryNeuron;
+import network.aika.direction.Direction;
 
+import java.util.List;
 import java.util.stream.Stream;
+
+import static network.aika.direction.Direction.OUTPUT;
+
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class DisjunctiveActivation<N extends DisjunctiveNeuron> extends Activation<N> {
+public abstract class Linker {
 
-    public DisjunctiveActivation(int id, Thought t, N neuron) {
-        super(id, t, neuron);
-    }
-
-    public boolean isSelfRef(Activation iAct) {
-        return false;
-    }
-
-    @Override
-    public boolean checkAllowPropagate() {
-        return isTemplate();
-    }
-
-    @Override
-    public Stream<? extends BindingSignal<?>> getReverseBindingSignals() {
-        return null;
-    }
 }

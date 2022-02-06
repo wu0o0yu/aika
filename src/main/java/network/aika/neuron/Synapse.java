@@ -100,7 +100,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public boolean checkTemplateLinkingPreConditions(IA iAct, OA oAct) {
-        if(oAct.getNeuron().isInputNeuron())
+        if(oAct.getNeuron().isNetworkInput())
             return false;
 
         if(Link.templateLinkExists(this, iAct, oAct))
@@ -206,10 +206,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
     public boolean isInputLinked() {
         return getInput().containsOutputSynapse(this);
-    }
-
-    public O getTemplatePropagateTargetNeuron(OA act) {
-        return getOutput();
     }
 
     public void linkInput() {
@@ -420,7 +416,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public String toString() {
-        return "S " +
+        return (isTemplate() ? "Template-" : "") + "Syn " +
                 getClass().getSimpleName() +
                 "  w:" + getWeight() +
                 " in:[" + input.getNeuron() + "](" + (isInputLinked() ? "+" : "-") + ")" +

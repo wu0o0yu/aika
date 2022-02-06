@@ -44,11 +44,6 @@ public abstract class DisjunctiveNeuron<S extends DisjunctiveSynapse, A extends 
     }
 
     @Override
-    public boolean allowTemplatePropagate(Activation act) {
-        return false;
-    }
-
-    @Override
     public void addInactiveLinks(Activation act) {
     }
 

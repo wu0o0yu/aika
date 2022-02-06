@@ -202,6 +202,10 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         return isForward(input, output);
     }
 
+    public boolean isTemplate() {
+        return getSynapse().isTemplate();
+    }
+
     public static boolean isForward(Activation iAct, Activation oAct) {
         if(!iAct.isFired())
             return false;
@@ -265,7 +269,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
     }
 
     public String toString() {
-        return synapse.getClass().getSimpleName() +
+        return getClass().getSimpleName() +
                 ": " + getIdString() +
                 " --> " + output.toShortString();
     }
@@ -273,7 +277,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
     public String toDetailedString() {
         return "in:[" + input.toShortString() + " v:" + input.getValue() + "] - " +
                 "s:[" + synapse.toString() + "] - " +
-                "out:[" + input.toShortString() + " v:" + input.getValue() + "]";
+                "out:[" + output.toShortString() + " v:" + output.getValue() + "]";
     }
 
     public String getIdString() {

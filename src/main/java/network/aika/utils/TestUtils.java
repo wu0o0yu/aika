@@ -108,7 +108,6 @@ public class TestUtils {
     public static void updateBias(Neuron n, double bias) {
         n.getBias().addAndTriggerUpdate(bias);
 
-        n.limitBias();
         n.updateAllowPropagate();
     }
 
@@ -120,9 +119,8 @@ public class TestUtils {
         s.linkInput();
         s.linkOutput();
         s.getOutput().getBias().addAndTriggerUpdate(-weight);
-        s.getFeedbackWeight().setAndTriggerUpdate(10.0);
-        s.getFeedbackBias().addAndTriggerUpdate(-10.0);
-        output.limitBias();
+        s.getFeedbackWeight().setAndTriggerUpdate(feedbackWeight);
+        s.getFeedbackBias().addAndTriggerUpdate(-feedbackWeight);
         output.updateAllowPropagate();
         return (S) s;
     }
@@ -139,7 +137,6 @@ public class TestUtils {
                 s.getOutput().getBias().addAndTriggerUpdate(-weight);
         }
 
-        output.limitBias();
         output.updateAllowPropagate();
         return (S) s;
     }

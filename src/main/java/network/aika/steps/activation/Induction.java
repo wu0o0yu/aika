@@ -46,7 +46,7 @@ public class Induction extends Step<Activation> {
     public void process() {
         Activation act = getElement();
 
-        assert act.getNeuron().isTemplate();
+        assert act.isTemplate();
 
         Neuron inducedNeuron = act.getNeuron().instantiateTemplate(true);
         inducedNeuron.setLabel(act.getConfig().getLabel(act));

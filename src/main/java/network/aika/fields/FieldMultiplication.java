@@ -90,4 +90,8 @@ public class FieldMultiplication implements MultiSourceFieldOutput {
                 in2.acknowledgePropagated();
         }
     }
+
+    public String toString() {
+        return "[mulf:" + getCurrentValue() + "]";
+    }
 }

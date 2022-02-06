@@ -16,11 +16,13 @@
  */
 package network.aika.steps.activation;
 
-import network.aika.linker.AbstractLinker;
-import network.aika.linker.TemplateTask;
+import network.aika.Thought;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.steps.*;
-import network.aika.linker.LinkingTask;
+
+import static network.aika.direction.Direction.OUTPUT;
 
 
 /**
@@ -44,14 +46,12 @@ public class Propagate extends Step<Activation> {
             Step.add(new Propagate(act, true));
     }
 
-    private final AbstractLinker linker;
     private boolean template;
 
     private Propagate(Activation act, boolean template) {
         super(act);
 
         this.template = template;
-        this.linker = template ? new TemplateTask() : new LinkingTask();
     }
 
     @Override
@@ -61,7 +61,29 @@ public class Propagate extends Step<Activation> {
 
     @Override
     public void process() {
-        linker.propagate(getElement());
+        Activation act = getElement();
+
+        if(!act.checkAllowPropagate())
+            return;
+
+        Neuron<?, ?> n = act.getNeuron();
+        n.getTargetSynapses(OUTPUT, template)
+                .filter(s ->
+                        s.allowPropagate() &&
+                                !act.linkExists(OUTPUT, s, template)
+                )
+                .forEach(s ->
+                        propagate(act, s)
+                );
+    }
+
+    public void propagate(Activation fromAct, Synapse targetSynapse) {
+        Thought t = fromAct.getThought();
+
+        Activation toAct = targetSynapse.getOutput().createActivation(t);
+        toAct.init(targetSynapse, fromAct);
+
+        targetSynapse.createLink(fromAct, toAct);
     }
 
     public String toString() {

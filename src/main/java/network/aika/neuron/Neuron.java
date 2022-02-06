@@ -18,6 +18,7 @@ package network.aika.neuron;
 
 import network.aika.Model;
 import network.aika.Thought;
+import network.aika.direction.Direction;
 import network.aika.neuron.activation.Activation;
 import network.aika.fields.Field;
 import network.aika.sign.Sign;
@@ -145,8 +146,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public abstract ActivationFunction getActivationFunction();
 
-    public abstract boolean allowTemplatePropagate(Activation act);
-
     public boolean isAllowTraining() {
         return allowTraining;
     }
@@ -159,7 +158,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return getId() < 0;
     }
 
-    public Neuron<?, ?> getTemplate() {
+    public Neuron getTemplate() {
         if(isTemplate())
             return this;
         return template;
@@ -218,7 +217,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         isInputNeuron = inputNeuron;
     }
 
-    public boolean isInputNeuron() {
+    public boolean isNetworkInput() {
         return isInputNeuron;
     }
 
@@ -228,6 +227,12 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public boolean containsOutputSynapse(Synapse s) {
         return outputSynapses.containsKey(s.getPOutput());
+    }
+
+    public Stream<? extends Synapse> getTargetSynapses(Direction dir, boolean template) {
+        return template ?
+                getTemplateGroup().stream().flatMap(dir::getSynapses) :
+                dir.getSynapses(this);
     }
 
     public Synapse getInputSynapse(NeuronProvider n) {
@@ -456,7 +461,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public String toDetailedString() {
-        return "n " + getClass().getSimpleName() + " " + this + " b:" + bias;
+        return (isTemplate() ? "Template-" : "") + "neuron " + getClass().getSimpleName() + " " + this + " b:" + bias;
     }
 
     public String statToString() {

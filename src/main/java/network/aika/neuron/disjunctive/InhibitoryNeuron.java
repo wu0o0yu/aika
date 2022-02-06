@@ -49,11 +49,6 @@ public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitorySynapse, Inhib
     }
 
     @Override
-    public boolean allowTemplatePropagate(Activation act) {
-        return false;
-    }
-
-    @Override
     public InhibitoryNeuron instantiateTemplate(boolean addProvider) {
         InhibitoryNeuron n = new InhibitoryNeuron(getModel(), addProvider);
         initFromTemplate(n);

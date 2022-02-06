@@ -160,14 +160,6 @@ public class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[u:");
-        if(update != null)
-            sb.append(Utils.round(update));
-        else sb.append("-");
-        sb.append(",v:");
-        sb.append(Utils.round(currentValue));
-        sb.append("]");
-        return sb.toString();
+        return "[u:" + (update != null ? Utils.round(update) : "-") + ",v:" + Utils.round(currentValue) + "]";
     }
 }

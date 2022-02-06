@@ -17,10 +17,10 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.fields.*;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.conjunctive.BindingNeuron;
@@ -94,6 +94,19 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     public void init(Synapse originSynapse, Activation originAct) {
         super.init(originSynapse, originAct);
         addBindingSignal(new BranchBindingSignal(this));
+    }
+
+    @Override
+    public boolean checkAllowPropagate() {
+        if(isTemplate()) {
+            if (isNetworkInput())
+                return false;
+
+            if (getOutputGradient().updateAvailable())
+                return false;
+        }
+
+        return super.checkAllowPropagate();
     }
 
     public boolean checkPropagateBranchBindingSignal(BranchBindingSignal bs) {

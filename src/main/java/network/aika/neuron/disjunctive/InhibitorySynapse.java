@@ -43,17 +43,6 @@ public class InhibitorySynapse<N extends BindingNeuron & BindingAxon> extends Di
         return false;
     }
 
-    public InhibitoryNeuron getTemplatePropagateTargetNeuron(InhibitoryActivation act) {
-/*
-        List<Activation<?>> candidates = act.getPatternBindingSignals().entrySet().stream()
-                .map(e -> e.getKey())
-                .flatMap(bAct -> bAct.getReverseBindingSignals().entrySet().stream())
-                .map(e -> e.getKey())
-                .filter(relAct -> relAct.getNeuron() instanceof InhibitoryNeuron)
-                .collect(Collectors.toList());
-*/
-        return getOutput();
-    }
 
     @Override
     protected Bound getProbabilityBound(Sign si, Sign so) {

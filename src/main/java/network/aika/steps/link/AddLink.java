@@ -51,6 +51,11 @@ public class AddLink extends Step<Link> {
         if(l.getInput() != null) {
             l.linkInput();
             PropagateBindingSignal.add(l);
+
+            if(l.getSynapse().isTemplate())
+                LinkInduction.add(l);
+
+            InformationGainGradient.add(l);
         }
 
         if(l.getOutput() != null)

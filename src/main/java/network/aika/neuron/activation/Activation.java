@@ -131,6 +131,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
             addEntropySteps();
             setFired();
+            if(isTemplate())
+                Induction.add(this);
             Propagate.add(this);
             addFeedbackSteps();
             addCountingSteps();
@@ -267,6 +269,18 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public abstract boolean isSelfRef(Activation iAct);
 
+    public boolean isNetworkInput() {
+        return getNeuron().isNetworkInput();
+    }
+
+    public boolean isTemplate() {
+        return getNeuron().isTemplate();
+    }
+
+    public boolean checkAllowPropagate() {
+        return isFired();
+    }
+
     public abstract Range getRange();
 
     public Range getAbsoluteRange() {
@@ -370,10 +384,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return inputLinks.containsKey(s.getPInput());
     }
 
-    public boolean templateLinkExists(Direction dir, Synapse ts) {
-        return dir.getLinks(this)
-                .map(Link::getSynapse)
-                .anyMatch(s -> s.isOfTemplate(ts));
+    public boolean linkExists(Direction dir, Synapse ts, boolean template) {
+        return template ?
+                dir.getLinks(this)
+                        .map(Link::getSynapse)
+                        .anyMatch(s -> s.isOfTemplate(ts)) :
+                !getOutputLinks(ts).isEmpty();
     }
 
     public SortedMap<OutputKey, Link> getOutputLinks(Synapse s) {

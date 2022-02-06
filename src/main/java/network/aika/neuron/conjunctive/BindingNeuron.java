@@ -48,19 +48,6 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
     }
 
     @Override
-    public boolean allowTemplatePropagate(Activation act) {
-        Neuron n = act.getNeuron();
-
-        if(n.isInputNeuron())
-            return false;
-
-        if(act.getOutputGradient().updateAvailable())
-            return false;
-
-        return true;
-    }
-
-    @Override
     public BindingNeuron instantiateTemplate(boolean addProvider) {
         BindingNeuron n = new BindingNeuron(getModel(), addProvider);
         initFromTemplate(n);

@@ -17,15 +17,12 @@
 package network.aika.text;
 
 import network.aika.neuron.Range;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.conjunctive.PrimaryInputBNSynapse;
-import network.aika.neuron.conjunctive.RelatedInputBNSynapse;
 import network.aika.neuron.disjunctive.CategoryNeuron;
 
-import static network.aika.linker.LinkingTask.addNextLinkerSteps;
 import static network.aika.neuron.bindingsignal.Scope.SAME;
 import static network.aika.text.TextModel.REL_NEXT_TOKEN_LABEL;
 import static network.aika.text.TextModel.REL_PREVIOUS_TOKEN_LABEL;
@@ -45,12 +42,6 @@ public class TokenActivation extends PatternActivation {
     public TokenActivation(int id, int begin, int end, Document doc, PatternNeuron patternNeuron) {
         super(id, doc, patternNeuron);
         range = new Range(begin, end);
-    }
-
-    private static void addLink(Synapse s, Activation iAct, Activation oAct) {
-        Link nl = s.createLink(iAct, oAct);
-
-        addNextLinkerSteps(nl);
     }
 
     private static PrimaryInputBNSynapse getRelatedSynapse(CategoryNeuron input, BindingNeuron output) {
@@ -73,10 +64,10 @@ public class TokenActivation extends PatternActivation {
         BindingActivation relActPrev = getRelationActivation(next, REL_PREVIOUS_TOKEN_LABEL);
 
         PrimaryInputBNSynapse relSynNext = getRelatedSynapse(nextCatAct.getNeuron(), relActNext.getNeuron());
-        addLink(relSynNext, nextCatAct, relActNext);
+        relSynNext.createLink(nextCatAct, relActNext);
 
         PrimaryInputBNSynapse relSynPrev = getRelatedSynapse(prevCatAct.getNeuron(), relActPrev.getNeuron());
-        addLink(relSynPrev, prevCatAct, relActPrev);
+        relSynPrev.createLink(prevCatAct, relActPrev);
     }
 
     private static BindingActivation getRelationActivation(PatternActivation patternAct, String direction) {

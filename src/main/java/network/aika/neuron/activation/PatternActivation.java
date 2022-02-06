@@ -60,6 +60,12 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
         );
     }
 
+
+    @Override
+    public boolean checkAllowPropagate() {
+        return super.checkAllowPropagate();
+    }
+
     @Override
     public void registerPatternBindingSignal(PatternBindingSignal pbs) {
         super.registerPatternBindingSignal(pbs);

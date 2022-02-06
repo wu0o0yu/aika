@@ -91,4 +91,8 @@ public class SwitchField implements FieldInput, FieldOutput {
     public void acknowledgePropagated() {
         getField().acknowledgePropagated();
     }
+
+    public String toString() {
+        return "[swf:" + getCurrentValue() + "]";
+    }
 }

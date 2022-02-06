@@ -47,18 +47,6 @@ public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends
         return true;
     }
 
-    @Override
-    public O getTemplatePropagateTargetNeuron(OA act) {
-/*
-        List<Activation<?>> candidates = act.getPatternBindingSignals().entrySet().stream()
-                .map(e -> e.getKey())
-                .flatMap(bAct -> bAct.getReverseBindingSignals().entrySet().stream())
-                .map(e -> e.getKey())
-                .filter(relAct -> relAct.getNeuron() instanceof InhibitoryNeuron)
-                .collect(Collectors.toList());
-*/
-        return getOutput();
-    }
 
     @Override
     public void updateWeight(Link l, double delta) {

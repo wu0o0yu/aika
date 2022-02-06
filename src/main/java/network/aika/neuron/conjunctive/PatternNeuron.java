@@ -65,11 +65,6 @@ public class PatternNeuron extends ConjunctiveNeuron<PatternSynapse, PatternActi
     }
 
     @Override
-    public boolean allowTemplatePropagate(Activation act) {
-        return true; //getCandidateGradient(act) >= 1.4;
-    }
-
-    @Override
     public PatternNeuron instantiateTemplate(boolean addProvider) {
         PatternNeuron n = new PatternNeuron(getModel(), addProvider);
         initFromTemplate(n);
