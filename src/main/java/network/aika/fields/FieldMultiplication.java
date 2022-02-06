@@ -32,7 +32,7 @@ public class FieldMultiplication implements MultiSourceFieldOutput {
 
     @Override
     public double getCurrentValue() {
-        return in1.getCurrentValue() * in2.getCurrentValue();
+        return FieldOutput.getCurrentValue(in1) * FieldOutput.getCurrentValue(in2);
     }
 /*
     @Override
@@ -60,9 +60,9 @@ public class FieldMultiplication implements MultiSourceFieldOutput {
     public boolean updateAvailable(int updateArg) {
         switch (updateArg) {
             case 1:
-                return !Utils.belowTolerance(in2.getCurrentValue()) && in1.updateAvailable();
+                return !Utils.belowTolerance(FieldOutput.getCurrentValue(in2)) && in1.updateAvailable();
             case 2:
-                return !Utils.belowTolerance(in1.getCurrentValue()) && in2.updateAvailable();
+                return !Utils.belowTolerance(FieldOutput.getCurrentValue(in1)) && in2.updateAvailable();
             default:
                 return false;
         }
@@ -72,10 +72,10 @@ public class FieldMultiplication implements MultiSourceFieldOutput {
         double result = 0.0;
         if(updateArg == 1) {
             if (in1.updateAvailable())
-                result += in1.getUpdate() * in2.getCurrentValue();
+                result += in1.getUpdate() * FieldOutput.getCurrentValue(in2);
         } else if(updateArg == 2) {
             if (in2.updateAvailable())
-                result += in2.getUpdate() * in1.getCurrentValue();
+                result += in2.getUpdate() * FieldOutput.getCurrentValue(in1);
         }
         return result;
     }

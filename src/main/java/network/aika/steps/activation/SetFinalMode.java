@@ -49,8 +49,4 @@ public class SetFinalMode extends Step<PatternActivation> {
         getElement()
                 .setFinalMode();
     }
-
-    public String toString() {
-        return "Act-Step: Set final Mode " + getElement().toShortString();
-    }
 }

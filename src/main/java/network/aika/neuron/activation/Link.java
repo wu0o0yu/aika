@@ -23,14 +23,13 @@ import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.PostTraining;
-import network.aika.steps.link.AddLink;
+import network.aika.steps.link.InitializeLink;
 import network.aika.steps.link.PropagateBindingSignal;
 
 import java.util.Comparator;
 
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.fields.ConstantField.ZERO;
-import static network.aika.sign.Sign.POS;
 
 /**
  *
@@ -65,7 +64,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
                 ZERO;
         backPropGradient = new FieldMultiplication(output.outputGradient, getWeightOutput());
 
-        AddLink.add(this);
+        InitializeLink.add(this);
 
         getThought().onLinkCreationEvent(this);
     }
@@ -268,24 +267,18 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         return COMPARE.compare(this, l);
     }
 
-    public String toShortString() {
-        return getClass().getSimpleName() +
-                " " + getKeyString() +
-                " --> " + output.toShortString();
-    }
-
     public String toString() {
-        return getClass().getSimpleName() + " in:[" + input.toShortString() + " v:" + input.getValue() + "] - " +
-                "out:[" + output.toShortString() + " v:" + output.getValue() + "]";
+        return (isTemplate() ? "Template-" : "") + getClass().getSimpleName() +
+                " in:[" + getInputKeyString() + "] " +
+                "--> " +
+                "out:[" + getOutputKeyString() + "]";
     }
 
-    public String getKeyString() {
-        return (input != null ? input.toShortString() : "X:" + synapse.getInput());
+    private String getInputKeyString() {
+        return (input != null ? input.toKeyString() : "id:X n:[" + synapse.getInput() + "]");
     }
 
-    public String gradientsToString() {
-        return "   " + getKeyString() +
-                " x:" + getInputValue(POS) +
-                " w:" + getWeightOutput();
+    private String getOutputKeyString() {
+        return (output != null ? output.toKeyString() : "id:X n:[" + synapse.getOutput() + "]");
     }
 }

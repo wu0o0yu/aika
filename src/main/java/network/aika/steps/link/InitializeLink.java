@@ -24,13 +24,13 @@ import network.aika.steps.Step;
  *
  * @author Lukas Molzberger
  */
-public class AddLink extends Step<Link> {
+public class InitializeLink extends Step<Link> {
 
     public static void add(Link l) {
-        add(new AddLink(l));
+        add(new InitializeLink(l));
     }
 
-    private AddLink(Link l) {
+    private InitializeLink(Link l) {
         super(l);
     }
 
@@ -64,9 +64,5 @@ public class AddLink extends Step<Link> {
         l.getOutput().getNet().addAndTriggerUpdate(
                 l.getWeightedInput().getCurrentValue()
         );
-    }
-
-    public String toString() {
-        return "Link-Step: Add Link " + getElement().toShortString();
     }
 }

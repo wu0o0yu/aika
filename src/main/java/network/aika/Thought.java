@@ -235,15 +235,6 @@ public abstract class Thought<M extends Model> {
         return sb.toString();
     }
 
-    public String gradientsToString() {
-        StringBuilder sb = new StringBuilder();
-
-        activationsById.values()
-                .forEach(act -> sb.append(act.gradientsToString()));
-
-        return sb.toString();
-    }
-
     public Stream<PatternBindingSignal> getLooselyRelatedBindingSignals(BindingSignal<?> fromBindingSignal, Integer looseLinkingRange) {
         return Stream.empty();
     }

@@ -49,8 +49,4 @@ public class EntropyGradient extends Step<Activation> {
     public void process() {
         getElement().updateEntropyGradient();
     }
-
-    public String toString() {
-        return "Act-Step: Entropy Gradient " + getElement().toShortString();
-    }
 }

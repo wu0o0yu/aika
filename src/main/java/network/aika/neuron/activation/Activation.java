@@ -465,42 +465,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return outputLinks.values().stream();
     }
 
-    public String gradientsToString() {
-        StringBuilder sb = new StringBuilder();
-
-        inputLinks.values()
-                .forEach(l -> {
-                    sb.append(l.gradientsToString());
-                    sb.append(" \n");
-                });
-
-        sb.append("\n");
-        return sb.toString();
-    }
-
-    public String toShortString() {
-        return "act " + toKeyString();
+    public String toString() {
+        return (isTemplate() ? "Template-" : "") + getClass().getSimpleName() + " " + toKeyString();
     }
 
     public String toKeyString() {
-        return "id:" + getId() + " n:[" + getNeuron().toShortString() + "]";
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(toKeyString());
-        sb.append(" value:" + value);
-        sb.append(" net:" + net);
-
-        sb.append("\n");
-        getInputLinks().forEach(l ->
-            sb.append("   " + l.toString() + "\n")
-        );
-        sb.append("\n");
-
-        return sb.toString();
+        return "id:" + getId() + " n:[" + getNeuron().toKeyString() + "]";
     }
 
     @Override

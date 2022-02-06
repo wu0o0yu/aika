@@ -48,8 +48,4 @@ public class BranchProbability extends Step<BindingActivation> {
         getElement()
                 .computeBranchProbability();
     }
-
-    public String toString() {
-        return "Act-Step: Determine Branch Probability " + getElement().toShortString();
-    }
 }

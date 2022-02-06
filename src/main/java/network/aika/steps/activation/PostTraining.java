@@ -54,8 +54,4 @@ public class PostTraining extends Step<Activation> {
         n.updateAllowPropagate();
         Save.add(getElement());
     }
-
-    public String toString() {
-        return "Act-Step: Update Synapse Input Connections " + getElement().toShortString();
-    }
 }

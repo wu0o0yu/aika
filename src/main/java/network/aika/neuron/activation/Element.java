@@ -60,6 +60,4 @@ public abstract class Element<E extends Element> implements Comparable<E> {
     public abstract Thought getThought();
 
     public abstract Config getConfig();
-
-    public abstract String toShortString();
 }

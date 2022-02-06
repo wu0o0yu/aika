@@ -86,4 +86,8 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
     public E getElement() {
         return element;
     }
+
+    public String toString() {
+        return "" + getElement();
+    }
 }

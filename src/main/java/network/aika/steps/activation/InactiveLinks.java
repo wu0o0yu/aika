@@ -27,8 +27,4 @@ public class InactiveLinks extends Step<Activation> {
 
         n.addInactiveLinks(act);
     }
-
-    public String toString() {
-        return "Act-Step: Add inactive links " + getElement().toShortString();
-    }
 }

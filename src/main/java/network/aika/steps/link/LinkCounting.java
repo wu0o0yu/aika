@@ -52,8 +52,4 @@ public class LinkCounting extends Step<Link> {
 
         s.count(l);
     }
-
-    public String toString() {
-        return "Link-Step: Counting " + getElement().toShortString();
-    }
 }

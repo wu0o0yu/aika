@@ -58,8 +58,4 @@ public class LinkInduction extends Step<Link> {
 
         Cleanup.add(l);
     }
-
-    public String toString() {
-        return "Link-Step: Induction " + getElement().toShortString();
-    }
 }

@@ -83,8 +83,6 @@ public class InductionTest {
 
         actTarget.updateEntropyGradient();
  //       actTarget.computeInitialLinkGradients();
-
-        System.out.println(actTarget.gradientsToString());
     }
 
     @Test
@@ -116,8 +114,5 @@ public class InductionTest {
         doc.updateModel();
 
         System.out.println(doc);
-        System.out.println(doc.gradientsToString());
-
-        System.out.println(); // doc.activationsToString()
     }
 }

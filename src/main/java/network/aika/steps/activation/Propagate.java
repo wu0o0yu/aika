@@ -87,6 +87,6 @@ public class Propagate extends Step<Activation> {
     }
 
     public String toString() {
-        return "Act-Step: " + (template ? "Template-" : "") + "Propagate " + getElement().toShortString();
+        return (template ? "Template " : " ") + getElement();
     }
 }

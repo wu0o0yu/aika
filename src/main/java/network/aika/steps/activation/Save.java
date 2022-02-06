@@ -47,8 +47,4 @@ public class Save extends Step<Activation> {
                 .getProvider()
                 .save();
     }
-
-    public String toString() {
-        return "Act-Step: Store neuron " + getElement().toShortString();
-    }
 }

@@ -456,26 +456,11 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         }
     }
 
-    public String toShortString() {
-        return (isTemplate() ? "t" : "") + toKeyString();
-    }
-
-    private String toKeyString() {
+    public String toKeyString() {
         return getId() + ":" + getLabel();
     }
 
     public String toString() {
-        return (isTemplate() ? "Template-" : "") + getClass().getSimpleName() + " b:" + bias;
-    }
-
-    public String statToString() {
-        return getClass().getSimpleName() + " " +
-                getId() + ":" + getLabel() + " " +
-                "f:" + Utils.round(frequency) + " " +
-                "N:" + Utils.round(sampleSpace.getN(null)) + " " +
-                "p:" + Utils.round(getProbability(null, POS, sampleSpace.getN(null))) + " " +
-                "s(p):" + Utils.round(getSurprisal(null, POS, null)) + " " +
-                "s(n):" + Utils.round(getSurprisal(null, NEG, null)) + " " +
-                "\n";
+        return (isTemplate() ? "Template-" : "") + getClass().getSimpleName();
     }
 }

@@ -47,8 +47,4 @@ public class Counting extends Step<Activation> {
         assert act.isFired();
         act.getNeuron().count(act);
     }
-
-    public String toString() {
-        return "Act-Step: Counting " + getElement().toShortString();
-    }
 }

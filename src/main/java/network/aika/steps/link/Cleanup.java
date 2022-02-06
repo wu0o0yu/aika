@@ -49,8 +49,4 @@ public class Cleanup extends Step<Link> {
         l.unlinkInput();
         l.unlinkOutput();
     }
-
-    public String toString() {
-        return "Link-Step: Commit " + getElement().toShortString();
-    }
 }

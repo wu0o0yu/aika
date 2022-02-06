@@ -30,4 +30,12 @@ public interface FieldOutput {
     double getUpdate();
 
     void acknowledgePropagated();
+
+    static double getCurrentValue(FieldOutput f) {
+        return f != null ? f.getCurrentValue() : 0.0;
+    }
+
+    static double getUpdate(FieldOutput f) {
+        return f != null ? f.getCurrentValue() : 0.0;
+    }
 }

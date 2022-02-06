@@ -44,8 +44,4 @@ public class ShadowFactor extends Step<Link> {
     public void process() {
     //    getElement().removeGradientDependencies();
     }
-
-    public String toString() {
-        return "Link-Step: Shadow Factor " + getElement().toShortString();
-    }
 }

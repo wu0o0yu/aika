@@ -146,6 +146,6 @@ public class Linking extends Step<Activation> {
     }
 
     public String toString() {
-        return "Act-Step: " + (template ? "Template-" : "") + "Link " + getElement().toShortString() + " Binding-Signal:" + bindingSignal;
+        return (template ? "Template " : " ")  + getElement() + " Binding-Signal:" + bindingSignal;
     }
 }

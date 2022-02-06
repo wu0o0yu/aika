@@ -23,7 +23,6 @@ import java.util.function.BooleanSupplier;
  */
 public class SwitchField implements FieldInput, FieldOutput {
 
-
     private BooleanSupplier test;
     private Field inputFieldA;
     private Field inputFieldB;
@@ -51,7 +50,6 @@ public class SwitchField implements FieldInput, FieldOutput {
         }
     }
 
-
     @Override
     public boolean set(double v) {
         return getField().set(v);
@@ -69,12 +67,12 @@ public class SwitchField implements FieldInput, FieldOutput {
 
     @Override
     public double getCurrentValue() {
-        return inputFieldA.getCurrentValue() + inputFieldB.getCurrentValue();
+        return FieldOutput.getCurrentValue(inputFieldA) + FieldOutput.getCurrentValue(inputFieldB);
     }
 
     @Override
     public double getNewValue() {
-        return getField().getNewValue() + getOtherField().getCurrentValue();
+        return getField().getNewValue() + FieldOutput.getCurrentValue(getOtherField());
     }
 
     @Override
@@ -84,7 +82,7 @@ public class SwitchField implements FieldInput, FieldOutput {
 
     @Override
     public double getUpdate() {
-        return getField().getUpdate();
+        return FieldOutput.getUpdate(getField());
     }
 
     @Override
