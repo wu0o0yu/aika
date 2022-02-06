@@ -418,7 +418,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     public String toString() {
         return (isTemplate() ? "Template-" : "") +
                 getClass().getSimpleName() +
-                " in:[" + input.getNeuron().toKeyString()  + "](" + (isInputLinked() ? "+" : "-") + ")" +
-                " --> out:[" + output.getNeuron().toKeyString() + "](" + (isOutputLinked() ? "+" : "-") + ")";
+                " in:[" + input.getNeuron().toKeyString()  + "](" + (isInputLinked() ? "+" : "-") + ") " +
+                (allowPropagate() ? "==>" : "-->") +
+                " out:[" + output.getNeuron().toKeyString() + "](" + (isOutputLinked() ? "+" : "-") + ")";
     }
 }
