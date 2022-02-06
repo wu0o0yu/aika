@@ -15,3 +15,4 @@ The AIKA network uses four different types of neurons:
 
 The Pattern-Neurons and the Binding-Neurons are both conjunctive in nature while the Inhibitory-Neurons and the Category-Neurons are disjunctive. The Binding-Neurons are kind of the glue code of the whole network. On the one hand, they bind the input-features of a pattern to the pattern-neuron and on the receive negative feedback synapses from the inhibitory neurons which allow them to either be suppressed by an opposing pattern or allow themselves suppress another conflicting pattern. 
 
+Initially the network starts out empty and is then populated during training. The induction of new neurons and synapses is guided by a network of template neurons and synapses.
