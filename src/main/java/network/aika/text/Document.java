@@ -64,7 +64,9 @@ public class Document extends Thought<TextModel> {
         return Stream.concat(
             beginPBSIndex.subMap(r.getEnd(), r.getEnd() + looseLinkingRange).values().stream(),
             endPBSIndex.subMap(r.getBegin() - looseLinkingRange, r.getBegin()).values().stream()
-        );
+        )
+                .map(bs -> bs.getOriginActivation())
+                .flatMap(originAct -> originAct.getReverseBindingSignals());
     }
 
     public void append(String txt) {

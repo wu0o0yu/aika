@@ -101,7 +101,7 @@ public class Linking extends Step<Activation> {
         );
     }
 
-    public void link(Synapse targetSynapse, Activation<?> fromAct, Direction dir, BindingSignal<?> fromBindingSignal) {
+    private void link(Synapse targetSynapse, Activation<?> fromAct, Direction dir, BindingSignal<?> fromBindingSignal) {
         getRelatedBindingSignal(targetSynapse, fromBindingSignal)
                 .filter(toBS -> fromBindingSignal != toBS)
                 .filter(toBS ->

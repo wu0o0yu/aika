@@ -84,7 +84,7 @@ public class PropagateBindingSignal extends Step<Link> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(getElement());
-        inputBindingSignals.forEach(bs -> sb.append("\nBS:  " + bs));
+        inputBindingSignals.forEach(bs -> sb.append("\n    BS: " + bs));
         return sb.toString();
     }
 }

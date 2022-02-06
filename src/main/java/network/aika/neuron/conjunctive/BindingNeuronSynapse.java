@@ -36,7 +36,7 @@ public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I ext
 
     @Override
     public boolean checkLinkingPreConditions(IA iAct, BindingActivation oAct) {
-        if(Link.isForward(iAct, oAct))
+        if(!Link.isForward(iAct, oAct))
             return false;
 
         return super.checkLinkingPreConditions(iAct, oAct);
