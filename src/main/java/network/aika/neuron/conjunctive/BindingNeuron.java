@@ -18,15 +18,8 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.fields.Field;
 import network.aika.neuron.axons.BindingAxon;
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 
 
 /**

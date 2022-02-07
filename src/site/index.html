@@ -53,9 +53,9 @@
 		</div>
 	</div>
 	<div id="contents">
-		<div align="right"><span style='color: #FF0000;'>February 06, 2022</span></div>
+		<div align="right"><span style='color: #FF0000;'>February 07, 2022</span></div>
 		<div id="features">
-			<h1>About the Aika Neural Network</h1>
+			<h1>About the AIKA Neural Network</h1>
 			<div>
 				<p>
 					<b>
@@ -86,7 +86,7 @@
 					<li>They allow the training gradient to be propagated backwards.</li>
 					<li>Negative feedback links create mutually exclusive branches within the activations network.</li>
 					<li>Positive feedback links allow the binding neurons of a pattern neuron ensemble to support each
-						other.
+						other, by feeding the activation value of the patten neuron back to its input binding-neurons.
 					</li>
 				</ul>
 				</b>
@@ -95,28 +95,59 @@
 
 						The AIKA network uses four different types of neurons:
 				<ul>
-					<li>Pattern-Neurons</li>
-					<li>Binding-Neurons</li>
-					<li>Inhibitory-Neurons</li>
-					<li>Category-Neurons</li>
+					<li>Pattern-Neurons (PN)</li>
+					<li>Binding-Neurons (BN)</li>
+					<li>Inhibitory-Neurons (IN)</li>
+					<li>Category-Neurons (CN)</li>
 				</ul>
 
 				</b>
 				</p>
 				<p>
-					The Pattern-Neurons and the Binding-Neurons are both conjunctive in nature while the
-					Inhibitory-Neurons and the Category-Neurons are disjunctive. The Binding-Neurons are kind of the
-					glue code of the whole network. On the one hand, they bind the input-features of a pattern to the
-					pattern-neuron and on the other hand receive negative feedback synapses from the inhibitory neurons
-					which allow them to either be suppressed by an opposing pattern or allow themselves to suppress
-					another conflicting pattern.
+					The Pattern-Neurons and the Binding-Neurons are both conjunctive in nature while the Inhibitory-Neurons
+					and the Category-Neurons are disjunctive. The Binding-Neurons are kind of the glue code of the whole
+					network. On the one hand, they bind the input-features of a pattern to the pattern-neuron and on the
+					other hand receive negative feedback synapses from the inhibitory neurons which allow them to either
+					be suppressed by an opposing pattern or allow themselves suppress another conflicting pattern. Similar
+					to the neuron types there are also several different types of synapses, depending on wich types of
+					neurons they connect. For example, the input synapses of an inhibitory neuron are always linked to
+					Binding-Neurons, while the input synapses of Category-Neurons are always linked to pattern-neurons.
 				</p>
 				<p>
-					Depending on their source activation two types of binding-signals can be distinguished:
-					The pattern-binding-signal and the branch-binding-signal. The pattern-binding-signal originates at
-					a pattern-activation and is used to bind the input-features of a pattern to the pattern itself.
+					The following types of synapses exist within the AIKA network:
+				<ul>
+					<li>PrimaryInputBNSynapse ((PN|CN) -> BN)</li>
+					<li>RelatedInputBNSynapse (BN -> BN)</li>
+					<li>SamePatternBNSynapse (BN -> BN)</li>
+					<li>PositiveFeedbackSynapse (PN -> BN)</li>
+					<li>NegativeFeedbackSynapse (IN -> BN)</li>
+					<li>PatternSynapse (BN -> PN)</li>
+					<li>CategorySynapse (PN -> PN)</li>
+					<li>InhibitorySynapse (BN -> IN)</li>
+				</ul>
+				</p>
+				<p>
+					Depending on their source activation two types of binding-signals can be distinguished: The
+					pattern-binding-signal and the branch-binding-signal. The pattern-binding-signal originates at a
+					pattern-activation and is used to bind the input-features of a pattern to the pattern itself.
 					The branch-binding-signal originates at a binding-activation and is used to distinguish the mutually
-					exclusive branches from each other.
+					exclusive branches from each other. The pattern-binding-signal is also carrying a scope that allows
+					it to distinguish between different pattern binding ensembles. The scope of the binding-signal
+					changes when being propagated through certain types of synapses such as the PrimaryInputBNSynapse
+					of the RelatedInputBNSynapse. The scope is used during the linking process to verify the validity
+					of creating a certain new link.
+				</p>
+				<p>
+					As already mentioned, the Binding-Neurons of a pattern neuron ensemble are used to bind this pattern
+					to its input features. To verify that all the input-features occurred in the correct relation to
+					each other the SamePatternBNSynapse is used. The SamePatternBNSynapse connects two Binding-Neurons
+					within the same pattern neuron ensemble and is only linked both ends of the synapse have been reached
+					by the same binding-signal. Therefore, the SamePatternBNSynapse is used to avoid what
+					is called the superposition catastrophe.
+				</p>
+				<p>
+					Since the Category-Neuron passes on the pattern-binding-signal of its input Pattern-Neuron, it can
+					act as a category slot, therefore allowing the network great flexibility in abstracting concepts.
 				</p>
 				<p>
 					Initially, the network starts out empty and is then gradually populated during training. The
@@ -145,7 +176,7 @@
 
 				<ul>
 				<li>
-					Not all the neurons exist right from the start. Therefore we need to keep track of an offset for
+					Not all the neurons exist right from the start. Therefore, we need to keep track of an offset for
 					each neuron, so that we can compute how many training examples this neuron has already seen.
 				</li>
 				<li>

@@ -71,6 +71,10 @@ public class PatternNeuron extends ConjunctiveNeuron<PatternSynapse, PatternActi
         return n;
     }
 
+    @Override
+    public void updateAllowPropagate() {
+    }
+
     public void setTokenLabel(String tokenLabel) {
         this.tokenLabel = tokenLabel;
     }

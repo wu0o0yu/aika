@@ -85,25 +85,19 @@ public class Field implements FieldInput, FieldOutput, Writable {
 
     @Override
     public boolean set(double v) {
-        if(!propagatePreCondition.check(currentValue, v, v - currentValue))
-            return false;
-
         update = v - currentValue;
 
-        return true;
+        return propagatePreCondition.check(currentValue, v, v - currentValue);
     }
 
     @Override
     public boolean add(double u) {
-        if(!propagatePreCondition.check(currentValue, currentValue + u, u))
-            return false;
-
         if(update == null)
             update = u;
         else
             update += u;
 
-        return true;
+        return propagatePreCondition.check(currentValue, currentValue + u, u);
     }
 
     @Override

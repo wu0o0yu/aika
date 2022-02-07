@@ -109,7 +109,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return true;
     }
 
-
     public boolean checkRelatedBranchBindingSignal(BranchBindingSignal iBS, BranchBindingSignal oBS) {
         return false;
     }

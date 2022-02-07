@@ -30,8 +30,7 @@ import network.aika.utils.Bound;
  *
  * @author Lukas Molzberger
  */
-public class InhibitorySynapse<N extends BindingNeuron & BindingAxon> extends DisjunctiveSynapse<InhibitorySynapse, N, InhibitoryNeuron, InhibitoryLink, BindingActivation, InhibitoryActivation> {
-
+public class InhibitorySynapse extends DisjunctiveSynapse<InhibitorySynapse, BindingNeuron, InhibitoryNeuron, InhibitoryLink, BindingActivation, InhibitoryActivation> {
 
     @Override
     public InhibitoryLink createLink(BindingActivation input, InhibitoryActivation output) {

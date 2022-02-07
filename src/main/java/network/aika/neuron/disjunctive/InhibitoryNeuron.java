@@ -19,7 +19,6 @@ package network.aika.neuron.disjunctive;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.ActivationFunction;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.InhibitoryActivation;
