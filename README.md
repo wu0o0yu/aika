@@ -23,7 +23,7 @@ The following types of synapses exist within the AIKA network:
 - PositiveFeedbackSynapse (PN -> BN)
 - NegativeFeedbackSynapse (IN -> BN)
 - PatternSynapse (BN -> PN)
-- CategorySynapse (PN -> PN)
+- CategorySynapse (PN -> CN)
 - InhibitorySynapse (BN -> IN)
 
 Depending on their source activation two types of binding-signals can be distinguished: The pattern-binding-signal and the branch-binding-signal. The pattern-binding-signal originates at a pattern-activation and is used to bind the input-features of a pattern to the pattern itself. The branch-binding-signal originates at a binding-activation and is used to distinguish the mutually exclusive branches from each other. The pattern-binding-signal is also carrying a scope that allows it to distinguish between different pattern 
