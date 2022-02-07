@@ -8,13 +8,25 @@ AIKA (**A**rtificial **I**ntelligence for **K**nowledge **A**cquisition) is a ne
 - Positive feedback links allow the binding neurons of a pattern neuron ensemble to support each other, by feeding the activation value of the patten neuron back to its input binding-neurons.
 
 The AIKA network uses four different types of neurons:
-- Pattern-Neurons
-- Binding-Neurons
-- Inhibitory-Neurons
-- Category-Neurons
+- Pattern-Neurons (PN)
+- Binding-Neurons (BN)
+- Inhibitory-Neurons (IN)
+- Category-Neurons (CN)
 
-The Pattern-Neurons and the Binding-Neurons are both conjunctive in nature while the Inhibitory-Neurons and the Category-Neurons are disjunctive. The Binding-Neurons are kind of the glue code of the whole network. On the one hand, they bind the input-features of a pattern to the pattern-neuron and on the other hand receive negative feedback synapses from the inhibitory neurons which allow them to either be suppressed by an opposing pattern or allow themselves suppress another conflicting pattern. 
+The Pattern-Neurons and the Binding-Neurons are both conjunctive in nature while the Inhibitory-Neurons and the Category-Neurons are disjunctive. The Binding-Neurons are kind of the glue code of the whole network. On the one hand, they bind the input-features of a pattern to the pattern-neuron and on the other hand receive negative feedback synapses from the inhibitory neurons which allow them to either be suppressed by an opposing pattern or allow themselves suppress another conflicting pattern. Similar to the neuron types there are also several different types of synapses, depending on wich types of neurons they connect. For example, the input synapses of an inhibitory neuron are always linked to Binding-Neurons, while the input synapses of Category-Neurons are always linked to pattern-neurons.
 
-Depending on their source activation two types of binding-signals can be distinguished: The pattern-binding-signal and the branch-binding-signal. The pattern-binding-signal originates at a pattern-activation and is used to bind the input-features of a pattern to the pattern itself. The branch-binding-signal originates at a binding-activation and is used to distinguish the mutually exclusive branches from each other.
+The following types of synapses exist within the AIKA network:
+
+- PrimaryInputBNSynapse ((PN|CN) -> BN)
+- RelatedInputBNSynapse (BN -> BN)
+- SamePatternBNSynapse (BN -> BN)
+- PositiveFeedbackSynapse (PN -> BN)
+- NegativeFeedbackSynapse (IN -> BN)
+- PatternSynapse (BN -> PN)
+- CategorySynapse (PN -> PN)
+- InhibitorySynapse (BN -> IN)
+
+Depending on their source activation two types of binding-signals can be distinguished: The pattern-binding-signal and the branch-binding-signal. The pattern-binding-signal originates at a pattern-activation and is used to bind the input-features of a pattern to the pattern itself. The branch-binding-signal originates at a binding-activation and is used to distinguish the mutually exclusive branches from each other. The pattern-binding-signal is also carrying a scope that allows it to distinguish between different pattern 
+binding ensembles. The scope of the binding-signal changes when beeing propagated through certain types of synapses such as the PrimaryInputBNSynapse of the RelatedInputBNSynapse. The scope is used during the linking process to verify the validity of creating a certain new link. 
 
 Initially, the network starts out empty and is then gradually populated during training. The induction of new neurons and synapses is guided by a network of template neurons and synapses.
