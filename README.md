@@ -31,4 +31,6 @@ binding ensembles. The scope of the binding-signal changes when beeing propagate
 
 As already mentioned the Binding-Neurons of a pattern neuron ensamble are used to bind this pattern to its input features. To verify that all the input-features occured in the correct relation to each other the SamePatternBNSynapse is used. The SamePatternBNSynapse connects two Binding-Neurons within the same pattern neuron ensamble. Therfore, the SamePatternBNSynapse is used to avoid what is called the superposition catastrophe.
 
+Since the Category-Neuron passes on the pattern-binding-signal of its input Pattern-Neuron, it can act as a category slot, therefore allowing the network great flexibility in abstracting concepts.
+
 Initially, the network starts out empty and is then gradually populated during training. The induction of new neurons and synapses is guided by a network of template neurons and synapses.
