@@ -5,7 +5,7 @@ AIKA (**A**rtificial **I**ntelligence for **K**nowledge **A**cquisition) is a ne
 - They establish an approximate causal relation through the fired timestamps of their input and output activations.
 - They allow the training gradient to be propagated backwards.
 - Negative feedback links create mutually exclusive branches within the activations network.
-- Positive feedback links allow the binding neurons of a pattern neuron ensemble to support each other.
+- Positive feedback links allow the binding neurons of a pattern neuron ensemble to support each other, by feeding the activation value of the patten neuron back to its input binding-neurons.
 
 The AIKA network uses four different types of neurons:
 - Pattern-Neurons
