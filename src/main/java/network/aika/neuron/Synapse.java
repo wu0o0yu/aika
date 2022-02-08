@@ -81,12 +81,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     protected boolean checkCommonLinkingPreConditions(IA iAct, OA oAct) {
-        if (!iAct.getNeuron().neuronMatches(getInput()))
-            return false;
-
-        if (!oAct.getNeuron().neuronMatches(getOutput()))
-            return false;
-
         if(Link.linkExists(iAct, oAct))
             return false;
 

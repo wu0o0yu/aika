@@ -39,4 +39,12 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
 
         return super.getOutputValue();
     }
+
+    @Override
+    public double getOutputValueUpdate() {
+        if(isSelfRef())
+            return 0.0;
+
+        return super.getOutputValueUpdate();
+    }
 }

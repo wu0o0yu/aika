@@ -169,7 +169,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         return s.getValue(input != null ? input.getValue() : ZERO);
     }
 
-    public FieldOutput getOutputValue(Sign s) {
+    public FieldOutput getOutputValueUpdate(Sign s) {
         return s.getValue(output != null ? output.getValue() : ZERO);
     }
 
@@ -224,11 +224,15 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
 
     public void propagateValue() {
         output.getNet().addAndTriggerUpdate(
-                getOutputValue()
+                getOutputValueUpdate()
         );
     }
 
-    protected double getOutputValue() {
+    public double getOutputValue() {
+        return getWeightedInput().getCurrentValue();
+    }
+
+    public double getOutputValueUpdate() {
         return getWeightedInput().getUpdate(1);
     }
 

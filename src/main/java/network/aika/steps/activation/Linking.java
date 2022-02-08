@@ -139,6 +139,12 @@ public class Linking extends Step<Activation> {
         Activation iAct = dir.getInput(fromAct, toAct);
         Activation oAct = dir.getOutput(fromAct, toAct);
 
+        if (!iAct.getNeuron().neuronMatches(targetSynapse.getInput()))
+            return;
+
+        if (!oAct.getNeuron().neuronMatches(targetSynapse.getOutput()))
+            return;
+
         if(!targetSynapse.checkLinkingPreConditions(iAct, oAct))
             return;
 

@@ -62,7 +62,7 @@ public class InitializeLink extends Step<Link> {
             l.linkOutput();
 
         l.getOutput().getNet().addAndTriggerUpdate(
-                l.getWeightedInput().getCurrentValue()
+                l.getOutputValue()
         );
     }
 }
