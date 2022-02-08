@@ -52,6 +52,7 @@ public class QueueField extends Field {
     }
 
     public void process() {
+        isQueued = false;
         triggerInternal();
     }
 }
