@@ -17,7 +17,13 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
+
+import java.util.List;
+
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
 
 /**
  *
@@ -31,5 +37,10 @@ public abstract class ConjunctiveActivation<N extends Neuron> extends Activation
 
     public ConjunctiveActivation(int id, Thought t, N n) {
         super(id, t, n);
+    }
+
+    @Override
+    public List<Direction> getLinkingDirections() {
+        return List.of(INPUT, OUTPUT);
     }
 }

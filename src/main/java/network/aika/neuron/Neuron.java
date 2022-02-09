@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
 
 /**
@@ -461,6 +460,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public String toString() {
-        return (isTemplate() ? "Template-" : "") + getClass().getSimpleName();
+        return (isTemplate() ? "Template-" : "") + getClass().getSimpleName() + " " + toKeyString();
     }
 }

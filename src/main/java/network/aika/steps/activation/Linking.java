@@ -17,22 +17,15 @@
 package network.aika.steps.activation;
 
 import network.aika.direction.Direction;
-import network.aika.neuron.Linker;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.InhibitoryActivation;
 import network.aika.neuron.activation.Timestamp;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
-import java.util.List;
 import java.util.stream.Stream;
-
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
-
 
 /**
  * The job of the linking phase is to propagate information through the network by creating the required activations and links.
@@ -71,13 +64,6 @@ public class Linking extends Step<Activation> {
 
     protected final BindingSignal bindingSignal;
 
-    protected List<Direction> getDirections() {
-        if(getElement() instanceof InhibitoryActivation)
-            return List.of(OUTPUT);
-
-        return List.of(INPUT, OUTPUT);
-    }
-
     @Override
     public Phase getPhase() {
         return Phase.PROCESSING;
@@ -89,8 +75,10 @@ public class Linking extends Step<Activation> {
 
     @Override
     public void process() {
-        Neuron<?, ?> fromN = getElement().getNeuron();
-        getDirections().forEach(dir ->
+        Activation<?> act = getElement();
+        Neuron<?, ?> fromN = act.getNeuron();
+
+        act.getLinkingDirections().forEach(dir ->
                 fromN.getTargetSynapses(dir, template)
                         .filter(ts ->
                                 ts.checkBindingSignal(bindingSignal, dir)

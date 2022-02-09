@@ -63,6 +63,9 @@ public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PositiveFeedba
 
     @Override
     public boolean checkLinkingPreConditions(PatternActivation iAct, BindingActivation oAct) {
-        return checkCommonLinkingPreConditions(iAct, oAct); // Skip BindingNeuronSynapse.checkLinkingPreConditions
+        // Skip BindingNeuronSynapse.checkLinkingPreConditions
+        // --> Do not check Link.isForward(iAct, oAct) and
+        // --> iAct.isFired() since the positive feedback synapse is initially assumed to be active.
+        return checkCommonLinkingPreConditions(iAct, oAct);
     }
 }

@@ -17,12 +17,14 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.neuron.Range;
+import network.aika.direction.Direction;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.disjunctive.DisjunctiveNeuron;
-import network.aika.neuron.disjunctive.InhibitoryNeuron;
 
+import java.util.List;
 import java.util.stream.Stream;
+
+import static network.aika.direction.Direction.OUTPUT;
 
 /**
  *
@@ -41,6 +43,11 @@ public abstract class DisjunctiveActivation<N extends DisjunctiveNeuron> extends
     @Override
     public boolean checkAllowPropagate() {
         return isTemplate();
+    }
+
+    @Override
+    public List<Direction> getLinkingDirections() {
+        return List.of(OUTPUT);
     }
 
     @Override

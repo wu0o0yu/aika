@@ -77,14 +77,14 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public boolean checkLinkingPreConditions(IA iAct, OA oAct) {
+        if(!iAct.isFired())
+            return false;
+
         return checkCommonLinkingPreConditions(iAct, oAct);
     }
 
     protected boolean checkCommonLinkingPreConditions(IA iAct, OA oAct) {
         if(Link.linkExists(iAct, oAct))
-            return false;
-
-        if(!iAct.isFired())
             return false;
 
         if(isTemplate() && !checkTemplateLinkingPreConditions(iAct, oAct))

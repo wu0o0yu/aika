@@ -57,7 +57,12 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
         if(isSeparateBranch(iAct, oAct))
             return false;
 
-        return checkCommonLinkingPreConditions(iAct, oAct);  // Skip BindingNeuronSynapse.checkLinkingPreConditions
+        if(!iAct.isFired())
+            return false;
+
+        // Skip BindingNeuronSynapse.checkLinkingPreConditions
+        // --> Do not check Link.isForward(iAct, oAct)
+        return checkCommonLinkingPreConditions(iAct, oAct);
     }
 
     @Override

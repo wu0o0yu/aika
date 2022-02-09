@@ -423,6 +423,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         inputGradient.addAndTriggerUpdate(u);
     }
 
+    public abstract List<Direction> getLinkingDirections();
+
     public void linkInputs() {
         inputLinks
                 .values()
