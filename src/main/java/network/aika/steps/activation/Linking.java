@@ -41,20 +41,21 @@ import java.util.stream.Stream;
  */
 public class Linking extends Step<Activation> {
 
-    public static void add(Activation act, BindingSignal bindingSignal) {
-        Step.add(new Linking(act, bindingSignal, false));
+    public static void add(Activation act, BindingSignal bindingSignal, boolean postFired, boolean template) {
+        if(template && !act.getConfig().isTemplatesEnabled())
+            return;
 
-        if(act.getConfig().isTemplatesEnabled())
-            Step.add(new Linking(act, bindingSignal, true));
+        Step.add(new Linking(act, bindingSignal, postFired, template));
     }
 
+    private boolean postFired;
     private boolean template;
 
-    private Linking(Activation act, BindingSignal bindingSignal, boolean template) {
+    private Linking(Activation act, BindingSignal bindingSignal, boolean postFired, boolean template) {
         super(act);
 
+        this.postFired = postFired;
         this.template = template;
-
         this.bindingSignal = bindingSignal;
 
         Timestamp bsFired = bindingSignal.getOriginActivation().getFired();
@@ -62,7 +63,7 @@ public class Linking extends Step<Activation> {
             this.fired = bsFired;
     }
 
-    protected final BindingSignal bindingSignal;
+    protected final BindingSignal<?> bindingSignal;
 
     @Override
     public Phase getPhase() {
@@ -75,36 +76,34 @@ public class Linking extends Step<Activation> {
 
     @Override
     public void process() {
-        Activation<?> act = getElement();
-        Neuron<?, ?> fromN = act.getNeuron();
-
-        act.getLinkingDirections().forEach(dir ->
-                fromN.getTargetSynapses(dir, template)
-                        .filter(ts ->
-                                ts.checkBindingSignal(bindingSignal, dir)
-                        )
-                        .forEach(ts ->
-                                link(ts, getElement(), dir, bindingSignal)
-                        )
-        );
+        bindingSignal.getTargetSynapses(
+                getElement().getNeuron(),
+                        postFired,
+                        template
+                ).forEach(ts ->
+                        link(ts)
+                );
     }
 
-    private void link(Synapse targetSynapse, Activation<?> fromAct, Direction dir, BindingSignal<?> fromBindingSignal) {
-        getRelatedBindingSignal(targetSynapse, fromBindingSignal)
-                .filter(toBS -> fromBindingSignal != toBS)
+    private void link(Synapse ts) {
+        Activation fromAct = getElement();
+        Direction dir = ts.getDirection(getElement().getNeuron());
+
+        getRelatedBindingSignal(ts, bindingSignal)
+                .filter(toBS -> bindingSignal != toBS)
                 .filter(toBS ->
-                        checkRelatedBindingSignal(targetSynapse, dir, fromBindingSignal, toBS)
+                        checkRelatedBindingSignal(ts, dir, bindingSignal, toBS)
                 )
                 .map(toBS -> toBS.getActivation())
                 .filter(toAct -> fromAct != toAct)
                 .forEach(toAct ->
-                        link(targetSynapse, fromAct, toAct, dir)
+                        link(ts, fromAct, toAct, dir)
                 );
     }
 
-    private Stream<? extends BindingSignal<?>> getRelatedBindingSignal(Synapse targetSynapse, BindingSignal<?> fromBindingSignal) {
+    private Stream<? extends BindingSignal> getRelatedBindingSignal(Synapse targetSynapse, BindingSignal fromBindingSignal) {
         Activation originAct = fromBindingSignal.getOriginActivation();
-        Stream<? extends BindingSignal<?>> relatedBindingSignals = originAct.getReverseBindingSignals();
+        Stream<? extends BindingSignal> relatedBindingSignals = originAct.getReverseBindingSignals();
 
         if(targetSynapse.allowLooseLinking()) {
             relatedBindingSignals = Stream.concat(
@@ -116,10 +115,10 @@ public class Linking extends Step<Activation> {
         return relatedBindingSignals;
     }
 
-    private boolean checkRelatedBindingSignal(Synapse targetSynapse, Direction dir, BindingSignal<?> fromBindingSignal, BindingSignal<?> toBindingSignal) {
+    private boolean checkRelatedBindingSignal(Synapse targetSynapse, Direction dir, BindingSignal fromBindingSignal, BindingSignal toBindingSignal) {
         //           fromBindingSignal.checkRelatedBindingSignal(targetSynapse, toBindingSignal, dir)
-        BindingSignal inputBS = dir.getInputBindingSignal(fromBindingSignal, toBindingSignal);
-        BindingSignal outputBS = dir.getOutputBindingSignal(fromBindingSignal, toBindingSignal);
+        BindingSignal inputBS = dir.getInput(fromBindingSignal, toBindingSignal);
+        BindingSignal outputBS = dir.getOutput(fromBindingSignal, toBindingSignal);
         return inputBS.checkRelatedBindingSignal(targetSynapse, outputBS);
     }
 
@@ -140,6 +139,6 @@ public class Linking extends Step<Activation> {
     }
 
     public String toString() {
-        return (template ? "Template " : " ")  + getElement() + " Binding-Signal:" + bindingSignal;
+        return (template ? "Template " : "")  + getElement() + " - " + bindingSignal.getClass().getSimpleName() + ": " + bindingSignal;
     }
 }

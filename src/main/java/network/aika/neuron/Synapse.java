@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.stream.Stream;
 
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
@@ -62,14 +63,20 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
     protected boolean allowTraining = true;
 
-    public abstract boolean checkBindingSignal(BindingSignal fromBS, Direction dir);
-
     public Integer getLooseLinkingRange() {
         return null;
     }
 
     public boolean allowLooseLinking() {
         return false;
+    }
+
+    public Direction getDirection(Neuron n) {
+        if(n == getOutput())
+            return Direction.INPUT;
+        if(n == getInput())
+            return Direction.OUTPUT;
+        return null;
     }
 
     public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {

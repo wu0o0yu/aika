@@ -46,11 +46,6 @@ public abstract class DisjunctiveActivation<N extends DisjunctiveNeuron> extends
     }
 
     @Override
-    public List<Direction> getLinkingDirections() {
-        return List.of(OUTPUT);
-    }
-
-    @Override
     public Stream<? extends BindingSignal<?>> getReverseBindingSignals() {
         return null;
     }

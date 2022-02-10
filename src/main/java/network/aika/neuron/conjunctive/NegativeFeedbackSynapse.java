@@ -38,11 +38,6 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     }
 
     @Override
-    public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
-        return fromBS instanceof PatternBindingSignal;
-    }
-
-    @Override
     public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
         return iBS.getScope() == oBS.getScope();
     }

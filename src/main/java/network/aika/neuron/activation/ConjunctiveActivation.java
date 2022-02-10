@@ -39,8 +39,4 @@ public abstract class ConjunctiveActivation<N extends Neuron> extends Activation
         super(id, t, n);
     }
 
-    @Override
-    public List<Direction> getLinkingDirections() {
-        return List.of(INPUT, OUTPUT);
-    }
 }

@@ -34,13 +34,9 @@ public interface Direction {
 
     Direction invert();
 
-    BindingSignal getInputBindingSignal(BindingSignal fromBindingSignal, BindingSignal toBindingSignal);
+    <I> I getInput(I from, I to);
 
-    BindingSignal getOutputBindingSignal(BindingSignal fromBindingSignal, BindingSignal toBindingSignal);
-
-    Activation getInput(Activation fromAct, Activation toAct);
-
-    Activation getOutput(Activation fromAct, Activation toAct);
+    <O> O getOutput(O from, O to);
 
     Neuron getNeuron(Synapse s);
 

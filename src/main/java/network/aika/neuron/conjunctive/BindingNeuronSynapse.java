@@ -16,23 +16,15 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.axons.Axon;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.PatternBindingSignal;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I extends Neuron & Axon, L extends Link<S, IA, BindingActivation>, IA extends Activation> extends ConjunctiveSynapse<S, I, BindingNeuron, L, IA, BindingActivation> {
-
-    @Override
-    public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
-        return fromBS instanceof PatternBindingSignal;
-    }
 
     @Override
     public boolean checkLinkingPreConditions(IA iAct, BindingActivation oAct) {

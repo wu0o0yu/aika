@@ -37,11 +37,6 @@ public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNe
     }
 
     @Override
-    public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
-        return fromBS instanceof PatternBindingSignal;
-    }
-
-    @Override
     public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
         return iBS.getOrigin() == oBS;
     }

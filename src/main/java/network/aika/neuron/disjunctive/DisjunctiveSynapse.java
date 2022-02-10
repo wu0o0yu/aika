@@ -38,15 +38,9 @@ import network.aika.utils.Bound;
 public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends Neuron & Axon, O extends DisjunctiveNeuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation, OA extends DisjunctiveActivation> extends Synapse<S, I, O, L, IA, OA> {
 
     @Override
-    public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
-        return false;
-    }
-
-    @Override
     public boolean allowPropagate() {
         return true;
     }
-
 
     @Override
     public void updateWeight(Link l, double delta) {

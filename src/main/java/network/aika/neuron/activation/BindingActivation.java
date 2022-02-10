@@ -17,7 +17,6 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.fields.*;
@@ -25,7 +24,6 @@ import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.steps.activation.BranchProbability;
-import network.aika.steps.activation.Linking;
 import network.aika.utils.Utils;
 
 import java.util.*;
@@ -82,7 +80,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     public void registerReverseBindingSignal(Activation targetAct, BranchBindingSignal bindingSignal) {
         reverseBindingSignals.put(targetAct, bindingSignal);
-        Linking.add(targetAct, bindingSignal);
     }
 
     @Override
@@ -253,5 +250,4 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         super.receiveOwnGradientUpdate(u);
         ownInputGradient.addAndTriggerUpdate(u);
     }
-
 }

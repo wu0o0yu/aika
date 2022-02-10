@@ -17,12 +17,18 @@
 package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 
 import java.util.Optional;
+import java.util.stream.Stream;
+
+import static network.aika.direction.Direction.OUTPUT;
 
 /**
  * @author Lukas Molzberger
@@ -53,6 +59,15 @@ public class BranchBindingSignal extends BindingSignal<BranchBindingSignal> {
                 !iAct.getBranchBindingSignals().containsKey(
                         branchBindingSignal.get().getOriginActivation()
                 );
+    }
+
+    @Override
+    public Stream<? extends Synapse> getTargetSynapses(Neuron fromN, boolean postFired, boolean template) {
+        if(postFired || !(fromN instanceof PatternNeuron))
+            return Stream.empty();
+
+        return fromN.getTargetSynapses(OUTPUT, template)
+                .filter(s -> s instanceof PositiveFeedbackSynapse);
     }
 
     public BranchBindingSignal next(Activation act) {
@@ -86,9 +101,5 @@ public class BranchBindingSignal extends BindingSignal<BranchBindingSignal> {
 
     public boolean exists() {
         return getActivation().getBranchBindingSignals().containsKey(getOriginActivation());
-    }
-
-    public String toString() {
-        return "[BRANCH:" + getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ",d:" + getDepth() + "]";
     }
 }

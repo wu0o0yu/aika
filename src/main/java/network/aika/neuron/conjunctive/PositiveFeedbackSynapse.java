@@ -52,11 +52,6 @@ public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PositiveFeedba
     }
 
     @Override
-    public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
-        return fromBS instanceof BranchBindingSignal;
-    }
-
-    @Override
     public boolean checkRelatedBranchBindingSignal(BranchBindingSignal iBS, BranchBindingSignal oBS) {
         return iBS.getOrigin() == oBS;
     }

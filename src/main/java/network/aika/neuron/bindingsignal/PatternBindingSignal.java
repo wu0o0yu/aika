@@ -16,10 +16,14 @@
  */
 package network.aika.neuron.bindingsignal;
 
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
+
+import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.Scope.SAME;
 
@@ -42,6 +46,11 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
         this.activation = activation;
         this.scope = scopeTransition ? parent.scope.next() : parent.scope;
         this.depth = (byte) (getDepth() + 1);
+    }
+
+    @Override
+    public Stream<? extends Synapse> getTargetSynapses(Neuron fromN, boolean postFired, boolean template) {
+        return fromN.getTargetSynapses(postFired, template);
     }
 
     public PatternBindingSignal next(Activation act, boolean scopeTransition) {
@@ -84,6 +93,6 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
     }
 
     public String toString() {
-        return "[PATTERN:" + getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ",s:" + scope + ",d:" + getDepth() + "]";
+        return super.toString() + ", scope:" + scope;
     }
 }

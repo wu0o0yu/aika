@@ -33,7 +33,7 @@ public class PositiveFeedbackLink extends BindingNeuronLink<PositiveFeedbackSyna
         super(s, input, output);
 
         combinedWeight = new SwitchField(
-                () -> input.isFinalMode(),
+                () -> input.isFinal(),
                 s.getWeight(),
                 s.getFeedbackWeight()
         );

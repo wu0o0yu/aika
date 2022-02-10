@@ -21,7 +21,6 @@ import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.conjunctive.PatternNeuron;
-import network.aika.steps.activation.Linking;
 import network.aika.steps.activation.SetFinalMode;
 
 import java.util.Map;
@@ -36,8 +35,6 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     protected Map<Activation<?>, PatternBindingSignal> reverseBindingSignals = new TreeMap<>();
 
-    private boolean finalMode = false;
-
     protected PatternActivation(int id, PatternNeuron n) {
         super(id, n);
     }
@@ -46,20 +43,14 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
         super(id, t, patternNeuron);
     }
 
-    public boolean isFinalMode() {
-        return finalMode;
-    }
-
-    public void setFinalMode() {
-        if(finalMode)
-            return;
-        finalMode = true;
+    @Override
+    public void onFinal() {
+        super.onFinal();
 
         outputLinks.values().forEach(l ->
                 l.setFinalMode()
         );
     }
-
 
     @Override
     public boolean checkAllowPropagate() {
@@ -76,7 +67,6 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     public void registerReverseBindingSignal(Activation targetAct, PatternBindingSignal bindingSignal) {
         reverseBindingSignals.put(targetAct, bindingSignal);
-        Linking.add(targetAct, bindingSignal);
     }
 
     @Override

@@ -36,23 +36,13 @@ public class Input implements Direction {
     }
 
     @Override
-    public BindingSignal getInputBindingSignal(BindingSignal fromBindingSignal, BindingSignal toBindingSignal) {
-        return toBindingSignal;
+    public <I> I getInput(I from, I to) {
+        return to;
     }
 
     @Override
-    public BindingSignal getOutputBindingSignal(BindingSignal fromBindingSignal, BindingSignal toBindingSignal) {
-        return fromBindingSignal;
-    }
-
-    @Override
-    public Activation getInput(Activation fromAct, Activation toAct) {
-        return toAct;
-    }
-
-    @Override
-    public Activation getOutput(Activation fromAct, Activation toAct) {
-        return fromAct;
+    public <O> O getOutput(O from, O to) {
+        return from;
     }
 
     @Override

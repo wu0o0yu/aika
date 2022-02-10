@@ -39,11 +39,11 @@ import static network.aika.direction.Direction.OUTPUT;
  */
 public class Propagate extends Step<Activation> {
 
-    public static void add(Activation act) {
-        Step.add(new Propagate(act, false));
+    public static void add(Activation act, boolean template) {
+        if(template && !act.getConfig().isTemplatesEnabled())
+            return;
 
-        if(act.getConfig().isTemplatesEnabled())
-            Step.add(new Propagate(act, true));
+        Step.add(new Propagate(act, template));
     }
 
     private boolean template;
@@ -56,7 +56,7 @@ public class Propagate extends Step<Activation> {
 
     @Override
     public Phase getPhase() {
-        return template ? Phase.LATE : Phase.PROCESSING;
+        return Phase.PROCESSING;
     }
 
     @Override
@@ -67,7 +67,7 @@ public class Propagate extends Step<Activation> {
             return;
 
         Neuron<?, ?> n = act.getNeuron();
-        n.getTargetSynapses(OUTPUT, template)
+        n.getTargetSynapses(true, template)
                 .filter(s ->
                         s.allowPropagate() &&
                                 !act.linkExists(OUTPUT, s, template)
@@ -87,6 +87,6 @@ public class Propagate extends Step<Activation> {
     }
 
     public String toString() {
-        return (template ? "Template " : " ") + getElement();
+        return (template ? "Template " : "") + getElement();
     }
 }

@@ -18,12 +18,19 @@ package network.aika.neuron.disjunctive;
 
 import network.aika.Model;
 import network.aika.Thought;
+import network.aika.direction.Direction;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.InhibitoryActivation;
+
+import java.util.List;
+import java.util.stream.Stream;
+
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
 
 /**
  *
@@ -41,6 +48,13 @@ public abstract class DisjunctiveNeuron<S extends DisjunctiveSynapse, A extends 
 
     protected DisjunctiveNeuron(Model model, boolean addProvider) {
         super(model, addProvider);
+    }
+
+    public Stream<? extends Synapse> getTargetSynapses(boolean postFired, boolean template) {
+        if(!postFired)
+            return Stream.empty();
+
+        return super.getTargetSynapses(true, template);
     }
 
     @Override

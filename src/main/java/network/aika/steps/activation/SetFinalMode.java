@@ -16,7 +16,6 @@
  */
 package network.aika.steps.activation;
 
-import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
@@ -29,7 +28,7 @@ import network.aika.steps.Step;
 public class SetFinalMode extends Step<PatternActivation> {
 
     public static void add(PatternActivation act) {
-        if(act.isFinalMode())
+        if(act.isFinal())
             return;
 
         Step.add(new SetFinalMode(act));
@@ -47,6 +46,6 @@ public class SetFinalMode extends Step<PatternActivation> {
     @Override
     public void process() {
         getElement()
-                .setFinalMode();
+                .setFinal();
     }
 }

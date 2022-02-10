@@ -42,7 +42,6 @@ public class PropagateBindingSignal extends Step<Link> {
         Activation<?> iAct = l.getInput();
         Step.add(new PropagateBindingSignal(l,
                 iAct.getBindingSignals()
-                        .stream()
                         .filter(bs -> bs.checkPropagate())
                         .collect(Collectors.toList()))
         );
@@ -84,7 +83,7 @@ public class PropagateBindingSignal extends Step<Link> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(getElement());
-        inputBindingSignals.forEach(bs -> sb.append("\n    BS: " + bs));
+        inputBindingSignals.forEach(bs -> sb.append("\n    " + bs.getClass().getSimpleName() + ": " + bs));
         return sb.toString();
     }
 }

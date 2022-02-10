@@ -16,7 +16,7 @@
  */
 package network.aika.neuron.bindingsignal;
 
-import network.aika.direction.Direction;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
@@ -40,6 +40,8 @@ public abstract class BindingSignal<B extends BindingSignal> {
                 .filter(oBS -> oBS != null);
     }
 
+    public abstract Stream<? extends Synapse> getTargetSynapses(Neuron fromN, boolean postFired, boolean template);
+
     public abstract boolean checkPropagate();
 
     protected abstract BindingSignal propagate(Link l);
@@ -62,5 +64,9 @@ public abstract class BindingSignal<B extends BindingSignal> {
 
     public byte getDepth() {
         return depth;
+    }
+
+    public String toString() {
+        return getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ", depth:" + getDepth();
     }
 }

@@ -38,12 +38,6 @@ public class InhibitorySynapse extends DisjunctiveSynapse<InhibitorySynapse, Bin
     }
 
     @Override
-    public boolean checkBindingSignal(BindingSignal fromBS, Direction dir) {
-        return false;
-    }
-
-
-    @Override
     protected Bound getProbabilityBound(Sign si, Sign so) {
         return so == Sign.POS ? Bound.LOWER : Bound.UPPER;
     }

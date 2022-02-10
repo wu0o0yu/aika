@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.sign.Sign.POS;
 
 /**
@@ -228,10 +230,14 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return outputSynapses.containsKey(s.getPOutput());
     }
 
+    public Stream<? extends Synapse> getTargetSynapses(boolean postFired, boolean template) {
+        return getTargetSynapses(postFired ? OUTPUT : INPUT, template);
+    }
+
     public Stream<? extends Synapse> getTargetSynapses(Direction dir, boolean template) {
-        return template ?
+        return (template ?
                 getTemplateGroup().stream().flatMap(dir::getSynapses) :
-                dir.getSynapses(this);
+                dir.getSynapses(this));
     }
 
     public Synapse getInputSynapse(NeuronProvider n) {

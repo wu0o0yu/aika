@@ -54,6 +54,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected Timestamp fired = NOT_SET;
 
     protected boolean isInput;
+    private boolean finalMode = false;
 
     protected Field value = new Field();
     protected Field net = new QueueField(this, "net");
@@ -126,16 +127,10 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
             propagateGradient();
 
-            if (isFired() || net.getCurrentValue() <= 0.0)
+            if (net.getCurrentValue() <= 0.0)
                 return;
 
-            addEntropySteps();
             setFired();
-            if(isTemplate())
-                Induction.add(this);
-            Propagate.add(this);
-            addFeedbackSteps();
-            addCountingSteps();
         });
     }
 
@@ -147,38 +142,15 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return true;
     }
 
-    public Collection<? extends BindingSignal> getBindingSignals() {
-        return Stream.concat(
-                getPatternBindingSignals().values().stream(),
-                getBranchBindingSignals().values().stream()
-        ).collect(Collectors.toList());
-    }
-
     protected void updateValue(double net) {
         if(!isInput)
             value.setAndTriggerUpdate(getActivationFunction().f(net));
     }
 
-    protected void addEntropySteps() {
-        EntropyGradient.add(this);
-
-        inputLinks.values()
-                .forEach(l ->
-                        InformationGainGradient.add(l)
-                );
-    }
 
     protected void propagateGradient() {
         if(outputGradientMul.updateAvailable(2))
             outputGradient.addAndTriggerUpdate(outputGradientMul.getUpdate(2));
-    }
-
-    public void addCountingSteps() {
-        InactiveLinks.add(this);
-        Counting.add(this);
-        getInputLinks().forEach(l ->
-                LinkCounting.add(l)
-        );
     }
 
     protected void propagateGradient(double g, boolean updateWeights, boolean backPropagate) {
@@ -195,9 +167,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                         l.backPropagate();
                 }
         );
-
-        if(isFired())
-            Propagate.add(this); // Previously only the propagate template step was added.
     }
 
     public void init(Synapse originSynapse, Activation originAct) {
@@ -247,6 +216,18 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this.creationTimestamp = thought.getCurrentTimestamp();
     }
 
+    public boolean isFinal() {
+        return finalMode;
+    }
+
+    public void setFinal() {
+        if(finalMode)
+            return;
+        finalMode = true;
+
+        onFinal();
+    }
+
     public Timestamp getFired() {
         return fired;
     }
@@ -256,11 +237,84 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void setFired(Timestamp f) {
+        boolean notFiredSoFar = !isFired();
         fired = f;
+
+        if(notFiredSoFar && isFired())
+            onFired();
     }
 
     public void setFired() {
         setFired(thought.getCurrentTimestamp());
+    }
+
+    protected void onFired() {
+        if(isTemplate())
+            Induction.add(this);
+
+        Propagate.add(this, false);
+
+        addEntropySteps();
+        addFeedbackSteps();
+        addCountingSteps();
+
+        if(isFinal())
+            onFinalFired();
+
+        getBindingSignals()
+                .forEach(bs ->
+                        onBindingSignalArrivedFired(bs)
+                );
+    }
+
+    protected void onFinal() {
+        if(isFired())
+            onFinalFired();
+    }
+
+    protected void onFinalFired() {
+        Propagate.add(this, true);
+
+        getBindingSignals()
+                .forEach(bs ->
+                        onBindingSignalArrivedFinalFired(bs)
+                );
+    }
+
+    protected void onBindingSignalArrived(BindingSignal bs) {
+        Linking.add(this, bs, false, false);
+        Linking.add(this, bs, false, true);
+
+        if(isFired())
+            onBindingSignalArrivedFired(bs);
+    }
+
+    protected void onBindingSignalArrivedFired(BindingSignal bs) {
+        Linking.add(this, bs, true, false);
+
+        if(isFinal())
+            onBindingSignalArrivedFinalFired(bs);
+    }
+
+    protected void onBindingSignalArrivedFinalFired(BindingSignal bs) {
+        Linking.add(this, bs, true, true);
+    }
+
+    private void addEntropySteps() {
+        EntropyGradient.add(this);
+
+        inputLinks.values()
+                .forEach(l ->
+                        InformationGainGradient.add(l)
+                );
+    }
+
+    private void addCountingSteps() {
+        InactiveLinks.add(this);
+        Counting.add(this);
+        getInputLinks().forEach(l ->
+                LinkCounting.add(l)
+        );
     }
 
     public Thought getThought() {
@@ -289,6 +343,13 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return r.getAbsoluteRange(thought.getRange());
     }
 
+    public Stream<? extends BindingSignal> getBindingSignals() {
+        return Stream.concat(
+                getPatternBindingSignals().values().stream(),
+                getBranchBindingSignals().values().stream()
+        );
+    }
+
     public BindingSignal addBindingSignal(BindingSignal bindingSignal) {
         if (bindingSignal.exists())
             return null;
@@ -297,11 +358,13 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return bindingSignal;
     }
 
-    public void registerPatternBindingSignal(PatternBindingSignal pbs) {
-        patternBindingSignals.put(pbs.getOriginActivation(), pbs);
+    public void registerPatternBindingSignal(PatternBindingSignal bs) {
+        onBindingSignalArrived(bs);
+        patternBindingSignals.put(bs.getOriginActivation(), bs);
     }
 
     public void registerBranchBindingSignal(BranchBindingSignal bs) {
+        onBindingSignalArrived(bs);
         branchBindingSignals.put(bs.getOriginActivation(), bs);
     }
 
@@ -422,8 +485,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     public void receiveOwnGradientUpdate(double u) {
         inputGradient.addAndTriggerUpdate(u);
     }
-
-    public abstract List<Direction> getLinkingDirections();
 
     public void linkInputs() {
         inputLinks

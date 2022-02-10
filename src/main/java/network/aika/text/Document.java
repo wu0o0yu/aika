@@ -111,8 +111,6 @@ public class Document extends Thought<TextModel> {
         act.setInputValue(1.0);
         act.init(null, null);
         act.setFired();
-        Propagate.add(act);
-        act.addCountingSteps();
 
         return act;
     }
