@@ -32,17 +32,13 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
     protected Timestamp fired;
     private Timestamp timestamp;
 
-
     public Step(E element) {
         this.element = element;
         this.fired = element.getFired();
-        this.timestamp = NOT_SET;
-    }
 
-    public Step(E element, Timestamp timestamp) {
-        this.element = element;
-        this.fired = element.getFired();
-        this.timestamp = timestamp;
+        this.timestamp = element.getThought() != null ?
+                element.getThought().getNextTimestamp() :
+                NOT_SET;
     }
 
     public Step copy(Element newElement) {
@@ -73,6 +69,11 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
 
     public Timestamp getFired() {
         return fired;
+    }
+
+    @Override
+    public LinkingOrder getLinkingOrder() {
+        return LinkingOrder.NOT_SET;
     }
 
     public Timestamp getTimestamp() {

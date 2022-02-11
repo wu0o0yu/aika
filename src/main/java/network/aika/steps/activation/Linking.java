@@ -22,10 +22,13 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Timestamp;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.steps.LinkingOrder;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
 import java.util.stream.Stream;
+
+import static network.aika.neuron.activation.Timestamp.NOT_SET;
 
 /**
  * The job of the linking phase is to propagate information through the network by creating the required activations and links.
@@ -41,26 +44,27 @@ import java.util.stream.Stream;
  */
 public class Linking extends Step<Activation> {
 
-    public static void add(Activation act, BindingSignal bindingSignal, boolean postFired, boolean template) {
+    public static void add(Activation act, BindingSignal bindingSignal, LinkingOrder linkingOrder, boolean template) {
         if(template && !act.getConfig().isTemplatesEnabled())
             return;
 
-        Step.add(new Linking(act, bindingSignal, postFired, template));
+        Step.add(new Linking(act, bindingSignal, linkingOrder, template));
     }
 
-    private boolean postFired;
+    private LinkingOrder linkingOrder;
     private boolean template;
 
-    private Linking(Activation act, BindingSignal bindingSignal, boolean postFired, boolean template) {
+    private Linking(Activation act, BindingSignal bindingSignal, LinkingOrder linkingOrder, boolean template) {
         super(act);
 
-        this.postFired = postFired;
+        this.linkingOrder = linkingOrder;
         this.template = template;
         this.bindingSignal = bindingSignal;
+    }
 
-        Timestamp bsFired = bindingSignal.getOriginActivation().getFired();
-        if(act.getFired().compareTo(bsFired) >= 0)
-            this.fired = bsFired;
+    @Override
+    public LinkingOrder getLinkingOrder() {
+        return linkingOrder;
     }
 
     protected final BindingSignal<?> bindingSignal;
@@ -78,7 +82,7 @@ public class Linking extends Step<Activation> {
     public void process() {
         bindingSignal.getTargetSynapses(
                 getElement().getNeuron(),
-                        postFired,
+                        linkingOrder == LinkingOrder.POST_FIRED,
                         template
                 ).forEach(ts ->
                         link(ts)
@@ -139,6 +143,6 @@ public class Linking extends Step<Activation> {
     }
 
     public String toString() {
-        return (template ? "Template " : "")  + getElement() + " - " + bindingSignal.getClass().getSimpleName() + ": " + bindingSignal;
+        return linkingOrder + " " + (template ? "Template " : "")  + getElement() + " - " + bindingSignal.getClass().getSimpleName() + ": " + bindingSignal;
     }
 }

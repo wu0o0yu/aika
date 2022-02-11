@@ -29,48 +29,37 @@ public interface QueueKey {
 
     Comparator<QueueKey> COMPARATOR = Comparator
             .<QueueKey>comparingInt(k -> k.getPhase().ordinal())
-            .thenComparingInt(k -> k.getFired() == NOT_SET ? 0 : 1)
-            .thenComparing(k -> k.getFired());
+            .thenComparing(k -> k.getFired())
+            .thenComparing(k -> k.getLinkingOrder());
 
     Comparator<QueueKey> THOUGHT_COMPARATOR = COMPARATOR
             .thenComparing(k -> k.getTimestamp());
 
     Comparator<QueueKey> ELEMENT_COMPARATOR = COMPARATOR
             .thenComparing(k -> k.getStepName())  // Needed to check if the entry is already on the queue.
-            .thenComparing(k -> k.getTimestamp());
+            .thenComparing(k -> k.getCheckIfQueuedTimestamp());
+
+    default Timestamp getCheckIfQueuedTimestamp() {
+        return checkIfQueued() ? NOT_SET : getTimestamp();
+    }
 
     Phase getPhase();
 
     Timestamp getFired();
 
+    LinkingOrder getLinkingOrder();
+
     String getStepName();
 
     Timestamp getTimestamp();
 
+    boolean checkIfQueued();
+
     class Key implements QueueKey {
         private final Phase p;
-        private final Timestamp fired;
-        private final String stepName;
-        private final Timestamp timestamp;
 
-        public Key(Phase p, Timestamp fired) {
+        public Key(Phase p) {
             this.p = p;
-            this.fired = fired;
-            this.stepName = "";
-            this.timestamp = NOT_SET;
-        }
-
-        public Key(Step s, Timestamp timestamp) {
-            this.p = s.getPhase();
-            this.fired = s.getFired();
-
-            if(s.checkIfQueued()) {
-                this.stepName = s.getStepName();
-                this.timestamp = NOT_SET;
-            } else {
-                this.stepName = "";
-                this.timestamp = timestamp;
-            }
         }
 
         @Override
@@ -80,17 +69,27 @@ public interface QueueKey {
 
         @Override
         public Timestamp getFired() {
-            return fired;
+            return Timestamp.MAX;
+        }
+
+        @Override
+        public LinkingOrder getLinkingOrder() {
+            return LinkingOrder.NOT_SET;
         }
 
         @Override
         public String getStepName() {
-            return stepName;
+            return "";
         }
 
         @Override
         public Timestamp getTimestamp() {
-            return timestamp;
+            return NOT_SET;
+        }
+
+        @Override
+        public boolean checkIfQueued() {
+            return true;
         }
     }
 }

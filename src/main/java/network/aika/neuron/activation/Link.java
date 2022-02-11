@@ -28,8 +28,8 @@ import network.aika.steps.link.PropagateBindingSignal;
 
 import java.util.Comparator;
 
-import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.fields.ConstantField.ZERO;
+import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
 
 /**
  *
@@ -193,23 +193,16 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         return output.isSelfRef(input);
     }
 
-    public boolean isCausal() {
-        return input == null || input.getFired().compareTo(output.getFired()) < 0;
-    }
-
-    public boolean isForward() {
-        return isForward(input, output);
-    }
-
     public boolean isTemplate() {
         return getSynapse().isTemplate();
     }
 
-    public static boolean isForward(Activation iAct, Activation oAct) {
-        if(!iAct.isFired())
-            return false;
+    public boolean isCausal() {
+        return input == null || isCausal(input, output);
+    }
 
-        return oAct.getFired() == NOT_SET || iAct.getFired().compareTo(oAct.getFired()) < 0;
+    public static boolean isCausal(Activation iAct, Activation oAct) {
+        return NOT_SET_AFTER.compare(iAct.getFired(), oAct.getFired()) < 0;
     }
 
     public void linkInput() {

@@ -31,6 +31,6 @@ public class FieldStep<E extends Element> extends Step<E> {
     }
 
     public String toString() {
-        return label + ":  " + getElement();
+        return label + ": " + field + " " + getElement();
     }
 }

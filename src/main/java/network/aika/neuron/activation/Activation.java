@@ -38,6 +38,8 @@ import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
+import static network.aika.steps.LinkingOrder.POST_FIRED;
+import static network.aika.steps.LinkingOrder.PRE_FIRED;
 
 /**
  * @author Lukas Molzberger
@@ -236,16 +238,13 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return fired != NOT_SET;
     }
 
-    public void setFired(Timestamp f) {
-        boolean notFiredSoFar = !isFired();
-        fired = f;
-
-        if(notFiredSoFar && isFired())
-            onFired();
-    }
-
     public void setFired() {
-        setFired(thought.getCurrentTimestamp());
+        if(isFired())
+            return;
+
+        fired = thought.getCurrentTimestamp();
+
+        onFired();
     }
 
     protected void onFired() {
@@ -282,22 +281,22 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     protected void onBindingSignalArrived(BindingSignal bs) {
-        Linking.add(this, bs, false, false);
-        Linking.add(this, bs, false, true);
+        Linking.add(this, bs, PRE_FIRED, false);
+        Linking.add(this, bs, PRE_FIRED, true);
 
         if(isFired())
             onBindingSignalArrivedFired(bs);
     }
 
     protected void onBindingSignalArrivedFired(BindingSignal bs) {
-        Linking.add(this, bs, true, false);
+        Linking.add(this, bs, POST_FIRED, false);
 
         if(isFinal())
             onBindingSignalArrivedFinalFired(bs);
     }
 
     protected void onBindingSignalArrivedFinalFired(BindingSignal bs) {
-        Linking.add(this, bs, true, true);
+        Linking.add(this, bs, POST_FIRED, true);
     }
 
     private void addEntropySteps() {

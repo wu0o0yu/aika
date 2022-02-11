@@ -35,8 +35,7 @@ import static network.aika.neuron.bindingsignal.BindingSignal.transitionBindingS
  */
 public class PropagateBindingSignal extends Step<Link> {
 
-    protected Collection<BindingSignal> inputBindingSignals;
-
+    private Collection<BindingSignal> inputBindingSignals;
 
     public static void add(Link l) {
         Activation<?> iAct = l.getInput();

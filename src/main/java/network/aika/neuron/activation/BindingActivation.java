@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
+import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
 import static network.aika.neuron.bindingsignal.Scope.SAME;
 
 /**
@@ -155,7 +156,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     private PatternBindingSignal getPrimaryPatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
-                .filter(bs -> bs.getOriginActivation().getFired().compareTo(fired) < 0)
+                .filter(bs -> NOT_SET_AFTER.compare(bs.getOriginActivation().getFired(), fired) < 0)
                 .min(Comparator.comparing(bs -> bs.getScope()))
                 .orElse(null);
     }

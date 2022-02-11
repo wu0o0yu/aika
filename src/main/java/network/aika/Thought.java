@@ -139,7 +139,6 @@ public abstract class Thought<M extends Model> {
     }
 
     public void addStep(Step s) {
-        s.setTimeStamp(getNextTimestamp());
         queue.put(s, s);
     }
 
@@ -161,7 +160,7 @@ public abstract class Thought<M extends Model> {
             return queue;
 
         return queue.headMap(
-                new QueueKey.Key(maxPhase, Timestamp.MAX),
+                new QueueKey.Key(maxPhase),
                 true
         );
     }

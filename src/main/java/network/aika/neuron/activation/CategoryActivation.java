@@ -23,6 +23,8 @@ import network.aika.neuron.disjunctive.CategoryNeuron;
 
 import java.util.Comparator;
 
+import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
+
 /**
  * @author Lukas Molzberger
  */
@@ -44,7 +46,7 @@ public class CategoryActivation extends DisjunctiveActivation<CategoryNeuron> {
 
     private BindingSignal getPrimaryPatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
-                .filter(bs -> bs.getOriginActivation().getFired().compareTo(fired) < 0)
+                .filter(bs -> NOT_SET_AFTER.compare(bs.getOriginActivation().getFired(), fired) < 0)
                 .min(Comparator.comparing(bs -> bs.getScope()))
                 .orElse(null);
     }

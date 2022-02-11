@@ -23,6 +23,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.steps.*;
 
 import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.steps.LinkingOrder.PROPAGATE;
 
 
 /**
@@ -60,6 +61,11 @@ public class Propagate extends Step<Activation> {
     }
 
     @Override
+    public LinkingOrder getLinkingOrder() {
+        return PROPAGATE;
+    }
+
+    @Override
     public void process() {
         Activation act = getElement();
 
@@ -87,6 +93,6 @@ public class Propagate extends Step<Activation> {
     }
 
     public String toString() {
-        return (template ? "Template " : "") + getElement();
+        return PROPAGATE + " " + (template ? "Template " : "") + getElement();
     }
 }
