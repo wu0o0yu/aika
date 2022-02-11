@@ -26,7 +26,7 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
     public NegativeFeedbackLink(NegativeFeedbackSynapse s, InhibitoryActivation input, BindingActivation output) {
         super(s,
                 input,
-                output.isSelfRef(input) ?
+                input == null || output.isSelfRef(input) ?
                         output :
                         output.createBranch(s)
         );
