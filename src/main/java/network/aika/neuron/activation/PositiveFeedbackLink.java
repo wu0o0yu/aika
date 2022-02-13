@@ -31,12 +31,16 @@ public class PositiveFeedbackLink extends BindingNeuronLink<PositiveFeedbackSyna
 
     public PositiveFeedbackLink(PositiveFeedbackSynapse s, PatternActivation input, BindingActivation output) {
         super(s, input, output);
+    }
 
+    protected void initWeightInput() {
         combinedWeight = new SwitchField(
                 () -> input.isFinal(),
-                s.getWeight(),
-                s.getFeedbackWeight()
+                synapse.getWeight(),
+                synapse.getFeedbackWeight()
         );
+
+        super.initWeightInput();
     }
 
     public void setFinalMode() {

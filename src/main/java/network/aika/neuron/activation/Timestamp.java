@@ -27,10 +27,10 @@ public class Timestamp implements Comparable<Timestamp> {
         if(this == NOT_SET)
             return "NOT_SET";
 
-        if(timestamp == MIN.timestamp)
+        if(this == MIN)
             return "MIN";
 
-        if(timestamp == MAX.timestamp)
+        if(this == MAX)
             return "MAX";
 
         return "" + timestamp;

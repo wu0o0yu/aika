@@ -20,10 +20,11 @@ import network.aika.neuron.Range;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 import network.aika.neuron.conjunctive.PrimaryInputBNSynapse;
 import network.aika.neuron.disjunctive.CategoryNeuron;
+import network.aika.steps.activation.Propagate;
 
-import static network.aika.neuron.bindingsignal.Scope.SAME;
 import static network.aika.text.TextModel.REL_NEXT_TOKEN_LABEL;
 import static network.aika.text.TextModel.REL_PREVIOUS_TOKEN_LABEL;
 
@@ -57,6 +58,9 @@ public class TokenActivation extends PatternActivation {
 
         TextModel model = (TextModel) prev.getModel();
 
+        Propagate.propagate(next, next.getNeuron().getOutputSynapse(model.getTokenCategory().getProvider()));
+        Propagate.propagate(next, getRelationSynapse(next.getNeuron(), REL_PREVIOUS_TOKEN_LABEL));
+
         CategoryActivation prevCatAct = prev.getCategoryTokenAct(model.getTokenCategory());
         BindingActivation relActNext = getRelationActivation(prev, REL_NEXT_TOKEN_LABEL);
 
@@ -70,6 +74,14 @@ public class TokenActivation extends PatternActivation {
         relSynPrev.createLink(prevCatAct, relActPrev);
     }
 
+    private static PositiveFeedbackSynapse getRelationSynapse(PatternNeuron patternNeuron, String direction) {
+        return (PositiveFeedbackSynapse) patternNeuron
+                .getOutputSynapses()
+                .filter(s -> s.getOutput().getLabel().contains(direction))
+                .findFirst()
+                .orElse(null);
+    }
+
     private static BindingActivation getRelationActivation(PatternActivation patternAct, String direction) {
         return (BindingActivation) patternAct
                 .getOutputLinks()
@@ -80,12 +92,10 @@ public class TokenActivation extends PatternActivation {
     }
 
     private CategoryActivation getCategoryTokenAct(CategoryNeuron categoryNeuron) {
-        return (CategoryActivation) reverseBindingSignals
-                .values()
-                .stream()
-                .filter(bs -> bs.getScope() == SAME)
-                .map(bs -> bs.getActivation())
-                .filter(act -> act.getNeuron() == categoryNeuron)
+        return (CategoryActivation) outputLinks.values().stream()
+                .map(l -> l.getOutput())
+                .filter(oAct -> oAct != null)
+                .filter(oAct -> oAct.getNeuron() == categoryNeuron)
                 .findFirst()
                 .orElse(null);
     }

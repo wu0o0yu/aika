@@ -121,8 +121,6 @@ public class Document extends Thought<TextModel> {
         for(String t: tokens) {
             int j = i + t.length();
             TokenActivation currentToken = addToken(t, i, j);
-            process();
-
             TokenActivation.addRelation(lastToken, currentToken);
             process();
 

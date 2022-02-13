@@ -83,7 +83,7 @@ public class Propagate extends Step<Activation> {
                 );
     }
 
-    public void propagate(Activation fromAct, Synapse targetSynapse) {
+    public static void propagate(Activation fromAct, Synapse targetSynapse) {
         Thought t = fromAct.getThought();
 
         Activation toAct = targetSynapse.getOutput().createActivation(t);

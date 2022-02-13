@@ -253,10 +253,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         Propagate.add(this, false);
 
-        addEntropySteps();
-        addFeedbackSteps();
-        addCountingSteps();
-
         if(isFinal())
             onFinalFired();
 
@@ -274,6 +270,10 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected void onFinalFired() {
         Propagate.add(this, true);
 
+        addEntropySteps();
+        addFeedbackSteps();
+        addCountingSteps();
+
         getBindingSignals()
                 .forEach(bs ->
                         onBindingSignalArrivedFinalFired(bs)
@@ -281,8 +281,10 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     protected void onBindingSignalArrived(BindingSignal bs) {
-        Linking.add(this, bs, PRE_FIRED, false);
-        Linking.add(this, bs, PRE_FIRED, true);
+        if(!getNeuron().isNetworkInput()) {
+            Linking.add(this, bs, PRE_FIRED, false);
+            Linking.add(this, bs, PRE_FIRED, true);
+        }
 
         if(isFired())
             onBindingSignalArrivedFired(bs);

@@ -23,7 +23,7 @@ import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.PostTraining;
-import network.aika.steps.link.InitializeLink;
+import network.aika.steps.link.LinkInduction;
 import network.aika.steps.link.PropagateBindingSignal;
 
 import java.util.Comparator;
@@ -47,7 +47,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
     protected final O output;
 
     private Field igGradient = new Field();
-    private MultiSourceFieldOutput weightedInput;
+    private MultiSourceFieldOutput weightedInput = ZERO;
     private MultiSourceFieldOutput backPropGradient;
 
     public Link(S s, I input, O output) {
@@ -59,14 +59,36 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
                 output.receiveOwnGradientUpdate(u)
         );
 
-        weightedInput = input != null ?
-                new FieldMultiplication(input.getValue(), getWeightOutput()) :
-                ZERO;
+        if(input != null)
+            initWeightInput();
+
         backPropGradient = new FieldMultiplication(output.outputGradient, getWeightOutput());
 
-        InitializeLink.add(this);
+        init();
 
         getThought().onLinkCreationEvent(this);
+    }
+
+    protected void initWeightInput() {
+        weightedInput = new FieldMultiplication(input.getValue(), getWeightOutput());
+    }
+
+    public void init() {
+        if(getInput() != null) {
+            linkInput();
+            PropagateBindingSignal.add(this);
+
+            if(getSynapse().isTemplate())
+                LinkInduction.add(this);
+        }
+
+        if(getOutput() != null) {
+            linkOutput();
+
+            getOutput().getNet().addAndTriggerUpdate(
+                    getOutputValue()
+            );
+        }
     }
 
     public Field getInformationGainGradient() {

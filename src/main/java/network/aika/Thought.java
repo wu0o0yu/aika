@@ -167,6 +167,13 @@ public abstract class Thought<M extends Model> {
         }
     }
 
+    public void processFinalMode() {
+        activationsById.values()
+                .forEach(act -> act.setFinal());
+
+        process();
+    }
+
     public Timestamp getTimestampOnProcess() {
         return timestampOnProcess;
     }
