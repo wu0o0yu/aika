@@ -39,6 +39,7 @@ public abstract class Element<E extends Element> implements Comparable<E> {
         if(s.checkIfQueued() && queuedSteps.containsKey(s))
             return;
 
+        s.setTimestamp(getThought().getNextTimestamp());
         queuedSteps.put(s, s);
         getThought().addStep(s);
     }

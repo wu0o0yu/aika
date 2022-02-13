@@ -16,15 +16,12 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.RelatedInputBNLink;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 
-import static network.aika.neuron.bindingsignal.Scope.RELATED;
-import static network.aika.neuron.bindingsignal.Scope.SAME;
+import static network.aika.neuron.bindingsignal.Scope.*;
 
 /**
  *
@@ -39,7 +36,7 @@ public class RelatedInputBNSynapse extends InputBNSynapse<RelatedInputBNSynapse,
 
     @Override
     public PatternBindingSignal propagatePatternBindingSignal(RelatedInputBNLink l, PatternBindingSignal iBS) {
-        if(iBS.getScope() == SAME || iBS.getScope() == RELATED)
+        if(iBS.getScope() != INPUT)
             return null;
 
         return iBS.next(l.getOutput(), true);

@@ -19,8 +19,6 @@ package network.aika.steps;
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Timestamp;
 
-import static network.aika.neuron.activation.Timestamp.NOT_SET;
-
 
 /**
  * @author Lukas Molzberger
@@ -35,10 +33,6 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
     public Step(E element) {
         this.element = element;
         this.fired = element.getFired();
-
-        this.timestamp = element.getThought() != null ?
-                element.getThought().getNextTimestamp() :
-                NOT_SET;
     }
 
     public Step copy(Element newElement) {
@@ -80,7 +74,7 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
         return timestamp;
     }
 
-    public void setTimeStamp(Timestamp timestamp) {
+    public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
 

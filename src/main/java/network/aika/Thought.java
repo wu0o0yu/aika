@@ -24,7 +24,6 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
-import network.aika.steps.Phase;
 import network.aika.steps.QueueKey;
 import network.aika.steps.Step;
 
@@ -55,7 +54,6 @@ public abstract class Thought<M extends Model> {
     private final List<EventListener> eventListeners = new ArrayList<>();
 
     private Config config;
-
 
     public Thought(M m) {
         model = m;
@@ -155,25 +153,9 @@ public abstract class Thought<M extends Model> {
         return new Range(absoluteBegin, absoluteBegin + length());
     }
 
-    private NavigableMap<QueueKey, Step> getFilteredQueue(Phase maxPhase) {
-        if(maxPhase == null)
-            return queue;
-
-        return queue.headMap(
-                new QueueKey.Key(maxPhase),
-                true
-        );
-    }
-
     public void process() {
-        process(null);
-    }
-
-    public void process(Phase maxPhase) {
-        NavigableMap<QueueKey, Step> filteredQueue = getFilteredQueue(maxPhase);
-
-        while (!filteredQueue.isEmpty()) {
-            Step s = filteredQueue.pollFirstEntry().getValue();
+        while (!queue.isEmpty()) {
+            Step s = queue.pollFirstEntry().getValue();
 
             timestampOnProcess = getCurrentTimestamp();
 
