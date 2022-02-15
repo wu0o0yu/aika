@@ -39,6 +39,11 @@ public class DummyActivation extends Activation {
         thought = getModel().getCurrentThought();
     }
 
+    public DummyActivation(int id, Neuron neuron) {
+        super(id, neuron);
+        thought = getModel().getCurrentThought();
+    }
+
     @Override
     public Timestamp getFired() {
         return MAX;

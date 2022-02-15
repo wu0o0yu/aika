@@ -44,6 +44,10 @@ import static network.aika.steps.LinkingOrder.PRE_FIRED;
  */
 public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
+    public static final Comparator<Activation> NEURON_COMPARATOR = Comparator.
+            <Activation>comparingLong(act -> act.getNeuron().getId())
+            .thenComparingInt(Activation::getId);
+
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(Activation::getId);
 
     protected final int id;

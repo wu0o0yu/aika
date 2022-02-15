@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.bindingsignal.BindingSignal.transitionBindingSignals;
+import static network.aika.neuron.bindingsignal.BindingSignal.propagateBindingSignals;
 
 /**
  * Propagates the binding signal to the next activation.
@@ -74,7 +74,7 @@ public class PropagateBindingSignal extends Step<Link> {
     public void process() {
         Activation<?> oAct = getElement().getOutput();
 
-        add(oAct, transitionBindingSignals(getElement(), inputBindingSignals)
+        add(oAct, propagateBindingSignals(getElement(), inputBindingSignals)
                 .map(bs -> oAct.addBindingSignal(bs))
                 .filter(bs -> bs != null));
     }

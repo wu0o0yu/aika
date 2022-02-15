@@ -21,7 +21,6 @@ import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.neuron.activation.Activation;
 import network.aika.fields.Field;
-import network.aika.neuron.activation.DummyActivation;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.PostTraining;
 import network.aika.steps.activation.Save;
@@ -103,15 +102,11 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         }
     }
 
-    public boolean neuronMatches(Neuron<?, ?> targetN) {
-        if(isTemplate()) {
-            return getTemplateGroup().stream()
-                    .anyMatch(tn ->
-                            tn.getId().intValue() == targetN.getId().intValue()
-                    );
-        } else {
-            return getId().intValue() == targetN.getId().intValue();
-        }
+    public boolean templateNeuronMatches(Neuron<?, ?> targetN) {
+        return getTemplateGroup().stream()
+                .anyMatch(tn ->
+                        tn.getId().intValue() == targetN.getId().intValue()
+                );
     }
 
     private TreeSet<A> initActivationsSet(Thought t) {

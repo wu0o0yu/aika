@@ -34,7 +34,7 @@ public abstract class BindingSignal<B extends BindingSignal> {
     protected B origin;
     protected byte depth;
 
-    public static Stream<BindingSignal> transitionBindingSignals(Link l, Collection<BindingSignal> bindingSignals) {
+    public static Stream<BindingSignal> propagateBindingSignals(Link l, Collection<BindingSignal> bindingSignals) {
         return bindingSignals.stream()
                 .map(iBS -> iBS.propagate(l))
                 .filter(oBS -> oBS != null);

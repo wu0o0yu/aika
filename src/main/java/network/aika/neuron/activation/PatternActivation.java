@@ -23,7 +23,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.conjunctive.PatternNeuron;
 
-import java.util.Map;
+import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
@@ -33,7 +33,7 @@ import java.util.stream.Stream;
  */
 public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
-    protected Map<Activation<?>, PatternBindingSignal> reverseBindingSignals = new TreeMap<>();
+    protected NavigableMap<Activation<?>, PatternBindingSignal> reverseBindingSignals = new TreeMap<>(NEURON_COMPARATOR);
 
     protected PatternActivation(int id, PatternNeuron n) {
         super(id, n);
@@ -71,8 +71,15 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     @Override
     public Stream<PatternBindingSignal> getReverseBindingSignals(Neuron toNeuron) {
-        return reverseBindingSignals.values().stream()
-                .filter(bs -> bs.getActivation().getNeuron().neuronMatches(toNeuron));
+        if(toNeuron.isTemplate()) {
+            return reverseBindingSignals.values().stream()
+                    .filter(bs -> bs.getActivation().getNeuron().templateNeuronMatches(toNeuron));
+        } else {
+            return reverseBindingSignals.subMap(
+                            new DummyActivation(0, toNeuron),
+                            new DummyActivation(Integer.MAX_VALUE, toNeuron)
+                    ).values().stream();
+        }
     }
 
     @Override

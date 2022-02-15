@@ -39,7 +39,7 @@ import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
  */
 public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
-    protected Map<Activation<?>, BranchBindingSignal> reverseBindingSignals = new TreeMap<>();
+    protected NavigableMap<Activation<?>, BranchBindingSignal> reverseBindingSignals = new TreeMap<>(NEURON_COMPARATOR);
 
     private Timestamp finalTimestamp = NOT_SET;
 
@@ -85,8 +85,15 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     public Stream<BranchBindingSignal> getReverseBindingSignals(Neuron toNeuron) {
-        return reverseBindingSignals.values().stream()
-                .filter(bs -> bs.getActivation().getNeuron().neuronMatches(toNeuron));
+        if(toNeuron.isTemplate()) {
+            return reverseBindingSignals.values().stream()
+                    .filter(bs -> bs.getActivation().getNeuron().templateNeuronMatches(toNeuron));
+        } else {
+            return reverseBindingSignals.subMap(
+                    new DummyActivation(0, toNeuron),
+                    new DummyActivation(Integer.MAX_VALUE, toNeuron)
+            ).values().stream();
+        }
     }
 
     @Override
