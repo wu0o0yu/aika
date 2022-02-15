@@ -97,7 +97,7 @@ public class Field implements FieldInput, FieldOutput, Writable {
         else
             update += u;
 
-        return propagatePreCondition.check(currentValue, currentValue + u, u);
+        return propagatePreCondition.check(currentValue, currentValue + update, update);
     }
 
     @Override
