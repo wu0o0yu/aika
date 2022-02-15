@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
@@ -69,8 +70,9 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     }
 
     @Override
-    public Stream<PatternBindingSignal> getReverseBindingSignals() {
-        return reverseBindingSignals.values().stream();
+    public Stream<PatternBindingSignal> getReverseBindingSignals(Neuron toNeuron) {
+        return reverseBindingSignals.values().stream()
+                .filter(bs -> bs.getActivation().getNeuron().neuronMatches(toNeuron));
     }
 
     @Override

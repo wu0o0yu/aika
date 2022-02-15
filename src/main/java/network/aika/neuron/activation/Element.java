@@ -39,9 +39,13 @@ public abstract class Element<E extends Element> implements Comparable<E> {
         if(s.checkIfQueued() && queuedSteps.containsKey(s))
             return;
 
-        s.setTimestamp(getThought().getNextTimestamp());
+        Thought t = getThought();
+        if(t == null)
+            return;
+
+        s.setTimestamp(t.getNextTimestamp());
         queuedSteps.put(s, s);
-        getThought().addStep(s);
+        t.addStep(s);
     }
 
     public void removeQueuedPhase(Step s) {

@@ -26,7 +26,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import static network.aika.neuron.bindingsignal.BranchBindingSignal.isSeparateBranch;
-import static network.aika.neuron.bindingsignal.Scope.*;
 
 /**
  * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
@@ -69,23 +68,6 @@ public class SamePatternBNSynapse extends BindingNeuronSynapse<SamePatternBNSyna
     }
 
     @Override
-    public PatternBindingSignal propagatePatternBindingSignal(SamePatternBNLink l, PatternBindingSignal iBS) {
-        if(iBS.getScope() != SAME)
-            return null;
-
-        return iBS.next(l.getOutput(), false);
-    }
-
-    @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
-        if(allowLooseLinking) {
-            return iBS.getOrigin() != oBS.getOrigin() && iBS.getScope() == INPUT && oBS.getScope() == INPUT;
-        } else {
-            return iBS.getScope() == INPUT && oBS.getScope() == RELATED;
-        }
-    }
-
-    @Override
     public boolean checkLinkingPreConditions(BindingActivation iAct, BindingActivation oAct) {
         if(isSeparateBranch(iAct, oAct))
             return false;
@@ -98,6 +80,23 @@ public class SamePatternBNSynapse extends BindingNeuronSynapse<SamePatternBNSyna
 
         // The Input and Output BindingActivations belong to different Patterns.
         return oSamePBS == null || oSamePBS == iSamePBS;
+    }
+
+    @Override
+    public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS) {
+        if(!iBS.isInput())
+            return iBS.next(false, false); // Same Pattern BindingSignal
+        else
+            return iBS.next(true, true); // Input BS becomes related
+    }
+
+    @Override
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
+        if(allowLooseLinking) {
+            return iBS.getOrigin() != oBS.getOrigin() && iBS.isInput() && oBS.isInput();
+        } else {
+            return super.checkRelatedPatternBindingSignal(iBS, oBS);
+        }
     }
 
     @Override

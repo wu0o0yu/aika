@@ -21,7 +21,10 @@ import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.neuron.activation.Activation;
 import network.aika.fields.Field;
+import network.aika.neuron.activation.DummyActivation;
 import network.aika.sign.Sign;
+import network.aika.steps.activation.PostTraining;
+import network.aika.steps.activation.Save;
 import network.aika.utils.Bound;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Utils;
@@ -181,6 +184,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
                 .forEach(act ->
                         act.updateBias(u)
                 );
+        PostTraining.add(this);
         setModified();
     }
 
@@ -301,6 +305,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public void setModified() {
         this.modified = true;
+        Save.add(this);
     }
 
     public void resetModified() {

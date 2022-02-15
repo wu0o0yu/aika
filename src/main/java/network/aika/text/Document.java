@@ -17,6 +17,7 @@
 package network.aika.text;
 
 import network.aika.Thought;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.Activation;
@@ -58,7 +59,7 @@ public class Document extends Thought<TextModel> {
         endPBSIndex.put(r.getEnd(), pbs);
     }
 
-    public Stream<PatternBindingSignal> getLooselyRelatedBindingSignals(BindingSignal<?> fromBindingSignal, Integer looseLinkingRange) {
+    public Stream<PatternBindingSignal> getLooselyRelatedBindingSignals(BindingSignal<?> fromBindingSignal, Integer looseLinkingRange, Neuron toNeuron) {
         Range r = fromBindingSignal.getOriginActivation().getRange();
 
         return Stream.concat(
@@ -66,7 +67,7 @@ public class Document extends Thought<TextModel> {
             endPBSIndex.subMap(r.getBegin() - looseLinkingRange, r.getBegin()).values().stream()
         )
                 .map(bs -> bs.getOriginActivation())
-                .flatMap(originAct -> originAct.getReverseBindingSignals());
+                .flatMap(originAct -> originAct.getReverseBindingSignals(toNeuron));
     }
 
     public void append(String txt) {

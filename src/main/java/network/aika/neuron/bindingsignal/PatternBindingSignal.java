@@ -21,31 +21,46 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 
 import java.util.stream.Stream;
 
-import static network.aika.neuron.bindingsignal.Scope.SAME;
 
 /**
  * @author Lukas Molzberger
  */
 public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
 
-    protected Scope scope;
+    private boolean isInput;
+    private boolean isRelated;
 
     public PatternBindingSignal(PatternActivation act) {
         this.origin = this;
         this.activation = act;
-        this.scope = SAME;
     }
 
-    protected PatternBindingSignal(PatternBindingSignal parent, Activation activation, boolean scopeTransition) {
+    protected PatternBindingSignal(PatternBindingSignal parent, boolean isInput, boolean isRelated) {
         this.parent = parent;
         this.origin = parent.getOrigin();
-        this.activation = activation;
-        this.scope = scopeTransition ? parent.scope.next() : parent.scope;
+        this.isInput = isInput;
+        this.isRelated = isRelated;
         this.depth = (byte) (getDepth() + 1);
+    }
+
+
+    public boolean isInput() {
+        return isInput;
+    }
+
+    public void setInput(boolean input) {
+        isInput = input;
+    }
+
+    public boolean isRelated() {
+        return isRelated;
+    }
+
+    public void setRelated(boolean related) {
+        isRelated = related;
     }
 
     @Override
@@ -53,8 +68,8 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
         return fromN.getTargetSynapses(postFired, template);
     }
 
-    public PatternBindingSignal next(Activation act, boolean scopeTransition) {
-        return new PatternBindingSignal(this, act, scopeTransition);
+    public PatternBindingSignal next(boolean isInput, boolean isRelated) {
+        return new PatternBindingSignal(this, isInput, isRelated);
     }
 
     public PatternActivation getOriginActivation() {
@@ -76,7 +91,7 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
         if(existingBSScope == null)
             return false;
 
-        return existingBSScope.getScope().ordinal() <= getScope().ordinal();
+        return existingBSScope.isInput() == isInput() && existingBSScope.isRelated() == isRelated();
     }
 
     @Override
@@ -85,14 +100,18 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
     }
 
     protected BindingSignal propagate(Link l) {
-        return l.getSynapse().propagatePatternBindingSignal(l, this);
+        PatternBindingSignal nextPBS = l.getSynapse().transitionPatternBindingSignal(this);
+        if(nextPBS != null)
+            nextPBS.activation = l.getOutput();
+
+        return nextPBS;
     }
 
-    public Scope getScope() {
-        return scope;
+    public boolean match(PatternBindingSignal oBS) {
+        return isInput == oBS.isInput && isRelated == oBS.isRelated;
     }
 
     public String toString() {
-        return super.toString() + ", scope:" + scope;
+        return super.toString() + ", isInput:" + isInput + ", isRelated:" + isRelated;
     }
 }

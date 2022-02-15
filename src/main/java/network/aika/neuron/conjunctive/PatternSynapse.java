@@ -28,7 +28,7 @@ import network.aika.neuron.bindingsignal.PatternBindingSignal;
 public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNeuron, PatternNeuron, PatternLink, BindingActivation, PatternActivation> {
 
     public PatternSynapse() {
-        setAllowPropagate(true);
+        allowPropagate = true;
     }
 
     @Override

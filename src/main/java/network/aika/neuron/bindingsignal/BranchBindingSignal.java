@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.bindingsignal;
 
-import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -41,10 +40,9 @@ public class BranchBindingSignal extends BindingSignal<BranchBindingSignal> {
         this.depth = 0;
     }
 
-    private BranchBindingSignal(BranchBindingSignal parent, Activation activation) {
+    private BranchBindingSignal(BranchBindingSignal parent) {
         this.parent = parent;
         this.origin = parent.getOrigin();
-        this.activation = activation;
         this.depth = (byte) (getDepth() + 1);
     }
 
@@ -70,8 +68,8 @@ public class BranchBindingSignal extends BindingSignal<BranchBindingSignal> {
                 .filter(s -> s instanceof PositiveFeedbackSynapse);
     }
 
-    public BranchBindingSignal next(Activation act) {
-        return new BranchBindingSignal(this, act);
+    public BranchBindingSignal next() {
+        return new BranchBindingSignal(this);
     }
 
     @Override
@@ -86,7 +84,11 @@ public class BranchBindingSignal extends BindingSignal<BranchBindingSignal> {
 
     @Override
     protected BindingSignal propagate(Link l) {
-        return l.getSynapse().propagateBranchBindingSignal(l, this);
+        BranchBindingSignal nextBBS = l.getSynapse().transitionBranchBindingSignal(this);
+        if(nextBBS != null)
+            nextBBS.activation = l.getOutput();
+
+        return nextBBS;
     }
 
     @Override

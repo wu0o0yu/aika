@@ -23,31 +23,30 @@ import network.aika.neuron.activation.PrimaryInputBNLink;
 import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 
-import static network.aika.neuron.bindingsignal.Scope.RELATED;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PrimaryInputBNSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends InputBNSynapse<PrimaryInputBNSynapse, I, PrimaryInputBNLink<IA>, IA> {
+public class PrimaryInputBNSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends BindingNeuronSynapse<PrimaryInputBNSynapse, I, PrimaryInputBNLink<IA>, IA> {
 
     public PrimaryInputBNLink createLink(IA input, BindingActivation output) {
         return new PrimaryInputBNLink(this, input, output);
     }
 
     @Override
-    public boolean checkLinkingPreConditions(IA iAct, BindingActivation oAct) {
-        if(oAct.checkIfPrimaryPatternBindingSignalAlreadyExists())
-            return false;
+    public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS) {
+        if(iBS.isInput() || iBS.isRelated())
+            return null;
 
-        return super.checkLinkingPreConditions(iAct, oAct);
+        return iBS.next(true, false);
     }
 
     @Override
-    public PatternBindingSignal propagatePatternBindingSignal(PrimaryInputBNLink l, PatternBindingSignal iBS) {
-        if(iBS.getScope() == RELATED)
-            return null;
+    public boolean checkLinkingPreConditions(IA iAct, BindingActivation oAct) {
+        if(oAct.checkIfPrimaryInputBNLinkAlreadyExists())
+            return false;
 
-        return iBS.next(l.getOutput(), true);
+        return super.checkLinkingPreConditions(iAct, oAct);
     }
 }

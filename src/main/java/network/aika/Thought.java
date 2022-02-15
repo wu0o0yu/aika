@@ -18,6 +18,7 @@ package network.aika;
 
 
 import network.aika.callbacks.EventListener;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
@@ -223,7 +224,7 @@ public abstract class Thought<M extends Model> {
         return sb.toString();
     }
 
-    public Stream<PatternBindingSignal> getLooselyRelatedBindingSignals(BindingSignal<?> fromBindingSignal, Integer looseLinkingRange) {
+    public Stream<PatternBindingSignal> getLooselyRelatedBindingSignals(BindingSignal<?> fromBindingSignal, Integer looseLinkingRange, Neuron toNeuron) {
         return Stream.empty();
     }
 }

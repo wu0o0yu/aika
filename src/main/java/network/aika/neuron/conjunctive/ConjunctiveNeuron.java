@@ -26,6 +26,8 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.fields.Field;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -43,6 +45,8 @@ import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGEN
  * @author Lukas Molzberger
  */
 public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends ConjunctiveActivation> extends Neuron<S, A> {
+
+    private static final Logger log = LoggerFactory.getLogger(ConjunctiveNeuron.class);
 
     public ConjunctiveNeuron() {
         super();
@@ -90,6 +94,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         );
         sortedSynapses.addAll(inputSynapses.values());
 
+        int countAP = 0;
         double sum = getBias().getCurrentValue();
         for(ConjunctiveSynapse s: sortedSynapses) {
             if(s.getWeight().getCurrentValue() <= 0.0)
@@ -98,6 +103,12 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
             sum += s.getWeight().getCurrentValue();
 
             s.setAllowPropagate(sum > 0.0);
+
+            if(s.allowPropagate)
+                countAP++;
         }
+
+        if(countAP > 1)
+            log.warn("countAP: " + countAP + " Activation merging not yet implemented.");
     }
 }

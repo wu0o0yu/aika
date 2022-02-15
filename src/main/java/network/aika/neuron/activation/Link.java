@@ -22,7 +22,6 @@ import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.sign.Sign;
-import network.aika.steps.activation.PostTraining;
 import network.aika.steps.link.LinkInduction;
 import network.aika.steps.link.PropagateBindingSignal;
 
@@ -120,8 +119,6 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
 
         if (oldWeightIsZero && !synapse.isZero() && getInput().isFired())
             PropagateBindingSignal.add(this);
-
-        PostTraining.add(getOutput());
     }
 
     public void backPropagate() {

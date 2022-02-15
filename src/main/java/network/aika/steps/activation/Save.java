@@ -16,7 +16,10 @@
  */
 package network.aika.steps.activation;
 
+import network.aika.Thought;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.DummyActivation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
@@ -25,13 +28,16 @@ import network.aika.steps.Step;
  *
  * @author Lukas Molzberger
  */
-public class Save extends Step<Activation> {
+public class Save extends Step<DummyActivation> {
 
-    public static void add(Activation act) {
-        Step.add(new Save(act));
+    public static void add(Neuron n) {
+        if(n.isTemplate())
+            return;
+
+        Step.add(new Save(new DummyActivation(n)));
     }
 
-    private Save(Activation act) {
+    private Save(DummyActivation act) {
         super(act);
     }
 

@@ -38,7 +38,7 @@ import java.io.IOException;
  */
 public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends Neuron & Axon, O extends ConjunctiveNeuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation, OA extends ConjunctiveActivation> extends Synapse<S, I, O, L, IA, OA> {
 
-    private boolean allowPropagate;
+    protected boolean allowPropagate;
 
     protected double getSortingWeight() {
         return getWeight().getCurrentValue();
@@ -50,6 +50,9 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     public void setAllowPropagate(boolean allowPropagate) {
+        if(this.allowPropagate != allowPropagate)
+            setModified();
+
         this.allowPropagate = allowPropagate;
     }
 
@@ -62,7 +65,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
             updateBias(delta);
 
             if(delta < 0.0)
-                PostTraining.add(l.getOutput());
+                PostTraining.add(l.getSynapse().getOutput());
         }
 
         checkConstraints();

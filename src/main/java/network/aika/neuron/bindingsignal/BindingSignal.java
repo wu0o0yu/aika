@@ -52,6 +52,10 @@ public abstract class BindingSignal<B extends BindingSignal> {
 
     public abstract void link();
 
+    public boolean isOrigin() {
+        return this == origin;
+    }
+
     public B getOrigin() {
         return origin;
     }

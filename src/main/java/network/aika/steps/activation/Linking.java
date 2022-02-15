@@ -26,9 +26,11 @@ import network.aika.steps.LinkingOrder;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.activation.Timestamp.NOT_SET;
+import static network.aika.direction.Direction.getDirection;
 
 /**
  * The job of the linking phase is to propagate information through the network by creating the required activations and links.
@@ -48,18 +50,34 @@ public class Linking extends Step<Activation> {
         if(template && !act.getConfig().isTemplatesEnabled())
             return;
 
-        Step.add(new Linking(act, bindingSignal, linkingOrder, template));
+        if(bindingSignal.isOrigin())
+            return;
+
+        Linking step = new Linking(act, bindingSignal, linkingOrder, template);
+
+        if(step.hasTargetSynapses())
+            Step.add(step);
     }
 
     private LinkingOrder linkingOrder;
     private boolean template;
 
-    private Linking(Activation act, BindingSignal bindingSignal, LinkingOrder linkingOrder, boolean template) {
+    private Linking(Activation act, BindingSignal<?> bindingSignal, LinkingOrder linkingOrder, boolean template) {
         super(act);
 
         this.linkingOrder = linkingOrder;
         this.template = template;
         this.bindingSignal = bindingSignal;
+
+        this.targetSynapses = bindingSignal.getTargetSynapses(
+                getElement().getNeuron(),
+                linkingOrder == LinkingOrder.POST_FIRED,
+                template
+        ).collect(Collectors.toList());
+    }
+
+    private boolean hasTargetSynapses() {
+        return targetSynapses != null && !targetSynapses.isEmpty();
     }
 
     @Override
@@ -67,7 +85,8 @@ public class Linking extends Step<Activation> {
         return linkingOrder;
     }
 
-    protected final BindingSignal<?> bindingSignal;
+    private final BindingSignal<?> bindingSignal;
+    private List<Synapse> targetSynapses;
 
     @Override
     public Phase getPhase() {
@@ -80,20 +99,17 @@ public class Linking extends Step<Activation> {
 
     @Override
     public void process() {
-        bindingSignal.getTargetSynapses(
-                getElement().getNeuron(),
-                        linkingOrder == LinkingOrder.POST_FIRED,
-                        template
-                ).forEach(ts ->
+        targetSynapses.forEach(ts ->
                         link(ts)
                 );
     }
 
     private void link(Synapse ts) {
         Activation fromAct = getElement();
-        Direction dir = ts.getDirection(getElement().getNeuron());
+        Direction dir = getDirection(ts, getElement().getNeuron());
+        Neuron toNeuron = dir.getNeuron(ts);
 
-        getRelatedBindingSignal(ts, bindingSignal)
+        getRelatedBindingSignal(ts, bindingSignal, toNeuron)
                 .filter(toBS -> bindingSignal != toBS)
                 .filter(toBS ->
                         checkRelatedBindingSignal(ts, dir, bindingSignal, toBS)
@@ -105,14 +121,14 @@ public class Linking extends Step<Activation> {
                 );
     }
 
-    private Stream<? extends BindingSignal> getRelatedBindingSignal(Synapse targetSynapse, BindingSignal fromBindingSignal) {
+    private Stream<? extends BindingSignal> getRelatedBindingSignal(Synapse targetSynapse, BindingSignal fromBindingSignal, Neuron toNeuron) {
         Activation originAct = fromBindingSignal.getOriginActivation();
-        Stream<? extends BindingSignal> relatedBindingSignals = originAct.getReverseBindingSignals();
+        Stream<? extends BindingSignal> relatedBindingSignals = originAct.getReverseBindingSignals(toNeuron);
 
         if(targetSynapse.allowLooseLinking()) {
             relatedBindingSignals = Stream.concat(
                     relatedBindingSignals,
-                    originAct.getThought().getLooselyRelatedBindingSignals(fromBindingSignal, targetSynapse.getLooseLinkingRange())
+                    originAct.getThought().getLooselyRelatedBindingSignals(fromBindingSignal, targetSynapse.getLooseLinkingRange(), toNeuron)
             );
         }
 
@@ -120,7 +136,6 @@ public class Linking extends Step<Activation> {
     }
 
     private boolean checkRelatedBindingSignal(Synapse targetSynapse, Direction dir, BindingSignal fromBindingSignal, BindingSignal toBindingSignal) {
-        //           fromBindingSignal.checkRelatedBindingSignal(targetSynapse, toBindingSignal, dir)
         BindingSignal inputBS = dir.getInput(fromBindingSignal, toBindingSignal);
         BindingSignal outputBS = dir.getOutput(fromBindingSignal, toBindingSignal);
         return inputBS.checkRelatedBindingSignal(targetSynapse, outputBS);
@@ -130,12 +145,6 @@ public class Linking extends Step<Activation> {
         Activation iAct = dir.getInput(fromAct, toAct);
         Activation oAct = dir.getOutput(fromAct, toAct);
 
-        if (!iAct.getNeuron().neuronMatches(targetSynapse.getInput()))
-            return;
-
-        if (!oAct.getNeuron().neuronMatches(targetSynapse.getOutput()))
-            return;
-
         if(!targetSynapse.checkLinkingPreConditions(iAct, oAct))
             return;
 
@@ -143,6 +152,11 @@ public class Linking extends Step<Activation> {
     }
 
     public String toString() {
-        return linkingOrder + " " + (template ? "Template " : "")  + getElement() + " - " + bindingSignal.getClass().getSimpleName() + ": " + bindingSignal;
+        StringBuilder sb = new StringBuilder();
+        sb.append(linkingOrder + " " + (template ? "Template " : "")  + getElement() + " - " + bindingSignal.getClass().getSimpleName() + ": " + bindingSignal);
+        targetSynapses.forEach(ts ->
+                sb.append("\n    " + ts)
+        );
+        return sb.toString();
     }
 }

@@ -25,7 +25,6 @@ import network.aika.direction.Direction;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
-import network.aika.neuron.bindingsignal.Scope;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.*;
 import network.aika.steps.link.InformationGainGradient;
@@ -33,7 +32,6 @@ import network.aika.steps.link.LinkCounting;
 import network.aika.utils.Utils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
@@ -361,11 +359,13 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public void registerPatternBindingSignal(PatternBindingSignal bs) {
         onBindingSignalArrived(bs);
+
         patternBindingSignals.put(bs.getOriginActivation(), bs);
     }
 
     public void registerBranchBindingSignal(BranchBindingSignal bs) {
         onBindingSignalArrived(bs);
+
         branchBindingSignals.put(bs.getOriginActivation(), bs);
     }
 
@@ -377,12 +377,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return branchBindingSignals;
     }
 
-    public abstract Stream<? extends BindingSignal<?>> getReverseBindingSignals();
-
-    public boolean checkIfPrimaryPatternBindingSignalAlreadyExists() {
-        return getPatternBindingSignals().values().stream()
-                .anyMatch(mainBS -> mainBS.getScope() == Scope.INPUT);
-    }
+    public abstract Stream<? extends BindingSignal<?>> getReverseBindingSignals(Neuron toNeuron);
 
     @Override
     public int compareTo(Activation act) {

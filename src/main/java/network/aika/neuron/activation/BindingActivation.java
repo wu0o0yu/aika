@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.fields.*;
@@ -32,7 +33,6 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
-import static network.aika.neuron.bindingsignal.Scope.SAME;
 
 /**
  * @author Lukas Molzberger
@@ -84,8 +84,9 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     @Override
-    public Stream<BranchBindingSignal> getReverseBindingSignals() {
-        return reverseBindingSignals.values().stream();
+    public Stream<BranchBindingSignal> getReverseBindingSignals(Neuron toNeuron) {
+        return reverseBindingSignals.values().stream()
+                .filter(bs -> bs.getActivation().getNeuron().neuronMatches(toNeuron));
     }
 
     @Override
@@ -157,13 +158,14 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     private PatternBindingSignal getPrimaryPatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
                 .filter(bs -> NOT_SET_AFTER.compare(bs.getOriginActivation().getFired(), fired) < 0)
-                .min(Comparator.comparing(bs -> bs.getScope()))
+                .filter(bs -> !bs.isRelated())
+                .min(Comparator.comparing(bs -> bs.isInput() ? 1 : 0))
                 .orElse(null);
     }
 
     public PatternBindingSignal getSamePatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
-                .filter(bs -> bs.getScope() == SAME)
+                .filter(bs -> !bs.isInput() && !bs.isRelated())
                 .findAny()
                 .orElse(null);
     }
@@ -250,5 +252,10 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     public void receiveOwnGradientUpdate(double u) {
         super.receiveOwnGradientUpdate(u);
         ownInputGradient.addAndTriggerUpdate(u);
+    }
+
+    public boolean checkIfPrimaryInputBNLinkAlreadyExists() {
+        return inputLinks.values().stream()
+                .anyMatch(l -> l instanceof PrimaryInputBNLink<?>);
     }
 }

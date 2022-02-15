@@ -17,37 +17,54 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.disjunctive.DisjunctiveNeuron;
+import network.aika.neuron.Range;
 
-import java.util.List;
+import network.aika.neuron.bindingsignal.BindingSignal;
+
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.neuron.activation.Timestamp.MAX;
+
 
 /**
+ * The dummy activation is just used to add neurons to the event queue.
  *
  * @author Lukas Molzberger
  */
-public abstract class DisjunctiveActivation<N extends DisjunctiveNeuron> extends Activation<N> {
+public class DummyActivation extends Activation {
 
-    public DisjunctiveActivation(int id, Thought t, N neuron) {
-        super(id, t, neuron);
+    public DummyActivation(Neuron neuron) {
+        super(0, neuron);
+        thought = getModel().getCurrentThought();
     }
 
+    @Override
+    public Timestamp getFired() {
+        return MAX;
+    }
+
+    @Override
     public boolean isSelfRef(Activation iAct) {
         return false;
     }
 
     @Override
-    public boolean checkAllowPropagate() {
-        return isTemplate();
+    public Range getRange() {
+        throw new NoSuchMethodError();
     }
 
     @Override
     public Stream<? extends BindingSignal<?>> getReverseBindingSignals(Neuron toNeuron) {
-        return null;
+        throw new NoSuchMethodError();
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        throw new NoSuchMethodError();
+    }
+
+    public String toString() {
+        return "DummyAct - neuron: " + neuron;
     }
 }

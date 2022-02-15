@@ -142,6 +142,23 @@ public class TextModel extends Model {
         return (CategoryNeuron) tokenCategory.getNeuron();
     }
 
+    public static BindingNeuron getPreviousTokenRelationBindingNeuron(PatternNeuron pn) {
+        return getRelationBindingNeuron(pn, pn.getLabel() + REL_PREVIOUS_TOKEN_LABEL);
+    }
+
+    public static BindingNeuron getNextTokenRelationBindingNeuron(PatternNeuron pn) {
+        return getRelationBindingNeuron(pn, pn.getLabel() + REL_NEXT_TOKEN_LABEL);
+    }
+
+    private static BindingNeuron getRelationBindingNeuron(PatternNeuron pn, String label) {
+        return pn.getOutputSynapses()
+                .filter(s -> s instanceof PositiveFeedbackSynapse)
+                .map(s -> ((PositiveFeedbackSynapse) s).getOutput())
+                .filter(s -> label.equalsIgnoreCase(s.getLabel()))
+                .findFirst()
+                .orElse(null);
+    }
+
     @Override
     public void write(DataOutput out) throws IOException {
         super.write(out);

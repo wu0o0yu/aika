@@ -22,6 +22,9 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.steps.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.steps.LinkingOrder.PROPAGATE;
 
@@ -44,15 +47,32 @@ public class Propagate extends Step<Activation> {
         if(template && !act.getConfig().isTemplatesEnabled())
             return;
 
-        Step.add(new Propagate(act, template));
+        Propagate step = new Propagate(act, template);
+
+        if(step.hasTargetSynapses())
+            Step.add(step);
     }
 
     private boolean template;
+    private List<Synapse> targetSynapses;
 
     private Propagate(Activation act, boolean template) {
         super(act);
 
         this.template = template;
+
+        if(!act.checkAllowPropagate())
+            return;
+
+        Neuron<?, ?> n = act.getNeuron();
+        targetSynapses = n.getTargetSynapses(true, template)
+                .filter(s ->
+                        s.allowPropagate()
+                ).collect(Collectors.toList());
+    }
+
+    private boolean hasTargetSynapses() {
+        return targetSynapses != null && !targetSynapses.isEmpty();
     }
 
     @Override
@@ -69,17 +89,12 @@ public class Propagate extends Step<Activation> {
     public void process() {
         Activation act = getElement();
 
-        if(!act.checkAllowPropagate())
-            return;
-
-        Neuron<?, ?> n = act.getNeuron();
-        n.getTargetSynapses(true, template)
+        targetSynapses.stream()
                 .filter(s ->
-                        s.allowPropagate() &&
-                                !act.linkExists(OUTPUT, s, template)
+                        !act.linkExists(OUTPUT, s, template)
                 )
-                .forEach(s ->
-                        propagate(act, s)
+                .forEach(ts ->
+                        propagate(act, ts)
                 );
     }
 
@@ -93,6 +108,11 @@ public class Propagate extends Step<Activation> {
     }
 
     public String toString() {
-        return PROPAGATE + " " + (template ? "Template " : "") + getElement();
+        StringBuilder sb = new StringBuilder();
+        sb.append(PROPAGATE + " " + (template ? "Template " : "") + getElement());
+        targetSynapses.forEach(ts ->
+                sb.append("\n    " + ts)
+        );
+        return sb.toString();
     }
 }

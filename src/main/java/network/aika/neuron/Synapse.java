@@ -18,13 +18,12 @@ package network.aika.neuron;
 
 import network.aika.Model;
 import network.aika.neuron.activation.*;
-import network.aika.direction.Direction;
 import network.aika.fields.Field;
 import network.aika.neuron.axons.Axon;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.sign.Sign;
+import network.aika.steps.activation.PostTraining;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
@@ -34,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.stream.Stream;
 
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
@@ -71,16 +69,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return false;
     }
 
-    public Direction getDirection(Neuron n) {
-        if(n == getOutput())
-            return Direction.INPUT;
-        if(n == getInput())
-            return Direction.OUTPUT;
-        return null;
-    }
-
     public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
-        return false;
+        PatternBindingSignal transitionedIBS = transitionPatternBindingSignal(iBS);
+        return transitionedIBS != null && transitionedIBS.match(oBS);
     }
 
     public boolean checkLinkingPreConditions(IA iAct, OA oAct) {
@@ -114,12 +105,12 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return false;
     }
 
-    public PatternBindingSignal propagatePatternBindingSignal(L l, PatternBindingSignal iBS) {
-        return iBS.next(l.getOutput(), false);
+    public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS) {
+        return iBS.next(iBS.isInput(), iBS.isRelated());
     }
 
-    public BranchBindingSignal propagateBranchBindingSignal(L l, BranchBindingSignal iBS) {
-        return iBS.next(l.getOutput());
+    public BranchBindingSignal transitionBranchBindingSignal(BranchBindingSignal iBS) {
+        return iBS.next();
     }
 
     public abstract void setModified();
@@ -374,6 +365,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
                 .map(act -> act.getInputLink(this))
                 .filter(l -> l != null)
                 .forEach(l -> l.receiveWeightUpdate());
+
+        PostTraining.add(getOutput());
         setModified();
     }
 

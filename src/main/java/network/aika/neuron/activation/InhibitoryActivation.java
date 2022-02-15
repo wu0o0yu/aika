@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
@@ -48,7 +49,7 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
     }
 
     @Override
-    public Stream<? extends BindingSignal<?>> getReverseBindingSignals() {
+    public Stream<? extends BindingSignal<?>> getReverseBindingSignals(Neuron toNeuron) {
         return null;
     }
 

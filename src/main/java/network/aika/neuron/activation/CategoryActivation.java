@@ -46,8 +46,8 @@ public class CategoryActivation extends DisjunctiveActivation<CategoryNeuron> {
 
     private BindingSignal getPrimaryPatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
-                .filter(bs -> NOT_SET_AFTER.compare(bs.getOriginActivation().getFired(), fired) < 0)
-                .min(Comparator.comparing(bs -> bs.getScope()))
+                .filter(bs -> !bs.isInput() && !bs.isRelated())
+                .findFirst()
                 .orElse(null);
     }
 }

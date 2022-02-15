@@ -154,6 +154,6 @@ public class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public String toString() {
-        return "[u:" + (update != null ? Utils.round(update) : "-") + ",v:" + Utils.round(currentValue) + "]";
+        return "[u:" + (update != null ? Utils.round(update) : "--") + ", v:" + Utils.round(currentValue) + "]";
     }
 }

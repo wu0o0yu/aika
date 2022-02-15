@@ -44,7 +44,7 @@ public class Templates {
 
     public PrimaryInputBNSynapse PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE;
     public PrimaryInputBNSynapse PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE;
-    public RelatedInputBNSynapse RELATED_INPUT_SYNAPSE_FROM_BINDING_TEMPLATE;
+    public RelatedInputBNSynapse RELATED_INPUT_SYNAPSE_TEMPLATE;
     public SamePatternBNSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
     public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE;
     public NegativeFeedbackSynapse NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE;
@@ -99,12 +99,12 @@ public class Templates {
 //        PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE.setAllowPropagate(true);
 
 
-        RELATED_INPUT_SYNAPSE_FROM_BINDING_TEMPLATE =
+        RELATED_INPUT_SYNAPSE_TEMPLATE =
                 init(
                         new RelatedInputBNSynapse(),
                         INPUT_BINDING_TEMPLATE,
                         BINDING_TEMPLATE,
-                        "Related Input Synapse from Binding Neuron",
+                        "Related Input Synapse",
                         2,
                         0.0
                 );

@@ -16,10 +16,7 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.direction.Direction;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
@@ -38,13 +35,20 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     }
 
     @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
-        return iBS.getScope() == oBS.getScope();
+    public void setWeight(double w) {
+        weight.addAndTriggerUpdate(w);
     }
 
     @Override
-    public boolean checkRelatedBranchBindingSignal(BranchBindingSignal iBS, BranchBindingSignal oBS) {
-        return iBS.getOrigin() == oBS;
+    public void updateWeight(NegativeFeedbackLink l, double delta) {
+        if(l.getInput().isFired() && l.isSelfRef()) {
+            weight.addAndTriggerUpdate(-delta);
+        }
+    }
+
+    @Override
+    protected void checkConstraints() {
+        assert isNegative();
     }
 
     @Override
@@ -69,19 +73,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     }
 
     @Override
-    public void setWeight(double w) {
-        weight.addAndTriggerUpdate(w);
-    }
-
-    @Override
-    public void updateWeight(NegativeFeedbackLink l, double delta) {
-        if(l.getInput().isFired() && l.isSelfRef()) {
-            weight.addAndTriggerUpdate(-delta);
-        }
-    }
-
-    @Override
-    protected void checkConstraints() {
-        assert isNegative();
+    public boolean checkRelatedBranchBindingSignal(BranchBindingSignal iBS, BranchBindingSignal oBS) {
+        return iBS.getOrigin() == oBS;
     }
 }

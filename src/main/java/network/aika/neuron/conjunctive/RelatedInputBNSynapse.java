@@ -21,13 +21,12 @@ import network.aika.neuron.activation.RelatedInputBNLink;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 
-import static network.aika.neuron.bindingsignal.Scope.*;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class RelatedInputBNSynapse extends InputBNSynapse<RelatedInputBNSynapse, BindingNeuron, RelatedInputBNLink, BindingActivation> {
+public class RelatedInputBNSynapse extends BindingNeuronSynapse<RelatedInputBNSynapse, BindingNeuron, RelatedInputBNLink, BindingActivation> {
 
     @Override
     public RelatedInputBNLink createLink(BindingActivation input, BindingActivation output) {
@@ -35,23 +34,18 @@ public class RelatedInputBNSynapse extends InputBNSynapse<RelatedInputBNSynapse,
     }
 
     @Override
-    public PatternBindingSignal propagatePatternBindingSignal(RelatedInputBNLink l, PatternBindingSignal iBS) {
-        if(iBS.getScope() != INPUT)
+    public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS) {
+        if(iBS.isRelated())
             return null;
 
-        return iBS.next(l.getOutput(), true);
+        if(iBS.isInput())
+            return iBS.next(true, true); // Related Binding-Signal
+        else
+            return iBS.next(true, false); // Own Binding-Signal
     }
 
     @Override
-    public BranchBindingSignal propagateBranchBindingSignal(RelatedInputBNLink l, BranchBindingSignal iBS) {
+    public BranchBindingSignal transitionBranchBindingSignal(BranchBindingSignal iBS) {
         return null;
-    }
-
-    @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
-        if(iBS.getScope() == RELATED || oBS.getScope() == RELATED)
-            return false;
-
-        return super.checkRelatedPatternBindingSignal(iBS, oBS);
     }
 }
