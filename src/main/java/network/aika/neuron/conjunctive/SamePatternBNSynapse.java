@@ -69,8 +69,8 @@ public class SamePatternBNSynapse extends BindingNeuronSynapse<SamePatternBNSyna
 
     @Override
     public boolean checkLinkingPreConditions(BindingActivation iAct, BindingActivation oAct) {
-        if(isSeparateBranch(iAct, oAct))
-            return false;
+     //   if(isSeparateBranch(iAct, oAct))
+     //       return false;
 
         if(!super.checkLinkingPreConditions(iAct, oAct))
             return false;
@@ -83,7 +83,7 @@ public class SamePatternBNSynapse extends BindingNeuronSynapse<SamePatternBNSyna
     }
 
     @Override
-    public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS) {
+    public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS, boolean propagate) {
         if(!iBS.isInput())
             return iBS.next(false, false); // Same Pattern BindingSignal
         else

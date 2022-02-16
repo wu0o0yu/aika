@@ -35,7 +35,7 @@ public class PrimaryInputBNSynapse<I extends Neuron & PatternAxon, IA extends Ac
     }
 
     @Override
-    public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS) {
+    public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS, boolean propagate) {
         if(iBS.isInput() || iBS.isRelated())
             return null;
 

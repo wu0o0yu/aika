@@ -100,7 +100,7 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
     }
 
     protected BindingSignal propagate(Link l) {
-        PatternBindingSignal nextPBS = l.getSynapse().transitionPatternBindingSignal(this);
+        PatternBindingSignal nextPBS = l.getSynapse().transitionPatternBindingSignal(this, true);
         if(nextPBS != null)
             nextPBS.activation = l.getOutput();
 

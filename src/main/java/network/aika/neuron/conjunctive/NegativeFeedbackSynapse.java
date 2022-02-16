@@ -53,10 +53,13 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
 
     @Override
     public boolean checkLinkingPreConditions(InhibitoryActivation iAct, BindingActivation oAct) {
-        if(isSeparateBranch(iAct, oAct))
-            return false;
+ //       if(isSeparateBranch(iAct, oAct))
+ //           return false;
 
         if(!iAct.isFired())
+            return false;
+
+        if(isTemplate() && !oAct.isSelfRef(iAct))
             return false;
 
         // Skip BindingNeuronSynapse.checkLinkingPreConditions
@@ -73,7 +76,16 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     }
 
     @Override
+    public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS, boolean propagate) {
+        if(!iBS.isInput() || iBS.isRelated() || propagate)
+            return null;
+
+        return iBS.next(true, false);
+    }
+/*
+    @Override
     public boolean checkRelatedBranchBindingSignal(BranchBindingSignal iBS, BranchBindingSignal oBS) {
         return iBS.getOrigin() == oBS;
     }
+ */
 }

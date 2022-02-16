@@ -70,7 +70,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
-        PatternBindingSignal transitionedIBS = transitionPatternBindingSignal(iBS);
+        PatternBindingSignal transitionedIBS = transitionPatternBindingSignal(iBS, false);
         return transitionedIBS != null && transitionedIBS.match(oBS);
     }
 
@@ -105,7 +105,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return false;
     }
 
-    public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS) {
+    public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS, boolean propagate) {
         return iBS.next(iBS.isInput(), iBS.isRelated());
     }
 

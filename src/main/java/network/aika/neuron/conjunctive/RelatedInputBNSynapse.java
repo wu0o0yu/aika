@@ -34,7 +34,7 @@ public class RelatedInputBNSynapse extends BindingNeuronSynapse<RelatedInputBNSy
     }
 
     @Override
-    public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS) {
+    public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS, boolean propagate) {
         if(iBS.isRelated())
             return null;
 

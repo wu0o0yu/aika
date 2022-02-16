@@ -151,7 +151,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
             value.setAndTriggerUpdate(getActivationFunction().f(net));
     }
 
-
     protected void propagateGradient() {
         if(outputGradientMul.updateAvailable(2))
             outputGradient.addAndTriggerUpdate(outputGradientMul.getUpdate(2));
