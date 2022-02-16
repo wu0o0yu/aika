@@ -46,14 +46,6 @@ public interface Direction {
 
     Stream<? extends Synapse> getSynapses(Neuron n);
 
-    static Direction getDirection(Synapse s, Neuron n) {
-        if(n == s.getOutput())
-            return Direction.INPUT;
-        if(n == s.getInput())
-            return Direction.OUTPUT;
-        return null;
-    }
-
     static int compare(Direction a, Direction b) {
         if(a == b) return 0;
         if(a == null) return -1;

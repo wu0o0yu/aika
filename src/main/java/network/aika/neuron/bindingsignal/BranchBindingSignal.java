@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.bindingsignal;
 
+import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -57,15 +58,6 @@ public class BranchBindingSignal extends BindingSignal<BranchBindingSignal> {
                 !iAct.getBranchBindingSignals().containsKey(
                         branchBindingSignal.get().getOriginActivation()
                 );
-    }
-
-    @Override
-    public Stream<? extends Synapse> getTargetSynapses(Neuron fromN, boolean postFired, boolean template) {
-        if(postFired || !(fromN instanceof PatternNeuron))
-            return Stream.empty();
-
-        return fromN.getTargetSynapses(OUTPUT, template)
-                .filter(s -> s instanceof PositiveFeedbackSynapse);
     }
 
     public BranchBindingSignal next() {

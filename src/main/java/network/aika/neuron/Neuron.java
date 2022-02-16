@@ -229,10 +229,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return outputSynapses.containsKey(s.getPOutput());
     }
 
-    public Stream<? extends Synapse> getTargetSynapses(boolean postFired, boolean template) {
-        return getTargetSynapses(postFired ? OUTPUT : INPUT, template);
-    }
-
     public Stream<? extends Synapse> getTargetSynapses(Direction dir, boolean template) {
         return (template ?
                 getTemplateGroup().stream().flatMap(dir::getSynapses) :

@@ -65,7 +65,7 @@ public class Propagate extends Step<Activation> {
             return;
 
         Neuron<?, ?> n = act.getNeuron();
-        targetSynapses = n.getTargetSynapses(true, template)
+        targetSynapses = n.getTargetSynapses(OUTPUT, template)
                 .filter(s ->
                         s.allowPropagate()
                 ).collect(Collectors.toList());

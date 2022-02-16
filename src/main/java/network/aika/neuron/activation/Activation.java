@@ -35,6 +35,8 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.steps.LinkingOrder.POST_FIRED;
 import static network.aika.steps.LinkingOrder.PRE_FIRED;
@@ -283,8 +285,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     protected void onBindingSignalArrived(BindingSignal bs) {
         if(!getNeuron().isNetworkInput()) {
-            Linking.add(this, bs, PRE_FIRED, false);
-            Linking.add(this, bs, PRE_FIRED, true);
+            Linking.add(this, bs, INPUT, PRE_FIRED, false);
+            Linking.add(this, bs, INPUT, PRE_FIRED, true);
         }
 
         if(isFired())
@@ -292,14 +294,14 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     protected void onBindingSignalArrivedFired(BindingSignal bs) {
-        Linking.add(this, bs, POST_FIRED, false);
+        Linking.add(this, bs, OUTPUT, POST_FIRED, false);
 
         if(isFinal())
             onBindingSignalArrivedFinalFired(bs);
     }
 
     protected void onBindingSignalArrivedFinalFired(BindingSignal bs) {
-        Linking.add(this, bs, POST_FIRED, true);
+        Linking.add(this, bs, OUTPUT, POST_FIRED, true);
     }
 
     private void addEntropySteps() {

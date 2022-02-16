@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.bindingsignal;
 
+import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -61,11 +62,6 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
 
     public void setRelated(boolean related) {
         isRelated = related;
-    }
-
-    @Override
-    public Stream<? extends Synapse> getTargetSynapses(Neuron fromN, boolean postFired, boolean template) {
-        return fromN.getTargetSynapses(postFired, template);
     }
 
     public PatternBindingSignal next(boolean isInput, boolean isRelated) {

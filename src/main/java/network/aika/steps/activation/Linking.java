@@ -20,8 +20,8 @@ import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Timestamp;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 import network.aika.steps.LinkingOrder;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
@@ -29,8 +29,6 @@ import network.aika.steps.Step;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static network.aika.direction.Direction.getDirection;
 
 /**
  * The job of the linking phase is to propagate information through the network by creating the required activations and links.
@@ -46,34 +44,39 @@ import static network.aika.direction.Direction.getDirection;
  */
 public class Linking extends Step<Activation> {
 
-    public static void add(Activation act, BindingSignal bindingSignal, LinkingOrder linkingOrder, boolean template) {
+    public static void add(Activation act, BindingSignal bindingSignal, Direction dir, LinkingOrder linkingOrder, boolean template) {
         if(template && !act.getConfig().isTemplatesEnabled())
             return;
 
         if(bindingSignal.isOrigin())
             return;
 
-        Linking step = new Linking(act, bindingSignal, linkingOrder, template);
+        Linking step = new Linking(act, bindingSignal, dir, linkingOrder, template);
 
         if(step.hasTargetSynapses())
             Step.add(step);
     }
 
+    private Direction direction;
     private LinkingOrder linkingOrder;
     private boolean template;
 
-    private Linking(Activation act, BindingSignal<?> bindingSignal, LinkingOrder linkingOrder, boolean template) {
+    private Linking(Activation act, BindingSignal<?> bindingSignal, Direction dir, LinkingOrder linkingOrder, boolean template) {
         super(act);
 
         this.linkingOrder = linkingOrder;
+        this.direction = dir;
         this.template = template;
         this.bindingSignal = bindingSignal;
 
-        this.targetSynapses = bindingSignal.getTargetSynapses(
-                getElement().getNeuron(),
-                linkingOrder == LinkingOrder.POST_FIRED,
-                template
-        ).collect(Collectors.toList());
+        Stream<? extends Synapse> tsyns = getElement().getNeuron()
+                .getTargetSynapses(direction, template);
+
+        if(dir == Direction.OUTPUT && linkingOrder == LinkingOrder.PRE_FIRED) {
+            tsyns = tsyns.filter(ts -> ts instanceof PositiveFeedbackSynapse);
+        }
+
+        this.targetSynapses =  tsyns.collect(Collectors.toList());
     }
 
     private boolean hasTargetSynapses() {
@@ -106,18 +109,17 @@ public class Linking extends Step<Activation> {
 
     private void link(Synapse ts) {
         Activation fromAct = getElement();
-        Direction dir = getDirection(ts, getElement().getNeuron());
-        Neuron toNeuron = dir.getNeuron(ts);
+        Neuron toNeuron = direction.getNeuron(ts);
 
         getRelatedBindingSignal(ts, bindingSignal, toNeuron)
                 .filter(toBS -> bindingSignal != toBS)
                 .filter(toBS ->
-                        checkRelatedBindingSignal(ts, dir, bindingSignal, toBS)
+                        checkRelatedBindingSignal(ts, bindingSignal, toBS)
                 )
                 .map(toBS -> toBS.getActivation())
                 .filter(toAct -> fromAct != toAct)
                 .forEach(toAct ->
-                        link(ts, fromAct, toAct, dir)
+                        link(ts, fromAct, toAct, direction)
                 );
     }
 
@@ -135,9 +137,9 @@ public class Linking extends Step<Activation> {
         return relatedBindingSignals;
     }
 
-    private boolean checkRelatedBindingSignal(Synapse targetSynapse, Direction dir, BindingSignal fromBindingSignal, BindingSignal toBindingSignal) {
-        BindingSignal inputBS = dir.getInput(fromBindingSignal, toBindingSignal);
-        BindingSignal outputBS = dir.getOutput(fromBindingSignal, toBindingSignal);
+    private boolean checkRelatedBindingSignal(Synapse targetSynapse, BindingSignal fromBindingSignal, BindingSignal toBindingSignal) {
+        BindingSignal inputBS = direction.getInput(fromBindingSignal, toBindingSignal);
+        BindingSignal outputBS = direction.getOutput(fromBindingSignal, toBindingSignal);
         return inputBS.checkRelatedBindingSignal(targetSynapse, outputBS);
     }
 
@@ -153,7 +155,7 @@ public class Linking extends Step<Activation> {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(linkingOrder + " " + (template ? "Template " : "")  + getElement() + " - " + bindingSignal.getClass().getSimpleName() + ": " + bindingSignal);
+        sb.append(linkingOrder + " " + direction + " " + (template ? "Template " : "")  + getElement() + " - " + bindingSignal.getClass().getSimpleName() + ": " + bindingSignal);
         targetSynapses.forEach(ts ->
                 sb.append("\n    " + ts)
         );

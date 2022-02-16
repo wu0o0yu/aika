@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.bindingsignal;
 
+import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -39,8 +40,6 @@ public abstract class BindingSignal<B extends BindingSignal> {
                 .map(iBS -> iBS.propagate(l))
                 .filter(oBS -> oBS != null);
     }
-
-    public abstract Stream<? extends Synapse> getTargetSynapses(Neuron fromN, boolean postFired, boolean template);
 
     public abstract boolean checkPropagate();
 

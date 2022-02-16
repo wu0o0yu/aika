@@ -20,12 +20,19 @@ import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.steps.activation.Linking;
 
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.stream.Stream;
+
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.steps.LinkingOrder.PRE_FIRED;
 
 /**
  *
@@ -50,6 +57,16 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
         outputLinks.values().forEach(l ->
                 l.setFinalMode()
         );
+    }
+
+    @Override
+    protected void onBindingSignalArrived(BindingSignal bs) {
+        if(!getNeuron().isNetworkInput() && bs instanceof BranchBindingSignal) {
+            Linking.add(this, bs, OUTPUT, PRE_FIRED, false);
+            Linking.add(this, bs, OUTPUT, PRE_FIRED, true);
+        }
+
+        super.onBindingSignalArrived(bs);
     }
 
     @Override

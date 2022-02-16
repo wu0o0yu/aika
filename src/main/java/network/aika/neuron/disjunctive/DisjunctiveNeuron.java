@@ -50,11 +50,11 @@ public abstract class DisjunctiveNeuron<S extends DisjunctiveSynapse, A extends 
         super(model, addProvider);
     }
 
-    public Stream<? extends Synapse> getTargetSynapses(boolean postFired, boolean template) {
-        if(!postFired)
+    public Stream<? extends Synapse> getTargetSynapses(Direction dir, boolean template) {
+        if(dir == INPUT)
             return Stream.empty();
 
-        return super.getTargetSynapses(true, template);
+        return super.getTargetSynapses(dir, template);
     }
 
     @Override
