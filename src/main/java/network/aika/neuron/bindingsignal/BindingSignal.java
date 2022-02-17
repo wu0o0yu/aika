@@ -30,7 +30,7 @@ import java.util.stream.Stream;
  */
 public abstract class BindingSignal<B extends BindingSignal> {
 
-    protected BindingSignal parent;
+    protected B parent;
     protected Activation activation;
     protected B origin;
     protected byte depth;
@@ -50,6 +50,8 @@ public abstract class BindingSignal<B extends BindingSignal> {
     public abstract boolean exists();
 
     public abstract void link();
+
+    public abstract boolean isOwnPatternBS();
 
     public boolean isOrigin() {
         return this == origin;

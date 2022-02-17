@@ -21,18 +21,23 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.fields.*;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.PatternSynapse;
 import network.aika.steps.activation.BranchProbability;
+import network.aika.steps.activation.Linking;
 import network.aika.utils.Utils;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
+import static network.aika.steps.LinkingOrder.POST_FIRED;
 
 /**
  * @author Lukas Molzberger
@@ -42,6 +47,8 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     protected NavigableMap<Activation<?>, BranchBindingSignal> reverseBindingSignals = new TreeMap<>(NEURON_COMPARATOR);
 
     private Timestamp finalTimestamp = NOT_SET;
+
+    private PatternBindingSignal bound;
 
     private final Set<BindingActivation> branches = new TreeSet<>();
     private BindingActivation mainBranch;
@@ -145,6 +152,60 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         linkClone(clonedAct, excludedSyn);
 
         return clonedAct;
+    }
+
+    @Override
+    protected void onBindingSignalArrived(BindingSignal bs) {
+        if(bs.isOwnPatternBS()) {
+            bound = (PatternBindingSignal) bs;
+            onBound();
+        }
+
+        super.onBindingSignalArrived(bs);
+    }
+
+    @Override
+    protected void onBindingSignalArrivedFired(BindingSignal bs) {
+        Linking.add(this, bs, OUTPUT, POST_FIRED, false, "PATTERN-SYN", s -> s instanceof PatternSynapse);
+
+        if(isFinal())
+            onBindingSignalArrivedFinalFired(bs);
+
+        if(isBound())
+            onBindingSignalArrivedFiredBound(bs);
+
+        if(isFinal() && isBound()) {
+            onBindingSignalArrivedFinalFiredBound(bs);
+        }
+    }
+
+    protected void onBindingSignalArrivedFiredBound(BindingSignal bs) {
+        Linking.add(this, bs, OUTPUT, POST_FIRED, false, "", s -> true);
+
+        if(isFinal())
+            onBindingSignalArrivedFinalFiredBound(bs);
+    }
+
+    protected void onBindingSignalArrivedFinalFiredBound(BindingSignal bs) {
+
+    }
+
+    protected void onBound() {
+
+        if(isFired()) {
+            getBindingSignals()
+                    .forEach(bs ->
+                            onBindingSignalArrivedFiredBound(bs)
+                    );
+        }
+    }
+
+    public boolean isBound() {
+        return bound != null;
+    }
+
+    public PatternBindingSignal getBoundPatternBindingSignal() {
+        return bound;
     }
 
     @Override

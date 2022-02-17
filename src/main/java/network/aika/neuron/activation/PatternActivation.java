@@ -24,13 +24,13 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 import network.aika.steps.activation.Linking;
 
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.steps.LinkingOrder.PRE_FIRED;
 
@@ -62,8 +62,8 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     @Override
     protected void onBindingSignalArrived(BindingSignal bs) {
         if(!getNeuron().isNetworkInput() && bs instanceof BranchBindingSignal) {
-            Linking.add(this, bs, OUTPUT, PRE_FIRED, false);
-            Linking.add(this, bs, OUTPUT, PRE_FIRED, true);
+            Linking.add(this, bs, OUTPUT, PRE_FIRED, false, "POS-FEEDBACK", s -> s instanceof PositiveFeedbackSynapse);
+            Linking.add(this, bs, OUTPUT, PRE_FIRED, true, "POS-FEEDBACK", s -> s instanceof PositiveFeedbackSynapse);
         }
 
         super.onBindingSignalArrived(bs);

@@ -65,6 +65,11 @@ public class BranchBindingSignal extends BindingSignal<BranchBindingSignal> {
     }
 
     @Override
+    public boolean isOwnPatternBS() {
+        return false;
+    }
+
+    @Override
     public boolean checkPropagate() {
         return getActivation().checkPropagateBranchBindingSignal(this);
     }

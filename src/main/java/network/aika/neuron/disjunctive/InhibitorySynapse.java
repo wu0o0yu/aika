@@ -16,11 +16,8 @@
  */
 package network.aika.neuron.disjunctive;
 
-import network.aika.direction.Direction;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.axons.BindingAxon;
-import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.sign.Sign;
 import network.aika.utils.Bound;
@@ -35,6 +32,14 @@ public class InhibitorySynapse extends DisjunctiveSynapse<InhibitorySynapse, Bin
     @Override
     public InhibitoryLink createLink(BindingActivation input, InhibitoryActivation output) {
         return new InhibitoryLink(this, input, output);
+    }
+
+    @Override
+    public boolean matchPatternBindingSignal(PatternBindingSignal transitionedIBS, PatternBindingSignal oBS) {
+        if(!transitionedIBS.isInput())
+            return false;
+
+        return super.matchPatternBindingSignal(transitionedIBS, oBS);
     }
 
     @Override

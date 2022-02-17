@@ -23,6 +23,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.steps.*;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static network.aika.direction.Direction.OUTPUT;
@@ -43,11 +44,11 @@ import static network.aika.steps.LinkingOrder.PROPAGATE;
  */
 public class Propagate extends Step<Activation> {
 
-    public static void add(Activation act, boolean template) {
+    public static void add(Activation act, boolean template, String linkingType, Predicate<Synapse> filter) {
         if(template && !act.getConfig().isTemplatesEnabled())
             return;
 
-        Propagate step = new Propagate(act, template);
+        Propagate step = new Propagate(act, template, linkingType, filter);
 
         if(step.hasTargetSynapses())
             Step.add(step);
@@ -55,11 +56,13 @@ public class Propagate extends Step<Activation> {
 
     private boolean template;
     private List<Synapse> targetSynapses;
+    private String linkingType;
 
-    private Propagate(Activation act, boolean template) {
+    private Propagate(Activation act, boolean template, String linkingType, Predicate<Synapse> filter) {
         super(act);
 
         this.template = template;
+        this.linkingType = linkingType;
 
         if(!act.checkAllowPropagate())
             return;
@@ -68,7 +71,9 @@ public class Propagate extends Step<Activation> {
         targetSynapses = n.getTargetSynapses(OUTPUT, template)
                 .filter(s ->
                         s.allowPropagate()
-                ).collect(Collectors.toList());
+                )
+                .filter(filter)
+                .collect(Collectors.toList());
     }
 
     private boolean hasTargetSynapses() {
@@ -109,7 +114,7 @@ public class Propagate extends Step<Activation> {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(PROPAGATE + " " + (template ? "Template " : "") + getElement());
+        sb.append(linkingType + " " + PROPAGATE + " " + (template ? "Template " : "") + getElement());
         targetSynapses.forEach(ts ->
                 sb.append("\n    " + ts)
         );

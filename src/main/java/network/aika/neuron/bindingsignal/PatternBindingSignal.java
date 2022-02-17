@@ -77,6 +77,11 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
     }
 
     @Override
+    public boolean isOwnPatternBS() {
+        return !isInput && !isRelated;
+    }
+
+    @Override
     public void link() {
         getActivation().registerPatternBindingSignal(this);
         getOriginActivation().registerReverseBindingSignal(getActivation(), this);

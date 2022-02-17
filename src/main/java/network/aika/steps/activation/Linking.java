@@ -21,12 +21,12 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 import network.aika.steps.LinkingOrder;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -44,14 +44,14 @@ import java.util.stream.Stream;
  */
 public class Linking extends Step<Activation> {
 
-    public static void add(Activation act, BindingSignal bindingSignal, Direction dir, LinkingOrder linkingOrder, boolean template) {
+    public static void add(Activation act, BindingSignal bindingSignal, Direction dir, LinkingOrder linkingOrder, boolean template, String linkingType, Predicate<Synapse> filter) {
         if(template && !act.getConfig().isTemplatesEnabled())
             return;
 
         if(bindingSignal.isOrigin())
             return;
 
-        Linking step = new Linking(act, bindingSignal, dir, linkingOrder, template);
+        Linking step = new Linking(act, bindingSignal, dir, linkingOrder, template, linkingType, filter);
 
         if(step.hasTargetSynapses())
             Step.add(step);
@@ -60,23 +60,25 @@ public class Linking extends Step<Activation> {
     private Direction direction;
     private LinkingOrder linkingOrder;
     private boolean template;
+    private String linkingType;
 
-    private Linking(Activation act, BindingSignal<?> bindingSignal, Direction dir, LinkingOrder linkingOrder, boolean template) {
+    private final BindingSignal<?> bindingSignal;
+    private List<Synapse> targetSynapses;
+
+
+    private Linking(Activation act, BindingSignal<?> bindingSignal, Direction dir, LinkingOrder linkingOrder, boolean template, String linkingType, Predicate<Synapse> filter) {
         super(act);
 
         this.linkingOrder = linkingOrder;
         this.direction = dir;
         this.template = template;
         this.bindingSignal = bindingSignal;
+        this.linkingType = linkingType;
 
-        Stream<? extends Synapse> tsyns = getElement().getNeuron()
-                .getTargetSynapses(direction, template);
-
-        if(dir == Direction.OUTPUT && linkingOrder == LinkingOrder.PRE_FIRED) {
-            tsyns = tsyns.filter(ts -> ts instanceof PositiveFeedbackSynapse);
-        }
-
-        this.targetSynapses =  tsyns.collect(Collectors.toList());
+        Neuron<?, ?> n = getElement().getNeuron();
+        this.targetSynapses = n.getTargetSynapses(direction, template)
+                .filter(filter)
+                .collect(Collectors.toList());
     }
 
     private boolean hasTargetSynapses() {
@@ -87,9 +89,6 @@ public class Linking extends Step<Activation> {
     public LinkingOrder getLinkingOrder() {
         return linkingOrder;
     }
-
-    private final BindingSignal<?> bindingSignal;
-    private List<Synapse> targetSynapses;
 
     @Override
     public Phase getPhase() {
@@ -155,7 +154,7 @@ public class Linking extends Step<Activation> {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(linkingOrder + " " + direction + " " + (template ? "Template " : "")  + getElement() + " - " + bindingSignal.getClass().getSimpleName() + ": " + bindingSignal);
+        sb.append(linkingType + " " + linkingOrder + " " + direction + " " + (template ? "Template " : "")  + getElement() + " - " + bindingSignal.getClass().getSimpleName() + ": " + bindingSignal);
         targetSynapses.forEach(ts ->
                 sb.append("\n    " + ts)
         );

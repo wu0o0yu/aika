@@ -74,6 +74,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return transitionedIBS != null && transitionedIBS.match(oBS);
     }
 
+    public boolean matchPatternBindingSignal(PatternBindingSignal transitionedIBS, PatternBindingSignal oBS) {
+        return transitionedIBS.match(oBS);
+    }
+
     public boolean checkLinkingPreConditions(IA iAct, OA oAct) {
         if(!iAct.isFired())
             return false;

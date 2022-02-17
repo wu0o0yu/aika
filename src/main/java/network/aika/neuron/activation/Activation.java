@@ -254,7 +254,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         if(isTemplate())
             Induction.add(this);
 
-        Propagate.add(this, false);
+        Propagate.add(this, false, "", s -> true);
 
         if(isFinal())
             onFinalFired();
@@ -268,10 +268,15 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected void onFinal() {
         if(isFired())
             onFinalFired();
+
+        getBindingSignals()
+                .forEach(bs ->
+                        onBindingSignalArrivedFinal(bs)
+                );
     }
 
     protected void onFinalFired() {
-        Propagate.add(this, true);
+        Propagate.add(this, true, "", s -> true);
 
         addEntropySteps();
         addFeedbackSteps();
@@ -285,23 +290,31 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     protected void onBindingSignalArrived(BindingSignal bs) {
         if(!getNeuron().isNetworkInput()) {
-            Linking.add(this, bs, INPUT, PRE_FIRED, false);
-            Linking.add(this, bs, INPUT, PRE_FIRED, true);
+            Linking.add(this, bs, INPUT, PRE_FIRED, false, "", s -> true);
         }
 
         if(isFired())
             onBindingSignalArrivedFired(bs);
+
+        if(isFinal())
+            onBindingSignalArrivedFinal(bs);
+    }
+
+    protected void onBindingSignalArrivedFinal(BindingSignal bs) {
+        if(!getNeuron().isNetworkInput()) {
+            Linking.add(this, bs, INPUT, PRE_FIRED, true, "", s -> true);
+        }
     }
 
     protected void onBindingSignalArrivedFired(BindingSignal bs) {
-        Linking.add(this, bs, OUTPUT, POST_FIRED, false);
+        Linking.add(this, bs, OUTPUT, POST_FIRED, false, "", s -> true);
 
         if(isFinal())
             onBindingSignalArrivedFinalFired(bs);
     }
 
     protected void onBindingSignalArrivedFinalFired(BindingSignal bs) {
-        Linking.add(this, bs, OUTPUT, POST_FIRED, true);
+        Linking.add(this, bs, OUTPUT, POST_FIRED, true, "", s -> true);
     }
 
     private void addEntropySteps() {
