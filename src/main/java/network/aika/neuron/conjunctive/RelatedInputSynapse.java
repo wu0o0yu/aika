@@ -16,11 +16,9 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.PrimaryInputBNLink;
-import network.aika.neuron.axons.PatternAxon;
+import network.aika.neuron.activation.RelatedInputLink;
+import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 
 
@@ -28,25 +26,26 @@ import network.aika.neuron.bindingsignal.PatternBindingSignal;
  *
  * @author Lukas Molzberger
  */
-public class PrimaryInputBNSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends BindingNeuronSynapse<PrimaryInputBNSynapse, I, PrimaryInputBNLink<IA>, IA> {
+public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynapse, BindingNeuron, RelatedInputLink, BindingActivation> {
 
-    public PrimaryInputBNLink createLink(IA input, BindingActivation output) {
-        return new PrimaryInputBNLink(this, input, output);
+    @Override
+    public RelatedInputLink createLink(BindingActivation input, BindingActivation output) {
+        return new RelatedInputLink(this, input, output);
     }
 
     @Override
     public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS, boolean propagate) {
-        if(iBS.isInput() || iBS.isRelated())
+        if(iBS.isRelated())
             return null;
 
-        return iBS.next(true, false);
+        if(iBS.isInput())
+            return iBS.next(true, true); // Related Binding-Signal
+        else
+            return iBS.next(true, false); // Own Binding-Signal
     }
 
     @Override
-    public boolean checkLinkingPreConditions(IA iAct, BindingActivation oAct) {
-        if(oAct.checkIfPrimaryInputBNLinkAlreadyExists())
-            return false;
-
-        return super.checkLinkingPreConditions(iAct, oAct);
+    public BranchBindingSignal transitionBranchBindingSignal(BranchBindingSignal iBS) {
+        return null;
     }
 }

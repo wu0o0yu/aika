@@ -42,10 +42,10 @@ public class Templates {
     public CategoryNeuron CATEGORY_TEMPLATE = new CategoryNeuron();
 
 
-    public PrimaryInputBNSynapse PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE;
-    public PrimaryInputBNSynapse PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE;
-    public RelatedInputBNSynapse RELATED_INPUT_SYNAPSE_TEMPLATE;
-    public SamePatternBNSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
+    public PrimaryInputSynapse PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE;
+    public PrimaryInputSynapse PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE;
+    public RelatedInputSynapse RELATED_INPUT_SYNAPSE_TEMPLATE;
+    public SamePatternSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
     public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE;
     public NegativeFeedbackSynapse NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE;
     public PatternSynapse PATTERN_SYNAPSE_TEMPLATE;
@@ -78,7 +78,7 @@ public class Templates {
 
         PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE =
                 init(
-                        new PrimaryInputBNSynapse(),
+                        new PrimaryInputSynapse(),
                         INPUT_PATTERN_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Primary Input Synapse from Pattern",
@@ -89,7 +89,7 @@ public class Templates {
 
         PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE =
                 init(
-                        new PrimaryInputBNSynapse(),
+                        new PrimaryInputSynapse(),
                         CATEGORY_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Primary Input Synapse from Category",
@@ -101,7 +101,7 @@ public class Templates {
 
         RELATED_INPUT_SYNAPSE_TEMPLATE =
                 init(
-                        new RelatedInputBNSynapse(),
+                        new RelatedInputSynapse(),
                         INPUT_BINDING_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Related Input Synapse",
@@ -111,7 +111,7 @@ public class Templates {
 
         SAME_PATTERN_SYNAPSE_TEMPLATE =
                 init(
-                        new SamePatternBNSynapse(),
+                        new SamePatternSynapse(),
                         BINDING_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Same Pattern Synapse",

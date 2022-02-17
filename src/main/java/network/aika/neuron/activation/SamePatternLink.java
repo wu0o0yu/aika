@@ -16,14 +16,14 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.conjunctive.SamePatternBNSynapse;
+import network.aika.neuron.conjunctive.SamePatternSynapse;
 
 /**
  * @author Lukas Molzberger
  */
-public class SamePatternBNLink extends BindingNeuronLink<SamePatternBNSynapse, BindingActivation> {
+public class SamePatternLink extends BindingNeuronLink<SamePatternSynapse, BindingActivation> {
 
-    public SamePatternBNLink(SamePatternBNSynapse s, BindingActivation input, BindingActivation output) {
+    public SamePatternLink(SamePatternSynapse s, BindingActivation input, BindingActivation output) {
         super(s, input, output);
     }
 }

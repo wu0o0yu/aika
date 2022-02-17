@@ -16,14 +16,14 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.conjunctive.RelatedInputBNSynapse;
+import network.aika.neuron.conjunctive.RelatedInputSynapse;
 
 /**
  * @author Lukas Molzberger
  */
-public class RelatedInputBNLink extends BindingNeuronLink<RelatedInputBNSynapse, BindingActivation> {
+public class RelatedInputLink extends BindingNeuronLink<RelatedInputSynapse, BindingActivation> {
 
-    public RelatedInputBNLink(RelatedInputBNSynapse s, BindingActivation input, BindingActivation output) {
+    public RelatedInputLink(RelatedInputSynapse s, BindingActivation input, BindingActivation output) {
         super(s, input, output);
     }
 }

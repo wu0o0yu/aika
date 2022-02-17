@@ -16,9 +16,11 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.RelatedInputBNLink;
-import network.aika.neuron.bindingsignal.BranchBindingSignal;
+import network.aika.neuron.activation.PrimaryInputLink;
+import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 
 
@@ -26,26 +28,25 @@ import network.aika.neuron.bindingsignal.PatternBindingSignal;
  *
  * @author Lukas Molzberger
  */
-public class RelatedInputBNSynapse extends BindingNeuronSynapse<RelatedInputBNSynapse, BindingNeuron, RelatedInputBNLink, BindingActivation> {
+public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends BindingNeuronSynapse<PrimaryInputSynapse, I, PrimaryInputLink<IA>, IA> {
 
-    @Override
-    public RelatedInputBNLink createLink(BindingActivation input, BindingActivation output) {
-        return new RelatedInputBNLink(this, input, output);
+    public PrimaryInputLink createLink(IA input, BindingActivation output) {
+        return new PrimaryInputLink(this, input, output);
     }
 
     @Override
     public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS, boolean propagate) {
-        if(iBS.isRelated())
+        if(iBS.isInput() || iBS.isRelated())
             return null;
 
-        if(iBS.isInput())
-            return iBS.next(true, true); // Related Binding-Signal
-        else
-            return iBS.next(true, false); // Own Binding-Signal
+        return iBS.next(true, false);
     }
 
     @Override
-    public BranchBindingSignal transitionBranchBindingSignal(BranchBindingSignal iBS) {
-        return null;
+    public boolean checkLinkingPreConditions(IA iAct, BindingActivation oAct) {
+        if(oAct.checkIfPrimaryInputBNLinkAlreadyExists())
+            return false;
+
+        return super.checkLinkingPreConditions(iAct, oAct);
     }
 }

@@ -18,29 +18,27 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.SamePatternBNLink;
+import network.aika.neuron.activation.SamePatternLink;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static network.aika.neuron.bindingsignal.BranchBindingSignal.isSeparateBranch;
-
 /**
  * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
  *
  * @author Lukas Molzberger
  */
-public class SamePatternBNSynapse extends BindingNeuronSynapse<SamePatternBNSynapse, BindingNeuron, SamePatternBNLink, BindingActivation> {
+public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse, BindingNeuron, SamePatternLink, BindingActivation> {
 
     private int looseLinkingRange;
     private boolean allowLooseLinking;
 
 
     @Override
-    public SamePatternBNLink createLink(BindingActivation input, BindingActivation output) {
-        return new SamePatternBNLink(this, input, output);
+    public SamePatternLink createLink(BindingActivation input, BindingActivation output) {
+        return new SamePatternLink(this, input, output);
     }
 
     @Override

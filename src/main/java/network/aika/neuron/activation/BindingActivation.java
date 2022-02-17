@@ -263,6 +263,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     public boolean checkIfPrimaryInputBNLinkAlreadyExists() {
         return inputLinks.values().stream()
-                .anyMatch(l -> l instanceof PrimaryInputBNLink<?>);
+                .anyMatch(l -> l instanceof PrimaryInputLink<?>);
     }
 }
