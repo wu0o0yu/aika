@@ -35,14 +35,6 @@ public class InhibitorySynapse extends DisjunctiveSynapse<InhibitorySynapse, Bin
     }
 
     @Override
-    public boolean matchPatternBindingSignal(PatternBindingSignal transitionedIBS, PatternBindingSignal oBS) {
-        if(!transitionedIBS.isInput())
-            return false;
-
-        return super.matchPatternBindingSignal(transitionedIBS, oBS);
-    }
-
-    @Override
     protected Bound getProbabilityBound(Sign si, Sign so) {
         return so == Sign.POS ? Bound.LOWER : Bound.UPPER;
     }

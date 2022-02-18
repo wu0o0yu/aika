@@ -47,14 +47,21 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     }
 
     @Override
+    public boolean isRecurrent() {
+        return true;
+    }
+
+    @Override
     protected void checkConstraints() {
         assert isNegative();
     }
 
     @Override
     public boolean checkLinkingPreConditions(InhibitoryActivation iAct, BindingActivation oAct) {
- //       if(isSeparateBranch(iAct, oAct))
- //           return false;
+//        if(isSeparateBranch(iAct, oAct))
+//            return false;
+        if(oAct.isSeparateBranch(iAct))
+            return false;
 
         if(!iAct.isFired())
             return false;

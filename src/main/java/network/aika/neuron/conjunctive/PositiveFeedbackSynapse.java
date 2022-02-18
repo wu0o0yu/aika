@@ -52,6 +52,11 @@ public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PositiveFeedba
     }
 
     @Override
+    public boolean isRecurrent() {
+        return true;
+    }
+
+    @Override
     public boolean checkRelatedBranchBindingSignal(BranchBindingSignal iBS, BranchBindingSignal oBS) {
         return iBS.getOrigin() == oBS;
     }

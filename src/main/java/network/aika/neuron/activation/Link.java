@@ -216,6 +216,10 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         return getSynapse().isTemplate();
     }
 
+    public boolean isRecurrent() {
+        return synapse.isRecurrent();
+    }
+
     public boolean isCausal() {
         return input == null || isCausal(input, output);
     }

@@ -326,4 +326,16 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         return inputLinks.values().stream()
                 .anyMatch(l -> l instanceof PrimaryInputLink<?>);
     }
+
+    public boolean isSeparateBranch(InhibitoryActivation iAct) {
+        if(isMainBranch())
+            return false;
+
+        return iAct.getBranchBindingSignals().values().stream()
+                .anyMatch(bbs -> bbs.getOriginActivation() == mainBranch);
+    }
+
+    public boolean isMainBranch() {
+        return mainBranch == null;
+    }
 }

@@ -69,13 +69,13 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return false;
     }
 
+    public boolean isRecurrent() {
+        return false;
+    }
+
     public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
         PatternBindingSignal transitionedIBS = transitionPatternBindingSignal(iBS, false);
         return transitionedIBS != null && transitionedIBS.match(oBS);
-    }
-
-    public boolean matchPatternBindingSignal(PatternBindingSignal transitionedIBS, PatternBindingSignal oBS) {
-        return transitionedIBS.match(oBS);
     }
 
     public boolean checkLinkingPreConditions(IA iAct, OA oAct) {

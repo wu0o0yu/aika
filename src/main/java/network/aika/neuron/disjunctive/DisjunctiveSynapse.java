@@ -21,12 +21,9 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.DisjunctiveActivation;
-import network.aika.neuron.activation.InhibitoryActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.axons.Axon;
-import network.aika.neuron.axons.BindingAxon;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.sign.Sign;
 import network.aika.utils.Bound;
 
@@ -40,6 +37,11 @@ public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends
     @Override
     public boolean allowPropagate() {
         return true;
+    }
+
+    @Override
+    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
+        return false;
     }
 
     @Override
