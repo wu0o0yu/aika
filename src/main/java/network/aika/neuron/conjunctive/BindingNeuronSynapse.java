@@ -33,4 +33,11 @@ public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I ext
 
         return super.checkLinkingPreConditions(iAct, oAct);
     }
+
+    protected boolean checkCommonLinkingPreConditions(IA iAct, BindingActivation oAct) {
+        if(!oAct.isMainBranch() && iAct.isBoundToConflictingBS(oAct.getMainBranch().getBoundPatternBindingSignal()))
+            return false;
+
+        return super.checkCommonLinkingPreConditions(iAct, oAct);
+    }
 }

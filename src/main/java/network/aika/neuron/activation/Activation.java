@@ -140,6 +140,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         });
     }
 
+    public abstract boolean isBoundToConflictingBS(BindingSignal bs);
+
     public boolean checkPropagatePatternBindingSignal(PatternBindingSignal bs) {
         return true;
     }
@@ -432,16 +434,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public NeuronProvider getNeuronProvider() {
         return neuron.getProvider();
-    }
-
-    protected void linkClone(Activation clonedAct, Synapse excludedSyn) {
-        inputLinks
-                .values()
-                .stream()
-                .filter(l -> l.getSynapse() != excludedSyn)
-                .forEach(l ->
-                        l.getSynapse().createLink(l.getInput(), clonedAct)
-                );
     }
 
     public void setInputValue(double v) {

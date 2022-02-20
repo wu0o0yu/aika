@@ -44,6 +44,11 @@ public class CategoryActivation extends DisjunctiveActivation<CategoryNeuron> {
                 .getRange();
     }
 
+    @Override
+    public boolean isBoundToConflictingBS(BindingSignal conflictingBS) {
+        return false;
+    }
+
     private BindingSignal getPrimaryPatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
                 .filter(bs -> !bs.isInput() && !bs.isRelated())

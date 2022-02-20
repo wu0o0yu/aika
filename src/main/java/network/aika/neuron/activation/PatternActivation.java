@@ -70,6 +70,11 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     }
 
     @Override
+    public boolean isBoundToConflictingBS(BindingSignal conflictingBS) {
+        return conflictingBS != null && conflictingBS.getOriginActivation() == this;
+    }
+
+    @Override
     public boolean checkAllowPropagate() {
         return super.checkAllowPropagate();
     }

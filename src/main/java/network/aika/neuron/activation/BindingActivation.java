@@ -25,6 +25,7 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 import network.aika.neuron.conjunctive.PatternSynapse;
 import network.aika.steps.activation.BranchProbability;
 import network.aika.steps.activation.Linking;
@@ -122,6 +123,11 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         return super.checkAllowPropagate();
     }
 
+    @Override
+    public boolean isBoundToConflictingBS(BindingSignal conflictingBS) {
+        return BindingSignal.originEquals(conflictingBS, bound);
+    }
+
     public boolean checkPropagateBranchBindingSignal(BranchBindingSignal bs) {
         return bs.getOriginActivation() == this;
     }
@@ -142,16 +148,27 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
             ownOutputGradient.addAndTriggerUpdate(ownOutputGradientMul.getUpdate(2));
     }
 
-    public BindingActivation createBranch(Synapse excludedSyn) {
+    public BindingActivation createBranch(NegativeFeedbackSynapse excludedSyn) {
         BindingActivation clonedAct = getNeuron().createActivation(getThought());
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
         clonedAct.init(null, this);
 
         copySteps(clonedAct);
-        linkClone(clonedAct, excludedSyn);
+        copyBindingSignals(clonedAct);
+//        linkClone(clonedAct, excludedSyn);
 
         return clonedAct;
+    }
+
+    private void copyBindingSignals(BindingActivation clonedAct) {
+        getPatternBindingSignals().values().stream()
+                .filter(bs -> !bs.isOwnPatternBS())
+                .forEach(bs ->
+                        clonedAct.addBindingSignal(
+                                bs.clone(clonedAct)
+                        )
+                );
     }
 
     @Override

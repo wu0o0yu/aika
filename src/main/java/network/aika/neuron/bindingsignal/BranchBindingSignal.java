@@ -47,19 +47,6 @@ public class BranchBindingSignal extends BindingSignal<BranchBindingSignal> {
         this.depth = (byte) (getDepth() + 1);
     }
 
-    public static boolean isSeparateBranch(Activation<?> iAct, Activation<?> oAct) {
-        Optional<BranchBindingSignal> branchBindingSignal = oAct.getBranchBindingSignals()
-                .values()
-                .stream()
-                .filter(bs -> bs.getDepth() > 0)
-                .findAny();
-
-        return branchBindingSignal.isPresent() &&
-                !iAct.getBranchBindingSignals().containsKey(
-                        branchBindingSignal.get().getOriginActivation()
-                );
-    }
-
     public BranchBindingSignal next() {
         return new BranchBindingSignal(this);
     }
@@ -67,6 +54,13 @@ public class BranchBindingSignal extends BindingSignal<BranchBindingSignal> {
     @Override
     public boolean isOwnPatternBS() {
         return false;
+    }
+
+    @Override
+    public BranchBindingSignal clone(Activation act) {
+        BranchBindingSignal c = new BranchBindingSignal(parent);
+        c.activation = act;
+        return c;
     }
 
     @Override

@@ -53,6 +53,11 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
         return null;
     }
 
+    @Override
+    public boolean isBoundToConflictingBS(BindingSignal conflictingBS) {
+        return false;
+    }
+
     private BindingSignal getPrimaryBranchBindingSignal() {
         return getBranchBindingSignals().values().stream()
                 .filter(bs -> bs.getDepth() == 1)

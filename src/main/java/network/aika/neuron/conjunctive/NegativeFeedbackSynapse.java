@@ -17,11 +17,9 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.*;
-import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 
-import static network.aika.neuron.bindingsignal.BranchBindingSignal.isSeparateBranch;
 
 /**
  *

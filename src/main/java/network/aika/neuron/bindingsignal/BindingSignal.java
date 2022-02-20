@@ -51,6 +51,8 @@ public abstract class BindingSignal<B extends BindingSignal> {
 
     public abstract void link();
 
+    public abstract B clone(Activation act);
+
     public abstract boolean isOwnPatternBS();
 
     public boolean isOrigin() {
@@ -69,6 +71,10 @@ public abstract class BindingSignal<B extends BindingSignal> {
 
     public byte getDepth() {
         return depth;
+    }
+
+    public static boolean originEquals(BindingSignal bsA, BindingSignal bsB) {
+        return bsA != null && bsB != null && bsA.getOrigin() == bsB.getOrigin();
     }
 
     public String toString() {

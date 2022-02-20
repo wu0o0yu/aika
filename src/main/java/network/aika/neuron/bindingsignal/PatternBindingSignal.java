@@ -96,6 +96,13 @@ public class PatternBindingSignal extends BindingSignal<PatternBindingSignal> {
     }
 
     @Override
+    public PatternBindingSignal clone(Activation act) {
+        PatternBindingSignal c = new PatternBindingSignal(parent, isInput, isRelated);
+        c.activation = act;
+        return c;
+    }
+
+    @Override
     public boolean checkPropagate() {
         return getActivation().checkPropagatePatternBindingSignal(this);
     }
