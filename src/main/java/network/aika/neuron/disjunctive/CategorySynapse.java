@@ -27,9 +27,16 @@ import network.aika.neuron.axons.PatternAxon;
  */
 public class CategorySynapse<N extends Neuron & PatternAxon> extends DisjunctiveSynapse<CategorySynapse, N, CategoryNeuron, CategoryLink, PatternActivation, CategoryActivation> {
 
-
     @Override
     public CategoryLink createLink(PatternActivation input, CategoryActivation output) {
         return new CategoryLink(this, input, output);
+    }
+
+    @Override
+    public boolean checkTemplateLinkingPreConditions(PatternActivation iAct, CategoryActivation oAct) {
+        if(iAct.getNeuron().isNetworkInput())
+            return false;
+
+        return super.checkTemplateLinkingPreConditions(iAct, oAct);
     }
 }

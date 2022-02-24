@@ -1,6 +1,6 @@
 package network.aika;
 
-import network.aika.debugger.AikaDebugger;
+import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.Templates;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
@@ -36,7 +36,7 @@ public class OscillationTest {
         BindingNeuron nPPA = createNeuron(t.BINDING_TEMPLATE, "B-A");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, nA, nPPA, 0.3);
 
-        AikaDebugger.createAndShowGUI(doc);
+        AIKADebugger.createAndShowGUI(doc);
 
         doc.addToken(nA, 0, 1);
         doc.process();

@@ -35,6 +35,7 @@ public class PositiveFeedbackLink extends BindingNeuronLink<PositiveFeedbackSyna
 
     protected void initWeightInput() {
         combinedWeight = new SwitchField(
+                "combinedWeight",
                 () -> input.isFinal(),
                 synapse.getWeight(),
                 synapse.getFeedbackWeight()

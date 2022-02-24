@@ -37,6 +37,8 @@ import java.util.stream.Stream;
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.fields.FieldUtils.func;
+import static network.aika.fields.FieldUtils.mul;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.steps.LinkingOrder.POST_FIRED;
 import static network.aika.steps.LinkingOrder.PRE_FIRED;
@@ -62,7 +64,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected boolean isInput;
     private boolean finalMode = false;
 
-    protected Field value = new Field();
+    protected Field value = new Field("value");
     protected Field net = new QueueField(this, "net");
 
     protected Map<NeuronProvider, Link> inputLinks;
@@ -75,16 +77,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
             Comparator.comparing(Activation::getId)
     );
 
-    private Field entropy = new Field();
-    protected Field inputGradient = new QueueField(this, "inputGradient");
-
-    protected MultiSourceFieldOutput outputGradientMul = new FieldMultiplication(
-            inputGradient,
-            new FieldFunction(net, x ->
-                    getNeuron().getActivationFunction().outerGrad(x)
-            )
-    );
-    protected Field outputGradient = new QueueField(this, "outputGradient");
+    private Field entropy = new Field("Entropy");
+    protected Field inputGradient = new QueueField(this, "Input-Gradient");
+    protected Field outputGradient = new QueueField(this, "Output-Gradient");
 
     protected Activation(int id, N n) {
         this.id = id;
@@ -95,23 +90,36 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
-        entropy.setFieldListener(u -> receiveOwnGradientUpdate(u));
+        entropy.addFieldListener(u -> receiveOwnGradientUpdate(u));
 
-        initNet();
+        net.setPropagatePreCondition((cv, nv, u) ->
+                !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0)
+        );
+        net.add(getNeuron().getBias().getCurrentValue());
 
-        value.setFieldListener(u ->
+        net.addFieldListener(u -> {
+            if (net.getNewValue() > 0.0)
+                setFired();
+        });
+
+        initFields();
+
+        value.addFieldListener(u ->
                 getOutputLinks()
                         .forEach(l -> l.propagateValue())
         );
 
-        inputGradient.setFieldListener(u -> {
-                    if (outputGradientMul.updateAvailable(1))
-                        outputGradient.addAndTriggerUpdate(outputGradientMul.getUpdate(1));
-                }
+        mul(
+                "ig * f'(net)",
+                inputGradient,
+                new FieldFunction("f'(net)", net, x ->
+                        getNeuron().getActivationFunction().outerGrad(x)
+                ),
+                outputGradient
         );
 
-        outputGradient.setFieldListener(u ->
-                propagateGradient(u, true, true)
+        outputGradient.addFieldListener(g ->
+                getNeuron().getBias().addAndTriggerUpdate(getConfig().getLearnRate() * g)
         );
 
         thought.register(this);
@@ -121,24 +129,23 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
     }
 
-    private void initNet() {
-        net.setPropagatePreCondition((cv, nv, u) ->
-                !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0)
+    protected void initFields() {
+        if (!isInput)
+            func(
+                    "f(net)",
+                    net,
+                    x -> getActivationFunction().f(x),
+                    value
+            );
+
+        outputGradient.addFieldListener(u ->
+                updateWeights(u)
         );
-        net.add(getNeuron().getBias().getCurrentValue());
-
-        net.setFieldListener(u -> {
-            double v = net.getNewValue();
-            updateValue(v);
-
-            propagateGradient();
-
-            if (net.getCurrentValue() <= 0.0)
-                return;
-
-            setFired();
-        });
+        outputGradient.addFieldListener(u ->
+                propagateGradient()
+        );
     }
+
 
     public abstract boolean isBoundToConflictingBS(BindingSignal bs);
 
@@ -150,30 +157,16 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return true;
     }
 
-    protected void updateValue(double net) {
-        if(!isInput)
-            value.setAndTriggerUpdate(getActivationFunction().f(net));
-    }
-
     protected void propagateGradient() {
-        if(outputGradientMul.updateAvailable(2))
-            outputGradient.addAndTriggerUpdate(outputGradientMul.getUpdate(2));
+        inputLinks.values().stream()
+                .filter(l -> l.getSynapse().isAllowTraining())
+                .forEach(l -> l.backPropagate());
     }
 
-    protected void propagateGradient(double g, boolean updateWeights, boolean backPropagate) {
-        getNeuron().getBias().addAndTriggerUpdate(getConfig().getLearnRate() * g);
-
-        inputLinks.values().forEach(l -> {
-                    if (!l.getSynapse().isAllowTraining())
-                        return;
-
-                    if (updateWeights)
-                        l.updateWeight(g);
-
-                    if (backPropagate)
-                        l.backPropagate();
-                }
-        );
+    protected void updateWeights(double g) {
+        inputLinks.values().stream()
+                .filter(l -> l.getSynapse().isAllowTraining())
+                .forEach(l -> l.updateWeight(g));
     }
 
     public void init(Synapse originSynapse, Activation originAct) {
@@ -192,8 +185,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     public void updateBias(double u) {
         getNet().addAndTriggerUpdate(u);
     }
-
-    public void addFeedbackSteps() {}
 
     public int getId() {
         return id;
@@ -281,7 +272,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         Propagate.add(this, true, "", s -> true);
 
         addEntropySteps();
-        addFeedbackSteps();
         addCountingSteps();
 
         getBindingSignals()

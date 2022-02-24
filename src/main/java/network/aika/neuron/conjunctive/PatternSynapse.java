@@ -40,4 +40,12 @@ public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNe
     public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
         return iBS.getOrigin() == oBS;
     }
+
+    @Override
+    public boolean checkTemplateLinkingPreConditions(BindingActivation iAct, PatternActivation oAct) {
+        if(iAct.getNeuron().isNetworkInput())
+            return false;
+
+        return super.checkTemplateLinkingPreConditions(iAct, oAct);
+    }
 }

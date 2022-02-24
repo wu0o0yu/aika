@@ -21,6 +21,8 @@ package network.aika.fields;
  */
 public interface FieldOutput {
 
+    String getLabel();
+
     double getCurrentValue();
 
     double getNewValue();
@@ -29,7 +31,7 @@ public interface FieldOutput {
 
     double getUpdate();
 
-    void acknowledgePropagated();
+    void addFieldListener(FieldUpdateEvent fieldListener);
 
     static double getCurrentValue(FieldOutput f) {
         return f != null ? f.getCurrentValue() : 0.0;

@@ -28,6 +28,8 @@ import network.aika.steps.link.PropagateBindingSignal;
 import java.util.Comparator;
 
 import static network.aika.fields.ConstantField.ZERO;
+import static network.aika.fields.FieldUtils.mul;
+import static network.aika.fields.FieldUtils.mulUnregistered;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
 
 /**
@@ -45,23 +47,23 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
     protected final I input;
     protected final O output;
 
-    private Field igGradient = new Field();
-    private MultiSourceFieldOutput weightedInput = ZERO;
-    private MultiSourceFieldOutput backPropGradient;
+    private Field igGradient = new Field("Information-Gain gradient");
+    private BiFunction weightedInput;
+    private BiFunction backPropGradient;
 
     public Link(S s, I input, O output) {
         this.synapse = s;
         this.input = input;
         this.output = output;
 
-        igGradient.setFieldListener(u ->
+        igGradient.addFieldListener(u ->
                 output.receiveOwnGradientUpdate(u)
         );
 
         if(input != null)
             initWeightInput();
 
-        backPropGradient = new FieldMultiplication(output.outputGradient, getWeightOutput());
+        backPropGradient = mulUnregistered("oAct.og * s.weight", output.outputGradient, getWeightOutput());
 
         init();
 
@@ -69,7 +71,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
     }
 
     protected void initWeightInput() {
-        weightedInput = new FieldMultiplication(input.getValue(), getWeightOutput());
+        weightedInput = mulUnregistered("iAct.value * s.weight", input.getValue(), getWeightOutput());
     }
 
     public void init() {
@@ -102,11 +104,11 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         return synapse.getWeight();
     }
 
-    public MultiSourceFieldOutput getWeightedInput() {
+    public FieldOutput getWeightedInput() {
         return weightedInput;
     }
 
-    public MultiSourceFieldOutput getBackPropGradient() {
+    public FieldOutput getBackPropGradient() {
         return backPropGradient;
     }
 
@@ -122,18 +124,12 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
     }
 
     public void backPropagate() {
-        input.getInputGradient().addAndTriggerUpdate(
-                backPropGradient.getUpdate(1)
-        );
+        backPropGradient.triggerUpdate(1);
     }
 
     public void receiveWeightUpdate() {
-        output.getNet().addAndTriggerUpdate(
-                weightedInput.getUpdate(2)
-        );
-        input.getInputGradient().addAndTriggerUpdate(
-                backPropGradient.getUpdate(2)
-        );
+        weightedInput.triggerUpdate(2);
+        backPropGradient.triggerUpdate(2);
     }
 
     @Override
@@ -239,17 +235,11 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
     }
 
     public void propagateValue() {
-        output.getNet().addAndTriggerUpdate(
-                getOutputValueUpdate()
-        );
+        weightedInput.triggerUpdate(1);
     }
 
     public double getOutputValue() {
-        return getWeightedInput().getCurrentValue();
-    }
-
-    public double getOutputValueUpdate() {
-        return getWeightedInput().getUpdate(1);
+        return weightedInput != null ? weightedInput.getCurrentValue() : 0.0;
     }
 
     public void setFinalMode() {

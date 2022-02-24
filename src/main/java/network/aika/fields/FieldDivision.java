@@ -19,28 +19,28 @@ package network.aika.fields;
 /**
  * @author Lukas Molzberger
  */
-public class FieldMultiplication extends BiFunction {
+public class FieldDivision extends BiFunction {
 
-    public FieldMultiplication(String label, FieldOutput in1, boolean register1, FieldOutput in2, boolean register2) {
+    public FieldDivision(String label, FieldOutput in1, boolean register1, FieldOutput in2, boolean register2) {
         super(label, in1, register1, in2, register2);
     }
 
-    public FieldMultiplication(String label, FieldOutput in1, boolean register1, FieldOutput in2, boolean register2, FieldInput out) {
+    public FieldDivision(String label, FieldOutput in1, boolean register1, FieldOutput in2, boolean register2, FieldInput out) {
         super(label, in1, register1, in2, register2, out);
     }
 
     @Override
     public double getCurrentValue() {
-        return FieldOutput.getCurrentValue(in1) * FieldOutput.getCurrentValue(in2);
+        return FieldOutput.getCurrentValue(in1) / FieldOutput.getCurrentValue(in2);
     }
 
     @Override
     public double getNewValue() {
         switch (currentArgument) {
             case 1:
-                return in1.getNewValue() * in2.getCurrentValue();
+                return in1.getNewValue() / in2.getCurrentValue();
             case 2:
-                return in1.getCurrentValue() * in2.getNewValue();
+                return in1.getCurrentValue() / in2.getNewValue();
             default:
                 throw new IllegalArgumentException();
         }
@@ -49,12 +49,15 @@ public class FieldMultiplication extends BiFunction {
     public double getUpdate() {
         switch (currentArgument) {
             case 1:
-                if (in1.updateAvailable())
-                    return in1.getUpdate() * FieldOutput.getCurrentValue(in2);
+                if (in1.updateAvailable()) {
+                    double v2 = FieldOutput.getCurrentValue(in2);
+                    return (in1.getUpdate() * v2) / Math.pow(v2, 2.0);
+                }
                 break;
             case 2:
-                if (in2.updateAvailable())
-                    return in2.getUpdate() * FieldOutput.getCurrentValue(in1);
+                if (in2.updateAvailable()) {
+                    return -(in2.getUpdate() * FieldOutput.getCurrentValue(in1)) / Math.pow(FieldOutput.getCurrentValue(in2), 2.0);
+                }
                 break;
             default:
                 throw new IllegalArgumentException();

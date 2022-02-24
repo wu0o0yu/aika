@@ -21,14 +21,42 @@ import java.util.function.Function;
 /**
  * @author Lukas Molzberger
  */
-public class FieldFunction implements FieldOutput {
+public class FieldFunction extends FieldListener implements FieldOutput {
 
-    FieldOutput input;
-    Function<Double, Double> function;
+    private FieldOutput input;
+    private Function<Double, Double> function;
+    private String label;
 
-    public FieldFunction(FieldOutput in, Function<Double, Double> f) {
+    public FieldFunction(String label, FieldOutput in, Function<Double, Double> f) {
         this.input = in;
         this.function = f;
+        this.label = label;
+
+        this.input.addFieldListener(u ->
+                triggerUpdate()
+        );
+    }
+
+    public FieldFunction(String label, FieldOutput in, Function<Double, Double> f, FieldInput out) {
+        this(label, in, f);
+
+        addFieldListener(u ->
+                out.addAndTriggerUpdate(u)
+        );
+    }
+
+    @Override
+    public String getLabel() {
+        return label;
+    }
+
+    private void triggerUpdate() {
+        if (!updateAvailable())
+            return;
+
+        propagateUpdate(
+                getUpdate()
+        );
     }
 
     @Override
@@ -49,10 +77,5 @@ public class FieldFunction implements FieldOutput {
     @Override
     public double getUpdate() {
         return getNewValue() - getCurrentValue();
-    }
-
-    @Override
-    public void acknowledgePropagated() {
-        input.acknowledgePropagated();
     }
 }

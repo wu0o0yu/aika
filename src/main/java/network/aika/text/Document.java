@@ -24,7 +24,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.conjunctive.PatternNeuron;
-import network.aika.steps.activation.Propagate;
 
 import java.util.NavigableMap;
 import java.util.TreeMap;

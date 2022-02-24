@@ -31,7 +31,7 @@ public class Negative implements Sign {
 
     @Override
     public FieldOutput getValue(FieldOutput v) {
-        return new InvertedField(v);
+        return new InvertedField("neg", v);
     }
 
     @Override

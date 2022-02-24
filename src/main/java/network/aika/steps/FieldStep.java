@@ -6,11 +6,10 @@ import network.aika.fields.QueueField;
 public class FieldStep<E extends Element> extends Step<E> {
 
     private QueueField field;
-    private String label;
 
-    public FieldStep(E e, QueueField qf, String label) {
+
+    public FieldStep(E e, QueueField qf) {
         super(e);
-        this.label = label;
         this.field = qf;
         this.field.setStep(this);
     }
@@ -31,6 +30,6 @@ public class FieldStep<E extends Element> extends Step<E> {
     }
 
     public String toString() {
-        return label + ": " + field + " " + getElement();
+        return field.getLabel() + ": " + field + " " + getElement();
     }
 }

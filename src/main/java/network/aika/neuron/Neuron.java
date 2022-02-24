@@ -55,7 +55,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Writable customData;
 
-    protected Field bias = new Field(u ->
+    protected Field bias = new Field("bias", u ->
         biasUpdate(u)
     );
 
@@ -372,6 +372,10 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     public void setFrequency(double f) {
         frequency = f;
         setModified();
+    }
+
+    public boolean checkTemplateInductionThreshold(Activation act)  {
+        return Math.abs(getCandidateGradient(act)) > act.getConfig().getInductionThreshold();
     }
 
     public void reactivate(Model m) {

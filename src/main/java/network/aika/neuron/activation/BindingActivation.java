@@ -27,15 +27,13 @@ import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 import network.aika.neuron.conjunctive.PatternSynapse;
-import network.aika.steps.activation.BranchProbability;
 import network.aika.steps.activation.Linking;
-import network.aika.utils.Utils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.fields.FieldUtils.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
 import static network.aika.steps.LinkingOrder.POST_FIRED;
@@ -53,17 +51,11 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     private final Set<BindingActivation> branches = new TreeSet<>();
     private BindingActivation mainBranch;
+    private Field branchProbability = new Field("Branch-Probability");
+    private Field bpNorm = new Field("BP-Norm");
 
-    private double branchProbability = 1.0;
-    private Field ownInputGradient = new QueueField(this, "ownInputGradient");
-
-    protected MultiSourceFieldOutput ownOutputGradientMul = new FieldMultiplication(
-            ownInputGradient,
-            new FieldFunction(net, x ->
-                    getNeuron().getActivationFunction().outerGrad(x)
-            )
-    );
-    protected Field ownOutputGradient = new QueueField(this, "ownOutputGradient");
+    private Field ownInputGradient = new QueueField(this, "Own-Input-Gradient");
+    protected Field ownOutputGradient = new QueueField(this, "Own-Output-Gradient");
 
     protected BindingActivation(int id, BindingNeuron n) {
         super(id, n);
@@ -72,18 +64,69 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
 
-        ownInputGradient.setFieldListener(u -> {
-                    if (ownOutputGradientMul.updateAvailable(1))
-                        ownOutputGradient.addAndTriggerUpdate(ownOutputGradientMul.getUpdate(1));
-                }
+        branchProbability.setAndTriggerUpdate(1.0);
+
+        if (!isInput)
+            func(
+                    "f(bp * net)",
+                    mul(
+                            "bp * net",
+                            branchProbability,
+                            net
+                    ),
+                    x -> getNeuron().getActivationFunction().f(x),
+                    value
+            );
+
+        mul(
+                "ownIG * f'(net)",
+                ownInputGradient,
+                func(
+                        "f'(net)",
+                        net,
+                        x -> getNeuron().getActivationFunction().outerGrad(x)
+                ),
+                ownOutputGradient
         );
 
-        outputGradient.setFieldListener(u ->
-                propagateGradient(u, true, false)
+        net.addFieldListener(u ->
+                propagateConflictingNetChange()
         );
 
-        ownOutputGradient.setFieldListener(u ->
-                propagateGradient(u, false, true)
+        func(
+                "exp(net)",
+                net,
+                x -> Math.exp(x),
+                bpNorm
+        );
+
+        outputGradient.addFieldListener(u ->
+                updateWeights(u)
+        );
+
+        ownOutputGradient.addFieldListener(u ->
+                propagateGradient()
+        );
+    }
+
+    @Override
+    protected void initFields() {
+        // Override parent
+    }
+
+    @Override
+    protected void onFinal() {
+        super.onFinal();
+
+        div(
+                "exp(net) / bpNorm",
+                func(
+                        "exp(net)",
+                        net,
+                        x -> Math.exp(x)
+                ),
+                bpNorm,
+                branchProbability
         );
     }
 
@@ -128,24 +171,28 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         return BindingSignal.originEquals(conflictingBS, bound);
     }
 
+    @Override
     public boolean checkPropagateBranchBindingSignal(BranchBindingSignal bs) {
         return bs.getOriginActivation() == this;
     }
 
-    protected void updateValue(double net) {
-        if(!isInput)
-            value.setAndTriggerUpdate(getBranchProbability() * getActivationFunction().f(net));
+    private void propagateConflictingNetChange() {
+        reverseBindingSignals.values().stream()
+                .filter(bs -> bs.getActivation() instanceof BindingActivation)
+                .map(bs -> (BindingActivation) bs.getActivation())
+                .filter(act -> !act.isMainBranch())
+                .forEach(act -> act.onConflictingNetChange(net));
     }
 
+    private void onConflictingNetChange(Field inputNet) {
+        double expUpdate = Math.exp(inputNet.getNewValue()) - Math.exp(inputNet.getCurrentValue());
+
+        bpNorm.addAndTriggerUpdate(expUpdate);
+    }
+
+    @Override
     public boolean isSelfRef(Activation iAct) {
         return iAct != null && iAct.branchBindingSignals.containsKey(this);
-    }
-
-    protected void propagateGradient() {
-        super.propagateGradient();
-
-        if(ownOutputGradientMul.updateAvailable(2))
-            ownOutputGradient.addAndTriggerUpdate(ownOutputGradientMul.getUpdate(2));
     }
 
     public BindingActivation createBranch(NegativeFeedbackSynapse excludedSyn) {
@@ -226,11 +273,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     @Override
-    public void addFeedbackSteps() {
-        BranchProbability.add(this);
-    }
-
-    @Override
     public Range getRange() {
         PatternBindingSignal bs = getPrimaryPatternBindingSignal();
         if(bs == null)
@@ -294,44 +336,12 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
             return branches.stream();
     }
 
-    public double getBranchProbability() {
+    public Field getBpNorm() {
+        return bpNorm;
+    }
+
+    public Field getBranchProbability() {
         return branchProbability;
-    }
-
-    public void setBranchProbability(double p) {
-        branchProbability = p;
-    }
-
-    public void computeBranchProbability() {
-        Stream<Link> linksStream = getBranches()
-                .stream()
-                .flatMap(Activation::getInputLinks)
-                .filter(Link::isNegative)
-                .flatMap(l -> l.getInput().getInputLinks());  // Walk through to the inhib. Activation.
-
-        Set<BindingActivation> conflictingActs = linksStream
-                .map(l -> (BindingActivation) l.getInput())
-                .collect(Collectors.toSet());
-
-        double offset = conflictingActs
-                .stream()
-                .mapToDouble(cAct -> cAct.getNet().getCurrentValue())
-                .min()
-                .getAsDouble();
-
-        double norm = Math.exp(getNet().getCurrentValue() - offset);
-        norm += conflictingActs
-                .stream()
-                .mapToDouble(cAct -> Math.exp(cAct.getNet().getCurrentValue() - offset))
-                .sum();
-
-        double p = Math.exp(getNet().getCurrentValue() - offset) / norm;
-
-        if(Utils.belowTolerance(p - getBranchProbability()))
-            return;
-// TODO
-//        BindingActivation cAct = act.clone(null);
-//        cAct.setBranchProbability(p);
     }
 
     public void receiveOwnGradientUpdate(double u) {

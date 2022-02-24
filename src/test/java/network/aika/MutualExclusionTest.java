@@ -16,7 +16,7 @@
  */
 package network.aika;
 
-import network.aika.debugger.AikaDebugger;
+import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
@@ -125,7 +125,7 @@ TODO: Counting Mode
                 s.getStepType() == StepType.TEMPLATE || s.getStepType() == StepType.TRAINING
         );
 */
-        AikaDebugger.createAndShowGUI(doc);
+        AIKADebugger.createAndShowGUI(doc);
 
         doc.addToken(in, 0, 4);
         doc.process();

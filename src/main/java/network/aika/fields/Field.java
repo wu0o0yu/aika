@@ -17,6 +17,7 @@
 package network.aika.fields;
 
 import network.aika.Model;
+import network.aika.neuron.activation.Link;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import org.slf4j.Logger;
@@ -25,28 +26,35 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Lukas Molzberger
  */
-public class Field implements FieldInput, FieldOutput, Writable {
+public class Field extends FieldListener implements FieldInput, FieldOutput, Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Field.class);
 
     private double currentValue = 0.0;
     private Double update;
     private boolean allowUpdate;
+    private String label;
 
     private PropagatePreCondition propagatePreCondition;
-    private FieldUpdateEvent fieldListener;
 
-    public Field() {
+    public Field(String label) {
+        this.label = label;
         this.propagatePreCondition = (cv, nv, u) -> !Utils.belowTolerance(u);
     }
 
-    public Field(FieldUpdateEvent fieldListener) {
-        this();
-        this.fieldListener = fieldListener;
+    public Field(String label, FieldUpdateEvent fieldListener) {
+        this(label);
+        addFieldListener(fieldListener);
+    }
+
+    public String getLabel() {
+        return label;
     }
 
     public PropagatePreCondition getPropagatePreCondition() {
@@ -57,13 +65,15 @@ public class Field implements FieldInput, FieldOutput, Writable {
         this.propagatePreCondition = propagatePreCondition;
     }
 
-    public FieldUpdateEvent getFieldListener() {
-        return fieldListener;
+    /*
+    WIP
+    public void addMultiEdgeListener(Stream<Link> edges, FieldUpdateEvent fieldListener) {
+        edges.forEach(e -> fieldListener.updated());
     }
 
-    public void setFieldListener(FieldUpdateEvent fieldListener) {
-        this.fieldListener = fieldListener;
-    }
+    public void addMultiEdgeListener(Stream<Link> edges, MultiSourceFieldOutput operator, int arg, FieldInput target) {
+        addMultiEdgeListener(edges, createMultiSourceListener(operator, arg, target));
+    }*/
 
     @Override
     public double getCurrentValue() {
@@ -72,15 +82,13 @@ public class Field implements FieldInput, FieldOutput, Writable {
 
     @Override
     public double getNewValue() {
-        double r;
+        if(!allowUpdate)
+            throw new IllegalStateException("getNewValue was called outside the listener");
+
         if(updateAvailable())
-            r = currentValue + update;
+            return currentValue + update;
         else
-            r = currentValue;
-
-        acknowledgePropagated();
-
-        return r;
+            return currentValue;
     }
 
     @Override
@@ -107,12 +115,8 @@ public class Field implements FieldInput, FieldOutput, Writable {
 
     protected void triggerInternal() {
         allowUpdate = true;
-
-        if (fieldListener != null)
-            fieldListener.updated(update);
-
+        propagateUpdate(update);
         acknowledgePropagated();
-
         allowUpdate = false;
     }
 
@@ -124,16 +128,12 @@ public class Field implements FieldInput, FieldOutput, Writable {
     @Override
     public double getUpdate() {
         if(!allowUpdate)
-            log.warn("field is not allowed to retrieve update value");
+            throw new IllegalStateException("getNewValue was called outside the listener");
 
-        double r = update;
-        acknowledgePropagated();
-
-        return r;
+        return update;
     }
 
-    @Override
-    public void acknowledgePropagated() {
+    private void acknowledgePropagated() {
         if(update == null)
             return;
 

@@ -16,7 +16,7 @@
  */
 package network.aika;
 
-import network.aika.debugger.AikaDebugger;
+import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.Templates;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
@@ -52,7 +52,7 @@ public class PatternTest {
                         .setTemplatesEnabled(true)
         );
 
-        AikaDebugger.createAndShowGUI(doc);
+        AIKADebugger.createAndShowGUI(doc);
 
         doc.processTokens(List.of("A", "B", "C"));
 

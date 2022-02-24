@@ -17,6 +17,7 @@
 package network.aika.neuron;
 
 import network.aika.Model;
+import network.aika.Thought;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
 import network.aika.neuron.axons.Axon;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.function.Consumer;
 
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
@@ -51,7 +53,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     protected S template;
     private TemplateSynapseInfo templateInfo;
 
-    protected Field weight = new Field(u -> weightUpdate(u));
+    protected Field weight = new Field("weight", u -> weightUpdate(u));
 
     protected SampleSpace sampleSpace = new SampleSpace();
 
@@ -102,7 +104,14 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         if(Link.templateLinkExists(this, iAct, oAct))
             return false;
 
+        if(!checkTemplateInductionThreshold(oAct))
+            return false;
+
         return true;
+    }
+
+    protected boolean checkTemplateInductionThreshold(OA oAct) {
+        return Math.abs(oAct.getOutputGradient().getCurrentValue()) > oAct.getConfig().getInductionThreshold();
     }
 
     public boolean checkRelatedBranchBindingSignal(BranchBindingSignal iBS, BranchBindingSignal oBS) {
@@ -363,15 +372,21 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     protected void weightUpdate(double u) {
-        getOutput()
-                .getActivations(getModel().getCurrentThought())
-                .stream()
-                .map(act -> act.getInputLink(this))
-                .filter(l -> l != null)
-                .forEach(l -> l.receiveWeightUpdate());
+        forAllLinks(getModel().getCurrentThought(), l ->
+                l.receiveWeightUpdate()
+        );
 
         PostTraining.add(getOutput());
         setModified();
+    }
+
+    public void forAllLinks(Thought t, Consumer<Link> c) {
+        getOutput()
+                .getActivations(t)
+                .stream()
+                .map(act -> act.getInputLink(this))
+                .filter(l -> l != null)
+                .forEach(l -> c.accept(l));
     }
 
     @Override

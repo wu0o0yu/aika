@@ -16,16 +16,27 @@
  */
 package network.aika.fields;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Lukas Molzberger
  */
-public interface MultiSourceFieldOutput {
+public class FieldListener {
 
-    double getCurrentValue();
+    private List<FieldUpdateEvent> fieldListeners = new ArrayList<>();
 
-    boolean updateAvailable(int updateArg);
+    public List<FieldUpdateEvent> getFieldListeners() {
+        return fieldListeners;
+    }
 
-    double getUpdate(int updateArg);
+    public void addFieldListener(FieldUpdateEvent fieldListener) {
+        this.fieldListeners.add(fieldListener);
+    }
 
-    void acknowledgePropagated(int updateArg);
+    protected void propagateUpdate(Double update) {
+        fieldListeners.forEach(fl ->
+                fl.updated(update)
+        );
+    }
 }

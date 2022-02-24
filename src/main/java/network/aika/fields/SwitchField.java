@@ -21,17 +21,24 @@ import java.util.function.BooleanSupplier;
 /**
  * @author Lukas Molzberger
  */
-public class SwitchField implements FieldInput, FieldOutput {
+public class SwitchField extends FieldListener implements FieldInput, FieldOutput {
 
     private BooleanSupplier test;
     private Field inputFieldA;
     private Field inputFieldB;
+    private String label;
 
 
-    public SwitchField(BooleanSupplier test, Field inputFieldA, Field inputFieldB) {
+    public SwitchField(String label, BooleanSupplier test, Field inputFieldA, Field inputFieldB) {
+        this.label = label;
         this.test = test;
         this.inputFieldA = inputFieldA;
         this.inputFieldB = inputFieldB;
+    }
+
+    @Override
+    public String getLabel() {
+        return label;
     }
 
     private Field getField() {
@@ -83,11 +90,6 @@ public class SwitchField implements FieldInput, FieldOutput {
     @Override
     public double getUpdate() {
         return FieldOutput.getUpdate(getField());
-    }
-
-    @Override
-    public void acknowledgePropagated() {
-        getField().acknowledgePropagated();
     }
 
     public String toString() {

@@ -1,6 +1,6 @@
 package network.aika;
 
-import network.aika.debugger.AikaDebugger;
+import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.Neuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
@@ -40,7 +40,7 @@ public class GradientTest {
         nB.getSampleSpace().setOffset(739l);
 */
 
-        AikaDebugger.createAndShowGUI(doc);
+        AIKADebugger.createAndShowGUI(doc);
 
         processDoc(doc);
 
@@ -77,7 +77,7 @@ public class GradientTest {
         setStatistic(nC, 30.0, 234, 867l);
 
 
-        AikaDebugger.createAndShowGUI(doc);
+        AIKADebugger.createAndShowGUI(doc);
 
         doc.process();
         doc.updateModel();
@@ -109,7 +109,7 @@ public class GradientTest {
         Neuron nB = m.getNeuron("B");
         setStatistic(nB, 10.0, 121, 739l);
 
-        AikaDebugger.createAndShowGUI(doc1);
+        AIKADebugger.createAndShowGUI(doc1);
 
         doc1.process();
         doc1.updateModel();
@@ -126,7 +126,7 @@ public class GradientTest {
         Neuron nC = m.getNeuron("C");
         setStatistic(nC, 30.0, 234, 867l);
 
-        AikaDebugger.createAndShowGUI(doc2);
+        AIKADebugger.createAndShowGUI(doc2);
 
         doc2.process();
         doc2.updateModel();

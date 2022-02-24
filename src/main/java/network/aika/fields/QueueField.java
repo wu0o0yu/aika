@@ -31,13 +31,13 @@ public class QueueField extends Field {
 
 
     public QueueField(Element e, String label) {
-        super();
-        step = new FieldStep(e, this, label);
+        super(label);
+        step = new FieldStep(e, this);
     }
 
     public QueueField(FieldUpdateEvent fieldListener, Element e, String label) {
         this(e, label);
-        setFieldListener(fieldListener);
+        addFieldListener(fieldListener);
     }
 
     public void setStep(FieldStep s) {

@@ -35,6 +35,14 @@ public class InhibitorySynapse extends DisjunctiveSynapse<InhibitorySynapse, Bin
     }
 
     @Override
+    public boolean checkTemplateLinkingPreConditions(BindingActivation iAct, InhibitoryActivation oAct) {
+        if(iAct.getNeuron().isNetworkInput())
+            return false;
+
+        return super.checkTemplateLinkingPreConditions(iAct, oAct);
+    }
+
+    @Override
     protected Bound getProbabilityBound(Sign si, Sign so) {
         return so == Sign.POS ? Bound.LOWER : Bound.UPPER;
     }

@@ -1,7 +1,7 @@
 package network.aika;
 
 import network.aika.callbacks.FSSuspensionCallback;
-import network.aika.debugger.AikaDebugger;
+import network.aika.debugger.AIKADebugger;
 import network.aika.debugger.stepmanager.StepMode;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
@@ -28,7 +28,7 @@ public class TestFsModel {
         {
             Document doc = generateDocument(m, "arbeit fair arbeitsvermittlung ", true);
 
-            AikaDebugger debugger = AikaDebugger.createAndShowGUI(doc);
+            AIKADebugger debugger = AIKADebugger.createAndShowGUI(doc);
             debugger.setStepMode(StepMode.ACT);
 
             doc.process();
@@ -39,7 +39,7 @@ public class TestFsModel {
         {
             Document doc = generateDocument(m, "arbeit fair arbeitsvermittlung ", false);
 
-            AikaDebugger debugger = AikaDebugger.createAndShowGUI(doc);
+            AIKADebugger debugger = AIKADebugger.createAndShowGUI(doc);
             debugger.setStepMode(StepMode.ACT);
 
             doc.process();

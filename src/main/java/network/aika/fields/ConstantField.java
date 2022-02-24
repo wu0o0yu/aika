@@ -19,16 +19,23 @@ package network.aika.fields;
 /**
  * @author Lukas Molzberger
  */
-public class ConstantField implements FieldOutput, MultiSourceFieldOutput {
+public class ConstantField extends FieldListener implements FieldOutput {
 
-    public static final ConstantField ZERO = new ConstantField(0.0);
-    public static final ConstantField ONE = new ConstantField(1.0);
+    public static final ConstantField ZERO = new ConstantField("ZERO", 0.0);
+    public static final ConstantField ONE = new ConstantField("ONE", 1.0);
 
     private final double value;
     private boolean initialized = false;
+    private String label;
 
-    public ConstantField(double value) {
+    public ConstantField(String label, double value) {
+        this.label = label;
         this.value = value;
+    }
+
+
+    public String getLabel() {
+        return label;
     }
 
     @Override
@@ -47,27 +54,7 @@ public class ConstantField implements FieldOutput, MultiSourceFieldOutput {
     }
 
     @Override
-    public boolean updateAvailable(int updateArg) {
-        return updateAvailable();
-    }
-    @Override
     public double getUpdate() {
-        acknowledgePropagated();
-        return !initialized ? value : 0.0;
-    }
-
-    @Override
-    public double getUpdate(int updateArg) {
-        return getUpdate();
-    }
-
-    @Override
-    public void acknowledgePropagated() {
-        initialized = true;
-    }
-
-    @Override
-    public void acknowledgePropagated(int updateArg) {
-        acknowledgePropagated();
+        return 0;
     }
 }

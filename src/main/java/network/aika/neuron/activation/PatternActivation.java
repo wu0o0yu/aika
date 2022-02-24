@@ -110,9 +110,6 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
         addBindingSignal(new PatternBindingSignal(this));
     }
 
-    public void addFeedbackSteps() {
-    }
-
     public boolean checkPropagatePatternBindingSignal(PatternBindingSignal bs) {
         return bs.getOriginActivation() == this;
     }

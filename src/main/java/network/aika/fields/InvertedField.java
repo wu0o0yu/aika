@@ -20,12 +20,19 @@ package network.aika.fields;
 /**
  * @author Lukas Molzberger
  */
-public class InvertedField implements FieldOutput {
+public class InvertedField extends FieldListener implements FieldOutput {
 
     FieldOutput input;
+    private String label;
 
-    public InvertedField(FieldOutput in) {
+    public InvertedField(String label, FieldOutput in) {
+        this.label = label;
         this.input = in;
+    }
+
+    @Override
+    public String getLabel() {
+        return label;
     }
 
     @Override
@@ -46,10 +53,5 @@ public class InvertedField implements FieldOutput {
     @Override
     public double getUpdate() {
         return getNewValue() - getCurrentValue();
-    }
-
-    @Override
-    public void acknowledgePropagated() {
-        input.acknowledgePropagated();
     }
 }
