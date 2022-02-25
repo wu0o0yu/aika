@@ -31,7 +31,8 @@ public class TestFsModel {
             AIKADebugger debugger = AIKADebugger.createAndShowGUI(doc);
             debugger.setStepMode(StepMode.ACT);
 
-            doc.process();
+            doc.processFinalMode();
+            doc.postProcessing();
             doc.updateModel();
         }
 
@@ -42,7 +43,8 @@ public class TestFsModel {
             AIKADebugger debugger = AIKADebugger.createAndShowGUI(doc);
             debugger.setStepMode(StepMode.ACT);
 
-            doc.process();
+            doc.processFinalMode();
+            doc.postProcessing();
             doc.updateModel();
         }
 

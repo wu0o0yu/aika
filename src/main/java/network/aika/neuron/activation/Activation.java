@@ -271,6 +271,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected void onFinalFired() {
         Propagate.add(this, true, "", s -> true);
 
+        InactiveLinks.add(this);
         addEntropySteps();
         addCountingSteps();
 
@@ -319,7 +320,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     private void addCountingSteps() {
-        InactiveLinks.add(this);
         Counting.add(this);
         getInputLinks().forEach(l ->
                 LinkCounting.add(l)

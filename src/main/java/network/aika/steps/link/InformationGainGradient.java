@@ -46,7 +46,7 @@ public class InformationGainGradient extends Step<Link> {
 
     @Override
     public Phase getPhase() {
-        return Phase.LATE;
+        return Phase.PROCESSING;
     }
 
     @Override

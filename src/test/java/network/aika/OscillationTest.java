@@ -39,7 +39,8 @@ public class OscillationTest {
         AIKADebugger.createAndShowGUI(doc);
 
         doc.addToken(nA, 0, 1);
-        doc.process();
+        doc.processFinalMode();
+        doc.postProcessing();
         doc.updateModel();
 
         System.out.println();

@@ -42,7 +42,7 @@ public class EntropyGradient extends Step<Activation> {
 
     @Override
     public Phase getPhase() {
-        return Phase.LATE;
+        return Phase.PROCESSING;
     }
 
     @Override

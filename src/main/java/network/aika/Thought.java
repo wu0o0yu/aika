@@ -25,6 +25,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
+import network.aika.steps.Phase;
 import network.aika.steps.QueueKey;
 import network.aika.steps.Step;
 
@@ -32,6 +33,8 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static network.aika.steps.Phase.*;
 
 /**
  *
@@ -154,8 +157,11 @@ public abstract class Thought<M extends Model> {
         return new Range(absoluteBegin, absoluteBegin + length());
     }
 
-    public void process() {
+    protected void process(Phase maxPhase) {
         while (!queue.isEmpty()) {
+            if(checkMaxPhaseReached(maxPhase))
+                break;
+
             Step s = queue.pollFirstEntry().getValue();
 
             timestampOnProcess = getCurrentTimestamp();
@@ -168,11 +174,19 @@ public abstract class Thought<M extends Model> {
         }
     }
 
+    private boolean checkMaxPhaseReached(Phase maxPhase) {
+        return maxPhase.compareTo(queue.firstEntry().getValue().getPhase()) < 0;
+    }
+
     public void processFinalMode() {
         activationsById.values()
                 .forEach(act -> act.setFinal());
 
-        process();
+        process(PROCESSING);
+    }
+
+    public void postProcessing() {
+        process(POST_PROCESSING);
     }
 
     public Timestamp getTimestampOnProcess() {

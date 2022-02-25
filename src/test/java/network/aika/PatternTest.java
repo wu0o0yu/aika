@@ -58,7 +58,8 @@ public class PatternTest {
 
         System.out.println(doc);
 
-        doc.process();
+        doc.processFinalMode();
+        doc.postProcessing();
         doc.updateModel();
 
         System.out.println(doc);
@@ -75,7 +76,8 @@ public class PatternTest {
         TokenActivation refB = doc.addToken("B", 1, 2);
         TokenActivation.addRelation(refA, refB);
 
-        doc.process();
+        doc.processFinalMode();
+        doc.postProcessing();
         doc.updateModel();
 
         System.out.println(doc);

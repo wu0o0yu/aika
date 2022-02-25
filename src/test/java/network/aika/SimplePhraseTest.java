@@ -54,7 +54,8 @@ public class SimplePhraseTest {
                 i = j + 1;
             }
 
-            doc.process();
+            doc.processFinalMode();
+            doc.postProcessing();
             doc.updateModel();
 
             System.out.println(doc);

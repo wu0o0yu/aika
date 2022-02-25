@@ -29,6 +29,8 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
+import static network.aika.steps.Phase.PROCESSING;
+
 
 /**
  * The {@code Document} class represents a single document which may be either used for processing a text or as
@@ -122,7 +124,7 @@ public class Document extends Thought<TextModel> {
             int j = i + t.length();
             TokenActivation currentToken = addToken(t, i, j);
             TokenActivation.addRelation(lastToken, currentToken);
-            process();
+            process(PROCESSING);
 
             lastToken = currentToken;
             i = j + 1;

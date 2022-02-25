@@ -46,7 +46,7 @@ public class PostTraining extends Step<DummyActivation> {
 
     @Override
     public Phase getPhase() {
-        return Phase.LATE;
+        return Phase.PROCESSING;
     }
 
     @Override
