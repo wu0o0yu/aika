@@ -235,6 +235,9 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
     }
 
     public void propagateValue() {
+        if(weightedInput == null)
+            return;
+
         weightedInput.triggerUpdate(1);
     }
 

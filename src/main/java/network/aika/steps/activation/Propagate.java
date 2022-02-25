@@ -94,7 +94,7 @@ public class Propagate extends Step<Activation> {
     public void process() {
         Activation act = getElement();
 
-        if(!act.getNeuron().checkTemplateInductionThreshold(act))
+        if(template && !act.getNeuron().checkTemplateInductionThreshold(act))
             return;
 
         targetSynapses.stream()

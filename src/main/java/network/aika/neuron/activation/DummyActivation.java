@@ -56,7 +56,7 @@ public class DummyActivation extends Activation {
 
     @Override
     public Range getRange() {
-        throw new NoSuchMethodError();
+        return null;
     }
 
     @Override
