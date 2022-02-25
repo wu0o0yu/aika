@@ -32,6 +32,14 @@ public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNe
     }
 
     @Override
+    public boolean allowPropagate(Activation act) {
+        if(isTemplate() && act != null && act.isNetworkInput())
+            return false;
+
+        return super.allowPropagate(act);
+    }
+
+    @Override
     public PatternLink createLink(BindingActivation input, PatternActivation output) {
         return new PatternLink(this, input, output);
     }

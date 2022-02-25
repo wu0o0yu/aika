@@ -70,7 +70,7 @@ public class Propagate extends Step<Activation> {
         Neuron<?, ?> n = act.getNeuron();
         targetSynapses = n.getTargetSynapses(OUTPUT, template)
                 .filter(s ->
-                        s.allowPropagate()
+                        s.allowPropagate(act)
                 )
                 .filter(filter)
                 .collect(Collectors.toList());

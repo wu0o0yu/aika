@@ -128,7 +128,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
     public abstract void setModified();
 
-    public boolean allowPropagate() {
+    public boolean allowPropagate(Activation act) {
         return true;
     }
 
@@ -431,7 +431,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return (isTemplate() ? "Template-" : "") +
                 getClass().getSimpleName() +
                 " in:[" + input.getNeuron().toKeyString()  + "](" + (isInputLinked() ? "+" : "-") + ") " +
-                (allowPropagate() ? "==>" : "-->") +
+                (allowPropagate(null) ? "==>" : "-->") +
                 " out:[" + output.getNeuron().toKeyString() + "](" + (isOutputLinked() ? "+" : "-") + ")";
     }
 }

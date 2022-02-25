@@ -45,7 +45,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     @Override
-    public boolean allowPropagate() {
+    public boolean allowPropagate(Activation act) {
         return allowPropagate;
     }
 

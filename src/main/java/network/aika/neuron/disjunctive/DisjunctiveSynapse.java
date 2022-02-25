@@ -35,7 +35,10 @@ import network.aika.utils.Bound;
 public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends Neuron & Axon, O extends DisjunctiveNeuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation, OA extends DisjunctiveActivation> extends Synapse<S, I, O, L, IA, OA> {
 
     @Override
-    public boolean allowPropagate() {
+    public boolean allowPropagate(Activation act) {
+        if(isTemplate() && act != null && act.isNetworkInput())
+            return false;
+
         return true;
     }
 
