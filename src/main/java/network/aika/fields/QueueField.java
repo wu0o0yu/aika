@@ -37,7 +37,7 @@ public class QueueField extends Field {
 
     public QueueField(FieldUpdateEvent fieldListener, Element e, String label) {
         this(e, label);
-        addFieldListener(fieldListener);
+        addFieldListener(e + "-" + label, fieldListener);
     }
 
     public void setStep(FieldStep s) {

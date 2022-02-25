@@ -34,12 +34,12 @@ public abstract class BiFunction extends FieldListener implements FieldOutput {
         this.in2 = in2;
 
         if (register1)
-            in1.addFieldListener(u ->
+            in1.addFieldListener(label + "-arg(1)", (l, u) ->
                     triggerUpdate(1)
             );
 
         if (register2)
-            in2.addFieldListener(u ->
+            in2.addFieldListener(label + "-arg(2)", (l, u) ->
                     triggerUpdate(2)
             );
     }
@@ -47,7 +47,7 @@ public abstract class BiFunction extends FieldListener implements FieldOutput {
     public BiFunction(String label, FieldOutput in1, boolean register1, FieldOutput in2, boolean register2, FieldInput out) {
         this(label, in1, register1, in2, register2);
 
-        addFieldListener(u ->
+        addFieldListener(out.getLabel(), (l, u) ->
                 out.addAndTriggerUpdate(u)
         );
     }

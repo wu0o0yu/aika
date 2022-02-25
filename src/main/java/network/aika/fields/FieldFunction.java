@@ -32,7 +32,7 @@ public class FieldFunction extends FieldListener implements FieldOutput {
         this.function = f;
         this.label = label;
 
-        this.input.addFieldListener(u ->
+        this.input.addFieldListener(label, (l, u) ->
                 triggerUpdate()
         );
     }
@@ -40,7 +40,7 @@ public class FieldFunction extends FieldListener implements FieldOutput {
     public FieldFunction(String label, FieldOutput in, Function<Double, Double> f, FieldInput out) {
         this(label, in, f);
 
-        addFieldListener(u ->
+        addFieldListener(label, (l, u) ->
                 out.addAndTriggerUpdate(u)
         );
     }

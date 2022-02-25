@@ -21,5 +21,5 @@ package network.aika.fields;
  */
 public interface FieldUpdateEvent {
 
-    void updated(double u);
+    void updated(String receiverLabel, double u);
 }

@@ -24,19 +24,25 @@ import java.util.List;
  */
 public class FieldListener {
 
-    private List<FieldUpdateEvent> fieldListeners = new ArrayList<>();
+    private record Entry(
+            String label,
+            FieldUpdateEvent listener
+    ) {}
 
-    public List<FieldUpdateEvent> getFieldListeners() {
-        return fieldListeners;
-    }
+    private List<Entry> fieldListeners = new ArrayList<>();
 
-    public void addFieldListener(FieldUpdateEvent fieldListener) {
-        this.fieldListeners.add(fieldListener);
+    public void addFieldListener(String receiverLabel, FieldUpdateEvent fieldListener) {
+        this.fieldListeners.add(
+                new Entry(
+                        receiverLabel,
+                        fieldListener
+                )
+        );
     }
 
     protected void propagateUpdate(Double update) {
-        fieldListeners.forEach(fl ->
-                fl.updated(update)
+        fieldListeners.forEach(e ->
+                e.listener.updated(e.label, update)
         );
     }
 }

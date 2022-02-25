@@ -56,7 +56,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         this.input = input;
         this.output = output;
 
-        igGradient.addFieldListener(u ->
+        igGradient.addFieldListener("receiveOwnGradientUpdate", (l, u) ->
                 output.receiveOwnGradientUpdate(u)
         );
 

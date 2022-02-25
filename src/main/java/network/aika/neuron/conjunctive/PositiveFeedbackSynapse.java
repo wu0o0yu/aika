@@ -35,7 +35,7 @@ import network.aika.neuron.bindingsignal.BranchBindingSignal;
 public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PositiveFeedbackSynapse, PatternNeuron, PositiveFeedbackLink, PatternActivation> {
 
     private Field feedbackWeight = new Field("feedbackWeight");
-    private Field feedbackBias = new Field("feedbackBias", u ->
+    private Field feedbackBias = new Field("feedbackBias", (l, u) ->
             getInput().biasUpdateOnFinalActivations(this, u)
     );
 

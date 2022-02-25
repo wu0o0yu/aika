@@ -21,6 +21,8 @@ package network.aika.fields;
  */
 public interface FieldInput {
 
+    String getLabel();
+
     boolean set(double v);
 
     boolean add(double u);

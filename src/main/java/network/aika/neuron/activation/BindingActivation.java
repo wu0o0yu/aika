@@ -89,7 +89,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 ownOutputGradient
         );
 
-        net.addFieldListener(u ->
+        net.addFieldListener("propagateConflictingNetChange", (l, u) ->
                 propagateConflictingNetChange()
         );
 
@@ -100,11 +100,11 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 bpNorm
         );
 
-        outputGradient.addFieldListener(u ->
+        outputGradient.addFieldListener("updateWeights", (l, u) ->
                 updateWeights(u)
         );
 
-        ownOutputGradient.addFieldListener(u ->
+        ownOutputGradient.addFieldListener("propagateGradient", (l, u) ->
                 propagateGradient()
         );
     }

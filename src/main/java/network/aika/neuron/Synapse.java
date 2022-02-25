@@ -53,7 +53,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     protected S template;
     private TemplateSynapseInfo templateInfo;
 
-    protected Field weight = new Field("weight", u -> weightUpdate(u));
+    protected Field weight = new Field("weight", (l, u) -> weightUpdate(u));
 
     protected SampleSpace sampleSpace = new SampleSpace();
 

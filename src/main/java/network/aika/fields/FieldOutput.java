@@ -31,7 +31,7 @@ public interface FieldOutput {
 
     double getUpdate();
 
-    void addFieldListener(FieldUpdateEvent fieldListener);
+    void addFieldListener(String label, FieldUpdateEvent fieldListener);
 
     static double getCurrentValue(FieldOutput f) {
         return f != null ? f.getCurrentValue() : 0.0;

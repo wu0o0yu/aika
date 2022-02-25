@@ -50,7 +50,7 @@ public class Field extends FieldListener implements FieldInput, FieldOutput, Wri
 
     public Field(String label, FieldUpdateEvent fieldListener) {
         this(label);
-        addFieldListener(fieldListener);
+        addFieldListener(label, fieldListener);
     }
 
     public String getLabel() {

@@ -55,7 +55,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Writable customData;
 
-    protected Field bias = new Field("bias", u ->
+    protected Field bias = new Field("bias", (l, u) ->
         biasUpdate(u)
     );
 

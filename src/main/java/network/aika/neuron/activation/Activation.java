@@ -90,21 +90,23 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
-        entropy.addFieldListener(u -> receiveOwnGradientUpdate(u));
+        entropy.addFieldListener("receiveOwnGradientUpdate", (l, u) ->
+                receiveOwnGradientUpdate(u)
+        );
 
         net.setPropagatePreCondition((cv, nv, u) ->
                 !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0)
         );
         net.add(getNeuron().getBias().getCurrentValue());
 
-        net.addFieldListener(u -> {
+        net.addFieldListener("checkIfFired", (l, u) -> {
             if (net.getNewValue() > 0.0)
                 setFired();
         });
 
         initFields();
 
-        value.addFieldListener(u ->
+        value.addFieldListener("l.propagateValue", (label, u) ->
                 getOutputLinks()
                         .forEach(l -> l.propagateValue())
         );
@@ -112,13 +114,13 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         mul(
                 "ig * f'(net)",
                 inputGradient,
-                new FieldFunction("f'(net)", net, x ->
+                func("f'(net)", net, x ->
                         getNeuron().getActivationFunction().outerGrad(x)
                 ),
                 outputGradient
         );
 
-        outputGradient.addFieldListener(g ->
+        outputGradient.addFieldListener("update-bias", (l, g) ->
                 getNeuron().getBias().addAndTriggerUpdate(getConfig().getLearnRate() * g)
         );
 
@@ -138,10 +140,10 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                     value
             );
 
-        outputGradient.addFieldListener(u ->
+        outputGradient.addFieldListener("updateWeights", (l, u) ->
                 updateWeights(u)
         );
-        outputGradient.addFieldListener(u ->
+        outputGradient.addFieldListener("propagateGradient", (l, u) ->
                 propagateGradient()
         );
     }
