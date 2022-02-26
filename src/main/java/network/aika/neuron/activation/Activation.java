@@ -141,15 +141,17 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     protected void initFields() {
+        if(!isInput) {
+            func(
+                    "f(net)",
+                    net,
+                    x -> getActivationFunction().f(x),
+                    value
+            );
+        }
+
         if (getNeuron().isNetworkInput())
             return;
-
-        func(
-                "f(net)",
-                net,
-                x -> getActivationFunction().f(x),
-                value
-        );
 
         outputGradient.addFieldListener("updateWeights", (l, u) ->
                 updateWeights(u)
