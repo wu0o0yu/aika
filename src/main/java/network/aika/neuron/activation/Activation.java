@@ -77,9 +77,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
             Comparator.comparing(Activation::getId)
     );
 
-    private Field entropy = new Field("Entropy");
-    protected Field inputGradient = new QueueField(this, "Input-Gradient");
-    protected Field outputGradient = new QueueField(this, "Output-Gradient");
+    private Field entropy;
+    protected Field inputGradient;
+    protected Field outputGradient;
 
     protected Activation(int id, N n) {
         this.id = id;
@@ -90,9 +90,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
-        entropy.addFieldListener("receiveOwnGradientUpdate", (l, u) ->
-                receiveOwnGradientUpdate(u)
-        );
+        if(!getNeuron().isNetworkInput())
+            initGradientFields();
 
         net.setPropagatePreCondition((cv, nv, u) ->
                 !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0)
@@ -111,6 +110,22 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                         .forEach(l -> l.propagateValue())
         );
 
+        thought.register(this);
+        neuron.register(this);
+
+        inputLinks = new TreeMap<>();
+        outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
+    }
+
+    private void initGradientFields() {
+        entropy = new Field("Entropy");
+        inputGradient = new QueueField(this, "Input-Gradient");
+        outputGradient = new QueueField(this, "Output-Gradient");
+
+        entropy.addFieldListener("receiveOwnGradientUpdate", (l, u) ->
+                receiveOwnGradientUpdate(u)
+        );
+
         mul(
                 "ig * f'(net)",
                 inputGradient,
@@ -123,22 +138,18 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         outputGradient.addFieldListener("update-bias", (l, g) ->
                 getNeuron().getBias().addAndTriggerUpdate(getConfig().getLearnRate() * g)
         );
-
-        thought.register(this);
-        neuron.register(this);
-
-        inputLinks = new TreeMap<>();
-        outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
     }
 
     protected void initFields() {
-        if (!isInput)
-            func(
-                    "f(net)",
-                    net,
-                    x -> getActivationFunction().f(x),
-                    value
-            );
+        if (getNeuron().isNetworkInput())
+            return;
+
+        func(
+                "f(net)",
+                net,
+                x -> getActivationFunction().f(x),
+                value
+        );
 
         outputGradient.addFieldListener("updateWeights", (l, u) ->
                 updateWeights(u)
@@ -481,6 +492,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void receiveOwnGradientUpdate(double u) {
+        if(inputGradient == null)
+            return;
+
         inputGradient.addAndTriggerUpdate(u);
     }
 

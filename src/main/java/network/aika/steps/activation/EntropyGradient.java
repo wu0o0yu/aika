@@ -30,7 +30,7 @@ import network.aika.steps.Step;
 public class EntropyGradient extends Step<Activation> {
 
     public static void add(Activation act) {
-        if(!act.getConfig().isTrainingEnabled())
+        if(!act.getConfig().isTrainingEnabled() || act.getEntropy() == null)
             return;
 
         Step.add(new EntropyGradient(act));
