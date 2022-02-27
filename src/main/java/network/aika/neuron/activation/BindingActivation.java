@@ -66,13 +66,8 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
         branchProbability.setAndTriggerUpdate(1.0);
 
-        if (getNeuron().isNetworkInput())
-            return;
-
-        ownInputGradient = new QueueField(this, "Own-Input-Gradient");
-        ownOutputGradient = new QueueField(this, "Own-Output-Gradient");
-
-        func(
+        if(!isInput) {
+            func(
                     "f(bp * net)",
                     mul(
                             "bp * net",
@@ -82,6 +77,13 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                     x -> getNeuron().getActivationFunction().f(x),
                     value
             );
+        }
+
+        if (getNeuron().isNetworkInput())
+            return;
+
+        ownInputGradient = new QueueField(this, "Own-Input-Gradient");
+        ownOutputGradient = new QueueField(this, "Own-Output-Gradient");
 
         mul(
                 "ownIG * f'(net)",
