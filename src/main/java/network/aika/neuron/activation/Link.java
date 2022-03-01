@@ -22,14 +22,14 @@ import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.sign.Sign;
+import network.aika.steps.link.LinkCounting;
 import network.aika.steps.link.LinkInduction;
 import network.aika.steps.link.PropagateBindingSignal;
 
 import java.util.Comparator;
 
 import static network.aika.fields.ConstantField.ZERO;
-import static network.aika.fields.FieldUtils.mul;
-import static network.aika.fields.FieldUtils.mulUnregistered;
+import static network.aika.fields.FieldUtils.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
 
 /**
@@ -47,31 +47,43 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
     protected final I input;
     protected final O output;
 
-    private Field igGradient = new Field("Information-Gain gradient");
-    private BiFunction weightedInput;
-    private BiFunction backPropGradient;
+    private BiFunction igGradient;
+    private AbstractBiFunction weightedInput;
+    private AbstractBiFunction backPropGradient;
 
     public Link(S s, I input, O output) {
         this.synapse = s;
         this.input = input;
         this.output = output;
 
-        igGradient.addFieldListener("receiveOwnGradientUpdate", (l, u) ->
-                output.receiveOwnGradientUpdate(u)
-        );
-
-        if(input != null)
-            initWeightInput();
+        if (getConfig().isTrainingEnabled() && !isNegative()) {
+            igGradient = func("Information-Gain", input.net, output.net, (x1, x2) ->
+                    getRelativeSurprisal(
+                            Sign.getSign(x1),
+                            Sign.getSign(x2),
+                            input.getAbsoluteRange()
+                    ),
+                    output.getGradientInputFields()
+            );
+        }
 
         backPropGradient = mulUnregistered("oAct.og * s.weight", output.outputGradient, getWeightOutput());
 
         init();
 
+        if(input != null && output != null)
+            initWeightInput();
+
         getThought().onLinkCreationEvent(this);
     }
 
     protected void initWeightInput() {
-        weightedInput = mulUnregistered("iAct.value * s.weight", input.getValue(), getWeightOutput());
+        weightedInput = mulUnregistered(
+                "iAct.value * s.weight",
+                input.getValue(),
+                getWeightOutput(),
+                getOutput().getNet()
+        );
     }
 
     public void init() {
@@ -85,14 +97,13 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
 
         if(getOutput() != null) {
             linkOutput();
-
-            getOutput().getNet().addAndTriggerUpdate(
-                    getOutputValue()
-            );
         }
+
+        if(getConfig().isCountingEnabled())
+            LinkCounting.add(this);
     }
 
-    public Field getInformationGainGradient() {
+    public FieldOutput getInformationGainGradient() {
         return igGradient;
     }
 
@@ -157,18 +168,6 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         return s;
     }
 
-    public void updateInformationGainGradient() {
-        Range range = input.getAbsoluteRange();
-        assert range != null;
-
-        Sign si = Sign.getSign(input);
-        Sign so = Sign.getSign(output);
-
-        double igGrad = getRelativeSurprisal(si, so, range) * getInputValue(si).getCurrentValue();
-
-        igGradient.setAndTriggerUpdate(igGrad);
-    }
-
 /*
     public void removeGradientDependencies() {
         output.getInputLinks()
@@ -182,10 +181,6 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
 
     public FieldOutput getInputValue(Sign s) {
         return s.getValue(input != null ? input.getValue() : ZERO);
-    }
-
-    public FieldOutput getOutputValueUpdate(Sign s) {
-        return s.getValue(output != null ? output.getValue() : ZERO);
     }
 
     public S getSynapse() {
@@ -239,10 +234,6 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
             return;
 
         weightedInput.triggerUpdate(1);
-    }
-
-    public double getOutputValue() {
-        return weightedInput != null ? weightedInput.getCurrentValue() : 0.0;
     }
 
     public void setFinalMode() {

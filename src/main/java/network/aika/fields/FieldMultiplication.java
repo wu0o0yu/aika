@@ -19,13 +19,13 @@ package network.aika.fields;
 /**
  * @author Lukas Molzberger
  */
-public class FieldMultiplication extends BiFunction {
+public class FieldMultiplication extends AbstractBiFunction {
 
     public FieldMultiplication(String label, FieldOutput in1, boolean register1, FieldOutput in2, boolean register2) {
         super(label, in1, register1, in2, register2);
     }
 
-    public FieldMultiplication(String label, FieldOutput in1, boolean register1, FieldOutput in2, boolean register2, FieldInput out) {
+    public FieldMultiplication(String label, FieldOutput in1, boolean register1, FieldOutput in2, boolean register2, FieldInput... out) {
         super(label, in1, register1, in2, register2, out);
     }
 

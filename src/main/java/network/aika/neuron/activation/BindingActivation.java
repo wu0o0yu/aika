@@ -79,11 +79,29 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
             );
         }
 
-        if (getNeuron().isNetworkInput())
-            return;
+        net.addFieldListener("propagateConflictingNetChange", (l, u) ->
+                propagateConflictingNetChange()
+        );
 
+        func(
+                "exp(net)",
+                net,
+                x -> Math.exp(x),
+                bpNorm
+        );
+    }
+
+    @Override
+    protected void initFields() {
+        // Override parent
+    }
+
+    @Override
+    protected void initGradientFields() {
         ownInputGradient = new QueueField(this, "Own-Input-Gradient");
         ownOutputGradient = new QueueField(this, "Own-Output-Gradient");
+
+        super.initGradientFields();
 
         mul(
                 "ownIG * f'(net)",
@@ -96,17 +114,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 ownOutputGradient
         );
 
-        net.addFieldListener("propagateConflictingNetChange", (l, u) ->
-                propagateConflictingNetChange()
-        );
-
-        func(
-                "exp(net)",
-                net,
-                x -> Math.exp(x),
-                bpNorm
-        );
-
         outputGradient.addFieldListener("updateWeights", (l, u) ->
                 updateWeights(u)
         );
@@ -114,11 +121,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         ownOutputGradient.addFieldListener("propagateGradient", (l, u) ->
                 propagateGradient()
         );
-    }
-
-    @Override
-    protected void initFields() {
-        // Override parent
     }
 
     @Override
@@ -351,13 +353,8 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         return branchProbability;
     }
 
-    public void receiveOwnGradientUpdate(double u) {
-        super.receiveOwnGradientUpdate(u);
-
-        if(ownInputGradient == null)
-            return;
-
-        ownInputGradient.addAndTriggerUpdate(u);
+    public FieldInput[] getGradientInputFields() {
+        return new FieldInput[] {inputGradient, ownInputGradient};
     }
 
     public boolean checkIfPrimaryInputBNLinkAlreadyExists() {

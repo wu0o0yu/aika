@@ -29,6 +29,7 @@ public class Config {
 
     private boolean trainingEnabled;
     private boolean templatesEnabled;
+    private boolean countingEnabled;
 
     public double getLearnRate() {
         return learnRate;
@@ -74,6 +75,16 @@ public class Config {
         this.templatesEnabled = templatesEnabled;
         return this;
     }
+
+    public Config setCountingEnabled(boolean countingEnabled) {
+        this.countingEnabled = countingEnabled;
+        return this;
+    }
+
+    public boolean isCountingEnabled() {
+        return countingEnabled;
+    }
+
     public String getLabel(Activation<?> act) {
         return "";
     }

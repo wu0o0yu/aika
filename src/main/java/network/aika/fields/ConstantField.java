@@ -33,9 +33,14 @@ public class ConstantField extends FieldListener implements FieldOutput {
         this.value = value;
     }
 
-
+    @Override
     public String getLabel() {
         return label;
+    }
+
+    @Override
+    public void propagateInitialValue() {
+        propagateUpdate(getCurrentValue());
     }
 
     @Override

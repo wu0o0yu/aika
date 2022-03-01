@@ -27,8 +27,6 @@ import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.*;
-import network.aika.steps.link.InformationGainGradient;
-import network.aika.steps.link.LinkCounting;
 import network.aika.utils.Utils;
 
 import java.util.*;
@@ -77,7 +75,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
             Comparator.comparing(Activation::getId)
     );
 
-    private Field entropy;
+    private FieldFunction entropy;
     protected Field inputGradient;
     protected Field outputGradient;
 
@@ -90,7 +88,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
-        if(!getNeuron().isNetworkInput())
+        if(!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled())
             initGradientFields();
 
         net.setPropagatePreCondition((cv, nv, u) ->
@@ -105,6 +103,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         initFields();
 
+        if(getConfig().isCountingEnabled())
+            Counting.add(this);
+
         value.addFieldListener("l.propagateValue", (label, u) ->
                 getOutputLinks()
                         .forEach(l -> l.propagateValue())
@@ -117,13 +118,17 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
     }
 
-    private void initGradientFields() {
-        entropy = new Field("Entropy");
+    protected void initGradientFields() {
         inputGradient = new QueueField(this, "Input-Gradient");
         outputGradient = new QueueField(this, "Output-Gradient");
 
-        entropy.addFieldListener("receiveOwnGradientUpdate", (l, u) ->
-                receiveOwnGradientUpdate(u)
+        entropy = func("Entropy", net, x ->
+                        getNeuron().getSurprisal(
+                                this,
+                                Sign.getSign(x),
+                                getAbsoluteRange()
+                        ),
+                getGradientInputFields()
         );
 
         mul(
@@ -189,7 +194,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         thought.onActivationCreationEvent(this, originSynapse, originAct);
     }
 
-    public Field getEntropy() {
+    public FieldOutput getEntropy() {
         return entropy;
     }
 
@@ -287,8 +292,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         Propagate.add(this, true, "", s -> true);
 
         InactiveLinks.add(this);
-        addEntropySteps();
-        addCountingSteps();
 
         getBindingSignals()
                 .forEach(bs ->
@@ -323,22 +326,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     protected void onBindingSignalArrivedFinalFired(BindingSignal bs) {
         Linking.add(this, bs, OUTPUT, POST_FIRED, true, "", s -> true);
-    }
-
-    private void addEntropySteps() {
-        EntropyGradient.add(this);
-
-        inputLinks.values()
-                .forEach(l ->
-                        InformationGainGradient.add(l)
-                );
-    }
-
-    private void addCountingSteps() {
-        Counting.add(this);
-        getInputLinks().forEach(l ->
-                LinkCounting.add(l)
-        );
     }
 
     public Thought getThought() {
@@ -480,24 +467,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return outputGradient;
     }
 
-    public void updateEntropyGradient() {
-        Range range = getAbsoluteRange();
-        assert range != null;
-
-        entropy.setAndTriggerUpdate(
-                getNeuron().getSurprisal(
-                        this,
-                        Sign.getSign(this),
-                        range
-                )
-        );
-    }
-
-    public void receiveOwnGradientUpdate(double u) {
-        if(inputGradient == null)
-            return;
-
-        inputGradient.addAndTriggerUpdate(u);
+    public FieldInput[] getGradientInputFields() {
+        return new FieldInput[] {inputGradient};
     }
 
     public void linkInputs() {

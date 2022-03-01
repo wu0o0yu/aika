@@ -53,6 +53,7 @@ public class Field extends FieldListener implements FieldInput, FieldOutput, Wri
         addFieldListener(label, fieldListener);
     }
 
+    @Override
     public String getLabel() {
         return label;
     }
@@ -65,15 +66,10 @@ public class Field extends FieldListener implements FieldInput, FieldOutput, Wri
         this.propagatePreCondition = propagatePreCondition;
     }
 
-    /*
-    WIP
-    public void addMultiEdgeListener(Stream<Link> edges, FieldUpdateEvent fieldListener) {
-        edges.forEach(e -> fieldListener.updated());
+    @Override
+    public void propagateInitialValue() {
+        propagateUpdate(getCurrentValue());
     }
-
-    public void addMultiEdgeListener(Stream<Link> edges, MultiSourceFieldOutput operator, int arg, FieldInput target) {
-        addMultiEdgeListener(edges, createMultiSourceListener(operator, arg, target));
-    }*/
 
     @Override
     public double getCurrentValue() {
@@ -115,7 +111,8 @@ public class Field extends FieldListener implements FieldInput, FieldOutput, Wri
 
     protected void triggerInternal() {
         allowUpdate = true;
-        propagateUpdate(update);
+        if(updateAvailable())
+            propagateUpdate(update);
         acknowledgePropagated();
         allowUpdate = false;
     }

@@ -40,7 +40,7 @@ public class FieldListener {
         );
     }
 
-    protected void propagateUpdate(Double update) {
+    protected void propagateUpdate(double update) {
         fieldListeners.forEach(e ->
                 e.listener.updated(e.label, update)
         );

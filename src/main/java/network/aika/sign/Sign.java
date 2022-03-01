@@ -38,6 +38,10 @@ public interface Sign {
         return act != null && act.isFired() ? POS : NEG;
     }
 
+    static Sign getSign(double x) {
+        return x >= 0.0 ? POS : NEG;
+    }
+
     FieldOutput getValue(FieldOutput v);
 
     int index();

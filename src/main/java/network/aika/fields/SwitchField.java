@@ -41,6 +41,11 @@ public class SwitchField extends FieldListener implements FieldInput, FieldOutpu
         return label;
     }
 
+    @Override
+    public void propagateInitialValue() {
+        propagateUpdate(getCurrentValue());
+    }
+
     private Field getField() {
         if(test.getAsBoolean()) {
             return inputFieldB;

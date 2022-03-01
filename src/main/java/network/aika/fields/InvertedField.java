@@ -36,6 +36,11 @@ public class InvertedField extends FieldListener implements FieldOutput {
     }
 
     @Override
+    public void propagateInitialValue() {
+        propagateUpdate(getCurrentValue());
+    }
+
+    @Override
     public double getCurrentValue() {
         return 1.0 - input.getCurrentValue();
     }

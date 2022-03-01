@@ -31,6 +31,8 @@ public interface FieldOutput {
 
     double getUpdate();
 
+    void propagateInitialValue();
+
     void addFieldListener(String label, FieldUpdateEvent fieldListener);
 
     static double getCurrentValue(FieldOutput f) {

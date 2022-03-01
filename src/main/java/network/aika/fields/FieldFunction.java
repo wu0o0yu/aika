@@ -16,7 +16,7 @@
  */
 package network.aika.fields;
 
-import java.util.function.Function;
+import java.util.function.DoubleFunction;
 
 /**
  * @author Lukas Molzberger
@@ -24,10 +24,10 @@ import java.util.function.Function;
 public class FieldFunction extends FieldListener implements FieldOutput {
 
     private FieldOutput input;
-    private Function<Double, Double> function;
+    private DoubleFunction<Double> function;
     private String label;
 
-    public FieldFunction(String label, FieldOutput in, Function<Double, Double> f) {
+    public FieldFunction(String label, FieldOutput in, DoubleFunction<Double> f) {
         this.input = in;
         this.function = f;
         this.label = label;
@@ -37,17 +37,23 @@ public class FieldFunction extends FieldListener implements FieldOutput {
         );
     }
 
-    public FieldFunction(String label, FieldOutput in, Function<Double, Double> f, FieldInput out) {
+    public FieldFunction(String label, FieldOutput in, DoubleFunction<Double> f, FieldInput... out) {
         this(label, in, f);
 
-        addFieldListener(label, (l, u) ->
-                out.addAndTriggerUpdate(u)
-        );
+        for (FieldInput o : out)
+            addFieldListener(label, (l, u) ->
+                    o.addAndTriggerUpdate(u)
+            );
     }
 
     @Override
     public String getLabel() {
         return label;
+    }
+
+    @Override
+    public void propagateInitialValue() {
+        propagateUpdate(getCurrentValue());
     }
 
     private void triggerUpdate() {
@@ -77,5 +83,9 @@ public class FieldFunction extends FieldListener implements FieldOutput {
     @Override
     public double getUpdate() {
         return getNewValue() - getCurrentValue();
+    }
+
+    public String toString() {
+        return "[v:" + getCurrentValue() + "]";
     }
 }
