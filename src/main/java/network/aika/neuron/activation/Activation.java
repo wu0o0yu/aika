@@ -202,6 +202,17 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return inputGradient;
     }
 
+    public FieldOutput getOutputGradient() {
+        return outputGradient;
+    }
+
+    public FieldInput[] getGradientInputFields() {
+        if(inputGradient != null)
+            return new FieldInput[] {inputGradient};
+        else
+            return new FieldInput[0];
+    }
+
     public void updateBias(double u) {
         getNet().addAndTriggerUpdate(u);
     }
@@ -461,14 +472,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                         new OutputKey(s.getOutput().getProvider(), MAX_VALUE),
                         true
                 );
-    }
-
-    public FieldOutput getOutputGradient() {
-        return outputGradient;
-    }
-
-    public FieldInput[] getGradientInputFields() {
-        return new FieldInput[] {inputGradient};
     }
 
     public void linkInputs() {

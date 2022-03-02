@@ -354,7 +354,10 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     public FieldInput[] getGradientInputFields() {
-        return new FieldInput[] {inputGradient, ownInputGradient};
+        if(inputGradient != null && ownInputGradient != null)
+            return new FieldInput[] {inputGradient, ownInputGradient};
+        else
+            return super.getGradientInputFields();
     }
 
     public boolean checkIfPrimaryInputBNLinkAlreadyExists() {

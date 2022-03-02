@@ -25,10 +25,6 @@ public class FieldDivision extends AbstractBiFunction {
         super(label, in1, register1, in2, register2);
     }
 
-    public FieldDivision(String label, FieldOutput in1, boolean register1, FieldOutput in2, boolean register2, FieldInput... out) {
-        super(label, in1, register1, in2, register2, out);
-    }
-
     @Override
     public double getCurrentValue() {
         return FieldOutput.getCurrentValue(in1) / FieldOutput.getCurrentValue(in2);

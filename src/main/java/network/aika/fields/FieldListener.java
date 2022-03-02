@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * @author Lukas Molzberger
  */
-public class FieldListener {
+public abstract class FieldListener {
 
     private record Entry(
             String label,
@@ -30,6 +30,18 @@ public class FieldListener {
     ) {}
 
     private List<Entry> fieldListeners = new ArrayList<>();
+
+    public abstract void propagateInitialValue();
+
+
+    public void registerOutputs(FieldInput... out) {
+        for(FieldInput o : out)
+            addFieldListener(o.getLabel(), (l, u) ->
+                    o.addAndTriggerUpdate(u)
+            );
+
+        propagateInitialValue();
+    }
 
     public void addFieldListener(String receiverLabel, FieldUpdateEvent fieldListener) {
         this.fieldListeners.add(

@@ -44,17 +44,6 @@ public abstract class AbstractBiFunction extends FieldListener implements FieldO
             );
     }
 
-    public AbstractBiFunction(String label, FieldOutput in1, boolean register1, FieldOutput in2, boolean register2, FieldInput... out) {
-        this(label, in1, register1, in2, register2);
-
-        for(FieldInput o : out)
-            addFieldListener(o.getLabel(), (l, u) ->
-                    o.addAndTriggerUpdate(u)
-            );
-
-        propagateInitialValue();
-    }
-
     @Override
     public void propagateInitialValue() {
         propagateUpdate(getCurrentValue());
