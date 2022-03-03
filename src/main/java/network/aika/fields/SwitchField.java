@@ -21,24 +21,13 @@ import java.util.function.BooleanSupplier;
 /**
  * @author Lukas Molzberger
  */
-public class SwitchField extends FieldListener implements FieldInput, FieldOutput {
+public class SwitchField extends AbstractBiFunction implements FieldInput {
 
     private BooleanSupplier test;
-    private Field inputFieldA;
-    private Field inputFieldB;
-    private String label;
 
-
-    public SwitchField(String label, BooleanSupplier test, Field inputFieldA, Field inputFieldB) {
-        this.label = label;
+    public SwitchField(String label, FieldInterface in1, boolean register1, FieldInterface in2, boolean register2, BooleanSupplier test) {
+        super(label, in1, register1, in2, register2);
         this.test = test;
-        this.inputFieldA = inputFieldA;
-        this.inputFieldB = inputFieldB;
-    }
-
-    @Override
-    public String getLabel() {
-        return label;
     }
 
     @Override
@@ -46,19 +35,19 @@ public class SwitchField extends FieldListener implements FieldInput, FieldOutpu
         propagateUpdate(getCurrentValue());
     }
 
-    private Field getField() {
+    private FieldInterface getField() {
         if(test.getAsBoolean()) {
-            return inputFieldB;
+            return (FieldInterface) in2;
         } else {
-            return inputFieldA;
+            return (FieldInterface) in1;
         }
     }
 
-    private Field getOtherField() {
+    private FieldInterface getOtherField() {
         if(test.getAsBoolean()) {
-            return inputFieldA;
+            return (FieldInterface) in1;
         } else {
-            return inputFieldB;
+            return (FieldInterface) in2;
         }
     }
 
@@ -79,7 +68,7 @@ public class SwitchField extends FieldListener implements FieldInput, FieldOutpu
 
     @Override
     public double getCurrentValue() {
-        return FieldOutput.getCurrentValue(inputFieldA) + FieldOutput.getCurrentValue(inputFieldB);
+        return FieldOutput.getCurrentValue(in1) + FieldOutput.getCurrentValue(in2);
     }
 
     @Override
@@ -97,7 +86,11 @@ public class SwitchField extends FieldListener implements FieldInput, FieldOutpu
         return FieldOutput.getUpdate(getField());
     }
 
+    @Override
     public String toString() {
-        return "[swf:" + getCurrentValue() + "]";
+        if(!isInitialized())
+            return "--";
+
+        return "[v:" + getCurrentValue() + "]";
     }
 }

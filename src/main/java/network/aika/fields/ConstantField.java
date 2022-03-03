@@ -39,6 +39,11 @@ public class ConstantField extends FieldListener implements FieldOutput {
     }
 
     @Override
+    public boolean isInitialized() {
+        return true;
+    }
+
+    @Override
     public void propagateInitialValue() {
         propagateUpdate(getCurrentValue());
     }

@@ -43,6 +43,12 @@ public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PositiveFeedba
         return new PositiveFeedbackLink(this, input, output);
     }
 
+    protected void initFromTemplate(PositiveFeedbackSynapse s) {
+        s.feedbackWeight.setAndTriggerUpdate(feedbackWeight.getCurrentValue());
+        s.feedbackBias.setAndTriggerUpdate(feedbackBias.getCurrentValue());
+        super.initFromTemplate(s);
+    }
+
     public Field getFeedbackWeight() {
         return feedbackWeight;
     }

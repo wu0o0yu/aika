@@ -106,11 +106,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         mul(
                 "ownIG * f'(net)",
                 ownInputGradient,
-                func(
-                        "f'(net)",
-                        net,
-                        x -> getNeuron().getActivationFunction().outerGrad(x)
-                ),
+                netOuterGradient,
                 ownOutputGradient
         );
 
@@ -166,9 +162,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     public boolean checkAllowPropagate() {
         if(isTemplate()) {
             if (isNetworkInput())
-                return false;
-
-            if (getOutputGradient().updateAvailable())
                 return false;
         }
 

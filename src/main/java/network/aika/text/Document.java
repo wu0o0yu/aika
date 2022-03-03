@@ -110,7 +110,7 @@ public class Document extends Thought<TextModel> {
     public TokenActivation addToken(PatternNeuron n, int begin, int end) {
         TokenActivation act = new TokenActivation(createActivationId(), begin, end, this, n);
 
-        act.setInputValue(1.0);
+        act.setInputNet(10.0);
         act.init(null, null);
         act.setFired();
 

@@ -32,11 +32,11 @@ import java.util.List;
 /**
  * @author Lukas Molzberger
  */
-public class Field extends FieldListener implements FieldInput, FieldOutput, Writable {
+public class Field extends FieldListener implements FieldInterface, Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Field.class);
 
-    private double currentValue = 0.0;
+    private Double currentValue;
     private Double update;
     private boolean allowUpdate;
     private String label;
@@ -73,6 +73,9 @@ public class Field extends FieldListener implements FieldInput, FieldOutput, Wri
 
     @Override
     public double getCurrentValue() {
+        if(!isInitialized())
+            throw new IllegalStateException("getNewValue was called on an uninitialized field");
+
         return currentValue;
     }
 
@@ -82,16 +85,21 @@ public class Field extends FieldListener implements FieldInput, FieldOutput, Wri
             throw new IllegalStateException("getNewValue was called outside the listener");
 
         if(updateAvailable())
-            return currentValue + update;
-        else
-            return currentValue;
+            return isInitialized() ? currentValue + update : update;
+        else {
+            return getCurrentValue();
+        }
     }
 
     @Override
     public boolean set(double v) {
-        update = v - currentValue;
-
-        return propagatePreCondition.check(currentValue, v, v - currentValue);
+        if(isInitialized()) {
+            update = v - currentValue;
+            return propagatePreCondition.check(currentValue, v, v - currentValue);
+        } else {
+            update = v;
+            return true;
+        }
     }
 
     @Override
@@ -101,7 +109,10 @@ public class Field extends FieldListener implements FieldInput, FieldOutput, Wri
         else
             update += u;
 
-        return propagatePreCondition.check(currentValue, currentValue + update, update);
+        return !isInitialized() || propagatePreCondition.check(
+                currentValue,
+                currentValue + update,
+                update);
     }
 
     @Override
@@ -130,12 +141,21 @@ public class Field extends FieldListener implements FieldInput, FieldOutput, Wri
         return update;
     }
 
+    @Override
+    public boolean isInitialized() {
+        return currentValue != null;
+    }
+
     private void acknowledgePropagated() {
-        if(update == null)
+        if (update == null)
             return;
 
         assert allowUpdate;
-        currentValue += update;
+        if (isInitialized())
+            currentValue += update;
+        else
+            currentValue = update;
+
         update = null;
     }
 
@@ -150,7 +170,12 @@ public class Field extends FieldListener implements FieldInput, FieldOutput, Wri
         update = null;
     }
 
+    @Override
     public String toString() {
-        return "[u:" + (update != null ? Utils.round(update) : "--") + ", v:" + Utils.round(currentValue) + "]";
+        if(!isInitialized())
+            return "--";
+
+        return "[u:" + (update != null ? Utils.round(update) : "--") + ", " +
+                "v:" + (currentValue != null ? Utils.round(currentValue) : "--") + "]";
     }
 }

@@ -16,6 +16,8 @@
  */
 package network.aika.fields;
 
+import network.aika.utils.Utils;
+
 import java.util.function.DoubleFunction;
 
 /**
@@ -52,8 +54,14 @@ public class FieldFunction extends FieldListener implements FieldOutput {
     }
 
     @Override
+    public boolean isInitialized() {
+        return input.isInitialized();
+    }
+
+    @Override
     public void propagateInitialValue() {
-        propagateUpdate(getCurrentValue());
+        if(isInitialized())
+            propagateUpdate(getCurrentValue());
     }
 
     private void triggerUpdate() {
@@ -82,10 +90,16 @@ public class FieldFunction extends FieldListener implements FieldOutput {
 
     @Override
     public double getUpdate() {
-        return getNewValue() - getCurrentValue();
+        return input.isInitialized() ?
+                getNewValue() - getCurrentValue() :
+                getNewValue();
     }
 
+    @Override
     public String toString() {
-        return "[v:" + getCurrentValue() + "]";
+        if(!isInitialized())
+            return "--";
+
+        return "[v:" + Utils.round(getCurrentValue()) + "]";
     }
 }

@@ -56,23 +56,24 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         this.input = input;
         this.output = output;
 
-        if (getConfig().isTrainingEnabled() && !isNegative()) {
-            igGradient = func("Information-Gain", input.net, output.net, (x1, x2) ->
-                    getRelativeSurprisal(
-                            Sign.getSign(x1),
-                            Sign.getSign(x2),
-                            input.getAbsoluteRange()
-                    ),
-                    output.getGradientInputFields()
-            );
-        }
-
-        backPropGradient = mulUnregistered("oAct.og * s.weight", output.outputGradient, getWeightOutput());
-
         init();
 
-        if(input != null && output != null)
+        if(input != null && output != null) {
             initWeightInput();
+
+            if (getConfig().isTrainingEnabled() && !isNegative()) {
+                igGradient = func("Information-Gain", input.net, output.net, (x1, x2) ->
+                                getRelativeSurprisal(
+                                        Sign.getSign(x1),
+                                        Sign.getSign(x2),
+                                        input.getAbsoluteRange()
+                                ),
+                        output.getGradientInputFields()
+                );
+
+                backPropGradient = mulUnregistered("oAct.og * s.weight", output.outputGradient, getWeightOutput());
+            }
+        }
 
         getThought().onLinkCreationEvent(this);
     }
@@ -135,12 +136,15 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
     }
 
     public void backPropagate() {
-        backPropGradient.triggerUpdate(1);
+        if(backPropGradient != null)
+            backPropGradient.triggerUpdate(1);
     }
 
     public void receiveWeightUpdate() {
         weightedInput.triggerUpdate(2);
-        backPropGradient.triggerUpdate(2);
+
+        if(backPropGradient != null)
+            backPropGradient.triggerUpdate(2);
     }
 
     @Override
@@ -164,7 +168,6 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         double s = synapse.getSurprisal(this, si, so, range);
         s -= input.getNeuron().getSurprisal(input, si, range);
         s -= output.getNeuron().getSurprisal(output, so, range);
-
         return s;
     }
 

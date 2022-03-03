@@ -76,6 +76,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     );
 
     private FieldFunction entropy;
+    protected FieldFunction netOuterGradient;
     protected Field inputGradient;
     protected Field outputGradient;
 
@@ -131,12 +132,16 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 getGradientInputFields()
         );
 
+        netOuterGradient =
+                func("f'(net)",
+                        net,
+                        x -> getNeuron().getActivationFunction().outerGrad(x)
+        );
+
         mul(
                 "ig * f'(net)",
                 inputGradient,
-                func("f'(net)", net, x ->
-                        getNeuron().getActivationFunction().outerGrad(x)
-                ),
+                netOuterGradient,
                 outputGradient
         );
 
@@ -166,6 +171,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         );
     }
 
+    public FieldFunction getNetOuterGradient() {
+        return netOuterGradient;
+    }
 
     public abstract boolean isBoundToConflictingBS(BindingSignal bs);
 
@@ -439,8 +447,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return neuron.getProvider();
     }
 
-    public void setInputValue(double v) {
-        value.setAndTriggerUpdate(v);
+    public void setInputNet(double x) {
+        net.setAndTriggerUpdate(x);
         isInput = true;
     }
 

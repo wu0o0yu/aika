@@ -45,8 +45,14 @@ public abstract class AbstractBiFunction extends FieldListener implements FieldO
     }
 
     @Override
+    public boolean isInitialized() {
+        return in1.isInitialized() && in2.isInitialized();
+    }
+
+    @Override
     public void propagateInitialValue() {
-        propagateUpdate(getCurrentValue());
+        if(isInitialized())
+            propagateUpdate(getCurrentValue());
     }
 
     @Override
@@ -78,6 +84,9 @@ public abstract class AbstractBiFunction extends FieldListener implements FieldO
     }
 
     public String toString() {
-        return "[v:" + getCurrentValue() + "]";
+        if(!isInitialized())
+            return "--";
+
+        return "[v:" + Utils.round(getCurrentValue()) + "]";
     }
 }

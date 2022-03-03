@@ -16,6 +16,7 @@
  */
 package network.aika.fields;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleFunction;
 
@@ -70,5 +71,9 @@ public class FieldUtils {
         BiFunction func = new BiFunction(label, in1, true, in2, true, f);
         func.registerOutputs(out);
         return func;
+    }
+
+    public static SwitchField switchField(String label, FieldInterface in1, FieldInterface in2, BooleanSupplier test) {
+        return new SwitchField(label, in1, false, in2, false, test);
     }
 }

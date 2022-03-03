@@ -21,6 +21,8 @@ import network.aika.fields.FieldOutput;
 import network.aika.fields.SwitchField;
 import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 
+import static network.aika.fields.FieldUtils.switchField;
+
 /**
  *
  * @author Lukas Molzberger
@@ -34,11 +36,11 @@ public class PositiveFeedbackLink extends BindingNeuronLink<PositiveFeedbackSyna
     }
 
     protected void initWeightInput() {
-        combinedWeight = new SwitchField(
+        combinedWeight = switchField(
                 "combinedWeight",
-                () -> input.isFinal(),
                 synapse.getWeight(),
-                synapse.getFeedbackWeight()
+                synapse.getFeedbackWeight(),
+                () -> input.isFinal()
         );
 
         super.initWeightInput();

@@ -36,8 +36,14 @@ public class InvertedField extends FieldListener implements FieldOutput {
     }
 
     @Override
+    public boolean isInitialized() {
+        return input.isInitialized();
+    }
+
+    @Override
     public void propagateInitialValue() {
-        propagateUpdate(getCurrentValue());
+        if(isInitialized())
+            propagateUpdate(getCurrentValue());
     }
 
     @Override

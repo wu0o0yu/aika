@@ -58,12 +58,12 @@ public class Templates {
     public Templates(Model m) {
         model = m;
 
-        init(INPUT_BINDING_TEMPLATE, -1, "Input Binding Neuron");
-        init(BINDING_TEMPLATE, -2, "Binding Neuron");
-        init(INPUT_PATTERN_TEMPLATE, -3, "Input Pattern Neuron");
-        init(PATTERN_TEMPLATE, -4, "Pattern Neuron");
-        init(INHIBITORY_TEMPLATE, -5, "Inhibitory Neuron");
-        init(CATEGORY_TEMPLATE, -6, "Category Neuron");
+        init(INPUT_BINDING_TEMPLATE, -1, "Input Binding Neuron", 0.0);
+        init(BINDING_TEMPLATE, -2, "Binding Neuron", 0.0);
+        init(INPUT_PATTERN_TEMPLATE, -3, "Input Pattern Neuron", 0.0);
+        init(PATTERN_TEMPLATE, -4, "Pattern Neuron", 0.0);
+        init(INHIBITORY_TEMPLATE, -5, "Inhibitory Neuron", 0.0);
+        init(CATEGORY_TEMPLATE, -6, "Category Neuron", 0.0);
 
         Set<Neuron> BINDING_NEURON_TEMPLATE_GROUP = Set.of(INPUT_BINDING_TEMPLATE, BINDING_TEMPLATE);
         INPUT_BINDING_TEMPLATE.getTemplateInfo().setTemplateGroup(BINDING_NEURON_TEMPLATE_GROUP);
@@ -128,6 +128,8 @@ public class Templates {
                         5,
                         0.0
                 );
+        POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE.getFeedbackBias().setAndTriggerUpdate(0.0);
+        POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE.getFeedbackWeight().setAndTriggerUpdate(0.0);
 
         NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE =
                 init(
@@ -182,12 +184,14 @@ public class Templates {
         );
     }
 
-    private <N extends Neuron> void init(N n, int id, String label) {
+    private <N extends Neuron> void init(N n, int id, String label, double initialBias) {
         NeuronProvider np = new NeuronProvider(model, id);
         templateNeuronIndex.put((byte) id, n);
         np.setNeuron(n);
         n.setProvider(np);
         n.setLabel(label);
+        n.getBias().setAndTriggerUpdate(initialBias);
+
         TemplateNeuronInfo templateInfo = n.getTemplateInfo();
         templateInfo.setLabel(label);
     }
