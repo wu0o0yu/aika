@@ -25,55 +25,55 @@ import java.util.function.DoubleFunction;
  */
 public class FieldUtils {
 
-    public static FieldMultiplication mul(String label, FieldOutput in1, FieldOutput in2) {
+    public static FieldMultiplication mul(String label, DoubleFieldOutput in1, DoubleFieldOutput in2) {
         return new FieldMultiplication(label, in1, true, in2, true);
     }
 
-    public static FieldMultiplication mul(String label, FieldOutput in1, FieldOutput in2, FieldInput out) {
+    public static FieldMultiplication mul(String label, DoubleFieldOutput in1, DoubleFieldOutput in2, DoubleFieldInput out) {
         FieldMultiplication func = new FieldMultiplication(label, in1, true, in2, true);
         func.registerOutputs(out);
         return func;
     }
 
-    public static FieldMultiplication mulUnregistered(String label, FieldOutput in1, FieldOutput in2) {
+    public static FieldMultiplication mulUnregistered(String label, DoubleFieldOutput in1, DoubleFieldOutput in2) {
         return new FieldMultiplication(label, in1, false, in2, false);
     }
 
-    public static FieldMultiplication mulUnregistered(String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
+    public static FieldMultiplication mulUnregistered(String label, DoubleFieldOutput in1, DoubleFieldOutput in2, DoubleFieldInput... out) {
         FieldMultiplication func = new FieldMultiplication(label, in1, false, in2, false);
         func.registerOutputs(out);
         return func;
     }
 
-    public static FieldDivision div(String label, FieldOutput in1, FieldOutput in2) {
+    public static FieldDivision div(String label, DoubleFieldOutput in1, DoubleFieldOutput in2) {
         return new FieldDivision(label, in1, true, in2, true);
     }
 
-    public static FieldDivision div(String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
+    public static FieldDivision div(String label, DoubleFieldOutput in1, DoubleFieldOutput in2, DoubleFieldInput... out) {
         FieldDivision func = new FieldDivision(label, in1, true, in2, true);
         func.registerOutputs(out);
         return func;
     }
 
-    public static FieldFunction func(String label, FieldOutput in, DoubleFunction<Double> f) {
+    public static FieldFunction func(String label, DoubleFieldOutput in, DoubleFunction<Double> f) {
         return new FieldFunction(label, in, f);
     }
 
-    public static FieldFunction func(String label, FieldOutput in, DoubleFunction<Double> f, FieldInput... out) {
+    public static FieldFunction func(String label, DoubleFieldOutput in, DoubleFunction<Double> f, DoubleFieldInput... out) {
         return new FieldFunction(label, in, f, out);
     }
 
-    public static BiFunction func(String label, FieldOutput in1, FieldOutput in2, DoubleBinaryOperator f) {
+    public static BiFunction func(String label, DoubleFieldOutput in1, DoubleFieldOutput in2, DoubleBinaryOperator f) {
         return new BiFunction(label, in1, true, in2, true, f);
     }
 
-    public static BiFunction func(String label, FieldOutput in1, FieldOutput in2, DoubleBinaryOperator f, FieldInput... out) {
+    public static BiFunction func(String label, DoubleFieldOutput in1, DoubleFieldOutput in2, DoubleBinaryOperator f, DoubleFieldInput... out) {
         BiFunction func = new BiFunction(label, in1, true, in2, true, f);
         func.registerOutputs(out);
         return func;
     }
 
-    public static SwitchField switchField(String label, FieldInterface in1, FieldInterface in2, BooleanSupplier test) {
+    public static SwitchField switchField(String label, DoubleFieldInterface in1, DoubleFieldInterface in2, BooleanSupplier test) {
         return new SwitchField(label, in1, false, in2, false, test);
     }
 }

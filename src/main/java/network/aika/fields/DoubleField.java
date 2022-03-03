@@ -17,7 +17,6 @@
 package network.aika.fields;
 
 import network.aika.Model;
-import network.aika.neuron.activation.Link;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import org.slf4j.Logger;
@@ -26,15 +25,13 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Lukas Molzberger
  */
-public class Field extends FieldListener implements FieldInterface, Writable {
+public class DoubleField extends FieldListener implements DoubleFieldInterface, Writable {
 
-    private static final Logger log = LoggerFactory.getLogger(Field.class);
+    private static final Logger log = LoggerFactory.getLogger(DoubleField.class);
 
     private Double currentValue;
     private Double update;
@@ -43,12 +40,12 @@ public class Field extends FieldListener implements FieldInterface, Writable {
 
     private PropagatePreCondition propagatePreCondition;
 
-    public Field(String label) {
+    public DoubleField(String label) {
         this.label = label;
         this.propagatePreCondition = (cv, nv, u) -> !Utils.belowTolerance(u);
     }
 
-    public Field(String label, FieldUpdateEvent fieldListener) {
+    public DoubleField(String label, FieldUpdateEvent fieldListener) {
         this(label);
         addFieldListener(label, fieldListener);
     }

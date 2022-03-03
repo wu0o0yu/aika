@@ -62,8 +62,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected boolean isInput;
     private boolean finalMode = false;
 
-    protected Field value = new Field("value");
-    protected Field net = new QueueField(this, "net");
+    protected DoubleField value = new DoubleField("value");
+    protected DoubleField net = new QueueDoubleField(this, "net");
 
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
@@ -77,8 +77,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     private FieldFunction entropy;
     protected FieldFunction netOuterGradient;
-    protected Field inputGradient;
-    protected Field outputGradient;
+    protected DoubleField inputGradient;
+    protected DoubleField outputGradient;
 
     protected Activation(int id, N n) {
         this.id = id;
@@ -120,8 +120,19 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     protected void initGradientFields() {
-        inputGradient = new QueueField(this, "Input-Gradient");
-        outputGradient = new QueueField(this, "Output-Gradient");
+        commonInitGradientFields();
+
+        outputGradient.addFieldListener("updateWeights", (l, u) ->
+                updateWeights(u)
+        );
+        outputGradient.addFieldListener("propagateGradient", (l, u) ->
+                propagateGradient()
+        );
+    }
+
+    protected void commonInitGradientFields() {
+        inputGradient = new QueueDoubleField(this, "Input-Gradient");
+        outputGradient = new QueueDoubleField(this, "Output-Gradient");
 
         entropy = func("Entropy", net, x ->
                         getNeuron().getSurprisal(
@@ -159,16 +170,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                     value
             );
         }
-
-        if (getNeuron().isNetworkInput())
-            return;
-
-        outputGradient.addFieldListener("updateWeights", (l, u) ->
-                updateWeights(u)
-        );
-        outputGradient.addFieldListener("propagateGradient", (l, u) ->
-                propagateGradient()
-        );
     }
 
     public FieldFunction getNetOuterGradient() {
@@ -202,23 +203,23 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         thought.onActivationCreationEvent(this, originSynapse, originAct);
     }
 
-    public FieldOutput getEntropy() {
+    public DoubleFieldOutput getEntropy() {
         return entropy;
     }
 
-    public Field getInputGradient() {
+    public DoubleField getInputGradient() {
         return inputGradient;
     }
 
-    public FieldOutput getOutputGradient() {
+    public DoubleFieldOutput getOutputGradient() {
         return outputGradient;
     }
 
-    public FieldInput[] getGradientInputFields() {
+    public DoubleFieldInput[] getGradientInputFields() {
         if(inputGradient != null)
-            return new FieldInput[] {inputGradient};
+            return new DoubleFieldInput[] {inputGradient};
         else
-            return new FieldInput[0];
+            return new DoubleFieldInput[0];
     }
 
     public void updateBias(double u) {
@@ -229,7 +230,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return id;
     }
 
-    public Field getValue() {
+    public DoubleField getValue() {
         return value;
     }
 
@@ -241,7 +242,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         isInput = input;
     }
 
-    public Field getNet() {
+    public DoubleField getNet() {
         return net;
     }
 

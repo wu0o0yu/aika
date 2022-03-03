@@ -51,11 +51,11 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     private final Set<BindingActivation> branches = new TreeSet<>();
     private BindingActivation mainBranch;
-    private Field branchProbability = new Field("Branch-Probability");
-    private Field bpNorm = new Field("BP-Norm");
+    private DoubleField branchProbability = new DoubleField("Branch-Probability");
+    private DoubleField bpNorm = new DoubleField("BP-Norm");
 
-    private Field ownInputGradient;
-    protected Field ownOutputGradient;
+    private DoubleField ownInputGradient;
+    protected DoubleField ownOutputGradient;
 
     protected BindingActivation(int id, BindingNeuron n) {
         super(id, n);
@@ -98,10 +98,10 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     protected void initGradientFields() {
-        ownInputGradient = new QueueField(this, "Own-Input-Gradient");
-        ownOutputGradient = new QueueField(this, "Own-Output-Gradient");
+        ownInputGradient = new QueueDoubleField(this, "Own-Input-Gradient");
+        ownOutputGradient = new QueueDoubleField(this, "Own-Output-Gradient");
 
-        super.initGradientFields();
+        super.commonInitGradientFields();
 
         mul(
                 "ownIG * f'(net)",
@@ -186,7 +186,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 .forEach(act -> act.onConflictingNetChange(net));
     }
 
-    private void onConflictingNetChange(Field inputNet) {
+    private void onConflictingNetChange(DoubleField inputNet) {
         double expUpdate = Math.exp(inputNet.getNewValue()) - Math.exp(inputNet.getCurrentValue());
 
         bpNorm.addAndTriggerUpdate(expUpdate);
@@ -299,11 +299,11 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 .orElse(null);
     }
 
-    public Field getOwnInputGradient() {
+    public DoubleField getOwnInputGradient() {
         return ownInputGradient;
     }
 
-    public FieldOutput getOwnOutputGradient() {
+    public DoubleFieldOutput getOwnOutputGradient() {
         return ownOutputGradient;
     }
 
@@ -338,17 +338,17 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
             return branches.stream();
     }
 
-    public Field getBpNorm() {
+    public DoubleField getBpNorm() {
         return bpNorm;
     }
 
-    public Field getBranchProbability() {
+    public DoubleField getBranchProbability() {
         return branchProbability;
     }
 
-    public FieldInput[] getGradientInputFields() {
+    public DoubleFieldInput[] getGradientInputFields() {
         if(inputGradient != null && ownInputGradient != null)
-            return new FieldInput[] {inputGradient, ownInputGradient};
+            return new DoubleFieldInput[] {inputGradient, ownInputGradient};
         else
             return super.getGradientInputFields();
     }

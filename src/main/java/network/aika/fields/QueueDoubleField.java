@@ -14,34 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.sign;
+package network.aika.fields;
 
-import network.aika.neuron.activation.Activation;
-import network.aika.fields.DoubleFieldOutput;
 
+import network.aika.neuron.activation.Element;
+import network.aika.steps.FieldStep;
+import network.aika.steps.Step;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public interface Sign {
+public class QueueDoubleField extends DoubleField {
 
-    Positive POS = new Positive();
-    Negative NEG = new Negative();
+    private boolean isQueued;
+    private FieldStep step;
 
-    Sign[] SIGNS = new Sign[] {POS, NEG};
-
-    Sign invert();
-
-    static Sign getSign(Activation act) {
-        return act != null && act.isFired() ? POS : NEG;
+    public QueueDoubleField(Element e, String label) {
+        super(label);
+        step = new FieldStep(e, this);
     }
 
-    static Sign getSign(double x) {
-        return x >= 0.0 ? POS : NEG;
+    public void setStep(FieldStep s) {
+        this.step = s;
     }
 
-    DoubleFieldOutput getValue(DoubleFieldOutput v);
+    public void triggerUpdate() {
+        if(!isQueued) {
+            Step.add(step);
+            isQueued = true;
+        }
+    }
 
-    int index();
+    public void process() {
+        isQueued = false;
+        triggerInternal();
+    }
 }

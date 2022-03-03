@@ -16,8 +16,8 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.fields.FieldInput;
-import network.aika.fields.FieldOutput;
+import network.aika.fields.DoubleFieldInput;
+import network.aika.fields.DoubleFieldOutput;
 import network.aika.fields.SwitchField;
 import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 
@@ -51,11 +51,11 @@ public class PositiveFeedbackLink extends BindingNeuronLink<PositiveFeedbackSyna
         output.getNet().addAndTriggerUpdate(synapse.getFeedbackWeight().getCurrentValue());
     }
 
-    public FieldInput getWeightInput() {
+    public DoubleFieldInput getWeightInput() {
         return combinedWeight;
     }
 
-    public FieldOutput getWeightOutput() {
+    public DoubleFieldOutput getWeightOutput() {
         return combinedWeight;
     }
 }

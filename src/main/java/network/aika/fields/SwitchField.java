@@ -21,11 +21,11 @@ import java.util.function.BooleanSupplier;
 /**
  * @author Lukas Molzberger
  */
-public class SwitchField extends AbstractBiFunction implements FieldInput {
+public class SwitchField extends AbstractBiFunction implements DoubleFieldInput {
 
     private BooleanSupplier test;
 
-    public SwitchField(String label, FieldInterface in1, boolean register1, FieldInterface in2, boolean register2, BooleanSupplier test) {
+    public SwitchField(String label, DoubleFieldInterface in1, boolean register1, DoubleFieldInterface in2, boolean register2, BooleanSupplier test) {
         super(label, in1, register1, in2, register2);
         this.test = test;
     }
@@ -35,19 +35,19 @@ public class SwitchField extends AbstractBiFunction implements FieldInput {
         propagateUpdate(getCurrentValue());
     }
 
-    private FieldInterface getField() {
+    private DoubleFieldInterface getField() {
         if(test.getAsBoolean()) {
-            return (FieldInterface) in2;
+            return (DoubleFieldInterface) in2;
         } else {
-            return (FieldInterface) in1;
+            return (DoubleFieldInterface) in1;
         }
     }
 
-    private FieldInterface getOtherField() {
+    private DoubleFieldInterface getOtherField() {
         if(test.getAsBoolean()) {
-            return (FieldInterface) in1;
+            return (DoubleFieldInterface) in1;
         } else {
-            return (FieldInterface) in2;
+            return (DoubleFieldInterface) in2;
         }
     }
 
@@ -68,12 +68,12 @@ public class SwitchField extends AbstractBiFunction implements FieldInput {
 
     @Override
     public double getCurrentValue() {
-        return FieldOutput.getCurrentValue(in1) + FieldOutput.getCurrentValue(in2);
+        return DoubleFieldOutput.getCurrentValue(in1) + DoubleFieldOutput.getCurrentValue(in2);
     }
 
     @Override
     public double getNewValue() {
-        return getField().getNewValue() + FieldOutput.getCurrentValue(getOtherField());
+        return getField().getNewValue() + DoubleFieldOutput.getCurrentValue(getOtherField());
     }
 
     @Override
@@ -83,7 +83,7 @@ public class SwitchField extends AbstractBiFunction implements FieldInput {
 
     @Override
     public double getUpdate() {
-        return FieldOutput.getUpdate(getField());
+        return DoubleFieldOutput.getUpdate(getField());
     }
 
     @Override

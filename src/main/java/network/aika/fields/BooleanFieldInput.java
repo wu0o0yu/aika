@@ -14,34 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.sign;
-
-import network.aika.neuron.activation.Activation;
-import network.aika.fields.DoubleFieldOutput;
-
+package network.aika.fields;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public interface Sign {
+public interface BooleanFieldInput extends FieldInput {
 
-    Positive POS = new Positive();
-    Negative NEG = new Negative();
+    boolean set(boolean v);
 
-    Sign[] SIGNS = new Sign[] {POS, NEG};
-
-    Sign invert();
-
-    static Sign getSign(Activation act) {
-        return act != null && act.isFired() ? POS : NEG;
+    default void setAndTriggerUpdate(boolean v) {
+        if(set(v))
+            triggerUpdate();
     }
-
-    static Sign getSign(double x) {
-        return x >= 0.0 ? POS : NEG;
-    }
-
-    DoubleFieldOutput getValue(DoubleFieldOutput v);
-
-    int index();
 }

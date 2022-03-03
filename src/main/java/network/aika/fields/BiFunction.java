@@ -17,7 +17,6 @@
 package network.aika.fields;
 
 import java.util.function.DoubleBinaryOperator;
-import java.util.function.Function;
 
 /**
  * @author Lukas Molzberger
@@ -26,7 +25,7 @@ public class BiFunction extends AbstractBiFunction {
 
     private DoubleBinaryOperator function;
 
-    public BiFunction(String label, FieldOutput in1, boolean register1, FieldOutput in2, boolean register2, DoubleBinaryOperator f) {
+    public BiFunction(String label, DoubleFieldOutput in1, boolean register1, DoubleFieldOutput in2, boolean register2, DoubleBinaryOperator f) {
         super(label, in1, register1, in2, register2);
         this.function = f;
     }

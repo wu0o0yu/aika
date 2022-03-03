@@ -16,37 +16,14 @@
  */
 package network.aika.fields;
 
-
-import network.aika.neuron.activation.Element;
-import network.aika.steps.FieldStep;
-import network.aika.steps.Step;
-
 /**
  * @author Lukas Molzberger
  */
-public class QueueField extends Field {
+public interface BooleanFieldOutput extends FieldOutput {
 
-    private boolean isQueued;
-    private FieldStep step;
+    boolean getCurrentValue();
 
-    public QueueField(Element e, String label) {
-        super(label);
-        step = new FieldStep(e, this);
-    }
+    boolean getNewValue();
 
-    public void setStep(FieldStep s) {
-        this.step = s;
-    }
-
-    public void triggerUpdate() {
-        if(!isQueued) {
-            Step.add(step);
-            isQueued = true;
-        }
-    }
-
-    public void process() {
-        isQueued = false;
-        triggerInternal();
-    }
+    boolean getUpdate();
 }

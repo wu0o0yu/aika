@@ -34,8 +34,8 @@ public abstract class FieldListener {
     public abstract void propagateInitialValue();
 
 
-    public void registerOutputs(FieldInput... out) {
-        for(FieldInput o : out)
+    public void registerOutputs(DoubleFieldInput... out) {
+        for(DoubleFieldInput o : out)
             addFieldListener(o.getLabel(), (l, u) ->
                     o.addAndTriggerUpdate(u)
             );

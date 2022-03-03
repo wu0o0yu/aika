@@ -28,7 +28,7 @@ import network.aika.steps.link.PropagateBindingSignal;
 
 import java.util.Comparator;
 
-import static network.aika.fields.ConstantField.ZERO;
+import static network.aika.fields.ConstantDoubleField.ZERO;
 import static network.aika.fields.FieldUtils.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
 
@@ -104,23 +104,23 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
             LinkCounting.add(this);
     }
 
-    public FieldOutput getInformationGainGradient() {
+    public DoubleFieldOutput getInformationGainGradient() {
         return igGradient;
     }
 
-    public FieldInput getWeightInput() {
+    public DoubleFieldInput getWeightInput() {
         return synapse.getWeight();
     }
 
-    public FieldOutput getWeightOutput() {
+    public DoubleFieldOutput getWeightOutput() {
         return synapse.getWeight();
     }
 
-    public FieldOutput getWeightedInput() {
+    public DoubleFieldOutput getWeightedInput() {
         return weightedInput;
     }
 
-    public FieldOutput getBackPropGradient() {
+    public DoubleFieldOutput getBackPropGradient() {
         return backPropGradient;
     }
 
@@ -182,7 +182,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
     }
 */
 
-    public FieldOutput getInputValue(Sign s) {
+    public DoubleFieldOutput getInputValue(Sign s) {
         return s.getValue(input != null ? input.getValue() : ZERO);
     }
 

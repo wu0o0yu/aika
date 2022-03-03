@@ -17,7 +17,6 @@
 package network.aika.neuron;
 
 import network.aika.Model;
-import network.aika.fields.Field;
 
 import java.io.*;
 import java.util.zip.GZIPInputStream;

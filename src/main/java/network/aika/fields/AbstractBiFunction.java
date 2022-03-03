@@ -21,14 +21,14 @@ import network.aika.utils.Utils;
 /**
  * @author Lukas Molzberger
  */
-public abstract class AbstractBiFunction extends FieldListener implements FieldOutput {
-    protected FieldOutput in1;
-    protected FieldOutput in2;
+public abstract class AbstractBiFunction extends FieldListener implements DoubleFieldOutput {
+    protected DoubleFieldOutput in1;
+    protected DoubleFieldOutput in2;
 
     protected int currentArgument = -1;
     private String label;
 
-    public AbstractBiFunction(String label, FieldOutput in1, boolean register1, FieldOutput in2, boolean register2) {
+    public AbstractBiFunction(String label, DoubleFieldOutput in1, boolean register1, DoubleFieldOutput in2, boolean register2) {
         this.label = label;
         this.in1 = in1;
         this.in2 = in2;
@@ -46,7 +46,8 @@ public abstract class AbstractBiFunction extends FieldListener implements FieldO
 
     @Override
     public boolean isInitialized() {
-        return in1.isInitialized() && in2.isInitialized();
+        return in1 != null && in1.isInitialized() &&
+                in2 != null && in2.isInitialized();
     }
 
     @Override
@@ -75,9 +76,9 @@ public abstract class AbstractBiFunction extends FieldListener implements FieldO
     public boolean updateAvailable() {
         switch (currentArgument) {
             case 1:
-                return !Utils.belowTolerance(FieldOutput.getCurrentValue(in2)) && in1.updateAvailable();
+                return !Utils.belowTolerance(DoubleFieldOutput.getCurrentValue(in2)) && in1.updateAvailable();
             case 2:
-                return !Utils.belowTolerance(FieldOutput.getCurrentValue(in1)) && in2.updateAvailable();
+                return !Utils.belowTolerance(DoubleFieldOutput.getCurrentValue(in1)) && in2.updateAvailable();
             default:
                 throw new IllegalArgumentException();
         }

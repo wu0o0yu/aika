@@ -16,18 +16,21 @@
  */
 package network.aika.fields;
 
-
 /**
  * @author Lukas Molzberger
  */
-public class InvertedField extends FieldListener implements FieldOutput {
+public class ConstantDoubleField extends FieldListener implements DoubleFieldOutput {
 
-    FieldOutput input;
+    public static final ConstantDoubleField ZERO = new ConstantDoubleField("ZERO", 0.0);
+    public static final ConstantDoubleField ONE = new ConstantDoubleField("ONE", 1.0);
+
+    private final double value;
+    private boolean initialized = false;
     private String label;
 
-    public InvertedField(String label, FieldOutput in) {
+    public ConstantDoubleField(String label, double value) {
         this.label = label;
-        this.input = in;
+        this.value = value;
     }
 
     @Override
@@ -37,32 +40,31 @@ public class InvertedField extends FieldListener implements FieldOutput {
 
     @Override
     public boolean isInitialized() {
-        return input.isInitialized();
+        return true;
     }
 
     @Override
     public void propagateInitialValue() {
-        if(isInitialized())
-            propagateUpdate(getCurrentValue());
+        propagateUpdate(getCurrentValue());
     }
 
     @Override
     public double getCurrentValue() {
-        return 1.0 - input.getCurrentValue();
+        return value;
     }
 
     @Override
     public double getNewValue() {
-        return 1.0 - input.getNewValue();
+        return value;
     }
 
     @Override
     public boolean updateAvailable() {
-        return input.updateAvailable();
+        return !initialized;
     }
 
     @Override
     public double getUpdate() {
-        return getNewValue() - getCurrentValue();
+        return 0;
     }
 }

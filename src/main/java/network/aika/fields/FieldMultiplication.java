@@ -21,13 +21,13 @@ package network.aika.fields;
  */
 public class FieldMultiplication extends AbstractBiFunction {
 
-    public FieldMultiplication(String label, FieldOutput in1, boolean register1, FieldOutput in2, boolean register2) {
+    public FieldMultiplication(String label, DoubleFieldOutput in1, boolean register1, DoubleFieldOutput in2, boolean register2) {
         super(label, in1, register1, in2, register2);
     }
 
     @Override
     public double getCurrentValue() {
-        return FieldOutput.getCurrentValue(in1) * FieldOutput.getCurrentValue(in2);
+        return DoubleFieldOutput.getCurrentValue(in1) * DoubleFieldOutput.getCurrentValue(in2);
     }
 
     @Override
@@ -46,11 +46,11 @@ public class FieldMultiplication extends AbstractBiFunction {
         switch (currentArgument) {
             case 1:
                 if (in1.updateAvailable())
-                    return in1.getUpdate() * FieldOutput.getCurrentValue(in2);
+                    return in1.getUpdate() * DoubleFieldOutput.getCurrentValue(in2);
                 break;
             case 2:
                 if (in2.updateAvailable())
-                    return in2.getUpdate() * FieldOutput.getCurrentValue(in1);
+                    return in2.getUpdate() * DoubleFieldOutput.getCurrentValue(in1);
                 break;
             default:
                 throw new IllegalArgumentException();
