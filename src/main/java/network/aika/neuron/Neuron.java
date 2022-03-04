@@ -188,7 +188,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         if(isTemplate())
             return 0.0;
 
-        return getSurprisal(act, POS, range);
+        return getSurprisal(POS, range, true);
     }
 
     public SampleSpace getSampleSpace() {
@@ -339,18 +339,17 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         setModified();
     }
 
-    public double getSurprisal(Activation act, Sign s, Range range) {
+    public double getSurprisal(Sign s, Range range, boolean addCurrentInstance) {
         double n = sampleSpace.getN(range);
-        double p = getProbability(act, s, n);
+        double p = getProbability(s, n, addCurrentInstance);
         return Utils.surprisal(p);
     }
 
-    public double getProbability(Activation act, Sign s, double n) {
+    public double getProbability(Sign s, double n, boolean addCurrentInstance) {
         double f = getFrequency(s, n);
-        if(act != null) {
-            if (s == Sign.getSign(act)) {
-                f += 1.0;
-            }
+
+        if(addCurrentInstance) {
+            f += 1.0;
             n += 1.0;
         }
 

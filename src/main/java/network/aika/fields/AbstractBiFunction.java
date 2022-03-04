@@ -76,9 +76,9 @@ public abstract class AbstractBiFunction extends FieldListener implements Double
     public boolean updateAvailable() {
         switch (currentArgument) {
             case 1:
-                return !Utils.belowTolerance(DoubleFieldOutput.getCurrentValue(in2)) && in1.updateAvailable();
+                return in1.updateAvailable() && in2.isInitialized();
             case 2:
-                return !Utils.belowTolerance(DoubleFieldOutput.getCurrentValue(in1)) && in2.updateAvailable();
+                return in1.isInitialized() && in2.updateAvailable();
             default:
                 throw new IllegalArgumentException();
         }

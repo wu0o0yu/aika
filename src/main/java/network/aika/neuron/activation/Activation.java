@@ -104,9 +104,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         initFields();
 
-        if(getConfig().isCountingEnabled())
-            Counting.add(this);
-
         value.addFieldListener("l.propagateValue", (label, u) ->
                 getOutputLinks()
                         .forEach(l -> l.propagateValue())
@@ -136,9 +133,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         entropy = func("Entropy", net, x ->
                         getNeuron().getSurprisal(
-                                this,
                                 Sign.getSign(x),
-                                getAbsoluteRange()
+                                getAbsoluteRange(),
+                                true
                         ),
                 getGradientInputFields()
         );
@@ -284,10 +281,10 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     protected void onFired() {
-        if(isTemplate())
-            Induction.add(this);
-
         Propagate.add(this, false, "", s -> true);
+
+        if(getConfig().isCountingEnabled())
+            Counting.add(this);
 
         if(isFinal())
             onFinalFired();
@@ -346,6 +343,16 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     protected void onBindingSignalArrivedFinalFired(BindingSignal bs) {
         Linking.add(this, bs, OUTPUT, POST_FIRED, true, "", s -> true);
+    }
+
+    public void induce() {
+        assert isTemplate();
+
+        unlink();
+        neuron = (N) neuron.instantiateTemplate(true);
+        neuron.setLabel(getConfig().getLabel(this));
+
+        link();
     }
 
     public Thought getThought() {

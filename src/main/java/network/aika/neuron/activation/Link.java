@@ -22,8 +22,8 @@ import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.sign.Sign;
+import network.aika.steps.link.Cleanup;
 import network.aika.steps.link.LinkCounting;
-import network.aika.steps.link.LinkInduction;
 import network.aika.steps.link.PropagateBindingSignal;
 
 import java.util.Comparator;
@@ -91,14 +91,10 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         if(getInput() != null) {
             linkInput();
             PropagateBindingSignal.add(this);
-
-            if(getSynapse().isTemplate())
-                LinkInduction.add(this);
         }
 
-        if(getOutput() != null) {
+        if(getOutput() != null)
             linkOutput();
-        }
 
         if(getConfig().isCountingEnabled())
             LinkCounting.add(this);
@@ -128,7 +124,9 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         double weightDelta = getConfig().getLearnRate() * g;
         boolean oldWeightIsZero = synapse.isZero();
 
-        assert !synapse.isTemplate();
+        if(isTemplate())
+            induce();
+
         synapse.updateWeight(this, weightDelta);
 
         if (oldWeightIsZero && !synapse.isZero() && getInput().isFired())
@@ -165,9 +163,9 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
     }
 
     public double getRelativeSurprisal(Sign si, Sign so, Range range) {
-        double s = synapse.getSurprisal(this, si, so, range);
-        s -= input.getNeuron().getSurprisal(input, si, range);
-        s -= output.getNeuron().getSurprisal(output, so, range);
+        double s = synapse.getSurprisal(si, so, range, true);
+        s -= input.getNeuron().getSurprisal(si, range, true);
+        s -= output.getNeuron().getSurprisal(so, range, true);
         return s;
     }
 
@@ -220,6 +218,23 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
 
     public static boolean isCausal(Activation iAct, Activation oAct) {
         return NOT_SET_AFTER.compare(iAct.getFired(), oAct.getFired()) < 0;
+    }
+
+    public void induce() {
+        assert isTemplate();
+
+        if(output.isTemplate())
+            output.induce();
+
+        synapse = (S) synapse
+                .instantiateTemplate(
+                        input.getNeuron(),
+                        output.getNeuron()
+                );
+
+        synapse.linkOutput();
+
+        Cleanup.add(this);
     }
 
     public void linkInput() {

@@ -336,23 +336,18 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return getPOutput().getModel();
     }
 
-    public double getSurprisal(Link l, Sign si, Sign so, Range range) {
+    public double getSurprisal(Sign si, Sign so, Range range, boolean addCurrentInstance) {
         double n = sampleSpace.getN(range);
-        double p = getProbability(l, si, so, n);
+        double p = getProbability(si, so, n, addCurrentInstance);
         return Utils.surprisal(p);
     }
 
-    public double getProbability(Link l, Sign si, Sign so, double n) {
+    public double getProbability(Sign si, Sign so, double n, boolean addCurrentInstance) {
         double f = getFrequency(si, so, n);
 
         // Add the current instance
-        if(l != null) {
-            if (
-                    si == Sign.getSign(l.getInput()) &&
-                    so == Sign.getSign(l.getOutput())
-            ) {
-                f += 1.0;
-            }
+        if(addCurrentInstance) {
+            f += 1.0;
             n += 1.0;
         }
 

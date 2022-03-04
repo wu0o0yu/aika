@@ -49,6 +49,9 @@ public class BiFunction extends AbstractBiFunction {
 
     @Override
     public double getUpdate() {
-        return getNewValue() - getCurrentValue();
+        if(isInitialized())
+            return getNewValue() - getCurrentValue();
+        else
+            return getNewValue();
     }
 }
