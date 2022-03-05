@@ -54,42 +54,4 @@ public interface QueueKey {
     Timestamp getTimestamp();
 
     boolean checkIfQueued();
-
-    class Key implements QueueKey {
-        private final Phase p;
-
-        public Key(Phase p) {
-            this.p = p;
-        }
-
-        @Override
-        public Phase getPhase() {
-            return p;
-        }
-
-        @Override
-        public Timestamp getFired() {
-            return Timestamp.MAX;
-        }
-
-        @Override
-        public LinkingOrder getLinkingOrder() {
-            return LinkingOrder.NOT_SET;
-        }
-
-        @Override
-        public String getStepName() {
-            return "";
-        }
-
-        @Override
-        public Timestamp getTimestamp() {
-            return NOT_SET;
-        }
-
-        @Override
-        public boolean checkIfQueued() {
-            return true;
-        }
-    }
 }
