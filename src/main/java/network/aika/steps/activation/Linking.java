@@ -20,7 +20,10 @@ import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Timestamp;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.conjunctive.PatternSynapse;
+import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 import network.aika.steps.LinkingOrder;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
@@ -29,6 +32,11 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.steps.LinkingOrder.POST_FIRED;
+import static network.aika.steps.LinkingOrder.PRE_FIRED;
 
 /**
  * The job of the linking phase is to propagate information through the network by creating the required activations and links.
@@ -44,17 +52,33 @@ import java.util.stream.Stream;
  */
 public class Linking extends Step<Activation> {
 
-    public static void add(Activation act, BindingSignal bindingSignal, Direction dir, LinkingOrder linkingOrder, boolean template, String linkingType, Predicate<Synapse> filter) {
-        if(template && !act.getConfig().isTemplatesEnabled())
+    public static void addInternal(Activation act, BindingSignal bindingSignal, Direction dir, LinkingOrder linkingOrder, Timestamp fired, String linkingType, Predicate<Synapse> filter) {
+        if (bindingSignal.isOrigin())
             return;
 
-        if(bindingSignal.isOrigin())
-            return;
+        Linking step = new Linking(act, bindingSignal, dir, linkingOrder, fired, false, linkingType, filter);
 
-        Linking step = new Linking(act, bindingSignal, dir, linkingOrder, template, linkingType, filter);
-
-        if(step.hasTargetSynapses())
+        if (step.hasTargetSynapses())
             Step.add(step);
+
+        if (act.getConfig().isTemplatesEnabled()) {
+            Linking templateStep = new Linking(act, bindingSignal, dir, linkingOrder, fired, true, linkingType, filter);
+
+            if (templateStep.hasTargetSynapses())
+                Step.add(templateStep);
+        }
+    }
+
+    public static void add(Activation act, BindingSignal bindingSignal, LinkingOrder linkingOrder) {
+        addInternal(act, bindingSignal, linkingOrder == PRE_FIRED ? INPUT : OUTPUT, linkingOrder, act.getFired(), "", s -> true);
+    }
+
+    public static void addUnboundLinking(Activation act, BindingSignal bindingSignal) {
+        addInternal(act, bindingSignal, OUTPUT, POST_FIRED, act.getFired(), "PATTERN-SYN", s -> s instanceof PatternSynapse);
+    }
+
+    public static void addPosFeedback(Activation act, BindingSignal bindingSignal) {
+        addInternal(act, bindingSignal, OUTPUT, POST_FIRED, bindingSignal.getOriginActivation().getFired(), "POS-FEEDBACK", s -> s instanceof PositiveFeedbackSynapse);
     }
 
     private Direction direction;
@@ -66,7 +90,7 @@ public class Linking extends Step<Activation> {
     private List<Synapse> targetSynapses;
 
 
-    private Linking(Activation act, BindingSignal<?> bindingSignal, Direction dir, LinkingOrder linkingOrder, boolean template, String linkingType, Predicate<Synapse> filter) {
+    private Linking(Activation act, BindingSignal<?> bindingSignal, Direction dir, LinkingOrder linkingOrder, Timestamp fired, boolean template, String linkingType, Predicate<Synapse> filter) {
         super(act);
 
         this.linkingOrder = linkingOrder;
@@ -74,6 +98,7 @@ public class Linking extends Step<Activation> {
         this.template = template;
         this.bindingSignal = bindingSignal;
         this.linkingType = linkingType;
+        this.fired = fired;
 
         Neuron<?, ?> n = getElement().getNeuron();
         this.targetSynapses = n.getTargetSynapses(direction, template)

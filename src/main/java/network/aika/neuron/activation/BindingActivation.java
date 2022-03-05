@@ -26,13 +26,11 @@ import network.aika.neuron.bindingsignal.BranchBindingSignal;
 import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
-import network.aika.neuron.conjunctive.PatternSynapse;
 import network.aika.steps.activation.Linking;
 
 import java.util.*;
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.FieldUtils.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
@@ -232,7 +230,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     protected void onBindingSignalArrivedFired(BindingSignal bs) {
-        Linking.add(this, bs, OUTPUT, POST_FIRED, false, "PATTERN-SYN", s -> s instanceof PatternSynapse);
+        Linking.addUnboundLinking(this, bs);
 
         if(isFinal())
             onBindingSignalArrivedFinalFired(bs);
@@ -246,7 +244,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     protected void onBindingSignalArrivedFiredBound(BindingSignal bs) {
-        Linking.add(this, bs, OUTPUT, POST_FIRED, false, "", s -> true);
+        Linking.add(this, bs, POST_FIRED);
 
         if(isFinal())
             onBindingSignalArrivedFinalFiredBound(bs);

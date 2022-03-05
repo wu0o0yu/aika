@@ -33,8 +33,6 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.FieldUtils.func;
 import static network.aika.fields.FieldUtils.mul;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
@@ -320,8 +318,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     protected void onBindingSignalArrived(BindingSignal bs) {
         if(!getNeuron().isNetworkInput()) {
-            Linking.add(this, bs, INPUT, PRE_FIRED, false, "", s -> true);
-            Linking.add(this, bs, INPUT, PRE_FIRED, true, "", s -> true);
+            Linking.add(this, bs, PRE_FIRED);
         }
 
         if(isFired())
@@ -335,8 +332,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     protected void onBindingSignalArrivedFired(BindingSignal bs) {
-        Linking.add(this, bs, OUTPUT, POST_FIRED, false, "", s -> true);
-        Linking.add(this, bs, OUTPUT, POST_FIRED, true, "", s -> true);
+        Linking.add(this, bs, POST_FIRED);
 
         if(isFinal())
             onBindingSignalArrivedFinalFired(bs);
