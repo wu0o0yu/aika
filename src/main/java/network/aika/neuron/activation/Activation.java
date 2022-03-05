@@ -106,7 +106,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         value.addFieldListener("l.propagateValue", (label, u) ->
                 getOutputLinks()
-                        .forEach(l -> l.propagateValue())
+                        .map(l -> l.getWeightedInput())
+                        .filter(f -> f != null)
+                        .forEach(f -> f.triggerUpdate(1))
         );
 
         thought.register(this);
@@ -319,6 +321,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected void onBindingSignalArrived(BindingSignal bs) {
         if(!getNeuron().isNetworkInput()) {
             Linking.add(this, bs, INPUT, PRE_FIRED, false, "", s -> true);
+            Linking.add(this, bs, INPUT, PRE_FIRED, true, "", s -> true);
         }
 
         if(isFired())
@@ -329,20 +332,17 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     protected void onBindingSignalArrivedFinal(BindingSignal bs) {
-        if(!getNeuron().isNetworkInput()) {
-            Linking.add(this, bs, INPUT, PRE_FIRED, true, "", s -> true);
-        }
     }
 
     protected void onBindingSignalArrivedFired(BindingSignal bs) {
         Linking.add(this, bs, OUTPUT, POST_FIRED, false, "", s -> true);
+        Linking.add(this, bs, OUTPUT, POST_FIRED, true, "", s -> true);
 
         if(isFinal())
             onBindingSignalArrivedFinalFired(bs);
     }
 
     protected void onBindingSignalArrivedFinalFired(BindingSignal bs) {
-        Linking.add(this, bs, OUTPUT, POST_FIRED, true, "", s -> true);
     }
 
     public void induce() {

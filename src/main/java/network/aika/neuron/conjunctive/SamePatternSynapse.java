@@ -67,6 +67,9 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
 
     @Override
     public boolean checkLinkingPreConditions(BindingActivation iAct, BindingActivation oAct) {
+        if(isTemplate() && (iAct.isNetworkInput() || oAct.isNetworkInput()))
+            return false;
+
         if(!iAct.isBound())
             return false;
 

@@ -38,9 +38,12 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
         if(iBS.isRelated())
             return null;
 
-        if(iBS.isInput())
+        if(iBS.isInput()) {
+            if(!propagate)
+                return null; // Prevent contagion
+
             return iBS.next(true, true); // Related Binding-Signal
-        else
+        } else
             return iBS.next(true, false); // Own Binding-Signal
     }
 

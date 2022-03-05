@@ -112,7 +112,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         return synapse.getWeight();
     }
 
-    public DoubleFieldOutput getWeightedInput() {
+    public AbstractBiFunction getWeightedInput() {
         return weightedInput;
     }
 
@@ -245,13 +245,6 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
                 new OutputKey(output.getNeuronProvider(), output.getId()),
                 this
         );
-    }
-
-    public void propagateValue() {
-        if(weightedInput == null)
-            return;
-
-        weightedInput.triggerUpdate(1);
     }
 
     public void setFinalMode() {
