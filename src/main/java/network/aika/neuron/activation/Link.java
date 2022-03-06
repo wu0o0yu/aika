@@ -169,17 +169,6 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         return s;
     }
 
-/*
-    public void removeGradientDependencies() {
-        output.getInputLinks()
-                .filter(l -> l.input != null && l != this && input.isConnected(l.input))
-                .forEach(l -> {
-                    outputGradient -= l.outputGradient;
-                    outputGradient = Math.min(0.0, outputGradient); // TODO: check if that's correct.
-                });
-    }
-*/
-
     public DoubleFieldOutput getInputValue(Sign s) {
         return s.getValue(input != null ? input.getValue() : ZERO);
     }
