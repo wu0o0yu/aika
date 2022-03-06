@@ -351,10 +351,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
             n += 1.0;
         }
 
-        return getProbabilityBound(si, so).probability(f, n);
+        return Bound.UPPER.probability(f, n);
     }
-
-    protected abstract Bound getProbabilityBound(Sign si, Sign so);
 
     public DoubleField getWeight() {
         return weight;

@@ -147,7 +147,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
 
     @Override
     public Timestamp getFired() {
-        return output.getFired();
+        return isCausal() ? input.getFired() : output.getFired();
     }
 
     public static boolean linkExists(Activation iAct, Activation oAct) {

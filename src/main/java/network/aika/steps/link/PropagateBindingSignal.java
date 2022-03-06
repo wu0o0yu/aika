@@ -61,7 +61,6 @@ public class PropagateBindingSignal extends Step<Link> {
 
     protected PropagateBindingSignal(Link l, Collection<BindingSignal> inputBindingSignals) {
         super(l);
-        fired = l.getInput().getFired();
         this.inputBindingSignals = inputBindingSignals;
     }
 

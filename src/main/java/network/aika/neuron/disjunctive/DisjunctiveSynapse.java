@@ -56,11 +56,6 @@ public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends
     }
 
     @Override
-    protected Bound getProbabilityBound(Sign si, Sign so) {
-        return so == Sign.POS ? Bound.LOWER : Bound.UPPER;
-    }
-
-    @Override
     public void setModified() {
         getInput().setModified();
     }

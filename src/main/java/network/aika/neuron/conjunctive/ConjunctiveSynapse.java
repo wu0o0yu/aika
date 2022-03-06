@@ -80,11 +80,6 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     @Override
-    protected Bound getProbabilityBound(Sign si, Sign so) {
-        return si == Sign.POS ? Bound.LOWER : Bound.UPPER;
-    }
-
-    @Override
     public void setModified() {
         getOutput().setModified();
     }
