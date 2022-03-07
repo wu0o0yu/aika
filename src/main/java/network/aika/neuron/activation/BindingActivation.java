@@ -232,8 +232,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     protected void onBindingSignalArrivedFired(BindingSignal bs) {
         Linking.addUnboundLinking(this, bs);
 
-        if(isFinal())
-            onBindingSignalArrivedFinalFired(bs);
+        super.onBindingSignalArrivedFired(bs);
 
         if(isBound())
             onBindingSignalArrivedFiredBound(bs);
