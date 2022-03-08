@@ -19,6 +19,10 @@ package network.aika.neuron.disjunctive;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.axons.PatternAxon;
+import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.bindingsignal.Transition;
+
+import java.util.List;
 
 
 /**
@@ -27,9 +31,16 @@ import network.aika.neuron.axons.PatternAxon;
  */
 public class CategorySynapse<N extends Neuron & PatternAxon> extends DisjunctiveSynapse<CategorySynapse, N, CategoryNeuron, CategoryLink, PatternActivation, CategoryActivation> {
 
+    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(new Transition(State.SAME, State.SAME));
+
     @Override
     public CategoryLink createLink(PatternActivation input, CategoryActivation output) {
         return new CategoryLink(this, input, output);
+    }
+
+    @Override
+    public List<Transition> getPropagateTransitions() {
+        return PROPAGATE_TRANSITIONS;
     }
 
     @Override

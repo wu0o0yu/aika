@@ -22,7 +22,6 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.conjunctive.PatternNeuron;
 
 import java.util.NavigableMap;
@@ -42,8 +41,8 @@ public class Document extends Thought<TextModel> {
 
     private final StringBuilder content;
 
-    private NavigableMap<Long, PatternBindingSignal> beginPBSIndex = new TreeMap<>();
-    private NavigableMap<Long, PatternBindingSignal> endPBSIndex = new TreeMap<>();
+    private NavigableMap<Long, BindingSignal> beginPBSIndex = new TreeMap<>();
+    private NavigableMap<Long, BindingSignal> endPBSIndex = new TreeMap<>();
 
     public Document(TextModel model, String content) {
         super(model);
@@ -53,14 +52,14 @@ public class Document extends Thought<TextModel> {
         }
     }
 
-    public void registerPatternBindingSignalSource(Activation act, PatternBindingSignal pbs) {
-        Range r = pbs.getOriginActivation().getRange();
+    public void registerPatternBindingSignalSource(Activation act, BindingSignal bs) {
+        Range r = bs.getOriginActivation().getRange();
 
-        beginPBSIndex.put(r.getBegin(), pbs);
-        endPBSIndex.put(r.getEnd(), pbs);
+        beginPBSIndex.put(r.getBegin(), bs);
+        endPBSIndex.put(r.getEnd(), bs);
     }
 
-    public Stream<PatternBindingSignal> getLooselyRelatedBindingSignals(BindingSignal<?> fromBindingSignal, Integer looseLinkingRange, Neuron toNeuron) {
+    public Stream<BindingSignal<?>> getLooselyRelatedBindingSignals(BindingSignal<?> fromBindingSignal, Integer looseLinkingRange, Neuron toNeuron) {
         Range r = fromBindingSignal.getOriginActivation().getRange();
 
         return Stream.concat(
@@ -112,7 +111,6 @@ public class Document extends Thought<TextModel> {
 
         act.setInputNet(10.0);
         act.init(null, null);
-        act.setFired();
 
         return act;
     }

@@ -147,9 +147,9 @@ public class Linking extends Step<Activation> {
                 );
     }
 
-    private Stream<? extends BindingSignal> getRelatedBindingSignal(Synapse targetSynapse, BindingSignal fromBindingSignal, Neuron toNeuron) {
+    private Stream<BindingSignal<?>> getRelatedBindingSignal(Synapse targetSynapse, BindingSignal fromBindingSignal, Neuron toNeuron) {
         Activation originAct = fromBindingSignal.getOriginActivation();
-        Stream<? extends BindingSignal> relatedBindingSignals = originAct.getReverseBindingSignals(toNeuron);
+        Stream<BindingSignal<?>> relatedBindingSignals = originAct.getReverseBindingSignals(toNeuron);
 
         if(targetSynapse.allowLooseLinking()) {
             relatedBindingSignals = Stream.concat(
@@ -164,7 +164,7 @@ public class Linking extends Step<Activation> {
     private boolean checkRelatedBindingSignal(Synapse targetSynapse, BindingSignal fromBindingSignal, BindingSignal toBindingSignal) {
         BindingSignal inputBS = direction.getInput(fromBindingSignal, toBindingSignal);
         BindingSignal outputBS = direction.getOutput(fromBindingSignal, toBindingSignal);
-        return inputBS.checkRelatedBindingSignal(targetSynapse, outputBS);
+        return targetSynapse.checkRelatedBindingSignal(inputBS, outputBS);
     }
 
     private void link(Synapse targetSynapse, Activation<?> fromAct, Activation<?> toAct, Direction dir) {

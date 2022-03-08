@@ -16,31 +16,30 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.PrimaryInputLink;
-import network.aika.neuron.axons.PatternAxon;
-import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.activation.IRelatedInputLink;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
+
+import static network.aika.neuron.bindingsignal.State.*;
 
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends BindingNeuronSynapse<PrimaryInputSynapse, I, PrimaryInputLink<IA>, IA> {
+public class IRelatedInputSynapse extends BindingNeuronSynapse<IRelatedInputSynapse, BindingNeuron, IRelatedInputLink, BindingActivation> {
 
-    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(
-            new Transition(State.SAME, State.INPUT)
+    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(new Transition(INPUT, INPUT));
+    private static List<Transition> CHECK_TRANSITIONS = List.of(
+            new Transition(SAME, INPUT),
+            new Transition(INPUT, INPUT)
     );
-    private static List<Transition> CHECK_TRANSITIONS = List.of(new Transition(State.SAME, State.INPUT));
 
-
-    public PrimaryInputLink createLink(IA input, BindingActivation output) {
-        return new PrimaryInputLink(this, input, output);
+    @Override
+    public IRelatedInputLink createLink(BindingActivation input, BindingActivation output) {
+        return new IRelatedInputLink(this, input, output);
     }
 
     @Override
@@ -51,13 +50,5 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
     @Override
     public List<Transition> getCheckTransitions() {
         return CHECK_TRANSITIONS;
-    }
-
-    @Override
-    public boolean checkLinkingPreConditions(IA iAct, BindingActivation oAct) {
-        if(oAct.checkIfPrimaryInputBNLinkAlreadyExists())
-            return false;
-
-        return super.checkLinkingPreConditions(iAct, oAct);
     }
 }

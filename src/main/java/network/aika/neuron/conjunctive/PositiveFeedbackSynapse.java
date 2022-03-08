@@ -20,13 +20,22 @@ import network.aika.fields.DoubleField;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.PositiveFeedbackLink;
-import network.aika.neuron.bindingsignal.BranchBindingSignal;
+import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.bindingsignal.Transition;
+
+import java.util.List;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PositiveFeedbackSynapse, PatternNeuron, PositiveFeedbackLink, PatternActivation> {
+
+    private static List<Transition> TRANSITIONS = List.of(
+            new Transition(State.BRANCH, State.BRANCH),
+            new Transition(State.SAME, State.SAME)
+    );
+
 
     private DoubleField feedbackWeight = new DoubleField("feedbackWeight");
     private DoubleField feedbackBias = new DoubleField("feedbackBias", (l, u) ->
@@ -57,8 +66,13 @@ public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PositiveFeedba
     }
 
     @Override
-    public boolean checkRelatedBranchBindingSignal(BranchBindingSignal iBS, BranchBindingSignal oBS) {
-        return iBS.getOrigin() == oBS;
+    public List<Transition> getPropagateTransitions() {
+        return TRANSITIONS;
+    }
+
+    @Override
+    public List<Transition> getCheckTransitions() {
+        return TRANSITIONS;
     }
 
     @Override

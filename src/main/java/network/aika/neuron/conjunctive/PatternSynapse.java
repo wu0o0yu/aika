@@ -17,15 +17,24 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.*;
-import network.aika.direction.Direction;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.PatternBindingSignal;
+import network.aika.neuron.bindingsignal.Transition;
+
+import java.util.List;
+
+import static network.aika.neuron.bindingsignal.State.BRANCH;
+import static network.aika.neuron.bindingsignal.State.SAME;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNeuron, PatternNeuron, PatternLink, BindingActivation, PatternActivation> {
+
+    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(
+            new Transition(SAME, SAME),
+            new Transition(BRANCH, BRANCH)
+    );
+    private static List<Transition> CHECK_TRANSITIONS = List.of(new Transition(SAME, SAME));
 
     public PatternSynapse() {
         allowPropagate = true;
@@ -45,8 +54,13 @@ public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNe
     }
 
     @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
-        return iBS.getOrigin() == oBS;
+    public List<Transition> getPropagateTransitions() {
+        return PROPAGATE_TRANSITIONS;
+    }
+
+    @Override
+    public List<Transition> getCheckTransitions() {
+        return CHECK_TRANSITIONS;
     }
 
     @Override

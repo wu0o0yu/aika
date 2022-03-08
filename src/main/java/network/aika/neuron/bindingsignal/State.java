@@ -14,14 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.fields;
+package network.aika.neuron.bindingsignal;
+
 
 /**
  * @author Lukas Molzberger
  */
-public interface BooleanFieldOutput extends FieldOutput {
-
-    boolean getCurrentValue();
-
-    boolean getNewValue();
+public enum State {
+    SAME,
+    INPUT,
+    RELATED,
+    INPUT_RELATED,
+    BRANCH
 }

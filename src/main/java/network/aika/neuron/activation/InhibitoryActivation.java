@@ -17,9 +17,9 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 
 import java.util.stream.Stream;
@@ -49,17 +49,13 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
     }
 
     @Override
-    public Stream<? extends BindingSignal<?>> getReverseBindingSignals(Neuron toNeuron) {
-        return null;
-    }
-
-    @Override
     public boolean isBoundToConflictingBS(BindingSignal conflictingBS) {
         return false;
     }
 
     private BindingSignal getPrimaryBranchBindingSignal() {
-        return getBranchBindingSignals().values().stream()
+        return getBindingSignals()
+                .filter(bs -> bs.getState() == State.BRANCH)
                 .filter(bs -> bs.getDepth() == 1)
                 .findFirst()
                 .orElse(null);

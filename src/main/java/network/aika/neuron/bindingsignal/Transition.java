@@ -14,14 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.fields;
+package network.aika.neuron.bindingsignal;
+
+import network.aika.direction.Direction;
+
+import static network.aika.direction.Direction.OUTPUT;
 
 /**
  * @author Lukas Molzberger
  */
-public interface BooleanFieldOutput extends FieldOutput {
+public class Transition {
 
-    boolean getCurrentValue();
+    private State input;
+    private State output;
 
-    boolean getNewValue();
+    public Transition(State input, State output) {
+        this.input = input;
+        this.output = output;
+    }
+
+    public State getInput() {
+        return input;
+    }
+
+    public State getOutput() {
+        return output;
+    }
+
+    public State next(Direction dir) {
+        return dir == OUTPUT ? output : input;
+    }
+
+    public boolean check(State from, Direction dir) {
+        return from == (dir == OUTPUT ? input : output);
+    }
 }

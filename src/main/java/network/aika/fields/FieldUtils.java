@@ -76,4 +76,9 @@ public class FieldUtils {
     public static SwitchField switchField(String label, DoubleFieldInterface in1, DoubleFieldInterface in2, BooleanSupplier test) {
         return new SwitchField(label, in1, false, in2, false, test);
     }
+
+    public static ThresholdOperator threshold(String label, double threshold, DoubleFieldOutput in, BooleanFieldInput... out) {
+        return new ThresholdOperator(label, threshold, in, out);
+    }
+
 }

@@ -18,8 +18,11 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.RelatedInputLink;
-import network.aika.neuron.bindingsignal.BranchBindingSignal;
-import network.aika.neuron.bindingsignal.PatternBindingSignal;
+import network.aika.neuron.bindingsignal.Transition;
+
+import java.util.List;
+
+import static network.aika.neuron.bindingsignal.State.*;
 
 
 /**
@@ -28,27 +31,22 @@ import network.aika.neuron.bindingsignal.PatternBindingSignal;
  */
 public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynapse, BindingNeuron, RelatedInputLink, BindingActivation> {
 
+    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(new Transition(SAME, INPUT));
+    private static List<Transition> CHECK_TRANSITIONS = List.of(new Transition(INPUT, INPUT_RELATED));
+
+
     @Override
     public RelatedInputLink createLink(BindingActivation input, BindingActivation output) {
         return new RelatedInputLink(this, input, output);
     }
 
     @Override
-    public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS, boolean propagate) {
-        if(iBS.isRelated())
-            return null;
-
-        if(iBS.isInput()) {
-            if(!propagate)
-                return null; // Prevent contagion
-
-            return iBS.next(true, true); // Related Binding-Signal
-        } else
-            return iBS.next(true, false); // Own Binding-Signal
+    public List<Transition> getPropagateTransitions() {
+        return PROPAGATE_TRANSITIONS;
     }
 
     @Override
-    public BranchBindingSignal transitionBranchBindingSignal(BranchBindingSignal iBS) {
-        return null;
+    public List<Transition> getCheckTransitions() {
+        return CHECK_TRANSITIONS;
     }
 }

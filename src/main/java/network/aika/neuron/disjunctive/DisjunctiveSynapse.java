@@ -16,23 +16,27 @@
  */
 package network.aika.neuron.disjunctive;
 
-import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.DisjunctiveActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.axons.Axon;
-import network.aika.neuron.bindingsignal.PatternBindingSignal;
-import network.aika.sign.Sign;
-import network.aika.utils.Bound;
+import network.aika.neuron.bindingsignal.Transition;
 
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends Neuron & Axon, O extends DisjunctiveNeuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation, OA extends DisjunctiveActivation> extends Synapse<S, I, O, L, IA, OA> {
+public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends Neuron & Axon, O extends DisjunctiveNeuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation, OA extends DisjunctiveActivation> extends Synapse<S,I,O,L,IA,OA> {
+
+    @Override
+    public List<Transition> getCheckTransitions() {
+        return Collections.EMPTY_LIST;
+    }
 
     @Override
     public boolean allowPropagate(Activation act) {
@@ -43,12 +47,7 @@ public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends
     }
 
     @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
-        return false;
-    }
-
-    @Override
-    public void updateWeight(Link l, double delta) {
+    public void updateWeight(L l, double delta) {
         if(!l.getInput().isFired())
             return;
 

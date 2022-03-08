@@ -18,12 +18,13 @@ package network.aika.neuron;
 
 import network.aika.Model;
 import network.aika.Thought;
+import network.aika.direction.Direction;
 import network.aika.fields.DoubleFieldOutput;
 import network.aika.neuron.activation.*;
 import network.aika.fields.DoubleField;
 import network.aika.neuron.axons.Axon;
-import network.aika.neuron.bindingsignal.BranchBindingSignal;
-import network.aika.neuron.bindingsignal.PatternBindingSignal;
+import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.Transition;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.PostTraining;
 import network.aika.utils.Bound;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.List;
 import java.util.function.Consumer;
 
 import static network.aika.sign.Sign.NEG;
@@ -76,8 +78,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return false;
     }
 
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
-        PatternBindingSignal transitionedIBS = transitionPatternBindingSignal(iBS, false);
+    public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
+        BindingSignal transitionedIBS = transition(iBS, Direction.OUTPUT, false);
         return transitionedIBS != null && transitionedIBS.match(oBS);
     }
 
@@ -113,20 +115,22 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
     protected boolean checkTemplateInductionThreshold(OA oAct) {
         DoubleFieldOutput grad = oAct.getOutputGradient();
-        return grad != null && Math.abs(grad.getCurrentValue()) > oAct.getConfig().getInductionThreshold();
+        return grad != null &&
+                grad.isInitialized() &&
+                Math.abs(grad.getCurrentValue()) > oAct.getConfig().getInductionThreshold();
     }
 
-    public boolean checkRelatedBranchBindingSignal(BranchBindingSignal iBS, BranchBindingSignal oBS) {
-        return false;
+    public BindingSignal transition(BindingSignal from, Direction dir, boolean propagate) {
+        return (propagate ? getPropagateTransitions() : getCheckTransitions()).stream()
+                .filter(t -> t.check(from.getState(), dir))
+                .map(t -> from.next(t))
+                .findFirst()
+                .orElse(null);
     }
 
-    public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS, boolean propagate) {
-        return iBS.next(iBS.isInput(), iBS.isRelated());
-    }
+    public abstract List<Transition> getPropagateTransitions();
 
-    public BranchBindingSignal transitionBranchBindingSignal(BranchBindingSignal iBS) {
-        return iBS.next();
-    }
+    public abstract List<Transition> getCheckTransitions();
 
     public abstract void setModified();
 

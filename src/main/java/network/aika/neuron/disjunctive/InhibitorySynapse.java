@@ -17,10 +17,11 @@
 package network.aika.neuron.disjunctive;
 
 import network.aika.neuron.activation.*;
-import network.aika.neuron.bindingsignal.PatternBindingSignal;
+import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.sign.Sign;
-import network.aika.utils.Bound;
+
+import java.util.List;
 
 
 /**
@@ -29,9 +30,20 @@ import network.aika.utils.Bound;
  */
 public class InhibitorySynapse extends DisjunctiveSynapse<InhibitorySynapse, BindingNeuron, InhibitoryNeuron, InhibitoryLink, BindingActivation, InhibitoryActivation> {
 
+    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(
+            new Transition(State.SAME, State.SAME),
+            new Transition(State.INPUT, State.INPUT),
+            new Transition(State.BRANCH, State.BRANCH)
+    );
+
     @Override
     public InhibitoryLink createLink(BindingActivation input, InhibitoryActivation output) {
         return new InhibitoryLink(this, input, output);
+    }
+
+    @Override
+    public List<Transition> getPropagateTransitions() {
+        return PROPAGATE_TRANSITIONS;
     }
 
     @Override

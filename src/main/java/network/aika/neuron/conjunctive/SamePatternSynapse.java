@@ -19,11 +19,14 @@ package network.aika.neuron.conjunctive;
 import network.aika.Model;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.SamePatternLink;
-import network.aika.neuron.bindingsignal.PatternBindingSignal;
+import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.bindingsignal.Transition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
@@ -32,9 +35,14 @@ import java.io.IOException;
  */
 public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse, BindingNeuron, SamePatternLink, BindingActivation> {
 
+    private static List<Transition> TRANSITIONS = List.of(
+            new Transition(State.SAME, State.SAME), // Same Pattern BindingSignal
+            new Transition(State.INPUT, State.INPUT_RELATED) // Input BS becomes related
+    );
+
+
     private int looseLinkingRange;
     private boolean allowLooseLinking;
-
 
     @Override
     public SamePatternLink createLink(BindingActivation input, BindingActivation output) {
@@ -82,27 +90,29 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
         if(!super.checkLinkingPreConditions(iAct, oAct))
             return false;
 
-        PatternBindingSignal iSamePBS = iAct.getSamePatternBindingSignal();
-        PatternBindingSignal oSamePBS = oAct.getSamePatternBindingSignal();
+        BindingSignal iSamePBS = iAct.getSamePatternBindingSignal();
+        BindingSignal oSamePBS = oAct.getSamePatternBindingSignal();
 
         // The Input and Output BindingActivations belong to different Patterns.
         return oSamePBS == null || oSamePBS == iSamePBS;
     }
 
     @Override
-    public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS, boolean propagate) {
-        if(!iBS.isInput())
-            return iBS.next(false, false); // Same Pattern BindingSignal
-        else
-            return iBS.next(true, true); // Input BS becomes related
+    public List<Transition> getPropagateTransitions() {
+        return TRANSITIONS;
     }
 
     @Override
-    public boolean checkRelatedPatternBindingSignal(PatternBindingSignal iBS, PatternBindingSignal oBS) {
+    public List<Transition> getCheckTransitions() {
+        return TRANSITIONS;
+    }
+
+    @Override
+    public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
         if(allowLooseLinking) {
-            return iBS.getOrigin() != oBS.getOrigin() && iBS.isInput() && oBS.isInput();
+            return iBS.getOrigin() != oBS.getOrigin() && iBS.getState() == State.INPUT && oBS.getState() == State.INPUT;
         } else {
-            return super.checkRelatedPatternBindingSignal(iBS, oBS);
+            return super.checkRelatedBindingSignal(iBS, oBS);
         }
     }
 

@@ -51,6 +51,8 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
     private AbstractBiFunction weightedInput;
     private AbstractBiFunction backPropGradient;
 
+    private ThresholdOperator onVisible;
+
     public Link(S s, I input, O output) {
         this.synapse = s;
         this.input = input;
@@ -79,6 +81,8 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
     }
 
     protected void initWeightInput() {
+        onVisible = threshold("onVisible", 0.0, getWeightOutput());
+
         weightedInput = mulUnregistered(
                 "iAct.value * s.weight",
                 input.getValue(),

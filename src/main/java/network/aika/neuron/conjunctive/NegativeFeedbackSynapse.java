@@ -17,8 +17,12 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.*;
-import network.aika.neuron.bindingsignal.PatternBindingSignal;
+import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
+
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -26,6 +30,9 @@ import network.aika.neuron.disjunctive.InhibitoryNeuron;
  * @author Lukas Molzberger
  */
 public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedbackSynapse, InhibitoryNeuron, NegativeFeedbackLink, InhibitoryActivation> {
+
+    private static List<Transition> CHECK_TRANSITIONS = List.of(new Transition(State.INPUT, State.INPUT));
+
 
     @Override
     public NegativeFeedbackLink createLink(InhibitoryActivation input, BindingActivation output) {
@@ -81,16 +88,12 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     }
 
     @Override
-    public PatternBindingSignal transitionPatternBindingSignal(PatternBindingSignal iBS, boolean propagate) {
-        if(!iBS.isInput() || iBS.isRelated() || propagate)
-            return null;
+    public List<Transition> getPropagateTransitions() {
+        return Collections.emptyList();
+    }
 
-        return iBS.next(true, false);
-    }
-/*
     @Override
-    public boolean checkRelatedBranchBindingSignal(BranchBindingSignal iBS, BranchBindingSignal oBS) {
-        return iBS.getOrigin() == oBS;
+    public List<Transition> getCheckTransitions() {
+        return CHECK_TRANSITIONS;
     }
- */
 }

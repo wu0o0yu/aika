@@ -19,11 +19,8 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.disjunctive.CategoryNeuron;
-
-import java.util.Comparator;
-
-import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
 
 /**
  * @author Lukas Molzberger
@@ -51,7 +48,7 @@ public class CategoryActivation extends DisjunctiveActivation<CategoryNeuron> {
 
     private BindingSignal getPrimaryPatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
-                .filter(bs -> !bs.isInput() && !bs.isRelated())
+                .filter(bs -> bs.getState() == State.SAME)
                 .findFirst()
                 .orElse(null);
     }

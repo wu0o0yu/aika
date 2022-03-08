@@ -28,7 +28,7 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
                 input,
                 input == null || output.isSelfRef(input) ?
                         output :
-                        output.createBranch(s)
+                        output.createBranch()
         );
     }
 

@@ -17,10 +17,12 @@
 package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
+import network.aika.fields.BooleanFieldOutput;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.PatternActivation;
 
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -28,12 +30,30 @@ import java.util.stream.Stream;
 /**
  * @author Lukas Molzberger
  */
-public abstract class BindingSignal<B extends BindingSignal> {
+public class BindingSignal<O extends Activation> {
 
-    protected B parent;
-    protected Activation activation;
-    protected B origin;
-    protected byte depth;
+    private BindingSignal<O> parent;
+    private Activation activation;
+    private BindingSignal<O> origin;
+    private byte depth;
+    private State state;
+
+    private BooleanFieldOutput onArrived;
+
+
+    public BindingSignal(O act, State state) {
+        this.origin = this;
+        this.activation = act;
+        this.depth = 0;
+        this.state = state;
+    }
+
+    protected BindingSignal(BindingSignal<O> parent, State state) {
+        this.parent = parent;
+        this.origin = parent.getOrigin();
+        this.depth = (byte) (getDepth() + 1);
+        this.state = state;
+    }
 
     public static Stream<BindingSignal> propagateBindingSignals(Link l, Collection<BindingSignal> bindingSignals) {
         return bindingSignals.stream()
@@ -41,31 +61,15 @@ public abstract class BindingSignal<B extends BindingSignal> {
                 .filter(oBS -> oBS != null);
     }
 
-    public abstract boolean checkPropagate();
-
-    protected abstract BindingSignal propagate(Link l);
-
-    public abstract boolean checkRelatedBindingSignal(Synapse s, BindingSignal outputBS);
-
-    public abstract boolean exists();
-
-    public abstract void link();
-
-    public abstract B clone(Activation act);
-
-    public abstract boolean isOwnPatternBS();
-
     public boolean isOrigin() {
         return this == origin;
     }
 
-    public B getOrigin() {
+    public BindingSignal<O> getOrigin() {
         return origin;
     }
 
-    public abstract Activation<?> getOriginActivation();
-
-    public Activation<?> getActivation() {
+    public Activation getActivation() {
         return activation;
     }
 
@@ -77,7 +81,54 @@ public abstract class BindingSignal<B extends BindingSignal> {
         return bsA != null && bsB != null && bsA.getOrigin() == bsB.getOrigin();
     }
 
+    public State getState() {
+        return state;
+    }
+
+    public BindingSignal<O> next(Transition t) {
+        return new BindingSignal(this, t.next(Direction.OUTPUT));
+    }
+
+    public O getOriginActivation() {
+        return (O) origin.getActivation();
+    }
+
+    public void link() {
+        getActivation().registerBindingSignal(this);
+        getOriginActivation().registerReverseBindingSignal(getActivation(), this);
+    }
+
+    public boolean exists() {
+        BindingSignal existingBS = getActivation().getBindingSignal(getOriginActivation());
+        if(existingBS == null)
+            return false;
+
+        return existingBS.getState() == state;
+    }
+
+    public BindingSignal<O> clone(O act) {
+        BindingSignal<O> c = new BindingSignal(parent, state);
+        c.activation = act;
+        return c;
+    }
+
+    public boolean checkPropagate() {
+        return getActivation().checkPropagateBindingSignal(this);
+    }
+
+    protected BindingSignal<O> propagate(Link l) {
+        BindingSignal<O> nextBS = l.getSynapse().transition(this, Direction.OUTPUT, true);
+        if(nextBS != null)
+            nextBS.activation = l.getOutput();
+
+        return nextBS;
+    }
+
+    public boolean match(BindingSignal<O> oBS) {
+        return state == oBS.state;
+    }
+
     public String toString() {
-        return getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ", depth:" + getDepth();
+        return getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ", depth:" + getDepth() + ", state:" + state;
     }
 }

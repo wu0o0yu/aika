@@ -17,26 +17,21 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.BranchBindingSignal;
-import network.aika.neuron.bindingsignal.PatternBindingSignal;
+import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.steps.activation.Linking;
 
-import java.util.NavigableMap;
-import java.util.TreeMap;
-import java.util.stream.Stream;
+import static network.aika.neuron.bindingsignal.State.BRANCH;
+import static network.aika.neuron.bindingsignal.State.SAME;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
-
-    protected NavigableMap<Activation<?>, PatternBindingSignal> reverseBindingSignals = new TreeMap<>(NEURON_COMPARATOR);
 
     protected PatternActivation(int id, PatternNeuron n) {
         super(id, n);
@@ -57,7 +52,7 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     @Override
     protected void onBindingSignalArrived(BindingSignal bs) {
-        if(!getNeuron().isNetworkInput() && bs instanceof BranchBindingSignal) {
+        if(!getNeuron().isNetworkInput() && bs.getState() == State.BRANCH) {
             Linking.addPosFeedback(this, bs);
         }
 
@@ -69,44 +64,23 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
         return conflictingBS != null && conflictingBS.getOriginActivation() == this;
     }
 
-    @Override
-    public boolean checkAllowPropagate() {
-        return super.checkAllowPropagate();
-    }
-
-    @Override
-    public void registerPatternBindingSignal(PatternBindingSignal pbs) {
-        super.registerPatternBindingSignal(pbs);
-
-        if(pbs.getOriginActivation() == this)
-            thought.registerPatternBindingSignalSource(this, pbs);
-    }
-
-    public void registerReverseBindingSignal(Activation targetAct, PatternBindingSignal bindingSignal) {
-        reverseBindingSignals.put(targetAct, bindingSignal);
-    }
-
-    @Override
-    public Stream<PatternBindingSignal> getReverseBindingSignals(Neuron toNeuron) {
-        if(toNeuron.isTemplate()) {
-            return reverseBindingSignals.values().stream()
-                    .filter(bs -> bs.getActivation().getNeuron().templateNeuronMatches(toNeuron));
-        } else {
-            return reverseBindingSignals.subMap(
-                            new DummyActivation(0, toNeuron),
-                            new DummyActivation(Integer.MAX_VALUE, toNeuron)
-                    ).values().stream();
-        }
-    }
 
     @Override
     public void init(Synapse originSynapse, Activation originAct) {
         super.init(originSynapse, originAct);
-        addBindingSignal(new PatternBindingSignal(this));
+        addBindingSignal(new BindingSignal(this, SAME));
     }
 
-    public boolean checkPropagatePatternBindingSignal(PatternBindingSignal bs) {
-        return bs.getOriginActivation() == this;
+    @Override
+    public void registerBindingSignal(BindingSignal bs) {
+        super.registerBindingSignal(bs);
+
+        if(bs.getOriginActivation() == this)
+            thought.registerBindingSignalSource(this, bs);
+    }
+
+    public boolean checkPropagateBindingSignal(BindingSignal bs) {
+        return bs.getState() == BRANCH || bs.getOriginActivation() == this;
     }
 
     public boolean isSelfRef(Activation iAct) {
@@ -115,7 +89,8 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     @Override
     public Range getRange() {
-        return getBranchBindingSignals().values().stream()
+        return getBindingSignals()
+                .filter(s -> s.getState() == State.BRANCH)
                 .map(s -> s.getOriginActivation().getRange())
                 .reduce(
                         new Range(0, 0),

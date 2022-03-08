@@ -19,13 +19,10 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
-import network.aika.neuron.Synapse;
 import network.aika.fields.*;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.BranchBindingSignal;
-import network.aika.neuron.bindingsignal.PatternBindingSignal;
 import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 import network.aika.steps.activation.Linking;
 
 import java.util.*;
@@ -34,6 +31,7 @@ import java.util.stream.Stream;
 import static network.aika.fields.FieldUtils.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
+import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.steps.LinkingOrder.POST_FIRED;
 
 /**
@@ -41,11 +39,9 @@ import static network.aika.steps.LinkingOrder.POST_FIRED;
  */
 public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
-    protected NavigableMap<Activation<?>, BranchBindingSignal> reverseBindingSignals = new TreeMap<>(NEURON_COMPARATOR);
-
     private Timestamp finalTimestamp = NOT_SET;
 
-    private PatternBindingSignal bound;
+    private BindingSignal<PatternActivation> bound;
 
     private final Set<BindingActivation> branches = new TreeSet<>();
     private BindingActivation mainBranch;
@@ -133,12 +129,18 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         );
     }
 
-    public void registerReverseBindingSignal(Activation targetAct, BranchBindingSignal bindingSignal) {
+    @Override
+    public void init(Synapse originSynapse, Activation originAct) {
+        super.init(originSynapse, originAct);
+        addBindingSignal(new BindingSignal(this, BRANCH));
+    }
+
+    public void registerReverseBindingSignal(Activation targetAct, BindingSignal bindingSignal) {
         reverseBindingSignals.put(targetAct, bindingSignal);
     }
 
     @Override
-    public Stream<BranchBindingSignal> getReverseBindingSignals(Neuron toNeuron) {
+    public Stream<BindingSignal> getReverseBindingSignals(Neuron toNeuron) {
         if(toNeuron.isTemplate()) {
             return reverseBindingSignals.values().stream()
                     .filter(bs -> bs.getActivation().getNeuron().templateNeuronMatches(toNeuron));
@@ -148,12 +150,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                     new DummyActivation(Integer.MAX_VALUE, toNeuron)
             ).values().stream();
         }
-    }
-
-    @Override
-    public void init(Synapse originSynapse, Activation originAct) {
-        super.init(originSynapse, originAct);
-        addBindingSignal(new BranchBindingSignal(this));
     }
 
     @Override
@@ -172,8 +168,8 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     @Override
-    public boolean checkPropagateBranchBindingSignal(BranchBindingSignal bs) {
-        return bs.getOriginActivation() == this;
+    public boolean checkPropagateBindingSignal(BindingSignal bs) {
+        return bs.getState() != BRANCH || bs.getOriginActivation() == this;
     }
 
     private void propagateConflictingNetChange() {
@@ -185,17 +181,20 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     private void onConflictingNetChange(DoubleField inputNet) {
-        double expUpdate = Math.exp(inputNet.getNewValue()) - Math.exp(inputNet.getCurrentValue());
+        double expUpdate = Math.exp(inputNet.getNewValue());
+
+        if(inputNet.isInitialized())
+            expUpdate -= Math.exp(inputNet.getCurrentValue());
 
         bpNorm.addAndTriggerUpdate(expUpdate);
     }
 
     @Override
     public boolean isSelfRef(Activation iAct) {
-        return iAct != null && iAct.branchBindingSignals.containsKey(this);
+        return iAct != null && iAct.bindingSignals.containsKey(this);
     }
 
-    public BindingActivation createBranch(NegativeFeedbackSynapse excludedSyn) {
+    public BindingActivation createBranch() {
         BindingActivation clonedAct = getNeuron().createActivation(getThought());
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
@@ -203,14 +202,13 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
         copySteps(clonedAct);
         copyBindingSignals(clonedAct);
-//        linkClone(clonedAct, excludedSyn);
 
         return clonedAct;
     }
 
     private void copyBindingSignals(BindingActivation clonedAct) {
         getPatternBindingSignals().values().stream()
-                .filter(bs -> !bs.isOwnPatternBS())
+                .filter(bs -> !bs.isOrigin())
                 .forEach(bs ->
                         clonedAct.addBindingSignal(
                                 bs.clone(clonedAct)
@@ -220,8 +218,8 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     protected void onBindingSignalArrived(BindingSignal bs) {
-        if(bs.isOwnPatternBS()) {
-            bound = (PatternBindingSignal) bs;
+        if(bs.getState() == SAME) {
+            bound = bs;
             onBound();
         }
 
@@ -267,13 +265,13 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         return bound != null;
     }
 
-    public PatternBindingSignal getBoundPatternBindingSignal() {
+    public BindingSignal<PatternActivation> getBoundPatternBindingSignal() {
         return bound;
     }
 
     @Override
     public Range getRange() {
-        PatternBindingSignal bs = getPrimaryPatternBindingSignal();
+        BindingSignal bs = getPrimaryPatternBindingSignal();
         if(bs == null)
             return null;
 
@@ -281,17 +279,17 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 .getRange();
     }
 
-    private PatternBindingSignal getPrimaryPatternBindingSignal() {
+    private BindingSignal<?> getPrimaryPatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
                 .filter(bs -> NOT_SET_AFTER.compare(bs.getOriginActivation().getFired(), fired) < 0)
-                .filter(bs -> !bs.isRelated())
-                .min(Comparator.comparing(bs -> bs.isInput() ? 1 : 0))
+                .filter(bs -> bs.getState() == SAME || bs.getState() == INPUT)
+                .min(Comparator.comparing(bs -> bs.getState().ordinal()))
                 .orElse(null);
     }
 
-    public PatternBindingSignal getSamePatternBindingSignal() {
+    public BindingSignal<?> getSamePatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
-                .filter(bs -> !bs.isInput() && !bs.isRelated())
+                .filter(bs -> bs.getState() == SAME)
                 .findAny()
                 .orElse(null);
     }
@@ -359,8 +357,8 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         if(isMainBranch())
             return false;
 
-        return iAct.getBranchBindingSignals().values().stream()
-                .anyMatch(bbs -> bbs.getOriginActivation() == mainBranch);
+        return iAct.getBindingSignals()
+                .anyMatch(bs -> bs.getOriginActivation() == mainBranch);
     }
 
     public boolean isMainBranch() {

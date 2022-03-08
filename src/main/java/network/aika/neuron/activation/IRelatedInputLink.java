@@ -14,14 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.fields;
+package network.aika.neuron.activation;
+
+import network.aika.neuron.Range;
+import network.aika.neuron.conjunctive.IRelatedInputSynapse;
+import network.aika.sign.Sign;
 
 /**
  * @author Lukas Molzberger
  */
-public interface BooleanFieldOutput extends FieldOutput {
+public class IRelatedInputLink extends BindingNeuronLink<IRelatedInputSynapse, BindingActivation> {
 
-    boolean getCurrentValue();
+    public IRelatedInputLink(IRelatedInputSynapse s, BindingActivation input, BindingActivation output) {
+        super(s, input, output);
+    }
 
-    boolean getNewValue();
+    @Override
+    public double getRelativeSurprisal(Sign si, Sign so, Range range) {
+        double s = super.getRelativeSurprisal(si, so, range);
+
+        s += input.getBoundPatternBindingSignal().getOriginActivation().getNeuron()
+                .getSurprisal(si, range, true);
+        return s;
+    }
 }
