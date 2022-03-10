@@ -23,7 +23,6 @@ package network.aika.neuron.bindingsignal;
 public enum State {
     SAME,
     INPUT,
-    RELATED,
     INPUT_RELATED,
     BRANCH
 }

@@ -45,7 +45,6 @@ public class Templates {
     public PrimaryInputSynapse PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE;
     public PrimaryInputSynapse PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE;
     public RelatedInputSynapse RELATED_INPUT_SYNAPSE_TEMPLATE;
-    public IRelatedInputSynapse I_RELATED_INPUT_SYNAPSE_TEMPLATE;
     public SamePatternSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
     public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE;
     public NegativeFeedbackSynapse NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE;
@@ -103,16 +102,6 @@ public class Templates {
         RELATED_INPUT_SYNAPSE_TEMPLATE =
                 init(
                         new RelatedInputSynapse(),
-                        INPUT_BINDING_TEMPLATE,
-                        BINDING_TEMPLATE,
-                        "Related Input Synapse",
-                        2,
-                        0.0
-                );
-
-        I_RELATED_INPUT_SYNAPSE_TEMPLATE =
-                init(
-                        new IRelatedInputSynapse(),
                         INPUT_BINDING_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Related Input Synapse",

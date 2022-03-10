@@ -31,8 +31,15 @@ import static network.aika.neuron.bindingsignal.State.*;
  */
 public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynapse, BindingNeuron, RelatedInputLink, BindingActivation> {
 
-    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(new Transition(SAME, INPUT));
-    private static List<Transition> CHECK_TRANSITIONS = List.of(new Transition(INPUT, INPUT_RELATED));
+    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(
+            new Transition(SAME, INPUT),
+            new Transition(INPUT, INPUT)
+    );
+
+    private static List<Transition> CHECK_TRANSITIONS = List.of(
+            new Transition(SAME, INPUT),
+            new Transition(INPUT, INPUT_RELATED)
+    );
 
 
     @Override

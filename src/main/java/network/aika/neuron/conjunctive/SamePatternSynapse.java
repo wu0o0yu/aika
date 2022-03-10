@@ -35,9 +35,14 @@ import java.util.List;
  */
 public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse, BindingNeuron, SamePatternLink, BindingActivation> {
 
-    private static List<Transition> TRANSITIONS = List.of(
+    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(
             new Transition(State.SAME, State.SAME), // Same Pattern BindingSignal
             new Transition(State.INPUT, State.INPUT_RELATED) // Input BS becomes related
+    );
+
+    private static List<Transition> CHECK_TRANSITIONS = List.of(
+            new Transition(State.SAME, State.SAME), // Same Pattern BindingSignal
+            new Transition(State.INPUT, State.INPUT)
     );
 
 
@@ -99,12 +104,12 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
 
     @Override
     public List<Transition> getPropagateTransitions() {
-        return TRANSITIONS;
+        return PROPAGATE_TRANSITIONS;
     }
 
     @Override
     public List<Transition> getCheckTransitions() {
-        return TRANSITIONS;
+        return CHECK_TRANSITIONS;
     }
 
     @Override

@@ -34,7 +34,10 @@ public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNe
             new Transition(SAME, SAME),
             new Transition(BRANCH, BRANCH)
     );
-    private static List<Transition> CHECK_TRANSITIONS = List.of(new Transition(SAME, SAME));
+
+    private static List<Transition> CHECK_TRANSITIONS = List.of(
+            new Transition(SAME, SAME)
+    );
 
     public PatternSynapse() {
         allowPropagate = true;

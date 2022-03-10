@@ -36,7 +36,10 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
     private static List<Transition> PROPAGATE_TRANSITIONS = List.of(
             new Transition(State.SAME, State.INPUT)
     );
-    private static List<Transition> CHECK_TRANSITIONS = List.of(new Transition(State.SAME, State.INPUT));
+
+    private static List<Transition> CHECK_TRANSITIONS = List.of(
+            new Transition(State.SAME, State.INPUT)
+    );
 
 
     public PrimaryInputLink createLink(IA input, BindingActivation output) {

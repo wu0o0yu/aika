@@ -143,7 +143,7 @@ public class ABCDTest {
 
         BindingNeuron bc_bcdBN = createNeuron(t.BINDING_TEMPLATE, "bc (bcd)");
         BindingNeuron d_bcdBN = createNeuron(t.BINDING_TEMPLATE, "d (bcd)");
-        createSynapse(t.I_RELATED_INPUT_SYNAPSE_TEMPLATE, c_bcBN, bc_bcdBN, 10.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, c_bcBN, bc_bcdBN, 10.0);
 
         createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, d_PTRelBN, d_bcdBN, 10.0);
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, bc_bcdBN, d_bcdBN, 10.0);
