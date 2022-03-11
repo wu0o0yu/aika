@@ -154,11 +154,6 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         return isCausal() ? input.getFired() : output.getFired();
     }
 
-    public static boolean linkExists(Activation iAct, Activation oAct) {
-        Link existingLink = oAct.getInputLink(iAct.getNeuron());
-        return existingLink != null && existingLink.getInput() == iAct;
-    }
-
     public static boolean templateLinkExists(Synapse ts, Activation iAct, Activation oAct) {
         Link l = oAct.getInputLink(iAct.getNeuron());
         if(l == null)

@@ -17,7 +17,9 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.PrimaryInputLink;
 import network.aika.neuron.activation.RelatedInputLink;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
@@ -38,9 +40,12 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
 
     private static List<Transition> CHECK_TRANSITIONS = List.of(
             new Transition(SAME, INPUT),
-            new Transition(INPUT, INPUT_RELATED)
+            new Transition(INPUT, INPUT)
     );
 
+    private static List<Transition> CHECK_TRANSITIONS_TEMPLATE = List.of(
+            new Transition(SAME, INPUT)
+    );
 
     @Override
     public RelatedInputLink createLink(BindingActivation input, BindingActivation output) {
@@ -54,6 +59,16 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
 
     @Override
     public List<Transition> getCheckTransitions() {
-        return CHECK_TRANSITIONS;
+        return isTemplate() ?
+                CHECK_TRANSITIONS_TEMPLATE :
+                CHECK_TRANSITIONS;
+    }
+
+    @Override
+    public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
+        if(isTemplate() && oBS.getLink() instanceof PrimaryInputLink<?>)
+            return false;
+
+        return super.checkRelatedBindingSignal(iBS, oBS);
     }
 }

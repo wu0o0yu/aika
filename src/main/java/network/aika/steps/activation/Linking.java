@@ -56,17 +56,10 @@ public class Linking extends Step<Activation> {
         if (bindingSignal.isOrigin())
             return;
 
-        Linking step = new Linking(act, bindingSignal, dir, linkingOrder, fired, false, linkingType, filter);
+        Linking step = new Linking(act, bindingSignal, dir, linkingOrder, fired,  linkingType, filter);
 
         if (step.hasTargetSynapses())
             Step.add(step);
-
-        if (act.getConfig().isTemplatesEnabled()) {
-            Linking templateStep = new Linking(act, bindingSignal, dir, linkingOrder, fired, true, linkingType, filter);
-
-            if (templateStep.hasTargetSynapses())
-                Step.add(templateStep);
-        }
     }
 
     public static void add(Activation act, BindingSignal bindingSignal, LinkingOrder linkingOrder) {
@@ -83,25 +76,29 @@ public class Linking extends Step<Activation> {
 
     private Direction direction;
     private LinkingOrder linkingOrder;
-    private boolean template;
     private String linkingType;
 
     private final BindingSignal<?> bindingSignal;
     private List<Synapse> targetSynapses;
 
 
-    private Linking(Activation act, BindingSignal<?> bindingSignal, Direction dir, LinkingOrder linkingOrder, Timestamp fired, boolean template, String linkingType, Predicate<Synapse> filter) {
+    private Linking(Activation act, BindingSignal<?> bindingSignal, Direction dir, LinkingOrder linkingOrder, Timestamp fired, String linkingType, Predicate<Synapse> filter) {
         super(act);
 
         this.linkingOrder = linkingOrder;
         this.direction = dir;
-        this.template = template;
         this.bindingSignal = bindingSignal;
         this.linkingType = linkingType;
         this.fired = fired;
 
+
         Neuron<?, ?> n = getElement().getNeuron();
-        this.targetSynapses = n.getTargetSynapses(direction, template)
+
+        Stream<? extends Synapse> targetSynapsesStream = n.getTargetSynapses(direction, false);
+        if(act.getConfig().isTemplatesEnabled())
+            targetSynapsesStream = Stream.concat(targetSynapsesStream, n.getTargetSynapses(direction, false));
+
+        this.targetSynapses = targetSynapsesStream
                 .filter(filter)
                 .collect(Collectors.toList());
     }
@@ -179,7 +176,7 @@ public class Linking extends Step<Activation> {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(linkingType + " " + linkingOrder + " " + direction + " " + (template ? "Template " : "")  + getElement() + " - " + bindingSignal.getClass().getSimpleName() + ": " + bindingSignal);
+        sb.append(linkingType + " " + linkingOrder + " " + direction + " " + getElement() + " - " + bindingSignal.getClass().getSimpleName() + ": " + bindingSignal);
         targetSynapses.forEach(ts ->
                 sb.append("\n    " + ts)
         );

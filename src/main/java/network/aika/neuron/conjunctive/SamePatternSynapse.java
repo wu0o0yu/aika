@@ -37,7 +37,7 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
 
     private static List<Transition> PROPAGATE_TRANSITIONS = List.of(
             new Transition(State.SAME, State.SAME), // Same Pattern BindingSignal
-            new Transition(State.INPUT, State.INPUT_RELATED) // Input BS becomes related
+            new Transition(State.INPUT, State.INPUT) // Input BS becomes related
     );
 
     private static List<Transition> CHECK_TRANSITIONS = List.of(

@@ -34,6 +34,7 @@ public class BindingSignal<O extends Activation> {
 
     private BindingSignal<O> parent;
     private Activation activation;
+    private Link link;
     private BindingSignal<O> origin;
     private byte depth;
     private State state;
@@ -48,7 +49,7 @@ public class BindingSignal<O extends Activation> {
         this.state = state;
     }
 
-    protected BindingSignal(BindingSignal<O> parent, State state) {
+    public BindingSignal(BindingSignal<O> parent, State state) {
         this.parent = parent;
         this.origin = parent.getOrigin();
         this.depth = (byte) (getDepth() + 1);
@@ -85,10 +86,6 @@ public class BindingSignal<O extends Activation> {
         return state;
     }
 
-    public BindingSignal<O> next(Transition t) {
-        return new BindingSignal(this, t.next(Direction.OUTPUT));
-    }
-
     public O getOriginActivation() {
         return (O) origin.getActivation();
     }
@@ -109,6 +106,7 @@ public class BindingSignal<O extends Activation> {
     public BindingSignal<O> clone(O act) {
         BindingSignal<O> c = new BindingSignal(parent, state);
         c.activation = act;
+        c.link = link;
         return c;
     }
 
@@ -118,8 +116,10 @@ public class BindingSignal<O extends Activation> {
 
     protected BindingSignal<O> propagate(Link l) {
         BindingSignal<O> nextBS = l.getSynapse().transition(this, Direction.OUTPUT, true);
-        if(nextBS != null)
+        if(nextBS != null) {
             nextBS.activation = l.getOutput();
+            nextBS.link = l;
+        }
 
         return nextBS;
     }
@@ -130,5 +130,9 @@ public class BindingSignal<O extends Activation> {
 
     public String toString() {
         return getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ", depth:" + getDepth() + ", state:" + state;
+    }
+
+    public Link getLink() {
+        return link;
     }
 }

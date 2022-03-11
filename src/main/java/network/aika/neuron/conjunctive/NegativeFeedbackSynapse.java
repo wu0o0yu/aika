@@ -52,6 +52,15 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     }
 
     @Override
+    public boolean linkExists(InhibitoryActivation iAct, BindingActivation oAct) {
+        if(super.linkExists(iAct, oAct))
+            return true;
+
+        return oAct.getBranches().stream()
+                .anyMatch(bAct -> super.linkExists(iAct, bAct));
+    }
+
+    @Override
     public boolean isRecurrent() {
         return true;
     }

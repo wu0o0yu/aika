@@ -91,13 +91,18 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     protected boolean checkCommonLinkingPreConditions(IA iAct, OA oAct) {
-        if(Link.linkExists(iAct, oAct))
+        if(linkExists(iAct, oAct))
             return false;
 
         if(isTemplate() && !checkTemplateLinkingPreConditions(iAct, oAct))
             return false;
 
         return true;
+    }
+
+    public boolean linkExists(IA iAct, OA oAct) {
+        Link existingLink = oAct.getInputLink(iAct.getNeuron());
+        return existingLink != null && existingLink.getInput() == iAct;
     }
 
     public boolean checkTemplateLinkingPreConditions(IA iAct, OA oAct) {
@@ -123,7 +128,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     public BindingSignal transition(BindingSignal from, Direction dir, boolean propagate) {
         return (propagate ? getPropagateTransitions() : getCheckTransitions()).stream()
                 .filter(t -> t.check(from.getState(), dir))
-                .map(t -> from.next(t))
+                .map(t ->
+                        new BindingSignal(from,
+                                t.next(Direction.OUTPUT)
+                        )
+                )
                 .findFirst()
                 .orElse(null);
     }
