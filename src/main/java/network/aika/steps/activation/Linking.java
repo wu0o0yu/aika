@@ -96,7 +96,7 @@ public class Linking extends Step<Activation> {
 
         Stream<? extends Synapse> targetSynapsesStream = n.getTargetSynapses(direction, false);
         if(act.getConfig().isTemplatesEnabled())
-            targetSynapsesStream = Stream.concat(targetSynapsesStream, n.getTargetSynapses(direction, false));
+            targetSynapsesStream = Stream.concat(targetSynapsesStream, n.getTargetSynapses(direction, true));
 
         this.targetSynapses = targetSynapsesStream
                 .filter(filter)
