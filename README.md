@@ -46,7 +46,7 @@ within the same pattern neuron ensemble and is only linked both ends of the syna
 by the same binding-signal. Therefore, the SamePatternSynapse is used to avoid what
 is called the superposition catastrophe.
 
-Since the Category-Neuron passes on the pattern-binding-signal of its input Pattern-Neuron, it can act as a 
+Since the category-neuron passes on the binding-signal of its input pattern-neuron, it can act as a 
 category slot, therefore allowing the network great flexibility in abstracting concepts.
 
 Initially, the network starts out empty and is then gradually populated during training. The induction of new neurons 
