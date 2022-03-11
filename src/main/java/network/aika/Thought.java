@@ -177,6 +177,11 @@ public abstract class Thought<M extends Model> {
         return maxPhase.compareTo(queue.firstEntry().getValue().getPhase()) < 0;
     }
 
+
+    /**
+     * After the switch into final mode, the initial assumption, that the positive feedback synapses are fully
+     * active is reverted and the actual evaluation of the feedback synapses takes place.
+     */
     public void processFinalMode() {
         activationsById.values()
                 .forEach(act -> act.setFinal());
@@ -184,6 +189,9 @@ public abstract class Thought<M extends Model> {
         process(PROCESSING);
     }
 
+    /**
+     * The postprocessing steps such as counting, cleanup or save are executed.
+     */
     public void postProcessing() {
         process(POST_PROCESSING);
     }
@@ -227,9 +235,6 @@ public abstract class Thought<M extends Model> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for(Activation act: activationsById.values()) {
-/*            if(!act.isActive())
-                continue;
-*/
             sb.append(act.toString());
             sb.append("\n");
         }
