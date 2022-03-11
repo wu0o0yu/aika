@@ -13,27 +13,41 @@ The AIKA network uses four different types of neurons:
 - Inhibitory-Neurons (IN)
 - Category-Neurons (CN)
 
-The Pattern-Neurons and the Binding-Neurons are both conjunctive in nature while the Inhibitory-Neurons and the Category-Neurons are disjunctive. The Binding-Neurons are kind of the glue code of the whole network. On the one hand, they bind the input-features of a pattern to the pattern-neuron and on the other hand receive negative feedback synapses from the inhibitory neurons which allow them to either be suppressed by an opposing pattern or allow themselves suppress another conflicting pattern. Similar to the neuron types there are also several different types of synapses, depending on wich types of neurons they connect. For example, the input synapses of an inhibitory neuron are always linked to Binding-Neurons, while the input synapses of Category-Neurons are always linked to pattern-neurons.
+The pattern-neurons and the binding-neurons are both conjunctive in nature while the inhibitory-neurons and the 
+category-neurons are disjunctive. The binding-neurons are kind of the glue code of the whole network. On the one hand, 
+they bind the input-features of a pattern to the pattern-neuron and on the other hand receive negative feedback synapses 
+from the inhibitory neurons which allow them to either be suppressed by an opposing pattern or allow themselves to 
+suppress another conflicting pattern. Similar to the neuron types there are also several types of synapses, depending on 
+which types of neurons they connect. For example, the input synapses of an inhibitory neuron are always linked to 
+binding-neurons, while the input synapses of category-neurons are always linked to pattern-neurons.
 
 The following types of synapses exist within the AIKA network:
 
-- PrimaryInputBNSynapse ((PN|CN) -> BN)
-- RelatedInputBNSynapse (BN -> BN)
-- SamePatternBNSynapse (BN -> BN)
+- PrimaryInputSynapse ((PN|CN) -> BN)
+- RelatedInputSynapse (BN -> BN)
+- SamePatternSynapse (BN -> BN)
 - PositiveFeedbackSynapse (PN -> BN)
 - NegativeFeedbackSynapse (IN -> BN)
 - PatternSynapse (BN -> PN)
 - CategorySynapse (PN -> CN)
 - InhibitorySynapse (BN -> IN)
 
-Depending on their source activation two types of binding-signals can be distinguished: The pattern-binding-signal and the branch-binding-signal. The pattern-binding-signal originates at a pattern-activation and is used to bind the input-features of a pattern to the pattern itself. The branch-binding-signal originates at a binding-activation and is used to distinguish the mutually exclusive branches from each other. The pattern-binding-signal is also carrying a scope that allows it to distinguish between different pattern 
-binding ensembles. The scope of the binding-signal changes when being propagated through certain types of synapses such as the PrimaryInputBNSynapse of the RelatedInputBNSynapse. The scope is used during the linking process to verify the validity of creating a certain new link. 
+The binding-signal that is propagated along linked synapses carries a state consisting of either of these three values: SAME, INPUT, BRANCH 
 
-As already mentioned, the Binding-Neurons of a pattern neuron ensemble are used to bind this pattern to its input features. To verify that all the input-features occurred in the correct relation to each other the SamePatternBNSynapse is used. The SamePatternBNSynapse connects two Binding-Neurons within the same pattern neuron ensemble. The SamePatternBNSynapse connects two Binding-Neurons
+SAME indicates that the binding signal has not yet left its originating neuron pattern ensemble. INPUT indicates, that the binding 
+signal was propagated to a dependant pattern neuron ensemble, for instance through the PrimaryInputSynapse or the RelatedInputSynapse.
+BRANCH indicates, that the binding signal originated from a binding activation instead of a pattern activation.
+
+As already mentioned, the binding-neurons of a pattern neuron ensemble are used to bind this pattern to its input 
+features. To verify that all the input-features occurred in the correct relation to each other the SamePatternSynapse 
+is used. The SamePatternSynapse connects two binding-neurons within the same pattern neuron ensemble. 
+The SamePatternSynapse connects two binding-neurons
 within the same pattern neuron ensemble and is only linked both ends of the synapse have been reached
-by the same binding-signal. Therefore, the SamePatternBNSynapse is used to avoid what
+by the same binding-signal. Therefore, the SamePatternSynapse is used to avoid what
 is called the superposition catastrophe.
 
-Since the Category-Neuron passes on the pattern-binding-signal of its input Pattern-Neuron, it can act as a category slot, therefore allowing the network great flexibility in abstracting concepts.
+Since the Category-Neuron passes on the pattern-binding-signal of its input Pattern-Neuron, it can act as a 
+category slot, therefore allowing the network great flexibility in abstracting concepts.
 
-Initially, the network starts out empty and is then gradually populated during training. The induction of new neurons and synapses is guided by a network of template neurons and synapses.
+Initially, the network starts out empty and is then gradually populated during training. The induction of new neurons 
+and synapses is guided by a network of template neurons and synapses.

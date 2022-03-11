@@ -5,7 +5,7 @@
     <groupId>network.aika</groupId>
     <artifactId>aika</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>2.0.2.ALPHA</version>
     <name>aika</name>
     <url>https://aika.network</url>
     <description>An Artificial Intelligence for Knowledge Acquisition</description>
@@ -175,7 +175,7 @@
         <dependency>
             <groupId>network.aika</groupId>
             <artifactId>aika-debugger</artifactId>
-            <version>2.0.1-SNAPSHOT</version>
+            <version>2.0.2.ALPHA</version>
             <scope>test</scope>
         </dependency>
 
@@ -244,7 +244,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.8</version>
+                        <version>1.6.12</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>
