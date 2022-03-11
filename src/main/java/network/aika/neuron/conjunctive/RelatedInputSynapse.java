@@ -66,7 +66,7 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
 
     @Override
     public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
-        if(isTemplate() && oBS.getLink() instanceof PrimaryInputLink<?>)
+        if(isTemplate() && !(oBS.getLink() instanceof PrimaryInputLink<?>))
             return false;
 
         return super.checkRelatedBindingSignal(iBS, oBS);
