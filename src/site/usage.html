@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Examples - Aika</title>
+	<title>Examples - AIKA</title>
 	<link rel="stylesheet" href="css/style.css" type="text/css">
 	<link rel="shortcut icon" href="images/favicon.png" />
 	<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
@@ -36,9 +36,6 @@
                 <a rel="canonical" href="inference.html">Inference</a>
             </li>
             <li>
-                <a rel="canonical" href="nlp.html">NLP</a>
-            </li>
-            <li>
                 <a rel="canonical" href="training.html">Training</a>
             </li>
 			<li class="active">
@@ -54,316 +51,126 @@
 	</div>
 </div>
 	<div id="contents">
-        <div align="right"><span style='color: #FF0000;'>October 09, 2020</span></div>
+        <div align="right"><span style='color: #FF0000;'>March 12, 2022</span></div>
         <div align="middle"><b><span style='color: #FF0000;'>Work in progress</span></b></div>
 		<div class="features">
             <h1>Usage</h1>
 
             <h3>Maven POM</h3>
             <p>
-                The following dependency includes the Aika software library to an existing maven project.
+                The following dependency includes the AIKA software library to an existing maven project.
             </p>
 
             <p>
                 <b>
                 &lt;dependency&gt;<br/>
-                &nbsp;&nbsp;&nbsp;&nbsp;&lt;groupId&gt;org.aika-software&lt;&#47;groupId&gt;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&lt;groupId&gt;network.aika&lt;&#47;groupId&gt;<br/>
                 &nbsp;&nbsp;&nbsp;&nbsp;&lt;artifactId&gt;aika&lt;&#47;artifactId&gt;<br/>
-                &nbsp;&nbsp;&nbsp;&nbsp;&lt;version&gt;2.0.0-SNAPSHOT&lt;&#47;version&gt;<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;&lt;version&gt;2.0.3-SNAPSHOT&lt;&#47;version&gt;<br/>
                 &lt;&#47;dependency&gt;<br/>
                 </b>
             </p>
 
             <h3>Mutual exclusion example</h3>
             <div style="text-align:center; width:100%">
-                <img src="images/code-example-mutual-exclusion.svg" width="50%" height="50%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
+                <img src="images/abcd.png" width="100%" height="100%" style="float:none; margin-left:auto; margin-right:auto; display:block"/>
             </div>
 
             <div class="prettyprint-code">
 			<pre class="prettyprint">
 				<code class="language-java">
+
     @Test
-    public void testMutualExclusion() {
-        Model m = new TextModel();
-
-        PatternNeuron in = new PatternNeuron(m, "I", "IN", true);
-        PatternPartNeuron na = new PatternPartNeuron(m, "A", false);
-        PatternPartNeuron nb = new PatternPartNeuron(m, "B", false);
-        PatternPartNeuron nc = new PatternPartNeuron(m, "C", false);
-        InhibitoryNeuron inhib = new InhibitoryNeuron(m, "I", false);
-
-        {
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(in, na, false, false, true, false);
-
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                na.addConjunctiveBias(-10.0, false);
-            }
-
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(inhib, na, true, true, false, false);
-
-                s.linkOutput();
-                s.getWeight().add(-100.0);
-            }
-
-            na.setBias(1.0);
-        }
-
-        {
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(in, nb, false, false, true, false);
-
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                nb.addConjunctiveBias(-10.0, false);
-            }
-
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(inhib, nb, true, true, false, false);
-
-                s.linkOutput();
-                s.getWeight().add(-100.0);
-            }
-            nb.setBias(1.5);
-        }
-
-
-        {
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(in, nc, false, false, true, false);
-
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                nc.addConjunctiveBias(-10.0, false);
-            }
-
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(inhib, nc, true, true, false, false);
-
-                s.linkOutput();
-                s.getWeight().add(-100.0);
-            }
-
-            nc.setBias(1.2);
-        }
-
-        {
-            {
-                InhibitorySynapse s = new InhibitorySynapse(na, inhib);
-                s.linkInput();
-                s.getWeight().add(1.0);
-            }
-            {
-                InhibitorySynapse s = new InhibitorySynapse(nb, inhib);
-                s.linkInput();
-                s.getWeight().add(1.0);
-            }
-            {
-                InhibitorySynapse s = new InhibitorySynapse(nc, inhib);
-                s.linkInput();
-                s.getWeight().add(1.0);
-            }
-
-            inhib.setBias(0.0);
-        }
-
-        Document doc = new Document("test");
-
-        Activation act = new Activation(doc, in);
-        act.setValue(1.0);
-        act.setFired(0);
-
-        act.propagateInput();
-
-        doc.process();
-
-        System.out.println(doc.activationsToString());
-
-        Set<Activation> nbActs = doc.getActivations(nb);
-        Activation nbAct = nbActs.iterator().next();
-
-        assertTrue(nbAct.getValue() > 0.38);
-    }
-                </code>
-			</pre>
-
-
-            <h3>Pattern matching example</h3>
-            <div class="prettyprint-code">
-			<pre class="prettyprint">
-				<code class="language-java">
-    public TextModel initModel() {
+    public void testABCD() throws InterruptedException {
         TextModel m = new TextModel();
+        m.init();
+        Templates t = m.getTemplates();
 
-        PatternNeuron nA = m.lookupToken("A");
-        PatternNeuron nB = m.lookupToken("B");
-        PatternNeuron nC = m.lookupToken("C");
+        PatternNeuron a_IN = m.lookupToken("a");
 
-        PatternPartNeuron eA = new PatternPartNeuron(m, "E A", false);
-        PatternPartNeuron eB = new PatternPartNeuron(m, "E B", false);
-        PatternPartNeuron eC = new PatternPartNeuron(m, "E C", false);
+        PatternNeuron b_IN = m.lookupToken("b");
+        BindingNeuron b_PTRelBN = TextModel.getPreviousTokenRelationBindingNeuron(b_IN);
 
-        PatternNeuron out = new PatternNeuron(m, "ABC", "OUT", false);
+        PatternNeuron c_IN = m.lookupToken("c");
+        BindingNeuron c_PTRelBN = TextModel.getPreviousTokenRelationBindingNeuron(c_IN);
 
-        {
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(nA, eA, false, false, true, false);
+        PatternNeuron d_IN = m.lookupToken("d");
+        BindingNeuron d_PTRelBN = TextModel.getPreviousTokenRelationBindingNeuron(d_IN);
 
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eA.addConjunctiveBias(-10.0, false);
-            }
 
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(out, eA, false, true, false, false);
+        // Pattern ab
+        BindingNeuron a_abBN = createNeuron(t.BINDING_TEMPLATE, "a (ab)");
+        BindingNeuron b_abBN = createNeuron(t.BINDING_TEMPLATE, "b (ab)");
 
-                s.linkInput();
-                s.linkOutput();
-                s.setWeight(10.0);
-                eA.addConjunctiveBias(-10.0, true);
-            }
-            eA.setBias(4.0);
-        }
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, b_PTRelBN, b_abBN, 10.0);
+        createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, a_abBN, b_abBN, 10.0);
 
-        {
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(nB, eB, false, false, true, false);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, a_IN, a_abBN, 10.0);
+        updateBias(a_abBN, 2.5);
 
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eB.addConjunctiveBias(-10.0, false);
-            }
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, b_IN, b_abBN, 10.0);
 
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(eA, eB, false, false, false, true);
+        PatternNeuron abPattern = initPatternLoop(t, "ab", a_abBN, b_abBN);
+        updateBias(abPattern, 3.0);
 
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eB.addConjunctiveBias(-10.0, false);
-            }
 
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nB), eB, false, false, true, false);
+        // Pattern bc
+        BindingNeuron b_bcBN = createNeuron(t.BINDING_TEMPLATE, "b (bc)");
+        BindingNeuron c_bcBN = createNeuron(t.BINDING_TEMPLATE, "c (bc)");
 
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eB.addConjunctiveBias(-10.0, false);
-            }
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, c_PTRelBN, c_bcBN, 10.0);
+        createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, b_bcBN, c_bcBN, 10.0);
 
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(out, eB, false, true, false, false);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, b_IN, b_bcBN, 10.0);
+        initInhibitoryLoop(t, "b", b_abBN, b_bcBN);
+        updateBias(b_abBN, 3.0);
+        updateBias(b_bcBN, 2.5);
 
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eB.addConjunctiveBias(-10.0, true);
-            }
-            eB.setBias(4.0);
-        }
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, c_IN, c_bcBN, 10.0);
+        updateBias(c_bcBN, 3.0);
 
-        {
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(nC, eC, false, false, true, false);
+        PatternNeuron bcPattern = initPatternLoop(t, "bc", b_bcBN, c_bcBN);
+        updateBias(bcPattern, 3.0);
 
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eC.addConjunctiveBias(-10.0, false);
-            }
 
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(eB, eC, false, false, false, true);
+        // Pattern bcd
+        BindingNeuron bc_bcdBN = createNeuron(t.BINDING_TEMPLATE, "bc (bcd)");
+        BindingNeuron d_bcdBN = createNeuron(t.BINDING_TEMPLATE, "d (bcd)");
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, c_bcBN, bc_bcdBN, 10.0);
 
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eC.addConjunctiveBias(-10.0, false);
-            }
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, d_PTRelBN, d_bcdBN, 10.0);
+        createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, bc_bcdBN, d_bcdBN, 10.0);
 
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(lookupPPPT(m, nC), eC, false, false, true, false);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, bcPattern, bc_bcdBN, 10.0);
+        updateBias(bc_bcdBN, 2.5);
 
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eC.addConjunctiveBias(-10.0, false);
-            }
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, d_IN, d_bcdBN, 10.0);
+        updateBias(d_bcdBN, 3.0);
 
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(out, eC, false, true, false, false);
+        PatternNeuron bcdPattern = initPatternLoop(t, "bcd", bc_bcdBN, d_bcdBN);
+        updateBias(bcdPattern, 3.0);
 
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                eC.addConjunctiveBias(-10.0, true);
-            }
-            eC.setBias(4.0);
-        }
 
-        {
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(eA, out, false, false, false, true);
+        Document doc = new Document(m, "abcd");
 
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                out.addConjunctiveBias(-10.0, false);
-            }
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(eB, out, false, false, false, true);
+        Config c = getConfig()
+                .setAlpha(0.99)
+                .setLearnRate(-0.011)
+                .setInductionThreshold(0.1)
+                .setTrainingEnabled(true)
+                .setTemplatesEnabled(true);
+        doc.setConfig(c);
 
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                out.addConjunctiveBias(-10.0, false);
-            }
-            {
-                ExcitatorySynapse s = new ExcitatorySynapse(eC, out, false, false, false, true);
+        AIKADebugger debugger = AIKADebugger.createAndShowGUI(doc);
 
-                s.linkInput();
-                s.linkOutput();
-                s.getWeight().add(10.0);
-                out.addConjunctiveBias(-10.0, false);
-            }
-            out.setBias(4.0);
-        }
-        return m;
+        ...
+
+        doc.processTokens(List.of("a", "b", "c", "d"));
+
+        doc.processFinalMode();
+        doc.postProcessing();
+        doc.updateModel();
     }
-
-    public PatternPartNeuron lookupPPPT(TextModel tm, PatternNeuron pn) {
-        return (PatternPartNeuron) pn.getOutputSynapses()
-                .map(s -> s.getOutput())
-                .filter(n -> isPTNeuron(tm, n))
-                .findAny()
-                .orElse(null);
-    }
-
-    private boolean isPTNeuron(TextModel tm, Neuron<?> n) {
-        return n.getOutputSynapses()
-                .map(s -> s.getOutput())
-                .anyMatch(in -> in == tm.getPrevTokenInhib());
-    }
-				</code>
-			</pre>
-            </div>
-
-            <div class="prettyprint-code">
-            <pre class="prettyprint">
-				<code class="language-java">
-Activation ID - Neuron Type - Final Decision - Slots | Identity - Neuron Label - Upper Bound -
-Value | Net | Weight - Input Value | Target Value
-
-0   INPUT      -          - (0:0, 1:2) "a " () - a - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
-1   INPUT      -          - (0:2, 1:4) "b " () - b - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
-5   EXCITATORY - SELECTED - (0:2, 1:10) "b c d e " () - BCDE - V:1.0 UB:1.0 Net:5.0 W:0.0
-2   INPUT      -          - (0:4, 1:6) "c " () - c - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
-3   INPUT      -          - (0:6, 1:8) "d " () - d - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
-4   INPUT      -          - (0:8, 1:10) "e " () - e - V:1.0 UB:1.0 Net:0.0 W:0.0 - IV:1.0
-
- Final SearchNode:1  WeightSum:0.0
 				</code>
 			</pre>
             </div>

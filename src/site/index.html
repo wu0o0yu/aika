@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Aika: An Artificial Intelligence for Knowledge Acquisition</title>
+	<title>AIKA: An Artificial Intelligence for Knowledge Acquisition</title>
 	<link rel="stylesheet" href="css/style.css" type="text/css">
 	<link rel="shortcut icon" href="images/favicon.png" />
 
@@ -35,9 +35,6 @@
 					<a rel="canonical" href="inference.html">Inference</a>
 				</li>
 				<li>
-					<a rel="canonical" href="nlp.html">NLP</a>
-				</li>
-				<li>
 					<a rel="canonical" href="training.html">Training</a>
 				</li>
 				<li>
@@ -53,13 +50,13 @@
 		</div>
 	</div>
 	<div id="contents">
-		<div align="right"><span style='color: #FF0000;'>February 07, 2022</span></div>
+		<div align="right"><span style='color: #FF0000;'>March 12, 2022</span></div>
 		<div id="features">
 			<h1>About the AIKA Neural Network</h1>
 			<div>
 				<p>
 					<b>
-						Aika (<u>A</u>rtificial <u>I</u>ntelligence for <u>K</u>nowledge <u>A</u>cquisition) is a new
+						AIKA (<u>A</u>rtificial <u>I</u>ntelligence for <u>K</u>nowledge <u>A</u>cquisition) is a new
 						type of artificial neural network designed to more closely mimic the behavior of a biological
 						brain and to bridge the gap to classical AI. A key design decision in the AIKA network is to
 						conceptually separate the activations from their neurons, meaning that there are two separate
@@ -127,27 +124,25 @@
 				</ul>
 				</p>
 				<p>
-					Depending on their source activation two types of binding-signals can be distinguished: The
-					pattern-binding-signal and the branch-binding-signal. The pattern-binding-signal originates at a
-					pattern-activation and is used to bind the input-features of a pattern to the pattern itself.
-					The branch-binding-signal originates at a binding-activation and is used to distinguish the mutually
-					exclusive branches from each other. The pattern-binding-signal is also carrying a scope that allows
-					it to distinguish between different pattern binding ensembles. The scope of the binding-signal
-					changes when being propagated through certain types of synapses such as the PrimaryInputBNSynapse
-					of the RelatedInputBNSynapse. The scope is used during the linking process to verify the validity
-					of creating a certain new link.
+					The binding-signal that is propagated along linked synapses carries a state consisting of either
+					of these three values: SAME, INPUT, BRANCH </br>
+
+					SAME indicates that the binding signal has not yet left its originating neuron pattern ensemble. INPUT indicates, that the binding
+					signal was propagated to a dependant pattern neuron ensemble, for instance through the PrimaryInputSynapse or the RelatedInputSynapse.
+					BRANCH indicates, that the binding signal originated from a binding activation instead of a pattern activation.
 				</p>
 				<p>
-					As already mentioned, the Binding-Neurons of a pattern neuron ensemble are used to bind this pattern
-					to its input features. To verify that all the input-features occurred in the correct relation to
-					each other the SamePatternBNSynapse is used. The SamePatternBNSynapse connects two Binding-Neurons
+					As already mentioned, the binding-neurons of a pattern neuron ensemble are used to bind this pattern to its input
+					features. To verify that all the input-features occurred in the correct relation to each other the SamePatternSynapse
+					is used. The SamePatternSynapse connects two binding-neurons within the same pattern neuron ensemble.
+					The SamePatternSynapse connects two binding-neurons
 					within the same pattern neuron ensemble and is only linked both ends of the synapse have been reached
-					by the same binding-signal. Therefore, the SamePatternBNSynapse is used to avoid what
+					by the same binding-signal. Therefore, the SamePatternSynapse is used to avoid what
 					is called the superposition catastrophe.
 				</p>
 				<p>
-					Since the Category-Neuron passes on the pattern-binding-signal of its input Pattern-Neuron, it can
-					act as a category slot, therefore allowing the network great flexibility in abstracting concepts.
+					Since the category-neuron passes on the binding-signal of its input pattern-neuron, it can act as a
+					category slot, therefore allowing the network great flexibility in abstracting concepts.
 				</p>
 				<p>
 					Initially, the network starts out empty and is then gradually populated during training. The

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Inference - Aika</title>
+	<title>Inference - AIKA</title>
 	<link rel="stylesheet" href="css/style.css" type="text/css">
 	<link rel="shortcut icon" href="images/favicon.png" />
 
@@ -53,9 +53,6 @@
 				<a rel="canonical" href="inference.html">Inference</a>
 			</li>
 			<li>
-				<a rel="canonical" href="nlp.html">NLP</a>
-			</li>
-			<li>
 				<a rel="canonical" href="training.html">Training</a>
 			</li>
 			<li>
@@ -78,7 +75,7 @@
 			<p>
 			<h2>General Architecture</h2>
 			<p>
-				In the Aika neural network, neurons and their activations are represented separately. Thus, each neuron may have an arbitrary number of activations.
+				In the AIKA neural network, neurons and their activations are represented separately. Thus, each neuron may have an arbitrary number of activations.
 				For example, if the input data set is a text and a neuron represents a specific word, then there might be several occurrences of this word and therefore
 				several activations of this neuron. The human brain probably does something similar through the timing of activation spikes.<br/>
 				These activations represent the information that the neural network was able to infer about the input data set. Every activation is directly or
@@ -91,12 +88,12 @@
 				A consequence of separating the neurons and their activations is that we cannot rely on the network topology to give us the chronological sequence in which each
 				activation is processed. Therefore each activation needs fired timestamp information that describes the point in time when this activation becomes visible to other neurons.
 				In contrast to conventional neural networks, with their predefined and layered architecture, in which one layer after another is processed by hardware-accelerated matrix
-				operations Aika, follows a different approach. The core of the Aika algorithm is a single queue to which primitive operations within the graph of the neural network are
+				operations AIKA, follows a different approach. The core of the AIKA algorithm is a single queue to which primitive operations within the graph of the neural network are
 				added and then processed in a predefined order. The advantage of this approach is that the activation network can be very sparse in comparison to the actual neural network.
 				Only a tiny minority of neurons that are relevant to a given input data set are actually activated, and the order in which inferences are performed within the network is
 				completely determined by the input data set instead of the hardwired network architecture. <br/>
 
-				Another difference from classical neural networks is that the complete structure of the network is inferred during training. The Aika network starts out completely empty.
+				Another difference from classical neural networks is that the complete structure of the network is inferred during training. The AIKA network starts out completely empty.
 				In a first step, input neurons and their activations are added to the network. These represent either letters or words. Some relational input activations are then added
 				to capture the correct sequence in which the input tokens occur. Then, during training, new neurons and synapses are instantiated and added to the network. These, however,
 				are not completely created from scratch. Instead they are instantiated based on neurons and synapses in a template network. This template network contains several
@@ -121,7 +118,7 @@
 				$$y_j = \varphi (net_j)$$
 
 				Depending on the type of neuron, different activation functions are used. One commonly used activation function
-				in the Aika network is the <a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks)">rectified</a>
+				in the AIKA network is the <a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks)">rectified</a>
 				hyperbolic tangent function, which is basically the positive half of the \(\tanh()\) function.
 
 				\[\varphi(x) = \Bigg \{ {0 \atop \tanh(x)} {: x \leq 0 \atop : x > 0}\]
@@ -156,14 +153,14 @@
 				during the entire stimulus. In contrast, most pyramidal cells are unable to maintain a constant firing
 				rate. Instead, they fire quickly at the beginning of the stimulus but then the firing reduces in frequency even
 				if the stimulus stays strong. This slowdown over time is called "adaption". <br/>
-				Aika tries to mimic this behaviour by using different activation functions for the different types of
-				neurons. Since Aika is not a spiking neural network like its biological counterpart, we have only the neurons'
+				AIKA tries to mimic this behaviour by using different activation functions for the different types of
+				neurons. Since AIKA is not a spiking neural network like its biological counterpart, we have only the neurons'
 				activation value, which can be roughly interpreted as the firing frequency of a spiking neuron. In a sense, the
 				earlier-described activation function based on the rectified tanh function quite nicely captures
 				the adaption behaviour of a pyramidal cell. An increase of a weak signal has a strong effect on the
 				neurons' output, while an increase of an already-strong signal has almost no effect. Furthermore, if the
 				input of the neuron does not exceed a certain threshold, it will not fire at all.
-				For inhibitory neurons, Aika uses the rectified linear unit function (ReLU).
+				For inhibitory neurons, AIKA uses the rectified linear unit function (ReLU).
 			</p>
 
 			$$y = \max(0, x)$$

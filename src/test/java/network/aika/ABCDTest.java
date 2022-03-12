@@ -78,13 +78,10 @@ public class ABCDTest {
         coords.put(23l, new double[]{3.305, 2.822});
         return coords;
     }
-    /**
-     * Dieser Testcase dient dazu, die gegenseitige Unterdrückung mehrerer Pattern zu testen:
-     * 'ab' steht im Konflikt mit 'bc' und 'bcd'. 'bc' ist aber in 'bcd' eingebettet und soll daher nicht unterdrückt werden.
-     *
-     * Testet also Pattern, Mutual Exclusion und Relationen
-     */
 
+    /**
+     *
+     */
     @Test
     public void testABCD() throws InterruptedException {
         TextModel m = new TextModel();
@@ -103,7 +100,6 @@ public class ABCDTest {
         BindingNeuron d_PTRelBN = TextModel.getPreviousTokenRelationBindingNeuron(d_IN);
 
         // Pattern ab
-
         BindingNeuron a_abBN = createNeuron(t.BINDING_TEMPLATE, "a (ab)");
         BindingNeuron b_abBN = createNeuron(t.BINDING_TEMPLATE, "b (ab)");
 
@@ -112,7 +108,6 @@ public class ABCDTest {
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, a_abBN, b_abBN, 10.0);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, a_IN, a_abBN, 10.0);
-    //    initInhibitoryLoop(t, "a", a_abBN);
         updateBias(a_abBN, 2.5);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, b_IN, b_abBN, 10.0);
@@ -133,14 +128,12 @@ public class ABCDTest {
         updateBias(b_bcBN, 2.5);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, c_IN, c_bcBN, 10.0);
-     //   initInhibitoryLoop(t, "c", c_bcBN);
         updateBias(c_bcBN, 3.0);
 
         PatternNeuron bcPattern = initPatternLoop(t, "bc", b_bcBN, c_bcBN);
         updateBias(bcPattern, 3.0);
 
         // Pattern bcd
-
         BindingNeuron bc_bcdBN = createNeuron(t.BINDING_TEMPLATE, "bc (bcd)");
         BindingNeuron d_bcdBN = createNeuron(t.BINDING_TEMPLATE, "d (bcd)");
         createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, c_bcBN, bc_bcdBN, 10.0);
@@ -149,11 +142,9 @@ public class ABCDTest {
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, bc_bcdBN, d_bcdBN, 10.0);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, bcPattern, bc_bcdBN, 10.0);
-    //    initInhibitoryLoop(t, "bc", bc_bcdBN);
         updateBias(bc_bcdBN, 2.5);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, d_IN, d_bcdBN, 10.0);
-    //    initInhibitoryLoop(t, "d", d_bcdBN);
         updateBias(d_bcdBN, 3.0);
 
         PatternNeuron bcdPattern = initPatternLoop(t, "bcd", bc_bcdBN, d_bcdBN);

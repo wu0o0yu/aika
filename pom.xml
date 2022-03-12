@@ -5,7 +5,7 @@
     <groupId>network.aika</groupId>
     <artifactId>aika</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.2.ALPHA</version>
+    <version>2.0.3-SNAPSHOT</version>
     <name>aika</name>
     <url>https://aika.network</url>
     <description>An Artificial Intelligence for Knowledge Acquisition</description>
