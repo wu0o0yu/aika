@@ -17,12 +17,9 @@
 package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
-import network.aika.fields.BooleanFieldOutput;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.PatternActivation;
 
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -39,7 +36,7 @@ public class BindingSignal<O extends Activation> {
     private byte depth;
     private State state;
 
-    private BooleanFieldOutput onArrived;
+    private FieldOutput onArrived;
 
 
     public BindingSignal(O act, State state) {

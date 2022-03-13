@@ -16,7 +16,6 @@
  */
 package network.aika.fields;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleFunction;
 
@@ -25,60 +24,72 @@ import java.util.function.DoubleFunction;
  */
 public class FieldUtils {
 
-    public static FieldMultiplication mul(String label, DoubleFieldOutput in1, DoubleFieldOutput in2) {
-        return new FieldMultiplication(label, in1, true, in2, true);
+    public static FieldMultiplication mul(String label, FieldOutput in1, FieldOutput in2) {
+        if(in1 == null || in2 == null)
+            return null;
+
+        return new FieldMultiplication(label, in1, in2);
     }
 
-    public static FieldMultiplication mul(String label, DoubleFieldOutput in1, DoubleFieldOutput in2, DoubleFieldInput out) {
-        FieldMultiplication func = new FieldMultiplication(label, in1, true, in2, true);
+    public static FieldMultiplication mul(String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
+        if(in1 == null || in2 == null)
+            return null;
+
+        FieldMultiplication func = new FieldMultiplication(label, in1, in2);
         func.registerOutputs(out);
         return func;
     }
 
-    public static FieldMultiplication mulUnregistered(String label, DoubleFieldOutput in1, DoubleFieldOutput in2) {
-        return new FieldMultiplication(label, in1, false, in2, false);
+    public static FieldDivision div(String label, FieldOutput in1, FieldOutput in2) {
+        if(in1 == null || in2 == null)
+            return null;
+
+        return new FieldDivision(label, in1, in2);
     }
 
-    public static FieldMultiplication mulUnregistered(String label, DoubleFieldOutput in1, DoubleFieldOutput in2, DoubleFieldInput... out) {
-        FieldMultiplication func = new FieldMultiplication(label, in1, false, in2, false);
+    public static FieldDivision div(String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
+        if(in1 == null || in2 == null)
+            return null;
+
+        FieldDivision func = new FieldDivision(label, in1, in2);
         func.registerOutputs(out);
         return func;
     }
 
-    public static FieldDivision div(String label, DoubleFieldOutput in1, DoubleFieldOutput in2) {
-        return new FieldDivision(label, in1, true, in2, true);
-    }
+    public static FieldFunction func(String label, FieldOutput in, DoubleFunction<Double> f) {
+        if(in == null)
+            return null;
 
-    public static FieldDivision div(String label, DoubleFieldOutput in1, DoubleFieldOutput in2, DoubleFieldInput... out) {
-        FieldDivision func = new FieldDivision(label, in1, true, in2, true);
-        func.registerOutputs(out);
-        return func;
-    }
-
-    public static FieldFunction func(String label, DoubleFieldOutput in, DoubleFunction<Double> f) {
         return new FieldFunction(label, in, f);
     }
 
-    public static FieldFunction func(String label, DoubleFieldOutput in, DoubleFunction<Double> f, DoubleFieldInput... out) {
+    public static FieldFunction func(String label, FieldOutput in, DoubleFunction<Double> f, FieldInput... out) {
+        if(in == null)
+            return null;
+
         return new FieldFunction(label, in, f, out);
     }
 
-    public static BiFunction func(String label, DoubleFieldOutput in1, DoubleFieldOutput in2, DoubleBinaryOperator f) {
-        return new BiFunction(label, in1, true, in2, true, f);
-    }
+    public static BiFunction func(String label, FieldOutput in1, FieldOutput in2, DoubleBinaryOperator f, FieldInput... out) {
+        if(in1 == null || in2 == null)
+            return null;
 
-    public static BiFunction func(String label, DoubleFieldOutput in1, DoubleFieldOutput in2, DoubleBinaryOperator f, DoubleFieldInput... out) {
-        BiFunction func = new BiFunction(label, in1, true, in2, true, f);
+        BiFunction func = new BiFunction(label, in1, in2, f);
         func.registerOutputs(out);
         return func;
     }
 
-    public static SwitchField switchField(String label, DoubleFieldInterface in1, DoubleFieldInterface in2, BooleanSupplier test) {
-        return new SwitchField(label, in1, false, in2, false, test);
+    public static FieldIdentity identity(String label, FieldOutput in, FieldInput... out) {
+        if(in == null)
+            return null;
+
+        return new FieldIdentity(label, in, out);
     }
 
-    public static ThresholdOperator threshold(String label, double threshold, DoubleFieldOutput in, BooleanFieldInput... out) {
+    public static ThresholdOperator threshold(String label, double threshold, FieldOutput in, FieldInput... out) {
+        if(in == null)
+            return null;
+
         return new ThresholdOperator(label, threshold, in, out);
     }
-
 }

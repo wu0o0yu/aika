@@ -16,12 +16,10 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.fields.DoubleFieldInput;
-import network.aika.fields.DoubleFieldOutput;
-import network.aika.fields.SwitchField;
+import network.aika.fields.AbstractBiFunction;
 import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 
-import static network.aika.fields.FieldUtils.switchField;
+import static network.aika.fields.FieldUtils.mul;
 
 /**
  *
@@ -29,33 +27,42 @@ import static network.aika.fields.FieldUtils.switchField;
  */
 public class PositiveFeedbackLink extends BindingNeuronLink<PositiveFeedbackSynapse, PatternActivation> {
 
-    private SwitchField combinedWeight;
+    private AbstractBiFunction feedbackWeightInput;
+    private AbstractBiFunction feedbackBiasInput;
 
     public PositiveFeedbackLink(PositiveFeedbackSynapse s, PatternActivation input, BindingActivation output) {
         super(s, input, output);
     }
 
     protected void initWeightInput() {
-        combinedWeight = switchField(
-                "combinedWeight",
-                synapse.getWeight(),
+        if(isCausal())
+            super.initWeightInput();
+
+        feedbackWeightInput = mul(
+                "iAct.finalValue * s.feedbackWeighted",
+                input.getFinalValue(),
                 synapse.getFeedbackWeight(),
-                () -> input.isFinal()
+                getOutput().getNet()
         );
 
-        super.initWeightInput();
+        feedbackBiasInput = mul(
+                "iAct.isFinal * s.feedbackBias",
+                input.getIsFinal(),
+                synapse.getFeedbackBias(),
+                getOutput().getNet()
+        );
+    }
+
+    public AbstractBiFunction getFeedbackWeightInput() {
+        return feedbackWeightInput;
+    }
+
+    public AbstractBiFunction getFeedbackBiasInput() {
+        return feedbackBiasInput;
     }
 
     public void setFinalMode() {
         output.updateBias(synapse.getFeedbackBias().getCurrentValue());
         output.getNet().addAndTriggerUpdate(synapse.getFeedbackWeight().getCurrentValue());
-    }
-
-    public DoubleFieldInput getWeightInput() {
-        return combinedWeight;
-    }
-
-    public DoubleFieldOutput getWeightOutput() {
-        return combinedWeight;
     }
 }

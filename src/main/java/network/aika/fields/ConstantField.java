@@ -16,42 +16,55 @@
  */
 package network.aika.fields;
 
-import java.util.function.DoubleBinaryOperator;
-
 /**
  * @author Lukas Molzberger
  */
-public class BiFunction extends AbstractBiFunction {
+public class ConstantField extends FieldListener implements FieldOutput {
 
-    private DoubleBinaryOperator function;
+    public static final ConstantField ZERO = new ConstantField("ZERO", 0.0);
+    public static final ConstantField ONE = new ConstantField("ONE", 1.0);
 
-    public BiFunction(String label, FieldOutput in1, FieldOutput in2, DoubleBinaryOperator f) {
-        super(label, in1, in2);
-        this.function = f;
+    private final double value;
+    private boolean initialized = false;
+    private String label;
+
+    public ConstantField(String label, double value) {
+        this.label = label;
+        this.value = value;
+    }
+
+    @Override
+    public String getLabel() {
+        return label;
+    }
+
+    @Override
+    public boolean isInitialized() {
+        return true;
+    }
+
+    @Override
+    public void propagateInitialValue() {
+        propagateUpdate(getCurrentValue());
     }
 
     @Override
     public double getCurrentValue() {
-        return function.applyAsDouble(in1.getCurrentValue(), in2.getCurrentValue());
+        return value;
     }
 
     @Override
     public double getNewValue() {
-        switch (currentArgument) {
-            case 1:
-                return function.applyAsDouble(in1.getNewValue(), in2.getCurrentValue());
-            case 2:
-                return function.applyAsDouble(in1.getCurrentValue(), in2.getNewValue());
-            default:
-                throw new IllegalArgumentException();
-        }
+        return value;
+    }
+
+    @Override
+    public boolean updateAvailable() {
+        return !initialized;
     }
 
     @Override
     public double getUpdate() {
-        if(isInitialized())
-            return getNewValue() - getCurrentValue();
-        else
-            return getNewValue();
+        return 0;
     }
 }

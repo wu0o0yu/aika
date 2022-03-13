@@ -21,13 +21,13 @@ package network.aika.fields;
  */
 public class FieldDivision extends AbstractBiFunction {
 
-    public FieldDivision(String label, DoubleFieldOutput in1, boolean register1, DoubleFieldOutput in2, boolean register2) {
-        super(label, in1, register1, in2, register2);
+    public FieldDivision(String label, FieldOutput in1, FieldOutput in2) {
+        super(label, in1, in2);
     }
 
     @Override
     public double getCurrentValue() {
-        return DoubleFieldOutput.getCurrentValue(in1) / DoubleFieldOutput.getCurrentValue(in2);
+        return FieldOutput.getCurrentValue(in1) / FieldOutput.getCurrentValue(in2);
     }
 
     @Override
@@ -47,13 +47,13 @@ public class FieldDivision extends AbstractBiFunction {
         switch (currentArgument) {
             case 1:
                 if (in1.updateAvailable()) {
-                    double v2 = DoubleFieldOutput.getCurrentValue(in2);
+                    double v2 = FieldOutput.getCurrentValue(in2);
                     return (in1.getUpdate() * v2) / Math.pow(v2, 2.0);
                 }
                 break;
             case 2:
                 if (in2.updateAvailable()) {
-                    return -(in2.getUpdate() * DoubleFieldOutput.getCurrentValue(in1)) / Math.pow(DoubleFieldOutput.getCurrentValue(in2), 2.0);
+                    return -(in2.getUpdate() * FieldOutput.getCurrentValue(in1)) / Math.pow(FieldOutput.getCurrentValue(in2), 2.0);
                 }
                 break;
             default:
@@ -61,5 +61,4 @@ public class FieldDivision extends AbstractBiFunction {
         }
         return 0.0;
     }
-
 }

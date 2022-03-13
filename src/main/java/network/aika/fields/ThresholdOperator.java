@@ -17,18 +17,18 @@
 package network.aika.fields;
 
 
-import java.util.function.DoubleFunction;
+import network.aika.utils.Utils;
 
 /**
  * @author Lukas Molzberger
  */
-public class ThresholdOperator extends FieldListener implements BooleanFieldOutput {
+public class ThresholdOperator extends FieldListener implements FieldOutput {
 
     private double threshold;
-    private DoubleFieldOutput input;
+    private FieldOutput input;
     private String label;
 
-    public ThresholdOperator(String label, double threshold, DoubleFieldOutput in) {
+    public ThresholdOperator(String label, double threshold, FieldOutput in) {
         this.label = label;
         this.threshold = threshold;
         this.input = in;
@@ -37,11 +37,11 @@ public class ThresholdOperator extends FieldListener implements BooleanFieldOutp
         );
     }
 
-    public ThresholdOperator(String label, double threshold, DoubleFieldOutput in, BooleanFieldInput... out) {
+    public ThresholdOperator(String label, double threshold, FieldOutput in, FieldInput... out) {
         this(label, threshold, in);
 
-        for (BooleanFieldInput o : out)
-            addFieldListener(label, (l, v) ->
+        for (FieldInput o : out)
+            addFieldListener(label, (l, u) ->
                     o.setAndTriggerUpdate(getNewValue())
             );
     }
@@ -50,25 +50,30 @@ public class ThresholdOperator extends FieldListener implements BooleanFieldOutp
         if (!updateAvailable())
             return;
 
-        if((!input.isInitialized() || !getCurrentValue()) && getNewValue()) {
-            propagateUpdate(
-                    0.0
-            );
-        }
+        propagateUpdate(
+                getUpdate()
+        );
     }
 
     @Override
-    public boolean getCurrentValue() {
+    public double getCurrentValue() {
         return checkThreshold(input.getCurrentValue());
     }
 
     @Override
-    public boolean getNewValue() {
+    public double getNewValue() {
         return checkThreshold(input.getNewValue());
     }
 
-    private boolean checkThreshold(double x) {
-        return x > threshold;
+    @Override
+    public double getUpdate() {
+        return input.isInitialized() ?
+                getNewValue() - getCurrentValue() :
+                getNewValue();
+    }
+
+    private double checkThreshold(double x) {
+        return x > threshold ? 1.0 : 0.0;
     }
 
     @Override
@@ -89,5 +94,13 @@ public class ThresholdOperator extends FieldListener implements BooleanFieldOutp
     @Override
     public void propagateInitialValue() {
         input.propagateInitialValue();
+    }
+
+    @Override
+    public String toString() {
+        if(!isInitialized())
+            return "--";
+
+        return "[v:" + Utils.round(getCurrentValue()) + "]";
     }
 }

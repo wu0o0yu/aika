@@ -21,27 +21,25 @@ import network.aika.utils.Utils;
 /**
  * @author Lukas Molzberger
  */
-public abstract class AbstractBiFunction extends FieldListener implements DoubleFieldOutput {
-    protected DoubleFieldOutput in1;
-    protected DoubleFieldOutput in2;
+public abstract class AbstractBiFunction extends FieldListener implements FieldOutput {
+    protected FieldOutput in1;
+    protected FieldOutput in2;
 
     protected int currentArgument = -1;
     private String label;
 
-    public AbstractBiFunction(String label, DoubleFieldOutput in1, boolean register1, DoubleFieldOutput in2, boolean register2) {
+    public AbstractBiFunction(String label, FieldOutput in1, FieldOutput in2) {
         this.label = label;
         this.in1 = in1;
         this.in2 = in2;
 
-        if (register1)
-            in1.addFieldListener(label + "-arg(1)", (l, u) ->
-                    triggerUpdate(1)
-            );
+        in1.addFieldListener(label + "-arg(1)", (l, u) ->
+                triggerUpdate(1)
+        );
 
-        if (register2)
-            in2.addFieldListener(label + "-arg(2)", (l, u) ->
-                    triggerUpdate(2)
-            );
+        in2.addFieldListener(label + "-arg(2)", (l, u) ->
+                triggerUpdate(2)
+        );
     }
 
     @Override

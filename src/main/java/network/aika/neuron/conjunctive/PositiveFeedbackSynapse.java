@@ -16,7 +16,7 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.fields.DoubleField;
+import network.aika.fields.Field;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.PositiveFeedbackLink;
@@ -37,10 +37,8 @@ public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PositiveFeedba
     );
 
 
-    private DoubleField feedbackWeight = new DoubleField("feedbackWeight");
-    private DoubleField feedbackBias = new DoubleField("feedbackBias", (l, u) ->
-            getInput().biasUpdateOnFinalActivations(this, u)
-    );
+    private Field feedbackWeight = new Field("feedbackWeight");
+    private Field feedbackBias = new Field("feedbackBias");
 
     public PositiveFeedbackLink createLink(PatternActivation input, BindingActivation output) {
         return new PositiveFeedbackLink(this, input, output);
@@ -52,11 +50,11 @@ public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PositiveFeedba
         super.initFromTemplate(s);
     }
 
-    public DoubleField getFeedbackWeight() {
+    public Field getFeedbackWeight() {
         return feedbackWeight;
     }
 
-    public DoubleField getFeedbackBias() {
+    public Field getFeedbackBias() {
         return feedbackBias;
     }
 

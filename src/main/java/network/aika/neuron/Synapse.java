@@ -19,9 +19,9 @@ package network.aika.neuron;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.direction.Direction;
-import network.aika.fields.DoubleFieldOutput;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.activation.*;
-import network.aika.fields.DoubleField;
+import network.aika.fields.Field;
 import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
@@ -56,7 +56,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     protected S template;
     private TemplateSynapseInfo templateInfo;
 
-    protected DoubleField weight = new DoubleField("weight", (l, u) -> weightUpdate(u));
+    protected Field weight = new Field("weight", (l, u) -> weightUpdate(u));
 
     protected SampleSpace sampleSpace = new SampleSpace();
 
@@ -119,7 +119,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     protected boolean checkTemplateInductionThreshold(OA oAct) {
-        DoubleFieldOutput grad = oAct.getOutputGradient();
+        FieldOutput grad = oAct.getOutputGradient();
         return grad != null &&
                 grad.isInitialized() &&
                 Math.abs(grad.getCurrentValue()) > oAct.getConfig().getInductionThreshold();
@@ -367,7 +367,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return Bound.UPPER.probability(f, n);
     }
 
-    public DoubleField getWeight() {
+    public Field getWeight() {
         return weight;
     }
 
@@ -380,10 +380,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     protected void weightUpdate(double u) {
-        forAllLinks(getModel().getCurrentThought(), l ->
-                l.receiveWeightUpdate()
-        );
-
         PostTraining.add(getOutput());
         setModified();
     }

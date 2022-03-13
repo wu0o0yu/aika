@@ -17,9 +17,12 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.fields.Field;
+import network.aika.fields.FieldInput;
+import network.aika.fields.FieldOutput;
+import network.aika.fields.QueueField;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
-import network.aika.fields.*;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.BindingNeuron;
@@ -28,6 +31,7 @@ import network.aika.steps.activation.Linking;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static network.aika.fields.FieldOutput.isTrue;
 import static network.aika.fields.FieldUtils.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
@@ -45,11 +49,11 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     private final Set<BindingActivation> branches = new TreeSet<>();
     private BindingActivation mainBranch;
-    private DoubleField branchProbability = new DoubleField("Branch-Probability");
-    private DoubleField bpNorm = new DoubleField("BP-Norm");
+    private Field branchProbability = new Field("Branch-Probability");
+    private Field bpNorm = new Field("BP-Norm");
 
-    private DoubleField ownInputGradient;
-    protected DoubleField ownOutputGradient;
+    private Field ownInputGradient;
+    private Field ownOutputGradient;
 
     protected BindingActivation(int id, BindingNeuron n) {
         super(id, n);
@@ -92,8 +96,8 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     protected void initGradientFields() {
-        ownInputGradient = new QueueDoubleField(this, "Own-Input-Gradient");
-        ownOutputGradient = new QueueDoubleField(this, "Own-Output-Gradient");
+        ownInputGradient = new QueueField(this, "Own-Input-Gradient");
+        ownOutputGradient = new QueueField(this, "Own-Output-Gradient");
 
         super.commonInitGradientFields();
 
@@ -102,14 +106,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 ownInputGradient,
                 netOuterGradient,
                 ownOutputGradient
-        );
-
-        outputGradient.addFieldListener("updateWeights", (l, u) ->
-                updateWeights(u)
-        );
-
-        ownOutputGradient.addFieldListener("propagateGradient", (l, u) ->
-                propagateGradient()
         );
     }
 
@@ -180,7 +176,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 .forEach(act -> act.onConflictingNetChange(net));
     }
 
-    private void onConflictingNetChange(DoubleField inputNet) {
+    private void onConflictingNetChange(Field inputNet) {
         double expUpdate = Math.exp(inputNet.getNewValue());
 
         if(inputNet.isInitialized())
@@ -235,7 +231,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         if(isBound())
             onBindingSignalArrivedFiredBound(bs);
 
-        if(isFinal() && isBound()) {
+        if(isTrue(isFinal) && isBound()) {
             onBindingSignalArrivedFinalFiredBound(bs);
         }
     }
@@ -243,7 +239,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     protected void onBindingSignalArrivedFiredBound(BindingSignal bs) {
         Linking.add(this, bs, POST_FIRED);
 
-        if(isFinal())
+        if(isTrue(isFinal))
             onBindingSignalArrivedFinalFiredBound(bs);
     }
 
@@ -294,11 +290,11 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 .orElse(null);
     }
 
-    public DoubleField getOwnInputGradient() {
+    public Field getOwnInputGradient() {
         return ownInputGradient;
     }
 
-    public DoubleFieldOutput getOwnOutputGradient() {
+    public FieldOutput getOwnOutputGradient() {
         return ownOutputGradient;
     }
 
@@ -333,17 +329,17 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
             return branches.stream();
     }
 
-    public DoubleField getBpNorm() {
+    public Field getBpNorm() {
         return bpNorm;
     }
 
-    public DoubleField getBranchProbability() {
+    public Field getBranchProbability() {
         return branchProbability;
     }
 
-    public DoubleFieldInput[] getGradientInputFields() {
+    public FieldInput[] getGradientInputFields() {
         if(inputGradient != null && ownInputGradient != null)
-            return new DoubleFieldInput[] {inputGradient, ownInputGradient};
+            return new FieldInput[] {inputGradient, ownInputGradient};
         else
             return super.getGradientInputFields();
     }

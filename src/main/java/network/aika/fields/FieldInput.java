@@ -24,4 +24,18 @@ public interface FieldInput {
     String getLabel();
 
     void triggerUpdate();
+
+    boolean set(double v);
+
+    boolean add(double u);
+
+    default void setAndTriggerUpdate(double v) {
+        if(set(v))
+            triggerUpdate();
+    }
+
+    default void addAndTriggerUpdate(double u) {
+        if(add(u))
+            triggerUpdate();
+    }
 }

@@ -19,9 +19,7 @@ package network.aika.fields;
 /**
  * @author Lukas Molzberger
  */
-public interface BooleanFieldOutput extends FieldOutput {
+public interface FieldOnTrueEvent {
 
-    boolean getCurrentValue();
-
-    boolean getNewValue();
+    void onTrue(String receiverLabel);
 }

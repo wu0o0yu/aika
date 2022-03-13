@@ -34,8 +34,8 @@ public abstract class FieldListener {
     public abstract void propagateInitialValue();
 
 
-    public void registerOutputs(DoubleFieldInput... out) {
-        for(DoubleFieldInput o : out)
+    public void registerOutputs(FieldInput... out) {
+        for(FieldInput o : out)
             addFieldListener(o.getLabel(), (l, u) ->
                     o.addAndTriggerUpdate(u)
             );
@@ -49,6 +49,14 @@ public abstract class FieldListener {
                         receiverLabel,
                         fieldListener
                 )
+        );
+    }
+
+    public void addEventListener(String receiverLabel, FieldOnTrueEvent eventListener) {
+        addFieldListener(receiverLabel, (l, u) -> {
+                    if (u > 0.0)
+                        eventListener.onTrue(receiverLabel);
+                }
         );
     }
 

@@ -16,18 +16,38 @@
  */
 package network.aika.fields;
 
+import network.aika.utils.Utils;
+
+import java.util.function.DoubleFunction;
 
 /**
  * @author Lukas Molzberger
  */
-public class InvertedDoubleField extends FieldListener implements DoubleFieldOutput {
+public class FieldIdentity extends FieldListener implements FieldOutput {
 
-    DoubleFieldOutput input;
+    private FieldOutput input;
     private String label;
 
-    public InvertedDoubleField(String label, DoubleFieldOutput in) {
-        this.label = label;
+    public FieldIdentity(String label, FieldOutput in) {
         this.input = in;
+        this.label = label;
+
+        this.input.addFieldListener(label, (l, u) ->
+                triggerUpdate()
+        );
+    }
+
+    public FieldIdentity(String label, FieldOutput in, FieldInput... out) {
+        this(label, in);
+
+        for (FieldInput o : out) {
+            if(in.isInitialized())
+                o.addAndTriggerUpdate(in.getCurrentValue());
+
+            addFieldListener(label, (l, u) ->
+                    o.addAndTriggerUpdate(u)
+            );
+        }
     }
 
     @Override
@@ -46,14 +66,23 @@ public class InvertedDoubleField extends FieldListener implements DoubleFieldOut
             propagateUpdate(getCurrentValue());
     }
 
+    private void triggerUpdate() {
+        if (!updateAvailable())
+            return;
+
+        propagateUpdate(
+                getUpdate()
+        );
+    }
+
     @Override
     public double getCurrentValue() {
-        return 1.0 - input.getCurrentValue();
+        return input.getCurrentValue();
     }
 
     @Override
     public double getNewValue() {
-        return 1.0 - input.getNewValue();
+        return input.getNewValue();
     }
 
     @Override
@@ -63,6 +92,16 @@ public class InvertedDoubleField extends FieldListener implements DoubleFieldOut
 
     @Override
     public double getUpdate() {
-        return getNewValue() - getCurrentValue();
+        return input.isInitialized() ?
+                getUpdate() :
+                getNewValue();
+    }
+
+    @Override
+    public String toString() {
+        if(!isInitialized())
+            return "--";
+
+        return "[v:" + Utils.round(getCurrentValue()) + "]";
     }
 }

@@ -23,13 +23,13 @@ import java.util.function.DoubleFunction;
 /**
  * @author Lukas Molzberger
  */
-public class FieldFunction extends FieldListener implements DoubleFieldOutput {
+public class FieldFunction extends FieldListener implements FieldOutput {
 
-    private DoubleFieldOutput input;
+    private FieldOutput input;
     private DoubleFunction<Double> function;
     private String label;
 
-    public FieldFunction(String label, DoubleFieldOutput in, DoubleFunction<Double> f) {
+    public FieldFunction(String label, FieldOutput in, DoubleFunction<Double> f) {
         this.input = in;
         this.function = f;
         this.label = label;
@@ -39,10 +39,10 @@ public class FieldFunction extends FieldListener implements DoubleFieldOutput {
         );
     }
 
-    public FieldFunction(String label, DoubleFieldOutput in, DoubleFunction<Double> f, DoubleFieldInput... out) {
+    public FieldFunction(String label, FieldOutput in, DoubleFunction<Double> f, FieldInput... out) {
         this(label, in, f);
 
-        for (DoubleFieldInput o : out)
+        for (FieldInput o : out)
             addFieldListener(label, (l, u) ->
                     o.addAndTriggerUpdate(u)
             );

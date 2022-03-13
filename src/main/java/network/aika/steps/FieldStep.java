@@ -1,14 +1,14 @@
 package network.aika.steps;
 
 import network.aika.neuron.activation.Element;
-import network.aika.fields.QueueDoubleField;
+import network.aika.fields.QueueField;
 
 public class FieldStep<E extends Element> extends Step<E> {
 
-    private QueueDoubleField field;
+    private QueueField field;
 
 
-    public FieldStep(E e, QueueDoubleField qf) {
+    public FieldStep(E e, QueueField qf) {
         super(e);
         this.field = qf;
         this.field.setStep(this);

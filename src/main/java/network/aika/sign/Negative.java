@@ -16,8 +16,8 @@
  */
 package network.aika.sign;
 
-import network.aika.fields.DoubleFieldOutput;
-import network.aika.fields.InvertedDoubleField;
+import network.aika.fields.FieldOutput;
+import network.aika.fields.InvertedField;
 
 /**
  *
@@ -30,8 +30,8 @@ public class Negative implements Sign {
     }
 
     @Override
-    public DoubleFieldOutput getValue(DoubleFieldOutput v) {
-        return new InvertedDoubleField("neg", v);
+    public FieldOutput getValue(FieldOutput v) {
+        return new InvertedField("neg", v);
     }
 
     @Override

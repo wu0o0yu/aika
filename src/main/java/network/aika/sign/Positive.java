@@ -16,7 +16,7 @@
  */
 package network.aika.sign;
 
-import network.aika.fields.DoubleFieldOutput;
+import network.aika.fields.FieldOutput;
 
 /**
  *
@@ -29,7 +29,7 @@ public class Positive implements Sign {
     }
 
     @Override
-    public DoubleFieldOutput getValue(DoubleFieldOutput v) {
+    public FieldOutput getValue(FieldOutput v) {
         return v;
     }
 

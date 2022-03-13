@@ -31,6 +31,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
+import static network.aika.fields.FieldOutput.isTrue;
 import static network.aika.fields.FieldUtils.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.steps.LinkingOrder.POST_FIRED;
@@ -55,12 +56,13 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected Timestamp fired = NOT_SET;
 
     protected boolean isInput;
-    private boolean finalMode = false;
 
-    protected DoubleField value = new DoubleField("value");
-    protected DoubleField net = new QueueDoubleField(this, "net");
+    protected Field value = new Field("value");
+    protected FieldOutput finalValue;
+    protected Field net = new QueueField(this, "net");
 
-    protected BooleanFieldOutput onFired;
+    protected FieldOutput isFired;
+    protected Field isFinal;
 
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
@@ -74,8 +76,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     private FieldFunction entropy;
     protected FieldFunction netOuterGradient;
-    protected DoubleField inputGradient;
-    protected DoubleField outputGradient;
+    protected Field inputGradient;
+    protected Field outputGradient;
 
     protected Activation(int id, N n) {
         this.id = id;
@@ -92,20 +94,29 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         net.setPropagatePreCondition((cv, nv, u) ->
                 !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0)
         );
-        net.add(getNeuron().getBias().getCurrentValue());
+        identity("bias", getNeuron().getBias(), net);
 
-        onFired = threshold("checkIfFired", 0.0, net);
-        onFired.addFieldListener("onFired", (label, u) ->
+        isFired = threshold("checkIfFired", 0.0, net);
+        isFired.addEventListener("isFired", label ->
                 onFired()
+        );
+
+        isFinal = new Field("isFinal");
+        isFinal.addEventListener("isFinal", label ->
+                onFinal()
+        );
+
+        FieldMultiplication onFinalFired = mul("isFinalFired", isFired, isFinal);
+        onFinalFired.addEventListener("isFinalFired", label ->
+                onFinalFired()
         );
 
         initFields();
 
-        value.addFieldListener("l.propagateValue", (label, u) ->
-                getOutputLinks()
-                        .map(l -> l.getWeightedInput())
-                        .filter(f -> f != null)
-                        .forEach(f -> f.triggerUpdate(1))
+        finalValue = mul(
+                "finalValue",
+                isFinal,
+                value
         );
 
         thought.register(this);
@@ -117,18 +128,11 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     protected void initGradientFields() {
         commonInitGradientFields();
-
-        outputGradient.addFieldListener("updateWeights", (l, u) ->
-                updateWeights(u)
-        );
-        outputGradient.addFieldListener("propagateGradient", (l, u) ->
-                propagateGradient()
-        );
     }
 
     protected void commonInitGradientFields() {
-        inputGradient = new QueueDoubleField(this, "Input-Gradient");
-        outputGradient = new QueueDoubleField(this, "Output-Gradient");
+        inputGradient = new QueueField(this, "Input-Gradient");
+        outputGradient = new QueueField(this, "Output-Gradient");
 
         entropy = func("Entropy", net, x ->
                         getNeuron().getSurprisal(
@@ -157,8 +161,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         );
     }
 
-    public BooleanFieldOutput getOnFired() {
-        return onFired;
+    public FieldOutput getIsFired() {
+        return isFired;
+    }
+
+    public Field getIsFinal() {
+        return isFinal;
     }
 
     protected void initFields() {
@@ -182,52 +190,40 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return true;
     }
 
-    protected void propagateGradient() {
-        inputLinks.values().stream()
-                .filter(l -> l.getSynapse().isAllowTraining())
-                .forEach(l -> l.backPropagate());
-    }
-
-    protected void updateWeights(double g) {
-        inputLinks.values().stream()
-                .filter(l -> l.getSynapse().isAllowTraining())
-                .forEach(l -> l.updateWeight(g));
-    }
-
     public void init(Synapse originSynapse, Activation originAct) {
         setCreationTimestamp();
         thought.onActivationCreationEvent(this, originSynapse, originAct);
     }
 
-    public DoubleFieldOutput getEntropy() {
+    public FieldOutput getEntropy() {
         return entropy;
     }
 
-    public DoubleField getInputGradient() {
+    public Field getInputGradient() {
         return inputGradient;
     }
 
-    public DoubleFieldOutput getOutputGradient() {
+    public FieldOutput getOutputGradient() {
         return outputGradient;
     }
 
-    public DoubleFieldInput[] getGradientInputFields() {
+    public FieldInput[] getGradientInputFields() {
         if(inputGradient != null)
-            return new DoubleFieldInput[] {inputGradient};
+            return new FieldInput[] {inputGradient};
         else
-            return new DoubleFieldInput[0];
-    }
-
-    public void updateBias(double u) {
-        getNet().addAndTriggerUpdate(u);
+            return new FieldInput[0];
     }
 
     public int getId() {
         return id;
     }
 
-    public DoubleField getValue() {
+    public Field getValue() {
         return value;
+    }
+
+    public FieldOutput getFinalValue() {
+        return finalValue;
     }
 
     public boolean isInput() {
@@ -238,7 +234,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         isInput = input;
     }
 
-    public DoubleField getNet() {
+    public Field getNet() {
         return net;
     }
 
@@ -248,18 +244,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public void setCreationTimestamp() {
         this.creationTimestamp = thought.getCurrentTimestamp();
-    }
-
-    public boolean isFinal() {
-        return finalMode;
-    }
-
-    public void setFinal() {
-        if(finalMode)
-            return;
-        finalMode = true;
-
-        onFinal();
     }
 
     public Timestamp getFired() {
@@ -278,9 +262,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         if(getConfig().isCountingEnabled())
             Counting.add(this);
 
-        if(isFinal())
-            onFinalFired();
-
         getBindingSignals()
                 .forEach(bs ->
                         onBindingSignalArrivedFired(bs)
@@ -288,9 +269,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     protected void onFinal() {
-        if(isFired())
-            onFinalFired();
-
         getBindingSignals()
                 .forEach(bs ->
                         onBindingSignalArrivedFinal(bs)
@@ -316,7 +294,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         if(isFired())
             onBindingSignalArrivedFired(bs);
 
-        if(isFinal())
+        if(isTrue(isFinal))
             onBindingSignalArrivedFinal(bs);
     }
 
@@ -326,7 +304,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected void onBindingSignalArrivedFired(BindingSignal bs) {
         Linking.add(this, bs, POST_FIRED);
 
-        if(isFinal())
+        if(isTrue(isFinal))
             onBindingSignalArrivedFinalFired(bs);
     }
 

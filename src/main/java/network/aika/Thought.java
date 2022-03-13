@@ -177,14 +177,15 @@ public abstract class Thought<M extends Model> {
         return maxPhase.compareTo(queue.firstEntry().getValue().getPhase()) < 0;
     }
 
-
     /**
      * After the switch into final mode, the initial assumption, that the positive feedback synapses are fully
      * active is reverted and the actual evaluation of the feedback synapses takes place.
      */
     public void processFinalMode() {
         activationsById.values()
-                .forEach(act -> act.setFinal());
+                .forEach(act ->
+                        act.getIsFinal().setAndTriggerUpdate(1.0)
+                );
 
         process(PROCESSING);
     }

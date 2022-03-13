@@ -20,7 +20,7 @@ import network.aika.Model;
 import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.neuron.activation.Activation;
-import network.aika.fields.DoubleField;
+import network.aika.fields.Field;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.PostTraining;
 import network.aika.steps.activation.Save;
@@ -53,7 +53,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Writable customData;
 
-    protected DoubleField bias = new DoubleField("bias", (l, u) ->
+    protected Field bias = new Field("bias", (l, u) ->
         biasUpdate(u)
     );
 
@@ -173,10 +173,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     protected void biasUpdate(double u) {
-        getActivations(getModel().getCurrentThought())
-                .forEach(act ->
-                        act.updateBias(u)
-                );
         PostTraining.add(this);
         setModified();
     }
@@ -310,7 +306,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
             bias.setAndTriggerUpdate(0.0);
     }
 
-    public DoubleField getBias() {
+    public Field getBias() {
         return bias;
     }
 

@@ -16,22 +16,37 @@
  */
 package network.aika.fields;
 
+
+import network.aika.neuron.activation.Element;
+import network.aika.steps.FieldStep;
+import network.aika.steps.Step;
+
 /**
  * @author Lukas Molzberger
  */
-public interface DoubleFieldOutput extends FieldOutput {
+public class QueueField extends Field {
 
-    double getCurrentValue();
+    private boolean isQueued;
+    private FieldStep step;
 
-    double getNewValue();
-
-    double getUpdate();
-
-    static double getCurrentValue(DoubleFieldOutput f) {
-        return f != null ? f.getCurrentValue() : 0.0;
+    public QueueField(Element e, String label) {
+        super(label);
+        step = new FieldStep(e, this);
     }
 
-    static double getUpdate(DoubleFieldOutput f) {
-        return f != null ? f.getCurrentValue() : 0.0;
+    public void setStep(FieldStep s) {
+        this.step = s;
+    }
+
+    public void triggerUpdate() {
+        if(!isQueued) {
+            Step.add(step);
+            isQueued = true;
+        }
+    }
+
+    public void process() {
+        isQueued = false;
+        triggerInternal();
     }
 }

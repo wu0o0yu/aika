@@ -19,17 +19,13 @@ package network.aika.neuron.conjunctive;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.activation.PositiveFeedbackLink;
 import network.aika.neuron.axons.PatternAxon;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.stream.Stream;
-
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
 
 /**
  *
@@ -49,18 +45,6 @@ public class PatternNeuron extends ConjunctiveNeuron<PatternSynapse, PatternActi
 
     public PatternNeuron(Model model, boolean addProvider) {
         super(model, addProvider);
-    }
-
-    public void biasUpdateOnFinalActivations(PositiveFeedbackSynapse s, double u) {
-        getActivations(getModel().getCurrentThought()).stream()
-                .filter(act -> act.isFinal())
-                .flatMap(act -> act.getOutputLinks())
-                .filter(l -> l.getSynapse() == s)
-                .map(l -> l.getOutput())
-                .forEach(act ->
-                        act.updateBias(u)
-                );
-        setModified();
     }
 
     @Override

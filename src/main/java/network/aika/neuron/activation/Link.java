@@ -18,7 +18,11 @@ package network.aika.neuron.activation;
 
 import network.aika.Config;
 import network.aika.Thought;
-import network.aika.fields.*;
+import network.aika.fields.ThresholdOperator;
+import network.aika.fields.AbstractBiFunction;
+import network.aika.fields.BiFunction;
+import network.aika.fields.FieldInput;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.sign.Sign;
@@ -28,8 +32,9 @@ import network.aika.steps.link.PropagateBindingSignal;
 
 import java.util.Comparator;
 
-import static network.aika.fields.ConstantDoubleField.ZERO;
+import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.FieldUtils.*;
+import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
 
 /**
@@ -61,6 +66,8 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         init();
 
         if(input != null && output != null) {
+            onVisible = threshold("onVisible", 0.0, synapse.getWeight());
+
             initWeightInput();
 
             if (getConfig().isTrainingEnabled() && !isNegative()) {
@@ -73,20 +80,28 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
                         output.getGradientInputFields()
                 );
 
-                backPropGradient = mulUnregistered("oAct.og * s.weight", output.outputGradient, getWeightOutput());
+                if(getSynapse().isAllowTraining())
+                    backPropGradient = mul(
+                            "oAct.og * s.weight",
+                            output.outputGradient,
+                            synapse.getWeight()
+                    );
             }
         }
+
+        if (getSynapse().isAllowTraining() && input.outputGradient != null)
+            input.outputGradient.addFieldListener("updateWeight", (l, u) ->
+                    updateWeight(u)
+            );
 
         getThought().onLinkCreationEvent(this);
     }
 
     protected void initWeightInput() {
-        onVisible = threshold("onVisible", 0.0, getWeightOutput());
-
-        weightedInput = mulUnregistered(
+        weightedInput = mul(
                 "iAct.value * s.weight",
                 input.getValue(),
-                getWeightOutput(),
+                synapse.getWeight(),
                 getOutput().getNet()
         );
     }
@@ -104,23 +119,16 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
             LinkCounting.add(this);
     }
 
-    public DoubleFieldOutput getInformationGainGradient() {
+    public FieldOutput getInformationGainGradient() {
         return igGradient;
     }
 
-    public DoubleFieldInput getWeightInput() {
-        return synapse.getWeight();
-    }
-
-    public DoubleFieldOutput getWeightOutput() {
-        return synapse.getWeight();
-    }
 
     public AbstractBiFunction getWeightedInput() {
         return weightedInput;
     }
 
-    public DoubleFieldOutput getBackPropGradient() {
+    public FieldOutput getBackPropGradient() {
         return backPropGradient;
     }
 
@@ -135,18 +143,6 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
 
         if (oldWeightIsZero && !synapse.isZero() && getInput().isFired())
             PropagateBindingSignal.add(this);
-    }
-
-    public void backPropagate() {
-        if(backPropGradient != null)
-            backPropGradient.triggerUpdate(1);
-    }
-
-    public void receiveWeightUpdate() {
-        weightedInput.triggerUpdate(2);
-
-        if(backPropGradient != null)
-            backPropGradient.triggerUpdate(2);
     }
 
     @Override
@@ -168,7 +164,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         return s;
     }
 
-    public DoubleFieldOutput getInputValue(Sign s) {
+    public FieldOutput getInputValue(Sign s) {
         return s.getValue(input != null ? input.getValue() : ZERO);
     }
 
@@ -205,7 +201,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
     }
 
     public static boolean isCausal(Activation iAct, Activation oAct) {
-        return NOT_SET_AFTER.compare(iAct.getFired(), oAct.getFired()) < 0;
+        return oAct.getFired() == NOT_SET || NOT_SET_AFTER.compare(iAct.getFired(), oAct.getFired()) < 0;
     }
 
     public void induce() {

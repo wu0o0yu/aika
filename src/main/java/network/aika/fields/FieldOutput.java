@@ -29,5 +29,25 @@ public interface FieldOutput {
 
     void propagateInitialValue();
 
+    double getCurrentValue();
+
+    double getNewValue();
+
+    double getUpdate();
+
+    static double getCurrentValue(FieldOutput f) {
+        return f != null ? f.getCurrentValue() : 0.0;
+    }
+
+    static boolean isTrue(FieldOutput f) {
+        return f != null && f.isInitialized() && f.getCurrentValue() > 0.5;
+    }
+
+    static double getUpdate(FieldOutput f) {
+        return f != null ? f.getCurrentValue() : 0.0;
+    }
+
     void addFieldListener(String label, FieldUpdateEvent fieldListener);
+
+    void addEventListener(String label, FieldOnTrueEvent eventListener);
 }

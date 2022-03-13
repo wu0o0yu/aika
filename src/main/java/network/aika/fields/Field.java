@@ -29,9 +29,9 @@ import java.io.IOException;
 /**
  * @author Lukas Molzberger
  */
-public class DoubleField extends FieldListener implements DoubleFieldInterface, Writable {
+public class Field extends FieldListener implements FieldInterface, Writable {
 
-    private static final Logger log = LoggerFactory.getLogger(DoubleField.class);
+    private static final Logger log = LoggerFactory.getLogger(Field.class);
 
     private Double currentValue;
     private Double update;
@@ -40,12 +40,12 @@ public class DoubleField extends FieldListener implements DoubleFieldInterface, 
 
     private PropagatePreCondition propagatePreCondition;
 
-    public DoubleField(String label) {
+    public Field(String label) {
         this.label = label;
         this.propagatePreCondition = (cv, nv, u) -> !Utils.belowTolerance(u);
     }
 
-    public DoubleField(String label, FieldUpdateEvent fieldListener) {
+    public Field(String label, FieldUpdateEvent fieldListener) {
         this(label);
         addFieldListener(label, fieldListener);
     }
@@ -71,7 +71,7 @@ public class DoubleField extends FieldListener implements DoubleFieldInterface, 
     @Override
     public double getCurrentValue() {
         if(!isInitialized())
-            throw new IllegalStateException("getNewValue was called on an uninitialized field");
+            throw new IllegalStateException("getCurrentValue was called on an uninitialized field");
 
         return currentValue;
     }

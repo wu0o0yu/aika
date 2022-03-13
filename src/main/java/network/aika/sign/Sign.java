@@ -17,7 +17,7 @@
 package network.aika.sign;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.fields.DoubleFieldOutput;
+import network.aika.fields.FieldOutput;
 
 
 /**
@@ -41,7 +41,7 @@ public interface Sign {
         return x >= 0.0 ? POS : NEG;
     }
 
-    DoubleFieldOutput getValue(DoubleFieldOutput v);
+    FieldOutput getValue(FieldOutput v);
 
     int index();
 }
