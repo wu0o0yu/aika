@@ -92,9 +92,7 @@ public class FieldIdentity extends FieldListener implements FieldOutput {
 
     @Override
     public double getUpdate() {
-        return input.isInitialized() ?
-                getUpdate() :
-                getNewValue();
+        return input.getUpdate();
     }
 
     @Override
