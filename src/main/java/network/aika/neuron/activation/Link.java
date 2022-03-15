@@ -77,22 +77,29 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
                                         Sign.getSign(x2),
                                         input.getAbsoluteRange()
                                 ),
-                        output.getGradientInputFields()
+                        output.ownInputGradient
                 );
 
                 if(getSynapse().isAllowTraining())
                     backPropGradient = mul(
                             "oAct.og * s.weight",
-                            output.outputGradient,
+                            output.ownOutputGradient,
                             synapse.getWeight()
                     );
             }
         }
 
-        if (getSynapse().isAllowTraining() && input.outputGradient != null)
-            input.outputGradient.addFieldListener("updateWeight", (l, u) ->
-                    updateWeight(u)
-            );
+        if (getSynapse().isAllowTraining()) {
+            if (input.ownOutputGradient != null)
+                input.ownOutputGradient.addFieldListener("ownUpdateWeight", (l, u) ->
+                        updateWeight(u)
+                );
+
+            if (input.backpropOutputGradient != null)
+                input.backpropOutputGradient.addFieldListener("packpropUpdateWeight", (l, u) ->
+                        updateWeight(u)
+                );
+        }
 
         getThought().onLinkCreationEvent(this);
     }

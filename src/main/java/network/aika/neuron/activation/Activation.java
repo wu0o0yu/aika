@@ -76,8 +76,10 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     private FieldFunction entropy;
     protected FieldFunction netOuterGradient;
-    protected Field inputGradient;
-    protected Field outputGradient;
+    protected Field ownInputGradient;
+    protected Field backpropInputGradient;
+    protected Field ownOutputGradient;
+    protected Field backpropOutputGradient;
 
     protected Activation(int id, N n) {
         this.id = id;
@@ -131,8 +133,10 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     protected void commonInitGradientFields() {
-        inputGradient = new QueueField(this, "Input-Gradient");
-        outputGradient = new QueueField(this, "Output-Gradient");
+        ownInputGradient = new QueueField(this, "Own-Input-Gradient");
+        backpropInputGradient = new QueueField(this, "Backprop-Input-Gradient");
+        ownOutputGradient = new QueueField(this, "Own-Output-Gradient");
+        backpropOutputGradient = new QueueField(this, "Backprop-Output-Gradient");
 
         entropy = func("Entropy", net, x ->
                         getNeuron().getSurprisal(
@@ -140,7 +144,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                                 getAbsoluteRange(),
                                 true
                         ),
-                getGradientInputFields()
+                ownInputGradient
         );
 
         netOuterGradient =
@@ -151,12 +155,23 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         mul(
                 "ig * f'(net)",
-                inputGradient,
+                ownInputGradient,
                 netOuterGradient,
-                outputGradient
+                ownOutputGradient
         );
 
-        outputGradient.addFieldListener("update-bias", (l, g) ->
+        mul(
+                "ig * f'(net)",
+                backpropInputGradient,
+                netOuterGradient,
+                backpropOutputGradient
+        );
+
+        ownOutputGradient.addFieldListener("own-update-bias", (l, g) ->
+                getNeuron().getBias().addAndTriggerUpdate(getConfig().getLearnRate() * g)
+        );
+
+        backpropOutputGradient.addFieldListener("backprop-update-bias", (l, g) ->
                 getNeuron().getBias().addAndTriggerUpdate(getConfig().getLearnRate() * g)
         );
     }
@@ -199,19 +214,21 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return entropy;
     }
 
-    public Field getInputGradient() {
-        return inputGradient;
+    public Field getOwnInputGradient() {
+        return ownInputGradient;
     }
 
-    public FieldOutput getOutputGradient() {
-        return outputGradient;
+    public Field getBackpropInputGradient() {
+        return backpropInputGradient;
     }
 
-    public FieldInput[] getGradientInputFields() {
-        if(inputGradient != null)
-            return new FieldInput[] {inputGradient};
-        else
-            return new FieldInput[0];
+
+    public FieldOutput getOwnOutputGradient() {
+        return ownOutputGradient;
+    }
+
+    public FieldOutput getBackpropOutputGradient() {
+        return backpropOutputGradient;
     }
 
     public int getId() {

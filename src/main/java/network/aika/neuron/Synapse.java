@@ -119,7 +119,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     protected boolean checkTemplateInductionThreshold(OA oAct) {
-        FieldOutput grad = oAct.getOutputGradient();
+        FieldOutput grad = oAct.getOwnOutputGradient();
         return grad != null &&
                 grad.isInitialized() &&
                 Math.abs(grad.getCurrentValue()) > oAct.getConfig().getInductionThreshold();

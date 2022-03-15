@@ -52,9 +52,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     private Field branchProbability = new Field("Branch-Probability");
     private Field bpNorm = new Field("BP-Norm");
 
-    private Field ownInputGradient;
-    private Field ownOutputGradient;
-
     protected BindingActivation(int id, BindingNeuron n) {
         super(id, n);
     }
@@ -92,21 +89,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     @Override
     protected void initFields() {
         // Override parent
-    }
-
-    @Override
-    protected void initGradientFields() {
-        ownInputGradient = new QueueField(this, "Own-Input-Gradient");
-        ownOutputGradient = new QueueField(this, "Own-Output-Gradient");
-
-        super.commonInitGradientFields();
-
-        mul(
-                "ownIG * f'(net)",
-                ownInputGradient,
-                netOuterGradient,
-                ownOutputGradient
-        );
     }
 
     @Override
@@ -290,14 +272,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 .orElse(null);
     }
 
-    public Field getOwnInputGradient() {
-        return ownInputGradient;
-    }
-
-    public FieldOutput getOwnOutputGradient() {
-        return ownOutputGradient;
-    }
-
     public void updateBias(double u) {
         getNet().addAndTriggerUpdate(u);
     }
@@ -335,13 +309,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     public Field getBranchProbability() {
         return branchProbability;
-    }
-
-    public FieldInput[] getGradientInputFields() {
-        if(inputGradient != null && ownInputGradient != null)
-            return new FieldInput[] {inputGradient, ownInputGradient};
-        else
-            return super.getGradientInputFields();
     }
 
     public boolean checkIfPrimaryInputBNLinkAlreadyExists() {

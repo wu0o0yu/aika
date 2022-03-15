@@ -35,11 +35,13 @@ public abstract class FieldListener {
 
 
     public void registerOutputs(FieldInput... out) {
-        for(FieldInput o : out)
-            addFieldListener(o.getLabel(), (l, u) ->
-                    o.addAndTriggerUpdate(u)
-            );
-
+        for(FieldInput o : out) {
+            if(o != null) {
+                addFieldListener(o.getLabel(), (l, u) ->
+                        o.addAndTriggerUpdate(u)
+                );
+            }
+        }
         propagateInitialValue();
     }
 
