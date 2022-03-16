@@ -42,11 +42,6 @@ public abstract class DisjunctiveActivation<N extends DisjunctiveNeuron> extends
     }
 
     @Override
-    public boolean checkAllowPropagate() {
-        return isTemplate();
-    }
-
-    @Override
     public Stream<BindingSignal> getReverseBindingSignals(Neuron toNeuron) {
         throw new UnsupportedOperationException();
     }

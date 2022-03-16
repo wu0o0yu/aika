@@ -17,9 +17,12 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.fields.Field;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.PositiveFeedbackLink;
+import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 
@@ -29,7 +32,7 @@ import java.util.List;
  *
  * @author Lukas Molzberger
  */
-public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PositiveFeedbackSynapse, PatternNeuron, PositiveFeedbackLink, PatternActivation> {
+public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends BindingNeuronSynapse<PositiveFeedbackSynapse, I, PositiveFeedbackLink<IA>, IA> {
 
     private static List<Transition> TRANSITIONS = List.of(
             new Transition(State.BRANCH, State.BRANCH),
@@ -40,7 +43,7 @@ public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PositiveFeedba
     private Field feedbackWeight = new Field("feedbackWeight");
     private Field feedbackBias = new Field("feedbackBias");
 
-    public PositiveFeedbackLink createLink(PatternActivation input, BindingActivation output) {
+    public PositiveFeedbackLink createLink(IA input, BindingActivation output) {
         return new PositiveFeedbackLink(this, input, output);
     }
 
@@ -74,7 +77,7 @@ public class PositiveFeedbackSynapse extends BindingNeuronSynapse<PositiveFeedba
     }
 
     @Override
-    public boolean checkLinkingPreConditions(PatternActivation iAct, BindingActivation oAct) {
+    public boolean checkLinkingPreConditions(IA iAct, BindingActivation oAct) {
         // Skip BindingNeuronSynapse.checkLinkingPreConditions
         // --> Do not check Link.isForward(iAct, oAct) and
         // --> iAct.isFired() since the positive feedback synapse is initially assumed to be active.

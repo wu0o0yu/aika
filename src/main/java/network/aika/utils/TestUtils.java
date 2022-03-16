@@ -22,6 +22,8 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
@@ -111,8 +113,8 @@ public class TestUtils {
         n.updateAllowPropagate();
     }
 
-    public static <S extends Synapse> S createPositiveFeedbackSynapse(PositiveFeedbackSynapse templateSynapse, PatternNeuron input, BindingNeuron output, double weight, double feedbackWeight) {
-        PositiveFeedbackSynapse s = templateSynapse.instantiateTemplate(input, output);
+    public static PositiveFeedbackSynapse createPositiveFeedbackSynapse(PositiveFeedbackSynapse templateSynapse, PatternNeuron input, BindingNeuron output, double weight, double feedbackWeight) {
+        PositiveFeedbackSynapse s = (PositiveFeedbackSynapse) templateSynapse.instantiateTemplate(input, output);
 
         s.setWeight(weight);
 
@@ -122,7 +124,7 @@ public class TestUtils {
         s.getFeedbackWeight().setAndTriggerUpdate(feedbackWeight);
         s.getFeedbackBias().addAndTriggerUpdate(-feedbackWeight);
         output.updateAllowPropagate();
-        return (S) s;
+        return s;
     }
 
     public static <S extends Synapse> S createSynapse(Synapse templateSynapse, Neuron input, Neuron output, double weight) {

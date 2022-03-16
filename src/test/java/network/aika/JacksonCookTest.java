@@ -22,9 +22,9 @@ public class JacksonCookTest {
         Map<Integer, double[]> coords = new TreeMap<>();
 
         coords.put(0, new double[]{-0.084, -0.003});
-        coords.put(1, new double[]{0.171, 0.197});
+        coords.put(1, new double[]{-0.081, 0.197});
         coords.put(2, new double[]{-0.455, 0.2});
-        coords.put(3, new double[]{0.252, 0.377});
+        coords.put(3, new double[]{0.252, 0.785});
         coords.put(4, new double[]{0.25, 0.612});
         coords.put(5, new double[]{-0.345, 0.609});
         coords.put(6, new double[]{0.403, 0.812});
@@ -35,20 +35,23 @@ public class JacksonCookTest {
         coords.put(11, new double[]{0.403, 1.012});
         coords.put(12, new double[]{-0.403, 1.047});
         coords.put(13, new double[]{0.103, 0.612});
-        coords.put(14, new double[]{0.797, -0.023});
-        coords.put(15, new double[]{0.817, 0.177});
-        coords.put(16, new double[]{0.583, 0.403});
-        coords.put(17, new double[]{1.142, 0.187});
-        coords.put(18, new double[]{0.695, 0.585});
-        coords.put(19, new double[]{1.144, 0.587});
-        coords.put(20, new double[]{0.704, 0.973});
-        coords.put(21, new double[]{0.79, 0.823});
-        coords.put(22, new double[]{0.989, 0.582});
-        coords.put(23, new double[]{1.287, 0.948});
-        coords.put(24, new double[]{1.041, 0.835});
-        coords.put(25, new double[]{0.704, 1.173});
-        coords.put(26, new double[]{1.287, 1.148});
-        coords.put(27, new double[]{0.84, 0.585});
+        coords.put(14, new double[]{0.415, 1.214});
+        coords.put(15, new double[]{0.678, 1.219});
+        coords.put(16, new double[]{0.542, 1.427});
+        coords.put(17, new double[]{0.928, -0.046});
+        coords.put(18, new double[]{0.921, 0.154});
+        coords.put(19, new double[]{0.66, 0.397});
+        coords.put(20, new double[]{1.147, 0.317});
+        coords.put(21, new double[]{0.781, 0.607});
+        coords.put(22, new double[]{1.176, 0.614});
+        coords.put(23, new double[]{0.668, 0.813});
+        coords.put(24, new double[]{0.867, 0.806});
+        coords.put(25, new double[]{1.051, 0.614});
+        coords.put(26, new double[]{1.287, 0.814});
+        coords.put(27, new double[]{1.093, 0.808});
+        coords.put(28, new double[]{0.668, 1.013});
+        coords.put(29, new double[]{1.287, 1.014});
+        coords.put(30, new double[]{0.781, 0.607});
         return coords;
     }
 
@@ -149,6 +152,8 @@ public class JacksonCookTest {
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, surnameCN, surnameBN, 10.0);
         createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, cookPTRelBN, surnameBN, 10.0);
 
+        createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, forenameBN, surnameBN, 10.0);
+
         updateBias(forenameBN, 2.0);
         updateBias(surnameBN, 2.0);
 
@@ -176,7 +181,7 @@ public class JacksonCookTest {
 
         Camera camera = debugger.getActivationViewManager().getCamera();
         camera.setViewPercent(2.4);
-        camera.setViewCenter(0.443, 0.844, 0);
+        camera.setViewCenter(0.274, 0.95, 0);
 
         debugger.getNeuronViewManager().setCoordinateListener(n -> neuronCoords.get(n.getId()));
         camera = debugger.getNeuronViewManager().getCamera();

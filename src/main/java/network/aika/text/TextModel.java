@@ -153,7 +153,7 @@ public class TextModel extends Model {
     private static BindingNeuron getRelationBindingNeuron(PatternNeuron pn, String label) {
         return pn.getOutputSynapses()
                 .filter(s -> s instanceof PositiveFeedbackSynapse)
-                .map(s -> ((PositiveFeedbackSynapse) s).getOutput())
+                .map(s -> ((PositiveFeedbackSynapse<?, ?>) s).getOutput())
                 .filter(s -> label.equalsIgnoreCase(s.getLabel()))
                 .findFirst()
                 .orElse(null);

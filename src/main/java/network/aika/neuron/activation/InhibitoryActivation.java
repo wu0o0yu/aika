@@ -38,6 +38,12 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
         return false;
     }
 
+
+    @Override
+    public boolean checkAllowPropagate() {
+        return isTemplate();
+    }
+
     @Override
     public Range getRange() {
         BindingSignal bs = getPrimaryBranchBindingSignal();
