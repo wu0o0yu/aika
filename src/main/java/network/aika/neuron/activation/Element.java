@@ -52,12 +52,6 @@ public abstract class Element<E extends Element> implements Comparable<E> {
         queuedSteps.remove(s);
     }
 
-    public void copySteps(Element newElement) {
-        getQueuedSteps().forEach(s ->
-                Step.add(s.copy(newElement))
-        );
-    }
-
     public Stream<Step> getQueuedSteps() {
         return queuedSteps.values().stream();
     }

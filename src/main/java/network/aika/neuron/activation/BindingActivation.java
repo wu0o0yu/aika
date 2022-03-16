@@ -178,7 +178,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         clonedAct.mainBranch = this;
         clonedAct.init(null, this);
 
-        copySteps(clonedAct);
         copyBindingSignals(clonedAct);
 
         return clonedAct;
