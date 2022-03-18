@@ -145,11 +145,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         return BindingSignal.originEquals(conflictingBS, bound);
     }
 
-    @Override
-    public boolean checkPropagateBindingSignal(BindingSignal bs) {
-        return bs.getState() != BRANCH || bs.getOriginActivation() == this;
-    }
-
     private void propagateConflictingNetChange() {
         reverseBindingSignals.values().stream()
                 .filter(bs -> bs.getActivation() instanceof BindingActivation)

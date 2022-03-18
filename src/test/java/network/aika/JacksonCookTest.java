@@ -145,6 +145,7 @@ public class JacksonCookTest {
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE, forenameCN, relPrevEntityBN, 10.0);
         createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE, surnameCN, relPrevEntityBN, 10.0);
         createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelationBindingNeuron(), relPrevEntityBN, 10.0);
+        updateBias(relPrevEntityBN, 3.0);
 
         BindingNeuron forenameBN = createNeuron(t.BINDING_TEMPLATE, "forename (person name)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, forenameCN, forenameBN, 10.0);

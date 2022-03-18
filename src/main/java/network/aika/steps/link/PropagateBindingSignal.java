@@ -41,14 +41,12 @@ public class PropagateBindingSignal extends Step<Link> {
         Activation<?> iAct = l.getInput();
         Step.add(new PropagateBindingSignal(l,
                 iAct.getBindingSignals()
-                        .filter(bs -> bs.checkPropagate())
                         .collect(Collectors.toList()))
         );
     }
 
     public static void add(Activation<?> act, Stream<BindingSignal> bindingSignals) {
         Collection<BindingSignal> outgoingBindingSignals = bindingSignals
-                .filter(bs -> bs.checkPropagate())
                 .collect(Collectors.toList());
 
         if(outgoingBindingSignals.isEmpty())

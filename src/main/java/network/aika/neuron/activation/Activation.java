@@ -201,10 +201,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public abstract boolean isBoundToConflictingBS(BindingSignal bs);
 
-    public boolean checkPropagateBindingSignal(BindingSignal bs) {
-        return true;
-    }
-
     public void init(Synapse originSynapse, Activation originAct) {
         setCreationTimestamp();
         thought.onActivationCreationEvent(this, originSynapse, originAct);

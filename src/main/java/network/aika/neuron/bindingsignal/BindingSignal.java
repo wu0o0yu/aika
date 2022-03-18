@@ -107,10 +107,6 @@ public class BindingSignal<O extends Activation> {
         return c;
     }
 
-    public boolean checkPropagate() {
-        return getActivation().checkPropagateBindingSignal(this);
-    }
-
     protected BindingSignal<O> propagate(Link l) {
         BindingSignal<O> nextBS = l.getSynapse().transition(this, Direction.OUTPUT, true);
         if(nextBS != null) {
