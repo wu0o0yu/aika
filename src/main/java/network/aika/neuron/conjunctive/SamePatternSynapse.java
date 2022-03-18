@@ -95,8 +95,8 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
         if(!super.checkLinkingPreConditions(iAct, oAct))
             return false;
 
-        BindingSignal iSamePBS = iAct.getSamePatternBindingSignal();
-        BindingSignal oSamePBS = oAct.getSamePatternBindingSignal();
+        BindingSignal iSamePBS = iAct.getBoundPatternBindingSignal();
+        BindingSignal oSamePBS = oAct.getBoundPatternBindingSignal();
 
         // The Input and Output BindingActivations belong to different Patterns.
         return oSamePBS == null || oSamePBS == iSamePBS;

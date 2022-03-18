@@ -264,13 +264,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 .orElse(null);
     }
 
-    public BindingSignal<?> getSamePatternBindingSignal() {
-        return getPatternBindingSignals().values().stream()
-                .filter(bs -> bs.getState() == SAME)
-                .findAny()
-                .orElse(null);
-    }
-
     public void updateBias(double u) {
         getNet().addAndTriggerUpdate(u);
     }

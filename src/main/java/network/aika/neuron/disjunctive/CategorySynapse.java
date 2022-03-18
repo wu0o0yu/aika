@@ -31,7 +31,10 @@ import java.util.List;
  */
 public class CategorySynapse<N extends Neuron & PatternAxon> extends DisjunctiveSynapse<CategorySynapse, N, CategoryNeuron, CategoryLink, PatternActivation, CategoryActivation> {
 
-    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(new Transition(State.SAME, State.SAME));
+    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(
+            new Transition(State.SAME, State.SAME),
+            new Transition(State.INPUT, State.INPUT)
+    );
 
     @Override
     public CategoryLink createLink(PatternActivation input, CategoryActivation output) {

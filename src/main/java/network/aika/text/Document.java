@@ -41,8 +41,8 @@ public class Document extends Thought<TextModel> {
 
     private final StringBuilder content;
 
-    private NavigableMap<Long, BindingSignal> beginPBSIndex = new TreeMap<>();
-    private NavigableMap<Long, BindingSignal> endPBSIndex = new TreeMap<>();
+    private NavigableMap<Long, BindingSignal> beginBSIndex = new TreeMap<>();
+    private NavigableMap<Long, BindingSignal> endBSIndex = new TreeMap<>();
 
     public Document(TextModel model, String content) {
         super(model);
@@ -52,22 +52,25 @@ public class Document extends Thought<TextModel> {
         }
     }
 
-    public void registerPatternBindingSignalSource(Activation act, BindingSignal bs) {
+    @Override
+    public void registerBindingSignalSource(Activation act, BindingSignal bs) {
         Range r = bs.getOriginActivation().getRange();
 
-        beginPBSIndex.put(r.getBegin(), bs);
-        endPBSIndex.put(r.getEnd(), bs);
+        beginBSIndex.put(r.getBegin(), bs);
+        endBSIndex.put(r.getEnd(), bs);
     }
 
     public Stream<BindingSignal<?>> getLooselyRelatedBindingSignals(BindingSignal<?> fromBindingSignal, Integer looseLinkingRange, Neuron toNeuron) {
         Range r = fromBindingSignal.getOriginActivation().getRange();
 
         return Stream.concat(
-            beginPBSIndex.subMap(r.getEnd(), r.getEnd() + looseLinkingRange).values().stream(),
-            endPBSIndex.subMap(r.getBegin() - looseLinkingRange, r.getBegin()).values().stream()
+            beginBSIndex.subMap(r.getEnd(), r.getEnd() + looseLinkingRange).values().stream(),
+            endBSIndex.subMap(r.getBegin() - looseLinkingRange, r.getBegin()).values().stream()
         )
                 .map(bs -> bs.getOriginActivation())
-                .flatMap(originAct -> originAct.getReverseBindingSignals(toNeuron));
+                .flatMap(originAct ->
+                        originAct.getReverseBindingSignals(toNeuron)
+                );
     }
 
     public void append(String txt) {

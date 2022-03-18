@@ -90,7 +90,7 @@ public class TestUtils {
 
         for(BindingNeuron bn: bns) {
             createSynapse(t.PATTERN_SYNAPSE_TEMPLATE, bn, patternN, 10.0);
-            createPositiveFeedbackSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE, patternN, bn, 0.0, 10.0);
+            createPositiveFeedbackSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE, patternN, bn, 0.0, 10.0);
         }
         return patternN;
     }

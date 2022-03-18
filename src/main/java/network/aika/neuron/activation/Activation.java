@@ -431,8 +431,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return neuron.getActivationFunction();
     }
 
-    public Model getModel() {
-        return neuron.getModel();
+    public <M extends Model> M getModel() {
+        return (M) neuron.getModel();
     }
 
     public Config getConfig() {

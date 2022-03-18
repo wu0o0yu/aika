@@ -21,6 +21,7 @@ import network.aika.callbacks.SuspensionCallback;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.CategoryActivation;
 import network.aika.neuron.conjunctive.*;
 import network.aika.neuron.disjunctive.CategoryNeuron;
 
@@ -40,6 +41,14 @@ public class TextModel extends Model {
 
 
     private NeuronProvider tokenCategory;
+    private NeuronProvider relPreviousToken;
+    private NeuronProvider relNextToken;
+
+    private PrimaryInputSynapse<CategoryNeuron, CategoryActivation> relPTPrimaryInputSyn;
+    private PositiveFeedbackSynapse<CategoryNeuron, CategoryActivation> relPTFeedbackSyn;
+
+    private PrimaryInputSynapse<CategoryNeuron, CategoryActivation> relNTPrimaryInputSyn;
+    private PositiveFeedbackSynapse<CategoryNeuron, CategoryActivation> relNTFeedbackSyn;
 
     public TextModel() {
         super();
@@ -52,6 +61,23 @@ public class TextModel extends Model {
     public void init() {
         if(tokenCategory == null)
             tokenCategory = initCategoryNeuron(TOKEN_LABEL);
+
+        BindingNeuron relPT = getTemplates().INPUT_BINDING_TEMPLATE.instantiateTemplate(true);
+        relPreviousToken = relPT.getProvider();
+
+        BindingNeuron relNT = getTemplates().INPUT_BINDING_TEMPLATE.instantiateTemplate(true);
+        relNextToken = relNT.getProvider();
+
+        relPTFeedbackSyn = initFeedbackSamePatternSynapse(getTokenCategory(), relPT);
+        relPTPrimaryInputSyn = initRelatedInputSynapse(getTokenCategory(), relPT);
+        initRelationNeuron(REL_PREVIOUS_TOKEN_LABEL, relPT);
+
+        relNTFeedbackSyn = initFeedbackSamePatternSynapse(getTokenCategory(), relNT);
+        relNTPrimaryInputSyn = initRelatedInputSynapse(getTokenCategory(), relNT);
+        initRelationNeuron(REL_NEXT_TOKEN_LABEL, relNT);
+
+        relPT.getProvider().save();
+        relNT.getProvider().save();
     }
 
     private NeuronProvider initCategoryNeuron(String label) {
@@ -70,8 +96,6 @@ public class TextModel extends Model {
         }
 
         PatternNeuron in = getTemplates().INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
-        BindingNeuron inRelPT = getTemplates().INPUT_BINDING_TEMPLATE.instantiateTemplate(true);
-        BindingNeuron inRelNT = getTemplates().INPUT_BINDING_TEMPLATE.instantiateTemplate(true);
 
         in.setTokenLabel(tokenLabel);
         in.setNetworkInput(true);
@@ -81,30 +105,21 @@ public class TextModel extends Model {
 
         initCategorySynapse(in, getTokenCategory());
 
-        initRelationNeuron(tokenLabel + REL_PREVIOUS_TOKEN_LABEL, in, getTokenCategory(), inRelPT);
-        initRelationNeuron(tokenLabel + REL_NEXT_TOKEN_LABEL, in, getTokenCategory(), inRelNT);
-
         in.getProvider().save();
-        inRelPT.getProvider().save();
-        inRelNT.getProvider().save();
 
         return in;
     }
 
-    private void initRelationNeuron(String label, PatternNeuron in, CategoryNeuron relTokenCat, BindingNeuron inRel) {
+    private void initRelationNeuron(String label, BindingNeuron inRel) {
         inRel.setNetworkInput(true);
         inRel.setLabel(label);
-
-        initFeedbackSamePatternSynapse(in, inRel);
-        initRelatedInputSynapse(relTokenCat, inRel);
-
         inRel.getBias().addAndTriggerUpdate(4.0);
         inRel.setAllowTraining(false);
         inRel.updateAllowPropagate();
     }
 
-    private void initRelatedInputSynapse(CategoryNeuron relTokenCat, BindingNeuron relBN) {
-        Synapse s = getTemplates().PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE
+    private PrimaryInputSynapse initRelatedInputSynapse(CategoryNeuron relTokenCat, BindingNeuron relBN) {
+        PrimaryInputSynapse s = (PrimaryInputSynapse) getTemplates().PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE
                 .instantiateTemplate(relTokenCat, relBN);
 
         double w = 10.0;
@@ -114,10 +129,11 @@ public class TextModel extends Model {
         s.setAllowTraining(false);
 
         relBN.getBias().add(-w);
+        return s;
     }
 
-    private void initFeedbackSamePatternSynapse(PatternNeuron in, BindingNeuron inRel) {
-        Synapse s = getTemplates().POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE
+    private PositiveFeedbackSynapse initFeedbackSamePatternSynapse(CategoryNeuron in, BindingNeuron inRel) {
+        PositiveFeedbackSynapse s = (PositiveFeedbackSynapse) getTemplates().POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE
                 .instantiateTemplate(in, inRel);
 
         double w = 11.0;
@@ -127,6 +143,8 @@ public class TextModel extends Model {
         s.getWeight().setAndTriggerUpdate(w);
         s.setAllowTraining(false);
         inRel.getBias().add(-w);
+
+        return s;
     }
 
     private void initCategorySynapse(PatternNeuron tokenNeuron, CategoryNeuron tokenCat) {
@@ -142,21 +160,28 @@ public class TextModel extends Model {
         return (CategoryNeuron) tokenCategory.getNeuron();
     }
 
-    public static BindingNeuron getPreviousTokenRelationBindingNeuron(PatternNeuron pn) {
-        return getRelationBindingNeuron(pn, pn.getLabel() + REL_PREVIOUS_TOKEN_LABEL);
+    public BindingNeuron getPreviousTokenRelationBindingNeuron() {
+        return (BindingNeuron) relPreviousToken.getNeuron();
     }
 
-    public static BindingNeuron getNextTokenRelationBindingNeuron(PatternNeuron pn) {
-        return getRelationBindingNeuron(pn, pn.getLabel() + REL_NEXT_TOKEN_LABEL);
+    public BindingNeuron getNextTokenRelationBindingNeuron() {
+        return (BindingNeuron) relNextToken.getNeuron();
     }
 
-    private static BindingNeuron getRelationBindingNeuron(PatternNeuron pn, String label) {
-        return pn.getOutputSynapses()
-                .filter(s -> s instanceof PositiveFeedbackSynapse)
-                .map(s -> ((PositiveFeedbackSynapse<?, ?>) s).getOutput())
-                .filter(s -> label.equalsIgnoreCase(s.getLabel()))
-                .findFirst()
-                .orElse(null);
+    public PrimaryInputSynapse<CategoryNeuron, CategoryActivation> getRelPTPrimaryInputSyn() {
+        return relPTPrimaryInputSyn;
+    }
+
+    public PositiveFeedbackSynapse<CategoryNeuron, CategoryActivation> getRelPTFeedbackSyn() {
+        return relPTFeedbackSyn;
+    }
+
+    public PrimaryInputSynapse<CategoryNeuron, CategoryActivation> getRelNTPrimaryInputSyn() {
+        return relNTPrimaryInputSyn;
+    }
+
+    public PositiveFeedbackSynapse<CategoryNeuron, CategoryActivation> getRelNTFeedbackSyn() {
+        return relNTFeedbackSyn;
     }
 
     @Override

@@ -47,4 +47,11 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
 
         return n;
     }
+
+    public PrimaryInputSynapse getPrimaryInputSynapse() {
+        return (PrimaryInputSynapse) inputSynapses.values().stream()
+                .filter(s -> s instanceof PrimaryInputSynapse<?,?>)
+                .findFirst()
+                .orElse(null);
+    }
 }

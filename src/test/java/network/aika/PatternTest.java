@@ -100,19 +100,19 @@ public class PatternTest {
         out.setTokenLabel("ABC");
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, nA, eA, 10.0);
-        createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE, out, eA, 10.0);
+        createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE, out, eA, 10.0);
         updateBias(eA, 4.0);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, nB, eB, 10.0);
         createSynapse( t.SAME_PATTERN_SYNAPSE_TEMPLATE, eA, eB, 10.0);
         createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, lookupRelBindingNeuron(nB, REL_PREVIOUS_TOKEN_LABEL), eB, 10.0);
-        createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE, out, eB, 10.0);
+        createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE, out, eB, 10.0);
         updateBias(eB, 4.0);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, nC, eC, 10.0);
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, eB, eC, 10.0);
         createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, lookupRelBindingNeuron(nC, REL_PREVIOUS_TOKEN_LABEL), eC, 10.0);
-        createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE, out, eC, 10.0);
+        createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE, out, eC, 10.0);
 
         updateBias(eC, 4.0);
 

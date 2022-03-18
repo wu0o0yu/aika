@@ -21,8 +21,7 @@ import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
 
-import static network.aika.neuron.bindingsignal.State.BRANCH;
-import static network.aika.neuron.bindingsignal.State.SAME;
+import static network.aika.neuron.bindingsignal.State.*;
 
 /**
  *
@@ -32,6 +31,7 @@ public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNe
 
     private static List<Transition> PROPAGATE_TRANSITIONS = List.of(
             new Transition(SAME, SAME),
+            new Transition(INPUT, INPUT),
             new Transition(BRANCH, BRANCH)
     );
 

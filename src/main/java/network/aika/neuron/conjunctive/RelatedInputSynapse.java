@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PrimaryInputLink;
 import network.aika.neuron.activation.RelatedInputLink;
@@ -23,6 +24,7 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.State.*;
 
@@ -66,9 +68,29 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
 
     @Override
     public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
-        if(isTemplate() && !(oBS.getLink() instanceof PrimaryInputLink<?>))
+        if(iBS.getState() == SAME && !(oBS.getLink() instanceof PrimaryInputLink<?>))
+            return false;
+
+        if(iBS.getState() == INPUT && !verifySameBindingSignal(iBS, oBS))
             return false;
 
         return super.checkRelatedBindingSignal(iBS, oBS);
+    }
+
+    private boolean verifySameBindingSignal(BindingSignal iBS, BindingSignal oBS) {
+        BindingActivation iAct = (BindingActivation) iBS.getActivation();
+        BindingActivation oAct = (BindingActivation) oBS.getActivation();
+        BindingSignal sameSB = iAct.getBoundPatternBindingSignal();
+        if(sameSB == null)
+            return false;
+
+        PrimaryInputSynapse primaryInputSyn = oAct.getNeuron().getPrimaryInputSynapse();
+        if(primaryInputSyn == null)
+            return false;
+
+        Activation originAct = sameSB.getOriginActivation();
+        return originAct.getReverseBindingSignals(primaryInputSyn.getInput())
+                .findAny()
+                .isPresent();
     }
 }

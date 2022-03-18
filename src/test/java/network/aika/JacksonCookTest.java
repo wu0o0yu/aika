@@ -59,29 +59,27 @@ public class JacksonCookTest {
         Map<Long, double[]> coords = new TreeMap<>();
 
         coords.put(1l, new double[]{1.98, -1.765});
-        coords.put(2l, new double[]{0.552, -2.548});
-        coords.put(3l, new double[]{-0.895, -0.87});
-        coords.put(4l, new double[]{1.237, -1.15});
-        coords.put(5l, new double[]{3.294, -2.543});
-        coords.put(6l, new double[]{2.182, -1.068});
-        coords.put(7l, new double[]{4.835, -0.398});
-        coords.put(8l, new double[]{0.493, -0.03});
-        coords.put(9l, new double[]{0.902, 1.03});
-        coords.put(10l, new double[]{0.902, 2.164});
-        coords.put(11l, new double[]{-0.683, -0.055});
-        coords.put(12l, new double[]{-1.0, 1.03});
-        coords.put(13l, new double[]{-1.019, 2.096});
-        coords.put(14l, new double[]{3.15, -0.113});
-        coords.put(15l, new double[]{3.207, 1.251});
-        coords.put(16l, new double[]{3.198, 2.115});
-        coords.put(17l, new double[]{4.35, -0.094});
-        coords.put(18l, new double[]{4.936, 1.289});
-        coords.put(19l, new double[]{4.936, 2.485});
-        coords.put(20l, new double[]{-0.068, 1.635});
-        coords.put(21l, new double[]{4.052, 1.309});
-        coords.put(22l, new double[]{0.908, 2.931});
-        coords.put(23l, new double[]{3.044, 2.922});
-        coords.put(24l, new double[]{2.143, 3.792});
+        coords.put(2l, new double[]{2.595, -1.423});
+        coords.put(3l, new double[]{1.476, -1.387});
+        coords.put(4l, new double[]{0.698, -2.49});
+        coords.put(5l, new double[]{3.324, -2.434});
+        coords.put(6l, new double[]{1.318, -0.648});
+        coords.put(7l, new double[]{1.391, 0.382});
+        coords.put(8l, new double[]{1.346, 1.248});
+        coords.put(9l, new double[]{-0.328, -0.698});
+        coords.put(10l, new double[]{-0.753, 0.611});
+        coords.put(11l, new double[]{-1.017, 2.585});
+        coords.put(12l, new double[]{3.94, -0.576});
+        coords.put(13l, new double[]{3.662, 0.792});
+        coords.put(14l, new double[]{3.589, 1.522});
+        coords.put(15l, new double[]{5.205, -0.47});
+        coords.put(16l, new double[]{5.615, 0.973});
+        coords.put(17l, new double[]{5.713, 3.138});
+        coords.put(18l, new double[]{0.233, 0.008});
+        coords.put(19l, new double[]{4.492, 0.911});
+        coords.put(20l, new double[]{1.382, 2.169});
+        coords.put(21l, new double[]{3.689, 2.333});
+        coords.put(22l, new double[]{2.293, 3.463});
 
         return coords;
     }
@@ -105,10 +103,7 @@ public class JacksonCookTest {
         Templates t = m.getTemplates();
 
         PatternNeuron jacksonIN = m.lookupToken("Jackson");
-
         PatternNeuron cookIN = m.lookupToken("Cook");
-        BindingNeuron cookPTRelBN = TextModel.getPreviousTokenRelationBindingNeuron(cookIN);
-
 
         BindingNeuron jacksonForenameBN = createNeuron(t.BINDING_TEMPLATE, "jackson (forename)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, jacksonIN, jacksonForenameBN, 10.0);
@@ -146,11 +141,17 @@ public class JacksonCookTest {
         updateBias(cookSurnameBN, 2.0);
         updateBias(cookProfessionBN, 3.0);
 
+        BindingNeuron relPrevEntityBN = createNeuron(t.BINDING_TEMPLATE, "Rel Prev. Entity");
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE, forenameCN, relPrevEntityBN, 10.0);
+        createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE, surnameCN, relPrevEntityBN, 10.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelationBindingNeuron(), relPrevEntityBN, 10.0);
+
         BindingNeuron forenameBN = createNeuron(t.BINDING_TEMPLATE, "forename (person name)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, forenameCN, forenameBN, 10.0);
         BindingNeuron surnameBN = createNeuron(t.BINDING_TEMPLATE, "surname (person name)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, surnameCN, surnameBN, 10.0);
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, cookPTRelBN, surnameBN, 10.0);
+
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPrevEntityBN, surnameBN, 10.0);
 
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, forenameBN, surnameBN, 10.0);
 

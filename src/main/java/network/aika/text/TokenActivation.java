@@ -17,17 +17,12 @@
 package network.aika.text;
 
 import network.aika.neuron.Range;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
-import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 import network.aika.neuron.disjunctive.CategoryNeuron;
 import network.aika.steps.activation.Propagate;
-
-import static network.aika.text.TextModel.REL_NEXT_TOKEN_LABEL;
-import static network.aika.text.TextModel.REL_PREVIOUS_TOKEN_LABEL;
-
 
 /**
  *
@@ -39,14 +34,35 @@ public class TokenActivation extends PatternActivation {
     private TokenActivation previousToken;
     private TokenActivation nextToken;
 
+    private CategoryActivation categoryActivation;
+    private BindingActivation relPTBindingActivation;
+    private BindingActivation relNTBindingActivation;
+
 
     public TokenActivation(int id, int begin, int end, Document doc, PatternNeuron patternNeuron) {
         super(id, doc, patternNeuron);
         range = new Range(begin, end);
     }
 
-    private static PrimaryInputSynapse getRelatedSynapse(CategoryNeuron input, BindingNeuron output) {
-        return (PrimaryInputSynapse) output.getInputSynapse(input.getProvider());
+    @Override
+    public void init(Synapse originSynapse, Activation originAct) {
+        super.init(originSynapse, originAct);
+
+        TextModel m = getModel();
+        categoryActivation = (CategoryActivation) Propagate.propagate(
+                this,
+                getNeuron().getOutputSynapse(m.getTokenCategory().getProvider())
+        );
+
+        relPTBindingActivation = (BindingActivation) Propagate.propagate(
+                categoryActivation,
+                m.getRelPTFeedbackSyn()
+        );
+
+        relNTBindingActivation = (BindingActivation) Propagate.propagate(
+                categoryActivation,
+                m.getRelNTFeedbackSyn()
+        );
     }
 
     public static void addRelation(TokenActivation prev, TokenActivation next) {
@@ -56,48 +72,18 @@ public class TokenActivation extends PatternActivation {
         prev.nextToken = next;
         next.previousToken = prev;
 
-        TextModel model = (TextModel) prev.getModel();
+        TextModel model = prev.getModel();
 
-        Propagate.propagate(next, next.getNeuron().getOutputSynapse(model.getTokenCategory().getProvider()));
-        Propagate.propagate(next, getRelationSynapse(next.getNeuron(), REL_PREVIOUS_TOKEN_LABEL));
-
-        CategoryActivation prevCatAct = prev.getCategoryTokenAct(model.getTokenCategory());
-        BindingActivation relActNext = getRelationActivation(prev, REL_NEXT_TOKEN_LABEL);
-
-        CategoryActivation nextCatAct = next.getCategoryTokenAct(model.getTokenCategory());
-        BindingActivation relActPrev = getRelationActivation(next, REL_PREVIOUS_TOKEN_LABEL);
-
-        PrimaryInputSynapse relSynNext = getRelatedSynapse(nextCatAct.getNeuron(), relActNext.getNeuron());
-        relSynNext.createLink(nextCatAct, relActNext);
-
-        PrimaryInputSynapse relSynPrev = getRelatedSynapse(prevCatAct.getNeuron(), relActPrev.getNeuron());
-        relSynPrev.createLink(prevCatAct, relActPrev);
+        next.linkPrimaryInput(model.getRelNTPrimaryInputSyn(), prev.relNTBindingActivation);
+        prev.linkPrimaryInput(model.getRelPTPrimaryInputSyn(), next.relPTBindingActivation);
     }
 
-    private static PositiveFeedbackSynapse getRelationSynapse(PatternNeuron patternNeuron, String direction) {
-        return (PositiveFeedbackSynapse) patternNeuron
-                .getOutputSynapses()
-                .filter(s -> s.getOutput().getLabel().contains(direction))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private static BindingActivation getRelationActivation(PatternActivation patternAct, String direction) {
-        return (BindingActivation) patternAct
-                .getOutputLinks()
-                .filter(l -> l.getOutput().getLabel().contains(direction))
-                .findFirst()
-                .orElse(null)
-                .getOutput();
-    }
-
-    private CategoryActivation getCategoryTokenAct(CategoryNeuron categoryNeuron) {
-        return (CategoryActivation) outputLinks.values().stream()
-                .map(l -> l.getOutput())
-                .filter(oAct -> oAct != null)
-                .filter(oAct -> oAct.getNeuron() == categoryNeuron)
-                .findFirst()
-                .orElse(null);
+    private void linkPrimaryInput(PrimaryInputSynapse<CategoryNeuron, CategoryActivation> model, BindingActivation toAct) {
+        PrimaryInputSynapse relSynNext = model;
+        relSynNext.createLink(
+                categoryActivation,
+                toAct
+        );
     }
 
     public TokenActivation getPreviousToken() {

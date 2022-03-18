@@ -46,7 +46,8 @@ public class Templates {
     public PrimaryInputSynapse PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE;
     public RelatedInputSynapse RELATED_INPUT_SYNAPSE_TEMPLATE;
     public SamePatternSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
-    public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE;
+    public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE;
+    public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE;
     public NegativeFeedbackSynapse NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE;
     public PatternSynapse PATTERN_SYNAPSE_TEMPLATE;
     public InhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE;
@@ -119,7 +120,7 @@ public class Templates {
                         0.0
                 );
 
-        POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE =
+        POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE =
                 init(
                         new PositiveFeedbackSynapse(),
                         PATTERN_TEMPLATE,
@@ -128,8 +129,21 @@ public class Templates {
                         5,
                         0.0
                 );
-        POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE.getFeedbackBias().setAndTriggerUpdate(0.0);
-        POSITIVE_FEEDBACK_SYNAPSE_TEMPLATE.getFeedbackWeight().setAndTriggerUpdate(0.0);
+        POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE.getFeedbackBias().setAndTriggerUpdate(0.0);
+        POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE.getFeedbackWeight().setAndTriggerUpdate(0.0);
+
+
+        POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE =
+                init(
+                        new PositiveFeedbackSynapse(),
+                        CATEGORY_TEMPLATE,
+                        BINDING_TEMPLATE,
+                        "Positive Feedback Synapse",
+                        5,
+                        0.0
+                );
+        POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE.getFeedbackBias().setAndTriggerUpdate(0.0);
+        POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE.getFeedbackWeight().setAndTriggerUpdate(0.0);
 
         NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE =
                 init(
