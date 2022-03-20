@@ -96,10 +96,14 @@ public class JacksonCookTest {
     public void testJacksonCook()  {
         AIKADebugger debugger = AIKADebugger.createAndShowGUI();
 
+        debugger.addBreakpoints(
+                118l,
+                441l
+        );
+
         debugger.setCurrentTestCase(() ->
                 setupJacksonCookTest(debugger)
         );
-
         debugger.run();
     }
 
