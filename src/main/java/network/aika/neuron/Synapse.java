@@ -53,6 +53,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     protected NeuronProvider input;
     protected NeuronProvider output;
 
+    private boolean isInputLinked;
+    private boolean isOutputLinked;
+
     protected S template;
     private TemplateSynapseInfo templateInfo;
 
@@ -224,12 +227,13 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public boolean isInputLinked() {
-        return getInput().containsOutputSynapse(this);
+        return isInputLinked;
     }
 
     public void linkInput() {
         Neuron in = getInput();
         in.getLock().acquireWriteLock();
+        isInputLinked = true;
         in.addOutputSynapse(this);
         in.getLock().releaseWriteLock();
     }
@@ -237,18 +241,20 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     public void unlinkInput() {
         Neuron in = getInput();
         in.getLock().acquireWriteLock();
+        isInputLinked = false;
         in.removeOutputSynapse(this);
         in.getLock().releaseWriteLock();
     }
 
     public boolean isOutputLinked() {
-        return getOutput().containsInputSynapse(this);
+        return isOutputLinked;
     }
 
     public void linkOutput() {
         Neuron out = output.getNeuron();
 
         out.getLock().acquireWriteLock();
+        isOutputLinked = true;
         out.addInputSynapse(this);
         out.getLock().releaseWriteLock();
     }
@@ -257,6 +263,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         Neuron out = output.getNeuron();
 
         out.getLock().acquireWriteLock();
+        isOutputLinked = false;
         out.removeInputSynapse(this);
         out.getLock().releaseWriteLock();
     }
@@ -384,21 +391,15 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         setModified();
     }
 
-    public void forAllLinks(Thought t, Consumer<Link> c) {
-        getOutput()
-                .getActivations(t)
-                .stream()
-                .map(act -> act.getInputLink(this))
-                .filter(l -> l != null)
-                .forEach(l -> c.accept(l));
-    }
-
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeByte(getTemplate().getTemplateInfo().getTemplateSynapseId());
 
         out.writeLong(input.getId());
         out.writeLong(output.getId());
+
+        out.writeBoolean(isInputLinked);
+        out.writeBoolean(isOutputLinked);
 
         weight.write(out);
 
@@ -422,6 +423,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         input = m.lookupNeuron(in.readLong());
         output = m.lookupNeuron(in.readLong());
 
+        isInputLinked = in.readBoolean();
+        isOutputLinked = in.readBoolean();
+
         weight.readFields(in, m);
 
         frequencyIPosOPos = in.readDouble();
@@ -434,8 +438,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     public String toString() {
         return (isTemplate() ? "Template-" : "") +
                 getClass().getSimpleName() +
-                " in:[" + input.getNeuron().toKeyString()  + "](" + (isInputLinked() ? "+" : "-") + ") " +
+                " in:[" + input.getNeuron().toKeyString()  + "](" + (isInputLinked ? "+" : "-") + ") " +
                 (allowPropagate(null) ? "==>" : "-->") +
-                " out:[" + output.getNeuron().toKeyString() + "](" + (isOutputLinked() ? "+" : "-") + ")";
+                " out:[" + output.getNeuron().toKeyString() + "](" + (isOutputLinked ? "+" : "-") + ")";
     }
 }

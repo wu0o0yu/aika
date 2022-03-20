@@ -34,11 +34,15 @@ import java.util.List;
  */
 public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends BindingNeuronSynapse<PositiveFeedbackSynapse, I, PositiveFeedbackLink<IA>, IA> {
 
-    private static List<Transition> TRANSITIONS = List.of(
+    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(
             new Transition(State.BRANCH, State.BRANCH),
             new Transition(State.SAME, State.SAME)
     );
 
+    private static List<Transition> CHECK_TRANSITIONS = List.of(
+            new Transition(State.BRANCH, State.BRANCH),
+            new Transition(State.SAME, State.SAME)
+    );
 
     private Field feedbackWeight = new Field("feedbackWeight");
     private Field feedbackBias = new Field("feedbackBias");
@@ -68,12 +72,12 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
 
     @Override
     public List<Transition> getPropagateTransitions() {
-        return TRANSITIONS;
+        return PROPAGATE_TRANSITIONS;
     }
 
     @Override
     public List<Transition> getCheckTransitions() {
-        return TRANSITIONS;
+        return CHECK_TRANSITIONS;
     }
 
     @Override

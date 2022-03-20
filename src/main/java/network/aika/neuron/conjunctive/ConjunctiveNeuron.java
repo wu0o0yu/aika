@@ -20,14 +20,13 @@ import network.aika.Model;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.TreeSet;
 
 import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 
@@ -66,7 +65,6 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
 
     public void addInactiveLinks(Activation act) {
         inputSynapses
-                .values()
                 .stream()
                 .filter(s -> !act.inputLinkExists(s))
                 .forEach(s ->
@@ -79,15 +77,14 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     }
 
     public void updateAllowPropagate() {
-        TreeSet<ConjunctiveSynapse> sortedSynapses = new TreeSet<>(
+        Collections.sort(
+                inputSynapses,
                 Comparator.<ConjunctiveSynapse>comparingDouble(s -> s.getSortingWeight())
-                        .thenComparing(Synapse::getPInput)
         );
-        sortedSynapses.addAll(inputSynapses.values());
 
         int countAP = 0;
         double sum = getBias().getCurrentValue();
-        for(ConjunctiveSynapse s: sortedSynapses) {
+        for(ConjunctiveSynapse s: inputSynapses) {
             if(s.getWeight().getCurrentValue() <= 0.0)
                 continue;
 

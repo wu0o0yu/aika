@@ -38,7 +38,8 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
     );
 
     private static List<Transition> CHECK_TRANSITIONS = List.of(
-            new Transition(State.SAME, State.INPUT)
+            new Transition(State.SAME, State.INPUT),
+            new Transition(State.INPUT, State.INPUT)
     );
 
 
