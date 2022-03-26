@@ -19,23 +19,22 @@ package network.aika.neuron.activation;
 import network.aika.Config;
 import network.aika.Model;
 import network.aika.Thought;
+import network.aika.direction.Direction;
 import network.aika.fields.*;
 import network.aika.neuron.*;
-import network.aika.direction.Direction;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.sign.Sign;
-import network.aika.steps.activation.*;
+import network.aika.steps.activation.Counting;
+import network.aika.steps.activation.InactiveLinks;
+import network.aika.steps.activation.Propagate;
 import network.aika.utils.Utils;
 
 import java.util.*;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.fields.FieldOutput.isTrue;
 import static network.aika.fields.FieldUtils.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
-import static network.aika.steps.LinkingOrder.POST_FIRED;
-import static network.aika.steps.LinkingOrder.PRE_FIRED;
 
 /**
  * @author Lukas Molzberger
@@ -62,7 +61,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected Field net = new QueueField(this, "net");
 
     protected FieldOutput isFired;
-    protected Field isFinal;
+    protected Field isFinal = new Field("isFinal");
 
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
@@ -96,21 +95,25 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         net.setPropagatePreCondition((cv, nv, u) ->
                 !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0)
         );
-        identity("bias", getNeuron().getBias(), net);
+        connect("bias", getNeuron().getBias(), net);
 
         isFired = threshold("checkIfFired", 0.0, net);
-        isFired.addEventListener("isFired", label ->
-                onFired()
-        );
 
-        isFinal = new Field("isFinal");
-        isFinal.addEventListener("isFinal", label ->
-                onFinal()
+        isFired.addEventListener("isFired", label -> {
+                    fired = thought.getCurrentTimestamp();
+
+                    Propagate.add(this, false, "", s -> true);
+
+                    if (getConfig().isCountingEnabled())
+                        Counting.add(this);
+                }
         );
 
         FieldMultiplication onFinalFired = mul("isFinalFired", isFired, isFinal);
-        onFinalFired.addEventListener("isFinalFired", label ->
-                onFinalFired()
+        onFinalFired.addEventListener("isFinalFired", label -> {
+                    Propagate.add(this, true, "", s -> true);
+                    InactiveLinks.add(this);
+                }
         );
 
         initFields();
@@ -174,6 +177,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         backpropOutputGradient.addFieldListener("backprop-update-bias", (l, g) ->
                 getNeuron().getBias().addAndTriggerUpdate(getConfig().getLearnRate() * g)
         );
+    }
+
+    public void initBSFields(BindingSignal bs) {
     }
 
     public FieldOutput getIsFired() {
@@ -267,63 +273,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return fired != NOT_SET;
     }
 
-    protected void onFired() {
-        fired = thought.getCurrentTimestamp();
-
-        Propagate.add(this, false, "", s -> true);
-
-        if(getConfig().isCountingEnabled())
-            Counting.add(this);
-
-        getBindingSignals()
-                .forEach(bs ->
-                        onBindingSignalArrivedFired(bs)
-                );
-    }
-
-    protected void onFinal() {
-        getBindingSignals()
-                .forEach(bs ->
-                        onBindingSignalArrivedFinal(bs)
-                );
-    }
-
-    protected void onFinalFired() {
-        Propagate.add(this, true, "", s -> true);
-
-        InactiveLinks.add(this);
-
-        getBindingSignals()
-                .forEach(bs ->
-                        onBindingSignalArrivedFinalFired(bs)
-                );
-    }
-
-    protected void onBindingSignalArrived(BindingSignal bs) {
-        if(!getNeuron().isNetworkInput()) {
-            Linking.add(this, bs, PRE_FIRED);
-        }
-
-        if(isFired())
-            onBindingSignalArrivedFired(bs);
-
-        if(isTrue(isFinal))
-            onBindingSignalArrivedFinal(bs);
-    }
-
-    protected void onBindingSignalArrivedFinal(BindingSignal bs) {
-    }
-
-    protected void onBindingSignalArrivedFired(BindingSignal bs) {
-        Linking.add(this, bs, POST_FIRED);
-
-        if(isTrue(isFinal))
-            onBindingSignalArrivedFinalFired(bs);
-    }
-
-    protected void onBindingSignalArrivedFinalFired(BindingSignal bs) {
-    }
-
     public void induce() {
         assert isTemplate();
 
@@ -373,7 +322,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void registerBindingSignal(BindingSignal bs) {
-        onBindingSignalArrived(bs);
+        bs.getOnArrived().setAndTriggerUpdate(1.0);
 
         bindingSignals.put(bs.getOriginActivation(), bs);
     }

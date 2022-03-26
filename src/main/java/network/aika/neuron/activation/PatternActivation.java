@@ -24,7 +24,6 @@ import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.steps.activation.Linking;
 
-import static network.aika.neuron.bindingsignal.State.BRANCH;
 import static network.aika.neuron.bindingsignal.State.SAME;
 
 /**
@@ -42,21 +41,23 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     }
 
     @Override
-    public void onFinal() {
-        super.onFinal();
+    protected void initFields() {
+        super.initFields();
 
-        outputLinks.values().forEach(l ->
-                l.setFinalMode()
+        isFinal.addEventListener("onFinal", label ->
+                outputLinks.values().forEach(l ->
+                        l.setFinalMode()
+                )
         );
     }
 
     @Override
-    protected void onBindingSignalArrived(BindingSignal bs) {
+    public void initBSFields(BindingSignal bs) {
         if(!getNeuron().isNetworkInput() && bs.getState() == State.BRANCH) {
-            Linking.addPosFeedback(this, bs);
+            bs.getOnArrived().addEventListener("", label ->
+                    Linking.addPosFeedback(this, bs)
+            );
         }
-
-        super.onBindingSignalArrived(bs);
     }
 
     @Override

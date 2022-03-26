@@ -18,17 +18,15 @@ package network.aika.fields;
 
 import network.aika.utils.Utils;
 
-import java.util.function.DoubleFunction;
-
 /**
  * @author Lukas Molzberger
  */
-public class FieldIdentity extends FieldListener implements FieldOutput {
+public class FieldConnect extends FieldListener implements FieldOutput {
 
     private FieldOutput input;
     private String label;
 
-    public FieldIdentity(String label, FieldOutput in) {
+    public FieldConnect(String label, FieldOutput in) {
         this.input = in;
         this.label = label;
 
@@ -37,7 +35,7 @@ public class FieldIdentity extends FieldListener implements FieldOutput {
         );
     }
 
-    public FieldIdentity(String label, FieldOutput in, FieldInput... out) {
+    public FieldConnect(String label, FieldOutput in, FieldInput... out) {
         this(label, in);
 
         for (FieldInput o : out) {

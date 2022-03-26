@@ -52,7 +52,7 @@ import static network.aika.steps.LinkingOrder.PRE_FIRED;
  */
 public class Linking extends Step<Activation> {
 
-    public static void addInternal(Activation act, BindingSignal bindingSignal, Direction dir, LinkingOrder linkingOrder, Timestamp fired, String linkingType, Predicate<Synapse> filter) {
+    private static void addInternal(Activation act, BindingSignal bindingSignal, Direction dir, LinkingOrder linkingOrder, Timestamp fired, String linkingType, Predicate<Synapse> filter) {
         if (bindingSignal.isOrigin())
             return;
 
@@ -90,7 +90,6 @@ public class Linking extends Step<Activation> {
         this.bindingSignal = bindingSignal;
         this.linkingType = linkingType;
         this.fired = fired;
-
 
         Neuron<?, ?> n = getElement().getNeuron();
 

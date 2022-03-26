@@ -72,8 +72,6 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
 
     @Override
     public boolean checkLinkingPreConditions(InhibitoryActivation iAct, BindingActivation oAct) {
-//        if(isSeparateBranch(iAct, oAct))
-//            return false;
         if(oAct.isSeparateBranch(iAct))
             return false;
 

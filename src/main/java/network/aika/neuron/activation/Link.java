@@ -56,7 +56,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
     private AbstractBiFunction weightedInput;
     private AbstractBiFunction backPropGradient;
 
-    private ThresholdOperator onVisible;
+    private ThresholdOperator onTransparent;
 
     public Link(S s, I input, O output) {
         this.synapse = s;
@@ -66,7 +66,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         init();
 
         if(input != null && output != null) {
-            onVisible = threshold("onVisible", 0.0, synapse.getWeight());
+            onTransparent = threshold("onTransparent", 0.0, synapse.getWeight());
 
             initWeightInput();
 
@@ -96,7 +96,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
                 );
 
             if (input.backpropOutputGradient != null)
-                input.backpropOutputGradient.addFieldListener("packpropUpdateWeight", (l, u) ->
+                input.backpropOutputGradient.addFieldListener("backpropUpdateWeight", (l, u) ->
                         updateWeight(u)
                 );
         }
@@ -129,7 +129,6 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
     public FieldOutput getInformationGainGradient() {
         return igGradient;
     }
-
 
     public AbstractBiFunction getWeightedInput() {
         return weightedInput;

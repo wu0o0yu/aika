@@ -18,9 +18,6 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.fields.Field;
-import network.aika.fields.FieldInput;
-import network.aika.fields.FieldOutput;
-import network.aika.fields.QueueField;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
@@ -45,6 +42,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     private Timestamp finalTimestamp = NOT_SET;
 
+    private Field isBound = new Field("isBound");
     private BindingSignal<PatternActivation> bound;
 
     private final Set<BindingActivation> branches = new TreeSet<>();
@@ -89,22 +87,50 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     @Override
     protected void initFields() {
         // Override parent
+        isFinal.addEventListener("isFinal", label ->
+                div(
+                        "exp(net) / bpNorm",
+                        func(
+                                "exp(net)",
+                                net,
+                                x -> Math.exp(x)
+                        ),
+                        bpNorm,
+                        branchProbability
+                )
+        );
     }
 
     @Override
-    protected void onFinal() {
-        super.onFinal();
-
-        div(
-                "exp(net) / bpNorm",
-                func(
-                        "exp(net)",
-                        net,
-                        x -> Math.exp(x)
-                ),
-                bpNorm,
-                branchProbability
+    public void initBSFields(BindingSignal bs) {
+        bs.setOnArrivedBound(
+                mul(
+                        "isBound * onArrived",
+                        isBound,
+                        bs.getOnArrived()
+                )
         );
+
+        bs.setOnArrivedBoundFired(
+                mul(
+                        "onArrivedBound * onArrivedFired",
+                        bs.getOnArrivedBound(),
+                        bs.getOnArrivedFired()
+                )
+        );
+
+        bs.getOnArrivedBoundFired().addEventListener("onArrivedBoundFired", label ->
+                Linking.add(this, bs, POST_FIRED)
+        );
+
+        bs.getOnArrivedFired().addEventListener("onArrivedFired", label ->
+                Linking.addUnboundLinking(this, bs)
+        );
+
+        if(bs.getState() == SAME) {
+            bound = bs;
+            connect("isBound", bs.getOnArrived(), isBound);
+        }
     }
 
     @Override
@@ -186,51 +212,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                                 bs.clone(clonedAct)
                         )
                 );
-    }
-
-    @Override
-    protected void onBindingSignalArrived(BindingSignal bs) {
-        if(bs.getState() == SAME) {
-            bound = bs;
-            onBound();
-        }
-
-        super.onBindingSignalArrived(bs);
-    }
-
-    @Override
-    protected void onBindingSignalArrivedFired(BindingSignal bs) {
-        Linking.addUnboundLinking(this, bs);
-
-        super.onBindingSignalArrivedFired(bs);
-
-        if(isBound())
-            onBindingSignalArrivedFiredBound(bs);
-
-        if(isTrue(isFinal) && isBound()) {
-            onBindingSignalArrivedFinalFiredBound(bs);
-        }
-    }
-
-    protected void onBindingSignalArrivedFiredBound(BindingSignal bs) {
-        Linking.add(this, bs, POST_FIRED);
-
-        if(isTrue(isFinal))
-            onBindingSignalArrivedFinalFiredBound(bs);
-    }
-
-    protected void onBindingSignalArrivedFinalFiredBound(BindingSignal bs) {
-
-    }
-
-    protected void onBound() {
-
-        if(isFired()) {
-            getBindingSignals()
-                    .forEach(bs ->
-                            onBindingSignalArrivedFiredBound(bs)
-                    );
-        }
     }
 
     public boolean isBound() {

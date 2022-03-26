@@ -79,11 +79,11 @@ public class FieldUtils {
         return func;
     }
 
-    public static FieldIdentity identity(String label, FieldOutput in, FieldInput... out) {
+    public static FieldConnect connect(String label, FieldOutput in, FieldInput... out) {
         if(in == null)
             return null;
 
-        return new FieldIdentity(label, in, out);
+        return new FieldConnect(label, in, out);
     }
 
     public static ThresholdOperator threshold(String label, double threshold, FieldOutput in, FieldInput... out) {
