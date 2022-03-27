@@ -17,6 +17,7 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.*;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
@@ -32,7 +33,6 @@ import java.util.List;
 public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedbackSynapse, InhibitoryNeuron, NegativeFeedbackLink, InhibitoryActivation> {
 
     private static List<Transition> CHECK_TRANSITIONS = List.of(new Transition(State.INPUT, State.INPUT));
-
 
     @Override
     public NegativeFeedbackLink createLink(InhibitoryActivation input, BindingActivation output) {
@@ -71,19 +71,19 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     }
 
     @Override
-    public boolean checkLinkingPreConditions(InhibitoryActivation iAct, BindingActivation oAct) {
-        if(oAct.isSeparateBranch(iAct))
+    public boolean linkingCheck(BindingSignal<InhibitoryActivation> iBS, BindingSignal<BindingActivation> oBS) {
+        if(oBS.getActivation().isSeparateBranch(iBS.getActivation()))
             return false;
 
-        if(!iAct.isFired())
+        if(!iBS.getActivation().isFired())
             return false;
 
-        if(isTemplate() && !oAct.isSelfRef(iAct))
+        if(isTemplate() && !oBS.getActivation().isSelfRef(iBS.getActivation()))
             return false;
 
         // Skip BindingNeuronSynapse.checkLinkingPreConditions
         // --> Do not check Link.isForward(iAct, oAct)
-        return checkCommonLinkingPreConditions(iAct, oAct);
+        return commonLinkingCheck(iBS, oBS);
     }
 
     @Override

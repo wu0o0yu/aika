@@ -21,6 +21,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PrimaryInputLink;
 import network.aika.neuron.axons.PatternAxon;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 
@@ -58,10 +59,10 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
     }
 
     @Override
-    public boolean checkLinkingPreConditions(IA iAct, BindingActivation oAct) {
-        if(oAct.checkIfPrimaryInputBNLinkAlreadyExists())
+    public boolean linkingCheck(BindingSignal<IA> iBS, BindingSignal<BindingActivation> oBS) {
+        if(oBS.getActivation().checkIfPrimaryInputBNLinkAlreadyExists())
             return false;
 
-        return super.checkLinkingPreConditions(iAct, oAct);
+        return super.linkingCheck(iBS, oBS);
     }
 }

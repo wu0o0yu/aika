@@ -20,9 +20,9 @@ import network.aika.fields.Field;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.PositiveFeedbackLink;
 import network.aika.neuron.axons.PatternAxon;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 
@@ -81,10 +81,10 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     }
 
     @Override
-    public boolean checkLinkingPreConditions(IA iAct, BindingActivation oAct) {
+    public boolean linkingCheck(BindingSignal<IA> iBS, BindingSignal<BindingActivation> oBS) {
         // Skip BindingNeuronSynapse.checkLinkingPreConditions
         // --> Do not check Link.isForward(iAct, oAct) and
         // --> iAct.isFired() since the positive feedback synapse is initially assumed to be active.
-        return checkCommonLinkingPreConditions(iAct, oAct);
+        return commonLinkingCheck(iBS, oBS);
     }
 }

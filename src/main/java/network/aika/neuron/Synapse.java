@@ -81,23 +81,22 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return false;
     }
 
-    public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
+    public boolean linkingCheck(BindingSignal<IA> iBS, BindingSignal<OA> oBS) {
+        if(!iBS.getActivation().isFired())
+            return false;
+
+        return commonLinkingCheck(iBS, oBS);
+    }
+
+    protected boolean commonLinkingCheck(BindingSignal<IA> iBS, BindingSignal<OA> oBS) {
         BindingSignal transitionedIBS = transition(iBS, Direction.OUTPUT, false);
-        return transitionedIBS != null && transitionedIBS.match(oBS);
-    }
-
-    public boolean checkLinkingPreConditions(IA iAct, OA oAct) {
-        if(!iAct.isFired())
+        if(transitionedIBS == null || !transitionedIBS.match(oBS))
             return false;
 
-        return checkCommonLinkingPreConditions(iAct, oAct);
-    }
-
-    protected boolean checkCommonLinkingPreConditions(IA iAct, OA oAct) {
-        if(linkExists(iAct, oAct))
+        if(linkExists(iBS.getActivation(), oBS.getActivation()))
             return false;
 
-        if(isTemplate() && !checkTemplateLinkingPreConditions(iAct, oAct))
+        if(isTemplate() && !checkTemplateLinkingPreConditions(iBS.getActivation(), oBS.getActivation()))
             return false;
 
         return true;

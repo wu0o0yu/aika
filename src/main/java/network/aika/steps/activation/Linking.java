@@ -133,13 +133,9 @@ public class Linking extends Step<Activation> {
 
         getRelatedBindingSignal(ts, bindingSignal, toNeuron)
                 .filter(toBS -> bindingSignal != toBS)
-                .filter(toBS ->
-                        checkRelatedBindingSignal(ts, bindingSignal, toBS)
-                )
-                .map(toBS -> toBS.getActivation())
-                .filter(toAct -> fromAct != toAct)
-                .forEach(toAct ->
-                        link(ts, fromAct, toAct, direction)
+//                .filter(toAct -> fromAct != toAct)
+                .forEach(toBS ->
+                        link(ts, bindingSignal, toBS)
                 );
     }
 
@@ -157,20 +153,14 @@ public class Linking extends Step<Activation> {
         return relatedBindingSignals;
     }
 
-    private boolean checkRelatedBindingSignal(Synapse targetSynapse, BindingSignal fromBindingSignal, BindingSignal toBindingSignal) {
-        BindingSignal inputBS = direction.getInput(fromBindingSignal, toBindingSignal);
-        BindingSignal outputBS = direction.getOutput(fromBindingSignal, toBindingSignal);
-        return targetSynapse.checkRelatedBindingSignal(inputBS, outputBS);
-    }
+    private void link(Synapse targetSynapse, BindingSignal fromBS, BindingSignal toBS) {
+        BindingSignal inputBS = direction.getInput(fromBS, toBS);
+        BindingSignal outputBS = direction.getOutput(fromBS, toBS);
 
-    private void link(Synapse targetSynapse, Activation<?> fromAct, Activation<?> toAct, Direction dir) {
-        Activation iAct = dir.getInput(fromAct, toAct);
-        Activation oAct = dir.getOutput(fromAct, toAct);
-
-        if(!targetSynapse.checkLinkingPreConditions(iAct, oAct))
+        if(!targetSynapse.linkingCheck(inputBS, outputBS))
             return;
 
-        targetSynapse.createLink(iAct, oAct);
+        targetSynapse.createLink(inputBS.getActivation(), outputBS.getActivation());
     }
 
     public String toString() {

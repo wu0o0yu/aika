@@ -43,7 +43,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     private Timestamp finalTimestamp = NOT_SET;
 
     private Field isBound = new Field("isBound");
-    private BindingSignal<PatternActivation> bound;
+    private BindingSignal<BindingActivation> bound;
 
     private final Set<BindingActivation> branches = new TreeSet<>();
     private BindingActivation mainBranch;
@@ -218,7 +218,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         return bound != null;
     }
 
-    public BindingSignal<PatternActivation> getBoundPatternBindingSignal() {
+    public BindingSignal<BindingActivation> getBoundPatternBindingSignal() {
         return bound;
     }
 

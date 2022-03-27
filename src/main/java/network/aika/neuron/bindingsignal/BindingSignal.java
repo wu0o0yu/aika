@@ -34,12 +34,12 @@ import static network.aika.steps.LinkingOrder.PRE_FIRED;
 /**
  * @author Lukas Molzberger
  */
-public class BindingSignal<O extends Activation> {
+public class BindingSignal<A extends Activation> {
 
-    private BindingSignal<O> parent;
-    private Activation activation;
+    private BindingSignal parent;
+    private A activation;
     private Link link;
-    private BindingSignal<O> origin;
+    private BindingSignal origin;
     private byte depth;
     private State state;
 
@@ -48,7 +48,7 @@ public class BindingSignal<O extends Activation> {
     FieldOutput onArrivedBound;
     FieldOutput onArrivedBoundFired;
 
-    public BindingSignal(O act, State state) {
+    public BindingSignal(A act, State state) {
         this.origin = this;
         this.activation = act;
         this.depth = 0;
@@ -57,7 +57,7 @@ public class BindingSignal<O extends Activation> {
         initFields();
     }
 
-    public BindingSignal(BindingSignal<O> parent, State state) {
+    public BindingSignal(BindingSignal parent, State state) {
         this.parent = parent;
         this.origin = parent.getOrigin();
         this.depth = (byte) (getDepth() + 1);
@@ -119,11 +119,11 @@ public class BindingSignal<O extends Activation> {
         return this == origin;
     }
 
-    public BindingSignal<O> getOrigin() {
+    public BindingSignal getOrigin() {
         return origin;
     }
 
-    public Activation getActivation() {
+    public A getActivation() {
         return activation;
     }
 
@@ -139,8 +139,8 @@ public class BindingSignal<O extends Activation> {
         return state;
     }
 
-    public O getOriginActivation() {
-        return (O) origin.getActivation();
+    public Activation getOriginActivation() {
+        return origin.getActivation();
     }
 
     public void link() {
@@ -156,16 +156,16 @@ public class BindingSignal<O extends Activation> {
         return existingBS.getState() == state;
     }
 
-    public BindingSignal<O> clone(O act) {
-        BindingSignal<O> c = new BindingSignal(parent, state);
+    public BindingSignal<A> clone(A act) {
+        BindingSignal<A> c = new BindingSignal(parent, state);
         c.activation = act;
         c.link = link;
         c.initFields();
         return c;
     }
 
-    protected BindingSignal<O> propagate(Link l) {
-        BindingSignal<O> nextBS = l.getSynapse().transition(this, Direction.OUTPUT, true);
+    protected BindingSignal<A> propagate(Link<?, ?, A> l) {
+        BindingSignal<A> nextBS = l.getSynapse().transition(this, Direction.OUTPUT, true);
         if(nextBS != null) {
             nextBS.activation = l.getOutput();
             nextBS.link = l;
@@ -175,7 +175,7 @@ public class BindingSignal<O extends Activation> {
         return nextBS;
     }
 
-    public boolean match(BindingSignal<O> oBS) {
+    public boolean match(BindingSignal<A> oBS) {
         return state == oBS.state;
     }
 

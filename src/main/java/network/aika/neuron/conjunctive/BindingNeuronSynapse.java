@@ -19,6 +19,7 @@ package network.aika.neuron.conjunctive;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.axons.Axon;
+import network.aika.neuron.bindingsignal.BindingSignal;
 
 /**
  *
@@ -27,17 +28,22 @@ import network.aika.neuron.axons.Axon;
 public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I extends Neuron & Axon, L extends Link<S, IA, BindingActivation>, IA extends Activation> extends ConjunctiveSynapse<S, I, BindingNeuron, L, IA, BindingActivation> {
 
     @Override
-    public boolean checkLinkingPreConditions(IA iAct, BindingActivation oAct) {
-        if(!Link.isCausal(iAct, oAct))
+    public boolean linkingCheck(BindingSignal<IA> iBS, BindingSignal<BindingActivation> oBS) {
+        if(!Link.isCausal(iBS.getActivation(), oBS.getActivation()))
             return false;
 
-        return super.checkLinkingPreConditions(iAct, oAct);
+        return super.linkingCheck(iBS, oBS);
     }
 
-    protected boolean checkCommonLinkingPreConditions(IA iAct, BindingActivation oAct) {
-        if(!oAct.isMainBranch() && iAct.isBoundToConflictingBS(oAct.getMainBranch().getBoundPatternBindingSignal()))
+    @Override
+    protected boolean commonLinkingCheck(BindingSignal<IA> iBS, BindingSignal<BindingActivation> oBS) {
+        if(!oBS.getActivation().isMainBranch() &&
+                iBS.getActivation().isBoundToConflictingBS(
+                        oBS.getActivation().getMainBranch().getBoundPatternBindingSignal()
+                )
+        )
             return false;
 
-        return super.checkCommonLinkingPreConditions(iAct, oAct);
+        return super.commonLinkingCheck(iBS, oBS);
     }
 }

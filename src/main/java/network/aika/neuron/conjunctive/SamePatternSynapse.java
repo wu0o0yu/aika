@@ -79,24 +79,32 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
     }
 
     @Override
-    public boolean checkLinkingPreConditions(BindingActivation iAct, BindingActivation oAct) {
-        if(isTemplate() && (iAct.isNetworkInput() || oAct.isNetworkInput()))
+    public boolean linkingCheck(BindingSignal<BindingActivation> iBS, BindingSignal<BindingActivation> oBS) {
+
+        if(isTemplate() && (iBS.getActivation().isNetworkInput() || oBS.getActivation().isNetworkInput()))
             return false;
 
-        if(!iAct.isBound())
+        if(!iBS.getActivation().isBound())
             return false;
 
-        if(oAct.isBound() && iAct.getBoundPatternBindingSignal().getOrigin() != oAct.getBoundPatternBindingSignal().getOrigin())
+        if(oBS.getActivation().isBound() && iBS.getActivation().getBoundPatternBindingSignal().getOrigin() != oBS.getActivation().getBoundPatternBindingSignal().getOrigin())
             return false;
 
      //   if(isSeparateBranch(iAct, oAct))
      //       return false;
 
-        if(!super.checkLinkingPreConditions(iAct, oAct))
+        if(allowLooseLinking) {
+            return iBS.getOrigin() != oBS.getOrigin() &&
+                    iBS.getState() == State.INPUT &&
+                    oBS.getState() == State.INPUT &&
+                    commonLinkingCheck(iBS, oBS);
+        }
+
+        if(!super.linkingCheck(iBS, oBS))
             return false;
 
-        BindingSignal iSamePBS = iAct.getBoundPatternBindingSignal();
-        BindingSignal oSamePBS = oAct.getBoundPatternBindingSignal();
+        BindingSignal iSamePBS = iBS.getActivation().getBoundPatternBindingSignal();
+        BindingSignal oSamePBS = oBS.getActivation().getBoundPatternBindingSignal();
 
         // The Input and Output BindingActivations belong to different Patterns.
         return oSamePBS == null || oSamePBS == iSamePBS;
@@ -110,15 +118,6 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
     @Override
     public List<Transition> getCheckTransitions() {
         return CHECK_TRANSITIONS;
-    }
-
-    @Override
-    public boolean checkRelatedBindingSignal(BindingSignal iBS, BindingSignal oBS) {
-        if(allowLooseLinking) {
-            return iBS.getOrigin() != oBS.getOrigin() && iBS.getState() == State.INPUT && oBS.getState() == State.INPUT;
-        } else {
-            return super.checkRelatedBindingSignal(iBS, oBS);
-        }
     }
 
     @Override
