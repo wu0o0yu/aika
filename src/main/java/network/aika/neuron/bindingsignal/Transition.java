@@ -77,4 +77,11 @@ public class Transition {
 
         return from == (dir == OUTPUT ? input : output);
     }
+
+    public String toString() {
+        return "Input:" + input +
+                " Output:" + output +
+                " Check:" + check +
+                " Propagate:" + (propagate == Integer.MAX_VALUE ? "UNLIMITED" : propagate);
+    }
 }
