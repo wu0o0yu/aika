@@ -24,7 +24,7 @@ public class JacksonCookTest {
         coords.put(0, new double[]{-0.084, -0.003});
         coords.put(1, new double[]{-0.081, 0.197});
         coords.put(2, new double[]{-0.455, 0.397});
-        coords.put(3, new double[]{0.23, 0.418});
+        coords.put(3, new double[]{0.475, 0.417});
         coords.put(4, new double[]{0.25, 0.612});
         coords.put(5, new double[]{-0.345, 0.609});
         coords.put(6, new double[]{0.403, 0.812});
@@ -42,7 +42,7 @@ public class JacksonCookTest {
         coords.put(18, new double[]{0.637, 1.829});
         coords.put(19, new double[]{1.046, 0.014});
         coords.put(20, new double[]{0.919, 0.214});
-        coords.put(21, new double[]{0.716, 0.408});
+        coords.put(21, new double[]{0.714, 0.417});
         coords.put(22, new double[]{1.352, 0.414});
         coords.put(23, new double[]{0.875, 0.583});
         coords.put(24, new double[]{1.288, 0.587});

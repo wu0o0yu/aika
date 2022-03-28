@@ -55,6 +55,10 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
         if(oBS.getActivation().checkIfPrimaryInputBNLinkAlreadyExists())
             return false;
 
+        Transition oTr = oBS.getTransition();
+        if(oTr != null && oTr.getInput() != State.SAME) // Rel. Pre. Entity special case
+            return false;
+
         return super.linkingCheck(iBS, oBS);
     }
 }
