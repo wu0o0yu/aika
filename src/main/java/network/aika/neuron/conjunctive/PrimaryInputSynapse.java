@@ -27,6 +27,8 @@ import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
 
+import static network.aika.neuron.bindingsignal.Transition.transition;
+
 
 /**
  *
@@ -34,28 +36,18 @@ import java.util.List;
  */
 public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends BindingNeuronSynapse<PrimaryInputSynapse, I, PrimaryInputLink<IA>, IA> {
 
-    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(
-            new Transition(State.SAME, State.INPUT)
+    private static List<Transition> TRANSITIONS = List.of(
+            transition(State.SAME, State.INPUT, true, Integer.MAX_VALUE),
+            transition(State.INPUT, State.INPUT, true, 0)
     );
-
-    private static List<Transition> CHECK_TRANSITIONS = List.of(
-            new Transition(State.SAME, State.INPUT),
-            new Transition(State.INPUT, State.INPUT)
-    );
-
 
     public PrimaryInputLink createLink(IA input, BindingActivation output) {
         return new PrimaryInputLink(this, input, output);
     }
 
     @Override
-    public List<Transition> getPropagateTransitions() {
-        return PROPAGATE_TRANSITIONS;
-    }
-
-    @Override
-    public List<Transition> getCheckTransitions() {
-        return CHECK_TRANSITIONS;
+    public List<Transition> getTransitions() {
+        return TRANSITIONS;
     }
 
     @Override

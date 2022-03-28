@@ -24,6 +24,8 @@ import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
 
+import static network.aika.neuron.bindingsignal.Transition.transition;
+
 
 /**
  *
@@ -31,9 +33,9 @@ import java.util.List;
  */
 public class CategorySynapse<N extends Neuron & PatternAxon> extends DisjunctiveSynapse<CategorySynapse, N, CategoryNeuron, CategoryLink, PatternActivation, CategoryActivation> {
 
-    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(
-            new Transition(State.SAME, State.SAME),
-            new Transition(State.INPUT, State.INPUT)
+    private static List<Transition> TRANSITIONS = List.of(
+            transition(State.SAME, State.SAME, false, Integer.MAX_VALUE),
+            transition(State.INPUT, State.INPUT, false, Integer.MAX_VALUE)
     );
 
     @Override
@@ -42,8 +44,8 @@ public class CategorySynapse<N extends Neuron & PatternAxon> extends Disjunctive
     }
 
     @Override
-    public List<Transition> getPropagateTransitions() {
-        return PROPAGATE_TRANSITIONS;
+    public List<Transition> getTransitions() {
+        return TRANSITIONS;
     }
 
     @Override

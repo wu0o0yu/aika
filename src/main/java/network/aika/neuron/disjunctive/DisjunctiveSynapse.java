@@ -34,7 +34,7 @@ import java.util.List;
 public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends Neuron & Axon, O extends DisjunctiveNeuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation, OA extends DisjunctiveActivation> extends Synapse<S,I,O,L,IA,OA> {
 
     @Override
-    public List<Transition> getCheckTransitions() {
+    public List<Transition> getTransitions() {
         return Collections.EMPTY_LIST;
     }
 

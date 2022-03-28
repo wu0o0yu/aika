@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.State.*;
+import static network.aika.neuron.bindingsignal.Transition.transition;
 
 
 /**
@@ -35,18 +36,13 @@ import static network.aika.neuron.bindingsignal.State.*;
  */
 public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynapse, BindingNeuron, RelatedInputLink, BindingActivation> {
 
-    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(
-            new Transition(SAME, INPUT),
-            new Transition(INPUT, INPUT)
+    private static List<Transition> TRANSITIONS = List.of(
+            transition(SAME, INPUT, true, Integer.MAX_VALUE),
+            transition(INPUT, INPUT, true, Integer.MAX_VALUE)
     );
 
-    private static List<Transition> CHECK_TRANSITIONS = List.of(
-            new Transition(SAME, INPUT),
-            new Transition(INPUT, INPUT)
-    );
-
-    private static List<Transition> CHECK_TRANSITIONS_TEMPLATE = List.of(
-            new Transition(SAME, INPUT)
+    private static List<Transition> TRANSITIONS_TEMPLATE = List.of(
+            transition(SAME, INPUT, true, Integer.MAX_VALUE)
     );
 
     @Override
@@ -55,15 +51,10 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
     }
 
     @Override
-    public List<Transition> getPropagateTransitions() {
-        return PROPAGATE_TRANSITIONS;
-    }
-
-    @Override
-    public List<Transition> getCheckTransitions() {
+    public List<Transition> getTransitions() {
         return isTemplate() ?
-                CHECK_TRANSITIONS_TEMPLATE :
-                CHECK_TRANSITIONS;
+                TRANSITIONS_TEMPLATE :
+                TRANSITIONS;
     }
 
     @Override

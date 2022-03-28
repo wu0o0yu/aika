@@ -120,7 +120,7 @@ public class JacksonCookTest {
         BindingNeuron relPrevEntityBN = createNeuron(t.BINDING_TEMPLATE, "Rel Prev. Entity");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE, entityCN, relPrevEntityBN, 9.0);
         createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE, entityCN, relPrevEntityBN, 9.0);
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelationBindingNeuron(), relPrevEntityBN, 11.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getNextTokenRelationBindingNeuron(), relPrevEntityBN, 11.0);
 
         BindingNeuron jacksonForenameBN = createNeuron(t.BINDING_TEMPLATE, "jackson (forename)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, jacksonIN, jacksonForenameBN, 10.0);

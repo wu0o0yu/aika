@@ -27,10 +27,18 @@ public class Transition {
 
     private State input;
     private State output;
+    private boolean check;
+    private Integer propagate;
 
-    public Transition(State input, State output) {
+    private Transition(State input, State output, boolean check, Integer propagate) {
         this.input = input;
         this.output = output;
+        this.check = check;
+        this.propagate = propagate;
+    }
+
+    public static Transition transition(State input, State output, boolean check, Integer propagate) {
+        return new Transition(input, output, check, propagate);
     }
 
     public State getInput() {
@@ -41,11 +49,32 @@ public class Transition {
         return output;
     }
 
+    public boolean isCheck() {
+        return check;
+    }
+
+    public Integer getPropagate() {
+        return propagate;
+    }
+
     public State next(Direction dir) {
         return dir == OUTPUT ? output : input;
     }
 
-    public boolean check(State from, Direction dir) {
+    public BindingSignal next(BindingSignal from) {
+        return new BindingSignal(
+                from,
+                next(Direction.OUTPUT)
+        );
+    }
+
+    public boolean check(State from, Direction dir, boolean prop) {
+        if(!check && !prop)
+            return false;
+
+        if(propagate == 0 && prop)
+            return false;
+
         return from == (dir == OUTPUT ? input : output);
     }
 }

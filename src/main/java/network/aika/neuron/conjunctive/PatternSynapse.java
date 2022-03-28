@@ -22,6 +22,7 @@ import network.aika.neuron.bindingsignal.Transition;
 import java.util.List;
 
 import static network.aika.neuron.bindingsignal.State.*;
+import static network.aika.neuron.bindingsignal.Transition.transition;
 
 /**
  *
@@ -29,14 +30,10 @@ import static network.aika.neuron.bindingsignal.State.*;
  */
 public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNeuron, PatternNeuron, PatternLink, BindingActivation, PatternActivation> {
 
-    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(
-            new Transition(SAME, SAME),
-            new Transition(INPUT, INPUT),
-            new Transition(BRANCH, BRANCH)
-    );
-
-    private static List<Transition> CHECK_TRANSITIONS = List.of(
-            new Transition(SAME, SAME)
+    private static List<Transition> TRANSITIONS = List.of(
+            transition(SAME, SAME, true, Integer.MAX_VALUE),
+            transition(INPUT, INPUT, false, Integer.MAX_VALUE),
+            transition(BRANCH, BRANCH, false, Integer.MAX_VALUE)
     );
 
     public PatternSynapse() {
@@ -57,13 +54,8 @@ public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNe
     }
 
     @Override
-    public List<Transition> getPropagateTransitions() {
-        return PROPAGATE_TRANSITIONS;
-    }
-
-    @Override
-    public List<Transition> getCheckTransitions() {
-        return CHECK_TRANSITIONS;
+    public List<Transition> getTransitions() {
+        return TRANSITIONS;
     }
 
     @Override

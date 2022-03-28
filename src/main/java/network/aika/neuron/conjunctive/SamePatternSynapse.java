@@ -28,6 +28,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.List;
 
+import static network.aika.neuron.bindingsignal.Transition.transition;
+
 /**
  * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
  *
@@ -35,16 +37,10 @@ import java.util.List;
  */
 public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse, BindingNeuron, SamePatternLink, BindingActivation> {
 
-    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(
-            new Transition(State.SAME, State.SAME), // Same Pattern BindingSignal
-            new Transition(State.INPUT, State.INPUT) // Input BS becomes related
+    private static List<Transition> TRANSITIONS = List.of(
+            transition(State.SAME, State.SAME, true, Integer.MAX_VALUE), // Same Pattern BindingSignal
+            transition(State.INPUT, State.INPUT, true, Integer.MAX_VALUE) // Input BS becomes related
     );
-
-    private static List<Transition> CHECK_TRANSITIONS = List.of(
-            new Transition(State.SAME, State.SAME), // Same Pattern BindingSignal
-            new Transition(State.INPUT, State.INPUT)
-    );
-
 
     private int looseLinkingRange;
     private boolean allowLooseLinking;
@@ -111,13 +107,8 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
     }
 
     @Override
-    public List<Transition> getPropagateTransitions() {
-        return PROPAGATE_TRANSITIONS;
-    }
-
-    @Override
-    public List<Transition> getCheckTransitions() {
-        return CHECK_TRANSITIONS;
+    public List<Transition> getTransitions() {
+        return TRANSITIONS;
     }
 
     @Override

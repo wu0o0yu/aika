@@ -25,6 +25,8 @@ import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import java.util.Collections;
 import java.util.List;
 
+import static network.aika.neuron.bindingsignal.Transition.transition;
+
 
 /**
  *
@@ -32,7 +34,9 @@ import java.util.List;
  */
 public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedbackSynapse, InhibitoryNeuron, NegativeFeedbackLink, InhibitoryActivation> {
 
-    private static List<Transition> CHECK_TRANSITIONS = List.of(new Transition(State.INPUT, State.INPUT));
+    private static List<Transition> TRANSITIONS = List.of(
+            transition(State.INPUT, State.INPUT, true, 0)
+    );
 
     @Override
     public NegativeFeedbackLink createLink(InhibitoryActivation input, BindingActivation output) {
@@ -95,12 +99,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     }
 
     @Override
-    public List<Transition> getPropagateTransitions() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public List<Transition> getCheckTransitions() {
-        return CHECK_TRANSITIONS;
+    public List<Transition> getTransitions() {
+        return TRANSITIONS;
     }
 }

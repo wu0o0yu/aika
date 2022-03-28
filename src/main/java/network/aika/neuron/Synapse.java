@@ -17,7 +17,6 @@
 package network.aika.neuron;
 
 import network.aika.Model;
-import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.activation.*;
@@ -37,7 +36,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
@@ -89,8 +87,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     protected boolean commonLinkingCheck(BindingSignal<IA> iBS, BindingSignal<OA> oBS) {
-        BindingSignal transitionedIBS = transition(iBS, Direction.OUTPUT, false);
-        if(transitionedIBS == null || !transitionedIBS.match(oBS))
+        Transition t = getTransition(iBS, Direction.OUTPUT, false);
+        if(t == null)
+            return false;
+
+        if(!t.next(iBS).match(oBS))
             return false;
 
         if(linkExists(iBS.getActivation(), oBS.getActivation()))
@@ -127,21 +128,14 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
                 Math.abs(grad.getCurrentValue()) > oAct.getConfig().getInductionThreshold();
     }
 
-    public BindingSignal transition(BindingSignal from, Direction dir, boolean propagate) {
-        return (propagate ? getPropagateTransitions() : getCheckTransitions()).stream()
-                .filter(t -> t.check(from.getState(), dir))
-                .map(t ->
-                        new BindingSignal(from,
-                                t.next(Direction.OUTPUT)
-                        )
-                )
+    public Transition getTransition(BindingSignal from, Direction dir, boolean propagate) {
+        return getTransitions().stream()
+                .filter(t -> t.check(from.getState(), dir, propagate))
                 .findFirst()
                 .orElse(null);
     }
 
-    public abstract List<Transition> getPropagateTransitions();
-
-    public abstract List<Transition> getCheckTransitions();
+    public abstract List<Transition> getTransitions();
 
     public abstract void setModified();
 

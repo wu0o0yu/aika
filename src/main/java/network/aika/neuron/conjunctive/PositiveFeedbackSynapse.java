@@ -28,20 +28,17 @@ import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
 
+import static network.aika.neuron.bindingsignal.Transition.transition;
+
 /**
  *
  * @author Lukas Molzberger
  */
 public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends BindingNeuronSynapse<PositiveFeedbackSynapse, I, PositiveFeedbackLink<IA>, IA> {
 
-    private static List<Transition> PROPAGATE_TRANSITIONS = List.of(
-            new Transition(State.BRANCH, State.BRANCH),
-            new Transition(State.SAME, State.SAME)
-    );
-
-    private static List<Transition> CHECK_TRANSITIONS = List.of(
-            new Transition(State.BRANCH, State.BRANCH),
-            new Transition(State.SAME, State.SAME)
+    private static List<Transition> TRANSITIONS = List.of(
+            transition(State.BRANCH, State.BRANCH, true, Integer.MAX_VALUE),
+            transition(State.SAME, State.SAME, true, Integer.MAX_VALUE)
     );
 
     private Field feedbackWeight = new Field("feedbackWeight");
@@ -71,13 +68,8 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     }
 
     @Override
-    public List<Transition> getPropagateTransitions() {
-        return PROPAGATE_TRANSITIONS;
-    }
-
-    @Override
-    public List<Transition> getCheckTransitions() {
-        return CHECK_TRANSITIONS;
+    public List<Transition> getTransitions() {
+        return TRANSITIONS;
     }
 
     @Override
