@@ -63,6 +63,13 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected FieldOutput isFired;
     protected Field isFinal = new Field("isFinal");
 
+    private FieldFunction entropy;
+    protected FieldFunction netOuterGradient;
+    protected Field ownInputGradient;
+    protected Field backpropInputGradient;
+    protected Field ownOutputGradient;
+    protected Field backpropOutputGradient;
+
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
 
@@ -72,13 +79,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     protected NavigableMap<Activation<?>, BindingSignal> reverseBindingSignals = new TreeMap<>(NEURON_COMPARATOR);
 
-
-    private FieldFunction entropy;
-    protected FieldFunction netOuterGradient;
-    protected Field ownInputGradient;
-    protected Field backpropInputGradient;
-    protected Field ownOutputGradient;
-    protected Field backpropOutputGradient;
 
     protected Activation(int id, N n) {
         this.id = id;
@@ -97,7 +97,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         );
         connect("bias", getNeuron().getBias(), net);
 
-        isFired = threshold("checkIfFired", 0.0, net);
+        isFired = threshold("isFired", 0.0, net);
 
         isFired.addEventListener("isFired", label -> {
                     fired = thought.getCurrentTimestamp();
