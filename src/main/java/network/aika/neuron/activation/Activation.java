@@ -224,7 +224,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return backpropInputGradient;
     }
 
-
     public FieldOutput getOwnOutputGradient() {
         return ownOutputGradient;
     }

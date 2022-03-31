@@ -82,9 +82,10 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
 
                 if(getSynapse().isAllowTraining())
                     backPropGradient = mul(
-                            "oAct.og * s.weight",
+                            "oAct.ownOutputGradient * s.weight",
                             output.ownOutputGradient,
-                            synapse.getWeight()
+                            synapse.getWeight(),
+                            input.backpropInputGradient
                     );
             }
         }
