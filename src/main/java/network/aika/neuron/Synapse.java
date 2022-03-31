@@ -57,7 +57,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     protected S template;
     private TemplateSynapseInfo templateInfo;
 
-    protected Field weight = new Field("weight", (l, u) -> weightUpdate(u));
+    protected Field weight = new Field(this, "weight", (l, u) ->
+            weightUpdate(u)
+    );
 
     protected SampleSpace sampleSpace = new SampleSpace();
 
@@ -316,6 +318,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public void count(Link l) {
+        double oldN = sampleSpace.getN();
+
         boolean iActive = l.getInput().isFired();
         boolean oActive = l.getOutput().isFired();
 
@@ -323,13 +327,15 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
         sampleSpace.countSkippedInstances(absoluteRange);
 
+        sampleSpace.count();
+
         if(oActive) {
             Double alpha = l.getConfig().getAlpha();
             if (alpha != null)
-                applyMovingAverage(alpha);
+                applyMovingAverage(
+                        Math.pow(alpha, sampleSpace.getN() - oldN)
+                );
         }
-
-        sampleSpace.count();
 
         if(iActive && oActive) {
             frequencyIPosOPos += 1.0;

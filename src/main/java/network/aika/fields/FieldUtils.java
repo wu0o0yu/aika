@@ -36,7 +36,7 @@ public class FieldUtils {
             return null;
 
         FieldMultiplication func = new FieldMultiplication(label, in1, in2);
-        func.registerOutputs(out);
+        func.addFieldsAsAdditiveReceivers(out);
         return func;
     }
 
@@ -52,7 +52,7 @@ public class FieldUtils {
             return null;
 
         FieldDivision func = new FieldDivision(label, in1, in2);
-        func.registerOutputs(out);
+        func.addFieldsAsAdditiveReceivers(out);
         return func;
     }
 
@@ -75,7 +75,7 @@ public class FieldUtils {
             return null;
 
         BiFunction func = new BiFunction(label, in1, in2, f);
-        func.registerOutputs(out);
+        func.addFieldsAsAdditiveReceivers(out);
         return func;
     }
 

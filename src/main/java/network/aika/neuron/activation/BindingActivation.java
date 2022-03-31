@@ -18,10 +18,12 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.fields.Field;
+import network.aika.fields.FieldFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.steps.activation.Linking;
 
@@ -34,6 +36,7 @@ import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
 import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.steps.LinkingOrder.POST_FIRED;
+import static network.aika.steps.LinkingOrder.PRE_FIRED;
 
 /**
  * @author Lukas Molzberger
@@ -42,13 +45,14 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     private Timestamp finalTimestamp = NOT_SET;
 
-    private Field isBound = new Field("onBound");
+    private Field isBound = new Field(this, "onBound");
     private BindingSignal<BindingActivation> bound;
 
     private final Set<BindingActivation> branches = new TreeSet<>();
     private BindingActivation mainBranch;
-    private Field branchProbability = new Field("Branch-Probability");
-    private Field bpNorm = new Field("BP-Norm");
+    private Field branchProbability = new Field(this, "Branch-Probability");
+    private FieldFunction expNet;
+    private Field bpNorm = new Field(this, "BP-Norm");
 
     protected BindingActivation(int id, BindingNeuron n) {
         super(id, n);
@@ -72,11 +76,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
             );
         }
 
-        net.addFieldListener("propagateConflictingNetChange", (l, u) ->
-                propagateConflictingNetChange()
-        );
-
-        func(
+        expNet = func(
                 "exp(net)",
                 net,
                 x -> Math.exp(x),
@@ -90,11 +90,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         isFinal.addEventListener("isFinal", label ->
                 div(
                         "exp(net) / bpNorm",
-                        func(
-                                "exp(net)",
-                                net,
-                                x -> Math.exp(x)
-                        ),
+                        expNet,
                         bpNorm,
                         branchProbability
                 )
@@ -110,6 +106,13 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                         bs.getOnArrived()
                 )
         );
+
+        if(!bs.isOrigin() && bs.getState() == State.BRANCH && mainBranch != null) {
+            BindingActivation bAct = (BindingActivation) bs.getOriginActivation();
+            bs.getOnArrived().addEventListener("link conflicting branches", label ->
+                bAct.expNet.addFieldsAsAdditiveReceivers(mainBranch.bpNorm)
+            );
+        }
 
         bs.setOnArrivedBoundFired(
                 mul(
@@ -175,23 +178,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         return BindingSignal.originEquals(conflictingBS, bound);
     }
 
-    private void propagateConflictingNetChange() {
-        reverseBindingSignals.values().stream()
-                .filter(bs -> bs.getActivation() instanceof BindingActivation)
-                .map(bs -> (BindingActivation) bs.getActivation())
-                .filter(act -> !act.isMainBranch())
-                .forEach(act -> act.onConflictingNetChange(net));
-    }
-
-    private void onConflictingNetChange(Field inputNet) {
-        double expUpdate = Math.exp(inputNet.getNewValue());
-
-        if(inputNet.isInitialized())
-            expUpdate -= Math.exp(inputNet.getCurrentValue());
-
-        bpNorm.addAndTriggerUpdate(expUpdate);
-    }
-
     @Override
     public boolean isSelfRef(Activation iAct) {
         return iAct != null && iAct.bindingSignals.containsKey(this);
@@ -210,7 +196,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     private void copyBindingSignals(BindingActivation clonedAct) {
         getPatternBindingSignals().values().stream()
-                .filter(bs -> !bs.isOrigin())
+                .filter(bs -> bs.getState() == INPUT)
                 .forEach(bs ->
                         clonedAct.addBindingSignal(
                                 bs.clone(clonedAct)
@@ -268,15 +254,12 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         return branches;
     }
 
-    public Stream<BindingActivation> getAllBranches() {
-        if (mainBranch != null)
-            return Stream.concat(Stream.of(mainBranch), branches.stream());
-        else
-            return branches.stream();
-    }
-
     public Field getBpNorm() {
         return bpNorm;
+    }
+
+    public FieldFunction getExpNet() {
+        return expNet;
     }
 
     public Field getBranchProbability() {

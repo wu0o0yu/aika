@@ -43,6 +43,10 @@ public class SampleSpace implements Writable {
     public SampleSpace() {
     }
 
+    public double getN() {
+        return N;
+    }
+
     public double getN(Range range) {
         double n = range != null ? N + getInactiveInstancesSinceLastPos(range) : N;
         assert n >= 0.0;

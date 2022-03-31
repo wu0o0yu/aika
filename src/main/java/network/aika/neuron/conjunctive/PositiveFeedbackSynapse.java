@@ -37,12 +37,12 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends BindingNeuronSynapse<PositiveFeedbackSynapse, I, PositiveFeedbackLink<IA>, IA> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(State.BRANCH, State.BRANCH, true, Integer.MAX_VALUE),
+            transition(State.BRANCH, State.BRANCH, true, 1),
             transition(State.SAME, State.SAME, true, Integer.MAX_VALUE)
     );
 
-    private Field feedbackWeight = new Field("feedbackWeight");
-    private Field feedbackBias = new Field("feedbackBias");
+    private Field feedbackWeight = new Field(this, "feedbackWeight");
+    private Field feedbackBias = new Field(this, "feedbackBias");
 
     public PositiveFeedbackLink createLink(IA input, BindingActivation output) {
         return new PositiveFeedbackLink(this, input, output);

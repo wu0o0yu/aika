@@ -35,7 +35,8 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedbackSynapse, InhibitoryNeuron, NegativeFeedbackLink, InhibitoryActivation> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(State.INPUT, State.INPUT, true, 0)
+            transition(State.INPUT, State.INPUT, true, 0),
+            transition(State.BRANCH, State.BRANCH, true, 1)
     );
 
     @Override

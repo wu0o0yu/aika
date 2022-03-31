@@ -41,10 +41,11 @@ public class BindingSignal<A extends Activation> {
     private Link link;
     private Transition transition;
     private BindingSignal origin;
-    private byte depth;
+    private int depth;
     private State state;
+    private boolean propagateAllowed = true;
 
-    private Field onArrived = new Field("onArrived");
+    private Field onArrived = new Field(this, "onArrived");
     private FieldOutput onArrivedFired;
     FieldOutput onArrivedBound;
     FieldOutput onArrivedBoundFired;
@@ -61,7 +62,7 @@ public class BindingSignal<A extends Activation> {
     public BindingSignal(BindingSignal parent, State state) {
         this.parent = parent;
         this.origin = parent.getOrigin();
-        this.depth = (byte) (getDepth() + 1);
+        this.depth = parent.depth + 1;
         this.state = state;
     }
 
@@ -109,12 +110,6 @@ public class BindingSignal<A extends Activation> {
         onArrivedBoundFired = f;
     }
 
-    public static Stream<BindingSignal> propagateBindingSignals(Link l, Collection<BindingSignal> bindingSignals) {
-        return bindingSignals.stream()
-                .map(iBS -> iBS.propagate(l))
-                .filter(oBS -> oBS != null);
-    }
-
     public boolean isOrigin() {
         return this == origin;
     }
@@ -135,7 +130,7 @@ public class BindingSignal<A extends Activation> {
         return transition;
     }
 
-    public byte getDepth() {
+    public int getDepth() {
         return depth;
     }
 
@@ -172,7 +167,7 @@ public class BindingSignal<A extends Activation> {
         return c;
     }
 
-    protected BindingSignal<A> propagate(Link<?, ?, A> l) {
+    public BindingSignal<A> propagate(Link<?, ?, A> l) {
         Transition t = l.getSynapse().getTransition(
                 this,
                 Direction.OUTPUT,
@@ -186,9 +181,14 @@ public class BindingSignal<A extends Activation> {
         nextBS.activation = l.getOutput();
         nextBS.link = l;
         nextBS.transition = t;
+        nextBS.propagateAllowed = t.getPropagate() > 1;
         nextBS.initFields();
 
         return nextBS;
+    }
+
+    public boolean isPropagateAllowed() {
+        return propagateAllowed;
     }
 
     public boolean match(BindingSignal<A> oBS) {
@@ -198,4 +198,5 @@ public class BindingSignal<A extends Activation> {
     public String toString() {
         return getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ", depth:" + getDepth() + ", state:" + state;
     }
+
 }

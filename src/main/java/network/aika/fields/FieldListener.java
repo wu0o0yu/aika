@@ -34,7 +34,7 @@ public abstract class FieldListener {
     public abstract void propagateInitialValue();
 
 
-    public void registerOutputs(FieldInput... out) {
+    public void addFieldsAsAdditiveReceivers(FieldInput... out) {
         for(FieldInput o : out) {
             if(o != null) {
                 addFieldListener(o.getLabel(), (l, u) ->
@@ -44,6 +44,7 @@ public abstract class FieldListener {
         }
         propagateInitialValue();
     }
+
 
     public void addFieldListener(String receiverLabel, FieldUpdateEvent fieldListener) {
         this.fieldListeners.add(

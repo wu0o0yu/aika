@@ -54,7 +54,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Writable customData;
 
-    protected Field bias = new Field("bias", (l, u) ->
+    protected Field bias = new Field(this, "bias", (l, u) ->
         biasUpdate(u)
     );
 
@@ -325,15 +325,19 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public void count(Activation act) {
+        double oldN = sampleSpace.getN();
+
         Range absoluteRange = act.getAbsoluteRange();
         sampleSpace.countSkippedInstances(absoluteRange);
 
-        Double alpha = act.getConfig().getAlpha();
-        if (alpha != null)
-            applyMovingAverage(alpha);
-
         sampleSpace.count();
         frequency += 1.0;
+
+        Double alpha = act.getConfig().getAlpha();
+        if (alpha != null)
+            applyMovingAverage(
+                    Math.pow(alpha, sampleSpace.getN() - oldN)
+            );
 
         sampleSpace.updateLastPosition(absoluteRange);
         setModified();
