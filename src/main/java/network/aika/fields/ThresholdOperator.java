@@ -92,8 +92,8 @@ public class ThresholdOperator extends FieldListener implements FieldOutput {
     }
 
     @Override
-    public void propagateInitialValue() {
-        input.propagateInitialValue();
+    public void propagateInitialValue(FieldUpdateEvent listener) {
+        input.propagateInitialValue(listener);
     }
 
     @Override

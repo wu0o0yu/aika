@@ -44,8 +44,8 @@ public class ConstantField extends FieldListener implements FieldOutput {
     }
 
     @Override
-    public void propagateInitialValue() {
-        propagateUpdate(getCurrentValue());
+    public void propagateInitialValue(FieldUpdateEvent listener) {
+        propagateUpdate(listener, getCurrentValue());
     }
 
     @Override

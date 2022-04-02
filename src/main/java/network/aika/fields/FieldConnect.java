@@ -59,9 +59,9 @@ public class FieldConnect extends FieldListener implements FieldOutput {
     }
 
     @Override
-    public void propagateInitialValue() {
+    public void propagateInitialValue(FieldUpdateEvent listener) {
         if(isInitialized())
-            propagateUpdate(getCurrentValue());
+            propagateUpdate(listener, getCurrentValue());
     }
 
     private void triggerUpdate() {

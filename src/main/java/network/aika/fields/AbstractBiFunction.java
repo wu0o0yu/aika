@@ -49,9 +49,9 @@ public abstract class AbstractBiFunction extends FieldListener implements FieldO
     }
 
     @Override
-    public void propagateInitialValue() {
+    public void propagateInitialValue(FieldUpdateEvent listener) {
         if(isInitialized())
-            propagateUpdate(getCurrentValue());
+            propagateUpdate(listener, getCurrentValue());
     }
 
     @Override

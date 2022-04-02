@@ -27,7 +27,7 @@ public interface FieldOutput {
 
     boolean isInitialized();
 
-    void propagateInitialValue();
+    void propagateInitialValue(FieldUpdateEvent listener);
 
     double getCurrentValue();
 
@@ -47,7 +47,7 @@ public interface FieldOutput {
         return f != null ? f.getCurrentValue() : 0.0;
     }
 
-    void addFieldListener(String label, FieldUpdateEvent fieldListener);
+    FieldUpdateEvent addFieldListener(String label, FieldUpdateEvent fieldListener);
 
     void addEventListener(String label, FieldOnTrueEvent eventListener);
 }

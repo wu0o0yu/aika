@@ -31,28 +31,27 @@ public abstract class FieldListener {
 
     private List<Entry> fieldListeners = new ArrayList<>();
 
-    public abstract void propagateInitialValue();
-
+    public abstract void propagateInitialValue(FieldUpdateEvent listener);
 
     public void addFieldsAsAdditiveReceivers(FieldInput... out) {
         for(FieldInput o : out) {
             if(o != null) {
-                addFieldListener(o.getLabel(), (l, u) ->
+                FieldUpdateEvent listener = addFieldListener(o.getLabel(), (l, u) ->
                         o.addAndTriggerUpdate(u)
                 );
+                propagateInitialValue(listener);
             }
         }
-        propagateInitialValue();
     }
 
-
-    public void addFieldListener(String receiverLabel, FieldUpdateEvent fieldListener) {
+    public FieldUpdateEvent addFieldListener(String receiverLabel, FieldUpdateEvent fieldListener) {
         this.fieldListeners.add(
                 new Entry(
                         receiverLabel,
                         fieldListener
                 )
         );
+        return fieldListener;
     }
 
     public void addEventListener(String receiverLabel, FieldOnTrueEvent eventListener) {
@@ -67,5 +66,9 @@ public abstract class FieldListener {
         fieldListeners.forEach(e ->
                 e.listener.updated(e.label, update)
         );
+    }
+
+    protected void propagateUpdate(FieldUpdateEvent listener, double update) {
+        listener.updated("init", update);
     }
 }

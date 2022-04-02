@@ -17,6 +17,7 @@
 package network.aika.fields;
 
 import network.aika.Model;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import org.slf4j.Logger;
@@ -70,8 +71,8 @@ public class Field extends FieldListener implements FieldInterface, Writable {
     }
 
     @Override
-    public void propagateInitialValue() {
-        propagateUpdate(getCurrentValue());
+    public void propagateInitialValue(FieldUpdateEvent listener) {
+        propagateUpdate(listener, getCurrentValue());
     }
 
     @Override
