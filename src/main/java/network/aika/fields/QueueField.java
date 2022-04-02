@@ -30,7 +30,7 @@ public class QueueField extends Field {
     private FieldStep step;
 
     public QueueField(Element e, String label) {
-        super(label);
+        super(e, label);
         step = new FieldStep(e, this);
     }
 

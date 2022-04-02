@@ -30,7 +30,7 @@ public class FieldConnect extends FieldListener implements FieldOutput {
         this.input = in;
         this.label = label;
 
-        this.input.addFieldListener(label, (l, u) ->
+        this.input.addFieldListener("in", (l, u) ->
                 triggerUpdate()
         );
     }

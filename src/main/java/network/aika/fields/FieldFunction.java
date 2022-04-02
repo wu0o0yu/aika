@@ -34,7 +34,7 @@ public class FieldFunction extends FieldListener implements FieldOutput {
         this.function = f;
         this.label = label;
 
-        this.input.addFieldListener(label, (l, u) ->
+        this.input.addFieldListener("in", (l, u) ->
                 triggerUpdate()
         );
     }

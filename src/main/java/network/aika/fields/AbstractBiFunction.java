@@ -33,11 +33,11 @@ public abstract class AbstractBiFunction extends FieldListener implements FieldO
         this.in1 = in1;
         this.in2 = in2;
 
-        in1.addFieldListener(label + "-arg(1)", (l, u) ->
+        in1.addFieldListener("arg 1", (l, u) ->
                 triggerUpdate(1)
         );
 
-        in2.addFieldListener(label + "-arg(2)", (l, u) ->
+        in2.addFieldListener("arg 2", (l, u) ->
                 triggerUpdate(2)
         );
     }

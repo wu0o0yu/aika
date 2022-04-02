@@ -32,7 +32,7 @@ public class ThresholdOperator extends FieldListener implements FieldOutput {
         this.label = label;
         this.threshold = threshold;
         this.input = in;
-        this.input.addFieldListener(label, (l, u) ->
+        this.input.addFieldListener("in", (l, u) ->
                 triggerUpdate()
         );
     }
