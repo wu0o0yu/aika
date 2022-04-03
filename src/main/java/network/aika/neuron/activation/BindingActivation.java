@@ -19,6 +19,7 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.fields.Field;
 import network.aika.fields.FieldFunction;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
@@ -30,29 +31,24 @@ import network.aika.steps.activation.Linking;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static network.aika.fields.FieldOutput.isTrue;
 import static network.aika.fields.FieldUtils.*;
-import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
 import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.steps.LinkingOrder.POST_FIRED;
-import static network.aika.steps.LinkingOrder.PRE_FIRED;
 
 /**
  * @author Lukas Molzberger
  */
 public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
-    private Timestamp finalTimestamp = NOT_SET;
-
     private Field isBound = new Field(this, "onBound");
     private BindingSignal<BindingActivation> bound;
 
     private final Set<BindingActivation> branches = new TreeSet<>();
     private BindingActivation mainBranch;
-    private Field branchProbability = new Field(this, "Branch-Probability");
+    private FieldOutput branchProbability;
     private FieldFunction expNet;
-    private Field bpNorm = new Field(this, "BP-Norm");
+    private Field bpNorm = new Field(this, "BP-Norm", 1.0);
 
     protected BindingActivation(int id, BindingNeuron n) {
         super(id, n);
@@ -61,7 +57,29 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
 
-        branchProbability.setAndTriggerUpdate(1.0);
+        expNet = func(
+                "exp(net)",
+                net,
+                x -> Math.exp(x),
+                bpNorm
+        );
+
+        // (1 - (isFinal * (1 - bp))) : apply branch probability only when isFinal.
+        branchProbability = invert(
+                "branch-probability",
+                mul(
+                        "isFinal * (1 - bp)",
+                        isFinal,
+                        invert(
+                                "(1 - bp)",
+                                div(
+                                        "exp(net) / bpNorm",
+                                        expNet,
+                                        bpNorm
+                                )
+                        )
+                )
+        );
 
         if(!isInput) {
             func(
@@ -75,26 +93,11 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                     value
             );
         }
-
-        expNet = func(
-                "exp(net)",
-                net,
-                x -> Math.exp(x),
-                bpNorm
-        );
     }
 
     @Override
     protected void initFields() {
         // Override parent
-        isFinal.addEventListener("isFinal", label ->
-                div(
-                        "exp(net) / bpNorm",
-                        expNet,
-                        bpNorm,
-                        branchProbability
-                )
-        );
     }
 
     @Override
@@ -234,14 +237,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         getNet().addAndTriggerUpdate(u);
     }
 
-    public Timestamp getFinalTimestamp() {
-        return finalTimestamp;
-    }
-
-    public void setFinalTimestamp() {
-        this.finalTimestamp = getThought().getCurrentTimestamp();
-    }
-
     public BindingActivation getMainBranch() {
         return mainBranch;
     }
@@ -262,7 +257,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         return expNet;
     }
 
-    public Field getBranchProbability() {
+    public FieldOutput getBranchProbability() {
         return branchProbability;
     }
 

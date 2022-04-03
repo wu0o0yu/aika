@@ -34,6 +34,11 @@ public class QueueField extends Field {
         step = new FieldStep(e, this);
     }
 
+    public QueueField(Element e, String label, double initialValue) {
+        super(e, label, initialValue);
+        step = new FieldStep(e, this);
+    }
+
     public void setStep(FieldStep s) {
         this.step = s;
     }

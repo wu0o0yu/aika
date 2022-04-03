@@ -58,10 +58,10 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     protected Field value = new Field(this, "value");
     protected FieldOutput finalValue;
-    protected Field net = new QueueField(this, "net");
+    protected Field net = new QueueField(this, "net", 0.0);
 
     protected FieldOutput isFired;
-    protected Field isFinal = new Field(this, "isFinal");
+    protected Field isFinal = new Field(this, "isFinal", 0.0);
 
     private FieldFunction entropy;
     protected FieldFunction netOuterGradient;

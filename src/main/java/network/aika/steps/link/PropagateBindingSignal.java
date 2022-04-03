@@ -23,6 +23,7 @@ import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,10 +38,12 @@ public class PropagateBindingSignal extends Step<Link> {
 
     public static void add(Link l) {
         Activation<?> iAct = l.getInput();
-        Step.add(new PropagateBindingSignal(l,
-                iAct.getBindingSignals()
-                        .collect(Collectors.toList()))
-        );
+
+        List<BindingSignal> inputBindingSignals = iAct.getBindingSignals()
+                .collect(Collectors.toList());
+
+        if(!inputBindingSignals.isEmpty())
+            Step.add(new PropagateBindingSignal(l, inputBindingSignals));
     }
 
     public static void add(Activation<?> act, Stream<BindingSignal> bindingSignals) {

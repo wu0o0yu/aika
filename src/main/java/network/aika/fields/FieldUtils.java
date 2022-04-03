@@ -92,4 +92,11 @@ public class FieldUtils {
 
         return new ThresholdOperator(label, threshold, in, out);
     }
+
+    public static InvertFunction invert(String label, FieldOutput in) {
+        if(in == null)
+            return null;
+
+        return new InvertFunction(label, in);
+    }
 }

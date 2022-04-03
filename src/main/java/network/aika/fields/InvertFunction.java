@@ -17,15 +17,17 @@
 package network.aika.fields;
 
 
+import network.aika.utils.Utils;
+
 /**
  * @author Lukas Molzberger
  */
-public class InvertedField extends FieldListener implements FieldOutput {
+public class InvertFunction extends FieldListener implements FieldOutput {
 
     FieldOutput input;
     private String label;
 
-    public InvertedField(String label, FieldOutput in) {
+    public InvertFunction(String label, FieldOutput in) {
         this.label = label;
         this.input = in;
     }
@@ -64,5 +66,13 @@ public class InvertedField extends FieldListener implements FieldOutput {
     @Override
     public double getUpdate() {
         return getNewValue() - getCurrentValue();
+    }
+
+    @Override
+    public String toString() {
+        if(!isInitialized())
+            return "--";
+
+        return "[v:" + Utils.round(getCurrentValue()) + "]";
     }
 }

@@ -48,6 +48,12 @@ public class Field extends FieldListener implements FieldInterface, Writable {
         this.propagatePreCondition = (cv, nv, u) -> !Utils.belowTolerance(u);
     }
 
+    public Field(Object refObj, String label, double initialValue) {
+        this(refObj, label);
+
+        currentValue = initialValue;
+    }
+
     public Field(Object refObj, String label, FieldUpdateEvent fieldListener) {
         this(refObj, label);
         addFieldListener(label, fieldListener);

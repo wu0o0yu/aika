@@ -128,12 +128,10 @@ public class Linking extends Step<Activation> {
     }
 
     private void link(Synapse ts) {
-        Activation fromAct = getElement();
         Neuron toNeuron = direction.getNeuron(ts);
 
         getRelatedBindingSignal(ts, bindingSignal, toNeuron)
                 .filter(toBS -> bindingSignal != toBS)
-//                .filter(toAct -> fromAct != toAct)
                 .forEach(toBS ->
                         link(ts, bindingSignal, toBS)
                 );

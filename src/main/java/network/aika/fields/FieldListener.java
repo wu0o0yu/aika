@@ -35,6 +35,8 @@ public abstract class FieldListener {
 
     public void addFieldsAsAdditiveReceivers(FieldInput... out) {
         for(FieldInput o : out) {
+            assert o != this;
+
             if(o != null) {
                 FieldUpdateEvent listener = addFieldListener(o.getLabel(), (l, u) ->
                         o.addAndTriggerUpdate(u)
