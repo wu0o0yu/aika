@@ -78,7 +78,8 @@ public class Field extends FieldListener implements FieldInterface, Writable {
 
     @Override
     public void propagateInitialValue(FieldUpdateEvent listener) {
-        propagateUpdate(listener, getCurrentValue());
+        if(isInitialized())
+            propagateUpdate(listener, getCurrentValue());
     }
 
     @Override
@@ -87,18 +88,6 @@ public class Field extends FieldListener implements FieldInterface, Writable {
             throw new IllegalStateException("getCurrentValue was called on an uninitialized field");
 
         return currentValue;
-    }
-
-    @Override
-    public double getNewValue() {
-        if(!allowUpdate)
-            throw new IllegalStateException("getNewValue was called outside the listener");
-
-        if(updateAvailable())
-            return isInitialized() ? currentValue + update : update;
-        else {
-            return getCurrentValue();
-        }
     }
 
     @Override
@@ -138,17 +127,8 @@ public class Field extends FieldListener implements FieldInterface, Writable {
         allowUpdate = false;
     }
 
-    @Override
-    public boolean updateAvailable() {
+    private boolean updateAvailable() {
         return update != null;
-    }
-
-    @Override
-    public double getUpdate() {
-        if(!allowUpdate)
-            throw new IllegalStateException("getNewValue was called outside the listener");
-
-        return update;
     }
 
     @Override

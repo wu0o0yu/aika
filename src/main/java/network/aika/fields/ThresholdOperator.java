@@ -16,91 +16,21 @@
  */
 package network.aika.fields;
 
-
-import network.aika.utils.Utils;
-
 /**
  * @author Lukas Molzberger
  */
-public class ThresholdOperator extends FieldListener implements FieldOutput {
+public class ThresholdOperator extends AbstractFunction {
 
     private double threshold;
-    private FieldOutput input;
-    private String label;
 
     public ThresholdOperator(String label, double threshold, FieldOutput in) {
-        this.label = label;
+        super(label, in);
         this.threshold = threshold;
-        this.input = in;
-        this.input.addFieldListener("in", (l, u) ->
-                triggerUpdate()
-        );
-    }
-
-    public ThresholdOperator(String label, double threshold, FieldOutput in, FieldInput... out) {
-        this(label, threshold, in);
-
-        for (FieldInput o : out)
-            addFieldListener(label, (l, u) ->
-                    o.setAndTriggerUpdate(getNewValue())
-            );
-    }
-
-    private void triggerUpdate() {
-        if (!updateAvailable())
-            return;
-
-        propagateUpdate(
-                getUpdate()
-        );
+        registerInputListener();
     }
 
     @Override
-    public double getCurrentValue() {
-        return checkThreshold(input.getCurrentValue());
-    }
-
-    @Override
-    public double getNewValue() {
-        return checkThreshold(input.getNewValue());
-    }
-
-    @Override
-    public double getUpdate() {
-        return input.isInitialized() ?
-                getNewValue() - getCurrentValue() :
-                getNewValue();
-    }
-
-    private double checkThreshold(double x) {
+    protected double applyFunction(double x) {
         return x > threshold ? 1.0 : 0.0;
-    }
-
-    @Override
-    public String getLabel() {
-        return label;
-    }
-
-    @Override
-    public boolean updateAvailable() {
-        return input.updateAvailable();
-    }
-
-    @Override
-    public boolean isInitialized() {
-        return input.isInitialized();
-    }
-
-    @Override
-    public void propagateInitialValue(FieldUpdateEvent listener) {
-        input.propagateInitialValue(listener);
-    }
-
-    @Override
-    public String toString() {
-        if(!isInitialized())
-            return "--";
-
-        return "[v:" + Utils.round(getCurrentValue()) + "]";
     }
 }

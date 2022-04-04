@@ -50,6 +50,8 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     private FieldFunction expNet;
     private Field bpNorm = new Field(this, "BP-Norm", 1.0);
 
+    private boolean isInput;
+
     protected BindingActivation(int id, BindingNeuron n) {
         super(id, n);
     }
@@ -81,7 +83,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 )
         );
 
-        if(!isInput) {
+        if(!isInput()) {
             func(
                     "f(bp * net)",
                     mul(
@@ -143,6 +145,14 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     public void init(Synapse originSynapse, Activation originAct) {
         super.init(originSynapse, originAct);
         addBindingSignal(new BindingSignal(this, BRANCH));
+    }
+
+    public boolean isInput() {
+        return isInput;
+    }
+
+    public void setInput(boolean input) {
+        isInput = input;
     }
 
     public Field getIsBound() {

@@ -23,27 +23,11 @@ public interface FieldOutput {
 
     String getLabel();
 
-    boolean updateAvailable();
-
     boolean isInitialized();
-
-    void propagateInitialValue(FieldUpdateEvent listener);
 
     double getCurrentValue();
 
-    double getNewValue();
-
-    double getUpdate();
-
     static double getCurrentValue(FieldOutput f) {
-        return f != null ? f.getCurrentValue() : 0.0;
-    }
-
-    static boolean isTrue(FieldOutput f) {
-        return f != null && f.isInitialized() && f.getCurrentValue() > 0.5;
-    }
-
-    static double getUpdate(FieldOutput f) {
         return f != null ? f.getCurrentValue() : 0.0;
     }
 

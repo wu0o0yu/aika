@@ -16,20 +16,25 @@
  */
 package network.aika.fields;
 
+import network.aika.utils.Utils;
+
 /**
  * @author Lukas Molzberger
  */
-public class ConstantField extends FieldListener implements FieldOutput {
+public abstract class AbstractFunction extends FieldListener implements FieldOutput {
 
-    public static final ConstantField ZERO = new ConstantField("ZERO", 0.0);
-    public static final ConstantField ONE = new ConstantField("ONE", 1.0);
-
-    private final double value;
+    private FieldOutput input;
     private String label;
 
-    public ConstantField(String label, double value) {
+    public AbstractFunction(String label, FieldOutput in) {
+        this.input = in;
         this.label = label;
-        this.value = value;
+    }
+
+    protected void registerInputListener() {
+        this.input.addFieldListener("in", (l, u) ->
+                propagateUpdate(computeUpdate(u))
+        );
     }
 
     @Override
@@ -39,16 +44,37 @@ public class ConstantField extends FieldListener implements FieldOutput {
 
     @Override
     public boolean isInitialized() {
-        return true;
+        return input.isInitialized();
     }
 
     @Override
     public void propagateInitialValue(FieldUpdateEvent listener) {
-        propagateUpdate(listener, getCurrentValue());
+        if(isInitialized())
+            propagateUpdate(listener, getCurrentValue());
     }
 
     @Override
     public double getCurrentValue() {
-        return value;
+        return applyFunction(input.getCurrentValue());
+    }
+
+    protected abstract double applyFunction(double x);
+
+    protected double computeUpdate(double u) {
+        return input.isInitialized() ?
+                computeNewValue(u) - getCurrentValue() :
+                computeNewValue(u);
+    }
+
+    private double computeNewValue(double u) {
+        return applyFunction(input.getCurrentValue() + u);
+    }
+
+    @Override
+    public String toString() {
+        if(!isInitialized())
+            return "--";
+
+        return "[v:" + Utils.round(getCurrentValue()) + "]";
     }
 }

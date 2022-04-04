@@ -75,9 +75,6 @@ public class InductionTest {
         Activation actB = inB.createActivation(doc);
         Activation actTarget = targetN.createActivation(doc);
 
-        actA.setInputNet(10.0);
-        actB.setInputNet(10.0);
-
         sA.createLink(actA, actTarget);
         sB.createLink(actB, actTarget);
 

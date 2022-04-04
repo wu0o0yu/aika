@@ -38,10 +38,9 @@ public abstract class FieldListener {
             assert o != this;
 
             if(o != null) {
-                FieldUpdateEvent listener = addFieldListener(o.getLabel(), (l, u) ->
+                addFieldListener(o.getLabel(), (l, u) ->
                         o.addAndTriggerUpdate(u)
                 );
-                propagateInitialValue(listener);
             }
         }
     }
@@ -53,6 +52,7 @@ public abstract class FieldListener {
                         fieldListener
                 )
         );
+        propagateInitialValue(fieldListener);
         return fieldListener;
     }
 

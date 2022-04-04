@@ -25,20 +25,21 @@ public abstract class AbstractBiFunction extends FieldListener implements FieldO
     protected FieldOutput in1;
     protected FieldOutput in2;
 
-    protected int currentArgument = -1;
     private String label;
 
     public AbstractBiFunction(String label, FieldOutput in1, FieldOutput in2) {
         this.label = label;
         this.in1 = in1;
         this.in2 = in2;
+    }
 
+    protected void registerInputListener() {
         in1.addFieldListener("arg 1", (l, u) ->
-                triggerUpdate(1)
+                triggerUpdate(1, u)
         );
 
         in2.addFieldListener("arg 2", (l, u) ->
-                triggerUpdate(2)
+                triggerUpdate(2, u)
         );
     }
 
@@ -59,28 +60,12 @@ public abstract class AbstractBiFunction extends FieldListener implements FieldO
         return label;
     }
 
-    public void triggerUpdate(int arg) {
-        currentArgument = arg;
-        if (!updateAvailable())
-            return;
-
-        propagateUpdate(
-                getUpdate()
-        );
-        currentArgument = -1;
+    public void triggerUpdate(int arg, double u) {
+        if(isInitialized())
+            propagateUpdate(computeUpdate(arg, u));
     }
 
-    @Override
-    public boolean updateAvailable() {
-        switch (currentArgument) {
-            case 1:
-                return in1.updateAvailable() && in2.isInitialized();
-            case 2:
-                return in1.isInitialized() && in2.updateAvailable();
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
+    protected abstract double computeUpdate(int arg, double u);
 
     public String toString() {
         if(!isInitialized())

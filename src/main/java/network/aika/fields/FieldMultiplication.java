@@ -23,6 +23,7 @@ public class FieldMultiplication extends AbstractBiFunction {
 
     public FieldMultiplication(String label, FieldOutput in1, FieldOutput in2) {
         super(label, in1, in2);
+        registerInputListener();
     }
 
     @Override
@@ -31,30 +32,14 @@ public class FieldMultiplication extends AbstractBiFunction {
     }
 
     @Override
-    public double getNewValue() {
-        switch (currentArgument) {
+    protected double computeUpdate(int arg, double u) {
+        switch (arg) {
             case 1:
-                return in1.getNewValue() * in2.getCurrentValue();
+                return u * FieldOutput.getCurrentValue(in2);
             case 2:
-                return in1.getCurrentValue() * in2.getNewValue();
+                return u * FieldOutput.getCurrentValue(in1);
             default:
                 throw new IllegalArgumentException();
         }
-    }
-
-    public double getUpdate() {
-        switch (currentArgument) {
-            case 1:
-                if (in1.updateAvailable())
-                    return in1.getUpdate() * FieldOutput.getCurrentValue(in2);
-                break;
-            case 2:
-                if (in2.updateAvailable())
-                    return in2.getUpdate() * FieldOutput.getCurrentValue(in1);
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
-        return 0.0;
     }
 }

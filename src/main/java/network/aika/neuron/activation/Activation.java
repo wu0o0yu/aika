@@ -54,11 +54,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected Timestamp creationTimestamp = NOT_SET;
     protected Timestamp fired = NOT_SET;
 
-    protected boolean isInput;
-
     protected Field value = new Field(this, "value");
     protected FieldOutput finalValue;
-    protected Field net = new QueueField(this, "net", 0.0);
+    protected Field net = initNet();
 
     protected FieldOutput isFired;
     protected Field isFinal = new Field(this, "isFinal", 0.0);
@@ -131,6 +129,10 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
     }
 
+    protected Field initNet() {
+        return new QueueField(this, "net", 0.0);
+    }
+
     protected void initGradientFields() {
         commonInitGradientFields();
     }
@@ -191,7 +193,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     protected void initFields() {
-        if(!isInput) {
+        if(!isInput()) {
             func(
                     "f(net)",
                     net,
@@ -245,11 +247,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public boolean isInput() {
-        return isInput;
-    }
-
-    public void setInput(boolean input) {
-        isInput = input;
+        return false;
     }
 
     public Field getNet() {
@@ -385,11 +383,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public NeuronProvider getNeuronProvider() {
         return neuron.getProvider();
-    }
-
-    public void setInputNet(double x) {
-        net.setAndTriggerUpdate(x);
-        isInput = true;
     }
 
     public Link getInputLink(Neuron n) {

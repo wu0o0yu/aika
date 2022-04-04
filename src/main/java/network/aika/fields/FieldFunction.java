@@ -16,90 +16,23 @@
  */
 package network.aika.fields;
 
-import network.aika.utils.Utils;
-
 import java.util.function.DoubleFunction;
 
 /**
  * @author Lukas Molzberger
  */
-public class FieldFunction extends FieldListener implements FieldOutput {
+public class FieldFunction extends AbstractFunction {
 
-    private FieldOutput input;
     private DoubleFunction<Double> function;
-    private String label;
 
     public FieldFunction(String label, FieldOutput in, DoubleFunction<Double> f) {
-        this.input = in;
+        super(label, in);
         this.function = f;
-        this.label = label;
-
-        this.input.addFieldListener("in", (l, u) ->
-                triggerUpdate()
-        );
-    }
-
-    public FieldFunction(String label, FieldOutput in, DoubleFunction<Double> f, FieldInput... out) {
-        this(label, in, f);
-
-        for (FieldInput o : out)
-            addFieldListener(label, (l, u) ->
-                    o.addAndTriggerUpdate(u)
-            );
+        registerInputListener();
     }
 
     @Override
-    public String getLabel() {
-        return label;
-    }
-
-    @Override
-    public boolean isInitialized() {
-        return input.isInitialized();
-    }
-
-    @Override
-    public void propagateInitialValue(FieldUpdateEvent listener) {
-        if(isInitialized())
-            propagateUpdate(listener, getCurrentValue());
-    }
-
-    private void triggerUpdate() {
-        if (!updateAvailable())
-            return;
-
-        propagateUpdate(
-                getUpdate()
-        );
-    }
-
-    @Override
-    public double getCurrentValue() {
-        return function.apply(input.getCurrentValue());
-    }
-
-    @Override
-    public double getNewValue() {
-        return function.apply(input.getNewValue());
-    }
-
-    @Override
-    public boolean updateAvailable() {
-        return input.updateAvailable();
-    }
-
-    @Override
-    public double getUpdate() {
-        return input.isInitialized() ?
-                getNewValue() - getCurrentValue() :
-                getNewValue();
-    }
-
-    @Override
-    public String toString() {
-        if(!isInitialized())
-            return "--";
-
-        return "[v:" + Utils.round(getCurrentValue()) + "]";
+    protected double applyFunction(double x) {
+        return function.apply(x);
     }
 }

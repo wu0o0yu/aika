@@ -17,62 +17,18 @@
 package network.aika.fields;
 
 
-import network.aika.utils.Utils;
-
 /**
  * @author Lukas Molzberger
  */
-public class InvertFunction extends FieldListener implements FieldOutput {
-
-    FieldOutput input;
-    private String label;
+public class InvertFunction extends AbstractFunction {
 
     public InvertFunction(String label, FieldOutput in) {
-        this.label = label;
-        this.input = in;
+        super(label, in);
+        registerInputListener();
     }
 
     @Override
-    public String getLabel() {
-        return label;
-    }
-
-    @Override
-    public boolean isInitialized() {
-        return input.isInitialized();
-    }
-
-    @Override
-    public void propagateInitialValue(FieldUpdateEvent listener) {
-        if(isInitialized())
-            propagateUpdate(listener, getCurrentValue());
-    }
-
-    @Override
-    public double getCurrentValue() {
-        return 1.0 - input.getCurrentValue();
-    }
-
-    @Override
-    public double getNewValue() {
-        return 1.0 - input.getNewValue();
-    }
-
-    @Override
-    public boolean updateAvailable() {
-        return input.updateAvailable();
-    }
-
-    @Override
-    public double getUpdate() {
-        return getNewValue() - getCurrentValue();
-    }
-
-    @Override
-    public String toString() {
-        if(!isInitialized())
-            return "--";
-
-        return "[v:" + Utils.round(getCurrentValue()) + "]";
+    protected double applyFunction(double x) {
+        return 1.0 - x;
     }
 }

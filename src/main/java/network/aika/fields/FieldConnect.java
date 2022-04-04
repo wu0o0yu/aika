@@ -31,21 +31,8 @@ public class FieldConnect extends FieldListener implements FieldOutput {
         this.label = label;
 
         this.input.addFieldListener("in", (l, u) ->
-                triggerUpdate()
+                propagateUpdate(u)
         );
-    }
-
-    public FieldConnect(String label, FieldOutput in, FieldInput... out) {
-        this(label, in);
-
-        for (FieldInput o : out) {
-            if(in.isInitialized())
-                o.addAndTriggerUpdate(in.getCurrentValue());
-
-            addFieldListener(label, (l, u) ->
-                    o.addAndTriggerUpdate(u)
-            );
-        }
     }
 
     @Override
@@ -64,33 +51,9 @@ public class FieldConnect extends FieldListener implements FieldOutput {
             propagateUpdate(listener, getCurrentValue());
     }
 
-    private void triggerUpdate() {
-        if (!updateAvailable())
-            return;
-
-        propagateUpdate(
-                getUpdate()
-        );
-    }
-
     @Override
     public double getCurrentValue() {
         return input.getCurrentValue();
-    }
-
-    @Override
-    public double getNewValue() {
-        return input.getNewValue();
-    }
-
-    @Override
-    public boolean updateAvailable() {
-        return input.updateAvailable();
-    }
-
-    @Override
-    public double getUpdate() {
-        return input.getUpdate();
     }
 
     @Override

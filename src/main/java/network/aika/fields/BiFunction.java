@@ -28,6 +28,7 @@ public class BiFunction extends AbstractBiFunction {
     public BiFunction(String label, FieldOutput in1, FieldOutput in2, DoubleBinaryOperator f) {
         super(label, in1, in2);
         this.function = f;
+        registerInputListener();
     }
 
     @Override
@@ -36,22 +37,21 @@ public class BiFunction extends AbstractBiFunction {
     }
 
     @Override
-    public double getNewValue() {
-        switch (currentArgument) {
+    protected double computeUpdate(int arg, double u) {
+        if(isInitialized())
+            return computeNewValue(arg, u) - getCurrentValue();
+        else
+            return computeNewValue(arg, u);
+    }
+
+    private double computeNewValue(int arg, double u) {
+        switch (arg) {
             case 1:
-                return function.applyAsDouble(in1.getNewValue(), in2.getCurrentValue());
+                return function.applyAsDouble(u + FieldOutput.getCurrentValue(in1), FieldOutput.getCurrentValue(in2));
             case 2:
-                return function.applyAsDouble(in1.getCurrentValue(), in2.getNewValue());
+                return function.applyAsDouble(FieldOutput.getCurrentValue(in1), u + FieldOutput.getCurrentValue(in2));
             default:
                 throw new IllegalArgumentException();
         }
-    }
-
-    @Override
-    public double getUpdate() {
-        if(isInitialized())
-            return getNewValue() - getCurrentValue();
-        else
-            return getNewValue();
     }
 }

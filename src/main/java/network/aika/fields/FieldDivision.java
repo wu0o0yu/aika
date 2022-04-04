@@ -23,6 +23,7 @@ public class FieldDivision extends AbstractBiFunction {
 
     public FieldDivision(String label, FieldOutput in1, FieldOutput in2) {
         super(label, in1, in2);
+        registerInputListener();
     }
 
     @Override
@@ -31,34 +32,15 @@ public class FieldDivision extends AbstractBiFunction {
     }
 
     @Override
-    public double getNewValue() {
-        switch (currentArgument) {
+    protected double computeUpdate(int arg, double u) {
+        switch (arg) {
             case 1:
-                return in1.getNewValue() / in2.getCurrentValue();
+                double v2 = FieldOutput.getCurrentValue(in2);
+                return (u * v2) / Math.pow(v2, 2.0);
             case 2:
-                return in1.getCurrentValue() / in2.getNewValue();
+                return -(u * FieldOutput.getCurrentValue(in1)) / Math.pow(FieldOutput.getCurrentValue(in2), 2.0);
             default:
                 throw new IllegalArgumentException();
         }
-    }
-
-    @Override
-    public double getUpdate() {
-        switch (currentArgument) {
-            case 1:
-                if (in1.updateAvailable()) {
-                    double v2 = FieldOutput.getCurrentValue(in2);
-                    return (in1.getUpdate() * v2) / Math.pow(v2, 2.0);
-                }
-                break;
-            case 2:
-                if (in2.updateAvailable()) {
-                    return -(in2.getUpdate() * FieldOutput.getCurrentValue(in1)) / Math.pow(FieldOutput.getCurrentValue(in2), 2.0);
-                }
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
-        return 0.0;
     }
 }

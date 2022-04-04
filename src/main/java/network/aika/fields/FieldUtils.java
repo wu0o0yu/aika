@@ -32,10 +32,7 @@ public class FieldUtils {
     }
 
     public static FieldMultiplication mul(String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
-        if(in1 == null || in2 == null)
-            return null;
-
-        FieldMultiplication func = new FieldMultiplication(label, in1, in2);
+        FieldMultiplication func = mul(label, in1, in2);
         func.addFieldsAsAdditiveReceivers(out);
         return func;
     }
@@ -48,10 +45,7 @@ public class FieldUtils {
     }
 
     public static FieldDivision div(String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
-        if(in1 == null || in2 == null)
-            return null;
-
-        FieldDivision func = new FieldDivision(label, in1, in2);
+        FieldDivision func = div(label, in1, in2);
         func.addFieldsAsAdditiveReceivers(out);
         return func;
     }
@@ -67,7 +61,9 @@ public class FieldUtils {
         if(in == null)
             return null;
 
-        return new FieldFunction(label, in, f, out);
+        FieldFunction func = func(label, in, f);
+        func.addFieldsAsAdditiveReceivers(out);
+        return func;
     }
 
     public static BiFunction func(String label, FieldOutput in1, FieldOutput in2, DoubleBinaryOperator f, FieldInput... out) {
@@ -79,18 +75,30 @@ public class FieldUtils {
         return func;
     }
 
-    public static FieldConnect connect(String label, FieldOutput in, FieldInput... out) {
+    public static FieldConnect connect(String label, FieldOutput in) {
         if(in == null)
             return null;
 
-        return new FieldConnect(label, in, out);
+        return new FieldConnect(label, in);
+    }
+
+    public static FieldConnect connect(String label, FieldOutput in, FieldInput... out) {
+        FieldConnect fieldConnect = connect(label, in);
+        fieldConnect.addFieldsAsAdditiveReceivers(out);
+        return fieldConnect;
+    }
+
+    public static ThresholdOperator threshold(String label, double threshold, FieldOutput in) {
+        if(in == null)
+            return null;
+
+        return new ThresholdOperator(label, threshold, in);
     }
 
     public static ThresholdOperator threshold(String label, double threshold, FieldOutput in, FieldInput... out) {
-        if(in == null)
-            return null;
-
-        return new ThresholdOperator(label, threshold, in, out);
+        ThresholdOperator threshOp = threshold(label, threshold, in, out);
+        threshOp.addFieldsAsAdditiveReceivers(out);
+        return threshOp;
     }
 
     public static InvertFunction invert(String label, FieldOutput in) {

@@ -70,6 +70,12 @@ public class DummyActivation extends Activation {
     }
 
     @Override
+    public boolean isInput() {
+        return false;
+    }
+
+
+    @Override
     public int compareTo(Object o) {
         throw new NoSuchMethodError();
     }
