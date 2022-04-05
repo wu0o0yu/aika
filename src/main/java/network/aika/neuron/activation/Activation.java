@@ -193,14 +193,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     protected void initFields() {
-        if(!isInput()) {
-            func(
-                    "f(net)",
-                    net,
-                    x -> getActivationFunction().f(x),
-                    value
-            );
-        }
+        func(
+                "f(net)",
+                net,
+                x -> getActivationFunction().f(x),
+                value
+        );
     }
 
     public FieldFunction getNetOuterGradient() {
