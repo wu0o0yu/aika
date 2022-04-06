@@ -90,7 +90,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
             }
         }
 
-        if (getSynapse().isAllowTraining()) {
+        if (getSynapse().isAllowTraining() && input != null) {
             if (input.ownOutputGradient != null)
                 input.ownOutputGradient.addFieldListener("ownUpdateWeight", (l, u) ->
                         updateWeight(u)

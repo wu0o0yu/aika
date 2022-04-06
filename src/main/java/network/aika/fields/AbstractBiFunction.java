@@ -43,6 +43,12 @@ public abstract class AbstractBiFunction extends FieldListener implements FieldO
         );
     }
 
+    private boolean isInitialized(int arg) {
+        FieldOutput in = arg == 1 ? in2 : in1;
+
+        return in != null && in.isInitialized();
+    }
+
     @Override
     public boolean isInitialized() {
         return in1 != null && in1.isInitialized() &&
@@ -61,7 +67,7 @@ public abstract class AbstractBiFunction extends FieldListener implements FieldO
     }
 
     public void triggerUpdate(int arg, double u) {
-        if(isInitialized())
+        if(isInitialized(arg))
             propagateUpdate(computeUpdate(arg, u));
     }
 
