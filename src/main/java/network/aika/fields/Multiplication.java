@@ -19,24 +19,27 @@ package network.aika.fields;
 /**
  * @author Lukas Molzberger
  */
-public class FieldConnect extends AbstractFunction {
+public class Multiplication extends AbstractBiFunction {
 
-    public FieldConnect(String label, FieldOutput in) {
-        super(label, in);
+    public Multiplication(String label, FieldOutput in1, FieldOutput in2) {
+        super(label, in1, in2);
+        registerInputListener();
     }
 
     @Override
     public double getCurrentValue() {
-        return input.getCurrentValue();
+        return FieldOutput.getCurrentValue(in1) * FieldOutput.getCurrentValue(in2);
     }
 
     @Override
-    protected double computeUpdate(double u) {
-        return u;
-    }
-
-    @Override
-    protected double applyFunction(double x) {
-        return x;
+    protected double computeUpdate(int arg, double u) {
+        switch (arg) {
+            case 1:
+                return u * FieldOutput.getCurrentValue(in2);
+            case 2:
+                return u * FieldOutput.getCurrentValue(in1);
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 }

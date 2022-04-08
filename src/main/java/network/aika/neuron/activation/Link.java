@@ -21,7 +21,6 @@ import network.aika.Thought;
 import network.aika.fields.ThresholdOperator;
 import network.aika.fields.AbstractBiFunction;
 import network.aika.fields.BiFunction;
-import network.aika.fields.FieldInput;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
@@ -33,7 +32,7 @@ import network.aika.steps.link.PropagateBindingSignal;
 import java.util.Comparator;
 
 import static network.aika.fields.ConstantField.ZERO;
-import static network.aika.fields.FieldUtils.*;
+import static network.aika.fields.Fields.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
 
@@ -66,43 +65,51 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
         init();
 
         if(input != null && output != null) {
-            onTransparent = threshold("onTransparent", 0.0, synapse.getWeight());
+            onTransparent = threshold(
+                    "onTransparent",
+                    0.0,
+                    mul("isFired * weight",
+                            synapse.getWeight(),
+                            input.isFired
+                    )
+            );
+            onTransparent.addEventListener("propagate binding signal", l ->
+                    PropagateBindingSignal.add(this)
+            );
 
             initWeightInput();
 
-            if (getConfig().isTrainingEnabled() && !isNegative()) {
-                igGradient = func("Information-Gain", input.net, output.net, (x1, x2) ->
-                                getRelativeSurprisal(
-                                        Sign.getSign(x1),
-                                        Sign.getSign(x2),
-                                        input.getAbsoluteRange()
-                                ),
-                        output.ownInputGradient
-                );
-
-                if(getSynapse().isAllowTraining())
-                    backPropGradient = mul(
-                            "oAct.ownOutputGradient * s.weight",
-                            output.ownOutputGradient,
-                            synapse.getWeight(),
-                            input.backpropInputGradient
-                    );
-            }
-        }
-
-        if (getSynapse().isAllowTraining() && input != null) {
-            if (input.ownOutputGradient != null)
-                input.ownOutputGradient.addFieldListener("ownUpdateWeight", (l, u) ->
-                        updateWeight(u)
-                );
-
-            if (input.backpropOutputGradient != null)
-                input.backpropOutputGradient.addFieldListener("backpropUpdateWeight", (l, u) ->
-                        updateWeight(u)
-                );
+            output.getIsFinal().addEventListener("init gradients", l -> {
+                if (getConfig().isTrainingEnabled() && !isNegative() && getSynapse().isAllowTraining()) {
+                    initGradients(input, output);
+                }
+            });
         }
 
         getThought().onLinkCreationEvent(this);
+    }
+
+    private void initGradients(I input, O output) {
+        if(isTemplate())
+            induce();
+
+        igGradient = func("Information-Gain", input.net, output.net, (x1, x2) ->
+                        getRelativeSurprisal(
+                                Sign.getSign(x1),
+                                Sign.getSign(x2),
+                                input.getAbsoluteRange()
+                        ),
+                output.ownInputGradient
+        );
+
+        backPropGradient = mul(
+                "oAct.ownOutputGradient * s.weight",
+                output.ownOutputGradient,
+                synapse.getWeight(),
+                input.backpropInputGradient
+        );
+
+        synapse.initWeightUpdate(this);
     }
 
     protected void initWeightInput() {
@@ -137,19 +144,6 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
 
     public FieldOutput getBackPropGradient() {
         return backPropGradient;
-    }
-
-    public void updateWeight(double g) {
-        double weightDelta = getConfig().getLearnRate() * g;
-        boolean oldWeightIsZero = synapse.isZero();
-
-        if(isTemplate())
-            induce();
-
-        synapse.updateWeight(this, weightDelta);
-
-        if (oldWeightIsZero && !synapse.isZero() && getInput().isFired())
-            PropagateBindingSignal.add(this);
     }
 
     @Override
@@ -213,9 +207,6 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
 
     public void induce() {
         assert isTemplate();
-
-        if(output.isTemplate())
-            output.induce();
 
         synapse = (S) synapse
                 .instantiateTemplate(

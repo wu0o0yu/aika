@@ -77,10 +77,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     }
 
     public void updateAllowPropagate() {
-        Collections.sort(
-                inputSynapses,
-                Comparator.<ConjunctiveSynapse>comparingDouble(s -> s.getSortingWeight())
-        );
+        sortInputSynapses();
 
         int countAP = 0;
         double sum = getBias().getCurrentValue();
@@ -98,5 +95,12 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
 
         if(countAP > 1)
             log.warn("countAP: " + countAP + " Activation merging not yet implemented.");
+    }
+
+    private void sortInputSynapses() {
+        Collections.sort(
+                inputSynapses,
+                Comparator.<ConjunctiveSynapse>comparingDouble(s -> s.getSortingWeight())
+        );
     }
 }

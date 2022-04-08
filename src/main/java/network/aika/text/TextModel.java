@@ -128,7 +128,7 @@ public class TextModel extends Model {
         s.getWeight().setAndTriggerUpdate(w);
         s.setAllowTraining(false);
 
-        relBN.getBias().add(-w);
+        relBN.getBias().receiveUpdate(-w);
         return s;
     }
 
@@ -142,7 +142,7 @@ public class TextModel extends Model {
         s.linkOutput();
         s.getWeight().setAndTriggerUpdate(w);
         s.setAllowTraining(false);
-        inRel.getBias().add(-w);
+        inRel.getBias().receiveUpdate(-w);
 
         return s;
     }

@@ -38,5 +38,4 @@ public abstract class ConjunctiveActivation<N extends Neuron> extends Activation
     public ConjunctiveActivation(int id, Thought t, N n) {
         super(id, t, n);
     }
-
 }

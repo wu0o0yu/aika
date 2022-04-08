@@ -23,12 +23,21 @@ import network.aika.utils.Utils;
  */
 public abstract class AbstractFunction extends FieldListener implements FieldOutput {
 
-    private FieldOutput input;
+    protected FieldOutput input;
     private String label;
 
     public AbstractFunction(String label, FieldOutput in) {
         this.input = in;
         this.label = label;
+    }
+
+    public void setInput(FieldOutput newInput) {
+        if(input != null) {
+
+        }
+
+        input = newInput;
+        registerInputListener();
     }
 
     protected void registerInputListener() {

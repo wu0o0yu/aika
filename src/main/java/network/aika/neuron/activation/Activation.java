@@ -33,7 +33,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.fields.FieldUtils.*;
+import static network.aika.fields.Fields.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 
 /**
@@ -57,8 +57,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected Field value = new Field(this, "value");
     protected FieldOutput finalValue;
     protected Field net = initNet();
+    protected FieldConnect biasConnect;
 
     protected FieldOutput isFired;
+    protected FieldOutput isFiredForWeight;
+    protected FieldOutput isFiredForBias;
+
     protected Field isFinal = new Field(this, "isFinal", 0.0);
 
     private FieldFunction entropy;
@@ -67,6 +71,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected Field backpropInputGradient;
     protected Field ownOutputGradient;
     protected Field backpropOutputGradient;
+    protected FieldOutput outputGradient;
 
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
@@ -87,13 +92,15 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
-        if(!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled())
-            initGradientFields();
+        isFinal.addEventListener("init gradients", label -> {
+            if (!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled())
+                initGradientFields();
+        });
 
         net.setPropagatePreCondition((cv, nv, u) ->
                 !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0)
         );
-        connect("bias", getNeuron().getBias(), net);
+        biasConnect = connect("bias", getNeuron().getBias(), net);
 
         isFired = threshold("isFired", 0.0, net);
 
@@ -107,7 +114,10 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 }
         );
 
-        FieldMultiplication onFinalFired = mul("isFinalFired", isFired, isFinal);
+        isFiredForWeight = func("(isFired * 2) - 1", isFired, x -> (x * 2.0) - 1.0);
+        isFiredForBias = func("(isFired * -1) + 1", isFired, x -> (x * -1.0) + 1.0);
+
+        Multiplication onFinalFired = mul("isFinalFired", isFired, isFinal);
         onFinalFired.addEventListener("isFinalFired", label -> {
                     Propagate.add(this, true, "", s -> true);
                     InactiveLinks.add(this);
@@ -134,10 +144,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     protected void initGradientFields() {
-        commonInitGradientFields();
-    }
+        if(isTemplate())
+            induce();
 
-    protected void commonInitGradientFields() {
         ownInputGradient = new QueueField(this, "Own-Input-Gradient");
         backpropInputGradient = new QueueField(this, "Backprop-Input-Gradient");
         ownOutputGradient = new QueueField(this, "Own-Output-Gradient");
@@ -172,12 +181,16 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 backpropOutputGradient
         );
 
-        ownOutputGradient.addFieldListener("own-update-bias", (l, g) ->
-                getNeuron().getBias().addAndTriggerUpdate(getConfig().getLearnRate() * g)
+        outputGradient = add(
+                "ownOG + backpropOG",
+                ownOutputGradient,
+                backpropOutputGradient
         );
 
-        backpropOutputGradient.addFieldListener("backprop-update-bias", (l, g) ->
-                getNeuron().getBias().addAndTriggerUpdate(getConfig().getLearnRate() * g)
+        scale("learn-rate * og",
+                getConfig().getLearnRate(),
+                outputGradient,
+                getNeuron().getBias()
         );
     }
 
@@ -186,6 +199,14 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public FieldOutput getIsFired() {
         return isFired;
+    }
+
+    public FieldOutput getIsFiredForWeight() {
+        return isFiredForWeight;
+    }
+
+    public FieldOutput getIsFiredForBias() {
+        return isFiredForBias;
     }
 
     public Field getIsFinal() {
@@ -232,6 +253,10 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return backpropOutputGradient;
     }
 
+    public FieldOutput getOutputGradient() {
+        return outputGradient;
+    }
+
     public int getId() {
         return id;
     }
@@ -271,11 +296,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     public void induce() {
         assert isTemplate();
 
-        unlink();
+
         neuron = (N) neuron.instantiateTemplate(true);
         neuron.setLabel(getConfig().getLabel(this));
-
-        link();
     }
 
     public Thought getThought() {

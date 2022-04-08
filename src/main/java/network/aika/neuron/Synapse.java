@@ -57,9 +57,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     protected S template;
     private TemplateSynapseInfo templateInfo;
 
-    protected Field weight = new Field(this, "weight", (l, u) ->
-            weightUpdate(u)
-    );
+    protected Field weight = new Field(this, "weight", (l, u) -> {
+        PostTraining.add(getOutput());
+        setModified();
+    });
 
     protected SampleSpace sampleSpace = new SampleSpace();
 
@@ -184,7 +185,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         weight.setAndTriggerUpdate(w);
     }
 
-    public abstract void updateWeight(L l, double delta);
+    public abstract void initWeightUpdate(L l);
 
     public boolean isAllowTraining() {
         return allowTraining;
@@ -383,11 +384,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
     public boolean isNegative() {
         return weight.getCurrentValue() < 0.0;
-    }
-
-    protected void weightUpdate(double u) {
-        PostTraining.add(getOutput());
-        setModified();
     }
 
     @Override

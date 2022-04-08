@@ -22,9 +22,10 @@ import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 
-import java.util.Collections;
 import java.util.List;
 
+import static network.aika.fields.Fields.mul;
+import static network.aika.fields.Fields.scale;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
 
@@ -50,10 +51,13 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     }
 
     @Override
-    public void updateWeight(NegativeFeedbackLink l, double delta) {
-        if(l.getInput().isFired() && l.isSelfRef()) {
-            weight.addAndTriggerUpdate(-delta);
-        }
+    public void initWeightUpdate(NegativeFeedbackLink l) {
+        mul(
+                "weight update",
+                l.getInput().getIsFired(),
+                scale("-1 * og", -1, l.getOutput().getOutputGradient()),
+                weight
+        );
     }
 
     @Override
@@ -68,11 +72,6 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     @Override
     public boolean isRecurrent() {
         return true;
-    }
-
-    @Override
-    protected void checkConstraints() {
-        assert isNegative();
     }
 
     @Override

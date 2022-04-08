@@ -102,7 +102,7 @@ public class Field extends FieldListener implements FieldInterface, Writable {
     }
 
     @Override
-    public boolean add(double u) {
+    public boolean receiveUpdate(double u) {
         if(update == null)
             update = u;
         else

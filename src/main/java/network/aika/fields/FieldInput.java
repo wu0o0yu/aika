@@ -27,7 +27,7 @@ public interface FieldInput {
 
     boolean set(double v);
 
-    boolean add(double u);
+    boolean receiveUpdate(double u);
 
     default void setAndTriggerUpdate(double v) {
         if(set(v))
@@ -35,7 +35,7 @@ public interface FieldInput {
     }
 
     default void addAndTriggerUpdate(double u) {
-        if(add(u))
+        if(receiveUpdate(u))
             triggerUpdate();
     }
 }

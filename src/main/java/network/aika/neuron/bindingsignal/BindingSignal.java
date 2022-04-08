@@ -23,10 +23,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.steps.activation.Linking;
 
-import java.util.Collection;
-import java.util.stream.Stream;
-
-import static network.aika.fields.FieldUtils.mul;
+import static network.aika.fields.Fields.mul;
 import static network.aika.steps.LinkingOrder.POST_FIRED;
 import static network.aika.steps.LinkingOrder.PRE_FIRED;
 

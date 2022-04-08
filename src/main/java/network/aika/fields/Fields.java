@@ -22,31 +22,44 @@ import java.util.function.DoubleFunction;
 /**
  * @author Lukas Molzberger
  */
-public class FieldUtils {
+public class Fields {
 
-    public static FieldMultiplication mul(String label, FieldOutput in1, FieldOutput in2) {
+    public static Addition add(String label, FieldOutput in1, FieldOutput in2) {
         if(in1 == null || in2 == null)
             return null;
 
-        return new FieldMultiplication(label, in1, in2);
+        return new Addition(label, in1, in2);
     }
 
-    public static FieldMultiplication mul(String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
-        FieldMultiplication func = mul(label, in1, in2);
-        func.addFieldsAsAdditiveReceivers(out);
+    public static Addition add(String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
+        Addition func = add(label, in1, in2);
+        func.addReceivers(out);
         return func;
     }
 
-    public static FieldDivision div(String label, FieldOutput in1, FieldOutput in2) {
+    public static Multiplication mul(String label, FieldOutput in1, FieldOutput in2) {
         if(in1 == null || in2 == null)
             return null;
 
-        return new FieldDivision(label, in1, in2);
+        return new Multiplication(label, in1, in2);
     }
 
-    public static FieldDivision div(String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
-        FieldDivision func = div(label, in1, in2);
-        func.addFieldsAsAdditiveReceivers(out);
+    public static Multiplication mul(String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
+        Multiplication func = mul(label, in1, in2);
+        func.addReceivers(out);
+        return func;
+    }
+
+    public static Division div(String label, FieldOutput in1, FieldOutput in2) {
+        if(in1 == null || in2 == null)
+            return null;
+
+        return new Division(label, in1, in2);
+    }
+
+    public static Division div(String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
+        Division func = div(label, in1, in2);
+        func.addReceivers(out);
         return func;
     }
 
@@ -62,7 +75,7 @@ public class FieldUtils {
             return null;
 
         FieldFunction func = func(label, in, f);
-        func.addFieldsAsAdditiveReceivers(out);
+        func.addReceivers(out);
         return func;
     }
 
@@ -71,7 +84,7 @@ public class FieldUtils {
             return null;
 
         BiFunction func = new BiFunction(label, in1, in2, f);
-        func.addFieldsAsAdditiveReceivers(out);
+        func.addReceivers(out);
         return func;
     }
 
@@ -84,7 +97,7 @@ public class FieldUtils {
 
     public static FieldConnect connect(String label, FieldOutput in, FieldInput... out) {
         FieldConnect fieldConnect = connect(label, in);
-        fieldConnect.addFieldsAsAdditiveReceivers(out);
+        fieldConnect.addReceivers(out);
         return fieldConnect;
     }
 
@@ -97,7 +110,7 @@ public class FieldUtils {
 
     public static ThresholdOperator threshold(String label, double threshold, FieldOutput in, FieldInput... out) {
         ThresholdOperator threshOp = threshold(label, threshold, in, out);
-        threshOp.addFieldsAsAdditiveReceivers(out);
+        threshOp.addReceivers(out);
         return threshOp;
     }
 
@@ -106,5 +119,18 @@ public class FieldUtils {
             return null;
 
         return new InvertFunction(label, in);
+    }
+
+    public static ScaleFunction scale(String label, double scale, FieldOutput in) {
+        if(in == null)
+            return null;
+
+        return new ScaleFunction(label, scale, in);
+    }
+
+    public static ScaleFunction scale(String label, double scale, FieldOutput in, FieldInput... out) {
+        ScaleFunction scaleFunc = scale(label, scale, in);
+        scaleFunc.addReceivers(out);
+        return scaleFunc;
     }
 }

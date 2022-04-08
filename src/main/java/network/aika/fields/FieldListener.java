@@ -33,7 +33,7 @@ public abstract class FieldListener {
 
     public abstract void propagateInitialValue(FieldUpdateEvent listener);
 
-    public void addFieldsAsAdditiveReceivers(FieldInput... out) {
+    public void addReceivers(FieldInput... out) {
         for(FieldInput o : out) {
             assert o != this;
 

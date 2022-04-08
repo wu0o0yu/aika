@@ -19,9 +19,9 @@ package network.aika.fields;
 /**
  * @author Lukas Molzberger
  */
-public class FieldDivision extends AbstractBiFunction {
+public class Division extends AbstractBiFunction {
 
-    public FieldDivision(String label, FieldOutput in1, FieldOutput in2) {
+    public Division(String label, FieldOutput in1, FieldOutput in2) {
         super(label, in1, in2);
         registerInputListener();
     }

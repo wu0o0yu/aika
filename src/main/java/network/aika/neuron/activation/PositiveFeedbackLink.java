@@ -19,7 +19,7 @@ package network.aika.neuron.activation;
 import network.aika.fields.AbstractBiFunction;
 import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 
-import static network.aika.fields.FieldUtils.mul;
+import static network.aika.fields.Fields.mul;
 
 /**
  *

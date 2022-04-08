@@ -19,24 +19,38 @@ package network.aika.fields;
 /**
  * @author Lukas Molzberger
  */
-public class FieldConnect extends AbstractFunction {
+public class LimitedField extends Field {
 
-    public FieldConnect(String label, FieldOutput in) {
-        super(label, in);
+    private double limit;
+
+    public LimitedField(Object refObj, String label, double limit) {
+        super(refObj, label);
+        this.limit = limit;
+    }
+
+    public LimitedField(Object refObj, String label, double limit, double initialValue) {
+        super(refObj, label, initialValue);
+        this.limit = limit;
+    }
+
+    public LimitedField(Object refObj, String label, double limit, FieldUpdateEvent fieldListener) {
+        super(refObj, label, fieldListener);
+        this.limit = limit;
     }
 
     @Override
-    public double getCurrentValue() {
-        return input.getCurrentValue();
+    public boolean set(double v) {
+        return super.set(getLimitedValue(v));
     }
 
     @Override
-    protected double computeUpdate(double u) {
-        return u;
+    public boolean receiveUpdate(double u) {
+        double cv = isInitialized() ? getCurrentValue() : 0.0;
+        double nv = getLimitedValue(cv + u);
+        return super.receiveUpdate(nv - cv);
     }
 
-    @Override
-    protected double applyFunction(double x) {
-        return x;
+    private double getLimitedValue(double nv) {
+        return Math.max(limit, nv);
     }
 }

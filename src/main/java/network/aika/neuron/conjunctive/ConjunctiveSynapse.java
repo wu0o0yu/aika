@@ -18,19 +18,17 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.SampleSpace;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.axons.Axon;
-import network.aika.sign.Sign;
-import network.aika.steps.activation.PostTraining;
-import network.aika.utils.Bound;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+
+import static network.aika.fields.Fields.mul;
 
 /**
  *
@@ -57,26 +55,20 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     @Override
-    public void updateWeight(L l, double delta) {
-        if(l.getInput().isFired()) {
-            weight.addAndTriggerUpdate(delta);
-        } else {
-            weight.addAndTriggerUpdate(-delta);
-            updateBias(delta);
+    public void initWeightUpdate(L l) {
+        mul(
+                "weight update",
+                l.getInput().getIsFiredForWeight(),
+                l.getOutput().getOutputGradient(),
+                weight
+        );
 
-            if(delta < 0.0)
-                PostTraining.add(l.getSynapse().getOutput());
-        }
-
-        checkConstraints();
-    }
-
-    private void updateBias(double delta) {
-        getOutput().getBias().addAndTriggerUpdate(delta);
-    }
-
-    protected void checkConstraints() {
-        assert !isNegative();
+        mul(
+                "bias update",
+                l.getInput().getIsFiredForBias(),
+                l.getOutput().getOutputGradient(),
+                output.getNeuron().getBias()
+        );
     }
 
     @Override

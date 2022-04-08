@@ -27,6 +27,8 @@ import network.aika.neuron.bindingsignal.Transition;
 import java.util.Collections;
 import java.util.List;
 
+import static network.aika.fields.Fields.mul;
+
 /**
  *
  * @author Lukas Molzberger
@@ -47,11 +49,13 @@ public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends
     }
 
     @Override
-    public void updateWeight(L l, double delta) {
-        if(!l.getInput().isFired())
-            return;
-
-        weight.addAndTriggerUpdate(delta);
+    public void initWeightUpdate(L l) {
+        mul(
+                "weight update",
+                l.getInput().getIsFired(),
+                l.getOutput().getOutputGradient(),
+                weight
+        );
     }
 
     @Override

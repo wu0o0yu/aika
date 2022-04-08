@@ -19,6 +19,7 @@ package network.aika.neuron;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.direction.Direction;
+import network.aika.fields.LimitedField;
 import network.aika.neuron.activation.Activation;
 import network.aika.fields.Field;
 import network.aika.sign.Sign;
@@ -54,9 +55,10 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Writable customData;
 
-    protected Field bias = new Field(this, "bias", (l, u) ->
-        biasUpdate(u)
-    );
+    protected Field bias = new LimitedField(this, "bias", 0.0, (l, u) -> {
+        PostTraining.add(this);
+        setModified();
+    });
 
     protected List<S> inputSynapses = new ArrayList<>();
     protected List<Synapse> outputSynapses = new ArrayList<>();
@@ -164,12 +166,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public Set<Neuron> getTemplateGroup() {
         return getTemplate().getTemplateInfo().getTemplateGroup();
-    }
-
-
-    protected void biasUpdate(double u) {
-        PostTraining.add(this);
-        setModified();
     }
 
     public double getCandidateGradient(Activation act) {
@@ -309,11 +305,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public boolean isModified() {
         return modified;
-    }
-
-    public void limitBias() {
-        if(bias.getCurrentValue() > 0.0)
-            bias.setAndTriggerUpdate(0.0);
     }
 
     public Field getBias() {

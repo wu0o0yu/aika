@@ -19,27 +19,18 @@ package network.aika.fields;
 /**
  * @author Lukas Molzberger
  */
-public class FieldMultiplication extends AbstractBiFunction {
+public class ScaleFunction extends AbstractFunction {
 
-    public FieldMultiplication(String label, FieldOutput in1, FieldOutput in2) {
-        super(label, in1, in2);
+    private double scale;
+
+    public ScaleFunction(String label, double scale, FieldOutput in) {
+        super(label, in);
+        this.scale = scale;
         registerInputListener();
     }
 
     @Override
-    public double getCurrentValue() {
-        return FieldOutput.getCurrentValue(in1) * FieldOutput.getCurrentValue(in2);
-    }
-
-    @Override
-    protected double computeUpdate(int arg, double u) {
-        switch (arg) {
-            case 1:
-                return u * FieldOutput.getCurrentValue(in2);
-            case 2:
-                return u * FieldOutput.getCurrentValue(in1);
-            default:
-                throw new IllegalArgumentException();
-        }
+    protected double applyFunction(double x) {
+        return scale * x;
     }
 }
