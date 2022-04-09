@@ -114,8 +114,8 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
         if(!bs.isOrigin() && bs.getState() == State.BRANCH && mainBranch != null) {
             BindingActivation bAct = (BindingActivation) bs.getOriginActivation();
-            bs.getOnArrived().addEventListener("link conflicting branches", label ->
-                bAct.expNet.addReceivers(mainBranch.bpNorm)
+            bs.getOnArrived().addEventListener(() ->
+                connect(bAct.expNet, mainBranch.bpNorm)
             );
         }
 
@@ -127,17 +127,17 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 )
         );
 
-        bs.getOnArrivedBoundFired().addEventListener("onArrivedBoundFired", label ->
+        bs.getOnArrivedBoundFired().addEventListener(() ->
                 Linking.add(this, bs, POST_FIRED)
         );
 
-        bs.getOnArrivedFired().addEventListener("onArrivedFired", label ->
+        bs.getOnArrivedFired().addEventListener(() ->
                 Linking.addUnboundLinking(this, bs)
         );
 
         if(bs.getState() == SAME) {
             bound = bs;
-            connect("isBound", bs.getOnArrived(), isBound);
+            connect(bs.getOnArrived(), isBound);
         }
     }
 
@@ -244,7 +244,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     public void updateBias(double u) {
-        getNet().addAndTriggerUpdate(u);
+        getNet().receiveUpdate(0, u);
     }
 
     public BindingActivation getMainBranch() {

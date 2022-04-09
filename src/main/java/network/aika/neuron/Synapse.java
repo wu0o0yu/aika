@@ -57,7 +57,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     protected S template;
     private TemplateSynapseInfo templateInfo;
 
-    protected Field weight = new Field(this, "weight", (l, u) -> {
+    protected Field weight = new Field(this, "weight", () -> {
         PostTraining.add(getOutput());
         setModified();
     });
@@ -177,12 +177,12 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     public abstract L createLink(IA input, OA output);
 
     protected void initFromTemplate(S s) {
-        s.weight.setAndTriggerUpdate(weight.getCurrentValue());
+        s.weight.set(weight.getCurrentValue());
         s.template = this;
     }
 
     public void setWeight(double w) {
-        weight.setAndTriggerUpdate(w);
+        weight.set(w);
     }
 
     public abstract void initWeightUpdate(L l);

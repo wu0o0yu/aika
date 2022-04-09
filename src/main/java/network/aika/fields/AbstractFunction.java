@@ -21,29 +21,21 @@ import network.aika.utils.Utils;
 /**
  * @author Lukas Molzberger
  */
-public abstract class AbstractFunction extends FieldListener implements FieldOutput {
+public abstract class AbstractFunction extends FieldNode implements FieldInput, FieldOutput {
 
-    protected FieldOutput input;
+    protected FieldLink input;
     private String label;
 
-    public AbstractFunction(String label, FieldOutput in) {
-        this.input = in;
+    public AbstractFunction(String label) {
         this.label = label;
     }
 
-    public void setInput(FieldOutput newInput) {
-        if(input != null) {
-
-        }
-
-        input = newInput;
-        registerInputListener();
+    public void addInput(FieldLink in) {
+        this.input = in;
     }
 
-    protected void registerInputListener() {
-        this.input.addFieldListener("in", (l, u) ->
-                propagateUpdate(computeUpdate(u))
-        );
+    public void removeInput(FieldLink l) {
+        this.input = null;
     }
 
     @Override
@@ -53,30 +45,29 @@ public abstract class AbstractFunction extends FieldListener implements FieldOut
 
     @Override
     public boolean isInitialized() {
-        return input.isInitialized();
-    }
-
-    @Override
-    public void propagateInitialValue(FieldUpdateEvent listener) {
-        if(isInitialized())
-            propagateUpdate(listener, getCurrentValue());
+        return input.getInput().isInitialized();
     }
 
     @Override
     public double getCurrentValue() {
-        return applyFunction(input.getCurrentValue());
+        return applyFunction(input.getInput().getCurrentValue());
     }
 
     protected abstract double applyFunction(double x);
 
+    public void receiveUpdate(int arg, double u) {
+        if(isInitialized())
+            propagateUpdate(computeUpdate(u));
+    }
+
     protected double computeUpdate(double u) {
-        return input.isInitialized() ?
+        return input.getInput().isInitialized() ?
                 computeNewValue(u) - getCurrentValue() :
                 computeNewValue(u);
     }
 
     private double computeNewValue(double u) {
-        return applyFunction(input.getCurrentValue() + u);
+        return applyFunction(input.getInput().getCurrentValue() + u);
     }
 
     @Override

@@ -19,7 +19,33 @@ package network.aika.fields;
 /**
  * @author Lukas Molzberger
  */
-public interface FieldUpdateEvent {
+public class FieldLink {
 
-    void updated(String receiverLabel, double u);
+    private FieldOutput input;
+    private int arg;
+    private UpdateListener output;
+
+    public FieldLink(FieldOutput input, int arg, UpdateListener output) {
+        this.input = input;
+        this.arg = arg;
+        this.output = output;
+    }
+
+    public int getArgument() {
+        return arg;
+    }
+
+    public FieldOutput getInput() {
+        return input;
+    }
+
+    public UpdateListener getOutput() {
+        return output;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        FieldLink fLink = (FieldLink) o;
+        return arg == fLink.arg && output.equals(fLink.output);
+    }
 }

@@ -60,9 +60,4 @@ public class PositiveFeedbackLink<IA extends Activation> extends BindingNeuronLi
     public AbstractBiFunction getFeedbackBiasInput() {
         return feedbackBiasInput;
     }
-
-    public void setFinalMode() {
-        output.updateBias(synapse.getFeedbackBias().getCurrentValue());
-        output.getNet().addAndTriggerUpdate(synapse.getFeedbackWeight().getCurrentValue());
-    }
 }

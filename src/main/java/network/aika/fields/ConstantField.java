@@ -19,7 +19,7 @@ package network.aika.fields;
 /**
  * @author Lukas Molzberger
  */
-public class ConstantField extends FieldListener implements FieldOutput {
+public class ConstantField extends FieldNode implements FieldOutput {
 
     public static final ConstantField ZERO = new ConstantField("ZERO", 0.0);
     public static final ConstantField ONE = new ConstantField("ONE", 1.0);
@@ -40,11 +40,6 @@ public class ConstantField extends FieldListener implements FieldOutput {
     @Override
     public boolean isInitialized() {
         return true;
-    }
-
-    @Override
-    public void propagateInitialValue(FieldUpdateEvent listener) {
-        propagateUpdate(listener, getCurrentValue());
     }
 
     @Override

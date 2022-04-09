@@ -25,15 +25,14 @@ public class BiFunction extends AbstractBiFunction {
 
     private DoubleBinaryOperator function;
 
-    public BiFunction(String label, FieldOutput in1, FieldOutput in2, DoubleBinaryOperator f) {
-        super(label, in1, in2);
+    public BiFunction(String label, DoubleBinaryOperator f) {
+        super(label);
         this.function = f;
-        registerInputListener();
     }
 
     @Override
     public double getCurrentValue() {
-        return function.applyAsDouble(in1.getCurrentValue(), in2.getCurrentValue());
+        return function.applyAsDouble(in1.getInput().getCurrentValue(), in2.getInput().getCurrentValue());
     }
 
     @Override

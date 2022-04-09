@@ -44,7 +44,7 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     protected void initFields() {
         super.initFields();
 
-        isFinal.addEventListener("onFinal", label ->
+        isFinal.addEventListener(() ->
                 outputLinks.values().forEach(l ->
                         l.setFinalMode()
                 )
@@ -54,7 +54,7 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     @Override
     public void initBSFields(BindingSignal bs) {
         if(!getNeuron().isNetworkInput() && bs.getState() == State.BRANCH) {
-            bs.getOnArrived().addEventListener("", label ->
+            bs.getOnArrived().addEventListener(() ->
                     Linking.addPosFeedback(this, bs)
             );
         }

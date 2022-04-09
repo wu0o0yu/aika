@@ -25,10 +25,9 @@ public class FieldFunction extends AbstractFunction {
 
     private DoubleFunction<Double> function;
 
-    public FieldFunction(String label, FieldOutput in, DoubleFunction<Double> f) {
-        super(label, in);
+    public FieldFunction(String label, DoubleFunction<Double> f) {
+        super(label);
         this.function = f;
-        registerInputListener();
     }
 
     @Override

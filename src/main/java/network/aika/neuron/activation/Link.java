@@ -73,13 +73,13 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
                             input.isFired
                     )
             );
-            onTransparent.addEventListener("propagate binding signal", l ->
+            onTransparent.addEventListener(() ->
                     PropagateBindingSignal.add(this)
             );
 
             initWeightInput();
 
-            output.getIsFinal().addEventListener("init gradients", l -> {
+            output.getIsFinal().addEventListener(() -> {
                 if (getConfig().isTrainingEnabled() && !isNegative() && getSynapse().isAllowTraining()) {
                     initGradients(input, output);
                 }

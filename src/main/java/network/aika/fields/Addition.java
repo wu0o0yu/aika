@@ -21,9 +21,8 @@ package network.aika.fields;
  */
 public class Addition extends AbstractBiFunction {
 
-    public Addition(String label, FieldOutput in1, FieldOutput in2) {
-        super(label, in1, in2);
-        registerInputListener();
+    public Addition(String label) {
+        super(label);
     }
 
     @Override

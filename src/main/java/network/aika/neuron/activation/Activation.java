@@ -57,7 +57,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected Field value = new Field(this, "value");
     protected FieldOutput finalValue;
     protected Field net = initNet();
-    protected FieldConnect biasConnect;
 
     protected FieldOutput isFired;
     protected FieldOutput isFiredForWeight;
@@ -92,7 +91,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
-        isFinal.addEventListener("init gradients", label -> {
+        isFinal.addEventListener(() -> {
             if (!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled())
                 initGradientFields();
         });
@@ -100,11 +99,11 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         net.setPropagatePreCondition((cv, nv, u) ->
                 !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0)
         );
-        biasConnect = connect("bias", getNeuron().getBias(), net);
+        connect(getNeuron().getBias(), net);
 
         isFired = threshold("isFired", 0.0, net);
 
-        isFired.addEventListener("isFired", label -> {
+        isFired.addEventListener(() -> {
                     fired = thought.getCurrentTimestamp();
 
                     Propagate.add(this, false, "", s -> true);
@@ -118,7 +117,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         isFiredForBias = func("(isFired * -1) + 1", isFired, x -> (x * -1.0) + 1.0);
 
         Multiplication onFinalFired = mul("isFinalFired", isFired, isFinal);
-        onFinalFired.addEventListener("isFinalFired", label -> {
+        onFinalFired.addEventListener(() -> {
                     Propagate.add(this, true, "", s -> true);
                     InactiveLinks.add(this);
                 }
@@ -340,7 +339,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void registerBindingSignal(BindingSignal bs) {
-        bs.getOnArrived().setAndTriggerUpdate(1.0);
+        bs.getOnArrived().set(1.0);
 
         bindingSignals.put(bs.getOriginActivation(), bs);
     }

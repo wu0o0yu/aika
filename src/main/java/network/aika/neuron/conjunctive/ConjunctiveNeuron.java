@@ -54,15 +54,6 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         super.initFromTemplate(n);
     }
 
-    /**
-     * If the complete bias exceeds the threshold of 0 by itself, the neuron would become constantly active. The training
-     * should account for that and reduce the bias back to a level, where the neuron can be blocked again by its input synapses.
-     */
-    public void limitBias() {
-        if(bias.getCurrentValue() > 0.0)
-            bias.setAndTriggerUpdate(0.0);
-    }
-
     public void addInactiveLinks(Activation act) {
         inputSynapses
                 .stream()

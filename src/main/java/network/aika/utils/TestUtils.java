@@ -108,7 +108,7 @@ public class TestUtils {
     }
 
     public static void updateBias(Neuron n, double bias) {
-        n.getBias().addAndTriggerUpdate(bias);
+        n.getBias().receiveUpdate(0, bias);
 
         n.updateAllowPropagate();
     }
@@ -120,9 +120,9 @@ public class TestUtils {
 
         s.linkInput();
         s.linkOutput();
-        s.getOutput().getBias().addAndTriggerUpdate(-weight);
-        s.getFeedbackWeight().setAndTriggerUpdate(feedbackWeight);
-        s.getFeedbackBias().addAndTriggerUpdate(-feedbackWeight);
+        s.getOutput().getBias().receiveUpdate(0, -weight);
+        s.getFeedbackWeight().receiveUpdate(0, feedbackWeight);
+        s.getFeedbackBias().receiveUpdate(0, -feedbackWeight);
         output.updateAllowPropagate();
         return s;
     }
@@ -136,7 +136,7 @@ public class TestUtils {
         if(output instanceof ConjunctiveNeuron) {
             s.linkOutput();
             if(weight > 0.0)
-                s.getOutput().getBias().addAndTriggerUpdate(-weight);
+                s.getOutput().getBias().receiveUpdate(0, -weight);
         }
 
         output.updateAllowPropagate();

@@ -21,5 +21,5 @@ package network.aika.fields;
  */
 public interface FieldOnTrueEvent {
 
-    void onTrue(String receiverLabel);
+    void onTrue();
 }

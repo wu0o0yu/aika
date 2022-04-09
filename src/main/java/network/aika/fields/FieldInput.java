@@ -19,23 +19,11 @@ package network.aika.fields;
 /**
  * @author Lukas Molzberger
  */
-public interface FieldInput {
+public interface FieldInput extends UpdateListener {
 
     String getLabel();
 
-    void triggerUpdate();
+    void addInput(FieldLink l);
 
-    boolean set(double v);
-
-    boolean receiveUpdate(double u);
-
-    default void setAndTriggerUpdate(double v) {
-        if(set(v))
-            triggerUpdate();
-    }
-
-    default void addAndTriggerUpdate(double u) {
-        if(receiveUpdate(u))
-            triggerUpdate();
-    }
+    void removeInput(FieldLink l);
 }

@@ -33,24 +33,24 @@ public class LimitedField extends Field {
         this.limit = limit;
     }
 
-    public LimitedField(Object refObj, String label, double limit, FieldUpdateEvent fieldListener) {
+    public LimitedField(Object refObj, String label, double limit, FieldOnTrueEvent fieldListener) {
         super(refObj, label, fieldListener);
         this.limit = limit;
     }
 
     @Override
-    public boolean set(double v) {
-        return super.set(getLimitedValue(v));
+    public void set(double v) {
+        super.set(getLimitedValue(v));
     }
 
     @Override
-    public boolean receiveUpdate(double u) {
+    public void receiveUpdate(int arg, double u) {
         double cv = isInitialized() ? getCurrentValue() : 0.0;
         double nv = getLimitedValue(cv + u);
-        return super.receiveUpdate(nv - cv);
+        super.receiveUpdate(arg, nv - cv);
     }
 
     private double getLimitedValue(double nv) {
-        return Math.max(limit, nv);
+        return Math.min(limit, nv);
     }
 }

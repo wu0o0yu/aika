@@ -23,10 +23,9 @@ public class ThresholdOperator extends AbstractFunction {
 
     private double threshold;
 
-    public ThresholdOperator(String label, double threshold, FieldOutput in) {
-        super(label, in);
+    public ThresholdOperator(String label, double threshold) {
+        super(label);
         this.threshold = threshold;
-        registerInputListener();
     }
 
     @Override

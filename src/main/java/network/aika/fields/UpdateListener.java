@@ -19,24 +19,7 @@ package network.aika.fields;
 /**
  * @author Lukas Molzberger
  */
-public class FieldConnect extends AbstractFunction {
+public interface UpdateListener {
 
-    public FieldConnect(String label, FieldOutput in) {
-        super(label, in);
-    }
-
-    @Override
-    public double getCurrentValue() {
-        return input.getCurrentValue();
-    }
-
-    @Override
-    protected double computeUpdate(double u) {
-        return u;
-    }
-
-    @Override
-    protected double applyFunction(double x) {
-        return x;
-    }
+    void receiveUpdate(int arg, double u);
 }

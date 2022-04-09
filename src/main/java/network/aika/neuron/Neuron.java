@@ -55,7 +55,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Writable customData;
 
-    protected Field bias = new LimitedField(this, "bias", 0.0, (l, u) -> {
+    protected Field bias = new LimitedField(this, "bias", 0.0, () -> {
         PostTraining.add(this);
         setModified();
     });
@@ -134,7 +134,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     protected void initFromTemplate(Neuron n) {
-        n.bias.setAndTriggerUpdate(bias.getCurrentValue());
+        n.bias.set(bias.getCurrentValue());
         n.template = this;
     }
 

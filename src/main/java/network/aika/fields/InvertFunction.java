@@ -22,9 +22,8 @@ package network.aika.fields;
  */
 public class InvertFunction extends AbstractFunction {
 
-    public InvertFunction(String label, FieldOutput in) {
-        super(label, in);
-        registerInputListener();
+    public InvertFunction(String label) {
+        super(label);
     }
 
     @Override

@@ -23,10 +23,9 @@ public class ScaleFunction extends AbstractFunction {
 
     private double scale;
 
-    public ScaleFunction(String label, double scale, FieldOutput in) {
-        super(label, in);
+    public ScaleFunction(String label, double scale) {
+        super(label);
         this.scale = scale;
-        registerInputListener();
     }
 
     @Override

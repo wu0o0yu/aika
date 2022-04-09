@@ -27,11 +27,13 @@ public interface FieldOutput {
 
     double getCurrentValue();
 
-    static double getCurrentValue(FieldOutput f) {
-        return f != null ? f.getCurrentValue() : 0.0;
+    static double getCurrentValue(FieldLink f) {
+        return f != null ? f.getInput().getCurrentValue() : 0.0;
     }
 
-    FieldUpdateEvent addFieldListener(String label, FieldUpdateEvent fieldListener);
+    void addOutput(FieldLink l);
 
-    void addEventListener(String label, FieldOnTrueEvent eventListener);
+    void removeOutput(FieldLink l);
+
+    void addEventListener(FieldOnTrueEvent eventListener);
 }

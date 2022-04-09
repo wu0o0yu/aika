@@ -49,8 +49,8 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     }
 
     protected void initFromTemplate(PositiveFeedbackSynapse s) {
-        s.feedbackWeight.setAndTriggerUpdate(feedbackWeight.getCurrentValue());
-        s.feedbackBias.setAndTriggerUpdate(feedbackBias.getCurrentValue());
+        s.feedbackWeight.set(feedbackWeight.getCurrentValue());
+        s.feedbackBias.set(feedbackBias.getCurrentValue());
         super.initFromTemplate(s);
     }
 

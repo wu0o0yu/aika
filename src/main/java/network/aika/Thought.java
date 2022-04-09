@@ -184,7 +184,7 @@ public abstract class Thought<M extends Model> {
     public void processFinalMode() {
         activationsById.values()
                 .forEach(act ->
-                        act.getIsFinal().setAndTriggerUpdate(1.0)
+                        act.getIsFinal().set(1.0)
                 );
 
         process(PROCESSING);

@@ -47,7 +47,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
 
     @Override
     public void setWeight(double w) {
-        weight.addAndTriggerUpdate(w);
+        weight.receiveUpdate(0, w);
     }
 
     @Override

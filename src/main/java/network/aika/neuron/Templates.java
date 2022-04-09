@@ -129,8 +129,8 @@ public class Templates {
                         5,
                         0.0
                 );
-        POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE.getFeedbackBias().setAndTriggerUpdate(0.0);
-        POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE.getFeedbackWeight().setAndTriggerUpdate(0.0);
+        POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE.getFeedbackBias().set(0.0);
+        POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE.getFeedbackWeight().set(0.0);
 
 
         POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE =
@@ -142,8 +142,8 @@ public class Templates {
                         5,
                         0.0
                 );
-        POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE.getFeedbackBias().setAndTriggerUpdate(0.0);
-        POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE.getFeedbackWeight().setAndTriggerUpdate(0.0);
+        POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE.getFeedbackBias().set(0.0);
+        POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE.getFeedbackWeight().set(0.0);
 
         NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE =
                 init(
@@ -204,7 +204,7 @@ public class Templates {
         np.setNeuron(n);
         n.setProvider(np);
         n.setLabel(label);
-        n.getBias().setAndTriggerUpdate(initialBias);
+        n.getBias().set(initialBias);
 
         TemplateNeuronInfo templateInfo = n.getTemplateInfo();
         templateInfo.setLabel(label);
@@ -213,7 +213,7 @@ public class Templates {
     private <S extends Synapse> S init(S ts, Neuron input, Neuron output, String templateLabel, int templateSynapseId, double initialWeight) {
         ts.setInput(input);
         ts.setOutput(output);
-        ts.getWeight().setAndTriggerUpdate(initialWeight);
+        ts.getWeight().set(initialWeight);
 
         TemplateSynapseInfo ti = ts.getTemplateInfo();
         ti.setLabel(templateLabel);

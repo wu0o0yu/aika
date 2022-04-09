@@ -21,9 +21,8 @@ package network.aika.fields;
  */
 public class Division extends AbstractBiFunction {
 
-    public Division(String label, FieldOutput in1, FieldOutput in2) {
-        super(label, in1, in2);
-        registerInputListener();
+    public Division(String label) {
+        super(label);
     }
 
     @Override

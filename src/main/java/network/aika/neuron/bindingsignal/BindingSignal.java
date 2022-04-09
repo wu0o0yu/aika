@@ -64,7 +64,7 @@ public class BindingSignal<A extends Activation> {
     }
 
     private void initFields() {
-        onArrived.addEventListener("onArrived", label -> {
+        onArrived.addEventListener(() -> {
             if (!activation.getNeuron().isNetworkInput()) {
                 Linking.add(activation, this, PRE_FIRED);
             }
@@ -76,7 +76,7 @@ public class BindingSignal<A extends Activation> {
                 onArrived
         );
 
-        onArrivedFired.addEventListener("onArrivedFired", label ->
+        onArrivedFired.addEventListener(() ->
                 Linking.add(activation, this, POST_FIRED)
         );
 

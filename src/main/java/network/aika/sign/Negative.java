@@ -17,6 +17,7 @@
 package network.aika.sign;
 
 import network.aika.fields.FieldOutput;
+import network.aika.fields.Fields;
 import network.aika.fields.InvertFunction;
 
 /**
@@ -31,7 +32,7 @@ public class Negative implements Sign {
 
     @Override
     public FieldOutput getValue(FieldOutput v) {
-        return new InvertFunction("neg", v);
+        return Fields.invert("neg", v);
     }
 
     @Override

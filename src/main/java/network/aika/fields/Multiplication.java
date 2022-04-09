@@ -21,9 +21,8 @@ package network.aika.fields;
  */
 public class Multiplication extends AbstractBiFunction {
 
-    public Multiplication(String label, FieldOutput in1, FieldOutput in2) {
-        super(label, in1, in2);
-        registerInputListener();
+    public Multiplication(String label) {
+        super(label);
     }
 
     @Override

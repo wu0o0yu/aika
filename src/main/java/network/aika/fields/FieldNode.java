@@ -1,0 +1,75 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package network.aika.fields;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author Lukas Molzberger
+ */
+public abstract class FieldNode implements FieldOutput {
+
+    private List<FieldLink> receivers = new ArrayList<>();
+
+    public abstract double getCurrentValue();
+
+    public abstract boolean isInitialized();
+
+    public void addInitialCurrentValue(int arg, UpdateListener listener) {
+        if(isInitialized())
+            propagateUpdate(arg, listener, getCurrentValue());
+    }
+
+    public void removeFinalCurrentValue(int arg, UpdateListener listener) {
+        if(isInitialized())
+            propagateUpdate(arg, listener, -getCurrentValue());
+    }
+
+    public void addOutput(FieldLink l) {
+        this.receivers.add(l);
+        addInitialCurrentValue(l.getArgument(), l.getOutput());
+    }
+
+    public void removeOutput(FieldLink l) {
+        this.receivers.remove(l);
+        removeFinalCurrentValue(l.getArgument(), l.getOutput());
+    }
+
+    public void addEventListener(FieldOnTrueEvent eventListener) {
+        addOutput(
+                new FieldLink(
+                        null,
+                        0,
+                        (arg, u) -> {
+                            if (u > 0.0)
+                                eventListener.onTrue();
+                        }
+                )
+        );
+    }
+
+    protected void propagateUpdate(double update) {
+        receivers.forEach(l ->
+                l.getOutput().receiveUpdate(l.getArgument(), update)
+        );
+    }
+
+    protected void propagateUpdate(int arg, UpdateListener listener, double update) {
+        listener.receiveUpdate(arg, update);
+    }
+}

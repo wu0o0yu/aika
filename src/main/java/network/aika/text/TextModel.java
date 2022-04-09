@@ -113,7 +113,7 @@ public class TextModel extends Model {
     private void initRelationNeuron(String label, BindingNeuron inRel) {
         inRel.setNetworkInput(true);
         inRel.setLabel(label);
-        inRel.getBias().addAndTriggerUpdate(4.0);
+        inRel.getBias().receiveUpdate(0, 4.0);
         inRel.setAllowTraining(false);
         inRel.updateAllowPropagate();
     }
@@ -125,10 +125,10 @@ public class TextModel extends Model {
         double w = 10.0;
 
         s.linkOutput();
-        s.getWeight().setAndTriggerUpdate(w);
+        s.getWeight().set(w);
         s.setAllowTraining(false);
 
-        relBN.getBias().receiveUpdate(-w);
+        relBN.getBias().receiveUpdate(0, -w);
         return s;
     }
 
@@ -140,9 +140,9 @@ public class TextModel extends Model {
 
         s.linkInput();
         s.linkOutput();
-        s.getWeight().setAndTriggerUpdate(w);
+        s.getWeight().set(w);
         s.setAllowTraining(false);
-        inRel.getBias().receiveUpdate(-w);
+        inRel.getBias().receiveUpdate(0, -w);
 
         return s;
     }
@@ -152,7 +152,7 @@ public class TextModel extends Model {
                 .instantiateTemplate(tokenNeuron, tokenCat);
 
         s.linkInput();
-        s.getWeight().setAndTriggerUpdate(2.0);
+        s.getWeight().set(2.0);
         s.setAllowTraining(false);
     }
 

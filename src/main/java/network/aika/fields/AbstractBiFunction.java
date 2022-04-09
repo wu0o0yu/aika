@@ -21,44 +21,43 @@ import network.aika.utils.Utils;
 /**
  * @author Lukas Molzberger
  */
-public abstract class AbstractBiFunction extends FieldListener implements FieldOutput {
-    protected FieldOutput in1;
-    protected FieldOutput in2;
+public abstract class AbstractBiFunction extends FieldNode implements FieldInput, FieldOutput {
+    protected FieldLink in1;
+    protected FieldLink in2;
 
     private String label;
 
-    public AbstractBiFunction(String label, FieldOutput in1, FieldOutput in2) {
+    public AbstractBiFunction(String label) {
         this.label = label;
-        this.in1 = in1;
-        this.in2 = in2;
     }
 
-    protected void registerInputListener() {
-        in1.addFieldListener("arg 1", (l, u) ->
-                triggerUpdate(1, u)
-        );
+    public void addInput(FieldLink l) {
+        if(l.getArgument() == 1) {
+            in1 = l;
+        } else {
+            in2 = l;
+        }
+    }
 
-        in2.addFieldListener("arg 2", (l, u) ->
-                triggerUpdate(2, u)
-        );
+    @Override
+    public void removeInput(FieldLink l) {
+        if(l.getArgument() == 1) {
+            in1 = null;
+        } else {
+            in2 = null;
+        }
     }
 
     private boolean isInitialized(int arg) {
-        FieldOutput in = arg == 1 ? in2 : in1;
+        FieldLink in = arg == 1 ? in2 : in1;
 
-        return in != null && in.isInitialized();
+        return in != null && in.getInput().isInitialized();
     }
 
     @Override
     public boolean isInitialized() {
-        return in1 != null && in1.isInitialized() &&
-                in2 != null && in2.isInitialized();
-    }
-
-    @Override
-    public void propagateInitialValue(FieldUpdateEvent listener) {
-        if(isInitialized())
-            propagateUpdate(listener, getCurrentValue());
+        return in1 != null && in1.getInput().isInitialized() &&
+                in2 != null && in2.getInput().isInitialized();
     }
 
     @Override
@@ -66,7 +65,7 @@ public abstract class AbstractBiFunction extends FieldListener implements FieldO
         return label;
     }
 
-    public void triggerUpdate(int arg, double u) {
+    public void receiveUpdate(int arg, double u) {
         if(isInitialized(arg))
             propagateUpdate(computeUpdate(arg, u));
     }

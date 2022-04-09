@@ -17,7 +17,6 @@
 package network.aika.fields;
 
 import network.aika.Model;
-import network.aika.neuron.activation.BindingActivation;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import org.slf4j.Logger;
@@ -26,11 +25,13 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Lukas Molzberger
  */
-public class Field extends FieldListener implements FieldInterface, Writable {
+public class Field extends FieldNode implements IField, Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Field.class);
 
@@ -41,6 +42,8 @@ public class Field extends FieldListener implements FieldInterface, Writable {
     private String label;
 
     private PropagatePreCondition propagatePreCondition;
+
+    private List<FieldLink> inputs = new ArrayList<>();
 
     public Field(Object refObj, String label) {
         this.refObj = refObj;
@@ -54,9 +57,9 @@ public class Field extends FieldListener implements FieldInterface, Writable {
         currentValue = initialValue;
     }
 
-    public Field(Object refObj, String label, FieldUpdateEvent fieldListener) {
+    public Field(Object refObj, String label, FieldOnTrueEvent fieldListener) {
         this(refObj, label);
-        addFieldListener(label, fieldListener);
+        addEventListener(fieldListener);
     }
 
     public Object getRefObj() {
@@ -77,12 +80,6 @@ public class Field extends FieldListener implements FieldInterface, Writable {
     }
 
     @Override
-    public void propagateInitialValue(FieldUpdateEvent listener) {
-        if(isInitialized())
-            propagateUpdate(listener, getCurrentValue());
-    }
-
-    @Override
     public double getCurrentValue() {
         if(!isInitialized())
             throw new IllegalStateException("getCurrentValue was called on an uninitialized field");
@@ -90,31 +87,43 @@ public class Field extends FieldListener implements FieldInterface, Writable {
         return currentValue;
     }
 
-    @Override
-    public boolean set(double v) {
+    public void set(double v) {
         if(isInitialized()) {
             update = v - currentValue;
-            return propagatePreCondition.check(currentValue, v, v - currentValue);
+            if(!propagatePreCondition.check(currentValue, v, v - currentValue))
+                return;
         } else {
             update = v;
-            return true;
         }
+
+        triggerUpdate();
     }
 
     @Override
-    public boolean receiveUpdate(double u) {
+    public void receiveUpdate(int arg, double u) {
         if(update == null)
             update = u;
         else
             update += u;
 
-        return !isInitialized() || propagatePreCondition.check(
+        if(!isInitialized() || propagatePreCondition.check(
                 currentValue,
                 currentValue + update,
-                update);
+                update)) {
+            triggerUpdate();
+        }
     }
 
     @Override
+    public void addInput(FieldLink l) {
+        inputs.add(l);
+    }
+
+    @Override
+    public void removeInput(FieldLink l) {
+        inputs.remove(l);
+    }
+
     public void triggerUpdate() {
         triggerInternal();
     }
