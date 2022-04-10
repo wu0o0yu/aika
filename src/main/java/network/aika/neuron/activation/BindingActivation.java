@@ -287,4 +287,20 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     public boolean isMainBranch() {
         return mainBranch == null;
     }
+
+    public void disconnect() {
+        super.disconnect();
+
+        FieldOutput[] fields = new FieldOutput[]{
+                isBound,
+                branchProbability,
+                expNet,
+                bpNorm
+        };
+        for(FieldOutput f: fields) {
+            if(f == null)
+                continue;
+            f.disconnect();
+        }
+    }
 }

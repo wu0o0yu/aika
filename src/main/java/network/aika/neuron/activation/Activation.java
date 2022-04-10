@@ -62,7 +62,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected FieldOutput isFiredForWeight;
     protected FieldOutput isFiredForBias;
 
-    protected Field isFinal = new Field(this, "isFinal", 0.0);
+    protected Field isFinal;
 
     private FieldFunction entropy;
     protected FieldFunction netOuterGradient;
@@ -91,6 +91,11 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         this(id, n);
         this.thought = t;
 
+        inputLinks = new TreeMap<>();
+        outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
+
+        isFinal = new Field(this, "isFinal", isTemplate() ? 1.0 : 0.0);
+
         isFinal.addEventListener(() -> {
             if (!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled())
                 initGradientFields();
@@ -107,9 +112,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                     fired = thought.getCurrentTimestamp();
 
                     Propagate.add(this, false, "", s -> true);
-
-                    if (getConfig().isCountingEnabled())
-                        Counting.add(this);
+                    Counting.add(this);
                 }
         );
 
@@ -133,9 +136,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         thought.register(this);
         neuron.register(this);
-
-        inputLinks = new TreeMap<>();
-        outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
     }
 
     protected Field initNet() {
@@ -295,9 +295,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     public void induce() {
         assert isTemplate();
 
-
         neuron = (N) neuron.instantiateTemplate(true);
-        neuron.setLabel(getConfig().getLabel(this));
     }
 
     public Thought getThought() {
@@ -467,6 +465,31 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     public void unlink() {
         unlinkInputs();
         unlinkOutputs();
+    }
+
+    public void disconnect() {
+        FieldOutput[] fields = new FieldOutput[] {
+                net,
+                value,
+                finalValue,
+                isFired,
+                isFiredForWeight,
+                isFiredForBias,
+                isFinal,
+                entropy,
+                netOuterGradient,
+                ownInputGradient,
+                backpropInputGradient,
+                ownOutputGradient,
+                backpropOutputGradient,
+                outputGradient
+        };
+
+        for(FieldOutput f: fields) {
+            if(f == null)
+                continue;
+            f.disconnect();
+        }
     }
 
     public Stream<Link> getInputLinks() {

@@ -21,9 +21,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.axons.PatternAxon;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
@@ -41,12 +39,10 @@ public class TestUtils {
 
     public static Config getConfig() {
         return new Config() {
-            public String getLabel(Activation<?> act) {
+            public String getLabel(BindingSignal bs) {
+                Activation iAct = bs.getOriginActivation();
+                Activation act = bs.getActivation();
                 Neuron n = act.getNeuron();
-                Activation iAct = act.getInputLinks()
-                        .findFirst()
-                        .map(Link::getInput)
-                        .orElse(null);
 
                 if(n instanceof BindingNeuron) {
                     return "B-" + trimPrefix(iAct.getLabel());

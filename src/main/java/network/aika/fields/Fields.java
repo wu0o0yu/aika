@@ -31,7 +31,7 @@ public class Fields {
     public static void connect(FieldOutput in, int arg, FieldInput out) {
         FieldLink l = new FieldLink(in, arg, out);
         out.addInput(l);
-        in.addOutput(l);
+        in.addOutput(l, true);
     }
 
     private static void connectAll(FieldOutput in, FieldInput... out) {
@@ -51,7 +51,7 @@ public class Fields {
     public static void disconnect(FieldOutput in, int arg, FieldInput out) {
         FieldLink l = new FieldLink(in, arg, out);
         out.removeInput(l);
-        in.removeOutput(l);
+        in.removeOutput(l, false);
     }
 
     public static Addition add(String label, FieldOutput in1, FieldOutput in2) {

@@ -31,9 +31,11 @@ public interface FieldOutput {
         return f != null ? f.getInput().getCurrentValue() : 0.0;
     }
 
-    void addOutput(FieldLink l);
+    void addOutput(FieldLink l, boolean propagateInitValue);
 
-    void removeOutput(FieldLink l);
+    void removeOutput(FieldLink l, boolean propagateFinalValue);
 
     void addEventListener(FieldOnTrueEvent eventListener);
+
+    void disconnect();
 }

@@ -173,7 +173,7 @@ public class Templates {
                         INHIBITORY_TEMPLATE,
                         "Inhibitory Synapse",
                         8,
-                        0.0
+                        1.0
                 );
 
         CATEGORY_SYNAPSE_TEMPLATE =
@@ -206,7 +206,7 @@ public class Templates {
         n.setLabel(label);
         n.getBias().set(initialBias);
 
-        TemplateNeuronInfo templateInfo = n.getTemplateInfo();
+        TemplateNeuron templateInfo = n.getTemplateInfo();
         templateInfo.setLabel(label);
     }
 
@@ -215,7 +215,7 @@ public class Templates {
         ts.setOutput(output);
         ts.getWeight().set(initialWeight);
 
-        TemplateSynapseInfo ti = ts.getTemplateInfo();
+        TemplateSynapse ti = ts.getTemplateInfo();
         ti.setLabel(templateLabel);
         ti.setTemplateSynapseId((byte) templateSynapseId);
         templateSynapseIndex.put(ti.getTemplateSynapseId(), ts);

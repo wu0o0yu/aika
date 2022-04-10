@@ -55,7 +55,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     private boolean isOutputLinked;
 
     protected S template;
-    private TemplateSynapseInfo templateInfo;
+    private TemplateSynapse templateInfo;
 
     protected Field weight = new Field(this, "weight", () -> {
         PostTraining.add(getOutput());
@@ -205,10 +205,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return template;
     }
 
-    public TemplateSynapseInfo getTemplateInfo() {
+    public TemplateSynapse getTemplateInfo() {
         assert isTemplate();
         if (templateInfo == null) {
-            templateInfo = new TemplateSynapseInfo();
+            templateInfo = new TemplateSynapse();
         }
 
         return templateInfo;

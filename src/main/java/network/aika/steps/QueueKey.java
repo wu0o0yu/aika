@@ -30,18 +30,8 @@ public interface QueueKey {
     Comparator<QueueKey> COMPARATOR = Comparator
             .<QueueKey>comparingInt(k -> k.getPhase().ordinal())
             .thenComparing(k -> k.getFired())
-            .thenComparing(k -> k.getLinkingOrder());
-
-    Comparator<QueueKey> THOUGHT_COMPARATOR = COMPARATOR
+            .thenComparing(k -> k.getLinkingOrder())
             .thenComparing(k -> k.getTimestamp());
-
-    Comparator<QueueKey> ELEMENT_COMPARATOR = COMPARATOR
-            .thenComparing(k -> k.getStepName())  // Needed to check if the entry is already on the queue.
-            .thenComparing(k -> k.getCheckIfQueuedTimestamp());
-
-    default Timestamp getCheckIfQueuedTimestamp() {
-        return checkIfQueued() ? NOT_SET : getTimestamp();
-    }
 
     Phase getPhase();
 
@@ -52,6 +42,4 @@ public interface QueueKey {
     String getStepName();
 
     Timestamp getTimestamp();
-
-    boolean checkIfQueued();
 }

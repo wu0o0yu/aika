@@ -74,7 +74,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Neuron<?, ?> template;
 
-    private TemplateNeuronInfo templateInfo;
+    private TemplateNeuron templateInfo;
 
     private WeakHashMap<Long, SortedSet<A>> activations = new WeakHashMap<>();
 
@@ -124,10 +124,10 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return acts != null ? acts : Collections.emptyNavigableSet();
     }
 
-    public TemplateNeuronInfo getTemplateInfo() {
+    public TemplateNeuron getTemplateInfo() {
         assert isTemplate();
         if(templateInfo == null) {
-            templateInfo = new TemplateNeuronInfo();
+            templateInfo = new TemplateNeuron();
         }
 
         return templateInfo;
@@ -295,8 +295,10 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public void setModified() {
-        this.modified = true;
-        Save.add(this);
+        if(!modified)
+            Save.add(this);
+
+        modified = true;
     }
 
     public void resetModified() {

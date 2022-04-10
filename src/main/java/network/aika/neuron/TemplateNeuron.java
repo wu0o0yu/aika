@@ -22,7 +22,7 @@ import java.util.Set;
  *
  * @author Lukas Molzberger
  */
-public class TemplateNeuronInfo {
+public class TemplateNeuron {
 
     private String label;
     private Set<Neuron> templateGroup;

@@ -48,6 +48,19 @@ public abstract class AbstractBiFunction extends FieldNode implements FieldInput
         }
     }
 
+    @Override
+    public void disconnect() {
+        super.disconnect();
+        if(in1 != null) {
+            in1.getInput().removeOutput(in1, false);
+            in1 = null;
+        }
+        if(in2 != null) {
+            in2.getInput().removeOutput(in2, false);
+            in2 = null;
+        }
+    }
+
     private boolean isInitialized(int arg) {
         FieldLink in = arg == 1 ? in2 : in1;
 

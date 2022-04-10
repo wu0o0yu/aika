@@ -27,6 +27,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.WeakHashMap;
 
 /**
  * @author Lukas Molzberger
@@ -122,6 +123,14 @@ public class Field extends FieldNode implements IField, Writable {
     @Override
     public void removeInput(FieldLink l) {
         inputs.remove(l);
+    }
+
+    @Override
+    public void disconnect() {
+        super.disconnect();
+        inputs.stream()
+                .forEach(l -> l.getInput().removeOutput(l, false));
+        inputs.clear();
     }
 
     public void triggerUpdate() {

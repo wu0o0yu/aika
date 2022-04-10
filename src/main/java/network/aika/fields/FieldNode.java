@@ -40,16 +40,21 @@ public abstract class FieldNode implements FieldOutput {
             propagateUpdate(arg, listener, -getCurrentValue());
     }
 
-    public void addOutput(FieldLink l) {
+    @Override
+    public void addOutput(FieldLink l, boolean propagateInitValue) {
         this.receivers.add(l);
-        addInitialCurrentValue(l.getArgument(), l.getOutput());
+        if(propagateInitValue)
+            addInitialCurrentValue(l.getArgument(), l.getOutput());
     }
 
-    public void removeOutput(FieldLink l) {
+    @Override
+    public void removeOutput(FieldLink l, boolean propagateFinalValue) {
+        if(propagateFinalValue)
+            removeFinalCurrentValue(l.getArgument(), l.getOutput());
         this.receivers.remove(l);
-        removeFinalCurrentValue(l.getArgument(), l.getOutput());
     }
 
+    @Override
     public void addEventListener(FieldOnTrueEvent eventListener) {
         addOutput(
                 new FieldLink(
@@ -59,7 +64,8 @@ public abstract class FieldNode implements FieldOutput {
                             if (u > 0.0)
                                 eventListener.onTrue();
                         }
-                )
+                ),
+                true
         );
     }
 
@@ -71,5 +77,13 @@ public abstract class FieldNode implements FieldOutput {
 
     protected void propagateUpdate(int arg, UpdateListener listener, double update) {
         listener.receiveUpdate(arg, update);
+    }
+
+    @Override
+    public void disconnect() {
+        receivers.stream()
+                .filter(l -> l.getOutput() instanceof FieldInput)
+                .forEach(l -> ((FieldInput) l.getOutput()).removeInput(l));
+        receivers.clear();
     }
 }

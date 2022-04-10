@@ -20,7 +20,7 @@ package network.aika.neuron;
  *
  * @author Lukas Molzberger
  */
-public class TemplateSynapseInfo {
+public class TemplateSynapse {
 
     private byte templateSynapseId;
 

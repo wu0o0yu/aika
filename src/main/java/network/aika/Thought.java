@@ -50,7 +50,7 @@ public abstract class Thought<M extends Model> {
     private long timestampCounter = 0;
     private int activationIdCounter = 0;
 
-    private final NavigableMap<QueueKey, Step> queue = new TreeMap<>(QueueKey.THOUGHT_COMPARATOR);
+    private final NavigableMap<QueueKey, Step> queue = new TreeMap<>(QueueKey.COMPARATOR);
 
     private final TreeMap<Integer, Activation> activationsById = new TreeMap<>();
     private final Map<NeuronProvider, SortedSet<Activation<?>>> actsPerNeuron = new HashMap<>();
@@ -140,6 +140,7 @@ public abstract class Thought<M extends Model> {
     }
 
     public void addStep(Step s) {
+        s.setTimestamp(getNextTimestamp());
         queue.put(s, s);
     }
 
@@ -162,10 +163,7 @@ public abstract class Thought<M extends Model> {
                 break;
 
             Step s = queue.pollFirstEntry().getValue();
-
             timestampOnProcess = getCurrentTimestamp();
-
-            s.getElement().removeQueuedPhase(s);
 
             beforeProcessedEvent(s);
             s.process();
@@ -231,6 +229,12 @@ public abstract class Thought<M extends Model> {
 
     public int getNumberOfActivations() {
         return activationsById.size();
+    }
+
+    public void disconnect() {
+        getActivations().forEach(act ->
+                act.disconnect()
+        );
     }
 
     public String toString() {

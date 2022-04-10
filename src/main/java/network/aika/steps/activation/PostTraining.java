@@ -16,10 +16,9 @@
  */
 package network.aika.steps.activation;
 
-import network.aika.Thought;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.DummyActivation;
+import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
@@ -35,6 +34,14 @@ public class PostTraining extends Step<DummyActivation> {
 
     public static void add(Neuron n) {
         if(n.isTemplate())
+            return;
+
+        if(!(n instanceof ConjunctiveNeuron<?,?>))
+            return;
+
+        ConjunctiveNeuron cn = (ConjunctiveNeuron) n;
+
+        if(cn.getUpdateAllowPropagateIsQueued())
             return;
 
         Step.add(new PostTraining(new DummyActivation(n)));

@@ -38,6 +38,12 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
 
     private static final Logger log = LoggerFactory.getLogger(ConjunctiveNeuron.class);
 
+    private boolean updateAllowPropagateIsQueued;
+
+    public boolean getUpdateAllowPropagateIsQueued() {
+        return updateAllowPropagateIsQueued;
+    }
+
     public ConjunctiveNeuron() {
         super();
     }
@@ -48,6 +54,12 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
 
     public ConjunctiveNeuron(Model model, boolean addProvider) {
         super(model, addProvider);
+    }
+
+    @Override
+    public void setModified() {
+        super.setModified();
+        updateAllowPropagateIsQueued = true;
     }
 
     protected void initFromTemplate(ConjunctiveNeuron n) {
@@ -83,6 +95,8 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
             if(s.allowPropagate)
                 countAP++;
         }
+
+        updateAllowPropagateIsQueued = false;
 
         if(countAP > 1)
             log.warn("countAP: " + countAP + " Activation merging not yet implemented.");

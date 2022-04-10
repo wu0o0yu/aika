@@ -64,11 +64,19 @@ public class BindingSignal<A extends Activation> {
     }
 
     private void initFields() {
-        onArrived.addEventListener(() -> {
-            if (!activation.getNeuron().isNetworkInput()) {
-                Linking.add(activation, this, PRE_FIRED);
+        if (!activation.getNeuron().isNetworkInput()) {
+            onArrived.addEventListener(() ->
+                Linking.add(activation, this, PRE_FIRED)
+            );
+
+            if(state == State.INPUT && activation.getLabel() == null) {
+                onArrived.addEventListener(() ->
+                        activation.getNeuron().setLabel(
+                                activation.getConfig().getLabel(this)
+                        )
+                );
             }
-        });
+        }
 
         onArrivedFired = mul(
                 "onFired * onArrived",

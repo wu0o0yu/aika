@@ -16,6 +16,7 @@
  */
 package network.aika.steps;
 
+import network.aika.Thought;
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Timestamp;
 
@@ -49,16 +50,16 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
         return getClass().getSimpleName();
     }
 
-    public boolean checkIfQueued() {
-        return true;
-    }
-
     public abstract void process();
 
     public abstract Phase getPhase();
 
     public static void add(Step s) {
-        s.getElement().addToQueue(s);
+        Thought t = s.getElement().getThought();
+        if(t == null)
+            return;
+
+        t.addStep(s);
     }
 
     public Timestamp getFired() {

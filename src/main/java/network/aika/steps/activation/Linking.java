@@ -116,10 +116,6 @@ public class Linking extends Step<Activation> {
         return Phase.PROCESSING;
     }
 
-    public boolean checkIfQueued() {
-        return false;
-    }
-
     @Override
     public void process() {
         targetSynapses.forEach(ts ->
