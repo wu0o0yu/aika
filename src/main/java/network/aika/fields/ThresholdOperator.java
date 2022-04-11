@@ -21,15 +21,36 @@ package network.aika.fields;
  */
 public class ThresholdOperator extends AbstractFunction {
 
-    private double threshold;
+    public enum Type {
+        ABOVE,
+        BELOW,
+        ABOVE_ABS
+    }
 
-    public ThresholdOperator(String label, double threshold) {
+    private double threshold;
+    private Type type;
+
+    public ThresholdOperator(String label, double threshold, Type type) {
         super(label);
         this.threshold = threshold;
+        this.type = type;
     }
 
     @Override
     protected double applyFunction(double x) {
-        return x > threshold ? 1.0 : 0.0;
+        switch (type) {
+            case ABOVE:
+                return x > threshold ? 1.0 : 0.0;
+            case BELOW:
+                return x < threshold ? 1.0 : 0.0;
+            case ABOVE_ABS:
+                return Math.abs(x) > threshold ? 1.0 : 0.0;
+            default:
+                return 0.0;
+        }
+    }
+
+    public static boolean isTrue(FieldOutput f) {
+        return f != null && f.isInitialized() && f.getCurrentValue() > 0.5;
     }
 }

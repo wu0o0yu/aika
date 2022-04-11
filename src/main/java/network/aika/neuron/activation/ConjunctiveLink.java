@@ -16,14 +16,35 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.disjunctive.InhibitorySynapse;
+import network.aika.neuron.conjunctive.ConjunctiveSynapse;
+
+import static network.aika.fields.Fields.mul;
+
 
 /**
  * @author Lukas Molzberger
  */
-public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingActivation, InhibitoryActivation> {
+public class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends Activation, OA extends ConjunctiveActivation> extends Link<S, IA, OA> {
 
-    public InhibitoryLink(InhibitorySynapse s, BindingActivation input, InhibitoryActivation output) {
+
+    public ConjunctiveLink(S s, IA input, OA output) {
         super(s, input, output);
+    }
+
+    @Override
+    public void initWeightUpdate() {
+        mul(
+                "weight update",
+                getInput().getIsFiredForWeight(),
+                getOutput().getUpdateValue(),
+                synapse.getWeight()
+        );
+
+        mul(
+                "bias update",
+                getInput().getIsFiredForBias(),
+                getOutput().getUpdateValue(),
+                output.getNeuron().getBias()
+        );
     }
 }

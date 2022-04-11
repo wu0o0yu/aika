@@ -55,23 +55,6 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     @Override
-    public void initWeightUpdate(L l) {
-        mul(
-                "weight update",
-                l.getInput().getIsFiredForWeight(),
-                l.getOutput().getOutputGradient(),
-                weight
-        );
-
-        mul(
-                "bias update",
-                l.getInput().getIsFiredForBias(),
-                l.getOutput().getOutputGradient(),
-                output.getNeuron().getBias()
-        );
-    }
-
-    @Override
     public void setModified() {
         getOutput().setModified();
     }

@@ -49,16 +49,6 @@ public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends
     }
 
     @Override
-    public void initWeightUpdate(L l) {
-        mul(
-                "weight update",
-                l.getInput().getIsFired(),
-                l.getOutput().getOutputGradient(),
-                weight
-        );
-    }
-
-    @Override
     public void setModified() {
         getInput().setModified();
     }

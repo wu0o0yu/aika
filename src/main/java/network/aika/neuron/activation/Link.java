@@ -33,6 +33,7 @@ import java.util.Comparator;
 
 import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.Fields.*;
+import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
 
@@ -40,7 +41,7 @@ import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
  *
  * @author Lukas Molzberger
  */
-public class Link<S extends Synapse, I extends Activation, O extends Activation> extends Element<Link> {
+public abstract class Link<S extends Synapse, I extends Activation, O extends Activation> extends Element<Link> {
 
     public static final Comparator<Link> COMPARE = Comparator.
             <Link, Activation<?>>comparing(l -> l.output)
@@ -53,7 +54,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
 
     private BiFunction igGradient;
     private AbstractBiFunction weightedInput;
-    private AbstractBiFunction backPropGradient;
+    protected AbstractBiFunction backPropGradient;
 
     private ThresholdOperator onTransparent;
 
@@ -68,6 +69,7 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
             onTransparent = threshold(
                     "onTransparent",
                     0.0,
+                    ABOVE,
                     mul("isFired * weight",
                             synapse.getWeight(),
                             input.isFired
@@ -80,16 +82,15 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
             initWeightInput();
 
             output.getIsFinal().addEventListener(() -> {
-                if (getConfig().isTrainingEnabled() && !isNegative() && getSynapse().isAllowTraining()) {
-                    initGradients(input, output);
-                }
+                if (getConfig().isTrainingEnabled() && !isNegative() && getSynapse().isAllowTraining())
+                    initGradients();
             });
         }
 
         getThought().onLinkCreationEvent(this);
     }
 
-    private void initGradients(I input, O output) {
+    private void initGradients() {
         if(isTemplate())
             induce();
 
@@ -102,15 +103,21 @@ public class Link<S extends Synapse, I extends Activation, O extends Activation>
                 output.ownInputGradient
         );
 
+        initBackpropGradient();
+
+        initWeightUpdate();
+    }
+
+    protected void initBackpropGradient() {
         backPropGradient = mul(
                 "oAct.ownOutputGradient * s.weight",
                 output.ownOutputGradient,
                 synapse.getWeight(),
                 input.backpropInputGradient
         );
-
-        synapse.initWeightUpdate(this);
     }
+
+    public abstract void initWeightUpdate();
 
     protected void initWeightInput() {
         weightedInput = mul(

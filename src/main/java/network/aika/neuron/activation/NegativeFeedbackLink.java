@@ -18,6 +18,9 @@ package network.aika.neuron.activation;
 
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 
+import static network.aika.fields.Fields.mul;
+import static network.aika.fields.Fields.scale;
+
 /**
  * @author Lukas Molzberger
  */
@@ -38,5 +41,15 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
             return;
 
         super.initWeightInput();
+    }
+
+    @Override
+    public void initWeightUpdate() {
+        mul(
+                "weight update",
+                getInput().getIsFired(),
+                scale("-1 * og", -1, getOutput().getUpdateValue()),
+                synapse.getWeight()
+        );
     }
 }

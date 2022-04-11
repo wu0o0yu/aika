@@ -33,8 +33,8 @@ public class RelatedInputLink extends BindingNeuronLink<RelatedInputSynapse, Bin
     public double getRelativeSurprisal(Sign si, Sign so, Range range) {
         double s = super.getRelativeSurprisal(si, so, range);
 
-        s += input.getBoundPatternBindingSignal().getOriginActivation().getNeuron()
-                .getSurprisal(si, range, true);
+//        s += input.getBoundPatternBindingSignal().getOriginActivation().getNeuron()
+//                .getSurprisal(si, range, true);
         return s;
     }
 }

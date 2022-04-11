@@ -34,6 +34,8 @@ import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.fields.Fields.*;
+import static network.aika.fields.ThresholdOperator.Type.ABOVE;
+import static network.aika.fields.ThresholdOperator.Type.ABOVE_ABS;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 
 /**
@@ -71,6 +73,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected Field ownOutputGradient;
     protected Field backpropOutputGradient;
     protected FieldOutput outputGradient;
+    protected FieldOutput updateValue;
+    protected FieldOutput inductionThreshold;
 
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
@@ -106,7 +110,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         );
         connect(getNeuron().getBias(), net);
 
-        isFired = threshold("isFired", 0.0, net);
+        isFired = threshold("isFired", 0.0, ABOVE, net);
 
         isFired.addEventListener(() -> {
                     fired = thought.getCurrentTimestamp();
@@ -147,7 +151,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
             induce();
 
         ownInputGradient = new QueueField(this, "Own-Input-Gradient");
-        backpropInputGradient = new QueueField(this, "Backprop-Input-Gradient");
+        backpropInputGradient = new QueueField(this, "Backprop-Input-Gradient", 0.0);
         ownOutputGradient = new QueueField(this, "Own-Output-Gradient");
         backpropOutputGradient = new QueueField(this, "Backprop-Output-Gradient");
 
@@ -186,10 +190,18 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 backpropOutputGradient
         );
 
-        scale("learn-rate * og",
+        updateValue = scale(
+                "learn-rate * og",
                 getConfig().getLearnRate(),
-                outputGradient,
-                getNeuron().getBias()
+                outputGradient
+        );
+        connect(updateValue, getNeuron().getBias());
+
+        inductionThreshold = threshold(
+                "induction threshold",
+                getConfig().getInductionThreshold(),
+                ABOVE_ABS,
+                outputGradient
         );
     }
 
@@ -254,6 +266,14 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public FieldOutput getOutputGradient() {
         return outputGradient;
+    }
+
+    public FieldOutput getUpdateValue() {
+        return updateValue;
+    }
+
+    public FieldOutput getInductionThreshold() {
+        return inductionThreshold;
     }
 
     public int getId() {

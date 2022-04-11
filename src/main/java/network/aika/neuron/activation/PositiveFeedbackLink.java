@@ -53,6 +53,40 @@ public class PositiveFeedbackLink<IA extends Activation> extends BindingNeuronLi
         );
     }
 
+    @Override
+    public void initWeightUpdate() {
+        if(isCausal()) {
+            super.initWeightUpdate();
+        } else {
+            mul(
+                    "feedback weight update",
+                    getInput().getIsFiredForWeight(),
+                    getOutput().getUpdateValue(),
+                    synapse.getFeedbackWeight()
+            );
+
+            mul(
+                    "feedback bias update",
+                    getInput().getIsFiredForBias(),
+                    getOutput().getUpdateValue(),
+                    synapse.getFeedbackBias()
+            );
+        }
+    }
+
+    protected void initBackpropGradient() {
+        if(isCausal()) {
+            super.initWeightUpdate();
+        } else {
+            backPropGradient = mul(
+                    "oAct.ownOutputGradient * s.feedbackWeight",
+                    output.ownOutputGradient,
+                    synapse.getFeedbackWeight(),
+                    input.backpropInputGradient
+            );
+        }
+    }
+
     public AbstractBiFunction getFeedbackWeightInput() {
         return feedbackWeightInput;
     }

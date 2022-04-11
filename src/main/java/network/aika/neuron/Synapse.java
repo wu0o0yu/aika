@@ -18,7 +18,7 @@ package network.aika.neuron;
 
 import network.aika.Model;
 import network.aika.direction.Direction;
-import network.aika.fields.FieldOutput;
+import network.aika.fields.ThresholdOperator;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
 import network.aika.neuron.axons.Axon;
@@ -118,17 +118,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         if(Link.templateLinkExists(this, iAct, oAct))
             return false;
 
-        if(!checkTemplateInductionThreshold(oAct))
+        if(!ThresholdOperator.isTrue(oAct.getInductionThreshold()))
             return false;
 
         return true;
-    }
-
-    protected boolean checkTemplateInductionThreshold(OA oAct) {
-        FieldOutput grad = oAct.getOwnOutputGradient();
-        return grad != null &&
-                grad.isInitialized() &&
-                Math.abs(grad.getCurrentValue()) > oAct.getConfig().getInductionThreshold();
     }
 
     public Transition getTransition(BindingSignal from, Direction dir, boolean propagate) {
@@ -184,8 +177,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     public void setWeight(double w) {
         weight.set(w);
     }
-
-    public abstract void initWeightUpdate(L l);
 
     public boolean isAllowTraining() {
         return allowTraining;

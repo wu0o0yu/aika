@@ -136,17 +136,17 @@ public class Fields {
         return func;
     }
 
-    public static ThresholdOperator threshold(String label, double threshold, FieldOutput in) {
+    public static ThresholdOperator threshold(String label, double threshold, ThresholdOperator.Type type, FieldOutput in) {
         if(in == null)
             return null;
 
-        ThresholdOperator op = new ThresholdOperator(label, threshold);
+        ThresholdOperator op = new ThresholdOperator(label, threshold, type);
         connect(in, op);
         return op;
     }
 
-    public static ThresholdOperator threshold(String label, double threshold, FieldOutput in, FieldInput... out) {
-        ThresholdOperator op = threshold(label, threshold, in, out);
+    public static ThresholdOperator threshold(String label, double threshold, ThresholdOperator.Type type, FieldOutput in, FieldInput... out) {
+        ThresholdOperator op = threshold(label, threshold, type, in, out);
         connectAll(op, out);
         return op;
     }

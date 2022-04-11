@@ -51,16 +51,6 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     }
 
     @Override
-    public void initWeightUpdate(NegativeFeedbackLink l) {
-        mul(
-                "weight update",
-                l.getInput().getIsFired(),
-                scale("-1 * og", -1, l.getOutput().getOutputGradient()),
-                weight
-        );
-    }
-
-    @Override
     public boolean linkExists(InhibitoryActivation iAct, BindingActivation oAct) {
         if(super.linkExists(iAct, oAct))
             return true;
