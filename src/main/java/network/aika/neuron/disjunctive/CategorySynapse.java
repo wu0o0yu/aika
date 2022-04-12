@@ -19,6 +19,7 @@ package network.aika.neuron.disjunctive;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.axons.PatternAxon;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 
@@ -39,8 +40,8 @@ public class CategorySynapse<N extends Neuron & PatternAxon> extends Disjunctive
     );
 
     @Override
-    public CategoryLink createLink(PatternActivation input, CategoryActivation output) {
-        return new CategoryLink(this, input, output);
+    public CategoryLink createLink(PatternActivation input, CategoryActivation output, boolean isSelfRef) {
+        return new CategoryLink(this, input, output, isSelfRef);
     }
 
     @Override
@@ -49,10 +50,10 @@ public class CategorySynapse<N extends Neuron & PatternAxon> extends Disjunctive
     }
 
     @Override
-    public boolean checkTemplateLinkingPreConditions(PatternActivation iAct, CategoryActivation oAct) {
-        if(iAct.getNeuron().isNetworkInput())
+    public boolean checkTemplateLinkingPreConditions(BindingSignal<PatternActivation> iBS, BindingSignal<CategoryActivation> oBS) {
+        if(iBS.getActivation().getNeuron().isNetworkInput())
             return false;
 
-        return super.checkTemplateLinkingPreConditions(iAct, oAct);
+        return super.checkTemplateLinkingPreConditions(iBS, oBS);
     }
 }

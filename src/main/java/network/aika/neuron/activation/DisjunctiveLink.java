@@ -25,8 +25,8 @@ import static network.aika.fields.Fields.mul;
  */
 public class DisjunctiveLink<S extends DisjunctiveSynapse, IA extends Activation, OA extends DisjunctiveActivation> extends Link<S, IA, OA> {
 
-    public DisjunctiveLink(S s, IA input, OA output) {
-        super(s, input, output);
+    public DisjunctiveLink(S s, IA input, OA output, boolean isSelfRef) {
+        super(s, input, output, isSelfRef);
     }
 
     @Override

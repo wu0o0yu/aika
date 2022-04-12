@@ -17,6 +17,7 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.*;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
@@ -49,8 +50,8 @@ public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNe
     }
 
     @Override
-    public PatternLink createLink(BindingActivation input, PatternActivation output) {
-        return new PatternLink(this, input, output);
+    public PatternLink createLink(BindingActivation input, PatternActivation output, boolean isSelfRef) {
+        return new PatternLink(this, input, output, isSelfRef);
     }
 
     @Override
@@ -59,10 +60,10 @@ public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNe
     }
 
     @Override
-    public boolean checkTemplateLinkingPreConditions(BindingActivation iAct, PatternActivation oAct) {
-        if(iAct.getNeuron().isNetworkInput())
+    public boolean checkTemplateLinkingPreConditions(BindingSignal<BindingActivation> iBS, BindingSignal<PatternActivation> oBS) {
+        if(iBS.getActivation().getNeuron().isNetworkInput())
             return false;
 
-        return super.checkTemplateLinkingPreConditions(iAct, oAct);
+        return super.checkTemplateLinkingPreConditions(iBS, oBS);
     }
 }

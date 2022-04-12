@@ -322,8 +322,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return thought;
     }
 
-    public abstract boolean isSelfRef(Activation iAct);
-
     public boolean isNetworkInput() {
         return getNeuron().isNetworkInput();
     }

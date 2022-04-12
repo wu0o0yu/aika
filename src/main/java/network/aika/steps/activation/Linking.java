@@ -154,7 +154,7 @@ public class Linking extends Step<Activation> {
         if(!targetSynapse.linkingCheck(inputBS, outputBS))
             return;
 
-        targetSynapse.createLink(inputBS.getActivation(), outputBS.getActivation());
+        targetSynapse.createLink(inputBS.getActivation(), outputBS.getActivation(), inputBS.isSelfRef(outputBS));
     }
 
     public String toString() {

@@ -41,8 +41,8 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     );
 
     @Override
-    public NegativeFeedbackLink createLink(InhibitoryActivation input, BindingActivation output) {
-        return new NegativeFeedbackLink(this, input, output);
+    public NegativeFeedbackLink createLink(InhibitoryActivation input, BindingActivation output, boolean isSelfRef) {
+        return new NegativeFeedbackLink(this, input, output, isSelfRef);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
         if(!iBS.getActivation().isFired())
             return false;
 
-        if(isTemplate() && !oBS.getActivation().isSelfRef(iBS.getActivation()))
+        if(isTemplate() && !iBS.isSelfRef(oBS))
             return false;
 
         // Skip BindingNeuronSynapse.checkLinkingPreConditions
@@ -81,11 +81,11 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     }
 
     @Override
-    public boolean checkTemplateLinkingPreConditions(InhibitoryActivation iAct, BindingActivation oAct) {
-        if(iAct.getNeuron().getInputSynapse(oAct.getNeuronProvider()) == null) // TODO: should this be selfRef?
+    public boolean checkTemplateLinkingPreConditions(BindingSignal<InhibitoryActivation> iBS, BindingSignal<BindingActivation> oBS) {
+        if(!iBS.isSelfRef(oBS))
             return false;
 
-        return super.checkTemplateLinkingPreConditions(iAct, oAct);
+        return super.checkTemplateLinkingPreConditions(iBS, oBS);
     }
 
     @Override

@@ -23,7 +23,7 @@ import network.aika.neuron.conjunctive.SamePatternSynapse;
  */
 public class SamePatternLink extends BindingNeuronLink<SamePatternSynapse, BindingActivation> {
 
-    public SamePatternLink(SamePatternSynapse s, BindingActivation input, BindingActivation output) {
-        super(s, input, output);
+    public SamePatternLink(SamePatternSynapse s, BindingActivation input, BindingActivation output, boolean isSelfRef) {
+        super(s, input, output, isSelfRef);
     }
 }

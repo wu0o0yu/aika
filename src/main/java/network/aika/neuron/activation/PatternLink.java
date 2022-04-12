@@ -23,7 +23,7 @@ import network.aika.neuron.conjunctive.PatternSynapse;
  */
 public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivation, PatternActivation> {
 
-    public PatternLink(PatternSynapse s, BindingActivation input, PatternActivation output) {
-        super(s, input, output);
+    public PatternLink(PatternSynapse s, BindingActivation input, PatternActivation output, boolean isSelfRef) {
+        super(s, input, output, isSelfRef);
     }
 }

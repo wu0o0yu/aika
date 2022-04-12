@@ -58,10 +58,13 @@ public abstract class Link<S extends Synapse, I extends Activation, O extends Ac
 
     private ThresholdOperator onTransparent;
 
-    public Link(S s, I input, O output) {
+    protected boolean isSelfRef;
+
+    public Link(S s, I input, O output, boolean isSelfRef) {
         this.synapse = s;
         this.input = input;
         this.output = output;
+        this.isSelfRef = isSelfRef;
 
         init();
 
@@ -172,6 +175,10 @@ public abstract class Link<S extends Synapse, I extends Activation, O extends Ac
         return s;
     }
 
+    public boolean isSelfRef() {
+        return isSelfRef;
+    }
+
     public FieldOutput getInputValue(Sign s) {
         return s.getValue(input != null ? input.getValue() : ZERO);
     }
@@ -190,10 +197,6 @@ public abstract class Link<S extends Synapse, I extends Activation, O extends Ac
 
     public O getOutput() {
         return output;
-    }
-
-    public boolean isSelfRef() {
-        return output.isSelfRef(input);
     }
 
     public boolean isTemplate() {

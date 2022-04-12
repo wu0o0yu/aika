@@ -192,6 +192,16 @@ public class BindingSignal<A extends Activation> {
         return nextBS;
     }
 
+    public boolean isSelfRef(BindingSignal outputBS) {
+        if(this == outputBS)
+            return true;
+
+        if(parent == null)
+            return false;
+
+        return parent.isSelfRef(outputBS);
+    }
+
     public boolean isPropagateAllowed() {
         return propagateAllowed;
     }
@@ -203,5 +213,4 @@ public class BindingSignal<A extends Activation> {
     public String toString() {
         return getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ", depth:" + getDepth() + ", state:" + state;
     }
-
 }

@@ -100,7 +100,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         if(linkExists(iBS.getActivation(), oBS.getActivation()))
             return false;
 
-        if(isTemplate() && !checkTemplateLinkingPreConditions(iBS.getActivation(), oBS.getActivation()))
+        if(isTemplate() && !checkTemplateLinkingPreConditions(iBS, oBS))
             return false;
 
         return true;
@@ -111,14 +111,14 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return existingLink != null && existingLink.getInput() == iAct;
     }
 
-    public boolean checkTemplateLinkingPreConditions(IA iAct, OA oAct) {
-        if(oAct.getNeuron().isNetworkInput())
+    public boolean checkTemplateLinkingPreConditions(BindingSignal<IA> iBS, BindingSignal<OA> oBS) {
+        if(oBS.getActivation().getNeuron().isNetworkInput())
             return false;
 
-        if(Link.templateLinkExists(this, iAct, oAct))
+        if(Link.templateLinkExists(this, iBS.getActivation(), oBS.getActivation()))
             return false;
 
-        if(!ThresholdOperator.isTrue(oAct.getInductionThreshold()))
+        if(!ThresholdOperator.isTrue(oBS.getActivation().getInductionThreshold()))
             return false;
 
         return true;
@@ -167,7 +167,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return s;
     }
 
-    public abstract L createLink(IA input, OA output);
+    public abstract L createLink(IA input, OA output, boolean isSelfRef);
 
     protected void initFromTemplate(S s) {
         s.weight.set(weight.getCurrentValue());

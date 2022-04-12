@@ -46,8 +46,8 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
     private boolean allowLooseLinking;
 
     @Override
-    public SamePatternLink createLink(BindingActivation input, BindingActivation output) {
-        return new SamePatternLink(this, input, output);
+    public SamePatternLink createLink(BindingActivation input, BindingActivation output, boolean isSelfRef) {
+        return new SamePatternLink(this, input, output, isSelfRef);
     }
 
     @Override

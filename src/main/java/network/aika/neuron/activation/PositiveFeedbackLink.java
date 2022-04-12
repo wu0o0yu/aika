@@ -30,10 +30,11 @@ public class PositiveFeedbackLink<IA extends Activation> extends BindingNeuronLi
     private AbstractBiFunction feedbackWeightInput;
     private AbstractBiFunction feedbackBiasInput;
 
-    public PositiveFeedbackLink(PositiveFeedbackSynapse s, IA input, BindingActivation output) {
-        super(s, input, output);
+    public PositiveFeedbackLink(PositiveFeedbackSynapse s, IA input, BindingActivation output, boolean isSelfRef) {
+        super(s, input, output, isSelfRef);
     }
 
+    @Override
     protected void initWeightInput() {
         if(isCausal())
             super.initWeightInput();

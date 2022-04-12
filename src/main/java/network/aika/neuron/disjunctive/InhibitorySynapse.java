@@ -17,6 +17,7 @@
 package network.aika.neuron.disjunctive;
 
 import network.aika.neuron.activation.*;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.conjunctive.BindingNeuron;
@@ -39,8 +40,8 @@ public class InhibitorySynapse extends DisjunctiveSynapse<InhibitorySynapse, Bin
     );
 
     @Override
-    public InhibitoryLink createLink(BindingActivation input, InhibitoryActivation output) {
-        return new InhibitoryLink(this, input, output);
+    public InhibitoryLink createLink(BindingActivation input, InhibitoryActivation output, boolean isSelfRef) {
+        return new InhibitoryLink(this, input, output, isSelfRef);
     }
 
     @Override
@@ -49,11 +50,11 @@ public class InhibitorySynapse extends DisjunctiveSynapse<InhibitorySynapse, Bin
     }
 
     @Override
-    public boolean checkTemplateLinkingPreConditions(BindingActivation iAct, InhibitoryActivation oAct) {
-        if(iAct.getNeuron().isNetworkInput())
+    public boolean checkTemplateLinkingPreConditions(BindingSignal<BindingActivation> iBS, BindingSignal<InhibitoryActivation> oBS) {
+        if(iBS.getActivation().getNeuron().isNetworkInput())
             return false;
 
-        return super.checkTemplateLinkingPreConditions(iAct, oAct);
+        return super.checkTemplateLinkingPreConditions(iBS, oBS);
     }
 
     @Override

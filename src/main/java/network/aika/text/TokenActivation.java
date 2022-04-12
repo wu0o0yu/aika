@@ -92,7 +92,8 @@ public class TokenActivation extends PatternActivation {
         PrimaryInputSynapse relSynNext = model;
         relSynNext.createLink(
                 categoryActivation,
-                toAct
+                toAct,
+                false
         );
     }
 

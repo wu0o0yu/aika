@@ -50,11 +50,6 @@ public class DummyActivation extends Activation {
     }
 
     @Override
-    public boolean isSelfRef(Activation iAct) {
-        return false;
-    }
-
-    @Override
     public Range getRange() {
         return null;
     }

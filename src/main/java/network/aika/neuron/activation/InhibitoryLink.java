@@ -23,7 +23,7 @@ import network.aika.neuron.disjunctive.InhibitorySynapse;
  */
 public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingActivation, InhibitoryActivation> {
 
-    public InhibitoryLink(InhibitorySynapse s, BindingActivation input, InhibitoryActivation output) {
-        super(s, input, output);
+    public InhibitoryLink(InhibitorySynapse s, BindingActivation input, InhibitoryActivation output, boolean isSelfRef) {
+        super(s, input, output, isSelfRef);
     }
 }

@@ -191,11 +191,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         return BindingSignal.originEquals(conflictingBS, bound);
     }
 
-    @Override
-    public boolean isSelfRef(Activation iAct) {
-        return iAct != null && iAct.bindingSignals.containsKey(this);
-    }
-
     public BindingActivation createBranch() {
         BindingActivation clonedAct = getNeuron().createActivation(getThought());
         branches.add(clonedAct);

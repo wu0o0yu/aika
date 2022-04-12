@@ -112,7 +112,7 @@ public class Propagate extends Step<Activation> {
         Activation toAct = targetSynapse.getOutput().createActivation(t);
         toAct.init(targetSynapse, fromAct);
 
-        targetSynapse.createLink(fromAct, toAct);
+        targetSynapse.createLink(fromAct, toAct, false);
 
         return toAct;
     }
