@@ -22,6 +22,7 @@ import network.aika.direction.Direction;
 import network.aika.fields.LimitedField;
 import network.aika.neuron.activation.Activation;
 import network.aika.fields.Field;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.PostTraining;
 import network.aika.steps.activation.Save;
@@ -142,7 +143,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public abstract Neuron<?, ?> instantiateTemplate(boolean addProvider);
 
-    public abstract void addInactiveLinks(Activation act);
+    public abstract void addInactiveLinks(BindingSignal bs);
 
     public abstract ActivationFunction getActivationFunction();
 

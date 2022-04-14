@@ -20,6 +20,7 @@ import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.steps.*;
 
@@ -44,11 +45,11 @@ import static network.aika.direction.Direction.OUTPUT;
  */
 public class Propagate extends Step<Activation> {
 
-    public static void add(BindingSignal bs, boolean template, Predicate<Synapse> filter) {
+    public static void add(BindingSignal bs, boolean template) {
         if(template && !bs.getActivation().getConfig().isTemplatesEnabled())
             return;
 
-        Propagate step = new Propagate(bs, template, filter);
+        Propagate step = new Propagate(bs, template);
 
         if(step.hasTargetSynapses())
             Step.add(step);
@@ -58,7 +59,7 @@ public class Propagate extends Step<Activation> {
     private List<Synapse> targetSynapses;
     private BindingSignal bindingSignal;
 
-    private Propagate(BindingSignal bs, boolean template, Predicate<Synapse> filter) {
+    private Propagate(BindingSignal bs, boolean template) {
         super(bs.getActivation());
 
         this.template = template;
@@ -73,7 +74,6 @@ public class Propagate extends Step<Activation> {
                 .filter(s ->
                         s.allowPropagate(act)
                 )
-                .filter(filter)
                 .collect(Collectors.toList());
     }
 
@@ -109,11 +109,9 @@ public class Propagate extends Step<Activation> {
         Activation toAct = targetSynapse.getOutput().createActivation(t);
         toAct.init(targetSynapse, fromAct);
 
-        targetSynapse.createLink(
-                fromBS,
-                fromBS.propagate(targetSynapse, toAct)
-        );
-
+        BindingSignal toBS = fromBS.propagate(targetSynapse, toAct);
+        Link l = targetSynapse.createLink(fromBS, toBS);
+        toBS.setLink(l);
         return toAct;
     }
 

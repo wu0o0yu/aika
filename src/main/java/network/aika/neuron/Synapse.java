@@ -18,6 +18,7 @@ package network.aika.neuron;
 
 import network.aika.Model;
 import network.aika.direction.Direction;
+import network.aika.fields.Fields;
 import network.aika.fields.ThresholdOperator;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
@@ -118,7 +119,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         if(Link.templateLinkExists(this, iBS.getActivation(), oBS.getActivation()))
             return false;
 
-        if(!ThresholdOperator.isTrue(oBS.getActivation().getInductionThreshold()))
+        if(!Fields.isTrue(oBS.getActivation().getInductionThreshold()))
             return false;
 
         return true;
@@ -135,7 +136,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
     public abstract void setModified();
 
-    public boolean allowPropagate(Activation act) {
+    public boolean allowPropagate(IA act) {
         return true;
     }
 

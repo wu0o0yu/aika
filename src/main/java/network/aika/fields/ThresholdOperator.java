@@ -49,8 +49,4 @@ public class ThresholdOperator extends AbstractFunction {
                 return 0.0;
         }
     }
-
-    public static boolean isTrue(FieldOutput f) {
-        return f != null && f.isInitialized() && f.getCurrentValue() > 0.5;
-    }
 }

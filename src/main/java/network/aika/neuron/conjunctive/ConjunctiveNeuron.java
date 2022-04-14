@@ -22,6 +22,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,12 +67,12 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         super.initFromTemplate(n);
     }
 
-    public void addInactiveLinks(Activation act) {
+    public void addInactiveLinks(BindingSignal bs) {
         inputSynapses
                 .stream()
-                .filter(s -> !act.inputLinkExists(s))
+                .filter(s -> !bs.getActivation().inputLinkExists(s))
                 .forEach(s ->
-                        s.createLink(null, act)
+                        s.createLink(null, bs)
                 );
     }
 

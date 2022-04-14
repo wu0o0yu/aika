@@ -122,9 +122,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         isFiredForWeight = func("(isFired * 2) - 1", isFired, x -> (x * 2.0) - 1.0);
         isFiredForBias = func("(isFired * -1) + 1", isFired, x -> (x * -1.0) + 1.0);
 
-        Multiplication onFinalFired = mul("isFinalFired", isFired, isFinal);
-
-
         initFields();
 
         finalValue = mul(
@@ -201,9 +198,17 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void initBSFields(BindingSignal bs) {
+        if(!bs.isOrigin())
+            return;
+
         bs.getOnArrivedFired().addEventListener(() -> {
                     Linking.addPostFired(bs);
-                    Propagate.add(bs, false, s -> true);
+                    Propagate.add(bs, false);
+                }
+        );
+        bs.getOnArrivedFiredFinal().addEventListener(() -> {
+                    Propagate.add(bs, true);
+                    InactiveLinks.add(bs);
                 }
         );
     }

@@ -19,6 +19,7 @@ package network.aika.neuron.bindingsignal;
 import network.aika.direction.Direction;
 import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
+import network.aika.fields.Multiplication;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
@@ -43,6 +44,7 @@ public class BindingSignal<A extends Activation> {
 
     private Field onArrived = new Field(this, "onArrived");
     private FieldOutput onArrivedFired;
+    private FieldOutput onArrivedFiredFinal;
     FieldOutput onArrivedBound;
     FieldOutput onArrivedBoundFired;
 
@@ -55,27 +57,39 @@ public class BindingSignal<A extends Activation> {
         initFields();
     }
 
-    private BindingSignal(BindingSignal parent, State state, A act, Link link) {
+    private BindingSignal(BindingSignal parent) {
         this.parent = parent;
         this.origin = parent.getOrigin();
         this.depth = parent.depth + 1;
+    }
+
+    private BindingSignal(BindingSignal parent, State state, A act, Link link) {
+        this(parent);
         this.state = state;
         this.activation = act;
         this.link = link;
+
         this.initFields();
     }
 
-    private BindingSignal(BindingSignal parent, Link<?, ?, A> l, Transition t) {
-        this.parent = parent;
-        this.origin = parent.getOrigin();
-        this.depth = parent.depth + 1;
+    private BindingSignal(BindingSignal parent, A act, Link link, Transition t) {
+        this(parent);
+        this.activation = act;
+        this.link = link;
 
-        this.activation = l.getOutput();
-        this.link = l;
         this.transition = t;
         this.propagateAllowed = t.getPropagate() > 1;
         this.state = t.next(Direction.OUTPUT);
+
         this.initFields();
+    }
+
+    private BindingSignal(BindingSignal parent, A act, Transition t) {
+        this(parent, act, null, t);
+    }
+
+    private BindingSignal(BindingSignal parent, Link<?, ?, A> l, Transition t) {
+        this(parent, l.getOutput(), l, t);
     }
 
     private void initFields() {
@@ -99,6 +113,13 @@ public class BindingSignal<A extends Activation> {
                 onArrived
         );
 
+        onArrivedFiredFinal = mul(
+                "onFired * onArrived * isFinal",
+                onArrivedFired,
+                activation.getIsFinal()
+        );
+
+
         activation.initBSFields(this);
     }
 
@@ -108,6 +129,10 @@ public class BindingSignal<A extends Activation> {
 
     public FieldOutput getOnArrivedFired() {
         return onArrivedFired;
+    }
+
+    public FieldOutput getOnArrivedFiredFinal() {
+        return onArrivedFiredFinal;
     }
 
     public FieldOutput getOnArrivedBound() {
@@ -140,6 +165,10 @@ public class BindingSignal<A extends Activation> {
 
     public Link getLink() {
         return link;
+    }
+
+    public void setLink(Link l) {
+        this.link = l;
     }
 
     public Transition getTransition() {
@@ -191,8 +220,16 @@ public class BindingSignal<A extends Activation> {
         return new BindingSignal(this, l, t);
     }
 
-    public BindingSignal<A> propagate(Synapse<?, ?, ?, ?, ?, A> s, A toAct) {
-        return null;
+    public BindingSignal<A> propagate(Synapse s, A toAct) {
+        Transition t = s.getTransition(
+                this,
+                Direction.OUTPUT,
+                true
+        );
+        if(t == null)
+            return null;
+
+        return new BindingSignal(this, toAct, t);
     }
 
     public boolean isSelfRef(BindingSignal outputBS) {

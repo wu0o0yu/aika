@@ -75,8 +75,8 @@ public class InductionTest {
         Activation actB = inB.createActivation(doc);
         Activation actTarget = targetN.createActivation(doc);
 
-        sA.createLink(actA, actTarget, false);
-        sB.createLink(actB, actTarget, false);
+ //       sA.createLink(actA, actTarget, false);
+ //       sB.createLink(actB, actTarget, false);
 
      //   actTarget.updateEntropyGradient();
  //       actTarget.computeInitialLinkGradients();

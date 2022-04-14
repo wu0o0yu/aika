@@ -2,17 +2,21 @@ package network.aika.steps.activation;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
 public class InactiveLinks extends Step<Activation> {
 
-    public static void add(Activation act) {
-        Step.add(new InactiveLinks(act));
+    private BindingSignal bindingSignal;
+
+    public static void add(BindingSignal bs) {
+        Step.add(new InactiveLinks(bs));
     }
 
-    public InactiveLinks(Activation act) {
-        super(act);
+    public InactiveLinks(BindingSignal bs) {
+        super(bs.getActivation());
+        bindingSignal = bs;
     }
 
     @Override
@@ -25,6 +29,6 @@ public class InactiveLinks extends Step<Activation> {
         Activation act = getElement();
         Neuron n = act.getNeuron();
 
-        n.addInactiveLinks(act);
+        n.addInactiveLinks(bindingSignal);
     }
 }

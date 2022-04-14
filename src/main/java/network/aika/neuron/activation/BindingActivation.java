@@ -20,6 +20,7 @@ import network.aika.Thought;
 import network.aika.fields.Field;
 import network.aika.fields.FieldFunction;
 import network.aika.fields.FieldOutput;
+import network.aika.fields.Fields;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
@@ -103,6 +104,8 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     public void initBSFields(BindingSignal bs) {
+        super.initBSFields(bs);
+
         bs.setOnArrivedBound(
                 mul(
                         "isBound * onArrived",
@@ -177,9 +180,8 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     public boolean checkAllowPropagate() {
-        if(isTemplate()) {
-            if (isNetworkInput())
-                return false;
+        if(isTemplate() && isNetworkInput()) {
+            return false;
         }
 
         return super.checkAllowPropagate();

@@ -21,6 +21,7 @@ import network.aika.fields.QueueField;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 import network.aika.neuron.disjunctive.CategoryNeuron;
@@ -90,10 +91,9 @@ public class TokenActivation extends PatternActivation {
 
     private void linkPrimaryInput(PrimaryInputSynapse<CategoryNeuron, CategoryActivation> model, BindingActivation toAct) {
         PrimaryInputSynapse relSynNext = model;
-        relSynNext.createLink(
-                categoryActivation.getBindingSignal(this),
-                toAct.getBindingSignal(this)
-        );
+        BindingSignal fromBS = categoryActivation.getBindingSignal(this);
+        BindingSignal toBS = fromBS.propagate(relSynNext, toAct);
+        relSynNext.createLink(fromBS, toBS);
     }
 
     public TokenActivation getPreviousToken() {
