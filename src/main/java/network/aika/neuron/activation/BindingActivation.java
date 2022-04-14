@@ -34,7 +34,6 @@ import java.util.stream.Stream;
 import static network.aika.fields.Fields.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
 import static network.aika.neuron.bindingsignal.State.*;
-import static network.aika.steps.LinkingOrder.POST_FIRED;
 
 /**
  * @author Lukas Molzberger

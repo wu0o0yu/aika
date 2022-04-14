@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 
 /**
@@ -23,7 +24,7 @@ import network.aika.neuron.conjunctive.PrimaryInputSynapse;
  */
 public class PrimaryInputLink<IA extends Activation> extends BindingNeuronLink<PrimaryInputSynapse, IA> {
 
-    public PrimaryInputLink(PrimaryInputSynapse s, IA input, BindingActivation output, boolean isSelfRef) {
-        super(s, input, output, isSelfRef);
+    public PrimaryInputLink(PrimaryInputSynapse s, BindingSignal<IA> input, BindingSignal<BindingActivation> output) {
+        super(s, input, output);
     }
 }

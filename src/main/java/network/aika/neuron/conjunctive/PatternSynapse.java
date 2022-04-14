@@ -50,8 +50,8 @@ public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNe
     }
 
     @Override
-    public PatternLink createLink(BindingActivation input, PatternActivation output, boolean isSelfRef) {
-        return new PatternLink(this, input, output, isSelfRef);
+    public PatternLink createLink(BindingSignal<BindingActivation> input, BindingSignal<PatternActivation> output) {
+        return new PatternLink(this, input, output);
     }
 
     @Override

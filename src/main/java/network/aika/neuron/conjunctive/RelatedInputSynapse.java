@@ -46,8 +46,8 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
     );
 
     @Override
-    public RelatedInputLink createLink(BindingActivation input, BindingActivation output, boolean isSelfRef) {
-        return new RelatedInputLink(this, input, output, isSelfRef);
+    public RelatedInputLink createLink(BindingSignal<BindingActivation> input, BindingSignal<BindingActivation> output) {
+        return new RelatedInputLink(this, input, output);
     }
 
     @Override

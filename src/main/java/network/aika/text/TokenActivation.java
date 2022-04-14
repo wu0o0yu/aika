@@ -52,17 +52,17 @@ public class TokenActivation extends PatternActivation {
 
         TextModel m = getModel();
         categoryActivation = (CategoryActivation) Propagate.propagate(
-                this,
+                getBindingSignal(this),
                 getNeuron().getOutputSynapse(m.getTokenCategory().getProvider())
         );
 
         relPTBindingActivation = (BindingActivation) Propagate.propagate(
-                categoryActivation,
+                categoryActivation.getBindingSignal(this),
                 m.getRelPTFeedbackSyn()
         );
 
         relNTBindingActivation = (BindingActivation) Propagate.propagate(
-                categoryActivation,
+                categoryActivation.getBindingSignal(this),
                 m.getRelNTFeedbackSyn()
         );
     }
@@ -91,9 +91,8 @@ public class TokenActivation extends PatternActivation {
     private void linkPrimaryInput(PrimaryInputSynapse<CategoryNeuron, CategoryActivation> model, BindingActivation toAct) {
         PrimaryInputSynapse relSynNext = model;
         relSynNext.createLink(
-                categoryActivation,
-                toAct,
-                false
+                categoryActivation.getBindingSignal(this),
+                toAct.getBindingSignal(this)
         );
     }
 

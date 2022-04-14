@@ -115,8 +115,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         isFired.addEventListener(() -> {
                     fired = thought.getCurrentTimestamp();
-
-                    Propagate.add(this, false, s -> true);
                     Counting.add(this);
                 }
         );
@@ -125,11 +123,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         isFiredForBias = func("(isFired * -1) + 1", isFired, x -> (x * -1.0) + 1.0);
 
         Multiplication onFinalFired = mul("isFinalFired", isFired, isFinal);
-        onFinalFired.addEventListener(() -> {
-                    Propagate.add(this, true, s -> true);
-                    InactiveLinks.add(this);
-                }
-        );
+
 
         initFields();
 
@@ -207,8 +201,10 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void initBSFields(BindingSignal bs) {
-        bs.getOnArrivedFired().addEventListener(() ->
-                Linking.addPostFired(bs)
+        bs.getOnArrivedFired().addEventListener(() -> {
+                    Linking.addPostFired(bs);
+                    Propagate.add(bs, false, s -> true);
+                }
         );
     }
 
@@ -350,12 +346,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return getPatternBindingSignals().values().stream();
     }
 
-    public BindingSignal addBindingSignal(BindingSignal bindingSignal) {
-        if (bindingSignal.exists())
+    public BindingSignal addBindingSignal(BindingSignal bs) {
+        if (bs.exists())
             return null;
 
-        bindingSignal.link();
-        return bindingSignal;
+        bs.link();
+        return bs;
     }
 
     public void registerBindingSignal(BindingSignal bs) {

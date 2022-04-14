@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.fields.AbstractBiFunction;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 
 import static network.aika.fields.Fields.mul;
@@ -30,8 +31,8 @@ public class PositiveFeedbackLink<IA extends Activation> extends BindingNeuronLi
     private AbstractBiFunction feedbackWeightInput;
     private AbstractBiFunction feedbackBiasInput;
 
-    public PositiveFeedbackLink(PositiveFeedbackSynapse s, IA input, BindingActivation output, boolean isSelfRef) {
-        super(s, input, output, isSelfRef);
+    public PositiveFeedbackLink(PositiveFeedbackSynapse s, BindingSignal<IA> input, BindingSignal<BindingActivation> output) {
+        super(s, input, output);
     }
 
     @Override

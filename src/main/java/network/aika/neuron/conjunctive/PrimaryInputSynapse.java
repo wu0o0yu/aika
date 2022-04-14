@@ -41,8 +41,8 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
             transition(State.INPUT, State.INPUT, true, 0)
     );
 
-    public PrimaryInputLink createLink(IA input, BindingActivation output, boolean isSelfRef) {
-        return new PrimaryInputLink(this, input, output, isSelfRef);
+    public PrimaryInputLink createLink(BindingSignal<IA> input, BindingSignal<BindingActivation> output) {
+        return new PrimaryInputLink(this, input, output);
     }
 
     @Override

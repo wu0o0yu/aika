@@ -44,8 +44,8 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     private Field feedbackWeight = new Field(this, "feedbackWeight");
     private Field feedbackBias = new Field(this, "feedbackBias");
 
-    public PositiveFeedbackLink createLink(IA input, BindingActivation output, boolean isSelfRef) {
-        return new PositiveFeedbackLink(this, input, output, isSelfRef);
+    public PositiveFeedbackLink createLink(BindingSignal<IA> input, BindingSignal<BindingActivation> output) {
+        return new PositiveFeedbackLink(this, input, output);
     }
 
     protected void initFromTemplate(PositiveFeedbackSynapse s) {

@@ -66,11 +66,6 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
         return fired;
     }
 
-    @Override
-    public LinkingOrder getLinkingOrder() {
-        return LinkingOrder.NOT_SET;
-    }
-
     public Timestamp getTimestamp() {
         return timestamp;
     }
