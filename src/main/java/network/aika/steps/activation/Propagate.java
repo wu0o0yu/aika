@@ -20,6 +20,7 @@ import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.steps.*;
 
 import java.util.List;
@@ -27,7 +28,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.steps.LinkingOrder.PROPAGATE;
 
 
 /**
@@ -44,11 +44,11 @@ import static network.aika.steps.LinkingOrder.PROPAGATE;
  */
 public class Propagate extends Step<Activation> {
 
-    public static void add(Activation act, boolean template, String linkingType, Predicate<Synapse> filter) {
-        if(template && !act.getConfig().isTemplatesEnabled())
+    public static void add(BindingSignal bs, boolean template, Predicate<Synapse> filter) {
+        if(template && !bs.getActivation().getConfig().isTemplatesEnabled())
             return;
 
-        Propagate step = new Propagate(act, template, linkingType, filter);
+        Propagate step = new Propagate(bs, template, filter);
 
         if(step.hasTargetSynapses())
             Step.add(step);
@@ -56,14 +56,15 @@ public class Propagate extends Step<Activation> {
 
     private boolean template;
     private List<Synapse> targetSynapses;
-    private String linkingType;
+    private BindingSignal bindingSignal;
 
-    private Propagate(Activation act, boolean template, String linkingType, Predicate<Synapse> filter) {
-        super(act);
+    private Propagate(BindingSignal bs, boolean template, Predicate<Synapse> filter) {
+        super(bs.getActivation());
 
         this.template = template;
-        this.linkingType = linkingType;
+        this.bindingSignal = bs;
 
+        Activation act = bs.getActivation();
         if(!act.checkAllowPropagate())
             return;
 
@@ -86,11 +87,6 @@ public class Propagate extends Step<Activation> {
     }
 
     @Override
-    public LinkingOrder getLinkingOrder() {
-        return PROPAGATE;
-    }
-
-    @Override
     public void process() {
         Activation act = getElement();
 
@@ -102,24 +98,28 @@ public class Propagate extends Step<Activation> {
                         !act.linkExists(OUTPUT, s, template)
                 )
                 .forEach(ts ->
-                        propagate(act, ts)
+                        propagate(bindingSignal, ts)
                 );
     }
 
-    public static Activation propagate(Activation fromAct, Synapse targetSynapse) {
+    public static Activation propagate(BindingSignal fromBS, Synapse targetSynapse) {
+        Activation fromAct = fromBS.getActivation();
         Thought t = fromAct.getThought();
 
         Activation toAct = targetSynapse.getOutput().createActivation(t);
         toAct.init(targetSynapse, fromAct);
 
-        targetSynapse.createLink(fromAct, toAct, false);
+        targetSynapse.createLink(
+                fromBS,
+                fromBS.propagate(targetSynapse, toAct)
+        );
 
         return toAct;
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(linkingType + " " + PROPAGATE + " " + (template ? "Template " : "") + getElement());
+        sb.append((template ? "Template " : "") + getElement());
         targetSynapses.forEach(ts ->
                 sb.append("\n    " + ts)
         );

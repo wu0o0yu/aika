@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 public class PropagateBindingSignal extends Step<Link> {
 
     private Collection<BindingSignal> inputBindingSignals;
-
+/*
     public static void add(Link l) {
         Activation<?> iAct = l.getInput();
 
@@ -45,7 +45,7 @@ public class PropagateBindingSignal extends Step<Link> {
         if(!inputBindingSignals.isEmpty())
             Step.add(new PropagateBindingSignal(l, inputBindingSignals));
     }
-
+*/
     public static void add(Activation<?> act, Stream<BindingSignal> bindingSignals) {
         Collection<BindingSignal> outgoingBindingSignals = bindingSignals
                 .collect(Collectors.toList());
@@ -70,13 +70,25 @@ public class PropagateBindingSignal extends Step<Link> {
 
     @Override
     public void process() {
-        Activation<?> oAct = getElement().getOutput();
+        propagateBindingSignals(getElement(), inputBindingSignals);
+    }
 
-        add(oAct, inputBindingSignals.stream()
+    public static void propagateBindingSignals(Link l) {
+        Activation<?> iAct = l.getInput();
+
+        List<BindingSignal> inputBindingSignals = iAct.getBindingSignals()
+                .collect(Collectors.toList());
+
+        if(!inputBindingSignals.isEmpty())
+            propagateBindingSignals(l, inputBindingSignals);
+    }
+
+    public static void propagateBindingSignals(Link l, Collection<BindingSignal> inputBS) {
+        add(l.getOutput(), inputBS.stream()
                 .filter(iBS -> iBS.isPropagateAllowed())
-                .map(iBS -> iBS.propagate(getElement()))
+                .map(iBS -> iBS.propagate(l))
                 .filter(oBS -> oBS != null)
-                .map(bs -> oAct.addBindingSignal(bs))
+                .map(bs -> l.getOutput().addBindingSignal(bs))
                 .filter(bs -> bs != null));
     }
 

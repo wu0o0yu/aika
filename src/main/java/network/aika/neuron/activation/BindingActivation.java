@@ -128,11 +128,11 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         );
 
         bs.getOnArrivedBoundFired().addEventListener(() ->
-                Linking.add(this, bs, POST_FIRED)
+                Linking.addPostFired(bs)
         );
 
         bs.getOnArrivedFired().addEventListener(() ->
-                Linking.addUnboundLinking(this, bs)
+                Linking.addUnboundLinking(bs)
         );
 
         if(bs.getState() == SAME) {

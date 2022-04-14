@@ -19,13 +19,12 @@ package network.aika.neuron.bindingsignal;
 import network.aika.direction.Direction;
 import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.steps.activation.Linking;
 
 import static network.aika.fields.Fields.mul;
-import static network.aika.steps.LinkingOrder.POST_FIRED;
-import static network.aika.steps.LinkingOrder.PRE_FIRED;
 
 
 /**
@@ -56,17 +55,33 @@ public class BindingSignal<A extends Activation> {
         initFields();
     }
 
-    public BindingSignal(BindingSignal parent, State state) {
+    private BindingSignal(BindingSignal parent, State state, A act, Link link) {
         this.parent = parent;
         this.origin = parent.getOrigin();
         this.depth = parent.depth + 1;
         this.state = state;
+        this.activation = act;
+        this.link = link;
+        this.initFields();
+    }
+
+    private BindingSignal(BindingSignal parent, Link<?, ?, A> l, Transition t) {
+        this.parent = parent;
+        this.origin = parent.getOrigin();
+        this.depth = parent.depth + 1;
+
+        this.activation = l.getOutput();
+        this.link = l;
+        this.transition = t;
+        this.propagateAllowed = t.getPropagate() > 1;
+        this.state = t.next(Direction.OUTPUT);
+        this.initFields();
     }
 
     private void initFields() {
         if (!activation.getNeuron().isNetworkInput()) {
             onArrived.addEventListener(() ->
-                Linking.add(activation, this, PRE_FIRED)
+                Linking.addPreFired(this)
             );
 
             if(state == State.INPUT && activation.getLabel() == null) {
@@ -82,10 +97,6 @@ public class BindingSignal<A extends Activation> {
                 "onFired * onArrived",
                 activation.getIsFired(),
                 onArrived
-        );
-
-        onArrivedFired.addEventListener(() ->
-                Linking.add(activation, this, POST_FIRED)
         );
 
         activation.initBSFields(this);
@@ -165,11 +176,7 @@ public class BindingSignal<A extends Activation> {
     }
 
     public BindingSignal<A> clone(A act) {
-        BindingSignal<A> c = new BindingSignal(parent, state);
-        c.activation = act;
-        c.link = link;
-        c.initFields();
-        return c;
+        return new BindingSignal(parent, state, act, link);
     }
 
     public BindingSignal<A> propagate(Link<?, ?, A> l) {
@@ -181,15 +188,11 @@ public class BindingSignal<A extends Activation> {
         if(t == null)
             return null;
 
-        BindingSignal nextBS = t.next(this);
+        return new BindingSignal(this, l, t);
+    }
 
-        nextBS.activation = l.getOutput();
-        nextBS.link = l;
-        nextBS.transition = t;
-        nextBS.propagateAllowed = t.getPropagate() > 1;
-        nextBS.initFields();
-
-        return nextBS;
+    public BindingSignal<A> propagate(Synapse<?, ?, ?, ?, ?, A> s, A toAct) {
+        return null;
     }
 
     public boolean isSelfRef(BindingSignal outputBS) {
@@ -204,10 +207,6 @@ public class BindingSignal<A extends Activation> {
 
     public boolean isPropagateAllowed() {
         return propagateAllowed;
-    }
-
-    public boolean match(BindingSignal<A> oBS) {
-        return state == oBS.state;
     }
 
     public String toString() {

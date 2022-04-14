@@ -61,13 +61,6 @@ public class Transition {
         return dir == OUTPUT ? output : input;
     }
 
-    public BindingSignal next(BindingSignal from) {
-        return new BindingSignal(
-                from,
-                next(Direction.OUTPUT)
-        );
-    }
-
     public boolean check(State from, Direction dir, boolean prop) {
         if(!check && !prop)
             return false;

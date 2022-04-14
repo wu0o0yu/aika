@@ -41,8 +41,8 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     );
 
     @Override
-    public NegativeFeedbackLink createLink(InhibitoryActivation input, BindingActivation output, boolean isSelfRef) {
-        return new NegativeFeedbackLink(this, input, output, isSelfRef);
+    public NegativeFeedbackLink createLink(BindingSignal<InhibitoryActivation> input, BindingSignal<BindingActivation> output) {
+        return new NegativeFeedbackLink(this, input, output);
     }
 
     @Override

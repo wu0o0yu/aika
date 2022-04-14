@@ -94,7 +94,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         if(t == null)
             return false;
 
-        if(!t.next(iBS).match(oBS))
+        if(!(t.next(Direction.OUTPUT) == oBS.getState()))
             return false;
 
         if(linkExists(iBS.getActivation(), oBS.getActivation()))
@@ -167,7 +167,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return s;
     }
 
-    public abstract L createLink(IA input, OA output, boolean isSelfRef);
+    public abstract L createLink(BindingSignal<IA> input, BindingSignal<OA> output);
 
     protected void initFromTemplate(S s) {
         s.weight.set(weight.getCurrentValue());

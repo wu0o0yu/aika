@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.ConjunctiveSynapse;
 
 import static network.aika.fields.Fields.mul;
@@ -27,8 +28,8 @@ import static network.aika.fields.Fields.mul;
 public class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends Activation, OA extends ConjunctiveActivation> extends Link<S, IA, OA> {
 
 
-    public ConjunctiveLink(S s, IA input, OA output, boolean isSelfRef) {
-        super(s, input, output, isSelfRef);
+    public ConjunctiveLink(S s, BindingSignal<IA> input, BindingSignal<OA> output) {
+        super(s, input, output);
     }
 
     @Override

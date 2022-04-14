@@ -24,6 +24,7 @@ import network.aika.fields.BiFunction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.sign.Sign;
 import network.aika.steps.link.Cleanup;
 import network.aika.steps.link.LinkCounting;
@@ -50,7 +51,7 @@ public abstract class Link<S extends Synapse, I extends Activation, O extends Ac
     protected S synapse;
 
     protected final I input;
-    protected final O output;
+    protected O output;
 
     private BiFunction igGradient;
     private AbstractBiFunction weightedInput;
@@ -60,11 +61,11 @@ public abstract class Link<S extends Synapse, I extends Activation, O extends Ac
 
     protected boolean isSelfRef;
 
-    public Link(S s, I input, O output, boolean isSelfRef) {
+    public Link(S s, BindingSignal<I> iBS, BindingSignal<O> oBS) {
         this.synapse = s;
-        this.input = input;
-        this.output = output;
-        this.isSelfRef = isSelfRef;
+        this.input = iBS.getActivation();
+        setOutput(oBS.getActivation());
+        this.isSelfRef = iBS != null && iBS.isSelfRef(oBS);
 
         init();
 
@@ -79,7 +80,7 @@ public abstract class Link<S extends Synapse, I extends Activation, O extends Ac
                     )
             );
             onTransparent.addEventListener(() ->
-                    PropagateBindingSignal.add(this)
+                    PropagateBindingSignal.propagateBindingSignals(this)
             );
 
             initWeightInput();
@@ -91,6 +92,10 @@ public abstract class Link<S extends Synapse, I extends Activation, O extends Ac
         }
 
         getThought().onLinkCreationEvent(this);
+    }
+
+    protected void setOutput(O out) {
+        output = out;
     }
 
     private void initGradients() {
@@ -134,7 +139,8 @@ public abstract class Link<S extends Synapse, I extends Activation, O extends Ac
     public void init() {
         if(getInput() != null) {
             linkInput();
-            PropagateBindingSignal.add(this);
+            PropagateBindingSignal.propagateBindingSignals(this);
+   //         PropagateBindingSignal.add(this);
         }
 
         if(getOutput() != null)

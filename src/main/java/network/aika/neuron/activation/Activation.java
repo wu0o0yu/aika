@@ -26,6 +26,7 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
 import network.aika.steps.activation.InactiveLinks;
+import network.aika.steps.activation.Linking;
 import network.aika.steps.activation.Propagate;
 import network.aika.utils.Utils;
 
@@ -115,7 +116,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         isFired.addEventListener(() -> {
                     fired = thought.getCurrentTimestamp();
 
-                    Propagate.add(this, false, "", s -> true);
+                    Propagate.add(this, false, s -> true);
                     Counting.add(this);
                 }
         );
@@ -125,7 +126,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         Multiplication onFinalFired = mul("isFinalFired", isFired, isFinal);
         onFinalFired.addEventListener(() -> {
-                    Propagate.add(this, true, "", s -> true);
+                    Propagate.add(this, true, s -> true);
                     InactiveLinks.add(this);
                 }
         );
@@ -206,6 +207,9 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void initBSFields(BindingSignal bs) {
+        bs.getOnArrivedFired().addEventListener(() ->
+                Linking.addPostFired(bs)
+        );
     }
 
     public FieldOutput getIsFired() {

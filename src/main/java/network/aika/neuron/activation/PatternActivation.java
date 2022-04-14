@@ -53,9 +53,11 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     @Override
     public void initBSFields(BindingSignal bs) {
+        super.initBSFields(bs);
+
         if(!getNeuron().isNetworkInput() && bs.getState() == State.BRANCH) {
             bs.getOnArrived().addEventListener(() ->
-                    Linking.addPosFeedback(this, bs)
+                    Linking.addPosFeedback(bs)
             );
         }
     }
