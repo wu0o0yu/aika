@@ -16,6 +16,10 @@
  */
 package network.aika.fields;
 
+import network.aika.direction.Direction;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.bindingsignal.BindingSignal;
+
 /**
  * @author Lukas Molzberger
  */
@@ -36,6 +40,8 @@ public interface FieldOutput {
     void removeOutput(FieldLink l, boolean propagateFinalValue);
 
     void addEventListener(FieldOnTrueEvent eventListener);
+
+    void addLinkingEventListener(BindingSignal bs, Synapse ts, Direction dir);
 
     void disconnect();
 }

@@ -34,7 +34,7 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
  *
  * @author Lukas Molzberger
  */
-public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends BindingNeuronSynapse<PrimaryInputSynapse, I, PrimaryInputLink<IA>, IA> {
+public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<PrimaryInputSynapse, I, PrimaryInputLink<IA>, IA> {
 
     private static List<Transition> TRANSITIONS = List.of(
             transition(State.SAME, State.INPUT, true, Integer.MAX_VALUE),

@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.direction.Direction;
 import network.aika.fields.Field;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
@@ -25,16 +26,18 @@ import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
+import network.aika.steps.activation.Linking;
 
 import java.util.List;
 
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends BindingNeuronSynapse<PositiveFeedbackSynapse, I, PositiveFeedbackLink<IA>, IA> {
+public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<PositiveFeedbackSynapse, I, PositiveFeedbackLink<IA>, IA> {
 
     private static List<Transition> TRANSITIONS = List.of(
             transition(State.BRANCH, State.BRANCH, true, 1),
@@ -53,6 +56,18 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
         s.feedbackBias.set(feedbackBias.getCurrentValue());
         super.initFromTemplate(s);
     }
+/*
+    @Override
+    public boolean networkInputsAllowed(Direction dir) {
+        return !isTemplate();
+    }
+    */
+    public void addOutputLinkingEvents(BindingSignal<IA> iBS) {
+        if(getInput().isNetworkInput() || iBS.getState() != State.BRANCH)
+            return;
+
+        iBS.getOnArrived().addLinkingEventListener(iBS, this, OUTPUT);
+    }
 
     public Field getFeedbackWeight() {
         return feedbackWeight;
@@ -70,13 +85,5 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     @Override
     public List<Transition> getTransitions() {
         return TRANSITIONS;
-    }
-
-    @Override
-    public boolean linkingCheck(BindingSignal<IA> iBS, BindingSignal<BindingActivation> oBS) {
-        // Skip BindingNeuronSynapse.checkLinkingPreConditions
-        // --> Do not check Link.isForward(iAct, oAct) and
-        // --> iAct.isFired() since the positive feedback synapse is initially assumed to be active.
-        return commonLinkingCheck(iBS, oBS);
     }
 }

@@ -25,7 +25,9 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 import network.aika.neuron.disjunctive.CategoryNeuron;
-import network.aika.steps.activation.Propagate;
+import network.aika.steps.activation.Linking;
+
+import static network.aika.steps.activation.Linking.link;
 
 /**
  *
@@ -52,19 +54,34 @@ public class TokenActivation extends PatternActivation {
         super.init(originSynapse, originAct);
 
         TextModel m = getModel();
+
+        Link categoryLink = getOutputLinks(getNeuron().getOutputSynapse(m.getTokenCategory().getProvider()))
+                .values()
+                .stream()
+                .findFirst()
+                .orElse(null);
+
+        if(categoryLink == null)
+            return;
+
+        categoryActivation = (CategoryActivation) categoryLink.getOutput();
+        /*
         categoryActivation = (CategoryActivation) Propagate.propagate(
                 getBindingSignal(this),
-                getNeuron().getOutputSynapse(m.getTokenCategory().getProvider())
+                getNeuron().getOutputSynapse(m.getTokenCategory().getProvider()),
+                false
+        );
+*/
+        relPTBindingActivation = (BindingActivation) Linking.link(
+                m.getRelPTFeedbackSyn(),
+                categoryActivation.getBindingSignal(this),
+                (BindingSignal) null
         );
 
-        relPTBindingActivation = (BindingActivation) Propagate.propagate(
+        relNTBindingActivation = (BindingActivation) Linking.link(
+                m.getRelNTFeedbackSyn(),
                 categoryActivation.getBindingSignal(this),
-                m.getRelPTFeedbackSyn()
-        );
-
-        relNTBindingActivation = (BindingActivation) Propagate.propagate(
-                categoryActivation.getBindingSignal(this),
-                m.getRelNTFeedbackSyn()
+                (BindingSignal) null
         );
     }
 
@@ -92,7 +109,8 @@ public class TokenActivation extends PatternActivation {
     private void linkPrimaryInput(PrimaryInputSynapse<CategoryNeuron, CategoryActivation> model, BindingActivation toAct) {
         PrimaryInputSynapse relSynNext = model;
         BindingSignal fromBS = categoryActivation.getBindingSignal(this);
-        BindingSignal toBS = fromBS.propagate(relSynNext, toAct);
+        BindingSignal toBS = fromBS.propagate(relSynNext);
+        toBS.init(toAct);
         relSynNext.createLink(fromBS, toBS);
     }
 

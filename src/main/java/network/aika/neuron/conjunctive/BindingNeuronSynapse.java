@@ -25,18 +25,10 @@ import network.aika.neuron.bindingsignal.BindingSignal;
  *
  * @author Lukas Molzberger
  */
-public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I extends Neuron & Axon, L extends Link<S, IA, BindingActivation>, IA extends Activation> extends ConjunctiveSynapse<S, I, BindingNeuron, L, IA, BindingActivation> {
+public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I extends Neuron & Axon, L extends Link<S, IA, BindingActivation>, IA extends Activation<?>> extends ConjunctiveSynapse<S, I, BindingNeuron, L, IA, BindingActivation> {
 
     @Override
     public boolean linkingCheck(BindingSignal<IA> iBS, BindingSignal<BindingActivation> oBS) {
-        if(!Link.isCausal(iBS.getActivation(), oBS.getActivation()))
-            return false;
-
-        return super.linkingCheck(iBS, oBS);
-    }
-
-    @Override
-    protected boolean commonLinkingCheck(BindingSignal<IA> iBS, BindingSignal<BindingActivation> oBS) {
         if(!oBS.getActivation().isMainBranch() &&
                 iBS.getActivation().isBoundToConflictingBS(
                         oBS.getActivation().getMainBranch().getBoundPatternBindingSignal()
@@ -44,6 +36,6 @@ public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I ext
         )
             return false;
 
-        return super.commonLinkingCheck(iBS, oBS);
+        return super.linkingCheck(iBS, oBS);
     }
 }

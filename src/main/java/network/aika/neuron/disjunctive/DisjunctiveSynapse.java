@@ -33,7 +33,7 @@ import static network.aika.fields.Fields.mul;
  *
  * @author Lukas Molzberger
  */
-public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends Neuron & Axon, O extends DisjunctiveNeuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation, OA extends DisjunctiveActivation> extends Synapse<S,I,O,L,IA,OA> {
+public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends Neuron & Axon, O extends DisjunctiveNeuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends DisjunctiveActivation> extends Synapse<S,I,O,L,IA,OA> {
 
     @Override
     public List<Transition> getTransitions() {
@@ -41,7 +41,7 @@ public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends
     }
 
     @Override
-    public boolean allowPropagate(Activation act) {
+    public boolean propagatedAllowed(Activation act) {
         if(isTemplate() && act != null && act.isNetworkInput())
             return false;
 

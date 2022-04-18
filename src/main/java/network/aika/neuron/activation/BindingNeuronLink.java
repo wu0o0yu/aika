@@ -22,7 +22,7 @@ import network.aika.neuron.conjunctive.BindingNeuronSynapse;
 /**
  * @author Lukas Molzberger
  */
-public abstract class BindingNeuronLink<S extends BindingNeuronSynapse, IA extends Activation> extends ConjunctiveLink<S, IA, BindingActivation> {
+public abstract class BindingNeuronLink<S extends BindingNeuronSynapse, IA extends Activation<?>> extends ConjunctiveLink<S, IA, BindingActivation> {
 
     public BindingNeuronLink(S s, BindingSignal<IA> input, BindingSignal<BindingActivation> output) {
         super(s, input, output);

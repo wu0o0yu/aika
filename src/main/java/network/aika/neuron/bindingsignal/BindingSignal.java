@@ -19,12 +19,15 @@ package network.aika.neuron.bindingsignal;
 import network.aika.direction.Direction;
 import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
-import network.aika.fields.Multiplication;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.steps.activation.Linking;
 
+import java.util.stream.Stream;
+
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.mul;
 
 
@@ -47,6 +50,7 @@ public class BindingSignal<A extends Activation> {
     private FieldOutput onArrivedFiredFinal;
     FieldOutput onArrivedBound;
     FieldOutput onArrivedBoundFired;
+    FieldOutput onArrivedBoundFiredFinal;
 
     public BindingSignal(A act, State state) {
         this.origin = this;
@@ -55,6 +59,7 @@ public class BindingSignal<A extends Activation> {
         this.state = state;
 
         initFields();
+        initLinkingEvents();
     }
 
     private BindingSignal(BindingSignal parent) {
@@ -63,40 +68,46 @@ public class BindingSignal<A extends Activation> {
         this.depth = parent.depth + 1;
     }
 
-    private BindingSignal(BindingSignal parent, State state, A act, Link link) {
+    private BindingSignal(BindingSignal parent, State state) {
         this(parent);
         this.state = state;
-        this.activation = act;
-        this.link = link;
-
-        this.initFields();
     }
 
-    private BindingSignal(BindingSignal parent, A act, Link link, Transition t) {
+    private BindingSignal(BindingSignal parent, Transition t) {
         this(parent);
-        this.activation = act;
-        this.link = link;
 
         this.transition = t;
         this.propagateAllowed = t.getPropagate() > 1;
         this.state = t.next(Direction.OUTPUT);
-
-        this.initFields();
     }
 
-    private BindingSignal(BindingSignal parent, A act, Transition t) {
-        this(parent, act, null, t);
+    public void init(A act) {
+        this.activation = act;
+        initFields();
+        initLinkingEvents();
     }
 
-    private BindingSignal(BindingSignal parent, Link<?, ?, A> l, Transition t) {
-        this(parent, l.getOutput(), l, t);
+    public BindingSignal<A> clone(A act) {
+        BindingSignal clonedBS = new BindingSignal(parent, state);
+        clonedBS.init(act);
+        clonedBS.setLink(link); // TODO: wrong link
+        return clonedBS;
+    }
+
+    public BindingSignal propagate(Synapse s) {
+        Transition t = s.getTransition(
+                this,
+                Direction.OUTPUT,
+                true
+        );
+        if(t == null)
+            return null;
+
+        return new BindingSignal(this, t);
     }
 
     private void initFields() {
         if (!activation.getNeuron().isNetworkInput()) {
-            onArrived.addEventListener(() ->
-                Linking.addPreFired(this)
-            );
 
             if(state == State.INPUT && activation.getLabel() == null) {
                 onArrived.addEventListener(() ->
@@ -119,9 +130,24 @@ public class BindingSignal<A extends Activation> {
                 activation.getIsFinal()
         );
 
+        onArrivedFired.addEventListener(() ->
+                getActivation().propagateBindingSignal(this)
+        );
 
         activation.initBSFields(this);
     }
+
+    private void initLinkingEvents() {
+        Neuron<?, ?> n = activation.getNeuron();
+
+        boolean templateEnabled = activation.getConfig().isTemplatesEnabled();
+        n.getTargetSynapses(INPUT, templateEnabled)
+                .forEach(s -> s.addInputLinkingEvents(this));
+
+        n.getTargetSynapses(OUTPUT, templateEnabled)
+                .forEach(s -> s.addOutputLinkingEvents(this));
+    }
+
 
     public Field getOnArrived() {
         return onArrived;
@@ -149,6 +175,14 @@ public class BindingSignal<A extends Activation> {
 
     public void setOnArrivedBoundFired(FieldOutput f) {
         onArrivedBoundFired = f;
+    }
+
+    public FieldOutput getOnArrivedBoundFiredFinal() {
+        return onArrivedBoundFiredFinal;
+    }
+
+    public void setOnArrivedBoundFiredFinal(FieldOutput f) {
+        onArrivedBoundFiredFinal = f;
     }
 
     public boolean isOrigin() {
@@ -191,6 +225,20 @@ public class BindingSignal<A extends Activation> {
         return origin.getActivation();
     }
 
+    public Stream<BindingSignal<?>> getRelatedBindingSignal(Synapse targetSynapse, Neuron toNeuron) {
+        Activation originAct = getOriginActivation();
+        Stream<BindingSignal<?>> relatedBindingSignals = originAct.getReverseBindingSignals(toNeuron);
+
+        if(targetSynapse.allowLooseLinking()) {
+            relatedBindingSignals = Stream.concat(
+                    relatedBindingSignals,
+                    originAct.getThought().getLooselyRelatedBindingSignals(this, targetSynapse.getLooseLinkingRange(), toNeuron)
+            );
+        }
+
+        return relatedBindingSignals;
+    }
+
     public void link() {
         getActivation().registerBindingSignal(this);
         getOriginActivation().registerReverseBindingSignal(getActivation(), this);
@@ -202,34 +250,6 @@ public class BindingSignal<A extends Activation> {
             return false;
 
         return existingBS.getState() == state;
-    }
-
-    public BindingSignal<A> clone(A act) {
-        return new BindingSignal(parent, state, act, link);
-    }
-
-    public BindingSignal<A> propagate(Link<?, ?, A> l) {
-        Transition t = l.getSynapse().getTransition(
-                this,
-                Direction.OUTPUT,
-                true
-        );
-        if(t == null)
-            return null;
-
-        return new BindingSignal(this, l, t);
-    }
-
-    public BindingSignal<A> propagate(Synapse s, A toAct) {
-        Transition t = s.getTransition(
-                this,
-                Direction.OUTPUT,
-                true
-        );
-        if(t == null)
-            return null;
-
-        return new BindingSignal(this, toAct, t);
     }
 
     public boolean isSelfRef(BindingSignal outputBS) {

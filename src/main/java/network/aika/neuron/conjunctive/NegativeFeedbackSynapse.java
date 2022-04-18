@@ -24,6 +24,7 @@ import network.aika.neuron.disjunctive.InhibitoryNeuron;
 
 import java.util.List;
 
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.mul;
 import static network.aika.fields.Fields.scale;
 import static network.aika.neuron.bindingsignal.Transition.transition;
@@ -59,6 +60,13 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
                 .anyMatch(bAct -> super.linkExists(iAct, bAct));
     }
 
+    public void addOutputLinkingEvents(BindingSignal<InhibitoryActivation> iBS) {
+        if(getInput().isNetworkInput() || iBS.getState() != State.BRANCH)
+            return;
+
+        iBS.getOnArrivedFired().addLinkingEventListener(iBS, this, OUTPUT);
+    }
+
     @Override
     public boolean isRecurrent() {
         return true;
@@ -69,23 +77,15 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
         if(oBS.getActivation().isSeparateBranch(iBS.getActivation()))
             return false;
 
-        if(!iBS.getActivation().isFired())
-            return false;
+//        if(!iBS.getActivation().isFired())
+//            return false;
 
         if(isTemplate() && !iBS.isSelfRef(oBS))
             return false;
 
         // Skip BindingNeuronSynapse.checkLinkingPreConditions
         // --> Do not check Link.isForward(iAct, oAct)
-        return commonLinkingCheck(iBS, oBS);
-    }
-
-    @Override
-    public boolean checkTemplateLinkingPreConditions(BindingSignal<InhibitoryActivation> iBS, BindingSignal<BindingActivation> oBS) {
-        if(!iBS.isSelfRef(oBS))
-            return false;
-
-        return super.checkTemplateLinkingPreConditions(iBS, oBS);
+        return linkingCheck(iBS, oBS);
     }
 
     @Override

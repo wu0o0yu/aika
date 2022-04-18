@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.direction.Direction;
 import network.aika.fields.Fields;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
@@ -23,6 +24,7 @@ import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
 
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
@@ -43,14 +45,14 @@ public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNe
     }
 
     @Override
-    public boolean allowPropagate(BindingActivation act) {
+    public boolean propagatedAllowed(BindingActivation act) {
         if(isTemplate() && act != null && act.isNetworkInput())
             return false;
 
         if(act != null && Fields.isTrue(act.getIsBound()))
             return false;
 
-        return super.allowPropagate(act);
+        return super.propagatedAllowed(act);
     }
 
     @Override
@@ -64,10 +66,17 @@ public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNe
     }
 
     @Override
+    public boolean networkInputsAllowed(Direction dir) {
+        return dir != Direction.INPUT || !isTemplate();
+    }
+
+/*
+    @Override
     public boolean checkTemplateLinkingPreConditions(BindingSignal<BindingActivation> iBS, BindingSignal<PatternActivation> oBS) {
         if(iBS.getActivation().getNeuron().isNetworkInput())
             return false;
 
         return super.checkTemplateLinkingPreConditions(iBS, oBS);
     }
+ */
 }

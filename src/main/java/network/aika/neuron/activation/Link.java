@@ -28,7 +28,6 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.sign.Sign;
 import network.aika.steps.link.Cleanup;
 import network.aika.steps.link.LinkCounting;
-import network.aika.steps.link.PropagateBindingSignal;
 
 import java.util.Comparator;
 
@@ -42,7 +41,7 @@ import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
  *
  * @author Lukas Molzberger
  */
-public abstract class Link<S extends Synapse, I extends Activation, O extends Activation> extends Element<Link> {
+public abstract class Link<S extends Synapse, I extends Activation<?>, O extends Activation> extends Element<Link> {
 
     public static final Comparator<Link> COMPARE = Comparator.
             <Link, Activation<?>>comparing(l -> l.output)
@@ -63,9 +62,9 @@ public abstract class Link<S extends Synapse, I extends Activation, O extends Ac
 
     public Link(S s, BindingSignal<I> iBS, BindingSignal<O> oBS) {
         this.synapse = s;
+        this.isSelfRef = iBS != null && iBS.isSelfRef(oBS);
         this.input = iBS.getActivation();
         setOutput(oBS.getActivation());
-        this.isSelfRef = iBS != null && iBS.isSelfRef(oBS);
 
         init();
 
@@ -80,7 +79,7 @@ public abstract class Link<S extends Synapse, I extends Activation, O extends Ac
                     )
             );
             onTransparent.addEventListener(() ->
-                    PropagateBindingSignal.propagateBindingSignals(this)
+                   propagateAllBindingSignals()
             );
 
             initWeightInput();
@@ -137,11 +136,8 @@ public abstract class Link<S extends Synapse, I extends Activation, O extends Ac
     }
 
     public void init() {
-        if(getInput() != null) {
+        if(getInput() != null)
             linkInput();
-            PropagateBindingSignal.propagateBindingSignals(this);
-   //         PropagateBindingSignal.add(this);
-        }
 
         if(getOutput() != null)
             linkOutput();
@@ -149,6 +145,28 @@ public abstract class Link<S extends Synapse, I extends Activation, O extends Ac
         if(getConfig().isCountingEnabled())
             LinkCounting.add(this);
     }
+
+    public void propagateBindingSignal(BindingSignal<I> fromBS) {
+        if(!fromBS.isPropagateAllowed())
+            return;
+
+        BindingSignal<O> toBS = fromBS.propagate(synapse);
+        if(toBS == null)
+            return;
+
+        toBS.init(output);
+        toBS.setLink(this);
+
+        output.addBindingSignal(toBS);
+    }
+
+    public void propagateAllBindingSignals() {
+        input.getBindingSignals()
+                .forEach(fromBS ->
+                        propagateBindingSignal(fromBS)
+                );
+    }
+
 
     public FieldOutput getInformationGainGradient() {
         return igGradient;

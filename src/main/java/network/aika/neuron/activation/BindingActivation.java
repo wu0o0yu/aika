@@ -32,6 +32,7 @@ import network.aika.steps.activation.Linking;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
 import static network.aika.neuron.bindingsignal.State.*;
@@ -104,8 +105,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     public void initBSFields(BindingSignal bs) {
-        super.initBSFields(bs);
-
         bs.setOnArrivedBound(
                 mul(
                         "isBound * onArrived",
@@ -129,12 +128,12 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 )
         );
 
-        bs.getOnArrivedBoundFired().addEventListener(() ->
-                Linking.addPostFired(bs)
-        );
-
-        bs.getOnArrivedFired().addEventListener(() ->
-                Linking.addUnboundLinking(bs)
+        bs.setOnArrivedBoundFiredFinal(
+                mul(
+                        "onFired * onArrived * isFinal",
+                        bs.getOnArrivedBoundFired(),
+                        getIsFinal()
+                )
         );
 
         if(bs.getState() == SAME) {

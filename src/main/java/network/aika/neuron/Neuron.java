@@ -208,11 +208,17 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public Stream<? extends Synapse> getTargetSynapses(Direction dir, boolean template) {
+        Stream<? extends Synapse> targetSynapsesStream = getTargetSynapsesIntern(dir, false);
+        if(template)
+            targetSynapsesStream = Stream.concat(targetSynapsesStream, getTargetSynapsesIntern(dir, true));
+        return targetSynapsesStream;
+    }
+
+    private Stream<? extends Synapse> getTargetSynapsesIntern(Direction dir, boolean template) {
         return (template ?
                 getTemplateGroup().stream().flatMap(dir::getSynapses) :
                 dir.getSynapses(this));
     }
-
 
     public Synapse getOutputSynapse(NeuronProvider n) {
         lock.acquireReadLock();

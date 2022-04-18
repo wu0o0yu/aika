@@ -25,9 +25,6 @@ import network.aika.neuron.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
-import network.aika.steps.activation.InactiveLinks;
-import network.aika.steps.activation.Linking;
-import network.aika.steps.activation.Propagate;
 import network.aika.utils.Utils;
 
 import java.util.*;
@@ -198,19 +195,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void initBSFields(BindingSignal bs) {
-        if(!bs.isOrigin())
-            return;
-
-        bs.getOnArrivedFired().addEventListener(() -> {
-                    Linking.addPostFired(bs);
-                    Propagate.add(bs, false);
-                }
-        );
-        bs.getOnArrivedFiredFinal().addEventListener(() -> {
-                    Propagate.add(bs, true);
-                    InactiveLinks.add(bs);
-                }
-        );
     }
 
     public FieldOutput getIsFired() {
@@ -347,7 +331,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return r.getAbsoluteRange(thought.getRange());
     }
 
-    public Stream<? extends BindingSignal> getBindingSignals() {
+    public Stream<BindingSignal> getBindingSignals() {
         return getPatternBindingSignals().values().stream();
     }
 
@@ -357,6 +341,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         bs.link();
         return bs;
+    }
+
+    public void propagateBindingSignal(BindingSignal fromBS) {
+        getOutputLinks().forEach(l ->
+                l.propagateBindingSignal(fromBS)
+        );
     }
 
     public void registerBindingSignal(BindingSignal bs) {
@@ -436,14 +426,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public boolean inputLinkExists(Synapse s) {
         return inputLinks.containsKey(s.getPInput());
-    }
-
-    public boolean linkExists(Direction dir, Synapse ts, boolean template) {
-        return template ?
-                dir.getLinks(this)
-                        .map(Link::getSynapse)
-                        .anyMatch(s -> s.isOfTemplate(ts)) :
-                !getOutputLinks(ts).isEmpty();
     }
 
     public SortedMap<OutputKey, Link> getOutputLinks(Synapse s) {

@@ -26,7 +26,7 @@ import static network.aika.fields.Fields.mul;
  *
  * @author Lukas Molzberger
  */
-public class PositiveFeedbackLink<IA extends Activation> extends BindingNeuronLink<PositiveFeedbackSynapse, IA> {
+public class PositiveFeedbackLink<IA extends Activation<?>> extends BindingNeuronLink<PositiveFeedbackSynapse, IA> {
 
     private AbstractBiFunction feedbackWeightInput;
     private AbstractBiFunction feedbackBiasInput;

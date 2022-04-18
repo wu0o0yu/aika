@@ -17,6 +17,7 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
+import network.aika.direction.Direction;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.SamePatternLink;
 import network.aika.neuron.bindingsignal.BindingSignal;
@@ -28,6 +29,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.List;
 
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
 /**
@@ -75,11 +77,16 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
     }
 
     @Override
-    public boolean linkingCheck(BindingSignal<BindingActivation> iBS, BindingSignal<BindingActivation> oBS) {
+    public boolean networkInputsAllowed(Direction dir) {
+        return !isTemplate();
+    }
 
+    @Override
+    public boolean linkingCheck(BindingSignal<BindingActivation> iBS, BindingSignal<BindingActivation> oBS) {
+/*
         if(isTemplate() && (iBS.getActivation().isNetworkInput() || oBS.getActivation().isNetworkInput()))
             return false;
-
+*/
         if(!iBS.getActivation().isBound())
             return false;
 

@@ -18,14 +18,14 @@ package network.aika.neuron;
 
 import network.aika.Model;
 import network.aika.direction.Direction;
-import network.aika.fields.Fields;
-import network.aika.fields.ThresholdOperator;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
 import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.sign.Sign;
+import network.aika.steps.activation.InactiveLinks;
 import network.aika.steps.activation.PostTraining;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
@@ -38,6 +38,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.List;
 
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
 
@@ -45,7 +47,7 @@ import static network.aika.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O extends Neuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation, OA extends Activation> implements Writable {
+public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O extends Neuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends Activation> implements Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Synapse.class);
 
@@ -83,43 +85,54 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return false;
     }
 
-    public boolean linkingCheck(BindingSignal<IA> iBS, BindingSignal<OA> oBS) {
-        if(!iBS.getActivation().isFired())
-            return false;
+    public void addInputLinkingEvents(BindingSignal<OA> oBS) {
+        if (oBS.getActivation().getNeuron().isNetworkInput())
+            return;
 
+        oBS.getOnArrived().addLinkingEventListener(oBS, this, INPUT);
+    }
+
+    public void addOutputLinkingEvents(BindingSignal<IA> iBS) {
+        FieldOutput e = isTemplate() ?
+                iBS.getOnArrivedFiredFinal() :
+                iBS.getOnArrivedFired();
+
+        e.addLinkingEventListener(iBS, this, OUTPUT);
+
+        iBS.getOnArrivedFiredFinal().addEventListener(() ->
+                InactiveLinks.add(iBS)
+        );
+    }
+
+    public boolean linkingCheck(BindingSignal<IA> iBS, BindingSignal<OA> oBS) {
         return commonLinkingCheck(iBS, oBS);
     }
 
     protected boolean commonLinkingCheck(BindingSignal<IA> iBS, BindingSignal<OA> oBS) {
-        Transition t = getTransition(iBS, Direction.OUTPUT, false);
-        if(t == null)
-            return false;
-
-        if(!(t.next(Direction.OUTPUT) == oBS.getState()))
-            return false;
-
-        if(linkExists(iBS.getActivation(), oBS.getActivation()))
-            return false;
-
-        if(isTemplate() && !checkTemplateLinkingPreConditions(iBS, oBS))
-            return false;
-
         return true;
     }
 
     public boolean linkExists(IA iAct, OA oAct) {
+        if(oAct == null && linkExists(iAct))
+            return true;
+
+        if(isTemplate() && Link.templateLinkExists(this, iAct, oAct))
+            return true;
+
         Link existingLink = oAct.getInputLink(iAct.getNeuron());
         return existingLink != null && existingLink.getInput() == iAct;
     }
 
-    public boolean checkTemplateLinkingPreConditions(BindingSignal<IA> iBS, BindingSignal<OA> oBS) {
-        if(oBS.getActivation().getNeuron().isNetworkInput())
-            return false;
+    private boolean linkExists(IA iAct) {
+        return isTemplate() ?
+                iAct.getOutputLinks()
+                        .map(Link::getSynapse)
+                        .anyMatch(s -> s.isOfTemplate(this)) :
+                !iAct.getOutputLinks(this).isEmpty();
+    }
 
-        if(Link.templateLinkExists(this, iBS.getActivation(), oBS.getActivation()))
-            return false;
-
-        if(!Fields.isTrue(oBS.getActivation().getInductionThreshold()))
+    public boolean networkInputsAllowed(Direction dir) {
+        if(dir == OUTPUT && isTemplate())
             return false;
 
         return true;
@@ -136,7 +149,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
     public abstract void setModified();
 
-    public boolean allowPropagate(IA act) {
+    public boolean propagatedAllowed(IA act) {
         return true;
     }
 
@@ -426,7 +439,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return (isTemplate() ? "Template-" : "") +
                 getClass().getSimpleName() +
                 " in:[" + input.getNeuron().toKeyString()  + "](" + (isInputLinked ? "+" : "-") + ") " +
-                (allowPropagate(null) ? "==>" : "-->") +
+                (propagatedAllowed(null) ? "==>" : "-->") +
                 " out:[" + output.getNeuron().toKeyString() + "](" + (isOutputLinked ? "+" : "-") + ")";
     }
 }

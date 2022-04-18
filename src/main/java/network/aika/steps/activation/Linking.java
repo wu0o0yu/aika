@@ -19,21 +19,10 @@ package network.aika.steps.activation;
 import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.InhibitoryActivation;
-import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.activation.Timestamp;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
-import network.aika.neuron.conjunctive.PatternSynapse;
-import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
-import network.aika.steps.Phase;
-import network.aika.steps.Step;
-
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.bindingsignal.Transition;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
@@ -49,116 +38,82 @@ import static network.aika.direction.Direction.OUTPUT;
  *
  * @author Lukas Molzberger
  */
-public class Linking extends Step<Activation> {
+public class Linking  {
 
-    private static void addInternal(BindingSignal bs, Direction dir, Timestamp fired, String linkingType, Predicate<Synapse> filter) {
-        if (bs.isOrigin())
-            return;
+    public static void link(Synapse ts, Direction dir, BindingSignal fromBS, BindingSignal toBS) {
+        BindingSignal inputBS = dir.getInput(fromBS, toBS);
+        BindingSignal outputBS = dir.getOutput(fromBS, toBS);
 
-        Linking step = new Linking(bs, dir, fired,  linkingType, filter);
-
-        if (step.hasTargetSynapses())
-            Step.add(step);
+        link(ts, inputBS, outputBS);
     }
 
-    public static void addPreFired(BindingSignal bs) {
-        addInternal(bs, INPUT, bs.getActivation().getFired(), "", s -> true);
-    }
+    public static void link(Direction dir, Synapse ts, BindingSignal<?> fromBS) {
+        Neuron toNeuron = dir.getNeuron(ts);
 
-    public static void addPostFired(BindingSignal bs) {
-        addInternal(bs, OUTPUT, bs.getActivation().getFired(), "", s -> true);
-    }
-
-    public static void addUnboundLinking(BindingSignal bs) {
-        addInternal(bs, OUTPUT, bs.getActivation().getFired(), "PATTERN-SYN", s -> s instanceof PatternSynapse);
-    }
-
-    public static void addPosFeedback(BindingSignal<PatternActivation> bs) {
-        addInternal(bs, OUTPUT, bs.getOriginActivation().getFired(), "POS-FEEDBACK", s -> s instanceof PositiveFeedbackSynapse);
-    }
-    public static void addNegFeedback(BindingSignal<InhibitoryActivation> bs) {
-        addInternal(bs, OUTPUT, bs.getOriginActivation().getFired(), "NEG-FEEDBACK", s -> s instanceof NegativeFeedbackSynapse);
-    }
-
-    private Direction direction;
-    private final BindingSignal<?> bindingSignal;
-    private List<Synapse> targetSynapses;
-
-
-    private Linking(BindingSignal<?> bindingSignal, Direction dir, Timestamp fired, String linkingType, Predicate<Synapse> filter) {
-        super(bindingSignal.getActivation());
-
-        this.direction = dir;
-        this.bindingSignal = bindingSignal;
-        this.fired = fired;
-
-        Neuron<?, ?> n = getElement().getNeuron();
-
-        Stream<? extends Synapse> targetSynapsesStream = n.getTargetSynapses(direction, false);
-        if(bindingSignal.getActivation().getConfig().isTemplatesEnabled())
-            targetSynapsesStream = Stream.concat(targetSynapsesStream, n.getTargetSynapses(direction, true));
-
-        this.targetSynapses = targetSynapsesStream
-                .filter(filter)
-                .collect(Collectors.toList());
-    }
-
-    private boolean hasTargetSynapses() {
-        return targetSynapses != null && !targetSynapses.isEmpty();
-    }
-
-    @Override
-    public Phase getPhase() {
-        return Phase.PROCESSING;
-    }
-
-    @Override
-    public void process() {
-        targetSynapses.forEach(ts ->
-                        link(ts)
-                );
-    }
-
-    private void link(Synapse ts) {
-        Neuron toNeuron = direction.getNeuron(ts);
-
-        getRelatedBindingSignal(ts, bindingSignal, toNeuron)
-                .filter(toBS -> bindingSignal != toBS)
+        fromBS.getRelatedBindingSignal(ts, toNeuron)
+                .filter(toBS -> fromBS != toBS)
                 .forEach(toBS ->
-                        link(ts, bindingSignal, toBS)
+                        link(ts, dir, fromBS, toBS)
                 );
+
+        if(dir == OUTPUT) {
+            //           propagate(fromBS, ts);
+            link(ts, fromBS, null);
+        }
     }
+/*
+    public static Activation link(Synapse ts, BindingSignal inputBS, BindingSignal outputBS) {
+        if(!ts.linkingCheck(inputBS, outputBS))
+            return null;
 
-    private Stream<BindingSignal<?>> getRelatedBindingSignal(Synapse targetSynapse, BindingSignal fromBindingSignal, Neuron toNeuron) {
-        Activation originAct = fromBindingSignal.getOriginActivation();
-        Stream<BindingSignal<?>> relatedBindingSignals = originAct.getReverseBindingSignals(toNeuron);
+        Link l = ts.createLink(inputBS, outputBS);
+        return l.getOutput();
+    }
+*/
+    public static Activation link(Synapse ts, BindingSignal iBS, BindingSignal oBS) {
+        if(iBS.getActivation().getNeuron().isNetworkInput() && !ts.networkInputsAllowed(INPUT))
+            return null;
 
-        if(targetSynapse.allowLooseLinking()) {
-            relatedBindingSignals = Stream.concat(
-                    relatedBindingSignals,
-                    originAct.getThought().getLooselyRelatedBindingSignals(fromBindingSignal, targetSynapse.getLooseLinkingRange(), toNeuron)
-            );
+        if(oBS.getActivation().getNeuron().isNetworkInput() && !ts.networkInputsAllowed(OUTPUT))
+            return null;
+
+        Transition t = ts.getTransition(iBS, Direction.OUTPUT, false);
+        if(t == null)
+            return null;
+
+        State oState = t.next(Direction.OUTPUT);
+        if(oState == null || oState != oBS.getState())
+            return null;
+
+        if(ts.linkExists(iBS.getActivation(), oBS.getActivation()))
+            return null;
+
+        if(!(ts.isRecurrent() || Link.isCausal(iBS.getActivation(), oBS.getActivation())))
+            return null;
+
+        if(!ts.linkingCheck(iBS, null))
+            return null;
+
+        Activation inputAct = iBS.getActivation();
+
+        if(oBS == null) {
+            if(!ts.propagatedAllowed(inputAct))
+                return null;
+
+            oBS = iBS.propagate(ts);
+            if(oBS == null)
+                return null;
+
+            Activation outputAct = ts.getOutput().createActivation(inputAct.getThought());
+            outputAct.init(ts, inputAct);
+
+            oBS.init(outputAct);
+            outputAct.addBindingSignal(oBS);
         }
 
-        return relatedBindingSignals;
-    }
+        Link l = ts.createLink(iBS, oBS);
 
-    private void link(Synapse targetSynapse, BindingSignal fromBS, BindingSignal toBS) {
-        BindingSignal inputBS = direction.getInput(fromBS, toBS);
-        BindingSignal outputBS = direction.getOutput(fromBS, toBS);
-
-        if(!targetSynapse.linkingCheck(inputBS, outputBS))
-            return;
-
-        targetSynapse.createLink(inputBS, outputBS);
-    }
-
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(direction + " " + getElement() + " - " + bindingSignal.getClass().getSimpleName() + ": " + bindingSignal);
-        targetSynapses.forEach(ts ->
-                sb.append("\n    " + ts)
-        );
-        return sb.toString();
+        oBS.setLink(l); // <- TODO
+        return l.getOutput();
     }
 }

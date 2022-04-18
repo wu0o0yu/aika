@@ -16,8 +16,15 @@
  */
 package network.aika.fields;
 
+import network.aika.direction.Direction;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.steps.activation.Linking;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import static network.aika.steps.activation.Linking.link;
 
 /**
  * @author Lukas Molzberger
@@ -69,10 +76,25 @@ public abstract class FieldNode implements FieldOutput {
         );
     }
 
-    protected void propagateUpdate(double update) {
-        receivers.forEach(l ->
-                l.getOutput().receiveUpdate(l.getArgument(), update)
+    @Override
+    public void addLinkingEventListener(BindingSignal bs, Synapse ts, Direction dir) {
+        addOutput(
+                new FieldLink(
+                        null,
+                        0,
+                        (arg, u) -> {
+                            if (u > 0.0)
+                                link(dir, ts, bs);
+                        }
+                ),
+                true
         );
+    }
+
+    protected void propagateUpdate(double update) {
+        for(FieldLink l: receivers.toArray(new FieldLink[receivers.size()])) {
+            l.getOutput().receiveUpdate(l.getArgument(), update);
+        }
     }
 
     protected void propagateUpdate(int arg, UpdateListener listener, double update) {
