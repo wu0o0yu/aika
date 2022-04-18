@@ -52,12 +52,14 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
 
     @Override
     public boolean linkingCheck(BindingSignal<IA> iBS, BindingSignal<BindingActivation> oBS) {
-        if(oBS.getActivation().checkIfPrimaryInputBNLinkAlreadyExists())
+        if(oBS != null && oBS.getActivation().checkIfPrimaryInputBNLinkAlreadyExists())
             return false;
 
-        Transition oTr = oBS.getTransition();
-        if(oTr != null && oTr.getInput() != State.SAME) // Rel. Pre. Entity special case
-            return false;
+        if(oBS != null) {
+            Transition oTr = oBS.getTransition();
+            if (oTr != null && oTr.getInput() != State.SAME) // Rel. Pre. Entity special case
+                return false;
+        }
 
         return super.linkingCheck(iBS, oBS);
     }

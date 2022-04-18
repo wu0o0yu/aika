@@ -52,12 +52,12 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     }
 
     @Override
-    public boolean linkExists(InhibitoryActivation iAct, BindingActivation oAct) {
-        if(super.linkExists(iAct, oAct))
+    public boolean linkExists(BindingSignal<InhibitoryActivation> iBS, BindingSignal<BindingActivation> oBS) {
+        if(super.linkExists(iBS, oBS))
             return true;
 
-        return oAct.getBranches().stream()
-                .anyMatch(bAct -> super.linkExists(iAct, bAct));
+        return false; // TODO: oBS.getActivation().getBranches().stream()
+             //   .anyMatch(bAct -> super.linkExists(iBS.getActivation(), bAct));
     }
 
     public void addOutputLinkingEvents(BindingSignal<InhibitoryActivation> iBS) {
@@ -74,7 +74,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
 
     @Override
     public boolean linkingCheck(BindingSignal<InhibitoryActivation> iBS, BindingSignal<BindingActivation> oBS) {
-        if(oBS.getActivation().isSeparateBranch(iBS.getActivation()))
+        if(oBS != null && oBS.getActivation().isSeparateBranch(iBS.getActivation()))
             return false;
 
 //        if(!iBS.getActivation().isFired())
@@ -85,7 +85,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
 
         // Skip BindingNeuronSynapse.checkLinkingPreConditions
         // --> Do not check Link.isForward(iAct, oAct)
-        return linkingCheck(iBS, oBS);
+        return super.linkingCheck(iBS, oBS);
     }
 
     @Override

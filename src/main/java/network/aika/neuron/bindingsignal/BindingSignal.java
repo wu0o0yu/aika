@@ -73,7 +73,7 @@ public class BindingSignal<A extends Activation> {
         this.state = state;
     }
 
-    private BindingSignal(BindingSignal parent, Transition t) {
+    public BindingSignal(BindingSignal parent, Transition t) {
         this(parent);
 
         this.transition = t;

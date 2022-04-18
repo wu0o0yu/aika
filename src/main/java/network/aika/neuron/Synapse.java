@@ -112,15 +112,15 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return true;
     }
 
-    public boolean linkExists(IA iAct, OA oAct) {
-        if(oAct == null && linkExists(iAct))
+    public boolean linkExists(BindingSignal<IA> iBS, BindingSignal<OA> oBS) {
+        if(oBS == null)
+            return linkExists(iBS.getActivation());
+
+        if(isTemplate() && Link.templateLinkExists(this, iBS.getActivation(), oBS.getActivation()))
             return true;
 
-        if(isTemplate() && Link.templateLinkExists(this, iAct, oAct))
-            return true;
-
-        Link existingLink = oAct.getInputLink(iAct.getNeuron());
-        return existingLink != null && existingLink.getInput() == iAct;
+        Link existingLink = oBS.getActivation().getInputLink(iBS.getActivation().getNeuron());
+        return existingLink != null && existingLink.getInput() == iBS.getActivation();
     }
 
     private boolean linkExists(IA iAct) {

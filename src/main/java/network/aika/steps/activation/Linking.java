@@ -74,24 +74,24 @@ public class Linking  {
         if(iBS.getActivation().getNeuron().isNetworkInput() && !ts.networkInputsAllowed(INPUT))
             return null;
 
-        if(oBS.getActivation().getNeuron().isNetworkInput() && !ts.networkInputsAllowed(OUTPUT))
+        if(oBS != null && oBS.getActivation().getNeuron().isNetworkInput() && !ts.networkInputsAllowed(OUTPUT))
             return null;
 
-        Transition t = ts.getTransition(iBS, Direction.OUTPUT, false);
+        Transition t = ts.getTransition(iBS, Direction.OUTPUT, oBS == null);
         if(t == null)
             return null;
 
         State oState = t.next(Direction.OUTPUT);
-        if(oState == null || oState != oBS.getState())
+        if(oBS != null && oState != oBS.getState())
             return null;
 
-        if(ts.linkExists(iBS.getActivation(), oBS.getActivation()))
+        if(ts.linkExists(iBS, oBS))
             return null;
 
-        if(!(ts.isRecurrent() || Link.isCausal(iBS.getActivation(), oBS.getActivation())))
+        if(oBS != null && !(ts.isRecurrent() || Link.isCausal(iBS.getActivation(), oBS.getActivation())))
             return null;
 
-        if(!ts.linkingCheck(iBS, null))
+        if(!ts.linkingCheck(iBS, oBS))
             return null;
 
         Activation inputAct = iBS.getActivation();
@@ -100,13 +100,10 @@ public class Linking  {
             if(!ts.propagatedAllowed(inputAct))
                 return null;
 
-            oBS = iBS.propagate(ts);
-            if(oBS == null)
-                return null;
-
             Activation outputAct = ts.getOutput().createActivation(inputAct.getThought());
             outputAct.init(ts, inputAct);
 
+            oBS = new BindingSignal(iBS, t); //iBS.propagate(ts);
             oBS.init(outputAct);
             outputAct.addBindingSignal(oBS);
         }
