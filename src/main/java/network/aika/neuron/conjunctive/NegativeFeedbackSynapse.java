@@ -61,7 +61,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     }
 
     public void addOutputLinkingEvents(BindingSignal<InhibitoryActivation> iBS) {
-        if(getInput().isNetworkInput() || iBS.getState() != State.BRANCH)
+        if(getInput().isNetworkInput() || iBS.getState() == State.SAME)
             return;
 
         iBS.getOnArrivedFired().addLinkingEventListener(iBS, this, OUTPUT);

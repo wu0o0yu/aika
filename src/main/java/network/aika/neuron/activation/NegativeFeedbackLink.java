@@ -34,7 +34,13 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
     protected void setOutput(BindingActivation out) {
         output = isSelfRef ?
                 out :
-                out.createBranch();
+                out.getNeuron().createActivation(getThought());
+    }
+
+    @Override
+    public void init() {
+        super.init();
+
     }
 
     @Override

@@ -19,12 +19,10 @@ package network.aika.fields;
 import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.steps.activation.Linking;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static network.aika.steps.activation.Linking.link;
 
 /**
  * @author Lukas Molzberger
@@ -84,7 +82,7 @@ public abstract class FieldNode implements FieldOutput {
                         0,
                         (arg, u) -> {
                             if (u > 0.0)
-                                link(dir, ts, bs);
+                                ts.link(dir, bs);
                         }
                 ),
                 true

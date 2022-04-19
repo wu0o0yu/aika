@@ -55,12 +55,10 @@ public class BindingSignal<A extends Activation> {
 
     public BindingSignal(A act, State state) {
         this.origin = this;
-        this.activation = act;
         this.depth = 0;
         this.state = state;
 
-        initFields();
-        initLinkingEvents();
+        init(act);
     }
 
     private BindingSignal(BindingSignal parent) {

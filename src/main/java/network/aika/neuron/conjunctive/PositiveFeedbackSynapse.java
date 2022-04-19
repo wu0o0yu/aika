@@ -16,8 +16,8 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.direction.Direction;
 import network.aika.fields.Field;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
@@ -26,7 +26,6 @@ import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
-import network.aika.steps.activation.Linking;
 
 import java.util.List;
 
@@ -56,17 +55,16 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
         s.feedbackBias.set(feedbackBias.getCurrentValue());
         super.initFromTemplate(s);
     }
-/*
-    @Override
-    public boolean networkInputsAllowed(Direction dir) {
-        return !isTemplate();
-    }
-    */
+
     public void addOutputLinkingEvents(BindingSignal<IA> iBS) {
-        if(getInput().isNetworkInput() || iBS.getState() != State.BRANCH)
+        if(iBS.getState() == State.INPUT)
             return;
 
-        iBS.getOnArrived().addLinkingEventListener(iBS, this, OUTPUT);
+        FieldOutput e = isTemplate() ?
+                iBS.getOnArrivedFinal() :
+                iBS.getOnArrived();
+
+        e.addLinkingEventListener(iBS, this, OUTPUT);
     }
 
     public Field getFeedbackWeight() {

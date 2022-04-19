@@ -20,19 +20,16 @@ import network.aika.Thought;
 import network.aika.fields.Field;
 import network.aika.fields.FieldFunction;
 import network.aika.fields.FieldOutput;
-import network.aika.fields.Fields;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.steps.activation.Linking;
 
 import java.util.*;
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
 import static network.aika.neuron.bindingsignal.State.*;
@@ -191,15 +188,12 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         return BindingSignal.originEquals(conflictingBS, bound);
     }
 
-    public BindingActivation createBranch() {
-        BindingActivation clonedAct = getNeuron().createActivation(getThought());
+    public void initBranch(BindingActivation clonedAct) {
         branches.add(clonedAct);
         clonedAct.mainBranch = this;
         clonedAct.init(null, this);
 
         copyBindingSignals(clonedAct);
-
-        return clonedAct;
     }
 
     private void copyBindingSignals(BindingActivation clonedAct) {

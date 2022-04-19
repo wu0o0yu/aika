@@ -23,6 +23,7 @@ import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
 import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.InactiveLinks;
@@ -83,6 +84,71 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
     public boolean isRecurrent() {
         return false;
+    }
+
+    public void link(Direction dir, BindingSignal fromBS, BindingSignal toBS) {
+        BindingSignal inputBS = dir.getInput(fromBS, toBS);
+        BindingSignal outputBS = dir.getOutput(fromBS, toBS);
+
+        link(inputBS, outputBS);
+    }
+
+    public void link(Direction dir, BindingSignal<?> fromBS) {
+        Neuron toNeuron = dir.getNeuron(this);
+
+        fromBS.getRelatedBindingSignal(this, toNeuron)
+                .filter(toBS -> fromBS != toBS)
+                .forEach(toBS ->
+                        link(dir, fromBS, toBS)
+                );
+
+        if(dir == OUTPUT) {
+            link((BindingSignal<IA>)fromBS, null);
+        }
+    }
+
+    public Activation link(BindingSignal<IA> iBS, BindingSignal oBS) {
+        if(iBS.getActivation().getNeuron().isNetworkInput() && !networkInputsAllowed(INPUT))
+            return null;
+
+        if(oBS != null && oBS.getActivation().getNeuron().isNetworkInput() && !networkInputsAllowed(OUTPUT))
+            return null;
+
+        Transition t = getTransition(iBS, Direction.OUTPUT, oBS == null);
+        if(t == null)
+            return null;
+
+        State oState = t.next(Direction.OUTPUT);
+        if(oBS != null && oState != oBS.getState())
+            return null;
+
+        if(linkExists(iBS, oBS))
+            return null;
+
+        if(oBS != null && !(isRecurrent() || Link.isCausal(iBS.getActivation(), oBS.getActivation())))
+            return null;
+
+        IA iAct = iBS.getActivation();
+
+        if(oBS == null) {
+            if(!propagatedAllowed(iAct))
+                return null;
+
+            Activation oAct = getOutput().createActivation(iAct.getThought());
+            oAct.init(this, iAct);
+
+            oBS = new BindingSignal(iBS, t);
+            oBS.init(oAct);
+            oAct.addBindingSignal(oBS);
+        } else {
+            if(!linkingCheck(iBS, oBS))
+                return null;
+        }
+
+        Link l = createLink(iBS, oBS);
+
+        oBS.setLink(l); // <- TODO
+        return l.getOutput();
     }
 
     public void addInputLinkingEvents(BindingSignal<OA> oBS) {

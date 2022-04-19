@@ -22,7 +22,6 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.PatternNeuron;
-import network.aika.steps.activation.Linking;
 
 import static network.aika.neuron.bindingsignal.State.SAME;
 
