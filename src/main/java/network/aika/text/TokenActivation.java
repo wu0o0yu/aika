@@ -72,17 +72,19 @@ public class TokenActivation extends PatternActivation {
                 false
         );
 */
+        /*
         relPTBindingActivation = (BindingActivation) Linking.link(
                 m.getRelPTFeedbackSyn(),
                 categoryActivation.getBindingSignal(this),
-                (BindingSignal) null
+                null
         );
 
         relNTBindingActivation = (BindingActivation) Linking.link(
                 m.getRelNTFeedbackSyn(),
                 categoryActivation.getBindingSignal(this),
-                (BindingSignal) null
+                null
         );
+         */
     }
 
     protected Field initNet() {
