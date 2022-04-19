@@ -29,7 +29,7 @@ public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I ext
 
     @Override
     public boolean linkingCheck(BindingSignal<IA> iBS, BindingSignal<BindingActivation> oBS) {
-        if(oBS != null && !oBS.getActivation().isMainBranch() &&
+        if(!oBS.getActivation().isMainBranch() &&
                 iBS.getActivation().isBoundToConflictingBS(
                         oBS.getActivation().getMainBranch().getBoundPatternBindingSignal()
                 )

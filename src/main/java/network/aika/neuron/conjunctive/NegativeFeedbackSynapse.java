@@ -74,7 +74,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
 
     @Override
     public boolean linkingCheck(BindingSignal<InhibitoryActivation> iBS, BindingSignal<BindingActivation> oBS) {
-        if(oBS != null && oBS.getActivation().isSeparateBranch(iBS.getActivation()))
+        if(oBS.getActivation().isSeparateBranch(iBS.getActivation()))
             return false;
 
 //        if(!iBS.getActivation().isFired())

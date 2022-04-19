@@ -89,7 +89,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         if (oBS.getActivation().getNeuron().isNetworkInput())
             return;
 
-        oBS.getOnArrived().addLinkingEventListener(oBS, this, INPUT);
+        FieldOutput e = isTemplate() ?
+                oBS.getOnArrivedFinal() :
+                oBS.getOnArrived();
+
+        e.addLinkingEventListener(oBS, this, INPUT);
     }
 
     public void addOutputLinkingEvents(BindingSignal<IA> iBS) {

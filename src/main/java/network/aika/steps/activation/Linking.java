@@ -91,21 +91,21 @@ public class Linking  {
         if(oBS != null && !(ts.isRecurrent() || Link.isCausal(iBS.getActivation(), oBS.getActivation())))
             return null;
 
-        if(!ts.linkingCheck(iBS, oBS))
-            return null;
-
-        Activation inputAct = iBS.getActivation();
+        Activation iAct = iBS.getActivation();
 
         if(oBS == null) {
-            if(!ts.propagatedAllowed(inputAct))
+            if(!ts.propagatedAllowed(iAct))
                 return null;
 
-            Activation outputAct = ts.getOutput().createActivation(inputAct.getThought());
-            outputAct.init(ts, inputAct);
+            Activation outputAct = ts.getOutput().createActivation(iAct.getThought());
+            outputAct.init(ts, iAct);
 
             oBS = new BindingSignal(iBS, t); //iBS.propagate(ts);
             oBS.init(outputAct);
             outputAct.addBindingSignal(oBS);
+        } else {
+            if(!ts.linkingCheck(iBS, oBS))
+                return null;
         }
 
         Link l = ts.createLink(iBS, oBS);

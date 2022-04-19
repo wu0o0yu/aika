@@ -47,6 +47,7 @@ public class BindingSignal<A extends Activation> {
 
     private Field onArrived = new Field(this, "onArrived");
     private FieldOutput onArrivedFired;
+    private FieldOutput onArrivedFinal;
     private FieldOutput onArrivedFiredFinal;
     FieldOutput onArrivedBound;
     FieldOutput onArrivedBoundFired;
@@ -124,6 +125,12 @@ public class BindingSignal<A extends Activation> {
                 onArrived
         );
 
+        onArrivedFinal = mul(
+                "onFinal * onArrived",
+                activation.getIsFinal(),
+                onArrived
+        );
+
         onArrivedFiredFinal = mul(
                 "onFired * onArrived * isFinal",
                 onArrivedFired,
@@ -155,6 +162,10 @@ public class BindingSignal<A extends Activation> {
 
     public FieldOutput getOnArrivedFired() {
         return onArrivedFired;
+    }
+
+    public FieldOutput getOnArrivedFinal() {
+        return onArrivedFinal;
     }
 
     public FieldOutput getOnArrivedFiredFinal() {

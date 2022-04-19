@@ -59,7 +59,7 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
 
     @Override
     public boolean linkingCheck(BindingSignal<BindingActivation> iBS, BindingSignal<BindingActivation> oBS) {
-        if(iBS.getState() == SAME && oBS != null && !(oBS.getLink() instanceof PrimaryInputLink<?>))
+        if(iBS.getState() == SAME && !(oBS.getLink() instanceof PrimaryInputLink<?>))
             return false;
 
         if(iBS.getState() == INPUT && !verifySameBindingSignal(iBS, oBS))
