@@ -75,14 +75,14 @@ public abstract class FieldNode implements FieldOutput {
     }
 
     @Override
-    public void addLinkingEventListener(BindingSignal bs, Synapse ts, Direction dir) {
+    public void addLinkingEventListener(BindingSignal bs, Synapse ts, Direction dir, int linkingMode) {
         addOutput(
                 new FieldLink(
                         null,
                         0,
                         (arg, u) -> {
                             if (u > 0.0)
-                                ts.link(dir, bs);
+                                ts.link(dir, linkingMode, bs);
                         }
                 ),
                 true
@@ -90,7 +90,9 @@ public abstract class FieldNode implements FieldOutput {
     }
 
     protected void propagateUpdate(double update) {
-        for(FieldLink l: receivers.toArray(new FieldLink[receivers.size()])) {
+        int i = 0;
+        while(i < receivers.size()) {
+            FieldLink l = receivers.get(i++);
             l.getOutput().receiveUpdate(l.getArgument(), update);
         }
     }

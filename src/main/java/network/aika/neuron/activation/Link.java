@@ -56,28 +56,17 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     private AbstractBiFunction weightedInput;
     protected AbstractBiFunction backPropGradient;
 
-    private ThresholdOperator onTransparent;
-
-    protected boolean isSelfRef;
+    protected ThresholdOperator onTransparent;
 
     public Link(S s, BindingSignal<I> iBS, BindingSignal<O> oBS) {
         this.synapse = s;
-        this.isSelfRef = iBS != null && iBS.isSelfRef(oBS);
         this.input = iBS.getActivation();
-        setOutput(oBS.getActivation());
+        this.output = oBS.getActivation();
 
         init();
 
         if(input != null && output != null) {
-            onTransparent = threshold(
-                    "onTransparent",
-                    0.0,
-                    ABOVE,
-                    mul("isFired * weight",
-                            synapse.getWeight(),
-                            input.isFired
-                    )
-            );
+            initOnTransparent();
             onTransparent.addEventListener(() ->
                    propagateAllBindingSignals()
             );
@@ -93,8 +82,16 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         getThought().onLinkCreationEvent(this);
     }
 
-    protected void setOutput(O out) {
-        output = out;
+    protected void initOnTransparent() {
+        onTransparent = threshold(
+                "onTransparent",
+                0.0,
+                ABOVE,
+                mul("isFired * weight",
+                        synapse.getWeight(),
+                        input.isFired
+                )
+        );
     }
 
     private void initGradients() {
@@ -150,12 +147,11 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         if(!fromBS.isPropagateAllowed())
             return;
 
-        BindingSignal<O> toBS = fromBS.propagate(synapse);
+        BindingSignal<O> toBS = fromBS.propagate(this);
         if(toBS == null)
             return;
 
         toBS.init(output);
-        toBS.setLink(this);
 
         output.addBindingSignal(toBS);
     }
@@ -167,6 +163,9 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
                 );
     }
 
+    public FieldOutput getOnTransparent() {
+        return onTransparent;
+    }
 
     public FieldOutput getInformationGainGradient() {
         return igGradient;
@@ -197,10 +196,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         s -= input.getNeuron().getSurprisal(si, range, true);
         s -= output.getNeuron().getSurprisal(so, range, true);
         return s;
-    }
-
-    public boolean isSelfRef() {
-        return isSelfRef;
     }
 
     public FieldOutput getInputValue(Sign s) {

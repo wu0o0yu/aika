@@ -54,12 +54,4 @@ public class CategorySynapse<N extends Neuron & PatternAxon> extends Disjunctive
     public boolean networkInputsAllowed(Direction dir) {
         return dir != Direction.INPUT || !isTemplate();
     }
-    /*
-    @Override
-    public boolean checkTemplateLinkingPreConditions(BindingSignal<PatternActivation> iBS, BindingSignal<CategoryActivation> oBS) {
-        if(iBS.getActivation().getNeuron().isNetworkInput())
-            return false;
-
-        return super.checkTemplateLinkingPreConditions(iBS, oBS);
-    }*/
 }

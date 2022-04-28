@@ -54,15 +54,7 @@ public class InhibitorySynapse extends DisjunctiveSynapse<InhibitorySynapse, Bin
     public boolean networkInputsAllowed(Direction dir) {
         return dir != Direction.INPUT || !isTemplate();
     }
-    /*
-    @Override
-    public boolean checkTemplateLinkingPreConditions(BindingSignal<BindingActivation> iBS, BindingSignal<InhibitoryActivation> oBS) {
-        if(iBS.getActivation().getNeuron().isNetworkInput())
-            return false;
 
-        return super.checkTemplateLinkingPreConditions(iBS, oBS);
-    }
-*/
     @Override
     public void setModified() {
         getInput().setModified();

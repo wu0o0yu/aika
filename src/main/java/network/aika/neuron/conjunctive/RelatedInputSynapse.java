@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PrimaryInputLink;
@@ -58,6 +59,27 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
     }
 
     @Override
+    public FieldOutput getOutputLinkingEvent(BindingSignal<BindingActivation> iBS, int m) {
+        if(m == 0 && iBS.getState() != SAME)
+            return null;
+
+        if(m == 1 && iBS.getState() != INPUT)
+            return null;
+
+        return super.getOutputLinkingEvent(iBS, m);
+    }
+
+    @Override
+    public FieldOutput getInputLinkingEvent(BindingSignal<BindingActivation> oBS, int m) {
+        return super.getInputLinkingEvent(oBS, m);
+    }
+
+    @Override
+    public int getNumberOfLinkingModes() {
+        return 2;
+    }
+
+    @Override
     public boolean linkingCheck(BindingSignal<BindingActivation> iBS, BindingSignal<BindingActivation> oBS) {
         if(iBS.getState() == SAME && !(oBS.getLink() instanceof PrimaryInputLink<?>))
             return false;
@@ -71,7 +93,7 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
     private boolean verifySameBindingSignal(BindingSignal iBS, BindingSignal oBS) {
         BindingActivation iAct = (BindingActivation) iBS.getActivation();
         BindingActivation oAct = (BindingActivation) oBS.getActivation();
-        BindingSignal sameSB = iAct.getBoundPatternBindingSignal();
+        BindingSignal sameSB = iAct.getOnBoundPattern().getReference();
         if(sameSB == null)
             return false;
 

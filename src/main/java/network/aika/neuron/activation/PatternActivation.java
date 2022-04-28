@@ -51,11 +51,6 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     }
 
     @Override
-    public boolean isBoundToConflictingBS(BindingSignal conflictingBS) {
-        return conflictingBS != null && conflictingBS.getOriginActivation() == this;
-    }
-
-    @Override
     public void init(Synapse originSynapse, Activation originAct) {
         super.init(originSynapse, originAct);
         addBindingSignal(new BindingSignal(this, SAME));
@@ -67,10 +62,6 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
         if(bs.getOriginActivation() == this)
             thought.registerBindingSignalSource(this, bs);
-    }
-
-    public boolean isSelfRef(Activation iAct) {
-        return reverseBindingSignals.containsKey(iAct);
     }
 
     @Override

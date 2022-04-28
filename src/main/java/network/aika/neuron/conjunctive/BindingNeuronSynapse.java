@@ -16,10 +16,13 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.fields.Field;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.BindingSignal;
+
+import static network.aika.neuron.bindingsignal.BindingSignal.originEquals;
 
 /**
  *
@@ -27,15 +30,10 @@ import network.aika.neuron.bindingsignal.BindingSignal;
  */
 public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I extends Neuron & Axon, L extends Link<S, IA, BindingActivation>, IA extends Activation<?>> extends ConjunctiveSynapse<S, I, BindingNeuron, L, IA, BindingActivation> {
 
-    @Override
-    public boolean linkingCheck(BindingSignal<IA> iBS, BindingSignal<BindingActivation> oBS) {
-        if(!oBS.getActivation().isMainBranch() &&
-                iBS.getActivation().isBoundToConflictingBS(
-                        oBS.getActivation().getMainBranch().getBoundPatternBindingSignal()
-                )
-        )
-            return false;
+    protected boolean checkBoundToSamePattern(BindingSignal iBS, BindingSignal oBS) {
+        Field<BindingSignal> iOnBound = iBS.getActivation().getOnBoundPattern();
+        Field<BindingSignal> oOnBound = oBS.getActivation().getOnBoundPattern();
 
-        return super.linkingCheck(iBS, oBS);
+        return oOnBound.getReference() == null || originEquals(iOnBound.getReference(), oOnBound.getReference());
     }
 }

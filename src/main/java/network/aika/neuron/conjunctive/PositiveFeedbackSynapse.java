@@ -27,6 +27,8 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static network.aika.direction.Direction.OUTPUT;
@@ -56,15 +58,14 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
         super.initFromTemplate(s);
     }
 
-    public void addOutputLinkingEvents(BindingSignal<IA> iBS) {
+    @Override
+    public FieldOutput getOutputLinkingEvent(BindingSignal<IA> iBS, int linkingMode) {
         if(iBS.getState() == State.INPUT)
-            return;
+            return null;
 
-        FieldOutput e = isTemplate() ?
+        return isTemplate() ?
                 iBS.getOnArrivedFinal() :
                 iBS.getOnArrived();
-
-        e.addLinkingEventListener(iBS, this, OUTPUT);
     }
 
     public Field getFeedbackWeight() {

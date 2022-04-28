@@ -42,10 +42,7 @@ public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends
 
     @Override
     public boolean propagatedAllowed(Activation act) {
-        if(isTemplate() && act != null && act.isNetworkInput())
-            return false;
-
-        return true;
+        return !isTemplate() || act == null || !act.isNetworkInput();
     }
 
     @Override

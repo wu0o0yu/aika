@@ -18,6 +18,7 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
 import network.aika.direction.Direction;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.SamePatternLink;
 import network.aika.neuron.bindingsignal.BindingSignal;
@@ -29,7 +30,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.List;
 
-import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.fields.Fields.mul;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
 /**
@@ -82,35 +83,33 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
     }
 
     @Override
+    public FieldOutput getOutputLinkingEvent(BindingSignal<BindingActivation> iBS, int linkingMode) {
+        FieldOutput e = super.getOutputLinkingEvent(iBS, linkingMode);
+        if(e == null)
+            return null;
+
+        return mul(
+                "bound output linking event",
+                e,
+                iBS.getActivation().getOnBoundPattern()
+        );
+    }
+
+    @Override
     public boolean linkingCheck(BindingSignal<BindingActivation> iBS, BindingSignal<BindingActivation> oBS) {
-/*
-        if(isTemplate() && (iBS.getActivation().isNetworkInput() || oBS.getActivation().isNetworkInput()))
-            return false;
-*/
-        if(!iBS.getActivation().isBound())
-            return false;
-
-        if(oBS.getActivation().isBound() && iBS.getActivation().getBoundPatternBindingSignal().getOrigin() != oBS.getActivation().getBoundPatternBindingSignal().getOrigin())
-            return false;
-
      //   if(isSeparateBranch(iAct, oAct))
      //       return false;
 
         if(allowLooseLinking) {
             return iBS.getOrigin() != oBS.getOrigin() &&
                     iBS.getState() == State.INPUT &&
-                    oBS.getState() == State.INPUT &&
-                    commonLinkingCheck(iBS, oBS);
+                    oBS.getState() == State.INPUT;
         }
 
         if(!super.linkingCheck(iBS, oBS))
             return false;
 
-        BindingSignal iSamePBS = iBS.getActivation().getBoundPatternBindingSignal();
-        BindingSignal oSamePBS = oBS.getActivation().getBoundPatternBindingSignal();
-
-        // The Input and Output BindingActivations belong to different Patterns.
-        return oSamePBS == null || oSamePBS == iSamePBS;
+        return checkBoundToSamePattern(iBS, oBS);
     }
 
     @Override

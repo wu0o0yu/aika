@@ -34,16 +34,6 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
         super(id, t, neuron);
     }
 
-    public boolean isSelfRef(Activation iAct) {
-        return false;
-    }
-
-
-    @Override
-    public boolean checkAllowPropagate() {
-        return isTemplate();
-    }
-
     @Override
     public Range getRange() {
         BindingSignal bs = getPrimaryBranchBindingSignal();
@@ -52,11 +42,6 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
 
         return bs.getOriginActivation()
                 .getRange();
-    }
-
-    @Override
-    public boolean isBoundToConflictingBS(BindingSignal conflictingBS) {
-        return false;
     }
 
     private BindingSignal getPrimaryBranchBindingSignal() {

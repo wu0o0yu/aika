@@ -41,7 +41,7 @@ public interface FieldOutput {
 
     void addEventListener(FieldOnTrueEvent eventListener);
 
-    void addLinkingEventListener(BindingSignal bs, Synapse ts, Direction dir);
+    void addLinkingEventListener(BindingSignal bs, Synapse ts, Direction dir, int linkingMode);
 
     void disconnect();
 }

@@ -20,7 +20,8 @@ import network.aika.fields.AbstractBiFunction;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 
-import static network.aika.fields.Fields.mul;
+import static network.aika.fields.Fields.*;
+import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 
 /**
  *
@@ -52,6 +53,20 @@ public class PositiveFeedbackLink<IA extends Activation<?>> extends BindingNeuro
                 input.getIsFinal(),
                 synapse.getFeedbackBias(),
                 getOutput().getNet()
+        );
+    }
+
+    @Override
+    protected void initOnTransparent() {
+        onTransparent = threshold(
+                "onTransparent",
+                0.0,
+                ABOVE,
+                add(
+                        "weight sum",
+                        synapse.getWeight(),
+                        synapse.getFeedbackWeight()
+                )
         );
     }
 

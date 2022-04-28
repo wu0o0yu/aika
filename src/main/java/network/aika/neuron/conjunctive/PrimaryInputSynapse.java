@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
@@ -27,6 +28,8 @@ import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
 
+import static network.aika.fields.Fields.invert;
+import static network.aika.fields.Fields.mul;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
 
@@ -51,9 +54,22 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
     }
 
     @Override
+    public FieldOutput getInputLinkingEvent(BindingSignal<BindingActivation> oBS, int linkingMode) {
+        FieldOutput e = super.getInputLinkingEvent(oBS, linkingMode);
+        if(e == null)
+            return null;
+
+        return mul(
+                "bound input linking event",
+                e,
+                invert("!OnBoundPrimaryInput", oBS.getActivation().getOnBoundPrimaryInput())
+        );
+    }
+
+    @Override
     public boolean linkingCheck(BindingSignal<IA> iBS, BindingSignal<BindingActivation> oBS) {
-        if(oBS.getActivation().checkIfPrimaryInputBNLinkAlreadyExists())
-            return false;
+//        if(oBS.getActivation().checkIfPrimaryInputBNLinkAlreadyExists())
+//            return false;
 
         Transition oTr = oBS.getTransition();
         if(oTr != null && oTr.getInput() != State.SAME) // Rel. Pre. Entity special case

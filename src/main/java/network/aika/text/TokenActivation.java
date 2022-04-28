@@ -52,36 +52,33 @@ public class TokenActivation extends PatternActivation {
 
         TextModel m = getModel();
 
-        Link categoryLink = getOutputLinks(getNeuron().getOutputSynapse(m.getTokenCategory().getProvider()))
+        categoryActivation = followSynapse(
+                this,
+                getNeuron().getOutputSynapse(m.getTokenCategory().getProvider())
+        );
+
+        relPTBindingActivation = followSynapse(
+                categoryActivation,
+                m.getRelPTFeedbackSyn()
+        );
+
+        relNTBindingActivation = followSynapse(
+                categoryActivation,
+                m.getRelNTFeedbackSyn()
+        );
+    }
+
+    private <A extends Activation> A followSynapse(Activation<?> fromAct, Synapse s) {
+        Link l = fromAct.getOutputLinks(s)
                 .values()
                 .stream()
                 .findFirst()
                 .orElse(null);
 
-        if(categoryLink == null)
-            return;
+        if(l == null)
+            return null;
 
-        categoryActivation = (CategoryActivation) categoryLink.getOutput();
-        /*
-        categoryActivation = (CategoryActivation) Propagate.propagate(
-                getBindingSignal(this),
-                getNeuron().getOutputSynapse(m.getTokenCategory().getProvider()),
-                false
-        );
-*/
-        /*
-        relPTBindingActivation = (BindingActivation) Linking.link(
-                m.getRelPTFeedbackSyn(),
-                categoryActivation.getBindingSignal(this),
-                null
-        );
-
-        relNTBindingActivation = (BindingActivation) Linking.link(
-                m.getRelNTFeedbackSyn(),
-                categoryActivation.getBindingSignal(this),
-                null
-        );
-         */
+        return (A) l.getOutput();
     }
 
     protected Field initNet() {

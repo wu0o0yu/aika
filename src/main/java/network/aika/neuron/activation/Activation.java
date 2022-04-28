@@ -74,6 +74,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected FieldOutput updateValue;
     protected FieldOutput inductionThreshold;
 
+    protected Field<BindingSignal> onBoundPattern = new Field(null, "onBoundPattern");
+
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
 
@@ -222,11 +224,13 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         );
     }
 
+    public Field<BindingSignal> getOnBoundPattern() {
+        return onBoundPattern;
+    }
+
     public FieldFunction getNetOuterGradient() {
         return netOuterGradient;
     }
-
-    public abstract boolean isBoundToConflictingBS(BindingSignal bs);
 
     public void init(Synapse originSynapse, Activation originAct) {
         setCreationTimestamp();
@@ -317,10 +321,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public boolean isTemplate() {
         return getNeuron().isTemplate();
-    }
-
-    public boolean checkAllowPropagate() {
-        return isFired();
     }
 
     public abstract Range getRange();
@@ -487,7 +487,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 backpropInputGradient,
                 ownOutputGradient,
                 backpropOutputGradient,
-                outputGradient
+                outputGradient,
+                onBoundPattern
         };
 
         for(FieldOutput f: fields) {

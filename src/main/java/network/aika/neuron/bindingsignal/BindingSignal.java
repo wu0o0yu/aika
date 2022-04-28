@@ -28,7 +28,9 @@ import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.fields.Fields.connect;
 import static network.aika.fields.Fields.mul;
+import static network.aika.neuron.bindingsignal.State.SAME;
 
 
 /**
@@ -80,29 +82,39 @@ public class BindingSignal<A extends Activation> {
         this.state = t.next(Direction.OUTPUT);
     }
 
+    public BindingSignal(BindingSignal parent, Transition t, Link l) {
+        this(parent, t);
+
+        this.link = l;
+    }
+
+
     public void init(A act) {
         this.activation = act;
         initFields();
         initLinkingEvents();
     }
 
-    public BindingSignal<A> clone(A act) {
-        BindingSignal clonedBS = new BindingSignal(parent, state);
-        clonedBS.init(act);
-        clonedBS.setLink(link); // TODO: wrong link
-        return clonedBS;
-    }
-
-    public BindingSignal propagate(Synapse s) {
-        Transition t = s.getTransition(
+    private Transition transition(Synapse s) {
+        return s.getTransition(
                 this,
                 Direction.OUTPUT,
                 true
         );
-        if(t == null)
-            return null;
+    }
 
-        return new BindingSignal(this, t);
+    public BindingSignal propagate(Synapse s) {
+        Transition t = transition(s);
+        return t != null ?
+                new BindingSignal(this, t) :
+                null;
+    }
+
+    public BindingSignal propagate(Link l) {
+        Transition t = transition(l.getSynapse());
+        return t != null ?
+                new BindingSignal(this, t, l) :
+                null;
     }
 
     private void initFields() {
@@ -139,6 +151,11 @@ public class BindingSignal<A extends Activation> {
                 getActivation().propagateBindingSignal(this)
         );
 
+        if(getState() == SAME) {
+            activation.getOnBoundPattern().setReference(this);
+            connect(getOnArrived(), activation.getOnBoundPattern());
+        }
+
         activation.initBSFields(this);
     }
 
@@ -147,10 +164,10 @@ public class BindingSignal<A extends Activation> {
 
         boolean templateEnabled = activation.getConfig().isTemplatesEnabled();
         n.getTargetSynapses(INPUT, templateEnabled)
-                .forEach(s -> s.addInputLinkingEvents(this));
+                .forEach(s -> s.registerInputLinkingEvents(this));
 
         n.getTargetSynapses(OUTPUT, templateEnabled)
-                .forEach(s -> s.addOutputLinkingEvents(this));
+                .forEach(s -> s.registerOutputLinkingEvents(this));
     }
 
 
@@ -208,10 +225,6 @@ public class BindingSignal<A extends Activation> {
 
     public Link getLink() {
         return link;
-    }
-
-    public void setLink(Link l) {
-        this.link = l;
     }
 
     public Transition getTransition() {
