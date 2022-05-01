@@ -38,6 +38,7 @@ public class CategorySynapse<N extends Neuron & PatternAxon> extends Disjunctive
 
     private static List<Transition> TRANSITIONS = List.of(
             transition(State.SAME, State.SAME)
+                    .setCheck(true)
                     .setPropagate(Integer.MAX_VALUE),
 
             transition(State.INPUT, State.INPUT)

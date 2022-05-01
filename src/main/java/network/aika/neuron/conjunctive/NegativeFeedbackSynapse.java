@@ -46,11 +46,11 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
                     .setCheckSelfRef(true)
                     .setCheckSamePrimaryInput(true)
                     .setCheckBoundToSamePattern(true)
-                    .setPropagate(0),
+                    .setPropagate(0)//,
 
-            transition(State.BRANCH, State.BRANCH)
-                    .setCheck(true)
-                    .setPropagate(1)
+//            transition(State.BRANCH, State.BRANCH)
+//                    .setCheck(true)
+//                    .setPropagate(1)
     );
 
     @Override

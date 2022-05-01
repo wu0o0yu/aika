@@ -42,6 +42,7 @@ public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNe
                     .setPropagate(Integer.MAX_VALUE),
 
             transition(BRANCH, BRANCH)
+                    .setCheck(true)
                     .setPropagate(Integer.MAX_VALUE)
     );
 

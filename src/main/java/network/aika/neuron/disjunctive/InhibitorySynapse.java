@@ -40,6 +40,7 @@ public class InhibitorySynapse extends DisjunctiveSynapse<InhibitorySynapse, Bin
                     .setPropagate(Integer.MAX_VALUE),
 
             transition(State.INPUT, State.INPUT)
+                    .setCheck(true)
                     .setPropagate(Integer.MAX_VALUE),
 
             transition(State.BRANCH, State.BRANCH)
