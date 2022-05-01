@@ -26,8 +26,7 @@ import network.aika.neuron.activation.Link;
 
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.direction.Direction.*;
 import static network.aika.fields.Fields.connect;
 import static network.aika.fields.Fields.mul;
 import static network.aika.neuron.bindingsignal.State.SAME;
@@ -88,7 +87,6 @@ public class BindingSignal<A extends Activation> {
         this.link = l;
     }
 
-
     public void init(A act) {
         this.activation = act;
         initFields();
@@ -96,11 +94,11 @@ public class BindingSignal<A extends Activation> {
     }
 
     private Transition transition(Synapse s) {
-        return s.getTransition(
-                this,
-                Direction.OUTPUT,
-                true
-        );
+        Stream<Transition> transitions = s.getTransitions();
+        return transitions
+                .filter(t -> t.checkPropagate(getState()))
+                .findFirst()
+                .orElse(null);
     }
 
     public BindingSignal propagate(Synapse s) {
@@ -163,11 +161,9 @@ public class BindingSignal<A extends Activation> {
         Neuron<?, ?> n = activation.getNeuron();
 
         boolean templateEnabled = activation.getConfig().isTemplatesEnabled();
-        n.getTargetSynapses(INPUT, templateEnabled)
-                .forEach(s -> s.registerInputLinkingEvents(this));
-
-        n.getTargetSynapses(OUTPUT, templateEnabled)
-                .forEach(s -> s.registerOutputLinkingEvents(this));
+        for(Direction dir: DIRECTIONS)
+            n.getTargetSynapses(dir, templateEnabled)
+                    .forEach(s -> s.registerLinkingEvents(this, dir));
     }
 
 

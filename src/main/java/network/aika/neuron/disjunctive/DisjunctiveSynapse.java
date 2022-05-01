@@ -16,16 +16,15 @@
  */
 package network.aika.neuron.disjunctive;
 
+import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.DisjunctiveActivation;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.Transition;
 
-import java.util.Collections;
-import java.util.List;
+
+import java.util.stream.Stream;
 
 import static network.aika.fields.Fields.mul;
 
@@ -36,13 +35,13 @@ import static network.aika.fields.Fields.mul;
 public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends Neuron & Axon, O extends DisjunctiveNeuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends DisjunctiveActivation> extends Synapse<S,I,O,L,IA,OA> {
 
     @Override
-    public List<Transition> getTransitions() {
-        return Collections.EMPTY_LIST;
+    public Stream<Transition> getTransitions() {
+        return Stream.empty();
     }
 
     @Override
-    public boolean propagatedAllowed(Activation act) {
-        return !isTemplate() || act == null || !act.isNetworkInput();
+    public boolean networkInputsAllowed(Direction dir) {
+        return !isTemplate();
     }
 
     @Override

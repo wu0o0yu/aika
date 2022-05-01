@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.direction.Direction;
 import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Neuron;
@@ -27,9 +28,8 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.bindingsignal.Transition.transition;
@@ -41,8 +41,13 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<PositiveFeedbackSynapse, I, PositiveFeedbackLink<IA>, IA> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(State.BRANCH, State.BRANCH, true, 1),
-            transition(State.SAME, State.SAME, true, Integer.MAX_VALUE)
+            transition(State.BRANCH, State.BRANCH)
+                    .setCheck(true)
+                    .setPropagate(1),
+
+            transition(State.SAME, State.SAME)
+                    .setCheck(true)
+                    .setPropagate(Integer.MAX_VALUE)
     );
 
     private Field feedbackWeight = new Field(this, "feedbackWeight");
@@ -59,13 +64,14 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     }
 
     @Override
-    public FieldOutput getOutputLinkingEvent(BindingSignal<IA> iBS, int linkingMode) {
-        if(iBS.getState() == State.INPUT)
-            return null;
+    public FieldOutput getLinkingEvent(BindingSignal bs, Transition t, Direction dir) {
+        if(dir == OUTPUT) {
+            return isTemplate() ?
+                    bs.getOnArrivedFinal() :
+                    bs.getOnArrived();
+        }
 
-        return isTemplate() ?
-                iBS.getOnArrivedFinal() :
-                iBS.getOnArrived();
+        return super.getLinkingEvent(bs, t, dir);
     }
 
     public Field getFeedbackWeight() {
@@ -82,7 +88,7 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     }
 
     @Override
-    public List<Transition> getTransitions() {
-        return TRANSITIONS;
+    public Stream<Transition> getTransitions() {
+        return TRANSITIONS.stream();
     }
 }

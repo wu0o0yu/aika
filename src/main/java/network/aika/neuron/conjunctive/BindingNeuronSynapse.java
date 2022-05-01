@@ -30,10 +30,4 @@ import static network.aika.neuron.bindingsignal.BindingSignal.originEquals;
  */
 public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I extends Neuron & Axon, L extends Link<S, IA, BindingActivation>, IA extends Activation<?>> extends ConjunctiveSynapse<S, I, BindingNeuron, L, IA, BindingActivation> {
 
-    protected boolean checkBoundToSamePattern(BindingSignal iBS, BindingSignal oBS) {
-        Field<BindingSignal> iOnBound = iBS.getActivation().getOnBoundPattern();
-        Field<BindingSignal> oOnBound = oBS.getActivation().getOnBoundPattern();
-
-        return oOnBound.getReference() == null || originEquals(iOnBound.getReference(), oOnBound.getReference());
-    }
 }

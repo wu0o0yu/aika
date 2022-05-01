@@ -19,8 +19,9 @@ package network.aika.direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.stream.Stream;
 
@@ -50,10 +51,17 @@ public class Output implements Direction {
         return s.getOutput();
     }
 
+    @Override
     public Activation getActivation(Link l) {
         return l.getOutput();
     }
 
+    @Override
+    public State getState(Transition t) {
+        return t.getOutput();
+    }
+
+    @Override
     public Stream<Link> getLinks(Activation act) {
         return act.getOutputLinks();
     }

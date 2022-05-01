@@ -28,8 +28,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static network.aika.fields.Fields.mul;
-
 /**
  *
  * @author Lukas Molzberger
@@ -43,7 +41,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     @Override
-    public boolean propagatedAllowed(IA act) {
+    public boolean isAllowPropagate() {
         return allowPropagate;
     }
 

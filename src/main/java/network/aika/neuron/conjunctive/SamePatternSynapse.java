@@ -29,7 +29,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.mul;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
@@ -41,8 +43,21 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse, BindingNeuron, SamePatternLink, BindingActivation> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(State.SAME, State.SAME, true, Integer.MAX_VALUE), // Same Pattern BindingSignal
-            transition(State.INPUT, State.INPUT, true, Integer.MAX_VALUE) // Input BS becomes related
+            transition(State.SAME, State.SAME)
+                    .setCheck(true)
+                    .setPropagate(Integer.MAX_VALUE), // Same Pattern BindingSignal
+
+            transition(State.INPUT, State.INPUT)
+                    .setCheck(true)
+                    .setCheckBoundToSamePattern(true)
+                    .setCheckLooseLinking(true)
+                    .setPropagate(Integer.MAX_VALUE), // Input BS becomes related
+
+            transition(State.INPUT, State.INPUT)
+                    .setCheck(true)
+                    .setCheckBoundToSamePattern(true)
+                    .setCheckSamePrimaryInput(true)
+                    .setPropagate(Integer.MAX_VALUE) // Input BS becomes related
     );
 
     private int looseLinkingRange;
@@ -83,38 +98,23 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
     }
 
     @Override
-    public FieldOutput getOutputLinkingEvent(BindingSignal<BindingActivation> iBS, int linkingMode) {
-        FieldOutput e = super.getOutputLinkingEvent(iBS, linkingMode);
-        if(e == null)
-            return null;
+    public FieldOutput getLinkingEvent(BindingSignal bs, Transition t, Direction dir) {
+        FieldOutput e = super.getLinkingEvent(bs, t, dir);
 
-        return mul(
-                "bound output linking event",
-                e,
-                iBS.getActivation().getOnBoundPattern()
-        );
-    }
-
-    @Override
-    public boolean linkingCheck(BindingSignal<BindingActivation> iBS, BindingSignal<BindingActivation> oBS) {
-     //   if(isSeparateBranch(iAct, oAct))
-     //       return false;
-
-        if(allowLooseLinking) {
-            return iBS.getOrigin() != oBS.getOrigin() &&
-                    iBS.getState() == State.INPUT &&
-                    oBS.getState() == State.INPUT;
+        if(dir == OUTPUT && e != null) {
+            return mul(
+                    "bound output linking event",
+                    e,
+                    bs.getActivation().getOnBoundPattern()
+            );
         }
 
-        if(!super.linkingCheck(iBS, oBS))
-            return false;
-
-        return checkBoundToSamePattern(iBS, oBS);
+        return e;
     }
 
     @Override
-    public List<Transition> getTransitions() {
-        return TRANSITIONS;
+    public Stream<Transition> getTransitions() {
+        return TRANSITIONS.stream();
     }
 
     @Override

@@ -17,12 +17,12 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.direction.Direction;
-import network.aika.fields.Fields;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.Transition.transition;
@@ -34,9 +34,15 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNeuron, PatternNeuron, PatternLink, BindingActivation, PatternActivation> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(SAME, SAME, true, Integer.MAX_VALUE),
-            transition(INPUT, INPUT, false, Integer.MAX_VALUE),
-            transition(BRANCH, BRANCH, false, Integer.MAX_VALUE)
+            transition(SAME, SAME)
+                    .setCheck(true)
+                    .setPropagate(Integer.MAX_VALUE),
+
+            transition(INPUT, INPUT)
+                    .setPropagate(Integer.MAX_VALUE),
+
+            transition(BRANCH, BRANCH)
+                    .setPropagate(Integer.MAX_VALUE)
     );
 
     public PatternSynapse() {
@@ -49,8 +55,8 @@ public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNe
     }
 
     @Override
-    public List<Transition> getTransitions() {
-        return TRANSITIONS;
+    public Stream<Transition> getTransitions() {
+        return TRANSITIONS.stream();
     }
 
     @Override

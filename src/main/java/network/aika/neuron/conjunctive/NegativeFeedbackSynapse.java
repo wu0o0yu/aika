@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
@@ -24,7 +25,9 @@ import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 
 import java.util.List;
+import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
 
@@ -35,9 +38,19 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedbackSynapse, InhibitoryNeuron, NegativeFeedbackLink, InhibitoryActivation> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(State.SAME, State.INPUT, false, Integer.MAX_VALUE),
-            transition(State.INPUT, State.INPUT, true, 0),
-            transition(State.BRANCH, State.BRANCH, true, 1)
+            transition(State.SAME, State.INPUT)
+                    .setPropagate(Integer.MAX_VALUE),
+
+            transition(State.INPUT, State.INPUT)
+                    .setCheck(true)
+                    .setCheckSelfRef(true)
+                    .setCheckSamePrimaryInput(true)
+                    .setCheckBoundToSamePattern(true)
+                    .setPropagate(0),
+
+            transition(State.BRANCH, State.BRANCH)
+                    .setCheck(true)
+                    .setPropagate(1)
     );
 
     @Override
@@ -60,13 +73,14 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     }
 
     @Override
-    public FieldOutput getOutputLinkingEvent(BindingSignal<InhibitoryActivation> iBS, int linkingMode) {
-        if(getInput().isNetworkInput() || iBS.getState() == State.SAME)
-            return null;
+    public FieldOutput getLinkingEvent(BindingSignal bs, Transition t, Direction dir) {
+        if(dir == OUTPUT) {
+            return isTemplate() ?
+                    bs.getOnArrivedFiredFinal() :
+                    bs.getOnArrivedFired();
+        }
 
-        return isTemplate() ?
-                iBS.getOnArrivedFiredFinal() :
-                iBS.getOnArrivedFired();
+        return super.getLinkingEvent(bs, t, dir);
     }
 
     @Override
@@ -75,21 +89,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     }
 
     @Override
-    public boolean linkingCheck(BindingSignal<InhibitoryActivation> iBS, BindingSignal<BindingActivation> oBS) {
-        if(isTemplate() && !iBS.isSelfRef(oBS))
-            return false;
-/*
-        if(oBS.getActivation().isSeparateBranch(iBS.getActivation()))
-            return false;
-*/
-        if(!checkBoundToSamePattern(iBS,  oBS))
-            return false;
-
-        return super.linkingCheck(iBS, oBS);
-    }
-
-    @Override
-    public List<Transition> getTransitions() {
-        return TRANSITIONS;
+    public Stream<Transition> getTransitions() {
+        return TRANSITIONS.stream();
     }
 }

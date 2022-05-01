@@ -24,6 +24,7 @@ import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.conjunctive.BindingNeuron;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
@@ -35,9 +36,14 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class InhibitorySynapse extends DisjunctiveSynapse<InhibitorySynapse, BindingNeuron, InhibitoryNeuron, InhibitoryLink, BindingActivation, InhibitoryActivation> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(State.SAME, State.SAME, false, Integer.MAX_VALUE),
-            transition(State.INPUT, State.INPUT, false, Integer.MAX_VALUE),
-            transition(State.BRANCH, State.BRANCH, false, Integer.MAX_VALUE)
+            transition(State.SAME, State.SAME)
+                    .setPropagate(Integer.MAX_VALUE),
+
+            transition(State.INPUT, State.INPUT)
+                    .setPropagate(Integer.MAX_VALUE),
+
+            transition(State.BRANCH, State.BRANCH)
+                    .setPropagate(Integer.MAX_VALUE)
     );
 
     @Override
@@ -46,8 +52,8 @@ public class InhibitorySynapse extends DisjunctiveSynapse<InhibitorySynapse, Bin
     }
 
     @Override
-    public List<Transition> getTransitions() {
-        return TRANSITIONS;
+    public Stream<Transition> getTransitions() {
+        return TRANSITIONS.stream();
     }
 
     @Override
