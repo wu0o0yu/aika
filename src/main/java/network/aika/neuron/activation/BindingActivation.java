@@ -24,9 +24,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.steps.activation.Linking;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -34,18 +32,14 @@ import java.util.stream.Stream;
 import static network.aika.fields.Fields.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
 import static network.aika.neuron.bindingsignal.State.*;
-import static network.aika.steps.LinkingOrder.POST_FIRED;
 
 /**
  * @author Lukas Molzberger
  */
 public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
-    private Field isBound = new Field(this, "onBound");
-    private BindingSignal<BindingActivation> bound;
+    private Field<BindingSignal> onBoundPrimaryInput = new Field(null, "onBoundPrimaryInput");
 
-    private final Set<BindingActivation> branches = new TreeSet<>();
-    private BindingActivation mainBranch;
     private FieldOutput branchProbability;
     private FieldFunction expNet;
     private Field bpNorm = new Field(this, "BP-Norm", 1.0);
@@ -107,18 +101,20 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         bs.setOnArrivedBound(
                 mul(
                         "isBound * onArrived",
-                        isBound,
+                        onBoundPattern,
                         bs.getOnArrived()
                 )
         );
+/*
 
+TODO
         if(!bs.isOrigin() && bs.getState() == State.BRANCH && mainBranch != null) {
             BindingActivation bAct = (BindingActivation) bs.getOriginActivation();
             bs.getOnArrived().addEventListener(() ->
                 connect(bAct.expNet, mainBranch.bpNorm)
             );
         }
-
+*/
         bs.setOnArrivedBoundFired(
                 mul(
                         "onArrivedBound * onArrivedFired",
@@ -127,17 +123,17 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 )
         );
 
-        bs.getOnArrivedBoundFired().addEventListener(() ->
-                Linking.add(this, bs, POST_FIRED)
+        bs.setOnArrivedBoundFiredFinal(
+                mul(
+                        "onFired * onArrived * isFinal",
+                        bs.getOnArrivedBoundFired(),
+                        getIsFinal()
+                )
         );
 
-        bs.getOnArrivedFired().addEventListener(() ->
-                Linking.addUnboundLinking(this, bs)
-        );
-
-        if(bs.getState() == SAME) {
-            bound = bs;
-            connect(bs.getOnArrived(), isBound);
+        if(bs.getState() == INPUT && bs.getLink() instanceof PrimaryInputLink) {
+            onBoundPrimaryInput.setReference(bs);
+            connect(bs.getOnArrived(), onBoundPrimaryInput);
         }
     }
 
@@ -155,8 +151,9 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         isInput = input;
     }
 
-    public Field getIsBound() {
-        return isBound;
+
+    public Field<BindingSignal> getOnBoundPrimaryInput() {
+        return onBoundPrimaryInput;
     }
 
     public void registerReverseBindingSignal(Activation targetAct, BindingSignal bindingSignal) {
@@ -174,50 +171,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                     new DummyActivation(Integer.MAX_VALUE, toNeuron)
             ).values().stream();
         }
-    }
-
-    @Override
-    public boolean checkAllowPropagate() {
-        if(isTemplate()) {
-            if (isNetworkInput())
-                return false;
-        }
-
-        return super.checkAllowPropagate();
-    }
-
-    @Override
-    public boolean isBoundToConflictingBS(BindingSignal conflictingBS) {
-        return BindingSignal.originEquals(conflictingBS, bound);
-    }
-
-    public BindingActivation createBranch() {
-        BindingActivation clonedAct = getNeuron().createActivation(getThought());
-        branches.add(clonedAct);
-        clonedAct.mainBranch = this;
-        clonedAct.init(null, this);
-
-        copyBindingSignals(clonedAct);
-
-        return clonedAct;
-    }
-
-    private void copyBindingSignals(BindingActivation clonedAct) {
-        getPatternBindingSignals().values().stream()
-                .filter(bs -> bs.getState() == INPUT)
-                .forEach(bs ->
-                        clonedAct.addBindingSignal(
-                                bs.clone(clonedAct)
-                        )
-                );
-    }
-
-    public boolean isBound() {
-        return bound != null;
-    }
-
-    public BindingSignal<BindingActivation> getBoundPatternBindingSignal() {
-        return bound;
     }
 
     @Override
@@ -242,18 +195,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         getNet().receiveUpdate(0, u);
     }
 
-    public BindingActivation getMainBranch() {
-        return mainBranch;
-    }
-
-    public boolean hasBranches() {
-        return !branches.isEmpty();
-    }
-
-    public Set<BindingActivation> getBranches() {
-        return branches;
-    }
-
     public Field getBpNorm() {
         return bpNorm;
     }
@@ -266,28 +207,11 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         return branchProbability;
     }
 
-    public boolean checkIfPrimaryInputBNLinkAlreadyExists() {
-        return inputLinks.values().stream()
-                .anyMatch(l -> l instanceof PrimaryInputLink<?>);
-    }
-
-    public boolean isSeparateBranch(InhibitoryActivation iAct) {
-        if(isMainBranch())
-            return false;
-
-        return iAct.getBindingSignals()
-                .anyMatch(bs -> bs.getOriginActivation() == mainBranch);
-    }
-
-    public boolean isMainBranch() {
-        return mainBranch == null;
-    }
-
     public void disconnect() {
         super.disconnect();
 
         FieldOutput[] fields = new FieldOutput[]{
-                isBound,
+                onBoundPrimaryInput,
                 branchProbability,
                 expNet,
                 bpNorm

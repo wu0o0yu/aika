@@ -25,8 +25,6 @@ import network.aika.neuron.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
-import network.aika.steps.activation.InactiveLinks;
-import network.aika.steps.activation.Propagate;
 import network.aika.utils.Utils;
 
 import java.util.*;
@@ -76,6 +74,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected FieldOutput updateValue;
     protected FieldOutput inductionThreshold;
 
+    protected Field<BindingSignal> onBoundPattern = new Field(null, "onBoundPattern");
+
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
 
@@ -114,21 +114,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
         isFired.addEventListener(() -> {
                     fired = thought.getCurrentTimestamp();
-
-                    Propagate.add(this, false, "", s -> true);
                     Counting.add(this);
                 }
         );
 
         isFiredForWeight = func("(isFired * 2) - 1", isFired, x -> (x * 2.0) - 1.0);
         isFiredForBias = func("(isFired * -1) + 1", isFired, x -> (x * -1.0) + 1.0);
-
-        Multiplication onFinalFired = mul("isFinalFired", isFired, isFinal);
-        onFinalFired.addEventListener(() -> {
-                    Propagate.add(this, true, "", s -> true);
-                    InactiveLinks.add(this);
-                }
-        );
 
         initFields();
 
@@ -233,11 +224,13 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         );
     }
 
+    public Field<BindingSignal> getOnBoundPattern() {
+        return onBoundPattern;
+    }
+
     public FieldFunction getNetOuterGradient() {
         return netOuterGradient;
     }
-
-    public abstract boolean isBoundToConflictingBS(BindingSignal bs);
 
     public void init(Synapse originSynapse, Activation originAct) {
         setCreationTimestamp();
@@ -330,10 +323,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return getNeuron().isTemplate();
     }
 
-    public boolean checkAllowPropagate() {
-        return isFired();
-    }
-
     public abstract Range getRange();
 
     public Range getAbsoluteRange() {
@@ -342,16 +331,22 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return r.getAbsoluteRange(thought.getRange());
     }
 
-    public Stream<? extends BindingSignal> getBindingSignals() {
+    public Stream<BindingSignal> getBindingSignals() {
         return getPatternBindingSignals().values().stream();
     }
 
-    public BindingSignal addBindingSignal(BindingSignal bindingSignal) {
-        if (bindingSignal.exists())
+    public BindingSignal addBindingSignal(BindingSignal bs) {
+        if (bs.exists())
             return null;
 
-        bindingSignal.link();
-        return bindingSignal;
+        bs.link();
+        return bs;
+    }
+
+    public void propagateBindingSignal(BindingSignal fromBS) {
+        getOutputLinks().forEach(l ->
+                l.propagateBindingSignal(fromBS)
+        );
     }
 
     public void registerBindingSignal(BindingSignal bs) {
@@ -433,14 +428,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return inputLinks.containsKey(s.getPInput());
     }
 
-    public boolean linkExists(Direction dir, Synapse ts, boolean template) {
-        return template ?
-                dir.getLinks(this)
-                        .map(Link::getSynapse)
-                        .anyMatch(s -> s.isOfTemplate(ts)) :
-                !getOutputLinks(ts).isEmpty();
-    }
-
     public SortedMap<OutputKey, Link> getOutputLinks(Synapse s) {
         return outputLinks
                 .subMap(
@@ -500,7 +487,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 backpropInputGradient,
                 ownOutputGradient,
                 backpropOutputGradient,
-                outputGradient
+                outputGradient,
+                onBoundPattern
         };
 
         for(FieldOutput f: fields) {

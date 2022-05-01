@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.disjunctive;
 
+import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.axons.PatternAxon;
@@ -24,6 +25,7 @@ import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
@@ -35,25 +37,26 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class CategorySynapse<N extends Neuron & PatternAxon> extends DisjunctiveSynapse<CategorySynapse, N, CategoryNeuron, CategoryLink, PatternActivation, CategoryActivation> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(State.SAME, State.SAME, false, Integer.MAX_VALUE),
-            transition(State.INPUT, State.INPUT, false, Integer.MAX_VALUE)
+            transition(State.SAME, State.SAME)
+                    .setCheck(true)
+                    .setPropagate(Integer.MAX_VALUE),
+
+            transition(State.INPUT, State.INPUT)
+                    .setPropagate(Integer.MAX_VALUE)
     );
 
     @Override
-    public CategoryLink createLink(PatternActivation input, CategoryActivation output, boolean isSelfRef) {
-        return new CategoryLink(this, input, output, isSelfRef);
+    public CategoryLink createLink(BindingSignal<PatternActivation> input, BindingSignal<CategoryActivation> output) {
+        return new CategoryLink(this, input, output);
     }
 
     @Override
-    public List<Transition> getTransitions() {
-        return TRANSITIONS;
+    public Stream<Transition> getTransitions() {
+        return TRANSITIONS.stream();
     }
 
     @Override
-    public boolean checkTemplateLinkingPreConditions(BindingSignal<PatternActivation> iBS, BindingSignal<CategoryActivation> oBS) {
-        if(iBS.getActivation().getNeuron().isNetworkInput())
-            return false;
-
-        return super.checkTemplateLinkingPreConditions(iBS, oBS);
+    public boolean networkInputsAllowed(Direction dir) {
+        return dir != Direction.INPUT || !isTemplate();
     }
 }

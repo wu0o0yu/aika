@@ -16,6 +16,8 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.direction.Direction;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
@@ -26,7 +28,11 @@ import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
+import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.fields.Fields.invert;
+import static network.aika.fields.Fields.mul;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
 
@@ -34,31 +40,41 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
  *
  * @author Lukas Molzberger
  */
-public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends BindingNeuronSynapse<PrimaryInputSynapse, I, PrimaryInputLink<IA>, IA> {
+public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<PrimaryInputSynapse, I, PrimaryInputLink<IA>, IA> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(State.SAME, State.INPUT, true, Integer.MAX_VALUE),
-            transition(State.INPUT, State.INPUT, true, 0)
+            transition(State.SAME, State.INPUT)
+                    .setCheck(true)
+                    .setCheckIfPrimaryInputAlreadyExists(true)
+                    .setPropagate(Integer.MAX_VALUE),
+
+            transition(State.INPUT, State.INPUT)
+                    .setPropagate(0)  // check=false: Rel. Pre. Entity special case
     );
 
-    public PrimaryInputLink createLink(IA input, BindingActivation output, boolean isSelfRef) {
-        return new PrimaryInputLink(this, input, output, isSelfRef);
+    public PrimaryInputLink createLink(BindingSignal<IA> input, BindingSignal<BindingActivation> output) {
+        return new PrimaryInputLink(this, input, output);
     }
 
     @Override
-    public List<Transition> getTransitions() {
-        return TRANSITIONS;
+    public Stream<Transition> getTransitions() {
+        return TRANSITIONS.stream();
     }
 
     @Override
-    public boolean linkingCheck(BindingSignal<IA> iBS, BindingSignal<BindingActivation> oBS) {
-        if(oBS.getActivation().checkIfPrimaryInputBNLinkAlreadyExists())
-            return false;
+    public FieldOutput getLinkingEvent(BindingSignal bs, Transition t, Direction dir) {
+        FieldOutput e = super.getLinkingEvent(bs, t, dir);
 
-        Transition oTr = oBS.getTransition();
-        if(oTr != null && oTr.getInput() != State.SAME) // Rel. Pre. Entity special case
-            return false;
+        if(dir == INPUT && e != null) {
+            BindingActivation oAct = (BindingActivation) bs.getActivation();
 
-        return super.linkingCheck(iBS, oBS);
+            return mul(
+                    "bound input linking event",
+                    e,
+                    invert("!OnBoundPrimaryInput", oAct.getOnBoundPrimaryInput())
+            );
+        }
+
+        return e;
     }
 }

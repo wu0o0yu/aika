@@ -18,13 +18,14 @@ package network.aika.neuron;
 
 import network.aika.Model;
 import network.aika.direction.Direction;
-import network.aika.fields.ThresholdOperator;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
 import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.sign.Sign;
+import network.aika.steps.activation.InactiveLinks;
 import network.aika.steps.activation.PostTraining;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
@@ -35,8 +36,11 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.List;
+import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.fields.Fields.isTrue;
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
 
@@ -44,7 +48,7 @@ import static network.aika.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O extends Neuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation, OA extends Activation> implements Writable {
+public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O extends Neuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends Activation> implements Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Synapse.class);
 
@@ -82,62 +86,121 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return false;
     }
 
-    public boolean linkingCheck(BindingSignal<IA> iBS, BindingSignal<OA> oBS) {
-        if(!iBS.getActivation().isFired())
-            return false;
+    public void link(Direction dir, BindingSignal fromBS, BindingSignal toBS, Transition t) {
+        if(!isTrue(getLinkingEvent(toBS, t, dir)))
+            return;
 
-        return commonLinkingCheck(iBS, oBS);
+        BindingSignal inputBS = dir.getInput(fromBS, toBS);
+        BindingSignal outputBS = dir.getOutput(fromBS, toBS);
+
+        link(inputBS, outputBS);
     }
 
-    protected boolean commonLinkingCheck(BindingSignal<IA> iBS, BindingSignal<OA> oBS) {
-        Transition t = getTransition(iBS, Direction.OUTPUT, false);
-        if(t == null)
-            return false;
+    public void link(Direction dir, BindingSignal<?> fromBS, Transition t) {
+        Neuron toNeuron = dir.getNeuron(this);
 
-        if(!t.next(iBS).match(oBS))
-            return false;
+        fromBS.getRelatedBindingSignal(this, toNeuron)
+                .filter(toBS -> fromBS != toBS)
+                .forEach(toBS ->
+                        link(dir, fromBS, toBS, t)
+                );
 
-        if(linkExists(iBS.getActivation(), oBS.getActivation()))
-            return false;
+        if(dir == OUTPUT) {
+            link((BindingSignal<IA>)fromBS, null);
+        }
+    }
 
-        if(isTemplate() && !checkTemplateLinkingPreConditions(iBS, oBS))
+    public void link(BindingSignal<IA> iBS, BindingSignal oBS) {
+        if (!checkTransition(iBS, oBS))
+            return;
+
+        if(linkExists(iBS, oBS))
+            return;
+
+        if(oBS != null && !(isRecurrent() || Link.isCausal(iBS.getActivation(), oBS.getActivation())))
+            return;
+
+        IA iAct = iBS.getActivation();
+        if(oBS == null) {
+            Activation oAct = getOutput().createActivation(iAct.getThought());
+            oAct.init(this, iAct);
+
+            oBS = iBS.propagate(this);
+            oBS.init(oAct);
+            oAct.addBindingSignal(oBS);
+        }
+
+        createLink(iBS, oBS);
+    }
+
+    public boolean isAllowPropagate() {
+        return true;
+    }
+
+    private boolean checkTransition(BindingSignal<IA> iBS, BindingSignal oBS) {
+        return getTransitions()
+                .anyMatch(t -> t.linkCheck(this, iBS, oBS));
+    }
+
+    public FieldOutput getLinkingEvent(BindingSignal bs, Transition t, Direction dir) {
+        if(dir == INPUT) {
+            return isTemplate() ?
+                    bs.getOnArrivedFinal() :
+                    bs.getOnArrived();
+        } else {
+            return isTemplate() ?
+                    bs.getOnArrivedFiredFinal() :
+                    bs.getOnArrivedFired();
+        }
+    }
+
+    public void registerLinkingEvents(BindingSignal<IA> bs, Direction dir) {
+        if(bs.getActivation().getNeuron().isNetworkInput() && !networkInputsAllowed(dir))
+            return;
+
+        getTransitions()
+                .filter(t -> t.eventCheck(this, bs, dir))
+                .forEach(t -> {
+                    FieldOutput e = getLinkingEvent(bs, t, dir);
+                    if (e != null)
+                        e.addLinkingEventListener(bs, this, dir, t);
+
+                    if(dir == output)
+                        bs.getOnArrivedFiredFinal().addEventListener(() ->
+                                InactiveLinks.add(bs)
+                        );
+                });
+    }
+
+    public boolean linkExists(BindingSignal<IA> iBS, BindingSignal<OA> oBS) {
+        if(oBS == null)
+            return linkExists(iBS.getActivation());
+
+        if(isTemplate() && Link.templateLinkExists(this, iBS.getActivation(), oBS.getActivation()))
+            return true;
+
+        Link existingLink = oBS.getActivation().getInputLink(iBS.getActivation().getNeuron());
+        return existingLink != null && existingLink.getInput() == iBS.getActivation();
+    }
+
+    private boolean linkExists(IA iAct) {
+        return isTemplate() ?
+                iAct.getOutputLinks()
+                        .map(Link::getSynapse)
+                        .anyMatch(s -> s.isOfTemplate(this)) :
+                !iAct.getOutputLinks(this).isEmpty();
+    }
+
+    public boolean networkInputsAllowed(Direction dir) {
+        if(dir == OUTPUT && isTemplate())
             return false;
 
         return true;
     }
 
-    public boolean linkExists(IA iAct, OA oAct) {
-        Link existingLink = oAct.getInputLink(iAct.getNeuron());
-        return existingLink != null && existingLink.getInput() == iAct;
-    }
-
-    public boolean checkTemplateLinkingPreConditions(BindingSignal<IA> iBS, BindingSignal<OA> oBS) {
-        if(oBS.getActivation().getNeuron().isNetworkInput())
-            return false;
-
-        if(Link.templateLinkExists(this, iBS.getActivation(), oBS.getActivation()))
-            return false;
-
-        if(!ThresholdOperator.isTrue(oBS.getActivation().getInductionThreshold()))
-            return false;
-
-        return true;
-    }
-
-    public Transition getTransition(BindingSignal from, Direction dir, boolean propagate) {
-        return getTransitions().stream()
-                .filter(t -> t.check(from.getState(), dir, propagate))
-                .findFirst()
-                .orElse(null);
-    }
-
-    public abstract List<Transition> getTransitions();
+    public abstract Stream<Transition> getTransitions();
 
     public abstract void setModified();
-
-    public boolean allowPropagate(Activation act) {
-        return true;
-    }
 
     public void setInput(I input) {
         this.input = input.getProvider();
@@ -167,7 +230,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return s;
     }
 
-    public abstract L createLink(IA input, OA output, boolean isSelfRef);
+    public abstract L createLink(BindingSignal<IA> input, BindingSignal<OA> output);
 
     protected void initFromTemplate(S s) {
         s.weight.set(weight.getCurrentValue());
@@ -425,7 +488,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return (isTemplate() ? "Template-" : "") +
                 getClass().getSimpleName() +
                 " in:[" + input.getNeuron().toKeyString()  + "](" + (isInputLinked ? "+" : "-") + ") " +
-                (allowPropagate(null) ? "==>" : "-->") +
+//                (propagatedAllowed(null) ? "==>" : "-->") +
+                "-->" +
                 " out:[" + output.getNeuron().toKeyString() + "](" + (isOutputLinked ? "+" : "-") + ")";
     }
 }

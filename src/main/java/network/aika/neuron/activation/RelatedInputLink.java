@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.Range;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.RelatedInputSynapse;
 import network.aika.sign.Sign;
 
@@ -25,8 +26,8 @@ import network.aika.sign.Sign;
  */
 public class RelatedInputLink extends BindingNeuronLink<RelatedInputSynapse, BindingActivation> {
 
-    public RelatedInputLink(RelatedInputSynapse s, BindingActivation input, BindingActivation output, boolean isSelfRef) {
-        super(s, input, output, isSelfRef);
+    public RelatedInputLink(RelatedInputSynapse s, BindingSignal<BindingActivation> input, BindingSignal<BindingActivation> output) {
+        super(s, input, output);
     }
 
     @Override

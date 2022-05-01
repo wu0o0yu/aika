@@ -21,6 +21,8 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.stream.Stream;
 
@@ -32,6 +34,8 @@ public interface Direction {
     Direction INPUT = new Input();
     Direction OUTPUT = new Output();
 
+    Direction[] DIRECTIONS = new Direction[] {INPUT, OUTPUT};
+
     Direction invert();
 
     <I> I getInput(I from, I to);
@@ -41,6 +45,8 @@ public interface Direction {
     Neuron getNeuron(Synapse s);
 
     Activation getActivation(Link l);
+
+    State getState(Transition t);
 
     Stream<Link> getLinks(Activation act);
 

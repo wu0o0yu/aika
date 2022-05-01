@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.disjunctive.CategorySynapse;
 
 /**
@@ -23,7 +24,7 @@ import network.aika.neuron.disjunctive.CategorySynapse;
  */
 public class CategoryLink extends DisjunctiveLink<CategorySynapse, PatternActivation, CategoryActivation> {
 
-    public CategoryLink(CategorySynapse s, PatternActivation input, CategoryActivation output, boolean isSelfRef) {
-        super(s, input, output, isSelfRef);
+    public CategoryLink(CategorySynapse s, BindingSignal<PatternActivation> input, BindingSignal<CategoryActivation> output) {
+        super(s, input, output);
     }
 }

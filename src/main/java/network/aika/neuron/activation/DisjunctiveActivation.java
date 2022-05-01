@@ -37,10 +37,6 @@ public abstract class DisjunctiveActivation<N extends DisjunctiveNeuron> extends
         super(id, t, neuron);
     }
 
-    public boolean isSelfRef(Activation iAct) {
-        return false;
-    }
-
     @Override
     public Stream<BindingSignal> getReverseBindingSignals(Neuron toNeuron) {
         throw new UnsupportedOperationException();

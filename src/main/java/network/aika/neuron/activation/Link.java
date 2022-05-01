@@ -24,10 +24,10 @@ import network.aika.fields.BiFunction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.sign.Sign;
 import network.aika.steps.link.Cleanup;
 import network.aika.steps.link.LinkCounting;
-import network.aika.steps.link.PropagateBindingSignal;
 
 import java.util.Comparator;
 
@@ -41,7 +41,7 @@ import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
  *
  * @author Lukas Molzberger
  */
-public abstract class Link<S extends Synapse, I extends Activation, O extends Activation> extends Element<Link> {
+public abstract class Link<S extends Synapse, I extends Activation<?>, O extends Activation> extends Element<Link> {
 
     public static final Comparator<Link> COMPARE = Comparator.
             <Link, Activation<?>>comparing(l -> l.output)
@@ -50,36 +50,25 @@ public abstract class Link<S extends Synapse, I extends Activation, O extends Ac
     protected S synapse;
 
     protected final I input;
-    protected final O output;
+    protected O output;
 
     private BiFunction igGradient;
     private AbstractBiFunction weightedInput;
     protected AbstractBiFunction backPropGradient;
 
-    private ThresholdOperator onTransparent;
+    protected ThresholdOperator onTransparent;
 
-    protected boolean isSelfRef;
-
-    public Link(S s, I input, O output, boolean isSelfRef) {
+    public Link(S s, BindingSignal<I> iBS, BindingSignal<O> oBS) {
         this.synapse = s;
-        this.input = input;
-        this.output = output;
-        this.isSelfRef = isSelfRef;
+        this.input = iBS.getActivation();
+        this.output = oBS.getActivation();
 
         init();
 
         if(input != null && output != null) {
-            onTransparent = threshold(
-                    "onTransparent",
-                    0.0,
-                    ABOVE,
-                    mul("isFired * weight",
-                            synapse.getWeight(),
-                            input.isFired
-                    )
-            );
+            initOnTransparent();
             onTransparent.addEventListener(() ->
-                    PropagateBindingSignal.add(this)
+                   propagateAllBindingSignals()
             );
 
             initWeightInput();
@@ -91,6 +80,18 @@ public abstract class Link<S extends Synapse, I extends Activation, O extends Ac
         }
 
         getThought().onLinkCreationEvent(this);
+    }
+
+    protected void initOnTransparent() {
+        onTransparent = threshold(
+                "onTransparent",
+                0.0,
+                ABOVE,
+                mul("isFired * weight",
+                        synapse.getWeight(),
+                        input.isFired
+                )
+        );
     }
 
     private void initGradients() {
@@ -132,16 +133,38 @@ public abstract class Link<S extends Synapse, I extends Activation, O extends Ac
     }
 
     public void init() {
-        if(getInput() != null) {
+        if(getInput() != null)
             linkInput();
-            PropagateBindingSignal.add(this);
-        }
 
         if(getOutput() != null)
             linkOutput();
 
         if(getConfig().isCountingEnabled())
             LinkCounting.add(this);
+    }
+
+    public void propagateBindingSignal(BindingSignal<I> fromBS) {
+        if(!fromBS.isPropagateAllowed())
+            return;
+
+        BindingSignal<O> toBS = fromBS.propagate(this);
+        if(toBS == null)
+            return;
+
+        toBS.init(output);
+
+        output.addBindingSignal(toBS);
+    }
+
+    public void propagateAllBindingSignals() {
+        input.getBindingSignals()
+                .forEach(fromBS ->
+                        propagateBindingSignal(fromBS)
+                );
+    }
+
+    public FieldOutput getOnTransparent() {
+        return onTransparent;
     }
 
     public FieldOutput getInformationGainGradient() {
@@ -173,10 +196,6 @@ public abstract class Link<S extends Synapse, I extends Activation, O extends Ac
         s -= input.getNeuron().getSurprisal(si, range, true);
         s -= output.getNeuron().getSurprisal(so, range, true);
         return s;
-    }
-
-    public boolean isSelfRef() {
-        return isSelfRef;
     }
 
     public FieldOutput getInputValue(Sign s) {

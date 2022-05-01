@@ -16,7 +16,9 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.direction.Direction;
 import network.aika.fields.Field;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
@@ -27,31 +29,49 @@ import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
+import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends Activation> extends BindingNeuronSynapse<PositiveFeedbackSynapse, I, PositiveFeedbackLink<IA>, IA> {
+public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<PositiveFeedbackSynapse, I, PositiveFeedbackLink<IA>, IA> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(State.BRANCH, State.BRANCH, true, 1),
-            transition(State.SAME, State.SAME, true, Integer.MAX_VALUE)
+            transition(State.BRANCH, State.BRANCH)
+                    .setCheck(true)
+                    .setPropagate(1),
+
+            transition(State.SAME, State.SAME)
+                    .setCheck(true)
+                    .setPropagate(Integer.MAX_VALUE)
     );
 
     private Field feedbackWeight = new Field(this, "feedbackWeight");
     private Field feedbackBias = new Field(this, "feedbackBias");
 
-    public PositiveFeedbackLink createLink(IA input, BindingActivation output, boolean isSelfRef) {
-        return new PositiveFeedbackLink(this, input, output, isSelfRef);
+    public PositiveFeedbackLink createLink(BindingSignal<IA> input, BindingSignal<BindingActivation> output) {
+        return new PositiveFeedbackLink(this, input, output);
     }
 
     protected void initFromTemplate(PositiveFeedbackSynapse s) {
         s.feedbackWeight.set(feedbackWeight.getCurrentValue());
         s.feedbackBias.set(feedbackBias.getCurrentValue());
         super.initFromTemplate(s);
+    }
+
+    @Override
+    public FieldOutput getLinkingEvent(BindingSignal bs, Transition t, Direction dir) {
+        if(dir == OUTPUT) {
+            return isTemplate() ?
+                    bs.getOnArrivedFinal() :
+                    bs.getOnArrived();
+        }
+
+        return super.getLinkingEvent(bs, t, dir);
     }
 
     public Field getFeedbackWeight() {
@@ -68,15 +88,7 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     }
 
     @Override
-    public List<Transition> getTransitions() {
-        return TRANSITIONS;
-    }
-
-    @Override
-    public boolean linkingCheck(BindingSignal<IA> iBS, BindingSignal<BindingActivation> oBS) {
-        // Skip BindingNeuronSynapse.checkLinkingPreConditions
-        // --> Do not check Link.isForward(iAct, oAct) and
-        // --> iAct.isFired() since the positive feedback synapse is initially assumed to be active.
-        return commonLinkingCheck(iBS, oBS);
+    public Stream<Transition> getTransitions() {
+        return TRANSITIONS.stream();
     }
 }

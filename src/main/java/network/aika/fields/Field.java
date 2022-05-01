@@ -27,44 +27,49 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.WeakHashMap;
 
 /**
  * @author Lukas Molzberger
  */
-public class Field extends FieldNode implements IField, Writable {
+public class Field<R> extends FieldNode implements IField, Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Field.class);
 
     private Double currentValue;
     private Double update;
     private boolean allowUpdate;
-    private Object refObj;
+
+
+    private R reference;
     private String label;
 
     private PropagatePreCondition propagatePreCondition;
 
     private List<FieldLink> inputs = new ArrayList<>();
 
-    public Field(Object refObj, String label) {
-        this.refObj = refObj;
+    public Field(R reference, String label) {
+        this.reference = reference;
         this.label = label;
         this.propagatePreCondition = (cv, nv, u) -> !Utils.belowTolerance(u);
     }
 
-    public Field(Object refObj, String label, double initialValue) {
-        this(refObj, label);
+    public Field(R reference, String label, double initialValue) {
+        this(reference, label);
 
         currentValue = initialValue;
     }
 
-    public Field(Object refObj, String label, FieldOnTrueEvent fieldListener) {
-        this(refObj, label);
+    public Field(R reference, String label, FieldOnTrueEvent fieldListener) {
+        this(reference, label);
         addEventListener(fieldListener);
     }
 
-    public Object getRefObj() {
-        return refObj;
+    public R getReference() {
+        return reference;
+    }
+
+    public void setReference(R reference) {
+        this.reference = reference;
     }
 
     @Override

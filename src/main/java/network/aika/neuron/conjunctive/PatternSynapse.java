@@ -16,11 +16,13 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.direction.Direction;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.Transition.transition;
@@ -32,9 +34,16 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNeuron, PatternNeuron, PatternLink, BindingActivation, PatternActivation> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(SAME, SAME, true, Integer.MAX_VALUE),
-            transition(INPUT, INPUT, false, Integer.MAX_VALUE),
-            transition(BRANCH, BRANCH, false, Integer.MAX_VALUE)
+            transition(SAME, SAME)
+                    .setCheck(true)
+                    .setPropagate(Integer.MAX_VALUE),
+
+            transition(INPUT, INPUT)
+                    .setPropagate(Integer.MAX_VALUE),
+
+            transition(BRANCH, BRANCH)
+                    .setCheck(true)
+                    .setPropagate(Integer.MAX_VALUE)
     );
 
     public PatternSynapse() {
@@ -42,28 +51,17 @@ public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNe
     }
 
     @Override
-    public boolean allowPropagate(Activation act) {
-        if(isTemplate() && act != null && act.isNetworkInput())
-            return false;
-
-        return super.allowPropagate(act);
+    public PatternLink createLink(BindingSignal<BindingActivation> input, BindingSignal<PatternActivation> output) {
+        return new PatternLink(this, input, output);
     }
 
     @Override
-    public PatternLink createLink(BindingActivation input, PatternActivation output, boolean isSelfRef) {
-        return new PatternLink(this, input, output, isSelfRef);
+    public Stream<Transition> getTransitions() {
+        return TRANSITIONS.stream();
     }
 
     @Override
-    public List<Transition> getTransitions() {
-        return TRANSITIONS;
-    }
-
-    @Override
-    public boolean checkTemplateLinkingPreConditions(BindingSignal<BindingActivation> iBS, BindingSignal<PatternActivation> oBS) {
-        if(iBS.getActivation().getNeuron().isNetworkInput())
-            return false;
-
-        return super.checkTemplateLinkingPreConditions(iBS, oBS);
+    public boolean networkInputsAllowed(Direction dir) {
+        return dir != Direction.INPUT || !isTemplate();
     }
 }

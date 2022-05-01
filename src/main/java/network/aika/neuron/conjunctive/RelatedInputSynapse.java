@@ -16,7 +16,7 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.neuron.activation.Activation;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PrimaryInputLink;
 import network.aika.neuron.activation.RelatedInputLink;
@@ -37,51 +37,32 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynapse, BindingNeuron, RelatedInputLink, BindingActivation> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(SAME, INPUT, true, Integer.MAX_VALUE),
-            transition(INPUT, INPUT, true, Integer.MAX_VALUE)
+            transition(SAME, INPUT)
+                    .setCheck(true)
+                    .setCheckPrimaryInput(true)
+                    .setPropagate(Integer.MAX_VALUE),
+
+            transition(INPUT, INPUT)
+                    .setCheck(true)
+                    .setCheckSamePrimaryInput(true)
+                    .setPropagate(Integer.MAX_VALUE)
     );
 
     private static List<Transition> TRANSITIONS_TEMPLATE = List.of(
-            transition(SAME, INPUT, true, Integer.MAX_VALUE)
+            transition(SAME, INPUT)
+                    .setCheck(true)
+                    .setPropagate(Integer.MAX_VALUE)
     );
 
     @Override
-    public RelatedInputLink createLink(BindingActivation input, BindingActivation output, boolean isSelfRef) {
-        return new RelatedInputLink(this, input, output, isSelfRef);
+    public RelatedInputLink createLink(BindingSignal<BindingActivation> input, BindingSignal<BindingActivation> output) {
+        return new RelatedInputLink(this, input, output);
     }
 
     @Override
-    public List<Transition> getTransitions() {
+    public Stream<Transition> getTransitions() {
         return isTemplate() ?
-                TRANSITIONS_TEMPLATE :
-                TRANSITIONS;
-    }
-
-    @Override
-    public boolean linkingCheck(BindingSignal<BindingActivation> iBS, BindingSignal<BindingActivation> oBS) {
-        if(iBS.getState() == SAME && !(oBS.getLink() instanceof PrimaryInputLink<?>))
-            return false;
-
-        if(iBS.getState() == INPUT && !verifySameBindingSignal(iBS, oBS))
-            return false;
-
-        return super.linkingCheck(iBS, oBS);
-    }
-
-    private boolean verifySameBindingSignal(BindingSignal iBS, BindingSignal oBS) {
-        BindingActivation iAct = (BindingActivation) iBS.getActivation();
-        BindingActivation oAct = (BindingActivation) oBS.getActivation();
-        BindingSignal sameSB = iAct.getBoundPatternBindingSignal();
-        if(sameSB == null)
-            return false;
-
-        PrimaryInputSynapse primaryInputSyn = oAct.getNeuron().getPrimaryInputSynapse();
-        if(primaryInputSyn == null)
-            return false;
-
-        Activation originAct = sameSB.getOriginActivation();
-        return originAct.getReverseBindingSignals(primaryInputSyn.getInput())
-                .findAny()
-                .isPresent();
+                TRANSITIONS_TEMPLATE.stream() :
+                TRANSITIONS.stream();
     }
 }

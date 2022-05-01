@@ -23,6 +23,7 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.InhibitoryActivation;
 import network.aika.neuron.axons.BindingAxon;
+import network.aika.neuron.bindingsignal.BindingSignal;
 
 /**
  *
@@ -52,10 +53,6 @@ public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitorySynapse, Inhib
         InhibitoryNeuron n = new InhibitoryNeuron(getModel(), addProvider);
         initFromTemplate(n);
         return n;
-    }
-
-    @Override
-    public void addInactiveLinks(Activation act) {
     }
 
     public ActivationFunction getActivationFunction() {

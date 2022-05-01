@@ -25,6 +25,7 @@ import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.InhibitoryActivation;
+import network.aika.neuron.bindingsignal.BindingSignal;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -58,7 +59,7 @@ public abstract class DisjunctiveNeuron<S extends DisjunctiveSynapse, A extends 
     }
 
     @Override
-    public void addInactiveLinks(Activation act) {
+    public void addInactiveLinks(BindingSignal bs) {
     }
 
     public ActivationFunction getActivationFunction() {

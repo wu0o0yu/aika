@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 
 import static network.aika.fields.Fields.mul;
@@ -26,14 +27,16 @@ import static network.aika.fields.Fields.scale;
  */
 public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSynapse, InhibitoryActivation> {
 
-    public NegativeFeedbackLink(NegativeFeedbackSynapse s, InhibitoryActivation input, BindingActivation output, boolean isSelfRef) {
-        super(s,
-                input,
-                input == null || isSelfRef ?
-                        output :
-                        output.createBranch(),
-                isSelfRef
-        );
+    protected boolean isSelfRef;
+
+    public NegativeFeedbackLink(NegativeFeedbackSynapse s, BindingSignal<InhibitoryActivation> iBS, BindingSignal<BindingActivation> oBS) {
+        super(s, iBS, oBS);
+
+        this.isSelfRef = iBS != null && iBS.isSelfRef(oBS);
+    }
+
+    public boolean isSelfRef() {
+        return isSelfRef;
     }
 
     @Override

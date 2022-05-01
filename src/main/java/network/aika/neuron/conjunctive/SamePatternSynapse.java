@@ -17,6 +17,8 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
+import network.aika.direction.Direction;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.SamePatternLink;
 import network.aika.neuron.bindingsignal.BindingSignal;
@@ -27,7 +29,10 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.fields.Fields.mul;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
 /**
@@ -38,16 +43,29 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse, BindingNeuron, SamePatternLink, BindingActivation> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(State.SAME, State.SAME, true, Integer.MAX_VALUE), // Same Pattern BindingSignal
-            transition(State.INPUT, State.INPUT, true, Integer.MAX_VALUE) // Input BS becomes related
+            transition(State.SAME, State.SAME)
+                    .setCheck(true)
+                    .setPropagate(Integer.MAX_VALUE), // Same Pattern BindingSignal
+
+            transition(State.INPUT, State.INPUT)
+                    .setCheck(true)
+                    .setCheckBoundToSamePattern(true)
+                    .setCheckLooseLinking(true)
+                    .setPropagate(Integer.MAX_VALUE), // Input BS becomes related
+
+            transition(State.INPUT, State.INPUT)
+                    .setCheck(true)
+                    .setCheckBoundToSamePattern(true)
+                    .setCheckSamePrimaryInput(true)
+                    .setPropagate(Integer.MAX_VALUE) // Input BS becomes related
     );
 
     private int looseLinkingRange;
     private boolean allowLooseLinking;
 
     @Override
-    public SamePatternLink createLink(BindingActivation input, BindingActivation output, boolean isSelfRef) {
-        return new SamePatternLink(this, input, output, isSelfRef);
+    public SamePatternLink createLink(BindingSignal<BindingActivation> input, BindingSignal<BindingActivation> output) {
+        return new SamePatternLink(this, input, output);
     }
 
     @Override
@@ -75,40 +93,28 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
     }
 
     @Override
-    public boolean linkingCheck(BindingSignal<BindingActivation> iBS, BindingSignal<BindingActivation> oBS) {
-
-        if(isTemplate() && (iBS.getActivation().isNetworkInput() || oBS.getActivation().isNetworkInput()))
-            return false;
-
-        if(!iBS.getActivation().isBound())
-            return false;
-
-        if(oBS.getActivation().isBound() && iBS.getActivation().getBoundPatternBindingSignal().getOrigin() != oBS.getActivation().getBoundPatternBindingSignal().getOrigin())
-            return false;
-
-     //   if(isSeparateBranch(iAct, oAct))
-     //       return false;
-
-        if(allowLooseLinking) {
-            return iBS.getOrigin() != oBS.getOrigin() &&
-                    iBS.getState() == State.INPUT &&
-                    oBS.getState() == State.INPUT &&
-                    commonLinkingCheck(iBS, oBS);
-        }
-
-        if(!super.linkingCheck(iBS, oBS))
-            return false;
-
-        BindingSignal iSamePBS = iBS.getActivation().getBoundPatternBindingSignal();
-        BindingSignal oSamePBS = oBS.getActivation().getBoundPatternBindingSignal();
-
-        // The Input and Output BindingActivations belong to different Patterns.
-        return oSamePBS == null || oSamePBS == iSamePBS;
+    public boolean networkInputsAllowed(Direction dir) {
+        return !isTemplate();
     }
 
     @Override
-    public List<Transition> getTransitions() {
-        return TRANSITIONS;
+    public FieldOutput getLinkingEvent(BindingSignal bs, Transition t, Direction dir) {
+        FieldOutput e = super.getLinkingEvent(bs, t, dir);
+
+        if(dir == OUTPUT && e != null) {
+            return mul(
+                    "bound output linking event",
+                    e,
+                    bs.getActivation().getOnBoundPattern()
+            );
+        }
+
+        return e;
+    }
+
+    @Override
+    public Stream<Transition> getTransitions() {
+        return TRANSITIONS.stream();
     }
 
     @Override

@@ -17,21 +17,23 @@
 package network.aika.neuron.activation;
 
 import network.aika.fields.AbstractBiFunction;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 
-import static network.aika.fields.Fields.mul;
+import static network.aika.fields.Fields.*;
+import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PositiveFeedbackLink<IA extends Activation> extends BindingNeuronLink<PositiveFeedbackSynapse, IA> {
+public class PositiveFeedbackLink<IA extends Activation<?>> extends BindingNeuronLink<PositiveFeedbackSynapse, IA> {
 
     private AbstractBiFunction feedbackWeightInput;
     private AbstractBiFunction feedbackBiasInput;
 
-    public PositiveFeedbackLink(PositiveFeedbackSynapse s, IA input, BindingActivation output, boolean isSelfRef) {
-        super(s, input, output, isSelfRef);
+    public PositiveFeedbackLink(PositiveFeedbackSynapse s, BindingSignal<IA> input, BindingSignal<BindingActivation> output) {
+        super(s, input, output);
     }
 
     @Override
@@ -51,6 +53,20 @@ public class PositiveFeedbackLink<IA extends Activation> extends BindingNeuronLi
                 input.getIsFinal(),
                 synapse.getFeedbackBias(),
                 getOutput().getNet()
+        );
+    }
+
+    @Override
+    protected void initOnTransparent() {
+        onTransparent = threshold(
+                "onTransparent",
+                0.0,
+                ABOVE,
+                add(
+                        "weight sum",
+                        synapse.getWeight(),
+                        synapse.getFeedbackWeight()
+                )
         );
     }
 

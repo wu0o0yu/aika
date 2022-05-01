@@ -60,15 +60,9 @@ public class DummyActivation extends Activation {
     }
 
     @Override
-    public boolean isBoundToConflictingBS(BindingSignal conflictingBS) {
-        return false;
-    }
-
-    @Override
     public boolean isInput() {
         return false;
     }
-
 
     @Override
     public int compareTo(Object o) {

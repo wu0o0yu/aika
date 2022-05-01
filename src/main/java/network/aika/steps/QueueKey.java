@@ -30,14 +30,11 @@ public interface QueueKey {
     Comparator<QueueKey> COMPARATOR = Comparator
             .<QueueKey>comparingInt(k -> k.getPhase().ordinal())
             .thenComparing(k -> k.getFired())
-            .thenComparing(k -> k.getLinkingOrder())
             .thenComparing(k -> k.getTimestamp());
 
     Phase getPhase();
 
     Timestamp getFired();
-
-    LinkingOrder getLinkingOrder();
 
     String getStepName();
 

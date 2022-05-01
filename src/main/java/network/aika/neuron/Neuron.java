@@ -22,6 +22,7 @@ import network.aika.direction.Direction;
 import network.aika.fields.LimitedField;
 import network.aika.neuron.activation.Activation;
 import network.aika.fields.Field;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.PostTraining;
 import network.aika.steps.activation.Save;
@@ -142,7 +143,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public abstract Neuron<?, ?> instantiateTemplate(boolean addProvider);
 
-    public abstract void addInactiveLinks(Activation act);
+    public abstract void addInactiveLinks(BindingSignal bs);
 
     public abstract ActivationFunction getActivationFunction();
 
@@ -207,11 +208,17 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public Stream<? extends Synapse> getTargetSynapses(Direction dir, boolean template) {
+        Stream<? extends Synapse> targetSynapsesStream = getTargetSynapsesIntern(dir, false);
+        if(template)
+            targetSynapsesStream = Stream.concat(targetSynapsesStream, getTargetSynapsesIntern(dir, true));
+        return targetSynapsesStream;
+    }
+
+    private Stream<? extends Synapse> getTargetSynapsesIntern(Direction dir, boolean template) {
         return (template ?
                 getTemplateGroup().stream().flatMap(dir::getSynapses) :
                 dir.getSynapses(this));
     }
-
 
     public Synapse getOutputSynapse(NeuronProvider n) {
         lock.acquireReadLock();

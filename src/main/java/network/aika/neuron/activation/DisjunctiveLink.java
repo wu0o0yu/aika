@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.disjunctive.DisjunctiveSynapse;
 
 import static network.aika.fields.Fields.mul;
@@ -23,10 +24,10 @@ import static network.aika.fields.Fields.mul;
 /**
  * @author Lukas Molzberger
  */
-public class DisjunctiveLink<S extends DisjunctiveSynapse, IA extends Activation, OA extends DisjunctiveActivation> extends Link<S, IA, OA> {
+public class DisjunctiveLink<S extends DisjunctiveSynapse, IA extends Activation<?>, OA extends DisjunctiveActivation> extends Link<S, IA, OA> {
 
-    public DisjunctiveLink(S s, IA input, OA output, boolean isSelfRef) {
-        super(s, input, output, isSelfRef);
+    public DisjunctiveLink(S s, BindingSignal<IA> input, BindingSignal<OA> output) {
+        super(s, input, output);
     }
 
     @Override

@@ -28,13 +28,11 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static network.aika.fields.Fields.mul;
-
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends Neuron & Axon, O extends ConjunctiveNeuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation, OA extends ConjunctiveActivation> extends Synapse<S, I, O, L, IA, OA> {
+public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends Neuron & Axon, O extends ConjunctiveNeuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends ConjunctiveActivation> extends Synapse<S, I, O, L, IA, OA> {
 
     protected boolean allowPropagate;
 
@@ -43,7 +41,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     @Override
-    public boolean allowPropagate(Activation act) {
+    public boolean isAllowPropagate() {
         return allowPropagate;
     }
 

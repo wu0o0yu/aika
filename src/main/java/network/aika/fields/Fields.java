@@ -24,6 +24,10 @@ import java.util.function.DoubleFunction;
  */
 public class Fields {
 
+    public static boolean isTrue(FieldOutput f) {
+        return f != null && f.isInitialized() && f.getCurrentValue() > 0.5;
+    }
+
     public static void connect(FieldOutput in, FieldInput out) {
         connect(in, 0, out);
     }

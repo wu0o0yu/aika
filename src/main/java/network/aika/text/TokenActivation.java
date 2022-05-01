@@ -21,10 +21,10 @@ import network.aika.fields.QueueField;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 import network.aika.neuron.disjunctive.CategoryNeuron;
-import network.aika.steps.activation.Propagate;
 
 /**
  *
@@ -51,20 +51,34 @@ public class TokenActivation extends PatternActivation {
         super.init(originSynapse, originAct);
 
         TextModel m = getModel();
-        categoryActivation = (CategoryActivation) Propagate.propagate(
+
+        categoryActivation = followSynapse(
                 this,
                 getNeuron().getOutputSynapse(m.getTokenCategory().getProvider())
         );
 
-        relPTBindingActivation = (BindingActivation) Propagate.propagate(
+        relPTBindingActivation = followSynapse(
                 categoryActivation,
                 m.getRelPTFeedbackSyn()
         );
 
-        relNTBindingActivation = (BindingActivation) Propagate.propagate(
+        relNTBindingActivation = followSynapse(
                 categoryActivation,
                 m.getRelNTFeedbackSyn()
         );
+    }
+
+    private <A extends Activation> A followSynapse(Activation<?> fromAct, Synapse s) {
+        Link l = fromAct.getOutputLinks(s)
+                .values()
+                .stream()
+                .findFirst()
+                .orElse(null);
+
+        if(l == null)
+            return null;
+
+        return (A) l.getOutput();
     }
 
     protected Field initNet() {
@@ -90,11 +104,10 @@ public class TokenActivation extends PatternActivation {
 
     private void linkPrimaryInput(PrimaryInputSynapse<CategoryNeuron, CategoryActivation> model, BindingActivation toAct) {
         PrimaryInputSynapse relSynNext = model;
-        relSynNext.createLink(
-                categoryActivation,
-                toAct,
-                false
-        );
+        BindingSignal fromBS = categoryActivation.getBindingSignal(this);
+        BindingSignal toBS = fromBS.propagate(relSynNext);
+        toBS.init(toAct);
+        relSynNext.createLink(fromBS, toBS);
     }
 
     public TokenActivation getPreviousToken() {

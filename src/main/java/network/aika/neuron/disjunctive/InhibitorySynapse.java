@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.disjunctive;
 
+import network.aika.direction.Direction;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
@@ -23,6 +24,7 @@ import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.conjunctive.BindingNeuron;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
@@ -34,27 +36,30 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class InhibitorySynapse extends DisjunctiveSynapse<InhibitorySynapse, BindingNeuron, InhibitoryNeuron, InhibitoryLink, BindingActivation, InhibitoryActivation> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(State.SAME, State.SAME, false, Integer.MAX_VALUE),
-            transition(State.INPUT, State.INPUT, false, Integer.MAX_VALUE),
-            transition(State.BRANCH, State.BRANCH, false, Integer.MAX_VALUE)
+            transition(State.SAME, State.SAME)
+                    .setPropagate(Integer.MAX_VALUE),
+
+            transition(State.INPUT, State.INPUT)
+                    .setCheck(true)
+                    .setPropagate(Integer.MAX_VALUE),
+
+            transition(State.BRANCH, State.BRANCH)
+                    .setPropagate(Integer.MAX_VALUE)
     );
 
     @Override
-    public InhibitoryLink createLink(BindingActivation input, InhibitoryActivation output, boolean isSelfRef) {
-        return new InhibitoryLink(this, input, output, isSelfRef);
+    public InhibitoryLink createLink(BindingSignal<BindingActivation> input, BindingSignal<InhibitoryActivation> output) {
+        return new InhibitoryLink(this, input, output);
     }
 
     @Override
-    public List<Transition> getTransitions() {
-        return TRANSITIONS;
+    public Stream<Transition> getTransitions() {
+        return TRANSITIONS.stream();
     }
 
     @Override
-    public boolean checkTemplateLinkingPreConditions(BindingSignal<BindingActivation> iBS, BindingSignal<InhibitoryActivation> oBS) {
-        if(iBS.getActivation().getNeuron().isNetworkInput())
-            return false;
-
-        return super.checkTemplateLinkingPreConditions(iBS, oBS);
+    public boolean networkInputsAllowed(Direction dir) {
+        return dir != Direction.INPUT || !isTemplate();
     }
 
     @Override
