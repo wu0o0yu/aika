@@ -86,7 +86,25 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return false;
     }
 
-    public void link(Direction dir, BindingSignal fromBS, BindingSignal toBS, Transition t) {
+    public void link(Direction dir, BindingSignal<?> fromBS, Transition t) {
+        fromBS.getRelatedBindingSignal(
+                this,
+                        dir.getNeuron(this)
+                )
+                .filter(toBS -> fromBS != toBS)
+                .forEach(toBS ->
+                        link(dir, fromBS, toBS, t)
+                );
+
+        if(dir == OUTPUT) {
+            link(fromBS, null);
+        }
+    }
+
+    private void link(Direction dir, BindingSignal fromBS, BindingSignal toBS, Transition t) {
+        if(!t.eventCheck(this, toBS, dir.invert()))
+            return;
+
         if(!isTrue(getLinkingEvent(toBS, t, dir)))
             return;
 
@@ -96,21 +114,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         link(inputBS, outputBS);
     }
 
-    public void link(Direction dir, BindingSignal<?> fromBS, Transition t) {
-        Neuron toNeuron = dir.getNeuron(this);
-
-        fromBS.getRelatedBindingSignal(this, toNeuron)
-                .filter(toBS -> fromBS != toBS)
-                .forEach(toBS ->
-                        link(dir, fromBS, toBS, t)
-                );
-
-        if(dir == OUTPUT) {
-            link((BindingSignal<IA>)fromBS, null);
-        }
-    }
-
-    public void link(BindingSignal<IA> iBS, BindingSignal oBS) {
+    private void link(BindingSignal iBS, BindingSignal oBS) {
         if (!checkTransition(iBS, oBS))
             return;
 
@@ -120,7 +124,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         if(oBS != null && !(isRecurrent() || Link.isCausal(iBS.getActivation(), oBS.getActivation())))
             return;
 
-        IA iAct = iBS.getActivation();
+        Activation iAct = iBS.getActivation();
         if(oBS == null) {
             Activation oAct = getOutput().createActivation(iAct.getThought());
             oAct.init(this, iAct);

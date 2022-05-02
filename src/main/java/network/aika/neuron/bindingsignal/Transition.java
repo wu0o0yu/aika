@@ -165,11 +165,16 @@ public class Transition {
         if(boundPatternBS == null)
             return false;
 
+        Activation originAct = boundPatternBS.getOriginActivation();
+
+        return verifySamePrimaryInput(originAct, on);
+    }
+
+    private boolean verifySamePrimaryInput(Activation originAct, BindingNeuron on) {
         PrimaryInputSynapse primaryInputSyn = on.getPrimaryInputSynapse();
         if(primaryInputSyn == null)
             return false;
 
-        Activation originAct = boundPatternBS.getOriginActivation();
         return originAct.getReverseBindingSignals(primaryInputSyn.getInput())
                 .findAny()
                 .isPresent();

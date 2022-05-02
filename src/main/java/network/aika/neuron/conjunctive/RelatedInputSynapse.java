@@ -44,13 +44,14 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
 
             transition(INPUT, INPUT)
                     .setCheck(true)
-                    .setCheckSamePrimaryInput(true)
+//                    .setCheckSamePrimaryInput(true)
                     .setPropagate(Integer.MAX_VALUE)
     );
 
     private static List<Transition> TRANSITIONS_TEMPLATE = List.of(
             transition(SAME, INPUT)
                     .setCheck(true)
+                    .setCheckPrimaryInput(true)
                     .setPropagate(Integer.MAX_VALUE)
     );
 
