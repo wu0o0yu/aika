@@ -40,11 +40,11 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
             transition(SAME, INPUT)
                     .setCheck(true)
                     .setCheckPrimaryInput(true)
+                    .setCheckSamePrimaryInput(true)
                     .setPropagate(Integer.MAX_VALUE),
 
             transition(INPUT, INPUT)
                     .setCheck(true)
-//                    .setCheckSamePrimaryInput(true)
                     .setPropagate(Integer.MAX_VALUE)
     );
 

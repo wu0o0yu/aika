@@ -158,19 +158,18 @@ public class Transition {
 
         return oOnBound.getReference() == null || originEquals(iOnBound.getReference(), oOnBound.getReference());
     }
-
+/*
     protected boolean verifySamePrimaryInput(BindingSignal iBS, BindingNeuron on) {
         Activation<?> iAct = iBS.getActivation();
         BindingSignal boundPatternBS = iAct.getOnBoundPattern().getReference();
         if(boundPatternBS == null)
             return false;
 
-        Activation originAct = boundPatternBS.getOriginActivation();
+        return verifySamePrimaryInput(boundPatternBS, on);
+    }*/
 
-        return verifySamePrimaryInput(originAct, on);
-    }
-
-    private boolean verifySamePrimaryInput(Activation originAct, BindingNeuron on) {
+    private boolean verifySamePrimaryInput(BindingSignal refBS, BindingNeuron on) {
+        Activation originAct = refBS.getOriginActivation();
         PrimaryInputSynapse primaryInputSyn = on.getPrimaryInputSynapse();
         if(primaryInputSyn == null)
             return false;

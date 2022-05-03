@@ -46,17 +46,16 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
             transition(State.SAME, State.SAME)
                     .setCheck(true)
                     .setPropagate(Integer.MAX_VALUE), // Same Pattern BindingSignal
-
+/* Loose Linking
             transition(State.INPUT, State.INPUT)
                     .setCheck(true)
                     .setCheckBoundToSamePattern(true)
                     .setCheckLooseLinking(true)
                     .setPropagate(Integer.MAX_VALUE), // Input BS becomes related
-
+*/
             transition(State.INPUT, State.INPUT)
                     .setCheck(true)
                     .setCheckBoundToSamePattern(true)
-                    .setCheckSamePrimaryInput(true)
                     .setPropagate(Integer.MAX_VALUE) // Input BS becomes related
     );
 
