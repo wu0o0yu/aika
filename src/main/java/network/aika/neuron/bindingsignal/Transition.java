@@ -18,6 +18,7 @@ package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
 import network.aika.fields.Field;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.conjunctive.BindingNeuron;
@@ -29,7 +30,7 @@ import static network.aika.neuron.bindingsignal.BindingSignal.originEquals;
 /**
  * @author Lukas Molzberger
  */
-public class Transition {
+public class Transition extends AbstractTransition {
 
     private State input;
     private State output;
@@ -47,6 +48,13 @@ public class Transition {
     private Transition(State input, State output) {
         this.input = input;
         this.output = output;
+    }
+
+    @Override
+    public void register(BindingSignal bs, Synapse ts, Direction dir) {
+        FieldOutput e = ts.getLinkingEvent(bs, this, dir);
+        if (e != null)
+            e.addLinkingEventListener(bs, ts, dir, this);
     }
 
     public static Transition transition(State input, State output) {

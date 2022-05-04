@@ -74,8 +74,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected FieldOutput updateValue;
     protected FieldOutput inductionThreshold;
 
-    protected Field<BindingSignal> onBoundPattern = new Field(null, "onBoundPattern");
-
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
 
@@ -196,9 +194,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         );
     }
 
-    public void initBSFields(BindingSignal bs) {
-    }
-
     public FieldOutput getIsFired() {
         return isFired;
     }
@@ -222,10 +217,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 x -> getActivationFunction().f(x),
                 value
         );
-    }
-
-    public Field<BindingSignal> getOnBoundPattern() {
-        return onBoundPattern;
     }
 
     public FieldFunction getNetOuterGradient() {
@@ -487,8 +478,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 backpropInputGradient,
                 ownOutputGradient,
                 backpropOutputGradient,
-                outputGradient,
-                onBoundPattern
+                outputGradient
         };
 
         for(FieldOutput f: fields) {

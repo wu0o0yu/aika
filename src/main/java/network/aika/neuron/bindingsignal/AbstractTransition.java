@@ -14,38 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.fields;
+package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.bindingsignal.BiTransition;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.Transition;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 
 /**
  * @author Lukas Molzberger
  */
-public interface FieldOutput {
-
-    String getLabel();
-
-    boolean isInitialized();
-
-    double getCurrentValue();
-
-    static double getCurrentValue(FieldLink f) {
-        return f != null ? f.getInput().getCurrentValue() : 0.0;
-    }
-
-    void addOutput(FieldLink l, boolean propagateInitValue);
-
-    void removeOutput(FieldLink l, boolean propagateFinalValue);
-
-    void addEventListener(FieldOnTrueEvent eventListener);
-
-    void addLinkingEventListener(BindingSignal bs, Synapse ts, Direction dir, Transition t);
-
-    void addBiTransitionEventListener(BindingSignal bs, Direction dir, BiTransition t);
-
-    void disconnect();
+public abstract class AbstractTransition {
+    public abstract void register(BindingSignal bs, Synapse ts, Direction dir);
 }

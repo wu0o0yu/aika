@@ -38,8 +38,6 @@ import static network.aika.neuron.bindingsignal.State.*;
  */
 public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
-    private Field<BindingSignal> onBoundPrimaryInput = new Field(null, "onBoundPrimaryInput");
-
     private FieldOutput branchProbability;
     private FieldFunction expNet;
     private Field bpNorm = new Field(this, "BP-Norm", 1.0);
@@ -97,47 +95,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     @Override
-    public void initBSFields(BindingSignal bs) {
-        bs.setOnArrivedBound(
-                mul(
-                        "isBound * onArrived",
-                        onBoundPattern,
-                        bs.getOnArrived()
-                )
-        );
-/*
-
-TODO
-        if(!bs.isOrigin() && bs.getState() == State.BRANCH && mainBranch != null) {
-            BindingActivation bAct = (BindingActivation) bs.getOriginActivation();
-            bs.getOnArrived().addEventListener(() ->
-                connect(bAct.expNet, mainBranch.bpNorm)
-            );
-        }
-*/
-        bs.setOnArrivedBoundFired(
-                mul(
-                        "onArrivedBound * onArrivedFired",
-                        bs.getOnArrivedBound(),
-                        bs.getOnArrivedFired()
-                )
-        );
-
-        bs.setOnArrivedBoundFiredFinal(
-                mul(
-                        "onFired * onArrived * isFinal",
-                        bs.getOnArrivedBoundFired(),
-                        getIsFinal()
-                )
-        );
-
-        if(bs.getState() == INPUT && bs.getLink() instanceof PrimaryInputLink) {
-            onBoundPrimaryInput.setReference(bs);
-            connect(bs.getOnArrived(), onBoundPrimaryInput);
-        }
-    }
-
-    @Override
     public void init(Synapse originSynapse, Activation originAct) {
         super.init(originSynapse, originAct);
         addBindingSignal(new BindingSignal(this, BRANCH));
@@ -149,11 +106,6 @@ TODO
 
     public void setInput(boolean input) {
         isInput = input;
-    }
-
-
-    public Field<BindingSignal> getOnBoundPrimaryInput() {
-        return onBoundPrimaryInput;
     }
 
     public void registerReverseBindingSignal(Activation targetAct, BindingSignal bindingSignal) {
@@ -211,7 +163,6 @@ TODO
         super.disconnect();
 
         FieldOutput[] fields = new FieldOutput[]{
-                onBoundPrimaryInput,
                 branchProbability,
                 expNet,
                 bpNorm

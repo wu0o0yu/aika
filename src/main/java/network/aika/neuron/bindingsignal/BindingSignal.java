@@ -50,9 +50,6 @@ public class BindingSignal<A extends Activation> {
     private FieldOutput onArrivedFired;
     private FieldOutput onArrivedFinal;
     private FieldOutput onArrivedFiredFinal;
-    FieldOutput onArrivedBound;
-    FieldOutput onArrivedBoundFired;
-    FieldOutput onArrivedBoundFiredFinal;
 
     public BindingSignal(A act, State state) {
         this.origin = this;
@@ -148,13 +145,6 @@ public class BindingSignal<A extends Activation> {
         onArrivedFired.addEventListener(() ->
                 getActivation().propagateBindingSignal(this)
         );
-
-        if(getState() == SAME) {
-            activation.getOnBoundPattern().setReference(this);
-            connect(getOnArrived(), activation.getOnBoundPattern());
-        }
-
-        activation.initBSFields(this);
     }
 
     private void initLinkingEvents() {
@@ -181,30 +171,6 @@ public class BindingSignal<A extends Activation> {
 
     public FieldOutput getOnArrivedFiredFinal() {
         return onArrivedFiredFinal;
-    }
-
-    public FieldOutput getOnArrivedBound() {
-        return onArrivedBound;
-    }
-
-    public void setOnArrivedBound(FieldOutput onArrivedBound) {
-        this.onArrivedBound = onArrivedBound;
-    }
-
-    public FieldOutput getOnArrivedBoundFired() {
-        return onArrivedBoundFired;
-    }
-
-    public void setOnArrivedBoundFired(FieldOutput f) {
-        onArrivedBoundFired = f;
-    }
-
-    public FieldOutput getOnArrivedBoundFiredFinal() {
-        return onArrivedBoundFiredFinal;
-    }
-
-    public void setOnArrivedBoundFiredFinal(FieldOutput f) {
-        onArrivedBoundFiredFinal = f;
     }
 
     public boolean isOrigin() {

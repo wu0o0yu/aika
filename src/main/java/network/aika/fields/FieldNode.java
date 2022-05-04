@@ -18,6 +18,7 @@ package network.aika.fields;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.bindingsignal.BiTransition;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
 
@@ -89,6 +90,22 @@ public abstract class FieldNode implements FieldOutput {
                 true
         );
     }
+
+    @Override
+    public void addBiTransitionEventListener(BindingSignal bs, Direction dir, BiTransition t) {
+        addOutput(
+                new FieldLink(
+                        null,
+                        0,
+                        (arg, u) -> {
+                            if (u > 0.0)
+                                t.register(bs, dir);
+                        }
+                ),
+                true
+        );
+    }
+
 
     protected void propagateUpdate(double update) {
         int i = 0;

@@ -165,9 +165,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         getTransitions()
                 .filter(t -> t.eventCheck(this, bs, dir))
                 .forEach(t -> {
-                    FieldOutput e = getLinkingEvent(bs, t, dir);
-                    if (e != null)
-                        e.addLinkingEventListener(bs, this, dir, t);
+                    t.register(bs, this, dir);
 
                     if(dir == output)
                         bs.getOnArrivedFiredFinal().addEventListener(() ->
