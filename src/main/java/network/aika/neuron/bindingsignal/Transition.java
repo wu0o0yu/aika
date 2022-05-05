@@ -160,21 +160,6 @@ public class Transition extends AbstractTransition {
         return true;
     }
 
-    protected boolean checkBoundToSamePattern(BindingSignal iBS, BindingSignal oBS) {
-        Field<BindingSignal> iOnBound = iBS.getActivation().getOnBoundPattern();
-        Field<BindingSignal> oOnBound = oBS.getActivation().getOnBoundPattern();
-
-        return oOnBound.getReference() == null || originEquals(iOnBound.getReference(), oOnBound.getReference());
-    }
-/*
-    protected boolean verifySamePrimaryInput(BindingSignal iBS, BindingNeuron on) {
-        Activation<?> iAct = iBS.getActivation();
-        BindingSignal boundPatternBS = iAct.getOnBoundPattern().getReference();
-        if(boundPatternBS == null)
-            return false;
-
-        return verifySamePrimaryInput(boundPatternBS, on);
-    }*/
 
     private boolean verifySamePrimaryInput(BindingSignal refBS, BindingNeuron on) {
         Activation originAct = refBS.getOriginActivation();
