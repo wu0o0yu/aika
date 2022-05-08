@@ -356,9 +356,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void registerBindingSignal(BindingSignal bs) {
-        bs.getOnArrived().set(1.0);
-
         bindingSignals.put(bs.getOriginActivation(), bs);
+        bs.getOnArrived().set(1.0);
     }
 
     public Map<Activation<?>, BindingSignal> getPatternBindingSignals() {

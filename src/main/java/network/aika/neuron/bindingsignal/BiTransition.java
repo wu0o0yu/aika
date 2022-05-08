@@ -38,7 +38,7 @@ public class BiTransition extends Transition {
     }
 
     public BiTransitionListener createListener(Synapse ts, BindingSignal bs, Direction dir) {
-        return new BiTransitionListener(this, bs, dir, ts);
+        return new BiTransitionListener(relatedTransition, bs, dir, ts);
     }
 
     public static void link(BiTransition t1, BiTransition t2) {

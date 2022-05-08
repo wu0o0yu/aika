@@ -80,13 +80,10 @@ public class TransitionListener<T extends Transition> {
         BindingSignal inputBS = dir.getInput(fromBS, toBS);
         BindingSignal outputBS = dir.getOutput(fromBS, toBS);
 
-        Link nl = targetSynapse.link(
+        targetSynapse.link(
                 inputBS.getActivation(),
                 (outputBS != null ? outputBS.getActivation() : null)
         );
-
-        if(nl != null)
-            PropagateBindingSignal.add(nl, inputBS);
     }
 
     protected boolean linkCheck(BindingSignal fromBS, BindingSignal toBS) {
