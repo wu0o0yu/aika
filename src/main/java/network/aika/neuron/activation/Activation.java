@@ -23,8 +23,11 @@ import network.aika.direction.Direction;
 import network.aika.fields.*;
 import network.aika.neuron.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.Transition;
+import network.aika.neuron.bindingsignal.TransitionListener;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
+import network.aika.steps.link.PropagateBindingSignal;
 import network.aika.utils.Utils;
 
 import java.util.*;
@@ -80,6 +83,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected SortedMap<Activation<?>, BindingSignal> bindingSignals = new TreeMap<>(
             Comparator.comparing(Activation::getId)
     );
+
+    private List<TransitionListener> transitionListeners = new ArrayList<>();
 
     protected NavigableMap<Activation<?>, BindingSignal> reverseBindingSignals = new TreeMap<>(NEURON_COMPARATOR);
 
@@ -228,6 +233,16 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         thought.onActivationCreationEvent(this, originSynapse, originAct);
     }
 
+    public void addTransitionListener(TransitionListener tl) {
+        transitionListeners.add(tl);
+    }
+
+    public void receiveBindingSignal(BindingSignal bs) {
+        transitionListeners.forEach(l ->
+                l.notify(bs)
+        );
+    }
+
     public FieldOutput getEntropy() {
         return entropy;
     }
@@ -336,7 +351,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public void propagateBindingSignal(BindingSignal fromBS) {
         getOutputLinks().forEach(l ->
-                l.propagateBindingSignal(fromBS)
+                PropagateBindingSignal.add(l, fromBS)
         );
     }
 

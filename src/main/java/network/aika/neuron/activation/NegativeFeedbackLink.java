@@ -27,21 +27,20 @@ import static network.aika.fields.Fields.scale;
  */
 public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSynapse, InhibitoryActivation> {
 
-    protected boolean isSelfRef;
 
-    public NegativeFeedbackLink(NegativeFeedbackSynapse s, BindingSignal<InhibitoryActivation> iBS, BindingSignal<BindingActivation> oBS) {
-        super(s, iBS, oBS);
+    public NegativeFeedbackLink(NegativeFeedbackSynapse s, InhibitoryActivation input, BindingActivation output) {
+        super(s, input, output);
 
-        this.isSelfRef = iBS != null && iBS.isSelfRef(oBS);
+//        this.isSelfRef = iBS != null && iBS.isSelfRef(oBS);
     }
 
     public boolean isSelfRef() {
-        return isSelfRef;
+        return true; // TODO: isSelfRef;
     }
 
     @Override
     protected void initWeightInput() {
-        if(isSelfRef)
+        if(isSelfRef())
             return;
 
         super.initWeightInput();

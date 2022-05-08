@@ -107,7 +107,7 @@ public class TokenActivation extends PatternActivation {
         BindingSignal fromBS = categoryActivation.getBindingSignal(this);
         BindingSignal toBS = fromBS.propagate(relSynNext);
         toBS.init(toAct);
-        relSynNext.createLink(fromBS, toBS);
+        relSynNext.createLink(fromBS.getActivation(), (BindingActivation) toBS.getActivation());
     }
 
     public TokenActivation getPreviousToken() {

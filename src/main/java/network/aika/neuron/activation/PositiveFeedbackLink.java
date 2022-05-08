@@ -32,7 +32,7 @@ public class PositiveFeedbackLink<IA extends Activation<?>> extends BindingNeuro
     private AbstractBiFunction feedbackWeightInput;
     private AbstractBiFunction feedbackBiasInput;
 
-    public PositiveFeedbackLink(PositiveFeedbackSynapse s, BindingSignal<IA> input, BindingSignal<BindingActivation> output) {
+    public PositiveFeedbackLink(PositiveFeedbackSynapse s, IA input, BindingActivation output) {
         super(s, input, output);
     }
 

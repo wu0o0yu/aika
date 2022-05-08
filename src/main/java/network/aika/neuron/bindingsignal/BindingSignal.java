@@ -29,7 +29,6 @@ import java.util.stream.Stream;
 import static network.aika.direction.Direction.*;
 import static network.aika.fields.Fields.connect;
 import static network.aika.fields.Fields.mul;
-import static network.aika.neuron.bindingsignal.State.SAME;
 
 
 /**
@@ -87,7 +86,9 @@ public class BindingSignal<A extends Activation> {
     public void init(A act) {
         this.activation = act;
         initFields();
-        initLinkingEvents();
+        initBSListeners();
+
+        activation.receiveBindingSignal(this);
     }
 
     private Transition transition(Synapse s) {
@@ -147,15 +148,16 @@ public class BindingSignal<A extends Activation> {
         );
     }
 
-    private void initLinkingEvents() {
+    private void initBSListeners() {
         Neuron<?, ?> n = activation.getNeuron();
 
         boolean templateEnabled = activation.getConfig().isTemplatesEnabled();
         for(Direction dir: DIRECTIONS)
             n.getTargetSynapses(dir, templateEnabled)
-                    .forEach(s -> s.registerLinkingEvents(this, dir));
+                    .forEach(s ->
+                            s.registerLinkingEvents(this, dir)
+                    );
     }
-
 
     public Field getOnArrived() {
         return onArrived;

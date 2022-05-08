@@ -72,7 +72,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
                 .stream()
                 .filter(s -> !bs.getActivation().inputLinkExists(s))
                 .forEach(s ->
-                        s.createLink(null, bs)
+                        s.createLink(null, bs.getActivation())
                 );
     }
 

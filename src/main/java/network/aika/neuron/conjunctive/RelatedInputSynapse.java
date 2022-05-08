@@ -20,12 +20,15 @@ import network.aika.fields.FieldOutput;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PrimaryInputLink;
 import network.aika.neuron.activation.RelatedInputLink;
+import network.aika.neuron.bindingsignal.BiTransition;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
 import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
@@ -36,16 +39,19 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
  */
 public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynapse, BindingNeuron, RelatedInputLink, BindingActivation> {
 
-    private static List<Transition> TRANSITIONS = List.of(
-            transition(SAME, INPUT)
-                    .setCheck(true)
-                    .setCheckPrimaryInput(true)
-                    .setCheckSamePrimaryInput(true)
-                    .setPropagate(Integer.MAX_VALUE),
+    private static BiTransition sameTransition = (BiTransition) biTransition(SAME, INPUT)
+            .setCheck(true)
+            .setCheckPrimaryInput(true)
+            .setCheckSamePrimaryInput(true)
+            .setPropagate(Integer.MAX_VALUE);
 
-            transition(INPUT, INPUT)
-                    .setCheck(true)
-                    .setPropagate(Integer.MAX_VALUE)
+    private static BiTransition inputTransition = (BiTransition) biTransition(INPUT, INPUT)
+            .setCheck(true)
+            .setPropagate(Integer.MAX_VALUE);
+
+    private static List<Transition> TRANSITIONS = List.of(
+            sameTransition,
+            inputTransition
     );
 
     private static List<Transition> TRANSITIONS_TEMPLATE = List.of(
@@ -55,8 +61,12 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
                     .setPropagate(Integer.MAX_VALUE)
     );
 
+    static {
+        BiTransition.link(sameTransition, inputTransition);
+    }
+
     @Override
-    public RelatedInputLink createLink(BindingSignal<BindingActivation> input, BindingSignal<BindingActivation> output) {
+    public RelatedInputLink createLink(BindingActivation input, BindingActivation output) {
         return new RelatedInputLink(this, input, output);
     }
 

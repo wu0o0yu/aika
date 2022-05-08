@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.disjunctive.InhibitorySynapse;
 
 /**
@@ -24,7 +23,7 @@ import network.aika.neuron.disjunctive.InhibitorySynapse;
  */
 public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingActivation, InhibitoryActivation> {
 
-    public InhibitoryLink(InhibitorySynapse s, BindingSignal<BindingActivation> input, BindingSignal<InhibitoryActivation> output) {
+    public InhibitoryLink(InhibitorySynapse s, BindingActivation input, InhibitoryActivation output) {
         super(s, input, output);
     }
 }

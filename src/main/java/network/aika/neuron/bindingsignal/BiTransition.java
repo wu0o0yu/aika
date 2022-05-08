@@ -17,12 +17,36 @@
 package network.aika.neuron.bindingsignal;
 
 
+import network.aika.direction.Direction;
+import network.aika.neuron.Synapse;
+
+
 /**
  * @author Lukas Molzberger
  */
-public class BiTransition extends AbstractTransition {
+public class BiTransition extends Transition {
 
-    Transition[] innerTransitions = new Transition[2];
+    private BiTransition relatedTransition;
 
 
+    protected BiTransition(State input, State output) {
+        super(input, output);
+    }
+
+    public static BiTransition biTransition(State input, State output) {
+        return new BiTransition(input, output);
+    }
+
+    public BiTransitionListener createListener(Synapse ts, BindingSignal bs, Direction dir) {
+        return new BiTransitionListener(this, bs, dir, ts);
+    }
+
+    public static void link(BiTransition t1, BiTransition t2) {
+        t1.relatedTransition = t2;
+        t2.relatedTransition = t1;
+    }
+
+    public Transition getRelatedTransition() {
+        return relatedTransition;
+    }
 }

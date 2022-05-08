@@ -57,7 +57,12 @@ public class Output implements Direction {
     }
 
     @Override
-    public State getState(Transition t) {
+    public State getFromState(Transition t) {
+        return t.getInput();
+    }
+
+    @Override
+    public State getToState(Transition t) {
         return t.getOutput();
     }
 

@@ -18,9 +18,9 @@ package network.aika.fields;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.bindingsignal.BiTransition;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
+import network.aika.neuron.bindingsignal.TransitionListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,35 +77,19 @@ public abstract class FieldNode implements FieldOutput {
     }
 
     @Override
-    public void addLinkingEventListener(BindingSignal bs, Synapse ts, Direction dir, Transition t) {
+    public void addLinkingEventListener(TransitionListener tl) {
         addOutput(
                 new FieldLink(
                         null,
                         0,
                         (arg, u) -> {
                             if (u > 0.0)
-                                ts.link(dir, bs, t);
+                                tl.link();
                         }
                 ),
                 true
         );
     }
-
-    @Override
-    public void addBiTransitionEventListener(BindingSignal bs, Direction dir, BiTransition t) {
-        addOutput(
-                new FieldLink(
-                        null,
-                        0,
-                        (arg, u) -> {
-                            if (u > 0.0)
-                                t.register(bs, dir);
-                        }
-                ),
-                true
-        );
-    }
-
 
     protected void propagateUpdate(double update) {
         int i = 0;

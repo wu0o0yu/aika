@@ -14,16 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.bindingsignal;
+package network.aika.steps.link;
 
-import network.aika.direction.Direction;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.steps.Phase;
+import network.aika.steps.Step;
+
 
 /**
+ *
  * @author Lukas Molzberger
  */
-public abstract class AbstractTransition {
-    public abstract void register(BindingSignal bs, Synapse ts, Direction dir);
+public class PropagateBindingSignal extends Step<Link> {
+
+    BindingSignal inputBS;
+
+    public static void add(Link l, BindingSignal bs) {
+        Step.add(new PropagateBindingSignal(l, bs));
+    }
+
+    private PropagateBindingSignal(Link l, BindingSignal bs) {
+        super(l);
+        inputBS = bs;
+    }
+
+    @Override
+    public void process() {
+        getElement().propagateBindingSignal(inputBS);
+    }
+
+    @Override
+    public Phase getPhase() {
+        return Phase.PROCESSING;
+    }
 }

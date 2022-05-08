@@ -17,27 +17,23 @@
 package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
-import network.aika.fields.Field;
-import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 
 import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.neuron.bindingsignal.BindingSignal.originEquals;
 
 /**
  * @author Lukas Molzberger
  */
-public class Transition extends AbstractTransition {
+public class Transition {
 
     private State input;
     private State output;
     private boolean check;
     private boolean checkPrimaryInput;
     private boolean checkSamePrimaryInput;
-    private boolean checkBoundToSamePattern;
     private boolean checkIfPrimaryInputAlreadyExists;
     private boolean checkLooseLinking;
     private boolean checkSelfRef;
@@ -45,16 +41,18 @@ public class Transition extends AbstractTransition {
 
     private Integer propagate;
 
-    private Transition(State input, State output) {
+    protected Transition(State input, State output) {
         this.input = input;
         this.output = output;
     }
 
-    @Override
-    public void register(BindingSignal bs, Synapse ts, Direction dir) {
-        FieldOutput e = ts.getLinkingEvent(bs, this, dir);
-        if (e != null)
-            e.addLinkingEventListener(bs, ts, dir, this);
+    public boolean check(BindingSignal bs, Direction dir) {
+        return isCheck() &&
+                dir.getFromState(this) == bs.getState();
+    }
+
+    public TransitionListener createListener(Synapse ts, BindingSignal bs, Direction dir) {
+        return new TransitionListener(this, bs, dir, ts);
     }
 
     public static Transition transition(State input, State output) {
@@ -73,11 +71,6 @@ public class Transition extends AbstractTransition {
 
     public Transition setCheckSamePrimaryInput(boolean checkSamePrimaryInput) {
         this.checkSamePrimaryInput = checkSamePrimaryInput;
-        return this;
-    }
-
-    public Transition setCheckBoundToSamePattern(boolean checkBoundToSamePattern) {
-        this.checkBoundToSamePattern = checkBoundToSamePattern;
         return this;
     }
 
@@ -129,7 +122,7 @@ public class Transition extends AbstractTransition {
         if(!check)
             return false;
 
-        if(dir.invert().getState(this) != bs.getState())
+        if(dir.invert().getFromState(this) != bs.getState())
             return false;
 
         if(dir == OUTPUT && checkSamePrimaryInput && !verifySamePrimaryInput(bs, (BindingNeuron) ts.getOutput()))
@@ -153,10 +146,10 @@ public class Transition extends AbstractTransition {
 
         if(checkLooseLinking && !ts.allowLooseLinking()) // && iBS.getOrigin() != oBS.getOrigin()
             return false;
-
+/*
         if(checkBoundToSamePattern && !checkBoundToSamePattern(iBS, oBS))
             return false;
-
+*/
         return true;
     }
 
@@ -185,7 +178,6 @@ public class Transition extends AbstractTransition {
                 " Check:" + check +
                 " CheckPrimaryInput:" + checkPrimaryInput +
                 " CheckSamePrimaryInput:" + checkSamePrimaryInput +
-                " CheckBoundToSamePattern:" + checkBoundToSamePattern +
                 " CheckIfPrimaryInputAlreadyExists:" + checkIfPrimaryInputAlreadyExists +
                 " CheckLooseLinking:" + checkLooseLinking +
                 " CheckSelfRef:" + checkSelfRef +

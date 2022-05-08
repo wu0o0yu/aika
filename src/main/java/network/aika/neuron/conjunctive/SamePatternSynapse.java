@@ -21,6 +21,7 @@ import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.SamePatternLink;
+import network.aika.neuron.bindingsignal.BiTransition;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
@@ -33,6 +34,7 @@ import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.mul;
+import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
 /**
@@ -42,10 +44,18 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
  */
 public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse, BindingNeuron, SamePatternLink, BindingActivation> {
 
+    private static BiTransition sameTransition = (BiTransition) biTransition(State.SAME, State.SAME)
+            .setCheck(true)
+            .setPropagate(Integer.MAX_VALUE);
+
+    private static BiTransition inputTransition = (BiTransition) biTransition(State.INPUT, State.INPUT)
+            .setCheck(true)
+//            .setCheckBoundToSamePattern(true)
+            .setPropagate(Integer.MAX_VALUE);
+
     private static List<Transition> TRANSITIONS = List.of(
-            transition(State.SAME, State.SAME)
-                    .setCheck(true)
-                    .setPropagate(Integer.MAX_VALUE), // Same Pattern BindingSignal
+            sameTransition, // Same Pattern BindingSignal
+            inputTransition // Input BS becomes related
 /* Loose Linking
             transition(State.INPUT, State.INPUT)
                     .setCheck(true)
@@ -53,17 +63,17 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
                     .setCheckLooseLinking(true)
                     .setPropagate(Integer.MAX_VALUE), // Input BS becomes related
 */
-            transition(State.INPUT, State.INPUT)
-                    .setCheck(true)
-                    .setCheckBoundToSamePattern(true)
-                    .setPropagate(Integer.MAX_VALUE) // Input BS becomes related
     );
+
+    static {
+        BiTransition.link(sameTransition, inputTransition);
+    }
 
     private int looseLinkingRange;
     private boolean allowLooseLinking;
 
     @Override
-    public SamePatternLink createLink(BindingSignal<BindingActivation> input, BindingSignal<BindingActivation> output) {
+    public SamePatternLink createLink(BindingActivation input, BindingActivation output) {
         return new SamePatternLink(this, input, output);
     }
 
@@ -95,7 +105,7 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
     public boolean networkInputsAllowed(Direction dir) {
         return !isTemplate();
     }
-
+/*
     @Override
     public FieldOutput getLinkingEvent(BindingSignal bs, Transition t, Direction dir) {
         FieldOutput e = super.getLinkingEvent(bs, t, dir);
@@ -110,7 +120,7 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
 
         return e;
     }
-
+*/
     @Override
     public Stream<Transition> getTransitions() {
         return TRANSITIONS.stream();

@@ -46,7 +46,7 @@ public class CategorySynapse<N extends Neuron & PatternAxon> extends Disjunctive
     );
 
     @Override
-    public CategoryLink createLink(BindingSignal<PatternActivation> input, BindingSignal<CategoryActivation> output) {
+    public CategoryLink createLink(PatternActivation input, CategoryActivation output) {
         return new CategoryLink(this, input, output);
     }
 

@@ -28,6 +28,7 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.sign.Sign;
 import network.aika.steps.link.Cleanup;
 import network.aika.steps.link.LinkCounting;
+import network.aika.steps.link.PropagateBindingSignal;
 
 import java.util.Comparator;
 
@@ -58,10 +59,10 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected ThresholdOperator onTransparent;
 
-    public Link(S s, BindingSignal<I> iBS, BindingSignal<O> oBS) {
+    public Link(S s, I input, O output) {
         this.synapse = s;
-        this.input = iBS.getActivation();
-        this.output = oBS.getActivation();
+        this.input = input;
+        this.output = output;
 
         init();
 
@@ -159,7 +160,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     public void propagateAllBindingSignals() {
         input.getBindingSignals()
                 .forEach(fromBS ->
-                        propagateBindingSignal(fromBS)
+                        PropagateBindingSignal.add(this, fromBS)
                 );
     }
 

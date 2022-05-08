@@ -26,7 +26,7 @@ import network.aika.sign.Sign;
  */
 public class RelatedInputLink extends BindingNeuronLink<RelatedInputSynapse, BindingActivation> {
 
-    public RelatedInputLink(RelatedInputSynapse s, BindingSignal<BindingActivation> input, BindingSignal<BindingActivation> output) {
+    public RelatedInputLink(RelatedInputSynapse s, BindingActivation input, BindingActivation output) {
         super(s, input, output);
     }
 

@@ -18,9 +18,9 @@ package network.aika.fields;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.bindingsignal.BiTransition;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
+import network.aika.neuron.bindingsignal.TransitionListener;
 
 /**
  * @author Lukas Molzberger
@@ -43,9 +43,7 @@ public interface FieldOutput {
 
     void addEventListener(FieldOnTrueEvent eventListener);
 
-    void addLinkingEventListener(BindingSignal bs, Synapse ts, Direction dir, Transition t);
-
-    void addBiTransitionEventListener(BindingSignal bs, Direction dir, BiTransition t);
+    void addLinkingEventListener(TransitionListener tl);
 
     void disconnect();
 }

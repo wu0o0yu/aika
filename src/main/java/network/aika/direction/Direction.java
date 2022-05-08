@@ -19,7 +19,6 @@ package network.aika.direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
@@ -46,7 +45,9 @@ public interface Direction {
 
     Activation getActivation(Link l);
 
-    State getState(Transition t);
+    State getFromState(Transition t);
+
+    State getToState(Transition t);
 
     Stream<Link> getLinks(Activation act);
 
