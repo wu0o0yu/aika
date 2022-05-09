@@ -20,6 +20,8 @@ package network.aika.neuron.bindingsignal;
 import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
 
+import static network.aika.direction.Direction.OUTPUT;
+
 
 /**
  * @author Lukas Molzberger
@@ -37,8 +39,12 @@ public class BiTransition extends Transition {
         return new BiTransition(input, output);
     }
 
-    public BiTransitionListener createListener(Synapse ts, BindingSignal bs, Direction dir) {
-        return new BiTransitionListener(relatedTransition, bs, dir, ts);
+    public TransitionListener createListener(Synapse ts, BindingSignal bs, Direction dir) {
+        if(dir == OUTPUT) {
+            return new BiTransitionListener(relatedTransition, bs, dir, ts);
+        } else {
+            return new TransitionListener(this, bs, dir, ts);
+        }
     }
 
     public static void link(BiTransition t1, BiTransition t2) {

@@ -86,6 +86,10 @@ public class TransitionListener<T extends Transition> {
         );
     }
 
+    public boolean check(BindingSignal bs) {
+        return transition.check(bs, dir);
+    }
+
     protected boolean linkCheck(BindingSignal fromBS, BindingSignal toBS) {
         if (transition.eventCheck(targetSynapse, toBS, dir.invert()))
             return true;

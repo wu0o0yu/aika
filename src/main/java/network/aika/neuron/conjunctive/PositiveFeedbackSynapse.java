@@ -43,11 +43,12 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     private static List<Transition> TRANSITIONS = List.of(
             transition(State.BRANCH, State.BRANCH)
                     .setCheck(true)
-                    .setPropagate(1),
-
+                    .setPropagate(1)
+/*
             transition(State.SAME, State.SAME)
                     .setCheck(true)
                     .setPropagate(Integer.MAX_VALUE)
+ */
     );
 
     private Field feedbackWeight = new Field(this, "feedbackWeight");

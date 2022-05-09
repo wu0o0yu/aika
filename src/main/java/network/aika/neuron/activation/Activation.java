@@ -19,11 +19,9 @@ package network.aika.neuron.activation;
 import network.aika.Config;
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.direction.Direction;
 import network.aika.fields.*;
 import network.aika.neuron.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.bindingsignal.TransitionListener;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
@@ -238,7 +236,11 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void receiveBindingSignal(BindingSignal bs) {
-        transitionListeners.forEach(l ->
+        transitionListeners.stream()
+                .filter(l ->
+                        l.check(bs)
+                )
+                .forEach(l ->
                 l.notify(bs)
         );
     }
