@@ -37,7 +37,8 @@ import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
  */
 public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedbackSynapse, InhibitoryNeuron, NegativeFeedbackLink, InhibitoryActivation> {
 
-    private static BiTransition sameTransition = (BiTransition) biTransition(State.SAME, State.INPUT)
+    private static BiTransition sameTransition = (BiTransition) biTransition(State.SAME, State.SAME)
+            .setCheck(true)
             .setPropagate(Integer.MAX_VALUE);
 
     private static BiTransition inputTransition = (BiTransition) biTransition(State.INPUT, State.INPUT)

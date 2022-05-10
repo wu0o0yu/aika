@@ -43,7 +43,9 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     private static List<Transition> TRANSITIONS = List.of(
             transition(State.BRANCH, State.BRANCH)
                     .setCheck(true)
-                    .setPropagate(1)
+                    .setPropagate(0),
+            transition(State.SAME, State.SAME)
+                    .setPropagate(Integer.MAX_VALUE)
     );
 
     private Field feedbackBias = new Field(this, "feedbackBias");

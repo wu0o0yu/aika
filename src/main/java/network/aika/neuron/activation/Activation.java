@@ -22,6 +22,7 @@ import network.aika.Thought;
 import network.aika.fields.*;
 import network.aika.neuron.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.TransitionListener;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
@@ -384,6 +385,14 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public BindingSignal getBindingSignal(Activation act) {
         return bindingSignals.get(act);
+    }
+
+    public BindingSignal getBindingSignal(State s) {
+        return bindingSignals.values()
+                .stream()
+                .filter(bs -> bs.getState() == s)
+                .findFirst()
+                .orElse(null);
     }
 
     @Override

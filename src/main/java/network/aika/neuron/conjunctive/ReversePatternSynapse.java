@@ -45,7 +45,6 @@ public class ReversePatternSynapse<I extends Neuron & PatternAxon, IA extends Ac
             transition(State.SAME, State.SAME)
                     .setCheck(true)
                     .setPropagate(Integer.MAX_VALUE)
-
     );
 
     public ReversePatternLink createLink(IA input, BindingActivation output) {

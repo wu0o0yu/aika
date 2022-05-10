@@ -21,6 +21,7 @@ import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 
 import static network.aika.fields.Fields.mul;
 import static network.aika.fields.Fields.scale;
+import static network.aika.neuron.bindingsignal.State.INPUT;
 
 /**
  * @author Lukas Molzberger
@@ -35,7 +36,13 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
     }
 
     public boolean isSelfRef() {
-        return true; // TODO: isSelfRef;
+        BindingSignal iBS = input.getBindingSignal(INPUT);
+        if(iBS == null)
+            return false;
+
+        return iBS.isSelfRef(
+                output.getBindingSignal(INPUT)
+        );
     }
 
     @Override

@@ -36,7 +36,7 @@ public class BiTransitionListener extends TransitionListener<BiTransition> {
         this.relatedBindingSignal = bs;
 
         FieldOutput eA = targetSynapse.getLinkingEvent(relatedBindingSignal, transition.getRelatedTransition(), dir);
-        FieldOutput eB = targetSynapse.getLinkingEvent(bs, transition, dir);
+        FieldOutput eB = targetSynapse.getLinkingEvent(bindingSignal, transition, dir);
 
         if(eA != null && eB != null) {
             FieldOutput e = mul(
