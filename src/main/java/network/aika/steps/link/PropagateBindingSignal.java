@@ -16,8 +16,10 @@
  */
 package network.aika.steps.link;
 
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.Transition;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
@@ -28,24 +30,43 @@ import network.aika.steps.Step;
  */
 public class PropagateBindingSignal extends Step<Link> {
 
-    BindingSignal inputBS;
+    private BindingSignal inputBS;
+    private Transition transition;
 
     public static void add(Link l, BindingSignal bs) {
-        Step.add(new PropagateBindingSignal(l, bs));
+        if(!bs.isPropagateAllowed())
+            return;
+
+        Transition t = bs.transition(l.getSynapse());
+        if(t == null)
+            return;
+
+        Step.add(new PropagateBindingSignal(l, bs, t));
     }
 
-    private PropagateBindingSignal(Link l, BindingSignal bs) {
+    private PropagateBindingSignal(Link l, BindingSignal bs, Transition t) {
         super(l);
         inputBS = bs;
+        transition = t;
     }
 
     @Override
     public void process() {
-        getElement().propagateBindingSignal(inputBS);
+        Link l = getElement();
+        BindingSignal toBS = inputBS.next(transition);
+        toBS.setLink(l);
+
+        Activation oAct = l.getOutput();
+        toBS.init(oAct);
+        oAct.addBindingSignal(toBS);
     }
 
     @Override
     public Phase getPhase() {
         return Phase.PROCESSING;
+    }
+
+    public String toString() {
+        return "" + getElement() + " inputBS:" + inputBS + " transition:<" + transition + ">";
     }
 }

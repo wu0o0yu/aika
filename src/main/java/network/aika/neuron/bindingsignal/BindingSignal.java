@@ -77,12 +77,6 @@ public class BindingSignal<A extends Activation> {
         this.state = t.next(Direction.OUTPUT);
     }
 
-    public BindingSignal(BindingSignal parent, Transition t, Link l) {
-        this(parent, t);
-
-        this.link = l;
-    }
-
     public void init(A act) {
         this.activation = act;
         initFields();
@@ -91,7 +85,7 @@ public class BindingSignal<A extends Activation> {
         activation.receiveBindingSignal(this);
     }
 
-    private Transition transition(Synapse s) {
+    public Transition transition(Synapse s) {
         Stream<Transition> transitions = s.getTransitions();
         return transitions
                 .filter(t -> t.checkPropagate(getState()))
@@ -100,17 +94,17 @@ public class BindingSignal<A extends Activation> {
     }
 
     public BindingSignal propagate(Synapse s) {
-        Transition t = transition(s);
+        return next(transition(s));
+    }
+
+    public BindingSignal next(Transition t) {
         return t != null ?
                 new BindingSignal(this, t) :
                 null;
     }
 
-    public BindingSignal propagate(Link l) {
-        Transition t = transition(l.getSynapse());
-        return t != null ?
-                new BindingSignal(this, t, l) :
-                null;
+    public void setLink(Link l) {
+        this.link = l;
     }
 
     private void initFields() {

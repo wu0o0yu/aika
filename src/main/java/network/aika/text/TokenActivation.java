@@ -59,12 +59,12 @@ public class TokenActivation extends PatternActivation {
 
         relPTBindingActivation = followSynapse(
                 categoryActivation,
-                m.getRelPTFeedbackSyn()
+                m.getRelPTRevPatternSyn()
         );
 
         relNTBindingActivation = followSynapse(
                 categoryActivation,
-                m.getRelNTFeedbackSyn()
+                m.getRelNTRevPatternSyn()
         );
     }
 

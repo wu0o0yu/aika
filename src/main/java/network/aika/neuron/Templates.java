@@ -48,6 +48,8 @@ public class Templates {
     public SamePatternSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
     public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE;
     public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE;
+    public ReversePatternSynapse REVERSE_PATTERN_SYNAPSE_FROM_PATTERN_TEMPLATE;
+    public ReversePatternSynapse REVERSE_PATTERN_SYNAPSE_FROM_CATEGORY_TEMPLATE;
     public NegativeFeedbackSynapse NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE;
     public PatternSynapse PATTERN_SYNAPSE_TEMPLATE;
     public InhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE;
@@ -94,11 +96,10 @@ public class Templates {
                         CATEGORY_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Primary Input Synapse from Category",
-                        1,
+                        2,
                         0.01
                 );
 //        PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE.setAllowPropagate(true);
-
 
         RELATED_INPUT_SYNAPSE_TEMPLATE =
                 init(
@@ -106,7 +107,7 @@ public class Templates {
                         INPUT_BINDING_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Related Input Synapse",
-                        2,
+                        3,
                         0.0
                 );
 
@@ -127,10 +128,9 @@ public class Templates {
                         BINDING_TEMPLATE,
                         "Positive Feedback Synapse",
                         5,
-                        0.0
+                        0.01
                 );
         POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE.getFeedbackBias().set(0.0);
-        POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE.getFeedbackWeight().set(0.01);
 
 
         POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE =
@@ -139,11 +139,30 @@ public class Templates {
                         CATEGORY_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Positive Feedback Synapse",
-                        5,
-                        0.0
+                        6,
+                        0.01
                 );
         POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE.getFeedbackBias().set(0.0);
-        POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE.getFeedbackWeight().set(0.0);
+
+        REVERSE_PATTERN_SYNAPSE_FROM_PATTERN_TEMPLATE =
+                init(
+                        new ReversePatternSynapse(),
+                        PATTERN_TEMPLATE,
+                        BINDING_TEMPLATE,
+                        "Reverse Pattern Synapse",
+                        7,
+                        0.0
+                );
+
+        REVERSE_PATTERN_SYNAPSE_FROM_CATEGORY_TEMPLATE =
+                init(
+                        new ReversePatternSynapse(),
+                        CATEGORY_TEMPLATE,
+                        BINDING_TEMPLATE,
+                        "Reverse Pattern Synapse",
+                        8,
+                        0.0
+                );
 
         NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE =
                 init(
@@ -151,7 +170,7 @@ public class Templates {
                         INHIBITORY_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Negative Feedback Synapse",
-                        6,
+                        9,
                         0.0
                 );
 
@@ -161,7 +180,7 @@ public class Templates {
                         BINDING_TEMPLATE,
                         PATTERN_TEMPLATE,
                         "Pattern Synapse",
-                        7,
+                        10,
                         1.0 // Needs to be above the tolerance
                 );
         PATTERN_SYNAPSE_TEMPLATE.setAllowPropagate(true);
@@ -172,7 +191,7 @@ public class Templates {
                         BINDING_TEMPLATE,
                         INHIBITORY_TEMPLATE,
                         "Inhibitory Synapse",
-                        8,
+                        11,
                         1.0
                 );
 
@@ -182,7 +201,7 @@ public class Templates {
                         PATTERN_TEMPLATE,
                         CATEGORY_TEMPLATE,
                         "Category Synapse",
-                        9,
+                        12,
                         0.0
                 );
     }

@@ -144,19 +144,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
             LinkCounting.add(this);
     }
 
-    public void propagateBindingSignal(BindingSignal<I> fromBS) {
-        if(!fromBS.isPropagateAllowed())
-            return;
-
-        BindingSignal<O> toBS = fromBS.propagate(this);
-        if(toBS == null)
-            return;
-
-        toBS.init(output);
-
-        output.addBindingSignal(toBS);
-    }
-
     public void propagateAllBindingSignals() {
         input.getBindingSignals()
                 .forEach(fromBS ->

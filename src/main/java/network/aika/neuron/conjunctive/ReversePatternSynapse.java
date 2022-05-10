@@ -23,6 +23,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PositiveFeedbackLink;
+import network.aika.neuron.activation.ReversePatternLink;
 import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
@@ -38,43 +39,17 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
  *
  * @author Lukas Molzberger
  */
-public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<PositiveFeedbackSynapse, I, PositiveFeedbackLink<IA>, IA> {
+public class ReversePatternSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<ReversePatternSynapse, I, ReversePatternLink<IA>, IA> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(State.BRANCH, State.BRANCH)
+            transition(State.SAME, State.SAME)
                     .setCheck(true)
-                    .setPropagate(1)
+                    .setPropagate(Integer.MAX_VALUE)
+
     );
 
-    private Field feedbackBias = new Field(this, "feedbackBias");
-
-    public PositiveFeedbackLink createLink(IA input, BindingActivation output) {
-        return new PositiveFeedbackLink(this, input, output);
-    }
-
-    protected void initFromTemplate(PositiveFeedbackSynapse s) {
-        s.feedbackBias.set(feedbackBias.getCurrentValue());
-        super.initFromTemplate(s);
-    }
-
-    @Override
-    public FieldOutput getLinkingEvent(BindingSignal bs, Transition t, Direction dir) {
-        if(dir == OUTPUT) {
-            return isTemplate() ?
-                    bs.getOnArrivedFinal() :
-                    bs.getOnArrived();
-        }
-
-        return super.getLinkingEvent(bs, t, dir);
-    }
-
-    public Field getFeedbackBias() {
-        return feedbackBias;
-    }
-
-    @Override
-    public boolean isRecurrent() {
-        return true;
+    public ReversePatternLink createLink(IA input, BindingActivation output) {
+        return new ReversePatternLink(this, input, output);
     }
 
     @Override

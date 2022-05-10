@@ -38,13 +38,10 @@ public class PositiveFeedbackLink<IA extends Activation<?>> extends BindingNeuro
 
     @Override
     protected void initWeightInput() {
-        if(isCausal())
-            super.initWeightInput();
-
         feedbackWeightInput = mul(
-                "iAct.finalValue * s.feedbackWeighted",
+                "iAct.finalValue * s.weighted",
                 input.getFinalValue(),
-                synapse.getFeedbackWeight(),
+                synapse.getWeight(),
                 getOutput().getNet()
         );
 
@@ -62,46 +59,25 @@ public class PositiveFeedbackLink<IA extends Activation<?>> extends BindingNeuro
                 "onTransparent",
                 0.0,
                 ABOVE,
-                add(
-                        "weight sum",
-                        synapse.getWeight(),
-                        synapse.getFeedbackWeight()
-                )
+                synapse.getWeight()
         );
     }
 
     @Override
     public void initWeightUpdate() {
-        if(isCausal()) {
-            super.initWeightUpdate();
-        } else {
-            mul(
-                    "feedback weight update",
-                    getInput().getIsFiredForWeight(),
-                    getOutput().getUpdateValue(),
-                    synapse.getFeedbackWeight()
-            );
+        mul(
+                "weight update",
+                getInput().getIsFiredForWeight(),
+                getOutput().getUpdateValue(),
+                synapse.getWeight()
+        );
 
-            mul(
-                    "feedback bias update",
-                    getInput().getIsFiredForBias(),
-                    getOutput().getUpdateValue(),
-                    synapse.getFeedbackBias()
-            );
-        }
-    }
-
-    protected void initBackpropGradient() {
-        if(isCausal()) {
-            super.initWeightUpdate();
-        } else {
-            backPropGradient = mul(
-                    "oAct.ownOutputGradient * s.feedbackWeight",
-                    output.ownOutputGradient,
-                    synapse.getFeedbackWeight(),
-                    input.backpropInputGradient
-            );
-        }
+        mul(
+                "feedback bias update",
+                getInput().getIsFiredForBias(),
+                getOutput().getUpdateValue(),
+                synapse.getFeedbackBias()
+        );
     }
 
     public AbstractBiFunction getFeedbackWeightInput() {

@@ -45,10 +45,10 @@ public class TextModel extends Model {
     private NeuronProvider relNextToken;
 
     private PrimaryInputSynapse<CategoryNeuron, CategoryActivation> relPTPrimaryInputSyn;
-    private PositiveFeedbackSynapse<CategoryNeuron, CategoryActivation> relPTFeedbackSyn;
+    private ReversePatternSynapse<CategoryNeuron, CategoryActivation> relPTRevPatternSyn;
 
     private PrimaryInputSynapse<CategoryNeuron, CategoryActivation> relNTPrimaryInputSyn;
-    private PositiveFeedbackSynapse<CategoryNeuron, CategoryActivation> relNTFeedbackSyn;
+    private ReversePatternSynapse<CategoryNeuron, CategoryActivation> relNTRevPatternSyn;
 
     public TextModel() {
         super();
@@ -68,11 +68,11 @@ public class TextModel extends Model {
         BindingNeuron relNT = getTemplates().INPUT_BINDING_TEMPLATE.instantiateTemplate(true);
         relNextToken = relNT.getProvider();
 
-        relPTFeedbackSyn = initFeedbackSamePatternSynapse(getTokenCategory(), relPT);
+        relPTRevPatternSyn = initReversePatternSynapse(getTokenCategory(), relPT);
         relPTPrimaryInputSyn = initRelatedInputSynapse(getTokenCategory(), relPT);
         initRelationNeuron(REL_PREVIOUS_TOKEN_LABEL, relPT);
 
-        relNTFeedbackSyn = initFeedbackSamePatternSynapse(getTokenCategory(), relNT);
+        relNTRevPatternSyn = initReversePatternSynapse(getTokenCategory(), relNT);
         relNTPrimaryInputSyn = initRelatedInputSynapse(getTokenCategory(), relNT);
         initRelationNeuron(REL_NEXT_TOKEN_LABEL, relNT);
 
@@ -132,8 +132,8 @@ public class TextModel extends Model {
         return s;
     }
 
-    private PositiveFeedbackSynapse initFeedbackSamePatternSynapse(CategoryNeuron in, BindingNeuron inRel) {
-        PositiveFeedbackSynapse s = (PositiveFeedbackSynapse) getTemplates().POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE
+    private ReversePatternSynapse initReversePatternSynapse(CategoryNeuron in, BindingNeuron inRel) {
+        ReversePatternSynapse s = (ReversePatternSynapse) getTemplates().REVERSE_PATTERN_SYNAPSE_FROM_CATEGORY_TEMPLATE
                 .instantiateTemplate(in, inRel);
 
         double w = 11.0;
@@ -172,16 +172,16 @@ public class TextModel extends Model {
         return relPTPrimaryInputSyn;
     }
 
-    public PositiveFeedbackSynapse<CategoryNeuron, CategoryActivation> getRelPTFeedbackSyn() {
-        return relPTFeedbackSyn;
+    public ReversePatternSynapse<CategoryNeuron, CategoryActivation> getRelPTRevPatternSyn() {
+        return relPTRevPatternSyn;
     }
 
     public PrimaryInputSynapse<CategoryNeuron, CategoryActivation> getRelNTPrimaryInputSyn() {
         return relNTPrimaryInputSyn;
     }
 
-    public PositiveFeedbackSynapse<CategoryNeuron, CategoryActivation> getRelNTFeedbackSyn() {
-        return relNTFeedbackSyn;
+    public ReversePatternSynapse<CategoryNeuron, CategoryActivation> getRelNTRevPatternSyn() {
+        return relNTRevPatternSyn;
     }
 
     @Override

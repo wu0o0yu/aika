@@ -241,8 +241,8 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                         l.check(bs)
                 )
                 .forEach(l ->
-                l.notify(bs)
-        );
+                        l.notify(bs)
+                );
     }
 
     public FieldOutput getEntropy() {
