@@ -14,11 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.disjunctive;
+package network.aika.neuron.conjunctive;
 
 import network.aika.direction.Direction;
+import network.aika.fields.Field;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.PositiveFeedbackLink;
+import network.aika.neuron.activation.ReversePatternLink;
 import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
@@ -27,36 +32,27 @@ import network.aika.neuron.bindingsignal.Transition;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.bindingsignal.Transition.transition;
-
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class CategorySynapse<N extends Neuron & PatternAxon> extends DisjunctiveSynapse<CategorySynapse, N, CategoryNeuron, CategoryLink, PatternActivation, CategoryActivation> {
+public class ReversePatternSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<ReversePatternSynapse, I, ReversePatternLink<IA>, IA> {
 
     private static List<Transition> TRANSITIONS = List.of(
             transition(State.SAME, State.SAME)
                     .setCheck(true)
-                    .setPropagate(Integer.MAX_VALUE),
-
-            transition(State.INPUT, State.INPUT)
                     .setPropagate(Integer.MAX_VALUE)
     );
 
-    @Override
-    public CategoryLink createLink(PatternActivation input, CategoryActivation output) {
-        return new CategoryLink(this, input, output);
+    public ReversePatternLink createLink(IA input, BindingActivation output) {
+        return new ReversePatternLink(this, input, output);
     }
 
     @Override
     public Stream<Transition> getTransitions() {
         return TRANSITIONS.stream();
-    }
-
-    @Override
-    public boolean networkInputsAllowed(Direction dir) {
-        return dir != Direction.INPUT || !isTemplate();
     }
 }

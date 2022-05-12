@@ -36,35 +36,29 @@ public class TokenActivation extends PatternActivation {
     private TokenActivation previousToken;
     private TokenActivation nextToken;
 
-    private CategoryActivation categoryActivation;
-    private BindingActivation relPTBindingActivation;
-    private BindingActivation relNTBindingActivation;
-
-
     public TokenActivation(int id, int begin, int end, Document doc, PatternNeuron patternNeuron) {
         super(id, doc, patternNeuron);
         range = new Range(begin, end);
     }
 
-    @Override
-    public void init(Synapse originSynapse, Activation originAct) {
-        super.init(originSynapse, originAct);
+    private BindingActivation getRelNTBindingActivation(TextModel m) {
+        return followSynapse(
+                getCategoryActivation(m),
+                m.getRelNTRevPatternSyn()
+        );
+    }
 
-        TextModel m = getModel();
+    private BindingActivation getRelPTBindingActivation(TextModel m) {
+        return followSynapse(
+                getCategoryActivation(m),
+                m.getRelPTRevPatternSyn()
+        );
+    }
 
-        categoryActivation = followSynapse(
+    private CategoryActivation getCategoryActivation(TextModel m) {
+        return followSynapse(
                 this,
                 getNeuron().getOutputSynapse(m.getTokenCategory().getProvider())
-        );
-
-        relPTBindingActivation = followSynapse(
-                categoryActivation,
-                m.getRelPTFeedbackSyn()
-        );
-
-        relNTBindingActivation = followSynapse(
-                categoryActivation,
-                m.getRelNTFeedbackSyn()
         );
     }
 
@@ -98,16 +92,15 @@ public class TokenActivation extends PatternActivation {
 
         TextModel model = prev.getModel();
 
-        next.linkPrimaryInput(model.getRelNTPrimaryInputSyn(), prev.relNTBindingActivation);
-        prev.linkPrimaryInput(model.getRelPTPrimaryInputSyn(), next.relPTBindingActivation);
+        next.linkPrimaryInput(model.getRelNTPrimaryInputSyn(), prev.getRelNTBindingActivation(model));
+        prev.linkPrimaryInput(model.getRelPTPrimaryInputSyn(), next.getRelPTBindingActivation(model));
     }
 
-    private void linkPrimaryInput(PrimaryInputSynapse<CategoryNeuron, CategoryActivation> model, BindingActivation toAct) {
-        PrimaryInputSynapse relSynNext = model;
-        BindingSignal fromBS = categoryActivation.getBindingSignal(this);
+    private void linkPrimaryInput(PrimaryInputSynapse relSynNext, BindingActivation toAct) {
+        BindingSignal fromBS = getCategoryActivation(toAct.getModel()).getBindingSignal(this);
         BindingSignal toBS = fromBS.propagate(relSynNext);
         toBS.init(toAct);
-        relSynNext.createLink(fromBS, toBS);
+        relSynNext.createLink(fromBS.getActivation(), (BindingActivation) toBS.getActivation());
     }
 
     public TokenActivation getPreviousToken() {

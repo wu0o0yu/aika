@@ -25,7 +25,6 @@ import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.sign.Sign;
-import network.aika.steps.activation.InactiveLinks;
 import network.aika.steps.activation.PostTraining;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
@@ -86,64 +85,23 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return false;
     }
 
-    public void link(Direction dir, BindingSignal<?> fromBS, Transition t) {
-        fromBS.getRelatedBindingSignal(
-                this,
-                        dir.getNeuron(this)
-                )
-                .filter(toBS -> fromBS != toBS)
-                .forEach(toBS ->
-                        link(dir, fromBS, toBS, t)
-                );
+    public L link(IA iAct, OA oAct) {
+        if(linkExists(iAct, oAct))
+            return null;
 
-        if(dir == OUTPUT) {
-            link(fromBS, null);
-        }
-    }
+        if(oAct != null && !(isRecurrent() || Link.isCausal(iAct, oAct)))
+            return null;
 
-    private void link(Direction dir, BindingSignal fromBS, BindingSignal toBS, Transition t) {
-        if(!t.eventCheck(this, toBS, dir.invert()))
-            return;
-
-        if(!isTrue(getLinkingEvent(toBS, t, dir)))
-            return;
-
-        BindingSignal inputBS = dir.getInput(fromBS, toBS);
-        BindingSignal outputBS = dir.getOutput(fromBS, toBS);
-
-        link(inputBS, outputBS);
-    }
-
-    private void link(BindingSignal iBS, BindingSignal oBS) {
-        if (!checkTransition(iBS, oBS))
-            return;
-
-        if(linkExists(iBS, oBS))
-            return;
-
-        if(oBS != null && !(isRecurrent() || Link.isCausal(iBS.getActivation(), oBS.getActivation())))
-            return;
-
-        Activation iAct = iBS.getActivation();
-        if(oBS == null) {
-            Activation oAct = getOutput().createActivation(iAct.getThought());
+        if(oAct == null) {
+            oAct = getOutput().createActivation(iAct.getThought());
             oAct.init(this, iAct);
-
-            oBS = iBS.propagate(this);
-            oBS.init(oAct);
-            oAct.addBindingSignal(oBS);
         }
 
-        createLink(iBS, oBS);
+        return createLink(iAct, oAct);
     }
 
     public boolean isAllowPropagate() {
         return true;
-    }
-
-    private boolean checkTransition(BindingSignal<IA> iBS, BindingSignal oBS) {
-        return getTransitions()
-                .anyMatch(t -> t.linkCheck(this, iBS, oBS));
     }
 
     public FieldOutput getLinkingEvent(BindingSignal bs, Transition t, Direction dir) {
@@ -158,33 +116,45 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         }
     }
 
-    public void registerLinkingEvents(BindingSignal<IA> bs, Direction dir) {
+    public void registerLinkingEvents(BindingSignal bs, Direction dir) {
+        if(bs.getActivation().getNeuron().isNetworkInput() && !networkInputsAllowed(dir))
+            return;
+
+        getTransitions()
+                .filter(t ->
+                        t.check(bs, dir)
+                )
+                .forEach(t ->
+                        bs.getActivation().addTransitionListener(
+                                t.createListener(this, bs, dir)
+                        )
+                );
+    }
+
+    /*
+
+    public void registerLinkingEvents(BindingSignal bs, Direction dir) {
         if(bs.getActivation().getNeuron().isNetworkInput() && !networkInputsAllowed(dir))
             return;
 
         getTransitions()
                 .filter(t -> t.eventCheck(this, bs, dir))
                 .forEach(t -> {
-                    FieldOutput e = getLinkingEvent(bs, t, dir);
-                    if (e != null)
-                        e.addLinkingEventListener(bs, this, dir, t);
-
-                    if(dir == output)
-                        bs.getOnArrivedFiredFinal().addEventListener(() ->
-                                InactiveLinks.add(bs)
-                        );
+                    t.register(bs, this, dir);
                 });
     }
+     *
+     */
 
-    public boolean linkExists(BindingSignal<IA> iBS, BindingSignal<OA> oBS) {
-        if(oBS == null)
-            return linkExists(iBS.getActivation());
+    public boolean linkExists(IA iAct, OA oAct) {
+        if(oAct == null)
+            return linkExists(iAct);
 
-        if(isTemplate() && Link.templateLinkExists(this, iBS.getActivation(), oBS.getActivation()))
+        if(isTemplate() && Link.templateLinkExists(this, iAct, oAct))
             return true;
 
-        Link existingLink = oBS.getActivation().getInputLink(iBS.getActivation().getNeuron());
-        return existingLink != null && existingLink.getInput() == iBS.getActivation();
+        Link existingLink = oAct.getInputLink(iAct.getNeuron());
+        return existingLink != null && existingLink.getInput() == iAct;
     }
 
     private boolean linkExists(IA iAct) {
@@ -234,7 +204,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return s;
     }
 
-    public abstract L createLink(BindingSignal<IA> input, BindingSignal<OA> output);
+    public abstract L createLink(IA input, OA output);
 
     protected void initFromTemplate(S s) {
         s.weight.set(weight.getCurrentValue());

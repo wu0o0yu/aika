@@ -18,11 +18,6 @@ package network.aika.neuron.activation;
 
 import network.aika.Config;
 import network.aika.Thought;
-import network.aika.steps.Step;
-import network.aika.steps.QueueKey;
-
-import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * An Element is either a node (Activation) or an edge (Link) in the Activation graph.
@@ -30,6 +25,8 @@ import java.util.stream.Stream;
  *  @author Lukas Molzberger
  */
 public abstract class Element<E extends Element> implements Comparable<E> {
+
+    public abstract Timestamp getCreated();
 
     public abstract Timestamp getFired();
 

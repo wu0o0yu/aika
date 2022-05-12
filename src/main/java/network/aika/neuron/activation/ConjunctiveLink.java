@@ -28,7 +28,7 @@ import static network.aika.fields.Fields.mul;
 public class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends Activation<?>, OA extends ConjunctiveActivation> extends Link<S, IA, OA> {
 
 
-    public ConjunctiveLink(S s, BindingSignal<IA> input, BindingSignal<OA> output) {
+    public ConjunctiveLink(S s, IA input, OA output) {
         super(s, input, output);
     }
 

@@ -43,22 +43,18 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     private static List<Transition> TRANSITIONS = List.of(
             transition(State.BRANCH, State.BRANCH)
                     .setCheck(true)
-                    .setPropagate(1),
-
+                    .setPropagate(0),
             transition(State.SAME, State.SAME)
-                    .setCheck(true)
                     .setPropagate(Integer.MAX_VALUE)
     );
 
-    private Field feedbackWeight = new Field(this, "feedbackWeight");
     private Field feedbackBias = new Field(this, "feedbackBias");
 
-    public PositiveFeedbackLink createLink(BindingSignal<IA> input, BindingSignal<BindingActivation> output) {
+    public PositiveFeedbackLink createLink(IA input, BindingActivation output) {
         return new PositiveFeedbackLink(this, input, output);
     }
 
     protected void initFromTemplate(PositiveFeedbackSynapse s) {
-        s.feedbackWeight.set(feedbackWeight.getCurrentValue());
         s.feedbackBias.set(feedbackBias.getCurrentValue());
         super.initFromTemplate(s);
     }
@@ -72,10 +68,6 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
         }
 
         return super.getLinkingEvent(bs, t, dir);
-    }
-
-    public Field getFeedbackWeight() {
-        return feedbackWeight;
     }
 
     public Field getFeedbackBias() {

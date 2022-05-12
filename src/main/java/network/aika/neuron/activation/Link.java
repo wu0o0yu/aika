@@ -24,10 +24,10 @@ import network.aika.fields.BiFunction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.sign.Sign;
 import network.aika.steps.link.Cleanup;
 import network.aika.steps.link.LinkCounting;
+import network.aika.steps.link.PropagateBindingSignal;
 
 import java.util.Comparator;
 
@@ -58,10 +58,10 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected ThresholdOperator onTransparent;
 
-    public Link(S s, BindingSignal<I> iBS, BindingSignal<O> oBS) {
+    public Link(S s, I input, O output) {
         this.synapse = s;
-        this.input = iBS.getActivation();
-        this.output = oBS.getActivation();
+        this.input = input;
+        this.output = output;
 
         init();
 
@@ -143,23 +143,10 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
             LinkCounting.add(this);
     }
 
-    public void propagateBindingSignal(BindingSignal<I> fromBS) {
-        if(!fromBS.isPropagateAllowed())
-            return;
-
-        BindingSignal<O> toBS = fromBS.propagate(this);
-        if(toBS == null)
-            return;
-
-        toBS.init(output);
-
-        output.addBindingSignal(toBS);
-    }
-
     public void propagateAllBindingSignals() {
         input.getBindingSignals()
                 .forEach(fromBS ->
-                        propagateBindingSignal(fromBS)
+                        PropagateBindingSignal.add(this, fromBS)
                 );
     }
 
@@ -182,6 +169,11 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     @Override
     public Timestamp getFired() {
         return isCausal() ? input.getFired() : output.getFired();
+    }
+
+    @Override
+    public Timestamp getCreated() {
+        return isCausal() ? input.getCreated() : output.getCreated();
     }
 
     public static boolean templateLinkExists(Synapse ts, Activation iAct, Activation oAct) {

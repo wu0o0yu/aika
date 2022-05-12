@@ -14,36 +14,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.fields;
+package network.aika.neuron.bindingsignal;
+
 
 import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.Transition;
-import network.aika.neuron.bindingsignal.TransitionListener;
+
+import static network.aika.direction.Direction.OUTPUT;
+
 
 /**
  * @author Lukas Molzberger
  */
-public interface FieldOutput {
+public class BiTransition extends Transition {
 
-    String getLabel();
+    private BiTransition relatedTransition;
 
-    boolean isInitialized();
 
-    double getCurrentValue();
-
-    static double getCurrentValue(FieldLink f) {
-        return f != null ? f.getInput().getCurrentValue() : 0.0;
+    protected BiTransition(State input, State output) {
+        super(input, output);
     }
 
-    void addOutput(FieldLink l, boolean propagateInitValue);
+    public static BiTransition biTransition(State input, State output) {
+        return new BiTransition(input, output);
+    }
 
-    void removeOutput(FieldLink l, boolean propagateFinalValue);
+    public TransitionListener createListener(Synapse ts, BindingSignal bs, Direction dir) {
+        if(dir == OUTPUT) {
+            return new BiTransitionListener(relatedTransition, bs, dir, ts);
+        } else {
+            return new TransitionListener(this, bs, dir, ts);
+        }
+    }
 
-    void addEventListener(FieldOnTrueEvent eventListener);
+    public static void link(BiTransition t1, BiTransition t2) {
+        t1.relatedTransition = t2;
+        t2.relatedTransition = t1;
+    }
 
-    void addLinkingEventListener(TransitionListener tl);
-
-    void disconnect();
+    public Transition getRelatedTransition() {
+        return relatedTransition;
+    }
 }

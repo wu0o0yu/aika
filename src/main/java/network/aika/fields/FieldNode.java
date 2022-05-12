@@ -20,6 +20,7 @@ import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
+import network.aika.neuron.bindingsignal.TransitionListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,14 +77,14 @@ public abstract class FieldNode implements FieldOutput {
     }
 
     @Override
-    public void addLinkingEventListener(BindingSignal bs, Synapse ts, Direction dir, Transition t) {
+    public void addLinkingEventListener(TransitionListener tl) {
         addOutput(
                 new FieldLink(
                         null,
                         0,
                         (arg, u) -> {
                             if (u > 0.0)
-                                ts.link(dir, bs, t);
+                                tl.link();
                         }
                 ),
                 true

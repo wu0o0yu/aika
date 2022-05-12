@@ -29,7 +29,6 @@ import java.util.stream.Stream;
 import static network.aika.direction.Direction.*;
 import static network.aika.fields.Fields.connect;
 import static network.aika.fields.Fields.mul;
-import static network.aika.neuron.bindingsignal.State.SAME;
 
 
 /**
@@ -50,9 +49,6 @@ public class BindingSignal<A extends Activation> {
     private FieldOutput onArrivedFired;
     private FieldOutput onArrivedFinal;
     private FieldOutput onArrivedFiredFinal;
-    FieldOutput onArrivedBound;
-    FieldOutput onArrivedBoundFired;
-    FieldOutput onArrivedBoundFiredFinal;
 
     public BindingSignal(A act, State state) {
         this.origin = this;
@@ -81,19 +77,15 @@ public class BindingSignal<A extends Activation> {
         this.state = t.next(Direction.OUTPUT);
     }
 
-    public BindingSignal(BindingSignal parent, Transition t, Link l) {
-        this(parent, t);
-
-        this.link = l;
-    }
-
     public void init(A act) {
         this.activation = act;
         initFields();
-        initLinkingEvents();
+        initBSListeners();
+
+        activation.receiveBindingSignal(this);
     }
 
-    private Transition transition(Synapse s) {
+    public Transition transition(Synapse s) {
         Stream<Transition> transitions = s.getTransitions();
         return transitions
                 .filter(t -> t.checkPropagate(getState()))
@@ -102,17 +94,17 @@ public class BindingSignal<A extends Activation> {
     }
 
     public BindingSignal propagate(Synapse s) {
-        Transition t = transition(s);
+        return next(transition(s));
+    }
+
+    public BindingSignal next(Transition t) {
         return t != null ?
                 new BindingSignal(this, t) :
                 null;
     }
 
-    public BindingSignal propagate(Link l) {
-        Transition t = transition(l.getSynapse());
-        return t != null ?
-                new BindingSignal(this, t, l) :
-                null;
+    public void setLink(Link l) {
+        this.link = l;
     }
 
     private void initFields() {
@@ -148,24 +140,18 @@ public class BindingSignal<A extends Activation> {
         onArrivedFired.addEventListener(() ->
                 getActivation().propagateBindingSignal(this)
         );
-
-        if(getState() == SAME) {
-            activation.getOnBoundPattern().setReference(this);
-            connect(getOnArrived(), activation.getOnBoundPattern());
-        }
-
-        activation.initBSFields(this);
     }
 
-    private void initLinkingEvents() {
+    private void initBSListeners() {
         Neuron<?, ?> n = activation.getNeuron();
 
         boolean templateEnabled = activation.getConfig().isTemplatesEnabled();
         for(Direction dir: DIRECTIONS)
             n.getTargetSynapses(dir, templateEnabled)
-                    .forEach(s -> s.registerLinkingEvents(this, dir));
+                    .forEach(s ->
+                            s.registerLinkingEvents(this, dir)
+                    );
     }
-
 
     public Field getOnArrived() {
         return onArrived;
@@ -181,30 +167,6 @@ public class BindingSignal<A extends Activation> {
 
     public FieldOutput getOnArrivedFiredFinal() {
         return onArrivedFiredFinal;
-    }
-
-    public FieldOutput getOnArrivedBound() {
-        return onArrivedBound;
-    }
-
-    public void setOnArrivedBound(FieldOutput onArrivedBound) {
-        this.onArrivedBound = onArrivedBound;
-    }
-
-    public FieldOutput getOnArrivedBoundFired() {
-        return onArrivedBoundFired;
-    }
-
-    public void setOnArrivedBoundFired(FieldOutput f) {
-        onArrivedBoundFired = f;
-    }
-
-    public FieldOutput getOnArrivedBoundFiredFinal() {
-        return onArrivedBoundFiredFinal;
-    }
-
-    public void setOnArrivedBoundFiredFinal(FieldOutput f) {
-        onArrivedBoundFiredFinal = f;
     }
 
     public boolean isOrigin() {

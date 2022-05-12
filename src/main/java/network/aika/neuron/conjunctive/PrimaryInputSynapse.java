@@ -16,23 +16,18 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.direction.Direction;
-import network.aika.fields.FieldOutput;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PrimaryInputLink;
 import network.aika.neuron.axons.PatternAxon;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.fields.Fields.invert;
-import static network.aika.fields.Fields.mul;
+
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
 
@@ -52,7 +47,7 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
                     .setPropagate(0)  // check=false: Rel. Pre. Entity special case
     );
 
-    public PrimaryInputLink createLink(BindingSignal<IA> input, BindingSignal<BindingActivation> output) {
+    public PrimaryInputLink createLink(IA input, BindingActivation output) {
         return new PrimaryInputLink(this, input, output);
     }
 
@@ -60,7 +55,7 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
     public Stream<Transition> getTransitions() {
         return TRANSITIONS.stream();
     }
-
+/*
     @Override
     public FieldOutput getLinkingEvent(BindingSignal bs, Transition t, Direction dir) {
         FieldOutput e = super.getLinkingEvent(bs, t, dir);
@@ -77,4 +72,5 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
 
         return e;
     }
+ */
 }

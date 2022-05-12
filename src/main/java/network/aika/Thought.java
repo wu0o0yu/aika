@@ -87,9 +87,9 @@ public abstract class Thought<M extends Model> {
         this.config = config;
     }
 
-    public void onActivationCreationEvent(Activation act, Synapse originSynapse, Activation originAct) {
+    public void queueEntryAddedEvent(Step s) {
         callEventListener(el ->
-                el.onActivationCreationEvent(act, originSynapse, originAct)
+                el.queueEntryAddedEvent(s)
         );
     }
 
@@ -105,15 +105,20 @@ public abstract class Thought<M extends Model> {
         );
     }
 
-    private void callEventListener(Consumer<EventListener> el) {
-        getEventListeners().forEach(el);
+    public void onActivationCreationEvent(Activation act, Synapse originSynapse, Activation originAct) {
+        callEventListener(el ->
+                el.onActivationCreationEvent(act, originSynapse, originAct)
+        );
     }
 
     public void onLinkCreationEvent(Link l) {
-        getEventListeners()
-                .forEach(
-                        el -> el.onLinkCreationEvent(l)
-                );
+        callEventListener(el ->
+                el.onLinkCreationEvent(l)
+        );
+    }
+
+    private void callEventListener(Consumer<EventListener> el) {
+        getEventListeners().forEach(el);
     }
 
     public synchronized Collection<EventListener> getEventListeners() {
@@ -140,8 +145,9 @@ public abstract class Thought<M extends Model> {
     }
 
     public void addStep(Step s) {
-        s.setTimestamp(getNextTimestamp());
+        s.setSecondaryTimestamp(getNextTimestamp());
         queue.put(s, s);
+        queueEntryAddedEvent(s);
     }
 
     public void removeStep(Step s) {

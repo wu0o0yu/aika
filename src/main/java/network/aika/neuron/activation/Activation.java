@@ -19,12 +19,14 @@ package network.aika.neuron.activation;
 import network.aika.Config;
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.direction.Direction;
 import network.aika.fields.*;
 import network.aika.neuron.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.bindingsignal.TransitionListener;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
+import network.aika.steps.link.PropagateBindingSignal;
 import network.aika.utils.Utils;
 
 import java.util.*;
@@ -51,12 +53,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected N neuron;
     protected Thought thought;
 
-    protected Timestamp creationTimestamp = NOT_SET;
+    protected Timestamp created = NOT_SET;
     protected Timestamp fired = NOT_SET;
 
     protected Field value = new Field(this, "value");
     protected FieldOutput finalValue;
-    protected Field net = initNet();
+    protected Field net;
 
     protected FieldOutput isFired;
     protected FieldOutput isFiredForWeight;
@@ -74,14 +76,14 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected FieldOutput updateValue;
     protected FieldOutput inductionThreshold;
 
-    protected Field<BindingSignal> onBoundPattern = new Field(null, "onBoundPattern");
-
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
 
     protected SortedMap<Activation<?>, BindingSignal> bindingSignals = new TreeMap<>(
             Comparator.comparing(Activation::getId)
     );
+
+    private List<TransitionListener> transitionListeners = new ArrayList<>();
 
     protected NavigableMap<Activation<?>, BindingSignal> reverseBindingSignals = new TreeMap<>(NEURON_COMPARATOR);
 
@@ -94,6 +96,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     public Activation(int id, Thought t, N n) {
         this(id, n);
         this.thought = t;
+        setCreated(t.getCurrentTimestamp());
 
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
@@ -105,6 +108,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 initGradientFields();
         });
 
+        net = initNet();
         net.setPropagatePreCondition((cv, nv, u) ->
                 !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0)
         );
@@ -196,9 +200,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         );
     }
 
-    public void initBSFields(BindingSignal bs) {
-    }
-
     public FieldOutput getIsFired() {
         return isFired;
     }
@@ -224,17 +225,26 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         );
     }
 
-    public Field<BindingSignal> getOnBoundPattern() {
-        return onBoundPattern;
-    }
-
     public FieldFunction getNetOuterGradient() {
         return netOuterGradient;
     }
 
     public void init(Synapse originSynapse, Activation originAct) {
-        setCreationTimestamp();
         thought.onActivationCreationEvent(this, originSynapse, originAct);
+    }
+
+    public void addTransitionListener(TransitionListener tl) {
+        transitionListeners.add(tl);
+    }
+
+    public void receiveBindingSignal(BindingSignal bs) {
+        transitionListeners.stream()
+                .filter(l ->
+                        l.check(bs)
+                )
+                .forEach(l ->
+                        l.notify(bs)
+                );
     }
 
     public FieldOutput getEntropy() {
@@ -289,12 +299,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return net;
     }
 
-    public Timestamp getCreationTimestamp() {
-        return creationTimestamp;
+    public Timestamp getCreated() {
+        return created;
     }
 
-    public void setCreationTimestamp() {
-        this.creationTimestamp = thought.getCurrentTimestamp();
+    public void setCreated(Timestamp ts) {
+        this.created = ts;
     }
 
     public Timestamp getFired() {
@@ -345,14 +355,13 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public void propagateBindingSignal(BindingSignal fromBS) {
         getOutputLinks().forEach(l ->
-                l.propagateBindingSignal(fromBS)
+                PropagateBindingSignal.add(l, fromBS)
         );
     }
 
     public void registerBindingSignal(BindingSignal bs) {
-        bs.getOnArrived().set(1.0);
-
         bindingSignals.put(bs.getOriginActivation(), bs);
+        bs.getOnArrived().set(1.0);
     }
 
     public Map<Activation<?>, BindingSignal> getPatternBindingSignals() {
@@ -377,6 +386,14 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public BindingSignal getBindingSignal(Activation act) {
         return bindingSignals.get(act);
+    }
+
+    public BindingSignal getBindingSignal(State s) {
+        return bindingSignals.values()
+                .stream()
+                .filter(bs -> bs.getState() == s)
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
@@ -487,8 +504,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 backpropInputGradient,
                 ownOutputGradient,
                 backpropOutputGradient,
-                outputGradient,
-                onBoundPattern
+                outputGradient
         };
 
         for(FieldOutput f: fields) {

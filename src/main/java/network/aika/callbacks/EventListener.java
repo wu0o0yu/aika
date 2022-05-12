@@ -27,6 +27,8 @@ import network.aika.steps.Step;
  */
 public interface EventListener {
 
+    void queueEntryAddedEvent(Step s);
+
     void beforeProcessedEvent(Step s);
 
     void afterProcessedEvent(Step s);

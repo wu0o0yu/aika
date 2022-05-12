@@ -48,7 +48,7 @@ public class InhibitorySynapse extends DisjunctiveSynapse<InhibitorySynapse, Bin
     );
 
     @Override
-    public InhibitoryLink createLink(BindingSignal<BindingActivation> input, BindingSignal<InhibitoryActivation> output) {
+    public InhibitoryLink createLink(BindingActivation input, InhibitoryActivation output) {
         return new InhibitoryLink(this, input, output);
     }
 

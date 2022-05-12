@@ -20,6 +20,8 @@ import network.aika.Thought;
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Timestamp;
 
+import static network.aika.neuron.activation.Timestamp.NOT_SET;
+
 
 /**
  * @author Lukas Molzberger
@@ -28,11 +30,14 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
 
     private E element;
 
+    protected Timestamp created;
     protected Timestamp fired;
-    private Timestamp timestamp;
+
+    private Timestamp currentTimestamp;
 
     public Step(E element) {
         this.element = element;
+        this.created = element.getCreated();
         this.fired = element.getFired();
     }
 
@@ -62,16 +67,16 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
         t.addStep(s);
     }
 
-    public Timestamp getFired() {
-        return fired;
+    public Timestamp getPrimaryTimestamp() {
+        return element.getFired() != NOT_SET ? element.getFired() : element.getCreated();
     }
 
-    public Timestamp getTimestamp() {
-        return timestamp;
+    public Timestamp getSecondaryTimestamp() {
+        return currentTimestamp;
     }
 
-    public void setTimestamp(Timestamp timestamp) {
-        this.timestamp = timestamp;
+    public void setSecondaryTimestamp(Timestamp timestamp) {
+        this.currentTimestamp = timestamp;
     }
 
     public E getElement() {
@@ -81,4 +86,11 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
     public String toString() {
         return "" + getElement();
     }
+
+    public String timestampToString() {
+        if(fired != NOT_SET)
+            return "Fired:" + fired + " TS:" + currentTimestamp;
+        else
+            return "Created:" + created + " TS:" + currentTimestamp;
+     }
 }

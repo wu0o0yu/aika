@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.PatternSynapse;
 
 /**
@@ -24,7 +23,7 @@ import network.aika.neuron.conjunctive.PatternSynapse;
  */
 public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivation, PatternActivation> {
 
-    public PatternLink(PatternSynapse s, BindingSignal<BindingActivation> input, BindingSignal<PatternActivation> output) {
+    public PatternLink(PatternSynapse s, BindingActivation input, PatternActivation output) {
         super(s, input, output);
     }
 }

@@ -16,14 +16,16 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.disjunctive.InhibitorySynapse;
+import network.aika.neuron.conjunctive.ReversePatternSynapse;
+
 
 /**
+ *
  * @author Lukas Molzberger
  */
-public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingActivation, InhibitoryActivation> {
+public class ReversePatternLink<IA extends Activation<?>> extends BindingNeuronLink<ReversePatternSynapse, IA> {
 
-    public InhibitoryLink(InhibitorySynapse s, BindingActivation input, InhibitoryActivation output) {
+    public ReversePatternLink(ReversePatternSynapse s, IA input, BindingActivation output) {
         super(s, input, output);
     }
 }
