@@ -53,12 +53,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     protected N neuron;
     protected Thought thought;
 
-    protected Timestamp creationTimestamp = NOT_SET;
+    protected Timestamp created = NOT_SET;
     protected Timestamp fired = NOT_SET;
 
     protected Field value = new Field(this, "value");
     protected FieldOutput finalValue;
-    protected Field net = initNet();
+    protected Field net;
 
     protected FieldOutput isFired;
     protected FieldOutput isFiredForWeight;
@@ -96,6 +96,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     public Activation(int id, Thought t, N n) {
         this(id, n);
         this.thought = t;
+        setCreated(t.getCurrentTimestamp());
 
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
@@ -107,6 +108,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
                 initGradientFields();
         });
 
+        net = initNet();
         net.setPropagatePreCondition((cv, nv, u) ->
                 !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0)
         );
@@ -228,7 +230,6 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
     }
 
     public void init(Synapse originSynapse, Activation originAct) {
-        setCreationTimestamp();
         thought.onActivationCreationEvent(this, originSynapse, originAct);
     }
 
@@ -298,12 +299,12 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
         return net;
     }
 
-    public Timestamp getCreationTimestamp() {
-        return creationTimestamp;
+    public Timestamp getCreated() {
+        return created;
     }
 
-    public void setCreationTimestamp() {
-        this.creationTimestamp = thought.getCurrentTimestamp();
+    public void setCreated(Timestamp ts) {
+        this.created = ts;
     }
 
     public Timestamp getFired() {

@@ -20,8 +20,6 @@ import network.aika.neuron.activation.Timestamp;
 
 import java.util.Comparator;
 
-import static network.aika.neuron.activation.Timestamp.NOT_SET;
-
 /**
  * @author Lukas Molzberger
  */
@@ -29,14 +27,16 @@ public interface QueueKey {
 
     Comparator<QueueKey> COMPARATOR = Comparator
             .<QueueKey>comparingInt(k -> k.getPhase().ordinal())
-            .thenComparing(k -> k.getFired())
-            .thenComparing(k -> k.getTimestamp());
-
-    Phase getPhase();
-
-    Timestamp getFired();
+            .thenComparing(k -> k.getPrimaryTimestamp())
+            .thenComparing(k -> k.getSecondaryTimestamp());
 
     String getStepName();
 
-    Timestamp getTimestamp();
+    Phase getPhase();
+
+    Timestamp getPrimaryTimestamp();
+
+    Timestamp getSecondaryTimestamp();
+
+    String timestampToString();
 }

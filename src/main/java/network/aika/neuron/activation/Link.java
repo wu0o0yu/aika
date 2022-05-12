@@ -24,7 +24,6 @@ import network.aika.fields.BiFunction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.sign.Sign;
 import network.aika.steps.link.Cleanup;
 import network.aika.steps.link.LinkCounting;
@@ -170,6 +169,11 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     @Override
     public Timestamp getFired() {
         return isCausal() ? input.getFired() : output.getFired();
+    }
+
+    @Override
+    public Timestamp getCreated() {
+        return isCausal() ? input.getCreated() : output.getCreated();
     }
 
     public static boolean templateLinkExists(Synapse ts, Activation iAct, Activation oAct) {
