@@ -69,7 +69,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
 
     @Override
     public void setWeight(double w) {
-        weight.receiveUpdate(0, w);
+        weight.receiveUpdate(w);
     }
 
     @Override
@@ -80,18 +80,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
         return false; // TODO: oBS.getActivation().getBranches().stream()
              //   .anyMatch(bAct -> super.linkExists(iBS.getActivation(), bAct));
     }
-/*
-    @Override
-    public FieldOutput getLinkingEvent(BindingSignal bs, Transition t, Direction dir) {
-        if(dir == OUTPUT) {
-            return isTemplate() ?
-                    bs.getOnArrivedFiredFinal() :
-                    bs.getOnArrivedFired();
-        }
 
-        return super.getLinkingEvent(bs, t, dir);
-    }
-*/
     @Override
     public boolean isRecurrent() {
         return true;

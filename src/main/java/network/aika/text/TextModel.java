@@ -113,7 +113,7 @@ public class TextModel extends Model {
     private void initRelationNeuron(String label, BindingNeuron inRel) {
         inRel.setNetworkInput(true);
         inRel.setLabel(label);
-        inRel.getBias().receiveUpdate(0, 4.0);
+        inRel.getBias().receiveUpdate(4.0);
         inRel.setAllowTraining(false);
         inRel.updateAllowPropagate();
     }
@@ -128,7 +128,7 @@ public class TextModel extends Model {
         s.getWeight().set(w);
         s.setAllowTraining(false);
 
-        relBN.getBias().receiveUpdate(0, -w);
+        relBN.getBias().receiveUpdate(-w);
         return s;
     }
 
@@ -142,7 +142,7 @@ public class TextModel extends Model {
         s.linkOutput();
         s.getWeight().set(w);
         s.setAllowTraining(false);
-        inRel.getBias().receiveUpdate(0, -w);
+        inRel.getBias().receiveUpdate(-w);
 
         return s;
     }

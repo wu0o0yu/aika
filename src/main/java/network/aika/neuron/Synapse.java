@@ -104,16 +104,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return true;
     }
 
-    public FieldOutput getLinkingEvent(BindingSignal bs, Transition t, Direction dir) {
-        if(dir == INPUT) {
-            return isTemplate() ?
-                    bs.getOnArrivedFinal() :
-                    bs.getOnArrived();
-        } else {
-            return isTemplate() ?
-                    bs.getOnArrivedFiredFinal() :
-                    bs.getOnArrivedFired();
-        }
+    public FieldOutput getLinkingEvent(BindingSignal bs, Direction dir) {
+        return bs.getEvent(dir == OUTPUT, isTemplate());
     }
 
     public void registerLinkingEvents(BindingSignal bs, Direction dir) {
@@ -130,21 +122,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
                         )
                 );
     }
-
-    /*
-
-    public void registerLinkingEvents(BindingSignal bs, Direction dir) {
-        if(bs.getActivation().getNeuron().isNetworkInput() && !networkInputsAllowed(dir))
-            return;
-
-        getTransitions()
-                .filter(t -> t.eventCheck(this, bs, dir))
-                .forEach(t -> {
-                    t.register(bs, this, dir);
-                });
-    }
-     *
-     */
 
     public boolean linkExists(IA iAct, OA oAct) {
         if(oAct == null)

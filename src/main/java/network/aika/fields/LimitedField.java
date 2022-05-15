@@ -44,10 +44,10 @@ public class LimitedField extends Field {
     }
 
     @Override
-    public void receiveUpdate(int arg, double u) {
+    public void receiveUpdate(double u) {
         double cv = isInitialized() ? getCurrentValue() : 0.0;
         double nv = getLimitedValue(cv + u);
-        super.receiveUpdate(arg, nv - cv);
+        super.receiveUpdate(nv - cv);
     }
 
     private double getLimitedValue(double nv) {

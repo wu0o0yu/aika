@@ -37,7 +37,7 @@ public class Field<R> extends FieldNode implements IField, Writable {
 
     private Double currentValue;
     private Double update;
-    private boolean allowUpdate;
+    private boolean withinUpdate;
 
 
     private R reference;
@@ -106,7 +106,13 @@ public class Field<R> extends FieldNode implements IField, Writable {
     }
 
     @Override
-    public void receiveUpdate(int arg, double u) {
+    public void receiveUpdate(int arg, double inputCV, double u) {
+        receiveUpdate(u);
+    }
+
+    public void receiveUpdate(double u) {
+        assert !withinUpdate;
+
         if(update == null)
             update = u;
         else
@@ -143,15 +149,14 @@ public class Field<R> extends FieldNode implements IField, Writable {
     }
 
     protected void triggerInternal() {
-        allowUpdate = true;
-        if(updateAvailable())
-            propagateUpdate(update);
-        acknowledgePropagated();
-        allowUpdate = false;
-    }
-
-    private boolean updateAvailable() {
-        return update != null;
+        withinUpdate = true;
+        if(update != null) {
+            double cv = currentValue != null ? currentValue : 0.0;
+            performUpdate();
+            propagateUpdate(cv, update);
+            update = null;
+        }
+        withinUpdate = false;
     }
 
     @Override
@@ -159,17 +164,11 @@ public class Field<R> extends FieldNode implements IField, Writable {
         return currentValue != null;
     }
 
-    private void acknowledgePropagated() {
-        if (update == null)
-            return;
-
-        assert allowUpdate;
+    private void performUpdate() {
         if (isInitialized())
             currentValue += update;
         else
             currentValue = update;
-
-        update = null;
     }
 
     @Override

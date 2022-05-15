@@ -36,19 +36,31 @@ public class BiFunction extends AbstractBiFunction {
     }
 
     @Override
-    protected double computeUpdate(int arg, double u) {
+    protected double computeUpdate(int arg, double inputCV, double ownCV, double u) {
         if(isInitialized())
-            return computeNewValue(arg, u) - getCurrentValue();
+            return computeNewValue(arg, inputCV, u) - getCurrentValue(arg, inputCV);
         else
-            return computeNewValue(arg, u);
+            return computeNewValue(arg, inputCV, u);
     }
 
-    private double computeNewValue(int arg, double u) {
+    @Override
+    protected double getCurrentValue(int arg, double inputCV) {
         switch (arg) {
             case 1:
-                return function.applyAsDouble(u + FieldOutput.getCurrentValue(in1), FieldOutput.getCurrentValue(in2));
+                return function.applyAsDouble(inputCV, in2.getInput().getCurrentValue());
             case 2:
-                return function.applyAsDouble(FieldOutput.getCurrentValue(in1), u + FieldOutput.getCurrentValue(in2));
+                return function.applyAsDouble(in1.getInput().getCurrentValue(), inputCV);
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    private double computeNewValue(int arg, double inputCV, double u) {
+        switch (arg) {
+            case 1:
+                return function.applyAsDouble(u + inputCV, FieldOutput.getCurrentValue(in2));
+            case 2:
+                return function.applyAsDouble(FieldOutput.getCurrentValue(in1), u + inputCV);
             default:
                 throw new IllegalArgumentException();
         }

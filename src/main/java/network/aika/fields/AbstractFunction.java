@@ -64,19 +64,25 @@ public abstract class AbstractFunction extends FieldNode implements FieldInput, 
 
     protected abstract double applyFunction(double x);
 
-    public void receiveUpdate(int arg, double u) {
-        if(isInitialized())
-            propagateUpdate(computeUpdate(u));
+    @Override
+    public void receiveUpdate(int arg, double inputCV, double u) {
+        if(isInitialized()) {
+            double ownCV = applyFunction(inputCV);
+            propagateUpdate(
+                    ownCV,
+                    computeUpdate(inputCV, ownCV, u)
+            );
+        }
     }
 
-    protected double computeUpdate(double u) {
+    private double computeUpdate(double inputCV, double ownCV, double u) {
         return input.getInput().isInitialized() ?
-                computeNewValue(u) - getCurrentValue() :
-                computeNewValue(u);
+                computeNewValue(inputCV, u) - ownCV :
+                computeNewValue(inputCV, u);
     }
 
-    private double computeNewValue(double u) {
-        return applyFunction(input.getInput().getCurrentValue() + u);
+    private double computeNewValue(double inputCV, double u) {
+        return applyFunction(inputCV + u);
     }
 
     @Override

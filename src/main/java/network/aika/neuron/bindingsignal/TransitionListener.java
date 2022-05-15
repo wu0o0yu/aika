@@ -44,38 +44,41 @@ public class TransitionListener<T extends Transition> {
     }
 
     public void notify(BindingSignal bs) {
-        FieldOutput e = targetSynapse.getLinkingEvent(bs, transition, dir);
+        FieldOutput e = targetSynapse.getLinkingEvent(bs, dir);
         if (e != null)
             e.addLinkingEventListener(this);
 
         if(dir == OUTPUT)
-            bs.getOnArrivedFiredFinal().addEventListener(() ->
-                    InactiveLinks.add(bs)
-            );
+            bs.getEvent(true, true)
+                    .addEventListener(() ->
+                            InactiveLinks.add(bs)
+                    );
     }
 
     public void link() {
-        link(bindingSignal);
+        link(transition, bindingSignal);
     }
 
-    protected void link(BindingSignal<?> fromBS) {
+    protected void link(Transition t, BindingSignal<?> fromBS) {
         fromBS.getRelatedBindingSignal(
                         targetSynapse,
                         dir.getNeuron(targetSynapse)
                 )
                 .filter(toBS -> fromBS != toBS)
                 .forEach(toBS ->
-                        link(fromBS, toBS)
+                        link(t, fromBS, toBS)
                 );
 
         if(dir == OUTPUT) {
-            link(fromBS, null);
+            link(t, fromBS, null);
         }
     }
 
-    public void link(BindingSignal fromBS, BindingSignal toBS) {
-        if (toBS != null && !linkCheck(fromBS, toBS))
-            return;
+    public void link(Transition t, BindingSignal fromBS, BindingSignal toBS) {
+        if(!(toBS == null ?
+                targetSynapse.isAllowPropagate() :
+                t.linkCheck(targetSynapse, fromBS, toBS, dir)
+        )) return;
 
         BindingSignal inputBS = dir.getInput(fromBS, toBS);
         BindingSignal outputBS = dir.getOutput(fromBS, toBS);
@@ -88,18 +91,5 @@ public class TransitionListener<T extends Transition> {
 
     public boolean check(BindingSignal bs) {
         return transition.check(bs, dir);
-    }
-
-    protected boolean linkCheck(BindingSignal fromBS, BindingSignal toBS) {
-        if (transition.eventCheck(targetSynapse, toBS, dir.invert()))
-            return true;
-
-        if (isTrue(targetSynapse.getLinkingEvent(toBS, transition, dir)))
-            return true;
-
-        BindingSignal inputBS = dir.getInput(fromBS, toBS);
-        BindingSignal outputBS = dir.getOutput(fromBS, toBS);
-
-        return transition.linkCheck(targetSynapse, inputBS, outputBS);
     }
 }

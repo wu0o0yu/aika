@@ -21,5 +21,5 @@ package network.aika.fields;
  */
 public interface UpdateListener {
 
-    void receiveUpdate(int arg, double u);
+    void receiveUpdate(int arg, double cv, double u);
 }

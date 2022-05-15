@@ -19,6 +19,7 @@ package network.aika.neuron.bindingsignal;
 import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
 
 import static network.aika.fields.Fields.mul;
 
@@ -29,14 +30,16 @@ public class BiTransitionListener extends TransitionListener<BiTransition> {
     private BindingSignal relatedBindingSignal;
 
     public BiTransitionListener(BiTransition transition, BindingSignal bs, Direction dir, Synapse targetSynapse) {
-        super(transition, bs, dir, targetSynapse);
+        super(transition, null, dir, targetSynapse);
+
+        relatedBindingSignal = bs;
     }
 
     public void notify(BindingSignal bs) {
-        this.relatedBindingSignal = bs;
+        this.bindingSignal = bs;
 
-        FieldOutput eA = targetSynapse.getLinkingEvent(relatedBindingSignal, transition.getRelatedTransition(), dir);
-        FieldOutput eB = targetSynapse.getLinkingEvent(bindingSignal, transition, dir);
+        FieldOutput eA = targetSynapse.getLinkingEvent(relatedBindingSignal, dir);
+        FieldOutput eB = targetSynapse.getLinkingEvent(bindingSignal, dir);
 
         if(eA != null && eB != null) {
             FieldOutput e = mul(
@@ -50,15 +53,26 @@ public class BiTransitionListener extends TransitionListener<BiTransition> {
     }
 
     public void link() {
-        link(relatedBindingSignal);
-        link(bindingSignal);
+        if(relatedBindingSignal == null)
+            return;
+
+        link(transition.getRelatedTransition(), relatedBindingSignal);
+        link(transition, bindingSignal);
     }
 
-    public void link(BindingSignal fromBS, BindingSignal toBS) {
-        if(fromBS == relatedBindingSignal) {
-            super.link(fromBS, toBS);
-        } else {
-            super.link(fromBS, toBS);
-        }
+    public void link(Transition t, BindingSignal fromBS, BindingSignal toBS) {
+        Activation toAct = toBS.getActivation();
+        if(!(fromBS == relatedBindingSignal ?
+                checkRelated(transition, bindingSignal, toAct) :
+                checkRelated(transition.getRelatedTransition(), relatedBindingSignal, toAct)
+        )) return;
+
+        super.link(t, fromBS, toBS);
+    }
+
+    private boolean checkRelated(Transition relTransition, BindingSignal relFromBS, Activation toAct) {
+        BindingSignal relToBS = toAct.getBindingSignal(relTransition.getOutput());
+
+        return relToBS == null || relFromBS.getOriginActivation() == relToBS.getOriginActivation();
     }
 }

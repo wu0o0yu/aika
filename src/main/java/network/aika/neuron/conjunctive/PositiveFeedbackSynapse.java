@@ -31,7 +31,6 @@ import network.aika.neuron.bindingsignal.Transition;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
 /**
@@ -60,14 +59,8 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     }
 
     @Override
-    public FieldOutput getLinkingEvent(BindingSignal bs, Transition t, Direction dir) {
-        if(dir == OUTPUT) {
-            return isTemplate() ?
-                    bs.getOnArrivedFinal() :
-                    bs.getOnArrived();
-        }
-
-        return super.getLinkingEvent(bs, t, dir);
+    public FieldOutput getLinkingEvent(BindingSignal bs, Direction dir) {
+        return bs.getEvent(false, isTemplate());
     }
 
     public Field getFeedbackBias() {

@@ -78,12 +78,19 @@ public abstract class AbstractBiFunction extends FieldNode implements FieldInput
         return label;
     }
 
-    public void receiveUpdate(int arg, double u) {
-        if(isInitialized(arg))
-            propagateUpdate(computeUpdate(arg, u));
+    public void receiveUpdate(int arg, double inputCV, double u) {
+        if(isInitialized(arg)) {
+            double ownCV = getCurrentValue(arg, inputCV);
+            propagateUpdate(
+                    ownCV,
+                    computeUpdate(arg, inputCV, ownCV, u)
+            );
+        }
     }
 
-    protected abstract double computeUpdate(int arg, double u);
+    protected abstract double getCurrentValue(int arg, double inputCV);
+
+    protected abstract double computeUpdate(int arg, double inputCV, double ownCV, double u);
 
     public String toString() {
         if(!isInitialized())

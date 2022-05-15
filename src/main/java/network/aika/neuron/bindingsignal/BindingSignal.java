@@ -157,16 +157,17 @@ public class BindingSignal<A extends Activation> {
         return onArrived;
     }
 
-    public FieldOutput getOnArrivedFired() {
-        return onArrivedFired;
-    }
+    public FieldOutput getEvent(boolean isFired, boolean isFinal) {
+        if(isFired && isFinal)
+            return onArrivedFiredFinal;
 
-    public FieldOutput getOnArrivedFinal() {
-        return onArrivedFinal;
-    }
+        if(isFired)
+            return onArrivedFired;
 
-    public FieldOutput getOnArrivedFiredFinal() {
-        return onArrivedFiredFinal;
+        if(isFinal)
+            return onArrivedFinal;
+
+        return onArrived;
     }
 
     public boolean isOrigin() {

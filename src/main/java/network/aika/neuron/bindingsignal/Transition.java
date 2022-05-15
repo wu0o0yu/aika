@@ -23,6 +23,7 @@ import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 
 import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.fields.Fields.isTrue;
 
 /**
  * @author Lukas Molzberger
@@ -44,11 +45,6 @@ public class Transition {
     protected Transition(State input, State output) {
         this.input = input;
         this.output = output;
-    }
-
-    public boolean check(BindingSignal bs, Direction dir) {
-        return isCheck() &&
-                dir.getFromState(this) == bs.getState();
     }
 
     public TransitionListener createListener(Synapse ts, BindingSignal bs, Direction dir) {
@@ -118,41 +114,35 @@ public class Transition {
         return dir == OUTPUT ? output : input;
     }
 
-    public boolean eventCheck(Synapse ts, BindingSignal bs, Direction dir) {
+    public boolean check(BindingSignal bs, Direction dir) {
+        return check &&
+                dir.getFromState(this) == bs.getState();
+    }
+
+    public boolean linkCheck(Synapse ts, BindingSignal fromBS, BindingSignal toBS, Direction dir) {
         if(!check)
             return false;
 
-        if(dir.invert().getFromState(this) != bs.getState())
+        if(fromBS.getOrigin() != toBS.getOrigin())
             return false;
 
-        if(dir == OUTPUT && checkSamePrimaryInput && !verifySamePrimaryInput(bs, (BindingNeuron) ts.getOutput()))
+        if (!isTrue(ts.getLinkingEvent(toBS, dir)))
+            return false;
+
+        if(dir.getToState(this) != toBS.getState())
+            return false;
+
+        if(checkSamePrimaryInput && !verifySamePrimaryInput(
+                dir.getInput(fromBS, toBS),
+                (BindingNeuron) ts.getOutput()
+        ))
+            return false;
+
+        if(checkLooseLinking && !ts.allowLooseLinking())
             return false;
 
         return true;
     }
-
-    public boolean linkCheck(Synapse ts, BindingSignal iBS, BindingSignal oBS) {
-        if(!check)
-            return false;
-
-        if(iBS.getState() != input)
-            return false;
-
-        if(oBS == null && !ts.isAllowPropagate())
-            return false;
-
-        if(oBS != null && oBS.getState() != output)
-            return false;
-
-        if(checkLooseLinking && !ts.allowLooseLinking()) // && iBS.getOrigin() != oBS.getOrigin()
-            return false;
-/*
-        if(checkBoundToSamePattern && !checkBoundToSamePattern(iBS, oBS))
-            return false;
-*/
-        return true;
-    }
-
 
     private boolean verifySamePrimaryInput(BindingSignal refBS, BindingNeuron on) {
         Activation originAct = refBS.getOriginActivation();

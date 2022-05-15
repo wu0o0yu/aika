@@ -39,12 +39,12 @@ public abstract class FieldNode implements FieldOutput {
 
     public void addInitialCurrentValue(int arg, UpdateListener listener) {
         if(isInitialized())
-            propagateUpdate(arg, listener, getCurrentValue());
+            propagateUpdate(arg, listener, 0.0, getCurrentValue());
     }
 
     public void removeFinalCurrentValue(int arg, UpdateListener listener) {
         if(isInitialized())
-            propagateUpdate(arg, listener, -getCurrentValue());
+            propagateUpdate(arg, listener, getCurrentValue(), -getCurrentValue());
     }
 
     @Override
@@ -67,7 +67,7 @@ public abstract class FieldNode implements FieldOutput {
                 new FieldLink(
                         null,
                         0,
-                        (arg, u) -> {
+                        (arg, cv, u) -> {
                             if (u > 0.0)
                                 eventListener.onTrue();
                         }
@@ -82,7 +82,7 @@ public abstract class FieldNode implements FieldOutput {
                 new FieldLink(
                         null,
                         0,
-                        (arg, u) -> {
+                        (arg, cv, u) -> {
                             if (u > 0.0)
                                 tl.link();
                         }
@@ -91,16 +91,16 @@ public abstract class FieldNode implements FieldOutput {
         );
     }
 
-    protected void propagateUpdate(double update) {
+    protected void propagateUpdate(double cv, double update) {
         int i = 0;
         while(i < receivers.size()) {
             FieldLink l = receivers.get(i++);
-            l.getOutput().receiveUpdate(l.getArgument(), update);
+            l.getOutput().receiveUpdate(l.getArgument(), cv, update);
         }
     }
 
-    protected void propagateUpdate(int arg, UpdateListener listener, double update) {
-        listener.receiveUpdate(arg, update);
+    protected void propagateUpdate(int arg, UpdateListener listener, double cv, double update) {
+        listener.receiveUpdate(arg, cv, update);
     }
 
     @Override
