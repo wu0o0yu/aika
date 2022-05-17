@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
 import static network.aika.neuron.bindingsignal.PropagateBS.FALSE;
+import static network.aika.neuron.bindingsignal.SamePrimaryInputBiTransition.samePrimaryInputBiTransition;
 
 
 /**
@@ -37,9 +38,8 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
 
     private static BiTransition sameTransition = (BiTransition) biTransition(State.SAME, State.SAME);
 
-    private static BiTransition inputTransition = (BiTransition) biTransition(State.INPUT, State.INPUT)
+    private static BiTransition inputTransition = (BiTransition) samePrimaryInputBiTransition(State.INPUT, State.INPUT)
             .setCheckSelfRef(true)
-            .setCheckSamePrimaryInput(true)
             .setPropagateBS(FALSE);
 
 

@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
 import static network.aika.neuron.bindingsignal.PropagateBS.ONLY;
+import static network.aika.neuron.bindingsignal.SamePrimaryInputBiTransition.samePrimaryInputBiTransition;
 import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
@@ -36,11 +37,10 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
  */
 public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynapse, BindingNeuron, RelatedInputLink, BindingActivation> {
 
-    private static BiTransition sameTransition = (BiTransition) biTransition(SAME, INPUT)
-            .setCheckPrimaryInput(true)
-            .setCheckSamePrimaryInput(true);
+    private static BiTransition sameTransition = (BiTransition) samePrimaryInputBiTransition(SAME, INPUT)
+            .setCheckPrimaryInput(true);
 
-    private static BiTransition inputTransition = (BiTransition) biTransition(INPUT, INPUT);
+    private static BiTransition inputTransition = biTransition(INPUT, INPUT);
 
     private static List<Transition> TRANSITIONS = List.of(
             sameTransition,

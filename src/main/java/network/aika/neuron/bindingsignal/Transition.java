@@ -36,7 +36,6 @@ public class Transition {
     private State output;
 
     private boolean checkPrimaryInput;
-    private boolean checkSamePrimaryInput;
     private boolean checkLooseLinking;
     private boolean checkSelfRef;
 
@@ -57,11 +56,6 @@ public class Transition {
 
     public Transition setCheckPrimaryInput(boolean checkPrimaryInput) {
         this.checkPrimaryInput = checkPrimaryInput;
-        return this;
-    }
-
-    public Transition setCheckSamePrimaryInput(boolean checkSamePrimaryInput) {
-        this.checkSamePrimaryInput = checkSamePrimaryInput;
         return this;
     }
 
@@ -118,27 +112,10 @@ public class Transition {
         if(dir.getToState(this) != toBS.getState())
             return false;
 
-        if(checkSamePrimaryInput && !verifySamePrimaryInput(
-                dir.getInput(fromBS, toBS),
-                (BindingNeuron) ts.getOutput()
-        ))
-            return false;
-
         if(checkLooseLinking && !ts.allowLooseLinking())
             return false;
 
         return true;
-    }
-
-    private boolean verifySamePrimaryInput(BindingSignal refBS, BindingNeuron on) {
-        Activation originAct = refBS.getOriginActivation();
-        PrimaryInputSynapse primaryInputSyn = on.getPrimaryInputSynapse();
-        if(primaryInputSyn == null)
-            return false;
-
-        return originAct.getReverseBindingSignals(primaryInputSyn.getInput())
-                .findAny()
-                .isPresent();
     }
 
     public boolean checkPropagate(State from) {
@@ -152,7 +129,6 @@ public class Transition {
         return "Input:" + input +
                 " Output:" + output +
                 " CheckPrimaryInput:" + checkPrimaryInput +
-                " CheckSamePrimaryInput:" + checkSamePrimaryInput +
                 " CheckLooseLinking:" + checkLooseLinking +
                 " CheckSelfRef:" + checkSelfRef +
                 " PropagateBS:" + propagateBS;
