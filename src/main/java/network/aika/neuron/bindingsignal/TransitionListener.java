@@ -21,6 +21,8 @@ import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
 import network.aika.steps.activation.InactiveLinks;
 
+import java.util.stream.Stream;
+
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 
@@ -59,11 +61,9 @@ public class TransitionListener<T extends Transition> {
     }
 
     protected void link(T t, BindingSignal<?> fromBS) {
-        fromBS.getRelatedBindingSignal(
-                        targetSynapse,
-                        dir.getNeuron(targetSynapse)
-                )
-                .filter(toBS -> fromBS != toBS)
+        Stream<BindingSignal<?>> bsStream = targetSynapse.getRelatedBindingSignal(fromBS, dir);
+
+        bsStream.filter(toBS -> fromBS != toBS)
                 .forEach(toBS ->
                         link(t, fromBS, toBS)
                 );
@@ -88,6 +88,9 @@ public class TransitionListener<T extends Transition> {
 
         BindingSignal inputBS = dir.getInput(fromBS, toBS);
         BindingSignal outputBS = dir.getOutput(fromBS, toBS);
+
+        if(!targetSynapse.linkCheck(inputBS, outputBS))
+            return;
 
         targetSynapse.link(
                 inputBS.getActivation(),

@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 
+import static network.aika.neuron.bindingsignal.State.INPUT;
+import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
 
@@ -38,12 +40,12 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<PrimaryInputSynapse, I, PrimaryInputLink<IA>, IA> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(State.SAME, State.INPUT)
-
- //           transition(State.INPUT, State.INPUT)
-  //          .setPropagateBSOnly(false)
- //                   .setPropagateBS(false)  // check=false: Rel. Pre. Entity special case
+            transition(SAME, INPUT)
     );
+
+    //           transition(State.INPUT, State.INPUT)
+    //          .setPropagateBSOnly(false)
+    //                   .setPropagateBS(false)  // check=false: Rel. Pre. Entity special case
 
     public PrimaryInputLink createLink(IA input, BindingActivation output) {
         return new PrimaryInputLink(this, input, output);

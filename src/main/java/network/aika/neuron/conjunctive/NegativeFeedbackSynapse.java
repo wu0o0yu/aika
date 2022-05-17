@@ -18,6 +18,7 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BiTransition;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
@@ -36,25 +37,19 @@ import static network.aika.neuron.bindingsignal.SamePrimaryInputBiTransition.sam
  */
 public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedbackSynapse, InhibitoryNeuron, NegativeFeedbackLink, InhibitoryActivation> {
 
-    private static BiTransition sameTransition = (BiTransition) biTransition(State.SAME, State.SAME);
-
-    private static BiTransition inputTransition = (BiTransition) samePrimaryInputBiTransition(State.INPUT, State.INPUT)
-            .setCheckSelfRef(true)
-            .setPropagateBS(FALSE);
-
-
-    private static List<Transition> TRANSITIONS = List.of(
-            sameTransition,
-            inputTransition
+    private static List<Transition> TRANSITIONS = BiTransition.link(
+            biTransition(State.SAME, State.SAME),
+            samePrimaryInputBiTransition(State.INPUT, State.INPUT, FALSE)
     );
-
-    static {
-        BiTransition.link(sameTransition, inputTransition);
-    }
 
     @Override
     public NegativeFeedbackLink createLink(InhibitoryActivation input, BindingActivation output) {
         return new NegativeFeedbackLink(this, input, output);
+    }
+
+    @Override
+    public boolean linkCheck(BindingSignal iBS, BindingSignal oBS) {
+        return !isTemplate() || iBS.isSelfRef(oBS);
     }
 
     @Override

@@ -33,8 +33,13 @@ public class SamePrimaryInputBiTransition extends BiTransition {
         super(input, output);
     }
 
-    public static BiTransition samePrimaryInputBiTransition(State input, State output) {
-        return new BiTransition(input, output);
+    public static SamePrimaryInputBiTransition samePrimaryInputBiTransition(State input, State output) {
+        return new SamePrimaryInputBiTransition(input, output);
+    }
+
+    public static SamePrimaryInputBiTransition samePrimaryInputBiTransition(State input, State output, PropagateBS propagateBS) {
+        return (SamePrimaryInputBiTransition) samePrimaryInputBiTransition(input, output)
+                .setPropagateBS(propagateBS);
     }
 
     public boolean linkCheck(Synapse ts, BindingSignal fromBS, BindingSignal toBS, Direction dir) {

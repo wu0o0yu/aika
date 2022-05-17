@@ -17,10 +17,14 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
+import network.aika.Thought;
 import network.aika.direction.Direction;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.SamePatternLink;
 import network.aika.neuron.bindingsignal.BiTransition;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 
@@ -31,6 +35,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
+import static network.aika.neuron.bindingsignal.State.INPUT;
+import static network.aika.neuron.bindingsignal.State.SAME;
 
 /**
  * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
@@ -39,25 +45,10 @@ import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
  */
 public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse, BindingNeuron, SamePatternLink, BindingActivation> {
 
-    private static BiTransition sameTransition = (BiTransition) biTransition(State.SAME, State.SAME);
-
-    private static BiTransition inputTransition = (BiTransition) biTransition(State.INPUT, State.INPUT);
-
-    private static List<Transition> TRANSITIONS = List.of(
-            sameTransition, // Same Pattern BindingSignal
-            inputTransition // Input BS becomes related
-/* Loose Linking
-            transition(State.INPUT, State.INPUT)
-                    .setCheck(true)
-                    .setCheckBoundToSamePattern(true)
-                    .setCheckLooseLinking(true)
-                    .setPropagateBS(true), // Input BS becomes related
-*/
+    private static List<Transition> TRANSITIONS = BiTransition.link(
+            biTransition(SAME, SAME),
+            biTransition(INPUT, INPUT)
     );
-
-    static {
-        BiTransition.link(sameTransition, inputTransition);
-    }
 
     private int looseLinkingRange;
     private boolean allowLooseLinking;
@@ -68,12 +59,38 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
     }
 
     @Override
+    public Stream<BindingSignal<?>> getRelatedBindingSignal(BindingSignal<?> fromBS, Direction dir) {
+        Stream<BindingSignal<?>> relatedBindingSignals = super.getRelatedBindingSignal(fromBS, dir);
+
+        if(allowLooseLinking) {
+            Thought t = fromBS.getOriginActivation().getThought();
+            Neuron toNeuron = dir.getNeuron(this);
+
+            relatedBindingSignals = Stream.concat(
+                    relatedBindingSignals,
+                    t.getLooselyRelatedBindingSignals(fromBS, getLooseLinkingRange(), toNeuron)
+            );
+        }
+
+        return relatedBindingSignals;
+    }
+
+    @Override
     protected double getSortingWeight() {
         if(allowLooseLinking)
             return 0.0;
 
         return super.getSortingWeight();
     }
+
+    /*
+            if(allowLooseLinking) {
+            return iBS.getOrigin() != oBS.getOrigin() &&
+                    iBS.getState() == State.INPUT &&
+                    oBS.getState() == State.INPUT &&
+                    commonLinkingCheck(iBS, oBS);
+        }
+    */
 
     public void setLooseLinkingRange(int looseLinkingRange) {
         this.looseLinkingRange = looseLinkingRange;

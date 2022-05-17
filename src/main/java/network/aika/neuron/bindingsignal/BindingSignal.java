@@ -223,20 +223,6 @@ public class BindingSignal<A extends Activation> implements Element {
         return origin.getActivation();
     }
 
-    public Stream<BindingSignal<?>> getRelatedBindingSignal(Synapse targetSynapse, Neuron toNeuron) {
-        Activation originAct = getOriginActivation();
-        Stream<BindingSignal<?>> relatedBindingSignals = originAct.getReverseBindingSignals(toNeuron);
-
-        if(targetSynapse.allowLooseLinking()) {
-            relatedBindingSignals = Stream.concat(
-                    relatedBindingSignals,
-                    originAct.getThought().getLooselyRelatedBindingSignals(this, targetSynapse.getLooseLinkingRange(), toNeuron)
-            );
-        }
-
-        return relatedBindingSignals;
-    }
-
     public void link() {
         getActivation().registerBindingSignal(this);
         getOriginActivation().registerReverseBindingSignal(getActivation(), this);

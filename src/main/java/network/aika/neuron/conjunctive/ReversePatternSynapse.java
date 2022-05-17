@@ -27,6 +27,7 @@ import network.aika.neuron.bindingsignal.Transition;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
 /**
@@ -36,7 +37,7 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class ReversePatternSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<ReversePatternSynapse, I, ReversePatternLink<IA>, IA> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(State.SAME, State.SAME)
+            transition(SAME, SAME)
     );
 
     public ReversePatternLink createLink(IA input, BindingActivation output) {

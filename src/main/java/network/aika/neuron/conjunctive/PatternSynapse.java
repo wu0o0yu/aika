@@ -35,10 +35,7 @@ public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNe
 
     private static List<Transition> TRANSITIONS = List.of(
             transition(SAME, SAME),
-
-            transition(INPUT, INPUT)
-                    .setPropagateBS(ONLY),
-
+            transition(INPUT, INPUT, ONLY),
             transition(BRANCH, BRANCH)
     );
 

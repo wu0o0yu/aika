@@ -40,21 +40,20 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
     private static BiTransition sameTransition = (BiTransition) samePrimaryInputBiTransition(SAME, INPUT)
             .setCheckPrimaryInput(true);
 
+    /*
+    if(iBS.getState() == SAME && oBS != null && !(oBS.getLink() instanceof PrimaryInputLink<?>))
+     */
+
     private static BiTransition inputTransition = biTransition(INPUT, INPUT);
+
+    static {
+        BiTransition.link(sameTransition, inputTransition);
+    }
 
     private static List<Transition> TRANSITIONS = List.of(
             sameTransition,
             inputTransition
     );
-
-    private static List<Transition> TRANSITIONS_TEMPLATE = List.of(
-            transition(SAME, INPUT)
-                    .setCheckPrimaryInput(true)
-    );
-
-    static {
-        BiTransition.link(sameTransition, inputTransition);
-    }
 
     @Override
     public RelatedInputLink createLink(BindingActivation input, BindingActivation output) {
@@ -63,8 +62,6 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
 
     @Override
     public Stream<Transition> getTransitions() {
-        return isTemplate() ?
-                TRANSITIONS_TEMPLATE.stream() :
-                TRANSITIONS.stream();
+        return TRANSITIONS.stream();
     }
 }

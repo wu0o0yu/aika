@@ -73,16 +73,21 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
     protected boolean allowTraining = true;
 
-    public Integer getLooseLinkingRange() {
-        return null;
-    }
-
-    public boolean allowLooseLinking() {
-        return false;
-    }
-
     public boolean isRecurrent() {
         return false;
+    }
+
+
+    public Stream<BindingSignal<?>> getRelatedBindingSignal(BindingSignal<?> fromBS, Direction dir) {
+        Neuron toNeuron = dir.getNeuron(this);
+        Activation originAct = fromBS.getOriginActivation();
+        Stream<BindingSignal<?>> relatedBindingSignals = originAct.getReverseBindingSignals(toNeuron);
+
+        return relatedBindingSignals;
+    }
+
+    public boolean linkCheck(BindingSignal inputBS, BindingSignal outputBS) {
+        return true;
     }
 
     public L link(IA iAct, OA oAct) {

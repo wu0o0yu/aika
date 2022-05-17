@@ -34,12 +34,9 @@ public class Transition {
 
     private State input;
     private State output;
+    private PropagateBS propagateBS = PropagateBS.TRUE;
 
     private boolean checkPrimaryInput;
-    private boolean checkLooseLinking;
-    private boolean checkSelfRef;
-
-    private PropagateBS propagateBS = PropagateBS.TRUE;
 
     protected Transition(State input, State output) {
         this.input = input;
@@ -54,18 +51,13 @@ public class Transition {
         return new Transition(input, output);
     }
 
+    public static Transition transition(State input, State output, PropagateBS propagateBS) {
+        return transition(input, output)
+                .setPropagateBS(propagateBS);
+    }
+
     public Transition setCheckPrimaryInput(boolean checkPrimaryInput) {
         this.checkPrimaryInput = checkPrimaryInput;
-        return this;
-    }
-
-    public Transition setCheckLooseLinking(boolean checkLooseLinking) {
-        this.checkLooseLinking = checkLooseLinking;
-        return this;
-    }
-
-    public Transition setCheckSelfRef(boolean checkSelfRef) {
-        this.checkSelfRef = checkSelfRef;
         return this;
     }
 
@@ -112,9 +104,6 @@ public class Transition {
         if(dir.getToState(this) != toBS.getState())
             return false;
 
-        if(checkLooseLinking && !ts.allowLooseLinking())
-            return false;
-
         return true;
     }
 
@@ -128,9 +117,7 @@ public class Transition {
     public String toString() {
         return "Input:" + input +
                 " Output:" + output +
-                " CheckPrimaryInput:" + checkPrimaryInput +
-                " CheckLooseLinking:" + checkLooseLinking +
-                " CheckSelfRef:" + checkSelfRef +
-                " PropagateBS:" + propagateBS;
+                " PropagateBS:" + propagateBS +
+                " CheckPrimaryInput:" + checkPrimaryInput;
     }
 }
