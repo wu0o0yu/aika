@@ -39,12 +39,10 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
 
     private static List<Transition> TRANSITIONS = List.of(
             transition(State.SAME, State.INPUT)
-                    .setCheck(true)
-                    .setCheckIfPrimaryInputAlreadyExists(true)
-                    .setPropagate(Integer.MAX_VALUE),
 
-            transition(State.INPUT, State.INPUT)
-                    .setPropagate(0)  // check=false: Rel. Pre. Entity special case
+ //           transition(State.INPUT, State.INPUT)
+  //          .setPropagateBSOnly(false)
+ //                   .setPropagateBS(false)  // check=false: Rel. Pre. Entity special case
     );
 
     public PrimaryInputLink createLink(IA input, BindingActivation output) {
@@ -55,22 +53,4 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
     public Stream<Transition> getTransitions() {
         return TRANSITIONS.stream();
     }
-/*
-    @Override
-    public FieldOutput getLinkingEvent(BindingSignal bs, Transition t, Direction dir) {
-        FieldOutput e = super.getLinkingEvent(bs, t, dir);
-
-        if(dir == INPUT && e != null) {
-            BindingActivation oAct = (BindingActivation) bs.getActivation();
-
-            return mul(
-                    "bound input linking event",
-                    e,
-                    invert("!OnBoundPrimaryInput", oAct.getOnBoundPrimaryInput())
-            );
-        }
-
-        return e;
-    }
- */
 }

@@ -19,12 +19,10 @@ package network.aika.neuron.bindingsignal;
 import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Link;
 import network.aika.steps.activation.InactiveLinks;
-import network.aika.steps.link.PropagateBindingSignal;
 
+import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.fields.Fields.isTrue;
 
 /**
  * @author Lukas Molzberger
@@ -57,9 +55,10 @@ public class TransitionListener<T extends Transition> {
 
     public void link() {
         link(transition, bindingSignal);
+        propagate(transition, bindingSignal);
     }
 
-    protected void link(Transition t, BindingSignal<?> fromBS) {
+    protected void link(T t, BindingSignal<?> fromBS) {
         fromBS.getRelatedBindingSignal(
                         targetSynapse,
                         dir.getNeuron(targetSynapse)
@@ -68,24 +67,31 @@ public class TransitionListener<T extends Transition> {
                 .forEach(toBS ->
                         link(t, fromBS, toBS)
                 );
-
-        if(dir == OUTPUT) {
-            link(t, fromBS, null);
-        }
     }
 
-    public void link(Transition t, BindingSignal fromBS, BindingSignal toBS) {
-        if(!(toBS == null ?
-                targetSynapse.isAllowPropagate() :
-                t.linkCheck(targetSynapse, fromBS, toBS, dir)
-        )) return;
+    protected void propagate(T t, BindingSignal<?> fromBS) {
+        if (dir == INPUT)
+            return;
+
+        if (!targetSynapse.isAllowPropagate())
+            return;
+
+        targetSynapse.link(
+                fromBS.getActivation(),
+                null
+        );
+    }
+
+    public void link(T t, BindingSignal fromBS, BindingSignal toBS) {
+        if(!t.linkCheck(targetSynapse, fromBS, toBS, dir))
+            return;
 
         BindingSignal inputBS = dir.getInput(fromBS, toBS);
         BindingSignal outputBS = dir.getOutput(fromBS, toBS);
 
         targetSynapse.link(
                 inputBS.getActivation(),
-                (outputBS != null ? outputBS.getActivation() : null)
+                outputBS.getActivation()
         );
     }
 

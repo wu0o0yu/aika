@@ -24,6 +24,8 @@ import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.isTrue;
+import static network.aika.neuron.bindingsignal.PropagateBS.FALSE;
+import static network.aika.neuron.bindingsignal.PropagateBS.ONLY;
 
 /**
  * @author Lukas Molzberger
@@ -32,15 +34,13 @@ public class Transition {
 
     private State input;
     private State output;
-    private boolean check;
+
     private boolean checkPrimaryInput;
     private boolean checkSamePrimaryInput;
-    private boolean checkIfPrimaryInputAlreadyExists;
     private boolean checkLooseLinking;
     private boolean checkSelfRef;
 
-
-    private Integer propagate;
+    private PropagateBS propagateBS = PropagateBS.TRUE;
 
     protected Transition(State input, State output) {
         this.input = input;
@@ -55,11 +55,6 @@ public class Transition {
         return new Transition(input, output);
     }
 
-    public Transition setCheck(boolean check) {
-        this.check = check;
-        return this;
-    }
-
     public Transition setCheckPrimaryInput(boolean checkPrimaryInput) {
         this.checkPrimaryInput = checkPrimaryInput;
         return this;
@@ -67,11 +62,6 @@ public class Transition {
 
     public Transition setCheckSamePrimaryInput(boolean checkSamePrimaryInput) {
         this.checkSamePrimaryInput = checkSamePrimaryInput;
-        return this;
-    }
-
-    public Transition setCheckIfPrimaryInputAlreadyExists(boolean checkIfPrimaryInputAlreadyExists) {
-        this.checkIfPrimaryInputAlreadyExists = checkIfPrimaryInputAlreadyExists;
         return this;
     }
 
@@ -85,8 +75,8 @@ public class Transition {
         return this;
     }
 
-    public Transition setPropagate(Integer propagate) {
-        this.propagate = propagate;
+    public Transition setPropagateBS(PropagateBS propagateBS) {
+        this.propagateBS = propagateBS;
         return this;
     }
 
@@ -98,16 +88,12 @@ public class Transition {
         return output;
     }
 
-    public boolean isCheck() {
-        return check;
-    }
-
     public boolean isCheckPrimaryInput() {
         return checkPrimaryInput;
     }
 
-    public Integer getPropagate() {
-        return propagate;
+    public PropagateBS getPropagateBS() {
+        return propagateBS;
     }
 
     public State next(Direction dir) {
@@ -115,12 +101,12 @@ public class Transition {
     }
 
     public boolean check(BindingSignal bs, Direction dir) {
-        return check &&
+        return propagateBS != ONLY &&
                 dir.getFromState(this) == bs.getState();
     }
 
     public boolean linkCheck(Synapse ts, BindingSignal fromBS, BindingSignal toBS, Direction dir) {
-        if(!check)
+        if(propagateBS == ONLY)
             return false;
 
         if(fromBS.getOrigin() != toBS.getOrigin())
@@ -156,7 +142,7 @@ public class Transition {
     }
 
     public boolean checkPropagate(State from) {
-        if(propagate == 0)
+        if(propagateBS == FALSE)
             return false;
 
         return from == input;
@@ -165,12 +151,10 @@ public class Transition {
     public String toString() {
         return "Input:" + input +
                 " Output:" + output +
-                " Check:" + check +
                 " CheckPrimaryInput:" + checkPrimaryInput +
                 " CheckSamePrimaryInput:" + checkSamePrimaryInput +
-                " CheckIfPrimaryInputAlreadyExists:" + checkIfPrimaryInputAlreadyExists +
                 " CheckLooseLinking:" + checkLooseLinking +
                 " CheckSelfRef:" + checkSelfRef +
-                " Propagate:" + (propagate == Integer.MAX_VALUE ? "UNLIMITED" : propagate);
+                " PropagateBS:" + propagateBS;
     }
 }

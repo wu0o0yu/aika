@@ -18,11 +18,9 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
 import network.aika.direction.Direction;
-import network.aika.fields.FieldOutput;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.SamePatternLink;
 import network.aika.neuron.bindingsignal.BiTransition;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 
@@ -32,10 +30,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.fields.Fields.mul;
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
-import static network.aika.neuron.bindingsignal.Transition.transition;
 
 /**
  * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
@@ -44,14 +39,9 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
  */
 public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse, BindingNeuron, SamePatternLink, BindingActivation> {
 
-    private static BiTransition sameTransition = (BiTransition) biTransition(State.SAME, State.SAME)
-            .setCheck(true)
-            .setPropagate(Integer.MAX_VALUE);
+    private static BiTransition sameTransition = (BiTransition) biTransition(State.SAME, State.SAME);
 
-    private static BiTransition inputTransition = (BiTransition) biTransition(State.INPUT, State.INPUT)
-            .setCheck(true)
-//            .setCheckBoundToSamePattern(true)
-            .setPropagate(Integer.MAX_VALUE);
+    private static BiTransition inputTransition = (BiTransition) biTransition(State.INPUT, State.INPUT);
 
     private static List<Transition> TRANSITIONS = List.of(
             sameTransition, // Same Pattern BindingSignal
@@ -61,7 +51,7 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
                     .setCheck(true)
                     .setCheckBoundToSamePattern(true)
                     .setCheckLooseLinking(true)
-                    .setPropagate(Integer.MAX_VALUE), // Input BS becomes related
+                    .setPropagateBS(true), // Input BS becomes related
 */
     );
 
@@ -105,22 +95,7 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
     public boolean networkInputsAllowed(Direction dir) {
         return !isTemplate();
     }
-/*
-    @Override
-    public FieldOutput getLinkingEvent(BindingSignal bs, Transition t, Direction dir) {
-        FieldOutput e = super.getLinkingEvent(bs, t, dir);
 
-        if(dir == OUTPUT && e != null) {
-            return mul(
-                    "bound output linking event",
-                    e,
-                    bs.getActivation().getOnBoundPattern()
-            );
-        }
-
-        return e;
-    }
-*/
     @Override
     public Stream<Transition> getTransitions() {
         return TRANSITIONS.stream();

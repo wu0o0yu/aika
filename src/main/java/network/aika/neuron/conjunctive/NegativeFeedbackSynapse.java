@@ -16,11 +16,8 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.direction.Direction;
-import network.aika.fields.FieldOutput;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BiTransition;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
@@ -29,6 +26,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
+import static network.aika.neuron.bindingsignal.PropagateBS.FALSE;
 
 
 /**
@@ -37,25 +35,17 @@ import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
  */
 public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedbackSynapse, InhibitoryNeuron, NegativeFeedbackLink, InhibitoryActivation> {
 
-    private static BiTransition sameTransition = (BiTransition) biTransition(State.SAME, State.SAME)
-            .setCheck(true)
-            .setPropagate(Integer.MAX_VALUE);
+    private static BiTransition sameTransition = (BiTransition) biTransition(State.SAME, State.SAME);
 
     private static BiTransition inputTransition = (BiTransition) biTransition(State.INPUT, State.INPUT)
-            .setCheck(true)
             .setCheckSelfRef(true)
             .setCheckSamePrimaryInput(true)
-//            .setCheckBoundToSamePattern(true)
-            .setPropagate(0);
+            .setPropagateBS(FALSE);
 
 
     private static List<Transition> TRANSITIONS = List.of(
             sameTransition,
-            inputTransition//,
-
-//            transition(State.BRANCH, State.BRANCH)
-//                    .setCheck(true)
-//                    .setPropagate(1)
+            inputTransition
     );
 
     static {

@@ -35,6 +35,7 @@ public class BiTransitionListener extends TransitionListener<BiTransition> {
         relatedBindingSignal = bs;
     }
 
+    @Override
     public void notify(BindingSignal bs) {
         this.bindingSignal = bs;
 
@@ -52,22 +53,34 @@ public class BiTransitionListener extends TransitionListener<BiTransition> {
         }
     }
 
+    @Override
     public void link() {
         if(relatedBindingSignal == null)
             return;
 
-        link(transition.getRelatedTransition(), relatedBindingSignal);
         link(transition, bindingSignal);
+        link(transition.getRelatedTransition(), relatedBindingSignal);
+
+        propagate(transition, bindingSignal);
+        propagate(transition.getRelatedTransition(), relatedBindingSignal);
     }
 
-    public void link(Transition t, BindingSignal fromBS, BindingSignal toBS) {
-        Activation toAct = toBS.getActivation();
-        if(!(fromBS == relatedBindingSignal ?
-                checkRelated(transition, bindingSignal, toAct) :
-                checkRelated(transition.getRelatedTransition(), relatedBindingSignal, toAct)
-        )) return;
+    @Override
+    public void link(BiTransition t, BindingSignal fromBS, BindingSignal toBS) {
+        if(!checkRelated(
+                t.getRelatedTransition(),
+                getRelatedFromBS(fromBS),
+                toBS.getActivation())
+        )
+            return;
 
         super.link(t, fromBS, toBS);
+    }
+
+    private BindingSignal getRelatedFromBS(BindingSignal fromBS) {
+        return fromBS == relatedBindingSignal ?
+                bindingSignal :
+                relatedBindingSignal;
     }
 
     private boolean checkRelated(Transition relTransition, BindingSignal relFromBS, Activation toAct) {

@@ -26,7 +26,6 @@ import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.TransitionListener;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
-import network.aika.steps.link.PropagateBindingSignal;
 import network.aika.utils.Utils;
 
 import java.util.*;
@@ -41,7 +40,7 @@ import static network.aika.neuron.activation.Timestamp.NOT_SET;
 /**
  * @author Lukas Molzberger
  */
-public abstract class Activation<N extends Neuron> extends Element<Activation> {
+public abstract class Activation<N extends Neuron> implements Element, Comparable<Activation> {
 
     public static final Comparator<Activation> NEURON_COMPARATOR = Comparator.
             <Activation>comparingLong(act -> act.getNeuron().getId())
@@ -355,7 +354,7 @@ public abstract class Activation<N extends Neuron> extends Element<Activation> {
 
     public void propagateBindingSignal(BindingSignal fromBS) {
         getOutputLinks().forEach(l ->
-                PropagateBindingSignal.add(l, fromBS)
+                fromBS.propagate(l)
         );
     }
 

@@ -24,13 +24,13 @@ import network.aika.Thought;
  *
  *  @author Lukas Molzberger
  */
-public abstract class Element<E extends Element> implements Comparable<E> {
+public interface Element {
 
-    public abstract Timestamp getCreated();
+    Timestamp getCreated();
 
-    public abstract Timestamp getFired();
+    Timestamp getFired();
 
-    public abstract Thought getThought();
+    Thought getThought();
 
-    public abstract Config getConfig();
+    Config getConfig();
 }

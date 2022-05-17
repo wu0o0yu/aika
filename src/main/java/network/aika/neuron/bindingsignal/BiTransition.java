@@ -52,7 +52,7 @@ public class BiTransition extends Transition {
         t2.relatedTransition = t1;
     }
 
-    public Transition getRelatedTransition() {
+    public BiTransition getRelatedTransition() {
         return relatedTransition;
     }
 }

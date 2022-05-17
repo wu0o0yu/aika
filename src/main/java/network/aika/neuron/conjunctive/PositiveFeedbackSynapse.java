@@ -31,6 +31,8 @@ import network.aika.neuron.bindingsignal.Transition;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.bindingsignal.PropagateBS.FALSE;
+import static network.aika.neuron.bindingsignal.PropagateBS.ONLY;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
 /**
@@ -41,10 +43,9 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
 
     private static List<Transition> TRANSITIONS = List.of(
             transition(State.BRANCH, State.BRANCH)
-                    .setCheck(true)
-                    .setPropagate(0),
+                    .setPropagateBS(FALSE),
             transition(State.SAME, State.SAME)
-                    .setPropagate(Integer.MAX_VALUE)
+                    .setPropagateBS(ONLY)
     );
 
     private Field feedbackBias = new Field(this, "feedbackBias");

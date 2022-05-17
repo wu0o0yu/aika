@@ -27,7 +27,6 @@ import network.aika.neuron.Synapse;
 import network.aika.sign.Sign;
 import network.aika.steps.link.Cleanup;
 import network.aika.steps.link.LinkCounting;
-import network.aika.steps.link.PropagateBindingSignal;
 
 import java.util.Comparator;
 
@@ -41,11 +40,7 @@ import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
  *
  * @author Lukas Molzberger
  */
-public abstract class Link<S extends Synapse, I extends Activation<?>, O extends Activation> extends Element<Link> {
-
-    public static final Comparator<Link> COMPARE = Comparator.
-            <Link, Activation<?>>comparing(l -> l.output)
-            .thenComparing(l -> l.input);
+public abstract class Link<S extends Synapse, I extends Activation<?>, O extends Activation> implements Element {
 
     protected S synapse;
 
@@ -146,7 +141,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     public void propagateAllBindingSignals() {
         input.getBindingSignals()
                 .forEach(fromBS ->
-                        PropagateBindingSignal.add(this, fromBS)
+                        fromBS.propagate(this)
                 );
     }
 
@@ -278,11 +273,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     @Override
     public Config getConfig() {
         return output.getConfig();
-    }
-
-    @Override
-    public int compareTo(Link l) {
-        return COMPARE.compare(this, l);
     }
 
     public String toString() {

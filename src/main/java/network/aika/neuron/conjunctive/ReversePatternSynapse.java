@@ -16,23 +16,17 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.direction.Direction;
-import network.aika.fields.Field;
-import network.aika.fields.FieldOutput;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.PositiveFeedbackLink;
 import network.aika.neuron.activation.ReversePatternLink;
 import network.aika.neuron.axons.PatternAxon;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.bindingsignal.Transition.transition;
 
 /**
@@ -43,8 +37,6 @@ public class ReversePatternSynapse<I extends Neuron & PatternAxon, IA extends Ac
 
     private static List<Transition> TRANSITIONS = List.of(
             transition(State.SAME, State.SAME)
-                    .setCheck(true)
-                    .setPropagate(Integer.MAX_VALUE)
     );
 
     public ReversePatternLink createLink(IA input, BindingActivation output) {

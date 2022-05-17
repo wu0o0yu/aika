@@ -16,25 +16,29 @@
  */
 package network.aika.neuron.bindingsignal;
 
+import network.aika.Config;
+import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
+import network.aika.fields.QueueField;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Timestamp;
 
 import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.*;
-import static network.aika.fields.Fields.connect;
 import static network.aika.fields.Fields.mul;
 
 
 /**
  * @author Lukas Molzberger
  */
-public class BindingSignal<A extends Activation> {
+public class BindingSignal<A extends Activation> implements Element {
 
     private BindingSignal parent;
     private A activation;
@@ -43,9 +47,8 @@ public class BindingSignal<A extends Activation> {
     private BindingSignal origin;
     private int depth;
     private State state;
-    private boolean propagateAllowed = true;
 
-    private Field onArrived = new Field(this, "onArrived");
+    private Field onArrived;
     private FieldOutput onArrivedFired;
     private FieldOutput onArrivedFinal;
     private FieldOutput onArrivedFiredFinal;
@@ -73,12 +76,13 @@ public class BindingSignal<A extends Activation> {
         this(parent);
 
         this.transition = t;
-        this.propagateAllowed = t.getPropagate() > 1;
         this.state = t.next(Direction.OUTPUT);
     }
 
     public void init(A act) {
         this.activation = act;
+        onArrived = new QueueField(this, "arrived", 0.0);
+
         initFields();
         initBSListeners();
 
@@ -91,6 +95,19 @@ public class BindingSignal<A extends Activation> {
                 .filter(t -> t.checkPropagate(getState()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public void propagate(Link l) {
+        Transition t = transition(l.getSynapse());
+        if(t == null)
+            return;
+
+        BindingSignal toBS = next(t);
+        toBS.setLink(l);
+
+        Activation oAct = l.getOutput();
+        toBS.init(oAct);
+        oAct.addBindingSignal(toBS);
     }
 
     public BindingSignal propagate(Synapse s) {
@@ -243,11 +260,27 @@ public class BindingSignal<A extends Activation> {
         return parent.isSelfRef(outputBS);
     }
 
-    public boolean isPropagateAllowed() {
-        return propagateAllowed;
-    }
-
     public String toString() {
         return getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ", depth:" + getDepth() + ", state:" + state;
+    }
+
+    @Override
+    public Timestamp getCreated() {
+        return getOriginActivation().getCreated();
+    }
+
+    @Override
+    public Timestamp getFired() {
+        return getOriginActivation().getFired();
+    }
+
+    @Override
+    public Thought getThought() {
+        return activation.getThought();
+    }
+
+    @Override
+    public Config getConfig() {
+        return activation.getConfig();
     }
 }

@@ -64,11 +64,6 @@ public class DummyActivation extends Activation {
         return false;
     }
 
-    @Override
-    public int compareTo(Object o) {
-        throw new NoSuchMethodError();
-    }
-
     public String toString() {
         return "DummyAct - neuron: " + neuron;
     }
