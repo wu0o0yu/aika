@@ -23,6 +23,7 @@ import network.aika.neuron.bindingsignal.Transition;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.Transition.transition;
@@ -34,9 +35,9 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNeuron, PatternNeuron, PatternLink, BindingActivation, PatternActivation> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(SAME, SAME),
+            transition(SAME, SAME, MATCH_AND_PROPAGATE),
             transition(INPUT, INPUT, PROPAGATE_ONLY),
-            transition(BRANCH, BRANCH)
+            transition(BRANCH, BRANCH, MATCH_AND_PROPAGATE)
     );
 
     public PatternSynapse() {
