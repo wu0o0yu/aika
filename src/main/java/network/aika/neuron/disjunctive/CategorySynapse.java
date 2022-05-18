@@ -20,16 +20,16 @@ import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.axons.PatternAxon;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.bindingsignal.PropagateBS.ONLY;
+import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 import static network.aika.neuron.bindingsignal.State.INPUT;
 import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.neuron.bindingsignal.Transition.transition;
+import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 
 
 /**
@@ -39,8 +39,8 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class CategorySynapse<N extends Neuron & PatternAxon> extends DisjunctiveSynapse<CategorySynapse, N, CategoryNeuron, CategoryLink, PatternActivation, CategoryActivation> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(SAME, SAME),
-            transition(INPUT, INPUT, ONLY)
+            transition(SAME, SAME, MATCH_AND_PROPAGATE),
+            transition(INPUT, INPUT, PROPAGATE_ONLY)
     );
 
     @Override

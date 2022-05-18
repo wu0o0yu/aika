@@ -19,6 +19,8 @@ package network.aika.neuron.bindingsignal;
 import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.PrimaryInputLink;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 
@@ -29,25 +31,26 @@ import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 public class SamePrimaryInputBiTransition extends BiTransition {
 
 
-    protected SamePrimaryInputBiTransition(State input, State output) {
-        super(input, output);
+    protected SamePrimaryInputBiTransition(State input, State output, TransitionMode transitionMode) {
+        super(input, output, transitionMode);
     }
 
-    public static SamePrimaryInputBiTransition samePrimaryInputBiTransition(State input, State output) {
-        return new SamePrimaryInputBiTransition(input, output);
-    }
-
-    public static SamePrimaryInputBiTransition samePrimaryInputBiTransition(State input, State output, PropagateBS propagateBS) {
-        return (SamePrimaryInputBiTransition) samePrimaryInputBiTransition(input, output)
-                .setPropagateBS(propagateBS);
+    public static SamePrimaryInputBiTransition samePrimaryInputBiTransition(State input, State output, TransitionMode transitionMode) {
+        return new SamePrimaryInputBiTransition(input, output, transitionMode);
     }
 
     public boolean linkCheck(Synapse ts, BindingSignal fromBS, BindingSignal toBS, Direction dir) {
         if(!super.linkCheck(ts, fromBS, toBS, dir))
             return false;
 
+        BindingSignal iBS = dir.getInput(fromBS, toBS);
+        BindingSignal<BindingActivation> oBS = dir.getOutput(fromBS, toBS);
+
+        if(!(oBS.getLink() instanceof PrimaryInputLink))
+            return false;
+
         if(!verifySamePrimaryInput(
-                dir.getInput(fromBS, toBS),
+                iBS,
                 (BindingNeuron) ts.getOutput()
         ))
             return false;

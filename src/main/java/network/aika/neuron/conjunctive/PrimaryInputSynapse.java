@@ -23,6 +23,7 @@ import network.aika.neuron.activation.PrimaryInputLink;
 import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
+import network.aika.neuron.bindingsignal.TransitionMode;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -31,6 +32,7 @@ import java.util.stream.Stream;
 import static network.aika.neuron.bindingsignal.State.INPUT;
 import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.neuron.bindingsignal.Transition.transition;
+import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 
 
 /**
@@ -40,7 +42,7 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<PrimaryInputSynapse, I, PrimaryInputLink<IA>, IA> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(SAME, INPUT)
+            transition(SAME, INPUT, MATCH_AND_PROPAGATE)
     );
 
     //           transition(State.INPUT, State.INPUT)

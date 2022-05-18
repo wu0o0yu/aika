@@ -18,52 +18,33 @@ package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.isTrue;
-import static network.aika.neuron.bindingsignal.PropagateBS.FALSE;
-import static network.aika.neuron.bindingsignal.PropagateBS.ONLY;
+import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
+import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 
 /**
  * @author Lukas Molzberger
  */
 public class Transition {
 
-    private State input;
-    private State output;
-    private PropagateBS propagateBS = PropagateBS.TRUE;
+    protected State input;
+    protected State output;
+    protected TransitionMode transitionMode;
 
-    private boolean checkPrimaryInput;
-
-    protected Transition(State input, State output) {
+    protected Transition(State input, State output, TransitionMode transitionMode) {
         this.input = input;
         this.output = output;
+        this.transitionMode = transitionMode;
     }
 
     public TransitionListener createListener(Synapse ts, BindingSignal bs, Direction dir) {
         return new TransitionListener(this, bs, dir, ts);
     }
 
-    public static Transition transition(State input, State output) {
-        return new Transition(input, output);
-    }
-
-    public static Transition transition(State input, State output, PropagateBS propagateBS) {
-        return transition(input, output)
-                .setPropagateBS(propagateBS);
-    }
-
-    public Transition setCheckPrimaryInput(boolean checkPrimaryInput) {
-        this.checkPrimaryInput = checkPrimaryInput;
-        return this;
-    }
-
-    public Transition setPropagateBS(PropagateBS propagateBS) {
-        this.propagateBS = propagateBS;
-        return this;
+    public static Transition transition(State input, State output, TransitionMode transitionMode) {
+        return new Transition(input, output, transitionMode);
     }
 
     public State getInput() {
@@ -74,12 +55,8 @@ public class Transition {
         return output;
     }
 
-    public boolean isCheckPrimaryInput() {
-        return checkPrimaryInput;
-    }
-
-    public PropagateBS getPropagateBS() {
-        return propagateBS;
+    public TransitionMode getPropagateBS() {
+        return transitionMode;
     }
 
     public State next(Direction dir) {
@@ -87,12 +64,12 @@ public class Transition {
     }
 
     public boolean check(BindingSignal bs, Direction dir) {
-        return propagateBS != ONLY &&
+        return transitionMode != PROPAGATE_ONLY &&
                 dir.getFromState(this) == bs.getState();
     }
 
     public boolean linkCheck(Synapse ts, BindingSignal fromBS, BindingSignal toBS, Direction dir) {
-        if(propagateBS == ONLY)
+        if(transitionMode == PROPAGATE_ONLY)
             return false;
 
         if(fromBS.getOrigin() != toBS.getOrigin())
@@ -108,7 +85,7 @@ public class Transition {
     }
 
     public boolean checkPropagate(State from) {
-        if(propagateBS == FALSE)
+        if(transitionMode == MATCH_ONLY)
             return false;
 
         return from == input;
@@ -117,7 +94,6 @@ public class Transition {
     public String toString() {
         return "Input:" + input +
                 " Output:" + output +
-                " PropagateBS:" + propagateBS +
-                " CheckPrimaryInput:" + checkPrimaryInput;
+                " PropagateBS:" + transitionMode;
     }
 }

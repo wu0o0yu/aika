@@ -19,7 +19,6 @@ package network.aika.neuron.conjunctive;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BiTransition;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 
@@ -27,8 +26,11 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
-import static network.aika.neuron.bindingsignal.PropagateBS.FALSE;
+import static network.aika.neuron.bindingsignal.State.INPUT;
+import static network.aika.neuron.bindingsignal.State.SAME;
+import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
 import static network.aika.neuron.bindingsignal.SamePrimaryInputBiTransition.samePrimaryInputBiTransition;
+import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 
 
 /**
@@ -38,8 +40,8 @@ import static network.aika.neuron.bindingsignal.SamePrimaryInputBiTransition.sam
 public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedbackSynapse, InhibitoryNeuron, NegativeFeedbackLink, InhibitoryActivation> {
 
     private static List<Transition> TRANSITIONS = BiTransition.link(
-            biTransition(State.SAME, State.SAME),
-            samePrimaryInputBiTransition(State.INPUT, State.INPUT, FALSE)
+            biTransition(SAME, SAME, MATCH_AND_PROPAGATE),
+            samePrimaryInputBiTransition(INPUT, INPUT, MATCH_ONLY)
     );
 
     @Override

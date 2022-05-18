@@ -20,12 +20,10 @@ import network.aika.Model;
 import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.SamePatternLink;
 import network.aika.neuron.bindingsignal.BiTransition;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.io.DataInput;
@@ -37,6 +35,7 @@ import java.util.stream.Stream;
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
 import static network.aika.neuron.bindingsignal.State.INPUT;
 import static network.aika.neuron.bindingsignal.State.SAME;
+import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 
 /**
  * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
@@ -46,8 +45,8 @@ import static network.aika.neuron.bindingsignal.State.SAME;
 public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse, BindingNeuron, SamePatternLink, BindingActivation> {
 
     private static List<Transition> TRANSITIONS = BiTransition.link(
-            biTransition(SAME, SAME),
-            biTransition(INPUT, INPUT)
+            biTransition(SAME, SAME, MATCH_AND_PROPAGATE),
+            biTransition(INPUT, INPUT, MATCH_AND_PROPAGATE)
     );
 
     private int looseLinkingRange;

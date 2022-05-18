@@ -25,10 +25,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
-import static network.aika.neuron.bindingsignal.PropagateBS.ONLY;
 import static network.aika.neuron.bindingsignal.SamePrimaryInputBiTransition.samePrimaryInputBiTransition;
 import static network.aika.neuron.bindingsignal.State.*;
-import static network.aika.neuron.bindingsignal.Transition.transition;
+import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 
 
 /**
@@ -37,22 +36,9 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
  */
 public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynapse, BindingNeuron, RelatedInputLink, BindingActivation> {
 
-    private static BiTransition sameTransition = (BiTransition) samePrimaryInputBiTransition(SAME, INPUT)
-            .setCheckPrimaryInput(true);
-
-    /*
-    if(iBS.getState() == SAME && oBS != null && !(oBS.getLink() instanceof PrimaryInputLink<?>))
-     */
-
-    private static BiTransition inputTransition = biTransition(INPUT, INPUT);
-
-    static {
-        BiTransition.link(sameTransition, inputTransition);
-    }
-
-    private static List<Transition> TRANSITIONS = List.of(
-            sameTransition,
-            inputTransition
+    private static List<Transition> TRANSITIONS = BiTransition.link(
+            samePrimaryInputBiTransition(SAME, INPUT, MATCH_AND_PROPAGATE),
+            biTransition(INPUT, INPUT, MATCH_AND_PROPAGATE)
     );
 
     @Override

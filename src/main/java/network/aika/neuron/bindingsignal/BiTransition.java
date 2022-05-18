@@ -33,17 +33,12 @@ public class BiTransition extends Transition {
     private BiTransition relatedTransition;
 
 
-    protected BiTransition(State input, State output) {
-        super(input, output);
+    protected BiTransition(State input, State output, TransitionMode transitionMode) {
+        super(input, output, transitionMode);
     }
 
-    public static BiTransition biTransition(State input, State output) {
-        return new BiTransition(input, output);
-    }
-
-    public static BiTransition biTransition(State input, State output, PropagateBS propagateBS) {
-        return (BiTransition) biTransition(input, output)
-                .setPropagateBS(propagateBS);
+    public static BiTransition biTransition(State input, State output, TransitionMode transitionMode) {
+        return new BiTransition(input, output, transitionMode);
     }
 
     public TransitionListener createListener(Synapse ts, BindingSignal bs, Direction dir) {
