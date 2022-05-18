@@ -55,10 +55,6 @@ public class Transition {
         return output;
     }
 
-    public TransitionMode getPropagateBS() {
-        return transitionMode;
-    }
-
     public State next(Direction dir) {
         return dir == OUTPUT ? output : input;
     }
@@ -70,9 +66,6 @@ public class Transition {
 
     public boolean linkCheck(Synapse ts, BindingSignal fromBS, BindingSignal toBS, Direction dir) {
         if(transitionMode == PROPAGATE_ONLY)
-            return false;
-
-        if(fromBS.getOrigin() != toBS.getOrigin())
             return false;
 
         if (!isTrue(ts.getLinkingEvent(toBS, dir)))

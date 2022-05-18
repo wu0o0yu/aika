@@ -87,20 +87,28 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public boolean linkCheck(BindingSignal inputBS, BindingSignal outputBS) {
-        return true;
+        return inputBS.getOrigin() == outputBS.getOrigin();
+    }
+
+    public L propagate(IA iAct) {
+        if(!isAllowPropagate())
+            return null;
+
+        if(propagateLinkExists(iAct))
+            return null;
+
+        OA oAct = getOutput().createActivation(iAct.getThought());
+        oAct.init(this, iAct);
+
+        return createLink(iAct, oAct);
     }
 
     public L link(IA iAct, OA oAct) {
         if(linkExists(iAct, oAct))
             return null;
 
-        if(oAct != null && !(isRecurrent() || Link.isCausal(iAct, oAct)))
+        if(!(isRecurrent() || Link.isCausal(iAct, oAct)))
             return null;
-
-        if(oAct == null) {
-            oAct = getOutput().createActivation(iAct.getThought());
-            oAct.init(this, iAct);
-        }
 
         return createLink(iAct, oAct);
     }
@@ -129,9 +137,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public boolean linkExists(IA iAct, OA oAct) {
-        if(oAct == null)
-            return linkExists(iAct);
-
         if(isTemplate() && Link.templateLinkExists(this, iAct, oAct))
             return true;
 
@@ -139,7 +144,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return existingLink != null && existingLink.getInput() == iAct;
     }
 
-    private boolean linkExists(IA iAct) {
+    public boolean propagateLinkExists(IA iAct) {
         return isTemplate() ?
                 iAct.getOutputLinks()
                         .map(Link::getSynapse)

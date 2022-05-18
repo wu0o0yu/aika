@@ -49,6 +49,10 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
         return new NegativeFeedbackLink(this, input, output);
     }
 
+    public NegativeFeedbackSynapse() {
+        allowPropagate = true;
+    }
+
     @Override
     public boolean linkCheck(BindingSignal iBS, BindingSignal oBS) {
         return !isTemplate() || iBS.isSelfRef(oBS);
@@ -60,12 +64,8 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     }
 
     @Override
-    public boolean linkExists(InhibitoryActivation iAct, BindingActivation oAct) {
-        if(super.linkExists(iAct, oAct))
-            return true;
-
-        return false; // TODO: oBS.getActivation().getBranches().stream()
-             //   .anyMatch(bAct -> super.linkExists(iBS.getActivation(), bAct));
+    public boolean propagateLinkExists(InhibitoryActivation iAct) {
+        return false;
     }
 
     @Override

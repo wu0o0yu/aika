@@ -73,12 +73,8 @@ public class TransitionListener<T extends Transition> {
         if (dir == INPUT)
             return;
 
-        if (!targetSynapse.isAllowPropagate())
-            return;
-
-        targetSynapse.link(
-                fromBS.getActivation(),
-                null
+        targetSynapse.propagate(
+                fromBS.getActivation()
         );
     }
 

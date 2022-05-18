@@ -58,6 +58,11 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
     }
 
     @Override
+    public boolean linkCheck(BindingSignal inputBS, BindingSignal outputBS) {
+        return allowLooseLinking || super.linkCheck(inputBS, outputBS);
+    }
+
+    @Override
     public Stream<BindingSignal<?>> getRelatedBindingSignal(BindingSignal<?> fromBS, Direction dir) {
         Stream<BindingSignal<?>> relatedBindingSignals = super.getRelatedBindingSignal(fromBS, dir);
 
@@ -81,15 +86,6 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
 
         return super.getSortingWeight();
     }
-
-    /*
-            if(allowLooseLinking) {
-            return iBS.getOrigin() != oBS.getOrigin() &&
-                    iBS.getState() == State.INPUT &&
-                    oBS.getState() == State.INPUT &&
-                    commonLinkingCheck(iBS, oBS);
-        }
-    */
 
     public void setLooseLinkingRange(int looseLinkingRange) {
         this.looseLinkingRange = looseLinkingRange;
