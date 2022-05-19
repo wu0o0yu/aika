@@ -239,7 +239,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     public void receiveBindingSignal(BindingSignal bs) {
         transitionListeners.stream()
                 .filter(l ->
-                        l.check(bs)
+                        l.bindingSignalCheck(bs)
                 )
                 .forEach(l ->
                         l.notify(bs)

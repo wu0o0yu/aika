@@ -92,7 +92,7 @@ public class BindingSignal<A extends Activation> implements Element {
     public Transition transition(Synapse s) {
         Stream<Transition> transitions = s.getTransitions();
         return transitions
-                .filter(t -> t.checkPropagate(getState()))
+                .filter(t -> t.isPropagateBS(getState()))
                 .findFirst()
                 .orElse(null);
     }

@@ -19,8 +19,8 @@ package network.aika.neuron.activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 
-import static network.aika.fields.Fields.mul;
-import static network.aika.fields.Fields.scale;
+import static network.aika.fields.Fields.*;
+import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 import static network.aika.neuron.bindingsignal.State.INPUT;
 
 /**
@@ -51,6 +51,16 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
             return;
 
         super.initWeightInput();
+    }
+
+    @Override
+    protected void initOnTransparent() {
+        onTransparent = threshold(
+                "onTransparent",
+                0.0,
+                ABOVE,
+                input.isFired
+        );
     }
 
     @Override

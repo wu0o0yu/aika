@@ -53,6 +53,11 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
         return new PositiveFeedbackLink(this, input, output);
     }
 
+    @Override
+    public boolean propagateCheck(BindingSignal<IA> inputBS) {
+        return false;
+    }
+
     protected void initFromTemplate(PositiveFeedbackSynapse s) {
         s.feedbackBias.set(feedbackBias.getCurrentValue());
         super.initFromTemplate(s);

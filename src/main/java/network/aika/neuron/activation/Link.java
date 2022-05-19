@@ -27,9 +27,6 @@ import network.aika.neuron.Synapse;
 import network.aika.sign.Sign;
 import network.aika.steps.link.Cleanup;
 import network.aika.steps.link.LinkCounting;
-
-import java.util.Comparator;
-
 import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;

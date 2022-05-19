@@ -19,7 +19,6 @@ package network.aika.neuron.bindingsignal;
 import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PrimaryInputLink;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PrimaryInputSynapse;
@@ -39,20 +38,15 @@ public class SamePrimaryInputBiTransition extends BiTransition {
         return new SamePrimaryInputBiTransition(input, output, transitionMode);
     }
 
-    public boolean linkCheck(Synapse ts, BindingSignal fromBS, BindingSignal toBS, Direction dir) {
-        if(!super.linkCheck(ts, fromBS, toBS, dir))
+    @Override
+    public boolean bindingSignalCheck(Synapse ts, BindingSignal bs, Direction dir) {
+        if(!super.bindingSignalCheck(ts, bs, dir))
             return false;
 
-        BindingSignal iBS = dir.getInput(fromBS, toBS);
-        BindingSignal<BindingActivation> oBS = dir.getOutput(fromBS, toBS);
-
-        if(!(oBS.getLink() instanceof PrimaryInputLink))
+        if(dir == Direction.INPUT && !(bs.getLink() instanceof PrimaryInputLink))
             return false;
 
-        if(!verifySamePrimaryInput(
-                iBS,
-                (BindingNeuron) ts.getOutput()
-        ))
+        if(dir == Direction.OUTPUT && !verifySamePrimaryInput(bs, (BindingNeuron) ts.getOutput()))
             return false;
 
         return true;
@@ -67,5 +61,9 @@ public class SamePrimaryInputBiTransition extends BiTransition {
         return originAct.getReverseBindingSignals(primaryInputSyn.getInput())
                 .findAny()
                 .isPresent();
+    }
+
+    public String toString() {
+        return "SPI" + super.toString();
     }
 }

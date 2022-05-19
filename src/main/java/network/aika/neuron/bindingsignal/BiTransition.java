@@ -59,4 +59,12 @@ public class BiTransition extends Transition {
     public BiTransition getRelatedTransition() {
         return relatedTransition;
     }
+
+    private String innerToString() {
+        return super.toString();
+    }
+
+    public String toString() {
+        return "BiTr: this:<" + innerToString() + ">  related:<" + relatedTransition.innerToString() + ">";
+    }
 }

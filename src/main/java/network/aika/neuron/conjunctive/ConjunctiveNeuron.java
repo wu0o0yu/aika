@@ -20,7 +20,6 @@ import network.aika.Model;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import org.slf4j.Logger;
@@ -93,7 +92,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
 
             s.setAllowPropagate(sum > 0.0);
 
-            if(s.allowPropagate)
+            if(s.isAllowPropagate())
                 countAP++;
         }
 

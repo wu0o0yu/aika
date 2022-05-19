@@ -37,9 +37,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.fields.Fields.isTrue;
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
 
@@ -86,13 +84,19 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return relatedBindingSignals;
     }
 
+    public boolean propagateCheck(BindingSignal<IA> inputBS) {
+        return true;
+    }
+
     public boolean linkCheck(BindingSignal inputBS, BindingSignal outputBS) {
         return inputBS.getOrigin() == outputBS.getOrigin();
     }
 
-    public L propagate(IA iAct) {
-        if(!isAllowPropagate())
+    public L propagate(BindingSignal<IA> inputBS) {
+        if(!propagateCheck(inputBS))
             return null;
+
+        IA iAct = inputBS.getActivation();
 
         if(propagateLinkExists(iAct))
             return null;
@@ -103,7 +107,13 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return createLink(iAct, oAct);
     }
 
-    public L link(IA iAct, OA oAct) {
+    public L link(BindingSignal<IA> inputBS, BindingSignal<OA> outputBS) {
+        if(!linkCheck(inputBS, outputBS))
+            return null;
+
+        IA iAct = inputBS.getActivation();
+        OA oAct = outputBS.getActivation();
+
         if(linkExists(iAct, oAct))
             return null;
 
@@ -111,10 +121,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
             return null;
 
         return createLink(iAct, oAct);
-    }
-
-    public boolean isAllowPropagate() {
-        return true;
     }
 
     public FieldOutput getLinkingEvent(BindingSignal bs, Direction dir) {
@@ -127,7 +133,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
         getTransitions()
                 .filter(t ->
-                        t.check(bs, dir)
+                        t.bindingSignalCheck(this, bs, dir)
                 )
                 .forEach(t ->
                         bs.getActivation().addTransitionListener(

@@ -23,6 +23,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.axons.Axon;
+import network.aika.neuron.bindingsignal.BindingSignal;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -34,13 +35,17 @@ import java.io.IOException;
  */
 public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends Neuron & Axon, O extends ConjunctiveNeuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends ConjunctiveActivation> extends Synapse<S, I, O, L, IA, OA> {
 
-    protected boolean allowPropagate;
+    private boolean allowPropagate;
 
     protected double getSortingWeight() {
         return getWeight().getCurrentValue();
     }
 
     @Override
+    public boolean propagateCheck(BindingSignal<IA> inputBS) {
+        return allowPropagate;
+    }
+
     public boolean isAllowPropagate() {
         return allowPropagate;
     }

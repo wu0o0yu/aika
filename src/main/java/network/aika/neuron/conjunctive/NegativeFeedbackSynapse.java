@@ -41,7 +41,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
 
     private static List<Transition> TRANSITIONS = BiTransition.link(
             biTransition(SAME, SAME, MATCH_AND_PROPAGATE),
-            samePrimaryInputBiTransition(INPUT, INPUT, MATCH_ONLY)
+            samePrimaryInputBiTransition(INPUT, INPUT, MATCH_AND_PROPAGATE)
     );
 
     @Override
@@ -49,8 +49,9 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
         return new NegativeFeedbackLink(this, input, output);
     }
 
-    public NegativeFeedbackSynapse() {
-        allowPropagate = true;
+    @Override
+    public boolean propagateCheck(BindingSignal<InhibitoryActivation> inputBS) {
+        return true;
     }
 
     @Override
@@ -61,11 +62,6 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     @Override
     public void setWeight(double w) {
         weight.receiveUpdate(w);
-    }
-
-    @Override
-    public boolean propagateLinkExists(InhibitoryActivation iAct) {
-        return false;
     }
 
     @Override

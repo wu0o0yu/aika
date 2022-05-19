@@ -31,12 +31,12 @@ public class Transition {
 
     protected State input;
     protected State output;
-    protected TransitionMode transitionMode;
+    protected TransitionMode mode;
 
-    protected Transition(State input, State output, TransitionMode transitionMode) {
+    protected Transition(State input, State output, TransitionMode mode) {
         this.input = input;
         this.output = output;
-        this.transitionMode = transitionMode;
+        this.mode = mode;
     }
 
     public TransitionListener createListener(Synapse ts, BindingSignal bs, Direction dir) {
@@ -59,13 +59,13 @@ public class Transition {
         return dir == OUTPUT ? output : input;
     }
 
-    public boolean check(BindingSignal bs, Direction dir) {
-        return transitionMode != PROPAGATE_ONLY &&
+    public boolean bindingSignalCheck(Synapse ts, BindingSignal bs, Direction dir) {
+        return mode != PROPAGATE_ONLY &&
                 dir.getFromState(this) == bs.getState();
     }
 
     public boolean linkCheck(Synapse ts, BindingSignal fromBS, BindingSignal toBS, Direction dir) {
-        if(transitionMode == PROPAGATE_ONLY)
+        if(mode == PROPAGATE_ONLY)
             return false;
 
         if (!isTrue(ts.getLinkingEvent(toBS, dir)))
@@ -77,8 +77,8 @@ public class Transition {
         return true;
     }
 
-    public boolean checkPropagate(State from) {
-        if(transitionMode == MATCH_ONLY)
+    public boolean isPropagateBS(State from) {
+        if(mode == MATCH_ONLY)
             return false;
 
         return from == input;
@@ -87,6 +87,6 @@ public class Transition {
     public String toString() {
         return "Input:" + input +
                 " Output:" + output +
-                " PropagateBS:" + transitionMode;
+                " Mode:" + mode;
     }
 }

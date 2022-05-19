@@ -73,9 +73,7 @@ public class TransitionListener<T extends Transition> {
         if (dir == INPUT)
             return;
 
-        targetSynapse.propagate(
-                fromBS.getActivation()
-        );
+        targetSynapse.propagate(fromBS);
     }
 
     public void link(T t, BindingSignal fromBS, BindingSignal toBS) {
@@ -85,16 +83,10 @@ public class TransitionListener<T extends Transition> {
         BindingSignal inputBS = dir.getInput(fromBS, toBS);
         BindingSignal outputBS = dir.getOutput(fromBS, toBS);
 
-        if(!targetSynapse.linkCheck(inputBS, outputBS))
-            return;
-
-        targetSynapse.link(
-                inputBS.getActivation(),
-                outputBS.getActivation()
-        );
+        targetSynapse.link(inputBS, outputBS);
     }
 
-    public boolean check(BindingSignal bs) {
-        return transition.check(bs, dir);
+    public boolean bindingSignalCheck(BindingSignal bs) {
+        return transition.bindingSignalCheck(targetSynapse, bs, dir);
     }
 }
