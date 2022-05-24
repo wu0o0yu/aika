@@ -136,6 +136,10 @@ public class Field<R> extends FieldNode implements IField, Writable {
         inputs.remove(l);
     }
 
+    public List<FieldLink> getInputLinks() {
+        return inputs;
+    }
+
     @Override
     public void disconnect() {
         super.disconnect();

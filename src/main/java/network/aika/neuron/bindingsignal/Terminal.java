@@ -16,11 +16,38 @@
  */
 package network.aika.neuron.bindingsignal;
 
+import network.aika.direction.Direction;
+import network.aika.fields.FieldOutput;
+
 /**
  * @author Lukas Molzberger
  */
-public enum TransitionMode {
-    MATCH_AND_PROPAGATE,
-    MATCH_ONLY,
-    PROPAGATE_ONLY
+public abstract class Terminal {
+
+    protected Transition transition;
+    protected State state;
+    protected Direction type;
+
+    public Terminal(State state) {
+        this.state = state;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public Direction getType() {
+        return type;
+    }
+
+    public void init(Transition transition, Direction dir) {
+        this.transition = transition;
+        this.type = dir;
+    }
+
+    public Transition getTransition() {
+        return transition;
+    }
+
+    public abstract BindingSignal getBindingSignal(FieldOutput bsEvent);
 }

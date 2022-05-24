@@ -16,11 +16,6 @@
  */
 package network.aika.fields;
 
-import network.aika.direction.Direction;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.Transition;
-import network.aika.neuron.bindingsignal.TransitionListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,21 +65,6 @@ public abstract class FieldNode implements FieldOutput {
                         (arg, cv, u) -> {
                             if (u > 0.0)
                                 eventListener.onTrue();
-                        }
-                ),
-                true
-        );
-    }
-
-    @Override
-    public void addLinkingEventListener(TransitionListener tl) {
-        addOutput(
-                new FieldLink(
-                        null,
-                        0,
-                        (arg, cv, u) -> {
-                            if (u > 0.0)
-                                tl.link();
                         }
                 ),
                 true

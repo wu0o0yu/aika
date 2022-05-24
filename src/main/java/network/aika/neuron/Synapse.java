@@ -127,18 +127,29 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return bs.getEvent(dir == OUTPUT, isTemplate());
     }
 
-    public void registerLinkingEvents(BindingSignal bs, Direction dir) {
+    public void initFixedTransitions(Activation act, Direction dir) {
+        if(act.getNeuron().isNetworkInput() && !networkInputsAllowed(dir))
+            return;
+
+        getTransitions()
+                .flatMap(t ->
+                        t.getFixedTerminals(this, act, dir)
+                )
+                .forEach(t ->
+                        t.initFixedTransitionEvent(this, act)
+                );
+    }
+
+    public void notifyVariableTransitions(BindingSignal bs, Direction dir) {
         if(bs.getActivation().getNeuron().isNetworkInput() && !networkInputsAllowed(dir))
             return;
 
         getTransitions()
-                .filter(t ->
-                        t.bindingSignalCheck(this, bs, dir)
+                .flatMap(t ->
+                        t.getVariableTerminals(this, bs, dir)
                 )
                 .forEach(t ->
-                        bs.getActivation().addTransitionListener(
-                                t.createListener(this, bs, dir)
-                        )
+                        t.notify(this, bs)
                 );
     }
 

@@ -16,10 +16,7 @@
  */
 package network.aika.neuron.bindingsignal;
 
-import network.aika.direction.Direction;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.PrimaryInputLink;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 
@@ -27,20 +24,20 @@ import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 /**
  * @author Lukas Molzberger
  */
-public class SamePrimaryInputBiTransition extends BiTransition {
+public class SamePrimaryInputTerminal extends FixedTerminal {
 
 
-    protected SamePrimaryInputBiTransition(State input, State output, TransitionMode transitionMode) {
-        super(input, output, transitionMode);
+    public SamePrimaryInputTerminal(State state) {
+        super(state);
     }
 
-    public static SamePrimaryInputBiTransition samePrimaryInputBiTransition(State input, State output, TransitionMode transitionMode) {
-        return new SamePrimaryInputBiTransition(input, output, transitionMode);
+    public static SamePrimaryInputTerminal fixedSamePrimaryInput(State s) {
+        return new SamePrimaryInputTerminal(s);
     }
-
+/*
     @Override
-    public boolean bindingSignalCheck(Synapse ts, BindingSignal bs, Direction dir) {
-        if(!super.bindingSignalCheck(ts, bs, dir))
+    public boolean transitionCheck(Synapse ts, BindingSignal bs, Direction dir) {
+        if(!super.transitionCheck(ts, bs, dir))
             return false;
 
         if(dir == Direction.INPUT && !(bs.getLink() instanceof PrimaryInputLink))
@@ -51,7 +48,7 @@ public class SamePrimaryInputBiTransition extends BiTransition {
 
         return true;
     }
-
+*/
     private boolean verifySamePrimaryInput(BindingSignal refBS, BindingNeuron on) {
         Activation originAct = refBS.getOriginActivation();
         PrimaryInputSynapse primaryInputSyn = on.getPrimaryInputSynapse();

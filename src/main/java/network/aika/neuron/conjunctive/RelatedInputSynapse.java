@@ -18,16 +18,18 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.RelatedInputLink;
-import network.aika.neuron.bindingsignal.BiTransition;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
-import static network.aika.neuron.bindingsignal.SamePrimaryInputBiTransition.samePrimaryInputBiTransition;
+import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
+import static network.aika.neuron.bindingsignal.SamePrimaryInputTerminal.fixedSamePrimaryInput;
+import static network.aika.neuron.bindingsignal.SingleTransition.transition;
 import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
+import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 
 
 /**
@@ -36,9 +38,19 @@ import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGA
  */
 public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynapse, BindingNeuron, RelatedInputLink, BindingActivation> {
 
-    private static List<Transition> TRANSITIONS = BiTransition.link(
-            samePrimaryInputBiTransition(SAME, INPUT, MATCH_AND_PROPAGATE),
-            biTransition(INPUT, INPUT, MATCH_AND_PROPAGATE)
+    private static List<Transition> TRANSITIONS = List.of(
+            biTransition(
+                    transition(
+                            fixedSamePrimaryInput(SAME),
+                            fixed(INPUT),
+                            MATCH_AND_PROPAGATE
+                    ),
+                    transition(
+                            fixed(INPUT),
+                            variable(INPUT),
+                            MATCH_AND_PROPAGATE
+                    )
+            )
     );
 
     @Override

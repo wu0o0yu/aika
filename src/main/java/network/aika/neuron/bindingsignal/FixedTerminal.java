@@ -16,27 +16,51 @@
  */
 package network.aika.neuron.bindingsignal;
 
-import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 
-import java.util.stream.Stream;
 
 /**
  * @author Lukas Molzberger
  */
-public interface Transition {
+public class FixedTerminal extends Terminal {
 
-    void notify(Terminal t, Synapse ts, BindingSignal bs);
+    public FixedTerminal(State state) {
+        super(state);
+    }
 
-    void registerTransitionEvent(FixedTerminal t, Synapse ts, Activation act, FieldOutput transitionEvent);
 
-    TransitionMode getMode();
+    public static FixedTerminal fixed(State s) {
+        return new FixedTerminal(s);
+    }
 
-    Stream<SingleTransition> getBSPropagateTransitions();
+    public void initFixedTransitionEvent(Synapse ts, Activation act) {
+        FieldOutput bsEvent = getBSEvent(act);
+        if(bsEvent == null)
+            return;
 
-    Stream<FixedTerminal> getFixedTerminals(Synapse ts, Activation act, Direction dir);
+        transition.registerTransitionEvent(
+                this,
+                ts,
+                act,
+                bsEvent
+        );
+    }
 
-    Stream<VariableTerminal> getVariableTerminals(Synapse ts, BindingSignal bs, Direction dir);
+    public FieldOutput getBSEvent(Activation act) {
+        return act.getFixedBSEvent(state);
+    }
+
+    public BindingSignal getBindingSignal(Activation act) {
+        return getBindingSignal(getBSEvent(act));
+    }
+
+    public BindingSignal getBindingSignal(FieldOutput bsEvent) {
+        return ((Activation)bsEvent.getReference()).getFixedBindingSignal(state);
+    }
+
+    public String toString() {
+        return "fixed(" + type + ":" + state + ")";
+    }
 }

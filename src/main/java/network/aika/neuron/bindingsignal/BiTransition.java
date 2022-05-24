@@ -18,53 +18,145 @@ package network.aika.neuron.bindingsignal;
 
 
 import network.aika.direction.Direction;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.fields.Fields.mul;
+import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
 
 
 /**
  * @author Lukas Molzberger
  */
-public class BiTransition extends Transition {
+public class BiTransition implements Transition {
 
-    private BiTransition relatedTransition;
+    protected SingleTransition activeTransition;
+    protected SingleTransition<FixedTerminal, FixedTerminal> passiveTransition;
 
-
-    protected BiTransition(State input, State output, TransitionMode transitionMode) {
-        super(input, output, transitionMode);
+    protected BiTransition(SingleTransition activeTransition, SingleTransition<FixedTerminal, FixedTerminal> passiveTransition) {
+        this.activeTransition = activeTransition;
+        this.passiveTransition = passiveTransition;
     }
 
-    public static BiTransition biTransition(State input, State output, TransitionMode transitionMode) {
-        return new BiTransition(input, output, transitionMode);
+    public static BiTransition biTransition(SingleTransition transitionA, SingleTransition transitionB) {
+        return new BiTransition(transitionA, transitionB);
     }
 
-    public TransitionListener createListener(Synapse ts, BindingSignal bs, Direction dir) {
-        if(dir == OUTPUT) {
-            return new BiTransitionListener(relatedTransition, bs, dir, ts);
-        } else {
-            return new TransitionListener(this, bs, dir, ts);
-        }
+    @Override
+    public Stream<FixedTerminal> getFixedTerminals(Synapse ts, Activation act, Direction dir) {
+        return activeTransition.getFixedTerminals(ts, act, dir);
     }
 
-    public static List<Transition> link(BiTransition t1, BiTransition t2) {
-        t1.relatedTransition = t2;
-        t2.relatedTransition = t1;
-
-        return List.of(t1, t2);
+    @Override
+    public Stream<VariableTerminal> getVariableTerminals(Synapse ts, BindingSignal bs, Direction dir) {
+        return activeTransition.getVariableTerminals(ts, bs, dir);
     }
 
-    public BiTransition getRelatedTransition() {
-        return relatedTransition;
+    private FixedTerminal getPassiveTerminal(Terminal t, Synapse ts, Activation act) {
+        FixedTerminal passiveTerminal = passiveTransition.getFixedTerminals(ts, act, t.getType().invert())
+                .findFirst()
+                .orElse(null);
+        return passiveTerminal;
     }
 
-    private String innerToString() {
-        return super.toString();
+    @Override
+    public void notify(Terminal t, Synapse ts, BindingSignal bs) {
+        Activation act = bs.getActivation();
+
+        initTransitionEvent(
+                ts,
+                act,
+                t.getType().invert(),
+                bs.getOnArrived(),
+                getPassiveTerminal(t, ts, act).getBSEvent(act)
+        );
+    }
+
+    @Override
+    public void registerTransitionEvent(FixedTerminal t, Synapse ts, Activation act, FieldOutput transitionEvent) {
+        initTransitionEvent(
+                ts,
+                act,
+                t.getType().invert(),
+                transitionEvent,
+                getPassiveTerminal(t, ts, act).getBSEvent(act)
+        );
+    }
+
+    private void initTransitionEvent(Synapse ts, Activation act, Direction dir, FieldOutput activeBSEvent, FieldOutput passiveBSEvent) {
+        FieldOutput inputEvent = mul(
+                "input bi transition event",
+                activeBSEvent,
+                passiveBSEvent
+        );
+
+        FieldOutput actEvent = act.getEvent(dir == OUTPUT, ts.isTemplate());
+
+        FieldOutput outputEvent = mul("output bi transition event",
+                inputEvent,
+                actEvent
+        );
+
+        outputEvent.addEventListener(() ->
+                link(ts, activeBSEvent, dir)
+        );
+    }
+
+    @Override
+    public Stream<SingleTransition> getBSPropagateTransitions() {
+        return Stream.concat(
+                activeTransition.getBSPropagateTransitions(),
+                passiveTransition.getBSPropagateTransitions()
+        );
+    }
+
+    @Override
+    public TransitionMode getMode() {
+        return MATCH_ONLY;
+    }
+
+    protected void link(Synapse ts, FieldOutput activeBSEvent, Direction dir) {
+        Terminal activeTerminal = dir.getTerminal(activeTransition);
+        BindingSignal activeBS = activeTerminal.getBindingSignal(activeBSEvent);
+
+        FixedTerminal passiveTerminal = (FixedTerminal) dir.getTerminal(passiveTransition);
+        BindingSignal passiveBS = passiveTerminal.getBindingSignal(activeBS.getActivation());//getBindingSignal(dir.getFromState(passiveTransition), act);
+
+        link(activeTransition, ts, activeBS, passiveBS, dir);
+        link(passiveTransition, ts, passiveBS, activeBS, dir);
+
+        activeTransition.propagate(ts, activeBS, dir);
+        passiveTransition.propagate(ts, passiveBS, dir);
+    }
+
+    private void link(SingleTransition t, Synapse ts, BindingSignal fromBS, BindingSignal relatedFromBindingsSignal, Direction dir) {
+        Stream<BindingSignal<?>> bsStream = ts.getRelatedBindingSignal(fromBS, dir);
+
+        bsStream
+                .filter(toBS -> fromBS != toBS)
+                .filter(toBS -> checkRelated(
+                                t,
+                                relatedFromBindingsSignal,
+                                toBS.getActivation(),
+                                dir
+                        )
+                )
+                .forEach(toBS ->
+                        t.link(ts, fromBS, toBS, dir)
+                );
+    }
+
+    private static boolean checkRelated(SingleTransition relTransition, BindingSignal relFromBS, Activation toAct, Direction dir) {
+        BindingSignal relToBS = toAct.getBindingSignal(dir.getTerminal(relTransition).getState());
+
+        return relToBS == null || relFromBS.getOriginActivation() == relToBS.getOriginActivation();
     }
 
     public String toString() {
-        return "BiTr: this:<" + innerToString() + ">  related:<" + relatedTransition.innerToString() + ">";
+        return "BiTr: active:<" + activeTransition + ">  passive:<" + passiveTransition + ">";
     }
 }

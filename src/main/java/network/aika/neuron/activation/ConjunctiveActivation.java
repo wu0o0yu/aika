@@ -18,7 +18,10 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.direction.Direction;
+import network.aika.fields.Fields;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
 
 import java.util.List;
 

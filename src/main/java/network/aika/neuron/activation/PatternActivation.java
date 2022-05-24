@@ -17,6 +17,8 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.fields.Field;
+import network.aika.fields.Fields;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.BindingSignal;
@@ -62,6 +64,14 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
         if(bs.getOriginActivation() == this)
             thought.registerBindingSignalSource(this, bs);
+    }
+
+    public void receiveBindingSignal(BindingSignal bs) {
+        super.receiveBindingSignal(bs);
+
+        if(bs.getState() != SAME) {
+
+        }
     }
 
     @Override

@@ -22,7 +22,6 @@ import network.aika.direction.Direction;
 import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.QueueField;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Element;
@@ -31,7 +30,6 @@ import network.aika.neuron.activation.Timestamp;
 
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.*;
 import static network.aika.fields.Fields.mul;
 
 
@@ -43,7 +41,7 @@ public class BindingSignal<A extends Activation> implements Element {
     private BindingSignal parent;
     private A activation;
     private Link link;
-    private Transition transition;
+    private SingleTransition transition;
     private BindingSignal origin;
     private int depth;
     private State state;
@@ -72,7 +70,7 @@ public class BindingSignal<A extends Activation> implements Element {
         this.state = state;
     }
 
-    public BindingSignal(BindingSignal parent, Transition t) {
+    public BindingSignal(BindingSignal parent, SingleTransition t) {
         this(parent);
 
         this.transition = t;
@@ -84,21 +82,21 @@ public class BindingSignal<A extends Activation> implements Element {
         onArrived = new QueueField(this, "arrived", 0.0);
 
         initFields();
-        initBSListeners();
+//        initBSListeners();
 
         activation.receiveBindingSignal(this);
     }
 
-    public Transition transition(Synapse s) {
+    public SingleTransition transition(Synapse s) {
         Stream<Transition> transitions = s.getTransitions();
         return transitions
-                .filter(t -> t.isPropagateBS(getState()))
+                .flatMap(t -> t.getBSPropagateTransitions())
                 .findFirst()
                 .orElse(null);
     }
 
     public void propagate(Link l) {
-        Transition t = transition(l.getSynapse());
+        SingleTransition t = transition(l.getSynapse());
         if(t == null)
             return;
 
@@ -114,7 +112,7 @@ public class BindingSignal<A extends Activation> implements Element {
         return next(transition(s));
     }
 
-    public BindingSignal next(Transition t) {
+    public BindingSignal next(SingleTransition t) {
         return t != null ?
                 new BindingSignal(this, t) :
                 null;
@@ -158,7 +156,8 @@ public class BindingSignal<A extends Activation> implements Element {
                 getActivation().propagateBindingSignal(this)
         );
     }
-
+/*
+   wird durch fixed und dyn. BS abgelöst
     private void initBSListeners() {
         Neuron<?, ?> n = activation.getNeuron();
 
@@ -169,7 +168,7 @@ public class BindingSignal<A extends Activation> implements Element {
                             s.registerLinkingEvents(this, dir)
                     );
     }
-
+*/
     public Field getOnArrived() {
         return onArrived;
     }
@@ -203,7 +202,7 @@ public class BindingSignal<A extends Activation> implements Element {
         return link;
     }
 
-    public Transition getTransition() {
+    public SingleTransition getTransition() {
         return transition;
     }
 

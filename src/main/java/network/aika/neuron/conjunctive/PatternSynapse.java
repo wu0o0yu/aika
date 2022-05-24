@@ -19,15 +19,17 @@ package network.aika.neuron.conjunctive;
 import network.aika.direction.Direction;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.SingleTransition;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
-import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
+import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.State.*;
-import static network.aika.neuron.bindingsignal.Transition.transition;
+import static network.aika.neuron.bindingsignal.SingleTransition.transition;
+import static network.aika.neuron.bindingsignal.TransitionMode.*;
+import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 
 /**
  *
@@ -36,9 +38,21 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNeuron, PatternNeuron, PatternLink, BindingActivation, PatternActivation> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(SAME, SAME, MATCH_AND_PROPAGATE),
-            transition(INPUT, INPUT, PROPAGATE_ONLY),
-            transition(BRANCH, BRANCH, MATCH_AND_PROPAGATE)
+            transition(
+                    fixed(SAME),
+                    fixed(SAME),
+                    MATCH_ONLY
+            ),
+            transition(
+                    variable(INPUT),
+                    variable(INPUT),
+                    PROPAGATE_ONLY
+            ),
+            transition(
+                    variable(BRANCH),
+                    variable(BRANCH),
+                    MATCH_AND_PROPAGATE
+            )
     );
 
     @Override

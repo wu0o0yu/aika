@@ -16,11 +16,40 @@
  */
 package network.aika.neuron.bindingsignal;
 
+import network.aika.fields.FieldOutput;
+import network.aika.neuron.Synapse;
+
 /**
  * @author Lukas Molzberger
  */
-public enum TransitionMode {
-    MATCH_AND_PROPAGATE,
-    MATCH_ONLY,
-    PROPAGATE_ONLY
+public class VariableTerminal extends Terminal {
+
+    public VariableTerminal(State state) {
+        super(state);
+    }
+
+    public static VariableTerminal variable(State s) {
+        return new VariableTerminal(s);
+    }
+
+    public void notify(Synapse ts, BindingSignal bs) {
+        transition.notify(this, ts, bs);
+        /*
+        link(ts, bs, dir);
+        propagate(ts, bs, dir);
+
+        if(dir == OUTPUT)
+            bs.getEvent(true, true)
+                    .addEventListener(() ->
+                            InactiveLinks.add(bs)
+                    );*/
+    }
+
+    public BindingSignal getBindingSignal(FieldOutput bsEvent) {
+        return (BindingSignal) bsEvent.getReference();
+    }
+
+    public String toString() {
+        return "variable(" + type + ":" + state + ")";
+    }
 }

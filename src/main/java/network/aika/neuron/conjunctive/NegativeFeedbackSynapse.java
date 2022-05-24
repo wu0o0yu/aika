@@ -17,7 +17,6 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.*;
-import network.aika.neuron.bindingsignal.BiTransition;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
@@ -26,11 +25,13 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
+import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
+import static network.aika.neuron.bindingsignal.SamePrimaryInputTerminal.fixedSamePrimaryInput;
+import static network.aika.neuron.bindingsignal.SingleTransition.transition;
 import static network.aika.neuron.bindingsignal.State.INPUT;
 import static network.aika.neuron.bindingsignal.State.SAME;
-import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
-import static network.aika.neuron.bindingsignal.SamePrimaryInputBiTransition.samePrimaryInputBiTransition;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
+import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 
 
 /**
@@ -39,9 +40,19 @@ import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGA
  */
 public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedbackSynapse, InhibitoryNeuron, NegativeFeedbackLink, InhibitoryActivation> {
 
-    private static List<Transition> TRANSITIONS = BiTransition.link(
-            biTransition(SAME, SAME, MATCH_AND_PROPAGATE),
-            samePrimaryInputBiTransition(INPUT, INPUT, MATCH_AND_PROPAGATE)
+    private static List<Transition> TRANSITIONS = List.of(
+            biTransition(
+                    transition(
+                            fixed(SAME),
+                            fixed(SAME),
+                            MATCH_AND_PROPAGATE
+                    ),
+                    transition(
+                            fixedSamePrimaryInput(INPUT),
+                            variable(INPUT),
+                            MATCH_AND_PROPAGATE
+                    )
+            )
     );
 
     @Override

@@ -21,13 +21,15 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.ReversePatternLink;
 import network.aika.neuron.axons.PatternAxon;
+import network.aika.neuron.bindingsignal.SingleTransition;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.State.SAME;
-import static network.aika.neuron.bindingsignal.Transition.transition;
+import static network.aika.neuron.bindingsignal.SingleTransition.transition;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 
 /**
@@ -37,7 +39,11 @@ import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGA
 public class ReversePatternSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<ReversePatternSynapse, I, ReversePatternLink<IA>, IA> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(SAME, SAME, MATCH_AND_PROPAGATE)
+            transition(
+                    fixed(SAME),
+                    fixed(SAME),
+                    MATCH_AND_PROPAGATE
+            )
     );
 
     public ReversePatternLink createLink(IA input, BindingActivation output) {

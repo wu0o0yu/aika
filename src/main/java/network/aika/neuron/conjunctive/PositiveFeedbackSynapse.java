@@ -25,16 +25,19 @@ import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PositiveFeedbackLink;
 import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.SingleTransition;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
 import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 import static network.aika.neuron.bindingsignal.State.BRANCH;
 import static network.aika.neuron.bindingsignal.State.SAME;
-import static network.aika.neuron.bindingsignal.Transition.transition;
+import static network.aika.neuron.bindingsignal.SingleTransition.transition;
+import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 
 /**
  *
@@ -43,8 +46,16 @@ import static network.aika.neuron.bindingsignal.Transition.transition;
 public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<PositiveFeedbackSynapse, I, PositiveFeedbackLink<IA>, IA> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(BRANCH, BRANCH, MATCH_ONLY),
-            transition(SAME, SAME, PROPAGATE_ONLY)
+            transition(
+                    variable(BRANCH),
+                    fixed(BRANCH),
+                    MATCH_ONLY
+            ),
+            transition(
+                    fixed(SAME),
+                    fixed(SAME),
+                    PROPAGATE_ONLY
+            )
     );
 
     private Field feedbackBias = new Field(this, "feedbackBias");

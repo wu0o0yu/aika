@@ -39,6 +39,11 @@ public abstract class AbstractFunction extends FieldNode implements FieldInput, 
     }
 
     @Override
+    public Object getReference() {
+        return input.getInput().getReference();
+    }
+
+    @Override
     public void disconnect() {
         super.disconnect();
         if(input != null) {

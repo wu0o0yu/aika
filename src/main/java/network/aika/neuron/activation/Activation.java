@@ -19,11 +19,11 @@ package network.aika.neuron.activation;
 import network.aika.Config;
 import network.aika.Model;
 import network.aika.Thought;
+import network.aika.direction.Direction;
 import network.aika.fields.*;
 import network.aika.neuron.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
-import network.aika.neuron.bindingsignal.TransitionListener;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
 import network.aika.utils.Utils;
@@ -32,6 +32,8 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
+import static network.aika.direction.Direction.DIRECTIONS;
+import static network.aika.fields.ConstantField.ONE;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE_ABS;
@@ -82,7 +84,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
             Comparator.comparing(Activation::getId)
     );
 
-    private List<TransitionListener> transitionListeners = new ArrayList<>();
+    protected Field sameBSEvent = new Field(this, "sameBSEvent");
 
     protected NavigableMap<Activation<?>, BindingSignal> reverseBindingSignals = new TreeMap<>(NEURON_COMPARATOR);
 
@@ -131,6 +133,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
                 isFinal,
                 value
         );
+
+        initFixedTransitionEvents();
 
         thought.register(this);
         neuron.register(this);
@@ -215,6 +219,20 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return isFinal;
     }
 
+
+    public FieldOutput getEvent(boolean isFired, boolean isFinal) {
+        if(isFired && isFinal)
+            return mul("final * fired", this.isFinal, this.isFired);
+
+        if(isFired)
+            return this.isFired;
+
+        if(isFinal)
+            return this.isFinal;
+
+        return ONE;
+    }
+
     protected void initFields() {
         func(
                 "f(net)",
@@ -232,18 +250,48 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         thought.onActivationCreationEvent(this, originSynapse, originAct);
     }
 
-    public void addTransitionListener(TransitionListener tl) {
-        transitionListeners.add(tl);
+    public Field getFixedBSEvent(State s) {
+        if(s == State.SAME)
+            return sameBSEvent;
+        return null;
+    }
+
+    public BindingSignal getFixedBindingSignal(State s) {
+        List<FieldLink> inputs = getFixedBSEvent(s).getInputLinks();
+        FieldLink fl = inputs.get(0);
+        Field onArrived = (Field) fl.getInput();
+        return (BindingSignal) onArrived.getReference();
     }
 
     public void receiveBindingSignal(BindingSignal bs) {
-        transitionListeners.stream()
-                .filter(l ->
-                        l.bindingSignalCheck(bs)
-                )
-                .forEach(l ->
-                        l.notify(bs)
-                );
+        if(bs.getState() == State.SAME) {
+            Fields.connect(bs.getOnArrived(), sameBSEvent);
+            return;
+        }
+
+        notifyVariableTransitions(bs);
+    }
+
+    private void notifyVariableTransitions(BindingSignal bs) {
+        Neuron<?, ?> n = getNeuron();
+
+        boolean templateEnabled = getConfig().isTemplatesEnabled();
+        for(Direction dir: DIRECTIONS)
+            n.getTargetSynapses(dir, templateEnabled)
+                    .forEach(s ->
+                            s.notifyVariableTransitions(bs, dir)
+                    );
+    }
+
+    private void initFixedTransitionEvents() {
+        Neuron<?, ?> n = getNeuron();
+
+        boolean templateEnabled = getConfig().isTemplatesEnabled();
+        for(Direction dir: DIRECTIONS)
+            n.getTargetSynapses(dir, templateEnabled)
+                    .forEach(s ->
+                            s.initFixedTransitions(this, dir)
+                    );
     }
 
     public FieldOutput getEntropy() {

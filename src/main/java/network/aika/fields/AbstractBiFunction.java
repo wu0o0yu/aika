@@ -61,6 +61,11 @@ public abstract class AbstractBiFunction extends FieldNode implements FieldInput
         }
     }
 
+    @Override
+    public Object getReference() {
+        throw new UnsupportedOperationException();
+    }
+
     private boolean isInitialized(int arg) {
         FieldLink in = arg == 1 ? in2 : in1;
 

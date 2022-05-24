@@ -46,4 +46,9 @@ public class ConstantField extends FieldNode implements FieldOutput {
     public double getCurrentValue() {
         return value;
     }
+
+    @Override
+    public Object getReference() {
+        return null;
+    }
 }

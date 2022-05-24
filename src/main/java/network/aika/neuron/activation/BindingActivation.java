@@ -20,10 +20,12 @@ import network.aika.Thought;
 import network.aika.fields.Field;
 import network.aika.fields.FieldFunction;
 import network.aika.fields.FieldOutput;
+import network.aika.fields.Fields;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.BindingNeuron;
 
 import java.util.*;
@@ -43,6 +45,10 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     private Field bpNorm = new Field(this, "BP-Norm", 1.0);
 
     private boolean isInput;
+
+    protected Field inputBSEvent = new Field(this, "inputBSEvent");
+    protected Field branchBSEvent = new Field(this, "branchBSEvent");
+
 
     protected BindingActivation(int id, BindingNeuron n) {
         super(id, n);
@@ -87,6 +93,24 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                     value
             );
         }
+    }
+
+    public void receiveBindingSignal(BindingSignal bs) {
+        if(bs.getState() == INPUT && bs.getLink() instanceof PrimaryInputLink)
+            Fields.connect(bs.getOnArrived(), inputBSEvent);
+
+        if(bs.getState() == BRANCH)
+            Fields.connect(bs.getOnArrived(), branchBSEvent);
+
+        super.receiveBindingSignal(bs);
+    }
+
+    public Field getFixedBSEvent(State s) {
+        if(s == INPUT)
+            return inputBSEvent;
+        if(s == BRANCH)
+            return branchBSEvent;
+        return super.getFixedBSEvent(s);
     }
 
     @Override
