@@ -102,18 +102,18 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
 
+        net = initNet();
+        net.setPropagatePreCondition((cv, nv, u) ->
+                !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0)
+        );
+        connect(getNeuron().getBias(), net);
+
         isFinal = new Field(this, "isFinal", isTemplate() ? 1.0 : 0.0);
 
         isFinal.addEventListener(() -> {
             if (!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled())
                 initGradientFields();
         });
-
-        net = initNet();
-        net.setPropagatePreCondition((cv, nv, u) ->
-                !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0)
-        );
-        connect(getNeuron().getBias(), net);
 
         isFired = threshold("isFired", 0.0, ABOVE, net);
 
@@ -230,7 +230,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         if(isFinal)
             return this.isFinal;
 
-        return ONE;
+        return null;
     }
 
     protected void initFields() {

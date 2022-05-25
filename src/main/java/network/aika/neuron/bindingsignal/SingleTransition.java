@@ -57,14 +57,21 @@ public class SingleTransition<I extends Terminal, O extends Terminal> implements
     }
 
     @Override
-    public void registerTransitionEvent(FixedTerminal t, Synapse ts, Activation act, FieldOutput transitionEvent) {
+    public void registerTransitionEvent(FixedTerminal t, Synapse ts, Activation act, FieldOutput bsEvent) {
+        FieldOutput transitionEvent = getTransitionEvent(
+                ts,
+                act,
+                t.getType().invert(),
+                bsEvent
+        );
+
         transitionEvent.addEventListener(() ->
-                linkAndPropagate(t, ts, transitionEvent)
+                linkAndPropagate(t, ts, bsEvent)
         );
     }
 
-    private void linkAndPropagate(FixedTerminal t, Synapse ts, FieldOutput transitionEvent) {
-        BindingSignal fromBS = t.getBindingSignal(transitionEvent);
+    private void linkAndPropagate(FixedTerminal t, Synapse ts, FieldOutput bsEvent) {
+        BindingSignal fromBS = t.getBindingSignal(bsEvent);
         link(ts, fromBS, t.getType().invert());
         propagate(ts, fromBS, t.getType().invert());
     }

@@ -23,6 +23,9 @@ import network.aika.neuron.activation.Activation;
 
 import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.fields.Fields.mul;
+
 /**
  * @author Lukas Molzberger
  */
@@ -30,7 +33,7 @@ public interface Transition {
 
     void notify(Terminal t, Synapse ts, BindingSignal bs);
 
-    void registerTransitionEvent(FixedTerminal t, Synapse ts, Activation act, FieldOutput transitionEvent);
+    void registerTransitionEvent(FixedTerminal t, Synapse ts, Activation act, FieldOutput bsEvent);
 
     TransitionMode getMode();
 
@@ -39,4 +42,13 @@ public interface Transition {
     Stream<FixedTerminal> getFixedTerminals(Synapse ts, Activation act, Direction dir);
 
     Stream<VariableTerminal> getVariableTerminals(Synapse ts, BindingSignal bs, Direction dir);
+
+    default FieldOutput getTransitionEvent(Synapse ts, Activation act, Direction dir, FieldOutput inputEvent) {
+        FieldOutput actEvent = act.getEvent(dir == OUTPUT, ts.isTemplate());
+        return actEvent != null ? mul("transition event",
+                inputEvent,
+                actEvent
+        ) :
+                inputEvent;
+    }
 }

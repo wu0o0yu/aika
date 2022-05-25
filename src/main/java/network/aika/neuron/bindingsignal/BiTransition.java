@@ -77,12 +77,12 @@ public class BiTransition implements Transition {
     }
 
     @Override
-    public void registerTransitionEvent(FixedTerminal t, Synapse ts, Activation act, FieldOutput transitionEvent) {
+    public void registerTransitionEvent(FixedTerminal t, Synapse ts, Activation act, FieldOutput bsEvent) {
         initTransitionEvent(
                 ts,
                 act,
                 t.getType().invert(),
-                transitionEvent,
+                bsEvent,
                 getPassiveTerminal(t, ts, act).getBSEvent(act)
         );
     }
@@ -94,14 +94,8 @@ public class BiTransition implements Transition {
                 passiveBSEvent
         );
 
-        FieldOutput actEvent = act.getEvent(dir == OUTPUT, ts.isTemplate());
-
-        FieldOutput outputEvent = mul("output bi transition event",
-                inputEvent,
-                actEvent
-        );
-
-        outputEvent.addEventListener(() ->
+        FieldOutput transitionEvent = getTransitionEvent(ts, act, dir, inputEvent);
+        transitionEvent.addEventListener(() ->
                 link(ts, activeBSEvent, dir)
         );
     }
