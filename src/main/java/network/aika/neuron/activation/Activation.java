@@ -134,8 +134,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
                 value
         );
 
-        initFixedTransitionEvents();
-
         thought.register(this);
         neuron.register(this);
     }
@@ -247,6 +245,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public void init(Synapse originSynapse, Activation originAct) {
+        initFixedTransitionEvents();
         thought.onActivationCreationEvent(this, originSynapse, originAct);
     }
 
