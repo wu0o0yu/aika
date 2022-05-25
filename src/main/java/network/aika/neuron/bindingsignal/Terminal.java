@@ -18,6 +18,7 @@ package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
+import network.aika.neuron.Synapse;
 
 /**
  * @author Lukas Molzberger
@@ -50,4 +51,8 @@ public abstract class Terminal {
     }
 
     public abstract BindingSignal getBindingSignal(FieldOutput bsEvent);
+
+    public boolean linkCheck(Synapse ts, BindingSignal fromBS, BindingSignal toBS) {
+        return getState() == fromBS.getState();
+    }
 }

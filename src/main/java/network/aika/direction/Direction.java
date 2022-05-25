@@ -47,6 +47,8 @@ public interface Direction {
 
     Terminal getTerminal(SingleTransition t);
 
+    Terminal getFromTerminal(SingleTransition t);
+
     Stream<Link> getLinks(Activation act);
 
     Stream<? extends Synapse> getSynapses(Neuron n);

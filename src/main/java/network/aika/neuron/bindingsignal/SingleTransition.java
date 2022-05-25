@@ -59,14 +59,15 @@ public class SingleTransition<I extends Terminal, O extends Terminal> implements
     @Override
     public void registerTransitionEvent(FixedTerminal t, Synapse ts, Activation act, FieldOutput transitionEvent) {
         transitionEvent.addEventListener(() ->
-                link(
-                        ts,
-                        t.getBindingSignal(t.getBSEvent(act)),
-                        t.getType().invert()
-                )
+                linkAndPropagate(t, ts, transitionEvent)
         );
     }
 
+    private void linkAndPropagate(FixedTerminal t, Synapse ts, FieldOutput transitionEvent) {
+        BindingSignal fromBS = t.getBindingSignal(transitionEvent);
+        link(ts, fromBS, t.getType().invert());
+        propagate(ts, fromBS, t.getType().invert());
+    }
 
     public void link(Synapse ts, BindingSignal fromBS, Direction dir) {
         Stream<BindingSignal<?>> bsStream = ts.getRelatedBindingSignal(fromBS, dir);
@@ -99,7 +100,7 @@ public class SingleTransition<I extends Terminal, O extends Terminal> implements
         if(mode == PROPAGATE_ONLY)
             return Stream.empty();
 
-        Terminal term = dir.getTerminal(this);
+        Terminal term = dir.getFromTerminal(this);
 
         if(term.getState() != bs.getState())
             return Stream.empty();
@@ -115,7 +116,7 @@ public class SingleTransition<I extends Terminal, O extends Terminal> implements
         if(mode == PROPAGATE_ONLY)
             return Stream.empty();
 
-        Terminal term = dir.getTerminal(this);
+        Terminal term = dir.getFromTerminal(this);
 
         if(!(term instanceof FixedTerminal))
             return Stream.empty();
@@ -151,10 +152,13 @@ public class SingleTransition<I extends Terminal, O extends Terminal> implements
         if(mode == PROPAGATE_ONLY)
             return false;
 
-        if (!isTrue(ts.getLinkingEvent(toBS, dir)))
+//        if (!isTrue(ts.getLinkingEvent(toBS, dir))) TODO
+//            return false;
+
+        if(!dir.getFromTerminal(this).linkCheck(ts, fromBS, toBS))
             return false;
 
-        if(dir.getTerminal(this).getState() != toBS.getState())
+        if(!dir.getTerminal(this).linkCheck(ts, toBS, fromBS))
             return false;
 
         return true;

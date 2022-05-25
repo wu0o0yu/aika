@@ -151,7 +151,7 @@ public class BiTransition implements Transition {
     }
 
     private static boolean checkRelated(SingleTransition relTransition, BindingSignal relFromBS, Activation toAct, Direction dir) {
-        BindingSignal relToBS = toAct.getBindingSignal(dir.getTerminal(relTransition).getState());
+        BindingSignal relToBS = toAct.getBindingSignal(dir.getFromTerminal(relTransition).getState());
 
         return relToBS == null || relFromBS.getOriginActivation() == relToBS.getOriginActivation();
     }

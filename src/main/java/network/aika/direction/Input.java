@@ -62,6 +62,11 @@ public class Input implements Direction {
     }
 
     @Override
+    public Terminal getFromTerminal(SingleTransition t) {
+        return t.getOutput();
+    }
+
+    @Override
     public Stream<Link> getLinks(Activation act) {
         return act.getInputLinks();
     }

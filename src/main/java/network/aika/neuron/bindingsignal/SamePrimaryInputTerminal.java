@@ -16,6 +16,8 @@
  */
 package network.aika.neuron.bindingsignal;
 
+import network.aika.direction.Direction;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PrimaryInputSynapse;
@@ -26,7 +28,6 @@ import network.aika.neuron.conjunctive.PrimaryInputSynapse;
  */
 public class SamePrimaryInputTerminal extends FixedTerminal {
 
-
     public SamePrimaryInputTerminal(State state) {
         super(state);
     }
@@ -34,21 +35,14 @@ public class SamePrimaryInputTerminal extends FixedTerminal {
     public static SamePrimaryInputTerminal fixedSamePrimaryInput(State s) {
         return new SamePrimaryInputTerminal(s);
     }
-/*
-    @Override
-    public boolean transitionCheck(Synapse ts, BindingSignal bs, Direction dir) {
-        if(!super.transitionCheck(ts, bs, dir))
+
+    public boolean linkCheck(Synapse ts, BindingSignal fromBS, BindingSignal toBS) {
+        if(type == Direction.INPUT && !verifySamePrimaryInput(fromBS, (BindingNeuron) ts.getOutput()))
             return false;
 
-        if(dir == Direction.INPUT && !(bs.getLink() instanceof PrimaryInputLink))
-            return false;
-
-        if(dir == Direction.OUTPUT && !verifySamePrimaryInput(bs, (BindingNeuron) ts.getOutput()))
-            return false;
-
-        return true;
+        return super.linkCheck(ts, fromBS, toBS);
     }
-*/
+
     private boolean verifySamePrimaryInput(BindingSignal refBS, BindingNeuron on) {
         Activation originAct = refBS.getOriginActivation();
         PrimaryInputSynapse primaryInputSyn = on.getPrimaryInputSynapse();
@@ -61,6 +55,6 @@ public class SamePrimaryInputTerminal extends FixedTerminal {
     }
 
     public String toString() {
-        return "SPI" + super.toString();
+        return "spi(" + type + ":" + state + ")";
     }
 }
