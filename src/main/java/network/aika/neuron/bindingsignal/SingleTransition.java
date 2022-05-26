@@ -53,7 +53,7 @@ public class SingleTransition<I extends Terminal, O extends Terminal> implements
 
     @Override
     public void notify(Terminal t, Synapse ts, BindingSignal bs) {
-        link(ts, bs, t.getType().invert());
+        linkAndPropagate(t, ts, bs);
     }
 
     @Override
@@ -66,12 +66,15 @@ public class SingleTransition<I extends Terminal, O extends Terminal> implements
         );
 
         transitionEvent.addEventListener(() ->
-                linkAndPropagate(t, ts, bsEvent)
+                linkAndPropagate(
+                        t,
+                        ts,
+                        t.getBindingSignal(bsEvent)
+                )
         );
     }
 
-    private void linkAndPropagate(FixedTerminal t, Synapse ts, FieldOutput bsEvent) {
-        BindingSignal fromBS = t.getBindingSignal(bsEvent);
+    private void linkAndPropagate(Terminal t, Synapse ts, BindingSignal fromBS) {
         link(ts, fromBS, t.getType().invert());
         propagate(ts, fromBS, t.getType().invert());
     }
