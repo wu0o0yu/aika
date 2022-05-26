@@ -37,13 +37,16 @@ public abstract class Terminal {
         return state;
     }
 
+    public void setType(Direction type) {
+        this.type = type;
+    }
+
     public Direction getType() {
         return type;
     }
 
-    public void init(Transition transition, Direction dir) {
+    public void setTransition(Transition transition) {
         this.transition = transition;
-        this.type = dir;
     }
 
     public Transition getTransition() {

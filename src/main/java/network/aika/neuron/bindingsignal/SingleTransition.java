@@ -39,12 +39,17 @@ public class SingleTransition<I extends Terminal, O extends Terminal> implements
     protected TransitionMode mode;
 
     protected SingleTransition(I input, O output, TransitionMode mode) {
-        input.init(this, INPUT);
-        output.init(this, OUTPUT);
-
         this.input = input;
         this.output = output;
         this.mode = mode;
+        input.setType(INPUT);
+        output.setType(OUTPUT);
+        setTerminalTransition(this);
+    }
+
+    public void setTerminalTransition(Transition t) {
+        input.setTransition(t);
+        output.setTransition(t);
     }
 
     public static <I extends Terminal, O extends Terminal> SingleTransition<I, O> transition(I input, O output, TransitionMode transitionMode) {

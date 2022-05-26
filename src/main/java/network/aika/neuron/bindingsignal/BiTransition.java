@@ -40,6 +40,9 @@ public class BiTransition implements Transition {
     protected BiTransition(SingleTransition activeTransition, SingleTransition<FixedTerminal, FixedTerminal> passiveTransition) {
         this.activeTransition = activeTransition;
         this.passiveTransition = passiveTransition;
+
+        activeTransition.setTerminalTransition(this);
+        passiveTransition.setTerminalTransition(this);
     }
 
     public static BiTransition biTransition(SingleTransition transitionA, SingleTransition transitionB) {
