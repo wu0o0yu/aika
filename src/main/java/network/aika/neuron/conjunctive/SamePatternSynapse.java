@@ -49,13 +49,13 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
     private static List<Transition> TRANSITIONS = List.of(
             biTransition(
                     transition(
-                            fixed(SAME),
-                            fixed(SAME),
+                            fixed(INPUT),
+                            variable(INPUT),
                             MATCH_AND_PROPAGATE
                     ),
                     transition(
-                            fixed(INPUT),
-                            variable(INPUT),
+                            fixed(SAME),
+                            fixed(SAME),
                             MATCH_AND_PROPAGATE
                     )
             )
