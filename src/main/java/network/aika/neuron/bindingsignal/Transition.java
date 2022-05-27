@@ -37,7 +37,7 @@ public interface Transition {
 
     TransitionMode getMode();
 
-    Stream<SingleTransition> getBSPropagateTransitions();
+    Stream<SingleTransition> getBSPropagateTransitions(State s);
 
     Stream<FixedTerminal> getFixedTerminals(Synapse ts, Activation act, Direction dir);
 

@@ -87,14 +87,6 @@ public class BindingSignal<A extends Activation> implements Element {
         activation.receiveBindingSignal(this);
     }
 
-    public SingleTransition transition(Synapse s) {
-        Stream<Transition> transitions = s.getTransitions();
-        return transitions
-                .flatMap(t -> t.getBSPropagateTransitions())
-                .findFirst()
-                .orElse(null);
-    }
-
     public void propagate(Link l) {
         SingleTransition t = transition(l.getSynapse());
         if(t == null)
@@ -110,6 +102,14 @@ public class BindingSignal<A extends Activation> implements Element {
 
     public BindingSignal propagate(Synapse s) {
         return next(transition(s));
+    }
+
+    public SingleTransition transition(Synapse s) {
+        Stream<Transition> transitions = s.getTransitions();
+        return transitions
+                .flatMap(t -> t.getBSPropagateTransitions(state))
+                .findFirst()
+                .orElse(null);
     }
 
     public BindingSignal next(SingleTransition t) {

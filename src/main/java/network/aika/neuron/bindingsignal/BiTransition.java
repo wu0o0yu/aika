@@ -104,10 +104,10 @@ public class BiTransition implements Transition {
     }
 
     @Override
-    public Stream<SingleTransition> getBSPropagateTransitions() {
+    public Stream<SingleTransition> getBSPropagateTransitions(State s) {
         return Stream.concat(
-                activeTransition.getBSPropagateTransitions(),
-                passiveTransition.getBSPropagateTransitions()
+                activeTransition.getBSPropagateTransitions(s),
+                passiveTransition.getBSPropagateTransitions(s)
         );
     }
 

@@ -140,8 +140,11 @@ public class SingleTransition<I extends Terminal, O extends Terminal> implements
     }
 
     @Override
-    public Stream<SingleTransition> getBSPropagateTransitions() {
+    public Stream<SingleTransition> getBSPropagateTransitions(State s) {
         if(mode == MATCH_ONLY)
+            return Stream.empty();
+
+        if(s != input.getState())
             return Stream.empty();
 
         return Stream.of(this);
@@ -177,13 +180,6 @@ public class SingleTransition<I extends Terminal, O extends Terminal> implements
             return false;
 
         return true;
-    }
-
-    public boolean isPropagateBS(State from) {
-        if(mode == MATCH_ONLY)
-            return false;
-
-        return from == input.getState();
     }
 
     public String toString() {
