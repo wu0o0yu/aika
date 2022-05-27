@@ -66,14 +66,6 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
             thought.registerBindingSignalSource(this, bs);
     }
 
-    public void receiveBindingSignal(BindingSignal bs) {
-        super.receiveBindingSignal(bs);
-
-        if(bs.getState() != SAME) {
-
-        }
-    }
-
     @Override
     public Range getRange() {
         return getBindingSignals()

@@ -80,11 +80,11 @@ public class BindingSignal<A extends Activation> implements Element {
     public void init(A act) {
         this.activation = act;
         onArrived = new QueueField(this, "arrived", 0.0);
+        onArrived.addEventListener(() ->
+                activation.receiveBindingSignal(this)
+        );
 
         initFields();
-//        initBSListeners();
-
-        activation.receiveBindingSignal(this);
     }
 
     public void propagate(Link l) {
