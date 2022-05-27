@@ -49,7 +49,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
                     ),
                     transition(
                             fixedSamePrimaryInput(INPUT),
-                            variable(INPUT),
+                            fixed(INPUT),
                             MATCH_AND_PROPAGATE
                     )
             )

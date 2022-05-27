@@ -41,13 +41,13 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
     private static List<Transition> TRANSITIONS = List.of(
             biTransition(
                     transition(
-                            fixedSamePrimaryInput(SAME),
                             fixed(INPUT),
+                            variable(INPUT),
                             MATCH_AND_PROPAGATE
                     ),
                     transition(
+                            fixedSamePrimaryInput(SAME),
                             fixed(INPUT),
-                            variable(INPUT),
                             MATCH_AND_PROPAGATE
                     )
             )

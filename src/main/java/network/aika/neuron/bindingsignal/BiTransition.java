@@ -45,8 +45,8 @@ public class BiTransition implements Transition {
         passiveTransition.setTerminalTransition(this);
     }
 
-    public static BiTransition biTransition(SingleTransition transitionA, SingleTransition transitionB) {
-        return new BiTransition(transitionA, transitionB);
+    public static BiTransition biTransition(SingleTransition activeTransition, SingleTransition passiveTransition) {
+        return new BiTransition(activeTransition, passiveTransition);
     }
 
     @Override
