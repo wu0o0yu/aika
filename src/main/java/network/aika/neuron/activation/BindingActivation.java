@@ -96,7 +96,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     public void receiveBindingSignal(BindingSignal bs) {
-        if(bs.getState() == INPUT && bs.getLink() instanceof PrimaryInputLink)
+        if(bs.getState() == INPUT)
             Fields.connect(bs.getOnArrived(), inputBSEvent);
 
         if(bs.getState() == BRANCH)

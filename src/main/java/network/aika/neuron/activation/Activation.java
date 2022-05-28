@@ -257,6 +257,9 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public BindingSignal getFixedBindingSignal(State s) {
         List<FieldLink> inputs = getFixedBSEvent(s).getInputLinks();
+        if(inputs.isEmpty())
+            return null;
+
         FieldLink fl = inputs.get(0);
         Field onArrived = (Field) fl.getInput();
         return (BindingSignal) onArrived.getReference();

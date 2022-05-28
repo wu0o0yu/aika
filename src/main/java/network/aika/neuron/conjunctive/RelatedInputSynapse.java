@@ -42,7 +42,7 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
             biTransition(
                     transition(
                             fixed(INPUT),
-                            variable(INPUT),
+                            variable(RELATED),
                             MATCH_AND_PROPAGATE
                     ),
                     transition(

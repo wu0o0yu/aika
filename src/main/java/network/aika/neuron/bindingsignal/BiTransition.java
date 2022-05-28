@@ -24,6 +24,7 @@ import network.aika.neuron.activation.Activation;
 
 import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.mul;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
@@ -121,7 +122,7 @@ public class BiTransition implements Transition {
         BindingSignal activeBS = activeTerminal.getBindingSignal(activeBSEvent);
 
         FixedTerminal passiveTerminal = (FixedTerminal) dir.getTerminal(passiveTransition);
-        BindingSignal passiveBS = passiveTerminal.getBindingSignal(activeBS.getActivation());//getBindingSignal(dir.getFromState(passiveTransition), act);
+        BindingSignal passiveBS = passiveTerminal.getBindingSignal(activeBS.getActivation());
 
         link(activeTransition, ts, activeBS, passiveBS, dir);
         link(passiveTransition, ts, passiveBS, activeBS, dir);
@@ -131,6 +132,9 @@ public class BiTransition implements Transition {
     }
 
     private void link(SingleTransition t, Synapse ts, BindingSignal fromBS, BindingSignal relatedFromBindingsSignal, Direction dir) {
+        if(fromBS == null)
+            return;
+
         Stream<BindingSignal<?>> bsStream = ts.getRelatedBindingSignal(fromBS, dir);
 
         bsStream
@@ -156,7 +160,13 @@ public class BiTransition implements Transition {
     private static boolean checkRelated(SingleTransition relTransition, BindingSignal relFromBS, Activation toAct, Direction dir) {
         BindingSignal relToBS = toAct.getBindingSignal(dir.getFromTerminal(relTransition).getState());
 
-        return relToBS == null || relFromBS.getOriginActivation() == relToBS.getOriginActivation();
+        if(relToBS == null)
+            return dir == OUTPUT ;
+
+        if(relFromBS == null)
+            return dir == INPUT;
+
+        return relFromBS.getOriginActivation() == relToBS.getOriginActivation();
     }
 
     public String toString() {
