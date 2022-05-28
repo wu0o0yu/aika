@@ -117,7 +117,7 @@ public class BiTransition implements Transition {
     }
 
     protected void link(Synapse ts, FieldOutput activeBSEvent, Direction dir) {
-        Terminal activeTerminal = dir.getTerminal(activeTransition);
+        Terminal activeTerminal = dir.getFromTerminal(activeTransition);
         BindingSignal activeBS = activeTerminal.getBindingSignal(activeBSEvent);
 
         FixedTerminal passiveTerminal = (FixedTerminal) dir.getTerminal(passiveTransition);
@@ -136,7 +136,7 @@ public class BiTransition implements Transition {
         bsStream
                 .filter(toBS -> fromBS != toBS)
                 .filter(toBS -> checkRelated(
-                                t,
+                                getRelatedTransition(t),
                                 relatedFromBindingsSignal,
                                 toBS.getActivation(),
                                 dir
@@ -145,6 +145,12 @@ public class BiTransition implements Transition {
                 .forEach(toBS ->
                         t.link(ts, fromBS, toBS, dir)
                 );
+    }
+
+    private SingleTransition getRelatedTransition(SingleTransition t) {
+        return t == activeTransition ?
+                passiveTransition :
+                activeTransition;
     }
 
     private static boolean checkRelated(SingleTransition relTransition, BindingSignal relFromBS, Activation toAct, Direction dir) {

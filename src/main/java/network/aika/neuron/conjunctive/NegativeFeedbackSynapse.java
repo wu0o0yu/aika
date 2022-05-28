@@ -43,13 +43,13 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     private static List<Transition> TRANSITIONS = List.of(
             biTransition(
                     transition(
-                            fixed(SAME),
-                            fixed(SAME),
+                            fixedSamePrimaryInput(INPUT),
+                            fixed(INPUT),
                             MATCH_AND_PROPAGATE
                     ),
                     transition(
-                            fixedSamePrimaryInput(INPUT),
-                            fixed(INPUT),
+                            fixed(SAME),
+                            fixed(SAME),
                             MATCH_AND_PROPAGATE
                     )
             )

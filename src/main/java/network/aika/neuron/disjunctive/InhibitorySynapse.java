@@ -24,8 +24,8 @@ import network.aika.neuron.conjunctive.BindingNeuron;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.SingleTransition.transition;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
@@ -38,20 +38,17 @@ import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGA
 public class InhibitorySynapse extends DisjunctiveSynapse<InhibitorySynapse, BindingNeuron, InhibitoryNeuron, InhibitoryLink, BindingActivation, InhibitoryActivation> {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(
-                    fixed(SAME),
-                    fixed(SAME),
-                    PROPAGATE_ONLY
-            ),
-            transition(
-                    fixed(INPUT),
-                    fixed(INPUT),
-                    MATCH_AND_PROPAGATE
-            ),
-            transition(
-                    fixed(BRANCH),
-                    fixed(BRANCH),
-                    PROPAGATE_ONLY
+            biTransition(
+                    transition(
+                            fixed(INPUT),
+                            fixed(INPUT),
+                            MATCH_AND_PROPAGATE
+                    ),
+                    transition(
+                            fixed(SAME),
+                            fixed(SAME),
+                            MATCH_AND_PROPAGATE
+                    )
             )
     );
 
