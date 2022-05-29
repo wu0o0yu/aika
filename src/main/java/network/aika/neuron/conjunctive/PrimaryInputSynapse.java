@@ -33,6 +33,7 @@ import static network.aika.neuron.bindingsignal.State.INPUT;
 import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.neuron.bindingsignal.SingleTransition.transition;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
+import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
 
 
 /**
@@ -46,12 +47,13 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
                     fixed(SAME),
                     fixed(INPUT),
                     MATCH_AND_PROPAGATE
+            ),
+            transition(
+                    fixed(INPUT),
+                    fixed(INPUT),
+                    MATCH_ONLY
             )
     );
-
-    //           transition(State.INPUT, State.INPUT)
-    //          .setPropagateBSOnly(false)
-    //                   .setPropagateBS(false)  // check=false: Rel. Pre. Entity special case
 
     public PrimaryInputLink createLink(IA input, BindingActivation output) {
         return new PrimaryInputLink(this, input, output);

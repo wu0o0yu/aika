@@ -32,11 +32,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
-import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 import static network.aika.neuron.bindingsignal.State.BRANCH;
 import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.neuron.bindingsignal.SingleTransition.transition;
+import static network.aika.neuron.bindingsignal.TransitionMode.*;
 import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 
 /**
@@ -54,7 +53,7 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
             transition(
                     fixed(SAME),
                     fixed(SAME),
-                    PROPAGATE_ONLY
+                    MATCH_AND_PROPAGATE
             )
     );
 
