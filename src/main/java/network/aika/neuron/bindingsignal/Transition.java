@@ -20,6 +20,7 @@ import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 
 import java.util.stream.Stream;
 
@@ -44,7 +45,7 @@ public interface Transition {
     Stream<VariableTerminal> getVariableTerminals(Synapse ts, BindingSignal bs, Direction dir);
 
     default FieldOutput getTransitionEvent(Synapse ts, Activation act, Direction dir, FieldOutput inputEvent) {
-        FieldOutput actEvent = act.getEvent(dir == OUTPUT, ts.isTemplate());
+        FieldOutput actEvent = ts.getLinkingEvent(act, dir);
         return actEvent != null ? mul("transition event",
                 inputEvent,
                 actEvent

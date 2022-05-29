@@ -75,8 +75,8 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     }
 
     @Override
-    public FieldOutput getLinkingEvent(BindingSignal bs, Direction dir) {
-        return bs.getEvent(false, isTemplate());
+    public FieldOutput getLinkingEvent(Activation act, Direction dir) {
+        return act.getEvent(false, isTemplate());
     }
 
     public Field getFeedbackBias() {

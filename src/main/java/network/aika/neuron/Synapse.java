@@ -123,8 +123,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return createLink(iAct, oAct);
     }
 
-    public FieldOutput getLinkingEvent(BindingSignal bs, Direction dir) {
-        return bs.getEvent(dir == OUTPUT, isTemplate());
+    public FieldOutput getLinkingEvent(Activation act, Direction dir) {
+        return act.getEvent(dir == OUTPUT, isTemplate());
     }
 
     public void initFixedTransitions(Activation act, Direction dir) {

@@ -170,8 +170,9 @@ public class SingleTransition<I extends Terminal, O extends Terminal> implements
         if(mode == PROPAGATE_ONLY)
             return false;
 
-//        if (!isTrue(ts.getLinkingEvent(toBS, dir))) TODO
-//            return false;
+        FieldOutput linkingEvent = ts.getLinkingEvent(toBS.getActivation(), dir.invert());
+        if (linkingEvent != null && !isTrue(linkingEvent))
+            return false;
 
         if(!dir.getFromTerminal(this).linkCheck(ts, fromBS, toBS))
             return false;

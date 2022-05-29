@@ -69,15 +69,19 @@ public class BiTransition implements Transition {
 
     @Override
     public void notify(Terminal t, Synapse ts, BindingSignal bs) {
-        Activation act = bs.getActivation();
+        if(t.getType() == INPUT) {
+            Activation act = bs.getActivation();
 
-        initTransitionEvent(
-                ts,
-                act,
-                t.getType().invert(),
-                bs.getOnArrived(),
-                getPassiveTerminal(t, ts, act).getBSEvent(act)
-        );
+            initTransitionEvent(
+                    ts,
+                    act,
+                    t.getType().invert(),
+                    bs.getOnArrived(),
+                    getPassiveTerminal(t, ts, act).getBSEvent(act)
+            );
+        } else {
+            link(ts, bs.getOnArrived(), INPUT);
+        }
     }
 
     @Override
