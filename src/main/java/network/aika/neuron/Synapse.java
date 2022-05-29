@@ -166,7 +166,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
                 iAct.getOutputLinks()
                         .map(Link::getSynapse)
                         .anyMatch(s -> s.isOfTemplate(this)) :
-                !iAct.getOutputLinks(this).isEmpty();
+                iAct.getOutputLinks(this)
+                        .findAny()
+                        .isPresent();
     }
 
     public boolean networkInputsAllowed(Direction dir) {

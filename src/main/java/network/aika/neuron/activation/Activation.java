@@ -33,7 +33,6 @@ import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.direction.Direction.DIRECTIONS;
-import static network.aika.fields.ConstantField.ONE;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE_ABS;
@@ -494,14 +493,16 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return inputLinks.containsKey(s.getPInput());
     }
 
-    public SortedMap<OutputKey, Link> getOutputLinks(Synapse s) {
+    public Stream<Link> getOutputLinks(Synapse s) {
         return outputLinks
                 .subMap(
                         new OutputKey(s.getOutput().getProvider(), Integer.MIN_VALUE),
                         true,
                         new OutputKey(s.getOutput().getProvider(), MAX_VALUE),
                         true
-                );
+                ).values()
+                .stream()
+                .filter(l -> l.getSynapse() == s);
     }
 
     public void linkInputs() {

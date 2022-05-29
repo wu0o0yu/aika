@@ -125,7 +125,7 @@ public class BiTransition implements Transition {
         Terminal activeTerminal = dir.getFromTerminal(activeTransition);
         BindingSignal activeBS = activeTerminal.getBindingSignal(activeBSEvent);
 
-        FixedTerminal passiveTerminal = (FixedTerminal) dir.getTerminal(passiveTransition);
+        FixedTerminal passiveTerminal = (FixedTerminal) dir.getFromTerminal(passiveTransition);
         BindingSignal passiveBS = passiveTerminal.getBindingSignal(activeBS.getActivation());
 
         link(activeTransition, ts, activeBS, passiveBS, dir);
@@ -162,7 +162,7 @@ public class BiTransition implements Transition {
     }
 
     private static boolean checkRelated(SingleTransition relTransition, BindingSignal relFromBS, Activation toAct, Direction dir) {
-        BindingSignal relToBS = toAct.getBindingSignal(dir.getFromTerminal(relTransition).getState());
+        BindingSignal relToBS = toAct.getBindingSignal(dir.getTerminal(relTransition).getState());
 
         if(relToBS == null)
             return dir == OUTPUT ;

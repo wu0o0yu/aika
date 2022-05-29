@@ -62,16 +62,14 @@ public class TokenActivation extends PatternActivation {
     }
 
     private <A extends Activation> A followSynapse(Activation<?> fromAct, Synapse s) {
-        Link l = fromAct.getOutputLinks(s)
-                .values()
-                .stream()
+        Link link = fromAct.getOutputLinks(s)
                 .findFirst()
                 .orElse(null);
 
-        if(l == null)
+        if(link == null)
             return null;
 
-        return (A) l.getOutput();
+        return (A) link.getOutput();
     }
 
     protected Field initNet() {
