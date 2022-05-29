@@ -36,6 +36,7 @@ import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.SingleTransition.transition;
 import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
+import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 
 /**
@@ -57,6 +58,11 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
                             fixed(SAME),
                             MATCH_AND_PROPAGATE
                     )
+            ),
+            transition(
+                    variable(RELATED),
+                    variable(RELATED),
+                    PROPAGATE_ONLY
             )
     );
 

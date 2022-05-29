@@ -394,7 +394,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public BindingSignal addBindingSignal(BindingSignal bs) {
-        if (bs.exists())
+        if (bs.shorterBSExists())
             return null;
 
         bs.link();

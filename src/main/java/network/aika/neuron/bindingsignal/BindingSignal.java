@@ -48,8 +48,6 @@ public class BindingSignal<A extends Activation> implements Element {
 
     private Field onArrived;
     private FieldOutput onArrivedFired;
-    private FieldOutput onArrivedFinal;
-    private FieldOutput onArrivedFiredFinal;
 
     public BindingSignal(A act, State state) {
         this.origin = this;
@@ -63,11 +61,6 @@ public class BindingSignal<A extends Activation> implements Element {
         this.parent = parent;
         this.origin = parent.getOrigin();
         this.depth = parent.depth + 1;
-    }
-
-    private BindingSignal(BindingSignal parent, State state) {
-        this(parent);
-        this.state = state;
     }
 
     public BindingSignal(BindingSignal parent, SingleTransition t) {
@@ -105,6 +98,9 @@ public class BindingSignal<A extends Activation> implements Element {
     }
 
     public SingleTransition transition(Synapse s) {
+        if(depth >= 3)
+            return null;
+
         Stream<Transition> transitions = s.getTransitions();
         return transitions
                 .flatMap(t -> t.getBSPropagateTransitions(state))
@@ -140,49 +136,12 @@ public class BindingSignal<A extends Activation> implements Element {
                 onArrived
         );
 
-        onArrivedFinal = mul(
-                "onFinal * onArrived",
-                activation.getIsFinal(),
-                onArrived
-        );
-
-        onArrivedFiredFinal = mul(
-                "onFired * onArrived * isFinal",
-                onArrivedFired,
-                activation.getIsFinal()
-        );
-
         onArrivedFired.addEventListener(() ->
                 getActivation().propagateBindingSignal(this)
         );
     }
-/*
-   wird durch fixed und dyn. BS abgelöst
-    private void initBSListeners() {
-        Neuron<?, ?> n = activation.getNeuron();
 
-        boolean templateEnabled = activation.getConfig().isTemplatesEnabled();
-        for(Direction dir: DIRECTIONS)
-            n.getTargetSynapses(dir, templateEnabled)
-                    .forEach(s ->
-                            s.registerLinkingEvents(this, dir)
-                    );
-    }
-*/
     public Field getOnArrived() {
-        return onArrived;
-    }
-
-    public FieldOutput getEvent(boolean isFired, boolean isFinal) {
-        if(isFired && isFinal)
-            return onArrivedFiredFinal;
-
-        if(isFired)
-            return onArrivedFired;
-
-        if(isFinal)
-            return onArrivedFinal;
-
         return onArrived;
     }
 
@@ -227,12 +186,13 @@ public class BindingSignal<A extends Activation> implements Element {
         getOriginActivation().registerReverseBindingSignal(getActivation(), this);
     }
 
-    public boolean exists() {
+    public boolean shorterBSExists() {
         BindingSignal existingBS = getActivation().getBindingSignal(getOriginActivation());
         if(existingBS == null)
             return false;
 
-        return existingBS.getState() == state;
+        return existingBS.getState() == state &&
+                existingBS.depth <= depth;
     }
 
     public boolean isSelfRef(BindingSignal outputBS) {

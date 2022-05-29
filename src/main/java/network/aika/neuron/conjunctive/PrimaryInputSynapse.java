@@ -29,11 +29,10 @@ import java.util.stream.Stream;
 
 
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.State.INPUT;
-import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.neuron.bindingsignal.SingleTransition.transition;
-import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
-import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
+import static network.aika.neuron.bindingsignal.State.*;
+import static network.aika.neuron.bindingsignal.TransitionMode.*;
+import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 
 
 /**
@@ -52,6 +51,11 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
                     fixed(INPUT),
                     fixed(INPUT),
                     MATCH_ONLY
+            ),
+            transition(
+                    fixed(INPUT),
+                    variable(RELATED),
+                    PROPAGATE_ONLY
             )
     );
 
