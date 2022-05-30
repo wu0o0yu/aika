@@ -57,7 +57,18 @@ public class FixedTerminal extends Terminal {
     }
 
     public BindingSignal getBindingSignal(FieldOutput bsEvent) {
+        if(bsEvent == null)
+            return null;
+
         return ((Activation)bsEvent.getReference()).getFixedBindingSignal(state);
+    }
+
+    public boolean linkCheck(Synapse ts, BindingSignal fromBS, BindingSignal toBS) {
+        BindingSignal existingBS = getBindingSignal(fromBS.getActivation());
+        if(existingBS != null && existingBS.getOriginActivation() != fromBS.getOriginActivation())
+            return false;
+
+        return super.linkCheck(ts, fromBS, toBS);
     }
 
     public String toString() {

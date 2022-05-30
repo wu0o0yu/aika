@@ -47,6 +47,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     private boolean isInput;
 
     protected Field inputBSEvent = new Field(this, "inputBSEvent");
+    protected Field relatedSameBSEvent = new Field(this, "relatedSameBSEvent");
     protected Field branchBSEvent = new Field(this, "branchBSEvent");
 
 
@@ -99,6 +100,9 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         if(bs.getState() == INPUT)
             Fields.connect(bs.getOnArrived(), inputBSEvent);
 
+        if(bs.getState() == RELATED_SAME)
+            Fields.connect(bs.getOnArrived(), relatedSameBSEvent);
+
         if(bs.getState() == BRANCH)
             Fields.connect(bs.getOnArrived(), branchBSEvent);
 
@@ -108,8 +112,13 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     public Field getFixedBSEvent(State s) {
         if(s == INPUT)
             return inputBSEvent;
+
+        if(s == RELATED_SAME)
+            return relatedSameBSEvent;
+
         if(s == BRANCH)
             return branchBSEvent;
+
         return super.getFixedBSEvent(s);
     }
 
@@ -162,7 +171,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     private BindingSignal<?> getPrimaryPatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
                 .filter(bs -> NOT_SET_AFTER.compare(bs.getOriginActivation().getFired(), fired) < 0)
-                .filter(bs -> bs.getState() == SAME || bs.getState() == INPUT)
+                .filter(bs -> bs.getState() == SAME || bs.getState() == INPUT || bs.getState() == RELATED_SAME)
                 .min(Comparator.comparing(bs -> bs.getState().ordinal()))
                 .orElse(null);
     }

@@ -119,8 +119,8 @@ public class JacksonCookTest {
         CategoryNeuron entityCN = createNeuron(t.CATEGORY_TEMPLATE, "entity");
         BindingNeuron relPrevEntityBN = createNeuron(t.BINDING_TEMPLATE, "Rel Prev. Entity");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE, entityCN, relPrevEntityBN, 9.0);
-        createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE, entityCN, relPrevEntityBN, 9.0);
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getNextTokenRelationBindingNeuron(), relPrevEntityBN, 11.0);
+        createSynapse(t.REVERSE_PATTERN_SYNAPSE_FROM_CATEGORY_TEMPLATE, entityCN, relPrevEntityBN, 9.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelationBindingNeuron(), relPrevEntityBN, 11.0);
 
         BindingNeuron jacksonForenameBN = createNeuron(t.BINDING_TEMPLATE, "jackson (forename)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, jacksonIN, jacksonForenameBN, 10.0);
@@ -138,7 +138,7 @@ public class JacksonCookTest {
 
         BindingNeuron cookSurnameBN = createNeuron(t.BINDING_TEMPLATE, "cook (surname)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, cookIN, cookSurnameBN, 10.0);
-        createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, cookSurnameBN, relPrevEntityBN, 9.0);
+//        createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, cookSurnameBN, relPrevEntityBN, 9.0);
         PatternNeuron cookSurnameEntity = initPatternLoop(t, "Entity: cook (surname)", cookSurnameBN);
         updateBias(cookSurnameEntity, 3.0);
         CategoryNeuron surnameCN = createNeuron(t.CATEGORY_TEMPLATE, "surname");

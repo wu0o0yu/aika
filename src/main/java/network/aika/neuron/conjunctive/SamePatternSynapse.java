@@ -50,7 +50,7 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
             biTransition(
                     transition(
                             fixed(INPUT),
-                            variable(RELATED),
+                            variable(RELATED_INPUT),
                             MATCH_AND_PROPAGATE
                     ),
                     transition(
@@ -60,8 +60,8 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
                     )
             ),
             transition(
-                    variable(RELATED),
-                    variable(RELATED),
+                    variable(RELATED_INPUT),
+                    variable(RELATED_INPUT),
                     PROPAGATE_ONLY
             )
     );

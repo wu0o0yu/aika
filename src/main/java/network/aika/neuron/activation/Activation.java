@@ -107,7 +107,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         );
         connect(getNeuron().getBias(), net);
 
-        isFinal = new Field(this, "isFinal", isTemplate() ? 1.0 : 0.0);
+        isFinal = new QueueField(this, "isFinal", isTemplate() ? 1.0 : 0.0);
 
         isFinal.addEventListener(() -> {
             if (!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled())

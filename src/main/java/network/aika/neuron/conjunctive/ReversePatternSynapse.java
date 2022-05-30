@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.neuron.bindingsignal.SingleTransition.transition;
+import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 
 /**
@@ -42,6 +42,11 @@ public class ReversePatternSynapse<I extends Neuron & PatternAxon, IA extends Ac
             transition(
                     fixed(SAME),
                     fixed(SAME),
+                    MATCH_AND_PROPAGATE
+            ),
+            transition(
+                    fixed(INPUT),
+                    fixed(RELATED_SAME),
                     MATCH_AND_PROPAGATE
             )
     );

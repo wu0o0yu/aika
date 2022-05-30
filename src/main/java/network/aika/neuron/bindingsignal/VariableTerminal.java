@@ -34,15 +34,6 @@ public class VariableTerminal extends Terminal {
 
     public void notify(Synapse ts, BindingSignal bs) {
         transition.notify(this, ts, bs);
-        /*
-        link(ts, bs, dir);
-        propagate(ts, bs, dir);
-
-        if(dir == OUTPUT)
-            bs.getEvent(true, true)
-                    .addEventListener(() ->
-                            InactiveLinks.add(bs)
-                    );*/
     }
 
     public BindingSignal getBindingSignal(FieldOutput bsEvent) {

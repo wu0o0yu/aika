@@ -21,7 +21,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PrimaryInputLink;
 import network.aika.neuron.axons.PatternAxon;
-import network.aika.neuron.bindingsignal.SingleTransition;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
@@ -48,14 +47,14 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
                     MATCH_AND_PROPAGATE
             ),
             transition(
-                    fixed(INPUT),
-                    fixed(INPUT),
-                    MATCH_ONLY
+                    fixed(SAME),
+                    fixed(RELATED_SAME),
+                    MATCH_AND_PROPAGATE
             ),
             transition(
                     fixed(INPUT),
-                    variable(RELATED),
-                    PROPAGATE_ONLY
+                    variable(RELATED_INPUT),
+                    MATCH_AND_PROPAGATE
             )
     );
 
