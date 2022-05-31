@@ -109,11 +109,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         isFinal = new QueueField(this, "isFinal", isTemplate() ? 1.0 : 0.0);
 
-        isFinal.addEventListener(() -> {
-            if (!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled())
-                initGradientFields();
-        });
-
         isFired = threshold("isFired", 0.0, ABOVE, net);
 
         isFired.addEventListener(() -> {
@@ -126,6 +121,9 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         isFiredForBias = func("(isFired * -1) + 1", isFired, x -> (x * -1.0) + 1.0);
 
         initFields();
+
+        if (!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled())
+            initGradientFields();
 
         finalValue = mul(
                 "finalValue",

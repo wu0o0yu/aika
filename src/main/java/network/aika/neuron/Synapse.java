@@ -37,6 +37,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
@@ -113,6 +114,12 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
         IA iAct = inputBS.getActivation();
         OA oAct = outputBS.getActivation();
+
+        if(iAct.isNetworkInput() && !networkInputsAllowed(OUTPUT))
+            return null;
+
+        if(oAct.isNetworkInput() && !networkInputsAllowed(INPUT))
+            return null;
 
         if(linkExists(iAct, oAct))
             return null;

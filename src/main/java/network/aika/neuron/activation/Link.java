@@ -65,10 +65,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
             initWeightInput();
 
-            output.getIsFinal().addEventListener(() -> {
-                if (getConfig().isTrainingEnabled() && !isNegative() && getSynapse().isAllowTraining())
-                    initGradients();
-            });
+            if (getConfig().isTrainingEnabled() && !isNegative() && getSynapse().isAllowTraining())
+                initGradients();
         }
 
         getThought().onLinkCreationEvent(this);
@@ -105,6 +103,9 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     protected void initBackpropGradient() {
+        if(output.ownOutputGradient == null)
+            return;
+
         backPropGradient = mul(
                 "oAct.ownOutputGradient * s.weight",
                 output.ownOutputGradient,

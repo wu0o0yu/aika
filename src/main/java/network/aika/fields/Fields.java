@@ -39,9 +39,9 @@ public class Fields {
     }
 
     private static void connectAll(FieldOutput in, FieldInput... out) {
-        for(FieldInput o : out) {
-            assert o != in;
+        assert in != null;
 
+        for(FieldInput o : out) {
             if(o != null) {
                 connect(in, 0, o);
             }
