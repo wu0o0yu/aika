@@ -72,6 +72,6 @@ public class PatternSynapse extends ConjunctiveSynapse<PatternSynapse, BindingNe
 
     @Override
     public boolean networkInputsAllowed(Direction dir) {
-        return dir != Direction.INPUT || !isTemplate();
+        return !isTemplate();
     }
 }

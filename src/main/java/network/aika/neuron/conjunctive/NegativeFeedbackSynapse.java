@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.direction.Direction;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
@@ -83,5 +84,10 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     @Override
     public Stream<Transition> getTransitions() {
         return TRANSITIONS.stream();
+    }
+
+    @Override
+    public boolean networkInputsAllowed(Direction dir) {
+        return !isTemplate();
     }
 }

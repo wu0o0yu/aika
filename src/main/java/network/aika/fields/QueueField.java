@@ -19,6 +19,7 @@ package network.aika.fields;
 
 import network.aika.neuron.activation.Element;
 import network.aika.steps.FieldStep;
+import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
 /**
@@ -31,12 +32,17 @@ public class QueueField extends Field {
 
     public QueueField(Element e, String label) {
         super(e, label);
-        step = new FieldStep(e, this);
+        step = new FieldStep(e, this, Phase.PROCESSING);
     }
 
     public QueueField(Element e, String label, double initialValue) {
         super(e, label, initialValue);
-        step = new FieldStep(e, this);
+        step = new FieldStep(e, this, Phase.PROCESSING);
+    }
+
+    public QueueField(Element e, String label, double initialValue, Phase p) {
+        super(e, label, initialValue);
+        step = new FieldStep(e, this, p);
     }
 
     public void setStep(FieldStep s) {

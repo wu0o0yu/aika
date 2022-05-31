@@ -68,6 +68,7 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
         return false;
     }
 
+    @Override
     protected void initFromTemplate(PositiveFeedbackSynapse s) {
         s.feedbackBias.set(feedbackBias.getCurrentValue());
         super.initFromTemplate(s);
@@ -90,5 +91,10 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     @Override
     public Stream<Transition> getTransitions() {
         return TRANSITIONS.stream();
+    }
+
+    @Override
+    public boolean networkInputsAllowed(Direction dir) {
+        return !isTemplate();
     }
 }

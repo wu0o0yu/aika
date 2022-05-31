@@ -163,7 +163,7 @@ public abstract class Thought<M extends Model> {
         return new Range(absoluteBegin, absoluteBegin + length());
     }
 
-    protected void process(Phase maxPhase) {
+    public void process(Phase maxPhase) {
         while (!queue.isEmpty()) {
             if(checkMaxPhaseReached(maxPhase))
                 break;
@@ -190,7 +190,6 @@ public abstract class Thought<M extends Model> {
                 .forEach(act ->
                         act.getIsFinal().set(1.0)
                 );
-
         process(PROCESSING);
     }
 
@@ -198,7 +197,7 @@ public abstract class Thought<M extends Model> {
      * The postprocessing steps such as counting, cleanup or save are executed.
      */
     public void postProcessing() {
-        process(POST_PROCESSING);
+        process(POST);
     }
 
     public Timestamp getTimestampOnProcess() {

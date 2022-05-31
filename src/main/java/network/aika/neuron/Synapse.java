@@ -90,6 +90,12 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public boolean linkCheck(BindingSignal inputBS, BindingSignal outputBS) {
+        if(inputBS.getActivation().isNetworkInput() && !networkInputsAllowed(OUTPUT))
+            return false;
+
+        if(outputBS.getActivation().isNetworkInput() && !networkInputsAllowed(INPUT))
+            return false;
+
         return inputBS.getOrigin() == outputBS.getOrigin();
     }
 
@@ -114,12 +120,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
         IA iAct = inputBS.getActivation();
         OA oAct = outputBS.getActivation();
-
-        if(iAct.isNetworkInput() && !networkInputsAllowed(OUTPUT))
-            return null;
-
-        if(oAct.isNetworkInput() && !networkInputsAllowed(INPUT))
-            return null;
 
         if(linkExists(iAct, oAct))
             return null;
@@ -179,10 +179,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public boolean networkInputsAllowed(Direction dir) {
-        if(dir == OUTPUT && isTemplate())
-            return false;
-
-        return true;
+        return dir == OUTPUT || !isTemplate();
     }
 
     public abstract Stream<Transition> getTransitions();
@@ -222,6 +219,16 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     protected void initFromTemplate(S s) {
         s.weight.set(weight.getCurrentValue());
         s.template = this;
+    }
+
+    public boolean checkCandidateSynapse(IA iAct) {
+        double candidateWeight = weight.getCurrentValue();
+        candidateWeight -= iAct.getConfig().getLearnRate() *
+                        iAct.getNeuron().getSurprisal(POS, iAct.getAbsoluteRange(), true);
+
+        double candidateNet = (iAct.getFinalValue().getCurrentValue() * candidateWeight) + getOutput().getBias().getCurrentValue();
+
+        return candidateNet >= 0.0;
     }
 
     public void setWeight(double w) {

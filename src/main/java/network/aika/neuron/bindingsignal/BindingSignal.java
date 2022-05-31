@@ -216,6 +216,8 @@ public class BindingSignal<A extends Activation> implements Element {
 
     @Override
     public Timestamp getFired() {
+//        if(state == State.BRANCH)
+//            return Timestamp.NOT_SET;
         return getOriginActivation().getFired();
     }
 

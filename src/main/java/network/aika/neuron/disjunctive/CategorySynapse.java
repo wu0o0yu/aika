@@ -66,6 +66,6 @@ public class CategorySynapse<N extends Neuron & PatternAxon> extends Disjunctive
 
     @Override
     public boolean networkInputsAllowed(Direction dir) {
-        return dir != Direction.INPUT || !isTemplate();
+        return !isTemplate();
     }
 }

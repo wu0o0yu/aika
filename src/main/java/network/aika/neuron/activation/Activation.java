@@ -25,6 +25,7 @@ import network.aika.neuron.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.sign.Sign;
+import network.aika.steps.Phase;
 import network.aika.steps.activation.Counting;
 import network.aika.utils.Utils;
 
@@ -107,7 +108,12 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         );
         connect(getNeuron().getBias(), net);
 
-        isFinal = new QueueField(this, "isFinal", isTemplate() ? 1.0 : 0.0);
+        isFinal = new QueueField(
+                this,
+                "isFinal",
+                isTemplate() ? 1.0 : 0.0,
+                Phase.FINAL
+        );
 
         isFired = threshold("isFired", 0.0, ABOVE, net);
 

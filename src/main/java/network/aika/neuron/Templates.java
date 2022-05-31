@@ -86,7 +86,7 @@ public class Templates {
                         BINDING_TEMPLATE,
                         "Primary Input Synapse from Pattern",
                         1,
-                        0.01
+                        -0.01
                 );
         PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE.setAllowPropagate(true);
 
@@ -97,7 +97,7 @@ public class Templates {
                         BINDING_TEMPLATE,
                         "Primary Input Synapse from Category",
                         2,
-                        0.01
+                        -0.01
                 );
 //        PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE.setAllowPropagate(true);
 

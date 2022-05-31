@@ -21,6 +21,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PrimaryInputLink;
 import network.aika.neuron.axons.PatternAxon;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
@@ -58,8 +59,14 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
             )
     );
 
+    @Override
     public PrimaryInputLink createLink(IA input, BindingActivation output) {
         return new PrimaryInputLink(this, input, output);
+    }
+
+    @Override
+    public boolean propagateCheck(BindingSignal<IA> inputBS) {
+        return checkCandidateSynapse(inputBS.getActivation());
     }
 
     @Override

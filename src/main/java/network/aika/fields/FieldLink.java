@@ -48,4 +48,8 @@ public class FieldLink {
         FieldLink fLink = (FieldLink) o;
         return arg == fLink.arg && output.equals(fLink.output);
     }
+
+    public String toString() {
+        return input + " --" + arg + "--> " + output;
+    }
 }

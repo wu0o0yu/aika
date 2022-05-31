@@ -64,7 +64,7 @@ public class InhibitorySynapse extends DisjunctiveSynapse<InhibitorySynapse, Bin
 
     @Override
     public boolean networkInputsAllowed(Direction dir) {
-        return dir != Direction.INPUT || !isTemplate();
+        return !isTemplate();
     }
 
     @Override
