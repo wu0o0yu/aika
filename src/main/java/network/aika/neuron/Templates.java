@@ -34,9 +34,7 @@ public class Templates {
 
     private final Model model;
 
-    public BindingNeuron INPUT_BINDING_TEMPLATE = new BindingNeuron();
     public BindingNeuron BINDING_TEMPLATE = new BindingNeuron();
-    public PatternNeuron INPUT_PATTERN_TEMPLATE = new PatternNeuron();
     public PatternNeuron PATTERN_TEMPLATE = new PatternNeuron();
     public InhibitoryNeuron INHIBITORY_TEMPLATE = new InhibitoryNeuron();
     public CategoryNeuron CATEGORY_TEMPLATE = new CategoryNeuron();
@@ -61,32 +59,19 @@ public class Templates {
     public Templates(Model m) {
         model = m;
 
-        init(INPUT_BINDING_TEMPLATE, -1, "Input Binding Neuron", 0.0);
-        init(BINDING_TEMPLATE, -2, "Binding Neuron", 0.0);
-        init(INPUT_PATTERN_TEMPLATE, -3, "Input Pattern Neuron", 0.0);
-        init(PATTERN_TEMPLATE, -4, "Pattern Neuron", 0.0);
-        init(INHIBITORY_TEMPLATE, -5, "Inhibitory Neuron", 0.0);
-        init(CATEGORY_TEMPLATE, -6, "Category Neuron", 0.0);
-
-        Set<Neuron> BINDING_NEURON_TEMPLATE_GROUP = Set.of(INPUT_BINDING_TEMPLATE, BINDING_TEMPLATE);
-        INPUT_BINDING_TEMPLATE.getTemplateInfo().setTemplateGroup(BINDING_NEURON_TEMPLATE_GROUP);
-        BINDING_TEMPLATE.getTemplateInfo().setTemplateGroup(BINDING_NEURON_TEMPLATE_GROUP);
-
-        Set<Neuron> PATTERN_NEURON_TEMPLATE_GROUP = Set.of(INPUT_PATTERN_TEMPLATE, PATTERN_TEMPLATE);
-        INPUT_PATTERN_TEMPLATE.getTemplateInfo().setTemplateGroup(PATTERN_NEURON_TEMPLATE_GROUP);
-        PATTERN_TEMPLATE.getTemplateInfo().setTemplateGroup(PATTERN_NEURON_TEMPLATE_GROUP);
-
-        INHIBITORY_TEMPLATE.getTemplateInfo().setTemplateGroup(Set.of(INHIBITORY_TEMPLATE));
-        CATEGORY_TEMPLATE.getTemplateInfo().setTemplateGroup(Set.of(CATEGORY_TEMPLATE));
+        init(BINDING_TEMPLATE, -1, "Binding Neuron", -0.02);
+        init(PATTERN_TEMPLATE, -2, "Pattern Neuron", 0.0);
+        init(INHIBITORY_TEMPLATE, -3, "Inhibitory Neuron", 0.0);
+        init(CATEGORY_TEMPLATE, -4, "Category Neuron", 0.0);
 
         PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE =
                 init(
                         new PrimaryInputSynapse(),
-                        INPUT_PATTERN_TEMPLATE,
+                        PATTERN_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Primary Input Synapse from Pattern",
                         1,
-                        -0.01
+                        0.01
                 );
         PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE.setAllowPropagate(true);
 
@@ -97,14 +82,14 @@ public class Templates {
                         BINDING_TEMPLATE,
                         "Primary Input Synapse from Category",
                         2,
-                        -0.01
+                        0.01
                 );
 //        PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE.setAllowPropagate(true);
 
         RELATED_INPUT_SYNAPSE_TEMPLATE =
                 init(
                         new RelatedInputSynapse(),
-                        INPUT_BINDING_TEMPLATE,
+                        BINDING_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Related Input Synapse",
                         3,
@@ -208,9 +193,7 @@ public class Templates {
 
     public Collection<Neuron> getAllTemplates() {
         return Arrays.asList(
-                INPUT_BINDING_TEMPLATE,
                 BINDING_TEMPLATE,
-                INPUT_PATTERN_TEMPLATE,
                 PATTERN_TEMPLATE,
                 INHIBITORY_TEMPLATE,
                 CATEGORY_TEMPLATE

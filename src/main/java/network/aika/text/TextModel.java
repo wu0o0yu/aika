@@ -62,10 +62,10 @@ public class TextModel extends Model {
         if(tokenCategory == null)
             tokenCategory = initCategoryNeuron(TOKEN_LABEL);
 
-        BindingNeuron relPT = getTemplates().INPUT_BINDING_TEMPLATE.instantiateTemplate(true);
+        BindingNeuron relPT = getTemplates().BINDING_TEMPLATE.instantiateTemplate(true);
         relPreviousToken = relPT.getProvider();
 
-        BindingNeuron relNT = getTemplates().INPUT_BINDING_TEMPLATE.instantiateTemplate(true);
+        BindingNeuron relNT = getTemplates().BINDING_TEMPLATE.instantiateTemplate(true);
         relNextToken = relNT.getProvider();
 
         relPTRevPatternSyn = initReversePatternSynapse(getTokenCategory(), relPT);
@@ -95,7 +95,7 @@ public class TextModel extends Model {
             return (PatternNeuron) inProv;
         }
 
-        PatternNeuron in = getTemplates().INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
+        PatternNeuron in = getTemplates().PATTERN_TEMPLATE.instantiateTemplate(true);
 
         in.setTokenLabel(tokenLabel);
         in.setNetworkInput(true);

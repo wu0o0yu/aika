@@ -36,7 +36,7 @@ public class PropagateTest {
         TextModel m = new TextModel();
         Templates t = new Templates(m);
 
-        PatternNeuron in = createNeuron(t.INPUT_PATTERN_TEMPLATE, "IN", true);
+        PatternNeuron in = createNeuron(t.PATTERN_TEMPLATE, "IN", true);
         BindingNeuron out = createNeuron(t.BINDING_TEMPLATE, "OUT");
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, in, out, 10.0);

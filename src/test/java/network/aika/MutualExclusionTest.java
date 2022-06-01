@@ -45,7 +45,7 @@ public class MutualExclusionTest {
         m.init();
         Templates t = m.getTemplates();
 
-        PatternNeuron in = createNeuron(t.INPUT_PATTERN_TEMPLATE, "I", true);
+        PatternNeuron in = createNeuron(t.PATTERN_TEMPLATE, "I", true);
         BindingNeuron na = createNeuron(t.BINDING_TEMPLATE, "A");
         BindingNeuron nb = createNeuron(t.BINDING_TEMPLATE, "B");
         BindingNeuron nc = createNeuron(t.BINDING_TEMPLATE, "C");
@@ -97,7 +97,7 @@ public class MutualExclusionTest {
         m.init();
         Templates t = m.getTemplates();
 
-        PatternNeuron in = createNeuron(t.INPUT_PATTERN_TEMPLATE, "I", true);
+        PatternNeuron in = createNeuron(t.PATTERN_TEMPLATE, "I", true);
         BindingNeuron na = createNeuron(t.BINDING_TEMPLATE, "A");
         BindingNeuron nb = createNeuron(t.BINDING_TEMPLATE, "B");
         InhibitoryNeuron inhib = createNeuron(t.INHIBITORY_TEMPLATE, "I");

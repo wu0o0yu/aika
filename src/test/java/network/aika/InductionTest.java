@@ -21,7 +21,7 @@ public class InductionTest {
         TextModel m = new TextModel();
         Templates t = new Templates(m);
 
-        PatternNeuron in = t.INPUT_PATTERN_TEMPLATE.instantiateTemplate(true);
+        PatternNeuron in = t.PATTERN_TEMPLATE.instantiateTemplate(true);
         in.setTokenLabel("A");
         in.setNetworkInput(true);
         in.setLabel("IN");
@@ -48,8 +48,8 @@ public class InductionTest {
 
         Templates t = new Templates(m);
 
-        PatternNeuron inA = createNeuron(t.INPUT_PATTERN_TEMPLATE, "IN-A");
-        PatternNeuron inB = createNeuron(t.INPUT_PATTERN_TEMPLATE, "IN-B");
+        PatternNeuron inA = createNeuron(t.PATTERN_TEMPLATE, "IN-A");
+        PatternNeuron inB = createNeuron(t.PATTERN_TEMPLATE, "IN-B");
         BindingNeuron targetN = createNeuron(t.BINDING_TEMPLATE, "OUT-Target");
 
         targetN.getBias().set(0.0);

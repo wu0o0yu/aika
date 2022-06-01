@@ -105,10 +105,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public boolean templateNeuronMatches(Neuron<?, ?> targetN) {
-        return getTemplateGroup().stream()
-                .anyMatch(tn ->
-                        tn.getId().intValue() == targetN.getId().intValue()
-                );
+        return getTemplate().getId().intValue() == targetN.getId().intValue();
     }
 
     private TreeSet<A> initActivationsSet(Thought t) {
@@ -165,10 +162,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return template;
     }
 
-    public Set<Neuron> getTemplateGroup() {
-        return getTemplate().getTemplateInfo().getTemplateGroup();
-    }
-
     public double getCandidateGradient(Activation act) {
         Range range = act.getAbsoluteRange();
         assert range != null;
@@ -215,9 +208,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     private Stream<? extends Synapse> getTargetSynapsesIntern(Direction dir, boolean template) {
-        return (template ?
-                getTemplateGroup().stream().flatMap(dir::getSynapses) :
-                dir.getSynapses(this));
+        return dir.getSynapses(template ? getTemplate() : this);
     }
 
     public Synapse getOutputSynapse(NeuronProvider n) {

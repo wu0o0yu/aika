@@ -23,10 +23,7 @@ import java.util.Set;
  * @author Lukas Molzberger
  */
 public class TemplateNeuron {
-
     private String label;
-    private Set<Neuron> templateGroup;
-
 
     public String getLabel() {
         return label;
@@ -34,13 +31,5 @@ public class TemplateNeuron {
 
     public void setLabel(String label) {
         this.label = label;
-    }
-
-    public Set<Neuron> getTemplateGroup() {
-        return templateGroup;
-    }
-
-    public void setTemplateGroup(Set<Neuron> templateGroup) {
-        this.templateGroup = templateGroup;
     }
 }
