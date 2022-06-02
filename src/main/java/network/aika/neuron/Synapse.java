@@ -194,13 +194,13 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         this.output = output.getProvider();
     }
 
-    public S instantiateTemplate(I input, O output) {
+    public S instantiateTemplate(L l, I input, O output) {
         S s = instantiateTemplate();
 
         s.input = input.getProvider();
         s.output = output.getProvider();
 
-        initFromTemplate(s);
+        initFromTemplate(l, s);
         return s;
     }
 
@@ -216,19 +216,27 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
     public abstract L createLink(IA input, OA output);
 
-    protected void initFromTemplate(S s) {
-        s.weight.set(weight.getCurrentValue());
+    protected void initFromTemplate(L l, S s) {
+        double initialWeight = l != null ?
+                computeInitialWeight(l.getInput()) :
+                weight.getCurrentValue();
+
+        s.weight.set(initialWeight);
         s.template = this;
     }
 
     public boolean checkCandidateSynapse(IA iAct) {
-        double candidateWeight = weight.getCurrentValue();
-        candidateWeight -= iAct.getConfig().getLearnRate() *
-                        iAct.getNeuron().getSurprisal(POS, iAct.getAbsoluteRange(), true);
-
+        double candidateWeight = computeInitialWeight(iAct);
         double candidateNet = (iAct.getFinalValue().getCurrentValue() * candidateWeight) + getOutput().getBias().getCurrentValue();
 
         return candidateNet >= 0.0;
+    }
+
+    protected double computeInitialWeight(IA iAct) {
+        double initialWeight = weight.getCurrentValue();
+        initialWeight -= iAct.getConfig().getLearnRate() *
+                        iAct.getNeuron().getSurprisal(POS, iAct.getAbsoluteRange(), true);
+        return initialWeight;
     }
 
     public void setWeight(double w) {

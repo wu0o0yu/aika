@@ -66,7 +66,18 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
 
     @Override
     public boolean propagateCheck(BindingSignal<IA> inputBS) {
-        return checkCandidateSynapse(inputBS.getActivation());
+        return !isTemplate() || checkCandidateSynapse(inputBS.getActivation());
+    }
+
+    @Override
+    public boolean linkCheck(BindingSignal inputBS, BindingSignal outputBS) {
+        if(!super.linkCheck(inputBS, outputBS))
+            return false;
+
+        BindingActivation oAct = (BindingActivation) outputBS.getActivation();
+        return !oAct.getBindingSignals()
+                .filter(bs -> bs.getState() == INPUT)
+                .anyMatch(bs -> bs.getLink() instanceof PrimaryInputLink);
     }
 
     @Override

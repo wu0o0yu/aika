@@ -69,9 +69,9 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     }
 
     @Override
-    protected void initFromTemplate(PositiveFeedbackSynapse s) {
+    protected void initFromTemplate(PositiveFeedbackLink l, PositiveFeedbackSynapse s) {
         s.feedbackBias.set(feedbackBias.getCurrentValue());
-        super.initFromTemplate(s);
+        super.initFromTemplate(l, s);
     }
 
     @Override

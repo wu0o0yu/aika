@@ -224,6 +224,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
         synapse = (S) synapse
                 .instantiateTemplate(
+                        this,
                         input.getNeuron(),
                         output.getNeuron()
                 );

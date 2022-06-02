@@ -110,7 +110,7 @@ public class TestUtils {
     }
 
     public static PositiveFeedbackSynapse createPositiveFeedbackSynapse(PositiveFeedbackSynapse templateSynapse, PatternNeuron input, BindingNeuron output, double weight, double feedbackWeight) {
-        PositiveFeedbackSynapse s = (PositiveFeedbackSynapse) templateSynapse.instantiateTemplate(input, output);
+        PositiveFeedbackSynapse s = (PositiveFeedbackSynapse) templateSynapse.instantiateTemplate(null, input, output);
 
         s.setWeight(weight);
 
@@ -124,7 +124,7 @@ public class TestUtils {
     }
 
     public static <S extends Synapse> S createSynapse(Synapse templateSynapse, Neuron input, Neuron output, double weight) {
-        Synapse s = templateSynapse.instantiateTemplate(input, output);
+        Synapse s = templateSynapse.instantiateTemplate(null, input, output);
 
         s.setWeight(weight);
 

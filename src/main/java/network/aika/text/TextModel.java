@@ -120,7 +120,7 @@ public class TextModel extends Model {
 
     private PrimaryInputSynapse initRelatedInputSynapse(CategoryNeuron relTokenCat, BindingNeuron relBN) {
         PrimaryInputSynapse s = (PrimaryInputSynapse) getTemplates().PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE
-                .instantiateTemplate(relTokenCat, relBN);
+                .instantiateTemplate(null, relTokenCat, relBN);
 
         double w = 10.0;
 
@@ -134,7 +134,7 @@ public class TextModel extends Model {
 
     private ReversePatternSynapse initReversePatternSynapse(CategoryNeuron in, BindingNeuron inRel) {
         ReversePatternSynapse s = (ReversePatternSynapse) getTemplates().REVERSE_PATTERN_SYNAPSE_FROM_CATEGORY_TEMPLATE
-                .instantiateTemplate(in, inRel);
+                .instantiateTemplate(null, in, inRel);
 
         double w = 11.0;
 
@@ -149,7 +149,7 @@ public class TextModel extends Model {
 
     private void initCategorySynapse(PatternNeuron tokenNeuron, CategoryNeuron tokenCat) {
         Synapse s = getTemplates().CATEGORY_SYNAPSE_TEMPLATE
-                .instantiateTemplate(tokenNeuron, tokenCat);
+                .instantiateTemplate(null, tokenNeuron, tokenCat);
 
         s.linkInput();
         s.getWeight().set(2.0);
