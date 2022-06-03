@@ -16,6 +16,7 @@
  */
 package network.aika.steps;
 
+import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Timestamp;
 
 import java.util.Comparator;
@@ -27,16 +28,20 @@ public interface QueueKey {
 
     Comparator<QueueKey> COMPARATOR = Comparator
             .<QueueKey>comparingInt(k -> k.getPhase().ordinal())
-            .thenComparing(k -> k.getPrimaryTimestamp())
-            .thenComparing(k -> k.getSecondaryTimestamp());
+            .thenComparing(k -> k.getElement().getFired())
+            .thenComparingDouble(k -> -k.getSortValue())
+            .thenComparing(k -> k.getElement().getCreated())
+            .thenComparing(k -> k.getCurrentTimestamp());
 
     String getStepName();
 
+    Element getElement();
+
     Phase getPhase();
 
-    Timestamp getPrimaryTimestamp();
+    double getSortValue();
 
-    Timestamp getSecondaryTimestamp();
+    Timestamp getCurrentTimestamp();
 
     String timestampToString();
 }

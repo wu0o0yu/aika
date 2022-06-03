@@ -141,7 +141,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     protected Field initNet() {
-        return new QueueField(this, "net", 0.0);
+        return new ValueSortedQueueField(this, "net", 0.0);
     }
 
     protected void initGradientFields() {

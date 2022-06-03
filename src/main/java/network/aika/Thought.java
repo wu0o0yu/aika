@@ -145,7 +145,7 @@ public abstract class Thought<M extends Model> {
     }
 
     public void addStep(Step s) {
-        s.setSecondaryTimestamp(getNextTimestamp());
+        s.setCurrentTimestamp(getNextTimestamp());
         queue.put(s, s);
         queueEntryAddedEvent(s);
     }

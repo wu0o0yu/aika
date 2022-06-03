@@ -18,6 +18,7 @@ package network.aika.text;
 
 import network.aika.fields.Field;
 import network.aika.fields.QueueField;
+import network.aika.fields.ValueSortedQueueField;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
@@ -73,7 +74,7 @@ public class TokenActivation extends PatternActivation {
     }
 
     protected Field initNet() {
-        return new QueueField(this, "net", 10.0);
+        return new ValueSortedQueueField(this, "net", 10.0);
     }
 
     public boolean isInput() {

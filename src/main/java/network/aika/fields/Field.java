@@ -35,8 +35,8 @@ public class Field<R> extends FieldNode implements IField, Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Field.class);
 
-    private Double currentValue;
-    private Double update;
+    protected Double currentValue;
+    protected Double update;
     private boolean withinUpdate;
 
 

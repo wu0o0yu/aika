@@ -19,6 +19,7 @@ package network.aika.steps;
 import network.aika.Thought;
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Timestamp;
+import network.aika.utils.Utils;
 
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 
@@ -43,11 +44,17 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
         this.fired = element.getFired();
     }
 
-    public void updateSortValue(double newValue) {
-        Thought t = getElement().getThought();
-        t.removeStep(this);
-        sortValue = newValue;
-        t.addStep(this);
+    public void updateSortValue(double newSortValue, boolean isQueued) {
+        if(Utils.belowTolerance(sortValue - newSortValue))
+            return;
+
+        if(isQueued) {
+            Thought t = getElement().getThought();
+            t.removeStep(this);
+            sortValue = newSortValue;
+            t.addStep(this);
+        } else
+            sortValue = newSortValue;
     }
 
     public Step copy(Element newElement) {
@@ -76,15 +83,15 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
         t.addStep(s);
     }
 
-    public Timestamp getPrimaryTimestamp() {
-        return element.getFired() != NOT_SET ? element.getFired() : element.getCreated();
+    public double getSortValue() {
+        return sortValue;
     }
 
-    public Timestamp getSecondaryTimestamp() {
+    public Timestamp getCurrentTimestamp() {
         return currentTimestamp;
     }
 
-    public void setSecondaryTimestamp(Timestamp timestamp) {
+    public void setCurrentTimestamp(Timestamp timestamp) {
         this.currentTimestamp = timestamp;
     }
 
