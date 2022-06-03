@@ -18,10 +18,7 @@ package network.aika.neuron.activation;
 
 import network.aika.Config;
 import network.aika.Thought;
-import network.aika.fields.ThresholdOperator;
-import network.aika.fields.AbstractBiFunction;
-import network.aika.fields.BiFunction;
-import network.aika.fields.FieldOutput;
+import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.sign.Sign;
@@ -230,6 +227,11 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
                 );
 
         synapse.linkOutput();
+
+        reconnect(weightedInput.getInput2(), synapse.getWeight());
+
+        if(backPropGradient != null)
+            reconnect(backPropGradient.getInput2(), synapse.getWeight());
 
         Cleanup.add(this);
     }

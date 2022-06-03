@@ -136,6 +136,13 @@ public class Field<R> extends FieldNode implements IField, Writable {
         inputs.remove(l);
     }
 
+    public FieldLink getInputLink(Field f) {
+        return inputs.stream()
+                .filter(l -> l.getInput() == f)
+                .findFirst()
+                .orElse(null);
+    }
+
     public List<FieldLink> getInputLinks() {
         return inputs;
     }

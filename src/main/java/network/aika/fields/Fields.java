@@ -28,6 +28,11 @@ public class Fields {
         return f != null && f.isInitialized() && f.getCurrentValue() > 0.5;
     }
 
+    public static void reconnect(FieldLink l, Field newInput) {
+        l.getInput().removeOutput(l, true);
+        newInput.addOutput(l, true);
+    }
+
     public static void connect(FieldOutput in, FieldInput out) {
         connect(in, 0, out);
     }

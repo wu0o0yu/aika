@@ -37,6 +37,14 @@ public class PositiveFeedbackLink<IA extends Activation<?>> extends BindingNeuro
     }
 
     @Override
+    public void induce() {
+        super.induce();
+
+        reconnect(feedbackWeightInput.getInput2(), synapse.getWeight());
+        reconnect(feedbackBiasInput.getInput2(), synapse.getFeedbackBias());
+    }
+
+    @Override
     protected void initWeightInput() {
         feedbackWeightInput = mul(
                 "iAct.finalValue * s.weighted",

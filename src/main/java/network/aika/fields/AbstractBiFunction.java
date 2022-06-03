@@ -22,6 +22,7 @@ import network.aika.utils.Utils;
  * @author Lukas Molzberger
  */
 public abstract class AbstractBiFunction extends FieldNode implements FieldInput, FieldOutput {
+
     protected FieldLink in1;
     protected FieldLink in2;
 
@@ -29,6 +30,14 @@ public abstract class AbstractBiFunction extends FieldNode implements FieldInput
 
     public AbstractBiFunction(String label) {
         this.label = label;
+    }
+
+    public FieldLink getInput1() {
+        return in1;
+    }
+
+    public FieldLink getInput2() {
+        return in2;
     }
 
     public void addInput(FieldLink l) {

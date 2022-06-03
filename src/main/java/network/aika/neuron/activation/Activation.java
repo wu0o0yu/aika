@@ -369,7 +369,11 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     public void induce() {
         assert isTemplate();
 
+        FieldLink biasLink = net.getInputLink(neuron.getBias());
+
         neuron = (N) neuron.instantiateTemplate(true);
+
+        reconnect(biasLink, neuron.getBias());
     }
 
     public Thought getThought() {
