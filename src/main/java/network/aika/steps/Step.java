@@ -33,12 +33,21 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
     protected Timestamp created;
     protected Timestamp fired;
 
+    protected double sortValue;
+
     private Timestamp currentTimestamp;
 
     public Step(E element) {
         this.element = element;
         this.created = element.getCreated();
         this.fired = element.getFired();
+    }
+
+    public void updateSortValue(double newValue) {
+        Thought t = getElement().getThought();
+        t.removeStep(this);
+        sortValue = newValue;
+        t.addStep(this);
     }
 
     public Step copy(Element newElement) {
