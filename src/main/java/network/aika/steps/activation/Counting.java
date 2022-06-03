@@ -38,7 +38,7 @@ public class Counting extends Step<Activation> {
 
     @Override
     public Phase getPhase() {
-        return Phase.POST;
+        return Phase.POST_PROCESSING;
     }
 
     @Override

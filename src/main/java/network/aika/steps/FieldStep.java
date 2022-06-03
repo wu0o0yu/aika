@@ -26,11 +26,9 @@ import network.aika.fields.QueueField;
 public class FieldStep<E extends Element> extends Step<E> {
 
     private QueueField field;
-    private Phase phase;
 
-    public FieldStep(E e, QueueField qf, Phase p) {
+    public FieldStep(E e, QueueField qf) {
         super(e);
-        this.phase = p;
         this.field = qf;
         this.field.setStep(this);
     }
@@ -42,7 +40,7 @@ public class FieldStep<E extends Element> extends Step<E> {
 
     @Override
     public Phase getPhase() {
-        return phase;
+        return Phase.PROCESSING;
     }
 
     public String toString() {

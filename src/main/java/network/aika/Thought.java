@@ -197,7 +197,7 @@ public abstract class Thought<M extends Model> {
      * The postprocessing steps such as counting, cleanup or save are executed.
      */
     public void postProcessing() {
-        process(POST);
+        process(POST_PROCESSING);
     }
 
     public Timestamp getTimestampOnProcess() {

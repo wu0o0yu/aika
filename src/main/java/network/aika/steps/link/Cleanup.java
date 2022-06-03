@@ -36,7 +36,7 @@ public class Cleanup extends Step<Link> {
 
     @Override
     public Phase getPhase() {
-        return Phase.POST;
+        return Phase.POST_PROCESSING;
     }
 
     @Override

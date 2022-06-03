@@ -111,8 +111,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         isFinal = new QueueField(
                 this,
                 "isFinal",
-                isTemplate() ? 1.0 : 0.0,
-                Phase.FINAL
+                isTemplate() ? 1.0 : 0.0
         );
 
         isFired = threshold("isFired", 0.0, ABOVE, net);

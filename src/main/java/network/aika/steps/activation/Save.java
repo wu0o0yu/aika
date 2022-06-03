@@ -41,7 +41,7 @@ public class Save extends Step<DummyActivation> {
 
     @Override
     public Phase getPhase() {
-        return Phase.POST;
+        return Phase.POST_PROCESSING;
     }
 
     @Override
