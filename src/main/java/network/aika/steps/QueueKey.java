@@ -19,29 +19,79 @@ package network.aika.steps;
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Timestamp;
 
+import java.sql.Time;
 import java.util.Comparator;
+
+import static network.aika.neuron.activation.Timestamp.NOT_SET;
 
 /**
  * @author Lukas Molzberger
  */
 public interface QueueKey {
 
-    Comparator<QueueKey> COMPARATOR = Comparator
-            .<QueueKey>comparingInt(k -> k.getPhase().ordinal())
-            .thenComparing(k -> k.getElement().getFired())
-            .thenComparingDouble(k -> -k.getSortValue())
-            .thenComparing(k -> k.getElement().getCreated())
-            .thenComparing(k -> k.getCurrentTimestamp());
+    Comparator<QueueKey> COMPARATOR = (k1, k2) -> {
+        int r = Integer.compare(k1.getPhase().ordinal(), k2.getPhase().ordinal());
+        if(r != 0)
+            return r;
+
+        r = compareBothFired(k1, k2);
+        if(r != 0)
+            return r;
+
+        if(firedBeforeCreated(k1, k2))
+            return 1;
+
+        if(firedBeforeCreated(k2, k1))
+            return -1;
+
+        r = Boolean.compare(
+                k1.getFired() != NOT_SET,
+                k2.getFired() != NOT_SET
+        );
+        if(r != 0)
+            return r;
+
+        r = compareBothNotFired(k1, k2);
+        if(r != 0)
+            return r;
+
+        return k1.getCurrentTimestamp().compareTo(k2.getCurrentTimestamp());
+    };
+
+    private static int compareBothFired(QueueKey k1, QueueKey k2) {
+        if(k1.getFired() == NOT_SET || k2.getFired() == NOT_SET)
+            return 0;
+
+        return k1.getFired().compareTo(k2.getFired());
+    }
+
+    private static boolean firedBeforeCreated(QueueKey k1, QueueKey k2) {
+        return k1.getFired() == NOT_SET &&
+                k2.getFired() != NOT_SET &&
+                k1.getCreated().compareTo(k2.getFired()) > 0;
+    }
+
+    private static boolean notFiredVsFired(QueueKey k1, QueueKey k2) {
+        return k1.getFired() == NOT_SET &&
+                k2.getFired() != NOT_SET;
+    }
+
+    private static int compareBothNotFired(QueueKey k1, QueueKey k2) {
+        if(k1.getFired() != NOT_SET || k2.getFired() != NOT_SET)
+            return 0;
+
+        return Double.compare(k2.getSortValue(), k1.getSortValue());
+    }
 
     String getStepName();
 
-    Element getElement();
-
     Phase getPhase();
+
+    Timestamp getFired();
+
+    Timestamp getCreated();
 
     double getSortValue();
 
     Timestamp getCurrentTimestamp();
-
-    String timestampToString();
 }

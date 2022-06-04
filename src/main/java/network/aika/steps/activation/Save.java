@@ -18,6 +18,7 @@ package network.aika.steps.activation;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.DummyActivation;
+import network.aika.neuron.activation.Timestamp;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 

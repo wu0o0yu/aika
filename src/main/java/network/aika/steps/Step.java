@@ -99,14 +99,17 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
         return element;
     }
 
+    @Override
+    public Timestamp getFired() {
+        return element.getFired();
+    }
+
+    @Override
+    public Timestamp getCreated() {
+        return element.getCreated();
+    }
+
     public String toString() {
         return "" + getElement();
     }
-
-    public String timestampToString() {
-        if(fired != NOT_SET)
-            return "Fired:" + fired + " TS:" + currentTimestamp;
-        else
-            return "Created:" + created + " TS:" + currentTimestamp;
-     }
 }
