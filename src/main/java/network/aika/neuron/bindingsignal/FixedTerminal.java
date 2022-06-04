@@ -30,7 +30,6 @@ public class FixedTerminal extends Terminal {
         super(state);
     }
 
-
     public static FixedTerminal fixed(State s) {
         return new FixedTerminal(s);
     }

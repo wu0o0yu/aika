@@ -46,7 +46,7 @@ public interface Transition {
 
     default FieldOutput getTransitionEvent(Synapse ts, Activation act, Direction dir, FieldOutput inputEvent) {
         FieldOutput actEvent = ts.getLinkingEvent(act, dir);
-        return actEvent != null ? mul("transition event",
+        return actEvent != null ? mul("transition event (syn: " + ts + ")",
                 inputEvent,
                 actEvent
         ) :

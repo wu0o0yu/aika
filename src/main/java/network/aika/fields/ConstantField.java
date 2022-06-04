@@ -51,4 +51,13 @@ public class ConstantField extends FieldNode implements FieldOutput {
     public Object getReference() {
         return null;
     }
+
+    @Override
+    public String toString() {
+        return getLabel() + ":" + getValueString();
+    }
+
+    public String getValueString() {
+        return "[v:" + value + "]";
+    }
 }

@@ -23,6 +23,8 @@ public interface FieldOutput {
 
     String getLabel();
 
+    String getValueString();
+
     boolean isInitialized();
 
     double getCurrentValue();

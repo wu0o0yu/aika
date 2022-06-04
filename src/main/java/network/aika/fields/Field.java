@@ -195,6 +195,10 @@ public class Field<R> extends FieldNode implements IField, Writable {
 
     @Override
     public String toString() {
+        return getLabel() + ":" + getValueString() + "(" + (getReference() != null ? getReference() : "") + ")";
+    }
+
+    public String getValueString() {
         if(!isInitialized())
             return "--";
 

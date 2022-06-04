@@ -92,6 +92,10 @@ public abstract class AbstractFunction extends FieldNode implements FieldInput, 
 
     @Override
     public String toString() {
+        return getLabel() + ":" + getValueString();
+    }
+
+    public String getValueString() {
         if(!isInitialized())
             return "--";
 
