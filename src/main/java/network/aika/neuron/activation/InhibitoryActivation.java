@@ -24,7 +24,6 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 
-import static network.aika.neuron.bindingsignal.State.BRANCH;
 import static network.aika.neuron.bindingsignal.State.INPUT;
 
 /**
@@ -34,7 +33,6 @@ import static network.aika.neuron.bindingsignal.State.INPUT;
 public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron> {
 
     protected Field inputBSEvent = new Field(this, "inputBSEvent");
-    protected Field branchBSEvent = new Field(this, "branchBSEvent");
 
 
     public InhibitoryActivation(int id, Thought t, InhibitoryNeuron neuron) {
@@ -45,17 +43,13 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
         if(bs.getState() == INPUT)
             Fields.connect(bs.getOnArrived(), inputBSEvent);
 
-        if(bs.getState() == BRANCH)
-            Fields.connect(bs.getOnArrived(), branchBSEvent);
-
         super.receiveBindingSignal(bs);
     }
 
     public Field getFixedBSEvent(State s) {
         if(s == INPUT)
             return inputBSEvent;
-        if(s == BRANCH)
-            return branchBSEvent;
+
         return super.getFixedBSEvent(s);
     }
 
@@ -71,7 +65,7 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
 
     private BindingSignal getPrimaryBranchBindingSignal() {
         return getBindingSignals()
-                .filter(bs -> bs.getState() == State.BRANCH)
+                .filter(bs -> bs.getState() == INPUT)
                 .filter(bs -> bs.getDepth() == 1)
                 .findFirst()
                 .orElse(null);

@@ -103,9 +103,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         if(bs.getState() == RELATED_SAME)
             Fields.connect(bs.getOnArrived(), relatedSameBSEvent);
 
-        if(bs.getState() == BRANCH)
-            Fields.connect(bs.getOnArrived(), branchBSEvent);
-
         super.receiveBindingSignal(bs);
     }
 
@@ -116,21 +113,12 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         if(s == RELATED_SAME)
             return relatedSameBSEvent;
 
-        if(s == BRANCH)
-            return branchBSEvent;
-
         return super.getFixedBSEvent(s);
     }
 
     @Override
     protected void initFields() {
         // Override parent
-    }
-
-    @Override
-    public void init(Synapse originSynapse, Activation originAct) {
-        super.init(originSynapse, originAct);
-        addBindingSignal(new BindingSignal(this, BRANCH));
     }
 
     public boolean isInput() {

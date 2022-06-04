@@ -69,7 +69,7 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     @Override
     public Range getRange() {
         return getBindingSignals()
-                .filter(s -> s.getState() == State.BRANCH)
+                .filter(s -> s.getState() == State.INPUT)
                 .map(s -> s.getOriginActivation().getRange())
                 .reduce(
                         new Range(0, 0),
