@@ -29,7 +29,6 @@ import static network.aika.fields.ThresholdOperator.Type.ABOVE;
  */
 public class PositiveFeedbackLink<IA extends Activation<?>> extends BindingNeuronLink<PositiveFeedbackSynapse, IA> {
 
-    private AbstractBiFunction feedbackWeightInput;
     private AbstractBiFunction feedbackBiasInput;
 
     public PositiveFeedbackLink(PositiveFeedbackSynapse s, IA input, BindingActivation output) {
@@ -40,18 +39,12 @@ public class PositiveFeedbackLink<IA extends Activation<?>> extends BindingNeuro
     public void induce() {
         super.induce();
 
-        reconnect(feedbackWeightInput.getInput2(), synapse.getWeight());
         reconnect(feedbackBiasInput.getInput2(), synapse.getFeedbackBias());
     }
 
     @Override
     protected void initWeightInput() {
-        feedbackWeightInput = mul(
-                "iAct.finalValue * s.weighted",
-                input.getFinalValue(),
-                synapse.getWeight(),
-                getOutput().getNet()
-        );
+        super.initWeightInput();
 
         feedbackBiasInput = mul(
                 "iAct.isFinal * s.feedbackBias",
@@ -86,10 +79,6 @@ public class PositiveFeedbackLink<IA extends Activation<?>> extends BindingNeuro
                 getOutput().getUpdateValue(),
                 synapse.getFeedbackBias()
         );
-    }
-
-    public AbstractBiFunction getFeedbackWeightInput() {
-        return feedbackWeightInput;
     }
 
     public AbstractBiFunction getFeedbackBiasInput() {
