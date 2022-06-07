@@ -34,7 +34,7 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
     protected Timestamp created;
     protected Timestamp fired;
 
-    protected double sortValue;
+    protected int sortValue;
 
     private Timestamp currentTimestamp;
 
@@ -51,10 +51,14 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
         if(isQueued) {
             Thought t = getElement().getThought();
             t.removeStep(this);
-            sortValue = newSortValue;
+            sortValue = convertSortValue(newSortValue);
             t.addStep(this);
         } else
-            sortValue = newSortValue;
+            sortValue = convertSortValue(newSortValue);
+    }
+
+    private int convertSortValue(double newSortValue) {
+        return (int) (1000.0 * newSortValue);
     }
 
     public Step copy(Element newElement) {

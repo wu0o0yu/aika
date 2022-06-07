@@ -4,6 +4,7 @@ package network.aika;
 import network.aika.neuron.activation.Timestamp;
 import network.aika.steps.Phase;
 import network.aika.steps.QueueKey;
+import network.aika.steps.Step;
 import org.junit.jupiter.api.Test;
 
 import java.util.TreeMap;
@@ -20,8 +21,17 @@ public class QueueSortTest {
         testQueue.put(new TestQueueKey(null, 321, 0.0, 385), 1);
         testQueue.put(new TestQueueKey(337l, 316, 0.0, 384), 2);
 */
+
+        TestQueueKey tqk3 = new TestQueueKey(null, 36, -18.020, 78);
+
+        testQueue.put(tqk3, 3);
+
         testQueue.put(new TestQueueKey(null, 386, 0.0, 393), 2);
         testQueue.put(new TestQueueKey(6l, 2, 0.0, 339), 1);
+
+        System.out.println();
+
+        Integer removedStep =testQueue.remove(tqk3);
 
         System.out.println();
     }

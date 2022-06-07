@@ -24,6 +24,7 @@ import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.utils.Utils;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -35,7 +36,7 @@ import java.io.IOException;
  */
 public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends Neuron & Axon, O extends ConjunctiveNeuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends ConjunctiveActivation> extends Synapse<S, I, O, L, IA, OA> {
 
-    private boolean allowPropagate;
+    private double sumOfLowerWeights;
 
     protected double getSortingWeight() {
         return getWeight().getCurrentValue();
@@ -43,18 +44,19 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
 
     @Override
     public boolean propagateCheck(BindingSignal<IA> inputBS) {
-        return allowPropagate;
+        return getWeight().getCurrentValue() + sumOfLowerWeights > 0.0;
     }
 
-    public boolean isAllowPropagate() {
-        return allowPropagate;
+    @Override
+    public double getSumOfLowerWeights() {
+        return sumOfLowerWeights;
     }
 
-    public void setAllowPropagate(boolean allowPropagate) {
-        if(this.allowPropagate != allowPropagate)
+    public void setSumOfLowerWeights(double sumOfLowerWeights) {
+        if(!Utils.belowTolerance(this.sumOfLowerWeights - sumOfLowerWeights))
             setModified();
 
-        this.allowPropagate = allowPropagate;
+        this.sumOfLowerWeights = sumOfLowerWeights;
     }
 
     @Override
@@ -66,13 +68,13 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     public void write(DataOutput out) throws IOException {
         super.write(out);
 
-        out.writeBoolean(allowPropagate);
+        out.writeDouble(sumOfLowerWeights);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
 
-        allowPropagate = in.readBoolean();
+        sumOfLowerWeights = in.readDouble();
     }
 }

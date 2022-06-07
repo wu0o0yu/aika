@@ -17,45 +17,21 @@
 package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
-import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class Terminal {
+public interface Terminal {
 
-    protected Transition transition;
-    protected State state;
-    protected Direction type;
+    Direction getType();
 
-    public Terminal(State state) {
-        this.state = state;
-    }
+    Transition getTransition();
 
-    public State getState() {
-        return state;
-    }
+    void initFixedTerminal(Synapse ts, Activation act);
 
-    public void setType(Direction type) {
-        this.type = type;
-    }
+    void notify(Synapse ts, BindingSignal bs);
 
-    public Direction getType() {
-        return type;
-    }
-
-    public void setTransition(Transition transition) {
-        this.transition = transition;
-    }
-
-    public Transition getTransition() {
-        return transition;
-    }
-
-    public abstract BindingSignal getBindingSignal(FieldOutput bsEvent);
-
-    public boolean linkCheck(Synapse ts, BindingSignal fromBS, BindingSignal toBS) {
-        return getState() == fromBS.getState();
-    }
+    BindingSignal propagate(BindingSignal bs);
 }

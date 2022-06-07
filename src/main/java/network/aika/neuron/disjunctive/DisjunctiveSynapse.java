@@ -50,6 +50,11 @@ public abstract class DisjunctiveSynapse<S extends DisjunctiveSynapse, I extends
     }
 
     @Override
+    public double getSumOfLowerWeights() {
+        return 0.0;
+    }
+
+    @Override
     public void linkOutput() {
         if(!isTemplate())
             return;

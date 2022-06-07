@@ -18,6 +18,7 @@ package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 
@@ -32,7 +33,7 @@ import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 /**
  * @author Lukas Molzberger
  */
-public class SingleTransition<I extends Terminal, O extends Terminal> implements Transition {
+public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal> implements Transition {
 
     protected I input;
     protected O output;
@@ -44,44 +45,18 @@ public class SingleTransition<I extends Terminal, O extends Terminal> implements
         this.mode = mode;
         input.setType(INPUT);
         output.setType(OUTPUT);
-        setTerminalTransition(this);
+
+        input.setTransition(this);
+        output.setTransition(this);
     }
 
-    public void setTerminalTransition(Transition t) {
-        input.setTransition(t);
-        output.setTransition(t);
-    }
-
-    public static <I extends Terminal, O extends Terminal> SingleTransition<I, O> transition(I input, O output, TransitionMode transitionMode) {
+    public static <I extends SingleTerminal, O extends SingleTerminal> SingleTransition<I, O> transition(I input, O output, TransitionMode transitionMode) {
         return new SingleTransition(input, output, transitionMode);
     }
 
-    @Override
-    public void notify(Terminal t, Synapse ts, BindingSignal bs) {
-        linkAndPropagate(t, ts, bs);
-    }
-
-    @Override
-    public void registerTransitionEvent(FixedTerminal t, Synapse ts, Activation act, FieldOutput bsEvent) {
-        FieldOutput transitionEvent = getTransitionEvent(
-                ts,
-                act,
-                t.getType().invert(),
-                bsEvent
-        );
-
-        transitionEvent.addEventListener(() ->
-                linkAndPropagate(
-                        t,
-                        ts,
-                        t.getBindingSignal(bsEvent)
-                )
-        );
-    }
-
-    private void linkAndPropagate(Terminal t, Synapse ts, BindingSignal fromBS) {
-        link(ts, fromBS, t.getType().invert());
-        propagate(ts, fromBS, t.getType().invert());
+    public void linkAndPropagate(Synapse ts, BindingSignal fromBS, Direction dir) {
+        link(ts, fromBS, dir);
+        propagate(ts, fromBS, dir);
     }
 
     public void link(Synapse ts, BindingSignal fromBS, Direction dir) {
@@ -97,11 +72,47 @@ public class SingleTransition<I extends Terminal, O extends Terminal> implements
         if (dir == INPUT)
             return;
 
-        ts.propagate(fromBS);
+        double tsWeight = ts.getWeight().getCurrentValue();
+        double tnBias = ts.getOutput().getBias().getCurrentValue();
+
+        if(tsWeight + tnBias > 0.0) {
+            ts.propagate(fromBS, null);
+        } else if(tsWeight + ts.getSumOfLowerWeights() > 0.0) {
+            latentLinking(ts, fromBS, dir);
+        }
+    }
+
+    private static void latentLinking(Synapse ts, BindingSignal<?> fromBS, Direction dir) {
+        Neuron<?, ?> toNeuron = dir.getNeuron(ts);
+
+        boolean templateEnabled = fromBS.getConfig().isTemplatesEnabled();
+        toNeuron.getTargetSynapses(INPUT, templateEnabled)
+                .filter(relatedTS -> ts != relatedTS)
+                .forEach(relatedTS -> {
+                    latentLinking(fromBS, ts, relatedTS);
+                    latentLinking(fromBS, relatedTS, ts);
+                });
+    }
+
+    private static void latentLinking(BindingSignal<?> fromBS, Synapse ts, Synapse latentTS) {
+        fromBS.getRelatedBindingSignal(latentTS.getInput())
+                .filter(relInputBS -> fromBS != relInputBS)
+                .filter(relInputBS ->
+                        isTrue(relInputBS.getOnArrivedFired())
+                )
+                .map(relInputBS ->
+                        relInputBS.propagate(latentTS)
+                )
+                .filter(toBS ->
+                        toBS != null && match(ts, fromBS, toBS, OUTPUT)
+                )
+                .forEach(toBS ->
+                        ts.propagate(fromBS, toBS)
+                );
     }
 
     public void link(Synapse ts, BindingSignal fromBS, BindingSignal toBS, Direction dir) {
-        if(!linkCheck(ts, fromBS, toBS, dir))
+        if(!match(ts, fromBS, toBS, dir))
             return;
 
         BindingSignal inputBS = dir.getInput(fromBS, toBS);
@@ -111,50 +122,20 @@ public class SingleTransition<I extends Terminal, O extends Terminal> implements
     }
 
     @Override
-    public Stream<VariableTerminal> getVariableTerminals(Synapse ts, BindingSignal bs, Direction dir) {
-        if(mode == PROPAGATE_ONLY)
-            return Stream.empty();
-
-        Terminal term = dir.getFromTerminal(this);
-
-        if(term.getState() != bs.getState())
-            return Stream.empty();
-
-        if(!(term instanceof VariableTerminal))
-            return Stream.empty();
-
-        return Stream.of((VariableTerminal) term);
+    public Stream<Terminal> getInputTerminals() {
+        return Stream.of(input);
     }
 
     @Override
-    public Stream<FixedTerminal> getFixedTerminals(Synapse ts, Activation act, Direction dir) {
-        if(mode == PROPAGATE_ONLY)
-            return Stream.empty();
-
-        Terminal term = dir.getFromTerminal(this);
-
-        if(!(term instanceof FixedTerminal))
-            return Stream.empty();
-
-        return Stream.of((FixedTerminal) term);
+    public Stream<Terminal> getOutputTerminals() {
+        return Stream.of(output);
     }
 
-    @Override
-    public Stream<SingleTransition> getBSPropagateTransitions(State s) {
-        if(mode == MATCH_ONLY)
-            return Stream.empty();
-
-        if(s != input.getState())
-            return Stream.empty();
-
-        return Stream.of(this);
-    }
-
-    public Terminal getInput() {
+    public I getInput() {
         return input;
     }
 
-    public Terminal getOutput() {
+    public O getOutput() {
         return output;
     }
 
@@ -166,7 +147,14 @@ public class SingleTransition<I extends Terminal, O extends Terminal> implements
         return mode;
     }
 
-    public boolean linkCheck(Synapse ts, BindingSignal fromBS, BindingSignal toBS, Direction dir) {
+    public BindingSignal propagate(BindingSignal bs) {
+        if(mode == MATCH_ONLY)
+            return null;
+
+        return bs.next(this);
+    }
+
+    public boolean match(Synapse ts, BindingSignal fromBS, BindingSignal toBS, Direction dir) {
         if(mode == PROPAGATE_ONLY)
             return false;
 

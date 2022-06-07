@@ -22,6 +22,7 @@ import network.aika.direction.Direction;
 import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.QueueField;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Element;
@@ -81,11 +82,10 @@ public class BindingSignal<A extends Activation> implements Element {
     }
 
     public void propagate(Link l) {
-        SingleTransition t = transition(l.getSynapse());
-        if(t == null)
+        BindingSignal toBS = propagate(l.getSynapse());
+        if(toBS == null)
             return;
 
-        BindingSignal toBS = next(t);
         toBS.setLink(l);
 
         Activation oAct = l.getOutput();
@@ -94,16 +94,13 @@ public class BindingSignal<A extends Activation> implements Element {
     }
 
     public BindingSignal propagate(Synapse s) {
-        return next(transition(s));
-    }
-
-    public SingleTransition transition(Synapse s) {
         if(depth >= 3)
             return null;
 
-        Stream<Transition> transitions = s.getTransitions();
+       Stream<Transition> transitions = s.getTransitions();
         return transitions
-                .flatMap(t -> t.getBSPropagateTransitions(state))
+                .flatMap(transition -> transition.getInputTerminals())
+                .map(terminal -> terminal.propagate(this))
                 .findFirst()
                 .orElse(null);
     }
@@ -112,6 +109,13 @@ public class BindingSignal<A extends Activation> implements Element {
         return t != null ?
                 new BindingSignal(this, t) :
                 null;
+    }
+
+    public Stream<BindingSignal<?>> getRelatedBindingSignal(Neuron toNeuron) {
+        Activation originAct = getOriginActivation();
+        Stream<BindingSignal<?>> relatedBindingSignals = originAct.getReverseBindingSignals(toNeuron);
+
+        return relatedBindingSignals;
     }
 
     public void setLink(Link l) {
@@ -145,6 +149,10 @@ public class BindingSignal<A extends Activation> implements Element {
         return onArrived;
     }
 
+    public FieldOutput getOnArrivedFired() {
+        return onArrivedFired;
+    }
+
     public boolean isOrigin() {
         return this == origin;
     }
@@ -167,6 +175,10 @@ public class BindingSignal<A extends Activation> implements Element {
 
     public int getDepth() {
         return depth;
+    }
+
+    public boolean isNetworkInput() {
+        return activation != null && activation.isNetworkInput();
     }
 
     public static boolean originEquals(BindingSignal bsA, BindingSignal bsB) {

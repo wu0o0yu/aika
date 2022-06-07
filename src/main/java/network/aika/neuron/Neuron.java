@@ -384,7 +384,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     public void suspend() {
     }
 
-    public void updateAllowPropagate() {
+    public void updateSumOfLowerWeights() {
     }
 
     @Override

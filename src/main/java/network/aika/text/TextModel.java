@@ -115,7 +115,7 @@ public class TextModel extends Model {
         inRel.setLabel(label);
         inRel.getBias().receiveUpdate(4.0);
         inRel.setAllowTraining(false);
-        inRel.updateAllowPropagate();
+        inRel.updateSumOfLowerWeights();
     }
 
     private PrimaryInputSynapse initRelatedInputSynapse(CategoryNeuron relTokenCat, BindingNeuron relBN) {

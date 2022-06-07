@@ -16,47 +16,54 @@
  */
 package network.aika.neuron.bindingsignal;
 
+import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-
-import java.util.stream.Stream;
-
-import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 
 /**
  * @author Lukas Molzberger
  */
-public class VariableTerminal extends SingleTerminal {
+public abstract class SingleTerminal implements Terminal {
 
-    public VariableTerminal(State state) {
-        super(state);
+    protected SingleTransition transition;
+    protected State state;
+    protected Direction type;
+
+    public SingleTerminal(State state) {
+        this.state = state;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setType(Direction type) {
+        this.type = type;
+    }
+
+    public Direction getType() {
+        return type;
+    }
+
+    public void setTransition(SingleTransition transition) {
+        this.transition = transition;
+    }
+
+    public Transition getTransition() {
+        return transition;
+    }
+
+    public abstract BindingSignal getBindingSignal(FieldOutput bsEvent);
+
+    public boolean linkCheck(Synapse ts, BindingSignal fromBS, BindingSignal toBS) {
+        return getState() == fromBS.getState();
     }
 
     @Override
-    public void initFixedTerminal(Synapse ts, Activation act) {
-        // nothing to do
-    }
+    public BindingSignal propagate(BindingSignal bs) {
+        if(bs.getState() != getState())
+            return null;
 
-    public static VariableTerminal variable(State s) {
-        return new VariableTerminal(s);
-    }
-
-    public void notify(Synapse ts, BindingSignal bs) {
-        if(transition.getMode() == PROPAGATE_ONLY)
-            return;
-
-        if(getState() != bs.getState())
-            return;
-
-        transition.linkAndPropagate(ts, bs, type.invert());
-    }
-
-    public BindingSignal getBindingSignal(FieldOutput bsEvent) {
-        return (BindingSignal) bsEvent.getReference();
-    }
-
-    public String toString() {
-        return "variable(" + type + ":" + state + ")";
+        return transition.propagate(bs);
     }
 }

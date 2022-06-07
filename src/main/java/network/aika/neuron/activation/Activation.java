@@ -254,6 +254,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     public Field getFixedBSEvent(State s) {
         if(s == State.SAME)
             return sameBSEvent;
+
         return null;
     }
 

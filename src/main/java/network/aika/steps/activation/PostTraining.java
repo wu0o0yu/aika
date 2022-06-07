@@ -61,6 +61,6 @@ public class PostTraining extends Step<DummyActivation> {
         Neuron n = getElement().getNeuron();
 
         assert !n.isTemplate();
-        n.updateAllowPropagate();
+        n.updateSumOfLowerWeights();
     }
 }

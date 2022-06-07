@@ -76,30 +76,32 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return false;
     }
 
-
     public Stream<BindingSignal<?>> getRelatedBindingSignal(BindingSignal<?> fromBS, Direction dir) {
-        Neuron toNeuron = dir.getNeuron(this);
-        Activation originAct = fromBS.getOriginActivation();
-        Stream<BindingSignal<?>> relatedBindingSignals = originAct.getReverseBindingSignals(toNeuron);
-
-        return relatedBindingSignals;
+        return fromBS.getRelatedBindingSignal(
+                dir.getNeuron(this)
+        );
     }
+
+    public abstract double getSumOfLowerWeights();
 
     public boolean propagateCheck(BindingSignal<IA> inputBS) {
         return true;
     }
 
     public boolean linkCheck(BindingSignal inputBS, BindingSignal outputBS) {
-        if(inputBS.getActivation().isNetworkInput() && !networkInputsAllowed(OUTPUT))
+        if(inputBS.isNetworkInput() && !networkInputsAllowed(OUTPUT))
             return false;
 
-        if(outputBS.getActivation().isNetworkInput() && !networkInputsAllowed(INPUT))
+        if(outputBS.isNetworkInput() && !networkInputsAllowed(INPUT))
             return false;
 
         return inputBS.getOrigin() == outputBS.getOrigin();
     }
 
-    public L propagate(BindingSignal<IA> inputBS) {
+    public L propagate(BindingSignal<IA> inputBS, BindingSignal<OA> outputBS) {
+        if(outputBS != null && !linkCheck(inputBS, outputBS))
+            return null;
+
         if(!propagateCheck(inputBS))
             return null;
 
@@ -131,6 +133,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public FieldOutput getLinkingEvent(Activation act, Direction dir) {
+        if(act == null)
+            return null;
+
         return act.getEvent(dir == OUTPUT, isTemplate());
     }
 
@@ -139,11 +144,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
             return;
 
         getTransitions()
-                .flatMap(t ->
-                        t.getFixedTerminals(this, act, dir)
+                .flatMap(transition ->
+                        dir.invert().getTerminals(transition)
                 )
-                .forEach(t ->
-                        t.initFixedTransitionEvent(this, act)
+                .forEach(terminal ->
+                        terminal.initFixedTerminal(this, act)
                 );
     }
 
@@ -152,8 +157,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
             return;
 
         getTransitions()
-                .flatMap(t ->
-                        t.getVariableTerminals(this, bs, dir)
+                .flatMap(transition ->
+                        dir.invert().getTerminals(transition)
                 )
                 .forEach(t ->
                         t.notify(this, bs)

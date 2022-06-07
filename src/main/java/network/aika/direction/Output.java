@@ -20,9 +20,10 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.SingleTransition;
+import network.aika.neuron.bindingsignal.SingleTerminal;
 import network.aika.neuron.bindingsignal.Terminal;
+import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.stream.Stream;
 
@@ -58,12 +59,12 @@ public class Output implements Direction {
     }
 
     @Override
-    public Terminal getTerminal(SingleTransition t) {
+    public SingleTerminal getTerminal(SingleTransition t) {
         return t.getOutput();
     }
 
     @Override
-    public Terminal getFromTerminal(SingleTransition t) {
+    public SingleTerminal getFromTerminal(SingleTransition t) {
         return t.getInput();
     }
 
@@ -75,6 +76,11 @@ public class Output implements Direction {
     @Override
     public Stream<? extends Synapse> getSynapses(Neuron n) {
         return n.getOutputSynapses();
+    }
+
+    @Override
+    public Stream<Terminal> getTerminals(Transition t) {
+        return t.getOutputTerminals();
     }
 
     public String toString() {

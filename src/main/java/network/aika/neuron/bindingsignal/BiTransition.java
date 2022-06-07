@@ -35,15 +35,16 @@ import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
  */
 public class BiTransition implements Transition {
 
-    protected SingleTransition activeTransition;
+    protected BiTerminal inputTerminal;
+
+    protected SingleTransition<FixedTerminal, ?> activeTransition;
     protected SingleTransition<FixedTerminal, FixedTerminal> passiveTransition;
 
-    protected BiTransition(SingleTransition activeTransition, SingleTransition<FixedTerminal, FixedTerminal> passiveTransition) {
+    protected BiTransition(SingleTransition<FixedTerminal, ?> activeTransition, SingleTransition<FixedTerminal, FixedTerminal> passiveTransition) {
         this.activeTransition = activeTransition;
         this.passiveTransition = passiveTransition;
 
-        activeTransition.setTerminalTransition(this);
-        passiveTransition.setTerminalTransition(this);
+        inputTerminal = new BiTerminal(this, activeTransition.getInput(), passiveTransition.getInput());
     }
 
     public static BiTransition biTransition(SingleTransition activeTransition, SingleTransition passiveTransition) {
@@ -51,69 +52,13 @@ public class BiTransition implements Transition {
     }
 
     @Override
-    public Stream<FixedTerminal> getFixedTerminals(Synapse ts, Activation act, Direction dir) {
-        return activeTransition.getFixedTerminals(ts, act, dir);
+    public Stream<Terminal> getInputTerminals() {
+        return Stream.of(inputTerminal);
     }
 
     @Override
-    public Stream<VariableTerminal> getVariableTerminals(Synapse ts, BindingSignal bs, Direction dir) {
-        return activeTransition.getVariableTerminals(ts, bs, dir);
-    }
-
-    private FixedTerminal getPassiveTerminal(Terminal t, Synapse ts, Activation act) {
-        FixedTerminal passiveTerminal = passiveTransition.getFixedTerminals(ts, act, t.getType().invert())
-                .findFirst()
-                .orElse(null);
-        return passiveTerminal;
-    }
-
-    @Override
-    public void notify(Terminal t, Synapse ts, BindingSignal bs) {
-        if(t.getType() == INPUT) {
-            Activation act = bs.getActivation();
-
-            initTransitionEvent(
-                    ts,
-                    act,
-                    t.getType().invert(),
-                    bs.getOnArrived(),
-                    getPassiveTerminal(t, ts, act).getBSEvent(act)
-            );
-        } else {
-            link(ts, bs.getOnArrived(), INPUT);
-        }
-    }
-
-    @Override
-    public void registerTransitionEvent(FixedTerminal t, Synapse ts, Activation act, FieldOutput bsEvent) {
-        initTransitionEvent(
-                ts,
-                act,
-                t.getType().invert(),
-                bsEvent,
-                getPassiveTerminal(t, ts, act).getBSEvent(act)
-        );
-    }
-
-    private void initTransitionEvent(Synapse ts, Activation act, Direction dir, FieldOutput activeBSEvent, FieldOutput passiveBSEvent) {
-        FieldOutput inputEvent = mul(
-                "input bi transition event",
-                activeBSEvent,
-                passiveBSEvent
-        );
-
-        FieldOutput transitionEvent = getTransitionEvent(ts, act, dir, inputEvent);
-        transitionEvent.addEventListener(() ->
-                link(ts, activeBSEvent, dir)
-        );
-    }
-
-    @Override
-    public Stream<SingleTransition> getBSPropagateTransitions(State s) {
-        return Stream.concat(
-                activeTransition.getBSPropagateTransitions(s),
-                passiveTransition.getBSPropagateTransitions(s)
-        );
+    public Stream<Terminal> getOutputTerminals() {
+        return Stream.of(activeTransition.getOutput(), passiveTransition.getOutput());
     }
 
     @Override
@@ -121,8 +66,8 @@ public class BiTransition implements Transition {
         return MATCH_ONLY;
     }
 
-    protected void link(Synapse ts, FieldOutput activeBSEvent, Direction dir) {
-        Terminal activeTerminal = dir.getFromTerminal(activeTransition);
+    public void linkAndPropagate(Synapse ts, FieldOutput activeBSEvent, Direction dir) {
+        SingleTerminal activeTerminal = dir.getFromTerminal(activeTransition);
         BindingSignal activeBS = activeTerminal.getBindingSignal(activeBSEvent);
 
         FixedTerminal passiveTerminal = (FixedTerminal) dir.getFromTerminal(passiveTransition);
