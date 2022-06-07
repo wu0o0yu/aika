@@ -52,6 +52,17 @@ public class ReversePatternSynapse<I extends Neuron & PatternAxon, IA extends Ac
             )
     );
 
+
+    @Override
+    public boolean isPropagate() {
+        return true;
+    }
+
+    @Override
+    public boolean isLatentLinking() {
+        return false;
+    }
+
     @Override
     public ReversePatternLink createLink(IA input, BindingActivation output) {
         return new ReversePatternLink(this, input, output);

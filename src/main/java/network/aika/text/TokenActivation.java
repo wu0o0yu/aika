@@ -95,8 +95,8 @@ public class TokenActivation extends PatternActivation {
     }
 
     private void linkPrimaryInput(PrimaryInputSynapse relSynNext, BindingActivation toAct) {
-        BindingSignal fromBS = getCategoryActivation(toAct.getModel()).getBindingSignal(this);
-        BindingSignal toBS = fromBS.propagate(relSynNext);
+        BindingSignal<?> fromBS = getCategoryActivation(toAct.getModel()).getBindingSignal(this);
+        BindingSignal toBS = fromBS.propagate(relSynNext).findFirst().orElse(null);
         toBS.init(toAct);
         relSynNext.createLink(fromBS.getActivation(), (BindingActivation) toBS.getActivation());
     }

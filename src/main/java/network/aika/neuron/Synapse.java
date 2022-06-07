@@ -23,6 +23,7 @@ import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
 import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.SingleTransition;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.PostTraining;
@@ -130,6 +131,23 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
             return null;
 
         return createLink(iAct, oAct);
+    }
+
+    public boolean isPropagate() {
+        double tsWeight = getWeight().getCurrentValue();
+        double tnBias = getOutput().getBias().getCurrentValue();
+        return tsWeight + tnBias > 0.0;
+    }
+
+    public boolean isLatentLinking() {
+        return getWeight().getCurrentValue() + getSumOfLowerWeights() > 0.0;
+    }
+
+    public Stream<SingleTransition> getRelatedTransitions(SingleTransition fromTransition) {
+        return getTransitions()
+                .flatMap(transition -> transition.getOutputTerminals())
+                .filter(terminal -> terminal.getState() == fromTransition.getOutput().getState())
+                .map(terminal -> terminal.getTransition());
     }
 
     public FieldOutput getLinkingEvent(Activation act, Direction dir) {

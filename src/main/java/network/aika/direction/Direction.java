@@ -55,7 +55,7 @@ public interface Direction {
 
     Stream<? extends Synapse> getSynapses(Neuron n);
 
-    Stream<Terminal> getTerminals(Transition t);
+    Stream<? extends Terminal> getTerminals(Transition t);
 
     static int compare(Direction a, Direction b) {
         if(a == b) return 0;

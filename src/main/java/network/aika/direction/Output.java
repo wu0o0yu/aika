@@ -79,7 +79,7 @@ public class Output implements Direction {
     }
 
     @Override
-    public Stream<Terminal> getTerminals(Transition t) {
+    public Stream<? extends Terminal> getTerminals(Transition t) {
         return t.getOutputTerminals();
     }
 

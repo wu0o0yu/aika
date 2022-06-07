@@ -20,6 +20,8 @@ import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
 
+import java.util.stream.Stream;
+
 /**
  * @author Lukas Molzberger
  */
@@ -49,21 +51,21 @@ public abstract class SingleTerminal implements Terminal {
         this.transition = transition;
     }
 
-    public Transition getTransition() {
+    public SingleTransition getTransition() {
         return transition;
     }
 
     public abstract BindingSignal getBindingSignal(FieldOutput bsEvent);
 
-    public boolean linkCheck(Synapse ts, BindingSignal fromBS, BindingSignal toBS) {
+    public boolean linkCheck(Synapse ts, BindingSignal fromBS) {
         return getState() == fromBS.getState();
     }
 
     @Override
-    public BindingSignal propagate(BindingSignal bs) {
+    public Stream<BindingSignal> propagate(BindingSignal bs) {
         if(bs.getState() != getState())
-            return null;
+            return Stream.empty();
 
-        return transition.propagate(bs);
+        return Stream.of(transition.propagate(bs));
     }
 }

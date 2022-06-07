@@ -21,6 +21,8 @@ import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 
+import java.util.stream.Stream;
+
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.mul;
 
@@ -80,10 +82,10 @@ public class BiTerminal implements Terminal {
     }
 
     @Override
-    public BindingSignal propagate(BindingSignal bs) {
-        BindingSignal nextBS = activeTerminal.propagate(bs);
-        if(nextBS != null)
-            return nextBS;
-        return passiveTerminal.propagate(bs);
+    public Stream<BindingSignal> propagate(BindingSignal bs) {
+        return Stream.concat(
+                activeTerminal.propagate(bs),
+                passiveTerminal.propagate(bs)
+        );
     }
 }

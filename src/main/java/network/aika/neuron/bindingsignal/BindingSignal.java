@@ -82,27 +82,27 @@ public class BindingSignal<A extends Activation> implements Element {
     }
 
     public void propagate(Link l) {
-        BindingSignal toBS = propagate(l.getSynapse());
-        if(toBS == null)
-            return;
+        propagate(l.getSynapse()).forEach(toBS -> {
+            toBS.setLink(l);
 
-        toBS.setLink(l);
-
-        Activation oAct = l.getOutput();
-        toBS.init(oAct);
-        oAct.addBindingSignal(toBS);
+            Activation oAct = l.getOutput();
+            toBS.init(oAct);
+            oAct.addBindingSignal(toBS);
+        });
     }
 
-    public BindingSignal propagate(Synapse s) {
+    public Stream<BindingSignal> propagate(Synapse s) {
         if(depth >= 3)
             return null;
 
        Stream<Transition> transitions = s.getTransitions();
         return transitions
-                .flatMap(transition -> transition.getInputTerminals())
-                .map(terminal -> terminal.propagate(this))
-                .findFirst()
-                .orElse(null);
+                .flatMap(transition ->
+                        transition.getInputTerminals()
+                )
+                .flatMap(terminal ->
+                        terminal.propagate(this)
+                );
     }
 
     public BindingSignal next(SingleTransition t) {

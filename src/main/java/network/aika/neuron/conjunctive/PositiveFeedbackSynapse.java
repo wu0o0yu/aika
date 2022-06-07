@@ -64,6 +64,16 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     }
 
     @Override
+    public boolean isPropagate() {
+        return false;
+    }
+
+    @Override
+    public boolean isLatentLinking() {
+        return false;
+    }
+
+    @Override
     public boolean propagateCheck(BindingSignal<IA> inputBS) {
         return false;
     }

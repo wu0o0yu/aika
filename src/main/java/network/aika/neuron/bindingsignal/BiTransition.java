@@ -27,6 +27,8 @@ import java.util.stream.Stream;
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.mul;
+import static network.aika.neuron.bindingsignal.SingleTransition.link;
+import static network.aika.neuron.bindingsignal.SingleTransition.propagate;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
 
 
@@ -57,7 +59,7 @@ public class BiTransition implements Transition {
     }
 
     @Override
-    public Stream<Terminal> getOutputTerminals() {
+    public Stream<SingleTerminal> getOutputTerminals() {
         return Stream.of(activeTransition.getOutput(), passiveTransition.getOutput());
     }
 
@@ -73,14 +75,14 @@ public class BiTransition implements Transition {
         FixedTerminal passiveTerminal = (FixedTerminal) dir.getFromTerminal(passiveTransition);
         BindingSignal passiveBS = passiveTerminal.getBindingSignal(activeBS.getActivation());
 
-        link(activeTransition, ts, activeBS, passiveBS, dir);
-        link(passiveTransition, ts, passiveBS, activeBS, dir);
+        biLink(activeTransition, ts, activeBS, passiveBS, dir);
+        biLink(passiveTransition, ts, passiveBS, activeBS, dir);
 
-        activeTransition.propagate(ts, activeBS, dir);
-        passiveTransition.propagate(ts, passiveBS, dir);
+        propagate(activeTransition, ts, activeBS, dir);
+        propagate(passiveTransition, ts, passiveBS, dir);
     }
 
-    private void link(SingleTransition t, Synapse ts, BindingSignal fromBS, BindingSignal relatedFromBindingsSignal, Direction dir) {
+    private void biLink(SingleTransition t, Synapse ts, BindingSignal fromBS, BindingSignal relatedFromBindingSignal, Direction dir) {
         if(fromBS == null)
             return;
 
@@ -90,13 +92,13 @@ public class BiTransition implements Transition {
                 .filter(toBS -> fromBS != toBS)
                 .filter(toBS -> checkRelated(
                                 getRelatedTransition(t),
-                                relatedFromBindingsSignal,
+                                relatedFromBindingSignal,
                                 toBS.getActivation(),
                                 dir
                         )
                 )
                 .forEach(toBS ->
-                        t.link(ts, fromBS, toBS, dir)
+                        link(t, ts, fromBS, toBS, dir)
                 );
     }
 

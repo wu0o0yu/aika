@@ -20,6 +20,8 @@ import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 
+import java.util.stream.Stream;
+
 /**
  * @author Lukas Molzberger
  */
@@ -33,5 +35,5 @@ public interface Terminal {
 
     void notify(Synapse ts, BindingSignal bs);
 
-    BindingSignal propagate(BindingSignal bs);
+    Stream<BindingSignal> propagate(BindingSignal bs);
 }
