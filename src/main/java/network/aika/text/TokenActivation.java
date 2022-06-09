@@ -17,7 +17,6 @@
 package network.aika.text;
 
 import network.aika.fields.Field;
-import network.aika.fields.QueueField;
 import network.aika.fields.ValueSortedQueueField;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
@@ -25,6 +24,9 @@ import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.conjunctive.PrimaryInputSynapse;
+
+import static network.aika.neuron.bindingsignal.BSKey.createKey;
+import static network.aika.neuron.bindingsignal.State.SAME;
 
 /**
  *
@@ -90,12 +92,19 @@ public class TokenActivation extends PatternActivation {
 
         TextModel model = prev.getModel();
 
-        next.linkPrimaryInput(model.getRelNTPrimaryInputSyn(), prev.getRelNTBindingActivation(model));
-        prev.linkPrimaryInput(model.getRelPTPrimaryInputSyn(), next.getRelPTBindingActivation(model));
+        next.linkPrimaryInput(
+                model.getRelNTPrimaryInputSyn(),
+                prev.getRelNTBindingActivation(model)
+        );
+        prev.linkPrimaryInput(
+                model.getRelPTPrimaryInputSyn(),
+                next.getRelPTBindingActivation(model)
+        );
     }
 
     private void linkPrimaryInput(PrimaryInputSynapse relSynNext, BindingActivation toAct) {
-        BindingSignal<?> fromBS = getCategoryActivation(toAct.getModel()).getBindingSignal(this);
+        CategoryActivation catAct = getCategoryActivation(toAct.getModel());
+        BindingSignal<?> fromBS = catAct.getBindingSignal(createKey(this, SAME));
         BindingSignal toBS = fromBS.propagate(relSynNext).findFirst().orElse(null);
         toBS.init(toAct);
         relSynNext.createLink(fromBS.getActivation(), (BindingActivation) toBS.getActivation());

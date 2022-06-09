@@ -66,6 +66,10 @@ public abstract class SingleTerminal implements Terminal {
         if(bs.getState() != getState())
             return Stream.empty();
 
-        return Stream.of(transition.propagate(bs));
+        BindingSignal toBS = transition.propagate(bs);
+        if(toBS == null)
+            return Stream.empty();
+
+        return Stream.of(toBS);
     }
 }

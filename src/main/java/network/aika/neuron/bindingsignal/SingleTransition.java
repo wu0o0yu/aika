@@ -98,7 +98,7 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
                         isTrue(bsB.getOnArrivedFired())
                 )
                 .forEach(bsB -> {
-                    Stream<SingleTransition> relTrans = synB.getRelatedTransitions(tA);
+                    Stream<SingleTransition> relTrans = synB.getRelatedTransitions(bsB, tA);
                     relTrans.forEach(tB -> {
                         latentLinking(synA, bsA, tA, synB, bsB, tB);
                         latentLinking(synB, bsB, tB, synA, bsA, tA);

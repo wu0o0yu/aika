@@ -29,9 +29,11 @@ import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Timestamp;
 
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.fields.Fields.mul;
+import static network.aika.neuron.bindingsignal.BSKey.createKey;
 
 
 /**
@@ -82,18 +84,20 @@ public class BindingSignal<A extends Activation> implements Element {
     }
 
     public void propagate(Link l) {
-        propagate(l.getSynapse()).forEach(toBS -> {
-            toBS.setLink(l);
+        propagate(l.getSynapse())
+                .forEach(toBS -> {
+                            toBS.setLink(l);
 
-            Activation oAct = l.getOutput();
-            toBS.init(oAct);
-            oAct.addBindingSignal(toBS);
-        });
+                            Activation oAct = l.getOutput();
+                            toBS.init(oAct);
+                            oAct.addBindingSignal(toBS);
+                        }
+                );
     }
 
     public Stream<BindingSignal> propagate(Synapse s) {
         if(depth >= 3)
-            return null;
+            return Stream.empty();
 
        Stream<Transition> transitions = s.getTransitions();
         return transitions
@@ -112,10 +116,11 @@ public class BindingSignal<A extends Activation> implements Element {
     }
 
     public Stream<BindingSignal<?>> getRelatedBindingSignal(Neuron toNeuron) {
-        Activation originAct = getOriginActivation();
-        Stream<BindingSignal<?>> relatedBindingSignals = originAct.getReverseBindingSignals(toNeuron);
-
-        return relatedBindingSignals;
+        Stream<BindingSignal<?>> relatedBSs = getOriginActivation()
+                .getReverseBindingSignals(toNeuron);
+        return relatedBSs
+                .collect(Collectors.toList())
+                .stream();
     }
 
     public void setLink(Link l) {
@@ -199,7 +204,7 @@ public class BindingSignal<A extends Activation> implements Element {
     }
 
     public boolean shorterBSExists() {
-        BindingSignal existingBS = getActivation().getBindingSignal(getOriginActivation());
+        BindingSignal existingBS = getActivation().getBindingSignal(createKey(this));
         if(existingBS == null)
             return false;
 

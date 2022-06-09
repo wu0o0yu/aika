@@ -134,6 +134,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public boolean isPropagate() {
+        if(isRecurrent())
+            return false;
+
         double tsWeight = getWeight().getCurrentValue();
         double tnBias = getOutput().getBias().getCurrentValue();
         return tsWeight + tnBias > 0.0;
@@ -143,11 +146,12 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return getWeight().getCurrentValue() + getSumOfLowerWeights() > 0.0;
     }
 
-    public Stream<SingleTransition> getRelatedTransitions(SingleTransition fromTransition) {
+    public Stream<SingleTransition> getRelatedTransitions(BindingSignal fromBS, SingleTransition fromTransition) {
         return getTransitions()
-                .flatMap(transition -> transition.getOutputTerminals())
-                .filter(terminal -> terminal.getState() == fromTransition.getOutput().getState())
-                .map(terminal -> terminal.getTransition());
+                .flatMap(toTransition -> toTransition.getOutputTerminals())
+                .filter(toTerminal -> toTerminal.getState() == fromTransition.getOutput().getState())
+                .filter(toTerminal -> toTerminal.getTransition().getInput().linkCheck(this, fromBS))
+                .map(toTerminal -> toTerminal.getTransition());
     }
 
     public FieldOutput getLinkingEvent(Activation act, Direction dir) {
