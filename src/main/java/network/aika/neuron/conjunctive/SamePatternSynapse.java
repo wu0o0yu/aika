@@ -16,18 +16,11 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.Model;
-import network.aika.Thought;
 import network.aika.direction.Direction;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.SamePatternLink;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -66,58 +59,9 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
             )
     );
 
-    private int looseLinkingRange;
-    private boolean allowLooseLinking;
-
     @Override
     public SamePatternLink createLink(BindingActivation input, BindingActivation output) {
         return new SamePatternLink(this, input, output);
-    }
-
-    @Override
-    public boolean linkCheck(BindingSignal inputBS, BindingSignal outputBS) {
-        return allowLooseLinking || super.linkCheck(inputBS, outputBS);
-    }
-
-    @Override
-    public Stream<BindingSignal<?>> getRelatedBindingSignal(BindingSignal<?> fromBS, Direction dir) {
-        Stream<BindingSignal<?>> relatedBindingSignals = super.getRelatedBindingSignal(fromBS, dir);
-
-        if(allowLooseLinking) {
-            Thought t = fromBS.getOriginActivation().getThought();
-            Neuron toNeuron = dir.getNeuron(this);
-
-            relatedBindingSignals = Stream.concat(
-                    relatedBindingSignals,
-                    t.getLooselyRelatedBindingSignals(fromBS, getLooseLinkingRange(), toNeuron)
-            );
-        }
-
-        return relatedBindingSignals;
-    }
-
-    @Override
-    protected double getSortingWeight() {
-        if(allowLooseLinking)
-            return 0.0;
-
-        return super.getSortingWeight();
-    }
-
-    public void setLooseLinkingRange(int looseLinkingRange) {
-        this.looseLinkingRange = looseLinkingRange;
-    }
-
-    public Integer getLooseLinkingRange() {
-        return looseLinkingRange;
-    }
-
-    public void setAllowLooseLinking(boolean allowLooseLinking) {
-        this.allowLooseLinking = allowLooseLinking;
-    }
-
-    public boolean allowLooseLinking() {
-        return allowLooseLinking;
     }
 
     @Override
@@ -128,21 +72,5 @@ public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse,
     @Override
     public Stream<Transition> getTransitions() {
         return TRANSITIONS.stream();
-    }
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-        super.write(out);
-
-        out.writeBoolean(allowLooseLinking);
-        out.writeInt(looseLinkingRange);
-    }
-
-    @Override
-    public void readFields(DataInput in, Model m) throws IOException {
-        super.readFields(in, m);
-
-        allowLooseLinking = in.readBoolean();
-        looseLinkingRange = in.readInt();
     }
 }
