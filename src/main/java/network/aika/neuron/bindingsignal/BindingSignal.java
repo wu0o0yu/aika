@@ -22,15 +22,18 @@ import network.aika.direction.Direction;
 import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.QueueField;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Timestamp;
 
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.fields.Fields.mul;
+import static network.aika.neuron.bindingsignal.BSKey.createKey;
 
 
 /**
@@ -81,37 +84,43 @@ public class BindingSignal<A extends Activation> implements Element {
     }
 
     public void propagate(Link l) {
-        SingleTransition t = transition(l.getSynapse());
-        if(t == null)
-            return;
+        propagate(l.getSynapse())
+                .forEach(toBS -> {
+                            toBS.setLink(l);
 
-        BindingSignal toBS = next(t);
-        toBS.setLink(l);
-
-        Activation oAct = l.getOutput();
-        toBS.init(oAct);
-        oAct.addBindingSignal(toBS);
+                            Activation oAct = l.getOutput();
+                            toBS.init(oAct);
+                            oAct.addBindingSignal(toBS);
+                        }
+                );
     }
 
-    public BindingSignal propagate(Synapse s) {
-        return next(transition(s));
-    }
-
-    public SingleTransition transition(Synapse s) {
+    public Stream<BindingSignal> propagate(Synapse s) {
         if(depth >= 3)
-            return null;
+            return Stream.empty();
 
-        Stream<Transition> transitions = s.getTransitions();
+       Stream<Transition> transitions = s.getTransitions();
         return transitions
-                .flatMap(t -> t.getBSPropagateTransitions(state))
-                .findFirst()
-                .orElse(null);
+                .flatMap(transition ->
+                        transition.getInputTerminals()
+                )
+                .flatMap(terminal ->
+                        terminal.propagate(this)
+                );
     }
 
     public BindingSignal next(SingleTransition t) {
         return t != null ?
                 new BindingSignal(this, t) :
                 null;
+    }
+
+    public Stream<BindingSignal<?>> getRelatedBindingSignal(Neuron toNeuron) {
+        Stream<BindingSignal<?>> relatedBSs = getOriginActivation()
+                .getReverseBindingSignals(toNeuron);
+        return relatedBSs
+                .collect(Collectors.toList())
+                .stream();
     }
 
     public void setLink(Link l) {
@@ -145,6 +154,10 @@ public class BindingSignal<A extends Activation> implements Element {
         return onArrived;
     }
 
+    public FieldOutput getOnArrivedFired() {
+        return onArrivedFired;
+    }
+
     public boolean isOrigin() {
         return this == origin;
     }
@@ -169,6 +182,10 @@ public class BindingSignal<A extends Activation> implements Element {
         return depth;
     }
 
+    public boolean isNetworkInput() {
+        return activation != null && activation.isNetworkInput();
+    }
+
     public static boolean originEquals(BindingSignal bsA, BindingSignal bsB) {
         return bsA != null && bsB != null && bsA.getOrigin() == bsB.getOrigin();
     }
@@ -187,7 +204,7 @@ public class BindingSignal<A extends Activation> implements Element {
     }
 
     public boolean shorterBSExists() {
-        BindingSignal existingBS = getActivation().getBindingSignal(getOriginActivation());
+        BindingSignal existingBS = getActivation().getBindingSignal(createKey(this));
         if(existingBS == null)
             return false;
 

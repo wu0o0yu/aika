@@ -60,7 +60,7 @@ public class PatternNeuron extends ConjunctiveNeuron<PatternSynapse, PatternActi
     }
 
     @Override
-    public void updateAllowPropagate() {
+    public void updateSumOfLowerWeights() {
     }
 
     public void setTokenLabel(String tokenLabel) {

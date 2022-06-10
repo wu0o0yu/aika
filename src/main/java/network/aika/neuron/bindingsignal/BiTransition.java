@@ -27,6 +27,8 @@ import java.util.stream.Stream;
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.mul;
+import static network.aika.neuron.bindingsignal.SingleTransition.link;
+import static network.aika.neuron.bindingsignal.SingleTransition.propagate;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
 
 
@@ -35,15 +37,16 @@ import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
  */
 public class BiTransition implements Transition {
 
-    protected SingleTransition activeTransition;
+    protected BiTerminal inputTerminal;
+
+    protected SingleTransition<FixedTerminal, ?> activeTransition;
     protected SingleTransition<FixedTerminal, FixedTerminal> passiveTransition;
 
-    protected BiTransition(SingleTransition activeTransition, SingleTransition<FixedTerminal, FixedTerminal> passiveTransition) {
+    protected BiTransition(SingleTransition<FixedTerminal, ?> activeTransition, SingleTransition<FixedTerminal, FixedTerminal> passiveTransition) {
         this.activeTransition = activeTransition;
         this.passiveTransition = passiveTransition;
 
-        activeTransition.setTerminalTransition(this);
-        passiveTransition.setTerminalTransition(this);
+        inputTerminal = new BiTerminal(this, activeTransition.getInput(), passiveTransition.getInput());
     }
 
     public static BiTransition biTransition(SingleTransition activeTransition, SingleTransition passiveTransition) {
@@ -51,69 +54,13 @@ public class BiTransition implements Transition {
     }
 
     @Override
-    public Stream<FixedTerminal> getFixedTerminals(Synapse ts, Activation act, Direction dir) {
-        return activeTransition.getFixedTerminals(ts, act, dir);
+    public Stream<Terminal> getInputTerminals() {
+        return Stream.of(inputTerminal);
     }
 
     @Override
-    public Stream<VariableTerminal> getVariableTerminals(Synapse ts, BindingSignal bs, Direction dir) {
-        return activeTransition.getVariableTerminals(ts, bs, dir);
-    }
-
-    private FixedTerminal getPassiveTerminal(Terminal t, Synapse ts, Activation act) {
-        FixedTerminal passiveTerminal = passiveTransition.getFixedTerminals(ts, act, t.getType().invert())
-                .findFirst()
-                .orElse(null);
-        return passiveTerminal;
-    }
-
-    @Override
-    public void notify(Terminal t, Synapse ts, BindingSignal bs) {
-        if(t.getType() == INPUT) {
-            Activation act = bs.getActivation();
-
-            initTransitionEvent(
-                    ts,
-                    act,
-                    t.getType().invert(),
-                    bs.getOnArrived(),
-                    getPassiveTerminal(t, ts, act).getBSEvent(act)
-            );
-        } else {
-            link(ts, bs.getOnArrived(), INPUT);
-        }
-    }
-
-    @Override
-    public void registerTransitionEvent(FixedTerminal t, Synapse ts, Activation act, FieldOutput bsEvent) {
-        initTransitionEvent(
-                ts,
-                act,
-                t.getType().invert(),
-                bsEvent,
-                getPassiveTerminal(t, ts, act).getBSEvent(act)
-        );
-    }
-
-    private void initTransitionEvent(Synapse ts, Activation act, Direction dir, FieldOutput activeBSEvent, FieldOutput passiveBSEvent) {
-        FieldOutput inputEvent = mul(
-                "input bi transition event",
-                activeBSEvent,
-                passiveBSEvent
-        );
-
-        FieldOutput transitionEvent = getTransitionEvent(ts, act, dir, inputEvent);
-        transitionEvent.addEventListener(() ->
-                link(ts, activeBSEvent, dir)
-        );
-    }
-
-    @Override
-    public Stream<SingleTransition> getBSPropagateTransitions(State s) {
-        return Stream.concat(
-                activeTransition.getBSPropagateTransitions(s),
-                passiveTransition.getBSPropagateTransitions(s)
-        );
+    public Stream<SingleTerminal> getOutputTerminals() {
+        return Stream.of(activeTransition.getOutput(), passiveTransition.getOutput());
     }
 
     @Override
@@ -121,21 +68,21 @@ public class BiTransition implements Transition {
         return MATCH_ONLY;
     }
 
-    protected void link(Synapse ts, FieldOutput activeBSEvent, Direction dir) {
-        Terminal activeTerminal = dir.getFromTerminal(activeTransition);
+    public void linkAndPropagate(Synapse ts, FieldOutput activeBSEvent, Direction dir) {
+        SingleTerminal activeTerminal = dir.getFromTerminal(activeTransition);
         BindingSignal activeBS = activeTerminal.getBindingSignal(activeBSEvent);
 
         FixedTerminal passiveTerminal = (FixedTerminal) dir.getFromTerminal(passiveTransition);
         BindingSignal passiveBS = passiveTerminal.getBindingSignal(activeBS.getActivation());
 
-        link(activeTransition, ts, activeBS, passiveBS, dir);
-        link(passiveTransition, ts, passiveBS, activeBS, dir);
+        biLink(activeTransition, ts, activeBS, passiveBS, dir);
+        biLink(passiveTransition, ts, passiveBS, activeBS, dir);
 
-        activeTransition.propagate(ts, activeBS, dir);
-        passiveTransition.propagate(ts, passiveBS, dir);
+        propagate(activeTransition, ts, activeBS, dir);
+        propagate(passiveTransition, ts, passiveBS, dir);
     }
 
-    private void link(SingleTransition t, Synapse ts, BindingSignal fromBS, BindingSignal relatedFromBindingsSignal, Direction dir) {
+    private void biLink(SingleTransition t, Synapse ts, BindingSignal fromBS, BindingSignal relatedFromBindingSignal, Direction dir) {
         if(fromBS == null)
             return;
 
@@ -145,13 +92,13 @@ public class BiTransition implements Transition {
                 .filter(toBS -> fromBS != toBS)
                 .filter(toBS -> checkRelated(
                                 getRelatedTransition(t),
-                                relatedFromBindingsSignal,
+                                relatedFromBindingSignal,
                                 toBS.getActivation(),
                                 dir
                         )
                 )
                 .forEach(toBS ->
-                        t.link(ts, fromBS, toBS, dir)
+                        link(t, ts, fromBS, toBS, dir)
                 );
     }
 

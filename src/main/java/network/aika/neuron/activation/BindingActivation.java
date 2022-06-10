@@ -21,15 +21,12 @@ import network.aika.fields.Field;
 import network.aika.fields.FieldFunction;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.Fields;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.BindingNeuron;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 import static network.aika.fields.Fields.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
@@ -48,7 +45,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     protected Field inputBSEvent = new Field(this, "inputBSEvent");
     protected Field relatedSameBSEvent = new Field(this, "relatedSameBSEvent");
-    protected Field branchBSEvent = new Field(this, "branchBSEvent");
 
 
     protected BindingActivation(int id, BindingNeuron n) {
@@ -127,23 +123,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     public void setInput(boolean input) {
         isInput = input;
-    }
-
-    public void registerReverseBindingSignal(Activation targetAct, BindingSignal bindingSignal) {
-        reverseBindingSignals.put(targetAct, bindingSignal);
-    }
-
-    @Override
-    public Stream<BindingSignal> getReverseBindingSignals(Neuron toNeuron) {
-        if(toNeuron.isTemplate()) {
-            return reverseBindingSignals.values().stream()
-                    .filter(bs -> bs.getActivation().getNeuron().templateNeuronMatches(toNeuron));
-        } else {
-            return reverseBindingSignals.subMap(
-                    new DummyActivation(0, toNeuron),
-                    new DummyActivation(Integer.MAX_VALUE, toNeuron)
-            ).values().stream();
-        }
     }
 
     @Override

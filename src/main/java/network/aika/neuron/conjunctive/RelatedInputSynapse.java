@@ -25,7 +25,6 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.SamePrimaryInputTerminal.fixedSamePrimaryInput;
 import static network.aika.neuron.bindingsignal.SingleTransition.transition;
 import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
@@ -46,7 +45,7 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<RelatedInputSynaps
                             MATCH_AND_PROPAGATE
                     ),
                     transition(
-                            fixedSamePrimaryInput(SAME),
+                            fixed(SAME),
                             fixed(RELATED_SAME),
                             MATCH_AND_PROPAGATE
                     )

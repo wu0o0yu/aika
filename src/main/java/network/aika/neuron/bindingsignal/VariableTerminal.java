@@ -18,14 +18,24 @@ package network.aika.neuron.bindingsignal;
 
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
+
+import java.util.stream.Stream;
+
+import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 
 /**
  * @author Lukas Molzberger
  */
-public class VariableTerminal extends Terminal {
+public class VariableTerminal extends SingleTerminal {
 
     public VariableTerminal(State state) {
         super(state);
+    }
+
+    @Override
+    public void initFixedTerminal(Synapse ts, Activation act) {
+        // nothing to do
     }
 
     public static VariableTerminal variable(State s) {
@@ -33,7 +43,13 @@ public class VariableTerminal extends Terminal {
     }
 
     public void notify(Synapse ts, BindingSignal bs) {
-        transition.notify(this, ts, bs);
+        if(transition.getMode() == PROPAGATE_ONLY)
+            return;
+
+        if(getState() != bs.getState())
+            return;
+
+        transition.linkAndPropagate(ts, bs, type.invert());
     }
 
     public BindingSignal getBindingSignal(FieldOutput bsEvent) {

@@ -16,15 +16,22 @@
  */
 package network.aika.neuron.bindingsignal;
 
+import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+
+import java.util.stream.Stream;
+
+import static network.aika.fields.Fields.mul;
+import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
+import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 
 
 /**
  * @author Lukas Molzberger
  */
-public class FixedTerminal extends Terminal {
+public class FixedTerminal extends SingleTerminal {
 
     public FixedTerminal(State state) {
         super(state);
@@ -34,21 +41,49 @@ public class FixedTerminal extends Terminal {
         return new FixedTerminal(s);
     }
 
-    public void initFixedTransitionEvent(Synapse ts, Activation act) {
+    @Override
+    public void initFixedTerminal(Synapse ts, Activation act) {
+        if(transition.getMode() == PROPAGATE_ONLY)
+            return;
+
         FieldOutput bsEvent = getBSEvent(act);
         if(bsEvent == null)
             return;
 
-        transition.registerTransitionEvent(
-                this,
+        FieldOutput transitionEvent = getTransitionEvent(
                 ts,
                 act,
+                type.invert(),
                 bsEvent
+        );
+
+        transitionEvent.addEventListener(() ->
+                transition.linkAndPropagate(
+                        ts,
+                        getBindingSignal(bsEvent),
+                        type.invert()
+                )
         );
     }
 
+    @Override
+    public void notify(Synapse ts, BindingSignal bs) {
+        // nothing to do here
+    }
+
+    private static FieldOutput getTransitionEvent(Synapse ts, Activation act, Direction dir, FieldOutput inputEvent) {
+        FieldOutput actEvent = ts.getLinkingEvent(act, dir);
+        return actEvent != null ? mul("transition event (syn: " + ts + ")",
+                inputEvent,
+                actEvent
+        ) :
+                inputEvent;
+    }
+
     public FieldOutput getBSEvent(Activation act) {
-        return act.getFixedBSEvent(state);
+        return act != null ?
+                act.getFixedBSEvent(state) :
+                null;
     }
 
     public BindingSignal getBindingSignal(Activation act) {
@@ -62,12 +97,12 @@ public class FixedTerminal extends Terminal {
         return ((Activation)bsEvent.getReference()).getFixedBindingSignal(state);
     }
 
-    public boolean linkCheck(Synapse ts, BindingSignal fromBS, BindingSignal toBS) {
+    public boolean linkCheck(Synapse ts, BindingSignal fromBS) {
         BindingSignal existingBS = getBindingSignal(fromBS.getActivation());
         if(existingBS != null && existingBS.getOriginActivation() != fromBS.getOriginActivation())
             return false;
 
-        return super.linkCheck(ts, fromBS, toBS);
+        return super.linkCheck(ts, fromBS);
     }
 
     public String toString() {

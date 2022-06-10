@@ -23,9 +23,9 @@ import network.aika.direction.Direction;
 import network.aika.fields.*;
 import network.aika.neuron.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.BSKey;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.sign.Sign;
-import network.aika.steps.Phase;
 import network.aika.steps.activation.Counting;
 import network.aika.utils.Utils;
 
@@ -37,16 +37,14 @@ import static network.aika.direction.Direction.DIRECTIONS;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE_ABS;
+import static network.aika.neuron.bindingsignal.BSKey.COMPARATOR;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
+import static network.aika.neuron.bindingsignal.BSKey.createKey;
 
 /**
  * @author Lukas Molzberger
  */
 public abstract class Activation<N extends Neuron> implements Element, Comparable<Activation> {
-
-    public static final Comparator<Activation> NEURON_COMPARATOR = Comparator.
-            <Activation>comparingLong(act -> act.getNeuron().getId())
-            .thenComparingInt(Activation::getId);
 
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(Activation::getId);
 
@@ -77,17 +75,14 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected FieldOutput updateValue;
     protected FieldOutput inductionThreshold;
 
+    protected Field sameBSEvent = new Field(this, "sameBSEvent");
+
+
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
 
-    protected SortedMap<Activation<?>, BindingSignal> bindingSignals = new TreeMap<>(
-            Comparator.comparing(Activation::getId)
-    );
-
-    protected Field sameBSEvent = new Field(this, "sameBSEvent");
-
-    protected NavigableMap<Activation<?>, BindingSignal> reverseBindingSignals = new TreeMap<>(NEURON_COMPARATOR);
-
+    protected SortedMap<BSKey, BindingSignal> bindingSignals = new TreeMap<>(COMPARATOR);
+    protected NavigableMap<BSKey, BindingSignal> reverseBindingSignals = new TreeMap<>(COMPARATOR);
 
     protected Activation(int id, N n) {
         this.id = id;
@@ -254,6 +249,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     public Field getFixedBSEvent(State s) {
         if(s == State.SAME)
             return sameBSEvent;
+
         return null;
     }
 
@@ -415,16 +411,16 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public void registerBindingSignal(BindingSignal bs) {
-        bindingSignals.put(bs.getOriginActivation(), bs);
+        bindingSignals.put(BSKey.createKey(bs), bs);
         bs.getOnArrived().set(1.0);
     }
 
-    public Map<Activation<?>, BindingSignal> getPatternBindingSignals() {
+    public Map<BSKey, BindingSignal> getPatternBindingSignals() {
         return bindingSignals;
     }
 
     public void registerReverseBindingSignal(Activation targetAct, BindingSignal bindingSignal) {
-        reverseBindingSignals.put(targetAct, bindingSignal);
+        reverseBindingSignals.put(BSKey.createReverseKey(bindingSignal), bindingSignal);
     }
 
     public Stream<BindingSignal> getReverseBindingSignals(Neuron toNeuron) {
@@ -433,14 +429,15 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
                     .filter(bs -> bs.getActivation().getNeuron().templateNeuronMatches(toNeuron));
         } else {
             return reverseBindingSignals.subMap(
-                    new DummyActivation(0, toNeuron),
-                    new DummyActivation(Integer.MAX_VALUE, toNeuron)
+                    new BSKey(toNeuron, 0, 0),
+                    new BSKey(toNeuron, Integer.MAX_VALUE, Integer.MAX_VALUE)
             ).values().stream();
         }
     }
 
-    public BindingSignal getBindingSignal(Activation act) {
-        return bindingSignals.get(act);
+
+    public BindingSignal getBindingSignal(BSKey bsKey) {
+        return bindingSignals.get(bsKey);
     }
 
     public BindingSignal getBindingSignal(State s) {

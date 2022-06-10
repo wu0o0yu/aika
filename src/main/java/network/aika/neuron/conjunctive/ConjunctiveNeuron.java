@@ -79,27 +79,20 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         return RECTIFIED_HYPERBOLIC_TANGENT;
     }
 
-    public void updateAllowPropagate() {
+    public void updateSumOfLowerWeights() {
         sortInputSynapses();
 
-        int countAP = 0;
         double sum = getBias().getCurrentValue();
         for(ConjunctiveSynapse s: inputSynapses) {
             if(s.getWeight().getCurrentValue() <= 0.0)
                 continue;
 
+            s.setSumOfLowerWeights(sum);
+
             sum += s.getWeight().getCurrentValue();
-
-            s.setAllowPropagate(sum > 0.0);
-
-            if(s.isAllowPropagate())
-                countAP++;
         }
 
         updateAllowPropagateIsQueued = false;
-
-        if(countAP > 1)
-            log.warn("countAP: " + countAP + " Activation merging not yet implemented.");
     }
 
     private void sortInputSynapses() {

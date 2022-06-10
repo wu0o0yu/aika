@@ -23,6 +23,7 @@ import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
 import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.SingleTransition;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.PostTraining;
@@ -76,30 +77,32 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return false;
     }
 
-
     public Stream<BindingSignal<?>> getRelatedBindingSignal(BindingSignal<?> fromBS, Direction dir) {
-        Neuron toNeuron = dir.getNeuron(this);
-        Activation originAct = fromBS.getOriginActivation();
-        Stream<BindingSignal<?>> relatedBindingSignals = originAct.getReverseBindingSignals(toNeuron);
-
-        return relatedBindingSignals;
+        return fromBS.getRelatedBindingSignal(
+                dir.getNeuron(this)
+        );
     }
+
+    public abstract double getSumOfLowerWeights();
 
     public boolean propagateCheck(BindingSignal<IA> inputBS) {
         return true;
     }
 
     public boolean linkCheck(BindingSignal inputBS, BindingSignal outputBS) {
-        if(inputBS.getActivation().isNetworkInput() && !networkInputsAllowed(OUTPUT))
+        if(inputBS.isNetworkInput() && !networkInputsAllowed(OUTPUT))
             return false;
 
-        if(outputBS.getActivation().isNetworkInput() && !networkInputsAllowed(INPUT))
+        if(outputBS.isNetworkInput() && !networkInputsAllowed(INPUT))
             return false;
 
         return inputBS.getOrigin() == outputBS.getOrigin();
     }
 
-    public L propagate(BindingSignal<IA> inputBS) {
+    public L propagate(BindingSignal<IA> inputBS, BindingSignal<OA> outputBS) {
+        if(outputBS != null && !linkCheck(inputBS, outputBS))
+            return null;
+
         if(!propagateCheck(inputBS))
             return null;
 
@@ -130,7 +133,31 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return createLink(iAct, oAct);
     }
 
+    public boolean isPropagate() {
+        if(isRecurrent())
+            return false;
+
+        double tsWeight = getWeight().getCurrentValue();
+        double tnBias = getOutput().getBias().getCurrentValue();
+        return tsWeight + tnBias > 0.0;
+    }
+
+    public boolean isLatentLinking() {
+        return getWeight().getCurrentValue() + getSumOfLowerWeights() > 0.0;
+    }
+
+    public Stream<SingleTransition> getRelatedTransitions(BindingSignal fromBS, SingleTransition fromTransition) {
+        return getTransitions()
+                .flatMap(toTransition -> toTransition.getOutputTerminals())
+                .filter(toTerminal -> toTerminal.getState() == fromTransition.getOutput().getState())
+                .filter(toTerminal -> toTerminal.getTransition().getInput().linkCheck(this, fromBS))
+                .map(toTerminal -> toTerminal.getTransition());
+    }
+
     public FieldOutput getLinkingEvent(Activation act, Direction dir) {
+        if(act == null)
+            return null;
+
         return act.getEvent(dir == OUTPUT, isTemplate());
     }
 
@@ -139,11 +166,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
             return;
 
         getTransitions()
-                .flatMap(t ->
-                        t.getFixedTerminals(this, act, dir)
+                .flatMap(transition ->
+                        dir.invert().getTerminals(transition)
                 )
-                .forEach(t ->
-                        t.initFixedTransitionEvent(this, act)
+                .forEach(terminal ->
+                        terminal.initFixedTerminal(this, act)
                 );
     }
 
@@ -152,8 +179,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
             return;
 
         getTransitions()
-                .flatMap(t ->
-                        t.getVariableTerminals(this, bs, dir)
+                .flatMap(transition ->
+                        dir.invert().getTerminals(transition)
                 )
                 .forEach(t ->
                         t.notify(this, bs)

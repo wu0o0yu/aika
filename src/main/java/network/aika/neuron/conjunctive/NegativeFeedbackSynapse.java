@@ -27,12 +27,10 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.SamePrimaryInputTerminal.fixedSamePrimaryInput;
 import static network.aika.neuron.bindingsignal.SingleTransition.transition;
 import static network.aika.neuron.bindingsignal.State.INPUT;
 import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
-import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 
 
 /**
@@ -44,7 +42,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedba
     private static List<Transition> TRANSITIONS = List.of(
             biTransition(
                     transition(
-                            fixedSamePrimaryInput(INPUT),
+                            fixed(INPUT),
                             fixed(INPUT),
                             MATCH_AND_PROPAGATE
                     ),
