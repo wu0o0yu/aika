@@ -37,7 +37,13 @@ import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGA
  *
  * @author Lukas Molzberger
  */
-public class NegativeFeedbackSynapse extends BindingNeuronSynapse<NegativeFeedbackSynapse, InhibitoryNeuron, NegativeFeedbackLink, InhibitoryActivation> {
+public class NegativeFeedbackSynapse extends BindingNeuronSynapse<
+        NegativeFeedbackSynapse,
+        InhibitoryNeuron,
+        NegativeFeedbackLink,
+        InhibitoryActivation
+        >
+{
 
     private static List<Transition> TRANSITIONS = List.of(
             biTransition(

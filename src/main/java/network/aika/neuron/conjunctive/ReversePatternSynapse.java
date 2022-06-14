@@ -37,7 +37,14 @@ import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGA
  *
  * @author Lukas Molzberger
  */
-public class ReversePatternSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<ReversePatternSynapse, I, ReversePatternLink<IA>, IA> {
+public class ReversePatternSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends
+        BindingNeuronSynapse<
+                ReversePatternSynapse,
+                I,
+                ReversePatternLink<IA>,
+                IA
+                >
+{
 
     private static List<Transition> TRANSITIONS = List.of(
             transition(

@@ -16,25 +16,14 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.Range;
-import network.aika.neuron.conjunctive.RelatedInputSynapse;
-import network.aika.sign.Sign;
+import network.aika.neuron.disjunctive.BindingCategorySynapse;
 
 /**
  * @author Lukas Molzberger
  */
-public class RelatedInputLink extends BindingNeuronLink<RelatedInputSynapse, BindingActivation> {
+public class BindingCategoryLink extends DisjunctiveLink<BindingCategorySynapse, BindingActivation, BindingCategoryActivation> {
 
-    public RelatedInputLink(RelatedInputSynapse s, BindingActivation input, BindingActivation output) {
+    public BindingCategoryLink(BindingCategorySynapse s, BindingActivation input, BindingCategoryActivation output) {
         super(s, input, output);
-    }
-
-    @Override
-    public double getRelativeSurprisal(Sign si, Sign so, Range range) {
-        double s = super.getRelativeSurprisal(si, so, range);
-
-//        s += input.getBoundPatternBindingSignal().getOriginActivation().getNeuron()
-//                .getSurprisal(si, range, true);
-        return s;
     }
 }

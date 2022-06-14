@@ -39,7 +39,15 @@ import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
  *
  * @author Lukas Molzberger
  */
-public class CategorySynapse<N extends Neuron & PatternAxon> extends DisjunctiveSynapse<CategorySynapse, N, CategoryNeuron, CategoryLink, PatternActivation, CategoryActivation> {
+public class CategorySynapse<N extends Neuron & PatternAxon> extends DisjunctiveSynapse<
+        CategorySynapse,
+        N,
+        CategoryNeuron,
+        CategoryLink,
+        PatternActivation,
+        CategoryActivation
+        >
+{
 
     private static List<Transition> TRANSITIONS = List.of(
             transition(

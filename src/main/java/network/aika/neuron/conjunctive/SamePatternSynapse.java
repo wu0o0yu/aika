@@ -37,7 +37,13 @@ import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
  *
  * @author Lukas Molzberger
  */
-public class SamePatternSynapse extends BindingNeuronSynapse<SamePatternSynapse, BindingNeuron, SamePatternLink, BindingActivation> {
+public class SamePatternSynapse extends BindingNeuronSynapse<
+        SamePatternSynapse,
+        BindingNeuron,
+        SamePatternLink,
+        BindingActivation
+        >
+{
 
     private static List<Transition> TRANSITIONS = List.of(
             biTransition(

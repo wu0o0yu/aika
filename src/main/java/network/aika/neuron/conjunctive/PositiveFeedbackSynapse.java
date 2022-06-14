@@ -42,7 +42,13 @@ import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
  *
  * @author Lukas Molzberger
  */
-public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<PositiveFeedbackSynapse, I, PositiveFeedbackLink<IA>, IA> {
+public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<
+        PositiveFeedbackSynapse,
+        I,
+        PositiveFeedbackLink<IA>,
+        IA
+        >
+{
 
     private static List<Transition> TRANSITIONS = List.of(
             transition(

@@ -35,7 +35,15 @@ import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGA
  *
  * @author Lukas Molzberger
  */
-public class InhibitorySynapse extends DisjunctiveSynapse<InhibitorySynapse, BindingNeuron, InhibitoryNeuron, InhibitoryLink, BindingActivation, InhibitoryActivation> {
+public class InhibitorySynapse extends DisjunctiveSynapse<
+        InhibitorySynapse,
+        BindingNeuron,
+        InhibitoryNeuron,
+        InhibitoryLink,
+        BindingActivation,
+        InhibitoryActivation
+        >
+{
 
     private static List<Transition> TRANSITIONS = List.of(
             biTransition(

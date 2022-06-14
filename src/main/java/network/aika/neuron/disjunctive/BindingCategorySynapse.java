@@ -14,62 +14,56 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.conjunctive;
+package network.aika.neuron.disjunctive;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
+import network.aika.neuron.conjunctive.BindingNeuron;
 
 import java.util.List;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.SingleTransition.transition;
-import static network.aika.neuron.bindingsignal.TransitionMode.*;
-import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
+import static network.aika.neuron.bindingsignal.State.INPUT;
+import static network.aika.neuron.bindingsignal.State.SAME;
+import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
+
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PatternSynapse extends ConjunctiveSynapse<
-        PatternSynapse,
+public class BindingCategorySynapse extends DisjunctiveSynapse<
+        BindingCategorySynapse,
         BindingNeuron,
-        PatternNeuron,
-        PatternLink,
+        BindingCategoryNeuron,
+        BindingCategoryLink,
         BindingActivation,
-        PatternActivation
+        BindingCategoryActivation
         >
 {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(
-                    fixed(SAME),
-                    fixed(SAME),
-                    MATCH_ONLY
-            ),
-            transition(
-                    fixed(INPUT),
-                    variable(INPUT),
-                    MATCH_AND_PROPAGATE
+            biTransition(
+                    transition(
+                            fixed(INPUT),
+                            fixed(INPUT),
+                            MATCH_AND_PROPAGATE
+                    ),
+                    transition(
+                            fixed(SAME),
+                            fixed(SAME),
+                            MATCH_AND_PROPAGATE
+                    )
             )
     );
 
     @Override
-    public boolean isPropagate() {
-        return true;
-    }
-
-    @Override
-    public boolean propagateCheck(BindingSignal<BindingActivation> inputBS) {
-        return true;
-    }
-
-    @Override
-    public PatternLink createLink(BindingActivation input, PatternActivation output) {
-        return new PatternLink(this, input, output);
+    public BindingCategoryLink createLink(BindingActivation input, BindingCategoryActivation output) {
+        return new BindingCategoryLink(this, input, output);
     }
 
     @Override
@@ -80,5 +74,10 @@ public class PatternSynapse extends ConjunctiveSynapse<
     @Override
     public boolean networkInputsAllowed(Direction dir) {
         return !isTemplate();
+    }
+
+    @Override
+    public void setModified() {
+        getInput().setModified();
     }
 }
