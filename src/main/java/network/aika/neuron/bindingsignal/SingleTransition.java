@@ -57,6 +57,7 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
 
     public void linkAndPropagate(Synapse ts, BindingSignal fromBS, Direction dir) {
         link(ts, fromBS, dir);
+        latentLinking(this, ts, fromBS, dir);
         propagate(this, ts, fromBS, dir);
     }
 
@@ -69,18 +70,20 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
                 );
     }
 
-    protected static void propagate(SingleTransition t, Synapse ts, BindingSignal<?> fromBS, Direction dir) {
-        if (dir == INPUT)
+    public static void propagate(SingleTransition t, Synapse ts, BindingSignal<?> fromBS, Direction dir) {
+        if (dir != OUTPUT)
             return;
 
-        if(ts.isPropagate()) {
-            ts.propagate(fromBS, null);
-        } else if(ts.isLatentLinking()) {
-            latentLinking(t, ts, fromBS, dir);
-        }
+        if(!ts.isPropagate())
+            return;
+
+        ts.propagate(fromBS, null);
     }
 
-    private static void latentLinking(SingleTransition t, Synapse synA, BindingSignal<?> fromBS, Direction dir) {
+    public static void latentLinking(SingleTransition t, Synapse synA, BindingSignal<?> fromBS, Direction dir) {
+        if(dir != OUTPUT)
+            return;
+
         Neuron<?, ?> toNeuron = dir.getNeuron(synA);
 
         boolean templateEnabled = fromBS.getConfig().isTemplatesEnabled();
@@ -114,14 +117,17 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
             BindingSignal<?> relBS,
             SingleTransition propagateTransition
     ) {
-       if(!propagateTransition.getInput().linkCheck(latentSyn, relBS))
-           return;
-
-        BindingSignal toBS = propagateTransition.propagate(relBS);
-        if(toBS == null)
+        if(!targetSyn.isLatentLinking())
             return;
 
-        if(!matchingTransition.match(targetSyn, fromBS, relBS, OUTPUT))
+        if (!propagateTransition.getInput().linkCheck(latentSyn, relBS))
+            return;
+
+        BindingSignal toBS = propagateTransition.propagate(relBS);
+        if (toBS == null)
+            return;
+
+        if (!matchingTransition.match(targetSyn, fromBS, toBS, OUTPUT))
             return;
 
         targetSyn.propagate(fromBS, toBS);

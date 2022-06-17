@@ -44,23 +44,23 @@ public class TheBlackCatTest {
 
         coords.put(0, new double[]{-0.061, 0.005});
         coords.put(1, new double[]{0.053, 0.205});
-        coords.put(2, new double[]{-0.024, 0.53});
-        coords.put(3, new double[]{0.301, 0.743});
+        coords.put(2, new double[]{-0.036, 0.862});
+        coords.put(3, new double[]{0.116, 1.07});
         coords.put(4, new double[]{-0.167, 0.405});
         coords.put(5, new double[]{0.112, 0.405});
         coords.put(6, new double[]{0.338, -0.008});
         coords.put(7, new double[]{0.336, 0.196});
-        coords.put(8, new double[]{0.505, 0.871});
-        coords.put(9, new double[]{0.688, 1.078});
+        coords.put(8, new double[]{0.403, 0.595});
+        coords.put(9, new double[]{0.577, 0.799});
         coords.put(10, new double[]{0.272, 0.405});
         coords.put(11, new double[]{0.505, 0.396});
         coords.put(12, new double[]{0.78, -0.023});
         coords.put(13, new double[]{0.731, 0.188});
-        coords.put(14, new double[]{0.788, 0.519});
-        coords.put(15, new double[]{0.901, 0.862});
+        coords.put(14, new double[]{0.873, 0.835});
+        coords.put(15, new double[]{0.901, 1.067});
         coords.put(16, new double[]{0.621, 0.396});
-        coords.put(17, new double[]{1.149, 0.388});
-        coords.put(18, new double[]{0.023, 0.82});
+        coords.put(17, new double[]{0.927, 0.388});
+        coords.put(18, new double[]{0.713, 0.596});
         coords.put(19, new double[]{0.476, 1.029});
 
         return coords;

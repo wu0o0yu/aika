@@ -81,7 +81,7 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
             return false;
 
         BindingActivation oAct = (BindingActivation) outputBS.getActivation();
-        return !oAct.getBindingSignals()
+        return oAct == null || !oAct.getBindingSignals()
                 .filter(bs -> bs.getState() == INPUT)
                 .anyMatch(bs -> bs.getLink() instanceof PrimaryInputLink);
     }

@@ -27,8 +27,7 @@ import java.util.stream.Stream;
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.mul;
-import static network.aika.neuron.bindingsignal.SingleTransition.link;
-import static network.aika.neuron.bindingsignal.SingleTransition.propagate;
+import static network.aika.neuron.bindingsignal.SingleTransition.*;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
 
 
@@ -77,6 +76,9 @@ public class BiTransition implements Transition {
 
         biLink(activeTransition, ts, activeBS, passiveBS, dir);
         biLink(passiveTransition, ts, passiveBS, activeBS, dir);
+
+        latentLinking(activeTransition, ts, activeBS, dir);
+        latentLinking(passiveTransition, ts, passiveBS, dir);
 
         propagate(activeTransition, ts, activeBS, dir);
         propagate(passiveTransition, ts, passiveBS, dir);
