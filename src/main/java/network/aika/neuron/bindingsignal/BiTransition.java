@@ -88,7 +88,7 @@ public class BiTransition implements Transition {
         if(fromBS == null)
             return;
 
-        Stream<BindingSignal<?>> bsStream = ts.getRelatedBindingSignal(fromBS, dir);
+        Stream<BindingSignal<?>> bsStream = ts.getRelatedBindingSignals(fromBS, dir);
 
         bsStream
                 .filter(toBS -> fromBS != toBS)

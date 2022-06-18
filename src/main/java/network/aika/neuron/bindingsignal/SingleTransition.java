@@ -20,8 +20,6 @@ import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.conjunctive.PatternSynapse;
 
 import java.util.stream.Stream;
 
@@ -62,7 +60,7 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
     }
 
     public void link(Synapse ts, BindingSignal fromBS, Direction dir) {
-        Stream<BindingSignal<?>> bsStream = ts.getRelatedBindingSignal(fromBS, dir);
+        Stream<BindingSignal<?>> bsStream = ts.getRelatedBindingSignals(fromBS, dir);
 
         bsStream.filter(toBS -> fromBS != toBS)
                 .forEach(toBS ->
@@ -94,9 +92,9 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
                 );
     }
 
-    private static void latentLinking(SingleTransition tA, BindingSignal<?> bsA, Synapse synA, Synapse synB) {
-        bsA.getRelatedBindingSignal(synB.getInput())
-                .filter(bsB -> bsA != bsB)
+    private static void latentLinking(SingleTransition tA, BindingSignal bsA, Synapse synA, Synapse synB) {
+        Stream<BindingSignal> bsStream = synB.getInput().getRelatedBindingSignals(bsA);
+        bsStream.filter(bsB -> bsA != bsB)
                 .filter(bsB ->
                         isTrue(bsB.getOnArrivedFired())
                 )

@@ -36,6 +36,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.sign.Sign.POS;
@@ -106,6 +107,14 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public boolean templateNeuronMatches(Neuron<?, ?> targetN) {
         return getTemplate().getId().intValue() == targetN.getId().intValue();
+    }
+
+    public Stream<BindingSignal> getRelatedBindingSignals(BindingSignal bs) {
+        Stream<BindingSignal> relatedBSs = bs.getOriginActivation()
+                .getReverseBindingSignals(this);
+        return relatedBSs
+                .collect(Collectors.toList())
+                .stream();
     }
 
     private TreeSet<A> initActivationsSet(Thought t) {

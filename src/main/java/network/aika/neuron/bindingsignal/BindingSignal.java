@@ -115,14 +115,6 @@ public class BindingSignal<A extends Activation> implements Element {
                 null;
     }
 
-    public Stream<BindingSignal<?>> getRelatedBindingSignal(Neuron toNeuron) {
-        Stream<BindingSignal<?>> relatedBSs = getOriginActivation()
-                .getReverseBindingSignals(toNeuron);
-        return relatedBSs
-                .collect(Collectors.toList())
-                .stream();
-    }
-
     public void setLink(Link l) {
         this.link = l;
     }

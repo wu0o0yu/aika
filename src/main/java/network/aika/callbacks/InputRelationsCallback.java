@@ -14,11 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.conjunctive;
+package network.aika.callbacks;
+
+import network.aika.neuron.bindingsignal.BindingSignal;
+
+import java.util.stream.Stream;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class RelationNeuron extends BindingNeuron {
+public interface InputRelationsCallback {
+
+    Stream<BindingSignal> getRelatedBindingSignals(BindingSignal fromBS);
 }
