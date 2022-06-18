@@ -87,7 +87,7 @@ public class TheBlackCatTest {
     }
 
     @Test
-    public void testJacksonCook()  {
+    public void testTheBlackCat()  {
         AIKADebugger debugger = AIKADebugger.createAndShowGUI();
 
         debugger.addBreakpoints(
