@@ -24,6 +24,8 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.PatternNeuron;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.stream.Stream;
@@ -41,8 +43,7 @@ public class Document extends Thought<TextModel> {
 
     private final StringBuilder content;
 
-    private NavigableMap<Long, BindingSignal> beginBSIndex = new TreeMap<>();
-    private NavigableMap<Long, BindingSignal> endBSIndex = new TreeMap<>();
+    private NavigableMap<Integer, BindingSignal> tokenPosIndex = new TreeMap<>();
 
     public Document(TextModel model, String content) {
         super(model);
@@ -54,23 +55,23 @@ public class Document extends Thought<TextModel> {
 
     @Override
     public void registerBindingSignalSource(Activation act, BindingSignal bs) {
-        Range r = bs.getOriginActivation().getRange();
-
-        beginBSIndex.put(r.getBegin(), bs);
-        endBSIndex.put(r.getEnd(), bs);
+        if(bs.getOriginActivation() instanceof TokenActivation) {
+            TokenActivation tokenAct = (TokenActivation) bs.getOriginActivation();
+            tokenPosIndex.put(tokenAct.getPosition(), bs);
+        }
     }
 
-    public Stream<BindingSignal<?>> getLooselyRelatedBindingSignals(BindingSignal<?> fromBindingSignal, Integer looseLinkingRange, Neuron toNeuron) {
-        Range r = fromBindingSignal.getOriginActivation().getRange();
+    public Stream<BindingSignal<?>> getRelatedBindingSignals(BindingSignal fromBindingSignal, Integer distance, Neuron toNeuron) {
+        if(!(fromBindingSignal.getOriginActivation() instanceof TokenActivation))
+            return Stream.empty();
 
-        return Stream.concat(
-            beginBSIndex.subMap(r.getEnd(), r.getEnd() + looseLinkingRange).values().stream(),
-            endBSIndex.subMap(r.getBegin() - looseLinkingRange, r.getBegin()).values().stream()
-        )
-                .map(bs -> bs.getOriginActivation())
-                .flatMap(originAct ->
-                        originAct.getReverseBindingSignals(toNeuron)
-                );
+        TokenActivation tAct = (TokenActivation) fromBindingSignal.getOriginActivation();
+        BindingSignal relBS = tokenPosIndex.get(tAct.getPosition() + distance);
+        if(relBS == null)
+            return Stream.empty();
+
+        return relBS.getOriginActivation()
+                .getReverseBindingSignals(toNeuron);
     }
 
     public void append(String txt) {
@@ -101,16 +102,12 @@ public class Document extends Thought<TextModel> {
         return ((Document)act.getThought()).getTextSegment(act.getRange());
     }
 
-    public TokenActivation addToken(String token, int begin, int end) {
-        return addToken(model.lookupToken(token), begin, end);
+    public TokenActivation addToken(String token, int pos, int begin, int end) {
+        return addToken(model.lookupToken(token), pos, begin, end);
     }
 
-    public TokenActivation addToken(NeuronProvider n, int begin, int end) {
-        return addToken((PatternNeuron) n.getNeuron(), begin, end);
-    }
-
-    public TokenActivation addToken(PatternNeuron n, int begin, int end) {
-        TokenActivation act = new TokenActivation(createActivationId(), begin, end, this, n);
+    public TokenActivation addToken(PatternNeuron n, int pos, int begin, int end) {
+        TokenActivation act = new TokenActivation(createActivationId(), pos, begin, end, this, n);
 
         act.init(null, null);
 
@@ -119,16 +116,19 @@ public class Document extends Thought<TextModel> {
 
     public void processTokens(Iterable<String> tokens) {
         int i = 0;
-        TokenActivation lastToken = null;
+        int pos = 0;
+
+        List<TokenActivation> tokenActs = new ArrayList<>();
         for(String t: tokens) {
             int j = i + t.length();
-            TokenActivation currentToken = addToken(t, i, j);
-            process(PROCESSING);
-            TokenActivation.addRelation(lastToken, currentToken);
-            process(PROCESSING);
+            tokenActs.add(addToken(t, pos++, i, j));
 
-            lastToken = currentToken;
             i = j + 1;
+        }
+
+        for(TokenActivation tAct: tokenActs) {
+            tAct.setNet(10.0);
+            process(PROCESSING);
         }
 
         updateModel();

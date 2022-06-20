@@ -43,7 +43,7 @@ public class PropagateTest {
         updateBias(out, 1.0);
 
         Document doc = new Document(m, "test");
-        doc.addToken(in, 0, 4);
+        doc.addToken(in, 0, 0, 4);
         System.out.println(doc);
     }
 }

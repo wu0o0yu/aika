@@ -38,11 +38,12 @@ public class Templates {
     public PatternNeuron PATTERN_TEMPLATE = new PatternNeuron();
     public InhibitoryNeuron INHIBITORY_TEMPLATE = new InhibitoryNeuron();
     public CategoryNeuron CATEGORY_TEMPLATE = new CategoryNeuron();
-
+    public LatentRelationNeuron LATENT_RELATION_TEMPLATE = new LatentRelationNeuron();
 
     public PrimaryInputSynapse PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE;
     public PrimaryInputSynapse PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE;
     public RelatedInputSynapse RELATED_INPUT_SYNAPSE_TEMPLATE;
+    public RelatedInputSynapse RELATED_INPUT_SYNAPSE_FROM_LATENT_RELATION_TEMPLATE;
     public SamePatternSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
     public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE;
     public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE;
@@ -63,6 +64,7 @@ public class Templates {
         init(PATTERN_TEMPLATE, -2, "Pattern Neuron", 0.0);
         init(INHIBITORY_TEMPLATE, -3, "Inhibitory Neuron", 0.0);
         init(CATEGORY_TEMPLATE, -4, "Category Neuron", 0.0);
+        init(LATENT_RELATION_TEMPLATE, -5, "Latent Relation Neuron", 0.0);
 
         PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE =
                 init(
@@ -96,13 +98,23 @@ public class Templates {
                         0.0
                 );
 
+        RELATED_INPUT_SYNAPSE_FROM_LATENT_RELATION_TEMPLATE =
+                init(
+                        new RelatedInputSynapse(),
+                        LATENT_RELATION_TEMPLATE,
+                        BINDING_TEMPLATE,
+                        "Related Input Synapse From Latent Relation",
+                        4,
+                        0.0
+                );
+
         SAME_PATTERN_SYNAPSE_TEMPLATE =
                 init(
                         new SamePatternSynapse(),
                         BINDING_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Same Pattern Synapse",
-                        4,
+                        5,
                         0.0
                 );
 
@@ -112,7 +124,7 @@ public class Templates {
                         PATTERN_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Positive Feedback Synapse",
-                        5,
+                        6,
                         0.01
                 );
         POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE.getFeedbackBias().set(0.0);
@@ -124,7 +136,7 @@ public class Templates {
                         CATEGORY_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Positive Feedback Synapse",
-                        6,
+                        7,
                         0.01
                 );
         POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE.getFeedbackBias().set(0.0);
@@ -135,7 +147,7 @@ public class Templates {
                         PATTERN_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Reverse Pattern Synapse",
-                        7,
+                        8,
                         0.0
                 );
 
@@ -145,7 +157,7 @@ public class Templates {
                         CATEGORY_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Reverse Pattern Synapse",
-                        8,
+                        9,
                         0.0
                 );
 
@@ -155,7 +167,7 @@ public class Templates {
                         INHIBITORY_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Negative Feedback Synapse",
-                        9,
+                        10,
                         0.0
                 );
 
@@ -165,7 +177,7 @@ public class Templates {
                         BINDING_TEMPLATE,
                         PATTERN_TEMPLATE,
                         "Pattern Synapse",
-                        10,
+                        11,
                         1.0 // Needs to be above the tolerance
                 );
 //        PATTERN_SYNAPSE_TEMPLATE.setAllowPropagate(true);
@@ -176,7 +188,7 @@ public class Templates {
                         BINDING_TEMPLATE,
                         INHIBITORY_TEMPLATE,
                         "Inhibitory Synapse",
-                        11,
+                        12,
                         1.0
                 );
 
@@ -186,7 +198,7 @@ public class Templates {
                         PATTERN_TEMPLATE,
                         CATEGORY_TEMPLATE,
                         "Category Synapse",
-                        12,
+                        13,
                         0.0
                 );
     }
@@ -196,7 +208,8 @@ public class Templates {
                 BINDING_TEMPLATE,
                 PATTERN_TEMPLATE,
                 INHIBITORY_TEMPLATE,
-                CATEGORY_TEMPLATE
+                CATEGORY_TEMPLATE,
+                LATENT_RELATION_TEMPLATE
         );
     }
 

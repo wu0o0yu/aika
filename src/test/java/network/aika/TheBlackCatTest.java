@@ -20,7 +20,6 @@ import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.Templates;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
-import network.aika.neuron.disjunctive.CategoryNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import org.graphstream.ui.view.camera.Camera;
@@ -121,7 +120,7 @@ public class TheBlackCatTest {
         BindingNeuron catBN2 = createNeuron(t.BINDING_TEMPLATE, "cat (black cat)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, catIN, catBN2, 20.0);
 
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelationBindingNeuron(), catBN2, 5.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelation(), catBN2, 5.0);
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, blackBN, catBN2, 5.0);
 
         PatternNeuron blackCat = initPatternLoop(t, "black cat", blackBN, catBN2);

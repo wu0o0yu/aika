@@ -53,7 +53,7 @@ public class InductionTest {
 
         Document doc = new Document(m, "");
 
-        doc.addToken(in, 0, 1);
+        doc.addToken(in, 0, 0, 1);
 
         doc.processFinalMode();
         doc.postProcessing();
@@ -117,9 +117,8 @@ public class InductionTest {
         );
         System.out.println("  " + phrase);
 
-        TokenActivation actDer = doc.addToken("der", 0, 4);
-        TokenActivation actHund = doc.addToken("Hund", 4, 8);
-        TokenActivation.addRelation(actDer, actHund);
+        TokenActivation actDer = doc.addToken("der", 0, 0, 4);
+        TokenActivation actHund = doc.addToken("Hund", 1, 4, 8);
 
         model.setN(1000);
         actDer.getNeuron().setFrequency(50);

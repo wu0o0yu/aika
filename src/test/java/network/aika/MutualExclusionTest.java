@@ -92,7 +92,7 @@ public class MutualExclusionTest {
                 .setTrainingEnabled(true);
         doc.setConfig(c);
 
-        doc.addToken(in, 0, 4);
+        doc.addToken(in, 0, 0, 4);
 
         doc.processFinalMode();
         doc.postProcessing();
@@ -144,7 +144,7 @@ TODO: Counting Mode
 */
         AIKADebugger.createAndShowGUI(doc);
 
-        doc.addToken(in, 0, 4);
+        doc.addToken(in, 0, 0, 4);
         doc.processFinalMode();
         doc.postProcessing();
         doc.updateModel();

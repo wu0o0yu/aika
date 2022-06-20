@@ -252,7 +252,7 @@ public abstract class Thought<M extends Model> {
         return sb.toString();
     }
 
-    public Stream<BindingSignal<?>> getLooselyRelatedBindingSignals(BindingSignal<?> fromBindingSignal, Integer looseLinkingRange, Neuron toNeuron) {
+    public Stream<BindingSignal<?>> getRelatedBindingSignals(BindingSignal<?> fromBindingSignal, Integer distance, Neuron toNeuron) {
         return Stream.empty();
     }
 }

@@ -19,9 +19,7 @@ package network.aika.text;
 import network.aika.Model;
 import network.aika.callbacks.SuspensionCallback;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.CategoryActivation;
 import network.aika.neuron.conjunctive.*;
 import network.aika.neuron.disjunctive.CategoryNeuron;
 
@@ -29,26 +27,18 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import static network.aika.utils.TestUtils.createNeuron;
+
 /**
  *
 * @author Lukas Molzberger
 */
 public class TextModel extends Model {
 
-    public static String REL_PREVIOUS_TOKEN_LABEL = " Rel Prev. Token";
-    public static String REL_NEXT_TOKEN_LABEL = " Rel Next Token";
     public static String TOKEN_LABEL = "Token Category";
 
-
-    private NeuronProvider tokenCategory;
-    private NeuronProvider relPreviousToken;
-    private NeuronProvider relNextToken;
-
-    private PrimaryInputSynapse<CategoryNeuron, CategoryActivation> relPTPrimaryInputSyn;
-    private ReversePatternSynapse<CategoryNeuron, CategoryActivation> relPTRevPatternSyn;
-
-    private PrimaryInputSynapse<CategoryNeuron, CategoryActivation> relNTPrimaryInputSyn;
-    private ReversePatternSynapse<CategoryNeuron, CategoryActivation> relNTRevPatternSyn;
+    private CategoryNeuron tokenCategory;
+    private LatentRelationNeuron relationNeuron;
 
     public TextModel() {
         super();
@@ -59,35 +49,16 @@ public class TextModel extends Model {
     }
 
     public void init() {
-        if(tokenCategory == null)
-            tokenCategory = initCategoryNeuron(TOKEN_LABEL);
+        tokenCategory = getTemplates().CATEGORY_TEMPLATE.instantiateTemplate(true);
+        tokenCategory.setNetworkInput(true);
+        tokenCategory.setLabel(TOKEN_LABEL);
 
-        BindingNeuron relPT = getTemplates().BINDING_TEMPLATE.instantiateTemplate(true);
-        relPreviousToken = relPT.getProvider();
-
-        BindingNeuron relNT = getTemplates().BINDING_TEMPLATE.instantiateTemplate(true);
-        relNextToken = relNT.getProvider();
-
-        relPTRevPatternSyn = initReversePatternSynapse(getTokenCategory(), relPT);
-        relPTPrimaryInputSyn = initRelatedInputSynapse(getTokenCategory(), relPT);
-        initRelationNeuron(REL_PREVIOUS_TOKEN_LABEL, relPT);
-
-        relNTRevPatternSyn = initReversePatternSynapse(getTokenCategory(), relNT);
-        relNTPrimaryInputSyn = initRelatedInputSynapse(getTokenCategory(), relNT);
-        initRelationNeuron(REL_NEXT_TOKEN_LABEL, relNT);
-
-        relPT.getProvider().save();
-        relNT.getProvider().save();
+        relationNeuron = createNeuron(getTemplates().LATENT_RELATION_TEMPLATE, "Rel. 1");
+        relationNeuron.setInputRelationsCallback(fromBS ->
+                fromBS.getThought().getRelatedBindingSignals(fromBS, 1, relationNeuron)
+        );
     }
 
-    private NeuronProvider initCategoryNeuron(String label) {
-        CategoryNeuron n = getTemplates().CATEGORY_TEMPLATE.instantiateTemplate(true);
-        n.setNetworkInput(true);
-        n.setLabel(label);
-        NeuronProvider np = n.getProvider();
-        np.save();
-        return np;
-    }
 
     public PatternNeuron lookupToken(String tokenLabel) {
         Neuron inProv = getNeuron(tokenLabel);
@@ -109,7 +80,7 @@ public class TextModel extends Model {
 
         return in;
     }
-
+/*
     private void initRelationNeuron(String label, BindingNeuron inRel) {
         inRel.setNetworkInput(true);
         inRel.setLabel(label);
@@ -146,7 +117,7 @@ public class TextModel extends Model {
 
         return s;
     }
-
+*/
     private void initCategorySynapse(PatternNeuron tokenNeuron, CategoryNeuron tokenCat) {
         Synapse s = getTemplates().CATEGORY_SYNAPSE_TEMPLATE
                 .instantiateTemplate(null, tokenNeuron, tokenCat);
@@ -157,13 +128,13 @@ public class TextModel extends Model {
     }
 
     public CategoryNeuron getTokenCategory() {
-        return (CategoryNeuron) tokenCategory.getNeuron();
+        return tokenCategory;
     }
 
-    public BindingNeuron getPreviousTokenRelationBindingNeuron() {
-        return (BindingNeuron) relPreviousToken.getNeuron();
+    public BindingNeuron getPreviousTokenRelation() {
+        return relationNeuron;
     }
-
+/*
     public BindingNeuron getNextTokenRelationBindingNeuron() {
         return (BindingNeuron) relNextToken.getNeuron();
     }
@@ -183,7 +154,7 @@ public class TextModel extends Model {
     public ReversePatternSynapse<CategoryNeuron, CategoryActivation> getRelNTRevPatternSyn() {
         return relNTRevPatternSyn;
     }
-
+*/
     @Override
     public void write(DataOutput out) throws IOException {
         super.write(out);
@@ -195,6 +166,6 @@ public class TextModel extends Model {
     public void readFields(DataInput in, Model m) throws Exception {
         super.readFields(in, m);
 
-        tokenCategory = lookupNeuron(in.readLong());
+        tokenCategory = (CategoryNeuron) lookupNeuron(in.readLong()).getNeuron();
     }
 }

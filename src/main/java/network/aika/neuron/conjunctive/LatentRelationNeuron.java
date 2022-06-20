@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.Model;
 import network.aika.callbacks.InputRelationsCallback;
 import network.aika.neuron.bindingsignal.BindingSignal;
 
@@ -30,8 +31,23 @@ public class LatentRelationNeuron extends BindingNeuron {
 
     private InputRelationsCallback inputRelationsCallback;
 
+    public LatentRelationNeuron() {
+    }
+
+    public LatentRelationNeuron(Model model, boolean addProvider) {
+        super(model, addProvider);
+    }
+
     public void setInputRelationsCallback(InputRelationsCallback inputRelationsCallback) {
         this.inputRelationsCallback = inputRelationsCallback;
+    }
+
+    @Override
+    public BindingNeuron instantiateTemplate(boolean addProvider) {
+        LatentRelationNeuron n = new LatentRelationNeuron(getModel(), addProvider);
+        initFromTemplate(n);
+
+        return n;
     }
 
     public Stream<BindingSignal> getRelatedBindingSignals(BindingSignal fromBS) {

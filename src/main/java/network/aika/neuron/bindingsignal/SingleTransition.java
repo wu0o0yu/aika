@@ -87,6 +87,7 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
         boolean templateEnabled = fromBS.getConfig().isTemplatesEnabled();
         toNeuron.getTargetSynapses(INPUT, templateEnabled)
                 .filter(synB -> synA != synB)
+                .filter(synB -> synB.hasOutputTerminal(t.getOutput().getState()))
                 .forEach(synB ->
                         latentLinking(t, fromBS, synA, synB)
                 );

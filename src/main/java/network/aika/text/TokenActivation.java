@@ -35,26 +35,21 @@ import static network.aika.neuron.bindingsignal.State.SAME;
 public class TokenActivation extends PatternActivation {
 
     private Range range;
-    private TokenActivation previousToken;
-    private TokenActivation nextToken;
+    private int position;
 
-    public TokenActivation(int id, int begin, int end, Document doc, PatternNeuron patternNeuron) {
+
+    public TokenActivation(int id, int pos, int begin, int end, Document doc, PatternNeuron patternNeuron) {
         super(id, doc, patternNeuron);
+        position = pos;
         range = new Range(begin, end);
     }
 
-    private BindingActivation getRelNTBindingActivation(TextModel m) {
-        return followSynapse(
-                getCategoryActivation(m),
-                m.getRelNTRevPatternSyn()
-        );
+    public int getPosition() {
+        return position;
     }
 
-    private BindingActivation getRelPTBindingActivation(TextModel m) {
-        return followSynapse(
-                getCategoryActivation(m),
-                m.getRelPTRevPatternSyn()
-        );
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     private CategoryActivation getCategoryActivation(TextModel m) {
@@ -76,46 +71,11 @@ public class TokenActivation extends PatternActivation {
     }
 
     protected Field initNet() {
-        return new ValueSortedQueueField(this, "net", 10.0);
+        return new ValueSortedQueueField(this, "net", 0.0);
     }
 
     public boolean isInput() {
         return true;
-    }
-
-    public static void addRelation(TokenActivation prev, TokenActivation next) {
-        if(prev == null || next == null)
-            return;
-
-        prev.nextToken = next;
-        next.previousToken = prev;
-
-        TextModel model = prev.getModel();
-
-        next.linkPrimaryInput(
-                model.getRelNTPrimaryInputSyn(),
-                prev.getRelNTBindingActivation(model)
-        );
-        prev.linkPrimaryInput(
-                model.getRelPTPrimaryInputSyn(),
-                next.getRelPTBindingActivation(model)
-        );
-    }
-
-    private void linkPrimaryInput(PrimaryInputSynapse relSynNext, BindingActivation toAct) {
-        CategoryActivation catAct = getCategoryActivation(toAct.getModel());
-        BindingSignal<?> fromBS = catAct.getBindingSignal(createKey(this, SAME));
-        BindingSignal toBS = fromBS.propagate(relSynNext).findFirst().orElse(null);
-        toBS.init(toAct);
-        relSynNext.createLink(fromBS.getActivation(), (BindingActivation) toBS.getActivation());
-    }
-
-    public TokenActivation getPreviousToken() {
-        return previousToken;
-    }
-
-    public TokenActivation getNextToken() {
-        return nextToken;
     }
 
     @Override

@@ -121,6 +121,7 @@ public class TheDogAndCatTest {
         m.init();
         Templates t = m.getTemplates();
 
+
         PatternNeuron theIN = m.lookupToken("the");
         PatternNeuron andIN = m.lookupToken("and");
         PatternNeuron dogIN = m.lookupToken("dog");
@@ -138,7 +139,7 @@ public class TheDogAndCatTest {
         BindingNeuron catBN = createNeuron(t.BINDING_TEMPLATE, "cat (the cat)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, catIN, catBN, 20.0);
 
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelationBindingNeuron(), catBN, 5.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelation(), catBN, 5.0);
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, theBN2, catBN, 5.0);
 
         PatternNeuron theCat = initPatternLoop(t, "the cat", theBN2, catBN);

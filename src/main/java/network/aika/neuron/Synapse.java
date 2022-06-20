@@ -24,6 +24,7 @@ import network.aika.fields.Field;
 import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.SingleTransition;
+import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.PostTraining;
@@ -466,6 +467,12 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
     public boolean isNegative() {
         return weight.getCurrentValue() < 0.0;
+    }
+
+    public boolean hasOutputTerminal(State s) {
+        return getTransitions()
+                .flatMap(t -> t.getOutputTerminals())
+                .anyMatch(t -> t.getState() == s);
     }
 
     @Override

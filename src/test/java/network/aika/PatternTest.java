@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static network.aika.text.TextModel.REL_PREVIOUS_TOKEN_LABEL;
 import static network.aika.utils.TestUtils.*;
 
 
@@ -72,9 +71,8 @@ public class PatternTest {
 
         Document doc = new Document(m, "ABC");
 
-        TokenActivation refA = doc.addToken("A", 0, 1);
-        TokenActivation refB = doc.addToken("B", 1, 2);
-        TokenActivation.addRelation(refA, refB);
+        doc.addToken("A", 0, 0, 1);
+        doc.addToken("B", 1, 1, 2);
 
         doc.processFinalMode();
         doc.postProcessing();
@@ -105,13 +103,13 @@ public class PatternTest {
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, nB, eB, 10.0);
         createSynapse( t.SAME_PATTERN_SYNAPSE_TEMPLATE, eA, eB, 10.0);
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, lookupRelBindingNeuron(nB, REL_PREVIOUS_TOKEN_LABEL), eB, 10.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelation(), eB, 10.0);
         createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE, out, eB, 10.0);
         updateBias(eB, 4.0);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, nC, eC, 10.0);
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, eB, eC, 10.0);
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, lookupRelBindingNeuron(nC, REL_PREVIOUS_TOKEN_LABEL), eC, 10.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelation(), eC, 10.0);
         createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE, out, eC, 10.0);
 
         updateBias(eC, 4.0);

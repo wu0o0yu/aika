@@ -63,13 +63,11 @@ public class SimplePhraseTest {
             c.setTrainingEnabled(k > 100);
 
             int i = 0;
-            TokenActivation lastToken = null;
+            int pos = 0;
             for(String t: doc.getContent().split(" ")) {
                 int j = i + t.length();
-                TokenActivation currentToken = doc.addToken(t, i, j);
-                TokenActivation.addRelation(lastToken, currentToken);
+                doc.addToken(t, pos++, i, j);
 
-                lastToken = currentToken;
                 i = j + 1;
             }
 

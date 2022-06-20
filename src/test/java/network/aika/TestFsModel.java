@@ -80,13 +80,10 @@ public class TestFsModel {
         doc.setConfig(c);
 
         int i = 0;
-        TokenActivation lastToken = null;
+        int pos = 0;
         for(String t: doc.getContent().split(" ")) {
             int j = i + t.length();
-            TokenActivation currentToken = doc.addToken("W-" + t, i, j);
-            TokenActivation.addRelation(lastToken, currentToken);
-
-            lastToken = currentToken;
+            doc.addToken(t, pos++, i, j);
             i = j + 1;
         }
         return doc;

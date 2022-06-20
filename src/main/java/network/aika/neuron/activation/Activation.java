@@ -139,6 +139,10 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return new ValueSortedQueueField(this, "net", 0.0);
     }
 
+    public void setNet(double v) {
+        net.set(v);
+    }
+
     protected void initGradientFields() {
         if(isTemplate())
             induce();
@@ -213,7 +217,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     public Field getIsFinal() {
         return isFinal;
     }
-
 
     public FieldOutput getEvent(boolean isFired, boolean isFinal) {
         if(isFired && isFinal)
