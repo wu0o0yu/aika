@@ -17,8 +17,10 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
-import network.aika.callbacks.InputRelationsCallback;
+import network.aika.direction.Direction;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
 
 
 import java.util.stream.Stream;
@@ -29,7 +31,8 @@ import java.util.stream.Stream;
  */
 public class LatentRelationNeuron extends BindingNeuron {
 
-    private InputRelationsCallback inputRelationsCallback;
+    private int rangeBegin = -1;
+    private int rangeEnd = -1;
 
     public LatentRelationNeuron() {
     }
@@ -38,8 +41,21 @@ public class LatentRelationNeuron extends BindingNeuron {
         super(model, addProvider);
     }
 
-    public void setInputRelationsCallback(InputRelationsCallback inputRelationsCallback) {
-        this.inputRelationsCallback = inputRelationsCallback;
+
+    public int getRangeBegin() {
+        return rangeBegin;
+    }
+
+    public void setRangeBegin(int rangeBegin) {
+        this.rangeBegin = rangeBegin;
+    }
+
+    public int getRangeEnd() {
+        return rangeEnd;
+    }
+
+    public void setRangeEnd(int rangeEnd) {
+        this.rangeEnd = rangeEnd;
     }
 
     @Override
@@ -51,14 +67,29 @@ public class LatentRelationNeuron extends BindingNeuron {
     }
 
     public Stream<BindingSignal> getRelatedBindingSignals(BindingSignal fromBS) {
+        State fromState = fromBS.getLink() == null ?
+                State.RELATED_SAME :
+                State.RELATED_INPUT;
+        State toState = fromBS.getLink() == null ?
+                State.RELATED_INPUT :
+                State.RELATED_SAME;
+
         Stream<BindingSignal> bindingSignals = super.getRelatedBindingSignals(fromBS);
-        if(inputRelationsCallback != null) {
-            bindingSignals = Stream.concat(
-                    bindingSignals,
-                    inputRelationsCallback.getRelatedBindingSignals(fromBS)
-            );
-        }
+        Stream<BindingSignal> relBindingSignals = fromBS.getThought().getRelatedBindingSignals(fromBS, rangeBegin, this);
+        relBindingSignals = relBindingSignals.map(bs -> createLatentInstance(fromBS, fromState, bs, toState));
+
+        bindingSignals = Stream.concat(
+                bindingSignals,
+                relBindingSignals
+        );
 
         return bindingSignals;
+    }
+
+    private BindingSignal createLatentInstance(BindingSignal fromBS, State fromState, BindingSignal toBS, State toState) {
+ /*       BindingActivation relAct = createActivation(fromBS.getThought());
+
+        BindingSignal(fromBS, PrimaryInputSynapse*/
+        return null;
     }
 }

@@ -41,42 +41,11 @@ public class TheDogAndCatTest {
     public Map<Integer, double[]> getActCoordinateMap() {
         Map<Integer, double[]> coords = new TreeMap<>();
 
-        coords.put(0, new double[]{0.0, 0.0});
-        coords.put(1, new double[]{0.026, 0.212});
-        coords.put(2, new double[]{-0.132, 0.519});
-        coords.put(3, new double[]{0.232, 0.532});
-        coords.put(4, new double[]{-0.179, 0.728});
-        coords.put(5, new double[]{0.206, 0.732});
-        coords.put(6, new double[]{-0.034, 0.412});
-        coords.put(7, new double[]{0.086, 0.427});
-        coords.put(8, new double[]{-0.023, 0.897});
-        coords.put(9, new double[]{0.305, 0.864});
-        coords.put(10, new double[]{0.459, -0.001});
-        coords.put(11, new double[]{0.448, 0.227});
-        coords.put(12, new double[]{0.586, 0.552});
-        coords.put(13, new double[]{0.574, 0.848});
-        coords.put(14, new double[]{0.502, 0.414});
-        coords.put(15, new double[]{0.622, 0.414});
-        coords.put(16, new double[]{0.764, 0.0});
-        coords.put(17, new double[]{0.764, 0.2});
-        coords.put(18, new double[]{0.704, 0.427});
-        coords.put(19, new double[]{0.824, 0.405});
-        coords.put(20, new double[]{0.995, -0.002});
-        coords.put(21, new double[]{1.025, 0.205});
-        coords.put(22, new double[]{0.822, 0.62});
-        coords.put(23, new double[]{0.983, 0.606});
-        coords.put(24, new double[]{0.879, 0.9});
-        coords.put(25, new double[]{1.065, 0.904});
-        coords.put(26, new double[]{0.904, 0.412});
-        coords.put(27, new double[]{1.024, 0.412});
-        coords.put(28, new double[]{0.798, 0.908});
-        coords.put(29, new double[]{0.935, 0.949});
-        coords.put(30, new double[]{1.195, 0.0});
-        coords.put(31, new double[]{1.195, 0.2});
-        coords.put(32, new double[]{1.135, 0.405});
-        coords.put(33, new double[]{1.255, 0.4});
-        coords.put(34, new double[]{1.203, 0.612});
-        coords.put(35, new double[]{1.195, 0.812});
+        coords.put(0, new double[]{-0.327, -0.032});
+        coords.put(1, new double[]{-0.1, -0.032});
+        coords.put(2, new double[]{0.111, -0.036});
+        coords.put(3, new double[]{0.345, -0.039});
+        coords.put(4, new double[]{0.583, -0.047});
 
         return coords;
     }

@@ -53,10 +53,9 @@ public class TextModel extends Model {
         tokenCategory.setNetworkInput(true);
         tokenCategory.setLabel(TOKEN_LABEL);
 
-        relationNeuron = createNeuron(getTemplates().LATENT_RELATION_TEMPLATE, "Rel. 1");
-        relationNeuron.setInputRelationsCallback(fromBS ->
-                fromBS.getThought().getRelatedBindingSignals(fromBS, 1, relationNeuron)
-        );
+        relationNeuron = createNeuron(getTemplates().LATENT_RELATION_TEMPLATE, "Rel. -1");
+        relationNeuron.setRangeBegin(-1);
+        relationNeuron.setRangeEnd(-1);
     }
 
 
