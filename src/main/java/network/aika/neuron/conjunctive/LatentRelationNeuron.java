@@ -17,13 +17,17 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
-import network.aika.direction.Direction;
+import network.aika.Thought;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.bindingsignal.SingleTransition;
 
 
 import java.util.stream.Stream;
+
+import static network.aika.neuron.bindingsignal.State.SAME;
+import static network.aika.neuron.conjunctive.PrimaryInputSynapse.SAME_RELATED_SAME_TRANSITION;
+import static network.aika.neuron.conjunctive.ReversePatternSynapse.INPUT_RELATED_SAME_TRANSITION;
 
 /**
  *
@@ -62,34 +66,51 @@ public class LatentRelationNeuron extends BindingNeuron {
     public BindingNeuron instantiateTemplate(boolean addProvider) {
         LatentRelationNeuron n = new LatentRelationNeuron(getModel(), addProvider);
         initFromTemplate(n);
-
         return n;
     }
 
+    @Override
     public Stream<BindingSignal> getRelatedBindingSignals(BindingSignal fromBS) {
-        State fromState = fromBS.getLink() == null ?
-                State.RELATED_SAME :
-                State.RELATED_INPUT;
-        State toState = fromBS.getLink() == null ?
-                State.RELATED_INPUT :
-                State.RELATED_SAME;
+        if(isTemplate())
+            return Stream.empty();
 
-        Stream<BindingSignal> bindingSignals = super.getRelatedBindingSignals(fromBS);
-        Stream<BindingSignal> relBindingSignals = fromBS.getThought().getRelatedBindingSignals(fromBS, rangeBegin, this);
-        relBindingSignals = relBindingSignals.map(bs -> createLatentInstance(fromBS, fromState, bs, toState));
-
-        bindingSignals = Stream.concat(
-                bindingSignals,
-                relBindingSignals
+        return Stream.concat(
+                super.getRelatedBindingSignals(fromBS),
+                getRelatedBindingSignalsInternal(fromBS)
         );
-
-        return bindingSignals;
     }
 
-    private BindingSignal createLatentInstance(BindingSignal fromBS, State fromState, BindingSignal toBS, State toState) {
- /*       BindingActivation relAct = createActivation(fromBS.getThought());
+    private Stream<BindingSignal> getRelatedBindingSignalsInternal(BindingSignal fromBS) {
+        boolean dir = fromBS.getLink() == null;
+        Thought<?> t = fromBS.getThought();
+        return t.getRelatedTokens(fromBS, (dir ? 1 : -1) * rangeBegin, this)
+                .map(tokenAct -> tokenAct.getBindingSignal(SAME))
+                .map(bs ->
+                        createLatentInstance(fromBS, bs, dir)
+                );
+    }
 
-        BindingSignal(fromBS, PrimaryInputSynapse*/
-        return null;
+    private BindingSignal createLatentInstance(BindingSignal fromBS, BindingSignal toBS, boolean direction) {
+        SingleTransition fromTransition = getTransitionByDirection(direction);
+        SingleTransition toTransition = getTransitionByDirection(!direction);
+
+        BindingActivation latentRelAct = createActivation(fromBS.getThought());
+
+        BindingSignal latentFromBS = addLatentBindingSignal(fromBS, fromTransition, latentRelAct);
+        addLatentBindingSignal(toBS, toTransition, latentRelAct);
+        return latentFromBS;
+    }
+
+    private BindingSignal addLatentBindingSignal(BindingSignal bs, SingleTransition t, BindingActivation latentRelAct) {
+        BindingSignal latentBS = new BindingSignal(bs, t);
+        latentBS.init(latentRelAct);
+        latentRelAct.addBindingSignal(latentBS);
+        return latentBS;
+    }
+
+    private SingleTransition getTransitionByDirection(boolean direction) {
+        return direction ?
+                SAME_RELATED_SAME_TRANSITION :
+                INPUT_RELATED_SAME_TRANSITION;
     }
 }

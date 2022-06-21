@@ -61,7 +61,7 @@ public class Document extends Thought<TextModel> {
         }
     }
 
-    public Stream<BindingSignal<?>> getRelatedBindingSignals(BindingSignal fromBindingSignal, Integer distance, Neuron toNeuron) {
+    public Stream<TokenActivation> getRelatedTokens(BindingSignal fromBindingSignal, Integer distance, Neuron toNeuron) {
         if(!(fromBindingSignal.getOriginActivation() instanceof TokenActivation))
             return Stream.empty();
 
@@ -70,8 +70,7 @@ public class Document extends Thought<TextModel> {
         if(relBS == null)
             return Stream.empty();
 
-        return relBS.getOriginActivation()
-                .getReverseBindingSignals(toNeuron);
+        return Stream.of((TokenActivation) relBS.getOriginActivation());
     }
 
     public void append(String txt) {

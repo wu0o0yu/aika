@@ -46,17 +46,19 @@ public class ReversePatternSynapse<I extends Neuron & PatternAxon, IA extends Ac
                 >
 {
 
+    public static SingleTransition INPUT_RELATED_SAME_TRANSITION = transition(
+            fixed(INPUT),
+            fixed(RELATED_SAME),
+            MATCH_AND_PROPAGATE
+    );
+
     private static List<Transition> TRANSITIONS = List.of(
             transition(
                     fixed(SAME),
                     fixed(SAME),
                     MATCH_AND_PROPAGATE
             ),
-            transition(
-                    fixed(INPUT),
-                    fixed(RELATED_SAME),
-                    MATCH_AND_PROPAGATE
-            )
+            INPUT_RELATED_SAME_TRANSITION
     );
 
     @Override

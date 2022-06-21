@@ -27,6 +27,7 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.steps.Phase;
 import network.aika.steps.QueueKey;
 import network.aika.steps.Step;
+import network.aika.text.TokenActivation;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -252,7 +253,7 @@ public abstract class Thought<M extends Model> {
         return sb.toString();
     }
 
-    public Stream<BindingSignal<?>> getRelatedBindingSignals(BindingSignal<?> fromBindingSignal, Integer distance, Neuron toNeuron) {
+    public Stream<TokenActivation> getRelatedTokens(BindingSignal<?> fromBindingSignal, Integer distance, Neuron toNeuron) {
         return Stream.empty();
     }
 }
