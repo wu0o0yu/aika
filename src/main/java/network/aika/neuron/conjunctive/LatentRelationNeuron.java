@@ -95,6 +95,7 @@ public class LatentRelationNeuron extends BindingNeuron {
         SingleTransition toTransition = getTransitionByDirection(!direction);
 
         BindingActivation latentRelAct = createActivation(fromBS.getThought());
+        latentRelAct.init(null, fromBS.getActivation());
 
         BindingSignal latentFromBS = addLatentBindingSignal(fromBS, fromTransition, latentRelAct);
         addLatentBindingSignal(toBS, toTransition, latentRelAct);
