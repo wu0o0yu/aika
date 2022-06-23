@@ -268,7 +268,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public void receiveBindingSignal(BindingSignal bs) {
         if(bs.getState() == State.SAME) {
-            Fields.connect(bs.getOnArrived(), sameBSEvent);
+            Fields.connect(bs.getOnArrived(), sameBSEvent, false);
             return;
         }
 

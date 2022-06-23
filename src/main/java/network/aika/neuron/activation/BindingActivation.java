@@ -94,10 +94,10 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     public void receiveBindingSignal(BindingSignal bs) {
         if(bs.getState() == INPUT)
-            Fields.connect(bs.getOnArrived(), inputBSEvent);
+            Fields.connect(bs.getOnArrived(), inputBSEvent, false);
 
         if(bs.getState() == RELATED_SAME)
-            Fields.connect(bs.getOnArrived(), relatedSameBSEvent);
+            Fields.connect(bs.getOnArrived(), relatedSameBSEvent, false);
 
         super.receiveBindingSignal(bs);
     }

@@ -17,10 +17,13 @@
 package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 
 import java.util.stream.Stream;
+
+import static network.aika.fields.Fields.mul;
 
 /**
  * @author Lukas Molzberger
@@ -36,4 +39,13 @@ public interface Terminal {
     void notify(Synapse ts, BindingSignal bs);
 
     Stream<BindingSignal> propagate(BindingSignal bs);
+
+    static FieldOutput getPreconditionEvent(Synapse ts, Activation act, Direction dir, FieldOutput inputEvent) {
+        FieldOutput actEvent = ts.getLinkingEvent(act, dir);
+        return actEvent != null ? mul("terminal precondition event (syn: " + ts + ")",
+                inputEvent,
+                actEvent
+        ) :
+                inputEvent;
+    }
 }

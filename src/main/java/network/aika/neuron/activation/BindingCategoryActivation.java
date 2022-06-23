@@ -42,7 +42,7 @@ public class BindingCategoryActivation extends DisjunctiveActivation<BindingCate
 
     public void receiveBindingSignal(BindingSignal bs) {
         if(bs.getState() == INPUT)
-            Fields.connect(bs.getOnArrived(), inputBSEvent);
+            Fields.connect(bs.getOnArrived(), inputBSEvent, false);
 
         super.receiveBindingSignal(bs);
     }

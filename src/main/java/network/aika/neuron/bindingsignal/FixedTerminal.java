@@ -16,15 +16,10 @@
  */
 package network.aika.neuron.bindingsignal;
 
-import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 
-import java.util.stream.Stream;
-
-import static network.aika.fields.Fields.mul;
-import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
 import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 
 
@@ -50,34 +45,24 @@ public class FixedTerminal extends SingleTerminal {
         if(bsEvent == null)
             return;
 
-        FieldOutput transitionEvent = getTransitionEvent(
-                ts,
-                act,
-                type.invert(),
-                bsEvent
-        );
-
-        transitionEvent.addEventListener(() ->
-                transition.linkAndPropagate(
+        Terminal.getPreconditionEvent(
                         ts,
-                        getBindingSignal(bsEvent),
-                        type.invert()
+                        act,
+                        type.invert(),
+                        bsEvent
                 )
-        );
+                .addEventListener(() ->
+                        transition.linkAndPropagate(
+                                ts,
+                                getBindingSignal(bsEvent),
+                                type.invert()
+                        )
+                );
     }
 
     @Override
     public void notify(Synapse ts, BindingSignal bs) {
         // nothing to do here
-    }
-
-    private static FieldOutput getTransitionEvent(Synapse ts, Activation act, Direction dir, FieldOutput inputEvent) {
-        FieldOutput actEvent = ts.getLinkingEvent(act, dir);
-        return actEvent != null ? mul("transition event (syn: " + ts + ")",
-                inputEvent,
-                actEvent
-        ) :
-                inputEvent;
     }
 
     public FieldOutput getBSEvent(Activation act) {

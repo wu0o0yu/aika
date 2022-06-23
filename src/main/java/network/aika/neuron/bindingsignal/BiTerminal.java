@@ -56,29 +56,20 @@ public class BiTerminal implements Terminal {
         FieldOutput activeBSEvent = activeTerminal.getBSEvent(act);
 
         FieldOutput inputEvent = mul(
-                "input bi transition event",
+                "bi-terminal event",
                 activeTerminal.getBSEvent(act),
                 passiveTerminal.getBSEvent(act)
         );
 
-        FieldOutput transitionEvent = getTransitionEvent(ts, act, OUTPUT, inputEvent);
-        transitionEvent.addEventListener(() ->
-                transition.linkAndPropagate(ts, activeBSEvent, OUTPUT)
-        );
+        Terminal.getPreconditionEvent(ts, act, OUTPUT, inputEvent)
+                .addEventListener(() ->
+                        transition.linkAndPropagate(ts, activeBSEvent, OUTPUT)
+                );
     }
 
     @Override
     public void notify(Synapse ts, BindingSignal bs) {
         // nothing to do
-    }
-
-    private static FieldOutput getTransitionEvent(Synapse ts, Activation act, Direction dir, FieldOutput inputEvent) {
-        FieldOutput actEvent = ts.getLinkingEvent(act, dir);
-        return actEvent != null ? mul("transition event (syn: " + ts + ")",
-                inputEvent,
-                actEvent
-        ) :
-                inputEvent;
     }
 
     @Override

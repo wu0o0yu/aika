@@ -37,10 +37,18 @@ public class Fields {
         connect(in, 0, out);
     }
 
+    public static void connect(FieldOutput in, FieldInput out, boolean propagateInitialValue) {
+        connect(in, 0, out, propagateInitialValue);
+    }
+
     public static void connect(FieldOutput in, int arg, FieldInput out) {
+        connect(in, arg, out, true);
+    }
+
+    public static void connect(FieldOutput in, int arg, FieldInput out, boolean propagateInitialValue) {
         FieldLink l = new FieldLink(in, arg, out);
         out.addInput(l);
-        in.addOutput(l, true);
+        in.addOutput(l, propagateInitialValue);
     }
 
     private static void connectAll(FieldOutput in, FieldInput... out) {
