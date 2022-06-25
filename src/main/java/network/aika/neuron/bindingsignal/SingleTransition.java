@@ -20,6 +20,8 @@ import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.stream.Stream;
 
@@ -33,6 +35,8 @@ import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
  * @author Lukas Molzberger
  */
 public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal> implements Transition {
+
+    private static final Logger log = LoggerFactory.getLogger(SingleTransition.class);
 
     protected I input;
     protected O output;
@@ -87,6 +91,7 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
         boolean templateEnabled = fromBS.getConfig().isTemplatesEnabled();
         toNeuron.getTargetSynapses(INPUT, templateEnabled)
                 .filter(synB -> synA != synB)
+                .filter(synB -> synA.isLatentLinking() || synB.isLatentLinking())
                 .filter(synB -> synB.hasOutputTerminal(t.getOutput().getState()))
                 .forEach(synB ->
                         latentLinking(t, fromBS, synA, synB)
@@ -94,6 +99,8 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
     }
 
     private static void latentLinking(SingleTransition tA, BindingSignal bsA, Synapse synA, Synapse synB) {
+        log.info("Check latent-link synA:" + synA + "  synB:" + synB);
+
         Stream<BindingSignal> bsStream = synB.getInput().getRelatedBindingSignals(bsA);
         bsStream.filter(bsB -> bsA != bsB)
                 .filter(bsB ->
