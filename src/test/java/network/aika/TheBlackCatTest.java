@@ -18,8 +18,6 @@ package network.aika;
 
 import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.Templates;
-import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import org.graphstream.ui.view.camera.Camera;
@@ -29,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static network.aika.TestHelper.initPatternBlackCat;
+import static network.aika.TestHelper.initPatternTheCat;
 import static network.aika.utils.TestUtils.*;
 
 
@@ -104,36 +104,8 @@ public class TheBlackCatTest {
         m.init();
         Templates t = m.getTemplates();
 
-        PatternNeuron theIN = m.lookupToken("the");
-        PatternNeuron blackIN = m.lookupToken("black");
-        PatternNeuron catIN = m.lookupToken("cat");
-
-        BindingNeuron theBN = createNeuron(t.BINDING_TEMPLATE, "the (the cat)");
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, theIN, theBN, 10.0);
-        BindingNeuron catBN1 = createNeuron(t.BINDING_TEMPLATE, "cat (the cat)");
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, catIN, catBN1, 10.0);
-        PatternNeuron theCat = initPatternLoop(t, "the cat", theBN, catBN1);
-        updateBias(theCat, 3.0);
-
-        BindingNeuron blackBN = createNeuron(t.BINDING_TEMPLATE, "black (black cat)");
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, blackIN, blackBN, 10.0);
-        BindingNeuron catBN2 = createNeuron(t.BINDING_TEMPLATE, "cat (black cat)");
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, catIN, catBN2, 20.0);
-
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelation(), catBN2, 5.0);
-        createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, blackBN, catBN2, 5.0);
-
-        PatternNeuron blackCat = initPatternLoop(t, "black cat", blackBN, catBN2);
-        updateBias(blackCat, 3.0);
-
-        updateBias(theBN, 3.0);
-        updateBias(blackBN, 3.0);
-        updateBias(catBN1, 3.0);
-        updateBias(catBN2, 3.0);
-
-
-//        initInhibitoryLoop(t, "jackson", jacksonForenameBN, jacksonCityBN);
-
+        initPatternTheCat(m, t);
+        initPatternBlackCat(m, t);
 
         Document doc = new Document(m, "the black cat");
         debugger.setDocument(doc);

@@ -18,8 +18,6 @@ package network.aika;
 
 import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.Templates;
-import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import org.graphstream.ui.view.camera.Camera;
@@ -29,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static network.aika.TestHelper.initPatternTheCat;
+import static network.aika.TestHelper.initPatternTheDog;
 import static network.aika.utils.TestUtils.*;
 
 
@@ -90,36 +90,8 @@ public class TheDogAndCatTest {
         m.init();
         Templates t = m.getTemplates();
 
-
-        PatternNeuron theIN = m.lookupToken("the");
-        PatternNeuron andIN = m.lookupToken("and");
-        PatternNeuron dogIN = m.lookupToken("dog");
-        PatternNeuron catIN = m.lookupToken("cat");
-
-        BindingNeuron theBN1 = createNeuron(t.BINDING_TEMPLATE, "the (the dog)");
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, theIN, theBN1, 10.0);
-        BindingNeuron dogBN = createNeuron(t.BINDING_TEMPLATE, "dog (the dog)");
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, dogIN, dogBN, 10.0);
-        PatternNeuron theDog = initPatternLoop(t, "the dog", theBN1, dogBN);
-        updateBias(theDog, 3.0);
-
-        BindingNeuron theBN2 = createNeuron(t.BINDING_TEMPLATE, "the (the cat)");
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, theIN, theBN2, 10.0);
-        BindingNeuron catBN = createNeuron(t.BINDING_TEMPLATE, "cat (the cat)");
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, catIN, catBN, 20.0);
-
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelation(), catBN, 5.0);
-        createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, theBN2, catBN, 5.0);
-
-        PatternNeuron theCat = initPatternLoop(t, "the cat", theBN2, catBN);
-        updateBias(theCat, 3.0);
-
-        updateBias(theBN1, 3.0);
-        updateBias(dogBN, 3.0);
-        updateBias(theBN2, 3.0);
-        updateBias(catBN, 3.0);
-
-        initInhibitoryLoop(t, "the", theBN1, theBN2);
+        initPatternTheCat(m, t);
+        initPatternTheDog(m, t);
 
         Document doc = new Document(m, "the dog and the cat");
         debugger.setDocument(doc);
