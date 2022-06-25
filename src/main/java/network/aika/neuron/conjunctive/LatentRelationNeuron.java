@@ -18,7 +18,9 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
 import network.aika.Thought;
+import network.aika.fields.QueueField;
 import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.LatentRelatedActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.SingleTransition;
 
@@ -26,8 +28,8 @@ import network.aika.neuron.bindingsignal.SingleTransition;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.State.SAME;
-import static network.aika.neuron.conjunctive.PrimaryInputSynapse.SAME_RELATED_SAME_TRANSITION;
-import static network.aika.neuron.conjunctive.ReversePatternSynapse.INPUT_RELATED_SAME_TRANSITION;
+import static network.aika.neuron.conjunctive.PrimaryInputSynapse.SAME_INPUT_TRANSITION;
+import static network.aika.neuron.conjunctive.ReversePatternSynapse.SAME_SAME_TRANSITION;
 
 /**
  *
@@ -63,6 +65,11 @@ public class LatentRelationNeuron extends BindingNeuron {
     }
 
     @Override
+    public LatentRelatedActivation createActivation(Thought t) {
+        return new LatentRelatedActivation(t.createActivationId(), t, this);
+    }
+
+    @Override
     public BindingNeuron instantiateTemplate(boolean addProvider) {
         LatentRelationNeuron n = new LatentRelationNeuron(getModel(), addProvider);
         initFromTemplate(n);
@@ -95,7 +102,6 @@ public class LatentRelationNeuron extends BindingNeuron {
         SingleTransition toTransition = getTransitionByDirection(!direction);
 
         BindingActivation latentRelAct = createActivation(fromBS.getThought());
-        latentRelAct.init(null, null);
 
         BindingSignal latentFromBS = addLatentBindingSignal(fromBS, fromTransition, latentRelAct);
         addLatentBindingSignal(toBS, toTransition, latentRelAct);
@@ -106,12 +112,15 @@ public class LatentRelationNeuron extends BindingNeuron {
         BindingSignal latentBS = new BindingSignal(bs, t);
         latentBS.init(latentRelAct);
         latentRelAct.addBindingSignal(latentBS);
+        QueueField qf = (QueueField) latentBS.getOnArrived();
+        qf.process();
+
         return latentBS;
     }
 
     private SingleTransition getTransitionByDirection(boolean direction) {
         return direction ?
-                SAME_RELATED_SAME_TRANSITION :
-                INPUT_RELATED_SAME_TRANSITION;
+                SAME_SAME_TRANSITION :
+                SAME_INPUT_TRANSITION;
     }
 }

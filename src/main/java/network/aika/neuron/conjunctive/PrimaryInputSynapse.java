@@ -48,24 +48,28 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
         >
 {
 
+    public static SingleTransition SAME_INPUT_TRANSITION = transition(
+            fixed(SAME),
+            fixed(INPUT),
+            MATCH_AND_PROPAGATE
+    );
+
     public static SingleTransition SAME_RELATED_SAME_TRANSITION = transition(
             fixed(SAME),
             fixed(RELATED_SAME),
             MATCH_AND_PROPAGATE
     );
 
+    public static SingleTransition INPUT_RELATED_INPUT_TRANSITION = transition(
+            fixed(INPUT),
+            variable(RELATED_INPUT),
+            MATCH_AND_PROPAGATE
+    );
+
     private static List<Transition> TRANSITIONS = List.of(
-            transition(
-                    fixed(SAME),
-                    fixed(INPUT),
-                    MATCH_AND_PROPAGATE
-            ),
+            SAME_INPUT_TRANSITION,
             SAME_RELATED_SAME_TRANSITION,
-            transition(
-                    fixed(INPUT),
-                    variable(RELATED_INPUT),
-                    MATCH_AND_PROPAGATE
-            )
+            INPUT_RELATED_INPUT_TRANSITION
     );
 
     @Override
