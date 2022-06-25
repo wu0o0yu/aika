@@ -19,8 +19,10 @@ package network.aika.neuron.conjunctive;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.fields.QueueField;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.LatentRelatedActivation;
+import network.aika.neuron.bindingsignal.BSKey;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.SingleTransition;
 
@@ -101,12 +103,25 @@ public class LatentRelationNeuron extends BindingNeuron {
         SingleTransition fromTransition = getTransitionByDirection(direction);
         SingleTransition toTransition = getTransitionByDirection(!direction);
 
-        BindingActivation latentRelAct = createActivation(fromBS.getThought());
-        latentRelAct.init(null, null);
+        LatentRelatedActivation latentRelAct = lookupLatentRelAct(fromBS, toBS);
+        if(latentRelAct == null) {
+            latentRelAct = createActivation(fromBS.getThought());
+            latentRelAct.init(null, null);
+        }
 
         BindingSignal latentFromBS = addLatentBindingSignal(fromBS, fromTransition, latentRelAct);
         addLatentBindingSignal(toBS, toTransition, latentRelAct);
         return latentFromBS;
+    }
+
+    private LatentRelatedActivation lookupLatentRelAct(BindingSignal<?> fromBS, BindingSignal<?> toBS) {
+        Activation<?> originAct = fromBS.getOriginActivation();
+        return (LatentRelatedActivation) originAct.getReverseBindingSignals(this)
+                .map(bs -> bs.getActivation())
+                .filter(act ->
+                        act.getBindingSignal(BSKey.createKey(toBS)) != null
+                ).findAny()
+                .orElse(null);
     }
 
     private BindingSignal addLatentBindingSignal(BindingSignal bs, SingleTransition t, BindingActivation latentRelAct) {

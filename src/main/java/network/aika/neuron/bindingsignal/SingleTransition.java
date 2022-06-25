@@ -66,7 +66,8 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
     public void link(Synapse ts, BindingSignal fromBS, Direction dir) {
         Stream<BindingSignal<?>> bsStream = ts.getRelatedBindingSignals(fromBS, dir);
 
-        bsStream.filter(toBS -> fromBS != toBS)
+        bsStream
+                .filter(toBS -> fromBS != toBS)
                 .forEach(toBS ->
                         link(this, ts, fromBS, toBS, dir)
                 );

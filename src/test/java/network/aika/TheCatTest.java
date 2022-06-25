@@ -76,12 +76,12 @@ public class TheCatTest {
         );
 
         debugger.setCurrentTestCase(() ->
-                setupTheBlackCatTest(debugger)
+                setupTheCatTest(debugger)
         );
         debugger.run();
     }
 
-    public void setupTheBlackCatTest(AIKADebugger debugger) {
+    public void setupTheCatTest(AIKADebugger debugger) {
         TextModel m = new TextModel();
 
         m.init();
