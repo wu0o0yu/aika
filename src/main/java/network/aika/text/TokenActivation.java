@@ -51,7 +51,7 @@ public class TokenActivation extends PatternActivation {
     public void setPosition(int position) {
         this.position = position;
     }
-
+/*
     private CategoryActivation getCategoryActivation(TextModel m) {
         return followSynapse(
                 this,
@@ -69,7 +69,7 @@ public class TokenActivation extends PatternActivation {
 
         return (A) link.getOutput();
     }
-
+*/
     protected Field initNet() {
         return new ValueSortedQueueField(this, "net", 0.0);
     }

@@ -5,13 +5,13 @@ import network.aika.fields.Field;
 import network.aika.fields.ValueSortedQueueField;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
 
-public class LatentRelatedActivation extends BindingActivation {
+public class LatentRelationActivation extends BindingActivation {
 
-    protected LatentRelatedActivation(int id, LatentRelationNeuron n) {
+    protected LatentRelationActivation(int id, LatentRelationNeuron n) {
         super(id, n);
     }
 
-    public LatentRelatedActivation(int id, Thought t, LatentRelationNeuron n) {
+    public LatentRelationActivation(int id, Thought t, LatentRelationNeuron n) {
         super(id, t, n);
     }
 

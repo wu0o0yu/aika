@@ -35,9 +35,9 @@ import static network.aika.utils.TestUtils.createNeuron;
 */
 public class TextModel extends Model {
 
-    public static String TOKEN_LABEL = "Token Category";
+//    public static String TOKEN_LABEL = "Token Category";
 
-    private CategoryNeuron tokenCategory;
+//    private CategoryNeuron tokenCategory;
     private LatentRelationNeuron relationNeuron;
 
     public TextModel() {
@@ -49,15 +49,35 @@ public class TextModel extends Model {
     }
 
     public void init() {
-        tokenCategory = getTemplates().CATEGORY_TEMPLATE.instantiateTemplate(true);
+/*        tokenCategory = getTemplates().CATEGORY_TEMPLATE.instantiateTemplate(true);
         tokenCategory.setNetworkInput(true);
         tokenCategory.setLabel(TOKEN_LABEL);
-
-        relationNeuron = createNeuron(getTemplates().LATENT_RELATION_TEMPLATE, "Rel. -1");
-        relationNeuron.setRangeBegin(-1);
-        relationNeuron.setRangeEnd(-1);
+*/
+        relationNeuron = initRelationNeuron("Rel. -1", -1);
     }
 
+    private LatentRelationNeuron initRelationNeuron(String label, int distance) {
+        LatentRelationNeuron n = getTemplates().LATENT_RELATION_TEMPLATE.instantiateTemplate(true);
+        n.setLabel(label);
+
+        n.setRangeBegin(distance);
+        n.setRangeEnd(distance);
+
+//        Synapse pis = initPrimaryInputSynapse(tokenCategory, n);
+//        Synapse rps = initReversePatternSynapse(tokenCategory, n);
+
+        // n.setNetworkInput(true);
+        n.getBias().receiveUpdate(-4.0);
+        n.setAllowTraining(false);
+        n.updateSumOfLowerWeights();
+
+//        assert !pis.isPropagate();
+//        assert !rps.isPropagate();
+
+        n.getProvider().save();
+
+        return n;
+    }
 
     public PatternNeuron lookupToken(String tokenLabel) {
         Neuron inProv = getNeuron(tokenLabel);
@@ -73,26 +93,18 @@ public class TextModel extends Model {
         in.setAllowTraining(false);
         putLabel(tokenLabel, in.getId());
 
-        initCategorySynapse(in, getTokenCategory());
+//        initCategorySynapse(in, getTokenCategory());
 
         in.getProvider().save();
 
         return in;
     }
 /*
-    private void initRelationNeuron(String label, BindingNeuron inRel) {
-        inRel.setNetworkInput(true);
-        inRel.setLabel(label);
-        inRel.getBias().receiveUpdate(4.0);
-        inRel.setAllowTraining(false);
-        inRel.updateSumOfLowerWeights();
-    }
-
-    private PrimaryInputSynapse initRelatedInputSynapse(CategoryNeuron relTokenCat, BindingNeuron relBN) {
+    private PrimaryInputSynapse initPrimaryInputSynapse(CategoryNeuron relTokenCat, BindingNeuron relBN) {
         PrimaryInputSynapse s = (PrimaryInputSynapse) getTemplates().PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE
                 .instantiateTemplate(null, relTokenCat, relBN);
 
-        double w = 10.0;
+        double w = 1.0;
 
         s.linkOutput();
         s.getWeight().set(w);
@@ -106,7 +118,7 @@ public class TextModel extends Model {
         ReversePatternSynapse s = (ReversePatternSynapse) getTemplates().REVERSE_PATTERN_SYNAPSE_FROM_CATEGORY_TEMPLATE
                 .instantiateTemplate(null, in, inRel);
 
-        double w = 11.0;
+        double w = 2.0;
 
         s.linkInput();
         s.linkOutput();
@@ -116,55 +128,35 @@ public class TextModel extends Model {
 
         return s;
     }
-*/
+
     private void initCategorySynapse(PatternNeuron tokenNeuron, CategoryNeuron tokenCat) {
         Synapse s = getTemplates().CATEGORY_SYNAPSE_TEMPLATE
                 .instantiateTemplate(null, tokenNeuron, tokenCat);
 
         s.linkInput();
-        s.getWeight().set(2.0);
+        s.getWeight().set(1.0);
         s.setAllowTraining(false);
     }
 
     public CategoryNeuron getTokenCategory() {
         return tokenCategory;
     }
-
-    public BindingNeuron getPreviousTokenRelation() {
+*/
+    public LatentRelationNeuron getPreviousTokenRelation() {
         return relationNeuron;
     }
-/*
-    public BindingNeuron getNextTokenRelationBindingNeuron() {
-        return (BindingNeuron) relNextToken.getNeuron();
-    }
 
-    public PrimaryInputSynapse<CategoryNeuron, CategoryActivation> getRelPTPrimaryInputSyn() {
-        return relPTPrimaryInputSyn;
-    }
-
-    public ReversePatternSynapse<CategoryNeuron, CategoryActivation> getRelPTRevPatternSyn() {
-        return relPTRevPatternSyn;
-    }
-
-    public PrimaryInputSynapse<CategoryNeuron, CategoryActivation> getRelNTPrimaryInputSyn() {
-        return relNTPrimaryInputSyn;
-    }
-
-    public ReversePatternSynapse<CategoryNeuron, CategoryActivation> getRelNTRevPatternSyn() {
-        return relNTRevPatternSyn;
-    }
-*/
     @Override
     public void write(DataOutput out) throws IOException {
         super.write(out);
 
-        out.writeLong(tokenCategory.getId());
+//        out.writeLong(tokenCategory.getId());
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws Exception {
         super.readFields(in, m);
 
-        tokenCategory = (CategoryNeuron) lookupNeuron(in.readLong()).getNeuron();
+//        tokenCategory = (CategoryNeuron) lookupNeuron(in.readLong()).getNeuron();
     }
 }

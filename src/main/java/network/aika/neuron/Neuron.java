@@ -109,7 +109,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return getTemplate().getId().intValue() == targetN.getId().intValue();
     }
 
-    public Stream<BindingSignal> getRelatedBindingSignals(BindingSignal bs) {
+    public Stream<BindingSignal> getRelatedBindingSignals(BindingSignal bs, Direction dir) {
         Stream<BindingSignal> relatedBSs = bs.getOriginActivation()
                 .getReverseBindingSignals(this);
         return relatedBSs

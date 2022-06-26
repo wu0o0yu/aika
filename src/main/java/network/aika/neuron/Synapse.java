@@ -80,7 +80,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
     public Stream<BindingSignal<?>> getRelatedBindingSignals(BindingSignal<?> fromBS, Direction dir) {
         return dir.getNeuron(this)
-                .getRelatedBindingSignals(fromBS);
+                .getRelatedBindingSignals(fromBS, dir);
     }
 
     public abstract double getSumOfLowerWeights();
@@ -523,8 +523,15 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return (isTemplate() ? "Template-" : "") +
                 getClass().getSimpleName() +
                 " in:[" + input.getNeuron().toKeyString()  + "](" + (isInputLinked ? "+" : "-") + ") " +
-//                (propagatedAllowed(null) ? "==>" : "-->") +
-                "-->" +
+                getArrow() +
                 " out:[" + output.getNeuron().toKeyString() + "](" + (isOutputLinked ? "+" : "-") + ")";
+    }
+
+    private String getArrow() {
+        if(isPropagate())
+            return "==>";
+        if(isLatentLinking())
+            return "-=>";
+        return "-->";
     }
 }

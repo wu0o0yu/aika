@@ -40,30 +40,25 @@ public class TheCatTest {
     public Map<Integer, double[]> getActCoordinateMap() {
         Map<Integer, double[]> coords = new TreeMap<>();
 
-        coords.put(0, new double[]{-0.061, 0.005});
-        coords.put(1, new double[]{0.59, -0.015});
-        coords.put(2, new double[]{0.092, 0.205});
-        coords.put(3, new double[]{-0.053, 0.649});
-        coords.put(4, new double[]{0.338, 1.016});
-        coords.put(5, new double[]{0.147, 0.387});
-        coords.put(6, new double[]{0.435, 0.194});
-        coords.put(7, new double[]{0.617, 0.647});
-        coords.put(8, new double[]{0.357, 0.39});
-        coords.put(9, new double[]{0.476, 0.311});
-        coords.put(10, new double[]{0.272, 0.847});
+        coords.put(0, new double[]{-0.048, 0.008});
+        coords.put(1, new double[]{0.688, -0.004});
+        coords.put(2, new double[]{-0.035, 0.49});
+        coords.put(3, new double[]{0.314, 0.791});
+        coords.put(4, new double[]{0.267, -0.002});
+        coords.put(5, new double[]{0.69, 0.48});
+
         return coords;
     }
 
     public Map<Long, double[]> getNeuronCoordinateMap() {
         Map<Long, double[]> coords = new TreeMap<>();
 
-        coords.put(1l, new double[]{1.766, 0.523});
-        coords.put(2l, new double[]{1.775, 0.778});
-        coords.put(3l, new double[]{0.722, -0.135});
-        coords.put(4l, new double[]{2.772, -0.127});
-        coords.put(5l, new double[]{0.755, 1.227});
-        coords.put(6l, new double[]{2.791, 1.215});
-        coords.put(7l, new double[]{1.8, 2.093});
+        coords.put(1l, new double[]{1.189, -0.101});
+        coords.put(2l, new double[]{0.431, -0.121});
+        coords.put(3l, new double[]{2.141, -0.086});
+        coords.put(4l, new double[]{0.442, 1.185});
+        coords.put(5l, new double[]{2.144, 1.171});
+        coords.put(6l, new double[]{1.302, 1.57});
 
         return coords;
     }
@@ -112,8 +107,8 @@ public class TheCatTest {
 
         debugger.getNeuronViewManager().setCoordinateListener(n -> neuronCoords.get(n.getId()));
         camera = debugger.getNeuronViewManager().getCamera();
-        camera.setViewPercent(1.3);
-        camera.setViewCenter(1.809, 0.923, 0);
+        camera.setViewPercent(1.5);
+        camera.setViewCenter(1.528, 0.828, 0);
 
         doc.processTokens(List.of("the", "cat"));
 

@@ -18,10 +18,11 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
 import network.aika.Thought;
+import network.aika.direction.Direction;
 import network.aika.fields.QueueField;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.LatentRelatedActivation;
+import network.aika.neuron.activation.LatentRelationActivation;
 import network.aika.neuron.bindingsignal.BSKey;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.SingleTransition;
@@ -67,26 +68,27 @@ public class LatentRelationNeuron extends BindingNeuron {
     }
 
     @Override
-    public LatentRelatedActivation createActivation(Thought t) {
-        return new LatentRelatedActivation(t.createActivationId(), t, this);
+    public LatentRelationActivation createActivation(Thought t) {
+        return new LatentRelationActivation(t.createActivationId(), t, this);
     }
 
     @Override
-    public BindingNeuron instantiateTemplate(boolean addProvider) {
+    public LatentRelationNeuron instantiateTemplate(boolean addProvider) {
         LatentRelationNeuron n = new LatentRelationNeuron(getModel(), addProvider);
         initFromTemplate(n);
         return n;
     }
 
     @Override
-    public Stream<BindingSignal> getRelatedBindingSignals(BindingSignal fromBS) {
+    public Stream<BindingSignal> getRelatedBindingSignals(BindingSignal fromBS, Direction dir) {
         if(isTemplate())
             return Stream.empty();
 
-        return Stream.concat(
-                super.getRelatedBindingSignals(fromBS),
-                getRelatedBindingSignalsInternal(fromBS)
-        );
+        Stream<BindingSignal> toBSs = super.getRelatedBindingSignals(fromBS, dir);
+
+        return dir == Direction.OUTPUT ?
+                toBSs :
+                Stream.concat(toBSs, getRelatedBindingSignalsInternal(fromBS));
     }
 
     private Stream<BindingSignal> getRelatedBindingSignalsInternal(BindingSignal fromBS) {
@@ -103,7 +105,7 @@ public class LatentRelationNeuron extends BindingNeuron {
         SingleTransition fromTransition = getTransitionByDirection(direction);
         SingleTransition toTransition = getTransitionByDirection(!direction);
 
-        LatentRelatedActivation latentRelAct = lookupLatentRelAct(fromBS, toBS);
+        LatentRelationActivation latentRelAct = lookupLatentRelAct(fromBS, toBS);
         if(latentRelAct == null) {
             latentRelAct = createActivation(fromBS.getThought());
             latentRelAct.init(null, null);
@@ -114,9 +116,9 @@ public class LatentRelationNeuron extends BindingNeuron {
         return latentFromBS;
     }
 
-    private LatentRelatedActivation lookupLatentRelAct(BindingSignal<?> fromBS, BindingSignal<?> toBS) {
+    private LatentRelationActivation lookupLatentRelAct(BindingSignal<?> fromBS, BindingSignal<?> toBS) {
         Activation<?> originAct = fromBS.getOriginActivation();
-        return (LatentRelatedActivation) originAct.getReverseBindingSignals(this)
+        return (LatentRelationActivation) originAct.getReverseBindingSignals(this)
                 .map(bs -> bs.getActivation())
                 .filter(act ->
                         act.getBindingSignal(BSKey.createKey(toBS)) != null

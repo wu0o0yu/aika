@@ -102,7 +102,7 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
     private static void latentLinking(SingleTransition tA, BindingSignal bsA, Synapse synA, Synapse synB) {
         log.info("Check latent-link synA:" + synA + "  synB:" + synB);
 
-        Stream<BindingSignal> bsStream = synB.getInput().getRelatedBindingSignals(bsA);
+        Stream<BindingSignal> bsStream = synB.getInput().getRelatedBindingSignals(bsA, INPUT);
         bsStream.filter(bsB -> bsA != bsB)
                 .filter(bsB ->
                         isTrue(bsB.getOnArrivedFired())

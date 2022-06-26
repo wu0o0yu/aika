@@ -228,7 +228,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
         synapse.linkOutput();
 
-        reconnect(weightedInput.getInput2(), synapse.getWeight());
+        if(weightedInput != null)
+            reconnect(weightedInput.getInput2(), synapse.getWeight());
 
         if(backPropGradient != null)
             reconnect(backPropGradient.getInput2(), synapse.getWeight());
