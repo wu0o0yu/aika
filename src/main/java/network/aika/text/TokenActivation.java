@@ -51,25 +51,7 @@ public class TokenActivation extends PatternActivation {
     public void setPosition(int position) {
         this.position = position;
     }
-/*
-    private CategoryActivation getCategoryActivation(TextModel m) {
-        return followSynapse(
-                this,
-                getNeuron().getOutputSynapse(m.getTokenCategory().getProvider())
-        );
-    }
 
-    private <A extends Activation> A followSynapse(Activation<?> fromAct, Synapse s) {
-        Link link = fromAct.getOutputLinks(s)
-                .findFirst()
-                .orElse(null);
-
-        if(link == null)
-            return null;
-
-        return (A) link.getOutput();
-    }
-*/
     protected Field initNet() {
         return new ValueSortedQueueField(this, "net", 0.0);
     }
