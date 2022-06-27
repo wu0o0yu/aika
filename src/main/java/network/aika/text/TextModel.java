@@ -66,22 +66,15 @@ public class TextModel extends Model {
     }
 
     public PatternNeuron lookupToken(String tokenLabel) {
-        Neuron inProv = getNeuron(tokenLabel);
-        if(inProv != null) {
-            return (PatternNeuron) inProv;
-        }
+        return lookupNeuron(tokenLabel, l -> {
+            PatternNeuron n = getTemplates().PATTERN_TEMPLATE.instantiateTemplate(true);
 
-        PatternNeuron in = getTemplates().PATTERN_TEMPLATE.instantiateTemplate(true);
-
-        in.setTokenLabel(tokenLabel);
-        in.setNetworkInput(true);
-        in.setLabel(tokenLabel);
-        in.setAllowTraining(false);
-        putLabel(tokenLabel, in.getId());
-
-        in.getProvider().save();
-
-        return in;
+            n.setTokenLabel(l);
+            n.setNetworkInput(true);
+            n.setLabel(l);
+            n.setAllowTraining(false);
+            return n;
+        });
     }
 
     public LatentRelationNeuron getPreviousTokenRelation() {

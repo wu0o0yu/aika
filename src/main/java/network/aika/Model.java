@@ -18,6 +18,7 @@ package network.aika;
 
 
 import network.aika.callbacks.InMemorySuspensionCallback;
+import network.aika.callbacks.NeuronProducer;
 import network.aika.callbacks.SuspensionCallback;
 import network.aika.neuron.*;
 import network.aika.utils.Writable;
@@ -107,16 +108,15 @@ public abstract class Model implements Writable {
         return new ArrayList<>(activeProviders.values());
     }
 
-    public NeuronProvider lookupNeuronProvider(String tokenLabel, NeuronProducer onNewCallback) {
+    public <N extends Neuron> N lookupNeuron(String tokenLabel, NeuronProducer<N> onNewCallback) {
         Long id = suspensionCallback.getIdByLabel(tokenLabel);
-        if (id == null) {
-            Neuron<?, ?> n = onNewCallback.createNeuron(tokenLabel);
-            NeuronProvider p = n.getProvider();
+        if(id != null)
+            return (N) lookupNeuron(id).getNeuron();
 
-            suspensionCallback.putLabel(tokenLabel, p.getId());
-            return p;
-        }
-        return lookupNeuron(id);
+        N n = onNewCallback.createNeuron(tokenLabel);
+        suspensionCallback.putLabel(tokenLabel, n.getId());
+        n.getProvider().save();
+        return n;
     }
 
     public NeuronProvider getNeuronProvider(String tokenLabel) {
@@ -246,9 +246,5 @@ public abstract class Model implements Writable {
 
     public long createThoughtId() {
         return thoughtIdCounter.addAndGet(1);
-    }
-
-    public interface NeuronProducer {
-        Neuron createNeuron(String tokenLabel);
     }
 }
