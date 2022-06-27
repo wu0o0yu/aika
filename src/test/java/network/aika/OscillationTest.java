@@ -17,14 +17,13 @@
 package network.aika;
 
 import network.aika.debugger.AIKADebugger;
-import network.aika.neuron.Templates;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
-import static network.aika.utils.TestUtils.*;
+import static network.aika.TestUtils.*;
 
 /**
  *
@@ -34,8 +33,9 @@ public class OscillationTest {
 
     @Test
     public void oscillationTest() {
+        SimpleTemplateGraph t = new SimpleTemplateGraph();
         TextModel m = new TextModel();
-        Templates t = m.getTemplates();
+        m.setTemplateGraph(t);
 
         m.setN(912);
 

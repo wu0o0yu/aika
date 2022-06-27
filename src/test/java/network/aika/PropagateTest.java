@@ -16,14 +16,13 @@
  */
 package network.aika;
 
-import network.aika.neuron.Templates;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
-import static network.aika.utils.TestUtils.*;
+import static network.aika.TestUtils.*;
 
 /**
  *
@@ -33,8 +32,9 @@ public class PropagateTest {
 
     @Test
     public void testPropagation() {
+        SimpleTemplateGraph t = new SimpleTemplateGraph();
         TextModel m = new TextModel();
-        Templates t = new Templates(m);
+        m.setTemplateGraph(t);
 
         PatternNeuron in = createNeuron(t.PATTERN_TEMPLATE, "IN", true);
         BindingNeuron out = createNeuron(t.BINDING_TEMPLATE, "OUT");

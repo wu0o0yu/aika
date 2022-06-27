@@ -17,7 +17,6 @@
 package network.aika;
 
 import network.aika.debugger.AIKADebugger;
-import network.aika.neuron.Templates;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import org.graphstream.ui.view.camera.Camera;
@@ -29,7 +28,7 @@ import java.util.TreeMap;
 
 import static network.aika.TestHelper.initPatternBlackCat;
 import static network.aika.TestHelper.initPatternTheCat;
-import static network.aika.utils.TestUtils.*;
+import static network.aika.TestUtils.*;
 
 
 /**
@@ -99,8 +98,9 @@ public class TheBlackCatTest {
     }
 
     public void setupTheBlackCatTest(AIKADebugger debugger) {
+        SimpleTemplateGraph t = new SimpleTemplateGraph();
         TextModel m = new TextModel();
-        Templates t = m.getTemplates();
+        m.setTemplateGraph(t);
 
         initPatternTheCat(m, t);
         initPatternBlackCat(m, t);

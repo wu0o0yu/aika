@@ -22,8 +22,6 @@ package network.aika.neuron;
  */
 public class TemplateSynapse {
 
-    private byte templateSynapseId;
-
     private String label;
 
     public String getLabel() {
@@ -32,13 +30,5 @@ public class TemplateSynapse {
 
     public void setLabel(String label) {
         this.label = label;
-    }
-
-    public byte getTemplateSynapseId() {
-        return templateSynapseId;
-    }
-
-    public void setTemplateSynapseId(byte templateSynapseId) {
-        this.templateSynapseId = templateSynapseId;
     }
 }

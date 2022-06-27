@@ -14,31 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron;
+package network.aika;
 
-import network.aika.Model;
+import network.aika.callbacks.NeuronProducer;
+import network.aika.neuron.*;
 import network.aika.neuron.conjunctive.*;
-import network.aika.neuron.disjunctive.CategoryNeuron;
-import network.aika.neuron.disjunctive.CategorySynapse;
-import network.aika.neuron.disjunctive.InhibitoryNeuron;
-import network.aika.neuron.disjunctive.InhibitorySynapse;
+import network.aika.neuron.disjunctive.*;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class Templates {
+public class SimpleTemplateGraph implements TemplateGraph {
 
-
-    private final Model model;
-
-    public BindingNeuron BINDING_TEMPLATE = new BindingNeuron();
-    public PatternNeuron PATTERN_TEMPLATE = new PatternNeuron();
-    public InhibitoryNeuron INHIBITORY_TEMPLATE = new InhibitoryNeuron();
-    public CategoryNeuron CATEGORY_TEMPLATE = new CategoryNeuron();
-    public LatentRelationNeuron LATENT_RELATION_TEMPLATE = new LatentRelationNeuron();
+    public BindingNeuron BINDING_TEMPLATE;
+    public PatternNeuron PATTERN_TEMPLATE;
+    public InhibitoryNeuron INHIBITORY_TEMPLATE;
+    public CategoryNeuron CATEGORY_TEMPLATE;
+    public BindingCategoryNeuron BINDING_CATEGORY_TEMPLATE;
+    public LatentRelationNeuron LATENT_RELATION_TEMPLATE;
 
     public PrimaryInputSynapse PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE;
     public PrimaryInputSynapse PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE;
@@ -53,18 +51,22 @@ public class Templates {
     public PatternSynapse PATTERN_SYNAPSE_TEMPLATE;
     public InhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE;
     public CategorySynapse CATEGORY_SYNAPSE_TEMPLATE;
+    public BindingCategorySynapse BINDING_CATEGORY_SYNAPSE_TEMPLATE;
 
-    private final Map<Byte, Neuron> templateNeuronIndex = new TreeMap<>();
-    private final Map<Byte, Synapse> templateSynapseIndex = new TreeMap<>();
+    private Model model;
 
-    public Templates(Model m) {
-        model = m;
+    public SimpleTemplateGraph() {
+    }
 
-        init(BINDING_TEMPLATE, -1, "Binding Neuron", -0.02);
-        init(PATTERN_TEMPLATE, -2, "Pattern Neuron", 0.0);
-        init(INHIBITORY_TEMPLATE, -3, "Inhibitory Neuron", 0.0);
-        init(CATEGORY_TEMPLATE, -4, "Category Neuron", 0.0);
-        init(LATENT_RELATION_TEMPLATE, -5, "Latent Relation Neuron", 0.0);
+    public void init(Model m) {
+        this.model = m;
+
+        BINDING_TEMPLATE = init("Binding Neuron", -0.02, l -> new BindingNeuron());
+        PATTERN_TEMPLATE = init("Pattern Neuron", 0.0, l -> new PatternNeuron());
+        INHIBITORY_TEMPLATE = init("Inhibitory Neuron", 0.0, l -> new InhibitoryNeuron());
+        CATEGORY_TEMPLATE = init("Category Neuron", 0.0, l -> new CategoryNeuron());
+        BINDING_CATEGORY_TEMPLATE = init("Binding Category Neuron", 0.0, l -> new BindingCategoryNeuron());
+        LATENT_RELATION_TEMPLATE = init("Latent Relation Neuron", 0.0, l -> new LatentRelationNeuron());
 
         PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE =
                 init(
@@ -72,7 +74,6 @@ public class Templates {
                         PATTERN_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Primary Input Synapse from Pattern",
-                        1,
                         0.01
                 );
 //        PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE.setAllowPropagate(true);
@@ -83,7 +84,6 @@ public class Templates {
                         CATEGORY_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Primary Input Synapse from Category",
-                        2,
                         0.01
                 );
 //        PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE.setAllowPropagate(true);
@@ -94,7 +94,6 @@ public class Templates {
                         BINDING_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Related Input Synapse",
-                        3,
                         0.0
                 );
 
@@ -104,7 +103,6 @@ public class Templates {
                         LATENT_RELATION_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Related Input Synapse From Latent Relation",
-                        4,
                         0.0
                 );
 
@@ -114,7 +112,6 @@ public class Templates {
                         BINDING_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Same Pattern Synapse",
-                        5,
                         0.0
                 );
 
@@ -124,7 +121,6 @@ public class Templates {
                         PATTERN_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Positive Feedback Synapse",
-                        6,
                         0.01
                 );
         POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE.getFeedbackBias().set(0.0);
@@ -136,7 +132,6 @@ public class Templates {
                         CATEGORY_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Positive Feedback Synapse",
-                        7,
                         0.01
                 );
         POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE.getFeedbackBias().set(0.0);
@@ -147,7 +142,6 @@ public class Templates {
                         PATTERN_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Reverse Pattern Synapse",
-                        8,
                         0.0
                 );
 
@@ -157,7 +151,6 @@ public class Templates {
                         CATEGORY_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Reverse Pattern Synapse",
-                        9,
                         0.0
                 );
 
@@ -167,7 +160,6 @@ public class Templates {
                         INHIBITORY_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Negative Feedback Synapse",
-                        10,
                         0.0
                 );
 
@@ -177,7 +169,6 @@ public class Templates {
                         BINDING_TEMPLATE,
                         PATTERN_TEMPLATE,
                         "Pattern Synapse",
-                        11,
                         1.0 // Needs to be above the tolerance
                 );
 //        PATTERN_SYNAPSE_TEMPLATE.setAllowPropagate(true);
@@ -188,7 +179,6 @@ public class Templates {
                         BINDING_TEMPLATE,
                         INHIBITORY_TEMPLATE,
                         "Inhibitory Synapse",
-                        12,
                         1.0
                 );
 
@@ -198,12 +188,22 @@ public class Templates {
                         PATTERN_TEMPLATE,
                         CATEGORY_TEMPLATE,
                         "Category Synapse",
-                        13,
+                        0.0
+                );
+
+
+        BINDING_CATEGORY_SYNAPSE_TEMPLATE =
+                init(
+                        new BindingCategorySynapse(),
+                        BINDING_TEMPLATE,
+                        BINDING_CATEGORY_TEMPLATE,
+                        "Biding Category Synapse",
                         0.0
                 );
     }
 
-    public Collection<Neuron> getAllTemplates() {
+    @Override
+    public Collection<Neuron> getAllTemplateNeurons() {
         return Arrays.asList(
                 BINDING_TEMPLATE,
                 PATTERN_TEMPLATE,
@@ -213,27 +213,26 @@ public class Templates {
         );
     }
 
-    private <N extends Neuron> void init(N n, int id, String label, double initialBias) {
-        NeuronProvider np = new NeuronProvider(model, id);
-        templateNeuronIndex.put((byte) id, n);
-        np.setNeuron(n);
-        n.setProvider(np);
+    private <N extends Neuron> N init(String label, double initialBias, NeuronProducer<N> np) {
+        N n = model.lookupNeuron(label, np);
+
         n.setLabel(label);
         n.getBias().set(initialBias);
 
         TemplateNeuron templateInfo = n.getTemplateInfo();
         templateInfo.setLabel(label);
+
+        n.getProvider().save();
+        return n;
     }
 
-    private <S extends Synapse> S init(S ts, Neuron input, Neuron output, String templateLabel, int templateSynapseId, double initialWeight) {
+    private <S extends Synapse> S init(S ts, Neuron input, Neuron output, String templateLabel, double initialWeight) {
         ts.setInput(input);
         ts.setOutput(output);
         ts.getWeight().set(initialWeight);
 
         TemplateSynapse ti = ts.getTemplateInfo();
         ti.setLabel(templateLabel);
-        ti.setTemplateSynapseId((byte) templateSynapseId);
-        templateSynapseIndex.put(ti.getTemplateSynapseId(), ts);
 
         ts.linkInput();
         ts.linkOutput();
@@ -241,11 +240,13 @@ public class Templates {
         return ts;
     }
 
-    public Neuron getTemplateNeuron(byte templateNeuronId) {
-        return templateNeuronIndex.get(templateNeuronId);
+    @Override
+    public PatternNeuron getPatternTemplate() {
+        return PATTERN_TEMPLATE;
     }
 
-    public Synapse getTemplateSynapse(byte templateSynapseId) {
-        return templateSynapseIndex.get(templateSynapseId);
+    @Override
+    public LatentRelationNeuron getLatentRelationTemplate() {
+        return LATENT_RELATION_TEMPLATE;
     }
 }

@@ -33,7 +33,6 @@
 package network.aika;
 
 import network.aika.debugger.AIKADebugger;
-import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.conjunctive.BindingNeuron;
@@ -41,12 +40,11 @@ import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
-import network.aika.utils.TestUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static network.aika.utils.TestUtils.*;
+import static network.aika.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -57,8 +55,9 @@ public class MutualExclusionTest {
 
     @Test
     public void testPropagation() {
+        SimpleTemplateGraph t = new SimpleTemplateGraph();
         TextModel m = new TextModel();
-        Templates t = m.getTemplates();
+        m.setTemplateGraph(t);
 
         PatternNeuron in = createNeuron(t.PATTERN_TEMPLATE, "I", true);
         BindingNeuron na = createNeuron(t.BINDING_TEMPLATE, "A");
@@ -108,8 +107,9 @@ public class MutualExclusionTest {
 
     @Test
     public void testPropagationWithPrimaryLink() {
+        SimpleTemplateGraph t = new SimpleTemplateGraph();
         TextModel m = new TextModel();
-        Templates t = m.getTemplates();
+        m.setTemplateGraph(t);
 
         PatternNeuron in = createNeuron(t.PATTERN_TEMPLATE, "I", true);
         BindingNeuron na = createNeuron(t.BINDING_TEMPLATE, "A");

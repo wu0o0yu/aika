@@ -17,19 +17,16 @@
 package network.aika;
 
 import network.aika.debugger.AIKADebugger;
-import network.aika.neuron.Templates;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
-import network.aika.text.TokenActivation;
-import network.aika.utils.TestUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static network.aika.utils.TestUtils.*;
+import static network.aika.TestUtils.*;
 
 
 /**
@@ -65,7 +62,6 @@ public class PatternTest {
         System.out.println(doc);
     }
 
-
     @Test
     public void testPatternNeg() {
         TextModel m = initModel();
@@ -83,8 +79,9 @@ public class PatternTest {
     }
 
     public TextModel initModel() {
+        SimpleTemplateGraph t = new SimpleTemplateGraph();
         TextModel m = new TextModel();
-        Templates t = m.getTemplates();
+        m.setTemplateGraph(t);
 
         PatternNeuron nA = m.lookupToken("A");
         PatternNeuron nB = m.lookupToken("B");

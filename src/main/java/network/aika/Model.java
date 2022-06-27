@@ -48,7 +48,7 @@ public abstract class Model implements Writable {
     private final WeakHashMap<Long, WeakReference<NeuronProvider>> providers = new WeakHashMap<>();
     public final Map<Long, NeuronProvider> activeProviders = new TreeMap<>();
 
-    private final Templates templates = new Templates(this);
+    private TemplateGraph templateGraph;
 
     private Thought currentThought;
 
@@ -90,8 +90,13 @@ public abstract class Model implements Writable {
         return suspensionCallback.createId();
     }
 
-    public Templates getTemplates() {
-        return templates;
+    public void setTemplateGraph(TemplateGraph templateGraph) {
+        this.templateGraph = templateGraph;
+        this.templateGraph.init(this);
+    }
+
+    public TemplateGraph getTemplateGraph() {
+        return templateGraph;
     }
 
     public Thought<?> getCurrentThought() {
@@ -112,8 +117,10 @@ public abstract class Model implements Writable {
             return (N) lookupNeuron(id).getNeuron();
 
         N n = onNewCallback.createNeuron(tokenLabel);
+        n.addProvider(this);
+
         suspensionCallback.putLabel(tokenLabel, n.getId());
-        n.getProvider().save();
+//        n.getProvider().save();
         return n;
     }
 
@@ -226,6 +233,15 @@ public abstract class Model implements Writable {
         suspensionCallback.saveIndex(this);
 
         suspensionCallback.close();
+    }
+
+    public Object modelClass(String clazzName) {
+        try {
+            Class clazz = getClass().getClassLoader().loadClass(clazzName);
+            return clazz.getConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

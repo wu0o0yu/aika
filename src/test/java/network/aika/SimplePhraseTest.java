@@ -18,12 +18,11 @@ package network.aika;
 
 import network.aika.text.Document;
 import network.aika.text.TextModel;
-import network.aika.text.TokenActivation;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static network.aika.utils.TestUtils.getConfig;
+import static network.aika.TestUtils.getConfig;
 
 /**
  *

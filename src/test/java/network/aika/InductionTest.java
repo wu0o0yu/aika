@@ -17,18 +17,16 @@
 package network.aika;
 
 import network.aika.neuron.Synapse;
-import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import network.aika.text.TokenActivation;
-import network.aika.utils.TestUtils;
 import org.junit.jupiter.api.Test;
 
-import static network.aika.utils.TestUtils.createNeuron;
-import static network.aika.utils.TestUtils.createSynapse;
+import static network.aika.TestUtils.createNeuron;
+import static network.aika.TestUtils.createSynapse;
 
 /**
  *
@@ -38,8 +36,9 @@ public class InductionTest {
 
     @Test
     public void testInduceFromMaturePattern() {
+        SimpleTemplateGraph t = new SimpleTemplateGraph();
         TextModel m = new TextModel();
-        Templates t = new Templates(m);
+        m.setTemplateGraph(t);
 
         PatternNeuron in = t.PATTERN_TEMPLATE.instantiateTemplate(true);
         in.setTokenLabel("A");
@@ -64,9 +63,9 @@ public class InductionTest {
 
     @Test
     public void initialGradientTest() {
+        SimpleTemplateGraph t = new SimpleTemplateGraph();
         TextModel m = new TextModel();
-
-        Templates t = new Templates(m);
+        m.setTemplateGraph(t);
 
         PatternNeuron inA = createNeuron(t.PATTERN_TEMPLATE, "IN-A");
         PatternNeuron inB = createNeuron(t.PATTERN_TEMPLATE, "IN-B");

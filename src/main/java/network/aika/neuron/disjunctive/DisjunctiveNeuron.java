@@ -43,14 +43,6 @@ public abstract class DisjunctiveNeuron<S extends DisjunctiveSynapse, A extends 
         super();
     }
 
-    public DisjunctiveNeuron(NeuronProvider p) {
-        super(p);
-    }
-
-    protected DisjunctiveNeuron(Model model, boolean addProvider) {
-        super(model, addProvider);
-    }
-
     public Stream<? extends Synapse> getTargetSynapses(Direction dir, boolean template) {
         if(dir == INPUT)
             return Stream.empty();

@@ -24,8 +24,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static network.aika.utils.TestUtils.getConfig;
-import static network.aika.utils.TestUtils.setStatistic;
+import static network.aika.TestUtils.getConfig;
+import static network.aika.TestUtils.setStatistic;
 
 /**
  *
@@ -107,10 +107,12 @@ public class GradientTest {
 
     @Test
     public void gradientAndInduction2With2Docs() {
+        SimpleTemplateGraph t = new SimpleTemplateGraph();
         TextModel m = new TextModel();
+        m.setTemplateGraph(t);
 
         m.setN(912);
-        m.getTemplates().BINDING_TEMPLATE.getBias().receiveUpdate(-0.32);
+        t.BINDING_TEMPLATE.getBias().receiveUpdate(-0.32);
 
         Document doc1 = new Document(m, "A B ");
         doc1.setConfig(

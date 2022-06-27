@@ -14,12 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.utils;
+package network.aika;
 
-import network.aika.Config;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.Templates;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.BindingNeuron;
@@ -61,7 +59,7 @@ public class TestUtils {
         return l.substring(l.indexOf("-") + 1);
     }
 
-    public static CategoryNeuron initCategory(Templates t, String label, PatternNeuron... inputPatterns) {
+    public static CategoryNeuron initCategory(SimpleTemplateGraph t, String label, PatternNeuron... inputPatterns) {
         CategoryNeuron categoryN = createNeuron(t.CATEGORY_TEMPLATE, "C-" + label);
 
         for (PatternNeuron pn : inputPatterns) {
@@ -71,7 +69,7 @@ public class TestUtils {
         return categoryN;
     }
 
-    public static InhibitoryNeuron initInhibitoryLoop(Templates t, String label, BindingNeuron... bns) {
+    public static InhibitoryNeuron initInhibitoryLoop(SimpleTemplateGraph t, String label, BindingNeuron... bns) {
         InhibitoryNeuron inhibN = createNeuron(t.INHIBITORY_TEMPLATE, "I-" + label);
 
         for(BindingNeuron bn: bns) {
@@ -81,7 +79,7 @@ public class TestUtils {
         return inhibN;
     }
 
-    public static PatternNeuron initPatternLoop(Templates t, String label, BindingNeuron... bns) {
+    public static PatternNeuron initPatternLoop(SimpleTemplateGraph t, String label, BindingNeuron... bns) {
         PatternNeuron patternN = createNeuron(t.PATTERN_TEMPLATE, "P-" + label);
 
         for(BindingNeuron bn: bns) {

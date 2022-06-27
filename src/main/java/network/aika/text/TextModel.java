@@ -24,8 +24,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static network.aika.utils.TestUtils.createNeuron;
-
 /**
  *
 * @author Lukas Molzberger
@@ -42,7 +40,7 @@ public class TextModel extends Model {
 
     public LatentRelationNeuron lookupRelation(int rangeBegin, int rangeEnd) {
         return lookupNeuron("Rel.: " + rangeBegin + "," + rangeEnd, l -> {
-            LatentRelationNeuron n = getTemplates().LATENT_RELATION_TEMPLATE.instantiateTemplate(true);
+            LatentRelationNeuron n = getTemplateGraph().getLatentRelationTemplate().instantiateTemplate(true);
             n.setLabel(l);
 
             n.setRangeBegin(rangeBegin);
@@ -57,7 +55,7 @@ public class TextModel extends Model {
 
     public PatternNeuron lookupToken(String tokenLabel) {
         return lookupNeuron(tokenLabel, l -> {
-            PatternNeuron n = getTemplates().PATTERN_TEMPLATE.instantiateTemplate(true);
+            PatternNeuron n = getTemplateGraph().getPatternTemplate().instantiateTemplate(true);
 
             n.setTokenLabel(l);
             n.setNetworkInput(true);

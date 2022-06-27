@@ -83,13 +83,8 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     protected Neuron() {
     }
 
-    public Neuron(NeuronProvider p) {
-        provider = p;
-    }
-
-    public Neuron(Model m, boolean addProvider) {
-        if(addProvider)
-            provider = new NeuronProvider(m, this);
+    public void addProvider(Model m) {
+        provider = new NeuronProvider(m, this);
         setModified();
     }
 
@@ -162,7 +157,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public boolean isTemplate() {
-        return getId() < 0;
+        return template == null;
     }
 
     public Neuron getTemplate() {
@@ -398,7 +393,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeByte((byte) getTemplate().getId().intValue());
+        out.writeUTF(getClass().getCanonicalName());
 
         out.writeBoolean(label != null);
         if(label != null)
@@ -433,9 +428,9 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public static Neuron read(DataInput in, Model m) throws Exception {
-        byte templateNeuronId = in.readByte();
-        Neuron templateNeuron = m.getTemplates().getTemplateNeuron(templateNeuronId);
-        Neuron n = templateNeuron.instantiateTemplate(false);
+        String neuronClazz = in.readUTF();
+        Neuron n = (Neuron) m.modelClass(neuronClazz);
+
         n.readFields(in, m);
         return n;
     }

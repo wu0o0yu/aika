@@ -298,11 +298,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public boolean isOfTemplate(Synapse templateSynapse) {
-        return getTemplateSynapseId() == templateSynapse.getTemplateSynapseId();
-    }
-
-    public byte getTemplateSynapseId() {
-        return getTemplate().getTemplateInfo().getTemplateSynapseId();
+        return template == templateSynapse;
     }
 
     public boolean isInputLinked() {
@@ -477,7 +473,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeByte(getTemplate().getTemplateInfo().getTemplateSynapseId());
+        out.writeUTF(getClass().getName());
 
         out.writeLong(input.getId());
         out.writeLong(output.getId());
@@ -495,9 +491,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public static Synapse read(DataInput in, Model m) throws IOException {
-        byte templateSynapseId = in.readByte();
-        Synapse templateSynapse = m.getTemplates().getTemplateSynapse(templateSynapseId);
-        Synapse s = templateSynapse.instantiateTemplate();
+        String synClazz = in.readUTF();
+
+        Synapse s = (Synapse) m.modelClass(synClazz);
         s.readFields(in, m);
         return s;
     }

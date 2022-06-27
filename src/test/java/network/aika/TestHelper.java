@@ -16,14 +16,13 @@
  */
 package network.aika;
 
-import network.aika.neuron.Templates;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.text.TextModel;
 
-import static network.aika.utils.TestUtils.*;
-import static network.aika.utils.TestUtils.updateBias;
+import static network.aika.TestUtils.*;
+import static network.aika.TestUtils.updateBias;
 
 /**
  *
@@ -31,7 +30,7 @@ import static network.aika.utils.TestUtils.updateBias;
  */
 public class TestHelper {
 
-    public static void initPatternTheCat(TextModel m, Templates t) {
+    public static void initPatternTheCat(TextModel m, SimpleTemplateGraph t) {
         PatternNeuron theIN = m.lookupToken("the");
         PatternNeuron catIN = m.lookupToken("cat");
 
@@ -55,7 +54,7 @@ public class TestHelper {
         updateBias(catBN, 3.0);
     }
 
-    public static void initPatternBlackCat(TextModel m, Templates t) {
+    public static void initPatternBlackCat(TextModel m, SimpleTemplateGraph t) {
         PatternNeuron blackIN = m.lookupToken("black");
         PatternNeuron catIN = m.lookupToken("cat");
 
@@ -78,7 +77,7 @@ public class TestHelper {
         //        initInhibitoryLoop(t, "jackson", jacksonForenameBN, jacksonCityBN);
     }
 
-    public static void initPatternTheDog(TextModel m, Templates t) {
+    public static void initPatternTheDog(TextModel m, SimpleTemplateGraph t) {
         PatternNeuron theIN = m.lookupToken("the");
         PatternNeuron dogIN = m.lookupToken("dog");
 

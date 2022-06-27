@@ -16,14 +16,10 @@
  */
 package network.aika.neuron.disjunctive;
 
-import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.ActivationFunction;
-import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.InhibitoryActivation;
 import network.aika.neuron.axons.BindingAxon;
-import network.aika.neuron.bindingsignal.BindingSignal;
 
 /**
  *
@@ -35,14 +31,6 @@ public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitorySynapse, Inhib
         super();
     }
 
-    public InhibitoryNeuron(NeuronProvider p) {
-        super(p);
-    }
-
-    private InhibitoryNeuron(Model model, boolean addProvider) {
-        super(model, addProvider);
-    }
-
     @Override
     public InhibitoryActivation createActivation(Thought t) {
         return new InhibitoryActivation(t.createActivationId(), t, this);
@@ -50,7 +38,10 @@ public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitorySynapse, Inhib
 
     @Override
     public InhibitoryNeuron instantiateTemplate(boolean addProvider) {
-        InhibitoryNeuron n = new InhibitoryNeuron(getModel(), addProvider);
+        InhibitoryNeuron n = new InhibitoryNeuron();
+        if(addProvider)
+            n.addProvider(getModel());
+
         initFromTemplate(n);
         return n;
     }

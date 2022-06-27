@@ -14,38 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.disjunctive;
+package network.aika.neuron;
+
 
 import network.aika.Model;
-import network.aika.Thought;
-import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.activation.CategoryActivation;
-import network.aika.neuron.activation.DisjunctiveActivation;
-import network.aika.neuron.axons.PatternAxon;
+import network.aika.neuron.conjunctive.LatentRelationNeuron;
+import network.aika.neuron.conjunctive.PatternNeuron;
+
+import java.util.Collection;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class CategoryNeuron extends DisjunctiveNeuron<CategorySynapse, CategoryActivation> implements PatternAxon {
+public interface TemplateGraph {
 
+    void init(Model model);
 
-    public CategoryNeuron() {
-        super();
-    }
+    Collection<Neuron> getAllTemplateNeurons();
 
-    @Override
-    public CategoryActivation createActivation(Thought t) {
-        return new CategoryActivation(t.createActivationId(), t, this);
-    }
+    PatternNeuron getPatternTemplate();
 
-    @Override
-    public CategoryNeuron instantiateTemplate(boolean addProvider) {
-        CategoryNeuron n = new CategoryNeuron();
-        if(addProvider)
-            n.addProvider(getModel());
-
-        initFromTemplate(n);
-        return n;
-    }
+    LatentRelationNeuron getLatentRelationTemplate();
 }

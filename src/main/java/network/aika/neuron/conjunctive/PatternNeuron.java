@@ -18,9 +18,7 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.activation.PositiveFeedbackLink;
 import network.aika.neuron.axons.PatternAxon;
 
 import java.io.DataInput;
@@ -39,14 +37,6 @@ public class PatternNeuron extends ConjunctiveNeuron<PatternSynapse, PatternActi
         super();
     }
 
-    public PatternNeuron(NeuronProvider p) {
-        super(p);
-    }
-
-    public PatternNeuron(Model model, boolean addProvider) {
-        super(model, addProvider);
-    }
-
     @Override
     public PatternActivation createActivation(Thought t) {
         return new PatternActivation(t.createActivationId(), t, this);
@@ -54,7 +44,10 @@ public class PatternNeuron extends ConjunctiveNeuron<PatternSynapse, PatternActi
 
     @Override
     public PatternNeuron instantiateTemplate(boolean addProvider) {
-        PatternNeuron n = new PatternNeuron(getModel(), addProvider);
+        PatternNeuron n = new PatternNeuron();
+        if(addProvider)
+            n.addProvider(getModel());
+
         initFromTemplate(n);
         return n;
     }

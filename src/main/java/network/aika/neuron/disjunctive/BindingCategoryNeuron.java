@@ -34,14 +34,6 @@ public class BindingCategoryNeuron extends DisjunctiveNeuron<BindingCategorySyna
         super();
     }
 
-    public BindingCategoryNeuron(NeuronProvider p) {
-        super(p);
-    }
-
-    private BindingCategoryNeuron(Model model, boolean addProvider) {
-        super(model, addProvider);
-    }
-
     @Override
     public BindingCategoryActivation createActivation(Thought t) {
         return new BindingCategoryActivation(t.createActivationId(), t, this);
@@ -49,7 +41,10 @@ public class BindingCategoryNeuron extends DisjunctiveNeuron<BindingCategorySyna
 
     @Override
     public BindingCategoryNeuron instantiateTemplate(boolean addProvider) {
-        BindingCategoryNeuron n = new BindingCategoryNeuron(getModel(), addProvider);
+        BindingCategoryNeuron n = new BindingCategoryNeuron();
+        if(addProvider)
+            n.addProvider(getModel());
+
         initFromTemplate(n);
         return n;
     }

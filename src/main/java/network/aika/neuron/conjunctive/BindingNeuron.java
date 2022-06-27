@@ -31,10 +31,6 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
         super();
     }
 
-    public BindingNeuron(Model model, boolean addProvider) {
-        super(model, addProvider);
-    }
-
     @Override
     public BindingActivation createActivation(Thought t) {
         return new BindingActivation(t.createActivationId(), t, this);
@@ -42,7 +38,10 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
 
     @Override
     public BindingNeuron instantiateTemplate(boolean addProvider) {
-        BindingNeuron n = new BindingNeuron(getModel(), addProvider);
+        BindingNeuron n = new BindingNeuron();
+        if(addProvider)
+            n.addProvider(getModel());
+
         initFromTemplate(n);
 
         return n;

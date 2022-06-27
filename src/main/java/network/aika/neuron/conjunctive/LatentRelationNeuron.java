@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.Model;
 import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.fields.QueueField;
@@ -46,11 +45,6 @@ public class LatentRelationNeuron extends BindingNeuron {
     public LatentRelationNeuron() {
     }
 
-    public LatentRelationNeuron(Model model, boolean addProvider) {
-        super(model, addProvider);
-    }
-
-
     public int getRangeBegin() {
         return rangeBegin;
     }
@@ -74,7 +68,10 @@ public class LatentRelationNeuron extends BindingNeuron {
 
     @Override
     public LatentRelationNeuron instantiateTemplate(boolean addProvider) {
-        LatentRelationNeuron n = new LatentRelationNeuron(getModel(), addProvider);
+        LatentRelationNeuron n = new LatentRelationNeuron();
+        if(addProvider)
+            n.addProvider(getModel());
+
         initFromTemplate(n);
         return n;
     }

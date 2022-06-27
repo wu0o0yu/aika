@@ -48,14 +48,6 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         super();
     }
 
-    public ConjunctiveNeuron(NeuronProvider p) {
-        super(p);
-    }
-
-    public ConjunctiveNeuron(Model model, boolean addProvider) {
-        super(model, addProvider);
-    }
-
     @Override
     public void setModified() {
         super.setModified();
