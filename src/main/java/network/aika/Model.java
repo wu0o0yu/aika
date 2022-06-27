@@ -62,8 +62,6 @@ public abstract class Model implements Writable {
         suspensionCallback = sc;
     }
 
-    public abstract void init();
-
     public Long getIdByLabel(String label) {
         return suspensionCallback.getIdByLabel(label);
     }

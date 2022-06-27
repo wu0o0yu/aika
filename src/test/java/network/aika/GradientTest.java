@@ -38,7 +38,6 @@ public class GradientTest {
         TextModel m = new TextModel();
 
         m.setN(912);
-        m.init();
 
         Document doc = new Document(m, "A B ");
         doc.setConfig(
@@ -74,9 +73,7 @@ public class GradientTest {
     @Test
     public void gradientAndInduction3() {
         TextModel m = new TextModel();
-
         m.setN(912);
-        m.init();
 
         Document doc = new Document(m, "A B C ");
         doc.setConfig(
@@ -114,7 +111,6 @@ public class GradientTest {
 
         m.setN(912);
         m.getTemplates().BINDING_TEMPLATE.getBias().receiveUpdate(-0.32);
-        m.init();
 
         Document doc1 = new Document(m, "A B ");
         doc1.setConfig(

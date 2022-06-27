@@ -19,6 +19,7 @@ package network.aika;
 import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.Templates;
 import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
@@ -102,7 +103,6 @@ public class ABCDTest {
     @Test
     public void testABCD() throws InterruptedException {
         TextModel m = new TextModel();
-        m.init();
         Templates t = m.getTemplates();
 
         PatternNeuron a_IN = m.lookupToken("a");
@@ -115,8 +115,9 @@ public class ABCDTest {
         BindingNeuron a_abBN = createNeuron(t.BINDING_TEMPLATE, "a (ab)");
         BindingNeuron b_abBN = createNeuron(t.BINDING_TEMPLATE, "b (ab)");
 
+        LatentRelationNeuron relPT = m.lookupRelation(-1, -1);
 
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelation(), b_abBN, 10.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, b_abBN, 10.0);
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, a_abBN, b_abBN, 11.0);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, a_IN, a_abBN, 10.0);
@@ -131,7 +132,7 @@ public class ABCDTest {
         BindingNeuron b_bcBN = createNeuron(t.BINDING_TEMPLATE, "b (bc)");
         BindingNeuron c_bcBN = createNeuron(t.BINDING_TEMPLATE, "c (bc)");
 
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelation(), c_bcBN, 10.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, c_bcBN, 10.0);
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, b_bcBN, c_bcBN, 11.0);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, b_IN, b_bcBN, 10.0);
@@ -150,7 +151,7 @@ public class ABCDTest {
         BindingNeuron d_bcdBN = createNeuron(t.BINDING_TEMPLATE, "d (bcd)");
         createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, c_bcBN, bc_bcdBN, 10.0);
 
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelation(), d_bcdBN, 10.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, d_bcdBN, 10.0);
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, bc_bcdBN, d_bcdBN, 11.0);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, bcPattern, bc_bcdBN, 10.0);

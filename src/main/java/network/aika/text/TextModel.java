@@ -18,10 +18,7 @@ package network.aika.text;
 
 import network.aika.Model;
 import network.aika.callbacks.SuspensionCallback;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.conjunctive.*;
-import network.aika.neuron.disjunctive.CategoryNeuron;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -35,8 +32,6 @@ import static network.aika.utils.TestUtils.createNeuron;
 */
 public class TextModel extends Model {
 
-    private LatentRelationNeuron relationNeuron;
-
     public TextModel() {
         super();
     }
@@ -45,24 +40,19 @@ public class TextModel extends Model {
         super(sc);
     }
 
-    public void init() {
-        relationNeuron = initRelationNeuron("Rel. -1", -1);
-    }
+    public LatentRelationNeuron lookupRelation(int rangeBegin, int rangeEnd) {
+        return lookupNeuron("Rel.: " + rangeBegin + "," + rangeEnd, l -> {
+            LatentRelationNeuron n = getTemplates().LATENT_RELATION_TEMPLATE.instantiateTemplate(true);
+            n.setLabel(l);
 
-    private LatentRelationNeuron initRelationNeuron(String label, int distance) {
-        LatentRelationNeuron n = getTemplates().LATENT_RELATION_TEMPLATE.instantiateTemplate(true);
-        n.setLabel(label);
+            n.setRangeBegin(rangeBegin);
+            n.setRangeEnd(rangeEnd);
 
-        n.setRangeBegin(distance);
-        n.setRangeEnd(distance);
-
-        n.getBias().receiveUpdate(-4.0);
-        n.setAllowTraining(false);
-        n.updateSumOfLowerWeights();
-
-        n.getProvider().save();
-
-        return n;
+            n.getBias().receiveUpdate(-4.0);
+            n.setAllowTraining(false);
+            n.updateSumOfLowerWeights();
+            return n;
+        });
     }
 
     public PatternNeuron lookupToken(String tokenLabel) {
@@ -75,10 +65,6 @@ public class TextModel extends Model {
             n.setAllowTraining(false);
             return n;
         });
-    }
-
-    public LatentRelationNeuron getPreviousTokenRelation() {
-        return relationNeuron;
     }
 
     @Override

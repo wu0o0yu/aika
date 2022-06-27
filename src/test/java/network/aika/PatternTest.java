@@ -19,6 +19,7 @@ package network.aika;
 import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.Templates;
 import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
@@ -83,7 +84,6 @@ public class PatternTest {
 
     public TextModel initModel() {
         TextModel m = new TextModel();
-        m.init();
         Templates t = m.getTemplates();
 
         PatternNeuron nA = m.lookupToken("A");
@@ -97,19 +97,21 @@ public class PatternTest {
         PatternNeuron out = createNeuron(t.PATTERN_TEMPLATE, "OUT");
         out.setTokenLabel("ABC");
 
+        LatentRelationNeuron relPT = m.lookupRelation(-1, -1);
+
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, nA, eA, 10.0);
         createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE, out, eA, 10.0);
         updateBias(eA, 4.0);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, nB, eB, 10.0);
         createSynapse( t.SAME_PATTERN_SYNAPSE_TEMPLATE, eA, eB, 10.0);
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelation(), eB, 10.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, eB, 10.0);
         createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE, out, eB, 10.0);
         updateBias(eB, 4.0);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, nC, eC, 10.0);
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, eB, eC, 10.0);
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelation(), eC, 10.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, eC, 10.0);
         createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE, out, eC, 10.0);
 
         updateBias(eC, 4.0);

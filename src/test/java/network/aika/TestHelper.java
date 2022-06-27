@@ -18,6 +18,7 @@ package network.aika;
 
 import network.aika.neuron.Templates;
 import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.text.TextModel;
 
@@ -34,13 +35,15 @@ public class TestHelper {
         PatternNeuron theIN = m.lookupToken("the");
         PatternNeuron catIN = m.lookupToken("cat");
 
+        LatentRelationNeuron relPT = m.lookupRelation(-1, -1);
+
         BindingNeuron theBN = createNeuron(t.BINDING_TEMPLATE, "the (the cat)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, theIN, theBN, 10.0);
 
         BindingNeuron catBN = createNeuron(t.BINDING_TEMPLATE, "cat (the cat)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, catIN, catBN, 10.0);
 
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelation(), catBN, 5.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, catBN, 5.0);
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, theBN, catBN, 5.0);
 
         PatternNeuron theCatP = initPatternLoop(t, "the cat", theBN, catBN);
@@ -56,12 +59,14 @@ public class TestHelper {
         PatternNeuron blackIN = m.lookupToken("black");
         PatternNeuron catIN = m.lookupToken("cat");
 
+        LatentRelationNeuron relPT = m.lookupRelation(-1, -1);
+
         BindingNeuron blackBN = createNeuron(t.BINDING_TEMPLATE, "black (black cat)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, blackIN, blackBN, 10.0);
         BindingNeuron catBN = createNeuron(t.BINDING_TEMPLATE, "cat (black cat)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, catIN, catBN, 20.0);
 
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelation(), catBN, 5.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, catBN, 5.0);
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, blackBN, catBN, 5.0);
 
         PatternNeuron blackCat = initPatternLoop(t, "black cat", blackBN, catBN);

@@ -42,7 +42,6 @@ public class TestFsModel {
         );
 
         m.open(false);
-        m.init();
 
         {
             Document doc = generateDocument(m, "arbeit fair arbeitsvermittlung ", true);

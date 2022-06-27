@@ -100,8 +100,6 @@ public class TheBlackCatTest {
 
     public void setupTheBlackCatTest(AIKADebugger debugger) {
         TextModel m = new TextModel();
-
-        m.init();
         Templates t = m.getTemplates();
 
         initPatternTheCat(m, t);

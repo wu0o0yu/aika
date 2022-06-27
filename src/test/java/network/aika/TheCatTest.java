@@ -78,8 +78,6 @@ public class TheCatTest {
 
     public void setupTheCatTest(AIKADebugger debugger) {
         TextModel m = new TextModel();
-
-        m.init();
         Templates t = m.getTemplates();
 
         initPatternTheCat(m, t);

@@ -86,8 +86,6 @@ public class TheDogAndCatTest {
 
     public void setupTheDogAndTheCatTest(AIKADebugger debugger) {
         TextModel m = new TextModel();
-
-        m.init();
         Templates t = m.getTemplates();
 
         initPatternTheCat(m, t);

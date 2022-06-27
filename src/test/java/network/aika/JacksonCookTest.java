@@ -3,6 +3,7 @@ package network.aika;
 import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.Templates;
 import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -130,17 +131,18 @@ public class JacksonCookTest {
     public void setupJacksonCookTest(AIKADebugger debugger) {
         TextModel m = new TextModel();
 
-        m.init();
         Templates t = m.getTemplates();
 
         PatternNeuron jacksonIN = m.lookupToken("Jackson");
         PatternNeuron cookIN = m.lookupToken("Cook");
 
+        LatentRelationNeuron relPT = m.lookupRelation(-1, -1);
+
         CategoryNeuron entityCN = createNeuron(t.CATEGORY_TEMPLATE, "entity");
         BindingNeuron relPrevEntityBN = createNeuron(t.BINDING_TEMPLATE, "Rel Prev. Entity");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE, entityCN, relPrevEntityBN, 9.0);
         createSynapse(t.REVERSE_PATTERN_SYNAPSE_FROM_CATEGORY_TEMPLATE, entityCN, relPrevEntityBN, 9.0);
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, m.getPreviousTokenRelation(), relPrevEntityBN, 11.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, relPrevEntityBN, 11.0);
 
         BindingNeuron jacksonForenameBN = createNeuron(t.BINDING_TEMPLATE, "jackson (forename)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, jacksonIN, jacksonForenameBN, 10.0);

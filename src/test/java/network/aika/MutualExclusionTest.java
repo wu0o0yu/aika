@@ -58,7 +58,6 @@ public class MutualExclusionTest {
     @Test
     public void testPropagation() {
         TextModel m = new TextModel();
-        m.init();
         Templates t = m.getTemplates();
 
         PatternNeuron in = createNeuron(t.PATTERN_TEMPLATE, "I", true);
@@ -110,7 +109,6 @@ public class MutualExclusionTest {
     @Test
     public void testPropagationWithPrimaryLink() {
         TextModel m = new TextModel();
-        m.init();
         Templates t = m.getTemplates();
 
         PatternNeuron in = createNeuron(t.PATTERN_TEMPLATE, "I", true);
