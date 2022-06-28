@@ -35,10 +35,10 @@ import static network.aika.neuron.bindingsignal.State.SAME;
 public class TokenActivation extends PatternActivation {
 
     private Range range;
-    private int position;
+    private Integer position;
 
 
-    public TokenActivation(int id, int pos, int begin, int end, Document doc, PatternNeuron patternNeuron) {
+    public TokenActivation(int id, Integer pos, int begin, int end, Document doc, PatternNeuron patternNeuron) {
         super(id, doc, patternNeuron);
         position = pos;
         range = new Range(begin, end);

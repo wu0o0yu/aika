@@ -101,11 +101,11 @@ public class Document extends Thought<TextModel> {
         return ((Document)act.getThought()).getTextSegment(act.getRange());
     }
 
-    public TokenActivation addToken(String token, int pos, int begin, int end) {
+    public TokenActivation addToken(String token, Integer pos, int begin, int end) {
         return addToken(model.lookupToken(token), pos, begin, end);
     }
 
-    public TokenActivation addToken(PatternNeuron n, int pos, int begin, int end) {
+    public TokenActivation addToken(PatternNeuron n, Integer pos, int begin, int end) {
         TokenActivation act = new TokenActivation(createActivationId(), pos, begin, end, this, n);
 
         act.init(null, null);
