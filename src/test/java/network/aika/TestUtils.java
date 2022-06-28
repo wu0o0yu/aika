@@ -79,6 +79,14 @@ public class TestUtils {
         return inhibN;
     }
 
+    public static InhibitoryNeuron addInhibitoryLoop(SimpleTemplateGraph t, InhibitoryNeuron inhibN, BindingNeuron... bns) {
+        for(BindingNeuron bn: bns) {
+            createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, bn, inhibN, 1.0);
+            createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhibN, bn, -100.0);
+        }
+        return inhibN;
+    }
+
     public static PatternNeuron initPatternLoop(SimpleTemplateGraph t, String label, BindingNeuron... bns) {
         PatternNeuron patternN = createNeuron(t.PATTERN_TEMPLATE, "P-" + label);
 

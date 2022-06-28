@@ -17,6 +17,7 @@
 package network.aika;
 
 import network.aika.debugger.AIKADebugger;
+import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import network.aika.text.Document;
 import network.aika.text.TextModel;
 import org.graphstream.ui.view.camera.Camera;
@@ -102,7 +103,8 @@ public class TheBlackCatTest {
         TextModel m = new TextModel();
         m.setTemplateGraph(t);
 
-        initPatternTheCat(m, t);
+        InhibitoryNeuron inhibNCat = initInhibitoryLoop(t, "cat");
+        initPatternTheCat(m, t, inhibNCat, 0);
         initPatternBlackCat(m, t);
 
         Document doc = new Document(m, "the black cat");

@@ -19,6 +19,7 @@ package network.aika;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import network.aika.text.TextModel;
 
 import static network.aika.TestUtils.*;
@@ -30,23 +31,32 @@ import static network.aika.TestUtils.updateBias;
  */
 public class TestHelper {
 
-    public static void initPatternTheCat(TextModel m, SimpleTemplateGraph t) {
+    public static void initPatternTheCat(TextModel m, SimpleTemplateGraph t, InhibitoryNeuron inhibNCat, int variant) {
         PatternNeuron theIN = m.lookupToken("the");
         PatternNeuron catIN = m.lookupToken("cat");
 
-        LatentRelationNeuron relPT = m.lookupRelation(-1, -1);
+        int variantDir = variant < 2 ? -1 : 1;
+
+        LatentRelationNeuron relPT = m.lookupRelation(variantDir, variantDir);
 
         BindingNeuron theBN = createNeuron(t.BINDING_TEMPLATE, "the (the cat)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, theIN, theBN, 10.0);
 
         BindingNeuron catBN = createNeuron(t.BINDING_TEMPLATE, "cat (the cat)");
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, catIN, catBN, 10.0);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, catIN, catBN, variant == 0  || variant == 2 ? 10.0 : 5.0);
 
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, catBN, 5.0);
-        createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, theBN, catBN, 5.0);
+        if(variantDir < 0) {
+            createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, catBN, 5.0);
+            createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, theBN, catBN, variant == 1 || variant == 3 ? 10.0 : 5.0);
+        } else {
+            createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, theBN, 5.0);
+            createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, catBN, theBN, variant == 1 || variant == 3 ? 10.0 : 5.0);
+        }
 
         PatternNeuron theCatP = initPatternLoop(t, "the cat", theBN, catBN);
-        //        initInhibitoryLoop(t, "jackson", jacksonForenameBN, jacksonCityBN);
+
+        initInhibitoryLoop(t, "the", theBN);
+        addInhibitoryLoop(t, inhibNCat, catBN);
 
         updateBias(theCatP, 3.0);
 
