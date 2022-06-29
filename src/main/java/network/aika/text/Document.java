@@ -19,20 +19,15 @@ package network.aika.text;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.stream.Stream;
-
-import static network.aika.steps.Phase.PROCESSING;
 
 
 /**

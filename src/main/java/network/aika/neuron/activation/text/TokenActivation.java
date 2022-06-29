@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.text;
+package network.aika.neuron.activation.text;
 
 import network.aika.fields.Field;
 import network.aika.fields.ValueSortedQueueField;
@@ -25,6 +25,7 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
+import network.aika.text.Document;
 
 import static network.aika.neuron.bindingsignal.BSKey.createKey;
 import static network.aika.neuron.bindingsignal.State.SAME;

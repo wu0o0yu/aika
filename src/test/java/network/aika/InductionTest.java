@@ -22,7 +22,7 @@ import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.text.Document;
-import network.aika.text.TokenActivation;
+import network.aika.neuron.activation.text.TokenActivation;
 import org.junit.jupiter.api.Test;
 
 import static network.aika.TestUtils.*;

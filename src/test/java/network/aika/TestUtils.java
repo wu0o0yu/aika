@@ -27,7 +27,7 @@ import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 import network.aika.neuron.disjunctive.CategoryNeuron;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import network.aika.text.Document;
-import network.aika.text.TokenActivation;
+import network.aika.neuron.activation.text.TokenActivation;
 
 import java.util.ArrayList;
 import java.util.List;

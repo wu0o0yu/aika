@@ -27,7 +27,7 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.steps.Phase;
 import network.aika.steps.QueueKey;
 import network.aika.steps.Step;
-import network.aika.text.TokenActivation;
+import network.aika.neuron.activation.text.TokenActivation;
 
 import java.util.*;
 import java.util.function.Consumer;
