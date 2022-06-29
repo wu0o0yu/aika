@@ -1,9 +1,3 @@
-package network.aika;
-
-import network.aika.debugger.AIKADebugger;
-import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.neuron.conjunctive.LatentRelationNeuron;
-import network.aika.neuron.conjunctive.PatternNeuron;
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -20,6 +14,12 @@ import network.aika.neuron.conjunctive.PatternNeuron;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package network.aika;
+
+import network.aika.debugger.AIKADebugger;
+import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.LatentRelationNeuron;
+import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.disjunctive.CategoryNeuron;
 import network.aika.text.Document;
 import org.graphstream.ui.view.camera.Camera;
