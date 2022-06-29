@@ -114,7 +114,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private TreeSet<A> initActivationsSet(Thought t) {
         TreeSet<A> acts = new TreeSet<>();
-        t.register(provider, acts);
+        t.register(provider, (TreeSet<Activation>) acts);
         return acts;
     }
 

@@ -36,7 +36,7 @@ import java.util.stream.Stream;
  *
  * @author Lukas Molzberger
  */
-public abstract class Model implements Writable {
+public class Model implements Writable {
 
     private long N = 0;
 
@@ -99,11 +99,11 @@ public abstract class Model implements Writable {
         return templateGraph;
     }
 
-    public Thought<?> getCurrentThought() {
+    public Thought getCurrentThought() {
         return currentThought;
     }
 
-    public void setCurrentThought(Thought<?> currentThought) {
+    public void setCurrentThought(Thought currentThought) {
         this.currentThought = currentThought;
     }
 

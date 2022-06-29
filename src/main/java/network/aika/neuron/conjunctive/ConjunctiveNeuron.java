@@ -44,10 +44,6 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         return updateAllowPropagateIsQueued;
     }
 
-    public ConjunctiveNeuron() {
-        super();
-    }
-
     @Override
     public void setModified() {
         super.setModified();

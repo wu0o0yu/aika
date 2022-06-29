@@ -20,13 +20,12 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.text.Document;
-import network.aika.text.TextModel;
 import network.aika.text.TokenActivation;
 import org.junit.jupiter.api.Test;
 
-import static network.aika.TestUtils.createNeuron;
-import static network.aika.TestUtils.createSynapse;
+import static network.aika.TestUtils.*;
 
 /**
  *
@@ -37,10 +36,10 @@ public class InductionTest {
     @Test
     public void testInduceFromMaturePattern() {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
-        TextModel m = new TextModel();
+        Model m = new Model();
         m.setTemplateGraph(t);
 
-        PatternNeuron in = t.PATTERN_TEMPLATE.instantiateTemplate(true);
+        TokenNeuron in = t.TOKEN_TEMPLATE.instantiateTemplate(true);
         in.setTokenLabel("A");
         in.setNetworkInput(true);
         in.setLabel("IN");
@@ -64,7 +63,7 @@ public class InductionTest {
     @Test
     public void initialGradientTest() {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
-        TextModel m = new TextModel();
+        Model m = new Model();
         m.setTemplateGraph(t);
 
         PatternNeuron inA = createNeuron(t.PATTERN_TEMPLATE, "IN-A");
@@ -103,7 +102,9 @@ public class InductionTest {
 
     @Test
     public void inductionTest() throws InterruptedException {
-        TextModel model = new TextModel();
+        SimpleTemplateGraph t = new SimpleTemplateGraph();
+        Model model = new Model();
+        model.setTemplateGraph(t);
 
         String phrase = "der Hund";
 
@@ -116,8 +117,8 @@ public class InductionTest {
         );
         System.out.println("  " + phrase);
 
-        TokenActivation actDer = doc.addToken("der", 0, 0, 4);
-        TokenActivation actHund = doc.addToken("Hund", 1, 4, 8);
+        TokenActivation actDer = addToken(t, doc, "der", 0, 0, 4);
+        TokenActivation actHund = addToken(t, doc, "Hund", 1, 4, 8);
 
         model.setN(1000);
         actDer.getNeuron().setFrequency(50);

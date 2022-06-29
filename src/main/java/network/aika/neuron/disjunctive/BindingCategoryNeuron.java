@@ -16,12 +16,9 @@
  */
 package network.aika.neuron.disjunctive;
 
-import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.ActivationFunction;
-import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.BindingCategoryActivation;
-import network.aika.neuron.activation.InhibitoryActivation;
 import network.aika.neuron.axons.BindingAxon;
 
 /**
@@ -29,10 +26,6 @@ import network.aika.neuron.axons.BindingAxon;
  * @author Lukas Molzberger
  */
 public class BindingCategoryNeuron extends DisjunctiveNeuron<BindingCategorySynapse, BindingCategoryActivation> implements BindingAxon {
-
-    public BindingCategoryNeuron() {
-        super();
-    }
 
     @Override
     public BindingCategoryActivation createActivation(Thought t) {

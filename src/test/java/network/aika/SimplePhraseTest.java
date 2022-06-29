@@ -17,11 +17,11 @@
 package network.aika;
 
 import network.aika.text.Document;
-import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
+import static network.aika.TestUtils.addToken;
 import static network.aika.TestUtils.getConfig;
 
 /**
@@ -45,7 +45,10 @@ public class SimplePhraseTest {
 
     @Test
     public void simplePhraseTest() {
-        TextModel model = new TextModel();
+        SimpleTemplateGraph tg = new SimpleTemplateGraph();
+        Model model = new Model();
+        model.setTemplateGraph(tg);
+
         Config c = getConfig()
                         .setAlpha(0.99)
                         .setLearnRate(-0.1)
@@ -65,7 +68,7 @@ public class SimplePhraseTest {
             int pos = 0;
             for(String t: doc.getContent().split(" ")) {
                 int j = i + t.length();
-                doc.addToken(t, pos++, i, j);
+                addToken(tg, doc, t, pos++, i, j);
 
                 i = j + 1;
             }

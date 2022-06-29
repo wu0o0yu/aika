@@ -16,8 +16,6 @@
  */
 package network.aika.neuron;
 
-import java.util.Set;
-
 /**
  *
  * @author Lukas Molzberger

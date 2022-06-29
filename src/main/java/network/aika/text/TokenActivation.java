@@ -24,6 +24,7 @@ import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.conjunctive.PrimaryInputSynapse;
+import network.aika.neuron.conjunctive.text.TokenNeuron;
 
 import static network.aika.neuron.bindingsignal.BSKey.createKey;
 import static network.aika.neuron.bindingsignal.State.SAME;
@@ -38,8 +39,8 @@ public class TokenActivation extends PatternActivation {
     private Integer position;
 
 
-    public TokenActivation(int id, Integer pos, int begin, int end, Document doc, PatternNeuron patternNeuron) {
-        super(id, doc, patternNeuron);
+    public TokenActivation(int id, Integer pos, int begin, int end, Document doc, TokenNeuron tokenNeuron) {
+        super(id, doc, tokenNeuron);
         position = pos;
         range = new Range(begin, end);
     }

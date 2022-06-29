@@ -27,10 +27,6 @@ import network.aika.neuron.axons.BindingAxon;
  */
 public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitorySynapse, InhibitoryActivation> implements BindingAxon {
 
-    public InhibitoryNeuron() {
-        super();
-    }
-
     @Override
     public InhibitoryActivation createActivation(Thought t) {
         return new InhibitoryActivation(t.createActivationId(), t, this);

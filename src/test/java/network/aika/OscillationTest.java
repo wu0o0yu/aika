@@ -19,8 +19,8 @@ package network.aika;
 import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.text.Document;
-import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
 import static network.aika.TestUtils.*;
@@ -34,7 +34,7 @@ public class OscillationTest {
     @Test
     public void oscillationTest() {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
-        TextModel m = new TextModel();
+        Model m = new Model();
         m.setTemplateGraph(t);
 
         m.setN(912);
@@ -47,7 +47,7 @@ public class OscillationTest {
                         .setTrainingEnabled(true)
         );
 
-        PatternNeuron nA = createNeuron(t.PATTERN_TEMPLATE, "P-A");
+        TokenNeuron nA = createNeuron(t.TOKEN_TEMPLATE, "P-A");
 
         nA.setFrequency(53.0);
         nA.getSampleSpace().setN(299);

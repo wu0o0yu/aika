@@ -19,6 +19,8 @@ package network.aika;
 import network.aika.callbacks.NeuronProducer;
 import network.aika.neuron.*;
 import network.aika.neuron.conjunctive.*;
+import network.aika.neuron.conjunctive.text.TokenNeuron;
+import network.aika.neuron.conjunctive.text.TokenPositionRelationNeuron;
 import network.aika.neuron.disjunctive.*;
 
 import java.util.Arrays;
@@ -35,7 +37,9 @@ public class SimpleTemplateGraph implements TemplateGraph {
     public InhibitoryNeuron INHIBITORY_TEMPLATE;
     public CategoryNeuron CATEGORY_TEMPLATE;
     public BindingCategoryNeuron BINDING_CATEGORY_TEMPLATE;
-    public LatentRelationNeuron LATENT_RELATION_TEMPLATE;
+
+    public TokenNeuron TOKEN_TEMPLATE;
+    public TokenPositionRelationNeuron TOKEN_POSITION_RELATION_TEMPLATE;
 
     public PrimaryInputSynapse PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE;
     public PrimaryInputSynapse PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE;
@@ -65,7 +69,8 @@ public class SimpleTemplateGraph implements TemplateGraph {
         INHIBITORY_TEMPLATE = init("Inhibitory Neuron", 0.0, l -> new InhibitoryNeuron());
         CATEGORY_TEMPLATE = init("Category Neuron", 0.0, l -> new CategoryNeuron());
         BINDING_CATEGORY_TEMPLATE = init("Binding Category Neuron", 0.0, l -> new BindingCategoryNeuron());
-        LATENT_RELATION_TEMPLATE = init("Latent Relation Neuron", 0.0, l -> new LatentRelationNeuron());
+        TOKEN_TEMPLATE = init("Token Neuron", 0.0, l -> new TokenNeuron());
+        TOKEN_POSITION_RELATION_TEMPLATE = init("Token Position Relation Neuron", 0.0, l -> new TokenPositionRelationNeuron());
 
         PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE =
                 init(
@@ -99,7 +104,7 @@ public class SimpleTemplateGraph implements TemplateGraph {
         RELATED_INPUT_SYNAPSE_FROM_LATENT_RELATION_TEMPLATE =
                 init(
                         new RelatedInputSynapse(),
-                        LATENT_RELATION_TEMPLATE,
+                        TOKEN_POSITION_RELATION_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Related Input Synapse From Latent Relation",
                         0.0
@@ -208,7 +213,7 @@ public class SimpleTemplateGraph implements TemplateGraph {
                 PATTERN_TEMPLATE,
                 INHIBITORY_TEMPLATE,
                 CATEGORY_TEMPLATE,
-                LATENT_RELATION_TEMPLATE
+                TOKEN_POSITION_RELATION_TEMPLATE
         );
     }
 
@@ -237,15 +242,5 @@ public class SimpleTemplateGraph implements TemplateGraph {
         ts.linkOutput();
 
         return ts;
-    }
-
-    @Override
-    public PatternNeuron getPatternTemplate() {
-        return PATTERN_TEMPLATE;
-    }
-
-    @Override
-    public LatentRelationNeuron getLatentRelationTemplate() {
-        return LATENT_RELATION_TEMPLATE;
     }
 }

@@ -19,7 +19,6 @@ package network.aika;
 import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import network.aika.text.Document;
-import network.aika.text.TextModel;
 import org.graphstream.ui.view.camera.Camera;
 import org.junit.jupiter.api.Test;
 
@@ -91,11 +90,11 @@ public class TheCatTest {
 
     public void setupTheCatTest(AIKADebugger debugger) {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
-        TextModel m = new TextModel();
+        Model m = new Model();
         m.setTemplateGraph(t);
 
         InhibitoryNeuron inhibNCat = initInhibitoryLoop(t, "cat");
-        initPatternTheCat(m, t, inhibNCat, 2);
+        initPatternTheCat(t, inhibNCat, 2);
 
         Document doc = new Document(m, "the cat");
         debugger.setDocument(doc);
@@ -123,7 +122,7 @@ public class TheCatTest {
         camera.setViewPercent(1.5);
         camera.setViewCenter(1.528, 0.828, 0);
 
-        doc.processTokens(List.of("the", "cat"));
+        processTokens(t, doc, List.of("the", "cat"));
 
         doc.processFinalMode();
         doc.postProcessing();

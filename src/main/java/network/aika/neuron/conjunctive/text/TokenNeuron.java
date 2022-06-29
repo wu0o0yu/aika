@@ -14,24 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.conjunctive;
+package network.aika.neuron.conjunctive.text;
 
-import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.axons.PatternAxon;
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import network.aika.neuron.conjunctive.PatternNeuron;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PatternNeuron extends ConjunctiveNeuron<PatternSynapse, PatternActivation> implements PatternAxon {
+public class TokenNeuron extends PatternNeuron {
 
-    private String tokenLabel;
+    public TokenNeuron lookupToken(String tokenLabel) {
+        return getModel().lookupNeuron(tokenLabel, l -> {
+            TokenNeuron n = instantiateTemplate(true);
+
+            n.setTokenLabel(l);
+            n.setNetworkInput(true);
+            n.setLabel(l);
+            n.setAllowTraining(false);
+            return n;
+        });
+    }
 
     @Override
     public PatternActivation createActivation(Thought t) {
@@ -39,41 +44,12 @@ public class PatternNeuron extends ConjunctiveNeuron<PatternSynapse, PatternActi
     }
 
     @Override
-    public PatternNeuron instantiateTemplate(boolean addProvider) {
-        PatternNeuron n = new PatternNeuron();
+    public TokenNeuron instantiateTemplate(boolean addProvider) {
+        TokenNeuron n = new TokenNeuron();
         if(addProvider)
             n.addProvider(getModel());
 
         initFromTemplate(n);
         return n;
-    }
-
-    @Override
-    public void updateSumOfLowerWeights() {
-    }
-
-    public void setTokenLabel(String tokenLabel) {
-        this.tokenLabel = tokenLabel;
-    }
-
-    public String getTokenLabel() {
-        return tokenLabel;
-    }
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-        super.write(out);
-
-        out.writeBoolean(tokenLabel != null);
-        if(tokenLabel != null)
-            out.writeUTF(tokenLabel);
-    }
-
-    @Override
-    public void readFields(DataInput in, Model m) throws Exception {
-        super.readFields(in, m);
-
-        if(in.readBoolean())
-            tokenLabel = in.readUTF();
     }
 }

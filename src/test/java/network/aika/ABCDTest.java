@@ -21,7 +21,6 @@ import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.text.Document;
-import network.aika.text.TextModel;
 import org.graphstream.ui.view.camera.Camera;
 import org.junit.jupiter.api.Test;
 
@@ -102,20 +101,20 @@ public class ABCDTest {
     @Test
     public void testABCD() throws InterruptedException {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
-        TextModel m = new TextModel();
+        Model m = new Model();
         m.setTemplateGraph(t);
 
-        PatternNeuron a_IN = m.lookupToken("a");
+        PatternNeuron a_IN = t.TOKEN_TEMPLATE.lookupToken("a");
 
-        PatternNeuron b_IN = m.lookupToken("b");
-        PatternNeuron c_IN = m.lookupToken("c");
-        PatternNeuron d_IN = m.lookupToken("d");
+        PatternNeuron b_IN = t.TOKEN_TEMPLATE.lookupToken("b");
+        PatternNeuron c_IN = t.TOKEN_TEMPLATE.lookupToken("c");
+        PatternNeuron d_IN = t.TOKEN_TEMPLATE.lookupToken("d");
 
         // Pattern ab
         BindingNeuron a_abBN = createNeuron(t.BINDING_TEMPLATE, "a (ab)");
         BindingNeuron b_abBN = createNeuron(t.BINDING_TEMPLATE, "b (ab)");
 
-        LatentRelationNeuron relPT = m.lookupRelation(-1, -1);
+        LatentRelationNeuron relPT = t.TOKEN_POSITION_RELATION_TEMPLATE.lookupRelation(-1, -1);
 
         createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, b_abBN, 10.0);
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, a_abBN, b_abBN, 11.0);
@@ -188,7 +187,7 @@ public class ABCDTest {
         camera.setViewPercent(1.2);
         camera.setViewCenter(1.978, 0.47, 0);
 
-        doc.processTokens(List.of("a", "b", "c", "d"));
+        processTokens(t, doc, List.of("a", "b", "c", "d"));
 
         doc.processFinalMode();
         doc.postProcessing();

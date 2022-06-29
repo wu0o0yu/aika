@@ -18,8 +18,6 @@ package network.aika.neuron;
 
 
 import network.aika.Model;
-import network.aika.neuron.conjunctive.LatentRelationNeuron;
-import network.aika.neuron.conjunctive.PatternNeuron;
 
 import java.util.Collection;
 
@@ -32,8 +30,4 @@ public interface TemplateGraph {
     void init(Model model);
 
     Collection<Neuron> getAllTemplateNeurons();
-
-    PatternNeuron getPatternTemplate();
-
-    LatentRelationNeuron getLatentRelationTemplate();
 }

@@ -20,8 +20,8 @@ import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.text.Document;
-import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -37,7 +37,8 @@ public class PatternTest {
 
     @Test
     public void testPatternPos() {
-        TextModel m = initModel();
+        Model m = initModel();
+        SimpleTemplateGraph tg = (SimpleTemplateGraph) m.getTemplateGraph();
 
         Document doc = new Document(m, "ABC");
 
@@ -51,7 +52,7 @@ public class PatternTest {
 
         AIKADebugger.createAndShowGUI(doc);
 
-        doc.processTokens(List.of("A", "B", "C"));
+        processTokens(tg, doc, List.of("A", "B", "C"));
 
         System.out.println(doc);
 
@@ -64,12 +65,13 @@ public class PatternTest {
 
     @Test
     public void testPatternNeg() {
-        TextModel m = initModel();
+        Model m = initModel();
+        SimpleTemplateGraph tg = (SimpleTemplateGraph) m.getTemplateGraph();
 
         Document doc = new Document(m, "ABC");
 
-        doc.addToken("A", 0, 0, 1);
-        doc.addToken("B", 1, 1, 2);
+        addToken(tg, doc, "A", 0, 0, 1);
+        addToken(tg, doc, "B", 1, 1, 2);
 
         doc.processFinalMode();
         doc.postProcessing();
@@ -78,14 +80,14 @@ public class PatternTest {
         System.out.println(doc);
     }
 
-    public TextModel initModel() {
+    public Model initModel() {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
-        TextModel m = new TextModel();
+        Model m = new Model();
         m.setTemplateGraph(t);
 
-        PatternNeuron nA = m.lookupToken("A");
-        PatternNeuron nB = m.lookupToken("B");
-        PatternNeuron nC = m.lookupToken( "C");
+        TokenNeuron nA = t.TOKEN_TEMPLATE.lookupToken("A");
+        TokenNeuron nB = t.TOKEN_TEMPLATE.lookupToken("B");
+        TokenNeuron nC = t.TOKEN_TEMPLATE.lookupToken( "C");
 
         BindingNeuron eA = createNeuron(t.BINDING_TEMPLATE, "E A");
         BindingNeuron eB = createNeuron(t.BINDING_TEMPLATE, "E B");
@@ -94,7 +96,7 @@ public class PatternTest {
         PatternNeuron out = createNeuron(t.PATTERN_TEMPLATE, "OUT");
         out.setTokenLabel("ABC");
 
-        LatentRelationNeuron relPT = m.lookupRelation(-1, -1);
+        LatentRelationNeuron relPT = t.TOKEN_POSITION_RELATION_TEMPLATE.lookupRelation(-1, -1);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, nA, eA, 10.0);
         createSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE, out, eA, 10.0);
@@ -121,13 +123,4 @@ public class PatternTest {
 
         return m;
     }
-
-    public BindingNeuron lookupRelBindingNeuron(PatternNeuron pn, String direction) {
-        return (BindingNeuron) pn.getOutputSynapses()
-                .map(s -> s.getOutput())
-                .filter(n -> n.getLabel().contains(direction))
-                .findAny()
-                .orElse(null);
-    }
-
 }

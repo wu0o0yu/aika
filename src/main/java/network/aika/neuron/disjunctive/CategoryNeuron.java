@@ -16,11 +16,8 @@
  */
 package network.aika.neuron.disjunctive;
 
-import network.aika.Model;
 import network.aika.Thought;
-import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.CategoryActivation;
-import network.aika.neuron.activation.DisjunctiveActivation;
 import network.aika.neuron.axons.PatternAxon;
 
 /**
@@ -28,11 +25,6 @@ import network.aika.neuron.axons.PatternAxon;
  * @author Lukas Molzberger
  */
 public class CategoryNeuron extends DisjunctiveNeuron<CategorySynapse, CategoryActivation> implements PatternAxon {
-
-
-    public CategoryNeuron() {
-        super();
-    }
 
     @Override
     public CategoryActivation createActivation(Thought t) {

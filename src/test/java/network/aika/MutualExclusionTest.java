@@ -36,10 +36,9 @@ import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import network.aika.text.Document;
-import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -56,10 +55,10 @@ public class MutualExclusionTest {
     @Test
     public void testPropagation() {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
-        TextModel m = new TextModel();
+        Model m = new Model();
         m.setTemplateGraph(t);
 
-        PatternNeuron in = createNeuron(t.PATTERN_TEMPLATE, "I", true);
+        TokenNeuron in = createNeuron(t.PATTERN_TEMPLATE, "I", true);
         BindingNeuron na = createNeuron(t.BINDING_TEMPLATE, "A");
         BindingNeuron nb = createNeuron(t.BINDING_TEMPLATE, "B");
         BindingNeuron nc = createNeuron(t.BINDING_TEMPLATE, "C");
@@ -108,10 +107,10 @@ public class MutualExclusionTest {
     @Test
     public void testPropagationWithPrimaryLink() {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
-        TextModel m = new TextModel();
+        Model m = new Model();
         m.setTemplateGraph(t);
 
-        PatternNeuron in = createNeuron(t.PATTERN_TEMPLATE, "I", true);
+        TokenNeuron in = createNeuron(t.TOKEN_TEMPLATE, "I", true);
         BindingNeuron na = createNeuron(t.BINDING_TEMPLATE, "A");
         BindingNeuron nb = createNeuron(t.BINDING_TEMPLATE, "B");
         InhibitoryNeuron inhib = createNeuron(t.INHIBITORY_TEMPLATE, "I");

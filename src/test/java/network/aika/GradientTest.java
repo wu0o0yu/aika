@@ -19,13 +19,11 @@ package network.aika;
 import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.Neuron;
 import network.aika.text.Document;
-import network.aika.text.TextModel;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static network.aika.TestUtils.getConfig;
-import static network.aika.TestUtils.setStatistic;
+import static network.aika.TestUtils.*;
 
 /**
  *
@@ -35,7 +33,9 @@ public class GradientTest {
 
     @Test
     public void gradientAndInduction2() {
-        TextModel m = new TextModel();
+        SimpleTemplateGraph t = new SimpleTemplateGraph();
+        Model m = new Model();
+        m.setTemplateGraph(t);
 
         m.setN(912);
 
@@ -61,7 +61,7 @@ public class GradientTest {
 
         AIKADebugger.createAndShowGUI(doc);
 
-        processDoc(doc);
+        processDoc(t, doc);
 
         doc.processFinalMode();
         doc.postProcessing();
@@ -72,7 +72,10 @@ public class GradientTest {
 
     @Test
     public void gradientAndInduction3() {
-        TextModel m = new TextModel();
+        SimpleTemplateGraph t = new SimpleTemplateGraph();
+        Model m = new Model();
+        m.setTemplateGraph(t);
+
         m.setN(912);
 
         Document doc = new Document(m, "A B C ");
@@ -83,7 +86,7 @@ public class GradientTest {
                         .setTrainingEnabled(true)
         );
 
-        processDoc(doc);
+        processDoc(t, doc);
 
         Neuron nA = m.getNeuron("A");
         setStatistic(nA, 53.0,299,899l);
@@ -108,7 +111,7 @@ public class GradientTest {
     @Test
     public void gradientAndInduction2With2Docs() {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
-        TextModel m = new TextModel();
+        Model m = new Model();
         m.setTemplateGraph(t);
 
         m.setN(912);
@@ -121,7 +124,7 @@ public class GradientTest {
                         .setLearnRate(-0.1)
                         .setTrainingEnabled(true)
         );
-        processDoc(doc1);
+        processDoc(t, doc1);
 
         Neuron nA = m.getNeuron("A");
         setStatistic(nA, 53.0, 299, 899l);
@@ -142,7 +145,7 @@ public class GradientTest {
                         .setLearnRate(-0.1)
                         .setTrainingEnabled(true)
         );
-        processDoc(doc2);
+        processDoc(t, doc2);
 
         Neuron nC = m.getNeuron("C");
         setStatistic(nC, 30.0, 234, 867l);
@@ -156,7 +159,7 @@ public class GradientTest {
         System.out.println();
     }
 
-    private void processDoc(Document doc) {
-        doc.processTokens(Arrays.asList(doc.getContent().split(" ")));
+    private void processDoc(SimpleTemplateGraph t, Document doc) {
+        processTokens(t, doc, Arrays.asList(doc.getContent().split(" ")));
     }
 }

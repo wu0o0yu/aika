@@ -16,6 +16,7 @@
  */
 package network.aika.text;
 
+import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
@@ -23,6 +24,7 @@ import network.aika.neuron.Range;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.neuron.conjunctive.text.TokenNeuron;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,13 +41,13 @@ import static network.aika.steps.Phase.PROCESSING;
  *
  * @author Lukas Molzberger
  */
-public class Document extends Thought<TextModel> {
+public class Document extends Thought {
 
     private final StringBuilder content;
 
     private NavigableMap<Integer, BindingSignal> tokenPosIndex = new TreeMap<>();
 
-    public Document(TextModel model, String content) {
+    public Document(Model model, String content) {
         super(model);
         this.content = new StringBuilder();
         if(content != null) {
@@ -101,36 +103,12 @@ public class Document extends Thought<TextModel> {
         return ((Document)act.getThought()).getTextSegment(act.getRange());
     }
 
-    public TokenActivation addToken(String token, Integer pos, int begin, int end) {
-        return addToken(model.lookupToken(token), pos, begin, end);
-    }
-
-    public TokenActivation addToken(PatternNeuron n, Integer pos, int begin, int end) {
+    public TokenActivation addToken(TokenNeuron n, Integer pos, int begin, int end) {
         TokenActivation act = new TokenActivation(createActivationId(), pos, begin, end, this, n);
 
         act.init(null, null);
 
         return act;
-    }
-
-    public void processTokens(Iterable<String> tokens) {
-        int i = 0;
-        int pos = 0;
-
-        List<TokenActivation> tokenActs = new ArrayList<>();
-        for(String t: tokens) {
-            int j = i + t.length();
-            tokenActs.add(addToken(t, pos++, i, j));
-
-            i = j + 1;
-        }
-
-        for(TokenActivation tAct: tokenActs) {
-            tAct.setNet(10.0);
-            process(PROCESSING);
-        }
-
-        updateModel();
     }
 
     public String toString() {

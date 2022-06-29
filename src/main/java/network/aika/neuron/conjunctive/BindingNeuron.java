@@ -27,10 +27,6 @@ import network.aika.neuron.axons.BindingAxon;
  */
 public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, BindingActivation> implements BindingAxon {
 
-    public BindingNeuron() {
-        super();
-    }
-
     @Override
     public BindingActivation createActivation(Thought t) {
         return new BindingActivation(t.createActivationId(), t, this);

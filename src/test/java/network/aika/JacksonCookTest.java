@@ -22,7 +22,6 @@ import network.aika.neuron.conjunctive.PatternNeuron;
  */
 import network.aika.neuron.disjunctive.CategoryNeuron;
 import network.aika.text.Document;
-import network.aika.text.TextModel;
 import org.graphstream.ui.view.camera.Camera;
 import org.junit.jupiter.api.Test;
 
@@ -129,13 +128,13 @@ public class JacksonCookTest {
 
     public void setupJacksonCookTest(AIKADebugger debugger) {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
-        TextModel m = new TextModel();
+        Model m = new Model();
         m.setTemplateGraph(t);
 
-        PatternNeuron jacksonIN = m.lookupToken("Jackson");
-        PatternNeuron cookIN = m.lookupToken("Cook");
+        PatternNeuron jacksonIN = t.TOKEN_TEMPLATE.lookupToken("Jackson");
+        PatternNeuron cookIN = t.TOKEN_TEMPLATE.lookupToken("Cook");
 
-        LatentRelationNeuron relPT = m.lookupRelation(-1, -1);
+        LatentRelationNeuron relPT = t.TOKEN_POSITION_RELATION_TEMPLATE.lookupRelation(-1, -1);
 
         CategoryNeuron entityCN = createNeuron(t.CATEGORY_TEMPLATE, "entity");
         BindingNeuron relPrevEntityBN = createNeuron(t.BINDING_TEMPLATE, "Rel Prev. Entity");
@@ -229,7 +228,7 @@ public class JacksonCookTest {
         camera.setViewPercent(1.25);
         camera.setViewCenter(1.921, 1.449, 0);
 
-        doc.processTokens(List.of("Jackson", "Cook"));
+        processTokens(t, doc, List.of("Jackson", "Cook"));
 
         doc.processFinalMode();
         doc.postProcessing();

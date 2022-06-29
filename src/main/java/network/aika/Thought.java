@@ -40,9 +40,9 @@ import static network.aika.steps.Phase.*;
  *
  * @author Lukas Molzberger
  */
-public abstract class Thought<M extends Model> {
+public abstract class Thought {
 
-    protected final M model;
+    protected final Model model;
 
     private long id;
     private long absoluteBegin;
@@ -54,12 +54,12 @@ public abstract class Thought<M extends Model> {
     private final NavigableMap<QueueKey, Step> queue = new TreeMap<>(QueueKey.COMPARATOR);
 
     private final TreeMap<Integer, Activation> activationsById = new TreeMap<>();
-    private final Map<NeuronProvider, SortedSet<Activation<?>>> actsPerNeuron = new HashMap<>();
+    private final Map<NeuronProvider, SortedSet<Activation>> actsPerNeuron = new HashMap<>();
     private final List<EventListener> eventListeners = new ArrayList<>();
 
     private Config config;
 
-    public Thought(M m) {
+    public Thought(Model m) {
         model = m;
         id = model.createThoughtId();
         absoluteBegin = m.getN();
@@ -74,7 +74,7 @@ public abstract class Thought<M extends Model> {
         model.addToN(length());
     }
 
-    public M getModel() {
+    public Model getModel() {
         return model;
     }
 
@@ -138,7 +138,7 @@ public abstract class Thought<M extends Model> {
         activationsById.put(act.getId(), act);
     }
 
-    public void register(NeuronProvider np, SortedSet<Activation<?>> acts) {
+    public void register(NeuronProvider np, SortedSet<Activation> acts) {
         actsPerNeuron.put(np, acts);
     }
 

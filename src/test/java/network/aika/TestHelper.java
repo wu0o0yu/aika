@@ -20,7 +20,6 @@ import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
-import network.aika.text.TextModel;
 
 import static network.aika.TestUtils.*;
 import static network.aika.TestUtils.updateBias;
@@ -31,13 +30,13 @@ import static network.aika.TestUtils.updateBias;
  */
 public class TestHelper {
 
-    public static void initPatternTheCat(TextModel m, SimpleTemplateGraph t, InhibitoryNeuron inhibNCat, int variant) {
-        PatternNeuron theIN = m.lookupToken("the");
-        PatternNeuron catIN = m.lookupToken("cat");
+    public static void initPatternTheCat(SimpleTemplateGraph t, InhibitoryNeuron inhibNCat, int variant) {
+        PatternNeuron theIN = t.TOKEN_TEMPLATE.lookupToken("the");
+        PatternNeuron catIN = t.TOKEN_TEMPLATE.lookupToken("cat");
 
         int variantDir = variant < 2 ? -1 : 1;
 
-        LatentRelationNeuron relPT = m.lookupRelation(variantDir, variantDir);
+        LatentRelationNeuron relPT = t.TOKEN_POSITION_RELATION_TEMPLATE.lookupRelation(variantDir, variantDir);
 
         BindingNeuron theBN = createNeuron(t.BINDING_TEMPLATE, "the (the cat)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, theIN, theBN, 10.0);
@@ -64,11 +63,11 @@ public class TestHelper {
         updateBias(catBN, 3.0);
     }
 
-    public static void initPatternBlackCat(TextModel m, SimpleTemplateGraph t) {
-        PatternNeuron blackIN = m.lookupToken("black");
-        PatternNeuron catIN = m.lookupToken("cat");
+    public static void initPatternBlackCat(SimpleTemplateGraph t) {
+        PatternNeuron blackIN = t.TOKEN_TEMPLATE.lookupToken("black");
+        PatternNeuron catIN = t.TOKEN_TEMPLATE.lookupToken("cat");
 
-        LatentRelationNeuron relPT = m.lookupRelation(-1, -1);
+        LatentRelationNeuron relPT = t.TOKEN_POSITION_RELATION_TEMPLATE.lookupRelation(-1, -1);
 
         BindingNeuron blackBN = createNeuron(t.BINDING_TEMPLATE, "black (black cat)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, blackIN, blackBN, 10.0);
@@ -87,9 +86,9 @@ public class TestHelper {
         //        initInhibitoryLoop(t, "jackson", jacksonForenameBN, jacksonCityBN);
     }
 
-    public static void initPatternTheDog(TextModel m, SimpleTemplateGraph t) {
-        PatternNeuron theIN = m.lookupToken("the");
-        PatternNeuron dogIN = m.lookupToken("dog");
+    public static void initPatternTheDog(SimpleTemplateGraph t) {
+        PatternNeuron theIN = t.TOKEN_TEMPLATE.lookupToken("the");
+        PatternNeuron dogIN = t.TOKEN_TEMPLATE.lookupToken("dog");
 
         BindingNeuron theBN = createNeuron(t.BINDING_TEMPLATE, "the (the dog)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, theIN, theBN, 10.0);

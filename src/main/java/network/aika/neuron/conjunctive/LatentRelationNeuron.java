@@ -25,11 +25,11 @@ import network.aika.neuron.activation.LatentRelationActivation;
 import network.aika.neuron.bindingsignal.BSKey;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.SingleTransition;
+import network.aika.neuron.conjunctive.BindingNeuron;
 
 
 import java.util.stream.Stream;
 
-import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.neuron.conjunctive.PrimaryInputSynapse.SAME_INPUT_TRANSITION;
 import static network.aika.neuron.conjunctive.ReversePatternSynapse.SAME_SAME_TRANSITION;
 
@@ -37,43 +37,13 @@ import static network.aika.neuron.conjunctive.ReversePatternSynapse.SAME_SAME_TR
  *
  * @author Lukas Molzberger
  */
-public class LatentRelationNeuron extends BindingNeuron {
+public abstract class LatentRelationNeuron extends BindingNeuron {
 
-    private int rangeBegin = -1;
-    private int rangeEnd = -1;
-
-    public LatentRelationNeuron() {
-    }
-
-    public int getRangeBegin() {
-        return rangeBegin;
-    }
-
-    public void setRangeBegin(int rangeBegin) {
-        this.rangeBegin = rangeBegin;
-    }
-
-    public int getRangeEnd() {
-        return rangeEnd;
-    }
-
-    public void setRangeEnd(int rangeEnd) {
-        this.rangeEnd = rangeEnd;
-    }
+    protected abstract Stream<BindingSignal> getRelatedBindingSignalsInternal(BindingSignal fromBS);
 
     @Override
     public LatentRelationActivation createActivation(Thought t) {
         return new LatentRelationActivation(t.createActivationId(), t, this);
-    }
-
-    @Override
-    public LatentRelationNeuron instantiateTemplate(boolean addProvider) {
-        LatentRelationNeuron n = new LatentRelationNeuron();
-        if(addProvider)
-            n.addProvider(getModel());
-
-        initFromTemplate(n);
-        return n;
     }
 
     @Override
@@ -88,17 +58,7 @@ public class LatentRelationNeuron extends BindingNeuron {
                 Stream.concat(toBSs, getRelatedBindingSignalsInternal(fromBS));
     }
 
-    private Stream<BindingSignal> getRelatedBindingSignalsInternal(BindingSignal fromBS) {
-        boolean dir = fromBS.getLink() == null;
-        Thought<?> t = fromBS.getThought();
-        return t.getRelatedTokens(fromBS, (dir ? 1 : -1) * rangeBegin, this)
-                .map(tokenAct -> tokenAct.getBindingSignal(SAME))
-                .map(bs ->
-                        createLatentInstance(fromBS, bs, dir)
-                );
-    }
-
-    private BindingSignal createLatentInstance(BindingSignal fromBS, BindingSignal toBS, boolean direction) {
+    protected BindingSignal createLatentActivation(BindingSignal fromBS, BindingSignal toBS, boolean direction) {
         SingleTransition fromTransition = getTransitionByDirection(direction);
         SingleTransition toTransition = getTransitionByDirection(!direction);
 
