@@ -21,12 +21,12 @@ import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 
-import java.util.NavigableMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Stream;
 
 
@@ -40,7 +40,17 @@ public class Document extends Thought {
 
     private final StringBuilder content;
 
-    private NavigableMap<Integer, BindingSignal> tokenPosIndex = new TreeMap<>();
+    private NavigableMap<PositionKey, TokenActivation> tokenPosIndex = new TreeMap<>(Comparator
+            .<PositionKey>comparingInt(pk -> pk.getTokenPosition())
+            .thenComparingInt(pk -> pk.getActId())
+    );
+
+    private NavigableMap<RangeKey, TokenActivation> rangeIndex = new TreeMap<>(Comparator
+            .<RangeKey>comparingLong(rk -> rk.getRange().getBegin())
+            .thenComparingLong(rk -> -rk.getRange().getEnd())
+            .thenComparingInt(rk -> rk.getActId())
+    );
+
 
     public Document(Model model, String content) {
         super(model);
@@ -50,20 +60,20 @@ public class Document extends Thought {
         }
     }
 
-    @Override
-    public void registerBindingSignalSource(Activation act, BindingSignal bs) {
-        if(bs.getOriginActivation() instanceof TokenActivation) {
-            TokenActivation tokenAct = (TokenActivation) bs.getOriginActivation();
-            tokenPosIndex.put(tokenAct.getPosition(), bs);
-        }
+    public void registerTokenActivation(TokenActivation tokenAct) {
+        if(tokenAct.getPosition() != null)
+            tokenPosIndex.put(new PositionKey(tokenAct), tokenAct);
+
+        if(tokenAct.getRange() != null)
+            rangeIndex.put(new RangeKey(tokenAct), tokenAct);
     }
 
-    public Stream<TokenActivation> getRelatedTokens(BindingSignal fromBindingSignal, Integer distance, Neuron toNeuron) {
+    public Stream<TokenActivation> getRelatedTokensByTokenPosition(BindingSignal fromBindingSignal, Integer distance, Neuron toNeuron) {
         if(!(fromBindingSignal.getOriginActivation() instanceof TokenActivation))
             return Stream.empty();
 
         TokenActivation tAct = (TokenActivation) fromBindingSignal.getOriginActivation();
-        BindingSignal relBS = tokenPosIndex.get(tAct.getPosition() + distance);
+        BindingSignal relBS = tokenPosIndex.subMap(new PositionKey(tAct.getPosition() + distance), new PositionKey(tAct.getPosition() + distance));
         if(relBS == null)
             return Stream.empty();
 

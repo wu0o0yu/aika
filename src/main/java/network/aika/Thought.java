@@ -142,9 +142,6 @@ public abstract class Thought {
         actsPerNeuron.put(np, acts);
     }
 
-    public void registerBindingSignalSource(Activation act, BindingSignal pbs) {
-    }
-
     public void addStep(Step s) {
         s.setCurrentTimestamp(getNextTimestamp());
         queue.put(s, s);
@@ -251,9 +248,5 @@ public abstract class Thought {
         }
 
         return sb.toString();
-    }
-
-    public Stream<TokenActivation> getRelatedTokens(BindingSignal<?> fromBindingSignal, Integer distance, Neuron toNeuron) {
-        return Stream.empty();
     }
 }

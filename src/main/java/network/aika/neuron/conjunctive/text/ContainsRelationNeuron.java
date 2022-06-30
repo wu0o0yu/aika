@@ -29,35 +29,29 @@ import static network.aika.neuron.bindingsignal.State.SAME;
  *
  * @author Lukas Molzberger
  */
-public class TokenPositionRelationNeuron extends LatentRelationNeuron {
+public class ContainsRelationNeuron extends LatentRelationNeuron {
 
-    private int rangeBegin = -1;
-    private int rangeEnd = -1;
-
-
-    public int getRangeBegin() {
-        return rangeBegin;
+    public enum Direction {
+        CONTAINS,
+        CONTAINED_IN
     }
 
-    public void setRangeBegin(int rangeBegin) {
-        this.rangeBegin = rangeBegin;
+    private Direction direction;
+
+    public Direction getDirection() {
+        return direction;
     }
 
-    public int getRangeEnd() {
-        return rangeEnd;
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 
-    public void setRangeEnd(int rangeEnd) {
-        this.rangeEnd = rangeEnd;
-    }
-
-    public TokenPositionRelationNeuron lookupRelation(int rangeBegin, int rangeEnd) {
-        return getModel().lookupNeuron("TP-Rel.: " + rangeBegin + "," + rangeEnd, l -> {
-            TokenPositionRelationNeuron n = instantiateTemplate(true);
+    public ContainsRelationNeuron lookupRelation(Direction direction) {
+        return getModel().lookupNeuron("Contains-Rel.: " + direction, l -> {
+            ContainsRelationNeuron n = instantiateTemplate(true);
             n.setLabel(l);
 
-            n.setRangeBegin(rangeBegin);
-            n.setRangeEnd(rangeEnd);
+            n.setDirection(direction);
 
             n.getBias().receiveUpdate(-4.0);
             n.setAllowTraining(false);
@@ -67,8 +61,8 @@ public class TokenPositionRelationNeuron extends LatentRelationNeuron {
     }
 
     @Override
-    public TokenPositionRelationNeuron instantiateTemplate(boolean addProvider) {
-        TokenPositionRelationNeuron n = new TokenPositionRelationNeuron();
+    public ContainsRelationNeuron instantiateTemplate(boolean addProvider) {
+        ContainsRelationNeuron n = new ContainsRelationNeuron();
         if(addProvider)
             n.addProvider(getModel());
 

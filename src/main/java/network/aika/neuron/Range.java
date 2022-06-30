@@ -31,6 +31,11 @@ public class Range {
     }
 
     public static Range join(Range a, Range b) {
+        if(a == null)
+            return b;
+        if(b == null)
+            return a;
+
         return new Range(
                 Math.min(a.begin, b.begin),
                 Math.max(a.end, b.end)

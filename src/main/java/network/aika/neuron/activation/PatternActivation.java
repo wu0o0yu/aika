@@ -24,7 +24,9 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.text.Document;
 
+import static network.aika.neuron.bindingsignal.State.INPUT;
 import static network.aika.neuron.bindingsignal.State.SAME;
 
 /**
@@ -32,6 +34,8 @@ import static network.aika.neuron.bindingsignal.State.SAME;
  * @author Lukas Molzberger
  */
 public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
+
+    protected Range range;
 
     protected PatternActivation(int id, PatternNeuron n) {
         super(id, n);
@@ -62,18 +66,13 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     public void registerBindingSignal(BindingSignal bs) {
         super.registerBindingSignal(bs);
 
-        if(bs.getOriginActivation() == this)
-            thought.registerBindingSignalSource(this, bs);
+        if(bs.getState() == INPUT) {
+            range = Range.join(range, bs.getOriginActivation().getRange());
+        }
     }
 
     @Override
     public Range getRange() {
-        return getBindingSignals()
-                .filter(s -> s.getState() == State.INPUT)
-                .map(s -> s.getOriginActivation().getRange())
-                .reduce(
-                        new Range(0, 0),
-                        (a, s) -> Range.join(a, s)
-                );
+        return range;
     }
 }

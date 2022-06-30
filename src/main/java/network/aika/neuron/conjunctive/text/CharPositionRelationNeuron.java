@@ -29,7 +29,7 @@ import static network.aika.neuron.bindingsignal.State.SAME;
  *
  * @author Lukas Molzberger
  */
-public class TokenPositionRelationNeuron extends LatentRelationNeuron {
+public class CharPositionRelationNeuron extends LatentRelationNeuron {
 
     private int rangeBegin = -1;
     private int rangeEnd = -1;
@@ -51,9 +51,9 @@ public class TokenPositionRelationNeuron extends LatentRelationNeuron {
         this.rangeEnd = rangeEnd;
     }
 
-    public TokenPositionRelationNeuron lookupRelation(int rangeBegin, int rangeEnd) {
-        return getModel().lookupNeuron("TP-Rel.: " + rangeBegin + "," + rangeEnd, l -> {
-            TokenPositionRelationNeuron n = instantiateTemplate(true);
+    public CharPositionRelationNeuron lookupRelation(int rangeBegin, int rangeEnd) {
+        return getModel().lookupNeuron("CP-Rel.: " + rangeBegin + "," + rangeEnd, l -> {
+            CharPositionRelationNeuron n = instantiateTemplate(true);
             n.setLabel(l);
 
             n.setRangeBegin(rangeBegin);
@@ -67,8 +67,8 @@ public class TokenPositionRelationNeuron extends LatentRelationNeuron {
     }
 
     @Override
-    public TokenPositionRelationNeuron instantiateTemplate(boolean addProvider) {
-        TokenPositionRelationNeuron n = new TokenPositionRelationNeuron();
+    public CharPositionRelationNeuron instantiateTemplate(boolean addProvider) {
+        CharPositionRelationNeuron n = new CharPositionRelationNeuron();
         if(addProvider)
             n.addProvider(getModel());
 
