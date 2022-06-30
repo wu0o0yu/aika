@@ -28,6 +28,11 @@ public class RangeKey {
     private Range range;
     private int actId;
 
+    public RangeKey(Range range, int actId) {
+        this.range = range;
+        this.actId = actId;
+    }
+
     public RangeKey(TokenActivation tokenAct) {
         this.range = tokenAct.getRange();
         this.actId = tokenAct.getId();

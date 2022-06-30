@@ -27,6 +27,11 @@ public class PositionKey {
     private int tokenPosition;
     private int actId;
 
+    public PositionKey(int tokenPosition, int actId) {
+        this.tokenPosition = tokenPosition;
+        this.actId = actId;
+    }
+
     public PositionKey(TokenActivation tokenAct) {
         this.tokenPosition = tokenAct.getPosition();
         this.actId = tokenAct.getId();

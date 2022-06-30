@@ -68,16 +68,18 @@ public class Document extends Thought {
             rangeIndex.put(new RangeKey(tokenAct), tokenAct);
     }
 
-    public Stream<TokenActivation> getRelatedTokensByTokenPosition(BindingSignal fromBindingSignal, Integer distance, Neuron toNeuron) {
-        if(!(fromBindingSignal.getOriginActivation() instanceof TokenActivation))
-            return Stream.empty();
+    public Stream<TokenActivation> getRelatedTokensByTokenPosition(TokenActivation fromTokenAct, int relFrom, int relTo) {
+        return tokenPosIndex.subMap(
+                new PositionKey(fromTokenAct.getPosition() + relFrom, Integer.MIN_VALUE),
+                new PositionKey(fromTokenAct.getPosition() + relTo, Integer.MAX_VALUE)
+        ).values().stream();
+    }
 
-        TokenActivation tAct = (TokenActivation) fromBindingSignal.getOriginActivation();
-        BindingSignal relBS = tokenPosIndex.subMap(new PositionKey(tAct.getPosition() + distance), new PositionKey(tAct.getPosition() + distance));
-        if(relBS == null)
-            return Stream.empty();
-
-        return Stream.of((TokenActivation) relBS.getOriginActivation());
+    public Stream<TokenActivation> getRelatedTokensByCharPosition(Range fromRange, Range toRange) {
+        return rangeIndex.subMap(
+                new RangeKey(fromRange, Integer.MIN_VALUE),
+                new RangeKey(toRange, Integer.MAX_VALUE)
+        ).values().stream();
     }
 
     public void append(String txt) {
