@@ -78,9 +78,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return false;
     }
 
-    public Stream<BindingSignal<?>> getRelatedBindingSignals(BindingSignal<?> fromBS, Direction dir) {
+    public Stream<BindingSignal<?>> getRelatedBindingSignals(PatternActivation fromOriginAct, SingleTransition t, Direction dir) {
         return dir.getNeuron(this)
-                .getRelatedBindingSignals(fromBS, dir);
+                .getRelatedBindingSignals(fromOriginAct, dir.getTerminal(t).getState());
     }
 
     public abstract double getSumOfLowerWeights();
@@ -146,11 +146,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return getWeight().getCurrentValue() + getSumOfLowerWeights() > 0.0;
     }
 
-    public Stream<SingleTransition> getRelatedTransitions(BindingSignal fromBS, SingleTransition fromTransition) {
+    public Stream<SingleTransition> getRelatedTransitions(SingleTransition fromTransition) { // BindingSignal fromBS,
         return getTransitions()
                 .flatMap(toTransition -> toTransition.getOutputTerminals())
                 .filter(toTerminal -> toTerminal.getState() == fromTransition.getOutput().getState())
-                .filter(toTerminal -> toTerminal.getTransition().getInput().linkCheck(this, fromBS))
+  //              .filter(toTerminal -> toTerminal.getTransition().getInput().linkCheck(this, fromBS))
                 .map(toTerminal -> toTerminal.getTransition());
     }
 

@@ -64,7 +64,7 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
     }
 
     public void link(Synapse ts, BindingSignal fromBS, Direction dir) {
-        Stream<BindingSignal<?>> bsStream = ts.getRelatedBindingSignals(fromBS, dir);
+        Stream<BindingSignal<?>> bsStream = ts.getRelatedBindingSignals(fromBS.getOriginActivation(), this, dir);
 
         bsStream
                 .filter(toBS -> fromBS != toBS)
@@ -103,18 +103,18 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
     private static void latentLinking(SingleTransition tA, BindingSignal bsA, Synapse synA, Synapse synB) {
         log.info("Check latent-link synA:" + synA + "  synB:" + synB);
 
-        Stream<BindingSignal> bsStream = synB.getInput().getRelatedBindingSignals(bsA, INPUT);
-        bsStream.filter(bsB -> bsA != bsB)
-                .filter(bsB ->
-                        isTrue(bsB.getOnArrivedFired())
-                )
-                .forEach(bsB -> {
-                    Stream<SingleTransition> relTrans = synB.getRelatedTransitions(bsB, tA);
-                    relTrans.forEach(tB -> {
+        Stream<SingleTransition> relTrans = synB.getRelatedTransitions(tA); // bsB,
+        relTrans.forEach(tB -> {
+            Stream<BindingSignal> bsStream = synB.getInput().getRelatedBindingSignals(bsA.getOriginActivation(), INPUT.getTerminal(tB).getState());
+            bsStream.filter(bsB -> bsA != bsB)
+                    .filter(bsB ->
+                            isTrue(bsB.getOnArrivedFired())
+                    )
+                    .forEach(bsB -> {
                         latentLinking(synA, bsA, tA, synB, bsB, tB);
                         latentLinking(synB, bsB, tB, synA, bsA, tA);
                     });
-                });
+        });
     }
 
     private static void latentLinking(

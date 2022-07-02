@@ -34,9 +34,9 @@ public class TestHelper {
         PatternNeuron theIN = t.TOKEN_TEMPLATE.lookupToken("the");
         PatternNeuron catIN = t.TOKEN_TEMPLATE.lookupToken("cat");
 
-        int variantDir = variant < 2 ? -1 : 1;
+        int dir = variant < 2 ? -1 : 1;
 
-        LatentRelationNeuron relPT = t.TOKEN_POSITION_RELATION_TEMPLATE.lookupRelation(variantDir, variantDir);
+        LatentRelationNeuron relPT = t.TOKEN_POSITION_RELATION_TEMPLATE.lookupRelation(dir * 5, dir * 1);
 
         BindingNeuron theBN = createNeuron(t.BINDING_TEMPLATE, "the (the cat)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, theIN, theBN, 10.0);
@@ -44,7 +44,7 @@ public class TestHelper {
         BindingNeuron catBN = createNeuron(t.BINDING_TEMPLATE, "cat (the cat)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, catIN, catBN, variant == 0  || variant == 2 ? 10.0 : 5.0);
 
-        if(variantDir < 0) {
+        if(dir < 0) {
             createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, catBN, 5.0);
             createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, theBN, catBN, variant == 1 || variant == 3 ? 10.0 : 5.0);
         } else {

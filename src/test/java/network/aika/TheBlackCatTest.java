@@ -43,17 +43,14 @@ public class TheBlackCatTest {
         coords.put(0, new double[]{-0.061, 0.005});
         coords.put(1, new double[]{0.336, 0.001});
         coords.put(2, new double[]{0.768, -0.015});
-        coords.put(3, new double[]{-0.055, 0.396});
-        coords.put(4, new double[]{-0.167, 0.596});
-        coords.put(5, new double[]{0.112, 0.496});
+        coords.put(3, new double[]{-0.046, 0.617});
+        coords.put(4, new double[]{0.122, 0.817});
+        coords.put(5, new double[]{-0.194, 0.728});
         coords.put(6, new double[]{0.335, 0.269});
-        coords.put(7, new double[]{0.571, 0.548});
+        coords.put(7, new double[]{0.565, 0.469});
         coords.put(8, new double[]{0.481, -0.006});
-        coords.put(9, new double[]{0.608, -0.004});
-        coords.put(10, new double[]{0.861, 0.614});
-        coords.put(11, new double[]{0.757, 0.28});
-        coords.put(12, new double[]{0.375, 0.886});
-        coords.put(13, new double[]{1.061, 0.757});
+        coords.put(9, new double[]{0.828, 0.614});
+        coords.put(10, new double[]{0.689, 0.267});
 
         return coords;
     }

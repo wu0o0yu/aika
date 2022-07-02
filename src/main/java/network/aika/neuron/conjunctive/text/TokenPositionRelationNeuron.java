@@ -16,8 +16,10 @@
  */
 package network.aika.neuron.conjunctive.text;
 
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.text.Document;
 
@@ -81,24 +83,21 @@ public class TokenPositionRelationNeuron extends LatentRelationNeuron {
     }
 
     @Override
-    protected Stream<BindingSignal> getRelatedBindingSignalsInternal(BindingSignal fromBS) {
-        boolean dir = fromBS.getLink() == null;
-        Document doc = (Document) fromBS.getThought();
+    protected Stream<BindingSignal> getRelatedBindingSignalsInternal(PatternActivation fromOriginAct, State state) {
+        Document doc = (Document) fromOriginAct.getThought();
 
-        TokenActivation fromTokenAct = (TokenActivation) fromBS.getOriginActivation();
-
-        return doc.getRelatedTokensByTokenPosition(fromTokenAct, getRelFrom(dir), getRelTo(dir))
+        return doc.getRelatedTokensByTokenPosition((TokenActivation) fromOriginAct, getRelFrom(state), getRelTo(state))
                 .map(tokenAct -> tokenAct.getBindingSignal(SAME))
                 .map(bs ->
-                        createOrLookupLatentActivation(fromBS, bs, dir)
+                        createOrLookupLatentActivation(fromOriginAct, bs, state)
                 );
     }
 
-    private int getRelFrom(boolean dir) {
-        return (dir ? 1 : -1) * rangeBegin;
+    private int getRelFrom(State s) {
+        return (s == SAME ? 1 : -1) * rangeBegin;
     }
 
-    private int getRelTo(boolean dir) {
-        return (dir ? 1 : -1) * rangeEnd;
+    private int getRelTo(State s) {
+        return (s == SAME ? 1 : -1) * rangeEnd;
     }
 }

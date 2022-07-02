@@ -20,6 +20,7 @@ import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.LatentRelationActivation;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.bindingsignal.BSKey;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.SingleTransition;
@@ -28,6 +29,8 @@ import network.aika.neuron.bindingsignal.State;
 
 import java.util.stream.Stream;
 
+import static network.aika.neuron.bindingsignal.State.INPUT;
+import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.neuron.conjunctive.PrimaryInputSynapse.SAME_INPUT_TRANSITION;
 import static network.aika.neuron.conjunctive.ReversePatternSynapse.SAME_SAME_TRANSITION;
 
@@ -37,7 +40,7 @@ import static network.aika.neuron.conjunctive.ReversePatternSynapse.SAME_SAME_TR
  */
 public abstract class LatentRelationNeuron extends BindingNeuron {
 
-    protected abstract Stream<BindingSignal> getRelatedBindingSignalsInternal(BindingSignal fromBS);
+    protected abstract Stream<BindingSignal> getRelatedBindingSignalsInternal(PatternActivation fromOriginAct, State state);
 
     @Override
     public LatentRelationActivation createActivation(Thought t) {
@@ -45,38 +48,37 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
     }
 
     @Override
-    public Stream<BindingSignal> getRelatedBindingSignals(BindingSignal fromBS, Direction dir) {
+    public Stream<BindingSignal> getRelatedBindingSignals(PatternActivation fromOriginAct, State state) {
         if(isTemplate())
             return Stream.empty();
 
-        Stream<BindingSignal> toBSs = super.getRelatedBindingSignals(fromBS, dir);
+        Stream<BindingSignal> toBSs = super.getRelatedBindingSignals(fromOriginAct, state);
 
-        return dir == Direction.OUTPUT ?
-                toBSs :
-                Stream.concat(toBSs, getRelatedBindingSignalsInternal(fromBS));
+        return state == SAME || state == INPUT ?
+                Stream.concat(toBSs, getRelatedBindingSignalsInternal(fromOriginAct, state)) :
+                toBSs;
     }
 
-    protected BindingSignal createOrLookupLatentActivation(BindingSignal fromBS, BindingSignal toBS, boolean direction) {
-        SingleTransition fromTransition = getTransitionByDirection(direction);
+    protected BindingSignal createOrLookupLatentActivation(PatternActivation fromOriginAct, BindingSignal toBS, State s) {
+        SingleTransition fromTransition = getTransitionByDirection(s == SAME);
         State fromState = fromTransition.next(Direction.OUTPUT);
-        SingleTransition toTransition = getTransitionByDirection(!direction);
+        SingleTransition toTransition = getTransitionByDirection(s != SAME);
         State toState = toTransition.next(Direction.OUTPUT);
 
-        LatentRelationActivation latentRelAct = lookupLatentRelAct(fromBS, fromState, toBS, toState);
+        LatentRelationActivation latentRelAct = lookupLatentRelAct(fromOriginAct, fromState, toBS, toState);
         if(latentRelAct != null)
             return latentRelAct.getBindingSignal(fromState);
 
-        latentRelAct = createActivation(fromBS.getThought());
+        latentRelAct = createActivation(fromOriginAct.getThought());
         latentRelAct.init(null, null);
 
-        BindingSignal latentFromBS = latentRelAct.addLatentBindingSignal(fromBS, fromTransition);
-        latentRelAct.addLatentBindingSignal(toBS, toTransition);
+        BindingSignal latentFromBS = latentRelAct.addLatentBindingSignal(fromOriginAct, fromTransition);
+        latentRelAct.addLatentBindingSignal(toBS.getOriginActivation(), toTransition);
         return latentFromBS;
     }
 
-    private LatentRelationActivation lookupLatentRelAct(BindingSignal<?> fromBS, State fromState, BindingSignal<?> toBS, State toState) {
-        Activation<?> originAct = fromBS.getOriginActivation();
-        return (LatentRelationActivation) originAct.getReverseBindingSignals(this)
+    private LatentRelationActivation lookupLatentRelAct(PatternActivation fromOriginAct, State fromState, BindingSignal<?> toBS, State toState) {
+        return (LatentRelationActivation) fromOriginAct.getReverseBindingSignals(this)
                 .map(bs -> bs.getActivation())
                 .filter(act ->
                         act.getBindingSignal(BSKey.createKey(toBS.getOriginActivation(), toState)) != null

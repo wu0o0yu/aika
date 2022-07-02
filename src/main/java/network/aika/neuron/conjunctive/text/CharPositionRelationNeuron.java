@@ -17,8 +17,9 @@
 package network.aika.neuron.conjunctive.text;
 
 import network.aika.neuron.Range;
-import network.aika.neuron.activation.text.TokenActivation;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.text.Document;
 
@@ -81,21 +82,19 @@ public class CharPositionRelationNeuron extends LatentRelationNeuron {
     }
 
     @Override
-    protected Stream<BindingSignal> getRelatedBindingSignalsInternal(BindingSignal fromBS) {
-        boolean dir = fromBS.getLink() == null;
-        Document doc = (Document) fromBS.getThought();
+    protected Stream<BindingSignal> getRelatedBindingSignalsInternal(PatternActivation fromOriginAct, State s) {
+        Document doc = (Document) fromOriginAct.getThought();
 
-        TokenActivation fromTokenAct = (TokenActivation) fromBS.getOriginActivation();
-        Range r = fromTokenAct.getRange();
+        Range r = fromOriginAct.getRange();
 
-        Range fromRange = new Range(dir ? r.getBegin() + rangeBegin : r.getEnd() + rangeEnd, 0);
-        Range toRange = new Range(dir ? r.getEnd() + rangeEnd : r.getBegin() + rangeBegin, Integer.MAX_VALUE);
+        Range fromRange = new Range(s == SAME ? r.getBegin() + rangeBegin : r.getEnd() + rangeEnd, 0);
+        Range toRange = new Range(s == SAME ? r.getEnd() + rangeEnd : r.getBegin() + rangeBegin, Integer.MAX_VALUE);
 
         return doc.getRelatedTokensByCharPosition(fromRange, toRange)
                 .filter(tokenAct -> tokenAct.getRange() != null) // TODO filter range
                 .map(tokenAct -> tokenAct.getBindingSignal(SAME))
                 .map(bs ->
-                        createOrLookupLatentActivation(fromBS, bs, dir)
+                        createOrLookupLatentActivation(fromOriginAct, bs, s)
                 );
     }
 }

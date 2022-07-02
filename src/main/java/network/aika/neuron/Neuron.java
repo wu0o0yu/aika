@@ -22,7 +22,9 @@ import network.aika.direction.Direction;
 import network.aika.fields.LimitedField;
 import network.aika.neuron.activation.Activation;
 import network.aika.fields.Field;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.PostTraining;
 import network.aika.steps.activation.Save;
@@ -104,8 +106,8 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return getTemplate().getId().intValue() == targetN.getId().intValue();
     }
 
-    public Stream<BindingSignal> getRelatedBindingSignals(BindingSignal bs, Direction dir) {
-        Stream<BindingSignal> relatedBSs = bs.getOriginActivation()
+    public Stream<BindingSignal> getRelatedBindingSignals(PatternActivation fromOriginAct, State state) {
+        Stream<BindingSignal> relatedBSs = fromOriginAct
                 .getReverseBindingSignals(this);
         return relatedBSs
                 .collect(Collectors.toList())

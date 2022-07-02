@@ -24,12 +24,8 @@ import network.aika.fields.FieldOutput;
 import network.aika.fields.QueueField;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Element;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Timestamp;
+import network.aika.neuron.activation.*;
 
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.fields.Fields.mul;
@@ -186,8 +182,8 @@ public class BindingSignal<A extends Activation> implements Element {
         return state;
     }
 
-    public Activation getOriginActivation() {
-        return origin.getActivation();
+    public PatternActivation getOriginActivation() {
+        return (PatternActivation) origin.getActivation();
     }
 
     public void link() {
