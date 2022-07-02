@@ -18,14 +18,12 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.Thought;
 import network.aika.direction.Direction;
-import network.aika.fields.QueueField;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.LatentRelationActivation;
 import network.aika.neuron.bindingsignal.BSKey;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.SingleTransition;
-import network.aika.neuron.conjunctive.BindingNeuron;
 
 
 import java.util.stream.Stream;
@@ -87,8 +85,8 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
         BindingSignal latentBS = new BindingSignal(bs, t);
         latentBS.init(latentRelAct);
         latentRelAct.addBindingSignal(latentBS);
-        QueueField qf = (QueueField) latentBS.getOnArrived();
-        qf.process();
+//        QueueField qf = (QueueField) latentBS.getOnArrived();
+//        qf.process();
 
         return latentBS;
     }

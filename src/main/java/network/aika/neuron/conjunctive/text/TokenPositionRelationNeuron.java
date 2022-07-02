@@ -83,7 +83,7 @@ public class TokenPositionRelationNeuron extends LatentRelationNeuron {
 
         TokenActivation fromTokenAct = (TokenActivation) fromBS.getOriginActivation();
 
-        return doc.getRelatedTokensByTokenPosition(fromTokenAct, getRelFrom(dir), getRelTo(dir), this)
+        return doc.getRelatedTokensByTokenPosition(fromTokenAct, getRelFrom(dir), getRelTo(dir))
                 .map(tokenAct -> tokenAct.getBindingSignal(SAME))
                 .map(bs ->
                         createLatentActivation(fromBS, bs, dir)

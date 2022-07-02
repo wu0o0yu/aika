@@ -17,6 +17,7 @@
 package network.aika.neuron.conjunctive.text;
 
 import network.aika.Thought;
+import network.aika.neuron.Range;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
@@ -83,8 +84,13 @@ public class CharPositionRelationNeuron extends LatentRelationNeuron {
         Document doc = (Document) fromBS.getThought();
 
         TokenActivation fromTokenAct = (TokenActivation) fromBS.getOriginActivation();
+        Range r = fromTokenAct.getRange();
 
-        return doc.getRelatedTokensByTokenPosition(fromTokenAct, (dir ? 1 : -1) * rangeBegin, (dir ? 1 : -1) * rangeEnd, this)
+        Range fromRange = new Range(dir ? r.getBegin() + rangeBegin : r.getEnd() + rangeEnd, 0);
+        Range toRange = new Range(dir ? r.getEnd() + rangeEnd : r.getBegin() + rangeBegin, Integer.MAX_VALUE);
+
+        return doc.getRelatedTokensByCharPosition(fromRange, toRange)
+                .filter(tokenAct -> tokenAct.getRange() != null) // TODO filter range
                 .map(tokenAct -> tokenAct.getBindingSignal(SAME))
                 .map(bs ->
                         createLatentActivation(fromBS, bs, dir)

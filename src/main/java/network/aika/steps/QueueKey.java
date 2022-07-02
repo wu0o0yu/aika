@@ -16,10 +16,8 @@
  */
 package network.aika.steps;
 
-import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Timestamp;
 
-import java.sql.Time;
 import java.util.Comparator;
 
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
@@ -80,7 +78,7 @@ public interface QueueKey {
         if(k1.getFired() != NOT_SET || k2.getFired() != NOT_SET)
             return 0;
 
-        return Double.compare(k2.getSortValue(), k1.getSortValue());
+        return Integer.compare(k2.getSortValue(), k1.getSortValue());
     }
 
     String getStepName();
@@ -91,7 +89,7 @@ public interface QueueKey {
 
     Timestamp getCreated();
 
-    double getSortValue();
+    int getSortValue();
 
     Timestamp getCurrentTimestamp();
 }

@@ -34,7 +34,7 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
     protected Timestamp created;
     protected Timestamp fired;
 
-    protected int sortValue;
+    protected int sortValue = Integer.MAX_VALUE;
 
     private Timestamp currentTimestamp;
 
@@ -87,7 +87,7 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
         t.addStep(s);
     }
 
-    public double getSortValue() {
+    public int getSortValue() {
         return sortValue;
     }
 
