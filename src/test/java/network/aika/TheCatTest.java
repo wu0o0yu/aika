@@ -43,12 +43,46 @@ public class TheCatTest {
             case 0: {
                 coords.put(0, new double[]{-0.048, 0.008});
                 coords.put(1, new double[]{0.688, -0.004});
+                coords.put(2, new double[]{-0.052, 0.532});
+                coords.put(3, new double[]{0.314, 0.964});
+                coords.put(4, new double[]{-0.188, 0.954});
+                coords.put(5, new double[]{0.337, -0.011});
+                coords.put(6, new double[]{0.691, 0.544});
+                coords.put(7, new double[]{0.812, 0.927});
+                break;
+            }
+            case 1: {
+                coords.put(0, new double[]{-0.048, 0.008});
+                coords.put(1, new double[]{0.688, -0.004});
                 coords.put(2, new double[]{-0.035, 0.49});
                 coords.put(3, new double[]{0.314, 0.791});
-                coords.put(4, new double[]{-0.254, 0.756});
-                coords.put(5, new double[]{0.289, 0.003});
+                coords.put(4, new double[]{0.303, 0.007});
+                coords.put(5, new double[]{-0.19, 0.728});
                 coords.put(6, new double[]{0.687, 0.486});
                 coords.put(7, new double[]{0.949, 0.734});
+                break;
+            }
+            case 2: {
+                coords.put(0, new double[]{-0.048, 0.008});
+                coords.put(1, new double[]{0.688, -0.004});
+                coords.put(2, new double[]{0.323, -0.004});
+                coords.put(3, new double[]{-0.039, 0.538});
+                coords.put(4, new double[]{0.69, 0.514});
+                coords.put(5, new double[]{0.325, 0.771});
+                coords.put(6, new double[]{0.89, 0.736});
+                coords.put(7, new double[]{-0.252, 0.792});
+                break;
+            }
+            case 3: {
+                coords.put(0, new double[]{-0.048, 0.008});
+                coords.put(1, new double[]{0.688, -0.004});
+                coords.put(2, new double[]{0.69, 0.45});
+                coords.put(3, new double[]{0.314, 0.791});
+                coords.put(4, new double[]{0.327, 0.013});
+                coords.put(5, new double[]{0.921, 0.703});
+                coords.put(6, new double[]{-0.046, 0.448});
+                coords.put(7, new double[]{-0.295, 0.818});
+                break;
             }
         }
 
@@ -76,6 +110,70 @@ public class TheCatTest {
                 coords.put(15l, new double[]{2.766, 0.805});
                 coords.put(16l, new double[]{2.261, 1.627});
                 coords.put(17l, new double[]{1.028, 1.656});
+                break;
+            }
+            case 1: {
+                coords.put(1l, new double[]{0.223, 2.184});
+                coords.put(2l, new double[]{-0.155, 1.125});
+                coords.put(3l, new double[]{1.257, 2.85});
+                coords.put(4l, new double[]{0.457, 1.111});
+                coords.put(5l, new double[]{1.18, 2.231});
+                coords.put(6l, new double[]{-0.556, 2.189});
+                coords.put(7l, new double[]{0.213, 2.956});
+                coords.put(8l, new double[]{4.135, 1.43});
+                coords.put(9l, new double[]{1.878, -0.052});
+                coords.put(10l, new double[]{1.878, -0.052});
+                coords.put(11l, new double[]{3.542, -0.067});
+                coords.put(12l, new double[]{3.542, -0.067});
+                coords.put(13l, new double[]{2.639, -0.086});
+                coords.put(14l, new double[]{2.639, -0.086});
+                coords.put(15l, new double[]{1.872, 0.798});
+                coords.put(16l, new double[]{3.557, 0.838});
+                coords.put(17l, new double[]{2.777, 1.612});
+                coords.put(18l, new double[]{1.334, 1.422});
+                break;
+            }
+            case 2: {
+                coords.put(1l, new double[]{0.223, 2.184});
+                coords.put(2l, new double[]{-0.155, 1.125});
+                coords.put(3l, new double[]{1.257, 2.85});
+                coords.put(4l, new double[]{0.457, 1.111});
+                coords.put(5l, new double[]{1.18, 2.231});
+                coords.put(6l, new double[]{-0.556, 2.189});
+                coords.put(7l, new double[]{-0.042, 2.634});
+                coords.put(8l, new double[]{3.45, 1.704});
+                coords.put(9l, new double[]{1.611, -0.098});
+                coords.put(10l, new double[]{1.611, -0.098});
+                coords.put(11l, new double[]{2.891, -0.083});
+                coords.put(12l, new double[]{2.891, -0.083});
+                coords.put(13l, new double[]{2.235, -0.085});
+                coords.put(14l, new double[]{2.235, -0.085});
+                coords.put(15l, new double[]{1.594, 1.179});
+                coords.put(16l, new double[]{2.873, 1.127});
+                coords.put(17l, new double[]{2.321, 1.714});
+                coords.put(18l, new double[]{1.027, 1.694});
+                break;
+            }
+            case 3: {
+                coords.put(1l, new double[]{0.236, 2.207});
+                coords.put(2l, new double[]{-0.155, 1.125});
+                coords.put(3l, new double[]{1.257, 2.85});
+                coords.put(4l, new double[]{0.457, 1.111});
+                coords.put(5l, new double[]{1.18, 2.231});
+                coords.put(6l, new double[]{-0.556, 2.189});
+                coords.put(7l, new double[]{0.076, 2.68});
+                coords.put(8l, new double[]{3.81, 1.456});
+                coords.put(9l, new double[]{1.597, -0.01});
+                coords.put(10l, new double[]{1.597, -0.01});
+                coords.put(11l, new double[]{3.247, -0.015});
+                coords.put(12l, new double[]{3.247, -0.015});
+                coords.put(13l, new double[]{2.386, -0.037});
+                coords.put(14l, new double[]{2.386, -0.037});
+                coords.put(15l, new double[]{1.619, 1.093});
+                coords.put(16l, new double[]{3.251, 1.071});
+                coords.put(17l, new double[]{2.523, 1.657});
+                coords.put(18l, new double[]{1.315, 1.649});
+                break;
             }
         }
         return coords;

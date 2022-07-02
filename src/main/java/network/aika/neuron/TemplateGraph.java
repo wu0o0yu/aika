@@ -30,4 +30,6 @@ public interface TemplateGraph {
     void init(Model model);
 
     Collection<Neuron> getAllTemplateNeurons();
+
+    double[] getCoordinate(Neuron templateNeuron);
 }

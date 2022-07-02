@@ -66,8 +66,8 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
             latentRelAct.init(null, null);
         }
 
-        BindingSignal latentFromBS = addLatentBindingSignal(fromBS, fromTransition, latentRelAct);
-        addLatentBindingSignal(toBS, toTransition, latentRelAct);
+        BindingSignal latentFromBS = latentRelAct.addLatentBindingSignal(fromBS, fromTransition);
+        latentRelAct.addLatentBindingSignal(toBS, toTransition);
         return latentFromBS;
     }
 
@@ -79,16 +79,6 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
                         act.getBindingSignal(BSKey.createKey(toBS)) != null
                 ).findAny()
                 .orElse(null);
-    }
-
-    private BindingSignal addLatentBindingSignal(BindingSignal bs, SingleTransition t, BindingActivation latentRelAct) {
-        BindingSignal latentBS = new BindingSignal(bs, t);
-        latentBS.init(latentRelAct);
-        latentRelAct.addBindingSignal(latentBS);
-//        QueueField qf = (QueueField) latentBS.getOnArrived();
-//        qf.process();
-
-        return latentBS;
     }
 
     private SingleTransition getTransitionByDirection(boolean direction) {
