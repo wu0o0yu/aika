@@ -52,18 +52,22 @@ public class TokenPositionRelationNeuron extends LatentRelationNeuron {
     }
 
     public TokenPositionRelationNeuron lookupRelation(int rangeBegin, int rangeEnd) {
-        return getModel().lookupNeuron("TP-Rel.: " + rangeBegin + "," + rangeEnd, l -> {
-            TokenPositionRelationNeuron n = instantiateTemplate(true);
-            n.setLabel(l);
+        return getModel().lookupNeuron("TP-Rel.: " + rangeBegin + "," + rangeEnd, l ->
+                instantiateTemplate(true)
+                        .initTokenPositionRelationNeuron(rangeBegin, rangeEnd, l)
+        );
+    }
 
-            n.setRangeBegin(rangeBegin);
-            n.setRangeEnd(rangeEnd);
+    private TokenPositionRelationNeuron initTokenPositionRelationNeuron(int rangeBegin, int rangeEnd, String l) {
+        setLabel(l);
 
-            n.getBias().receiveUpdate(-4.0);
-            n.setAllowTraining(false);
-            n.updateSumOfLowerWeights();
-            return n;
-        });
+        setRangeBegin(rangeBegin);
+        setRangeEnd(rangeEnd);
+
+        getBias().receiveUpdate(-4.0);
+        setAllowTraining(false);
+        updateSumOfLowerWeights();
+        return this;
     }
 
     @Override
@@ -86,7 +90,7 @@ public class TokenPositionRelationNeuron extends LatentRelationNeuron {
         return doc.getRelatedTokensByTokenPosition(fromTokenAct, getRelFrom(dir), getRelTo(dir))
                 .map(tokenAct -> tokenAct.getBindingSignal(SAME))
                 .map(bs ->
-                        createLatentActivation(fromBS, bs, dir)
+                        createOrLookupLatentActivation(fromBS, bs, dir)
                 );
     }
 

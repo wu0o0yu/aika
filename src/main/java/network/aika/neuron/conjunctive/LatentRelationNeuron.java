@@ -19,11 +19,11 @@ package network.aika.neuron.conjunctive;
 import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.LatentRelationActivation;
 import network.aika.neuron.bindingsignal.BSKey;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.SingleTransition;
+import network.aika.neuron.bindingsignal.State;
 
 
 import java.util.stream.Stream;
@@ -56,27 +56,30 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
                 Stream.concat(toBSs, getRelatedBindingSignalsInternal(fromBS));
     }
 
-    protected BindingSignal createLatentActivation(BindingSignal fromBS, BindingSignal toBS, boolean direction) {
+    protected BindingSignal createOrLookupLatentActivation(BindingSignal fromBS, BindingSignal toBS, boolean direction) {
         SingleTransition fromTransition = getTransitionByDirection(direction);
+        State fromState = fromTransition.next(Direction.OUTPUT);
         SingleTransition toTransition = getTransitionByDirection(!direction);
+        State toState = toTransition.next(Direction.OUTPUT);
 
-        LatentRelationActivation latentRelAct = lookupLatentRelAct(fromBS, toBS);
-        if(latentRelAct == null) {
-            latentRelAct = createActivation(fromBS.getThought());
-            latentRelAct.init(null, null);
-        }
+        LatentRelationActivation latentRelAct = lookupLatentRelAct(fromBS, fromState, toBS, toState);
+        if(latentRelAct != null)
+            return latentRelAct.getBindingSignal(fromState);
+
+        latentRelAct = createActivation(fromBS.getThought());
+        latentRelAct.init(null, null);
 
         BindingSignal latentFromBS = latentRelAct.addLatentBindingSignal(fromBS, fromTransition);
         latentRelAct.addLatentBindingSignal(toBS, toTransition);
         return latentFromBS;
     }
 
-    private LatentRelationActivation lookupLatentRelAct(BindingSignal<?> fromBS, BindingSignal<?> toBS) {
+    private LatentRelationActivation lookupLatentRelAct(BindingSignal<?> fromBS, State fromState, BindingSignal<?> toBS, State toState) {
         Activation<?> originAct = fromBS.getOriginActivation();
         return (LatentRelationActivation) originAct.getReverseBindingSignals(this)
                 .map(bs -> bs.getActivation())
                 .filter(act ->
-                        act.getBindingSignal(BSKey.createKey(toBS)) != null
+                        act.getBindingSignal(BSKey.createKey(toBS.getOriginActivation(), toState)) != null
                 ).findAny()
                 .orElse(null);
     }

@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.conjunctive.text;
 
-import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
@@ -36,7 +35,6 @@ public class CharPositionRelationNeuron extends LatentRelationNeuron {
     private int rangeBegin = -1;
     private int rangeEnd = -1;
 
-
     public int getRangeBegin() {
         return rangeBegin;
     }
@@ -54,18 +52,22 @@ public class CharPositionRelationNeuron extends LatentRelationNeuron {
     }
 
     public CharPositionRelationNeuron lookupRelation(int rangeBegin, int rangeEnd) {
-        return getModel().lookupNeuron("CP-Rel.: " + rangeBegin + "," + rangeEnd, l -> {
-            CharPositionRelationNeuron n = instantiateTemplate(true);
-            n.setLabel(l);
+        return getModel().lookupNeuron("CP-Rel.: " + rangeBegin + "," + rangeEnd, l ->
+                instantiateTemplate(true)
+                        .initCharPositionRelationNeuron(rangeBegin, rangeEnd, l)
+        );
+    }
 
-            n.setRangeBegin(rangeBegin);
-            n.setRangeEnd(rangeEnd);
+    private CharPositionRelationNeuron initCharPositionRelationNeuron(int rangeBegin, int rangeEnd, String l) {
+        setLabel(l);
 
-            n.getBias().receiveUpdate(-4.0);
-            n.setAllowTraining(false);
-            n.updateSumOfLowerWeights();
-            return n;
-        });
+        setRangeBegin(rangeBegin);
+        setRangeEnd(rangeEnd);
+
+        getBias().receiveUpdate(-4.0);
+        setAllowTraining(false);
+        updateSumOfLowerWeights();
+        return this;
     }
 
     @Override
@@ -93,7 +95,7 @@ public class CharPositionRelationNeuron extends LatentRelationNeuron {
                 .filter(tokenAct -> tokenAct.getRange() != null) // TODO filter range
                 .map(tokenAct -> tokenAct.getBindingSignal(SAME))
                 .map(bs ->
-                        createLatentActivation(fromBS, bs, dir)
+                        createOrLookupLatentActivation(fromBS, bs, dir)
                 );
     }
 }
