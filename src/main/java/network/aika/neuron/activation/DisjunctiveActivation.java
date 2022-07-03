@@ -17,15 +17,12 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.disjunctive.DisjunctiveNeuron;
 
-import java.util.List;
 import java.util.stream.Stream;
-
-import static network.aika.direction.Direction.OUTPUT;
 
 /**
  *
@@ -38,7 +35,7 @@ public abstract class DisjunctiveActivation<N extends DisjunctiveNeuron> extends
     }
 
     @Override
-    public Stream<BindingSignal> getReverseBindingSignals(Neuron toNeuron) {
+    public Stream<BindingSignal> getReverseBindingSignals(Neuron toNeuron, State s) {
         throw new UnsupportedOperationException();
     }
 }

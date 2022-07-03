@@ -18,7 +18,6 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.Thought;
 import network.aika.direction.Direction;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.LatentRelationActivation;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.bindingsignal.BSKey;
@@ -77,8 +76,8 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
         return latentFromBS;
     }
 
-    private LatentRelationActivation lookupLatentRelAct(PatternActivation fromOriginAct, State fromState, BindingSignal<?> toBS, State toState) {
-        return (LatentRelationActivation) fromOriginAct.getReverseBindingSignals(this)
+    private LatentRelationActivation lookupLatentRelAct(PatternActivation fromOriginAct, State fromState, BindingSignal toBS, State toState) {
+        return (LatentRelationActivation) fromOriginAct.getReverseBindingSignals(this, fromState)
                 .map(bs -> bs.getActivation())
                 .filter(act ->
                         act.getBindingSignal(BSKey.createKey(toBS.getOriginActivation(), toState)) != null

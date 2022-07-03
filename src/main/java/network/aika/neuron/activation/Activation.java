@@ -395,6 +395,12 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return r.getAbsoluteRange(thought.getRange());
     }
 
+    public void initNeuronLabel(BindingSignal bs) {
+        getNeuron().setLabel(
+                getConfig().getLabel(bs)
+        );
+    }
+
     public Stream<BindingSignal> getBindingSignals() {
         return getPatternBindingSignals().values().stream();
     }
@@ -422,18 +428,19 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return bindingSignals;
     }
 
-    public void registerReverseBindingSignal(Activation targetAct, BindingSignal bindingSignal) {
+    public void registerReverseBindingSignal(BindingSignal bindingSignal) {
         reverseBindingSignals.put(BSKey.createReverseKey(bindingSignal), bindingSignal);
     }
 
-    public Stream<BindingSignal> getReverseBindingSignals(Neuron toNeuron) {
+    public Stream<BindingSignal> getReverseBindingSignals(Neuron toNeuron, State s) {
         if(toNeuron.isTemplate()) {
             return reverseBindingSignals.values().stream()
-                    .filter(bs -> bs.getActivation().getNeuron().templateNeuronMatches(toNeuron));
+                    .filter(bs -> bs.getActivation().getNeuron().templateNeuronMatches(toNeuron))
+                    .filter(bs -> bs.getState() == s);
         } else {
             return reverseBindingSignals.subMap(
-                    new BSKey(toNeuron, 0, 0),
-                    new BSKey(toNeuron, Integer.MAX_VALUE, Integer.MAX_VALUE)
+                    new BSKey(toNeuron, s.ordinal(), 0),
+                    new BSKey(toNeuron, s.ordinal(), Integer.MAX_VALUE)
             ).values().stream();
         }
     }

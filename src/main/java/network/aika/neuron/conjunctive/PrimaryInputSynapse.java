@@ -78,8 +78,8 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
     }
 
     @Override
-    public boolean propagateCheck(BindingSignal<IA> inputBS) {
-        return !isTemplate() || checkCandidateSynapse(inputBS.getActivation());
+    public boolean propagateCheck(BindingSignal inputBS) {
+        return !isTemplate() || checkCandidateSynapse((IA) inputBS.getActivation());
     }
 
     @Override

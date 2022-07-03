@@ -17,7 +17,6 @@
 package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
-import network.aika.fields.FieldOutput;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import org.slf4j.Logger;
@@ -28,8 +27,7 @@ import java.util.stream.Stream;
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.isTrue;
-import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
-import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
+import static network.aika.neuron.bindingsignal.TransitionMode.*;
 
 /**
  * @author Lukas Molzberger
@@ -64,7 +62,7 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
     }
 
     public void link(Synapse ts, BindingSignal fromBS, Direction dir) {
-        Stream<BindingSignal<?>> bsStream = ts.getRelatedBindingSignals(fromBS.getOriginActivation(), this, dir);
+        Stream<BindingSignal> bsStream = ts.getRelatedBindingSignals(fromBS.getOriginActivation(), this, dir);
 
         bsStream
                 .filter(toBS -> fromBS != toBS)
@@ -73,7 +71,7 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
                 );
     }
 
-    public static void propagate(SingleTransition t, Synapse ts, BindingSignal<?> fromBS, Direction dir) {
+    public static void propagate(SingleTransition t, Synapse ts, BindingSignal fromBS, Direction dir) {
         if (dir != OUTPUT)
             return;
 
@@ -83,7 +81,7 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
         ts.propagate(fromBS, null);
     }
 
-    public static void latentLinking(SingleTransition t, Synapse synA, BindingSignal<?> fromBS, Direction dir) {
+    public static void latentLinking(SingleTransition t, Synapse synA, BindingSignal fromBS, Direction dir) {
         if(dir != OUTPUT)
             return;
 
@@ -101,48 +99,52 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
     }
 
     private static void latentLinking(SingleTransition tA, BindingSignal bsA, Synapse synA, Synapse synB) {
-        log.info("Check latent-link synA:" + synA + "  synB:" + synB);
-
-        Stream<SingleTransition> relTrans = synB.getRelatedTransitions(tA); // bsB,
+        Stream<SingleTransition> relTrans = synB.getRelatedTransitions(tA);
         relTrans.forEach(tB -> {
-            Stream<BindingSignal> bsStream = synB.getInput().getRelatedBindingSignals(bsA.getOriginActivation(), INPUT.getTerminal(tB).getState());
+            Stream<BindingSignal> bsStream = synB.getInput().getRelatedBindingSignals(
+                    bsA.getOriginActivation(),
+                    INPUT.getTerminal(tB).getState()
+            );
             bsStream.filter(bsB -> bsA != bsB)
                     .filter(bsB ->
                             isTrue(bsB.getOnArrivedFired())
                     )
                     .forEach(bsB -> {
-                        latentLinking(synA, bsA, tA, synB, bsB, tB);
-                        latentLinking(synB, bsB, tB, synA, bsA, tA);
+                        latentLinking(synA, bsA, tA, bsB, tB);
+                        latentLinking(synB, bsB, tB, bsA, tA);
                     });
         });
     }
 
     private static void latentLinking(
             Synapse targetSyn,
-            BindingSignal<?> fromBS,
+            BindingSignal fromBS,
             SingleTransition matchingTransition,
-            Synapse latentSyn,
-            BindingSignal<?> relBS,
+            BindingSignal relBS,
             SingleTransition propagateTransition
     ) {
         if(!targetSyn.isLatentLinking())
             return;
 
-        if (!propagateTransition.getInput().linkCheck(latentSyn, relBS))
+        if(!propagateTransition.isPropagate())
             return;
 
-        BindingSignal toBS = propagateTransition.propagate(relBS);
-        if (toBS == null)
+        if(!matchingTransition.isMatching())
             return;
 
-        if (!matchingTransition.match(targetSyn, fromBS, toBS, OUTPUT))
+        BindingSignal toBS = relBS.next(propagateTransition);
+
+        if (!targetSyn.checkLinkingEvent(relBS.getActivation(), INPUT))
             return;
 
         targetSyn.propagate(fromBS, toBS);
     }
 
     public static void link(SingleTransition t, Synapse ts, BindingSignal fromBS, BindingSignal toBS, Direction dir) {
-        if(!t.match(ts, fromBS, toBS, dir))
+        if(!t.isMatching())
+            return;
+
+        if(!ts.checkLinkingEvent(toBS.getActivation(), dir))
             return;
 
         BindingSignal inputBS = dir.getInput(fromBS, toBS);
@@ -177,28 +179,12 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
         return mode;
     }
 
-    public BindingSignal propagate(BindingSignal bs) {
-        if(mode == MATCH_ONLY)
-            return null;
-
-        return bs.next(this);
+    public boolean isPropagate() {
+        return mode == PROPAGATE_ONLY || mode == MATCH_AND_PROPAGATE;
     }
 
-    public boolean match(Synapse ts, BindingSignal fromBS, BindingSignal toBS, Direction dir) {
-        if(mode == PROPAGATE_ONLY)
-            return false;
-
-        FieldOutput linkingEvent = ts.getLinkingEvent(toBS.getActivation(), dir.invert());
-        if (linkingEvent != null && !isTrue(linkingEvent))
-            return false;
-
-        if(!dir.getFromTerminal(this).linkCheck(ts, fromBS))
-            return false;
-
-        if(!dir.getTerminal(this).linkCheck(ts, toBS))
-            return false;
-
-        return true;
+    public boolean isMatching() {
+        return mode == MATCH_ONLY || mode == MATCH_AND_PROPAGATE;
     }
 
     public String toString() {

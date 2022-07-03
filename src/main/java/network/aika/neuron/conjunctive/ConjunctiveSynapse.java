@@ -52,7 +52,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     @Override
-    public boolean propagateCheck(BindingSignal<IA> inputBS) {
+    public boolean propagateCheck(BindingSignal inputBS) {
         return getWeight().getCurrentValue() + sumOfLowerWeights > 0.0;
     }
 

@@ -41,6 +41,7 @@ import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.fields.Fields.isTrue;
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
 
@@ -78,15 +79,20 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return false;
     }
 
-    public Stream<BindingSignal<?>> getRelatedBindingSignals(PatternActivation fromOriginAct, SingleTransition t, Direction dir) {
+    public Stream<BindingSignal> getRelatedBindingSignals(PatternActivation fromOriginAct, SingleTransition t, Direction dir) {
         return dir.getNeuron(this)
                 .getRelatedBindingSignals(fromOriginAct, dir.getTerminal(t).getState());
     }
 
     public abstract double getSumOfLowerWeights();
 
-    public boolean propagateCheck(BindingSignal<IA> inputBS) {
+    public boolean propagateCheck(BindingSignal inputBS) {
         return true;
+    }
+
+    public boolean checkLinkingEvent(Activation act, Direction dir) {
+        FieldOutput linkingEvent = getLinkingEvent(act, dir.invert());
+        return linkingEvent == null || isTrue(linkingEvent);
     }
 
     public boolean linkCheck(BindingSignal inputBS, BindingSignal outputBS) {
@@ -99,14 +105,14 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return inputBS.getOrigin() == outputBS.getOrigin();
     }
 
-    public L propagate(BindingSignal<IA> inputBS, BindingSignal<OA> outputBS) {
+    public L propagate(BindingSignal inputBS, BindingSignal outputBS) {
         if(outputBS != null && !linkCheck(inputBS, outputBS))
             return null;
 
         if(!propagateCheck(inputBS))
             return null;
 
-        IA iAct = inputBS.getActivation();
+        IA iAct = (IA) inputBS.getActivation();
 
         if(propagateLinkExists(iAct))
             return null;
@@ -117,12 +123,12 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return createLink(iAct, oAct);
     }
 
-    public L link(BindingSignal<IA> inputBS, BindingSignal<OA> outputBS) {
+    public L link(BindingSignal inputBS, BindingSignal outputBS) {
         if(!linkCheck(inputBS, outputBS))
             return null;
 
-        IA iAct = inputBS.getActivation();
-        OA oAct = outputBS.getActivation();
+        IA iAct = (IA) inputBS.getActivation();
+        OA oAct = (OA) outputBS.getActivation();
 
         if(linkExists(iAct, oAct))
             return null;
@@ -146,11 +152,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return getWeight().getCurrentValue() + getSumOfLowerWeights() > 0.0;
     }
 
-    public Stream<SingleTransition> getRelatedTransitions(SingleTransition fromTransition) { // BindingSignal fromBS,
+    public Stream<SingleTransition> getRelatedTransitions(SingleTransition fromTransition) {
         return getTransitions()
                 .flatMap(toTransition -> toTransition.getOutputTerminals())
                 .filter(toTerminal -> toTerminal.getState() == fromTransition.getOutput().getState())
-  //              .filter(toTerminal -> toTerminal.getTransition().getInput().linkCheck(this, fromBS))
                 .map(toTerminal -> toTerminal.getTransition());
     }
 

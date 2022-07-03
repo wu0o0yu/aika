@@ -35,10 +35,10 @@ import static network.aika.neuron.bindingsignal.BSKey.createKey;
 /**
  * @author Lukas Molzberger
  */
-public class BindingSignal<A extends Activation> implements Element {
+public class BindingSignal implements Element {
 
     private BindingSignal parent;
-    private A activation;
+    private Activation activation;
     private Link link;
     private SingleTransition transition;
     private BindingSignal origin;
@@ -48,7 +48,7 @@ public class BindingSignal<A extends Activation> implements Element {
     private Field onArrived;
     private FieldOutput onArrivedFired;
 
-    public BindingSignal(A act, State state) {
+    public BindingSignal(PatternActivation act, State state) {
         this.origin = this;
         this.depth = 0;
         this.state = state;
@@ -69,7 +69,7 @@ public class BindingSignal<A extends Activation> implements Element {
         this.state = t.next(Direction.OUTPUT);
     }
 
-    public void init(A act) {
+    public void init(Activation act) {
         this.activation = act;
         onArrived = new QueueField(this, "arrived", 0.0);
         onArrived.addEventListener(() ->
@@ -120,9 +120,7 @@ public class BindingSignal<A extends Activation> implements Element {
 
             if(state == State.INPUT && activation.getLabel() == null) {
                 onArrived.addEventListener(() ->
-                        activation.getNeuron().setLabel(
-                                activation.getConfig().getLabel(this)
-                        )
+                        activation.initNeuronLabel(this)
                 );
             }
         }
@@ -154,7 +152,7 @@ public class BindingSignal<A extends Activation> implements Element {
         return origin;
     }
 
-    public A getActivation() {
+    public Activation getActivation() {
         return activation;
     }
 
@@ -188,7 +186,7 @@ public class BindingSignal<A extends Activation> implements Element {
 
     public void link() {
         getActivation().registerBindingSignal(this);
-        getOriginActivation().registerReverseBindingSignal(getActivation(), this);
+        getOriginActivation().registerReverseBindingSignal(this);
     }
 
     public boolean shorterBSExists() {

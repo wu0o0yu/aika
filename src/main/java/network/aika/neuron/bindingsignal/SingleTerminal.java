@@ -57,19 +57,14 @@ public abstract class SingleTerminal implements Terminal {
 
     public abstract BindingSignal getBindingSignal(FieldOutput bsEvent);
 
-    public boolean linkCheck(Synapse ts, BindingSignal fromBS) {
-        return getState() == fromBS.getState();
-    }
-
     @Override
     public Stream<BindingSignal> propagate(BindingSignal bs) {
-        if(bs.getState() != getState())
+        if(bs.getState() != state)
             return Stream.empty();
 
-        BindingSignal toBS = transition.propagate(bs);
-        if(toBS == null)
+        if(!transition.isPropagate())
             return Stream.empty();
 
-        return Stream.of(toBS);
+        return Stream.of(bs.next(transition));
     }
 }

@@ -108,7 +108,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public Stream<BindingSignal> getRelatedBindingSignals(PatternActivation fromOriginAct, State state) {
         Stream<BindingSignal> relatedBSs = fromOriginAct
-                .getReverseBindingSignals(this);
+                .getReverseBindingSignals(this, state);
         return relatedBSs
                 .collect(Collectors.toList())
                 .stream();

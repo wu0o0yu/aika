@@ -82,14 +82,6 @@ public class FixedTerminal extends SingleTerminal {
         return ((Activation)bsEvent.getReference()).getFixedBindingSignal(state);
     }
 
-    public boolean linkCheck(Synapse ts, BindingSignal fromBS) {
-        BindingSignal existingBS = getBindingSignal(fromBS.getActivation());
-        if(existingBS != null && existingBS.getOriginActivation() != fromBS.getOriginActivation())
-            return false;
-
-        return super.linkCheck(ts, fromBS);
-    }
-
     public String toString() {
         return "fixed(" + type + ":" + state + ")";
     }

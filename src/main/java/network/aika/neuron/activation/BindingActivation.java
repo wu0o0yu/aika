@@ -135,7 +135,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 .getRange();
     }
 
-    private BindingSignal<?> getPrimaryPatternBindingSignal() {
+    private BindingSignal getPrimaryPatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
                 .filter(bs -> NOT_SET_AFTER.compare(bs.getOriginActivation().getFired(), fired) < 0)
                 .filter(bs -> bs.getState() == SAME || bs.getState() == INPUT || bs.getState() == RELATED_SAME)

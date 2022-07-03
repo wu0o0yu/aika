@@ -88,7 +88,7 @@ public class BiTransition implements Transition {
         if(fromBS == null)
             return;
 
-        Stream<BindingSignal<?>> bsStream = ts.getRelatedBindingSignals(fromBS.getOriginActivation(), t, dir);
+        Stream<BindingSignal> bsStream = ts.getRelatedBindingSignals(fromBS.getOriginActivation(), t, dir);
 
         bsStream
                 .filter(toBS -> fromBS != toBS)
@@ -111,7 +111,8 @@ public class BiTransition implements Transition {
     }
 
     private static boolean checkRelated(SingleTransition relTransition, BindingSignal relFromBS, Activation toAct, Direction dir) {
-        BindingSignal relToBS = toAct.getBindingSignal(dir.getTerminal(relTransition).getState());
+        State relToState = dir.getTerminal(relTransition).getState();
+        BindingSignal relToBS = toAct.getBindingSignal(relToState);
 
         if(relToBS == null)
             return dir == OUTPUT ;

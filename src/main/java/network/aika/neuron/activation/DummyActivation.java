@@ -16,11 +16,11 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
 
 import java.util.stream.Stream;
 
@@ -55,7 +55,7 @@ public class DummyActivation extends Activation {
     }
 
     @Override
-    public Stream<? extends BindingSignal<?>> getReverseBindingSignals(Neuron toNeuron) {
+    public Stream<? extends BindingSignal> getReverseBindingSignals(Neuron toNeuron, State s) {
         throw new NoSuchMethodError();
     }
 

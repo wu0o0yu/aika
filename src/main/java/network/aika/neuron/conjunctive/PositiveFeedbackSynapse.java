@@ -70,7 +70,7 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     }
 
     @Override
-    public boolean propagateCheck(BindingSignal<IA> inputBS) {
+    public boolean propagateCheck(BindingSignal inputBS) {
         return false;
     }
 

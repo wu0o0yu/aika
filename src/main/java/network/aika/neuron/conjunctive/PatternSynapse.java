@@ -63,7 +63,7 @@ public class PatternSynapse extends ConjunctiveSynapse<
     }
 
     @Override
-    public boolean propagateCheck(BindingSignal<BindingActivation> inputBS) {
+    public boolean propagateCheck(BindingSignal inputBS) {
         return true;
     }
 
