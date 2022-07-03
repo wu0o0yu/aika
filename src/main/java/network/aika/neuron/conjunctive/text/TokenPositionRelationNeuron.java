@@ -94,10 +94,10 @@ public class TokenPositionRelationNeuron extends LatentRelationNeuron {
     }
 
     private int getRelFrom(State s) {
-        return (s == SAME ? 1 : -1) * rangeBegin;
+        return s == SAME ? rangeBegin : -rangeEnd;
     }
 
     private int getRelTo(State s) {
-        return (s == SAME ? 1 : -1) * rangeEnd;
+        return s == SAME ? rangeEnd : -rangeBegin;
     }
 }
