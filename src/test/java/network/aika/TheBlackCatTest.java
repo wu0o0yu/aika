@@ -102,7 +102,7 @@ public class TheBlackCatTest {
 
         InhibitoryNeuron inhibNCat = initInhibitoryLoop(t, "cat");
         initPatternTheCat(t, inhibNCat, 0);
-        initPatternBlackCat(t);
+ //       initPatternBlackCat(t);
 
         Document doc = new Document(m, "the black cat");
         debugger.setDocument(doc);

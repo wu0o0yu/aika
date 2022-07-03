@@ -57,8 +57,11 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
 
     public void linkAndPropagate(Synapse ts, BindingSignal fromBS, Direction dir) {
         link(ts, fromBS, dir);
-        latentLinking(this, ts, fromBS, dir);
-        propagate(this, ts, fromBS, dir);
+        if (dir != OUTPUT)
+            return;
+
+        latentLinking(this, ts, fromBS);
+        propagate(this, ts, fromBS);
     }
 
     public void link(Synapse ts, BindingSignal fromBS, Direction dir) {
@@ -71,21 +74,15 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
                 );
     }
 
-    public static void propagate(SingleTransition t, Synapse ts, BindingSignal fromBS, Direction dir) {
-        if (dir != OUTPUT)
-            return;
-
+    public static void propagate(SingleTransition t, Synapse ts, BindingSignal fromBS) {
         if(!ts.isPropagate())
             return;
 
         ts.propagate(fromBS, null);
     }
 
-    public static void latentLinking(SingleTransition t, Synapse synA, BindingSignal fromBS, Direction dir) {
-        if(dir != OUTPUT)
-            return;
-
-        Neuron<?, ?> toNeuron = dir.getNeuron(synA);
+    public static void latentLinking(SingleTransition t, Synapse synA, BindingSignal fromBS) {
+        Neuron<?, ?> toNeuron = synA.getOutput();
 
         boolean templateEnabled = fromBS.getConfig().isTemplatesEnabled();
         toNeuron.getTargetSynapses(INPUT, templateEnabled)
@@ -101,10 +98,7 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
     private static void latentLinking(SingleTransition tA, BindingSignal bsA, Synapse synA, Synapse synB) {
         Stream<SingleTransition> relTrans = synB.getRelatedTransitions(tA);
         relTrans.forEach(tB -> {
-            Stream<BindingSignal> bsStream = synB.getInput().getRelatedBindingSignals(
-                    bsA.getOriginActivation(),
-                    INPUT.getTerminal(tB).getState()
-            );
+            Stream<BindingSignal> bsStream = synB.getRelatedBindingSignals(bsA.getOriginActivation(), tB, INPUT);
             bsStream.filter(bsB -> bsA != bsB)
                     .filter(bsB ->
                             isTrue(bsB.getOnArrivedFired())

@@ -77,11 +77,14 @@ public class BiTransition implements Transition {
         biLink(activeTransition, ts, activeBS, passiveBS, dir);
         biLink(passiveTransition, ts, passiveBS, activeBS, dir);
 
-        latentLinking(activeTransition, ts, activeBS, dir);
-        latentLinking(passiveTransition, ts, passiveBS, dir);
+        if (dir != OUTPUT)
+            return;
 
-        propagate(activeTransition, ts, activeBS, dir);
-        propagate(passiveTransition, ts, passiveBS, dir);
+        latentLinking(activeTransition, ts, activeBS);
+        latentLinking(passiveTransition, ts, passiveBS);
+
+        propagate(activeTransition, ts, activeBS);
+        propagate(passiveTransition, ts, passiveBS);
     }
 
     private void biLink(SingleTransition t, Synapse ts, BindingSignal fromBS, BindingSignal relatedFromBindingSignal, Direction dir) {

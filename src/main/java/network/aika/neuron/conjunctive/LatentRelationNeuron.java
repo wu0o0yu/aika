@@ -28,6 +28,7 @@ import network.aika.neuron.bindingsignal.State;
 
 import java.util.stream.Stream;
 
+import static network.aika.neuron.bindingsignal.SingleTransition.latentLinking;
 import static network.aika.neuron.bindingsignal.State.INPUT;
 import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.neuron.conjunctive.PrimaryInputSynapse.SAME_INPUT_TRANSITION;
@@ -63,6 +64,9 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
         State fromState = fromTransition.next(Direction.OUTPUT);
         SingleTransition toTransition = getTransitionByDirection(s != SAME);
         State toState = toTransition.next(Direction.OUTPUT);
+
+        // TODO: check opposite site of the relation
+ //       latentLinking(SingleTransition t, Synapse synA, BindingSignal fromBS);
 
         LatentRelationActivation latentRelAct = lookupLatentRelAct(fromOriginAct, fromState, toBS, toState);
         if(latentRelAct != null)
