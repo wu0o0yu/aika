@@ -83,14 +83,11 @@ public class TokenPositionRelationNeuron extends LatentRelationNeuron {
     }
 
     @Override
-    protected Stream<BindingSignal> getRelatedBindingSignalsInternal(PatternActivation fromOriginAct, State state) {
+    protected Stream<BindingSignal> evaluateLatentRelation(PatternActivation fromOriginAct, State state) {
         Document doc = (Document) fromOriginAct.getThought();
 
         return doc.getRelatedTokensByTokenPosition((TokenActivation) fromOriginAct, getRelFrom(state), getRelTo(state))
-                .map(tokenAct -> tokenAct.getBindingSignal(SAME))
-                .map(bs ->
-                        createOrLookupLatentActivation(fromOriginAct, bs, state)
-                );
+                .map(tokenAct -> tokenAct.getBindingSignal(SAME));
     }
 
     private int getRelFrom(State s) {

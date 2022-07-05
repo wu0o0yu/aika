@@ -28,8 +28,6 @@ import network.aika.neuron.bindingsignal.State;
 
 import java.util.stream.Stream;
 
-import static network.aika.neuron.bindingsignal.SingleTransition.latentLinking;
-import static network.aika.neuron.bindingsignal.State.INPUT;
 import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.neuron.conjunctive.PrimaryInputSynapse.SAME_INPUT_TRANSITION;
 import static network.aika.neuron.conjunctive.ReversePatternSynapse.SAME_SAME_TRANSITION;
@@ -40,23 +38,11 @@ import static network.aika.neuron.conjunctive.ReversePatternSynapse.SAME_SAME_TR
  */
 public abstract class LatentRelationNeuron extends BindingNeuron {
 
-    protected abstract Stream<BindingSignal> getRelatedBindingSignalsInternal(PatternActivation fromOriginAct, State state);
+    protected abstract Stream<BindingSignal> evaluateLatentRelation(PatternActivation fromOriginAct, State state);
 
     @Override
     public LatentRelationActivation createActivation(Thought t) {
         return new LatentRelationActivation(t.createActivationId(), t, this);
-    }
-
-    @Override
-    public Stream<BindingSignal> getRelatedBindingSignals(PatternActivation fromOriginAct, State state) {
-        if(isTemplate())
-            return Stream.empty();
-
-        Stream<BindingSignal> toBSs = super.getRelatedBindingSignals(fromOriginAct, state);
-
-        return state == SAME || state == INPUT ?
-                Stream.concat(toBSs, getRelatedBindingSignalsInternal(fromOriginAct, state)) :
-                toBSs;
     }
 
     protected BindingSignal createOrLookupLatentActivation(PatternActivation fromOriginAct, BindingSignal toBS, State s) {
@@ -64,9 +50,6 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
         State fromState = fromTransition.next(Direction.OUTPUT);
         SingleTransition toTransition = getTransitionByDirection(s != SAME);
         State toState = toTransition.next(Direction.OUTPUT);
-
-        // TODO: check opposite site of the relation
- //       latentLinking(SingleTransition t, Synapse synA, BindingSignal fromBS);
 
         LatentRelationActivation latentRelAct = lookupLatentRelAct(fromOriginAct, fromState, toBS, toState);
         if(latentRelAct != null)

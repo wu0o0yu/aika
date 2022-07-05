@@ -82,7 +82,7 @@ public class CharPositionRelationNeuron extends LatentRelationNeuron {
     }
 
     @Override
-    protected Stream<BindingSignal> getRelatedBindingSignalsInternal(PatternActivation fromOriginAct, State s) {
+    protected Stream<BindingSignal> evaluateLatentRelation(PatternActivation fromOriginAct, State s) {
         Document doc = (Document) fromOriginAct.getThought();
 
         Range r = fromOriginAct.getRange();

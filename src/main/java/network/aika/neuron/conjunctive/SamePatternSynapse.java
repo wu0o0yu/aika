@@ -18,7 +18,11 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.SamePatternLink;
+import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.SingleTransition;
+import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
@@ -45,18 +49,22 @@ public class SamePatternSynapse extends BindingNeuronSynapse<
         >
 {
 
+    private static SingleTransition INPUT_TRANSITION = transition(
+            fixed(INPUT),
+            variable(RELATED_INPUT),
+            MATCH_AND_PROPAGATE
+    );
+
+    private static SingleTransition SAME_TRANSITION = transition(
+            fixed(SAME),
+            fixed(SAME),
+            MATCH_AND_PROPAGATE
+    );
+
     private static List<Transition> TRANSITIONS = List.of(
             biTransition(
-                    transition(
-                            fixed(INPUT),
-                            variable(RELATED_INPUT),
-                            MATCH_AND_PROPAGATE
-                    ),
-                    transition(
-                            fixed(SAME),
-                            fixed(SAME),
-                            MATCH_AND_PROPAGATE
-                    )
+                    INPUT_TRANSITION,
+                    SAME_TRANSITION
             ),
             transition(
                     variable(RELATED_INPUT),
@@ -64,6 +72,27 @@ public class SamePatternSynapse extends BindingNeuronSynapse<
                     PROPAGATE_ONLY
             )
     );
+
+    private Stream<LatentRelationNeuron> findLatentRelationNeurons() {
+        return getOutput().getInputSynapses()
+                .filter(s -> s instanceof RelatedInputSynapse)
+                .map(s -> s.getInput())
+                .filter(n -> n instanceof LatentRelationNeuron)
+                .map(n -> (LatentRelationNeuron)n);
+    }
+
+    public Stream<BindingSignal> getRelatedBindingSignals(PatternActivation fromOriginAct, SingleTransition t, Direction dir) {
+        Stream<BindingSignal> relBS = super.getRelatedBindingSignals(fromOriginAct, t, dir);
+        if(t == SAME_TRANSITION)
+            return relBS;
+
+        State fromState = dir.getTerminal(t).getState();
+        Stream<BindingSignal> latentRelBS = findLatentRelationNeurons()
+                .flatMap(n -> n.evaluateLatentRelation(fromOriginAct, fromState));
+
+        return Stream.concat(relBS, latentRelBS);
+    }
+
 
     @Override
     public SamePatternLink createLink(BindingActivation input, BindingActivation output) {
