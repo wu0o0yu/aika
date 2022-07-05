@@ -106,8 +106,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public L propagate(BindingSignal inputBS, BindingSignal outputBS) {
-        if(outputBS != null && !linkCheck(inputBS, outputBS))
-            return null;
+//        if(outputBS != null && !linkCheck(inputBS, outputBS))
+//            return null;
 
         if(!propagateCheck(inputBS))
             return null;

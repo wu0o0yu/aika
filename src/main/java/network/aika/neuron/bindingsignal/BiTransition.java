@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.mul;
+import static network.aika.neuron.bindingsignal.LatentLinking.latentLinking;
 import static network.aika.neuron.bindingsignal.SingleTransition.*;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
 

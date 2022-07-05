@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.conjunctive.text;
 
+import network.aika.direction.Direction;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
@@ -83,18 +84,18 @@ public class TokenPositionRelationNeuron extends LatentRelationNeuron {
     }
 
     @Override
-    protected Stream<BindingSignal> evaluateLatentRelation(PatternActivation fromOriginAct, State state) {
+    public Stream<BindingSignal> evaluateLatentRelation(PatternActivation fromOriginAct, Direction dir) {
         Document doc = (Document) fromOriginAct.getThought();
 
-        return doc.getRelatedTokensByTokenPosition((TokenActivation) fromOriginAct, getRelFrom(state), getRelTo(state))
+        return doc.getRelatedTokensByTokenPosition((TokenActivation) fromOriginAct, getRelFrom(dir), getRelTo(dir))
                 .map(tokenAct -> tokenAct.getBindingSignal(SAME));
     }
 
-    private int getRelFrom(State s) {
-        return s == SAME ? rangeBegin : -rangeEnd;
+    private int getRelFrom(Direction dir) {
+        return dir == Direction.INPUT ? rangeBegin : -rangeEnd;
     }
 
-    private int getRelTo(State s) {
-        return s == SAME ? rangeEnd : -rangeBegin;
+    private int getRelTo(Direction dir) {
+        return dir == Direction.INPUT ? rangeEnd : -rangeBegin;
     }
 }

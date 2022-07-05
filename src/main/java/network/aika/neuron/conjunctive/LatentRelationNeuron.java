@@ -38,7 +38,7 @@ import static network.aika.neuron.conjunctive.ReversePatternSynapse.SAME_SAME_TR
  */
 public abstract class LatentRelationNeuron extends BindingNeuron {
 
-    protected abstract Stream<BindingSignal> evaluateLatentRelation(PatternActivation fromOriginAct, State state);
+    public abstract Stream<BindingSignal> evaluateLatentRelation(PatternActivation fromOriginAct, Direction dir);
 
     @Override
     public LatentRelationActivation createActivation(Thought t) {

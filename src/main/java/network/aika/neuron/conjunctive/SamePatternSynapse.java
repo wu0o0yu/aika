@@ -49,13 +49,13 @@ public class SamePatternSynapse extends BindingNeuronSynapse<
         >
 {
 
-    private static SingleTransition INPUT_TRANSITION = transition(
+    public static SingleTransition INPUT_TRANSITION = transition(
             fixed(INPUT),
             variable(RELATED_INPUT),
             MATCH_AND_PROPAGATE
     );
 
-    private static SingleTransition SAME_TRANSITION = transition(
+    public static SingleTransition SAME_TRANSITION = transition(
             fixed(SAME),
             fixed(SAME),
             MATCH_AND_PROPAGATE
@@ -72,27 +72,6 @@ public class SamePatternSynapse extends BindingNeuronSynapse<
                     PROPAGATE_ONLY
             )
     );
-
-    private Stream<LatentRelationNeuron> findLatentRelationNeurons() {
-        return getOutput().getInputSynapses()
-                .filter(s -> s instanceof RelatedInputSynapse)
-                .map(s -> s.getInput())
-                .filter(n -> n instanceof LatentRelationNeuron)
-                .map(n -> (LatentRelationNeuron)n);
-    }
-
-    public Stream<BindingSignal> getRelatedBindingSignals(PatternActivation fromOriginAct, SingleTransition t, Direction dir) {
-        Stream<BindingSignal> relBS = super.getRelatedBindingSignals(fromOriginAct, t, dir);
-        if(t == SAME_TRANSITION)
-            return relBS;
-
-        State fromState = dir.getTerminal(t).getState();
-        Stream<BindingSignal> latentRelBS = findLatentRelationNeurons()
-                .flatMap(n -> n.evaluateLatentRelation(fromOriginAct, fromState));
-
-        return Stream.concat(relBS, latentRelBS);
-    }
-
 
     @Override
     public SamePatternLink createLink(BindingActivation input, BindingActivation output) {
