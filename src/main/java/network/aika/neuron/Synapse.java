@@ -120,6 +120,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         OA oAct = getOutput().createActivation(iAct.getThought());
         oAct.init(this, iAct);
 
+        if(outputBS != null) {
+            outputBS.init(oAct);
+            oAct.addBindingSignal(outputBS);
+        }
+
         return createLink(iAct, oAct);
     }
 
