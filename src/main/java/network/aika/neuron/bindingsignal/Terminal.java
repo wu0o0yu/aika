@@ -30,7 +30,11 @@ import static network.aika.fields.Fields.mul;
  */
 public interface Terminal {
 
+    void setType(Direction type);
+
     Direction getType();
+
+    boolean matchesState(State s);
 
     Transition getTransition();
 

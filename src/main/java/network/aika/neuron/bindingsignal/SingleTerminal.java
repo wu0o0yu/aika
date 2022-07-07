@@ -39,10 +39,12 @@ public abstract class SingleTerminal implements Terminal {
         return state;
     }
 
+    @Override
     public void setType(Direction type) {
         this.type = type;
     }
 
+    @Override
     public Direction getType() {
         return type;
     }
@@ -66,5 +68,10 @@ public abstract class SingleTerminal implements Terminal {
             return Stream.empty();
 
         return Stream.of(bs.next(transition));
+    }
+
+    @Override
+    public boolean matchesState(State s) {
+        return s == state;
     }
 }

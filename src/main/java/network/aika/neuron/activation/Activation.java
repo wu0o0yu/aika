@@ -75,7 +75,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected FieldOutput updateValue;
     protected FieldOutput inductionThreshold;
 
-    protected Field sameBSEvent = new Field(this, "sameBSEvent");
+    protected SlotField sameBSSlot = new SlotField(this, "sameBSSlot");
 
 
     protected Map<NeuronProvider, Link> inputLinks;
@@ -249,26 +249,19 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         thought.onActivationCreationEvent(this, originSynapse, originAct);
     }
 
-    public Field getFixedBSEvent(State s) {
-        if(s == State.SAME)
-            return sameBSEvent;
-
-        return null;
-    }
-
-    public BindingSignal getFixedBindingSignal(State s) {
-        List<FieldLink> inputs = getFixedBSEvent(s).getInputLinks();
-        if(inputs.isEmpty())
-            return null;
-
-        FieldLink fl = inputs.get(0);
-        Field onArrived = (Field) fl.getInput();
-        return (BindingSignal) onArrived.getReference();
+    public SlotField getSlot(State s) {
+        switch(s) {
+            case SAME:
+                return sameBSSlot;
+            default:
+                return null;
+        }
     }
 
     public void receiveBindingSignal(BindingSignal bs) {
-        if(bs.getState() == State.SAME) {
-            Fields.connect(bs.getOnArrived(), sameBSEvent, false);
+        SlotField bsSlot = getSlot(bs.getState());
+        if(bsSlot != null) {
+            bsSlot.connect(bs);
             return;
         }
 
@@ -445,17 +438,20 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         }
     }
 
-
     public BindingSignal getBindingSignal(BSKey bsKey) {
         return bindingSignals.get(bsKey);
     }
 
     public BindingSignal getBindingSignal(State s) {
-        return bindingSignals.values()
-                .stream()
-                .filter(bs -> bs.getState() == s)
+        return getBindingSignals(s)
                 .findFirst()
                 .orElse(null);
+    }
+
+    public Stream<BindingSignal> getBindingSignals(State s) {
+        return bindingSignals.values()
+                .stream()
+                .filter(bs -> bs.getState() == s);
     }
 
     @Override

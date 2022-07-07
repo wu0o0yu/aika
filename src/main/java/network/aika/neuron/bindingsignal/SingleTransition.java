@@ -101,7 +101,7 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
     }
 
     @Override
-    public Stream<SingleTerminal> getOutputTerminals() {
+    public Stream<Terminal> getOutputTerminals() {
         return Stream.of(output);
     }
 

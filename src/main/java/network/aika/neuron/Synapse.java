@@ -157,11 +157,17 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return getWeight().getCurrentValue() + getSumOfLowerWeights() > 0.0;
     }
 
-    public Stream<SingleTransition> getRelatedTransitions(SingleTransition fromTransition) {
+    public Stream<Transition> getRelatedTransitions(SingleTransition fromTransition) {
         return getTransitions()
                 .flatMap(toTransition -> toTransition.getOutputTerminals())
-                .filter(toTerminal -> toTerminal.getState() == fromTransition.getOutput().getState())
+                .filter(toTerminal -> toTerminal.matchesState(fromTransition.getOutput().getState()))
                 .map(toTerminal -> toTerminal.getTransition());
+    }
+
+    public boolean hasOutputTerminal(State s) {
+        return getTransitions()
+                .flatMap(t -> t.getOutputTerminals())
+                .anyMatch(t -> t.matchesState(s));
     }
 
     public FieldOutput getLinkingEvent(Activation act, Direction dir) {
@@ -473,12 +479,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
     public boolean isNegative() {
         return weight.getCurrentValue() < 0.0;
-    }
-
-    public boolean hasOutputTerminal(State s) {
-        return getTransitions()
-                .flatMap(t -> t.getOutputTerminals())
-                .anyMatch(t -> t.getState() == s);
     }
 
     @Override

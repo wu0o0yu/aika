@@ -17,13 +17,11 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.fields.Field;
-import network.aika.fields.Fields;
+import network.aika.fields.SlotField;
 import network.aika.neuron.Range;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.disjunctive.BindingCategoryNeuron;
-import network.aika.neuron.disjunctive.InhibitoryNeuron;
 
 import static network.aika.neuron.bindingsignal.State.INPUT;
 
@@ -33,25 +31,19 @@ import static network.aika.neuron.bindingsignal.State.INPUT;
  */
 public class BindingCategoryActivation extends DisjunctiveActivation<BindingCategoryNeuron> {
 
-    protected Field inputBSEvent = new Field(this, "inputBSEvent");
-
+    protected SlotField inputBSSlot = new SlotField(this, "inputBSSlot");
 
     public BindingCategoryActivation(int id, Thought t, BindingCategoryNeuron neuron) {
         super(id, t, neuron);
     }
 
-    public void receiveBindingSignal(BindingSignal bs) {
-        if(bs.getState() == INPUT)
-            Fields.connect(bs.getOnArrived(), inputBSEvent, false);
-
-        super.receiveBindingSignal(bs);
-    }
-
-    public Field getFixedBSEvent(State s) {
-        if(s == INPUT)
-            return inputBSEvent;
-
-        return super.getFixedBSEvent(s);
+    public SlotField getSlot(State s) {
+        switch(s) {
+            case INPUT:
+                return inputBSSlot;
+            default:
+                return super.getSlot(s);
+        }
     }
 
     @Override

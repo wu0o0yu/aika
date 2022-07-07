@@ -17,10 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.fields.Field;
-import network.aika.fields.FieldFunction;
-import network.aika.fields.FieldOutput;
-import network.aika.fields.Fields;
+import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
@@ -43,8 +40,8 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     private boolean isInput;
 
-    protected Field inputBSEvent = new Field(this, "inputBSEvent");
-    protected Field relatedSameBSEvent = new Field(this, "relatedSameBSEvent");
+    protected SlotField inputBSSlot = new SlotField(this, "inputBSSlot");
+    protected SlotField relatedSameBSSlot = new SlotField(this, "relatedSameBSSlot");
 
 
     protected BindingActivation(int id, BindingNeuron n) {
@@ -92,24 +89,15 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         }
     }
 
-    public void receiveBindingSignal(BindingSignal bs) {
-        if(bs.getState() == INPUT)
-            Fields.connect(bs.getOnArrived(), inputBSEvent, false);
-
-        if(bs.getState() == RELATED_SAME)
-            Fields.connect(bs.getOnArrived(), relatedSameBSEvent, false);
-
-        super.receiveBindingSignal(bs);
-    }
-
-    public Field getFixedBSEvent(State s) {
-        if(s == INPUT)
-            return inputBSEvent;
-
-        if(s == RELATED_SAME)
-            return relatedSameBSEvent;
-
-        return super.getFixedBSEvent(s);
+    public SlotField getSlot(State s) {
+        switch(s) {
+            case INPUT:
+                return inputBSSlot;
+            case RELATED_SAME:
+                return relatedSameBSSlot;
+            default:
+                return super.getSlot(s);
+        }
     }
 
     @Override

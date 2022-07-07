@@ -38,6 +38,7 @@ import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
 public class BiTransition implements Transition {
 
     protected BiTerminal inputTerminal;
+    protected BiTerminal outputTerminal;
 
     protected SingleTransition<FixedTerminal, ?> activeTransition;
     protected SingleTransition<FixedTerminal, FixedTerminal> passiveTransition;
@@ -46,7 +47,8 @@ public class BiTransition implements Transition {
         this.activeTransition = activeTransition;
         this.passiveTransition = passiveTransition;
 
-        inputTerminal = new BiTerminal(this, activeTransition.getInput(), passiveTransition.getInput());
+        inputTerminal = new FixedBiTerminal(INPUT, this, activeTransition.getInput(), passiveTransition.getInput());
+        outputTerminal = BiTerminal.biTerminal(OUTPUT, this, activeTransition.getOutput(), passiveTransition.getOutput());
     }
 
     public static BiTransition biTransition(SingleTransition activeTransition, SingleTransition passiveTransition) {
@@ -59,8 +61,8 @@ public class BiTransition implements Transition {
     }
 
     @Override
-    public Stream<SingleTerminal> getOutputTerminals() {
-        return Stream.of(activeTransition.getOutput(), passiveTransition.getOutput());
+    public Stream<Terminal> getOutputTerminals() {
+        return Stream.of(outputTerminal);
     }
 
     @Override
@@ -68,10 +70,7 @@ public class BiTransition implements Transition {
         return MATCH_ONLY;
     }
 
-    public void linkAndPropagate(Synapse ts, FieldOutput activeBSEvent, Direction dir) {
-        SingleTerminal activeTerminal = dir.getFromTerminal(activeTransition);
-        BindingSignal activeBS = activeTerminal.getBindingSignal(activeBSEvent);
-
+    public void linkAndPropagate(Synapse ts, BindingSignal activeBS, Direction dir) {
         FixedTerminal passiveTerminal = (FixedTerminal) dir.getFromTerminal(passiveTransition);
         BindingSignal passiveBS = passiveTerminal.getBindingSignal(activeBS.getActivation());
 

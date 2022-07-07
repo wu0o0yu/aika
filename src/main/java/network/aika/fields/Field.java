@@ -16,40 +16,27 @@
  */
 package network.aika.fields;
 
-import network.aika.Model;
 import network.aika.utils.Utils;
-import network.aika.utils.Writable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Lukas Molzberger
  */
-public class Field<R> extends FieldNode implements IField, Writable {
+public class Field<R> extends AbstractField<R> {
 
     private static final Logger log = LoggerFactory.getLogger(Field.class);
-
-    protected Double currentValue;
-    protected Double update;
-    private boolean withinUpdate;
-
-
-    private R reference;
-    private String label;
 
     private PropagatePreCondition propagatePreCondition;
 
     private List<FieldLink> inputs = new ArrayList<>();
 
     public Field(R reference, String label) {
-        this.reference = reference;
-        this.label = label;
+        super(reference, label);
+
         this.propagatePreCondition = (cv, nv, u) -> !Utils.belowTolerance(u);
     }
 
@@ -64,17 +51,8 @@ public class Field<R> extends FieldNode implements IField, Writable {
         addEventListener(fieldListener);
     }
 
-    public R getReference() {
-        return reference;
-    }
-
-    public void setReference(R reference) {
-        this.reference = reference;
-    }
-
-    @Override
-    public String getLabel() {
-        return label;
+    protected boolean checkPreCondition(Double cv, double nv, double u) {
+        return !propagatePreCondition.check(cv, nv, u);
     }
 
     public PropagatePreCondition getPropagatePreCondition() {
@@ -83,47 +61,6 @@ public class Field<R> extends FieldNode implements IField, Writable {
 
     public void setPropagatePreCondition(PropagatePreCondition propagatePreCondition) {
         this.propagatePreCondition = propagatePreCondition;
-    }
-
-    @Override
-    public double getCurrentValue() {
-        if(!isInitialized())
-            throw new IllegalStateException("getCurrentValue was called on an uninitialized field");
-
-        return currentValue;
-    }
-
-    public void set(double v) {
-        if(isInitialized()) {
-            update = v - currentValue;
-            if(!propagatePreCondition.check(currentValue, v, v - currentValue))
-                return;
-        } else {
-            update = v;
-        }
-
-        triggerUpdate();
-    }
-
-    @Override
-    public void receiveUpdate(int arg, double inputCV, double u) {
-        receiveUpdate(u);
-    }
-
-    public void receiveUpdate(double u) {
-        assert !withinUpdate;
-
-        if(update == null)
-            update = u;
-        else
-            update += u;
-
-        if(!isInitialized() || propagatePreCondition.check(
-                currentValue,
-                currentValue + update,
-                update)) {
-            triggerUpdate();
-        }
     }
 
     @Override
@@ -153,56 +90,5 @@ public class Field<R> extends FieldNode implements IField, Writable {
         inputs.stream()
                 .forEach(l -> l.getInput().removeOutput(l, false));
         inputs.clear();
-    }
-
-    public void triggerUpdate() {
-        triggerInternal();
-    }
-
-    protected void triggerInternal() {
-        withinUpdate = true;
-        if(update != null) {
-            double cv = currentValue != null ? currentValue : 0.0;
-            performUpdate();
-            propagateUpdate(cv, update);
-            update = null;
-        }
-        withinUpdate = false;
-    }
-
-    @Override
-    public boolean isInitialized() {
-        return currentValue != null;
-    }
-
-    private void performUpdate() {
-        if (isInitialized())
-            currentValue += update;
-        else
-            currentValue = update;
-    }
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-        out.writeDouble(currentValue);
-    }
-
-    @Override
-    public void readFields(DataInput in, Model m) throws IOException {
-        currentValue = in.readDouble();
-        update = null;
-    }
-
-    @Override
-    public String toString() {
-        return getLabel() + ":" + getValueString() + "(" + (getReference() != null ? getReference() : "") + ")";
-    }
-
-    public String getValueString() {
-        if(!isInitialized())
-            return "--";
-
-        return "[u:" + (update != null ? Utils.round(update) : "--") + ", " +
-                "v:" + (currentValue != null ? Utils.round(currentValue) : "--") + "]";
     }
 }

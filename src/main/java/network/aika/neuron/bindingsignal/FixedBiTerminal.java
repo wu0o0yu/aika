@@ -22,37 +22,37 @@ import network.aika.fields.SlotField;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 
-import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
-
+import static network.aika.fields.Fields.mul;
 
 /**
  * @author Lukas Molzberger
  */
-public class FixedTerminal extends SingleTerminal {
+public class FixedBiTerminal extends BiTerminal<FixedTerminal> {
 
-    public FixedTerminal(State state) {
-        super(state);
-    }
-
-    public static FixedTerminal fixed(State s) {
-        return new FixedTerminal(s);
+    public FixedBiTerminal(Direction type, BiTransition transition, FixedTerminal activeTerminal, FixedTerminal passiveTerminal) {
+        this.type = type;
+        this.transition = transition;
+        this.activeTerminal = activeTerminal;
+        this.passiveTerminal = passiveTerminal;
     }
 
     @Override
     public void initFixedTerminal(Synapse ts, Activation act) {
-        if(transition.getMode() == PROPAGATE_ONLY)
-            return;
+        SlotField activeBSSlot = activeTerminal.getBSSlot(act);
+        SlotField passiveBSSlot = passiveTerminal.getBSSlot(act);
 
-        FieldOutput bsEvent = getBSSlot(act);
-        if(bsEvent == null)
-            return;
+        FieldOutput inputEvent = mul(
+                "fixed bi-terminal event",
+                activeBSSlot,
+                passiveBSSlot
+        );
 
         Direction dir = type.invert();
-        Terminal.getPreconditionEvent(ts, act, dir, bsEvent)
+        Terminal.getPreconditionEvent(ts, act, dir, inputEvent)
                 .addEventListener(() ->
                         transition.linkAndPropagate(
                                 ts,
-                                getBindingSignal(bsEvent),
+                                activeTerminal.getBindingSignal(activeBSSlot),
                                 dir
                         )
                 );
@@ -60,31 +60,6 @@ public class FixedTerminal extends SingleTerminal {
 
     @Override
     public void notify(Synapse ts, BindingSignal bs) {
-        // nothing to do here
-    }
-
-    public SlotField getBSSlot(Activation act) {
-        return act != null ?
-                act.getSlot(state) :
-                null;
-    }
-
-    public BindingSignal getBindingSignal(Activation act) {
-        return getBindingSignal(getBSSlot(act));
-    }
-
-    public BindingSignal getBindingSignal(FieldOutput bsEvent) {
-        return getBindingSignal((SlotField) bsEvent);
-    }
-
-    public BindingSignal getBindingSignal(SlotField bsEvent) {
-        if(bsEvent == null)
-            return null;
-
-        return bsEvent.getFixedBindingSignal(state);
-    }
-
-    public String toString() {
-        return "fixed(" + type + ":" + state + ")";
+        // nothing to do
     }
 }

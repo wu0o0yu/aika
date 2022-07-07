@@ -25,7 +25,7 @@ public interface Transition {
 
     Stream<Terminal> getInputTerminals();
 
-    Stream<SingleTerminal> getOutputTerminals();
+    Stream<Terminal> getOutputTerminals();
 
     TransitionMode getMode();
 }

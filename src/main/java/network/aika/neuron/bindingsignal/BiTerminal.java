@@ -21,6 +21,7 @@ import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 
+import java.util.InputMismatchException;
 import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.OUTPUT;
@@ -29,21 +30,32 @@ import static network.aika.fields.Fields.mul;
 /**
  * @author Lukas Molzberger
  */
-public class BiTerminal implements Terminal {
+public abstract class BiTerminal<A extends SingleTerminal> implements Terminal {
 
-    private BiTransition transition;
-    private FixedTerminal activeTerminal;
-    private FixedTerminal passiveTerminal;
+    protected Direction type;
+    protected BiTransition transition;
+    protected A activeTerminal;
+    protected FixedTerminal passiveTerminal;
 
-    public BiTerminal(BiTransition transition, FixedTerminal activeTerminal, FixedTerminal passiveTerminal) {
-        this.transition = transition;
-        this.activeTerminal = activeTerminal;
-        this.passiveTerminal = passiveTerminal;
+
+    public static BiTerminal biTerminal(Direction type, BiTransition biTransition, SingleTerminal activeTerminal, FixedTerminal passiveTerminal) {
+        if(activeTerminal instanceof FixedTerminal)
+            return new FixedBiTerminal(type, biTransition, (FixedTerminal) activeTerminal, passiveTerminal);
+
+        if(activeTerminal instanceof VariableTerminal)
+            return new MixedBiTerminal(type, biTransition, (VariableTerminal) activeTerminal, passiveTerminal);
+
+        throw new InputMismatchException();
+    }
+
+    @Override
+    public void setType(Direction type) {
+        this.type = type;
     }
 
     @Override
     public Direction getType() {
-        return Direction.INPUT;
+        return type;
     }
 
     @Override
@@ -52,31 +64,16 @@ public class BiTerminal implements Terminal {
     }
 
     @Override
-    public void initFixedTerminal(Synapse ts, Activation act) {
-        FieldOutput activeBSEvent = activeTerminal.getBSEvent(act);
-
-        FieldOutput inputEvent = mul(
-                "bi-terminal event",
-                activeTerminal.getBSEvent(act),
-                passiveTerminal.getBSEvent(act)
-        );
-
-        Terminal.getPreconditionEvent(ts, act, OUTPUT, inputEvent)
-                .addEventListener(() ->
-                        transition.linkAndPropagate(ts, activeBSEvent, OUTPUT)
-                );
-    }
-
-    @Override
-    public void notify(Synapse ts, BindingSignal bs) {
-        // nothing to do
-    }
-
-    @Override
     public Stream<BindingSignal> propagate(BindingSignal bs) {
         return Stream.concat(
                 activeTerminal.propagate(bs),
                 passiveTerminal.propagate(bs)
         );
+    }
+
+    @Override
+    public boolean matchesState(State s) {
+        return activeTerminal.matchesState(s) ||
+                passiveTerminal.matchesState(s);
     }
 }
