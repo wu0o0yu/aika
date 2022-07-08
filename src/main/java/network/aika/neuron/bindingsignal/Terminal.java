@@ -38,6 +38,8 @@ public interface Terminal {
 
     Transition getTransition();
 
+    Stream<PrimitiveTerminal> getPrimitiveTerminals();
+
     void initFixedTerminal(Synapse ts, Activation act);
 
     void notify(Synapse ts, BindingSignal bs);

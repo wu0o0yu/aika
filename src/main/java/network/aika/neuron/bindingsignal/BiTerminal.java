@@ -17,20 +17,16 @@
 package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
-import network.aika.fields.FieldOutput;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
 
 import java.util.InputMismatchException;
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.mul;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class BiTerminal<A extends SingleTerminal> implements Terminal {
+public abstract class BiTerminal<A extends PrimitiveTerminal> implements Terminal {
 
     protected Direction type;
     protected BiTransition transition;
@@ -38,7 +34,7 @@ public abstract class BiTerminal<A extends SingleTerminal> implements Terminal {
     protected FixedTerminal passiveTerminal;
 
 
-    public static BiTerminal biTerminal(Direction type, BiTransition biTransition, SingleTerminal activeTerminal, FixedTerminal passiveTerminal) {
+    public static BiTerminal biTerminal(Direction type, BiTransition biTransition, PrimitiveTerminal activeTerminal, FixedTerminal passiveTerminal) {
         if(activeTerminal instanceof FixedTerminal)
             return new FixedBiTerminal(type, biTransition, (FixedTerminal) activeTerminal, passiveTerminal);
 
@@ -61,6 +57,11 @@ public abstract class BiTerminal<A extends SingleTerminal> implements Terminal {
     @Override
     public Transition getTransition() {
         return transition;
+    }
+
+    @Override
+    public Stream<PrimitiveTerminal> getPrimitiveTerminals() {
+        return Stream.of(activeTerminal, passiveTerminal);
     }
 
     @Override

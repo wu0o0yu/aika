@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static network.aika.TestHelper.initPatternBlackCat;
 import static network.aika.TestHelper.initPatternTheCat;
 import static network.aika.TestUtils.*;
 

@@ -32,7 +32,7 @@ import static network.aika.neuron.bindingsignal.LatentRelations.expandRelation;
 public class LatentLinking {
 
 
-    public static void latentLinking(SingleTransition t, Synapse synA, BindingSignal fromBS) {
+    public static void latentLinking(PrimitiveTransition t, Synapse synA, BindingSignal fromBS) {
         Neuron<?, ?> toNeuron = synA.getOutput();
 
         boolean templateEnabled = fromBS.getConfig().isTemplatesEnabled();
@@ -46,9 +46,9 @@ public class LatentLinking {
                 );
     }
 
-    private static void latentLinking(SingleTransition tA, BindingSignal bsA, Synapse synA, Synapse synB) {
+    private static void latentLinking(PrimitiveTransition tA, BindingSignal bsA, Synapse synA, Synapse synB) {
         if(synB.hasOutputTerminal(tA.getOutput().getState())) {
-            Stream<SingleTransition> relTrans = synB.getRelatedTransitions(tA);
+            Stream<PrimitiveTransition> relTrans = synB.getRelatedTransitions(tA);
             relTrans.forEach(tB -> {
                 Stream<BindingSignal> bsStream = synB.getRelatedBindingSignals(bsA.getOriginActivation(), tB, INPUT);
 
@@ -59,7 +59,7 @@ public class LatentLinking {
         expandRelation(bsA, synA, synB, tA);
     }
 
-    public static void latentLinking(SingleTransition tA, BindingSignal bsA, Synapse synA, Synapse synB, SingleTransition tB, Stream<BindingSignal> bsStream) {
+    public static void latentLinking(PrimitiveTransition tA, BindingSignal bsA, Synapse synA, Synapse synB, PrimitiveTransition tB, Stream<BindingSignal> bsStream) {
         bsStream.filter(bsB -> bsA != bsB)
                 .filter(bsB ->
                         isTrue(bsB.getOnArrivedFired())
@@ -73,9 +73,9 @@ public class LatentLinking {
     private static void latentLinking(
             Synapse targetSyn,
             BindingSignal fromBS,
-            SingleTransition matchingTransition,
+            PrimitiveTransition matchingTransition,
             BindingSignal relBS,
-            SingleTransition propagateTransition
+            PrimitiveTransition propagateTransition
     ) {
         if(!targetSyn.isLatentLinking())
             return;

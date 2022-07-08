@@ -18,20 +18,19 @@ package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
-import network.aika.neuron.Synapse;
 
 import java.util.stream.Stream;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class SingleTerminal implements Terminal {
+public abstract class PrimitiveTerminal implements Terminal {
 
-    protected SingleTransition transition;
+    protected PrimitiveTransition transition;
     protected State state;
     protected Direction type;
 
-    public SingleTerminal(State state) {
+    public PrimitiveTerminal(State state) {
         this.state = state;
     }
 
@@ -49,12 +48,17 @@ public abstract class SingleTerminal implements Terminal {
         return type;
     }
 
-    public void setTransition(SingleTransition transition) {
+    public void setTransition(PrimitiveTransition transition) {
         this.transition = transition;
     }
 
-    public SingleTransition getTransition() {
+    public PrimitiveTransition getTransition() {
         return transition;
+    }
+
+    @Override
+    public Stream<PrimitiveTerminal> getPrimitiveTerminals() {
+        return Stream.of(this);
     }
 
     public abstract BindingSignal getBindingSignal(FieldOutput bsEvent);

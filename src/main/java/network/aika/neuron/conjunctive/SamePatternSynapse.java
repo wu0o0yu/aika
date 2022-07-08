@@ -18,11 +18,8 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.SamePatternLink;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.SingleTransition;
-import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.bindingsignal.PrimitiveTransition;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
@@ -30,7 +27,7 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.SingleTransition.transition;
+import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
 import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
@@ -49,13 +46,13 @@ public class SamePatternSynapse extends BindingNeuronSynapse<
         >
 {
 
-    public static SingleTransition INPUT_TRANSITION = transition(
+    public static PrimitiveTransition INPUT_TRANSITION = transition(
             fixed(INPUT),
             variable(RELATED_INPUT),
             MATCH_AND_PROPAGATE
     );
 
-    public static SingleTransition SAME_TRANSITION = transition(
+    public static PrimitiveTransition SAME_TRANSITION = transition(
             fixed(SAME),
             fixed(SAME),
             MATCH_AND_PROPAGATE

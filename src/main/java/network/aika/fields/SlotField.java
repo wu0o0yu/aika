@@ -36,7 +36,10 @@ public class SlotField extends AbstractField<Activation> {
         Fields.connect(bs.getOnArrived(), this, false);
     }
 
-    public BindingSignal getFixedBindingSignal(State s) {
+    public BindingSignal getFixedBindingSignal() {
+        if(input == null)
+            return null;
+
         Field onArrived = (Field) input.getInput();
         return (BindingSignal) onArrived.getReference();
     }

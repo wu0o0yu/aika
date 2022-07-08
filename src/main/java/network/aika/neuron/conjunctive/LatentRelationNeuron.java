@@ -22,7 +22,7 @@ import network.aika.neuron.activation.LatentRelationActivation;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.bindingsignal.BSKey;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.SingleTransition;
+import network.aika.neuron.bindingsignal.PrimitiveTransition;
 import network.aika.neuron.bindingsignal.State;
 
 
@@ -46,9 +46,9 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
     }
 
     protected BindingSignal createOrLookupLatentActivation(PatternActivation fromOriginAct, BindingSignal toBS, State s) {
-        SingleTransition fromTransition = getTransitionByDirection(s == SAME);
+        PrimitiveTransition fromTransition = getTransitionByDirection(s == SAME);
         State fromState = fromTransition.next(Direction.OUTPUT);
-        SingleTransition toTransition = getTransitionByDirection(s != SAME);
+        PrimitiveTransition toTransition = getTransitionByDirection(s != SAME);
         State toState = toTransition.next(Direction.OUTPUT);
 
         LatentRelationActivation latentRelAct = lookupLatentRelAct(fromOriginAct, fromState, toBS, toState);
@@ -72,7 +72,7 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
                 .orElse(null);
     }
 
-    private SingleTransition getTransitionByDirection(boolean direction) {
+    private PrimitiveTransition getTransitionByDirection(boolean direction) {
         return direction ?
                 SAME_SAME_TRANSITION :
                 SAME_INPUT_TRANSITION;

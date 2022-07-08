@@ -22,7 +22,7 @@ import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PrimaryInputLink;
 import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.SingleTransition;
+import network.aika.neuron.bindingsignal.PrimitiveTransition;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 
 
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.SingleTransition.transition;
+import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
 import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.TransitionMode.*;
 import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
@@ -48,19 +48,19 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
         >
 {
 
-    public static SingleTransition SAME_INPUT_TRANSITION = transition(
+    public static PrimitiveTransition SAME_INPUT_TRANSITION = transition(
             fixed(SAME),
             fixed(INPUT),
             MATCH_AND_PROPAGATE
     );
 
-    public static SingleTransition SAME_RELATED_SAME_TRANSITION = transition(
+    public static PrimitiveTransition SAME_RELATED_SAME_TRANSITION = transition(
             fixed(SAME),
             fixed(RELATED_SAME),
             MATCH_AND_PROPAGATE
     );
 
-    public static SingleTransition INPUT_RELATED_INPUT_TRANSITION = transition(
+    public static PrimitiveTransition INPUT_RELATED_INPUT_TRANSITION = transition(
             fixed(INPUT),
             variable(RELATED_INPUT),
             MATCH_AND_PROPAGATE

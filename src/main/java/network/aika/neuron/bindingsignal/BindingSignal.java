@@ -22,7 +22,6 @@ import network.aika.direction.Direction;
 import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.QueueField;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 
@@ -40,7 +39,7 @@ public class BindingSignal implements Element {
     private BindingSignal parent;
     private Activation activation;
     private Link link;
-    private SingleTransition transition;
+    private PrimitiveTransition transition;
     private BindingSignal origin;
     private int depth;
     private State state;
@@ -62,7 +61,7 @@ public class BindingSignal implements Element {
         this.depth = parent.depth + 1;
     }
 
-    public BindingSignal(BindingSignal parent, SingleTransition t) {
+    public BindingSignal(BindingSignal parent, PrimitiveTransition t) {
         this(parent);
 
         this.transition = t;
@@ -105,7 +104,7 @@ public class BindingSignal implements Element {
                 );
     }
 
-    public BindingSignal next(SingleTransition t) {
+    public BindingSignal next(PrimitiveTransition t) {
         return t != null ?
                 new BindingSignal(this, t) :
                 null;
@@ -160,7 +159,7 @@ public class BindingSignal implements Element {
         return link;
     }
 
-    public SingleTransition getTransition() {
+    public PrimitiveTransition getTransition() {
         return transition;
     }
 

@@ -38,13 +38,13 @@ public class FixedBiTerminal extends BiTerminal<FixedTerminal> {
 
     @Override
     public void initFixedTerminal(Synapse ts, Activation act) {
-        SlotField activeBSSlot = activeTerminal.getBSSlot(act);
-        SlotField passiveBSSlot = passiveTerminal.getBSSlot(act);
+        SlotField activeSlot = activeTerminal.getSlot(act);
+        SlotField passiveSlot = passiveTerminal.getSlot(act);
 
         FieldOutput inputEvent = mul(
                 "fixed bi-terminal event",
-                activeBSSlot,
-                passiveBSSlot
+                activeSlot,
+                passiveSlot
         );
 
         Direction dir = type.invert();
@@ -52,7 +52,7 @@ public class FixedBiTerminal extends BiTerminal<FixedTerminal> {
                 .addEventListener(() ->
                         transition.linkAndPropagate(
                                 ts,
-                                activeTerminal.getBindingSignal(activeBSSlot),
+                                activeTerminal.getBindingSignal(activeSlot),
                                 dir
                         )
                 );

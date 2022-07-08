@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.State.*;
-import static network.aika.neuron.bindingsignal.SingleTransition.transition;
+import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
 import static network.aika.neuron.bindingsignal.TransitionMode.*;
 import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 

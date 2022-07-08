@@ -43,7 +43,7 @@ public class MixedBiTerminal extends BiTerminal<VariableTerminal> {
                         ts,
                         act,
                         type.invert(),
-                        passiveTerminal.getBSSlot(act)
+                        passiveTerminal.getSlot(act)
                 )
                 .addEventListener(() ->
                         notifyInternal(ts, act)
@@ -60,7 +60,7 @@ public class MixedBiTerminal extends BiTerminal<VariableTerminal> {
 
     @Override
     public void notify(Synapse ts, BindingSignal bs) {
-        if(isTrue(passiveTerminal.getBSSlot(bs.getActivation())))
+        if(isTrue(passiveTerminal.getSlot(bs.getActivation())))
             transition.linkAndPropagate(ts, bs, type.invert());
     }
 }

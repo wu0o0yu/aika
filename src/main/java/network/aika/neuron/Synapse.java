@@ -23,7 +23,7 @@ import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
 import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.SingleTransition;
+import network.aika.neuron.bindingsignal.PrimitiveTransition;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.sign.Sign;
@@ -79,7 +79,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return false;
     }
 
-    public Stream<BindingSignal> getRelatedBindingSignals(PatternActivation fromOriginAct, SingleTransition t, Direction dir) {
+    public Stream<BindingSignal> getRelatedBindingSignals(PatternActivation fromOriginAct, PrimitiveTransition t, Direction dir) {
         return dir.getNeuron(this)
                 .getRelatedBindingSignals(fromOriginAct, dir.getTerminal(t).getState());
     }
@@ -157,10 +157,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return getWeight().getCurrentValue() + getSumOfLowerWeights() > 0.0;
     }
 
-    public Stream<Transition> getRelatedTransitions(SingleTransition fromTransition) {
+    public Stream<PrimitiveTransition> getRelatedTransitions(PrimitiveTransition fromTransition) {
         return getTransitions()
                 .flatMap(toTransition -> toTransition.getOutputTerminals())
-                .filter(toTerminal -> toTerminal.matchesState(fromTransition.getOutput().getState()))
+                .flatMap(toTerminal -> toTerminal.getPrimitiveTerminals())
+                .filter(toTerminal -> toTerminal.getState() == fromTransition.getOutput().getState())
                 .map(toTerminal -> toTerminal.getTransition());
     }
 

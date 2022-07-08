@@ -20,8 +20,8 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.bindingsignal.SingleTransition;
-import network.aika.neuron.bindingsignal.SingleTerminal;
+import network.aika.neuron.bindingsignal.PrimitiveTransition;
+import network.aika.neuron.bindingsignal.PrimitiveTerminal;
 import network.aika.neuron.bindingsignal.Terminal;
 import network.aika.neuron.bindingsignal.Transition;
 
@@ -59,12 +59,12 @@ public class Input implements Direction {
     }
 
     @Override
-    public SingleTerminal getTerminal(SingleTransition t) {
+    public PrimitiveTerminal getTerminal(PrimitiveTransition t) {
         return t.getInput();
     }
 
     @Override
-    public SingleTerminal getFromTerminal(SingleTransition t) {
+    public PrimitiveTerminal getFromTerminal(PrimitiveTransition t) {
         return t.getOutput();
     }
 

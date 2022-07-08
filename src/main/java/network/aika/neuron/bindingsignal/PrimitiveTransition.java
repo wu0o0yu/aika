@@ -17,7 +17,6 @@
 package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,22 +25,21 @@ import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.bindingsignal.LatentLinking.latentLinking;
 import static network.aika.neuron.bindingsignal.TransitionMode.*;
 
 /**
  * @author Lukas Molzberger
  */
-public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal> implements Transition {
+public class PrimitiveTransition<I extends PrimitiveTerminal, O extends PrimitiveTerminal> implements Transition {
 
-    private static final Logger log = LoggerFactory.getLogger(SingleTransition.class);
+    private static final Logger log = LoggerFactory.getLogger(PrimitiveTransition.class);
 
     protected I input;
     protected O output;
     protected TransitionMode mode;
 
-    protected SingleTransition(I input, O output, TransitionMode mode) {
+    protected PrimitiveTransition(I input, O output, TransitionMode mode) {
         this.input = input;
         this.output = output;
         this.mode = mode;
@@ -52,8 +50,8 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
         output.setTransition(this);
     }
 
-    public static <I extends SingleTerminal, O extends SingleTerminal> SingleTransition<I, O> transition(I input, O output, TransitionMode transitionMode) {
-        return new SingleTransition(input, output, transitionMode);
+    public static <I extends PrimitiveTerminal, O extends PrimitiveTerminal> PrimitiveTransition<I, O> transition(I input, O output, TransitionMode transitionMode) {
+        return new PrimitiveTransition(input, output, transitionMode);
     }
 
     public void linkAndPropagate(Synapse ts, BindingSignal fromBS, Direction dir) {
@@ -75,14 +73,14 @@ public class SingleTransition<I extends SingleTerminal, O extends SingleTerminal
                 );
     }
 
-    public static void propagate(SingleTransition t, Synapse ts, BindingSignal fromBS) {
+    public static void propagate(PrimitiveTransition t, Synapse ts, BindingSignal fromBS) {
         if(!ts.isPropagate())
             return;
 
         ts.propagate(fromBS, null);
     }
 
-    public static void link(SingleTransition t, Synapse ts, BindingSignal fromBS, BindingSignal toBS, Direction dir) {
+    public static void link(PrimitiveTransition t, Synapse ts, BindingSignal fromBS, BindingSignal toBS, Direction dir) {
         if(!t.isMatching())
             return;
 

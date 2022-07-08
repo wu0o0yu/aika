@@ -28,7 +28,7 @@ import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 /**
  * @author Lukas Molzberger
  */
-public class FixedTerminal extends SingleTerminal {
+public class FixedTerminal extends PrimitiveTerminal {
 
     public FixedTerminal(State state) {
         super(state);
@@ -43,7 +43,7 @@ public class FixedTerminal extends SingleTerminal {
         if(transition.getMode() == PROPAGATE_ONLY)
             return;
 
-        FieldOutput bsEvent = getBSSlot(act);
+        FieldOutput bsEvent = getSlot(act);
         if(bsEvent == null)
             return;
 
@@ -63,14 +63,14 @@ public class FixedTerminal extends SingleTerminal {
         // nothing to do here
     }
 
-    public SlotField getBSSlot(Activation act) {
+    public SlotField getSlot(Activation act) {
         return act != null ?
                 act.getSlot(state) :
                 null;
     }
 
     public BindingSignal getBindingSignal(Activation act) {
-        return getBindingSignal(getBSSlot(act));
+        return getBindingSignal(getSlot(act));
     }
 
     public BindingSignal getBindingSignal(FieldOutput bsEvent) {
@@ -81,7 +81,7 @@ public class FixedTerminal extends SingleTerminal {
         if(bsEvent == null)
             return null;
 
-        return bsEvent.getFixedBindingSignal(state);
+        return bsEvent.getFixedBindingSignal();
     }
 
     public String toString() {

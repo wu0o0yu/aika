@@ -20,14 +20,12 @@ import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 
-import java.util.stream.Stream;
-
 import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 
 /**
  * @author Lukas Molzberger
  */
-public class VariableTerminal extends SingleTerminal {
+public class VariableTerminal extends PrimitiveTerminal {
 
     public VariableTerminal(State state) {
         super(state);

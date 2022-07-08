@@ -4,7 +4,7 @@ import network.aika.Thought;
 import network.aika.fields.Field;
 import network.aika.fields.ValueSortedQueueField;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.SingleTransition;
+import network.aika.neuron.bindingsignal.PrimitiveTransition;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
 
@@ -23,7 +23,7 @@ public class LatentRelationActivation extends BindingActivation {
         return new ValueSortedQueueField(this, "net", 10.0);
     }
 
-    public BindingSignal addLatentBindingSignal(PatternActivation fromOriginAct, SingleTransition t) {
+    public BindingSignal addLatentBindingSignal(PatternActivation fromOriginAct, PrimitiveTransition t) {
         BindingSignal originBS = fromOriginAct.getBindingSignal(State.SAME);
         BindingSignal latentBS = new BindingSignal(originBS, t);
         latentBS.init(this);

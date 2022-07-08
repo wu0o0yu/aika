@@ -17,15 +17,12 @@
 package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.conjunctive.*;
 
 import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.LatentLinking.latentLinking;
-import static network.aika.neuron.conjunctive.PrimaryInputSynapse.INPUT_RELATED_INPUT_TRANSITION;
 import static network.aika.neuron.conjunctive.PrimaryInputSynapse.SAME_RELATED_SAME_TRANSITION;
 import static network.aika.neuron.conjunctive.SamePatternSynapse.INPUT_TRANSITION;
 
@@ -34,10 +31,10 @@ import static network.aika.neuron.conjunctive.SamePatternSynapse.INPUT_TRANSITIO
  */
 public class LatentRelations {
 
-    public static void expandRelation(BindingSignal bsA, Synapse synA, Synapse synB, SingleTransition tA) {
+    public static void expandRelation(BindingSignal bsA, Synapse synA, Synapse synB, PrimitiveTransition tA) {
         Direction dir;
 
-        SingleTransition tB;
+        PrimitiveTransition tB;
         if(samePatternToPrimaryInput(synA, synB) && tA == INPUT_TRANSITION) {
             dir = Direction.OUTPUT;
             tB = SAME_RELATED_SAME_TRANSITION;
