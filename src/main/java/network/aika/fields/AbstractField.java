@@ -81,7 +81,7 @@ public abstract class AbstractField<R> extends FieldNode implements IField, Writ
     public void set(double v) {
         if(isInitialized()) {
             update = v - currentValue;
-            if(checkPreCondition(currentValue, v, v - currentValue))
+            if(!checkPreCondition(currentValue, v, v - currentValue))
                 return;
         } else {
             update = v;

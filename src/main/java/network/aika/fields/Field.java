@@ -52,7 +52,7 @@ public class Field<R> extends AbstractField<R> {
     }
 
     protected boolean checkPreCondition(Double cv, double nv, double u) {
-        return !propagatePreCondition.check(cv, nv, u);
+        return propagatePreCondition.check(cv, nv, u);
     }
 
     public PropagatePreCondition getPropagatePreCondition() {
