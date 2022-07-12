@@ -18,6 +18,7 @@ package network.aika.neuron.bindingsignal;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Link;
 
 import java.util.stream.Stream;
 
@@ -91,6 +92,11 @@ public class LatentLinking {
         if (!targetSyn.checkLinkingEvent(relBS.getActivation(), INPUT))
             return;
 
-        targetSyn.propagate(fromBS, toBS);
+        Link l = targetSyn.propagate(fromBS);
+
+        if(l != null) {
+            toBS.init(l.getOutput());
+            l.getOutput().addBindingSignal(toBS);
+        }
     }
 }

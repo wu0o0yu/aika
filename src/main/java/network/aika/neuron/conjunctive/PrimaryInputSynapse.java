@@ -19,6 +19,7 @@ package network.aika.neuron.conjunctive;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.PrimaryInputLink;
 import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.BindingSignal;
@@ -78,19 +79,8 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
     }
 
     @Override
-    public boolean propagateCheck(BindingSignal inputBS) {
-        return !isTemplate() || checkCandidateSynapse((IA) inputBS.getActivation());
-    }
-
-    @Override
-    public boolean linkCheck(BindingSignal inputBS, BindingSignal outputBS) {
-        if(!super.linkCheck(inputBS, outputBS))
-            return false;
-
-        BindingActivation oAct = (BindingActivation) outputBS.getActivation();
-        return oAct == null || !oAct.getBindingSignals()
-                .filter(bs -> bs.getState() == INPUT)
-                .anyMatch(bs -> bs.getLink() instanceof PrimaryInputLink);
+    public boolean propagateCheck(IA iAct) {
+        return !isTemplate() || checkCandidateSynapse(iAct);
     }
 
     @Override

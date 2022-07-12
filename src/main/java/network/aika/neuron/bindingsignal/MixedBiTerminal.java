@@ -17,6 +17,7 @@
 package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
+import network.aika.fields.SlotField;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 
@@ -30,37 +31,50 @@ import static network.aika.fields.Fields.isTrue;
 public class MixedBiTerminal extends BiTerminal<VariableTerminal> {
 
 
-    public MixedBiTerminal(Direction type, BiTransition transition, VariableTerminal activeTerminal, FixedTerminal passiveTerminal) {
+    public MixedBiTerminal(Direction type, BiTransition transition, VariableTerminal firstTerminal, FixedTerminal secondTerminal) {
         this.type = type;
         this.transition = transition;
-        this.activeTerminal = activeTerminal;
-        this.passiveTerminal = passiveTerminal;
+        this.firstTerminal = firstTerminal;
+        this.secondTerminal = secondTerminal;
     }
 
     @Override
     public void initFixedTerminal(Synapse ts, Activation act) {
+        SlotField secondSlot = secondTerminal.getSlot(act);
         Terminal.getPreconditionEvent(
                         ts,
                         act,
                         type.invert(),
-                        passiveTerminal.getSlot(act)
+                        secondSlot
                 )
                 .addEventListener(() ->
-                        notifyInternal(ts, act)
+                        notifyInternal(ts, act, secondSlot)
                 );
     }
 
-    private void notifyInternal(Synapse ts, Activation act) {
-        Stream<BindingSignal> bsStream = act.getBindingSignals(activeTerminal.state);
+    private void notifyInternal(Synapse ts, Activation act, SlotField secondSlot) {
+        Stream<BindingSignal> bsStream = act.getBindingSignals(firstTerminal.state);
         bsStream
                 .forEach(bs ->
-                        transition.linkAndPropagate(ts, bs, type.invert())
+                        transition.linkAndPropagate(
+                                ts,
+                                type.invert(),
+                                bs,
+                                secondTerminal.getBindingSignal(secondSlot)
+                        )
                 );
     }
 
     @Override
     public void notify(Synapse ts, BindingSignal bs) {
-        if(isTrue(passiveTerminal.getSlot(bs.getActivation())))
-            transition.linkAndPropagate(ts, bs, type.invert());
+        SlotField secondSlot = secondTerminal.getSlot(bs.getActivation());
+
+        if(isTrue(secondSlot))
+            transition.linkAndPropagate(
+                    ts,
+                    type.invert(),
+                    bs,
+                    secondTerminal.getBindingSignal(secondSlot)
+            );
     }
 }

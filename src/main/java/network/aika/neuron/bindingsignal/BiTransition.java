@@ -21,12 +21,11 @@ import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.neuron.bindingsignal.LatentLinking.latentLinking;
-import static network.aika.neuron.bindingsignal.PrimitiveTransition.*;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
 
 
@@ -38,15 +37,15 @@ public class BiTransition implements Transition {
     protected BiTerminal inputTerminal;
     protected BiTerminal outputTerminal;
 
-    protected PrimitiveTransition<FixedTerminal, ?> activeTransition;
-    protected PrimitiveTransition<FixedTerminal, FixedTerminal> passiveTransition;
+    protected PrimitiveTransition<FixedTerminal, ?> firstTransition;
+    protected PrimitiveTransition<FixedTerminal, FixedTerminal> secondTransition;
 
-    protected BiTransition(PrimitiveTransition<FixedTerminal, ?> activeTransition, PrimitiveTransition<FixedTerminal, FixedTerminal> passiveTransition) {
-        this.activeTransition = activeTransition;
-        this.passiveTransition = passiveTransition;
+    protected BiTransition(PrimitiveTransition<FixedTerminal, ?> firstTransition, PrimitiveTransition<FixedTerminal, FixedTerminal> secondTransition) {
+        this.firstTransition = firstTransition;
+        this.secondTransition = secondTransition;
 
-        inputTerminal = new FixedBiTerminal(INPUT, this, activeTransition.getInput(), passiveTransition.getInput());
-        outputTerminal = BiTerminal.biTerminal(OUTPUT, this, activeTransition.getOutput(), passiveTransition.getOutput());
+        inputTerminal = new FixedBiTerminal(INPUT, this, firstTransition.getInput(), secondTransition.getInput());
+        outputTerminal = BiTerminal.biTerminal(OUTPUT, this, firstTransition.getOutput(), secondTransition.getOutput());
     }
 
     public static BiTransition biTransition(PrimitiveTransition activeTransition, PrimitiveTransition passiveTransition) {
@@ -68,47 +67,47 @@ public class BiTransition implements Transition {
         return MATCH_ONLY;
     }
 
-    public void linkAndPropagate(Synapse ts, BindingSignal activeBS, Direction dir) {
-        FixedTerminal passiveTerminal = (FixedTerminal) dir.getFromTerminal(passiveTransition);
-        BindingSignal passiveBS = passiveTerminal.getBindingSignal(activeBS.getActivation());
-
-        biLink(activeTransition, ts, activeBS, passiveBS, dir);
-        biLink(passiveTransition, ts, passiveBS, activeBS, dir);
+    public void linkAndPropagate(Synapse ts, Direction dir, BindingSignal... fromBSs) {
+        link(ts, dir, fromBSs);
 
         if (dir != OUTPUT)
             return;
 
-        latentLinking(activeTransition, ts, activeBS);
-        latentLinking(passiveTransition, ts, passiveBS);
+        latentLinking(ts, fromBSs);
 
-        propagate(activeTransition, ts, activeBS);
-        propagate(passiveTransition, ts, passiveBS);
+        if(ts.isPropagate())
+            ts.propagate(fromBSs[0]);
     }
 
-    private void biLink(PrimitiveTransition t, Synapse ts, BindingSignal fromBS, BindingSignal relatedFromBindingSignal, Direction dir) {
-        if(fromBS == null)
-            return;
+    @Override
+    public void link(Synapse ts, Direction dir, BindingSignal... fromBS) {
+        link(firstTransition, ts, fromBS[0], fromBS[1], dir);
+        link(secondTransition, ts, fromBS[1], fromBS[0], dir);
+    }
 
-        Stream<BindingSignal> bsStream = ts.getRelatedBindingSignals(fromBS.getOriginActivation(), t, dir);
+    @Override
+    public void latentLinking(Synapse ts, BindingSignal... fromBS) {
+        LatentLinking.latentLinking(firstTransition, ts, fromBS[0]);
+        LatentLinking.latentLinking(secondTransition, ts, fromBS[1]);
+    }
 
-        bsStream
-                .filter(toBS -> fromBS != toBS)
-                .filter(toBS -> checkRelated(
-                                getRelatedTransition(t),
-                                relatedFromBindingSignal,
-                                toBS.getActivation(),
-                                dir
-                        )
-                )
-                .forEach(toBS ->
-                        link(t, ts, fromBS, toBS, dir)
+    private void link(PrimitiveTransition t, Synapse ts, BindingSignal fromBS, BindingSignal relatedFromBindingSignal, Direction dir) {
+        Predicate<BindingSignal> biCheck = toBS ->
+                checkRelated(
+                        getRelatedTransition(t),
+                        relatedFromBindingSignal,
+                        toBS.getActivation(),
+                        dir
                 );
+
+        t.link(ts, dir, biCheck, fromBS);
     }
+
 
     private PrimitiveTransition getRelatedTransition(PrimitiveTransition t) {
-        return t == activeTransition ?
-                passiveTransition :
-                activeTransition;
+        return t == firstTransition ?
+                secondTransition :
+                firstTransition;
     }
 
     private static boolean checkRelated(PrimitiveTransition relTransition, BindingSignal relFromBS, Activation toAct, Direction dir) {
@@ -125,6 +124,6 @@ public class BiTransition implements Transition {
     }
 
     public String toString() {
-        return "BiTr: active:<" + activeTransition + ">  passive:<" + passiveTransition + ">";
+        return "BiTr: active:<" + firstTransition + ">  passive:<" + secondTransition + ">";
     }
 }

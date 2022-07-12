@@ -47,7 +47,7 @@ public class VariableTerminal extends PrimitiveTerminal {
         if(getState() != bs.getState())
             return;
 
-        transition.linkAndPropagate(ts, bs, type.invert());
+        transition.linkAndPropagate(ts, type.invert(), bs);
     }
 
     public BindingSignal getBindingSignal(FieldOutput bsEvent) {

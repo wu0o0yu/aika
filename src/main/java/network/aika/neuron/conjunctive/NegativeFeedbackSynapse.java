@@ -66,7 +66,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<
     }
 
     @Override
-    public boolean propagateCheck(BindingSignal inputBS) {
+    public boolean propagateCheck(InhibitoryActivation iAct) {
         return true;
     }
 

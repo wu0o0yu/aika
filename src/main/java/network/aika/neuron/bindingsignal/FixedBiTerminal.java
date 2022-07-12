@@ -29,22 +29,22 @@ import static network.aika.fields.Fields.mul;
  */
 public class FixedBiTerminal extends BiTerminal<FixedTerminal> {
 
-    public FixedBiTerminal(Direction type, BiTransition transition, FixedTerminal activeTerminal, FixedTerminal passiveTerminal) {
+    public FixedBiTerminal(Direction type, BiTransition transition, FixedTerminal firstTerminal, FixedTerminal secondTerminal) {
         this.type = type;
         this.transition = transition;
-        this.activeTerminal = activeTerminal;
-        this.passiveTerminal = passiveTerminal;
+        this.firstTerminal = firstTerminal;
+        this.secondTerminal = secondTerminal;
     }
 
     @Override
     public void initFixedTerminal(Synapse ts, Activation act) {
-        SlotField activeSlot = activeTerminal.getSlot(act);
-        SlotField passiveSlot = passiveTerminal.getSlot(act);
+        SlotField firstSlot = firstTerminal.getSlot(act);
+        SlotField secondSlot = secondTerminal.getSlot(act);
 
         FieldOutput inputEvent = mul(
                 "fixed bi-terminal event",
-                activeSlot,
-                passiveSlot
+                firstSlot,
+                secondSlot
         );
 
         Direction dir = type.invert();
@@ -52,8 +52,9 @@ public class FixedBiTerminal extends BiTerminal<FixedTerminal> {
                 .addEventListener(() ->
                         transition.linkAndPropagate(
                                 ts,
-                                activeTerminal.getBindingSignal(activeSlot),
-                                dir
+                                dir,
+                                firstTerminal.getBindingSignal(firstSlot),
+                                secondTerminal.getBindingSignal(secondSlot)
                         )
                 );
     }

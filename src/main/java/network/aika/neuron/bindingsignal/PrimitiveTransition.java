@@ -21,11 +21,11 @@ import network.aika.neuron.Synapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.neuron.bindingsignal.LatentLinking.latentLinking;
 import static network.aika.neuron.bindingsignal.TransitionMode.*;
 
 /**
@@ -54,43 +54,52 @@ public class PrimitiveTransition<I extends PrimitiveTerminal, O extends Primitiv
         return new PrimitiveTransition(input, output, transitionMode);
     }
 
-    public void linkAndPropagate(Synapse ts, BindingSignal fromBS, Direction dir) {
-        link(ts, fromBS, dir);
+    public void linkAndPropagate(Synapse ts, Direction dir, BindingSignal... fromBSs) {
+        link(ts, dir, fromBSs);
+
         if (dir != OUTPUT)
             return;
 
-        latentLinking(this, ts, fromBS);
-        propagate(this, ts, fromBS);
+        latentLinking(ts, fromBSs);
+
+        if(ts.isPropagate())
+            ts.propagate(fromBSs[0]);
     }
 
-    public void link(Synapse ts, BindingSignal fromBS, Direction dir) {
+    @Override
+    public void latentLinking(Synapse ts, BindingSignal... fromBSs) {
+        LatentLinking.latentLinking(this, ts, fromBSs[0]);
+    }
+
+    @Override
+    public void link(Synapse ts, Direction dir, BindingSignal... fromBSs) {
+        link(ts, dir, null, fromBSs);
+    }
+
+    public void link(Synapse ts, Direction dir, Predicate<BindingSignal> biCheck, BindingSignal... fromBSs) {
+        BindingSignal fromBS = fromBSs[0];
+        if(!isMatching())
+            return;
+
         Stream<BindingSignal> bsStream = ts.getRelatedBindingSignals(fromBS.getOriginActivation(), this, dir);
 
-        bsStream
-                .filter(toBS -> fromBS != toBS)
+        if(biCheck != null)
+            bsStream = bsStream.filter(biCheck);
+
+        bsStream.filter(toBS -> fromBS != toBS)
+                .filter(toBS ->
+                        ts.linkCheck(
+                                dir.getInput(fromBS, toBS),
+                                dir.getOutput(fromBS, toBS)
+                        )
+                )
                 .forEach(toBS ->
-                        link(this, ts, fromBS, toBS, dir)
+                        ts.link(
+                                fromBS.getActivation(),
+                                toBS.getActivation(),
+                                dir
+                        )
                 );
-    }
-
-    public static void propagate(PrimitiveTransition t, Synapse ts, BindingSignal fromBS) {
-        if(!ts.isPropagate())
-            return;
-
-        ts.propagate(fromBS, null);
-    }
-
-    public static void link(PrimitiveTransition t, Synapse ts, BindingSignal fromBS, BindingSignal toBS, Direction dir) {
-        if(!t.isMatching())
-            return;
-
-        if(!ts.checkLinkingEvent(toBS.getActivation(), dir))
-            return;
-
-        BindingSignal inputBS = dir.getInput(fromBS, toBS);
-        BindingSignal outputBS = dir.getOutput(fromBS, toBS);
-
-        ts.link(inputBS, outputBS);
     }
 
     @Override

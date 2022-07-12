@@ -16,12 +16,22 @@
  */
 package network.aika.neuron.bindingsignal;
 
+import network.aika.direction.Direction;
+import network.aika.neuron.Synapse;
+
 import java.util.stream.Stream;
+
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
 
 /**
  * @author Lukas Molzberger
  */
 public interface Transition {
+
+    void link(Synapse ts, Direction dir, BindingSignal... fromBSs);
+
+    void latentLinking(Synapse ts, BindingSignal... fromBSs);
 
     Stream<Terminal> getInputTerminals();
 

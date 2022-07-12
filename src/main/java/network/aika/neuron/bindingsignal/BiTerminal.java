@@ -30,8 +30,8 @@ public abstract class BiTerminal<A extends PrimitiveTerminal> implements Termina
 
     protected Direction type;
     protected BiTransition transition;
-    protected A activeTerminal;
-    protected FixedTerminal passiveTerminal;
+    protected A firstTerminal;
+    protected FixedTerminal secondTerminal;
 
 
     public static BiTerminal biTerminal(Direction type, BiTransition biTransition, PrimitiveTerminal activeTerminal, FixedTerminal passiveTerminal) {
@@ -61,20 +61,20 @@ public abstract class BiTerminal<A extends PrimitiveTerminal> implements Termina
 
     @Override
     public Stream<PrimitiveTerminal> getPrimitiveTerminals() {
-        return Stream.of(activeTerminal, passiveTerminal);
+        return Stream.of(firstTerminal, secondTerminal);
     }
 
     @Override
     public Stream<BindingSignal> propagate(BindingSignal bs) {
         return Stream.concat(
-                activeTerminal.propagate(bs),
-                passiveTerminal.propagate(bs)
+                firstTerminal.propagate(bs),
+                secondTerminal.propagate(bs)
         );
     }
 
     @Override
     public boolean matchesState(State s) {
-        return activeTerminal.matchesState(s) ||
-                passiveTerminal.matchesState(s);
+        return firstTerminal.matchesState(s) ||
+                secondTerminal.matchesState(s);
     }
 }

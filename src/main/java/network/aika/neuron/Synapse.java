@@ -86,7 +86,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
     public abstract double getSumOfLowerWeights();
 
-    public boolean propagateCheck(BindingSignal inputBS) {
+    public boolean propagateCheck(IA iAct) {
         return true;
     }
 
@@ -105,14 +105,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return inputBS.getOrigin() == outputBS.getOrigin();
     }
 
-    public L propagate(BindingSignal inputBS, BindingSignal outputBS) {
-//        if(outputBS != null && !linkCheck(inputBS, outputBS))
-//            return null;
-
-        if(!propagateCheck(inputBS))
-            return null;
-
+    public L propagate(BindingSignal inputBS) {
         IA iAct = (IA) inputBS.getActivation();
+
+        if(!propagateCheck(iAct))
+            return null;
 
         if(propagateLinkExists(iAct))
             return null;
@@ -120,20 +117,15 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         OA oAct = getOutput().createActivation(iAct.getThought());
         oAct.init(this, iAct);
 
-        if(outputBS != null) {
-            outputBS.init(oAct);
-            oAct.addBindingSignal(outputBS);
-        }
-
         return createLink(iAct, oAct);
     }
 
-    public L link(BindingSignal inputBS, BindingSignal outputBS) {
-        if(!linkCheck(inputBS, outputBS))
+    public L link(Activation fromAct, Activation toAct, Direction dir) {
+        if(!checkLinkingEvent(toAct, dir))
             return null;
 
-        IA iAct = (IA) inputBS.getActivation();
-        OA oAct = (OA) outputBS.getActivation();
+        IA iAct = (IA) dir.getInput(fromAct, toAct);
+        OA oAct = (OA) dir.getOutput(fromAct, toAct);
 
         if(linkExists(iAct, oAct))
             return null;

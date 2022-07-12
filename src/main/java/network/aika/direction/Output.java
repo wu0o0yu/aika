@@ -59,6 +59,11 @@ public class Output implements Direction {
     }
 
     @Override
+    public Activation getToActivation(Activation iAct, Activation oAct) {
+        return oAct;
+    }
+
+    @Override
     public PrimitiveTerminal getTerminal(PrimitiveTransition t) {
         return t.getOutput();
     }

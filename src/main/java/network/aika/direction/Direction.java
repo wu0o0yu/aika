@@ -47,6 +47,8 @@ public interface Direction {
 
     Activation getActivation(Link l);
 
+    Activation getToActivation(Activation iAct, Activation oAct);
+
     PrimitiveTerminal getTerminal(PrimitiveTransition t);
 
     PrimitiveTerminal getFromTerminal(PrimitiveTransition t);

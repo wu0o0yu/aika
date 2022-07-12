@@ -52,8 +52,8 @@ public class FixedTerminal extends PrimitiveTerminal {
                 .addEventListener(() ->
                         transition.linkAndPropagate(
                                 ts,
-                                getBindingSignal(bsEvent),
-                                dir
+                                dir,
+                                getBindingSignal(bsEvent)
                         )
                 );
     }
