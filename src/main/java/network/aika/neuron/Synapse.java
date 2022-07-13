@@ -105,6 +105,20 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return inputBS.getOrigin() == outputBS.getOrigin();
     }
 
+    public void linkAndPropagate(Transition t, Direction dir, BindingSignal... fromBSs) {
+        t.link(this, dir, fromBSs);
+
+        if (dir == INPUT) {
+            latentBackwardsPropagation(fromBSs);
+            return;
+        }
+
+        t.latentLinking(this, fromBSs);
+
+        if(isPropagate())
+            propagate(fromBSs[0]);
+    }
+
     public L propagate(BindingSignal inputBS) {
         IA iAct = (IA) inputBS.getActivation();
 
@@ -212,6 +226,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
                 iAct.getOutputLinks(this)
                         .findAny()
                         .isPresent();
+    }
+
+    protected void latentBackwardsPropagation(BindingSignal[] fromBSs) {
+
     }
 
     public boolean networkInputsAllowed(Direction dir) {

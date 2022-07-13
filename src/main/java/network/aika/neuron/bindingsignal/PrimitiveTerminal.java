@@ -71,7 +71,7 @@ public abstract class PrimitiveTerminal implements Terminal {
         if(!transition.isPropagate())
             return Stream.empty();
 
-        return Stream.of(bs.next(transition));
+        return Stream.of(bs.next(this));
     }
 
     @Override

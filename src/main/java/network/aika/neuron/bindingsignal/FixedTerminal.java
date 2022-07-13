@@ -50,8 +50,8 @@ public class FixedTerminal extends PrimitiveTerminal {
         Direction dir = type.invert();
         Terminal.getPreconditionEvent(ts, act, dir, bsEvent)
                 .addEventListener(() ->
-                        transition.linkAndPropagate(
-                                ts,
+                        ts.linkAndPropagate(
+                                transition,
                                 dir,
                                 getBindingSignal(bsEvent)
                         )

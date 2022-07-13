@@ -56,8 +56,8 @@ public class MixedBiTerminal extends BiTerminal<VariableTerminal> {
         Stream<BindingSignal> bsStream = act.getBindingSignals(firstTerminal.state);
         bsStream
                 .forEach(bs ->
-                        transition.linkAndPropagate(
-                                ts,
+                        ts.linkAndPropagate(
+                                transition,
                                 type.invert(),
                                 bs,
                                 secondTerminal.getBindingSignal(secondSlot)
@@ -70,8 +70,8 @@ public class MixedBiTerminal extends BiTerminal<VariableTerminal> {
         SlotField secondSlot = secondTerminal.getSlot(bs.getActivation());
 
         if(isTrue(secondSlot))
-            transition.linkAndPropagate(
-                    ts,
+            ts.linkAndPropagate(
+                    transition,
                     type.invert(),
                     bs,
                     secondTerminal.getBindingSignal(secondSlot)

@@ -54,18 +54,6 @@ public class PrimitiveTransition<I extends PrimitiveTerminal, O extends Primitiv
         return new PrimitiveTransition(input, output, transitionMode);
     }
 
-    public void linkAndPropagate(Synapse ts, Direction dir, BindingSignal... fromBSs) {
-        link(ts, dir, fromBSs);
-
-        if (dir != OUTPUT)
-            return;
-
-        latentLinking(ts, fromBSs);
-
-        if(ts.isPropagate())
-            ts.propagate(fromBSs[0]);
-    }
-
     @Override
     public void latentLinking(Synapse ts, BindingSignal... fromBSs) {
         LatentLinking.latentLinking(this, ts, fromBSs[0]);
@@ -118,10 +106,6 @@ public class PrimitiveTransition<I extends PrimitiveTerminal, O extends Primitiv
 
     public O getOutput() {
         return output;
-    }
-
-    public State next(Direction dir) {
-        return (dir == OUTPUT ? output : input).getState();
     }
 
     public TransitionMode getMode() {

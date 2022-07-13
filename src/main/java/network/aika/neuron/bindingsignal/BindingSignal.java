@@ -61,11 +61,12 @@ public class BindingSignal implements Element {
         this.depth = parent.depth + 1;
     }
 
-    public BindingSignal(BindingSignal parent, PrimitiveTransition t) {
+    public BindingSignal(BindingSignal parent, PrimitiveTerminal fromTerminal) {
         this(parent);
 
-        this.transition = t;
-        this.state = t.next(Direction.OUTPUT);
+        Direction toDirection = fromTerminal.getType().invert();
+        this.transition = fromTerminal.getTransition();
+        this.state = toDirection.getTerminal(transition).getState();
     }
 
     public void init(Activation act) {
@@ -104,7 +105,7 @@ public class BindingSignal implements Element {
                 );
     }
 
-    public BindingSignal next(PrimitiveTransition t) {
+    public BindingSignal next(PrimitiveTerminal t) {
         return t != null ?
                 new BindingSignal(this, t) :
                 null;

@@ -20,10 +20,7 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.bindingsignal.PrimitiveTransition;
-import network.aika.neuron.bindingsignal.PrimitiveTerminal;
-import network.aika.neuron.bindingsignal.Terminal;
-import network.aika.neuron.bindingsignal.Transition;
+import network.aika.neuron.bindingsignal.*;
 
 import java.util.stream.Stream;
 

@@ -18,6 +18,7 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.RelatedInputLink;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
@@ -61,6 +62,15 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<
     @Override
     public RelatedInputLink createLink(BindingActivation input, BindingActivation output) {
         return new RelatedInputLink(this, input, output);
+    }
+
+    @Override
+    protected void latentBackwardsPropagation(BindingSignal[] fromBSs) {
+        if(getInput() instanceof LatentRelationNeuron) {
+            LatentRelationNeuron lrn = (LatentRelationNeuron) getInput();
+
+//            lrn.createOrLookupLatentActivation()
+        }
     }
 
     @Override

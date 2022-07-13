@@ -67,18 +67,6 @@ public class BiTransition implements Transition {
         return MATCH_ONLY;
     }
 
-    public void linkAndPropagate(Synapse ts, Direction dir, BindingSignal... fromBSs) {
-        link(ts, dir, fromBSs);
-
-        if (dir != OUTPUT)
-            return;
-
-        latentLinking(ts, fromBSs);
-
-        if(ts.isPropagate())
-            ts.propagate(fromBSs[0]);
-    }
-
     @Override
     public void link(Synapse ts, Direction dir, BindingSignal... fromBS) {
         link(firstTransition, ts, fromBS[0], fromBS[1], dir);

@@ -50,8 +50,8 @@ public class FixedBiTerminal extends BiTerminal<FixedTerminal> {
         Direction dir = type.invert();
         Terminal.getPreconditionEvent(ts, act, dir, inputEvent)
                 .addEventListener(() ->
-                        transition.linkAndPropagate(
-                                ts,
+                        ts.linkAndPropagate(
+                                transition,
                                 dir,
                                 firstTerminal.getBindingSignal(firstSlot),
                                 secondTerminal.getBindingSignal(secondSlot)
