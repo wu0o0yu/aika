@@ -44,7 +44,7 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
     public LatentRelationActivation createActivation(Thought t) {
         return new LatentRelationActivation(t.createActivationId(), t, this);
     }
-
+/*
     protected BindingSignal createOrLookupLatentActivation(PatternActivation fromOriginAct, BindingSignal toBS, State s) {
         PrimitiveTransition fromTransition = getTransitionByDirection(s == SAME);
         State fromState = fromTransition.next(Direction.OUTPUT);
@@ -62,7 +62,7 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
         latentRelAct.addLatentBindingSignal(toBS.getOriginActivation(), toTransition);
         return latentFromBS;
     }
-
+*/
     private LatentRelationActivation lookupLatentRelAct(PatternActivation fromOriginAct, State fromState, BindingSignal toBS, State toState) {
         return (LatentRelationActivation) fromOriginAct.getReverseBindingSignals(this, fromState)
                 .map(bs -> bs.getActivation())

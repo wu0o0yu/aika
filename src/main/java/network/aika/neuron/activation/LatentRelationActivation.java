@@ -44,7 +44,7 @@ public class LatentRelationActivation extends BindingActivation {
 
     public BindingSignal addLatentBindingSignal(PatternActivation fromOriginAct, PrimitiveTransition t) {
         BindingSignal originBS = fromOriginAct.getBindingSignal(State.SAME);
-        BindingSignal latentBS = new BindingSignal(originBS, t);
+        BindingSignal latentBS = new BindingSignal(originBS, t.getInput());
         latentBS.init(this);
         addBindingSignal(latentBS);
 //        QueueField qf = (QueueField) latentBS.getOnArrived();
