@@ -87,7 +87,7 @@ public class LatentLinking {
         if(!matchingTransition.isMatching())
             return;
 
-        BindingSignal toBS = relBS.next(propagateTransition);
+        BindingSignal toBS = relBS.next(propagateTransition.getInput());
 
         if (!targetSyn.checkLinkingEvent(relBS.getActivation(), INPUT))
             return;
