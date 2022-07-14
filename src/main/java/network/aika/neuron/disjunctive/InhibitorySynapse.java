@@ -56,7 +56,9 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
                             fixed(SAME),
                             fixed(SAME),
                             MATCH_AND_PROPAGATE
-                    )
+                    ),
+                    true,
+                    false
             )
     );
 

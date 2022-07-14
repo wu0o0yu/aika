@@ -21,6 +21,7 @@ import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -34,32 +35,39 @@ import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
  */
 public class BiTransition implements Transition {
 
-    protected BiTerminal inputTerminal;
-    protected BiTerminal outputTerminal;
+    protected List<Terminal> inputTerminals;
+    protected List<Terminal> outputTerminals;
 
     protected PrimitiveTransition<FixedTerminal, ?> firstTransition;
     protected PrimitiveTransition<FixedTerminal, FixedTerminal> secondTransition;
 
-    protected BiTransition(PrimitiveTransition<FixedTerminal, ?> firstTransition, PrimitiveTransition<FixedTerminal, FixedTerminal> secondTransition) {
+    protected BiTransition(PrimitiveTransition<FixedTerminal, ?> firstTransition, PrimitiveTransition<FixedTerminal, FixedTerminal> secondTransition, boolean inputBiTerminal, boolean outputBiTerminal) {
         this.firstTransition = firstTransition;
         this.secondTransition = secondTransition;
 
-        inputTerminal = new FixedBiTerminal(INPUT, this, firstTransition.getInput(), secondTransition.getInput());
-        outputTerminal = BiTerminal.biTerminal(OUTPUT, this, firstTransition.getOutput(), secondTransition.getOutput());
+        if(inputBiTerminal)
+            inputTerminals = List.of(new FixedBiTerminal(INPUT, this, firstTransition.getInput(), secondTransition.getInput()));
+        else
+            inputTerminals = List.of(firstTransition.getInput(), secondTransition.getInput());
+
+        if(outputBiTerminal)
+            outputTerminals = List.of(BiTerminal.biTerminal(OUTPUT, this, firstTransition.getOutput(), secondTransition.getOutput()));
+        else
+            outputTerminals = List.of(firstTransition.getOutput(), secondTransition.getOutput());
     }
 
-    public static BiTransition biTransition(PrimitiveTransition activeTransition, PrimitiveTransition passiveTransition) {
-        return new BiTransition(activeTransition, passiveTransition);
+    public static BiTransition biTransition(PrimitiveTransition firstTransition, PrimitiveTransition secondTransition, boolean inputBiTerminal, boolean outputBiTerminal) {
+        return new BiTransition(firstTransition, secondTransition, inputBiTerminal, outputBiTerminal);
     }
 
     @Override
     public Stream<Terminal> getInputTerminals() {
-        return Stream.of(inputTerminal);
+        return inputTerminals.stream();
     }
 
     @Override
     public Stream<Terminal> getOutputTerminals() {
-        return Stream.of(outputTerminal);
+        return outputTerminals.stream();
     }
 
     @Override

@@ -56,7 +56,9 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<
                             fixed(SAME),
                             fixed(SAME),
                             MATCH_AND_PROPAGATE
-                    )
+                    ),
+                    true,
+                    false
             )
     );
 

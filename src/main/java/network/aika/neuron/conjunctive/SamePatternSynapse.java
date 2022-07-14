@@ -61,7 +61,9 @@ public class SamePatternSynapse extends BindingNeuronSynapse<
     private static List<Transition> TRANSITIONS = List.of(
             biTransition(
                     INPUT_TRANSITION,
-                    SAME_TRANSITION
+                    SAME_TRANSITION,
+                    true,
+                    false
             ),
             transition(
                     variable(RELATED_INPUT),

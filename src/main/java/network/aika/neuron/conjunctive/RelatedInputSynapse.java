@@ -55,7 +55,9 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<
                             fixed(SAME),
                             fixed(RELATED_SAME),
                             MATCH_AND_PROPAGATE
-                    )
+                    ),
+                    true,
+                    true
             )
     );
 
