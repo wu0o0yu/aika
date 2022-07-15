@@ -52,24 +52,25 @@ public class TheDogAndCatTest {
     public Map<Long, double[]> getNeuronCoordinateMap() {
         Map<Long, double[]> coords = new TreeMap<>();
 
-        coords.put(8l, new double[]{1.564, 0.923});
-        coords.put(9l, new double[]{2.818, 0.856});
-        coords.put(11l, new double[]{1.62, -0.031});
-        coords.put(11l, new double[]{1.62, -0.031});
-        coords.put(13l, new double[]{2.089, -0.041});
-        coords.put(13l, new double[]{2.089, -0.041});
-        coords.put(15l, new double[]{2.854, -0.02});
-        coords.put(15l, new double[]{2.854, -0.02});
-        coords.put(16l, new double[]{1.814, 0.304});
-        coords.put(17l, new double[]{2.196, 0.304});
-        coords.put(18l, new double[]{2.523, 0.959});
-        coords.put(20l, new double[]{2.574, -0.058});
-        coords.put(20l, new double[]{2.574, -0.058});
-        coords.put(21l, new double[]{1.435, 0.336});
-        coords.put(22l, new double[]{2.658, 0.304});
-        coords.put(23l, new double[]{2.133, 0.938});
-        coords.put(25l, new double[]{3.2, 0.0});
-        coords.put(25l, new double[]{3.2, 0.0});
+        coords.put(8l, new double[]{0.818, 1.482});
+        coords.put(9l, new double[]{2.56, 1.447});
+        coords.put(10l, new double[]{1.938, 0.764});
+        coords.put(12l, new double[]{0.6, 0.0});
+        coords.put(12l, new double[]{0.6, 0.0});
+        coords.put(14l, new double[]{2.323, -0.061});
+        coords.put(14l, new double[]{2.323, -0.061});
+        coords.put(16l, new double[]{1.007, -0.037});
+        coords.put(16l, new double[]{1.007, -0.037});
+        coords.put(17l, new double[]{0.6, 1.032});
+        coords.put(18l, new double[]{2.337, 1.032});
+        coords.put(19l, new double[]{1.605, 1.496});
+        coords.put(21l, new double[]{1.612, -0.082});
+        coords.put(21l, new double[]{1.612, -0.082});
+        coords.put(22l, new double[]{1.007, 0.447});
+        coords.put(23l, new double[]{1.626, 0.427});
+        coords.put(24l, new double[]{1.371, 0.681});
+        coords.put(26l, new double[]{3.4, 0.0});
+        coords.put(26l, new double[]{3.4, 0.0});
 
         return coords;
     }
@@ -94,8 +95,9 @@ public class TheDogAndCatTest {
 
         InhibitoryNeuron inhibNThe = initInhibitoryLoop(t, "the");
         InhibitoryNeuron inhibNCat = initInhibitoryLoop(t, "cat");
-        initPatternTheCat(t, inhibNThe, inhibNCat, 0);
-        initPatternTheDog(t, inhibNThe);
+        InhibitoryNeuron inhibNDog = initInhibitoryLoop(t, "dog");
+        initPatternTheCat(t, inhibNThe, inhibNCat, 3);
+        initPatternTheDog(t, inhibNThe, inhibNDog, 3);
 
         Document doc = new Document(m, "the dog and the cat");
         debugger.setDocument(doc);

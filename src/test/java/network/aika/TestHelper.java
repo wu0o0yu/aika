@@ -87,20 +87,38 @@ public class TestHelper {
         //        initInhibitoryLoop(t, "jackson", jacksonForenameBN, jacksonCityBN);
     }
 
-    public static void initPatternTheDog(SimpleTemplateGraph t, InhibitoryNeuron inhibNThe) {
+    public static void initPatternTheDog(SimpleTemplateGraph t, InhibitoryNeuron inhibNThe, InhibitoryNeuron inhibNDog, int variant) {
         PatternNeuron theIN = t.TOKEN_TEMPLATE.lookupToken("the");
         PatternNeuron dogIN = t.TOKEN_TEMPLATE.lookupToken("dog");
 
+        int relFrom = variant < 2 ? -5 : 1;
+        int relTo = variant < 2 ? -1 : 5;
+
+        LatentRelationNeuron relPT = t.TOKEN_POSITION_RELATION_TEMPLATE.lookupRelation(relFrom, relTo);
+
         BindingNeuron theBN = createNeuron(t.BINDING_TEMPLATE, "the (the dog)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, theIN, theBN, 10.0);
+
         BindingNeuron dogBN = createNeuron(t.BINDING_TEMPLATE, "dog (the dog)");
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, dogIN, dogBN, 10.0);
-        PatternNeuron theDog = initPatternLoop(t, "the dog", theBN, dogBN);
-        updateBias(theDog, 3.0);
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, dogIN, dogBN, variant == 0  || variant == 2 ? 10.0 : 5.0);
+
+        if(variant < 2) {
+            createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, dogBN, 5.0);
+            createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, theBN, dogBN, variant == 1 || variant == 3 ? 10.0 : 5.0);
+        } else {
+            createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, theBN, 5.0);
+            createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, dogBN, theBN, variant == 1 || variant == 3 ? 10.0 : 5.0);
+        }
+
+        PatternNeuron theDogP = initPatternLoop(t, "the dog", theBN, dogBN);
+
+        addInhibitoryLoop(t, inhibNThe, theBN);
+        addInhibitoryLoop(t, inhibNDog, dogBN);
+
+        updateBias(theDogP, 3.0);
 
         updateBias(theBN, 3.0);
         updateBias(dogBN, 3.0);
-
-        addInhibitoryLoop(t, inhibNThe, theBN);
     }
+
 }
