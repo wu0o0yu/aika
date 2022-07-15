@@ -30,7 +30,7 @@ import static network.aika.TestUtils.updateBias;
  */
 public class TestHelper {
 
-    public static void initPatternTheCat(SimpleTemplateGraph t, InhibitoryNeuron inhibNCat, int variant) {
+    public static void initPatternTheCat(SimpleTemplateGraph t, InhibitoryNeuron inhibNThe, InhibitoryNeuron inhibNCat, int variant) {
         PatternNeuron theIN = t.TOKEN_TEMPLATE.lookupToken("the");
         PatternNeuron catIN = t.TOKEN_TEMPLATE.lookupToken("cat");
 
@@ -55,7 +55,7 @@ public class TestHelper {
 
         PatternNeuron theCatP = initPatternLoop(t, "the cat", theBN, catBN);
 
-        initInhibitoryLoop(t, "the", theBN);
+        addInhibitoryLoop(t, inhibNThe, theBN);
         addInhibitoryLoop(t, inhibNCat, catBN);
 
         updateBias(theCatP, 3.0);
@@ -87,7 +87,7 @@ public class TestHelper {
         //        initInhibitoryLoop(t, "jackson", jacksonForenameBN, jacksonCityBN);
     }
 
-    public static void initPatternTheDog(SimpleTemplateGraph t) {
+    public static void initPatternTheDog(SimpleTemplateGraph t, InhibitoryNeuron inhibNThe) {
         PatternNeuron theIN = t.TOKEN_TEMPLATE.lookupToken("the");
         PatternNeuron dogIN = t.TOKEN_TEMPLATE.lookupToken("dog");
 
@@ -101,6 +101,6 @@ public class TestHelper {
         updateBias(theBN, 3.0);
         updateBias(dogBN, 3.0);
 
-        initInhibitoryLoop(t, "the", theBN);
+        addInhibitoryLoop(t, inhibNThe, theBN);
     }
 }

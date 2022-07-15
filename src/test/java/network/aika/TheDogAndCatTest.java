@@ -52,20 +52,24 @@ public class TheDogAndCatTest {
     public Map<Long, double[]> getNeuronCoordinateMap() {
         Map<Long, double[]> coords = new TreeMap<>();
 
-        coords.put(1l, new double[]{2.674, 0.407});
-        coords.put(2l, new double[]{2.354, 0.613});
-        coords.put(3l, new double[]{3.216, 0.526});
-        coords.put(4l, new double[]{2.389, -0.067});
-        coords.put(5l, new double[]{2.939, -0.073});
-        coords.put(6l, new double[]{1.81, -0.061});
-        coords.put(7l, new double[]{3.521, -0.087});
-        coords.put(8l, new double[]{1.822, 1.096});
-        coords.put(9l, new double[]{2.309, 1.04});
-        coords.put(10l, new double[]{1.848, 1.804});
-        coords.put(11l, new double[]{2.974, 1.043});
-        coords.put(12l, new double[]{3.505, 1.043});
-        coords.put(13l, new double[]{3.278, 1.754});
-        coords.put(14l, new double[]{2.487, 1.925});
+        coords.put(8l, new double[]{1.564, 0.923});
+        coords.put(9l, new double[]{2.818, 0.856});
+        coords.put(11l, new double[]{1.62, -0.031});
+        coords.put(11l, new double[]{1.62, -0.031});
+        coords.put(13l, new double[]{2.089, -0.041});
+        coords.put(13l, new double[]{2.089, -0.041});
+        coords.put(15l, new double[]{2.854, -0.02});
+        coords.put(15l, new double[]{2.854, -0.02});
+        coords.put(16l, new double[]{1.814, 0.304});
+        coords.put(17l, new double[]{2.196, 0.304});
+        coords.put(18l, new double[]{2.523, 0.959});
+        coords.put(20l, new double[]{2.574, -0.058});
+        coords.put(20l, new double[]{2.574, -0.058});
+        coords.put(21l, new double[]{1.435, 0.336});
+        coords.put(22l, new double[]{2.658, 0.304});
+        coords.put(23l, new double[]{2.133, 0.938});
+        coords.put(25l, new double[]{3.2, 0.0});
+        coords.put(25l, new double[]{3.2, 0.0});
 
         return coords;
     }
@@ -88,9 +92,10 @@ public class TheDogAndCatTest {
         Model m = new Model();
         m.setTemplateGraph(t);
 
+        InhibitoryNeuron inhibNThe = initInhibitoryLoop(t, "the");
         InhibitoryNeuron inhibNCat = initInhibitoryLoop(t, "cat");
-        initPatternTheCat(t, inhibNCat, 0);
-        initPatternTheDog(t);
+        initPatternTheCat(t, inhibNThe, inhibNCat, 0);
+        initPatternTheDog(t, inhibNThe);
 
         Document doc = new Document(m, "the dog and the cat");
         debugger.setDocument(doc);

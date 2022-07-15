@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static network.aika.TestHelper.initPatternBlackCat;
 import static network.aika.TestHelper.initPatternTheCat;
 import static network.aika.TestUtils.*;
 
@@ -42,12 +43,16 @@ public class TheBlackCatTest {
         coords.put(0, new double[]{-0.061, 0.005});
         coords.put(1, new double[]{0.336, 0.001});
         coords.put(2, new double[]{0.768, -0.015});
-        coords.put(3, new double[]{-0.046, 0.617});
-        coords.put(4, new double[]{0.331, 0.855});
-        coords.put(5, new double[]{-0.194, 0.728});
-        coords.put(6, new double[]{0.78, 0.617});
-        coords.put(7, new double[]{0.124, 0.018});
-        coords.put(8, new double[]{0.979, 0.757});
+        coords.put(3, new double[]{-0.064, 0.741});
+        coords.put(4, new double[]{0.331, 0.983});
+        coords.put(5, new double[]{-0.194, 0.883});
+        coords.put(6, new double[]{0.344, 0.256});
+        coords.put(7, new double[]{0.542, 0.456});
+        coords.put(8, new double[]{0.797, 0.73});
+        coords.put(9, new double[]{0.691, 0.256});
+        coords.put(10, new double[]{0.441, 0.005});
+        coords.put(11, new double[]{0.56, 0.003});
+        coords.put(12, new double[]{0.902, 0.835});
 
         return coords;
     }
@@ -95,9 +100,10 @@ public class TheBlackCatTest {
         Model m = new Model();
         m.setTemplateGraph(t);
 
+        InhibitoryNeuron inhibNThe = initInhibitoryLoop(t, "the");
         InhibitoryNeuron inhibNCat = initInhibitoryLoop(t, "cat");
-        initPatternTheCat(t, inhibNCat, 0);
- //       initPatternBlackCat(t);
+        initPatternTheCat(t, inhibNThe, inhibNCat, 0);
+        initPatternBlackCat(t);
 
         Document doc = new Document(m, "the black cat");
         debugger.setDocument(doc);

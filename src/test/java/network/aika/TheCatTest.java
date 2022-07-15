@@ -203,8 +203,9 @@ public class TheCatTest {
         Model m = new Model();
         m.setTemplateGraph(t);
 
+        InhibitoryNeuron inhibNThe = initInhibitoryLoop(t, "the");
         InhibitoryNeuron inhibNCat = initInhibitoryLoop(t, "cat");
-        initPatternTheCat(t, inhibNCat, variant);
+        initPatternTheCat(t, inhibNThe, inhibNCat, variant);
 
         Document doc = new Document(m, "the cat");
         debugger.setDocument(doc);
