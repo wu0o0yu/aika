@@ -17,11 +17,14 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.LatentRelationActivation;
 import network.aika.neuron.activation.RelatedInputLink;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.PrimitiveTransition;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
@@ -44,18 +47,22 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<
         >
 {
 
+    private static PrimitiveTransition INPUT_TRANSITION = transition(
+            fixed(INPUT),
+            variable(RELATED_INPUT),
+            MATCH_AND_PROPAGATE
+    );
+
+    private static PrimitiveTransition SAME_TRANSITION = transition(
+            fixed(SAME),
+            fixed(RELATED_SAME),
+            MATCH_AND_PROPAGATE
+    );
+
     private static List<Transition> TRANSITIONS = List.of(
             biTransition(
-                    transition(
-                            fixed(INPUT),
-                            variable(RELATED_INPUT),
-                            MATCH_AND_PROPAGATE
-                    ),
-                    transition(
-                            fixed(SAME),
-                            fixed(RELATED_SAME),
-                            MATCH_AND_PROPAGATE
-                    ),
+                    INPUT_TRANSITION,
+                    SAME_TRANSITION,
                     true,
                     true
             )
@@ -71,8 +78,28 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<
         if(getInput() instanceof LatentRelationNeuron) {
             LatentRelationNeuron lrn = (LatentRelationNeuron) getInput();
 
-//            lrn.createOrLookupLatentActivation()
+            BindingSignal relatedInputBS = fromBSs[0];
+            BindingSignal relatedSameBS = fromBSs[1];
+
+            BindingSignal inputBS = INPUT_TRANSITION.getOutput().propagate(relatedInputBS).findFirst().orElse(null);
+            BindingSignal sameBS = SAME_TRANSITION.getOutput().propagate(relatedSameBS).findFirst().orElse(null);
+
+            LatentRelationActivation latentRelAct = lrn.createOrLookupLatentActivation(
+                    inputBS.getOriginActivation(),
+                    inputBS.getState(),
+                    sameBS.getOriginActivation(),
+                    sameBS.getState()
+            );
+
+            addAndInitBindingSignal(latentRelAct, inputBS);
+            addAndInitBindingSignal(latentRelAct, sameBS);
         }
+    }
+
+    private void addAndInitBindingSignal(LatentRelationActivation act, BindingSignal bs) {
+        BindingSignal latentBS = new BindingSignal(bs.getOrigin(), bs.getState());
+        latentBS.init(act);
+        act.addBindingSignal(latentBS);
     }
 
     @Override

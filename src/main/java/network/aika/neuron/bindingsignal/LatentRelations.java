@@ -18,6 +18,7 @@ package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.*;
 
 import java.util.stream.Stream;
@@ -32,6 +33,9 @@ import static network.aika.neuron.conjunctive.SamePatternSynapse.INPUT_TRANSITIO
 public class LatentRelations {
 
     public static void expandRelation(BindingSignal bsA, Synapse synA, Synapse synB, PrimitiveTransition tA) {
+        if(!(bsA.getOriginActivation() instanceof TokenActivation))
+            return;
+
         Direction dir;
 
         PrimitiveTransition tB;

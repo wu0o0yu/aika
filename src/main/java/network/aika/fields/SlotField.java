@@ -40,7 +40,11 @@ public class SlotField extends AbstractField<Activation> {
         if(input == null)
             return null;
 
-        Field onArrived = (Field) input.getInput();
+        return getBindingSignal(input);
+    }
+
+    private BindingSignal getBindingSignal(FieldLink l) {
+        Field onArrived = (Field) l.getInput();
         return (BindingSignal) onArrived.getReference();
     }
 
@@ -51,7 +55,8 @@ public class SlotField extends AbstractField<Activation> {
 
     @Override
     public void addInput(FieldLink l) {
-        assert input == null;
+        assert input == null ||
+                getBindingSignal(input).getOriginActivation() == getBindingSignal(l).getOriginActivation();
         input = l;
     }
 

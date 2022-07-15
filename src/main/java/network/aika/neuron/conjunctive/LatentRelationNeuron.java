@@ -44,37 +44,24 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
     public LatentRelationActivation createActivation(Thought t) {
         return new LatentRelationActivation(t.createActivationId(), t, this);
     }
-/*
-    protected BindingSignal createOrLookupLatentActivation(PatternActivation fromOriginAct, BindingSignal toBS, State s) {
-        PrimitiveTransition fromTransition = getTransitionByDirection(s == SAME);
-        State fromState = fromTransition.next(Direction.OUTPUT);
-        PrimitiveTransition toTransition = getTransitionByDirection(s != SAME);
-        State toState = toTransition.next(Direction.OUTPUT);
 
-        LatentRelationActivation latentRelAct = lookupLatentRelAct(fromOriginAct, fromState, toBS, toState);
-        if(latentRelAct != null)
-            return latentRelAct.getBindingSignal(fromState);
+    protected LatentRelationActivation createOrLookupLatentActivation(PatternActivation fromOriginAct, State fromState, PatternActivation toOriginAct, State toState) {
+        LatentRelationActivation latentRelAct = getLatentRelAct(fromOriginAct, fromState, toOriginAct, toState);
+        if (latentRelAct != null)
+            return latentRelAct;
 
         latentRelAct = createActivation(fromOriginAct.getThought());
         latentRelAct.init(null, null);
 
-        BindingSignal latentFromBS = latentRelAct.addLatentBindingSignal(fromOriginAct, fromTransition);
-        latentRelAct.addLatentBindingSignal(toBS.getOriginActivation(), toTransition);
-        return latentFromBS;
+        return latentRelAct;
     }
-*/
-    private LatentRelationActivation lookupLatentRelAct(PatternActivation fromOriginAct, State fromState, BindingSignal toBS, State toState) {
+
+    private LatentRelationActivation getLatentRelAct(PatternActivation fromOriginAct, State fromState, PatternActivation toOriginAct, State toState) {
         return (LatentRelationActivation) fromOriginAct.getReverseBindingSignals(this, fromState)
                 .map(bs -> bs.getActivation())
                 .filter(act ->
-                        act.getBindingSignal(BSKey.createKey(toBS.getOriginActivation(), toState)) != null
+                        act.getBindingSignal(BSKey.createKey(toOriginAct, toState)) != null
                 ).findAny()
                 .orElse(null);
-    }
-
-    private PrimitiveTransition getTransitionByDirection(boolean direction) {
-        return direction ?
-                SAME_SAME_TRANSITION :
-                SAME_INPUT_TRANSITION;
     }
 }

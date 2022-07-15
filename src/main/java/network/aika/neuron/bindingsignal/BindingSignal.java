@@ -61,6 +61,12 @@ public class BindingSignal implements Element {
         this.depth = parent.depth + 1;
     }
 
+    public BindingSignal(BindingSignal parent, State s) {
+        this(parent);
+
+        this.state = s;
+    }
+
     public BindingSignal(BindingSignal parent, PrimitiveTerminal fromTerminal) {
         this(parent);
 
