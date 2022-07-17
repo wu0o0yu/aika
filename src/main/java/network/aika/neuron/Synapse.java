@@ -163,6 +163,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return getWeight().getCurrentValue() + getSumOfLowerWeights() > 0.0;
     }
 
+    public static boolean isLatentLinking(Synapse synA, Synapse synB) {
+        double sumOfLowerWeights = Math.min(synA.getSumOfLowerWeights(), synB.getSumOfLowerWeights());
+        return synA.getWeight().getCurrentValue() + synB.getWeight().getCurrentValue() + sumOfLowerWeights > 0.0;
+    }
+
     public Stream<PrimitiveTransition> getRelatedTransitions(PrimitiveTransition fromTransition) {
         return getTransitions()
                 .flatMap(toTransition -> toTransition.getOutputTerminals())
