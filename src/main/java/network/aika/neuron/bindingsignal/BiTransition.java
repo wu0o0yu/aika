@@ -48,12 +48,12 @@ public class BiTransition implements Transition {
         if(inputBiTerminal)
             inputTerminals = List.of(new FixedBiTerminal(INPUT, this, firstTransition.getInput(), secondTransition.getInput()));
         else
-            inputTerminals = List.of(firstTransition.getInput(), secondTransition.getInput());
+            inputTerminals = List.of(new OptionalFixedBiTerminal(INPUT, this, firstTransition.getInput(), secondTransition.getInput()));
 
         if(outputBiTerminal)
             outputTerminals = List.of(BiTerminal.biTerminal(OUTPUT, this, firstTransition.getOutput(), secondTransition.getOutput()));
         else
-            outputTerminals = List.of(firstTransition.getOutput(), secondTransition.getOutput());
+            outputTerminals = List.of(BiTerminal.optionalBiTerminal(OUTPUT, this, firstTransition.getOutput(), secondTransition.getOutput()));
     }
 
     public static BiTransition biTransition(PrimitiveTransition firstTransition, PrimitiveTransition secondTransition, boolean inputBiTerminal, boolean outputBiTerminal) {
@@ -88,6 +88,9 @@ public class BiTransition implements Transition {
     }
 
     private void link(PrimitiveTransition t, Synapse ts, BindingSignal fromBS, BindingSignal relatedFromBindingSignal, Direction dir) {
+        if(fromBS == null)
+            return;
+
         Predicate<BindingSignal> biCheck = toBS ->
                 checkRelated(
                         getRelatedTransition(t),

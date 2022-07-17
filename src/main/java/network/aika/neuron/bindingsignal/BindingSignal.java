@@ -22,6 +22,7 @@ import network.aika.direction.Direction;
 import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.QueueField;
+import network.aika.fields.SlotField;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 
@@ -192,6 +193,10 @@ public class BindingSignal implements Element {
 
     public void link() {
         getActivation().registerBindingSignal(this);
+        SlotField bsSlot = getActivation().getSlot(getState());
+        if(bsSlot != null)
+            bsSlot.connect(this);
+
         getOriginActivation().registerReverseBindingSignal(this);
     }
 

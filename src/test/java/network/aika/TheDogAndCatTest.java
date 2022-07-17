@@ -45,7 +45,17 @@ public class TheDogAndCatTest {
         coords.put(2, new double[]{0.111, -0.036});
         coords.put(3, new double[]{0.345, -0.039});
         coords.put(4, new double[]{0.583, -0.047});
-
+        coords.put(5, new double[]{-0.102, 0.168});
+        coords.put(6, new double[]{-0.217, 0.368});
+        coords.put(7, new double[]{-0.328, 0.168});
+        coords.put(8, new double[]{-0.107, 0.535});
+        coords.put(9, new double[]{-0.217, -0.036});
+        coords.put(10, new double[]{-0.333, 0.52});
+        coords.put(11, new double[]{0.583, 0.153});
+        coords.put(12, new double[]{0.415, 0.356});
+        coords.put(13, new double[]{0.355, 0.158});
+        coords.put(14, new double[]{0.774, 0.361});
+        coords.put(15, new double[]{0.0, 0.0});
         return coords;
     }
 

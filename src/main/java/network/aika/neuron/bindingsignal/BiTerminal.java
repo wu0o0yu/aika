@@ -44,6 +44,16 @@ public abstract class BiTerminal<A extends PrimitiveTerminal> implements Termina
         throw new InputMismatchException();
     }
 
+
+    public static BiTerminal optionalBiTerminal(Direction type, BiTransition biTransition, PrimitiveTerminal activeTerminal, FixedTerminal passiveTerminal) {
+        if(activeTerminal instanceof FixedTerminal)
+            return new OptionalFixedBiTerminal(type, biTransition, (FixedTerminal) activeTerminal, passiveTerminal);
+
+        if(activeTerminal instanceof VariableTerminal)
+            return new MixedBiTerminal(type, biTransition, (VariableTerminal) activeTerminal, passiveTerminal);
+
+        throw new InputMismatchException();
+    }
     @Override
     public void setType(Direction type) {
         this.type = type;

@@ -24,6 +24,7 @@ import network.aika.neuron.activation.Activation;
 import java.util.stream.Stream;
 
 import static network.aika.fields.Fields.isTrue;
+import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 
 /**
  * @author Lukas Molzberger
@@ -67,6 +68,12 @@ public class MixedBiTerminal extends BiTerminal<VariableTerminal> {
 
     @Override
     public void notify(Synapse ts, BindingSignal bs) {
+        if(transition.getMode() == PROPAGATE_ONLY)
+            return;
+
+        if(firstTerminal.getState() != bs.getState())
+            return;
+
         SlotField secondSlot = secondTerminal.getSlot(bs.getActivation());
 
         if(isTrue(secondSlot))

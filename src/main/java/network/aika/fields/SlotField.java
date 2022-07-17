@@ -66,6 +66,10 @@ public class SlotField extends AbstractField<Activation> {
         input = null;
     }
 
+    public boolean isBound() {
+        return input != null;
+    }
+
     @Override
     public void disconnect() {
         super.disconnect();

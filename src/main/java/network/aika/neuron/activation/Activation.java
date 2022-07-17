@@ -259,12 +259,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public void receiveBindingSignal(BindingSignal bs) {
-        SlotField bsSlot = getSlot(bs.getState());
-        if(bsSlot != null) {
-            bsSlot.connect(bs);
-            return;
-        }
-
         notifyVariableTransitions(bs);
     }
 
