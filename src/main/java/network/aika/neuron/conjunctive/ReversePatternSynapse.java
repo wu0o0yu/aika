@@ -28,10 +28,12 @@ import network.aika.neuron.bindingsignal.Transition;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
 import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
+import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 
 /**
  *
@@ -53,14 +55,18 @@ public class ReversePatternSynapse<I extends Neuron & PatternAxon, IA extends Ac
     );
 
     public static PrimitiveTransition INPUT_RELATED_SAME_TRANSITION = transition(
-            fixed(INPUT),
+            variable(INPUT),
             fixed(RELATED_SAME),
             MATCH_AND_PROPAGATE
     );
 
     private static List<Transition> TRANSITIONS = List.of(
-            SAME_SAME_TRANSITION,
-            INPUT_RELATED_SAME_TRANSITION
+            biTransition(
+                    INPUT_RELATED_SAME_TRANSITION,
+                    SAME_SAME_TRANSITION,
+                    true,
+                    false
+            )
     );
 
     @Override

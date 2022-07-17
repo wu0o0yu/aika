@@ -46,9 +46,9 @@ public class BiTransition implements Transition {
         this.secondTransition = secondTransition;
 
         if(inputBiTerminal)
-            inputTerminals = List.of(new FixedBiTerminal(INPUT, this, firstTransition.getInput(), secondTransition.getInput()));
+            inputTerminals = List.of(BiTerminal.biTerminal(INPUT, this, firstTransition.getInput(), secondTransition.getInput()));
         else
-            inputTerminals = List.of(new OptionalFixedBiTerminal(INPUT, this, firstTransition.getInput(), secondTransition.getInput()));
+            inputTerminals = List.of(BiTerminal.optionalBiTerminal(INPUT, this, firstTransition.getInput(), secondTransition.getInput()));
 
         if(outputBiTerminal)
             outputTerminals = List.of(BiTerminal.biTerminal(OUTPUT, this, firstTransition.getOutput(), secondTransition.getOutput()));
