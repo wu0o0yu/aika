@@ -31,12 +31,8 @@ import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
  */
 public class MixedBiTerminal extends BiTerminal<VariableTerminal> {
 
-
     public MixedBiTerminal(Direction type, BiTransition transition, VariableTerminal firstTerminal, FixedTerminal secondTerminal) {
-        this.type = type;
-        this.transition = transition;
-        this.firstTerminal = firstTerminal;
-        this.secondTerminal = secondTerminal;
+        super(type, transition, firstTerminal, secondTerminal);
     }
 
     @Override

@@ -25,6 +25,7 @@ import network.aika.neuron.bindingsignal.Transition;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 import static network.aika.neuron.bindingsignal.State.INPUT;
@@ -49,15 +50,19 @@ public class CategorySynapse<N extends Neuron & PatternAxon> extends Disjunctive
 {
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(
-                    fixed(SAME),
-                    fixed(SAME),
-                    MATCH_AND_PROPAGATE
-            ),
-            transition(
-                    variable(INPUT),
-                    variable(INPUT),
-                    PROPAGATE_ONLY
+            biTransition(
+                    transition(
+                            fixed(SAME),
+                            fixed(SAME),
+                            MATCH_AND_PROPAGATE
+                    ),
+                    transition(
+                            variable(INPUT),
+                            variable(INPUT),
+                            PROPAGATE_ONLY
+                    ),
+                    true,
+                    false
             )
     );
 

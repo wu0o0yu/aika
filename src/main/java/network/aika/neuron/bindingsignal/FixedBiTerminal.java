@@ -30,10 +30,7 @@ import static network.aika.fields.Fields.mul;
 public class FixedBiTerminal extends BiTerminal<FixedTerminal> {
 
     public FixedBiTerminal(Direction type, BiTransition transition, FixedTerminal firstTerminal, FixedTerminal secondTerminal) {
-        this.type = type;
-        this.transition = transition;
-        this.firstTerminal = firstTerminal;
-        this.secondTerminal = secondTerminal;
+        super(type, transition, firstTerminal, secondTerminal);
     }
 
     @Override

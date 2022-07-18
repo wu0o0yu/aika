@@ -35,6 +35,7 @@ public class PrimitiveTransition<I extends PrimitiveTerminal, O extends Primitiv
 
     private static final Logger log = LoggerFactory.getLogger(PrimitiveTransition.class);
 
+    protected BiTransition parent = null;
     protected I input;
     protected O output;
     protected TransitionMode mode;
@@ -52,6 +53,14 @@ public class PrimitiveTransition<I extends PrimitiveTerminal, O extends Primitiv
 
     public static <I extends PrimitiveTerminal, O extends PrimitiveTerminal> PrimitiveTransition<I, O> transition(I input, O output, TransitionMode transitionMode) {
         return new PrimitiveTransition(input, output, transitionMode);
+    }
+
+    public BiTransition getParent() {
+        return parent;
+    }
+
+    public void setParent(BiTransition parent) {
+        this.parent = parent;
     }
 
     @Override

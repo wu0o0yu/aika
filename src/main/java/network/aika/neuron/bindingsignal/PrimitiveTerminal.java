@@ -26,12 +26,21 @@ import java.util.stream.Stream;
  */
 public abstract class PrimitiveTerminal implements Terminal {
 
+    protected BiTerminal parent = null;
     protected PrimitiveTransition transition;
     protected State state;
     protected Direction type;
 
     public PrimitiveTerminal(State state) {
         this.state = state;
+    }
+
+    public BiTerminal getParent() {
+        return parent;
+    }
+
+    public void setParent(BiTerminal parent) {
+        this.parent = parent;
     }
 
     public State getState() {

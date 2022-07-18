@@ -28,12 +28,10 @@ import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.Synapse.isLatentLinking;
 import static network.aika.neuron.bindingsignal.LatentRelations.expandRelation;
 
-
 /**
  * @author Lukas Molzberger
  */
 public class LatentLinking {
-
 
     public static void latentLinking(PrimitiveTransition t, Synapse synA, BindingSignal fromBS) {
         if(t.getMode() != TransitionMode.MATCH_AND_PROPAGATE)
@@ -46,29 +44,26 @@ public class LatentLinking {
                 .filter(synB -> synA != synB)
                 .filter(synB -> synA.getTemplate() != synB && synB.getTemplate() != synA)
                 .filter(synB -> isLatentLinking(synA, synB))
-          //      .filter(synB -> synB.hasOutputTerminal(t.getOutput().getState()))
                 .forEach(synB ->
                         latentLinking(t, fromBS, synA, synB)
                 );
     }
 
     private static void latentLinking(PrimitiveTransition tA, BindingSignal bsA, Synapse synA, Synapse synB) {
-        if(synB.hasOutputTerminal(tA.getOutput().getState())) {
-            Stream<PrimitiveTransition> relTrans = synB.getRelatedTransitions(tA);
-            relTrans.filter(tB ->
-                            tB.getMode() == TransitionMode.MATCH_AND_PROPAGATE
-                    )
-                    .forEach(tB ->
-                latentLinking(
-                        tA,
-                        bsA,
-                        synA,
-                        synB,
-                        tB,
-                        synB.getRelatedBindingSignals(bsA.getOriginActivation(), tB, INPUT)
+        Stream<PrimitiveTransition> relTrans = synB.getRelatedTransitions(tA);
+        relTrans.filter(tB ->
+                        tB.getMode() == TransitionMode.MATCH_AND_PROPAGATE
                 )
-            );
-        }
+                .forEach(tB ->
+                        latentLinking(
+                                tA,
+                                bsA,
+                                synA,
+                                synB,
+                                tB,
+                                synB.getRelatedBindingSignals(bsA.getOriginActivation(), tB, INPUT)
+                        )
+                );
 
         expandRelation(bsA, synA, synB, tA);
     }

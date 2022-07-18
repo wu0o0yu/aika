@@ -33,6 +33,15 @@ public abstract class BiTerminal<A extends PrimitiveTerminal> implements Termina
     protected A firstTerminal;
     protected FixedTerminal secondTerminal;
 
+    public BiTerminal(Direction type, BiTransition transition, A firstTerminal, FixedTerminal secondTerminal) {
+        this.type = type;
+        this.transition = transition;
+        this.firstTerminal = firstTerminal;
+        this.secondTerminal = secondTerminal;
+
+        this.firstTerminal.setParent(this);
+        this.secondTerminal.setParent(this);
+    }
 
     public static BiTerminal biTerminal(Direction type, BiTransition biTransition, PrimitiveTerminal activeTerminal, FixedTerminal passiveTerminal) {
         if(activeTerminal instanceof FixedTerminal)
