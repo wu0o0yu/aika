@@ -109,6 +109,13 @@ public class PrimitiveTransition<I extends PrimitiveTerminal, O extends Primitiv
         return Stream.of(output);
     }
 
+    @Override
+    public Stream<PrimitiveTerminal> getPrimitiveOutputTerminalsByState(State s) {
+        return output.getState() == s ?
+                Stream.of(output) :
+                Stream.empty();
+    }
+
     public I getInput() {
         return input;
     }

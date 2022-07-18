@@ -169,13 +169,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public Stream<PrimitiveTransition> getRelatedTransitions(PrimitiveTransition fromTransition) {
-        if(!hasOutputTerminal(fromTransition.getOutput().getState()))
-            return Stream.empty();
-
         return getTransitions()
-                .flatMap(toTransition -> toTransition.getOutputTerminals())
-                .flatMap(toTerminal -> toTerminal.getPrimitiveTerminals())
-                .filter(toTerminal -> toTerminal.getState() == fromTransition.getOutput().getState())
+                .flatMap(toTransition ->
+                        toTransition.getPrimitiveOutputTerminalsByState(fromTransition.getOutput().getState())
+                )
                 .map(toTerminal -> toTerminal.getTransition());
     }
 

@@ -74,6 +74,13 @@ public class BiTransition implements Transition {
     }
 
     @Override
+    public Stream<PrimitiveTerminal> getPrimitiveOutputTerminalsByState(State s) {
+        return outputTerminals.stream()
+                .flatMap(ot -> ot.getPrimitiveTerminals())
+                .filter(ot -> ot.getState() == s);
+    }
+
+    @Override
     public TransitionMode getMode() {
         return MATCH_ONLY;
     }

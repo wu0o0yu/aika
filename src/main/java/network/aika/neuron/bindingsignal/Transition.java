@@ -21,8 +21,6 @@ import network.aika.neuron.Synapse;
 
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
 
 /**
  * @author Lukas Molzberger
@@ -36,6 +34,8 @@ public interface Transition {
     Stream<Terminal> getInputTerminals();
 
     Stream<Terminal> getOutputTerminals();
+
+    Stream<PrimitiveTerminal> getPrimitiveOutputTerminalsByState(State s);
 
     TransitionMode getMode();
 }
