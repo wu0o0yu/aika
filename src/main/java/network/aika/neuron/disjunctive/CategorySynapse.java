@@ -50,19 +50,15 @@ public class CategorySynapse<N extends Neuron & PatternAxon> extends Disjunctive
 {
 
     private static List<Transition> TRANSITIONS = List.of(
-            biTransition(
-                    transition(
-                            fixed(SAME),
-                            fixed(SAME),
-                            MATCH_AND_PROPAGATE
-                    ),
-                    transition(
-                            variable(INPUT),
-                            variable(INPUT),
-                            PROPAGATE_ONLY
-                    ),
-                    true,
-                    false
+            transition(
+                    fixed(SAME),
+                    fixed(SAME),
+                    MATCH_AND_PROPAGATE
+            ),
+            transition(
+                    variable(INPUT),
+                    variable(INPUT),
+                    PROPAGATE_ONLY
             )
     );
 

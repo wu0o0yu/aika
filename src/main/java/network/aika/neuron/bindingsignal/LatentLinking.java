@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.bindingsignal;
 
+import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -69,22 +70,25 @@ public class LatentLinking {
     }
 
     public static void latentLinking(PrimitiveTransition tA, BindingSignal bsA, Synapse synA, Synapse synB, PrimitiveTransition tB, Stream<BindingSignal> bsStream) {
+        Activation iActA = bsA.getActivation();
+        Thought t = iActA.getThought();
+
         bsStream.filter(bsB ->
                         bsA != bsB &&
-                        isTrue(bsB.getOnArrivedFired())
+                                isTrue(bsB.getOnArrivedFired())
                 )
                 .filter(bsB ->
                         synB.checkLinkingEvent(bsB.getActivation(), INPUT)
                 )
-                .forEach(bsB ->  {
-                    Activation iActA = bsA.getActivation();
-                    Activation iActB = bsB.getActivation();
-
-                    Activation oAct = synA.getOutput().createActivation(iActA.getThought());
+                .filter(bsB ->
+                        !latentActivationExists(synA, synB, iActA, bsB.getActivation())
+                )
+                .forEach(bsB -> {
+                    Activation oAct = synA.getOutput().createActivation(t);
                     oAct.init(synA, iActA);
 
                     createLink(synA, bsB, tB, iActA, oAct);
-                    createLink(synB, bsA, tA, iActB, oAct);
+                    createLink(synB, bsA, tA, bsB.getActivation(), oAct);
                 });
     }
 
@@ -96,5 +100,13 @@ public class LatentLinking {
         BindingSignal toBS = bs.next(t.getInput());
         toBS.init(l.getOutput());
         l.getOutput().addBindingSignal(toBS);
+    }
+
+    private static boolean latentActivationExists(Synapse synA, Synapse synB, Activation iActA, Activation iActB) {
+        Stream<Link> linksA = iActA.getOutputLinks(synA);
+        return linksA.map(lA -> lA.getOutput())
+                .map(oAct -> oAct.getInputLink(synB))
+                .map(lB -> lB.getInput())
+                .anyMatch(iAct -> iAct == iActB);
     }
 }
