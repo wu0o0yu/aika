@@ -57,7 +57,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     protected Field value = new Field(this, "value");
     protected FieldOutput finalValue;
-    protected Field net;
+    protected QueueField net;
 
     protected FieldOutput isFired;
     protected FieldOutput isFiredForWeight;
@@ -67,10 +67,10 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     private FieldFunction entropy;
     protected FieldFunction netOuterGradient;
-    protected Field ownInputGradient;
-    protected Field backpropInputGradient;
-    protected Field ownOutputGradient;
-    protected Field backpropOutputGradient;
+    protected QueueField ownInputGradient;
+    protected QueueField backpropInputGradient;
+    protected QueueField ownOutputGradient;
+    protected QueueField backpropOutputGradient;
     protected FieldOutput outputGradient;
     protected FieldOutput updateValue;
     protected FieldOutput inductionThreshold;
@@ -135,7 +135,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         neuron.register(this);
     }
 
-    protected Field initNet() {
+    protected QueueField initNet() {
         return new ValueSortedQueueField(this, "net", 0.0);
     }
 

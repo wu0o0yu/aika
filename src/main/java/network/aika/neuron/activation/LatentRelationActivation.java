@@ -18,6 +18,7 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.fields.Field;
+import network.aika.fields.QueueField;
 import network.aika.fields.ValueSortedQueueField;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.PrimitiveTransition;
@@ -38,7 +39,7 @@ public class LatentRelationActivation extends BindingActivation {
     }
 
     @Override
-    protected Field initNet() {
+    protected QueueField initNet() {
         return new ValueSortedQueueField(this, "net", 10.0);
     }
 

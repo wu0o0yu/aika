@@ -43,6 +43,14 @@ public class QueueField extends Field {
         this.step = s;
     }
 
+    public FieldStep getStep() {
+        return step;
+    }
+
+    public boolean isQueued() {
+        return isQueued;
+    }
+
     public void triggerUpdate() {
         if(!isQueued) {
             Step.add(step);
