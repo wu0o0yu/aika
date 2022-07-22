@@ -45,17 +45,25 @@ public class TheDogAndCatTest {
         coords.put(2, new double[]{0.111, -0.036});
         coords.put(3, new double[]{0.345, -0.039});
         coords.put(4, new double[]{0.583, -0.047});
-        coords.put(5, new double[]{-0.102, 0.168});
-        coords.put(6, new double[]{-0.217, 0.368});
-        coords.put(7, new double[]{-0.328, 0.168});
+        coords.put(5, new double[]{-0.104, 0.386});
+        coords.put(6, new double[]{-0.217, 0.629});
+        coords.put(7, new double[]{-0.326, 0.384});
         coords.put(8, new double[]{-0.107, 0.535});
         coords.put(9, new double[]{-0.217, -0.036});
-        coords.put(10, new double[]{-0.333, 0.52});
-        coords.put(11, new double[]{0.583, 0.153});
-        coords.put(12, new double[]{0.415, 0.356});
-        coords.put(13, new double[]{0.355, 0.158});
-        coords.put(14, new double[]{0.774, 0.361});
-        coords.put(15, new double[]{0.0, 0.0});
+        coords.put(10, new double[]{-0.333, 0.527});
+        coords.put(11, new double[]{-0.458, 0.384});
+        coords.put(12, new double[]{0.592, 0.376});
+        coords.put(13, new double[]{0.334, 0.609});
+        coords.put(14, new double[]{0.288, 0.464});
+        coords.put(15, new double[]{0.349, 0.374});
+        coords.put(16, new double[]{0.8, 0.504});
+        coords.put(17, new double[]{0.0, 0.0});
+        coords.put(18, new double[]{0.0, 0.0});
+        coords.put(19, new double[]{0.193, 0.574});
+        coords.put(20, new double[]{0.441, 0.605});
+        coords.put(21, new double[]{0.057, 0.392});
+        coords.put(22, new double[]{0.523, 0.291});
+
         return coords;
     }
 
@@ -118,7 +126,7 @@ public class TheDogAndCatTest {
                 .setLearnRate(-0.011)
                 .setInductionThreshold(0.1)
                 .setTrainingEnabled(true)
-                .setTemplatesEnabled(true);
+                .setTemplatesEnabled(false);
         doc.setConfig(c);
 
 
