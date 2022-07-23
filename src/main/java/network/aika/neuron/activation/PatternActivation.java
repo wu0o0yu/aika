@@ -36,8 +36,8 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     protected Range range;
 
-    private Field bpNormSame = new Field(this, "BP-Norm (Same)", 1.0);
-    private Field bpNormInput = new Field(this, "BP-Norm (Input)", 1.0);
+    private Field bpNormSame = new Field(this, "BP-Norm (Same)");
+    private Field bpNormInput = new Field(this, "BP-Norm (Input)");
 
 
     protected PatternActivation(int id, PatternNeuron n) {

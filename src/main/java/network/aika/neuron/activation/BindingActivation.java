@@ -53,7 +53,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
         expNet = exp(net);
 
-        norm = mul("inputNorm * sameNorm", ConstantField.ONE, ConstantField.ONE);
+        norm = mul("inputNorm * sameNorm", ConstantField.ZERO, ConstantField.ZERO);
 
         // (1 - (isFinal * (1 - bp))) : apply branch probability only when isFinal.
         branchProbability = invert(
@@ -89,12 +89,13 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     @Override
     public void connectNorm(Field n, State s) {
         Integer arg = switch (s) {
-            case INPUT -> 0;
-            case SAME -> 1;
+            case INPUT -> 1;
+            case SAME -> 2;
             default -> null;
         };
 
-        connect(n, arg, norm);
+        connect(expNet, n);
+        connect(n, arg, norm, true);
     }
 
     public SlotField getSlot(State s) {
