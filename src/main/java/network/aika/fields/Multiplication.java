@@ -32,25 +32,19 @@ public class Multiplication extends AbstractBiFunction {
 
     @Override
     protected double getCurrentValue(int arg, double inputCV) {
-        switch (arg) {
-            case 1:
-                return inputCV * in2.getInput().getCurrentValue();
-            case 2:
-                return in1.getInput().getCurrentValue() * inputCV;
-            default:
-                throw new IllegalArgumentException();
-        }
+        return switch (arg) {
+            case 1 -> inputCV * in2.getInput().getCurrentValue();
+            case 2 -> in1.getInput().getCurrentValue() * inputCV;
+            default -> throw new IllegalArgumentException();
+        };
     }
 
     @Override
     protected double computeUpdate(int arg, double inputCV, double ownCV, double u) {
-        switch (arg) {
-            case 1:
-                return u * FieldOutput.getCurrentValue(in2);
-            case 2:
-                return u * FieldOutput.getCurrentValue(in1);
-            default:
-                throw new IllegalArgumentException();
-        }
+        return switch (arg) {
+            case 1 -> u * FieldOutput.getCurrentValue(in2);
+            case 2 -> u * FieldOutput.getCurrentValue(in1);
+            default -> throw new IllegalArgumentException();
+        };
     }
 }

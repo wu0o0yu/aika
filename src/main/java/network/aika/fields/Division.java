@@ -32,26 +32,24 @@ public class Division extends AbstractBiFunction {
 
     @Override
     protected double getCurrentValue(int arg, double inputCV) {
-        switch (arg) {
-            case 1:
-                return inputCV / in2.getInput().getCurrentValue();
-            case 2:
-                return in1.getInput().getCurrentValue() / inputCV;
-            default:
-                throw new IllegalArgumentException();
-        }
+        return switch (arg) {
+            case 1 -> inputCV / in2.getInput().getCurrentValue();
+            case 2 -> in1.getInput().getCurrentValue() / inputCV;
+            default -> throw new IllegalArgumentException();
+        };
     }
 
     @Override
     protected double computeUpdate(int arg, double inputCV, double ownCV, double u) {
-        switch (arg) {
-            case 1:
-                double v2 = FieldOutput.getCurrentValue(in2);
-                return (u * v2) / Math.pow(v2, 2.0);
-            case 2:
-                return -(u * FieldOutput.getCurrentValue(in1)) / Math.pow(inputCV, 2.0);
-            default:
-                throw new IllegalArgumentException();
-        }
+        return switch (arg) {
+            case 1 -> updateDiv1(u);
+            case 2 -> -(u * FieldOutput.getCurrentValue(in1)) / Math.pow(inputCV, 2.0);
+            default -> throw new IllegalArgumentException();
+        };
+    }
+
+    private double updateDiv1(double u) {
+        double v2 = FieldOutput.getCurrentValue(in2);
+        return (u * v2) / Math.pow(v2, 2.0);
     }
 }

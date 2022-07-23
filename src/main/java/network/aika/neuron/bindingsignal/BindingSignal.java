@@ -102,7 +102,7 @@ public class BindingSignal implements Element {
         if(depth >= 3)
             return Stream.empty();
 
-       Stream<Transition> transitions = s.getTransitions();
+        Stream<Transition> transitions = s.getTransitions();
         return transitions
                 .flatMap(transition ->
                         transition.getInputTerminals()
@@ -124,7 +124,6 @@ public class BindingSignal implements Element {
 
     private void initFields() {
         if (!activation.getNeuron().isNetworkInput()) {
-
             if(state == State.INPUT && activation.getLabel() == null) {
                 onArrived.addEventListener(() ->
                         activation.initNeuronLabel(this)
@@ -141,6 +140,10 @@ public class BindingSignal implements Element {
         onArrivedFired.addEventListener(() ->
                 getActivation().propagateBindingSignal(this)
         );
+
+        Field norm = getOriginActivation().getNorm(state);
+        if(norm != null)
+            activation.connectNorm(norm, state);
     }
 
     public Field getOnArrived() {
@@ -219,10 +222,6 @@ public class BindingSignal implements Element {
         return parent.isSelfRef(outputBS);
     }
 
-    public String toString() {
-        return getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ", depth:" + getDepth() + ", state:" + state;
-    }
-
     @Override
     public Timestamp getCreated() {
         return getOriginActivation().getCreated();
@@ -230,8 +229,6 @@ public class BindingSignal implements Element {
 
     @Override
     public Timestamp getFired() {
-//        if(state == State.BRANCH)
-//            return Timestamp.NOT_SET;
         return getOriginActivation().getFired();
     }
 
@@ -243,5 +240,10 @@ public class BindingSignal implements Element {
     @Override
     public Config getConfig() {
         return activation.getConfig();
+    }
+
+    @Override
+    public String toString() {
+        return getOriginActivation().getId() + ":" + getOriginActivation().getLabel() + ", depth:" + getDepth() + ", state:" + state;
     }
 }

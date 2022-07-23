@@ -40,12 +40,10 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
 
 
     public SlotField getSlot(State s) {
-        switch(s) {
-            case INPUT:
-                return inputBSSlot;
-            default:
-                return super.getSlot(s);
-        }
+        return switch(s) {
+            case INPUT -> inputBSSlot;
+            default -> super.getSlot(s);
+        };
     }
 
     @Override

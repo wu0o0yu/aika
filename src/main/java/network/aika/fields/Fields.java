@@ -119,6 +119,22 @@ public class Fields {
         return div;
     }
 
+    public static FieldFunction exp(FieldOutput a) {
+        return func(
+                "exp(a)",
+                a,
+                x -> Math.exp(x)
+        );
+    }
+
+    public static FieldFunction pow(FieldOutput a, double b) {
+        return func(
+                "pow(a, b)",
+                a,
+                x -> Math.pow(x, b)
+        );
+    }
+
     public static FieldFunction func(String label, FieldOutput in, DoubleFunction<Double> f) {
         if(in == null)
             return null;

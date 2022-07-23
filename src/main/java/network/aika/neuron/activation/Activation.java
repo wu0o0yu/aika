@@ -250,12 +250,10 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public SlotField getSlot(State s) {
-        switch(s) {
-            case SAME:
-                return sameBSSlot;
-            default:
-                return null;
-        }
+        return switch(s) {
+            case SAME -> sameBSSlot;
+            default -> null;
+        };
     }
 
     public void receiveBindingSignal(BindingSignal bs) {
@@ -467,6 +465,9 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public void setNeuron(N n) {
         this.neuron = n;
+    }
+
+    public void connectNorm(Field norm, State s) {
     }
 
     public ActivationFunction getActivationFunction() {

@@ -35,8 +35,8 @@ import static network.aika.neuron.bindingsignal.State.*;
 public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     private FieldOutput branchProbability;
+    private Multiplication norm;
     private FieldFunction expNet;
-    private Field bpNorm = new Field(this, "BP-Norm", 1.0);
 
     private boolean isInput;
 
@@ -51,12 +51,9 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
 
-        expNet = func(
-                "exp(net)",
-                net,
-                x -> Math.exp(x),
-                bpNorm
-        );
+        expNet = exp(net);
+
+        norm = mul("inputNorm * sameNorm", ConstantField.ONE, ConstantField.ONE);
 
         // (1 - (isFinal * (1 - bp))) : apply branch probability only when isFinal.
         branchProbability = invert(
@@ -67,9 +64,9 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                         invert(
                                 "(1 - bp)",
                                 div(
-                                        "exp(net) / bpNorm",
-                                        expNet,
-                                        bpNorm
+                                        "exp(net) / norm",
+                                        pow(expNet, 2.0),
+                                        norm
                                 )
                         )
                 )
@@ -89,15 +86,23 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         }
     }
 
+    @Override
+    public void connectNorm(Field n, State s) {
+        Integer arg = switch (s) {
+            case INPUT -> 0;
+            case SAME -> 1;
+            default -> null;
+        };
+
+        connect(n, arg, norm);
+    }
+
     public SlotField getSlot(State s) {
-        switch(s) {
-            case INPUT:
-                return inputBSSlot;
-            case RELATED_SAME:
-                return relatedSameBSSlot;
-            default:
-                return super.getSlot(s);
-        }
+        return switch(s) {
+            case INPUT -> inputBSSlot;
+            case RELATED_SAME -> relatedSameBSSlot;
+            default -> super.getSlot(s);
+        };
     }
 
     @Override
@@ -135,10 +140,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         getNet().receiveUpdate(u);
     }
 
-    public Field getBpNorm() {
-        return bpNorm;
-    }
-
     public FieldFunction getExpNet() {
         return expNet;
     }
@@ -152,8 +153,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
         FieldOutput[] fields = new FieldOutput[]{
                 branchProbability,
-                expNet,
-                bpNorm
+                expNet
         };
         for(FieldOutput f: fields) {
             if(f == null)
