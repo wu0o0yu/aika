@@ -16,6 +16,8 @@
  */
 package network.aika.fields;
 
+import java.util.List;
+
 /**
  * @author Lukas Molzberger
  */
@@ -38,6 +40,8 @@ public interface FieldOutput {
     void removeOutput(FieldLink l, boolean propagateFinalValue);
 
     void addEventListener(FieldOnTrueEvent eventListener);
+
+    List<FieldLink> getReceivers();
 
     void disconnect();
 

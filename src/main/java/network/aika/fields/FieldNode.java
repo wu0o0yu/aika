@@ -32,6 +32,10 @@ public abstract class FieldNode implements FieldOutput {
 
     public abstract boolean isInitialized();
 
+    public List<FieldLink> getReceivers() {
+        return receivers;
+    }
+
     public void addInitialCurrentValue(int arg, UpdateListener listener) {
         if(isInitialized())
             propagateUpdate(arg, listener, 0.0, getCurrentValue());
