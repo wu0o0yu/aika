@@ -70,7 +70,7 @@ public abstract class AbstractBiFunction extends FieldNode implements FieldInput
 
     @Override
     public Object getReference() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     private boolean isInitialized(int arg) {
