@@ -16,6 +16,8 @@
  */
 package network.aika.fields;
 
+import network.aika.callbacks.UpdateListener;
+
 import java.util.List;
 
 /**
@@ -38,6 +40,8 @@ public interface FieldOutput {
     void addOutput(FieldLink l, boolean propagateInitValue);
 
     void removeOutput(FieldLink l, boolean propagateFinalValue);
+
+    void addUpdateListener(UpdateListener updateListener);
 
     void addEventListener(FieldOnTrueEvent eventListener);
 

@@ -16,6 +16,8 @@
  */
 package network.aika.fields;
 
+import network.aika.callbacks.UpdateListener;
+
 /**
  * @author Lukas Molzberger
  */

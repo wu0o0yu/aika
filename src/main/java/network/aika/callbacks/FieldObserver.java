@@ -14,44 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.fields;
-
-import network.aika.callbacks.UpdateListener;
+package network.aika.callbacks;
 
 /**
  * @author Lukas Molzberger
  */
-public class FieldLink {
+public interface FieldObserver {
 
-    private FieldOutput input;
-    private int arg;
-    private UpdateListener output;
-
-    public FieldLink(FieldOutput input, int arg, UpdateListener output) {
-        this.input = input;
-        this.arg = arg;
-        this.output = output;
-    }
-
-    public int getArgument() {
-        return arg;
-    }
-
-    public FieldOutput getInput() {
-        return input;
-    }
-
-    public UpdateListener getOutput() {
-        return output;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        FieldLink fLink = (FieldLink) o;
-        return arg == fLink.arg && output.equals(fLink.output);
-    }
-
-    public String toString() {
-        return input + " --" + arg + "--> " + output;
-    }
+    void receiveUpdate(Double cv, Double u);
 }

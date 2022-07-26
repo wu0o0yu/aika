@@ -17,6 +17,8 @@
 package network.aika.fields;
 
 
+import network.aika.callbacks.UpdateListener;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,14 +64,20 @@ public abstract class FieldNode implements FieldOutput {
 
     @Override
     public void addEventListener(FieldOnTrueEvent eventListener) {
+        addUpdateListener((arg, cv, u) -> {
+                    if (u > 0.0)
+                        eventListener.onTrue();
+                }
+        );
+    }
+
+    @Override
+    public void addUpdateListener(UpdateListener updateListener) {
         addOutput(
                 new FieldLink(
                         null,
                         0,
-                        (arg, cv, u) -> {
-                            if (u > 0.0)
-                                eventListener.onTrue();
-                        }
+                        updateListener
                 ),
                 true
         );
