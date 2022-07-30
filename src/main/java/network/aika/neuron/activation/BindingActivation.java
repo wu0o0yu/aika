@@ -25,6 +25,7 @@ import network.aika.neuron.conjunctive.BindingNeuron;
 
 import java.util.*;
 
+import static network.aika.fields.ConstantField.ONE;
 import static network.aika.fields.Fields.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
 import static network.aika.neuron.bindingsignal.State.*;
@@ -34,8 +35,11 @@ import static network.aika.neuron.bindingsignal.State.*;
  */
 public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
-    private FieldOutput branchProbability;
-    private Multiplication norm;
+    private AbstractBiFunction bpWeightedNet;
+
+    private FieldOutput bpSame;
+    private FieldOutput bpInput;
+
     private FieldFunction expNet;
 
     private boolean isInput;
@@ -53,33 +57,25 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
         expNet = exp(net);
 
-        norm = mul("inputNorm * sameNorm", ConstantField.ZERO, ConstantField.ZERO);
-
-        // (1 - (isFinal * (1 - bp))) : apply branch probability only when isFinal.
-        branchProbability = invert(
-                "branch-probability",
-                mul(
-                        "isFinal * (1 - bp)",
-                        isFinal,
-                        invert(
-                                "(1 - bp)",
-                                div(
-                                        "exp(net) / norm",
-                                        pow(expNet, 2.0),
-                                        norm
-                                )
-                        )
-                )
+        bpWeightedNet = mul(
+                "bp * net",
+                ONE,
+                net
         );
+
+        isFinal.addEventListener(() -> {
+            connect(
+                    mul("bpInput * bpSame", bpInput, bpSame),
+                    1,
+                    bpWeightedNet,
+                    true
+            );
+        });
 
         if(!isInput()) {
             func(
                     "f(bp * net)",
-                    mul(
-                            "bp * net",
-                            branchProbability,
-                            net
-                    ),
+                    bpWeightedNet,
                     x -> getNeuron().getActivationFunction().f(x),
                     value
             );
@@ -88,14 +84,15 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     public void connectNorm(Field n, State s) {
-        Integer arg = switch (s) {
-            case INPUT -> 1;
-            case SAME -> 2;
-            default -> null;
-        };
-
         connect(expNet, n);
-        connect(n, arg, norm, true);
+
+        switch (s) {
+            case INPUT:
+                bpInput = div("bpInput", expNet, n);
+            case SAME:
+                bpSame = div("bpSame", expNet, n);
+            default:
+        }
     }
 
     public SlotField getSlot(State s) {
@@ -145,15 +142,24 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         return expNet;
     }
 
-    public FieldOutput getBranchProbability() {
-        return branchProbability;
+    public AbstractBiFunction getBpWeightedNet() {
+        return bpWeightedNet;
     }
 
+    public FieldOutput getBpSame() {
+        return bpSame;
+    }
+
+    public FieldOutput getBpInput() {
+        return bpInput;
+    }
     public void disconnect() {
         super.disconnect();
 
         FieldOutput[] fields = new FieldOutput[]{
-                branchProbability,
+                bpWeightedNet,
+                bpSame,
+                bpInput,
                 expNet
         };
         for(FieldOutput f: fields) {
