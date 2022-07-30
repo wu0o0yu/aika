@@ -151,16 +151,19 @@ public abstract class AbstractField<R> extends FieldNode implements IField, Writ
         update = null;
     }
 
-    @Override
-    public String toString() {
-        return getLabel() + ":" + getValueString() + "(" + (getReference() != null ? getReference() : "") + ")";
-    }
-
     public String getValueString() {
         if(!isInitialized())
             return "--";
 
         return "[u:" + (update != null ? Utils.round(update) : "--") + ", " +
                 "v:" + (currentValue != null ? Utils.round(currentValue) : "--") + "]";
+    }
+
+    @Override
+    public String toString() {
+        String refStr = getReference() != null ?
+                " (Ref: " + getReference().getClass().getSimpleName() + " " + getReference() + ")" :
+                "";
+        return getLabel() + ":" + getValueString() + refStr;
     }
 }

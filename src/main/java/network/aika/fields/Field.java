@@ -80,7 +80,8 @@ public class Field<R> extends AbstractField<R> {
                 .orElse(null);
     }
 
-    public List<FieldLink> getInputLinks() {
+    @Override
+    public List<FieldLink> getInputs() {
         return inputs;
     }
 

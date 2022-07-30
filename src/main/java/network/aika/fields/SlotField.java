@@ -21,6 +21,8 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.utils.Utils;
 
+import java.util.List;
+
 /**
  * @author Lukas Molzberger
  */
@@ -34,6 +36,11 @@ public class SlotField extends AbstractField<Activation> {
 
     public void connect(BindingSignal bs) {
         Fields.connect(bs.getOnArrived(), this, false);
+    }
+
+    @Override
+    public List<FieldLink> getInputs() {
+        return List.of(input);
     }
 
     public BindingSignal getFixedBindingSignal() {

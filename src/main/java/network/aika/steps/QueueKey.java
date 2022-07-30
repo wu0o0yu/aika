@@ -69,11 +69,6 @@ public interface QueueKey {
                 k1.getCreated().compareTo(k2.getFired()) > 0;
     }
 
-    private static boolean notFiredVsFired(QueueKey k1, QueueKey k2) {
-        return k1.getFired() == NOT_SET &&
-                k2.getFired() != NOT_SET;
-    }
-
     private static int compareBothNotFired(QueueKey k1, QueueKey k2) {
         if(k1.getFired() != NOT_SET || k2.getFired() != NOT_SET)
             return 0;
@@ -92,4 +87,21 @@ public interface QueueKey {
     int getSortValue();
 
     Timestamp getCurrentTimestamp();
+
+    default String qkToString() {
+        String firedStr = getFired() == NOT_SET ?
+                "NOT_FIRED" : "" +
+                getFired();
+
+        String svStr = getSortValue() == Integer.MAX_VALUE ?
+                "MAX" :
+                "" + getSortValue();
+
+        return "[p:" + getPhase() + "-" + getPhase().ordinal() +
+                ",f:" + firedStr +
+                ",c:" + getCreated() +
+                ",sv:" + svStr +
+                ",ts:" + getCurrentTimestamp() +
+                "]";
+    }
 }

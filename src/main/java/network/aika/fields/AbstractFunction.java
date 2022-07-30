@@ -18,6 +18,8 @@ package network.aika.fields;
 
 import network.aika.utils.Utils;
 
+import java.util.List;
+
 /**
  * @author Lukas Molzberger
  */
@@ -36,6 +38,11 @@ public abstract class AbstractFunction extends FieldNode implements FieldInput, 
 
     public void removeInput(FieldLink l) {
         this.input = null;
+    }
+
+    @Override
+    public List<FieldLink> getInputs() {
+        return List.of(input);
     }
 
     @Override

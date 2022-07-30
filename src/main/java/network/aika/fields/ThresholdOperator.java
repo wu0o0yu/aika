@@ -16,6 +16,8 @@
  */
 package network.aika.fields;
 
+import java.util.List;
+
 /**
  * @author Lukas Molzberger
  */

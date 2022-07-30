@@ -18,6 +18,8 @@ package network.aika.fields;
 
 import network.aika.utils.Utils;
 
+import java.util.List;
+
 /**
  * @author Lukas Molzberger
  */
@@ -38,6 +40,11 @@ public abstract class AbstractBiFunction extends FieldNode implements FieldInput
 
     public FieldLink getInput2() {
         return in2;
+    }
+
+    @Override
+    public List<FieldLink> getInputs() {
+        return List.of(in1, in2);
     }
 
     public void addInput(FieldLink l) {
