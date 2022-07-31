@@ -77,7 +77,6 @@ public abstract class AbstractField<R> extends FieldNode implements IField, Writ
         return currentValue;
     }
 
-
     public void set(double v) {
         if(isInitialized()) {
             update = v - currentValue;
@@ -142,12 +141,16 @@ public abstract class AbstractField<R> extends FieldNode implements IField, Writ
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeDouble(currentValue);
+        out.writeBoolean(isInitialized());
+        if(isInitialized())
+            out.writeDouble(currentValue);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-        currentValue = in.readDouble();
+        if(in.readBoolean())
+            currentValue = in.readDouble();
+
         update = null;
     }
 

@@ -56,6 +56,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
         if(input != null && output != null) {
             initOnTransparent();
+
             onTransparent.addEventListener(() ->
                    propagateAllBindingSignals()
             );
@@ -270,11 +271,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     @Override
     public Thought getThought() {
         return output.getThought();
-    }
-
-    @Override
-    public Config getConfig() {
-        return output.getConfig();
     }
 
     public String toString() {

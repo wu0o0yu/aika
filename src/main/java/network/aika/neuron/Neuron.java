@@ -16,13 +16,17 @@
  */
 package network.aika.neuron;
 
+import network.aika.Config;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.fields.LimitedField;
+import network.aika.fields.QueueField;
 import network.aika.neuron.activation.Activation;
 import network.aika.fields.Field;
+import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.activation.Timestamp;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.sign.Sign;
@@ -41,13 +45,15 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.activation.Timestamp.MAX;
+import static network.aika.neuron.activation.Timestamp.MIN;
 import static network.aika.sign.Sign.POS;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class Neuron<S extends Synapse, A extends Activation> implements Writable {
+public abstract class Neuron<S extends Synapse, A extends Activation> implements Element, Writable {
 
     volatile long retrievalCount = 0;
 
@@ -59,7 +65,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Writable customData;
 
-    protected Field bias = new LimitedField(this, "bias", 0.0, () -> {
+    protected QueueField bias = new LimitedField(this, "bias", 0.0, () -> {
         PostTraining.add(this);
         setModified();
     });
@@ -81,9 +87,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     private TemplateNeuron templateInfo;
 
     private WeakHashMap<Long, SortedSet<A>> activations = new WeakHashMap<>();
-
-    protected Neuron() {
-    }
 
     public void addProvider(Model m) {
         provider = new NeuronProvider(m, this);
@@ -463,6 +466,21 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
             customData = m.getCustomDataInstanceSupplier().get();
             customData.readFields(in, m);
         }
+    }
+
+    @Override
+    public Timestamp getCreated() {
+        return MIN;
+    }
+
+    @Override
+    public Timestamp getFired() {
+        return MAX;
+    }
+
+    @Override
+    public Thought getThought() {
+        return getModel().getCurrentThought();
     }
 
     public String toKeyString() {

@@ -18,6 +18,7 @@ package network.aika.fields;
 
 
 import network.aika.callbacks.UpdateListener;
+import network.aika.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,12 +40,12 @@ public abstract class FieldNode implements FieldOutput {
     }
 
     public void addInitialCurrentValue(int arg, UpdateListener listener) {
-        if(isInitialized())
+        if(isInitialized() && !Utils.belowTolerance(getCurrentValue()))
             propagateUpdate(arg, listener, 0.0, getCurrentValue());
     }
 
     public void removeFinalCurrentValue(int arg, UpdateListener listener) {
-        if(isInitialized())
+        if(isInitialized() && !Utils.belowTolerance(getCurrentValue()))
             propagateUpdate(arg, listener, getCurrentValue(), -getCurrentValue());
     }
 
@@ -60,27 +61,6 @@ public abstract class FieldNode implements FieldOutput {
         if(propagateFinalValue)
             removeFinalCurrentValue(l.getArgument(), l.getOutput());
         this.receivers.remove(l);
-    }
-
-    @Override
-    public void addEventListener(FieldOnTrueEvent eventListener) {
-        addUpdateListener((arg, cv, u) -> {
-                    if (u > 0.0)
-                        eventListener.onTrue();
-                }
-        );
-    }
-
-    @Override
-    public void addUpdateListener(UpdateListener updateListener) {
-        addOutput(
-                new FieldLink(
-                        null,
-                        0,
-                        updateListener
-                ),
-                true
-        );
     }
 
     protected void propagateUpdate(double cv, double update) {

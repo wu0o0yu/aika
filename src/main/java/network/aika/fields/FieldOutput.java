@@ -20,6 +20,9 @@ import network.aika.callbacks.UpdateListener;
 
 import java.util.List;
 
+import static network.aika.fields.FieldLink.createEventListener;
+import static network.aika.fields.FieldLink.createUpdateListener;
+
 /**
  * @author Lukas Molzberger
  */
@@ -41,13 +44,17 @@ public interface FieldOutput {
 
     void removeOutput(FieldLink l, boolean propagateFinalValue);
 
-    void addUpdateListener(UpdateListener updateListener);
-
-    void addEventListener(FieldOnTrueEvent eventListener);
-
     List<FieldLink> getReceivers();
 
     void disconnect();
 
     Object getReference();
+
+    default void addUpdateListener(UpdateListener updateListener) {
+        addOutput(createUpdateListener(updateListener), true);
+    }
+
+    default void addEventListener(FieldOnTrueEvent eventListener) {
+        addOutput(createEventListener(eventListener), true);
+    }
 }

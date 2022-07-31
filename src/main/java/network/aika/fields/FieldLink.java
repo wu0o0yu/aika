@@ -27,6 +27,17 @@ public class FieldLink {
     private int arg;
     private UpdateListener output;
 
+    public static FieldLink createEventListener(FieldOnTrueEvent eventListener) {
+        return createUpdateListener((arg, cv, u) -> {
+            if (u > 0.0)
+                eventListener.onTrue();
+        });
+    }
+
+    public static FieldLink createUpdateListener(UpdateListener updateListener) {
+        return new FieldLink(null, 0, updateListener);
+    }
+
     public FieldLink(FieldOutput input, int arg, UpdateListener output) {
         this.input = input;
         this.arg = arg;

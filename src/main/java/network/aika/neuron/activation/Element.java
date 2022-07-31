@@ -32,5 +32,7 @@ public interface Element {
 
     Thought getThought();
 
-    Config getConfig();
+    default Config getConfig() {
+        return getThought().getConfig();
+    }
 }

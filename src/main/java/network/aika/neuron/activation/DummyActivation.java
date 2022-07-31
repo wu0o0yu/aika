@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 
@@ -36,12 +37,11 @@ public class DummyActivation extends Activation {
 
     public DummyActivation(Neuron neuron) {
         super(0, neuron);
-        thought = getModel().getCurrentThought();
     }
 
-    public DummyActivation(int id, Neuron neuron) {
-        super(id, neuron);
-        thought = getModel().getCurrentThought();
+    @Override
+    public Thought getThought() {
+        return getModel().getCurrentThought();
     }
 
     @Override

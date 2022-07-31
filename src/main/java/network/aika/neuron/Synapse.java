@@ -17,8 +17,10 @@
 package network.aika.neuron;
 
 import network.aika.Model;
+import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
+import network.aika.fields.QueueField;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
 import network.aika.neuron.axons.Axon;
@@ -42,6 +44,8 @@ import java.util.stream.Stream;
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.isTrue;
+import static network.aika.neuron.activation.Timestamp.MAX;
+import static network.aika.neuron.activation.Timestamp.MIN;
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
 
@@ -49,7 +53,7 @@ import static network.aika.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O extends Neuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends Activation> implements Writable {
+public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O extends Neuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends Activation> implements Element, Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Synapse.class);
 
@@ -62,7 +66,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     protected S template;
     private TemplateSynapse templateInfo;
 
-    protected Field weight = new Field(this, "weight", () -> {
+    protected QueueField weight = new QueueField(this, "weight", () -> {
         PostTraining.add(getOutput());
         setModified();
     });
@@ -542,6 +546,21 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         frequencyINegOPos = in.readDouble();
 
         sampleSpace = SampleSpace.read(in, m);
+    }
+
+    @Override
+    public Timestamp getCreated() {
+        return MIN;
+    }
+
+    @Override
+    public Timestamp getFired() {
+        return MAX;
+    }
+
+    @Override
+    public Thought getThought() {
+        return getModel().getCurrentThought();
     }
 
     public String toString() {

@@ -55,7 +55,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected Timestamp created = NOT_SET;
     protected Timestamp fired = NOT_SET;
 
-    protected Field value = new Field(this, "value");
+    protected FieldOutput value;
     protected FieldOutput finalValue;
     protected QueueField net;
 
@@ -232,11 +232,10 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     protected void initFields() {
-        func(
+        value = func(
                 "f(net)",
                 net,
-                x -> getActivationFunction().f(x),
-                value
+                x -> getActivationFunction().f(x)
         );
     }
 
@@ -318,7 +317,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return id;
     }
 
-    public Field getValue() {
+    public FieldOutput getValue() {
         return value;
     }
 
@@ -476,10 +475,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public <M extends Model> M getModel() {
         return (M) neuron.getModel();
-    }
-
-    public Config getConfig() {
-        return getThought().getConfig();
     }
 
     public NeuronProvider getNeuronProvider() {

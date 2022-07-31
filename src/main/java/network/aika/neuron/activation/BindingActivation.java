@@ -73,11 +73,10 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         });
 
         if(!isInput()) {
-            func(
+            value = func(
                     "f(bp * net)",
                     bpWeightedNet,
-                    x -> getNeuron().getActivationFunction().f(x),
-                    value
+                    x -> getNeuron().getActivationFunction().f(x)
             );
         }
     }

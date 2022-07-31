@@ -16,26 +16,31 @@
  */
 package network.aika.fields;
 
+import network.aika.neuron.activation.Element;
+
+import static network.aika.fields.FieldLink.createEventListener;
+
 /**
  * @author Lukas Molzberger
  */
-public class LimitedField extends Field {
+public class LimitedField extends QueueField {
 
     private double limit;
 
-    public LimitedField(Object refObj, String label, double limit) {
+    public LimitedField(Element refObj, String label, double limit) {
         super(refObj, label);
         this.limit = limit;
     }
 
-    public LimitedField(Object refObj, String label, double limit, double initialValue) {
+    public LimitedField(Element refObj, String label, double limit, double initialValue) {
         super(refObj, label, initialValue);
         this.limit = limit;
     }
 
-    public LimitedField(Object refObj, String label, double limit, FieldOnTrueEvent fieldListener) {
-        super(refObj, label, fieldListener);
+    public LimitedField(Element refObj, String label, double limit, FieldOnTrueEvent fieldListener) {
+        super(refObj, label);
         this.limit = limit;
+        addOutput(createEventListener(fieldListener), true);
     }
 
     @Override

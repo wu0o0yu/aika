@@ -18,10 +18,11 @@ package network.aika.fields;
 
 
 import network.aika.callbacks.FieldObserver;
-import network.aika.callbacks.UpdateListener;
 import network.aika.neuron.activation.Element;
 import network.aika.steps.FieldStep;
 import network.aika.steps.Step;
+
+import static network.aika.fields.FieldLink.createEventListener;
 
 /**
  * @author Lukas Molzberger
@@ -41,6 +42,11 @@ public class QueueField extends Field {
     public QueueField(Element e, String label, double initialValue) {
         super(e, label, initialValue);
         step = new FieldStep(e, this);
+    }
+
+    public QueueField(Element e, String label, FieldOnTrueEvent fieldListener) {
+        this(e, label);
+        addOutput(createEventListener(fieldListener), true);
     }
 
     public void setStep(FieldStep s) {
@@ -69,8 +75,17 @@ public class QueueField extends Field {
         }
     }
 
+    @Override
+    public void set(double v) {
+        super.set(v);
+        process();
+    }
+
     public void process() {
         isQueued = false;
         triggerInternal();
+
+        if(observer != null)
+            observer.receiveUpdate(currentValue, update);
     }
 }
