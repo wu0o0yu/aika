@@ -17,7 +17,6 @@
 package network.aika.steps.activation;
 
 import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.DummyActivation;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
@@ -30,7 +29,7 @@ import network.aika.steps.Step;
  *
  * @author Lukas Molzberger
  */
-public class PostTraining extends Step<DummyActivation> {
+public class PostTraining extends Step<Neuron> {
 
     public static void add(Neuron n) {
         if(n.isTemplate())
@@ -44,11 +43,11 @@ public class PostTraining extends Step<DummyActivation> {
         if(cn.getUpdateAllowPropagateIsQueued())
             return;
 
-        Step.add(new PostTraining(new DummyActivation(n)));
+        Step.add(new PostTraining(n));
     }
 
-    private PostTraining(DummyActivation act) {
-        super(act);
+    private PostTraining(Neuron n) {
+        super(n);
     }
 
     @Override
@@ -58,7 +57,7 @@ public class PostTraining extends Step<DummyActivation> {
 
     @Override
     public void process() {
-        Neuron n = getElement().getNeuron();
+        Neuron n = getElement();
 
         assert !n.isTemplate();
         n.updateSumOfLowerWeights();

@@ -17,8 +17,6 @@
 package network.aika.steps.activation;
 
 import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.DummyActivation;
-import network.aika.neuron.activation.Timestamp;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
@@ -27,17 +25,17 @@ import network.aika.steps.Step;
  *
  * @author Lukas Molzberger
  */
-public class Save extends Step<DummyActivation> {
+public class Save extends Step<Neuron> {
 
     public static void add(Neuron n) {
         if(n.isTemplate())
             return;
 
-        Step.add(new Save(new DummyActivation(n)));
+        Step.add(new Save(n));
     }
 
-    private Save(DummyActivation act) {
-        super(act);
+    private Save(Neuron n) {
+        super(n);
     }
 
     @Override
@@ -48,7 +46,6 @@ public class Save extends Step<DummyActivation> {
     @Override
     public void process() {
         getElement()
-                .getNeuron()
                 .getProvider()
                 .save();
     }
