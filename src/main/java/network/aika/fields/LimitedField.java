@@ -44,8 +44,8 @@ public class LimitedField extends QueueField {
     }
 
     @Override
-    public void set(double v) {
-        super.set(getLimitedValue(v));
+    public void setValue(double v) {
+        super.setValue(getLimitedValue(v));
     }
 
     @Override

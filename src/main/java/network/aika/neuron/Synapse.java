@@ -29,7 +29,6 @@ import network.aika.neuron.bindingsignal.PrimitiveTransition;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.sign.Sign;
-import network.aika.steps.activation.PostTraining;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
@@ -67,7 +66,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     private TemplateSynapse templateInfo;
 
     protected QueueField weight = new QueueField(this, "weight", () -> {
-        PostTraining.add(getOutput());
         setModified();
     });
 
@@ -287,7 +285,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
                 computeInitialWeight(l.getInput()) :
                 weight.getCurrentValue();
 
-        s.weight.set(initialWeight);
+        s.weight.setValue(initialWeight);
         s.template = this;
     }
 
@@ -306,7 +304,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public void setWeight(double w) {
-        weight.set(w);
+        weight.setValue(w);
     }
 
     public boolean isAllowTraining() {

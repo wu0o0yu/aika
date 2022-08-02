@@ -16,7 +16,6 @@
  */
 package network.aika.neuron;
 
-import network.aika.Config;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.direction.Direction;
@@ -30,7 +29,6 @@ import network.aika.neuron.activation.Timestamp;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.sign.Sign;
-import network.aika.steps.activation.PostTraining;
 import network.aika.steps.activation.Save;
 import network.aika.utils.Bound;
 import network.aika.utils.ReadWriteLock;
@@ -66,7 +64,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     private Writable customData;
 
     protected QueueField bias = new LimitedField(this, "bias", 0.0, () -> {
-        PostTraining.add(this);
         setModified();
     });
 
@@ -141,7 +138,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     protected void initFromTemplate(Neuron n) {
-        n.bias.set(bias.getCurrentValue());
+        n.bias.setValue(bias.getCurrentValue());
         n.template = this;
     }
 
@@ -391,9 +388,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public void suspend() {
-    }
-
-    public void updateSumOfLowerWeights() {
     }
 
     @Override

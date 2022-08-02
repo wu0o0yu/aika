@@ -22,10 +22,8 @@ import network.aika.fields.FieldOutput;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.PositiveFeedbackLink;
 import network.aika.neuron.axons.PatternAxon;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
@@ -81,7 +79,7 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
 
     @Override
     protected void initFromTemplate(PositiveFeedbackLink l, PositiveFeedbackSynapse s) {
-        s.feedbackBias.set(feedbackBias.getCurrentValue());
+        s.feedbackBias.setValue(feedbackBias.getCurrentValue());
         super.initFromTemplate(l, s);
     }
 

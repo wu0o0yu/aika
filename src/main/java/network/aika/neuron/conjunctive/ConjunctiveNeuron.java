@@ -16,10 +16,9 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.Model;
+import network.aika.fields.QueueField;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import org.slf4j.Logger;
@@ -28,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.Comparator;
 
+import static network.aika.fields.Fields.connect;
 import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 
 /**
@@ -38,16 +38,22 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
 
     private static final Logger log = LoggerFactory.getLogger(ConjunctiveNeuron.class);
 
-    private boolean updateAllowPropagateIsQueued;
+    private QueueField weightSum = new QueueField(this, "weight sum");
 
-    public boolean getUpdateAllowPropagateIsQueued() {
-        return updateAllowPropagateIsQueued;
+
+    public ConjunctiveNeuron() {
+        weightSum.addEventListener(this::updateSumOfLowerWeights);
+
+        connect(bias, weightSum);
     }
 
     @Override
     public void setModified() {
         super.setModified();
-        updateAllowPropagateIsQueued = true;
+    }
+
+    public QueueField getWeightSum() {
+        return weightSum;
     }
 
     protected void initFromTemplate(ConjunctiveNeuron n) {
@@ -67,7 +73,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         return RECTIFIED_HYPERBOLIC_TANGENT;
     }
 
-    public void updateSumOfLowerWeights() {
+    protected void updateSumOfLowerWeights() {
         sortInputSynapses();
 
         double sum = getBias().getCurrentValue();
@@ -79,8 +85,6 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
 
             sum += s.getWeight().getCurrentValue();
         }
-
-        updateAllowPropagateIsQueued = false;
     }
 
     private void sortInputSynapses() {

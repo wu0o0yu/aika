@@ -69,7 +69,6 @@ public class TokenPositionRelationNeuron extends LatentRelationNeuron {
 
         getBias().receiveUpdate(-4.0);
         setAllowTraining(false);
-        updateSumOfLowerWeights();
         return this;
     }
 

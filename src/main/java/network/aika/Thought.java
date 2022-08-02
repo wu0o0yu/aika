@@ -18,21 +18,17 @@ package network.aika;
 
 
 import network.aika.callbacks.EventListener;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.steps.Phase;
 import network.aika.steps.QueueKey;
 import network.aika.steps.Step;
-import network.aika.neuron.activation.text.TokenActivation;
 
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static network.aika.steps.Phase.*;
 
@@ -143,14 +139,15 @@ public abstract class Thought {
     }
 
     public void addStep(Step s) {
-        s.setCurrentTimestamp(getNextTimestamp());
-        queue.put(s, s);
+        s.createQueueKey(getNextTimestamp());
+        queue.put(s.getQueueKey(), s);
         queueEntryAddedEvent(s);
     }
 
     public void removeStep(Step s) {
-        Step removedStep = queue.remove(s);
+        Step removedStep = queue.remove(s.getQueueKey());
         assert removedStep != null;
+        s.removeQueueKey();
     }
 
     public Collection<Step> getQueue() {
@@ -167,6 +164,8 @@ public abstract class Thought {
                 break;
 
             Step s = queue.pollFirstEntry().getValue();
+            s.removeQueueKey();
+
             timestampOnProcess = getCurrentTimestamp();
 
             beforeProcessedEvent(s);
@@ -186,7 +185,7 @@ public abstract class Thought {
     public void processFinalMode() {
         activationsById.values()
                 .forEach(act ->
-                        act.getIsFinal().set(1.0)
+                        act.getIsFinal().setValue(1.0)
                 );
         process(PROCESSING);
     }

@@ -21,34 +21,42 @@ import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Timestamp;
 import network.aika.utils.Utils;
 
-import static network.aika.neuron.activation.Timestamp.NOT_SET;
-
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class Step<E extends Element> implements QueueKey, Cloneable {
+public abstract class Step<E extends Element> implements Cloneable {
 
     private E element;
+    private QueueKey queueKey;
+    private int sortValue = Integer.MAX_VALUE;
 
-    protected Timestamp created;
-    protected Timestamp fired;
-
-    protected int sortValue = Integer.MAX_VALUE;
-
-    private Timestamp currentTimestamp;
 
     public Step(E element) {
         this.element = element;
-        this.created = element.getCreated();
-        this.fired = element.getFired();
     }
 
-    public void updateSortValue(double newSortValue, boolean isQueued) {
+    public boolean isQueued() {
+        return queueKey != null;
+    }
+
+    public QueueKey getQueueKey() {
+        return queueKey;
+    }
+
+    public void createQueueKey(Timestamp timestamp) {
+        queueKey = new QueueKey(getPhase(), element, sortValue, timestamp);
+    }
+
+    public void removeQueueKey() {
+        queueKey = null;
+    }
+
+    public void updateSortValue(double newSortValue) {
         if(Utils.belowTolerance(sortValue - newSortValue))
             return;
 
-        if(isQueued) {
+        if(isQueued()) {
             Thought t = getElement().getThought();
             t.removeStep(this);
             sortValue = convertSortValue(newSortValue);
@@ -79,38 +87,17 @@ public abstract class Step<E extends Element> implements QueueKey, Cloneable {
 
     public abstract Phase getPhase();
 
-    public static void add(Step s) {
+    public static boolean add(Step s) {
         Thought t = s.getElement().getThought();
         if(t == null)
-            return;
+            return false;
 
         t.addStep(s);
-    }
-
-    public int getSortValue() {
-        return sortValue;
-    }
-
-    public Timestamp getCurrentTimestamp() {
-        return currentTimestamp;
-    }
-
-    public void setCurrentTimestamp(Timestamp timestamp) {
-        this.currentTimestamp = timestamp;
+        return true;
     }
 
     public E getElement() {
         return element;
-    }
-
-    @Override
-    public Timestamp getFired() {
-        return fired;
-    }
-
-    @Override
-    public Timestamp getCreated() {
-        return created;
     }
 
     public String toString() {

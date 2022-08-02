@@ -35,6 +35,6 @@ public class ValueSortedQueueField extends QueueField {
     public void receiveUpdate(double u) {
         super.receiveUpdate(u);
 
-        step.updateSortValue(currentValue + update, isQueued);
+        step.updateSortValue(currentValue + update);
     }
 }

@@ -35,7 +35,12 @@ public class SlotField extends AbstractField<Activation> {
     }
 
     public void connect(BindingSignal bs) {
-        Fields.connect(bs.getOnArrived(), this, false);
+        if(!isConnected())
+            Fields.connect(bs.getOnArrived(), this, true);
+    }
+
+    public boolean isConnected() {
+        return input != null;
     }
 
     @Override

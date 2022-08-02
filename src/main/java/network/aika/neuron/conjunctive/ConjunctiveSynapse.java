@@ -30,6 +30,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import static network.aika.fields.Fields.connect;
+
 /**
  *
  * @author Lukas Molzberger
@@ -46,6 +48,12 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
 {
 
     private double sumOfLowerWeights;
+
+    @Override
+    public void setOutput(O output) {
+        super.setOutput(output);
+        connect(weight, output.getWeightSum());
+    }
 
     protected double getSortingWeight() {
         return getWeight().getCurrentValue();

@@ -40,62 +40,17 @@ public class QueueSortTest {
         testQueue.put(new TestQueueKey(337l, 316, 0.0, 384), 2);
 */
 
-        TestQueueKey tqk3 = new TestQueueKey(null, 36, -1802, 78);
+        QueueKey tqk3 = new QueueKey(Phase.PROCESSING, null, 36, -1802, 78);
 
         testQueue.put(tqk3, 3);
 
-        testQueue.put(new TestQueueKey(null, 386, 0, 393), 2);
-        testQueue.put(new TestQueueKey(6l, 2, 0, 339), 1);
+        testQueue.put(new QueueKey(Phase.PROCESSING, null, 386, 0, 393), 2);
+        testQueue.put(new QueueKey(Phase.PROCESSING, 6l, 2, 0, 339), 1);
 
         System.out.println();
 
-        Integer removedStep =testQueue.remove(tqk3);
+        Integer removedStep = testQueue.remove(tqk3);
 
         System.out.println();
-    }
-
-    private static class TestQueueKey implements QueueKey {
-
-        private Timestamp fired;
-        private Timestamp created;
-        private int sortValue;
-        private Timestamp currentTimestamp;
-
-        public TestQueueKey(Long fired, long created, int sortValue, long currentTimestamp) {
-            this.fired = fired != null ? new Timestamp(fired) : NOT_SET;
-            this.created = new Timestamp(created);
-            this.sortValue = sortValue;
-            this.currentTimestamp = new Timestamp(currentTimestamp);
-        }
-
-        @Override
-        public String getStepName() {
-            return "";
-        }
-
-        @Override
-        public Phase getPhase() {
-            return Phase.PROCESSING;
-        }
-
-        @Override
-        public Timestamp getFired() {
-            return fired;
-        }
-
-        @Override
-        public Timestamp getCreated() {
-            return created;
-        }
-
-        @Override
-        public int getSortValue() {
-            return sortValue;
-        }
-
-        @Override
-        public Timestamp getCurrentTimestamp() {
-            return currentTimestamp;
-        }
     }
 }

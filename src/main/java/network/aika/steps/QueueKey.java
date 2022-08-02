@@ -16,6 +16,7 @@
  */
 package network.aika.steps;
 
+import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Timestamp;
 
 import java.util.Comparator;
@@ -25,9 +26,9 @@ import static network.aika.neuron.activation.Timestamp.NOT_SET;
 /**
  * @author Lukas Molzberger
  */
-public interface QueueKey {
+public class QueueKey {
 
-    Comparator<QueueKey> COMPARATOR = (k1, k2) -> {
+    public static Comparator<QueueKey> COMPARATOR = (k1, k2) -> {
         int r = Integer.compare(k1.getPhase().ordinal(), k2.getPhase().ordinal());
         if(r != 0)
             return r;
@@ -56,6 +57,28 @@ public interface QueueKey {
         return k1.getCurrentTimestamp().compareTo(k2.getCurrentTimestamp());
     };
 
+    private Phase phase;
+    private Timestamp created;
+    private Timestamp fired;
+    private int sortValue;
+    private Timestamp currentTimestamp;
+
+    public QueueKey(Phase phase, Element element, int sortValue, Timestamp currentTimestamp) {
+        this.phase = phase;
+        this.created = element.getCreated();
+        this.fired = element.getFired();
+        this.sortValue = sortValue;
+        this.currentTimestamp = currentTimestamp;
+    }
+
+    public QueueKey(Phase phase, Long fired, long created, int sortValue, long currentTimestamp) {
+        this.phase = phase;
+        this.fired = fired != null ? new Timestamp(fired) : NOT_SET;
+        this.created = new Timestamp(created);
+        this.sortValue = sortValue;
+        this.currentTimestamp = new Timestamp(currentTimestamp);
+    }
+
     private static int compareBothFired(QueueKey k1, QueueKey k2) {
         if(k1.getFired() == NOT_SET || k2.getFired() == NOT_SET)
             return 0;
@@ -76,19 +99,27 @@ public interface QueueKey {
         return Integer.compare(k2.getSortValue(), k1.getSortValue());
     }
 
-    String getStepName();
+    public Phase getPhase() {
+        return phase;
+    }
 
-    Phase getPhase();
+    public Timestamp getFired() {
+        return fired;
+    }
 
-    Timestamp getFired();
+    public Timestamp getCreated() {
+        return created;
+    }
 
-    Timestamp getCreated();
+    public int getSortValue() {
+        return sortValue;
+    }
 
-    int getSortValue();
+    public Timestamp getCurrentTimestamp() {
+        return currentTimestamp;
+    }
 
-    Timestamp getCurrentTimestamp();
-
-    default String qkToString() {
+    public String toString() {
         String firedStr = getFired() == NOT_SET ?
                 "NOT_FIRED" : "" +
                 getFired();

@@ -63,14 +63,14 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 net
         );
 
-        isFinal.addEventListener(() -> {
+        isFinal.addEventListener(() ->
             connect(
                     mul("bpInput * bpSame", bpInput, bpSame),
                     1,
                     bpWeightedNet,
                     true
-            );
-        });
+            )
+        );
 
         if(!isInput()) {
             value = func(

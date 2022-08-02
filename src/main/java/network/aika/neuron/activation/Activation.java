@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.Config;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.direction.Direction;
@@ -140,7 +139,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public void setNet(double v) {
-        net.set(v);
+        net.setValue(v);
     }
 
     protected void initGradientFields() {
@@ -405,7 +404,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public void registerBindingSignal(BindingSignal bs) {
         bindingSignals.put(BSKey.createKey(bs), bs);
-        bs.getOnArrived().set(1.0);
+        bs.getOnArrived().setValue(1.0);
     }
 
     public Map<BSKey, BindingSignal> getPatternBindingSignals() {

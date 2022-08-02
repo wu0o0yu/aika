@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.axons.BindingAxon;
@@ -41,11 +40,5 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
         initFromTemplate(n);
 
         return n;
-    }
-
-    public PrimaryInputSynapse getPrimaryInputSynapse() {
-        return (PrimaryInputSynapse) selectInputSynapse(s ->
-                s instanceof PrimaryInputSynapse<?,?>
-        );
     }
 }

@@ -149,8 +149,6 @@ public class TestUtils {
 
     public static void updateBias(Neuron n, double bias) {
         n.getBias().receiveUpdate(bias);
-
-        n.updateSumOfLowerWeights();
     }
 
     public static PositiveFeedbackSynapse createPositiveFeedbackSynapse(PositiveFeedbackSynapse templateSynapse, PatternNeuron input, BindingNeuron output, double weight, double feedbackWeight) {
@@ -163,7 +161,6 @@ public class TestUtils {
         s.getOutput().getBias().receiveUpdate(-weight);
         s.getWeight().receiveUpdate(feedbackWeight);
         s.getFeedbackBias().receiveUpdate(-feedbackWeight);
-        output.updateSumOfLowerWeights();
         return s;
     }
 
@@ -179,7 +176,6 @@ public class TestUtils {
                 s.getOutput().getBias().receiveUpdate(-weight);
         }
 
-        output.updateSumOfLowerWeights();
         return (S) s;
     }
 

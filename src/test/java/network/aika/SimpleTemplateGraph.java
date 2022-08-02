@@ -150,7 +150,7 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         "Positive Feedback Synapse",
                         0.01
                 );
-        POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE.getFeedbackBias().set(0.0);
+        POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE.getFeedbackBias().setValue(0.0);
 
 
         POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE =
@@ -161,7 +161,7 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         "Positive Feedback Synapse",
                         0.01
                 );
-        POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE.getFeedbackBias().set(0.0);
+        POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE.getFeedbackBias().setValue(0.0);
 
         REVERSE_PATTERN_SYNAPSE_FROM_PATTERN_TEMPLATE =
                 init(
@@ -249,7 +249,7 @@ public class SimpleTemplateGraph implements TemplateGraph {
         N n = model.lookupNeuron(label, np);
 
         n.setLabel(label);
-        n.getBias().set(initialBias);
+        n.getBias().setValue(initialBias);
 
         TemplateNeuron templateInfo = n.getTemplateInfo();
         templateInfo.setLabel(label);
@@ -261,7 +261,7 @@ public class SimpleTemplateGraph implements TemplateGraph {
     private <S extends Synapse> S init(S ts, Neuron input, Neuron output, String templateLabel, double initialWeight) {
         ts.setInput(input);
         ts.setOutput(output);
-        ts.getWeight().set(initialWeight);
+        ts.getWeight().setValue(initialWeight);
 
         TemplateSynapse ti = ts.getTemplateInfo();
         ti.setLabel(templateLabel);

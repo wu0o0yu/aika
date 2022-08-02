@@ -29,7 +29,6 @@ import static network.aika.fields.FieldLink.createEventListener;
  */
 public class QueueField extends Field {
 
-    protected boolean isQueued;
     protected FieldStep step;
 
     protected FieldObserver observer;
@@ -58,7 +57,7 @@ public class QueueField extends Field {
     }
 
     public boolean isQueued() {
-        return isQueued;
+        return step.isQueued();
     }
 
     public void setObserver(FieldObserver observer) {
@@ -69,20 +68,14 @@ public class QueueField extends Field {
         if(observer != null)
             observer.receiveUpdate(currentValue, update);
 
-        if(!isQueued) {
-            Step.add(step);
-            isQueued = true;
+        if(!isQueued()) {
+            if(!Step.add(step)) {
+                process();
+            }
         }
     }
 
-    @Override
-    public void set(double v) {
-        super.set(v);
-        process();
-    }
-
     public void process() {
-        isQueued = false;
         triggerInternal();
 
         if(observer != null)
