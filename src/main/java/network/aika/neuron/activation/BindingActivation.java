@@ -27,7 +27,7 @@ import java.util.*;
 
 import static network.aika.fields.ConstantField.ONE;
 import static network.aika.fields.Fields.*;
-import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
+import static network.aika.neuron.activation.Timestamp.FIRED_COMPARATOR;
 import static network.aika.neuron.bindingsignal.State.*;
 
 /**
@@ -127,7 +127,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     private BindingSignal getPrimaryPatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
-                .filter(bs -> NOT_SET_AFTER.compare(bs.getOriginActivation().getFired(), fired) < 0)
+                .filter(bs -> FIRED_COMPARATOR.compare(bs.getOriginActivation().getFired(), fired) < 0)
                 .filter(bs -> bs.getState() == SAME || bs.getState() == INPUT || bs.getState() == RELATED_SAME)
                 .min(Comparator.comparing(bs -> bs.getState().ordinal()))
                 .orElse(null);

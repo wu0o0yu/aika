@@ -21,6 +21,7 @@ import network.aika.neuron.activation.Timestamp;
 
 import java.util.Comparator;
 
+import static network.aika.neuron.activation.Timestamp.FIRED_COMPARATOR;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 
 /**
@@ -33,25 +34,18 @@ public class QueueKey {
         if(r != 0)
             return r;
 
-        r = compareBothFired(k1, k2);
-        if(r != 0)
+        r = FIRED_COMPARATOR.compare(k1.fired, k2.fired);
+        if (r != 0)
             return r;
 
-        if(firedBeforeCreated(k1, k2))
-            return 1;
-
-        if(firedBeforeCreated(k2, k1))
-            return -1;
-
-        r = Boolean.compare(
-                k1.getFired() != NOT_SET,
-                k2.getFired() != NOT_SET
-        );
-        if(r != 0)
+//        if(k1.getFired() == NOT_SET || k2.getFired() == NOT_SET) {
+        r = Integer.compare(k2.getSortValue(), k1.getSortValue());
+        if (r != 0)
             return r;
+//        }
 
-        r = compareBothNotFired(k1, k2);
-        if(r != 0)
+        r = k1.created.compareTo(k2.created);
+        if (r != 0)
             return r;
 
         return k1.getCurrentTimestamp().compareTo(k2.getCurrentTimestamp());
@@ -77,26 +71,6 @@ public class QueueKey {
         this.created = new Timestamp(created);
         this.sortValue = sortValue;
         this.currentTimestamp = new Timestamp(currentTimestamp);
-    }
-
-    private static int compareBothFired(QueueKey k1, QueueKey k2) {
-        if(k1.getFired() == NOT_SET || k2.getFired() == NOT_SET)
-            return 0;
-
-        return k1.getFired().compareTo(k2.getFired());
-    }
-
-    private static boolean firedBeforeCreated(QueueKey k1, QueueKey k2) {
-        return k1.getFired() == NOT_SET &&
-                k2.getFired() != NOT_SET &&
-                k1.getCreated().compareTo(k2.getFired()) > 0;
-    }
-
-    private static int compareBothNotFired(QueueKey k1, QueueKey k2) {
-        if(k1.getFired() != NOT_SET || k2.getFired() != NOT_SET)
-            return 0;
-
-        return Integer.compare(k2.getSortValue(), k1.getSortValue());
     }
 
     public Phase getPhase() {

@@ -9,7 +9,7 @@ public class Timestamp implements Comparable<Timestamp> {
     public static Timestamp MIN = new Timestamp(0);
     public static Timestamp MAX = new Timestamp(Long.MAX_VALUE);
 
-    public static Comparator<Timestamp> NOT_SET_AFTER = Comparator
+    public static Comparator<Timestamp> FIRED_COMPARATOR = Comparator
             .<Timestamp>comparingInt(ts -> ts == NOT_SET ? 1 : 0)
             .thenComparingLong(Timestamp::getTimestamp);
 

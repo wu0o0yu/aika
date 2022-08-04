@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.Config;
 import network.aika.Thought;
 import network.aika.fields.*;
 import network.aika.neuron.Range;
@@ -28,7 +27,7 @@ import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
-import static network.aika.neuron.activation.Timestamp.NOT_SET_AFTER;
+import static network.aika.neuron.activation.Timestamp.FIRED_COMPARATOR;
 
 /**
  *
@@ -214,7 +213,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     public static boolean isCausal(Activation iAct, Activation oAct) {
-        return oAct.getFired() == NOT_SET || NOT_SET_AFTER.compare(iAct.getFired(), oAct.getFired()) < 0;
+        return oAct.getFired() == NOT_SET || FIRED_COMPARATOR.compare(iAct.getFired(), oAct.getFired()) < 0;
     }
 
     public void induce() {

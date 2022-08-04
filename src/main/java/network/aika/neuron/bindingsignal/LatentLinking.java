@@ -22,6 +22,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
@@ -106,6 +107,7 @@ public class LatentLinking {
         Stream<Link> linksA = iActA.getOutputLinks(synA);
         return linksA.map(lA -> lA.getOutput())
                 .map(oAct -> oAct.getInputLink(synB))
+                .filter(Objects::nonNull)
                 .map(lB -> lB.getInput())
                 .anyMatch(iAct -> iAct == iActB);
     }
