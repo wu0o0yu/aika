@@ -16,6 +16,8 @@
  */
 package network.aika.fields;
 
+import network.aika.neuron.activation.Element;
+
 /**
  * @author Lukas Molzberger
  */
@@ -48,7 +50,7 @@ public class ConstantField extends FieldNode implements FieldOutput {
     }
 
     @Override
-    public Object getReference() {
+    public Element getReference() {
         return null;
     }
 

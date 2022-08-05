@@ -17,6 +17,7 @@
 package network.aika.fields;
 
 import network.aika.callbacks.UpdateListener;
+import network.aika.neuron.activation.Element;
 
 import java.util.List;
 
@@ -48,7 +49,7 @@ public interface FieldOutput {
 
     void disconnect();
 
-    Object getReference();
+    Element getReference();
 
     default void addUpdateListener(UpdateListener updateListener) {
         addOutput(createUpdateListener(updateListener), true);

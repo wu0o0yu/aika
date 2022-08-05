@@ -16,6 +16,7 @@
  */
 package network.aika.fields;
 
+import network.aika.neuron.activation.Element;
 import network.aika.utils.Utils;
 
 import java.util.List;
@@ -46,7 +47,7 @@ public abstract class AbstractFunction extends FieldNode implements FieldInput, 
     }
 
     @Override
-    public Object getReference() {
+    public Element getReference() {
         return input.getInput().getReference();
     }
 

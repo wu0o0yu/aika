@@ -17,6 +17,7 @@
 package network.aika.fields;
 
 import network.aika.Model;
+import network.aika.neuron.activation.Element;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ import java.io.IOException;
 /**
  * @author Lukas Molzberger
  */
-public abstract class AbstractField<R> extends FieldNode implements IField, Writable {
+public abstract class AbstractField<R extends Element> extends FieldNode implements IField, Writable {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractField.class);
 

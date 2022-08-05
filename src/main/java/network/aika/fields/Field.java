@@ -16,6 +16,7 @@
  */
 package network.aika.fields;
 
+import network.aika.neuron.activation.Element;
 import network.aika.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ import java.util.List;
 /**
  * @author Lukas Molzberger
  */
-public class Field<R> extends AbstractField<R> {
+public class Field<R extends Element> extends AbstractField<R> {
 
     private static final Logger log = LoggerFactory.getLogger(Field.class);
 
