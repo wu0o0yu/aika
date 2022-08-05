@@ -32,9 +32,8 @@ public class ValueSortedQueueField extends QueueField {
     }
 
     @Override
-    public void receiveUpdate(double u) {
-        super.receiveUpdate(u);
-
+    public void triggerUpdate() {
         step.updateSortValue(currentValue + update);
+        super.triggerUpdate();
     }
 }
