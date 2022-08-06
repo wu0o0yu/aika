@@ -43,4 +43,7 @@ public class LatentRelationActivation extends BindingActivation {
         return new ValueSortedQueueField(this, "net", 10.0);
     }
 
+    @Override
+    public void connectNorm(Field norm, State s) {
+    }
 }

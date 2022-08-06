@@ -54,7 +54,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected Timestamp created = NOT_SET;
     protected Timestamp fired = NOT_SET;
 
-    protected FieldOutput value;
+    protected Field value = new Field(this, "value");
     protected FieldOutput finalValue;
     protected QueueField net;
 
@@ -231,10 +231,11 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     protected void initFields() {
-        value = func(
+        func(
                 "f(net)",
                 net,
-                x -> getActivationFunction().f(x)
+                x -> getActivationFunction().f(x),
+                value
         );
     }
 

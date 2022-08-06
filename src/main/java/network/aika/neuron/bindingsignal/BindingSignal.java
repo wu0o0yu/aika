@@ -45,7 +45,7 @@ public class BindingSignal implements Element {
     private int depth;
     private State state;
 
-    private Field onArrived;
+    private QueueField onArrived;
     private FieldOutput onArrivedFired;
 
     public BindingSignal(PatternActivation act, State state) {

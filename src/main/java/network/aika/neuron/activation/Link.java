@@ -213,7 +213,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     public static boolean isCausal(Activation iAct, Activation oAct) {
-        return oAct.getFired() == NOT_SET || FIRED_COMPARATOR.compare(iAct.getFired(), oAct.getFired()) < 0;
+        return FIRED_COMPARATOR.compare(iAct.getFired(), oAct.getFired()) < 0;
     }
 
     public void induce() {
