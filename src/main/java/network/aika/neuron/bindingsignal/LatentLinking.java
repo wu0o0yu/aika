@@ -99,7 +99,6 @@ public class LatentLinking {
             return;
 
         BindingSignal toBS = bs.next(t.getInput());
-        toBS.init(l.getOutput());
         l.getOutput().addBindingSignal(toBS);
     }
 

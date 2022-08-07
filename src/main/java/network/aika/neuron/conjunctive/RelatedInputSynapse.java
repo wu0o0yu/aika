@@ -97,9 +97,9 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<
     }
 
     private void addAndInitBindingSignal(LatentRelationActivation act, BindingSignal bs) {
-        BindingSignal latentBS = new BindingSignal(bs.getOrigin(), bs.getState());
-        latentBS.init(act);
-        act.addBindingSignal(latentBS);
+        act.addBindingSignal(
+                new BindingSignal(bs.getOrigin(), bs.getState())
+        );
     }
 
     @Override

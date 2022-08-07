@@ -19,12 +19,19 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.bindingsignal.BSKey;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.PatternNeuron;
 
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.stream.Stream;
+
+import static network.aika.neuron.bindingsignal.BSKey.COMPARATOR;
 import static network.aika.neuron.bindingsignal.State.INPUT;
 import static network.aika.neuron.bindingsignal.State.SAME;
 
@@ -34,11 +41,9 @@ import static network.aika.neuron.bindingsignal.State.SAME;
  */
 public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
+    protected NavigableMap<BSKey, BindingSignal> reverseBindingSignals = new TreeMap<>(COMPARATOR);
+
     protected Range range;
-
-    private Field bpNormSame = new Field(this, "BP-Norm (Same)");
-    private Field bpNormInput = new Field(this, "BP-Norm (Input)");
-
 
     protected PatternActivation(int id, PatternNeuron n) {
         super(id, n);
@@ -73,12 +78,25 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
             range = Range.join(range, bs.getOriginActivation().getRange());
     }
 
-    public Field getNorm(State s) {
-        return switch (s) {
-            case INPUT -> bpNormInput;
-            case SAME -> bpNormSame;
-            default -> null;
-        };
+    @Override
+    public void connectNorm(BindingSignal bs) {
+    }
+
+    public void registerReverseBindingSignal(BindingSignal bindingSignal) {
+        reverseBindingSignals.put(BSKey.createReverseKey(bindingSignal), bindingSignal);
+    }
+
+    public Stream<BindingSignal> getReverseBindingSignals(Neuron toNeuron, State s) {
+        if(toNeuron.isTemplate()) {
+            return reverseBindingSignals.values().stream()
+                    .filter(bs -> bs.getActivation().getNeuron().templateNeuronMatches(toNeuron))
+                    .filter(bs -> bs.getState() == s);
+        } else {
+            return reverseBindingSignals.subMap(
+                    new BSKey(toNeuron, s.ordinal(), 0),
+                    new BSKey(toNeuron, s.ordinal(), Integer.MAX_VALUE)
+            ).values().stream();
+        }
     }
 
     @Override

@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 
 import static network.aika.fields.Fields.mul;
 import static network.aika.neuron.bindingsignal.BSKey.createKey;
+import static network.aika.neuron.bindingsignal.State.INPUT;
 
 
 /**
@@ -48,12 +49,13 @@ public class BindingSignal implements Element {
     private QueueField onArrived;
     private FieldOutput onArrivedFired;
 
+    private Field norm;
+
     public BindingSignal(PatternActivation act, State state) {
         this.origin = this;
         this.depth = 0;
         this.state = state;
-
-        init(act);
+        this.activation = act;
     }
 
     private BindingSignal(BindingSignal parent) {
@@ -90,10 +92,7 @@ public class BindingSignal implements Element {
         propagate(l.getSynapse())
                 .forEach(toBS -> {
                             toBS.setLink(l);
-
-                            Activation oAct = l.getOutput();
-                            toBS.init(oAct);
-                            oAct.addBindingSignal(toBS);
+                            l.getOutput().addBindingSignal(toBS);
                         }
                 );
     }
@@ -124,7 +123,7 @@ public class BindingSignal implements Element {
 
     private void initFields() {
         if (!activation.getNeuron().isNetworkInput()) {
-            if(state == State.INPUT && activation.getLabel() == null) {
+            if(state == INPUT && activation.getLabel() == null) {
                 onArrived.addEventListener(() ->
                         activation.initNeuronLabel(this)
                 );
@@ -140,10 +139,6 @@ public class BindingSignal implements Element {
         onArrivedFired.addEventListener(() ->
                 getActivation().propagateBindingSignal(this)
         );
-
-        Field norm = getOriginActivation().getNorm(state);
-        if(norm != null)
-            activation.connectNorm(norm, state);
     }
 
     public Field getOnArrived() {
@@ -180,6 +175,14 @@ public class BindingSignal implements Element {
 
     public boolean isNetworkInput() {
         return activation != null && activation.isNetworkInput();
+    }
+
+    public Field getNorm() {
+        return norm;
+    }
+
+    public void setNorm(Field norm) {
+        this.norm = norm;
     }
 
     public static boolean originEquals(BindingSignal bsA, BindingSignal bsB) {

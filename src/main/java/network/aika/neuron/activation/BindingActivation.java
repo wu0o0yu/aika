@@ -22,6 +22,7 @@ import network.aika.neuron.Range;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 
 import java.util.*;
 
@@ -37,10 +38,9 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     private AbstractBiFunction bpWeightedNet;
 
-    private FieldOutput bpSame;
-    private FieldOutput bpInput;
-
-    private FieldFunction expNet;
+    private QueueField norm = new QueueField(this, "norm");
+    private FieldOutput expNet;
+    private FieldOutput branchProbability;
 
     private boolean isInput;
 
@@ -57,6 +57,8 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
         expNet = exp(net);
 
+        branchProbability = div("branch probability", expNet, norm);
+
         bpWeightedNet = mul(
                 "bp * net",
                 ONE,
@@ -65,7 +67,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
         isFinal.addEventListener(() ->
             connect(
-                    mul("bpInput * bpSame", bpInput, bpSame),
+                    branchProbability,
                     1,
                     bpWeightedNet,
                     true
@@ -83,16 +85,28 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     @Override
-    public void connectNorm(Field n, State s) {
-        connect(expNet, n);
+    public void addBindingSignal(BindingSignal bs) {
+        super.addBindingSignal(bs);
 
-        switch (s) {
-            case INPUT:
-                bpInput = div("bpInput", expNet, n);
-            case SAME:
-                bpSame = div("bpSame", expNet, n);
-            default:
-        }
+        if(bs.getState() == INPUT)
+            connectNorm(bs);
+    }
+
+    @Override
+    public void connectNorm(BindingSignal bs) {
+        if(bs.getLink() instanceof NegativeFeedbackLink)
+            return;
+
+        bs.getOriginActivation()
+                .getReverseBindingSignals(getNeuron(), INPUT)
+                .map(relBS -> (BindingActivation) relBS.getActivation())
+                .forEach(relAct -> connectNorm(relAct));
+    }
+
+    private void connectNorm(BindingActivation relAct) {
+        connect(expNet, relAct.norm);
+        if(this != relAct)
+            connect(relAct.expNet, norm);
     }
 
     public SlotField getSlot(State s) {
@@ -138,7 +152,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         getNet().receiveUpdate(u);
     }
 
-    public FieldFunction getExpNet() {
+    public FieldOutput getExpNet() {
         return expNet;
     }
 
@@ -146,20 +160,20 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         return bpWeightedNet;
     }
 
-    public FieldOutput getBpSame() {
-        return bpSame;
+    public FieldOutput getBranchProbability() {
+        return branchProbability;
     }
 
-    public FieldOutput getBpInput() {
-        return bpInput;
+    public QueueField getNorm() {
+        return norm;
     }
+
     public void disconnect() {
         super.disconnect();
 
         FieldOutput[] fields = new FieldOutput[]{
                 bpWeightedNet,
-                bpSame,
-                bpInput,
+                branchProbability,
                 expNet
         };
         for(FieldOutput f: fields) {

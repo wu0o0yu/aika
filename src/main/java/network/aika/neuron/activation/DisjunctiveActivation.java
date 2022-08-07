@@ -34,8 +34,4 @@ public abstract class DisjunctiveActivation<N extends DisjunctiveNeuron> extends
         super(id, t, neuron);
     }
 
-    @Override
-    public Stream<BindingSignal> getReverseBindingSignals(Neuron toNeuron, State s) {
-        throw new UnsupportedOperationException();
-    }
 }

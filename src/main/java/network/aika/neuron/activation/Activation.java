@@ -81,7 +81,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected NavigableMap<OutputKey, Link> outputLinks;
 
     protected SortedMap<BSKey, BindingSignal> bindingSignals = new TreeMap<>(COMPARATOR);
-    protected NavigableMap<BSKey, BindingSignal> reverseBindingSignals = new TreeMap<>(COMPARATOR);
 
     protected Activation(int id, N n) {
         this.id = id;
@@ -389,12 +388,13 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return getPatternBindingSignals().values().stream();
     }
 
-    public BindingSignal addBindingSignal(BindingSignal bs) {
+    public void addBindingSignal(BindingSignal bs) {
+        bs.init(this);
+
         if (bs.shorterBSExists())
-            return null;
+            return;
 
         bs.link();
-        return bs;
     }
 
     public void propagateBindingSignal(BindingSignal fromBS) {
@@ -410,23 +410,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public Map<BSKey, BindingSignal> getPatternBindingSignals() {
         return bindingSignals;
-    }
-
-    public void registerReverseBindingSignal(BindingSignal bindingSignal) {
-        reverseBindingSignals.put(BSKey.createReverseKey(bindingSignal), bindingSignal);
-    }
-
-    public Stream<BindingSignal> getReverseBindingSignals(Neuron toNeuron, State s) {
-        if(toNeuron.isTemplate()) {
-            return reverseBindingSignals.values().stream()
-                    .filter(bs -> bs.getActivation().getNeuron().templateNeuronMatches(toNeuron))
-                    .filter(bs -> bs.getState() == s);
-        } else {
-            return reverseBindingSignals.subMap(
-                    new BSKey(toNeuron, s.ordinal(), 0),
-                    new BSKey(toNeuron, s.ordinal(), Integer.MAX_VALUE)
-            ).values().stream();
-        }
     }
 
     public BindingSignal getBindingSignal(BSKey bsKey) {
@@ -466,7 +449,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         this.neuron = n;
     }
 
-    public void connectNorm(Field norm, State s) {
+    public void connectNorm(BindingSignal bs) {
     }
 
     public ActivationFunction getActivationFunction() {
