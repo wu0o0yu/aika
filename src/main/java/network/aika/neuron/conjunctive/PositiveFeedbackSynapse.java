@@ -19,6 +19,7 @@ package network.aika.neuron.conjunctive;
 import network.aika.direction.Direction;
 import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
+import network.aika.fields.Multiplication;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
@@ -29,6 +30,7 @@ import network.aika.neuron.bindingsignal.Transition;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static network.aika.fields.Fields.mul;
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.State.INPUT;
@@ -66,10 +68,16 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
             )
     );
 
-    private Field feedbackBias = new Field(this, "feedbackBias");
-
     public PositiveFeedbackLink createLink(IA input, BindingActivation output) {
         return new PositiveFeedbackLink(this, input, output);
+    }
+
+    public void connectDummyLink(BindingActivation oAct) {
+         mul(getDummyLinkLabel(), oAct.getIsOpen(), getWeight(), oAct.getNetUB());
+    }
+
+    public String getDummyLinkLabel() {
+        return "dummy-weight-" + getInput().getId();
     }
 
     @Override
@@ -78,21 +86,11 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     }
 
     @Override
-    protected void initFromTemplate(PositiveFeedbackLink l, PositiveFeedbackSynapse s) {
-        s.feedbackBias.setValue(feedbackBias.getCurrentValue());
-        super.initFromTemplate(l, s);
-    }
-
-    @Override
     public FieldOutput getLinkingEvent(Activation act, Direction dir) {
         if(act == null)
             return null;
 
         return act.getEvent(false, isTemplate());
-    }
-
-    public Field getFeedbackBias() {
-        return feedbackBias;
     }
 
     @Override

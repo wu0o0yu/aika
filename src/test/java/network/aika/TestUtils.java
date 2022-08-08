@@ -160,7 +160,6 @@ public class TestUtils {
         s.linkOutput();
         s.getOutput().getBias().receiveUpdate(-weight);
         s.getWeight().receiveUpdate(feedbackWeight);
-        s.getFeedbackBias().receiveUpdate(-feedbackWeight);
         return s;
     }
 

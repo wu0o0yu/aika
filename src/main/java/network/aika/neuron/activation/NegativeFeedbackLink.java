@@ -48,7 +48,18 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
         if(isSelfRef())
             return;
 
-        super.initWeightInput();
+        weightedInputUB = mul(
+                "iAct.valueLB * s.weight",
+                input.getValueLB(),
+                synapse.getWeight(),
+                getOutput().getNetUB()
+        );
+        weightedInputLB = mul(
+                "iAct.valueUB * s.weight",
+                input.getValueUB(),
+                synapse.getWeight(),
+                getOutput().getNetLB()
+        );
     }
 
     @Override

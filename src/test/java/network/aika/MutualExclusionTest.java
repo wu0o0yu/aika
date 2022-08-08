@@ -100,7 +100,7 @@ public class MutualExclusionTest {
         Set<BindingActivation> nbActs = nb.getActivations(doc);
         Activation nbAct = nbActs.iterator().next();
 
-        assertTrue(nbAct.getValue().getCurrentValue() > 0.38);
+        assertTrue(nbAct.getValue(true).getCurrentValue() > 0.38);
     }
 
 

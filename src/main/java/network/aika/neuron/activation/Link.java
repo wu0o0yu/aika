@@ -41,7 +41,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected O output;
 
     private BiFunction igGradient;
-    private AbstractBiFunction weightedInput;
+    protected AbstractBiFunction weightedInputUB;
+    protected AbstractBiFunction weightedInputLB;
     protected AbstractBiFunction backPropGradient;
 
     protected ThresholdOperator onTransparent;
@@ -85,7 +86,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         if(isTemplate())
             induce();
 
-        igGradient = func("Information-Gain", input.net, output.net, (x1, x2) ->
+        igGradient = func("Information-Gain", input.netUB, output.netUB, (x1, x2) ->
                         getRelativeSurprisal(
                                 Sign.getSign(x1),
                                 Sign.getSign(x2),
@@ -114,11 +115,17 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     public abstract void initWeightUpdate();
 
     protected void initWeightInput() {
-        weightedInput = mul(
-                "iAct.value * s.weight",
-                input.getValue(),
+        weightedInputUB = mul(
+                "iAct.valueUB * s.weight",
+                input.getValueUB(),
                 synapse.getWeight(),
-                getOutput().getNet()
+                getOutput().getNetUB()
+        );
+        weightedInputLB = mul(
+                "iAct.valueLB * s.weight",
+                input.getValueLB(),
+                synapse.getWeight(),
+                getOutput().getNetLB()
         );
     }
 
@@ -148,8 +155,16 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return igGradient;
     }
 
-    public AbstractBiFunction getWeightedInput() {
-        return weightedInput;
+    public AbstractBiFunction getWeightedInput(boolean upperBound) {
+        return upperBound ? weightedInputUB : weightedInputLB;
+    }
+
+    public AbstractBiFunction getWeightedInputUB() {
+        return weightedInputUB;
+    }
+
+    public AbstractBiFunction getWeightedInputLB() {
+        return weightedInputLB;
     }
 
     public FieldOutput getBackPropGradient() {
@@ -180,8 +195,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return s;
     }
 
-    public FieldOutput getInputValue(Sign s) {
-        return s.getValue(input != null ? input.getValue() : ZERO);
+    public FieldOutput getInputValue(Sign s, boolean upperBound) {
+        return s.getValue(input != null ? input.getValue(upperBound) : ZERO);
     }
 
     public S getSynapse() {
@@ -228,8 +243,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
         synapse.linkOutput();
 
-        if(weightedInput != null)
-            reconnect(weightedInput.getInput2(), synapse.getWeight());
+        if(weightedInputLB != null)
+            reconnect(weightedInputLB.getInput2(), synapse.getWeight());
 
         if(backPropGradient != null)
             reconnect(backPropGradient.getInput2(), synapse.getWeight());

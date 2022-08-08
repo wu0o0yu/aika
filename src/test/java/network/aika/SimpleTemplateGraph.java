@@ -150,8 +150,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         "Positive Feedback Synapse",
                         0.01
                 );
-        POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE.getFeedbackBias().setValue(0.0);
-
 
         POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE =
                 init(
@@ -161,7 +159,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         "Positive Feedback Synapse",
                         0.01
                 );
-        POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE.getFeedbackBias().setValue(0.0);
 
         REVERSE_PATTERN_SYNAPSE_FROM_PATTERN_TEMPLATE =
                 init(

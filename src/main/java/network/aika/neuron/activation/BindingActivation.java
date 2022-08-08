@@ -22,7 +22,9 @@ import network.aika.neuron.Range;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.BindingNeuronSynapse;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
+import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 
 import java.util.*;
 
@@ -36,16 +38,12 @@ import static network.aika.neuron.bindingsignal.State.*;
  */
 public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
-    private AbstractBiFunction bpWeightedNet;
-
-    private QueueField norm = new QueueField(this, "norm");
-    private FieldOutput expNet;
-    private FieldOutput branchProbability;
-
     private boolean isInput;
 
     protected SlotField inputBSSlot = new SlotField(this, "inputBSSlot");
     protected SlotField relatedSameBSSlot = new SlotField(this, "relatedSameBSSlot");
+
+    private Field isOpen = new Field(this, "isOpen", 1.0);
 
 
     protected BindingActivation(int id, BindingNeuron n) {
@@ -55,33 +53,10 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
 
-        expNet = exp(net);
-
-        branchProbability = div("branch probability", expNet, norm);
-
-        bpWeightedNet = mul(
-                "bp * net",
-                ONE,
-                net
-        );
-
-        isFinal.addEventListener(() ->
-            connect(
-                    branchProbability,
-                    1,
-                    bpWeightedNet,
-                    true
-            )
-        );
-
-        if(!isInput()) {
-            func(
-                    "f(bp * net)",
-                    bpWeightedNet,
-                    x -> getNeuron().getActivationFunction().f(x),
-                    value
-            );
-        }
+        n.getInputSynapses()
+                .forEach(s ->
+                        s.connectDummyLink(this)
+                );
     }
 
     @Override
@@ -90,23 +65,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
         if(bs.getState() == INPUT)
             connectNorm(bs);
-    }
-
-    @Override
-    public void connectNorm(BindingSignal bs) {
-        if(bs.getLink() instanceof NegativeFeedbackLink)
-            return;
-
-        bs.getOriginActivation()
-                .getReverseBindingSignals(getNeuron(), INPUT)
-                .map(relBS -> (BindingActivation) relBS.getActivation())
-                .forEach(relAct -> connectNorm(relAct));
-    }
-
-    private void connectNorm(BindingActivation relAct) {
-        connect(expNet, relAct.norm);
-        if(this != relAct)
-            connect(relAct.expNet, norm);
     }
 
     public SlotField getSlot(State s) {
@@ -130,6 +88,10 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         isInput = input;
     }
 
+    public Field getIsOpen() {
+        return isOpen;
+    }
+
     @Override
     public Range getRange() {
         BindingSignal bs = getPrimaryPatternBindingSignal();
@@ -149,37 +111,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     public void updateBias(double u) {
-        getNet().receiveUpdate(u);
-    }
-
-    public FieldOutput getExpNet() {
-        return expNet;
-    }
-
-    public AbstractBiFunction getBpWeightedNet() {
-        return bpWeightedNet;
-    }
-
-    public FieldOutput getBranchProbability() {
-        return branchProbability;
-    }
-
-    public QueueField getNorm() {
-        return norm;
-    }
-
-    public void disconnect() {
-        super.disconnect();
-
-        FieldOutput[] fields = new FieldOutput[]{
-                bpWeightedNet,
-                branchProbability,
-                expNet
-        };
-        for(FieldOutput f: fields) {
-            if(f == null)
-                continue;
-            f.disconnect();
-        }
+        getNetUB().receiveUpdate(u);
+        getNetLB().receiveUpdate(u);
     }
 }

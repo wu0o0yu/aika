@@ -81,6 +81,13 @@ public class Field<R extends Element> extends AbstractField<R> {
                 .orElse(null);
     }
 
+    public FieldLink getInputLink(String inputLabel) {
+        return inputs.stream()
+                .filter(l -> inputLabel.equalsIgnoreCase(l.getInput().getLabel()))
+                .findFirst()
+                .orElse(null);
+    }
+
     @Override
     public List<FieldLink> getInputs() {
         return inputs;

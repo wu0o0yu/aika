@@ -16,20 +16,12 @@
  */
 package network.aika.neuron.activation.text;
 
-import network.aika.fields.Field;
-import network.aika.fields.QueueField;
 import network.aika.fields.ValueSortedQueueField;
 import network.aika.neuron.Range;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.conjunctive.PatternNeuron;
-import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.text.Document;
 
-import static network.aika.neuron.bindingsignal.BSKey.createKey;
-import static network.aika.neuron.bindingsignal.State.SAME;
 
 /**
  *
@@ -52,8 +44,9 @@ public class TokenActivation extends PatternActivation {
         return position;
     }
 
-    protected QueueField initNet() {
-        return new ValueSortedQueueField(this, "net", 0.0);
+    protected void initNet() {
+        netUB = new ValueSortedQueueField(this, "net UB", 0.0);
+        netLB = new ValueSortedQueueField(this, "net LB", 0.0);
     }
 
     public boolean isInput() {

@@ -54,15 +54,17 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected Timestamp created = NOT_SET;
     protected Timestamp fired = NOT_SET;
 
-    protected Field value = new Field(this, "value");
-    protected FieldOutput finalValue;
-    protected QueueField net;
+    protected Field valueUB = new Field(this, "value UB");
+    protected Field valueLB = new Field(this, "value LB");
+
+    protected QueueField netUB;
+    protected QueueField netLB;
 
     protected FieldOutput isFired;
     protected FieldOutput isFiredForWeight;
     protected FieldOutput isFiredForBias;
 
-    protected Field isFinal;
+    protected Field isFinal; // TODO: set true if UB == LB
 
     private FieldFunction entropy;
     protected FieldFunction netOuterGradient;
@@ -95,19 +97,18 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         inputLinks = new TreeMap<>();
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
 
-        net = initNet();
-        net.setPropagatePreCondition((cv, nv, u) ->
-                !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0)
-        );
-        connect(getNeuron().getBias(), net);
+        initNet();
 
-        isFinal = new QueueField(
-                this,
-                "isFinal",
-                isTemplate() ? 1.0 : 0.0
-        );
+        PropagatePreCondition propagatePreCondition = (cv, nv, u) ->
+                !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0);
 
-        isFired = threshold("isFired", 0.0, ABOVE, net);
+        netUB.setPropagatePreCondition(propagatePreCondition);
+        netLB.setPropagatePreCondition(propagatePreCondition);
+
+        connect(getNeuron().getBias(), netUB);
+        connect(getNeuron().getBias(), netLB);
+
+        isFired = threshold("isFired", 0.0, ABOVE, netUB);
 
         isFired.addEventListener(() -> {
                     fired = thought.getCurrentTimestamp();
@@ -123,22 +124,18 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         if (!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled())
             initGradientFields();
 
-        finalValue = mul(
-                "finalValue",
-                isFinal,
-                value
-        );
-
         thought.register(this);
         neuron.register(this);
     }
 
-    protected QueueField initNet() {
-        return new ValueSortedQueueField(this, "net", 0.0);
+    protected void initNet() {
+        netUB = new ValueSortedQueueField(this, "net UB", 0.0);
+        netLB = new ValueSortedQueueField(this, "net LB", 0.0);
     }
 
     public void setNet(double v) {
-        net.setValue(v);
+        netUB.setValue(v);
+        netLB.setValue(v);
     }
 
     protected void initGradientFields() {
@@ -150,7 +147,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         ownOutputGradient = new QueueField(this, "Own-Output-Gradient");
         backpropOutputGradient = new QueueField(this, "Backprop-Output-Gradient");
 
-        entropy = func("Entropy", net, x ->
+        entropy = func("Entropy", netUB, x ->
                         getNeuron().getSurprisal(
                                 Sign.getSign(x),
                                 getAbsoluteRange(),
@@ -161,7 +158,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         netOuterGradient =
                 func("f'(net)",
-                        net,
+                        netUB,
                         x -> getNeuron().getActivationFunction().outerGrad(x)
         );
 
@@ -231,10 +228,16 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     protected void initFields() {
         func(
-                "f(net)",
-                net,
+                "f(netUB)",
+                netUB,
                 x -> getActivationFunction().f(x),
-                value
+                valueUB
+        );
+        func(
+                "f(netLB)",
+                netLB,
+                x -> getActivationFunction().f(x),
+                valueLB
         );
     }
 
@@ -316,20 +319,32 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return id;
     }
 
-    public FieldOutput getValue() {
-        return value;
+    public FieldOutput getValue(boolean upperBound) {
+        return upperBound ? valueUB : valueLB;
     }
 
-    public FieldOutput getFinalValue() {
-        return finalValue;
+    public FieldOutput getValueUB() {
+        return valueUB;
+    }
+
+    public FieldOutput getValueLB() {
+        return valueLB;
     }
 
     public boolean isInput() {
         return false;
     }
 
-    public Field getNet() {
-        return net;
+    public Field getNet(boolean upperBound) {
+        return upperBound ? netUB : netLB;
+    }
+
+    public Field getNetUB() {
+        return netUB;
+    }
+
+    public Field getNetLB() {
+        return netLB;
     }
 
     public Timestamp getCreated() {
@@ -351,7 +366,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     public void induce() {
         assert isTemplate();
 
-        FieldLink biasLink = net.getInputLink(neuron.getBias());
+        FieldLink biasLink = netUB.getInputLink(neuron.getBias());
 
         neuron = (N) neuron.instantiateTemplate(true);
 
@@ -524,9 +539,10 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public void disconnect() {
         FieldOutput[] fields = new FieldOutput[] {
-                net,
-                value,
-                finalValue,
+                netUB,
+                netLB,
+                valueUB,
+                valueLB,
                 isFired,
                 isFiredForWeight,
                 isFiredForBias,

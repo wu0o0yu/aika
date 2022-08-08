@@ -39,4 +39,6 @@ public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I ext
                 >
 {
 
+    public void connectDummyLink(BindingActivation oAct) {
+    }
 }
