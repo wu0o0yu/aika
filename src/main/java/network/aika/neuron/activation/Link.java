@@ -272,18 +272,18 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return output.getThought();
     }
 
-    public String toString() {
-        return (isTemplate() ? "Template-" : "") + getClass().getSimpleName() +
-                " in:[" + getInputKeyString() + "] " +
-                "--> " +
-                "out:[" + getOutputKeyString() + "]";
-    }
-
     private String getInputKeyString() {
         return (input != null ? input.toKeyString() : "id:X n:[" + synapse.getInput() + "]");
     }
 
     private String getOutputKeyString() {
         return (output != null ? output.toKeyString() : "id:X n:[" + synapse.getOutput() + "]");
+    }
+
+    public String toString() {
+        return (isTemplate() ? "Template-" : "") + getClass().getSimpleName() +
+                " in:[" + getInputKeyString() + "] " +
+                "--> " +
+                "out:[" + getOutputKeyString() + "]";
     }
 }
