@@ -59,7 +59,16 @@ public class FieldLink {
     @Override
     public boolean equals(Object o) {
         FieldLink fLink = (FieldLink) o;
-        return arg == fLink.arg && output.equals(fLink.output);
+        if(arg != fLink.arg)
+            return false;
+
+        if(!output.equals(fLink.output))
+            return false;
+
+        if(input == fLink.input)
+            return true;
+
+        return input != null && input.equals(fLink.input);
     }
 
     public String toString() {

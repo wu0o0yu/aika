@@ -64,7 +64,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected FieldOutput isFiredForWeight;
     protected FieldOutput isFiredForBias;
 
-    protected Field isFinal; // TODO: set true if UB == LB
+    protected Field isFinal = new Field(this, "isFinal", 0.0); // TODO: set true if UB == LB
 
     private FieldFunction entropy;
     protected FieldFunction netOuterGradient;
