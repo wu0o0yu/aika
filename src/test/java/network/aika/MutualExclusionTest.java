@@ -194,6 +194,14 @@ public class MutualExclusionTest {
         TokenActivation tAct = doc.addToken(in, 0, 0, 4);
         tAct.setNet(10.0);
 
+        for(double x = 1.0; x <= 0.0; x -= 0.1) {
+            final double xFinal = x;
+            doc.getActivations().stream()
+                    .filter(act -> act instanceof BindingActivation)
+                    .map(act -> (BindingActivation)act)
+                    .forEach(act -> act.getIsOpen().setValue(xFinal));
+        }
+
         doc.process(PROCESSING);
         doc.processFinalMode();
         doc.postProcessing();
