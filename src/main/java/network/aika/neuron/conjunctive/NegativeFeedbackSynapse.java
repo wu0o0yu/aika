@@ -25,6 +25,7 @@ import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static network.aika.fields.Fields.mul;
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
@@ -56,6 +57,14 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<
     @Override
     public NegativeFeedbackLink createLink(InhibitoryActivation input, BindingActivation output) {
         return new NegativeFeedbackLink(this, input, output);
+    }
+
+    public void connectDummyLink(BindingActivation oAct) {
+        mul(getDummyLinkLabel(), oAct.getIsOpen(), getWeight(), oAct.getNetLB());
+    }
+
+    public String getDummyLinkLabel() {
+        return "neg-dummy-weight-" + getInput().getId();
     }
 
     @Override

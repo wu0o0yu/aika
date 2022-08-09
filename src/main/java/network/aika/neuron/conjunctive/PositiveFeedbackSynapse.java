@@ -77,7 +77,7 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     }
 
     public String getDummyLinkLabel() {
-        return "dummy-weight-" + getInput().getId();
+        return "pos-dummy-weight-" + getInput().getId();
     }
 
     @Override

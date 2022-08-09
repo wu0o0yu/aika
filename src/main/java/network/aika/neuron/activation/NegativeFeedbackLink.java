@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.fields.FieldLink;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 
@@ -48,14 +49,18 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
         if(isSelfRef())
             return;
 
+        FieldLink fl = output.getNetLB().getInputLink(synapse.getDummyLinkLabel());
+        fl.getInput().removeOutput(fl, true);
+        output.getNetLB().removeInput(fl);
+
         weightedInputUB = mul(
-                "iAct.valueLB * s.weight",
+                "wiUP = iAct.valueLB * s.weight",
                 input.getValueLB(),
                 synapse.getWeight(),
                 getOutput().getNetUB()
         );
         weightedInputLB = mul(
-                "iAct.valueUB * s.weight",
+                "wiLB = iAct.valueUB * s.weight",
                 input.getValueUB(),
                 synapse.getWeight(),
                 getOutput().getNetLB()
