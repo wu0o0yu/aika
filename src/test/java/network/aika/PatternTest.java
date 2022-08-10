@@ -56,7 +56,6 @@ public class PatternTest {
 
         System.out.println(doc);
 
-        doc.processFinalMode();
         doc.postProcessing();
         doc.updateModel();
 
@@ -73,7 +72,6 @@ public class PatternTest {
         addToken(tg, doc, "A", 0, 0, 1);
         addToken(tg, doc, "B", 1, 1, 2);
 
-        doc.processFinalMode();
         doc.postProcessing();
         doc.updateModel();
 

@@ -63,7 +63,6 @@ public class GradientTest {
 
         processDoc(t, doc);
 
-        doc.processFinalMode();
         doc.postProcessing();
 
         System.out.println();
@@ -100,7 +99,6 @@ public class GradientTest {
 
         AIKADebugger.createAndShowGUI(doc);
 
-        doc.processFinalMode();
         doc.postProcessing();
         doc.updateModel();
 
@@ -134,7 +132,6 @@ public class GradientTest {
 
         AIKADebugger.createAndShowGUI(doc1);
 
-        doc1.processFinalMode();
         doc1.postProcessing();
         doc1.updateModel();
 
@@ -152,7 +149,6 @@ public class GradientTest {
 
         AIKADebugger.createAndShowGUI(doc2);
 
-        doc2.processFinalMode();
         doc2.postProcessing();
         doc2.updateModel();
 

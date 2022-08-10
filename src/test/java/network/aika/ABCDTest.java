@@ -189,7 +189,6 @@ public class ABCDTest {
 
         processTokens(t, doc, List.of("a", "b", "c", "d"));
 
-        doc.processFinalMode();
         doc.postProcessing();
         doc.updateModel();
 

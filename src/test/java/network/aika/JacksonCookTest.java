@@ -230,7 +230,6 @@ public class JacksonCookTest {
 
         processTokens(t, doc, List.of("Jackson", "Cook"));
 
-        doc.processFinalMode();
         doc.postProcessing();
         doc.updateModel();
     }

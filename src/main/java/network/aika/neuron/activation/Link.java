@@ -262,9 +262,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         );
     }
 
-    public void setFinalMode() {
-    }
-
     public void linkOutput() {
         output.inputLinks.put(input != null ? input.getNeuronProvider() : synapse.getPInput(), this);
     }

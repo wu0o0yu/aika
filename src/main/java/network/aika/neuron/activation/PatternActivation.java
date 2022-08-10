@@ -54,17 +54,6 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     }
 
     @Override
-    protected void initFields() {
-        super.initFields();
-
-        isFinal.addEventListener(() ->
-                outputLinks.values().forEach(l ->
-                        l.setFinalMode()
-                )
-        );
-    }
-
-    @Override
     public void init(Synapse originSynapse, Activation originAct) {
         super.init(originSynapse, originAct);
         addBindingSignal(new BindingSignal(this, SAME));

@@ -53,7 +53,6 @@ public class InductionTest {
 
         doc.addToken(in, 0, 0, 1);
 
-        doc.processFinalMode();
         doc.postProcessing();
         doc.updateModel();
 
@@ -126,7 +125,6 @@ public class InductionTest {
         actHund.getNeuron().setFrequency(10);
         actHund.getNeuron().getSampleSpace().setN(1000);
 
-        doc.processFinalMode();
         doc.postProcessing();
         doc.updateModel();
 

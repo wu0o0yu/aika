@@ -73,7 +73,6 @@ public class SimplePhraseTest {
                 i = j + 1;
             }
 
-            doc.processFinalMode();
             doc.postProcessing();
             doc.updateModel();
 

@@ -235,7 +235,6 @@ public class TheCatTest {
 
         processTokens(t, doc, List.of("the", "cat"));
 
-        doc.processFinalMode();
         doc.postProcessing();
         doc.updateModel();
     }

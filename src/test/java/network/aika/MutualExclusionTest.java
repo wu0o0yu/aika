@@ -125,7 +125,6 @@ public class MutualExclusionTest {
 
         doc.addToken(in, 0, 0, 4);
 
-        doc.processFinalMode();
         doc.postProcessing();
         doc.updateModel();
 
@@ -150,13 +149,13 @@ public class MutualExclusionTest {
         InhibitoryNeuron inhib = createNeuron(t.INHIBITORY_TEMPLATE, "I");
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, in, na, 10.0);
-        createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, na, -100.0);
+        createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, na, -20.0);
         updateBias(na, 1.0);
         PatternNeuron pa = initPatternLoop(t, "P-A", na);
 
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, in, nb, 10.0);
-        createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, nb, -100.0);
+        createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, nb, -20.0);
         updateBias(nb, 1.5);
         PatternNeuron pb = initPatternLoop(t, "P-B", nb);
 
@@ -194,16 +193,18 @@ public class MutualExclusionTest {
         TokenActivation tAct = doc.addToken(in, 0, 0, 4);
         tAct.setNet(10.0);
 
-        for(double x = 1.0; x <= 0.0; x -= 0.1) {
+        doc.process(PROCESSING);
+
+        for(double x = 1.0; x >= 0.0; x -= 0.05) {
             final double xFinal = x;
             doc.getActivations().stream()
                     .filter(act -> act instanceof BindingActivation)
                     .map(act -> (BindingActivation)act)
                     .forEach(act -> act.getIsOpen().setValue(xFinal));
+
+            doc.process(PROCESSING);
         }
 
-        doc.process(PROCESSING);
-        doc.processFinalMode();
         doc.postProcessing();
         doc.updateModel();
 

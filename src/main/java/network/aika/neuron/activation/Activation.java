@@ -34,8 +34,7 @@ import java.util.stream.Stream;
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.direction.Direction.DIRECTIONS;
 import static network.aika.fields.Fields.*;
-import static network.aika.fields.ThresholdOperator.Type.ABOVE;
-import static network.aika.fields.ThresholdOperator.Type.ABOVE_ABS;
+import static network.aika.fields.ThresholdOperator.Type.*;
 import static network.aika.neuron.bindingsignal.BSKey.COMPARATOR;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.bindingsignal.BSKey.createKey;
@@ -64,7 +63,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected FieldOutput isFiredForWeight;
     protected FieldOutput isFiredForBias;
 
-    protected Field isFinal = new Field(this, "isFinal", 0.0); // TODO: set true if UB == LB
+    protected FieldOutput isFinal;
 
     private FieldFunction entropy;
     protected FieldFunction netOuterGradient;
@@ -120,6 +119,13 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         isFiredForBias = func("(isFired * -1) + 1", isFired, x -> (x * -1.0) + 1.0);
 
         initFields();
+
+        isFinal = threshold("isFinal", 0.01, BELOW, func("diff", netUB, netLB, (a,b) -> Math.abs(a - b)));
+
+        isFinal.addEventListener(() -> {
+                    System.out.println("isFinal");
+                }
+        );
 
         if (!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled())
             initGradientFields();
@@ -209,7 +215,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return isFiredForBias;
     }
 
-    public Field getIsFinal() {
+    public FieldOutput getIsFinal() {
         return isFinal;
     }
 

@@ -133,7 +133,6 @@ public class TheBlackCatTest {
 
         processTokens(t, doc, List.of("the", "black", "cat"));
 
-        doc.processFinalMode();
         doc.postProcessing();
         doc.updateModel();
     }

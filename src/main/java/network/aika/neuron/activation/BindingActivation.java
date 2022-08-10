@@ -43,10 +43,10 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     protected SlotField inputBSSlot = new SlotField(this, "inputBSSlot");
     protected SlotField relatedSameBSSlot = new SlotField(this, "relatedSameBSSlot");
 
-    protected Field mixedNetUB = new Field(this, "mixedNetUB");
-    protected Field mixedNetLB = new Field(this, "mixedNetLB");
+    protected Field mixedNetUB;
+    protected Field mixedNetLB;
 
-    private Field isOpen = new Field(this, "isOpen", 1.0);
+    private Field isOpen;
 
 
     protected BindingActivation(int id, BindingNeuron n) {
@@ -64,6 +64,11 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     protected void initFields() {
+        mixedNetUB = new Field(this, "mixedNetUB");
+        mixedNetLB = new Field(this, "mixedNetLB");
+
+        isOpen = new Field(this, "isOpen", 1.0);
+
         FieldFunction isOpenLowerPart = func("isOpen func LP", isOpen, x -> (0.5 * (1.0 - x)));
         FieldFunction isOpenUpperPart = func("isOpen func UP", isOpen, x -> 1.0 - (0.5 * (1.0 - x)));
 
