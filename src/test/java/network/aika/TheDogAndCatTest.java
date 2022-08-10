@@ -17,6 +17,7 @@
 package network.aika;
 
 import network.aika.debugger.AIKADebugger;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import network.aika.text.Document;
 import org.graphstream.ui.view.camera.Camera;
@@ -29,6 +30,7 @@ import java.util.TreeMap;
 import static network.aika.TestHelper.initPatternTheCat;
 import static network.aika.TestHelper.initPatternTheDog;
 import static network.aika.TestUtils.*;
+import static network.aika.steps.Phase.PROCESSING;
 
 
 /**
@@ -138,6 +140,16 @@ public class TheDogAndCatTest {
         camera.setViewCenter(2.595, 0.808, 0);
 
         processTokens(t, doc, List.of("the", "dog", "and", "the", "cat"));
+
+        for(double x = 1.0; x >= 0.0; x -= 0.05) {
+            final double xFinal = x;
+            doc.getActivations().stream()
+                    .filter(act -> act instanceof BindingActivation)
+                    .map(act -> (BindingActivation)act)
+                    .forEach(act -> act.getIsOpen().setValue(xFinal));
+
+            doc.process(PROCESSING);
+        }
 
         doc.postProcessing();
         doc.updateModel();
