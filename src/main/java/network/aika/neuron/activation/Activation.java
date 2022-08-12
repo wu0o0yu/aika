@@ -122,11 +122,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         isFinal = threshold("isFinal", 0.01, BELOW, func("diff", netUB, netLB, (a,b) -> Math.abs(a - b)));
 
-        isFinal.addEventListener(() -> {
-                    System.out.println("isFinal");
-                }
-        );
-
         if (!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled())
             initGradientFields();
 
@@ -135,13 +130,15 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     protected void initNet() {
-        netUB = new ValueSortedQueueField(this, "net UB", 0.0);
-        netLB = new ValueSortedQueueField(this, "net LB", 0.0);
+        netUB = new ValueSortedQueueField(this, "net UB");
+        netLB = new ValueSortedQueueField(this, "net LB");
     }
 
     public void setNet(double v) {
         netUB.setValue(v);
+        netUB.triggerUpdate();
         netLB.setValue(v);
+        netLB.triggerUpdate();
     }
 
     protected void initGradientFields() {

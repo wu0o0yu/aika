@@ -49,9 +49,11 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
         if(isSelfRef())
             return;
 
-        FieldLink fl = output.getNetLB().getInputLink(synapse.getDummyLinkLabel());
-        fl.getInput().removeOutput(fl, true);
-        output.getNetLB().removeInput(fl);
+        FieldLink fl = output.getNetLB().getInputLink(synapse);
+        if(fl != null) {
+            fl.getInput().removeOutput(fl, true);
+            output.getNetLB().removeInput(fl);
+        }
 
         weightedInputUB = mul(
                 "wiUP = iAct.valueLB * s.weight",

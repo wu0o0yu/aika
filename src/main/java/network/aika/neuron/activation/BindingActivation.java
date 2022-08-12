@@ -22,13 +22,9 @@ import network.aika.neuron.Range;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.neuron.conjunctive.BindingNeuronSynapse;
-import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
-import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 
 import java.util.*;
 
-import static network.aika.fields.ConstantField.ONE;
 import static network.aika.fields.Fields.*;
 import static network.aika.neuron.activation.Timestamp.FIRED_COMPARATOR;
 import static network.aika.neuron.bindingsignal.State.*;
@@ -55,11 +51,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
-
-        n.getInputSynapses()
-                .forEach(s ->
-                        s.connectDummyLink(this)
-                );
     }
 
     @Override
@@ -90,6 +81,11 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 x -> getActivationFunction().f(x),
                 valueLB
         );
+
+        neuron.getInputSynapses()
+                .forEach(s ->
+                        s.connectDummyLink(this)
+                );
     }
 
     @Override

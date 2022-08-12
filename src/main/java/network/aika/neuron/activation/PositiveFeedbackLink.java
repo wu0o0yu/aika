@@ -44,9 +44,11 @@ public class PositiveFeedbackLink<IA extends Activation<?>> extends BindingNeuro
 
     @Override
     protected void initWeightInput() {
-        FieldLink fl = output.getNetUB().getInputLink(synapse.getDummyLinkLabel());
-        fl.getInput().removeOutput(fl, true);
-        output.getNetUB().removeInput(fl);
+        FieldLink fl = output.getNetUB().getInputLink(synapse);
+        if (fl != null) {
+            fl.getInput().removeOutput(fl, true);
+            output.getNetUB().removeInput(fl);
+        }
 
         super.initWeightInput();
     }

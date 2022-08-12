@@ -116,13 +116,13 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected void initWeightInput() {
         weightedInputUB = mul(
-                "iAct.valueUB * s.weight",
+                "iAct(id:" + getInput().getId() + ").valueUB * s.weight",
                 input.getValueUB(),
                 synapse.getWeight(),
                 getOutput().getNetUB()
         );
         weightedInputLB = mul(
-                "iAct.valueLB * s.weight",
+                "iAct(id:" + getInput().getId() + ").valueLB * s.weight",
                 input.getValueLB(),
                 synapse.getWeight(),
                 getOutput().getNetLB()
