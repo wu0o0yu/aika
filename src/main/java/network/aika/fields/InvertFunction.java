@@ -16,14 +16,13 @@
  */
 package network.aika.fields;
 
-
 /**
  * @author Lukas Molzberger
  */
 public class InvertFunction extends AbstractFunction {
 
     public InvertFunction(String label) {
-        super(label);
+        super(null, label);
     }
 
     @Override

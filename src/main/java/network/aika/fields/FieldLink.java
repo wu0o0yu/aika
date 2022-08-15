@@ -21,11 +21,11 @@ import network.aika.callbacks.UpdateListener;
 /**
  * @author Lukas Molzberger
  */
-public class FieldLink {
+public class FieldLink<O extends UpdateListener> {
 
     private FieldOutput input;
     private int arg;
-    private UpdateListener output;
+    private O output;
 
     public static FieldLink createEventListener(FieldOnTrueEvent eventListener) {
         return createUpdateListener((arg, cv, u) -> {
@@ -34,11 +34,11 @@ public class FieldLink {
         });
     }
 
-    public static FieldLink createUpdateListener(UpdateListener updateListener) {
+    public static <O extends UpdateListener> FieldLink<O> createUpdateListener(O updateListener) {
         return new FieldLink(null, 0, updateListener);
     }
 
-    public FieldLink(FieldOutput input, int arg, UpdateListener output) {
+    public FieldLink(FieldOutput input, int arg, O output) {
         this.input = input;
         this.arg = arg;
         this.output = output;

@@ -18,6 +18,7 @@ package network.aika.fields;
 
 
 import network.aika.callbacks.UpdateListener;
+import network.aika.neuron.activation.Element;
 import network.aika.utils.Utils;
 
 import java.util.ArrayList;
@@ -27,9 +28,31 @@ import java.util.List;
 /**
  * @author Lukas Molzberger
  */
-public abstract class FieldNode implements FieldOutput {
+public abstract class FieldNode<R extends Element> implements FieldOutput {
+
+    private String label;
+    private R reference;
 
     private List<FieldLink> receivers = new ArrayList<>();
+
+    public FieldNode(R reference, String label) {
+        this.reference = reference;
+        this.label = label;
+    }
+
+    @Override
+    public R getReference() {
+        return reference;
+    }
+
+    public void setReference(R reference) {
+        this.reference = reference;
+    }
+
+    @Override
+    public String getLabel() {
+        return label;
+    }
 
     public abstract double getCurrentValue();
 
@@ -39,40 +62,40 @@ public abstract class FieldNode implements FieldOutput {
         return receivers;
     }
 
-    public void addInitialCurrentValue(int arg, UpdateListener listener) {
+    public void addInitialCurrentValue(FieldLink fl, UpdateListener listener) {
         if(isInitialized() && !Utils.belowTolerance(getCurrentValue()))
-            propagateUpdate(arg, listener, 0.0, getCurrentValue());
+            propagateUpdate(fl, listener, 0.0, getCurrentValue());
     }
 
-    public void removeFinalCurrentValue(int arg, UpdateListener listener) {
+    public void removeFinalCurrentValue(FieldLink fl, UpdateListener listener) {
         if(isInitialized() && !Utils.belowTolerance(getCurrentValue()))
-            propagateUpdate(arg, listener, getCurrentValue(), -getCurrentValue());
+            propagateUpdate(fl, listener, getCurrentValue(), -getCurrentValue());
     }
 
     @Override
-    public void addOutput(FieldLink l, boolean propagateInitValue) {
-        this.receivers.add(l);
+    public void addOutput(FieldLink fl, boolean propagateInitValue) {
+        this.receivers.add(fl);
         if(propagateInitValue)
-            addInitialCurrentValue(l.getArgument(), l.getOutput());
+            addInitialCurrentValue(fl, fl.getOutput());
     }
 
     @Override
-    public void removeOutput(FieldLink l, boolean propagateFinalValue) {
+    public void removeOutput(FieldLink fl, boolean propagateFinalValue) {
         if(propagateFinalValue)
-            removeFinalCurrentValue(l.getArgument(), l.getOutput());
-        this.receivers.remove(l);
+            removeFinalCurrentValue(fl, fl.getOutput());
+        this.receivers.remove(fl);
     }
 
     protected void propagateUpdate(double cv, double update) {
         int i = 0;
         while(i < receivers.size()) {
-            FieldLink l = receivers.get(i++);
-            l.getOutput().receiveUpdate(l.getArgument(), cv, update);
+            FieldLink fl = receivers.get(i++);
+            fl.getOutput().receiveUpdate(fl, cv, update);
         }
     }
 
-    protected void propagateUpdate(int arg, UpdateListener listener, double cv, double update) {
-        listener.receiveUpdate(arg, cv, update);
+    protected void propagateUpdate(FieldLink fl, UpdateListener listener, double cv, double update) {
+        listener.receiveUpdate(fl, cv, update);
     }
 
     @Override

@@ -131,6 +131,7 @@ public class BindingSignal implements Element {
         }
 
         onArrivedFired = mul(
+                this,
                 "onFired * onArrived",
                 activation.getIsFired(),
                 onArrived

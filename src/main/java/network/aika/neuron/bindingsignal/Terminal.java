@@ -48,7 +48,9 @@ public interface Terminal {
 
     static FieldOutput getPreconditionEvent(Synapse ts, Activation act, Direction dir, FieldOutput inputEvent) {
         FieldOutput actEvent = ts.getLinkingEvent(act, dir);
-        return actEvent != null ? mul("terminal precondition event (syn: " + ts + ")",
+        return actEvent != null ? mul(
+                act,
+                "terminal precondition event (syn: " + ts + ")",
                 inputEvent,
                 actEvent
         ) :

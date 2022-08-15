@@ -16,13 +16,15 @@
  */
 package network.aika.fields;
 
+import network.aika.neuron.activation.Element;
+
 /**
  * @author Lukas Molzberger
  */
 public class Addition extends AbstractBiFunction {
 
-    public Addition(String label) {
-        super(label);
+    public Addition(Element ref, String label) {
+        super(ref, label);
     }
 
     @Override
@@ -31,8 +33,8 @@ public class Addition extends AbstractBiFunction {
     }
 
     @Override
-    protected double getCurrentValue(int arg, double inputCV) {
-        switch (arg) {
+    protected double getCurrentValue(FieldLink fl, double inputCV) {
+        switch (fl.getArgument()) {
             case 1:
                 return inputCV + in2.getInput().getCurrentValue();
             case 2:
@@ -43,7 +45,7 @@ public class Addition extends AbstractBiFunction {
     }
 
     @Override
-    protected double computeUpdate(int arg, double inputCV, double ownCV, double u) {
+    protected double computeUpdate(FieldLink fl, double inputCV, double ownCV, double u) {
         return u;
     }
 }

@@ -35,21 +35,11 @@ public class PositiveFeedbackLink<IA extends Activation<?>> extends BindingNeuro
     @Override
     protected void initOnTransparent() {
         onTransparent = threshold(
+                this,
                 "onTransparent",
                 0.0,
                 ABOVE,
                 synapse.getWeight()
         );
-    }
-
-    @Override
-    protected void initWeightInput() {
-        FieldLink fl = output.getNetUB().getInputLink(synapse);
-        if (fl != null) {
-            fl.getInput().removeOutput(fl, true);
-            output.getNetUB().removeInput(fl);
-        }
-
-        super.initWeightInput();
     }
 }

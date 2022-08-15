@@ -16,7 +16,7 @@
  */
 package network.aika.fields;
 
-import java.util.List;
+import network.aika.neuron.activation.Element;
 
 /**
  * @author Lukas Molzberger
@@ -32,8 +32,8 @@ public class ThresholdOperator extends AbstractFunction {
     private double threshold;
     private Type type;
 
-    public ThresholdOperator(String label, double threshold, Type type) {
-        super(label);
+    public ThresholdOperator(Element ref, String label, double threshold, Type type) {
+        super(ref, label);
         this.threshold = threshold;
         this.type = type;
     }

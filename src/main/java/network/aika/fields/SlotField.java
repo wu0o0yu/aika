@@ -48,6 +48,11 @@ public class SlotField extends AbstractField<Activation> {
         return List.of(input);
     }
 
+    @Override
+    public int getNextArg() {
+        return 0;
+    }
+
     public BindingSignal getFixedBindingSignal() {
         if(input == null)
             return null;

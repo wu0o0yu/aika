@@ -60,22 +60,58 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
         isOpen = new Field(this, "isOpen", 1.0);
 
-        FieldFunction isOpenLowerPart = func("isOpen func LP", isOpen, x -> (0.5 * (1.0 - x)));
-        FieldFunction isOpenUpperPart = func("isOpen func UP", isOpen, x -> 1.0 - (0.5 * (1.0 - x)));
+        FieldFunction isOpenLowerPart = func(
+                this,
+                "isOpen func LP",
+                isOpen,
+                x -> (0.5 * (1.0 - x))
+        );
+        FieldFunction isOpenUpperPart = func(
+                this,
+                "isOpen func UP",
+                isOpen,
+                x -> 1.0 - (0.5 * (1.0 - x))
+        );
 
-        mul("mixedNetUB UP", netUB, isOpenUpperPart, mixedNetUB);
-        mul("mixedNetUB LP", netLB, isOpenLowerPart, mixedNetUB);
+        mul(
+                this,
+                "mixedNetUB UP",
+                netUB,
+                isOpenUpperPart,
+                mixedNetUB
+        );
+        mul(
+                this,
+                "mixedNetUB LP",
+                netLB,
+                isOpenLowerPart,
+                mixedNetUB
+        );
 
-        mul("mixedNetLB UP", netLB, isOpenUpperPart, mixedNetLB);
-        mul("mixedNetLB LP", netUB, isOpenLowerPart, mixedNetLB);
+        mul(
+                this,
+                "mixedNetLB UP",
+                netLB,
+                isOpenUpperPart,
+                mixedNetLB
+        );
+        mul(
+                this,
+                "mixedNetLB LP",
+                netUB,
+                isOpenLowerPart,
+                mixedNetLB
+        );
 
         func(
+                this,
                 "f(netUB)",
                 mixedNetUB,
                 x -> getActivationFunction().f(x),
                 valueUB
         );
         func(
+                this,
                 "f(netLB)",
                 mixedNetLB,
                 x -> getActivationFunction().f(x),
@@ -84,7 +120,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
         neuron.getInputSynapses()
                 .forEach(s ->
-                        s.connectDummyLink(this)
+                        s.initDummyLink(this)
                 );
     }
 
@@ -115,7 +151,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     public Field getIsOpen() {
         return isOpen;
     }
-
 
     public Field getMixedNetUB() {
         return mixedNetUB;

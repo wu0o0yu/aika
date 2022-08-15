@@ -37,7 +37,6 @@ import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.*;
 import static network.aika.neuron.bindingsignal.BSKey.COMPARATOR;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
-import static network.aika.neuron.bindingsignal.BSKey.createKey;
 
 /**
  * @author Lukas Molzberger
@@ -83,6 +82,11 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     protected SortedMap<BSKey, BindingSignal> bindingSignals = new TreeMap<>(COMPARATOR);
 
+    private static final Comparator<Synapse> SYN_COMP = Comparator.comparing(s -> s.getInput().getId());
+    protected Map<Synapse, LinkSlot> ubLinkSlots = new TreeMap<>(SYN_COMP);
+    protected Map<Synapse, LinkSlot> lbLinkSlots = new TreeMap<>(SYN_COMP);
+
+
     protected Activation(int id, N n) {
         this.id = id;
         this.neuron = n;
@@ -107,7 +111,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         connect(getNeuron().getBias(), netUB);
         connect(getNeuron().getBias(), netLB);
 
-        isFired = threshold("isFired", 0.0, ABOVE, netUB);
+        isFired = threshold(this, "isFired", 0.0, ABOVE, netUB);
 
         isFired.addEventListener(() -> {
                     fired = thought.getCurrentTimestamp();
@@ -115,12 +119,34 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
                 }
         );
 
-        isFiredForWeight = func("(isFired * 2) - 1", isFired, x -> (x * 2.0) - 1.0);
-        isFiredForBias = func("(isFired * -1) + 1", isFired, x -> (x * -1.0) + 1.0);
+        isFiredForWeight = func(
+                this,
+                "(isFired * 2) - 1",
+                isFired,
+                x -> (x * 2.0) - 1.0
+        );
+        isFiredForBias = func(
+                this,
+                "(isFired * -1) + 1",
+                isFired,
+                x -> (x * -1.0) + 1.0
+        );
 
         initFields();
 
-        isFinal = threshold("isFinal", 0.01, BELOW, func("diff", netUB, netLB, (a,b) -> Math.abs(a - b)));
+        isFinal = threshold(
+                this,
+                "isFinal",
+                0.01,
+                BELOW,
+                func(
+                        this,
+                        "diff",
+                        netUB,
+                        netLB,
+                        (a,b) -> Math.abs(a - b)
+                )
+        );
 
         if (!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled())
             initGradientFields();
@@ -136,9 +162,21 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public void setNet(double v) {
         netUB.setValue(v);
-        netUB.triggerUpdate();
+        netUB.process();
         netLB.setValue(v);
-        netLB.triggerUpdate();
+        netLB.process();
+    }
+
+    public Map<Synapse, LinkSlot> getLinkSlots(boolean upperBound) {
+        return upperBound ? ubLinkSlots : lbLinkSlots;
+    }
+
+    public LinkSlot lookupLinkSlot(Synapse syn, boolean upperBound) {
+        return getLinkSlots(upperBound).computeIfAbsent(syn, s -> {
+            LinkSlot ls = new LinkSlot(this, "link slot " + s.getInput().getId());
+            connect(ls, getNet(upperBound));
+            return ls;
+        });
     }
 
     protected void initGradientFields() {
@@ -150,7 +188,11 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         ownOutputGradient = new QueueField(this, "Own-Output-Gradient");
         backpropOutputGradient = new QueueField(this, "Backprop-Output-Gradient");
 
-        entropy = func("Entropy", netUB, x ->
+        entropy = func(
+                this,
+                "Entropy",
+                netUB,
+                x ->
                         getNeuron().getSurprisal(
                                 Sign.getSign(x),
                                 getAbsoluteRange(),
@@ -160,12 +202,15 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         );
 
         netOuterGradient =
-                func("f'(net)",
+                func(
+                        this,
+                        "f'(net)",
                         netUB,
                         x -> getNeuron().getActivationFunction().outerGrad(x)
         );
 
         mul(
+                this,
                 "ig * f'(net)",
                 ownInputGradient,
                 netOuterGradient,
@@ -173,6 +218,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         );
 
         mul(
+                this,
                 "ig * f'(net)",
                 backpropInputGradient,
                 netOuterGradient,
@@ -180,12 +226,14 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         );
 
         outputGradient = add(
+                this,
                 "ownOG + backpropOG",
                 ownOutputGradient,
                 backpropOutputGradient
         );
 
         updateValue = scale(
+                this,
                 "learn-rate * og",
                 getConfig().getLearnRate(),
                 outputGradient
@@ -193,6 +241,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         connect(updateValue, getNeuron().getBias());
 
         inductionThreshold = threshold(
+                this,
                 "induction threshold",
                 getConfig().getInductionThreshold(),
                 ABOVE_ABS,
@@ -218,7 +267,12 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public FieldOutput getEvent(boolean isFired, boolean isFinal) {
         if(isFired && isFinal)
-            return mul("final * fired", this.isFinal, this.isFired);
+            return mul(
+                    this,
+                    "final * fired",
+                    this.isFinal,
+                    this.isFired
+            );
 
         if(isFired)
             return this.isFired;
@@ -231,12 +285,14 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     protected void initFields() {
         func(
+                this,
                 "f(netUB)",
                 netUB,
                 x -> getActivationFunction().f(x),
                 valueUB
         );
         func(
+                this,
                 "f(netLB)",
                 netLB,
                 x -> getActivationFunction().f(x),

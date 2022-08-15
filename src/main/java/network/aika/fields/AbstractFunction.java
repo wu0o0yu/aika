@@ -27,10 +27,9 @@ import java.util.List;
 public abstract class AbstractFunction extends FieldNode implements FieldInput, FieldOutput {
 
     protected FieldLink input;
-    private String label;
 
-    public AbstractFunction(String label) {
-        this.label = label;
+    public AbstractFunction(Element ref, String label) {
+        super(ref, label);
     }
 
     public void addInput(FieldLink in) {
@@ -39,6 +38,11 @@ public abstract class AbstractFunction extends FieldNode implements FieldInput, 
 
     public void removeInput(FieldLink l) {
         this.input = null;
+    }
+
+    @Override
+    public int getNextArg() {
+        return 0;
     }
 
     @Override
@@ -61,11 +65,6 @@ public abstract class AbstractFunction extends FieldNode implements FieldInput, 
     }
 
     @Override
-    public String getLabel() {
-        return label;
-    }
-
-    @Override
     public boolean isInitialized() {
         return input.getInput().isInitialized();
     }
@@ -78,7 +77,7 @@ public abstract class AbstractFunction extends FieldNode implements FieldInput, 
     protected abstract double applyFunction(double x);
 
     @Override
-    public void receiveUpdate(int arg, double inputCV, double u) {
+    public void receiveUpdate(FieldLink fl, double inputCV, double u) {
         if(isInitialized()) {
             double ownCV = applyFunction(inputCV);
             propagateUpdate(

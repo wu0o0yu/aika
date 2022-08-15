@@ -29,10 +29,9 @@ public abstract class AbstractBiFunction extends FieldNode implements FieldInput
     protected FieldLink in1;
     protected FieldLink in2;
 
-    private String label;
 
-    public AbstractBiFunction(String label) {
-        this.label = label;
+    public AbstractBiFunction(Element ref, String label) {
+        super(ref, label);
     }
 
     public FieldLink getInput1() {
@@ -41,6 +40,11 @@ public abstract class AbstractBiFunction extends FieldNode implements FieldInput
 
     public FieldLink getInput2() {
         return in2;
+    }
+
+    @Override
+    public int getNextArg() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -81,8 +85,8 @@ public abstract class AbstractBiFunction extends FieldNode implements FieldInput
         return null;
     }
 
-    private boolean isInitialized(int arg) {
-        FieldLink in = arg == 1 ? in2 : in1;
+    private boolean isInitialized(FieldLink fl) {
+        FieldLink in = fl == in1 ? in2 : in1;
 
         return in != null && in.getInput().isInitialized();
     }
@@ -93,24 +97,19 @@ public abstract class AbstractBiFunction extends FieldNode implements FieldInput
                 in2 != null && in2.getInput().isInitialized();
     }
 
-    @Override
-    public String getLabel() {
-        return label;
-    }
-
-    public void receiveUpdate(int arg, double inputCV, double u) {
-        if(isInitialized(arg)) {
-            double ownCV = getCurrentValue(arg, inputCV);
+    public void receiveUpdate(FieldLink fl, double inputCV, double u) {
+        if(isInitialized(fl)) {
+            double ownCV = getCurrentValue(fl, inputCV);
             propagateUpdate(
                     ownCV,
-                    computeUpdate(arg, inputCV, ownCV, u)
+                    computeUpdate(fl, inputCV, ownCV, u)
             );
         }
     }
 
-    protected abstract double getCurrentValue(int arg, double inputCV);
+    protected abstract double getCurrentValue(FieldLink fl, double inputCV);
 
-    protected abstract double computeUpdate(int arg, double inputCV, double ownCV, double u);
+    protected abstract double computeUpdate(FieldLink fl, double inputCV, double ownCV, double u);
 
     @Override
     public String toString() {

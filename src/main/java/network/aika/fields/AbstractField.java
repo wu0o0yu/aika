@@ -30,7 +30,7 @@ import java.io.IOException;
 /**
  * @author Lukas Molzberger
  */
-public abstract class AbstractField<R extends Element> extends FieldNode implements IField, Writable {
+public abstract class AbstractField<R extends Element> extends FieldNode<R> implements IField, Writable {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractField.class);
 
@@ -38,36 +38,19 @@ public abstract class AbstractField<R extends Element> extends FieldNode impleme
     protected Double update;
     private boolean withinUpdate;
 
-    private R reference;
-    private String label;
 
     public AbstractField(R reference, String label) {
-        this.reference = reference;
-        this.label = label;
+        super(reference, label);
     }
 
     public AbstractField(R reference, String label, double initialValue) {
         this(reference, label);
-
         currentValue = initialValue;
     }
 
     public AbstractField(R reference, String label, FieldOnTrueEvent fieldListener) {
         this(reference, label);
         addEventListener(fieldListener);
-    }
-
-    public R getReference() {
-        return reference;
-    }
-
-    public void setReference(R reference) {
-        this.reference = reference;
-    }
-
-    @Override
-    public String getLabel() {
-        return label;
     }
 
     @Override
@@ -93,7 +76,7 @@ public abstract class AbstractField<R extends Element> extends FieldNode impleme
     protected abstract boolean checkPreCondition(Double cv, double nv, double u);
 
     @Override
-    public void receiveUpdate(int arg, double inputCV, double u) {
+    public void receiveUpdate(FieldLink fl, double inputCV, double u) {
         receiveUpdate(u);
     }
 

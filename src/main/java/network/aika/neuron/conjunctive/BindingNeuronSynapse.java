@@ -16,13 +16,9 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.fields.Field;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.axons.Axon;
-import network.aika.neuron.bindingsignal.BindingSignal;
-
-import static network.aika.neuron.bindingsignal.BindingSignal.originEquals;
 
 /**
  *
@@ -39,6 +35,6 @@ public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I ext
                 >
 {
 
-    public void connectDummyLink(BindingActivation oAct) {
+    public void initDummyLink(BindingActivation oAct) {
     }
 }

@@ -20,7 +20,6 @@ import network.aika.Model;
 import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
-import network.aika.fields.Multiplication;
 import network.aika.fields.QueueField;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;

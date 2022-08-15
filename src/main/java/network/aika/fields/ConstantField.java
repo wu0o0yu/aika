@@ -27,16 +27,10 @@ public class ConstantField extends FieldNode implements FieldOutput {
     public static final ConstantField ONE = new ConstantField("ONE", 1.0);
 
     private final double value;
-    private String label;
 
     public ConstantField(String label, double value) {
-        this.label = label;
+        super(null, label);
         this.value = value;
-    }
-
-    @Override
-    public String getLabel() {
-        return label;
     }
 
     @Override

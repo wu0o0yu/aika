@@ -16,10 +16,12 @@
  */
 package network.aika.callbacks;
 
+import network.aika.fields.FieldLink;
+
 /**
  * @author Lukas Molzberger
  */
 public interface UpdateListener {
 
-    void receiveUpdate(int arg, double cv, double u);
+    void receiveUpdate(FieldLink fl, double cv, double u);
 }

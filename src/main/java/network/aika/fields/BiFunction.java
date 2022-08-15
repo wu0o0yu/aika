@@ -16,6 +16,8 @@
  */
 package network.aika.fields;
 
+import network.aika.neuron.activation.Element;
+
 import java.util.function.DoubleBinaryOperator;
 
 /**
@@ -25,8 +27,8 @@ public class BiFunction extends AbstractBiFunction {
 
     private DoubleBinaryOperator function;
 
-    public BiFunction(String label, DoubleBinaryOperator f) {
-        super(label);
+    public BiFunction(Element ref, String label, DoubleBinaryOperator f) {
+        super(ref, label);
         this.function = f;
     }
 
@@ -36,16 +38,16 @@ public class BiFunction extends AbstractBiFunction {
     }
 
     @Override
-    protected double computeUpdate(int arg, double inputCV, double ownCV, double u) {
+    protected double computeUpdate(FieldLink fl, double inputCV, double ownCV, double u) {
         if(isInitialized())
-            return computeNewValue(arg, inputCV, u) - getCurrentValue(arg, inputCV);
+            return computeNewValue(fl, inputCV, u) - getCurrentValue(fl, inputCV);
         else
-            return computeNewValue(arg, inputCV, u);
+            return computeNewValue(fl, inputCV, u);
     }
 
     @Override
-    protected double getCurrentValue(int arg, double inputCV) {
-        switch (arg) {
+    protected double getCurrentValue(FieldLink fl, double inputCV) {
+        switch (fl.getArgument()) {
             case 1:
                 return function.applyAsDouble(inputCV, in2.getInput().getCurrentValue());
             case 2:
@@ -55,8 +57,8 @@ public class BiFunction extends AbstractBiFunction {
         }
     }
 
-    private double computeNewValue(int arg, double inputCV, double u) {
-        switch (arg) {
+    private double computeNewValue(FieldLink fl, double inputCV, double u) {
+        switch (fl.getArgument()) {
             case 1:
                 return function.applyAsDouble(u + inputCV, FieldOutput.getCurrentValue(in2));
             case 2:

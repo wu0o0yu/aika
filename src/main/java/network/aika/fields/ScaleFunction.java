@@ -16,6 +16,8 @@
  */
 package network.aika.fields;
 
+import network.aika.neuron.activation.Element;
+
 /**
  * @author Lukas Molzberger
  */
@@ -23,8 +25,8 @@ public class ScaleFunction extends AbstractFunction {
 
     private double scale;
 
-    public ScaleFunction(String label, double scale) {
-        super(label);
+    public ScaleFunction(Element ref, String label, double scale) {
+        super(ref, label);
         this.scale = scale;
     }
 

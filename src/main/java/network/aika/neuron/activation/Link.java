@@ -72,10 +72,13 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected void initOnTransparent() {
         onTransparent = threshold(
+                this,
                 "onTransparent",
                 0.0,
                 ABOVE,
-                mul("isFired * weight",
+                mul(
+                        this,
+                        "isFired * weight",
                         synapse.getWeight(),
                         input.isFired
                 )
@@ -86,7 +89,12 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         if(isTemplate())
             induce();
 
-        igGradient = func("Information-Gain", input.netUB, output.netUB, (x1, x2) ->
+        igGradient = func(
+                this,
+                "Information-Gain",
+                input.netUB,
+                output.netUB,
+                (x1, x2) ->
                         getRelativeSurprisal(
                                 Sign.getSign(x1),
                                 Sign.getSign(x2),
@@ -105,6 +113,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
             return;
 
         backPropGradient = mul(
+                this,
                 "oAct.ownOutputGradient * s.weight",
                 output.ownOutputGradient,
                 synapse.getWeight(),
@@ -115,17 +124,23 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     public abstract void initWeightUpdate();
 
     protected void initWeightInput() {
-        weightedInputUB = mul(
-                "iAct(id:" + getInput().getId() + ").valueUB * s.weight",
-                input.getValueUB(),
-                synapse.getWeight(),
-                getOutput().getNetUB()
+        weightedInputUB = initWeightedInput(
+                true,
+                getOutput().lookupLinkSlot(synapse, true)
         );
-        weightedInputLB = mul(
-                "iAct(id:" + getInput().getId() + ").valueLB * s.weight",
-                input.getValueLB(),
+        weightedInputLB = initWeightedInput(
+                false,
+                getOutput().lookupLinkSlot(synapse, false)
+        );
+    }
+
+    protected Multiplication initWeightedInput(boolean upperBound, LinkSlot ls) {
+        return mul(
+                this,
+                "iAct(id:" + getInput().getId() + ").value" + (upperBound ? "UB" : "LB") + " * s.weight",
+                input.getValue(upperBound),
                 synapse.getWeight(),
-                getOutput().getNetLB()
+                ls
         );
     }
 

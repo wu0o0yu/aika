@@ -16,7 +16,6 @@
  */
 package network.aika.fields;
 
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Element;
 import network.aika.utils.Utils;
 import org.slf4j.Logger;
@@ -53,6 +52,11 @@ public class Field<R extends Element> extends AbstractField<R> {
         addEventListener(fieldListener);
     }
 
+    @Override
+    public int getNextArg() {
+        return inputs.size();
+    }
+
     protected boolean checkPreCondition(Double cv, double nv, double u) {
         return propagatePreCondition.check(cv, nv, u);
     }
@@ -80,23 +84,6 @@ public class Field<R extends Element> extends AbstractField<R> {
                 .filter(l -> l.getInput() == f)
                 .findFirst()
                 .orElse(null);
-    }
-
-    public FieldLink getInputLink(Synapse s) {
-        return inputs.stream()
-                .filter(fl -> getRefSynapseForNetInput(fl) == s)
-                .findFirst()
-                .orElse(null);
-    }
-
-    private static Synapse getRefSynapseForNetInput(FieldLink fl) {
-        FieldOutput input = fl.getInput();
-        if(!(input instanceof Multiplication))
-            return null;
-
-        Multiplication weightedInput = (Multiplication) input;
-        FieldLink synWeightFL = weightedInput.getInput2();
-        return (Synapse) synWeightFL.getInput().getReference();
     }
 
     @Override

@@ -18,6 +18,7 @@ package network.aika.fields;
 
 import network.aika.callbacks.UpdateListener;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -31,5 +32,7 @@ public interface FieldInput extends UpdateListener {
 
     void removeInput(FieldLink l);
 
-    List<FieldLink> getInputs();
+    Collection<FieldLink> getInputs();
+
+    int getNextArg();
 }

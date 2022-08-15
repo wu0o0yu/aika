@@ -17,6 +17,9 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.direction.Direction;
+import network.aika.fields.FieldLink;
+import network.aika.fields.LinkSlot;
+import network.aika.fields.Multiplication;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
@@ -25,6 +28,7 @@ import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static network.aika.fields.Fields.connect;
 import static network.aika.fields.Fields.mul;
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
@@ -63,12 +67,17 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<
         return new NegativeFeedbackLink(this, input, output);
     }
 
-    public void connectDummyLink(BindingActivation oAct) {
-        mul(getDummyLinkLabel(), oAct.getIsOpen(), getWeight(), oAct.getNetLB());
-    }
+    public void initDummyLink(BindingActivation oAct) {
+        Multiplication dummyWeight = mul(
+                oAct,
+                "neg-dummy-weight-" + getInput().getId(),
+                oAct.getIsOpen(),
+                getWeight()
+        );
 
-    public String getDummyLinkLabel() {
-        return "neg-dummy-weight-" + getInput().getId();
+        LinkSlot ls = oAct.lookupLinkSlot(this, false);
+        FieldLink fl = connect(dummyWeight, ls);
+        ls.setDefaultInput(fl);
     }
 
     @Override
