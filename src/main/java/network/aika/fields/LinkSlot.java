@@ -16,8 +16,8 @@
  */
 package network.aika.fields;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Element;
 import network.aika.utils.Utils;
 
 import java.util.*;
@@ -25,19 +25,23 @@ import java.util.*;
 /**
  * @author Lukas Molzberger
  */
-public class LinkSlot extends FieldNode<Activation> implements FieldInput, FieldOutput {
+public class LinkSlot extends FieldNode<Synapse> implements FieldInput, FieldOutput {
 
     protected Map<FieldLink, Double> inputs = new TreeMap<>(Comparator.comparingInt(fl -> fl.getArgument()));
 
     private FieldLink defaultInput;
     private FieldLink selectedInput;
 
-    public LinkSlot(Activation ref, String label) {
+    public LinkSlot(Synapse ref, String label) {
         super(ref, label);
     }
 
     public FieldLink getDefaultInput() {
         return defaultInput;
+    }
+
+    public FieldLink getSelectedInput() {
+        return selectedInput;
     }
 
     public void setDefaultInput(FieldLink defaultInput) {
@@ -78,13 +82,12 @@ public class LinkSlot extends FieldNode<Activation> implements FieldInput, Field
         inputs.put(fl, Double.valueOf(inputCV + u));
 
         if(isInitialized(fl)) {
-            double ownCV = getCurrentValue(fl, inputCV);
-            propagateUpdate(
-                    ownCV,
-                    computeUpdate(fl, inputCV, ownCV, u)
-            );
+            double cv = getCurrentValue();
+            FieldLink newSelectedInput = getMaxInput();
+            double update = computeUpdate(fl, newSelectedInput);
+            selectedInput = newSelectedInput;
+            propagateUpdate(cv, update);
         }
-        selectedInput = getMaxInput();
     }
 
     private boolean isInitialized(FieldLink fl) {
@@ -102,20 +105,11 @@ public class LinkSlot extends FieldNode<Activation> implements FieldInput, Field
         return v;
     }
 
-    protected double getCurrentValue(FieldLink fl, double inputCV) {
-        FieldLink maxInput = getMaxInput();
-        if(maxInput == null)
+    protected double computeUpdate(FieldLink fl, FieldLink newSelectedInput) {
+        if(newSelectedInput == null || newSelectedInput != fl)
             return 0.0;
 
-        return getValue(maxInput);
-    }
-
-    protected double computeUpdate(FieldLink fl, double inputCV, double ownCV, double u) {
-        FieldLink maxInput = getMaxInput();
-        if(maxInput == null || maxInput != fl)
-            return 0.0;
-
-        double newValue = getValue(maxInput);
+        double newValue = getValue(newSelectedInput);
         double oldValue = getValue(selectedInput);
 
         return newValue - oldValue;
@@ -132,7 +126,10 @@ public class LinkSlot extends FieldNode<Activation> implements FieldInput, Field
 
     @Override
     public double getCurrentValue() {
-        return 0;
+        if(selectedInput == null)
+            return 0.0;
+
+        return getValue(selectedInput);
     }
 
     @Override
