@@ -52,19 +52,20 @@ public abstract class AbstractBiFunction extends FieldNode implements FieldInput
         return List.of(in1, in2);
     }
 
-    public void addInput(FieldLink l) {
-        if(l.getArgument() == 1)
-            in1 = l;
-        else
-            in2 = l;
+    public void addInput(FieldLink fl) {
+        setInput(fl);
     }
 
     @Override
-    public void removeInput(FieldLink l) {
-        if(l.getArgument() == 1)
-            in1 = null;
+    public void removeInput(FieldLink fl) {
+        setInput(fl);
+    }
+
+    private void setInput(FieldLink fl) {
+        if(fl.getArgument() == 1)
+            in1 = fl;
         else
-            in2 = null;
+            in2 = fl;
     }
 
     @Override

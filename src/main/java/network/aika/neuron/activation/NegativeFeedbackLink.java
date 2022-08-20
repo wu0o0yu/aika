@@ -50,14 +50,11 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
         if(isSelfRef())
             return;
 
-        weightedInputUB = initWeightedInput(
-                false,
-                getOutput().lookupLinkSlot(synapse, true)
-        );
-        weightedInputLB = initWeightedInput(
-                true,
-                getOutput().lookupLinkSlot(synapse, false)
-        );
+        weightedInputUB = initWeightedInput(false);
+        weightedInputLB = initWeightedInput(true);
+
+        connect(weightedInputUB, input.getId(), getOutput().lookupLinkSlot(synapse, true));
+        connect(weightedInputLB, input.getId(), getOutput().lookupLinkSlot(synapse, false));
     }
 
     @Override

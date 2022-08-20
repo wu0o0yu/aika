@@ -76,7 +76,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<
         );
 
         LinkSlot ls = oAct.lookupLinkSlot(this, false);
-        FieldLink fl = connect(dummyWeight, ls);
+        FieldLink fl = connect(dummyWeight, -1, ls);
         ls.setDefaultInput(fl);
     }
 

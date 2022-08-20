@@ -80,7 +80,7 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
          );
 
         LinkSlot ls = oAct.lookupLinkSlot(this, true);
-        FieldLink fl = connect(dummyWeight, ls);
+        FieldLink fl = connect(dummyWeight, -1, ls);
         ls.setDefaultInput(fl);
     }
 

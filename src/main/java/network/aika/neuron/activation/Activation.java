@@ -173,7 +173,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public LinkSlot lookupLinkSlot(Synapse syn, boolean upperBound) {
         return getLinkSlots(upperBound).computeIfAbsent(syn, s -> {
-            LinkSlot ls = new LinkSlot(s, "link slot");
+            LinkSlot ls = new LinkSlot(s, "link slot " + (upperBound ? "ub" : "lb"));
             connect(ls, getNet(upperBound));
             return ls;
         });

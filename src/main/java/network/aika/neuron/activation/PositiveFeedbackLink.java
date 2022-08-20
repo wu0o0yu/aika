@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.fields.FieldLink;
 import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 
 import static network.aika.fields.Fields.*;

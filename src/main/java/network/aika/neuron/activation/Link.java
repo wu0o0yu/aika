@@ -124,23 +124,19 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     public abstract void initWeightUpdate();
 
     protected void initWeightInput() {
-        weightedInputUB = initWeightedInput(
-                true,
-                getOutput().lookupLinkSlot(synapse, true)
-        );
-        weightedInputLB = initWeightedInput(
-                false,
-                getOutput().lookupLinkSlot(synapse, false)
-        );
+        weightedInputUB = initWeightedInput(true);
+        weightedInputLB = initWeightedInput(false);
+
+        connect(weightedInputUB, input.getId(), getOutput().lookupLinkSlot(synapse, true));
+        connect(weightedInputLB, input.getId(), getOutput().lookupLinkSlot(synapse, false));
     }
 
-    protected Multiplication initWeightedInput(boolean upperBound, LinkSlot ls) {
+    protected Multiplication initWeightedInput(boolean upperBound) {
         return mul(
                 this,
                 "iAct(id:" + getInput().getId() + ").value" + (upperBound ? "UB" : "LB") + " * s.weight",
                 input.getValue(upperBound),
-                synapse.getWeight(),
-                ls
+                synapse.getWeight()
         );
     }
 
