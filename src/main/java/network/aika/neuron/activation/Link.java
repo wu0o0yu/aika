@@ -24,6 +24,8 @@ import network.aika.sign.Sign;
 import network.aika.steps.link.Cleanup;
 import network.aika.steps.link.LinkCounting;
 import static network.aika.fields.ConstantField.ZERO;
+import static network.aika.fields.FieldLink.connect;
+import static network.aika.fields.FieldLink.reconnect;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
@@ -41,9 +43,9 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected O output;
 
     private BiFunction igGradient;
-    protected AbstractBiFunction weightedInputUB;
-    protected AbstractBiFunction weightedInputLB;
-    protected AbstractBiFunction backPropGradient;
+    protected AbstractFunction weightedInputUB;
+    protected AbstractFunction weightedInputLB;
+    protected AbstractFunction backPropGradient;
 
     protected ThresholdOperator onTransparent;
 
@@ -127,8 +129,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         weightedInputUB = initWeightedInput(true);
         weightedInputLB = initWeightedInput(false);
 
-        connect(weightedInputUB, input.getId(), getOutput().lookupLinkSlot(synapse, true));
-        connect(weightedInputLB, input.getId(), getOutput().lookupLinkSlot(synapse, false));
+        connect(weightedInputUB, getOutput().lookupLinkSlot(synapse, true));
+        connect(weightedInputLB, getOutput().lookupLinkSlot(synapse, false));
     }
 
     protected Multiplication initWeightedInput(boolean upperBound) {
@@ -166,15 +168,15 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return igGradient;
     }
 
-    public AbstractBiFunction getWeightedInput(boolean upperBound) {
+    public AbstractFunction getWeightedInput(boolean upperBound) {
         return upperBound ? weightedInputUB : weightedInputLB;
     }
 
-    public AbstractBiFunction getWeightedInputUB() {
+    public AbstractFunction getWeightedInputUB() {
         return weightedInputUB;
     }
 
-    public AbstractBiFunction getWeightedInputLB() {
+    public AbstractFunction getWeightedInputLB() {
         return weightedInputLB;
     }
 
@@ -255,10 +257,10 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         synapse.linkOutput();
 
         if(weightedInputLB != null)
-            reconnect(weightedInputLB.getInput2(), synapse.getWeight());
+            reconnect(weightedInputLB.getInputLinkByArg(2), synapse.getWeight());
 
         if(backPropGradient != null)
-            reconnect(backPropGradient.getInput2(), synapse.getWeight());
+            reconnect(backPropGradient.getInputLinkByArg(2), synapse.getWeight());
 
         Cleanup.add(this);
     }

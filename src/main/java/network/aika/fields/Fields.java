@@ -21,57 +21,16 @@ import network.aika.neuron.activation.Element;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleFunction;
 
+import static network.aika.fields.FieldLink.connect;
+import static network.aika.fields.FieldLink.connectAll;
+
 /**
  * @author Lukas Molzberger
  */
 public class Fields {
 
     public static boolean isTrue(FieldOutput f) {
-        return f != null && f.isInitialized() && f.getCurrentValue() > 0.5;
-    }
-
-    public static void reconnect(FieldLink fl, Field newInput) {
-        fl.getInput().removeOutput(fl, true);
-        newInput.addOutput(fl, true);
-    }
-
-    public static FieldLink connect(FieldOutput in, FieldInput out) {
-        return connect(in, out.getNextArg(), out);
-    }
-
-    public static FieldLink connect(FieldOutput in, FieldInput out, boolean propagateInitialValue) {
-        return connect(in, out.getNextArg(), out, propagateInitialValue);
-    }
-
-    public static FieldLink connect(FieldOutput in, int arg, FieldInput out) {
-        return connect(in, arg, out, true);
-    }
-
-    public static FieldLink connect(FieldOutput in, int arg, FieldInput out, boolean propagateInitialValue) {
-        FieldLink fl = new FieldLink(in, arg, out);
-        out.addInput(fl);
-        in.addOutput(fl, propagateInitialValue);
-        return fl;
-    }
-
-    private static void connectAll(FieldOutput in, FieldInput... out) {
-        assert in != null;
-
-        for(FieldInput o : out) {
-            if(o != null) {
-                connect(in, 0, o);
-            }
-        }
-    }
-
-    public static void disconnect(FieldOutput in, FieldInput out) {
-        disconnect(in, 0, out);
-    }
-
-    public static void disconnect(FieldOutput in, int arg, FieldInput out) {
-        FieldLink l = new FieldLink(in, arg, out);
-        out.removeInput(l);
-        in.removeOutput(l, false);
+        return f != null && f.getCurrentValue() > 0.5;
     }
 
     public static Addition add(Element ref, String label, FieldOutput in1, FieldOutput in2) {
@@ -79,8 +38,8 @@ public class Fields {
             return null;
 
         Addition add = new Addition(ref, label);
-        connect(in1, 1, add);
-        connect(in2, 2, add);
+        connect(in1, 0, add);
+        connect(in2, 1, add);
         return add;
     }
 
@@ -90,13 +49,30 @@ public class Fields {
         return add;
     }
 
+
+    public static MixFunction mix(Element ref, String label, FieldOutput x, FieldOutput in1, FieldOutput in2) {
+        if(in1 == null || in2 == null)
+            return null;
+
+        MixFunction mix = new MixFunction(ref, label);
+        connect(in1, 0, mix);
+        connect(in2, 1, mix);
+        return mix;
+    }
+
+    public static MixFunction mix(Element ref, String label, FieldOutput x, FieldOutput in1, FieldOutput in2, FieldInput... out) {
+        MixFunction mix = mix(ref, label, x, in1, in2);
+        connectAll(mix, out);
+        return mix;
+    }
+
     public static Multiplication mul(Element ref, String label, FieldOutput in1, FieldOutput in2) {
         if(in1 == null || in2 == null)
             return null;
 
         Multiplication mul = new Multiplication(ref, label);
-        connect(in1, 1, mul);
-        connect(in2, 2, mul);
+        connect(in1, 0, mul);
+        connect(in2, 1, mul);
         return mul;
     }
 
@@ -111,8 +87,8 @@ public class Fields {
             return null;
 
         Division div = new Division(ref, label);
-        connect(in1, 1, div);
-        connect(in2, 2, div);
+        connect(in1, 0, div);
+        connect(in2, 1, div);
         return div;
     }
 
@@ -155,8 +131,8 @@ public class Fields {
             return null;
 
         BiFunction func = new BiFunction(ref, label, f);
-        connect(in1, 1, func);
-        connect(in2, 2, func);
+        connect(in1, 0, func);
+        connect(in2, 1, func);
         return func;
     }
 

@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.Comparator;
 
-import static network.aika.fields.Fields.connect;
+import static network.aika.fields.FieldLink.connect;
 import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 
 /**

@@ -23,14 +23,14 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.axons.Axon;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.utils.Utils;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static network.aika.fields.Fields.connect;
+import static network.aika.fields.FieldLink.connect;
+
 
 /**
  *

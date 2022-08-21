@@ -23,5 +23,5 @@ import network.aika.fields.FieldLink;
  */
 public interface UpdateListener {
 
-    void receiveUpdate(FieldLink fl, double cv, double u);
+    void receiveUpdate(FieldLink fl, double u);
 }

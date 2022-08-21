@@ -55,52 +55,22 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     protected void initFields() {
-        mixedNetUB = new Field(this, "mixedNetUB");
-        mixedNetLB = new Field(this, "mixedNetLB");
-
         isOpen = new Field(this, "isOpen", 1.0);
 
-        FieldFunction isOpenLowerPart = func(
+        mixedNetUB = mix(
                 this,
-                "isOpen func LP",
+                "mixedNetUB",
                 isOpen,
-                x -> (0.5 * (1.0 - x))
-        );
-        FieldFunction isOpenUpperPart = func(
-                this,
-                "isOpen func UP",
-                isOpen,
-                x -> 1.0 - (0.5 * (1.0 - x))
+                netUB,
+                netLB
         );
 
-        mul(
+        mixedNetLB = mix(
                 this,
-                "mixedNetUB UP",
-                netUB,
-                isOpenUpperPart,
-                mixedNetUB
-        );
-        mul(
-                this,
-                "mixedNetUB LP",
+                "mixedNetLB",
+                isOpen,
                 netLB,
-                isOpenLowerPart,
-                mixedNetUB
-        );
-
-        mul(
-                this,
-                "mixedNetLB UP",
-                netLB,
-                isOpenUpperPart,
-                mixedNetLB
-        );
-        mul(
-                this,
-                "mixedNetLB LP",
-                netUB,
-                isOpenLowerPart,
-                mixedNetLB
+                netUB
         );
 
         func(

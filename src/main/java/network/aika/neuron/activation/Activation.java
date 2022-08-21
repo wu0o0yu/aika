@@ -33,6 +33,8 @@ import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.direction.Direction.DIRECTIONS;
+import static network.aika.fields.FieldLink.connect;
+import static network.aika.fields.FieldLink.reconnect;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.*;
 import static network.aika.neuron.bindingsignal.BSKey.COMPARATOR;
@@ -102,8 +104,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         initNet();
 
-        PropagatePreCondition propagatePreCondition = (cv, nv, u) ->
-                !Utils.belowTolerance(u) && (cv >= 0.0 || nv >= 0.0);
+        PropagatePreCondition propagatePreCondition = (cv, nv) ->
+                !Utils.belowTolerance(nv - cv) && (cv >= 0.0 || nv >= 0.0);
 
         netUB.setPropagatePreCondition(propagatePreCondition);
         netLB.setPropagatePreCondition(propagatePreCondition);

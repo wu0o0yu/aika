@@ -16,32 +16,106 @@
  */
 package network.aika.fields;
 
+
 import network.aika.callbacks.UpdateListener;
 
 /**
  * @author Lukas Molzberger
  */
-public class FieldLink<O extends UpdateListener> {
+public class FieldLink {
 
     private FieldOutput input;
     private int arg;
-    private O output;
+    private UpdateListener output;
 
-    public static FieldLink createEventListener(FieldOnTrueEvent eventListener) {
-        return createUpdateListener((arg, cv, u) -> {
+    private boolean isInitialized;
+
+    public static FieldLink createEventListener(FieldOutput in, FieldOnTrueEvent eventListener) {
+        return createUpdateListener(in, (arg, u) -> {
             if (u > 0.0)
                 eventListener.onTrue();
         });
     }
 
-    public static <O extends UpdateListener> FieldLink<O> createUpdateListener(O updateListener) {
-        return new FieldLink(null, 0, updateListener);
+    public static FieldLink createUpdateListener(FieldOutput in, UpdateListener updateListener) {
+        return new FieldLink(in, 0, updateListener);
     }
 
-    public FieldLink(FieldOutput input, int arg, O output) {
+
+    public static void reconnect(FieldLink fl, Field newInput) {
+        fl.getInput().removeOutput(fl, true);
+        newInput.addOutput(fl, true);
+    }
+
+    public static FieldLink connect(FieldOutput in, FieldInput out) {
+        return connect(in, out.getNextArg(), out);
+    }
+
+    public static FieldLink connect(FieldOutput in, FieldInput out, boolean propagateInitialValue) {
+        return connect(in, out.getNextArg(), out, propagateInitialValue);
+    }
+
+    public static FieldLink connect(FieldOutput in, int arg, FieldInput out) {
+        return connect(in, arg, out, true);
+    }
+
+    public static FieldLink connect(FieldOutput in, int arg, FieldInput out, boolean propagateInitialValue) {
+        FieldLink fl = new FieldLink(in, arg, out);
+        out.addInput(fl);
+        in.addOutput(fl, propagateInitialValue);
+        return fl;
+    }
+
+    public static void connectAll(FieldOutput in, FieldInput... out) {
+        assert in != null;
+
+        for(FieldInput o : out) {
+            if(o != null) {
+                connect(in, 0, o);
+            }
+        }
+    }
+
+    public static void disconnect(FieldOutput in, FieldInput out) {
+        disconnect(in, 0, out);
+    }
+
+    public static void disconnect(FieldOutput in, int arg, FieldInput out) {
+        FieldLink l = new FieldLink(in, arg, out);
+        out.removeInput(l);
+        in.removeOutput(l, false);
+    }
+
+    public FieldLink(FieldOutput input, int arg, UpdateListener output) {
         this.input = input;
         this.arg = arg;
         this.output = output;
+    }
+
+    public void receiveUpdate(double u) {
+        output.receiveUpdate(this, u);
+    }
+
+    public void connect() {
+        assert !isInitialized;
+        output.receiveUpdate(this, input.getCurrentValue());
+
+        isInitialized = true;
+    }
+
+    public void disconnect() {
+        assert isInitialized;
+        output.receiveUpdate(this, -input.getCurrentValue());
+
+        isInitialized = false;
+        if(output instanceof FieldInput) {
+            FieldInput fo = (FieldInput) output;
+            fo.removeInput(this);
+        }
+    }
+
+    public double getOldInputValue() {
+        return isInitialized ? input.getCurrentValue() : 0.0;
     }
 
     public int getArgument() {

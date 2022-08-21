@@ -20,6 +20,7 @@ import network.aika.neuron.activation.Element;
 
 import static network.aika.fields.FieldLink.createEventListener;
 
+
 /**
  * @author Lukas Molzberger
  */
@@ -40,7 +41,7 @@ public class LimitedField extends QueueField {
     public LimitedField(Element refObj, String label, double limit, FieldOnTrueEvent fieldListener) {
         super(refObj, label);
         this.limit = limit;
-        addOutput(createEventListener(fieldListener), true);
+        addOutput(createEventListener(this, fieldListener));
     }
 
     @Override
@@ -49,10 +50,10 @@ public class LimitedField extends QueueField {
     }
 
     @Override
-    public void receiveUpdate(double u) {
-        double cv = isInitialized() ? getCurrentValue() : 0.0;
+    public void receiveUpdate(FieldLink fl, double u) {
+        double cv = currentValue;
         double nv = getLimitedValue(cv + u);
-        super.receiveUpdate(nv - cv);
+        super.receiveUpdate(fl, nv - cv);
     }
 
     private double getLimitedValue(double nv) {

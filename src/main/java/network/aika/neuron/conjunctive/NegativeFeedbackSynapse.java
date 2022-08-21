@@ -28,7 +28,7 @@ import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static network.aika.fields.Fields.connect;
+import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.mul;
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;

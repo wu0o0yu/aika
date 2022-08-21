@@ -21,6 +21,7 @@ import network.aika.fields.Multiplication;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 
+import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 import static network.aika.neuron.bindingsignal.State.INPUT;

@@ -21,5 +21,5 @@ package network.aika.fields;
  */
 public interface PropagatePreCondition {
 
-    boolean check(Double cv, double nv, double u);
+    boolean check(Double cv, double nv);
 }

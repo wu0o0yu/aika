@@ -17,16 +17,13 @@
 package network.aika.fields;
 
 import network.aika.neuron.Synapse;
-import network.aika.utils.Utils;
 
-import java.util.*;
+import java.util.Comparator;
 
 /**
  * @author Lukas Molzberger
  */
-public class LinkSlot extends FieldNode<Synapse> implements FieldInput, FieldOutput {
-
-    protected Map<FieldLink, Double> inputs = new TreeMap<>(Comparator.comparingInt(fl -> fl.getArgument()));
+public class LinkSlot extends Field<Synapse> implements FieldInput, FieldOutput {
 
     private FieldLink defaultInput;
     private FieldLink selectedInput;
@@ -47,106 +44,33 @@ public class LinkSlot extends FieldNode<Synapse> implements FieldInput, FieldOut
         this.defaultInput = defaultInput;
     }
 
-    @Override
-    public Collection<FieldLink> getInputs() {
-        return inputs.keySet();
-    }
+    public void receiveUpdate(FieldLink fl, double u) {
+        double inputNV = fl.getInput().getNewValue();
+        double outputOV = selectedInput.getOldInputValue();
 
-    @Override
-    public int getNextArg() {
-        return inputs.size();
-    }
-
-    @Override
-    public void addInput(FieldLink fl) {
-        FieldOutput input = fl.getInput();
-
-        inputs.put(fl, input.isInitialized() ? input.getCurrentValue() : null);
-    }
-
-    @Override
-    public void removeInput(FieldLink l) {
-        inputs.remove(l);
-    }
-
-    @Override
-    public void disconnect() {
-        super.disconnect();
-        inputs.keySet()
-                .forEach(fl -> fl.getInput().removeOutput(fl, false));
-        inputs.clear();
-    }
-
-    public void receiveUpdate(FieldLink fl, double inputCV, double u) {
-        inputs.put(fl, Double.valueOf(inputCV + u));
-
-        if(isInitialized(fl)) {
-            double cv = getCurrentValue();
-            FieldLink newSelectedInput = getMaxInput();
-            double update = computeUpdate(fl, newSelectedInput);
-            selectedInput = newSelectedInput;
-            propagateUpdate(cv, update);
+        if(selectedInput == defaultInput) {
+            selectedInput = fl;
+            newValue = fl.getInput().getNewValue();
+            return;
         }
-    }
 
-    private boolean isInitialized(FieldLink fl) {
-        return fl.getInput().isInitialized();
-    }
+        if(fl == selectedInput) {
+            if(inputNV < outputOV) {
+                FieldLink maxFL = getInputs().stream()
+                        .filter(in -> in != defaultInput)
+                        .max(Comparator.comparingDouble(in -> in.getOldInputValue()))
+                        .orElse(null);
 
-    private double getValue(FieldLink fl) {
-        if(fl == null)
-            return 0.0;
-
-        Double v = inputs.get(fl);
-        if(v == null)
-            return 0.0;
-
-        return v;
-    }
-
-    protected double computeUpdate(FieldLink fl, FieldLink newSelectedInput) {
-        if(newSelectedInput == null || newSelectedInput != fl)
-            return 0.0;
-
-        double newValue = getValue(newSelectedInput);
-        double oldValue = getValue(selectedInput);
-
-        return newValue - oldValue;
-    }
-
-    private FieldLink getMaxInput() {
-        return inputs.entrySet().stream()
-                .filter(e -> e.getKey() != defaultInput)
-                .filter(e -> e.getValue() != null)
-                .max(Comparator.comparingDouble(e -> e.getValue()))
-                .map(e -> e.getKey())
-                .orElse(null);
-    }
-
-    @Override
-    public double getCurrentValue() {
-        if(selectedInput == null)
-            return 0.0;
-
-        return getValue(selectedInput);
-    }
-
-    @Override
-    public boolean isInitialized() {
-        return selectedInput != null ?
-                isInitialized(selectedInput) :
-                false;
-    }
-
-    @Override
-    public String toString() {
-        return getLabel() + ":" + getValueString();
-    }
-
-    public String getValueString() {
-        if(!isInitialized())
-            return "--";
-
-        return "[v:" + Utils.round(getCurrentValue()) + "]";
+                if(maxFL.getOldInputValue() > inputNV) {
+                    selectedInput = maxFL;
+                    newValue = maxFL.getOldInputValue();
+                }
+            }
+        } else {
+            if (inputNV > outputOV) {
+                selectedInput = fl;
+                newValue = fl.getInput().getNewValue();
+            }
+        }
     }
 }

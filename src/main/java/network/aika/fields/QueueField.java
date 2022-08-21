@@ -27,6 +27,7 @@ import java.util.List;
 
 import static network.aika.fields.FieldLink.createEventListener;
 
+
 /**
  * @author Lukas Molzberger
  */
@@ -48,7 +49,7 @@ public class QueueField extends Field {
 
     public QueueField(Element e, String label, FieldOnTrueEvent fieldListener) {
         this(e, label);
-        addOutput(createEventListener(fieldListener), true);
+        addOutput(createEventListener(this, fieldListener));
     }
 
     public void setStep(FieldStep s) {
@@ -73,7 +74,7 @@ public class QueueField extends Field {
 
     public void triggerUpdate() {
         observers.forEach(o ->
-                o.receiveUpdate(currentValue, update)
+                o.receiveUpdate(currentValue, newValue - currentValue)
         );
 
         if(!isQueued()) {
@@ -87,7 +88,7 @@ public class QueueField extends Field {
         triggerInternal();
 
         observers.forEach(o ->
-                o.receiveUpdate(currentValue, update)
+                o.receiveUpdate(currentValue, newValue - currentValue)
         );
     }
 }

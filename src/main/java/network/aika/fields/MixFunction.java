@@ -18,22 +18,40 @@ package network.aika.fields;
 
 import network.aika.neuron.activation.Element;
 
-import java.util.function.DoubleFunction;
-
 /**
  * @author Lukas Molzberger
  */
-public class FieldFunction extends AbstractFunction {
+public class MixFunction extends Field implements FieldInput, FieldOutput {
 
-    private DoubleFunction<Double> function;
-
-    public FieldFunction(Element ref, String label, DoubleFunction<Double> f) {
+    public MixFunction(Element ref, String label) {
         super(ref, label);
-        this.function = f;
     }
 
     @Override
+    public Element getReference() {
+        return null;
+    }
+
+    public void receiveUpdate(FieldLink fl, double u) {
+        propagateUpdate(
+                computeUpdate(fl, u)
+        );
+    }
+
     protected double computeUpdate(FieldLink fl, double u) {
-        return function.apply(fl.getInput().getNewValue());
+        int arg = fl.getArgument();
+        if(arg == 0) {
+            double a = getInputByArg(1).getCurrentValue();
+            double b = getInputByArg(2).getCurrentValue();
+
+            return (-u * a + u * b) / 2;
+        } else {
+            double x = getInputByArg(0).getCurrentValue();
+
+            if(arg == 1)
+                x = (1 - x);
+
+            return (x * u) / 2;
+        }
     }
 }

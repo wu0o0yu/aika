@@ -17,95 +17,22 @@
 package network.aika.fields;
 
 import network.aika.neuron.activation.Element;
-import network.aika.utils.Utils;
-
-import java.util.List;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class AbstractFunction extends FieldNode implements FieldInput, FieldOutput {
-
-    protected FieldLink input;
+public abstract class AbstractFunction extends Field implements FieldInput, FieldOutput {
 
     public AbstractFunction(Element ref, String label) {
         super(ref, label);
     }
 
-    public void addInput(FieldLink in) {
-        this.input = in;
-    }
-
-    public void removeInput(FieldLink l) {
-        this.input = null;
-    }
+    protected abstract double computeUpdate(FieldLink fl, double u);
 
     @Override
-    public int getNextArg() {
-        return 0;
-    }
-
-    @Override
-    public List<FieldLink> getInputs() {
-        return List.of(input);
-    }
-
-    @Override
-    public Element getReference() {
-        return input.getInput().getReference();
-    }
-
-    @Override
-    public void disconnect() {
-        super.disconnect();
-        if(input != null) {
-            input.getInput().removeOutput(input, false);
-            input = null;
-        }
-    }
-
-    @Override
-    public boolean isInitialized() {
-        return input.getInput().isInitialized();
-    }
-
-    @Override
-    public double getCurrentValue() {
-        return applyFunction(input.getInput().getCurrentValue());
-    }
-
-    protected abstract double applyFunction(double x);
-
-    @Override
-    public void receiveUpdate(FieldLink fl, double inputCV, double u) {
-        if(isInitialized()) {
-            double ownCV = applyFunction(inputCV);
-            propagateUpdate(
-                    ownCV,
-                    computeUpdate(inputCV, ownCV, u)
-            );
-        }
-    }
-
-    private double computeUpdate(double inputCV, double ownCV, double u) {
-        return input.getInput().isInitialized() ?
-                computeNewValue(inputCV, u) - ownCV :
-                computeNewValue(inputCV, u);
-    }
-
-    private double computeNewValue(double inputCV, double u) {
-        return applyFunction(inputCV + u);
-    }
-
-    @Override
-    public String toString() {
-        return getLabel() + ":" + getValueString();
-    }
-
-    public String getValueString() {
-        if(!isInitialized())
-            return "--";
-
-        return "[v:" + Utils.round(getCurrentValue()) + "]";
+    public void receiveUpdate(FieldLink fl, double u) {
+        propagateUpdate(
+                computeUpdate(fl, u)
+        );
     }
 }

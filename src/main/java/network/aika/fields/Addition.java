@@ -21,31 +21,14 @@ import network.aika.neuron.activation.Element;
 /**
  * @author Lukas Molzberger
  */
-public class Addition extends AbstractBiFunction {
+public class Addition extends AbstractFunction {
 
     public Addition(Element ref, String label) {
         super(ref, label);
     }
 
     @Override
-    public double getCurrentValue() {
-        return FieldOutput.getCurrentValue(in1) + FieldOutput.getCurrentValue(in2);
-    }
-
-    @Override
-    protected double getCurrentValue(FieldLink fl, double inputCV) {
-        switch (fl.getArgument()) {
-            case 1:
-                return inputCV + in2.getInput().getCurrentValue();
-            case 2:
-                return in1.getInput().getCurrentValue() + inputCV;
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
-    @Override
-    protected double computeUpdate(FieldLink fl, double inputCV, double ownCV, double u) {
+    protected double computeUpdate(FieldLink fl, double u) {
         return u;
     }
 }

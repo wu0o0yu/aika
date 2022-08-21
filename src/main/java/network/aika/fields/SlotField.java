@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * @author Lukas Molzberger
  */
-public class SlotField extends AbstractField<Activation> {
+public class SlotField extends Field<Activation> {
 
     private FieldLink input;
 
@@ -36,7 +36,7 @@ public class SlotField extends AbstractField<Activation> {
 
     public void connect(BindingSignal bs) {
         if(!isConnected())
-            Fields.connect(bs.getOnArrived(), this, true);
+            FieldLink.connect(bs.getOnArrived(), this, true);
     }
 
     public boolean isConnected() {
@@ -66,8 +66,8 @@ public class SlotField extends AbstractField<Activation> {
     }
 
     @Override
-    protected boolean checkPreCondition(Double cv, double nv, double u) {
-        return !Utils.belowTolerance(u);
+    protected boolean checkPreCondition(Double ov, double nv) {
+        return ov != null && !Utils.belowTolerance(nv - ov);
     }
 
     @Override
