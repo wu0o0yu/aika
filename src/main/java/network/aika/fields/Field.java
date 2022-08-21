@@ -78,7 +78,6 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
         this.propagatePreCondition = propagatePreCondition;
     }
 
-
     @Override
     public R getReference() {
         return reference;
@@ -103,23 +102,6 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
 
     public List<FieldLink> getReceivers() {
         return receivers;
-    }
-
-
-    @Override
-    public void addOutput(FieldLink fl, boolean propagateInitValue) {
-        addOutput(fl);
-
-        if(propagateInitValue && !Utils.belowTolerance(currentValue))
-            fl.connect();
-    }
-
-    @Override
-    public void removeOutput(FieldLink fl, boolean propagateFinalValue) {
-        if(propagateFinalValue && !Utils.belowTolerance(currentValue))
-            fl.disconnect();
-
-        removeOutput(fl);
     }
 
     @Override
@@ -207,7 +189,9 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
         receivers.clear();
 
         inputs.stream()
-                .forEach(l -> l.getInput().removeOutput(l, false));
+                .forEach(l ->
+                        l.getInput().removeOutput(l)
+                );
         inputs.clear();
     }
 

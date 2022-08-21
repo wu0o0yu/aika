@@ -35,10 +35,6 @@ public interface FieldOutput {
 
     double getNewValue();
 
-    void addOutput(FieldLink fl, boolean propagateInitValue);
-
-    void removeOutput(FieldLink fl, boolean propagateFinalValue);
-
     void addOutput(FieldLink fl);
 
     void removeOutput(FieldLink fl);
@@ -50,6 +46,8 @@ public interface FieldOutput {
     Element getReference();
 
     default void addEventListener(FieldOnTrueEvent eventListener) {
-        addOutput(createEventListener(this, eventListener), true);
+        FieldLink fl = createEventListener(this, eventListener);
+        addOutput(fl);
+        fl.connect();
     }
 }

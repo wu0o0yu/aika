@@ -46,13 +46,14 @@ public class LinkSlot extends Field<Synapse> implements FieldInput, FieldOutput 
 
     public void receiveUpdate(FieldLink fl, double u) {
         double inputNV = fl.getInput().getNewValue();
-        double outputOV = selectedInput.getOldInputValue();
 
-        if(selectedInput == defaultInput) {
+        if(selectedInput == null || selectedInput == defaultInput) {
             selectedInput = fl;
             newValue = fl.getInput().getNewValue();
             return;
         }
+
+        double outputOV = selectedInput.getOldInputValue();
 
         if(fl == selectedInput) {
             if(inputNV < outputOV) {

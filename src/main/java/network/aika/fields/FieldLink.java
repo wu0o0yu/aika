@@ -18,6 +18,7 @@ package network.aika.fields;
 
 
 import network.aika.callbacks.UpdateListener;
+import network.aika.utils.Utils;
 
 /**
  * @author Lukas Molzberger
@@ -43,26 +44,31 @@ public class FieldLink {
 
 
     public static void reconnect(FieldLink fl, Field newInput) {
-        fl.getInput().removeOutput(fl, true);
-        newInput.addOutput(fl, true);
+        fl.disconnect();
+        fl.getInput().removeOutput(fl);
+        fl.setInput(newInput);
+        newInput.addOutput(fl);
+        fl.connect();
     }
 
     public static FieldLink connect(FieldOutput in, FieldInput out) {
         return connect(in, out.getNextArg(), out);
     }
 
-    public static FieldLink connect(FieldOutput in, FieldInput out, boolean propagateInitialValue) {
-        return connect(in, out.getNextArg(), out, propagateInitialValue);
+    public static FieldLink link(FieldOutput in, FieldInput out) {
+        return link(in, out.getNextArg(), out);
     }
 
     public static FieldLink connect(FieldOutput in, int arg, FieldInput out) {
-        return connect(in, arg, out, true);
+        FieldLink fl = link(in, arg, out);
+        fl.connect();
+        return fl;
     }
 
-    public static FieldLink connect(FieldOutput in, int arg, FieldInput out, boolean propagateInitialValue) {
+    public static FieldLink link(FieldOutput in, int arg, FieldInput out) {
         FieldLink fl = new FieldLink(in, arg, out);
         out.addInput(fl);
-        in.addOutput(fl, propagateInitialValue);
+        in.addOutput(fl);
         return fl;
     }
 
@@ -81,9 +87,9 @@ public class FieldLink {
     }
 
     public static void disconnect(FieldOutput in, int arg, FieldInput out) {
-        FieldLink l = new FieldLink(in, arg, out);
-        out.removeInput(l);
-        in.removeOutput(l, false);
+        FieldLink fl = new FieldLink(in, arg, out);
+        out.removeInput(fl);
+        in.removeOutput(fl);
     }
 
     public FieldLink(FieldOutput input, int arg, UpdateListener output) {
@@ -92,20 +98,30 @@ public class FieldLink {
         this.output = output;
     }
 
+    public void setInput(FieldOutput input) {
+        this.input = input;
+    }
+
     public void receiveUpdate(double u) {
         output.receiveUpdate(this, u);
     }
 
     public void connect() {
         assert !isInitialized;
-        output.receiveUpdate(this, input.getCurrentValue());
+
+        double cv = input.getCurrentValue();
+        if(!Utils.belowTolerance(cv))
+            output.receiveUpdate(this, cv);
 
         isInitialized = true;
     }
 
     public void disconnect() {
         assert isInitialized;
-        output.receiveUpdate(this, -input.getCurrentValue());
+
+        double cv = input.getCurrentValue();
+        if(!Utils.belowTolerance(cv))
+            output.receiveUpdate(this, -cv);
 
         isInitialized = false;
         if(output instanceof FieldInput) {

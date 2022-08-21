@@ -18,10 +18,11 @@ package network.aika.fields;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.utils.Utils;
 
 import java.util.List;
+
+import static network.aika.fields.FieldLink.link;
 
 /**
  * @author Lukas Molzberger
@@ -36,7 +37,7 @@ public class SlotField extends Field<Activation> {
 
     public void connect(BindingSignal bs) {
         if(!isConnected())
-            FieldLink.connect(bs.getOnArrived(), this, true);
+            FieldLink.connect(bs.getOnArrived(), this);
     }
 
     public boolean isConnected() {
@@ -90,7 +91,7 @@ public class SlotField extends Field<Activation> {
     @Override
     public void disconnect() {
         super.disconnect();
-        input.getInput().removeOutput(input, false);
+        input.getInput().removeOutput(input);
         input = null;
     }
 }

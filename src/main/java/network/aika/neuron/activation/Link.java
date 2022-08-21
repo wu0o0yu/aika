@@ -28,7 +28,6 @@ import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.FieldLink.reconnect;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
-import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.activation.Timestamp.FIRED_COMPARATOR;
 
 /**

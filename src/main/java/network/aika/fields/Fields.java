@@ -21,8 +21,7 @@ import network.aika.neuron.activation.Element;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleFunction;
 
-import static network.aika.fields.FieldLink.connect;
-import static network.aika.fields.FieldLink.connectAll;
+import static network.aika.fields.FieldLink.*;
 
 /**
  * @author Lukas Molzberger
@@ -38,8 +37,12 @@ public class Fields {
             return null;
 
         Addition add = new Addition(ref, label);
-        connect(in1, 0, add);
-        connect(in2, 1, add);
+        FieldLink fl0 = link(in1, 0, add);
+        FieldLink fl1 = link(in2, 1, add);
+
+        fl0.connect();
+        fl1.connect();
+
         return add;
     }
 
@@ -55,8 +58,14 @@ public class Fields {
             return null;
 
         MixFunction mix = new MixFunction(ref, label);
-        connect(in1, 0, mix);
-        connect(in2, 1, mix);
+        FieldLink fl0 = link(x, 0, mix);
+        FieldLink fl1 = link(in1, 1, mix);
+        FieldLink fl2 = link(in2, 2, mix);
+
+        fl0.connect();
+        fl1.connect();
+        fl2.connect();
+
         return mix;
     }
 
@@ -71,8 +80,12 @@ public class Fields {
             return null;
 
         Multiplication mul = new Multiplication(ref, label);
-        connect(in1, 0, mul);
-        connect(in2, 1, mul);
+        FieldLink fl0 = link(in1, 0, mul);
+        FieldLink fl1 = link(in2, 1, mul);
+
+        fl0.connect();
+        fl1.connect();
+
         return mul;
     }
 
@@ -87,8 +100,12 @@ public class Fields {
             return null;
 
         Division div = new Division(ref, label);
-        connect(in1, 0, div);
-        connect(in2, 1, div);
+        FieldLink fl0 = link(in1, 0, div);
+        FieldLink fl1 = link(in2, 1, div);
+
+        fl0.connect();
+        fl1.connect();
+
         return div;
     }
 
@@ -131,8 +148,12 @@ public class Fields {
             return null;
 
         BiFunction func = new BiFunction(ref, label, f);
-        connect(in1, 0, func);
-        connect(in2, 1, func);
+        FieldLink fl0 = link(in1, 0, func);
+        FieldLink fl1 = link(in2, 1, func);
+
+        fl0.connect();
+        fl1.connect();
+
         return func;
     }
 

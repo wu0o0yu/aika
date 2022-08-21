@@ -16,8 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.fields.FieldLink;
-import network.aika.fields.Multiplication;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 
