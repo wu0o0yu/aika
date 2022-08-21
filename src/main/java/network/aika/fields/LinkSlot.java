@@ -45,32 +45,39 @@ public class LinkSlot extends Field<Synapse> implements FieldInput, FieldOutput 
     }
 
     public void receiveUpdate(FieldLink fl, double u) {
+        computeUpdate(fl);
+
+        if(checkPreCondition(currentValue, newValue))
+            triggerUpdate();
+    }
+
+    private void computeUpdate(FieldLink fl) {
         double inputNV = fl.getInput().getNewValue();
 
         if(selectedInput == null || selectedInput == defaultInput) {
             selectedInput = fl;
-            newValue = fl.getInput().getNewValue();
+            newValue = inputNV;
             return;
         }
 
-        double outputOV = selectedInput.getOldInputValue();
+        double outputOV = selectedInput.getCurrentInputValue();
 
         if(fl == selectedInput) {
             if(inputNV < outputOV) {
                 FieldLink maxFL = getInputs().stream()
                         .filter(in -> in != defaultInput)
-                        .max(Comparator.comparingDouble(in -> in.getOldInputValue()))
+                        .max(Comparator.comparingDouble(in -> in.getCurrentInputValue()))
                         .orElse(null);
 
-                if(maxFL.getOldInputValue() > inputNV) {
+                if(maxFL.getCurrentInputValue() > inputNV) {
                     selectedInput = maxFL;
-                    newValue = maxFL.getOldInputValue();
+                    newValue = maxFL.getCurrentInputValue();
                 }
             }
         } else {
             if (inputNV > outputOV) {
                 selectedInput = fl;
-                newValue = fl.getInput().getNewValue();
+                newValue = inputNV;
             }
         }
     }

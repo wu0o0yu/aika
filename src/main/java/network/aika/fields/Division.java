@@ -31,13 +31,13 @@ public class Division extends AbstractFunction {
     protected double computeUpdate(FieldLink fl, double u) {
         return switch (fl.getArgument()) {
             case 0 -> updateDiv1(u);
-            case 1 -> -(u * getInputByArg(0).getCurrentValue()) / Math.pow(fl.getInput().getCurrentValue(), 2.0);
+            case 1 -> -(u * getInputValueByArg(0)) / Math.pow(fl.getCurrentInputValue(), 2.0);
             default -> throw new IllegalArgumentException();
         };
     }
 
     private double updateDiv1(double u) {
-        double v2 = getInputByArg(1).getCurrentValue();
+        double v2 = getInputValueByArg(1);
         return (u * v2) / Math.pow(v2, 2.0);
     }
 }

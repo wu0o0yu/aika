@@ -41,12 +41,12 @@ public class MixFunction extends Field implements FieldInput, FieldOutput {
     protected double computeUpdate(FieldLink fl, double u) {
         int arg = fl.getArgument();
         if(arg == 0) {
-            double a = getInputByArg(1).getCurrentValue();
-            double b = getInputByArg(2).getCurrentValue();
+            double a = getInputValueByArg(1);
+            double b = getInputValueByArg(2);
 
             return (-u * a + u * b) / 2;
         } else {
-            double x = getInputByArg(0).getCurrentValue();
+            double x = getInputValueByArg(0);
 
             if(arg == 1)
                 x = (1 - x);

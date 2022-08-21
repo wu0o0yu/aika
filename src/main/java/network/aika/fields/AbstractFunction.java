@@ -31,8 +31,9 @@ public abstract class AbstractFunction extends Field implements FieldInput, Fiel
 
     @Override
     public void receiveUpdate(FieldLink fl, double u) {
-        propagateUpdate(
-                computeUpdate(fl, u)
-        );
+        newValue += computeUpdate(fl, u);
+
+        if(checkPreCondition(currentValue, newValue))
+            triggerUpdate();
     }
 }

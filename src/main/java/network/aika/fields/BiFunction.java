@@ -37,10 +37,10 @@ public class BiFunction extends AbstractFunction {
         return switch (fl.getArgument()) {
             case 0 -> function.applyAsDouble(
                     fl.getInput().getNewValue(),
-                    getInputByArg(1).getCurrentValue()
+                    getInputValueByArg(1)
                 );
             case 1 -> function.applyAsDouble(
-                    getInputByArg(0).getCurrentValue(),
+                    getInputValueByArg(0),
                     fl.getInput().getNewValue()
                 );
             default -> throw new IllegalArgumentException();

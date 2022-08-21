@@ -130,7 +130,7 @@ public class FieldLink {
         }
     }
 
-    public double getOldInputValue() {
+    public double getCurrentInputValue() {
         return isInitialized ? input.getCurrentValue() : 0.0;
     }
 

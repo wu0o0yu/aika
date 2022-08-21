@@ -29,12 +29,6 @@ public class Multiplication extends AbstractFunction {
 
     @Override
     protected double computeUpdate(FieldLink fl, double u) {
-        FieldOutput secondFl = getInputByArg(fl.getArgument() == 0 ? 1 : 0);
-
-        return switch (fl.getArgument()) {
-            case 0 -> u * secondFl.getCurrentValue();
-            case 1 -> u * secondFl.getCurrentValue();
-            default -> throw new IllegalArgumentException();
-        };
+        return u * getInputValueByArg(fl.getArgument() == 0 ? 1 : 0);
     }
 }

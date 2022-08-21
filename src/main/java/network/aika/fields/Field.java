@@ -151,6 +151,7 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
     public int getNextArg() {
         return inputs.size();
     }
+
     @Override
     public void addInput(FieldLink l) {
         inputs.add(l);
@@ -168,12 +169,12 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
                 .orElse(null);
     }
 
-    public FieldOutput getInputByArg(int arg) {
-        return getInputLinkByArg(arg).getInput();
-    }
-
     public FieldLink getInputLinkByArg(int arg) {
         return inputs.get(arg);
+    }
+
+    public double getInputValueByArg(int arg) {
+        return getInputLinkByArg(arg).getCurrentInputValue();
     }
 
     @Override
