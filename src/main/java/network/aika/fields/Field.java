@@ -65,6 +65,15 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
         return propagatePreCondition.check(cv, nv);
     }
 
+
+    public void setCurrentValue(double currentValue) {
+        this.currentValue = currentValue;
+    }
+
+    public void setNewValue(double newValue) {
+        this.newValue = newValue;
+    }
+
     public void setValue(double v) {
         newValue = v;
 

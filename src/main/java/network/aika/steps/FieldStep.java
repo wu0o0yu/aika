@@ -44,6 +44,6 @@ public class FieldStep<E extends Element> extends Step<E> {
     }
 
     public String toString() {
-        return "Field: " + field;
+        return "Field: " + field + "  Ref:" + field.getReference();
     }
 }

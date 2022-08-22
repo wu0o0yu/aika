@@ -65,6 +65,9 @@ public class QueueField extends Field {
     }
 
     public void addObserver(FieldObserver observer) {
+        if(observers.contains(observer))
+            return;
+
         observers.add(observer);
     }
 
@@ -73,9 +76,7 @@ public class QueueField extends Field {
     }
 
     public void triggerUpdate() {
-        observers.forEach(o ->
-                o.receiveUpdate(currentValue, newValue - currentValue)
-        );
+        updateObservers();
 
         if(!isQueued()) {
             if(!Step.add(step)) {
@@ -86,9 +87,12 @@ public class QueueField extends Field {
 
     public void process() {
         triggerInternal();
+        updateObservers();
+    }
 
+    private void updateObservers() {
         observers.forEach(o ->
-                o.receiveUpdate(currentValue, newValue - currentValue)
+                o.receiveUpdate(currentValue, newValue)
         );
     }
 }

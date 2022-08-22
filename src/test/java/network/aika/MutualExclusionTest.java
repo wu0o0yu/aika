@@ -151,13 +151,15 @@ public class MutualExclusionTest {
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, in, na, 10.0);
         createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, na, -20.0);
         updateBias(na, 1.0);
-        PatternNeuron pa = initPatternLoop(t, "P-A", na);
+        PatternNeuron pa = initPatternLoop(t, "A", na);
+        updateBias(pa, 3.0);
 
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, in, nb, 10.0);
         createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, nb, -20.0);
         updateBias(nb, 1.5);
-        PatternNeuron pb = initPatternLoop(t, "P-B", nb);
+        PatternNeuron pb = initPatternLoop(t, "B", nb);
+        updateBias(pb, 3.0);
 
         createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, na, inhib, 1.0);
         createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, nb, inhib, 1.0);

@@ -21,7 +21,7 @@ import network.aika.neuron.activation.Element;
 /**
  * @author Lukas Molzberger
  */
-public class MixFunction extends Field implements FieldInput, FieldOutput {
+public class MixFunction extends AbstractFunction implements FieldInput, FieldOutput {
 
     public MixFunction(Element ref, String label) {
         super(ref, label);
@@ -32,26 +32,19 @@ public class MixFunction extends Field implements FieldInput, FieldOutput {
         return null;
     }
 
-    public void receiveUpdate(FieldLink fl, double u) {
-        propagateUpdate(
-                computeUpdate(fl, u)
-        );
-    }
 
+    @Override
     protected double computeUpdate(FieldLink fl, double u) {
         int arg = fl.getArgument();
         if(arg == 0) {
             double a = getInputValueByArg(1);
             double b = getInputValueByArg(2);
 
-            return (-u * a + u * b) / 2;
+            return (u * a + -u * b);
         } else {
             double x = getInputValueByArg(0);
 
-            if(arg == 1)
-                x = (1 - x);
-
-            return (x * u) / 2;
+            return (arg == 1 ? x : 1 - x) * u;
         }
     }
 }
