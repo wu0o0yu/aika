@@ -42,8 +42,6 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
 
     protected boolean withinUpdate;
 
-    private PropagatePreCondition propagatePreCondition;
-
     private List<FieldLink> inputs = new ArrayList<>();
 
     private List<FieldLink> receivers = new ArrayList<>();
@@ -51,8 +49,6 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
     public Field(R reference, String label) {
         this.reference = reference;
         this.label = label;
-
-        this.propagatePreCondition = (cv, nv) -> !Utils.belowTolerance(nv - cv);
     }
 
     public Field(R reference, String label, double initialValue) {
@@ -60,11 +56,6 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
 
         currentValue = initialValue;
     }
-
-    protected boolean checkPreCondition(Double cv, double nv) {
-        return propagatePreCondition.check(cv, nv);
-    }
-
 
     public void setCurrentValue(double currentValue) {
         this.currentValue = currentValue;
@@ -77,14 +68,7 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
     public void setValue(double v) {
         newValue = v;
 
-        if (!checkPreCondition(currentValue, v))
-            return;
-
         triggerUpdate();
-    }
-
-    public void setPropagatePreCondition(PropagatePreCondition propagatePreCondition) {
-        this.propagatePreCondition = propagatePreCondition;
     }
 
     @Override
@@ -131,12 +115,13 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
         assert !withinUpdate;
 
         newValue += u;
-
-        if(checkPreCondition(currentValue, newValue))
-            triggerUpdate();
+        triggerUpdate();
     }
 
     public void triggerUpdate() {
+        if(Utils.belowTolerance(newValue - currentValue))
+            return;
+
         triggerInternal();
     }
 

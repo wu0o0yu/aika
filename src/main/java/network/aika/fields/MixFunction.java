@@ -32,7 +32,6 @@ public class MixFunction extends AbstractFunction implements FieldInput, FieldOu
         return null;
     }
 
-
     @Override
     protected double computeUpdate(FieldLink fl, double u) {
         int arg = fl.getArgument();

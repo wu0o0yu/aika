@@ -32,6 +32,6 @@ public class ScaleFunction extends AbstractFunction {
 
     @Override
     protected double computeUpdate(FieldLink fl, double u) {
-        return scale * fl.getInput().getNewValue();
+        return scale * u;
     }
 }

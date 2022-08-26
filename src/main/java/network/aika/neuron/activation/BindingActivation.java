@@ -73,19 +73,17 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 netUB
         );
 
-        func(
+        valueUB = func(
                 this,
-                "f(netUB)",
+                "value = f(mixedNetUB)",
                 mixedNetUB,
-                x -> getActivationFunction().f(x),
-                valueUB
+                x -> getActivationFunction().f(x)
         );
-        func(
+        valueLB = func(
                 this,
-                "f(netLB)",
+                "value = f(mixedNetLB)",
                 mixedNetLB,
-                x -> getActivationFunction().f(x),
-                valueLB
+                x -> getActivationFunction().f(x)
         );
 
         neuron.getInputSynapses()

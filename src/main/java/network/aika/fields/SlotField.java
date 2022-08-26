@@ -67,11 +67,6 @@ public class SlotField extends Field<Activation> {
     }
 
     @Override
-    protected boolean checkPreCondition(Double ov, double nv) {
-        return ov != null && !Utils.belowTolerance(nv - ov);
-    }
-
-    @Override
     public void addInput(FieldLink l) {
         assert input == null ||
                 getBindingSignal(input).getOriginActivation() == getBindingSignal(l).getOriginActivation();

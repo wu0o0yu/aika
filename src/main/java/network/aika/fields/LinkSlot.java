@@ -17,6 +17,7 @@
 package network.aika.fields;
 
 import network.aika.neuron.Synapse;
+import network.aika.utils.Utils;
 
 import java.util.Comparator;
 
@@ -46,9 +47,7 @@ public class LinkSlot extends Field<Synapse> implements FieldInput, FieldOutput 
 
     public void receiveUpdate(FieldLink fl, double u) {
         computeUpdate(fl);
-
-        if(checkPreCondition(currentValue, newValue))
-            triggerUpdate();
+        triggerUpdate();
     }
 
     private void computeUpdate(FieldLink fl) {
@@ -62,23 +61,16 @@ public class LinkSlot extends Field<Synapse> implements FieldInput, FieldOutput 
 
         double outputOV = selectedInput.getCurrentInputValue();
 
-        if(fl == selectedInput) {
-            if(inputNV < outputOV) {
-                FieldLink maxFL = getInputs().stream()
-                        .filter(in -> in != defaultInput)
-                        .max(Comparator.comparingDouble(in -> in.getCurrentInputValue()))
-                        .orElse(null);
+        FieldLink maxFL = inputNV >= outputOV ?
+            fl :
+            getInputs().stream()
+                    .filter(in -> in != defaultInput)
+                    .max(Comparator.comparingDouble(in -> in.getCurrentInputValue()))
+                    .orElse(null);
 
-                if(maxFL.getCurrentInputValue() > inputNV) {
-                    selectedInput = maxFL;
-                    newValue = maxFL.getCurrentInputValue();
-                }
-            }
-        } else {
-            if (inputNV > outputOV) {
-                selectedInput = fl;
-                newValue = inputNV;
-            }
-        }
+        selectedInput = maxFL;
+        newValue = maxFL == fl ?
+                inputNV :
+                maxFL.getCurrentInputValue();
     }
 }

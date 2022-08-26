@@ -17,6 +17,7 @@
 package network.aika.fields;
 
 import network.aika.neuron.activation.Element;
+import network.aika.utils.Utils;
 
 /**
  * @author Lukas Molzberger
@@ -33,7 +34,6 @@ public abstract class AbstractFunction extends Field implements FieldInput, Fiel
     public void receiveUpdate(FieldLink fl, double u) {
         newValue += computeUpdate(fl, u);
 
-        if(checkPreCondition(currentValue, newValue))
-            triggerUpdate();
+        triggerUpdate();
     }
 }

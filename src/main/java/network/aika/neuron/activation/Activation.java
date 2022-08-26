@@ -54,8 +54,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected Timestamp created = NOT_SET;
     protected Timestamp fired = NOT_SET;
 
-    protected Field valueUB = new Field(this, "value UB");
-    protected Field valueLB = new Field(this, "value LB");
+    protected Field valueUB;
+    protected Field valueLB;
 
     protected QueueField netUB;
     protected QueueField netLB;
@@ -103,12 +103,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         outputLinks = new TreeMap<>(OutputKey.COMPARATOR);
 
         initNet();
-
-        PropagatePreCondition propagatePreCondition = (cv, nv) ->
-                !Utils.belowTolerance(nv - cv) && (cv >= 0.0 || nv >= 0.0);
-
-        netUB.setPropagatePreCondition(propagatePreCondition);
-        netLB.setPropagatePreCondition(propagatePreCondition);
 
         connect(getNeuron().getBias(), netUB);
         connect(getNeuron().getBias(), netLB);
@@ -286,19 +280,17 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     protected void initFields() {
-        func(
+        valueUB = func(
                 this,
-                "f(netUB)",
+                "value = f(netUB)",
                 netUB,
-                x -> getActivationFunction().f(x),
-                valueUB
+                x -> getActivationFunction().f(x)
         );
-        func(
+        valueLB = func(
                 this,
-                "f(netLB)",
+                "value = f(netLB)",
                 netLB,
-                x -> getActivationFunction().f(x),
-                valueLB
+                x -> getActivationFunction().f(x)
         );
     }
 

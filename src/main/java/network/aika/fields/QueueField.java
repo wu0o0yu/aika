@@ -21,6 +21,7 @@ import network.aika.callbacks.FieldObserver;
 import network.aika.neuron.activation.Element;
 import network.aika.steps.FieldStep;
 import network.aika.steps.Step;
+import network.aika.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +77,9 @@ public class QueueField extends Field {
     }
 
     public void triggerUpdate() {
+        if(Utils.belowTolerance(newValue - currentValue))
+            return;
+
         updateObservers();
 
         if(!isQueued()) {

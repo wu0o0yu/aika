@@ -40,19 +40,14 @@ public class ThresholdOperator extends AbstractFunction {
 
     @Override
     protected double computeUpdate(FieldLink fl, double u) {
-        return applyFunction(fl.getInput().getNewValue());
+        return threshold(fl.getInput().getNewValue()) - currentValue;
     }
 
-    protected double applyFunction(double x) {
-        switch (type) {
-            case ABOVE:
-                return x > threshold ? 1.0 : 0.0;
-            case BELOW:
-                return x < threshold ? 1.0 : 0.0;
-            case ABOVE_ABS:
-                return Math.abs(x) > threshold ? 1.0 : 0.0;
-            default:
-                return 0.0;
-        }
+    protected double threshold(double x) {
+        return switch (type) {
+            case ABOVE -> x > threshold ? 1.0 : 0.0;
+            case BELOW -> x < threshold ? 1.0 : 0.0;
+            case ABOVE_ABS -> Math.abs(x) > threshold ? 1.0 : 0.0;
+        };
     }
 }
