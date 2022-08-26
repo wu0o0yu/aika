@@ -21,18 +21,14 @@ import network.aika.neuron.activation.Element;
 /**
  * @author Lukas Molzberger
  */
-public abstract class AbstractFunction extends Field implements FieldInput, FieldOutput {
+public class Subtraction extends AbstractFunction {
 
-    public AbstractFunction(Element ref, String label) {
+    public Subtraction(Element ref, String label) {
         super(ref, label);
     }
 
-    protected abstract double computeUpdate(FieldLink fl, double u);
-
     @Override
-    public void receiveUpdate(FieldLink fl, double u) {
-        newValue += computeUpdate(fl, u);
-
-        triggerUpdate();
+    protected double computeUpdate(FieldLink fl, double u) {
+        return fl.getArgument() == 0 ? u : -u;
     }
 }

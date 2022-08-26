@@ -17,7 +17,6 @@
 package network.aika.fields;
 
 import network.aika.neuron.Synapse;
-import network.aika.utils.Utils;
 
 import java.util.Comparator;
 

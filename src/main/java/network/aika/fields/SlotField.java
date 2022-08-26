@@ -18,11 +18,8 @@ package network.aika.fields;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.utils.Utils;
 
 import java.util.List;
-
-import static network.aika.fields.FieldLink.link;
 
 /**
  * @author Lukas Molzberger

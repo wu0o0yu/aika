@@ -16,7 +16,6 @@
  */
 package network.aika.fields;
 
-
 import network.aika.Model;
 import network.aika.neuron.activation.Element;
 import network.aika.utils.Utils;

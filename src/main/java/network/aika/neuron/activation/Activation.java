@@ -26,7 +26,6 @@ import network.aika.neuron.bindingsignal.BSKey;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
-import network.aika.utils.Utils;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -59,6 +58,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     protected QueueField netUB;
     protected QueueField netLB;
+
+    private FieldOutput netDiff;
 
     protected FieldOutput isFired;
     protected FieldOutput isFiredForWeight;
@@ -130,18 +131,19 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         initFields();
 
+        netDiff = sub(
+                this,
+                "netDiff",
+                netUB,
+                netLB
+        );
+
         isFinal = threshold(
                 this,
                 "isFinal",
                 0.01,
                 BELOW,
-                func(
-                        this,
-                        "diff",
-                        netUB,
-                        netLB,
-                        (a,b) -> Math.abs(a - b)
-                )
+                netDiff
         );
 
         if (!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled())
@@ -255,6 +257,10 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public FieldOutput getIsFiredForBias() {
         return isFiredForBias;
+    }
+
+    public FieldOutput getNetDiff() {
+        return netDiff;
     }
 
     public FieldOutput getIsFinal() {
