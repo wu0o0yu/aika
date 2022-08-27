@@ -141,17 +141,6 @@ public class TheDogAndCatTest {
 
         processTokens(t, doc, List.of("the", "dog", "and", "the", "cat"));
 
-  //      for(double x = 1.0; x >= 0.0; x -= 0.05) {
-            final double xFinal = 0.0; // x;
-            doc.getActivations().stream()
-                    .filter(act -> act instanceof BindingActivation)
-                    .map(act -> (BindingActivation)act)
-                    .forEach(act ->
-                            act.getIsOpen().setValue(xFinal)
-                    );
-
-            doc.process(PROCESSING);
- //       }
 
         doc.postProcessing();
         doc.updateModel();

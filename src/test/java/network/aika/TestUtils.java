@@ -19,6 +19,7 @@ package network.aika;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
@@ -61,16 +62,23 @@ public class TestUtils {
             doc.process(PROCESSING);
         }
 
+        for(double x = 1.0; x >= 0.0; x -= 0.05) {
+            final double xFinal = x;
+            doc.getActivations().stream()
+                    .filter(act -> act instanceof BindingActivation)
+                    .map(act -> (BindingActivation)act)
+                    .forEach(act ->
+                            act.getIsOpen().setValue(xFinal)
+                    );
+
+            doc.process(PROCESSING);
+        }
+
         doc.updateModel();
     }
 
     public static TokenActivation addToken(SimpleTemplateGraph tg, Document doc, String t, Integer pos, int i, int j) {
-        return doc.addToken(
-                tg.TOKEN_TEMPLATE.lookupToken(t),
-                pos++,
-                i,
-                j
-        );
+        return doc.addToken(tg.TOKEN_TEMPLATE.lookupToken(t), pos, i, j);
     }
 
     public static Config getConfig() {
