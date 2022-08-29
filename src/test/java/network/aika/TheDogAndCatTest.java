@@ -108,9 +108,9 @@ public class TheDogAndCatTest {
         Model m = new Model();
         m.setTemplateGraph(t);
 
-        InhibitoryNeuron inhibNThe = initInhibitoryLoop(t, "the");
-        InhibitoryNeuron inhibNCat = initInhibitoryLoop(t, "cat");
-        InhibitoryNeuron inhibNDog = initInhibitoryLoop(t, "dog");
+        InhibitoryNeuron inhibNThe = createNeuron(t.INHIBITORY_TEMPLATE, "I-the");
+        InhibitoryNeuron inhibNCat = createNeuron(t.INHIBITORY_TEMPLATE, "I-cat");
+        InhibitoryNeuron inhibNDog = createNeuron(t.INHIBITORY_TEMPLATE, "I-dog");
         initPatternTheCat(t, inhibNThe, inhibNCat, 3);
         initPatternTheDog(t, inhibNThe, inhibNDog, 3);
 
@@ -122,7 +122,7 @@ public class TheDogAndCatTest {
                 .setAlpha(0.99)
                 .setLearnRate(-0.011)
                 .setInductionThreshold(0.1)
-                .setTrainingEnabled(true)
+                .setTrainingEnabled(false)
                 .setTemplatesEnabled(false);
         doc.setConfig(c);
 

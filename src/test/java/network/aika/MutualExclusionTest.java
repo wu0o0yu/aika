@@ -161,8 +161,8 @@ public class MutualExclusionTest {
         PatternNeuron pb = initPatternLoop(t, "B", nb);
         updateBias(pb, 3.0);
 
-        createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, na, inhib, 1.0);
-        createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, nb, inhib, 1.0);
+        createSynapse(t.INPUT_INHIBITORY_SYNAPSE_TEMPLATE, na, inhib, 1.0);
+        createSynapse(t.INPUT_INHIBITORY_SYNAPSE_TEMPLATE, nb, inhib, 1.0);
 
 
 

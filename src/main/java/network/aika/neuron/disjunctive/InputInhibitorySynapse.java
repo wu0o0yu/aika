@@ -16,45 +16,33 @@
  */
 package network.aika.neuron.disjunctive;
 
-import network.aika.direction.Direction;
-import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.Transition;
-import network.aika.neuron.conjunctive.BindingNeuron;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
+import static network.aika.neuron.bindingsignal.State.INPUT;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
+
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class InhibitorySynapse extends DisjunctiveSynapse<
-        InhibitorySynapse,
-        BindingNeuron,
-        InhibitoryNeuron,
-        InhibitoryLink,
-        BindingActivation,
-        InhibitoryActivation
-        >
-{
-    @Override
-    public InhibitoryLink createLink(BindingActivation input, InhibitoryActivation output) {
-        return new InhibitoryLink(this, input, output);
-    }
+public class InputInhibitorySynapse extends InhibitorySynapse {
+
+    private static List<Transition> TRANSITIONS = List.of(
+            transition(
+                    fixed(INPUT),
+                    fixed(INPUT),
+                    MATCH_AND_PROPAGATE
+            )
+    );
 
     @Override
-    public boolean networkInputsAllowed(Direction dir) {
-        return !isTemplate();
-    }
-
-    @Override
-    public void setModified() {
-        getInput().setModified();
+    public Stream<Transition> getTransitions() {
+        return TRANSITIONS.stream();
     }
 }

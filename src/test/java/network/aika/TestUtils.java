@@ -115,19 +115,22 @@ public class TestUtils {
         return categoryN;
     }
 
-    public static InhibitoryNeuron initInhibitoryLoop(SimpleTemplateGraph t, String label, BindingNeuron... bns) {
+    public static InhibitoryNeuron initInhibitoryLoop(SimpleTemplateGraph t, String label, boolean sameInhibSynapse, BindingNeuron... bns) {
         InhibitoryNeuron inhibN = createNeuron(t.INHIBITORY_TEMPLATE, "I-" + label);
 
-        for(BindingNeuron bn: bns) {
-            createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, bn, inhibN, 1.0);
-            createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhibN, bn, -20.0);
-        }
-        return inhibN;
+        return addInhibitoryLoop(t, inhibN, sameInhibSynapse, bns);
     }
 
-    public static InhibitoryNeuron addInhibitoryLoop(SimpleTemplateGraph t, InhibitoryNeuron inhibN, BindingNeuron... bns) {
+    public static InhibitoryNeuron addInhibitoryLoop(SimpleTemplateGraph t, InhibitoryNeuron inhibN, boolean sameInhibSynapse, BindingNeuron... bns) {
         for(BindingNeuron bn: bns) {
-            createSynapse(t.INHIBITORY_SYNAPSE_TEMPLATE, bn, inhibN, 1.0);
+            createSynapse(
+                    sameInhibSynapse ?
+                            t.SAME_INHIBITORY_SYNAPSE_TEMPLATE :
+                            t.INPUT_INHIBITORY_SYNAPSE_TEMPLATE,
+                    bn,
+                    inhibN,
+                    1.0
+            );
             createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhibN, bn, -20.0);
         }
         return inhibN;

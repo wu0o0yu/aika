@@ -176,8 +176,8 @@ public class JacksonCookTest {
         createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, cookSurnameEntity, entityCN, 10.0);
         createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, cookProfessionEntity, entityCN, 10.0);
 
-        initInhibitoryLoop(t, "jackson", jacksonForenameBN, jacksonCityBN);
-        initInhibitoryLoop(t, "cook", cookSurnameBN, cookProfessionBN);
+        initInhibitoryLoop(t, "jackson", false, jacksonForenameBN, jacksonCityBN);
+        initInhibitoryLoop(t, "cook", false, cookSurnameBN, cookProfessionBN);
 
         updateBias(relPrevEntityBN, 3.0);
         updateBias(jacksonForenameBN, 2.0);

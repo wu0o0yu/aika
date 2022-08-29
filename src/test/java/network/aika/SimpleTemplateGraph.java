@@ -54,7 +54,8 @@ public class SimpleTemplateGraph implements TemplateGraph {
     public ReversePatternSynapse REVERSE_PATTERN_SYNAPSE_FROM_CATEGORY_TEMPLATE;
     public NegativeFeedbackSynapse NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE;
     public PatternSynapse PATTERN_SYNAPSE_TEMPLATE;
-    public InhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE;
+    public InhibitorySynapse INPUT_INHIBITORY_SYNAPSE_TEMPLATE;
+    public InhibitorySynapse SAME_INHIBITORY_SYNAPSE_TEMPLATE;
     public CategorySynapse CATEGORY_SYNAPSE_TEMPLATE;
     public BindingCategorySynapse BINDING_CATEGORY_SYNAPSE_TEMPLATE;
 
@@ -197,9 +198,18 @@ public class SimpleTemplateGraph implements TemplateGraph {
                 );
 //        PATTERN_SYNAPSE_TEMPLATE.setAllowPropagate(true);
 
-        INHIBITORY_SYNAPSE_TEMPLATE =
+        INPUT_INHIBITORY_SYNAPSE_TEMPLATE =
                 init(
-                        new InhibitorySynapse(),
+                        new InputInhibitorySynapse(),
+                        BINDING_TEMPLATE,
+                        INHIBITORY_TEMPLATE,
+                        "Input Inhibitory Synapse",
+                        1.0
+                );
+
+        SAME_INHIBITORY_SYNAPSE_TEMPLATE =
+                init(
+                        new SameInhibitorySynapse(),
                         BINDING_TEMPLATE,
                         INHIBITORY_TEMPLATE,
                         "Inhibitory Synapse",

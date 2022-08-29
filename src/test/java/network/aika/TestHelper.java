@@ -55,8 +55,10 @@ public class TestHelper {
 
         PatternNeuron theCatP = initPatternLoop(t, "the cat", theBN, catBN);
 
-        addInhibitoryLoop(t, inhibNThe, theBN);
-        addInhibitoryLoop(t, inhibNCat, catBN);
+        addInhibitoryLoop(t, inhibNThe, false, theBN);
+        addInhibitoryLoop(t, inhibNCat, false, catBN);
+        initInhibitoryLoop(t, "the (tc)", true, theBN);
+        initInhibitoryLoop(t, "cat (tc)", true, catBN);
 
         updateBias(theCatP, 3.0);
 
@@ -112,8 +114,10 @@ public class TestHelper {
 
         PatternNeuron theDogP = initPatternLoop(t, "the dog", theBN, dogBN);
 
-        addInhibitoryLoop(t, inhibNThe, theBN);
-        addInhibitoryLoop(t, inhibNDog, dogBN);
+        addInhibitoryLoop(t, inhibNThe, false, theBN);
+        addInhibitoryLoop(t, inhibNDog, false, dogBN);
+        initInhibitoryLoop(t, "the (tg)", true, theBN);
+        initInhibitoryLoop(t, "dog (tg)", true, dogBN);
 
         updateBias(theDogP, 3.0);
 
