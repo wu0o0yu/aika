@@ -43,6 +43,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     protected Field mixedNetLB;
 
     private Field isOpen;
+    private Field mix;
 
 
     protected BindingActivation(int id, BindingNeuron n) {
@@ -56,11 +57,12 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     @Override
     protected void initFields() {
         isOpen = new Field(this, "isOpen", 1.0);
+        mix = new Field(this, "mix", 1.0);
 
         mixedNetUB = mix(
                 this,
                 "mixedNetUB",
-                isOpen,
+                mix,
                 netUB,
                 netLB
         );
@@ -68,7 +70,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         mixedNetLB = mix(
                 this,
                 "mixedNetLB",
-                isOpen,
+                mix,
                 netLB,
                 netUB
         );
@@ -118,6 +120,10 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     public Field getIsOpen() {
         return isOpen;
+    }
+
+    public Field getMix() {
+        return mix;
     }
 
     public Field getMixedNetUB() {

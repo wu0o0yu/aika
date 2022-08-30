@@ -17,7 +17,6 @@
 package network.aika;
 
 import network.aika.debugger.AIKADebugger;
-import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import network.aika.text.Document;
 import org.graphstream.ui.view.camera.Camera;

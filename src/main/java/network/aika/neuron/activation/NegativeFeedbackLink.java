@@ -35,12 +35,12 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
     }
 
     public boolean isSelfRef() {
-        BindingSignal iBS = input.getBindingSignal(INPUT);
+        BindingSignal iBS = input.getBindingSignal();
         if(iBS == null)
             return false;
 
         return iBS.isSelfRef(
-                output.getBindingSignal(INPUT)
+                output.getBindingSignal(iBS.getState())
         );
     }
 

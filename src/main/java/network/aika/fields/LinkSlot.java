@@ -20,28 +20,27 @@ import network.aika.neuron.Synapse;
 
 import java.util.Comparator;
 
+import static network.aika.fields.LinkSlotMode.MAX;
+
 /**
  * @author Lukas Molzberger
  */
 public class LinkSlot extends Field<Synapse> implements FieldInput, FieldOutput {
 
-    private FieldLink defaultInput;
+    LinkSlotMode mode;
     private FieldLink selectedInput;
 
-    public LinkSlot(Synapse ref, String label) {
+    public LinkSlot(Synapse ref, LinkSlotMode m, String label) {
         super(ref, label);
-    }
-
-    public FieldLink getDefaultInput() {
-        return defaultInput;
+        mode = m;
     }
 
     public FieldLink getSelectedInput() {
         return selectedInput;
     }
 
-    public void setDefaultInput(FieldLink defaultInput) {
-        this.defaultInput = defaultInput;
+    public LinkSlotMode getMode() {
+        return mode;
     }
 
     public void receiveUpdate(FieldLink fl, double u) {
@@ -52,7 +51,7 @@ public class LinkSlot extends Field<Synapse> implements FieldInput, FieldOutput 
     private void computeUpdate(FieldLink fl) {
         double inputNV = fl.getInput().getNewValue();
 
-        if(selectedInput == null || selectedInput == defaultInput) {
+        if(selectedInput == null) {
             selectedInput = fl;
             newValue = inputNV;
             return;
@@ -60,16 +59,29 @@ public class LinkSlot extends Field<Synapse> implements FieldInput, FieldOutput 
 
         double outputOV = selectedInput.getCurrentInputValue();
 
-        FieldLink maxFL = inputNV >= outputOV ?
+        FieldLink mFL = compare(inputNV, outputOV) ?
             fl :
             getInputs().stream()
-                    .filter(in -> in != defaultInput)
-                    .max(Comparator.comparingDouble(in -> in.getCurrentInputValue()))
+                    .max(getComparator())
                     .orElse(null);
 
-        selectedInput = maxFL;
-        newValue = maxFL == fl ?
+        selectedInput = mFL;
+        newValue = mFL == fl ?
                 inputNV :
-                maxFL.getCurrentInputValue();
+                mFL.getCurrentInputValue();
+    }
+
+    private Comparator<FieldLink> getComparator() {
+        return switch (mode) {
+            case MAX -> Comparator.comparingDouble(in -> in.getCurrentInputValue());
+            case MIN -> Comparator.comparingDouble(in -> -in.getCurrentInputValue());
+        };
+    }
+
+    private boolean compare(double inputNV, double outputOV) {
+        return switch (mode) {
+            case MAX -> inputNV >= outputOV;
+            case MIN -> inputNV < outputOV;
+        };
     }
 }

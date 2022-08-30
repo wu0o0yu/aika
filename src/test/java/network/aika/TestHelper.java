@@ -22,7 +22,6 @@ import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 
 import static network.aika.TestUtils.*;
-import static network.aika.TestUtils.updateBias;
 
 /**
  *
@@ -56,9 +55,7 @@ public class TestHelper {
         PatternNeuron theCatP = initPatternLoop(t, "the cat", theBN, catBN);
 
         addInhibitoryLoop(t, inhibNThe, false, theBN);
-        addInhibitoryLoop(t, inhibNCat, false, catBN);
-        initInhibitoryLoop(t, "the (tc)", true, theBN);
-        initInhibitoryLoop(t, "cat (tc)", true, catBN);
+        addInhibitoryLoop(t, createNeuron(t.INHIBITORY_TEMPLATE, "I-the (tc)"), true, theBN);
 
         updateBias(theCatP, 3.0);
 
@@ -85,8 +82,6 @@ public class TestHelper {
 
         updateBias(blackBN, 3.0);
         updateBias(catBN, 3.0);
-
-        //        initInhibitoryLoop(t, "jackson", jacksonForenameBN, jacksonCityBN);
     }
 
     public static void initPatternTheDog(SimpleTemplateGraph t, InhibitoryNeuron inhibNThe, InhibitoryNeuron inhibNDog, int variant) {
@@ -115,14 +110,11 @@ public class TestHelper {
         PatternNeuron theDogP = initPatternLoop(t, "the dog", theBN, dogBN);
 
         addInhibitoryLoop(t, inhibNThe, false, theBN);
-        addInhibitoryLoop(t, inhibNDog, false, dogBN);
-        initInhibitoryLoop(t, "the (tg)", true, theBN);
-        initInhibitoryLoop(t, "dog (tg)", true, dogBN);
+        addInhibitoryLoop(t, createNeuron(t.INHIBITORY_TEMPLATE, "I-the (tg)"), true, theBN);
 
         updateBias(theDogP, 3.0);
 
         updateBias(theBN, 3.0);
         updateBias(dogBN, 3.0);
     }
-
 }

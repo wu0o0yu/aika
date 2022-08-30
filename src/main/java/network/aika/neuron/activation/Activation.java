@@ -24,6 +24,7 @@ import network.aika.neuron.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.BSKey;
 import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
 
@@ -35,6 +36,8 @@ import static network.aika.direction.Direction.DIRECTIONS;
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.FieldLink.reconnect;
 import static network.aika.fields.Fields.*;
+import static network.aika.fields.LinkSlotMode.MAX;
+import static network.aika.fields.LinkSlotMode.MIN;
 import static network.aika.fields.ThresholdOperator.Type.*;
 import static network.aika.neuron.bindingsignal.BSKey.COMPARATOR;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
@@ -171,7 +174,11 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public LinkSlot lookupLinkSlot(Synapse syn, boolean upperBound) {
         return getLinkSlots(upperBound).computeIfAbsent(syn, s -> {
-            LinkSlot ls = new LinkSlot(s, "link slot " + (upperBound ? "ub" : "lb"));
+            LinkSlot ls = new LinkSlot(
+                    s,
+                    syn instanceof NegativeFeedbackSynapse ? MIN : MAX,
+                    "link slot " + (upperBound ? "ub" : "lb")
+            );
             connect(ls, getNet(upperBound));
             return ls;
         });
@@ -488,6 +495,12 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public BindingSignal getBindingSignal(BSKey bsKey) {
         return bindingSignals.get(bsKey);
+    }
+
+    public BindingSignal getBindingSignal() {
+        return getBindingSignals()
+                .findFirst()
+                .orElse(null);
     }
 
     public BindingSignal getBindingSignal(State s) {
