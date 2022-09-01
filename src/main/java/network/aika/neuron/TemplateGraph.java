@@ -18,6 +18,8 @@ package network.aika.neuron;
 
 
 import network.aika.Model;
+import network.aika.neuron.activation.text.TokenActivation;
+import network.aika.text.Document;
 
 import java.util.Collection;
 
@@ -28,6 +30,8 @@ import java.util.Collection;
 public interface TemplateGraph {
 
     void init(Model model);
+
+    TokenActivation addToken(Document doc, String t, Integer pos, int i, int j);
 
     Collection<Neuron> getAllTemplateNeurons();
 

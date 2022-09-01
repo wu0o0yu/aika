@@ -18,10 +18,12 @@ package network.aika;
 
 import network.aika.callbacks.NeuronProducer;
 import network.aika.neuron.*;
+import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.*;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.neuron.conjunctive.text.TokenPositionRelationNeuron;
 import network.aika.neuron.disjunctive.*;
+import network.aika.text.Document;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -64,7 +66,7 @@ public class SimpleTemplateGraph implements TemplateGraph {
     private Map<Long, double[]> coords;
 
     public SimpleTemplateGraph() {
-        Map<Long, double[]> coords = new TreeMap<>();
+        coords = new TreeMap<>();
 
         coords.put(1l, new double[]{0.223, 2.184});
         coords.put(2l, new double[]{-0.155, 1.125});
@@ -234,6 +236,11 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         "Biding Category Synapse",
                         0.0
                 );
+    }
+
+    @Override
+    public TokenActivation addToken(Document doc, String t, Integer pos, int i, int j) {
+        return doc.addToken(TOKEN_TEMPLATE.lookupToken(t), pos, i, j);
     }
 
     @Override
