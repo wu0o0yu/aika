@@ -256,10 +256,13 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         synapse.linkOutput();
 
         if(weightedInputLB != null)
-            reconnect(weightedInputLB.getInputLinkByArg(2), synapse.getWeight());
+            reconnect(weightedInputLB.getInputLinkByArg(1), synapse.getWeight());
+
+        if(weightedInputUB != null)
+            reconnect(weightedInputUB.getInputLinkByArg(1), synapse.getWeight());
 
         if(backPropGradient != null)
-            reconnect(backPropGradient.getInputLinkByArg(2), synapse.getWeight());
+            reconnect(backPropGradient.getInputLinkByArg(1), synapse.getWeight());
 
         Cleanup.add(this);
     }
