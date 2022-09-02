@@ -16,29 +16,38 @@
  */
 package network.aika.fields;
 
+import network.aika.Model;
 import network.aika.neuron.activation.Element;
 import network.aika.utils.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import network.aika.utils.Writable;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * @author Lukas Molzberger
  */
-public class Field<R extends Element> extends AbstractField<R> {
+public class Field<R extends Element> implements FieldInput, FieldOutput, Writable {
 
-    private static final Logger log = LoggerFactory.getLogger(Field.class);
+    private String label;
+    private R reference;
 
-    private PropagatePreCondition propagatePreCondition;
+    protected double currentValue;
+    protected double newValue;
+
+    protected boolean withinUpdate;
 
     private List<FieldLink> inputs = new ArrayList<>();
 
-    public Field(R reference, String label) {
-        super(reference, label);
+    private List<FieldLink> receivers = new ArrayList<>();
 
-        this.propagatePreCondition = (cv, nv, u) -> !Utils.belowTolerance(u);
+    public Field(R reference, String label) {
+        this.reference = reference;
+        this.label = label;
     }
 
     public Field(R reference, String label, double initialValue) {
@@ -47,21 +56,93 @@ public class Field<R extends Element> extends AbstractField<R> {
         currentValue = initialValue;
     }
 
-    public Field(R reference, String label, FieldOnTrueEvent fieldListener) {
-        this(reference, label);
-        addEventListener(fieldListener);
+    public void setCurrentValue(double currentValue) {
+        this.currentValue = currentValue;
     }
 
-    protected boolean checkPreCondition(Double cv, double nv, double u) {
-        return propagatePreCondition.check(cv, nv, u);
+    public void setNewValue(double newValue) {
+        this.newValue = newValue;
     }
 
-    public PropagatePreCondition getPropagatePreCondition() {
-        return propagatePreCondition;
+    public void setValue(double v) {
+        newValue = v;
+
+        triggerUpdate();
     }
 
-    public void setPropagatePreCondition(PropagatePreCondition propagatePreCondition) {
-        this.propagatePreCondition = propagatePreCondition;
+    @Override
+    public R getReference() {
+        return reference;
+    }
+
+    public void setReference(R reference) {
+        this.reference = reference;
+    }
+
+    @Override
+    public String getLabel() {
+        return label;
+    }
+
+    public double getCurrentValue() {
+        return currentValue;
+    }
+
+    public double getNewValue() {
+        return newValue;
+    }
+
+    public List<FieldLink> getReceivers() {
+        return receivers;
+    }
+
+    @Override
+    public void addOutput(FieldLink fl) {
+        this.receivers.add(fl);
+    }
+
+    @Override
+    public void removeOutput(FieldLink fl) {
+        this.receivers.remove(fl);
+    }
+
+    public void receiveUpdate(FieldLink fl, double u) {
+        receiveUpdate(u);
+    }
+
+    public void receiveUpdate(double u) {
+        assert !withinUpdate;
+
+        newValue += u;
+        triggerUpdate();
+    }
+
+    public void triggerUpdate() {
+        if(Utils.belowTolerance(newValue - currentValue))
+            return;
+
+        triggerInternal();
+    }
+
+    protected void triggerInternal() {
+        withinUpdate = true;
+
+        propagateUpdate(newValue - currentValue);
+        currentValue = newValue;
+
+        withinUpdate = false;
+    }
+
+    protected void propagateUpdate(double update) {
+        int i = 0;
+        while(i < receivers.size()) {
+            receivers.get(i++)
+                    .receiveUpdate(update);
+        }
+    }
+
+    public int getNextArg() {
+        return inputs.size();
     }
 
     @Override
@@ -81,6 +162,14 @@ public class Field<R extends Element> extends AbstractField<R> {
                 .orElse(null);
     }
 
+    public FieldLink getInputLinkByArg(int arg) {
+        return inputs.get(arg);
+    }
+
+    public double getInputValueByArg(int arg) {
+        return getInputLinkByArg(arg).getCurrentInputValue();
+    }
+
     @Override
     public List<FieldLink> getInputs() {
         return inputs;
@@ -88,9 +177,36 @@ public class Field<R extends Element> extends AbstractField<R> {
 
     @Override
     public void disconnect() {
-        super.disconnect();
+        receivers.forEach(lf ->
+                lf.disconnect()
+        );
+        receivers.clear();
+
         inputs.stream()
-                .forEach(l -> l.getInput().removeOutput(l, false));
+                .forEach(l ->
+                        l.getInput().removeOutput(l)
+                );
         inputs.clear();
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        out.writeDouble(currentValue);
+        out.writeDouble(newValue);
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws IOException {
+        currentValue = in.readDouble();
+        newValue = in.readDouble();
+    }
+
+    @Override
+    public String toString() {
+        return getLabel() + ":" + getValueString();
+    }
+
+    public String getValueString() {
+        return "[ov:" + Utils.round(getCurrentValue()) + " nv:" + Utils.round(getNewValue()) + "]";
     }
 }

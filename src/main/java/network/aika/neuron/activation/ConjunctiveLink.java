@@ -35,6 +35,7 @@ public class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends Activation
     @Override
     public void initWeightUpdate() {
         mul(
+                this,
                 "weight update",
                 getInput().getIsFiredForWeight(),
                 getOutput().getUpdateValue(),
@@ -42,6 +43,7 @@ public class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends Activation
         );
 
         mul(
+                this,
                 "bias update",
                 getInput().getIsFiredForBias(),
                 getOutput().getUpdateValue(),

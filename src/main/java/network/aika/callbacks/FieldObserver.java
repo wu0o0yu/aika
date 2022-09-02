@@ -21,5 +21,5 @@ package network.aika.callbacks;
  */
 public interface FieldObserver {
 
-    void receiveUpdate(Double cv, Double u);
+    void receiveUpdate(double cv, double nv);
 }

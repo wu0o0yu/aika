@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.fields.QueueField;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.ConjunctiveActivation;
@@ -27,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.Comparator;
 
-import static network.aika.fields.Fields.connect;
 import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 
 /**
@@ -38,22 +36,13 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
 
     private static final Logger log = LoggerFactory.getLogger(ConjunctiveNeuron.class);
 
-    private QueueField weightSum = new QueueField(this, "weight sum");
-
-
     public ConjunctiveNeuron() {
-        weightSum.addEventListener(this::updateSumOfLowerWeights);
-
-        connect(bias, weightSum);
+        bias.addEventListener(this::updateSumOfLowerWeights);
     }
 
     @Override
     public void setModified() {
         super.setModified();
-    }
-
-    public QueueField getWeightSum() {
-        return weightSum;
     }
 
     protected void initFromTemplate(ConjunctiveNeuron n) {
@@ -76,7 +65,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     protected void updateSumOfLowerWeights() {
         sortInputSynapses();
 
-        double sum = getBias().getCurrentValue();
+        double sum = getBias().getNewValue();
         for(ConjunctiveSynapse s: inputSynapses) {
             if(s.getWeight().getCurrentValue() <= 0.0)
                 continue;

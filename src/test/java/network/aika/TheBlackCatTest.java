@@ -100,8 +100,8 @@ public class TheBlackCatTest {
         Model m = new Model();
         m.setTemplateGraph(t);
 
-        InhibitoryNeuron inhibNThe = initInhibitoryLoop(t, "the");
-        InhibitoryNeuron inhibNCat = initInhibitoryLoop(t, "cat");
+        InhibitoryNeuron inhibNThe = createNeuron(t.INHIBITORY_TEMPLATE, "I-the");
+        InhibitoryNeuron inhibNCat = createNeuron(t.INHIBITORY_TEMPLATE, "I-cat");
         initPatternTheCat(t, inhibNThe, inhibNCat, 0);
         initPatternBlackCat(t);
 
@@ -133,7 +133,6 @@ public class TheBlackCatTest {
 
         processTokens(t, doc, List.of("the", "black", "cat"));
 
-        doc.processFinalMode();
         doc.postProcessing();
         doc.updateModel();
     }

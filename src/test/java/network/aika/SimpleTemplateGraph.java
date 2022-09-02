@@ -18,10 +18,12 @@ package network.aika;
 
 import network.aika.callbacks.NeuronProducer;
 import network.aika.neuron.*;
+import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.*;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.neuron.conjunctive.text.TokenPositionRelationNeuron;
 import network.aika.neuron.disjunctive.*;
+import network.aika.text.Document;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -54,7 +56,8 @@ public class SimpleTemplateGraph implements TemplateGraph {
     public ReversePatternSynapse REVERSE_PATTERN_SYNAPSE_FROM_CATEGORY_TEMPLATE;
     public NegativeFeedbackSynapse NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE;
     public PatternSynapse PATTERN_SYNAPSE_TEMPLATE;
-    public InhibitorySynapse INHIBITORY_SYNAPSE_TEMPLATE;
+    public InhibitorySynapse INPUT_INHIBITORY_SYNAPSE_TEMPLATE;
+    public InhibitorySynapse SAME_INHIBITORY_SYNAPSE_TEMPLATE;
     public CategorySynapse CATEGORY_SYNAPSE_TEMPLATE;
     public BindingCategorySynapse BINDING_CATEGORY_SYNAPSE_TEMPLATE;
 
@@ -63,7 +66,7 @@ public class SimpleTemplateGraph implements TemplateGraph {
     private Map<Long, double[]> coords;
 
     public SimpleTemplateGraph() {
-        Map<Long, double[]> coords = new TreeMap<>();
+        coords = new TreeMap<>();
 
         coords.put(1l, new double[]{0.223, 2.184});
         coords.put(2l, new double[]{-0.155, 1.125});
@@ -150,8 +153,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         "Positive Feedback Synapse",
                         0.01
                 );
-        POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE.getFeedbackBias().setValue(0.0);
-
 
         POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE =
                 init(
@@ -161,7 +162,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         "Positive Feedback Synapse",
                         0.01
                 );
-        POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE.getFeedbackBias().setValue(0.0);
 
         REVERSE_PATTERN_SYNAPSE_FROM_PATTERN_TEMPLATE =
                 init(
@@ -200,9 +200,18 @@ public class SimpleTemplateGraph implements TemplateGraph {
                 );
 //        PATTERN_SYNAPSE_TEMPLATE.setAllowPropagate(true);
 
-        INHIBITORY_SYNAPSE_TEMPLATE =
+        INPUT_INHIBITORY_SYNAPSE_TEMPLATE =
                 init(
-                        new InhibitorySynapse(),
+                        new InputInhibitorySynapse(),
+                        BINDING_TEMPLATE,
+                        INHIBITORY_TEMPLATE,
+                        "Input Inhibitory Synapse",
+                        1.0
+                );
+
+        SAME_INHIBITORY_SYNAPSE_TEMPLATE =
+                init(
+                        new SameInhibitorySynapse(),
                         BINDING_TEMPLATE,
                         INHIBITORY_TEMPLATE,
                         "Inhibitory Synapse",
@@ -227,6 +236,11 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         "Biding Category Synapse",
                         0.0
                 );
+    }
+
+    @Override
+    public TokenActivation addToken(Document doc, String t, Integer pos, int i, int j) {
+        return doc.addToken(TOKEN_TEMPLATE.lookupToken(t), pos, i, j);
     }
 
     @Override

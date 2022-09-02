@@ -17,6 +17,9 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.direction.Direction;
+import network.aika.fields.FieldLink;
+import network.aika.fields.LinkSlot;
+import network.aika.fields.Multiplication;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
@@ -25,12 +28,13 @@ import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
+import static network.aika.fields.FieldLink.connect;
+import static network.aika.fields.Fields.mul;
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
 import static network.aika.neuron.bindingsignal.State.INPUT;
 import static network.aika.neuron.bindingsignal.State.SAME;
-import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
+import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
 
 
 /**
@@ -46,25 +50,33 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<
 {
 
     private static List<Transition> TRANSITIONS = List.of(
-            biTransition(
-                    transition(
-                            fixed(INPUT),
-                            fixed(INPUT),
-                            MATCH_AND_PROPAGATE
-                    ),
-                    transition(
-                            fixed(SAME),
-                            fixed(SAME),
-                            MATCH_AND_PROPAGATE
-                    ),
-                    true,
-                    false
+            transition(
+                    fixed(SAME),
+                    fixed(SAME),
+                    MATCH_ONLY
+            ),
+            transition(
+                    fixed(INPUT),
+                    fixed(INPUT),
+                    MATCH_ONLY
             )
     );
 
     @Override
     public NegativeFeedbackLink createLink(InhibitoryActivation input, BindingActivation output) {
         return new NegativeFeedbackLink(this, input, output);
+    }
+
+    public void initDummyLink(BindingActivation oAct) {
+        Multiplication dummyWeight = mul(
+                oAct,
+                "neg-dummy-weight-" + getInput().getId(),
+                oAct.getIsOpen(),
+                getWeight()
+        );
+
+        LinkSlot ls = oAct.lookupLinkSlot(this, false);
+        connect(dummyWeight, -1, ls);
     }
 
     @Override

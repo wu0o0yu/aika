@@ -39,8 +39,9 @@ public class LatentRelationActivation extends BindingActivation {
     }
 
     @Override
-    protected QueueField initNet() {
-        return new ValueSortedQueueField(this, "net", 10.0);
+    protected void initNet() {
+        netUB = new ValueSortedQueueField(this, "net UB", 10.0);
+        netLB = new ValueSortedQueueField(this, "net LB", 10.0);
     }
 
 }

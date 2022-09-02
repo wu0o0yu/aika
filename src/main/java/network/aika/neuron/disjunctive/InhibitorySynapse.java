@@ -30,12 +30,11 @@ import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 
-
 /**
  *
  * @author Lukas Molzberger
  */
-public class InhibitorySynapse extends DisjunctiveSynapse<
+public abstract class InhibitorySynapse extends DisjunctiveSynapse<
         InhibitorySynapse,
         BindingNeuron,
         InhibitoryNeuron,
@@ -44,32 +43,9 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
         InhibitoryActivation
         >
 {
-
-    private static List<Transition> TRANSITIONS = List.of(
-            biTransition(
-                    transition(
-                            fixed(INPUT),
-                            fixed(INPUT),
-                            MATCH_AND_PROPAGATE
-                    ),
-                    transition(
-                            fixed(SAME),
-                            fixed(SAME),
-                            MATCH_AND_PROPAGATE
-                    ),
-                    true,
-                    false
-            )
-    );
-
     @Override
     public InhibitoryLink createLink(BindingActivation input, InhibitoryActivation output) {
         return new InhibitoryLink(this, input, output);
-    }
-
-    @Override
-    public Stream<Transition> getTransitions() {
-        return TRANSITIONS.stream();
     }
 
     @Override

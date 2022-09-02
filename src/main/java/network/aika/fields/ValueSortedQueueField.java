@@ -17,6 +17,7 @@
 package network.aika.fields;
 
 import network.aika.neuron.activation.Element;
+import network.aika.utils.Utils;
 
 /**
  * @author Lukas Molzberger
@@ -33,7 +34,10 @@ public class ValueSortedQueueField extends QueueField {
 
     @Override
     public void triggerUpdate() {
-        step.updateSortValue(currentValue + update);
+        if(Utils.belowTolerance(newValue - currentValue))
+            return;
+
+        step.updateSortValue(newValue);
         super.triggerUpdate();
     }
 }

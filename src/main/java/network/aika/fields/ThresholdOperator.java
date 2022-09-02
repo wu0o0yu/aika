@@ -16,7 +16,7 @@
  */
 package network.aika.fields;
 
-import java.util.List;
+import network.aika.neuron.activation.Element;
 
 /**
  * @author Lukas Molzberger
@@ -32,23 +32,22 @@ public class ThresholdOperator extends AbstractFunction {
     private double threshold;
     private Type type;
 
-    public ThresholdOperator(String label, double threshold, Type type) {
-        super(label);
+    public ThresholdOperator(Element ref, String label, double threshold, Type type) {
+        super(ref, label);
         this.threshold = threshold;
         this.type = type;
     }
 
     @Override
-    protected double applyFunction(double x) {
-        switch (type) {
-            case ABOVE:
-                return x > threshold ? 1.0 : 0.0;
-            case BELOW:
-                return x < threshold ? 1.0 : 0.0;
-            case ABOVE_ABS:
-                return Math.abs(x) > threshold ? 1.0 : 0.0;
-            default:
-                return 0.0;
-        }
+    protected double computeUpdate(FieldLink fl, double u) {
+        return threshold(fl.getInput().getNewValue()) - currentValue;
+    }
+
+    protected double threshold(double x) {
+        return switch (type) {
+            case ABOVE -> x > threshold ? 1.0 : 0.0;
+            case BELOW -> x < threshold ? 1.0 : 0.0;
+            case ABOVE_ABS -> Math.abs(x) > threshold ? 1.0 : 0.0;
+        };
     }
 }

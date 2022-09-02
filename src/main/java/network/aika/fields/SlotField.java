@@ -18,15 +18,13 @@ package network.aika.fields;
 
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.State;
-import network.aika.utils.Utils;
 
 import java.util.List;
 
 /**
  * @author Lukas Molzberger
  */
-public class SlotField extends AbstractField<Activation> {
+public class SlotField extends Field<Activation> {
 
     private FieldLink input;
 
@@ -36,7 +34,7 @@ public class SlotField extends AbstractField<Activation> {
 
     public void connect(BindingSignal bs) {
         if(!isConnected())
-            Fields.connect(bs.getOnArrived(), this, true);
+            FieldLink.connect(bs.getOnArrived(), this);
     }
 
     public boolean isConnected() {
@@ -46,6 +44,11 @@ public class SlotField extends AbstractField<Activation> {
     @Override
     public List<FieldLink> getInputs() {
         return List.of(input);
+    }
+
+    @Override
+    public int getNextArg() {
+        return 0;
     }
 
     public BindingSignal getFixedBindingSignal() {
@@ -58,11 +61,6 @@ public class SlotField extends AbstractField<Activation> {
     private BindingSignal getBindingSignal(FieldLink l) {
         Field onArrived = (Field) l.getInput();
         return (BindingSignal) onArrived.getReference();
-    }
-
-    @Override
-    protected boolean checkPreCondition(Double cv, double nv, double u) {
-        return !Utils.belowTolerance(u);
     }
 
     @Override
@@ -85,7 +83,7 @@ public class SlotField extends AbstractField<Activation> {
     @Override
     public void disconnect() {
         super.disconnect();
-        input.getInput().removeOutput(input, false);
+        input.getInput().removeOutput(input);
         input = null;
     }
 }

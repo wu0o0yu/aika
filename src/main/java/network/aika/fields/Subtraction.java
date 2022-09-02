@@ -18,32 +18,17 @@ package network.aika.fields;
 
 import network.aika.neuron.activation.Element;
 
-import java.util.function.DoubleBinaryOperator;
-
 /**
  * @author Lukas Molzberger
  */
-public class BiFunction extends AbstractFunction {
+public class Subtraction extends AbstractFunction {
 
-    private DoubleBinaryOperator function;
-
-    public BiFunction(Element ref, String label, DoubleBinaryOperator f) {
+    public Subtraction(Element ref, String label) {
         super(ref, label);
-        this.function = f;
     }
 
     @Override
     protected double computeUpdate(FieldLink fl, double u) {
-        return switch (fl.getArgument()) {
-            case 0 -> function.applyAsDouble(
-                    fl.getInput().getNewValue(),
-                    getInputValueByArg(1)
-                );
-            case 1 -> function.applyAsDouble(
-                    getInputValueByArg(0),
-                    fl.getInput().getNewValue()
-                );
-            default -> throw new IllegalArgumentException();
-        };
+        return fl.getArgument() == 0 ? u : -u;
     }
 }

@@ -18,7 +18,7 @@ package network.aika.fields;
 
 import network.aika.callbacks.UpdateListener;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * @author Lukas Molzberger
@@ -27,9 +27,11 @@ public interface FieldInput extends UpdateListener {
 
     String getLabel();
 
-    void addInput(FieldLink l);
+    void addInput(FieldLink fl);
 
-    void removeInput(FieldLink l);
+    void removeInput(FieldLink fl);
 
-    List<FieldLink> getInputs();
+    Collection<FieldLink> getInputs();
+
+    int getNextArg();
 }

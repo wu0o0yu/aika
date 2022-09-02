@@ -16,50 +16,16 @@
  */
 package network.aika.fields;
 
-import network.aika.neuron.activation.Element;
-
 /**
  * @author Lukas Molzberger
  */
-public class ConstantField extends FieldNode implements FieldOutput {
+public class ConstantField extends Field implements FieldOutput {
 
     public static final ConstantField ZERO = new ConstantField("ZERO", 0.0);
     public static final ConstantField ONE = new ConstantField("ONE", 1.0);
 
-    private final double value;
-    private String label;
-
     public ConstantField(String label, double value) {
-        this.label = label;
-        this.value = value;
-    }
-
-    @Override
-    public String getLabel() {
-        return label;
-    }
-
-    @Override
-    public boolean isInitialized() {
-        return true;
-    }
-
-    @Override
-    public double getCurrentValue() {
-        return value;
-    }
-
-    @Override
-    public Element getReference() {
-        return null;
-    }
-
-    @Override
-    public String toString() {
-        return getLabel() + ":" + getValueString();
-    }
-
-    public String getValueString() {
-        return "[v:" + value + "]";
+        super(null, label);
+        this.currentValue = value;
     }
 }

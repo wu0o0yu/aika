@@ -166,9 +166,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public static boolean isLatentLinking(Synapse synA, Synapse synB) {
-        if(synA.isNegative() || synB.isNegative())
-            return true;
-
         double sumOfLowerWeights = Math.min(synA.getSumOfLowerWeights(), synB.getSumOfLowerWeights());
         return synA.getWeight().getCurrentValue() + synB.getWeight().getCurrentValue() + sumOfLowerWeights > 0.0;
     }
@@ -291,7 +288,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
     public boolean checkCandidateSynapse(IA iAct) {
         double candidateWeight = computeInitialWeight(iAct);
-        double candidateNet = (iAct.getFinalValue().getCurrentValue() * candidateWeight) + getOutput().getBias().getCurrentValue();
+        double candidateNet = (iAct.getValueLB().getCurrentValue() * candidateWeight) + getOutput().getBias().getCurrentValue();
 
         return candidateNet >= 0.0;
     }

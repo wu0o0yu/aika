@@ -32,6 +32,7 @@ public class DisjunctiveLink<S extends DisjunctiveSynapse, IA extends Activation
     @Override
     public void initWeightUpdate() {
         mul(
+                this,
                 "weight update",
                 getInput().getIsFired(),
                 getOutput().getUpdateValue(),

@@ -16,8 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.fields.AbstractBiFunction;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 
 import static network.aika.fields.Fields.*;
@@ -29,59 +27,18 @@ import static network.aika.fields.ThresholdOperator.Type.ABOVE;
  */
 public class PositiveFeedbackLink<IA extends Activation<?>> extends BindingNeuronLink<PositiveFeedbackSynapse, IA> {
 
-    private AbstractBiFunction feedbackBiasInput;
-
     public PositiveFeedbackLink(PositiveFeedbackSynapse s, IA input, BindingActivation output) {
         super(s, input, output);
     }
 
     @Override
-    public void induce() {
-        super.induce();
-
-        reconnect(feedbackBiasInput.getInput2(), synapse.getFeedbackBias());
-    }
-
-    @Override
-    protected void initWeightInput() {
-        super.initWeightInput();
-
-        feedbackBiasInput = mul(
-                "iAct.isFinal * s.feedbackBias",
-                input.getIsFinal(),
-                synapse.getFeedbackBias(),
-                getOutput().getNet()
-        );
-    }
-
-    @Override
     protected void initOnTransparent() {
         onTransparent = threshold(
+                this,
                 "onTransparent",
                 0.0,
                 ABOVE,
                 synapse.getWeight()
         );
-    }
-
-    @Override
-    public void initWeightUpdate() {
-        mul(
-                "weight update",
-                getInput().getIsFiredForWeight(),
-                getOutput().getUpdateValue(),
-                synapse.getWeight()
-        );
-
-        mul(
-                "feedback bias update",
-                getInput().getIsFiredForBias(),
-                getOutput().getUpdateValue(),
-                synapse.getFeedbackBias()
-        );
-    }
-
-    public AbstractBiFunction getFeedbackBiasInput() {
-        return feedbackBiasInput;
     }
 }

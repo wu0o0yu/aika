@@ -16,18 +16,17 @@
  */
 package network.aika.fields;
 
-
 /**
  * @author Lukas Molzberger
  */
 public class InvertFunction extends AbstractFunction {
 
     public InvertFunction(String label) {
-        super(label);
+        super(null, label);
     }
 
     @Override
-    protected double applyFunction(double x) {
-        return 1.0 - x;
+    protected double computeUpdate(FieldLink fl, double u) {
+        return (1.0 - fl.getInput().getNewValue()) - currentValue;
     }
 }

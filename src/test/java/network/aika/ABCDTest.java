@@ -135,7 +135,7 @@ public class ABCDTest {
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, b_bcBN, c_bcBN, 11.0);
 
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, b_IN, b_bcBN, 10.0);
-        initInhibitoryLoop(t, "b", b_abBN, b_bcBN);
+        addInhibitoryLoop(t, createNeuron(t.INHIBITORY_TEMPLATE, "I-b"), false, b_abBN, b_bcBN);
         updateBias(b_abBN, 3.0);
         updateBias(b_bcBN, 2.5);
 
@@ -189,7 +189,6 @@ public class ABCDTest {
 
         processTokens(t, doc, List.of("a", "b", "c", "d"));
 
-        doc.processFinalMode();
         doc.postProcessing();
         doc.updateModel();
 

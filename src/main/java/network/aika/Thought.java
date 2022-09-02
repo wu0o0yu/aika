@@ -179,18 +179,6 @@ public abstract class Thought {
     }
 
     /**
-     * After the switch into final mode, the initial assumption, that the positive feedback synapses are fully
-     * active is reverted and the actual evaluation of the feedback synapses takes place.
-     */
-    public void processFinalMode() {
-        activationsById.values()
-                .forEach(act ->
-                        act.getIsFinal().setValue(1.0)
-                );
-        process(PROCESSING);
-    }
-
-    /**
      * The postprocessing steps such as counting, cleanup or save are executed.
      */
     public void postProcessing() {

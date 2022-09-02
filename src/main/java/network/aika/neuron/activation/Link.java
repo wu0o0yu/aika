@@ -24,9 +24,10 @@ import network.aika.sign.Sign;
 import network.aika.steps.link.Cleanup;
 import network.aika.steps.link.LinkCounting;
 import static network.aika.fields.ConstantField.ZERO;
+import static network.aika.fields.FieldLink.connect;
+import static network.aika.fields.FieldLink.reconnect;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
-import static network.aika.neuron.activation.Timestamp.NOT_SET;
 import static network.aika.neuron.activation.Timestamp.FIRED_COMPARATOR;
 
 /**
@@ -41,8 +42,9 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected O output;
 
     private BiFunction igGradient;
-    private AbstractBiFunction weightedInput;
-    protected AbstractBiFunction backPropGradient;
+    protected AbstractFunction weightedInputUB;
+    protected AbstractFunction weightedInputLB;
+    protected AbstractFunction backPropGradient;
 
     protected ThresholdOperator onTransparent;
 
@@ -71,10 +73,13 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected void initOnTransparent() {
         onTransparent = threshold(
+                this,
                 "onTransparent",
                 0.0,
                 ABOVE,
-                mul("isFired * weight",
+                mul(
+                        this,
+                        "isFired * weight",
                         synapse.getWeight(),
                         input.isFired
                 )
@@ -85,7 +90,12 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         if(isTemplate())
             induce();
 
-        igGradient = func("Information-Gain", input.net, output.net, (x1, x2) ->
+        igGradient = func(
+                this,
+                "Information-Gain",
+                input.netUB,
+                output.netUB,
+                (x1, x2) ->
                         getRelativeSurprisal(
                                 Sign.getSign(x1),
                                 Sign.getSign(x2),
@@ -104,6 +114,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
             return;
 
         backPropGradient = mul(
+                this,
                 "oAct.ownOutputGradient * s.weight",
                 output.ownOutputGradient,
                 synapse.getWeight(),
@@ -114,11 +125,19 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     public abstract void initWeightUpdate();
 
     protected void initWeightInput() {
-        weightedInput = mul(
-                "iAct.value * s.weight",
-                input.getValue(),
-                synapse.getWeight(),
-                getOutput().getNet()
+        weightedInputUB = initWeightedInput(true);
+        weightedInputLB = initWeightedInput(false);
+
+        connect(weightedInputUB, getOutput().lookupLinkSlot(synapse, true));
+        connect(weightedInputLB, getOutput().lookupLinkSlot(synapse, false));
+    }
+
+    protected Multiplication initWeightedInput(boolean upperBound) {
+        return mul(
+                this,
+                "iAct(id:" + getInput().getId() + ").value" + (upperBound ? "UB" : "LB") + " * s.weight",
+                input.getValue(upperBound),
+                synapse.getWeight()
         );
     }
 
@@ -148,8 +167,16 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return igGradient;
     }
 
-    public AbstractBiFunction getWeightedInput() {
-        return weightedInput;
+    public AbstractFunction getWeightedInput(boolean upperBound) {
+        return upperBound ? weightedInputUB : weightedInputLB;
+    }
+
+    public AbstractFunction getWeightedInputUB() {
+        return weightedInputUB;
+    }
+
+    public AbstractFunction getWeightedInputLB() {
+        return weightedInputLB;
     }
 
     public FieldOutput getBackPropGradient() {
@@ -180,8 +207,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return s;
     }
 
-    public FieldOutput getInputValue(Sign s) {
-        return s.getValue(input != null ? input.getValue() : ZERO);
+    public FieldOutput getInputValue(Sign s, boolean upperBound) {
+        return s.getValue(input != null ? input.getValue(upperBound) : ZERO);
     }
 
     public S getSynapse() {
@@ -228,11 +255,11 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
         synapse.linkOutput();
 
-        if(weightedInput != null)
-            reconnect(weightedInput.getInput2(), synapse.getWeight());
+        if(weightedInputLB != null)
+            reconnect(weightedInputLB.getInputLinkByArg(2), synapse.getWeight());
 
         if(backPropGradient != null)
-            reconnect(backPropGradient.getInput2(), synapse.getWeight());
+            reconnect(backPropGradient.getInputLinkByArg(2), synapse.getWeight());
 
         Cleanup.add(this);
     }
@@ -245,9 +272,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
                 new OutputKey(output.getNeuronProvider(), output.getId()),
                 this
         );
-    }
-
-    public void setFinalMode() {
     }
 
     public void linkOutput() {

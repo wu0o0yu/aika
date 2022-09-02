@@ -16,40 +16,28 @@
  */
 package network.aika.fields;
 
+import network.aika.neuron.activation.Element;
+
 /**
  * @author Lukas Molzberger
  */
-public class Division extends AbstractBiFunction {
+public class Division extends AbstractFunction {
 
-    public Division(String label) {
-        super(label);
+    public Division(Element ref, String label) {
+        super(ref, label);
     }
 
     @Override
-    public double getCurrentValue() {
-        return FieldOutput.getCurrentValue(in1) / FieldOutput.getCurrentValue(in2);
-    }
-
-    @Override
-    protected double getCurrentValue(int arg, double inputCV) {
-        return switch (arg) {
-            case 1 -> inputCV / in2.getInput().getCurrentValue();
-            case 2 -> in1.getInput().getCurrentValue() / inputCV;
-            default -> throw new IllegalArgumentException();
-        };
-    }
-
-    @Override
-    protected double computeUpdate(int arg, double inputCV, double ownCV, double u) {
-        return switch (arg) {
-            case 1 -> updateDiv1(u);
-            case 2 -> -(u * FieldOutput.getCurrentValue(in1)) / Math.pow(inputCV, 2.0);
+    protected double computeUpdate(FieldLink fl, double u) {
+        return switch (fl.getArgument()) {
+            case 0 -> updateDiv1(u);
+            case 1 -> -(u * getInputValueByArg(0)) / Math.pow(fl.getCurrentInputValue(), 2.0);
             default -> throw new IllegalArgumentException();
         };
     }
 
     private double updateDiv1(double u) {
-        double v2 = FieldOutput.getCurrentValue(in2);
+        double v2 = getInputValueByArg(1);
         return (u * v2) / Math.pow(v2, 2.0);
     }
 }

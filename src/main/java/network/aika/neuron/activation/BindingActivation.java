@@ -22,11 +22,9 @@ import network.aika.neuron.Range;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 
 import java.util.*;
 
-import static network.aika.fields.ConstantField.ONE;
 import static network.aika.fields.Fields.*;
 import static network.aika.neuron.activation.Timestamp.FIRED_COMPARATOR;
 import static network.aika.neuron.bindingsignal.State.*;
@@ -36,16 +34,16 @@ import static network.aika.neuron.bindingsignal.State.*;
  */
 public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
-    private AbstractBiFunction bpWeightedNet;
-
-    private QueueField norm = new QueueField(this, "norm");
-    private FieldOutput expNet;
-    private FieldOutput branchProbability;
-
     private boolean isInput;
 
     protected SlotField inputBSSlot = new SlotField(this, "inputBSSlot");
     protected SlotField relatedSameBSSlot = new SlotField(this, "relatedSameBSSlot");
+
+    protected Field mixedNetUB;
+    protected Field mixedNetLB;
+
+    private Field isOpen;
+    private Field mix;
 
 
     protected BindingActivation(int id, BindingNeuron n) {
@@ -54,34 +52,46 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
+    }
 
-        expNet = exp(net);
+    @Override
+    protected void initFields() {
+        isOpen = new Field(this, "isOpen", 1.0);
+        mix = new Field(this, "mix", 1.0);
 
-        branchProbability = div("branch probability", expNet, norm);
-
-        bpWeightedNet = mul(
-                "bp * net",
-                ONE,
-                net
+        mixedNetUB = mix(
+                this,
+                "mixedNetUB",
+                mix,
+                netUB,
+                netLB
         );
 
-        isFinal.addEventListener(() ->
-            connect(
-                    branchProbability,
-                    1,
-                    bpWeightedNet,
-                    true
-            )
+        mixedNetLB = mix(
+                this,
+                "mixedNetLB",
+                mix,
+                netLB,
+                netUB
         );
 
-        if(!isInput()) {
-            func(
-                    "f(bp * net)",
-                    bpWeightedNet,
-                    x -> getNeuron().getActivationFunction().f(x),
-                    value
-            );
-        }
+        valueUB = func(
+                this,
+                "value = f(mixedNetUB)",
+                mixedNetUB,
+                x -> getActivationFunction().f(x)
+        );
+        valueLB = func(
+                this,
+                "value = f(mixedNetLB)",
+                mixedNetLB,
+                x -> getActivationFunction().f(x)
+        );
+
+        neuron.getInputSynapses()
+                .forEach(s ->
+                        s.initDummyLink(this)
+                );
     }
 
     @Override
@@ -92,23 +102,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
             connectNorm(bs);
     }
 
-    @Override
-    public void connectNorm(BindingSignal bs) {
-        if(bs.getLink() instanceof NegativeFeedbackLink)
-            return;
-
-        bs.getOriginActivation()
-                .getReverseBindingSignals(getNeuron(), INPUT)
-                .map(relBS -> (BindingActivation) relBS.getActivation())
-                .forEach(relAct -> connectNorm(relAct));
-    }
-
-    private void connectNorm(BindingActivation relAct) {
-        connect(expNet, relAct.norm);
-        if(this != relAct)
-            connect(relAct.expNet, norm);
-    }
-
     public SlotField getSlot(State s) {
         return switch(s) {
             case INPUT -> inputBSSlot;
@@ -117,17 +110,28 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         };
     }
 
-    @Override
-    protected void initFields() {
-        // Override parent
-    }
-
     public boolean isInput() {
         return isInput;
     }
 
     public void setInput(boolean input) {
         isInput = input;
+    }
+
+    public Field getIsOpen() {
+        return isOpen;
+    }
+
+    public Field getMix() {
+        return mix;
+    }
+
+    public Field getMixedNetUB() {
+        return mixedNetUB;
+    }
+
+    public Field getMixedNetLB() {
+        return mixedNetLB;
     }
 
     @Override
@@ -149,37 +153,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     public void updateBias(double u) {
-        getNet().receiveUpdate(u);
-    }
-
-    public FieldOutput getExpNet() {
-        return expNet;
-    }
-
-    public AbstractBiFunction getBpWeightedNet() {
-        return bpWeightedNet;
-    }
-
-    public FieldOutput getBranchProbability() {
-        return branchProbability;
-    }
-
-    public QueueField getNorm() {
-        return norm;
-    }
-
-    public void disconnect() {
-        super.disconnect();
-
-        FieldOutput[] fields = new FieldOutput[]{
-                bpWeightedNet,
-                branchProbability,
-                expNet
-        };
-        for(FieldOutput f: fields) {
-            if(f == null)
-                continue;
-            f.disconnect();
-        }
+        getNetUB().receiveUpdate(u);
+        getNetLB().receiveUpdate(u);
     }
 }

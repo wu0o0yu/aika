@@ -17,96 +17,22 @@
 package network.aika.fields;
 
 import network.aika.neuron.activation.Element;
-import network.aika.utils.Utils;
-
-import java.util.List;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class AbstractFunction extends FieldNode implements FieldInput, FieldOutput {
+public abstract class AbstractFunction extends Field implements FieldInput, FieldOutput {
 
-    protected FieldLink input;
-    private String label;
-
-    public AbstractFunction(String label) {
-        this.label = label;
+    public AbstractFunction(Element ref, String label) {
+        super(ref, label);
     }
 
-    public void addInput(FieldLink in) {
-        this.input = in;
-    }
-
-    public void removeInput(FieldLink l) {
-        this.input = null;
-    }
+    protected abstract double computeUpdate(FieldLink fl, double u);
 
     @Override
-    public List<FieldLink> getInputs() {
-        return List.of(input);
-    }
+    public void receiveUpdate(FieldLink fl, double u) {
+        newValue += computeUpdate(fl, u);
 
-    @Override
-    public Element getReference() {
-        return input.getInput().getReference();
-    }
-
-    @Override
-    public void disconnect() {
-        super.disconnect();
-        if(input != null) {
-            input.getInput().removeOutput(input, false);
-            input = null;
-        }
-    }
-
-    @Override
-    public String getLabel() {
-        return label;
-    }
-
-    @Override
-    public boolean isInitialized() {
-        return input.getInput().isInitialized();
-    }
-
-    @Override
-    public double getCurrentValue() {
-        return applyFunction(input.getInput().getCurrentValue());
-    }
-
-    protected abstract double applyFunction(double x);
-
-    @Override
-    public void receiveUpdate(int arg, double inputCV, double u) {
-        if(isInitialized()) {
-            double ownCV = applyFunction(inputCV);
-            propagateUpdate(
-                    ownCV,
-                    computeUpdate(inputCV, ownCV, u)
-            );
-        }
-    }
-
-    private double computeUpdate(double inputCV, double ownCV, double u) {
-        return input.getInput().isInitialized() ?
-                computeNewValue(inputCV, u) - ownCV :
-                computeNewValue(inputCV, u);
-    }
-
-    private double computeNewValue(double inputCV, double u) {
-        return applyFunction(inputCV + u);
-    }
-
-    @Override
-    public String toString() {
-        return getLabel() + ":" + getValueString();
-    }
-
-    public String getValueString() {
-        if(!isInitialized())
-            return "--";
-
-        return "[v:" + Utils.round(getCurrentValue()) + "]";
+        triggerUpdate();
     }
 }

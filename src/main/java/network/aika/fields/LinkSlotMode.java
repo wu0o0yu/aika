@@ -16,10 +16,11 @@
  */
 package network.aika.fields;
 
+
 /**
  * @author Lukas Molzberger
  */
-public interface PropagatePreCondition {
-
-    boolean check(Double cv, double nv, double u);
+public enum LinkSlotMode {
+    MAX,
+    MIN
 }

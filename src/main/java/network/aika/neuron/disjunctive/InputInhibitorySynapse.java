@@ -14,36 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.fields;
+package network.aika.neuron.disjunctive;
 
-import network.aika.neuron.activation.Element;
+import network.aika.neuron.bindingsignal.Transition;
 
-import java.util.function.DoubleBinaryOperator;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
+import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
+import static network.aika.neuron.bindingsignal.State.INPUT;
+import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
+
 
 /**
+ *
  * @author Lukas Molzberger
  */
-public class BiFunction extends AbstractFunction {
+public class InputInhibitorySynapse extends InhibitorySynapse {
 
-    private DoubleBinaryOperator function;
-
-    public BiFunction(Element ref, String label, DoubleBinaryOperator f) {
-        super(ref, label);
-        this.function = f;
-    }
+    private static List<Transition> TRANSITIONS = List.of(
+            transition(
+                    fixed(INPUT),
+                    fixed(INPUT),
+                    MATCH_AND_PROPAGATE
+            )
+    );
 
     @Override
-    protected double computeUpdate(FieldLink fl, double u) {
-        return switch (fl.getArgument()) {
-            case 0 -> function.applyAsDouble(
-                    fl.getInput().getNewValue(),
-                    getInputValueByArg(1)
-                );
-            case 1 -> function.applyAsDouble(
-                    getInputValueByArg(0),
-                    fl.getInput().getNewValue()
-                );
-            default -> throw new IllegalArgumentException();
-        };
+    public Stream<Transition> getTransitions() {
+        return TRANSITIONS.stream();
     }
 }

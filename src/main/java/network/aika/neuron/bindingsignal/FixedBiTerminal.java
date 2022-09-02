@@ -39,6 +39,7 @@ public class FixedBiTerminal extends BiTerminal<FixedTerminal> {
         SlotField secondSlot = secondTerminal.getSlot(act);
 
         FieldOutput inputEvent = mul(
+                act,
                 "fixed bi-terminal event",
                 firstSlot,
                 secondSlot

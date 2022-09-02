@@ -19,6 +19,7 @@ package network.aika.neuron.activation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 
+import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 import static network.aika.neuron.bindingsignal.State.INPUT;
@@ -34,12 +35,12 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
     }
 
     public boolean isSelfRef() {
-        BindingSignal iBS = input.getBindingSignal(INPUT);
+        BindingSignal iBS = input.getBindingSignal();
         if(iBS == null)
             return false;
 
         return iBS.isSelfRef(
-                output.getBindingSignal(INPUT)
+                output.getBindingSignal(iBS.getState())
         );
     }
 
@@ -48,12 +49,17 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
         if(isSelfRef())
             return;
 
-        super.initWeightInput();
+        weightedInputUB = initWeightedInput(false);
+        weightedInputLB = initWeightedInput(true);
+
+        connect(weightedInputUB, input.getId(), getOutput().lookupLinkSlot(synapse, true));
+        connect(weightedInputLB, input.getId(), getOutput().lookupLinkSlot(synapse, false));
     }
 
     @Override
     protected void initOnTransparent() {
         onTransparent = threshold(
+                this,
                 "onTransparent",
                 0.0,
                 ABOVE,
@@ -64,9 +70,15 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
     @Override
     public void initWeightUpdate() {
         mul(
+                this,
                 "weight update",
                 getInput().getIsFired(),
-                scale("-1 * og", -1, getOutput().getUpdateValue()),
+                scale(
+                        this,
+                        "-1 * og",
+                        -1,
+                        getOutput().getUpdateValue()
+                ),
                 synapse.getWeight()
         );
     }

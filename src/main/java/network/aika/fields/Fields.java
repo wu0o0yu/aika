@@ -16,8 +16,12 @@
  */
 package network.aika.fields;
 
+import network.aika.neuron.activation.Element;
+
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleFunction;
+
+import static network.aika.fields.FieldLink.*;
 
 /**
  * @author Lukas Molzberger
@@ -25,161 +29,170 @@ import java.util.function.DoubleFunction;
 public class Fields {
 
     public static boolean isTrue(FieldOutput f) {
-        return f != null && f.isInitialized() && f.getCurrentValue() > 0.5;
+        return f != null && f.getCurrentValue() > 0.5;
     }
 
-    public static void reconnect(FieldLink l, Field newInput) {
-        l.getInput().removeOutput(l, true);
-        newInput.addOutput(l, true);
-    }
-
-    public static void connect(FieldOutput in, FieldInput out) {
-        connect(in, 0, out);
-    }
-
-    public static void connect(FieldOutput in, FieldInput out, boolean propagateInitialValue) {
-        connect(in, 0, out, propagateInitialValue);
-    }
-
-    public static void connect(FieldOutput in, int arg, FieldInput out) {
-        connect(in, arg, out, true);
-    }
-
-    public static void connect(FieldOutput in, int arg, FieldInput out, boolean propagateInitialValue) {
-        FieldLink l = new FieldLink(in, arg, out);
-        out.addInput(l);
-        in.addOutput(l, propagateInitialValue);
-    }
-
-    private static void connectAll(FieldOutput in, FieldInput... out) {
-        assert in != null;
-
-        for(FieldInput o : out) {
-            if(o != null) {
-                connect(in, 0, o);
-            }
-        }
-    }
-
-    public static void disconnect(FieldOutput in, FieldInput out) {
-        disconnect(in, 0, out);
-    }
-
-    public static void disconnect(FieldOutput in, int arg, FieldInput out) {
-        FieldLink l = new FieldLink(in, arg, out);
-        out.removeInput(l);
-        in.removeOutput(l, false);
-    }
-
-    public static Addition add(String label, FieldOutput in1, FieldOutput in2) {
+    public static Addition add(Element ref, String label, FieldOutput in1, FieldOutput in2) {
         if(in1 == null || in2 == null)
             return null;
 
-        Addition add = new Addition(label);
-        connect(in1, 1, add);
-        connect(in2, 2, add);
+        Addition add = new Addition(ref, label);
+        FieldLink fl0 = link(in1, 0, add);
+        FieldLink fl1 = link(in2, 1, add);
+
+        fl0.connect();
+        fl1.connect();
+
         return add;
     }
 
-    public static Addition add(String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
-        Addition add = add(label, in1, in2);
+    public static Addition add(Element ref, String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
+        Addition add = add(ref, label, in1, in2);
         connectAll(add, out);
         return add;
     }
 
-    public static Multiplication mul(String label, FieldOutput in1, FieldOutput in2) {
+    public static Subtraction sub(Element ref, String label, FieldOutput in1, FieldOutput in2) {
         if(in1 == null || in2 == null)
             return null;
 
-        Multiplication mul = new Multiplication(label);
-        connect(in1, 1, mul);
-        connect(in2, 2, mul);
+        Subtraction sub = new Subtraction(ref, label);
+        FieldLink fl0 = link(in1, 0, sub);
+        FieldLink fl1 = link(in2, 1, sub);
+
+        fl0.connect();
+        fl1.connect();
+
+        return sub;
+    }
+
+    public static Subtraction sub(Element ref, String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
+        Subtraction sub = sub(ref, label, in1, in2);
+        connectAll(sub, out);
+        return sub;
+    }
+
+    public static MixFunction mix(Element ref, String label, FieldOutput x, FieldOutput in1, FieldOutput in2) {
+        if(in1 == null || in2 == null)
+            return null;
+
+        MixFunction mix = new MixFunction(ref, label);
+        FieldLink fl0 = link(x, 0, mix);
+        FieldLink fl1 = link(in1, 1, mix);
+        FieldLink fl2 = link(in2, 2, mix);
+
+        fl0.connect();
+        fl1.connect();
+        fl2.connect();
+
+        return mix;
+    }
+
+    public static MixFunction mix(Element ref, String label, FieldOutput x, FieldOutput in1, FieldOutput in2, FieldInput... out) {
+        MixFunction mix = mix(ref, label, x, in1, in2);
+        connectAll(mix, out);
+        return mix;
+    }
+
+    public static Multiplication mul(Element ref, String label, FieldOutput in1, FieldOutput in2) {
+        if(in1 == null || in2 == null)
+            return null;
+
+        Multiplication mul = new Multiplication(ref, label);
+        FieldLink fl0 = link(in1, 0, mul);
+        FieldLink fl1 = link(in2, 1, mul);
+
+        fl0.connect();
+        fl1.connect();
+
         return mul;
     }
 
-    public static Multiplication mul(String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
-        Multiplication mul = mul(label, in1, in2);
+    public static Multiplication mul(Element ref, String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
+        Multiplication mul = mul(ref, label, in1, in2);
         connectAll(mul, out);
         return mul;
     }
 
-    public static Division div(String label, FieldOutput in1, FieldOutput in2) {
+    public static Division div(Element ref, String label, FieldOutput in1, FieldOutput in2) {
         if(in1 == null || in2 == null)
             return null;
 
-        Division div = new Division(label);
-        connect(in1, 1, div);
-        connect(in2, 2, div);
+        Division div = new Division(ref, label);
+        FieldLink fl0 = link(in1, 0, div);
+        FieldLink fl1 = link(in2, 1, div);
+
+        fl0.connect();
+        fl1.connect();
+
         return div;
     }
 
-    public static Division div(String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
-        Division div = div(label, in1, in2);
+    public static Division div(Element ref, String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
+        Division div = div(ref, label, in1, in2);
         connectAll(div, out);
         return div;
     }
 
-    public static FieldFunction exp(FieldOutput a) {
-        return func(
-                "exp(a)",
-                a,
-                x -> Math.exp(x)
-        );
-    }
 
-    public static FieldFunction pow(FieldOutput a, double b) {
+    public static FieldFunction pow(Element ref, FieldOutput a, double b) {
         return func(
+                ref,
                 "pow(a, b)",
                 a,
                 x -> Math.pow(x, b)
         );
     }
 
-    public static FieldFunction func(String label, FieldOutput in, DoubleFunction<Double> f) {
+    public static FieldFunction func(Element ref, String label, FieldOutput in, DoubleFunction<Double> f) {
         if(in == null)
             return null;
 
-        FieldFunction func = new FieldFunction(label, f);
+        FieldFunction func = new FieldFunction(ref, label, f);
         connect(in, func);
         return func;
     }
 
-    public static FieldFunction func(String label, FieldOutput in, DoubleFunction<Double> f, FieldInput... out) {
+    public static FieldFunction func(Element ref, String label, FieldOutput in, DoubleFunction<Double> f, FieldInput... out) {
         if(in == null)
             return null;
 
-        FieldFunction func = func(label, in, f);
+        FieldFunction func = func(ref, label, in, f);
         connectAll(func, out);
         return func;
     }
 
-    public static BiFunction func(String label, FieldOutput in1, FieldOutput in2, DoubleBinaryOperator f) {
+    public static BiFunction func(Element ref, String label, FieldOutput in1, FieldOutput in2, DoubleBinaryOperator f) {
         if(in1 == null || in2 == null)
             return null;
 
-        BiFunction func = new BiFunction(label, f);
-        connect(in1, 1, func);
-        connect(in2, 2, func);
+        BiFunction func = new BiFunction(ref, label, f);
+        FieldLink fl0 = link(in1, 0, func);
+        FieldLink fl1 = link(in2, 1, func);
+
+        fl0.connect();
+        fl1.connect();
+
         return func;
     }
 
-    public static BiFunction func(String label, FieldOutput in1, FieldOutput in2, DoubleBinaryOperator f, FieldInput... out) {
-        BiFunction func = func(label, in1, in2, f);
+    public static BiFunction func(Element ref, String label, FieldOutput in1, FieldOutput in2, DoubleBinaryOperator f, FieldInput... out) {
+        BiFunction func = func(ref,label, in1, in2, f);
         connectAll(func, out);
         return func;
     }
 
-    public static ThresholdOperator threshold(String label, double threshold, ThresholdOperator.Type type, FieldOutput in) {
+    public static ThresholdOperator threshold(Element ref, String label, double threshold, ThresholdOperator.Type type, FieldOutput in) {
         if(in == null)
             return null;
 
-        ThresholdOperator op = new ThresholdOperator(label, threshold, type);
+        ThresholdOperator op = new ThresholdOperator(ref, label, threshold, type);
         connect(in, op);
         return op;
     }
 
-    public static ThresholdOperator threshold(String label, double threshold, ThresholdOperator.Type type, FieldOutput in, FieldInput... out) {
-        ThresholdOperator op = threshold(label, threshold, type, in, out);
+    public static ThresholdOperator threshold(Element ref, String label, double threshold, ThresholdOperator.Type type, FieldOutput in, FieldInput... out) {
+        ThresholdOperator op = threshold(ref, label, threshold, type, in, out);
         connectAll(op, out);
         return op;
     }
@@ -193,17 +206,17 @@ public class Fields {
         return f;
     }
 
-    public static ScaleFunction scale(String label, double scale, FieldOutput in) {
+    public static ScaleFunction scale(Element ref, String label, double scale, FieldOutput in) {
         if(in == null)
             return null;
 
-        ScaleFunction f = new ScaleFunction(label, scale);
+        ScaleFunction f = new ScaleFunction(ref, label, scale);
         connect(in, f);
         return f;
     }
 
-    public static ScaleFunction scale(String label, double scale, FieldOutput in, FieldInput... out) {
-        ScaleFunction f = scale(label, scale, in);
+    public static ScaleFunction scale(Element ref, String label, double scale, FieldOutput in, FieldInput... out) {
+        ScaleFunction f = scale(ref, label, scale, in);
         connectAll(f, out);
         return f;
     }

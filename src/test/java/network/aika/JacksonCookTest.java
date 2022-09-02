@@ -176,8 +176,8 @@ public class JacksonCookTest {
         createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, cookSurnameEntity, entityCN, 10.0);
         createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, cookProfessionEntity, entityCN, 10.0);
 
-        initInhibitoryLoop(t, "jackson", jacksonForenameBN, jacksonCityBN);
-        initInhibitoryLoop(t, "cook", cookSurnameBN, cookProfessionBN);
+        addInhibitoryLoop(t, createNeuron(t.INHIBITORY_TEMPLATE, "I-jackson"), false, jacksonForenameBN, jacksonCityBN);
+        addInhibitoryLoop(t, createNeuron(t.INHIBITORY_TEMPLATE, "I-cook"), false, cookSurnameBN, cookProfessionBN);
 
         updateBias(relPrevEntityBN, 3.0);
         updateBias(jacksonForenameBN, 2.0);
@@ -230,7 +230,6 @@ public class JacksonCookTest {
 
         processTokens(t, doc, List.of("Jackson", "Cook"));
 
-        doc.processFinalMode();
         doc.postProcessing();
         doc.updateModel();
     }

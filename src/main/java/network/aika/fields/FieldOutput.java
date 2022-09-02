@@ -16,13 +16,11 @@
  */
 package network.aika.fields;
 
-import network.aika.callbacks.UpdateListener;
 import network.aika.neuron.activation.Element;
 
 import java.util.List;
 
 import static network.aika.fields.FieldLink.createEventListener;
-import static network.aika.fields.FieldLink.createUpdateListener;
 
 /**
  * @author Lukas Molzberger
@@ -33,17 +31,13 @@ public interface FieldOutput {
 
     String getValueString();
 
-    boolean isInitialized();
-
     double getCurrentValue();
 
-    static double getCurrentValue(FieldLink f) {
-        return f != null ? f.getInput().getCurrentValue() : 0.0;
-    }
+    double getNewValue();
 
-    void addOutput(FieldLink l, boolean propagateInitValue);
+    void addOutput(FieldLink fl);
 
-    void removeOutput(FieldLink l, boolean propagateFinalValue);
+    void removeOutput(FieldLink fl);
 
     List<FieldLink> getReceivers();
 
@@ -51,11 +45,9 @@ public interface FieldOutput {
 
     Element getReference();
 
-    default void addUpdateListener(UpdateListener updateListener) {
-        addOutput(createUpdateListener(updateListener), true);
-    }
-
     default void addEventListener(FieldOnTrueEvent eventListener) {
-        addOutput(createEventListener(eventListener), true);
+        FieldLink fl = createEventListener(this, eventListener);
+        addOutput(fl);
+        fl.connect();
     }
 }
