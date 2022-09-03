@@ -44,6 +44,6 @@ public class BiFunction extends AbstractFunction {
                     fl.getInput().getNewValue()
                 );
             default -> throw new IllegalArgumentException();
-        };
+        } - currentValue;
     }
 }

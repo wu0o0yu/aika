@@ -478,7 +478,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public String toKeyString() {
-        return getId() + ":" + getLabel();
+        return getId() + ":" + (getLabel() != null ? getLabel() : "--");
     }
 
     public String toString() {

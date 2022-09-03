@@ -18,7 +18,6 @@ package network.aika;
 
 import network.aika.callbacks.FSSuspensionCallback;
 import network.aika.debugger.AIKADebugger;
-import network.aika.debugger.stepmanager.StepMode;
 import network.aika.text.Document;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +46,6 @@ public class TestFsModel {
             Document doc = generateDocument(tg, m, "arbeit fair arbeitsvermittlung ", true);
 
             AIKADebugger debugger = AIKADebugger.createAndShowGUI(doc);
-            debugger.setStepMode(StepMode.ACT);
 
             doc.postProcessing();
             doc.updateModel();
@@ -58,7 +56,6 @@ public class TestFsModel {
             Document doc = generateDocument(tg, m, "arbeit fair arbeitsvermittlung ", false);
 
             AIKADebugger debugger = AIKADebugger.createAndShowGUI(doc);
-            debugger.setStepMode(StepMode.ACT);
 
             doc.postProcessing();
             doc.updateModel();
