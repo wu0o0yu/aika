@@ -34,7 +34,6 @@ import java.util.stream.Stream;
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.direction.Direction.DIRECTIONS;
 import static network.aika.fields.FieldLink.connect;
-import static network.aika.fields.FieldLink.reconnect;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.LinkSlotMode.MAX;
 import static network.aika.fields.LinkSlotMode.MIN;
@@ -436,7 +435,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         neuron = (N) neuron.instantiateTemplate(true);
 
-        reconnect(biasLink, neuron.getBias());
+        biasLink.reconnect(neuron.getBias());
     }
 
     public Thought getThought() {

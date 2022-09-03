@@ -178,7 +178,7 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
     @Override
     public void disconnect() {
         receivers.forEach(lf ->
-                lf.disconnect()
+                lf.disconnectAndUnlink()
         );
         receivers.clear();
 

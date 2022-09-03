@@ -25,7 +25,6 @@ import network.aika.steps.link.Cleanup;
 import network.aika.steps.link.LinkCounting;
 import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.FieldLink.connect;
-import static network.aika.fields.FieldLink.reconnect;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 import static network.aika.neuron.activation.Timestamp.FIRED_COMPARATOR;
@@ -256,13 +255,16 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         synapse.linkOutput();
 
         if(weightedInputLB != null)
-            reconnect(weightedInputLB.getInputLinkByArg(1), synapse.getWeight());
+            weightedInputLB.getInputLinkByArg(1)
+                    .reconnect(synapse.getWeight());
 
         if(weightedInputUB != null)
-            reconnect(weightedInputUB.getInputLinkByArg(1), synapse.getWeight());
+            weightedInputUB.getInputLinkByArg(1)
+                    .reconnect(synapse.getWeight());
 
         if(backPropGradient != null)
-            reconnect(backPropGradient.getInputLinkByArg(1), synapse.getWeight());
+            backPropGradient.getInputLinkByArg(1)
+                    .reconnect(synapse.getWeight());
 
         Cleanup.add(this);
     }

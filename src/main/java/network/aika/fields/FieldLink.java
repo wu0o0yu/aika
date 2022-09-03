@@ -41,15 +41,6 @@ public class FieldLink {
         return new FieldLink(in, 0, updateListener);
     }
 
-
-    public static void reconnect(FieldLink fl, Field newInput) {
-        fl.disconnect();
-        fl.getInput().removeOutput(fl);
-        fl.setInput(newInput);
-        newInput.addOutput(fl);
-        fl.connect();
-    }
-
     public static FieldLink connect(FieldOutput in, FieldInput out) {
         return connect(in, out.getNextArg(), out);
     }
@@ -105,6 +96,15 @@ public class FieldLink {
         output.receiveUpdate(this, u);
     }
 
+
+    public void reconnect(Field newInput) {
+        disconnect();
+        getInput().removeOutput(this);
+        setInput(newInput);
+        newInput.addOutput(this);
+        connect();
+    }
+
     public void connect() {
         assert !isInitialized;
 
@@ -123,6 +123,14 @@ public class FieldLink {
             output.receiveUpdate(this, -cv);
 
         isInitialized = false;
+    }
+
+    public void disconnectAndUnlink() {
+        disconnect();
+        unlinkOutput();
+    }
+
+    private void unlinkOutput() {
         if(output instanceof FieldInput) {
             FieldInput fo = (FieldInput) output;
             fo.removeInput(this);
