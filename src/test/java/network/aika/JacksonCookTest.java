@@ -20,6 +20,8 @@ import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.neuron.conjunctive.text.TokenNeuron;
+import network.aika.neuron.disjunctive.BindingCategoryNeuron;
 import network.aika.neuron.disjunctive.CategoryNeuron;
 import network.aika.text.Document;
 import org.graphstream.ui.view.camera.Camera;
@@ -131,8 +133,8 @@ public class JacksonCookTest {
         Model m = new Model();
         m.setTemplateGraph(t);
 
-        PatternNeuron jacksonIN = t.TOKEN_TEMPLATE.lookupToken("Jackson");
-        PatternNeuron cookIN = t.TOKEN_TEMPLATE.lookupToken("Cook");
+        TokenNeuron jacksonIN = t.TOKEN_TEMPLATE.lookupToken("Jackson");
+        TokenNeuron cookIN = t.TOKEN_TEMPLATE.lookupToken("Cook");
 
         LatentRelationNeuron relPT = t.TOKEN_POSITION_RELATION_TEMPLATE.lookupRelation(-1, -1);
 
@@ -144,37 +146,25 @@ public class JacksonCookTest {
 
         BindingNeuron jacksonForenameBN = createNeuron(t.BINDING_TEMPLATE, "jackson (forename)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, jacksonIN, jacksonForenameBN, 10.0);
-        PatternNeuron jacksonForenameEntity = initPatternLoop(t, "Entity: jackson (forename)", jacksonForenameBN);
-        updateBias(jacksonForenameEntity, 3.0);
-        CategoryNeuron forenameCN = createNeuron(t.CATEGORY_TEMPLATE, "forename");
-        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, jacksonForenameEntity, forenameCN, 10.0);
+        BindingCategoryNeuron forenameCN = createNeuron(t.BINDING_CATEGORY_TEMPLATE, "forename");
+        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, jacksonForenameBN, forenameCN, 10.0);
 
         BindingNeuron jacksonCityBN = createNeuron(t.BINDING_TEMPLATE, "jackson (city)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, jacksonIN, jacksonCityBN, 10.0);
-        PatternNeuron jacksonCityEntity = initPatternLoop(t, "Entity: jackson (city)", jacksonCityBN);
-        updateBias(jacksonCityEntity, 3.0);
-        CategoryNeuron cityCN = createNeuron(t.CATEGORY_TEMPLATE, "city");
-        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, jacksonCityEntity, cityCN, 10.0);
+        BindingCategoryNeuron cityCN = createNeuron(t.BINDING_CATEGORY_TEMPLATE, "city");
+        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, jacksonCityBN, cityCN, 10.0);
 
         BindingNeuron cookSurnameBN = createNeuron(t.BINDING_TEMPLATE, "cook (surname)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, cookIN, cookSurnameBN, 10.0);
 //        createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, cookSurnameBN, relPrevEntityBN, 9.0);
-        PatternNeuron cookSurnameEntity = initPatternLoop(t, "Entity: cook (surname)", cookSurnameBN);
-        updateBias(cookSurnameEntity, 3.0);
-        CategoryNeuron surnameCN = createNeuron(t.CATEGORY_TEMPLATE, "surname");
-        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, cookSurnameEntity, surnameCN, 10.0);
+        BindingCategoryNeuron surnameCN = createNeuron(t.BINDING_CATEGORY_TEMPLATE, "surname");
+        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, cookSurnameBN, surnameCN, 10.0);
 
         BindingNeuron cookProfessionBN = createNeuron(t.BINDING_TEMPLATE, "cook (profession)");
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, cookIN, cookProfessionBN, 10.0);
-        PatternNeuron cookProfessionEntity = initPatternLoop(t, "Entity: cook (profession)", cookProfessionBN);
-        updateBias(cookProfessionEntity, 3.0);
-        CategoryNeuron professionCN = createNeuron(t.CATEGORY_TEMPLATE, "profession");
-        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, cookProfessionEntity, professionCN, 10.0);
+        BindingCategoryNeuron professionCN = createNeuron(t.BINDING_CATEGORY_TEMPLATE, "profession");
+        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, cookProfessionBN, professionCN, 10.0);
 
-        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, jacksonForenameEntity, entityCN, 10.0);
-        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, jacksonCityEntity, entityCN, 10.0);
-        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, cookSurnameEntity, entityCN, 10.0);
-        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, cookProfessionEntity, entityCN, 10.0);
 
         addInhibitoryLoop(t, createNeuron(t.INHIBITORY_TEMPLATE, "I-jackson"), false, jacksonForenameBN, jacksonCityBN);
         addInhibitoryLoop(t, createNeuron(t.INHIBITORY_TEMPLATE, "I-cook"), false, cookSurnameBN, cookProfessionBN);
@@ -186,9 +176,9 @@ public class JacksonCookTest {
         updateBias(cookProfessionBN, 3.0);
 
         BindingNeuron forenameBN = createNeuron(t.BINDING_TEMPLATE, "forename (person name)");
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, forenameCN, forenameBN, 10.0);
+        createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, forenameCN, forenameBN, 10.0);
         BindingNeuron surnameBN = createNeuron(t.BINDING_TEMPLATE, "surname (person name)");
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, surnameCN, surnameBN, 10.0);
+        createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, surnameCN, surnameBN, 10.0);
 
         createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPrevEntityBN, surnameBN, 10.0);
 
