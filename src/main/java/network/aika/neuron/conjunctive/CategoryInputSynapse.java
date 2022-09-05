@@ -14,12 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.disjunctive;
+package network.aika.neuron.conjunctive;
 
 import network.aika.direction.Direction;
-import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.BindingCategoryActivation;
+import network.aika.neuron.activation.CategoryInputLink;
+import network.aika.neuron.activation.SamePatternLink;
+import network.aika.neuron.bindingsignal.PrimitiveTransition;
 import network.aika.neuron.bindingsignal.Transition;
-import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.disjunctive.BindingCategoryNeuron;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -29,20 +33,21 @@ import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
 import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
+import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 
-
 /**
+ * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
+ *
  * @author Lukas Molzberger
  */
-public class BindingCategorySynapse extends DisjunctiveSynapse<
-        BindingCategorySynapse,
-        BindingNeuron,
+public class CategoryInputSynapse extends BindingNeuronSynapse<
+        CategoryInputSynapse,
         BindingCategoryNeuron,
-        BindingCategoryLink,
-        BindingActivation,
+        CategoryInputLink,
         BindingCategoryActivation
-        > {
+        >
+{
 
     private static List<Transition> TRANSITIONS = List.of(
             transition(
@@ -68,13 +73,8 @@ public class BindingCategorySynapse extends DisjunctiveSynapse<
     );
 
     @Override
-    public BindingCategoryLink createLink(BindingActivation input, BindingCategoryActivation output) {
-        return new BindingCategoryLink(this, input, output);
-    }
-
-    @Override
-    public Stream<Transition> getTransitions() {
-        return TRANSITIONS.stream();
+    public CategoryInputLink createLink(BindingCategoryActivation input, BindingActivation output) {
+        return new CategoryInputLink(this, input, output);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class BindingCategorySynapse extends DisjunctiveSynapse<
     }
 
     @Override
-    public void setModified() {
-        getInput().setModified();
+    public Stream<Transition> getTransitions() {
+        return TRANSITIONS.stream();
     }
 }

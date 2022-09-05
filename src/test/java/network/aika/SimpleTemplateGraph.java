@@ -49,6 +49,7 @@ public class SimpleTemplateGraph implements TemplateGraph {
     public PrimaryInputSynapse PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE;
     public RelatedInputSynapse RELATED_INPUT_SYNAPSE_TEMPLATE;
     public RelatedInputSynapse RELATED_INPUT_SYNAPSE_FROM_LATENT_RELATION_TEMPLATE;
+    public CategoryInputSynapse CATEGORY_INPUT_SYNAPSE_TEMPLATE;
     public SamePatternSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
     public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE;
     public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE;
@@ -106,7 +107,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         "Primary Input Synapse from Pattern",
                         0.01
                 );
-//        PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE.setAllowPropagate(true);
 
         PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE =
                 init(
@@ -116,7 +116,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         "Primary Input Synapse from Category",
                         0.01
                 );
-//        PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE.setAllowPropagate(true);
 
         RELATED_INPUT_SYNAPSE_TEMPLATE =
                 init(
@@ -133,6 +132,15 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         TOKEN_POSITION_RELATION_TEMPLATE,
                         BINDING_TEMPLATE,
                         "Related Input Synapse From Latent Relation",
+                        0.0
+                );
+
+        CATEGORY_INPUT_SYNAPSE_TEMPLATE =
+                init(
+                        new CategoryInputSynapse(),
+                        BINDING_TEMPLATE,
+                        BINDING_TEMPLATE,
+                        "Category Input Synapse",
                         0.0
                 );
 
@@ -198,7 +206,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         "Pattern Synapse",
                         1.0 // Needs to be above the tolerance
                 );
-//        PATTERN_SYNAPSE_TEMPLATE.setAllowPropagate(true);
 
         INPUT_INHIBITORY_SYNAPSE_TEMPLATE =
                 init(
