@@ -39,11 +39,14 @@ public class PrimitiveTransition<I extends PrimitiveTerminal, O extends Primitiv
     protected I input;
     protected O output;
     protected TransitionMode mode;
+    private Class<? extends Synapse> synClazz;
 
-    protected PrimitiveTransition(I input, O output, TransitionMode mode) {
+    protected PrimitiveTransition(I input, O output, TransitionMode mode, Class<? extends Synapse> synClazz) {
         this.input = input;
         this.output = output;
         this.mode = mode;
+        this.synClazz = synClazz;
+
         input.setType(INPUT);
         output.setType(OUTPUT);
 
@@ -51,8 +54,13 @@ public class PrimitiveTransition<I extends PrimitiveTerminal, O extends Primitiv
         output.setTransition(this);
     }
 
-    public static <I extends PrimitiveTerminal, O extends PrimitiveTerminal> PrimitiveTransition<I, O> transition(I input, O output, TransitionMode transitionMode) {
-        return new PrimitiveTransition(input, output, transitionMode);
+    public static <I extends PrimitiveTerminal, O extends PrimitiveTerminal> PrimitiveTransition<I, O> transition(
+            I input,
+            O output,
+            TransitionMode transitionMode,
+            Class<? extends Synapse> synClazz
+    ) {
+        return new PrimitiveTransition(input, output, transitionMode, synClazz);
     }
 
     public BiTransition getParent() {
@@ -139,6 +147,7 @@ public class PrimitiveTransition<I extends PrimitiveTerminal, O extends Primitiv
     public String toString() {
         return "Input:" + input +
                 " Output:" + output +
-                " Mode:" + mode;
+                " Mode:" + mode +
+                " Synapse:" + synClazz.getSimpleName();
     }
 }

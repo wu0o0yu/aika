@@ -98,8 +98,8 @@ public class BindingSignal implements Element {
     }
 
     public Stream<BindingSignal> propagate(Synapse s) {
-        if(depth >= 3)
-            return Stream.empty();
+//        if(depth >= 3)
+//            return Stream.empty();
 
         Stream<Transition> transitions = s.getTransitions();
         return transitions

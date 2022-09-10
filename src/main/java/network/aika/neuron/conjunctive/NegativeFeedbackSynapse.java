@@ -53,12 +53,14 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<
             transition(
                     fixed(SAME),
                     fixed(SAME),
-                    MATCH_ONLY
+                    MATCH_ONLY,
+                    NegativeFeedbackSynapse.class
             ),
             transition(
                     fixed(INPUT),
                     fixed(INPUT),
-                    MATCH_ONLY
+                    MATCH_ONLY,
+                    NegativeFeedbackSynapse.class
             )
     );
 

@@ -49,13 +49,15 @@ public class SamePatternSynapse extends BindingNeuronSynapse<
     public static PrimitiveTransition INPUT_TRANSITION = transition(
             fixed(INPUT),
             variable(RELATED_INPUT),
-            MATCH_AND_PROPAGATE
+            MATCH_AND_PROPAGATE,
+            SamePatternSynapse.class
     );
 
     public static PrimitiveTransition SAME_TRANSITION = transition(
             fixed(SAME),
             fixed(SAME),
-            MATCH_AND_PROPAGATE
+            MATCH_AND_PROPAGATE,
+            SamePatternSynapse.class
     );
 
     private static List<Transition> TRANSITIONS = List.of(
@@ -68,7 +70,8 @@ public class SamePatternSynapse extends BindingNeuronSynapse<
             transition(
                     variable(RELATED_INPUT),
                     variable(RELATED_INPUT),
-                    PROPAGATE_ONLY
+                    PROPAGATE_ONLY,
+                    SamePatternSynapse.class
             )
     );
 
@@ -80,6 +83,11 @@ public class SamePatternSynapse extends BindingNeuronSynapse<
     @Override
     public boolean networkInputsAllowed(Direction dir) {
         return !isTemplate();
+    }
+
+    @Override
+    public PrimitiveTransition getRelatedTransition() {
+        return INPUT_TRANSITION;
     }
 
     @Override

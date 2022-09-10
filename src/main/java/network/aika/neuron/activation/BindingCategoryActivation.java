@@ -32,6 +32,8 @@ import static network.aika.neuron.bindingsignal.State.INPUT;
 public class BindingCategoryActivation extends DisjunctiveActivation<BindingCategoryNeuron> {
 
     protected SlotField inputBSSlot = new SlotField(this, "inputBSSlot");
+    protected SlotField relatedSameBSSlot = new SlotField(this, "relatedSameBSSlot");
+
 
     public BindingCategoryActivation(int id, Thought t, BindingCategoryNeuron neuron) {
         super(id, t, neuron);
@@ -40,6 +42,7 @@ public class BindingCategoryActivation extends DisjunctiveActivation<BindingCate
     public SlotField getSlot(State s) {
         return switch(s) {
             case INPUT -> inputBSSlot;
+            case RELATED_SAME -> relatedSameBSSlot;
             default -> super.getSlot(s);
         };
     }

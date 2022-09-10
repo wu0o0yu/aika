@@ -48,12 +48,14 @@ public class PatternSynapse extends ConjunctiveSynapse<
             transition(
                     fixed(SAME),
                     fixed(SAME),
-                    MATCH_ONLY
+                    MATCH_ONLY,
+                    PatternSynapse.class
             ),
             transition(
                     fixed(INPUT),
                     variable(INPUT),
-                    MATCH_AND_PROPAGATE
+                    MATCH_AND_PROPAGATE,
+                    PatternSynapse.class
             )
     );
 

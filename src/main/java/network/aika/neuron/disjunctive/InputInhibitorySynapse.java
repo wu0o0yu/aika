@@ -37,7 +37,8 @@ public class InputInhibitorySynapse extends InhibitorySynapse {
             transition(
                     fixed(INPUT),
                     fixed(INPUT),
-                    MATCH_AND_PROPAGATE
+                    MATCH_AND_PROPAGATE,
+                    InputInhibitorySynapse.class
             )
     );
 

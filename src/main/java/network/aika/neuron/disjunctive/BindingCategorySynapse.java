@@ -48,22 +48,26 @@ public class BindingCategorySynapse extends DisjunctiveSynapse<
             transition(
                     fixed(INPUT),
                     fixed(INPUT),
-                    MATCH_AND_PROPAGATE
+                    MATCH_AND_PROPAGATE,
+                    BindingCategorySynapse.class
             ),
             transition(
                     fixed(SAME),
                     fixed(SAME),
-                    MATCH_AND_PROPAGATE
+                    MATCH_AND_PROPAGATE,
+                    BindingCategorySynapse.class
             ),
             transition(
                     variable(RELATED_INPUT),
                     variable(RELATED_INPUT),
-                    MATCH_AND_PROPAGATE
+                    MATCH_AND_PROPAGATE,
+                    BindingCategorySynapse.class
             ),
             transition(
                     fixed(RELATED_SAME),
                     fixed(RELATED_SAME),
-                    MATCH_AND_PROPAGATE
+                    MATCH_AND_PROPAGATE,
+                    BindingCategorySynapse.class
             )
     );
 

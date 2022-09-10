@@ -53,12 +53,14 @@ public class CategorySynapse<N extends Neuron & PatternAxon> extends Disjunctive
             transition(
                     fixed(SAME),
                     fixed(SAME),
-                    MATCH_AND_PROPAGATE
+                    MATCH_AND_PROPAGATE,
+                    CategorySynapse.class
             ),
             transition(
                     variable(INPUT),
                     variable(INPUT),
-                    PROPAGATE_ONLY
+                    PROPAGATE_ONLY,
+                    CategorySynapse.class
             )
     );
 

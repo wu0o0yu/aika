@@ -36,7 +36,8 @@ public class SameInhibitorySynapse extends InhibitorySynapse {
             transition(
                     fixed(SAME),
                     fixed(SAME),
-                    MATCH_AND_PROPAGATE
+                    MATCH_AND_PROPAGATE,
+                    SameInhibitorySynapse.class
             )
     );
 

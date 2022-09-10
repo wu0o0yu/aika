@@ -55,12 +55,14 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
                     transition(
                             variable(INPUT),
                             fixed(INPUT),
-                            MATCH_ONLY
+                            MATCH_ONLY,
+                            PositiveFeedbackSynapse.class
                     ),
                     transition(
                             fixed(SAME),
                             fixed(SAME),
-                            MATCH_AND_PROPAGATE
+                            MATCH_AND_PROPAGATE,
+                            PositiveFeedbackSynapse.class
                     ),
                     true,
                     false

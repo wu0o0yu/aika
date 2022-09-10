@@ -48,28 +48,39 @@ public class CategoryInputSynapse extends BindingNeuronSynapse<
         BindingCategoryActivation
         >
 {
+    private static PrimitiveTransition INPUT_TRANSITION = transition(
+            fixed(INPUT),
+            fixed(INPUT),
+            MATCH_AND_PROPAGATE,
+            CategoryInputSynapse.class
+    );
+
+    private static PrimitiveTransition SAME_TRANSITION = transition(
+            fixed(SAME),
+            fixed(SAME),
+            MATCH_AND_PROPAGATE,
+            CategoryInputSynapse.class
+    );
+
+    private static PrimitiveTransition RELATED_INPUT_TRANSITION = transition(
+            variable(RELATED_INPUT),
+            variable(RELATED_INPUT),
+            MATCH_AND_PROPAGATE,
+            CategoryInputSynapse.class
+    );
+
+    private static PrimitiveTransition RELATED_SAME_TRANSITION = transition(
+            fixed(RELATED_SAME),
+            fixed(RELATED_SAME),
+            MATCH_AND_PROPAGATE,
+            CategoryInputSynapse.class
+    );
 
     private static List<Transition> TRANSITIONS = List.of(
-            transition(
-                    fixed(INPUT),
-                    fixed(INPUT),
-                    MATCH_AND_PROPAGATE
-            ),
-            transition(
-                    fixed(SAME),
-                    fixed(SAME),
-                    MATCH_AND_PROPAGATE
-            ),
-            transition(
-                    variable(RELATED_INPUT),
-                    variable(RELATED_INPUT),
-                    MATCH_AND_PROPAGATE
-            ),
-            transition(
-                    fixed(RELATED_SAME),
-                    fixed(RELATED_SAME),
-                    MATCH_AND_PROPAGATE
-            )
+            INPUT_TRANSITION,
+            SAME_TRANSITION,
+            RELATED_INPUT_TRANSITION,
+            RELATED_SAME_TRANSITION
     );
 
     @Override
@@ -80,6 +91,11 @@ public class CategoryInputSynapse extends BindingNeuronSynapse<
     @Override
     public boolean networkInputsAllowed(Direction dir) {
         return !isTemplate();
+    }
+
+    @Override
+    public PrimitiveTransition getRelatedTransition() {
+        return RELATED_SAME_TRANSITION;
     }
 
     @Override

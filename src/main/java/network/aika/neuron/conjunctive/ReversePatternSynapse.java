@@ -51,13 +51,15 @@ public class ReversePatternSynapse<I extends Neuron & PatternAxon, IA extends Ac
     public static PrimitiveTransition SAME_SAME_TRANSITION = transition(
             fixed(SAME),
             fixed(SAME),
-            MATCH_AND_PROPAGATE
+            MATCH_AND_PROPAGATE,
+            ReversePatternSynapse.class
     );
 
     public static PrimitiveTransition INPUT_RELATED_SAME_TRANSITION = transition(
             variable(INPUT),
             fixed(RELATED_SAME),
-            MATCH_AND_PROPAGATE
+            MATCH_AND_PROPAGATE,
+            ReversePatternSynapse.class
     );
 
     private static List<Transition> TRANSITIONS = List.of(

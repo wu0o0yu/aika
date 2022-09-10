@@ -24,6 +24,7 @@ import network.aika.neuron.conjunctive.*;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.LatentLinking.latentLinking;
+import static network.aika.neuron.bindingsignal.State.RELATED_SAME;
 import static network.aika.neuron.conjunctive.PrimaryInputSynapse.SAME_RELATED_SAME_TRANSITION;
 import static network.aika.neuron.conjunctive.SamePatternSynapse.INPUT_TRANSITION;
 
@@ -36,17 +37,16 @@ public class LatentRelations {
         if(!(bsA.getOriginActivation() instanceof TokenActivation))
             return;
 
-        Direction dir;
-
-        PrimitiveTransition tB;
-        if(samePatternToPrimaryInput(synA, synB) && tA == INPUT_TRANSITION) {
-            dir = Direction.OUTPUT;
-            tB = SAME_RELATED_SAME_TRANSITION;
-        } else if(samePatternToPrimaryInput(synB, synA) && tA == SAME_RELATED_SAME_TRANSITION) {
-            dir = Direction.INPUT;
-            tB = INPUT_TRANSITION;
-        } else
+        if(synA.getRelatedTransition() != tA)
             return;
+
+        PrimitiveTransition tB = synB.getRelatedTransition();
+        if(tB == null)
+            return;
+
+        Direction dir = synA.getRelatedTransition().getOutput().getState() == RELATED_SAME ?
+                Direction.INPUT :
+                Direction.OUTPUT;
 
         Stream<BindingSignal> relatedBSs = findLatentRelationNeurons((BindingNeuron) synA.getOutput())
                 .flatMap(n -> n.evaluateLatentRelation(bsA.getOriginActivation(), dir))
@@ -55,12 +55,7 @@ public class LatentRelations {
                         tB.getInput().getState()
                 ));
 
-        latentLinking(tA, bsA, synA, synB, tB, relatedBSs);
-    }
-
-    private static boolean samePatternToPrimaryInput(Synapse synA, Synapse synB) {
-        return synA instanceof SamePatternSynapse &&
-                synB instanceof PrimaryInputSynapse;
+        latentLinking(bsA, synA, synB, relatedBSs);
     }
 
     private static Stream<LatentRelationNeuron> findLatentRelationNeurons(BindingNeuron n) {

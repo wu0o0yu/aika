@@ -147,7 +147,7 @@ public class JacksonCookTest {
         BindingNeuron surnameBN = createNeuron(t.BINDING_TEMPLATE, "surname (person name)");
         createSynapse(t.CATEGORY_INPUT_SYNAPSE_TEMPLATE, surnameCN, surnameBN, 10.0);
 
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, surnameBN, 10.0);
+        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, surnameBN, 5.0);
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, forenameBN, surnameBN, 10.0);
 
         updateBias(forenameBN, 2.0);

@@ -50,13 +50,15 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<
     private static PrimitiveTransition INPUT_TRANSITION = transition(
             fixed(INPUT),
             variable(RELATED_INPUT),
-            MATCH_AND_PROPAGATE
+            MATCH_AND_PROPAGATE,
+            RelatedInputSynapse.class
     );
 
     private static PrimitiveTransition SAME_TRANSITION = transition(
             fixed(SAME),
             fixed(RELATED_SAME),
-            MATCH_AND_PROPAGATE
+            MATCH_AND_PROPAGATE,
+            RelatedInputSynapse.class
     );
 
     private static List<Transition> TRANSITIONS = List.of(

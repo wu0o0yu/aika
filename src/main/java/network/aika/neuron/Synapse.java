@@ -81,6 +81,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         return false;
     }
 
+    public PrimitiveTransition getRelatedTransition() {
+        return null;
+    }
+
     public Stream<BindingSignal> getRelatedBindingSignals(PatternActivation fromOriginAct, PrimitiveTransition t, Direction dir) {
         return dir.getNeuron(this)
                 .getRelatedBindingSignals(fromOriginAct, dir.getTerminal(t).getState());

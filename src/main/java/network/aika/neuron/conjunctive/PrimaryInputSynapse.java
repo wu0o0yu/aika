@@ -52,19 +52,22 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
     public static PrimitiveTransition SAME_INPUT_TRANSITION = transition(
             fixed(SAME),
             fixed(INPUT),
-            MATCH_AND_PROPAGATE
+            MATCH_AND_PROPAGATE,
+            PrimaryInputSynapse.class
     );
 
     public static PrimitiveTransition SAME_RELATED_SAME_TRANSITION = transition(
             fixed(SAME),
             fixed(RELATED_SAME),
-            MATCH_AND_PROPAGATE
+            MATCH_AND_PROPAGATE,
+            PrimaryInputSynapse.class
     );
 
     public static PrimitiveTransition INPUT_RELATED_INPUT_TRANSITION = transition(
-            fixed(INPUT),
+            variable(INPUT),
             variable(RELATED_INPUT),
-            MATCH_AND_PROPAGATE
+            MATCH_AND_PROPAGATE,
+            PrimaryInputSynapse.class
     );
 
     private static List<Transition> TRANSITIONS = List.of(
@@ -81,6 +84,11 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
     @Override
     public boolean propagateCheck(IA iAct) {
         return !isTemplate() || checkCandidateSynapse(iAct);
+    }
+
+    @Override
+    public PrimitiveTransition getRelatedTransition() {
+        return SAME_RELATED_SAME_TRANSITION;
     }
 
     @Override

@@ -58,11 +58,9 @@ public class LatentLinking {
                 )
                 .forEach(tB ->
                         latentLinking(
-                                tA,
                                 bsA,
                                 synA,
                                 synB,
-                                tB,
                                 synB.getRelatedBindingSignals(bsA.getOriginActivation(), tB, INPUT)
                         )
                 );
@@ -70,7 +68,7 @@ public class LatentLinking {
         expandRelation(bsA, synA, synB, tA);
     }
 
-    public static void latentLinking(PrimitiveTransition tA, BindingSignal bsA, Synapse synA, Synapse synB, PrimitiveTransition tB, Stream<BindingSignal> bsStream) {
+    public static void latentLinking(BindingSignal bsA, Synapse synA, Synapse synB, Stream<BindingSignal> bsStream) {
         Activation iActA = bsA.getActivation();
         Thought t = iActA.getThought();
 
@@ -88,18 +86,9 @@ public class LatentLinking {
                     Activation oAct = synA.getOutput().createActivation(t);
                     oAct.init(synA, iActA);
 
-                    createLink(synA, bsB, tB, iActA, oAct);
-                    createLink(synB, bsA, tA, bsB.getActivation(), oAct);
+                    synA.createLink(iActA, oAct);
+                    synB.createLink(bsB.getActivation(), oAct);
                 });
-    }
-
-    private static void createLink(Synapse ts, BindingSignal bs, PrimitiveTransition t, Activation iAct, Activation oAct) {
-        Link l = ts.createLink(iAct, oAct);
-        if(l == null)
-            return;
-
-        BindingSignal toBS = bs.next(t.getInput());
-        l.getOutput().addBindingSignal(toBS);
     }
 
     private static boolean latentActivationExists(Synapse synA, Synapse synB, Activation iActA, Activation iActB) {
