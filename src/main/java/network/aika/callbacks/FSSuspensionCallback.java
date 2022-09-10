@@ -17,6 +17,7 @@
 package network.aika.callbacks;
 
 import network.aika.Model;
+import network.aika.exceptions.MissingNeuronException;
 import network.aika.utils.Writable;
 
 import java.io.*;

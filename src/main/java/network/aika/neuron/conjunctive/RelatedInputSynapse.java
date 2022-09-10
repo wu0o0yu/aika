@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.direction.Direction;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.LatentRelationActivation;
 import network.aika.neuron.activation.RelatedInputLink;
@@ -24,7 +25,6 @@ import network.aika.neuron.bindingsignal.PrimitiveTransition;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
@@ -41,7 +41,7 @@ import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
  */
 public class RelatedInputSynapse extends BindingNeuronSynapse<
         RelatedInputSynapse,
-        BindingNeuron,
+        LatentRelationNeuron,
         RelatedInputLink,
         BindingActivation
         >
@@ -75,27 +75,31 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<
         return new RelatedInputLink(this, input, output);
     }
 
-    @Override
-    protected void latentBackwardsPropagation(BindingSignal[] fromBSs) {
-        if(getInput() instanceof LatentRelationNeuron) {
-            LatentRelationNeuron lrn = (LatentRelationNeuron) getInput();
-
-            BindingSignal relatedInputBS = fromBSs[0];
-            BindingSignal relatedSameBS = fromBSs[1];
-
-            BindingSignal inputBS = INPUT_TRANSITION.getOutput().propagate(relatedInputBS).findFirst().orElse(null);
-            BindingSignal sameBS = SAME_TRANSITION.getOutput().propagate(relatedSameBS).findFirst().orElse(null);
-
-            LatentRelationActivation latentRelAct = lrn.createOrLookupLatentActivation(
-                    inputBS.getOriginActivation(),
-                    inputBS.getState(),
-                    sameBS.getOriginActivation(),
-                    sameBS.getState()
-            );
-
-            addAndInitBindingSignal(latentRelAct, inputBS);
-            addAndInitBindingSignal(latentRelAct, sameBS);
+    public void linkAndPropagate(Transition t, Direction dir, BindingSignal... fromBSs) {
+        if (dir == Direction.INPUT) {
+            latentBackwardsPropagation(fromBSs);
         }
+        super.linkAndPropagate(t, dir, fromBSs);
+    }
+
+    private void latentBackwardsPropagation(BindingSignal[] fromBSs) {
+        BindingSignal relatedInputBS = fromBSs[0];
+        BindingSignal relatedSameBS = fromBSs[1];
+
+        BindingSignal inputBS = INPUT_TRANSITION.getOutput().propagate(relatedInputBS).findFirst().orElse(null);
+        BindingSignal sameBS = SAME_TRANSITION.getOutput().propagate(relatedSameBS).findFirst().orElse(null);
+
+        LatentRelationActivation latentRelAct = getInput().createOrLookupLatentActivation(
+                inputBS.getOriginActivation(),
+                inputBS.getState(),
+                sameBS.getOriginActivation(),
+                sameBS.getState()
+        );
+
+        addAndInitBindingSignal(latentRelAct, inputBS);
+        addAndInitBindingSignal(latentRelAct, sameBS);
+
+        createLink(latentRelAct, (BindingActivation) relatedSameBS.getActivation());
     }
 
     private void addAndInitBindingSignal(LatentRelationActivation act, BindingSignal bs) {
