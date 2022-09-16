@@ -263,7 +263,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
     private <S extends Synapse> S init(S ts, Neuron input, Neuron output, double initialWeight) {
         ts.setInput(input);
         ts.setOutput(output);
-        ts.setTemplate(true);
         ts.getWeight().setValue(initialWeight);
 
         ts.linkInput();

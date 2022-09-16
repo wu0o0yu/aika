@@ -113,8 +113,7 @@ public class TheBlackCatTest {
                 .setAlpha(0.99)
                 .setLearnRate(-0.011)
                 .setInductionThreshold(0.1)
-                .setTrainingEnabled(true)
-                .setTemplatesEnabled(true);
+                .setTrainingEnabled(true);
         doc.setConfig(c);
 
 

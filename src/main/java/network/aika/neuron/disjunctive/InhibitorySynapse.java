@@ -16,19 +16,8 @@
  */
 package network.aika.neuron.disjunctive;
 
-import network.aika.direction.Direction;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.conjunctive.BindingNeuron;
-
-import java.util.List;
-import java.util.stream.Stream;
-
-import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
-import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.State.*;
-import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
-import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 
 /**
  *
@@ -46,11 +35,6 @@ public abstract class InhibitorySynapse extends DisjunctiveSynapse<
     @Override
     public InhibitoryLink createLink(BindingActivation input, InhibitoryActivation output) {
         return new InhibitoryLink(this, input, output);
-    }
-
-    @Override
-    public boolean networkInputsAllowed(Direction dir) {
-        return !isTemplate();
     }
 
     @Override

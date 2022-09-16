@@ -207,15 +207,8 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return isNetworkInput;
     }
 
-    public Stream<? extends Synapse> getTargetSynapses(Direction dir, boolean template) {
-        Stream<? extends Synapse> targetSynapsesStream = getTargetSynapsesIntern(dir, false);
-        if(template)
-            targetSynapsesStream = Stream.concat(targetSynapsesStream, getTargetSynapsesIntern(dir, true));
-        return targetSynapsesStream;
-    }
-
-    private Stream<? extends Synapse> getTargetSynapsesIntern(Direction dir, boolean template) {
-        return dir.getSynapses(template ? getTemplate() : this);
+    public Stream<? extends Synapse> getTargetSynapses(Direction dir) {
+        return dir.getSynapses(this);
     }
 
     public Synapse getOutputSynapse(NeuronProvider n) {

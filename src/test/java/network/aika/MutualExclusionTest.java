@@ -173,7 +173,6 @@ public class MutualExclusionTest {
                         .setLearnRate(-0.011)
                         .setInductionThreshold(0.1)
                         .setTrainingEnabled(true)
-                        .setTemplatesEnabled(false)
         );
 
         AIKADebugger debugger = AIKADebugger.createAndShowGUI(doc);

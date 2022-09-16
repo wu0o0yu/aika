@@ -47,7 +47,6 @@ public class PatternTest {
                         .setAlpha(0.99)
                         .setLearnRate(-0.011)
                         .setTrainingEnabled(false)
-                        .setTemplatesEnabled(true)
         );
 
         AIKADebugger.createAndShowGUI(doc);

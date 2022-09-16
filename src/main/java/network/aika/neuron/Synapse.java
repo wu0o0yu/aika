@@ -40,7 +40,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.activation.Timestamp.MAX;
@@ -62,7 +61,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     private boolean isInputLinked;
     private boolean isOutputLinked;
 
-    private boolean isTemplate;
     protected S template;
 
     protected QueueField weight = new QueueField(this, "weight", () -> {
@@ -102,12 +100,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public boolean linkCheck(BindingSignal inputBS, BindingSignal outputBS) {
-        if(inputBS.isNetworkInput() && !networkInputsAllowed(OUTPUT))
-            return false;
-
-        if(outputBS.isNetworkInput() && !networkInputsAllowed(INPUT))
-            return false;
-
         return inputBS.getOrigin() == outputBS.getOrigin();
     }
 
@@ -190,13 +182,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         if(act == null)
             return null;
 
-        return act.getEvent(dir == OUTPUT, isTemplate());
+        return act.getEvent(dir == OUTPUT, false);
     }
 
     public void initFixedTransitions(Activation act, Direction dir) {
-        if(act.getNeuron().isNetworkInput() && !networkInputsAllowed(dir))
-            return;
-
         getTransitions()
                 .flatMap(transition ->
                         dir.invert().getTerminals(transition)
@@ -207,9 +196,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public void notifyVariableTransitions(BindingSignal bs, Direction dir) {
-        if(bs.getActivation().getNeuron().isNetworkInput() && !networkInputsAllowed(dir))
-            return;
-
         getTransitions()
                 .flatMap(transition ->
                         dir.invert().getTerminals(transition)
@@ -220,25 +206,14 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public boolean linkExists(IA iAct, OA oAct) {
-        if(isTemplate() && Link.templateLinkExists(this, iAct, oAct))
-            return true;
-
         Link existingLink = oAct.getInputLink(iAct.getNeuron());
         return existingLink != null && existingLink.getInput() == iAct;
     }
 
     public boolean propagateLinkExists(IA iAct) {
-        return isTemplate() ?
-                iAct.getOutputLinks()
-                        .map(Link::getSynapse)
-                        .anyMatch(s -> s.isOfTemplate(this)) :
-                iAct.getOutputLinks(this)
+        return iAct.getOutputLinks(this)
                         .findAny()
                         .isPresent();
-    }
-
-    public boolean networkInputsAllowed(Direction dir) {
-        return dir == OUTPUT || !isTemplate();
     }
 
     public abstract Stream<Transition> getTransitions();
@@ -310,12 +285,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         this.allowTraining = allowTraining;
     }
 
-    public void setTemplate(boolean template) {
-        isTemplate = template;
-    }
-
-    public boolean isTemplate() {
-        return isTemplate;
+    public S getTemplate() {
+        return template;
     }
 
     public boolean isOfTemplate(Synapse templateSynapse) {
@@ -501,7 +472,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
         out.writeBoolean(isInputLinked);
         out.writeBoolean(isOutputLinked);
-        out.writeBoolean(isTemplate);
 
         weight.write(out);
 
@@ -527,7 +497,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
         isInputLinked = in.readBoolean();
         isOutputLinked = in.readBoolean();
-        isTemplate = in.readBoolean();
 
         weight.readFields(in, m);
 
@@ -554,8 +523,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public String toString() {
-        return (isTemplate() ? "Template-" : "") +
-                getClass().getSimpleName() +
+        return getClass().getSimpleName() +
                 " in:[" + input.getNeuron().toKeyString()  + "](" + (isInputLinked ? "+" : "-") + ") " +
                 getArrow() +
                 " out:[" + output.getNeuron().toKeyString() + "](" + (isOutputLinked ? "+" : "-") + ")";

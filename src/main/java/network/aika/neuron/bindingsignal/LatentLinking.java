@@ -41,8 +41,7 @@ public class LatentLinking {
 
         Neuron<?, ?> toNeuron = synA.getOutput();
 
-        boolean templateEnabled = fromBS.getConfig().isTemplatesEnabled();
-        toNeuron.getTargetSynapses(INPUT, templateEnabled)
+        toNeuron.getTargetSynapses(INPUT)
                 .filter(synB -> synA != synB)
                 .filter(synB -> !synA.isOfTemplate(synB) && !synB.isOfTemplate(synA))
                 .filter(synB -> isLatentLinking(synA, synB))

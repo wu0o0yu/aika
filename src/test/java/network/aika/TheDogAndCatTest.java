@@ -124,8 +124,7 @@ public class TheDogAndCatTest {
                 .setAlpha(0.99)
                 .setLearnRate(-0.011)
                 .setInductionThreshold(0.1)
-                .setTrainingEnabled(false)
-                .setTemplatesEnabled(false);
+                .setTrainingEnabled(false);
         doc.setConfig(c);
 
         Map<Integer, double[]> actCoords = getActCoordinateMap();

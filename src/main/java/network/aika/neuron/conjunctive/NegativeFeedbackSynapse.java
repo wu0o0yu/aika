@@ -16,8 +16,6 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.direction.Direction;
-import network.aika.fields.FieldLink;
 import network.aika.fields.LinkSlot;
 import network.aika.fields.Multiplication;
 import network.aika.neuron.activation.*;
@@ -88,7 +86,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<
 
     @Override
     public boolean linkCheck(BindingSignal iBS, BindingSignal oBS) {
-        return !isTemplate() || iBS.isSelfRef(oBS);
+        return iBS.isSelfRef(oBS);
     }
 
     @Override
@@ -104,10 +102,5 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<
     @Override
     public Stream<Transition> getTransitions() {
         return TRANSITIONS.stream();
-    }
-
-    @Override
-    public boolean networkInputsAllowed(Direction dir) {
-        return !isTemplate();
     }
 }

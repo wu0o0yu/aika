@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.disjunctive;
 
-import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.axons.PatternAxon;
@@ -25,7 +24,6 @@ import network.aika.neuron.bindingsignal.Transition;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 import static network.aika.neuron.bindingsignal.State.INPUT;
@@ -72,10 +70,5 @@ public class CategorySynapse<N extends Neuron & PatternAxon> extends Disjunctive
     @Override
     public Stream<Transition> getTransitions() {
         return TRANSITIONS.stream();
-    }
-
-    @Override
-    public boolean networkInputsAllowed(Direction dir) {
-        return !isTemplate();
     }
 }

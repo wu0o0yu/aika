@@ -31,7 +31,6 @@ public class TokenActivation extends PatternActivation {
 
     private Integer position;
 
-
     public TokenActivation(int id, Integer pos, int begin, int end, Document doc, TokenNeuron tokenNeuron) {
         super(id, doc, tokenNeuron);
         position = pos;

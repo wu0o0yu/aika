@@ -67,25 +67,36 @@ public class JacksonCookTest {
     public Map<Long, double[]> getNeuronCoordinateMap() {
         Map<Long, double[]> coords = new TreeMap<>();
 
-        coords.put(9l, new double[]{-0.186, -0.552});
-        coords.put(9l, new double[]{-0.186, -0.552});
-        coords.put(11l, new double[]{5.879, -0.712});
-        coords.put(11l, new double[]{5.879, -0.712});
-        coords.put(13l, new double[]{2.367, -0.616});
-        coords.put(13l, new double[]{2.367, -0.616});
-        coords.put(14l, new double[]{0.572, 1.148});
-        coords.put(15l, new double[]{1.772, 2.801});
-        coords.put(16l, new double[]{-1.121, 1.266});
-        coords.put(17l, new double[]{-1.775, 2.672});
-        coords.put(18l, new double[]{4.479, 1.104});
-        coords.put(19l, new double[]{3.527, 2.783});
-        coords.put(20l, new double[]{6.919, 1.071});
-        coords.put(21l, new double[]{7.627, 2.865});
-        coords.put(22l, new double[]{-0.253, 2.734});
-        coords.put(23l, new double[]{5.75, 2.83});
-        coords.put(24l, new double[]{1.76, 4.228});
-        coords.put(25l, new double[]{3.498, 4.271});
-        coords.put(26l, new double[]{2.616, 6.047});
+        coords.put(1l, new double[]{-16.014, 16.317});
+        coords.put(2l, new double[]{-11.343, 20.822});
+        coords.put(3l, new double[]{-18.834, 20.237});
+        coords.put(4l, new double[]{-7.751, 16.925});
+        coords.put(5l, new double[]{-17.996, 12.545});
+        coords.put(6l, new double[]{-22.238, 15.136});
+        coords.put(7l, new double[]{-12.898, 13.173});
+        coords.put(9l, new double[]{-4.209, -2.352});
+        coords.put(9l, new double[]{-4.209, -2.352});
+        coords.put(11l, new double[]{10.361, -2.811});
+        coords.put(11l, new double[]{10.361, -2.811});
+        coords.put(13l, new double[]{1.461, -2.43});
+        coords.put(13l, new double[]{1.461, -2.43});
+        coords.put(14l, new double[]{0.189, 13.082});
+        coords.put(15l, new double[]{5.911, 13.167});
+        coords.put(16l, new double[]{-2.142, 7.149});
+        coords.put(17l, new double[]{-2.099, 0.919});
+        coords.put(18l, new double[]{-2.197, 3.833});
+        coords.put(19l, new double[]{-2.142, 10.158});
+        coords.put(20l, new double[]{-7.525, 6.628});
+        coords.put(21l, new double[]{-9.388, 9.721});
+        coords.put(22l, new double[]{7.183, 6.81});
+        coords.put(23l, new double[]{7.225, 1.046});
+        coords.put(24l, new double[]{7.267, 3.801});
+        coords.put(25l, new double[]{7.225, 10.116});
+        coords.put(26l, new double[]{12.675, 5.113});
+        coords.put(27l, new double[]{15.058, 7.536});
+        coords.put(28l, new double[]{-4.433, 11.659});
+        coords.put(29l, new double[]{10.066, 9.785});
+        coords.put(30l, new double[]{3.241, 17.871});
 
         return coords;
     }
@@ -125,6 +136,7 @@ public class JacksonCookTest {
         BindingCategoryNeuron jacksonForenameCN = createNeuron(t.BINDING_CATEGORY_TEMPLATE, "jackson (forename)");
         createSynapse(t.BINDING_CATEGORY_SYNAPSE_TEMPLATE, jacksonJCBN, jacksonForenameCN, 10.0);
 
+        createSynapse(t.CATEGORY_INPUT_SYNAPSE_TEMPLATE, jacksonForenameCN, jacksonForenameBN, 10.0);
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, jacksonIN, jacksonForenameBN, 10.0);
         BindingCategoryNeuron forenameCN = createNeuron(t.BINDING_CATEGORY_TEMPLATE, "forename");
         createSynapse(t.BINDING_CATEGORY_SYNAPSE_TEMPLATE, jacksonForenameBN, forenameCN, 10.0);
@@ -153,8 +165,10 @@ public class JacksonCookTest {
         addInhibitoryLoop(t, createNeuron(t.INHIBITORY_TEMPLATE, "I-jackson"), false, jacksonForenameBN, jacksonCityBN);
         addInhibitoryLoop(t, createNeuron(t.INHIBITORY_TEMPLATE, "I-cook"), false, cookSurnameBN, cookProfessionBN);
 
+        updateBias(jacksonJCBN, 2.0);
         updateBias(jacksonForenameBN, 2.0);
         updateBias(jacksonCityBN, 3.0);
+        updateBias(cookJCBN, 2.0);
         updateBias(cookSurnameBN, 2.0);
         updateBias(cookProfessionBN, 3.0);
 
@@ -166,6 +180,9 @@ public class JacksonCookTest {
 
         updateBias(forenameBN, 2.0);
         updateBias(surnameBN, 2.0);
+
+        PatternNeuron jacksonCookPattern = initPatternLoop(t, "jackson cook", jacksonJCBN, cookJCBN);
+        updateBias(jacksonCookPattern, 3.0);
 
         PatternNeuron personNamePattern = initPatternLoop(t, "person name", forenameBN, surnameBN);
         updateBias(personNamePattern, 3.0);
@@ -180,8 +197,7 @@ public class JacksonCookTest {
                 .setAlpha(0.99)
                 .setLearnRate(-0.011)
                 .setInductionThreshold(0.1)
-                .setTrainingEnabled(true)
-                .setTemplatesEnabled(true);
+                .setTrainingEnabled(true);
         doc.setConfig(c);
 
 

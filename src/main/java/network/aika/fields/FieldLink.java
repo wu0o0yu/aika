@@ -96,15 +96,6 @@ public class FieldLink {
         output.receiveUpdate(this, u);
     }
 
-
-    public void reconnect(Field newInput) {
-        disconnect();
-        getInput().removeOutput(this);
-        setInput(newInput);
-        newInput.addOutput(this);
-        connect();
-    }
-
     public void connect() {
         assert !isInitialized;
 

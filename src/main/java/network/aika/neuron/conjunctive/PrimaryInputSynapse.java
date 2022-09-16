@@ -83,7 +83,7 @@ public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Acti
 
     @Override
     public boolean propagateCheck(IA iAct) {
-        return !isTemplate() || checkCandidateSynapse(iAct);
+        return checkCandidateSynapse(iAct);
     }
 
     @Override

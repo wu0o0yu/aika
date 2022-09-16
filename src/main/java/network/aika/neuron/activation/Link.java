@@ -86,9 +86,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     private void initGradients() {
-        if(isTemplate())
-            induce();
-
         igGradient = func(
                 this,
                 "Information-Gain",
@@ -192,13 +189,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return isCausal() ? input.getCreated() : output.getCreated();
     }
 
-    public static boolean templateLinkExists(Synapse ts, Activation iAct, Activation oAct) {
-        Link l = oAct.getInputLink(iAct.getNeuron());
-        if(l == null)
-            return false;
-        return l.getSynapse().isOfTemplate(ts);
-    }
-
     public double getRelativeSurprisal(Sign si, Sign so, Range range) {
         double s = synapse.getSurprisal(si, so, range, true);
         s -= input.getNeuron().getSurprisal(si, range, true);
@@ -226,10 +216,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return output;
     }
 
-    public boolean isTemplate() {
-        return getSynapse().isTemplate();
-    }
-
     public boolean isRecurrent() {
         return synapse.isRecurrent();
     }
@@ -242,31 +228,18 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return FIRED_COMPARATOR.compare(iAct.getFired(), oAct.getFired()) < 0;
     }
 
-    public void induce() {
-        assert isTemplate();
-
-        synapse = (S) synapse
+    public Link induce(Activation oAct) {
+        S inducedSynapse = (S) synapse
                 .instantiateTemplate(
                         this,
                         input.getNeuron(),
                         output.getNeuron()
                 );
+        inducedSynapse.linkOutput();
 
-        synapse.linkOutput();
-
-        if(weightedInputLB != null)
-            weightedInputLB.getInputLinkByArg(1)
-                    .reconnect(synapse.getWeight());
-
-        if(weightedInputUB != null)
-            weightedInputUB.getInputLinkByArg(1)
-                    .reconnect(synapse.getWeight());
-
-        if(backPropGradient != null)
-            backPropGradient.getInputLinkByArg(1)
-                    .reconnect(synapse.getWeight());
-
-        Cleanup.add(this);
+        Link l = inducedSynapse.createLink(input, oAct);
+        Cleanup.add(l);
+        return l;
     }
 
     public void linkInput() {
@@ -310,7 +283,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     public String toString() {
-        return (isTemplate() ? "Template-" : "") + getClass().getSimpleName() +
+        return getClass().getSimpleName() +
                 " in:[" + getInputKeyString() + "] " +
                 "--> " +
                 "out:[" + getOutputKeyString() + "]";

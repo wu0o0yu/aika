@@ -329,9 +329,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     private void notifyVariableTransitions(BindingSignal bs) {
         Neuron<?, ?> n = getNeuron();
 
-        boolean templateEnabled = getConfig().isTemplatesEnabled();
         for(Direction dir: DIRECTIONS)
-            n.getTargetSynapses(dir, templateEnabled)
+            n.getTargetSynapses(dir)
                     .forEach(s ->
                             s.notifyVariableTransitions(bs, dir)
                     );
@@ -340,9 +339,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     private void initFixedTransitionEvents() {
         Neuron<?, ?> n = getNeuron();
 
-        boolean templateEnabled = getConfig().isTemplatesEnabled();
         for(Direction dir: DIRECTIONS)
-            n.getTargetSynapses(dir, templateEnabled)
+            n.getTargetSynapses(dir)
                     .forEach(s ->
                             s.initFixedTransitions(this, dir)
                     );
@@ -431,14 +429,14 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     public void induce() {
         assert isTemplate();
 
-        neuron = (N) neuron.instantiateTemplate(true);
+        Activation<N> act = neuron.instantiateTemplate(true)
+                .createActivation(thought);
 
-        Activation<N> act = neuron.createActivation(thought);
         act.init(null, this);
 
         getInputLinks()
                 .forEach(l ->
-                        l.getSynapse().createLink(l.input, act)
+                    l.induce(act)
                 );
     }
 

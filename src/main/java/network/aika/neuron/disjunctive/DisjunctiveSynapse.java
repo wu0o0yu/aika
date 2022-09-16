@@ -55,11 +55,6 @@ public abstract class DisjunctiveSynapse<
     }
 
     @Override
-    public boolean networkInputsAllowed(Direction dir) {
-        return !isTemplate();
-    }
-
-    @Override
     public void setModified() {
         getInput().setModified();
     }
@@ -67,13 +62,5 @@ public abstract class DisjunctiveSynapse<
     @Override
     public double getSumOfLowerWeights() {
         return 0.0;
-    }
-
-    @Override
-    public void linkOutput() {
-        if(!isTemplate())
-            return;
-
-        super.linkOutput();
     }
 }

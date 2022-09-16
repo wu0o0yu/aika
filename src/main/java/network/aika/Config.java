@@ -28,7 +28,6 @@ public class Config {
     private double inductionThreshold;
 
     private boolean trainingEnabled;
-    private boolean templatesEnabled;
     private boolean countingEnabled;
 
     public double getLearnRate() {
@@ -64,15 +63,6 @@ public class Config {
 
     public Config setTrainingEnabled(boolean trainingEnabled) {
         this.trainingEnabled = trainingEnabled;
-        return this;
-    }
-
-    public boolean isTemplatesEnabled() {
-        return templatesEnabled;
-    }
-
-    public Config setTemplatesEnabled(boolean templatesEnabled) {
-        this.templatesEnabled = templatesEnabled;
         return this;
     }
 

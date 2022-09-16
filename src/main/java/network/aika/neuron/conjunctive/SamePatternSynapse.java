@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.direction.Direction;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.SamePatternLink;
 import network.aika.neuron.bindingsignal.PrimitiveTransition;
@@ -78,11 +77,6 @@ public class SamePatternSynapse extends BindingNeuronSynapse<
     @Override
     public SamePatternLink createLink(BindingActivation input, BindingActivation output) {
         return new SamePatternLink(this, input, output);
-    }
-
-    @Override
-    public boolean networkInputsAllowed(Direction dir) {
-        return !isTemplate();
     }
 
     @Override

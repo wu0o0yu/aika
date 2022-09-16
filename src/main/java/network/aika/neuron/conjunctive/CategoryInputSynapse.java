@@ -16,11 +16,9 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.direction.Direction;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.BindingCategoryActivation;
 import network.aika.neuron.activation.CategoryInputLink;
-import network.aika.neuron.activation.SamePatternLink;
 import network.aika.neuron.bindingsignal.PrimitiveTransition;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.disjunctive.BindingCategoryNeuron;
@@ -28,12 +26,10 @@ import network.aika.neuron.disjunctive.BindingCategoryNeuron;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
 import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
-import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
 import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 
 /**
@@ -86,11 +82,6 @@ public class CategoryInputSynapse extends BindingNeuronSynapse<
     @Override
     public CategoryInputLink createLink(BindingCategoryActivation input, BindingActivation output) {
         return new CategoryInputLink(this, input, output);
-    }
-
-    @Override
-    public boolean networkInputsAllowed(Direction dir) {
-        return !isTemplate();
     }
 
     @Override

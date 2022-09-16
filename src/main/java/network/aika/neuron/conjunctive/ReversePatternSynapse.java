@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
@@ -79,10 +78,5 @@ public class ReversePatternSynapse<I extends Neuron & PatternAxon, IA extends Ac
     @Override
     public Stream<Transition> getTransitions() {
         return TRANSITIONS.stream();
-    }
-
-    @Override
-    public boolean networkInputsAllowed(Direction dir) {
-        return !isTemplate();
     }
 }

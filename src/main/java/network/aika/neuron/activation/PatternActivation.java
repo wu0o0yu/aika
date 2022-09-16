@@ -76,16 +76,10 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     }
 
     public Stream<BindingSignal> getReverseBindingSignals(Neuron toNeuron, State s) {
-        if(toNeuron.isTemplate()) {
-            return reverseBindingSignals.values().stream()
-                    .filter(bs -> bs.getActivation().getNeuron().isOfTemplate(toNeuron))
-                    .filter(bs -> bs.getState() == s);
-        } else {
-            return reverseBindingSignals.subMap(
-                    new BSKey(toNeuron, s.ordinal(), 0),
-                    new BSKey(toNeuron, s.ordinal(), Integer.MAX_VALUE)
-            ).values().stream();
-        }
+        return reverseBindingSignals.subMap(
+                new BSKey(toNeuron, s.ordinal(), 0),
+                new BSKey(toNeuron, s.ordinal(), Integer.MAX_VALUE)
+        ).values().stream();
     }
 
     @Override

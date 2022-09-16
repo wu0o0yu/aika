@@ -95,7 +95,7 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
         if(act == null)
             return null;
 
-        return act.getEvent(false, isTemplate());
+        return act.getEvent(false, false);
     }
 
     @Override
@@ -106,10 +106,5 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     @Override
     public Stream<Transition> getTransitions() {
         return TRANSITIONS.stream();
-    }
-
-    @Override
-    public boolean networkInputsAllowed(Direction dir) {
-        return !isTemplate();
     }
 }
