@@ -255,6 +255,7 @@ public class SimpleTemplateGraph implements TemplateGraph {
 
         n.setLabel(label);
         n.getBias().setValue(initialBias);
+        n.setTemplate(true);
 
         n.getProvider().save();
         return n;
