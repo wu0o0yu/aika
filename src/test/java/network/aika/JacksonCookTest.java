@@ -58,7 +58,8 @@ public class JacksonCookTest {
         coords.put(13, new double[]{3.014, 1.168});
         coords.put(14, new double[]{1.622, 1.181});
         coords.put(15, new double[]{1.992, 1.185});
-
+        coords.put(16, new double[]{1.602, 1.827});
+        coords.put(17, new double[]{1.04, -0.055});
 
         return coords;
     }
@@ -114,7 +115,16 @@ public class JacksonCookTest {
 
         LatentRelationNeuron relPT = t.TOKEN_POSITION_RELATION_TEMPLATE.lookupRelation(-1, -1);
 
-        BindingNeuron jacksonForenameBN = createNeuron(t.BINDING_TEMPLATE, "jackson (forename)");
+        BindingNeuron forenameBN = createNeuron(t.BINDING_TEMPLATE, "forename (person name)");
+        BindingNeuron surnameBN = createNeuron(t.BINDING_TEMPLATE, "surname (person name)");
+
+
+        BindingNeuron jacksonForenameBN = createNeuron(forenameBN, "jackson (forename)");
+        BindingNeuron jacksonJCBN = createNeuron(jacksonForenameBN, "jackson (jackson cook)");
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, jacksonIN, jacksonJCBN, 10.0);
+        BindingCategoryNeuron jacksonForenameCN = createNeuron(t.BINDING_CATEGORY_TEMPLATE, "jackson (forename)");
+        createSynapse(t.BINDING_CATEGORY_SYNAPSE_TEMPLATE, jacksonJCBN, jacksonForenameCN, 10.0);
+
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, jacksonIN, jacksonForenameBN, 10.0);
         BindingCategoryNeuron forenameCN = createNeuron(t.BINDING_CATEGORY_TEMPLATE, "forename");
         createSynapse(t.BINDING_CATEGORY_SYNAPSE_TEMPLATE, jacksonForenameBN, forenameCN, 10.0);
@@ -124,7 +134,13 @@ public class JacksonCookTest {
         BindingCategoryNeuron cityCN = createNeuron(t.BINDING_CATEGORY_TEMPLATE, "city");
         createSynapse(t.BINDING_CATEGORY_SYNAPSE_TEMPLATE, jacksonCityBN, cityCN, 10.0);
 
-        BindingNeuron cookSurnameBN = createNeuron(t.BINDING_TEMPLATE, "cook (surname)");
+        BindingNeuron cookSurnameBN = createNeuron(surnameBN, "cook (surname)");
+        BindingNeuron cookJCBN = createNeuron(cookSurnameBN, "cook (jackson cook)");
+        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, cookIN, cookJCBN, 10.0);
+        BindingCategoryNeuron cookSurnameCN = createNeuron(t.BINDING_CATEGORY_TEMPLATE, "cook (surname)");
+        createSynapse(t.BINDING_CATEGORY_SYNAPSE_TEMPLATE, cookJCBN, cookSurnameCN, 10.0);
+
+        createSynapse(t.CATEGORY_INPUT_SYNAPSE_TEMPLATE, cookSurnameCN, cookSurnameBN, 10.0);
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, cookIN, cookSurnameBN, 10.0);
         BindingCategoryNeuron surnameCN = createNeuron(t.BINDING_CATEGORY_TEMPLATE, "surname");
         createSynapse(t.BINDING_CATEGORY_SYNAPSE_TEMPLATE, cookSurnameBN, surnameCN, 10.0);
@@ -142,9 +158,7 @@ public class JacksonCookTest {
         updateBias(cookSurnameBN, 2.0);
         updateBias(cookProfessionBN, 3.0);
 
-        BindingNeuron forenameBN = createNeuron(t.BINDING_TEMPLATE, "forename (person name)");
         createSynapse(t.CATEGORY_INPUT_SYNAPSE_TEMPLATE, forenameCN, forenameBN, 10.0);
-        BindingNeuron surnameBN = createNeuron(t.BINDING_TEMPLATE, "surname (person name)");
         createSynapse(t.CATEGORY_INPUT_SYNAPSE_TEMPLATE, surnameCN, surnameBN, 10.0);
 
         createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, surnameBN, 5.0);

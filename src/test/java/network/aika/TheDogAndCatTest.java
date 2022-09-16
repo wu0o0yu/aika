@@ -42,23 +42,26 @@ public class TheDogAndCatTest {
         Map<Integer, double[]> coords = new TreeMap<>();
 
         coords.put(0, new double[]{-0.327, -0.032});
-        coords.put(1, new double[]{-0.1, -0.032});
-        coords.put(2, new double[]{0.111, -0.036});
+        coords.put(1, new double[]{-0.023, -0.028});
+        coords.put(2, new double[]{0.219, -0.035});
         coords.put(3, new double[]{0.345, -0.039});
         coords.put(4, new double[]{0.583, -0.047});
         coords.put(5, new double[]{-0.104, 0.386});
-        coords.put(6, new double[]{-0.217, 0.629});
-        coords.put(7, new double[]{-0.326, 0.384});
-        coords.put(8, new double[]{-0.107, 0.535});
-        coords.put(9, new double[]{-0.217, -0.036});
-        coords.put(10, new double[]{-0.333, 0.527});
+        coords.put(6, new double[]{-0.248, 0.623});
+        coords.put(7, new double[]{-0.339, 0.388});
+        coords.put(8, new double[]{-0.224, -0.028});
+        coords.put(9, new double[]{-0.38, 0.636});
+        coords.put(10, new double[]{-0.53, 0.607});
         coords.put(11, new double[]{0.587, 0.305});
-        coords.put(12, new double[]{0.456, 0.514});
-        coords.put(13, new double[]{0.252, 0.379});
+        coords.put(12, new double[]{0.582, 0.587});
+        coords.put(13, new double[]{0.137, 0.401});
         coords.put(14, new double[]{0.344, 0.3});
-        coords.put(15, new double[]{0.711, 0.492});
-        coords.put(16, new double[]{-0.008, -0.026});
-        coords.put(17, new double[]{0.23, -0.026});
+        coords.put(15, new double[]{-0.122, -0.03});
+        coords.put(16, new double[]{0.114, -0.03});
+        coords.put(17, new double[]{0.002, 0.649});
+        coords.put(18, new double[]{0.176, 0.653});
+        coords.put(19, new double[]{0.471, 0.644});
+        coords.put(20, new double[]{0.331, 0.664});
 
         return coords;
     }

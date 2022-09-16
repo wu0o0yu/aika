@@ -104,7 +104,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         new PrimaryInputSynapse(),
                         PATTERN_TEMPLATE,
                         BINDING_TEMPLATE,
-                        "Primary Input Synapse from Pattern",
                         0.01
                 );
 
@@ -113,7 +112,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         new PrimaryInputSynapse(),
                         CATEGORY_TEMPLATE,
                         BINDING_TEMPLATE,
-                        "Primary Input Synapse from Category",
                         0.01
                 );
 
@@ -122,7 +120,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         new RelatedInputSynapse(),
                         BINDING_TEMPLATE,
                         BINDING_TEMPLATE,
-                        "Related Input Synapse",
                         0.0
                 );
 
@@ -131,7 +128,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         new RelatedInputSynapse(),
                         TOKEN_POSITION_RELATION_TEMPLATE,
                         BINDING_TEMPLATE,
-                        "Related Input Synapse From Latent Relation",
                         0.0
                 );
 
@@ -140,7 +136,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         new CategoryInputSynapse(),
                         BINDING_TEMPLATE,
                         BINDING_TEMPLATE,
-                        "Category Input Synapse",
                         0.0
                 );
 
@@ -149,7 +144,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         new SamePatternSynapse(),
                         BINDING_TEMPLATE,
                         BINDING_TEMPLATE,
-                        "Same Pattern Synapse",
                         0.0
                 );
 
@@ -158,7 +152,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         new PositiveFeedbackSynapse(),
                         PATTERN_TEMPLATE,
                         BINDING_TEMPLATE,
-                        "Positive Feedback Synapse",
                         0.01
                 );
 
@@ -167,7 +160,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         new PositiveFeedbackSynapse(),
                         CATEGORY_TEMPLATE,
                         BINDING_TEMPLATE,
-                        "Positive Feedback Synapse",
                         0.01
                 );
 
@@ -176,7 +168,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         new ReversePatternSynapse(),
                         PATTERN_TEMPLATE,
                         BINDING_TEMPLATE,
-                        "Reverse Pattern Synapse",
                         0.0
                 );
 
@@ -185,7 +176,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         new ReversePatternSynapse(),
                         CATEGORY_TEMPLATE,
                         BINDING_TEMPLATE,
-                        "Reverse Pattern Synapse",
                         0.0
                 );
 
@@ -194,7 +184,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         new NegativeFeedbackSynapse(),
                         INHIBITORY_TEMPLATE,
                         BINDING_TEMPLATE,
-                        "Negative Feedback Synapse",
                         0.0
                 );
 
@@ -203,7 +192,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         new PatternSynapse(),
                         BINDING_TEMPLATE,
                         PATTERN_TEMPLATE,
-                        "Pattern Synapse",
                         1.0 // Needs to be above the tolerance
                 );
 
@@ -212,7 +200,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         new InputInhibitorySynapse(),
                         BINDING_TEMPLATE,
                         INHIBITORY_TEMPLATE,
-                        "Input Inhibitory Synapse",
                         1.0
                 );
 
@@ -221,7 +208,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         new SameInhibitorySynapse(),
                         BINDING_TEMPLATE,
                         INHIBITORY_TEMPLATE,
-                        "Inhibitory Synapse",
                         1.0
                 );
 
@@ -230,7 +216,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         new CategorySynapse(),
                         PATTERN_TEMPLATE,
                         CATEGORY_TEMPLATE,
-                        "Category Synapse",
                         0.0
                 );
 
@@ -240,7 +225,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
                         new BindingCategorySynapse(),
                         BINDING_TEMPLATE,
                         BINDING_CATEGORY_TEMPLATE,
-                        "Biding Category Synapse",
                         0.0
                 );
     }
@@ -272,20 +256,15 @@ public class SimpleTemplateGraph implements TemplateGraph {
         n.setLabel(label);
         n.getBias().setValue(initialBias);
 
-        TemplateNeuron templateInfo = n.getTemplateInfo();
-        templateInfo.setLabel(label);
-
         n.getProvider().save();
         return n;
     }
 
-    private <S extends Synapse> S init(S ts, Neuron input, Neuron output, String templateLabel, double initialWeight) {
+    private <S extends Synapse> S init(S ts, Neuron input, Neuron output, double initialWeight) {
         ts.setInput(input);
         ts.setOutput(output);
+        ts.setTemplate(true);
         ts.getWeight().setValue(initialWeight);
-
-        TemplateSynapse ti = ts.getTemplateInfo();
-        ti.setLabel(templateLabel);
 
         ts.linkInput();
         ts.linkOutput();

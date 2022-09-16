@@ -79,9 +79,9 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     protected boolean allowTraining = true;
 
-    private Neuron<?, ?> template;
+    private boolean isTemplate;
 
-    private TemplateNeuron templateInfo;
+    private Neuron<?, ?> template;
 
     private WeakHashMap<Long, SortedSet<A>> activations = new WeakHashMap<>();
 
@@ -100,10 +100,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
                     )
                     .add(act);
         }
-    }
-
-    public boolean templateNeuronMatches(Neuron<?, ?> targetN) {
-        return getTemplate().getId().intValue() == targetN.getId().intValue();
     }
 
     public Stream<BindingSignal> getRelatedBindingSignals(PatternActivation fromOriginAct, State state) {
@@ -128,15 +124,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return acts != null ? acts : Collections.emptyNavigableSet();
     }
 
-    public TemplateNeuron getTemplateInfo() {
-        assert isTemplate();
-        if(templateInfo == null) {
-            templateInfo = new TemplateNeuron();
-        }
-
-        return templateInfo;
-    }
-
     protected void initFromTemplate(Neuron n) {
         n.bias.setValue(bias.getCurrentValue());
         n.template = this;
@@ -158,14 +145,28 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         this.allowTraining = allowTraining;
     }
 
+    public void setTemplate(boolean template) {
+        isTemplate = template;
+    }
+
     public boolean isTemplate() {
-        return template == null;
+        return isTemplate;
     }
 
     public Neuron getTemplate() {
         if(isTemplate())
             return this;
         return template;
+    }
+
+    public boolean isOfTemplate(Neuron templateNeuron) {
+        if(template == templateNeuron)
+            return true;
+
+        if(template == null)
+            return false;
+
+        return template.isOfTemplate(templateNeuron);
     }
 
     public double getCandidateGradient(Activation act) {
@@ -419,6 +420,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         out.writeDouble(frequency);
         sampleSpace.write(out);
 
+        out.writeBoolean(isTemplate);
         out.writeBoolean(isNetworkInput);
 
         out.writeBoolean(customData != null);
@@ -454,6 +456,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         frequency = in.readDouble();
         sampleSpace = SampleSpace.read(in, m);
 
+        isTemplate = in.readBoolean();
         isNetworkInput = in.readBoolean();
 
         if(in.readBoolean()) {

@@ -62,8 +62,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     private boolean isInputLinked;
     private boolean isOutputLinked;
 
+    private boolean isTemplate;
     protected S template;
-    private TemplateSynapse templateInfo;
 
     protected QueueField weight = new QueueField(this, "weight", () -> {
         setModified();
@@ -310,27 +310,22 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         this.allowTraining = allowTraining;
     }
 
+    public void setTemplate(boolean template) {
+        isTemplate = template;
+    }
+
     public boolean isTemplate() {
-        return template == null;
-    }
-
-    public Synapse getTemplate() {
-        if(isTemplate())
-            return this;
-        return template;
-    }
-
-    public TemplateSynapse getTemplateInfo() {
-        assert isTemplate();
-        if (templateInfo == null) {
-            templateInfo = new TemplateSynapse();
-        }
-
-        return templateInfo;
+        return isTemplate;
     }
 
     public boolean isOfTemplate(Synapse templateSynapse) {
-        return template == templateSynapse;
+        if(template == templateSynapse)
+            return true;
+
+        if(template == null)
+            return false;
+
+        return template.isOfTemplate(templateSynapse);
     }
 
     public boolean isInputLinked() {
@@ -506,6 +501,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
         out.writeBoolean(isInputLinked);
         out.writeBoolean(isOutputLinked);
+        out.writeBoolean(isTemplate);
 
         weight.write(out);
 
@@ -531,6 +527,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
         isInputLinked = in.readBoolean();
         isOutputLinked = in.readBoolean();
+        isTemplate = in.readBoolean();
 
         weight.readFields(in, m);
 

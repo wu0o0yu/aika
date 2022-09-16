@@ -46,9 +46,9 @@ public class TheCatTest {
                 coords.put(2, new double[]{-0.052, 0.532});
                 coords.put(3, new double[]{0.314, 0.964});
                 coords.put(4, new double[]{-0.188, 0.954});
-                coords.put(5, new double[]{0.337, -0.011});
-                coords.put(6, new double[]{0.691, 0.544});
-                coords.put(7, new double[]{0.812, 0.927});
+                coords.put(5, new double[]{0.337, 0.732});
+                coords.put(6, new double[]{0.688, 0.545});
+                coords.put(7, new double[]{0.289, 0.0});
                 break;
             }
             case 1: {

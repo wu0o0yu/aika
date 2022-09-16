@@ -78,7 +78,7 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     public Stream<BindingSignal> getReverseBindingSignals(Neuron toNeuron, State s) {
         if(toNeuron.isTemplate()) {
             return reverseBindingSignals.values().stream()
-                    .filter(bs -> bs.getActivation().getNeuron().templateNeuronMatches(toNeuron))
+                    .filter(bs -> bs.getActivation().getNeuron().isOfTemplate(toNeuron))
                     .filter(bs -> bs.getState() == s);
         } else {
             return reverseBindingSignals.subMap(
