@@ -118,8 +118,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     public L propagate(BindingSignal inputBS) {
         IA iAct = (IA) inputBS.getActivation();
 
-        if(!propagateCheck(iAct))
-            return null;
+//        if(!propagateCheck(iAct))
+//            return null;
 
         if(propagateLinkExists(iAct))
             return null;
