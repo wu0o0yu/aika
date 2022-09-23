@@ -35,7 +35,7 @@ public class OscillationTest {
     public void oscillationTest() {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        m.setTemplateGraph(t);
+        t.init(m);
 
         m.setN(912);
 

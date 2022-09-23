@@ -102,7 +102,7 @@ public class ABCDTest {
     public void testABCD() throws InterruptedException {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        m.setTemplateGraph(t);
+        t.init(m);
 
         PatternNeuron a_IN = t.TOKEN_TEMPLATE.lookupToken("a");
 

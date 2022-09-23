@@ -37,8 +37,9 @@ public class PatternTest {
 
     @Test
     public void testPatternPos() {
+        SimpleTemplateGraph tg = new SimpleTemplateGraph();
         Model m = initModel();
-        SimpleTemplateGraph tg = (SimpleTemplateGraph) m.getTemplateGraph();
+        tg.init(m);
 
         Document doc = new Document(m, "ABC");
 
@@ -63,8 +64,9 @@ public class PatternTest {
 
     @Test
     public void testPatternNeg() {
+        SimpleTemplateGraph tg = new SimpleTemplateGraph();
         Model m = initModel();
-        SimpleTemplateGraph tg = (SimpleTemplateGraph) m.getTemplateGraph();
+        tg.init(m);
 
         Document doc = new Document(m, "ABC");
 
@@ -80,7 +82,7 @@ public class PatternTest {
     public Model initModel() {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        m.setTemplateGraph(t);
+        t.init(m);
 
         TokenNeuron nA = t.TOKEN_TEMPLATE.lookupToken("A");
         TokenNeuron nB = t.TOKEN_TEMPLATE.lookupToken("B");

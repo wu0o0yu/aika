@@ -90,7 +90,7 @@ public class MutualExclusionTest {
     public void testPropagation() {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        m.setTemplateGraph(t);
+        t.init(m);
 
         TokenNeuron in = createNeuron(t.PATTERN_TEMPLATE, "I", true);
         BindingNeuron na = createNeuron(t.BINDING_TEMPLATE, "A");
@@ -141,7 +141,7 @@ public class MutualExclusionTest {
     public void testPropagationWithPrimaryLink() {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        m.setTemplateGraph(t);
+        t.init(m);
 
         TokenNeuron in = createNeuron(t.TOKEN_TEMPLATE, "I", true);
         BindingNeuron na = createNeuron(t.BINDING_TEMPLATE, "A");

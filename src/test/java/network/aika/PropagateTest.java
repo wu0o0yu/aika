@@ -34,7 +34,7 @@ public class PropagateTest {
     public void testPropagation() {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        m.setTemplateGraph(t);
+        t.init(m);
 
         TokenNeuron in = createNeuron(t.TOKEN_TEMPLATE, "IN", true);
         BindingNeuron out = createNeuron(t.BINDING_TEMPLATE, "OUT");

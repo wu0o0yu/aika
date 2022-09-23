@@ -119,7 +119,7 @@ public class JacksonCookTest {
     public void setupJacksonCookTest(AIKADebugger debugger) {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        m.setTemplateGraph(t);
+        t.init(m);
 
         TokenNeuron jacksonIN = t.TOKEN_TEMPLATE.lookupToken("Jackson");
         TokenNeuron cookIN = t.TOKEN_TEMPLATE.lookupToken("Cook");

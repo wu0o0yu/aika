@@ -35,7 +35,7 @@ public class GradientTest {
     public void gradientAndInduction2() {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        m.setTemplateGraph(t);
+        t.init(m);
 
         m.setN(912);
 
@@ -73,7 +73,7 @@ public class GradientTest {
     public void gradientAndInduction3() {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        m.setTemplateGraph(t);
+        t.init(m);
 
         m.setN(912);
 
@@ -110,7 +110,7 @@ public class GradientTest {
     public void gradientAndInduction2With2Docs() {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        m.setTemplateGraph(t);
+        t.init(m);
 
         m.setN(912);
         t.BINDING_TEMPLATE.getBias().receiveUpdate(-0.32);

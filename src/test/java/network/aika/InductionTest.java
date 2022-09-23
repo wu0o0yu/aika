@@ -37,7 +37,7 @@ public class InductionTest {
     public void testInduceFromMaturePattern() {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        m.setTemplateGraph(t);
+        t.init(m);
 
         TokenNeuron in = t.TOKEN_TEMPLATE.instantiateTemplate(true);
         in.setTokenLabel("A");
@@ -63,7 +63,7 @@ public class InductionTest {
     public void initialGradientTest() {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        m.setTemplateGraph(t);
+        t.init(m);
 
         PatternNeuron inA = createNeuron(t.PATTERN_TEMPLATE, "IN-A");
         PatternNeuron inB = createNeuron(t.PATTERN_TEMPLATE, "IN-B");
@@ -103,7 +103,7 @@ public class InductionTest {
     public void inductionTest() throws InterruptedException {
         SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model model = new Model();
-        model.setTemplateGraph(t);
+        t.init(model);
 
         String phrase = "der Hund";
 

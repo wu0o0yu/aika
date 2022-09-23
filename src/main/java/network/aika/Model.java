@@ -48,8 +48,6 @@ public class Model implements Writable {
     private final WeakHashMap<Long, SoftReference<NeuronProvider>> providers = new WeakHashMap<>();
     public final Map<Long, NeuronProvider> activeProviders = new TreeMap<>();
 
-    private TemplateGraph templateGraph;
-
     private Thought currentThought;
 
     private Supplier<Writable> customDataInstanceSupplier;
@@ -88,15 +86,6 @@ public class Model implements Writable {
 
     public long createNeuronId() {
         return suspensionCallback.createId();
-    }
-
-    public void setTemplateGraph(TemplateGraph templateGraph) {
-        this.templateGraph = templateGraph;
-        this.templateGraph.init(this);
-    }
-
-    public TemplateGraph getTemplateGraph() {
-        return templateGraph;
     }
 
     public Thought getCurrentThought() {

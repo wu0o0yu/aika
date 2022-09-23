@@ -38,7 +38,7 @@ public class TestFsModel {
         Model m = new Model(
                 new FSSuspensionCallback(new File("/Users/lukas.molzberger/models").toPath(), "AIKA-2.0-10", true)
         );
-        m.setTemplateGraph(tg);
+        tg.init(m);
 
         m.open(false);
 

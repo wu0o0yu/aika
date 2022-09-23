@@ -34,7 +34,7 @@ import java.util.TreeMap;
  *
  * @author Lukas Molzberger
  */
-public class SimpleTemplateGraph implements TemplateGraph {
+public class SimpleTemplateGraph {
 
     public BindingNeuron BINDING_TEMPLATE;
     public PatternNeuron PATTERN_TEMPLATE;
@@ -229,12 +229,10 @@ public class SimpleTemplateGraph implements TemplateGraph {
                 );
     }
 
-    @Override
     public TokenActivation addToken(Document doc, String t, Integer pos, int i, int j) {
         return doc.addToken(TOKEN_TEMPLATE.lookupToken(t), pos, i, j);
     }
 
-    @Override
     public Collection<Neuron> getAllTemplateNeurons() {
         return Arrays.asList(
                 BINDING_TEMPLATE,
@@ -245,7 +243,6 @@ public class SimpleTemplateGraph implements TemplateGraph {
         );
     }
 
-    @Override
     public double[] getCoordinate(Neuron templateNeuron) {
         return coords.get(templateNeuron.getId());
     }

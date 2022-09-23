@@ -47,7 +47,7 @@ public class SimplePhraseTest {
     public void simplePhraseTest() {
         SimpleTemplateGraph tg = new SimpleTemplateGraph();
         Model model = new Model();
-        model.setTemplateGraph(tg);
+        tg.init(model);
 
         Config c = getConfig()
                         .setAlpha(0.99)
