@@ -64,28 +64,7 @@ public class SimpleTemplateGraph {
 
     private Model model;
 
-    private Map<Long, double[]> coords;
-
     public SimpleTemplateGraph() {
-        coords = new TreeMap<>();
-
-        coords.put(1l, new double[]{0.223, 2.184});
-        coords.put(2l, new double[]{-0.155, 1.125});
-        coords.put(3l, new double[]{1.257, 2.85});
-        coords.put(4l, new double[]{0.457, 1.111});
-        coords.put(5l, new double[]{1.18, 2.231});
-        coords.put(6l, new double[]{-0.556, 2.189});
-        coords.put(7l, new double[]{3.484, 1.506});
-        coords.put(8l, new double[]{1.4, 0.0});
-        coords.put(9l, new double[]{1.4, 0.0});
-        coords.put(10l, new double[]{2.768, -0.037});
-        coords.put(11l, new double[]{2.768, -0.037});
-        coords.put(12l, new double[]{2.04, -0.021});
-        coords.put(13l, new double[]{2.04, -0.021});
-        coords.put(14l, new double[]{1.397, 0.772});
-        coords.put(15l, new double[]{2.766, 0.805});
-        coords.put(16l, new double[]{2.261, 1.627});
-        coords.put(17l, new double[]{1.028, 1.656});
     }
 
     public void init(Model m) {
@@ -231,20 +210,6 @@ public class SimpleTemplateGraph {
 
     public TokenActivation addToken(Document doc, String t, Integer pos, int i, int j) {
         return doc.addToken(TOKEN_TEMPLATE.lookupToken(t), pos, i, j);
-    }
-
-    public Collection<Neuron> getAllTemplateNeurons() {
-        return Arrays.asList(
-                BINDING_TEMPLATE,
-                PATTERN_TEMPLATE,
-                INHIBITORY_TEMPLATE,
-                CATEGORY_TEMPLATE,
-                TOKEN_POSITION_RELATION_TEMPLATE
-        );
-    }
-
-    public double[] getCoordinate(Neuron templateNeuron) {
-        return coords.get(templateNeuron.getId());
     }
 
     private <N extends Neuron> N init(String label, double initialBias, NeuronProducer<N> np) {
