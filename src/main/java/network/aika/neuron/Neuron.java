@@ -38,6 +38,7 @@ import network.aika.utils.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -83,7 +84,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Neuron<?, ?> template;
 
-    private WeakHashMap<Long, SortedSet<A>> activations = new WeakHashMap<>();
+    private WeakHashMap<Long, WeakReference<SortedSet<A>>> activations = new WeakHashMap<>();
 
     public void addProvider(Model m) {
         provider = new NeuronProvider(m, this);
@@ -93,11 +94,13 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     public void register(A act) {
         Thought t = act.getThought();
         synchronized (activations) {
-            activations
+            WeakReference<SortedSet<A>> weakRef = activations
                     .computeIfAbsent(
                             t.getId(),
-                            n -> initActivationsSet(t)
-                    )
+                            n -> new WeakReference<>(initActivationsSet(t))
+                    );
+
+            weakRef.get()
                     .add(act);
         }
     }
@@ -120,8 +123,15 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         if(t == null)
             return Collections.emptySortedSet();
 
-        SortedSet<A> acts = activations.get(t.getId());
-        return acts != null ? acts : Collections.emptyNavigableSet();
+        WeakReference<SortedSet<A>> weakRef = activations.get(t.getId());
+        if(weakRef == null)
+            return Collections.emptyNavigableSet();
+
+        SortedSet<A> acts = weakRef.get();
+        if(acts == null)
+            return Collections.emptyNavigableSet();
+
+        return acts;
     }
 
     protected void initFromTemplate(Neuron n) {

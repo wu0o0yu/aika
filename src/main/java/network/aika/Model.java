@@ -24,7 +24,7 @@ import network.aika.neuron.*;
 import network.aika.utils.Writable;
 
 import java.io.*;
-import java.lang.ref.WeakReference;
+import java.lang.ref.SoftReference;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
@@ -45,7 +45,7 @@ public class Model implements Writable {
     private final AtomicLong thoughtIdCounter = new AtomicLong(0);
 
     // Important: the id field needs to be referenced by the provider!
-    private final WeakHashMap<Long, WeakReference<NeuronProvider>> providers = new WeakHashMap<>();
+    private final WeakHashMap<Long, SoftReference<NeuronProvider>> providers = new WeakHashMap<>();
     public final Map<Long, NeuronProvider> activeProviders = new TreeMap<>();
 
     private TemplateGraph templateGraph;
@@ -169,7 +169,7 @@ public class Model implements Writable {
 
     public NeuronProvider lookupNeuron(Long id) {
         synchronized (providers) {
-            WeakReference<NeuronProvider> wr = providers.get(id);
+            SoftReference<NeuronProvider> wr = providers.get(id);
             if(wr != null) {
                 NeuronProvider n = wr.get();
                 if (n != null)
@@ -204,7 +204,7 @@ public class Model implements Writable {
 
     public void registerWeakReference(NeuronProvider p) {
         synchronized (providers) {
-            providers.put(p.getId(), new WeakReference<>(p));
+            providers.put(p.getId(), new SoftReference<>(p));
         }
     }
 
