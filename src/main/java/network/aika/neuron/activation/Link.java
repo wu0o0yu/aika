@@ -228,16 +228,16 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return FIRED_COMPARATOR.compare(iAct.getFired(), oAct.getFired()) < 0;
     }
 
-    public Link induce(Activation oAct) {
-        S inducedSynapse = (S) synapse
+    public Link instantiateTemplate(Activation oAct) {
+        S instSyn = (S) synapse
                 .instantiateTemplate(
                         this,
                         input.getNeuron(),
                         output.getNeuron()
                 );
-        inducedSynapse.linkOutput();
+        instSyn.linkOutput();
 
-        Link l = inducedSynapse.createLink(input, oAct);
+        Link l = instSyn.createLink(input, oAct);
         Cleanup.add(l);
         return l;
     }

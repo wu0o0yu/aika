@@ -92,10 +92,7 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
 
     @Override
     public FieldOutput getLinkingEvent(Activation act, Direction dir) {
-        if(act == null)
-            return null;
-
-        return act.getEvent(false, false);
+        return null;
     }
 
     @Override

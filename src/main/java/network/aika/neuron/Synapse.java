@@ -40,6 +40,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.activation.Timestamp.MAX;
@@ -182,7 +183,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         if(act == null)
             return null;
 
-        return act.getEvent(dir == OUTPUT, false);
+        if(dir == INPUT)
+            return null;
+
+        return act.getIsFired();
     }
 
     public void initFixedTransitions(Activation act, Direction dir) {
@@ -229,19 +233,28 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public S instantiateTemplate(L l, I input, O output) {
+        S s = instantiateTemplate(input, output);
+
+        s.weight.setValue(computeInitialWeight(l.getInput()));
+
+        return s;
+    }
+
+    public S instantiateTemplate(I input, O output) {
         S s = instantiateTemplate();
 
         s.input = input.getProvider();
         s.output = output.getProvider();
 
-        initFromTemplate(l, s);
         return s;
     }
 
-    private S instantiateTemplate() {
+    public S instantiateTemplate() {
         S s;
         try {
             s = (S) getClass().getConstructor().newInstance();
+            s.template = this;
+            s.weight.setValue(weight.getCurrentValue());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -249,15 +262,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public abstract L createLink(IA input, OA output);
-
-    protected void initFromTemplate(L l, S s) {
-        double initialWeight = l != null ?
-                computeInitialWeight(l.getInput()) :
-                weight.getCurrentValue();
-
-        s.weight.setValue(initialWeight);
-        s.template = this;
-    }
 
     public boolean checkCandidateSynapse(IA iAct) {
         double candidateWeight = computeInitialWeight(iAct);
@@ -430,7 +434,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     }
 
     public Model getModel() {
-        return getPOutput().getModel();
+        return output != null ?
+                output.getModel() :
+                null;
     }
 
     public double getSurprisal(Sign si, Sign so, Range range, boolean addCurrentInstance) {
@@ -519,14 +525,17 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
 
     @Override
     public Thought getThought() {
-        return getModel().getCurrentThought();
+        Model m = getModel();
+        return m != null ?
+                m.getCurrentThought() :
+                null;
     }
 
     public String toString() {
         return getClass().getSimpleName() +
-                " in:[" + input.getNeuron().toKeyString()  + "](" + (isInputLinked ? "+" : "-") + ") " +
+                " in:[" + (input != null ? input.getNeuron().toKeyString() : "--")  + "](" + (isInputLinked ? "+" : "-") + ") " +
                 getArrow() +
-                " out:[" + output.getNeuron().toKeyString() + "](" + (isOutputLinked ? "+" : "-") + ")";
+                " out:[" + (output != null ? output.getNeuron().toKeyString() : "--") + "](" + (isOutputLinked ? "+" : "-") + ")";
     }
 
     private String getArrow() {

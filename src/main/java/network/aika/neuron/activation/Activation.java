@@ -149,7 +149,9 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         );
 
         if (!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled())
-            initGradientFields();
+            isFinal.addEventListener(() ->
+                    initGradientFields()
+            );
 
         thought.register(this);
         neuron.register(this);
@@ -185,7 +187,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     protected void initGradientFields() {
         if(isTemplate())
-            induce();
+            instantiateTemplate();
 
         ownInputGradient = new QueueField(this, "Own-Input-Gradient");
         backpropInputGradient = new QueueField(this, "Backprop-Input-Gradient", 0.0);
@@ -271,24 +273,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public FieldOutput getIsFinal() {
         return isFinal;
-    }
-
-    public FieldOutput getEvent(boolean isFired, boolean isFinal) {
-        if(isFired && isFinal)
-            return mul(
-                    this,
-                    "final * fired",
-                    this.isFinal,
-                    this.isFired
-            );
-
-        if(isFired)
-            return this.isFired;
-
-        if(isFinal)
-            return this.isFinal;
-
-        return null;
     }
 
     protected void initFields() {
@@ -426,7 +410,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return fired != NOT_SET;
     }
 
-    public void induce() {
+    public void instantiateTemplate() {
         assert isTemplate();
 
         Activation<N> act = neuron.instantiateTemplate(true)
@@ -436,7 +420,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         getInputLinks()
                 .forEach(l ->
-                    l.induce(act)
+                    l.instantiateTemplate(act)
                 );
     }
 

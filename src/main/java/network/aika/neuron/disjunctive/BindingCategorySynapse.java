@@ -78,9 +78,4 @@ public class BindingCategorySynapse extends DisjunctiveSynapse<
     public Stream<Transition> getTransitions() {
         return TRANSITIONS.stream();
     }
-
-    @Override
-    public void setModified() {
-        getInput().setModified();
-    }
 }

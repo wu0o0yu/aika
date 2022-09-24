@@ -72,7 +72,8 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
 
     @Override
     public void setModified() {
-        getOutput().setModified();
+        if(output != null)
+            getOutput().setModified();
     }
 
     @Override

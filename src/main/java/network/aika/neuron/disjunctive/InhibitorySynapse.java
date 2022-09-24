@@ -36,9 +36,4 @@ public abstract class InhibitorySynapse extends DisjunctiveSynapse<
     public InhibitoryLink createLink(BindingActivation input, InhibitoryActivation output) {
         return new InhibitoryLink(this, input, output);
     }
-
-    @Override
-    public void setModified() {
-        getInput().setModified();
-    }
 }
