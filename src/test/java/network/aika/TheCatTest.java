@@ -232,7 +232,7 @@ public class TheCatTest {
         camera.setViewPercent(1.5);
         camera.setViewCenter(1.528, 0.828, 0);
 
-        processTokens(t, doc, List.of("the", "cat"));
+        processTokens(t.TOKEN_TEMPLATE, doc, List.of("the", "cat"));
 
         doc.postProcessing();
         doc.updateModel();

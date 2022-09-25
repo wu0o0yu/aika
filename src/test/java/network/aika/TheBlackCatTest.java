@@ -130,7 +130,7 @@ public class TheBlackCatTest {
         camera.setViewPercent(1.3);
         camera.setViewCenter(1.921, 1.449, 0);
 
-        processTokens(t, doc, List.of("the", "black", "cat"));
+        processTokens(t.TOKEN_TEMPLATE, doc, List.of("the", "black", "cat"));
 
         doc.postProcessing();
         doc.updateModel();

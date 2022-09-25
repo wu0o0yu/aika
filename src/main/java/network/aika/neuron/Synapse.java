@@ -531,6 +531,16 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
                 null;
     }
 
+    public static <S extends Synapse> S init(S ts, Neuron input, Neuron output, double initialWeight) {
+        ts.setInput(input);
+        ts.setOutput(output);
+        ts.getWeight().setValue(initialWeight);
+        ts.linkInput();
+        ts.linkOutput();
+
+        return ts;
+    }
+
     public String toString() {
         return getClass().getSimpleName() +
                 " in:[" + (input != null ? input.getNeuron().toKeyString() : "--")  + "](" + (isInputLinked ? "+" : "-") + ") " +

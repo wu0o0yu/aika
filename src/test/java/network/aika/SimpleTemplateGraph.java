@@ -70,16 +70,16 @@ public class SimpleTemplateGraph {
     public void init(Model m) {
         this.model = m;
 
-        BINDING_TEMPLATE = init("Binding Neuron", -0.02, l -> new BindingNeuron());
-        PATTERN_TEMPLATE = init("Pattern Neuron", 0.0, l -> new PatternNeuron());
-        INHIBITORY_TEMPLATE = init("Inhibitory Neuron", 0.0, l -> new InhibitoryNeuron());
-        CATEGORY_TEMPLATE = init("Category Neuron", 0.0, l -> new CategoryNeuron());
-        BINDING_CATEGORY_TEMPLATE = init("Binding Category Neuron", 0.0, l -> new BindingCategoryNeuron());
-        TOKEN_TEMPLATE = init("Token Neuron", 0.0, l -> new TokenNeuron());
-        TOKEN_POSITION_RELATION_TEMPLATE = init("Token Position Relation Neuron", 0.0, l -> new TokenPositionRelationNeuron());
+        BINDING_TEMPLATE = Neuron.init(model, "Binding Neuron", -0.02, true, l -> new BindingNeuron());
+        PATTERN_TEMPLATE = Neuron.init(model, "Pattern Neuron", 0.0, true, l -> new PatternNeuron());
+        INHIBITORY_TEMPLATE = Neuron.init(model, "Inhibitory Neuron", 0.0, true, l -> new InhibitoryNeuron());
+        CATEGORY_TEMPLATE = Neuron.init(model, "Category Neuron", 0.0, true, l -> new CategoryNeuron());
+        BINDING_CATEGORY_TEMPLATE = Neuron.init(model, "Binding Category Neuron", 0.0, true, l -> new BindingCategoryNeuron());
+        TOKEN_TEMPLATE = Neuron.init(model, "Token Neuron", 0.0, true, l -> new TokenNeuron());
+        TOKEN_POSITION_RELATION_TEMPLATE = Neuron.init(model, "Token Position Relation Neuron", 0.0, true, l -> new TokenPositionRelationNeuron());
 
         PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE =
-                init(
+                Synapse.init(
                         new PrimaryInputSynapse(),
                         PATTERN_TEMPLATE,
                         BINDING_TEMPLATE,
@@ -87,7 +87,7 @@ public class SimpleTemplateGraph {
                 );
 
         PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE =
-                init(
+                Synapse.init(
                         new PrimaryInputSynapse(),
                         CATEGORY_TEMPLATE,
                         BINDING_TEMPLATE,
@@ -95,7 +95,7 @@ public class SimpleTemplateGraph {
                 );
 
         RELATED_INPUT_SYNAPSE_TEMPLATE =
-                init(
+                Synapse.init(
                         new RelatedInputSynapse(),
                         BINDING_TEMPLATE,
                         BINDING_TEMPLATE,
@@ -103,7 +103,7 @@ public class SimpleTemplateGraph {
                 );
 
         RELATED_INPUT_SYNAPSE_FROM_LATENT_RELATION_TEMPLATE =
-                init(
+                Synapse.init(
                         new RelatedInputSynapse(),
                         TOKEN_POSITION_RELATION_TEMPLATE,
                         BINDING_TEMPLATE,
@@ -111,7 +111,7 @@ public class SimpleTemplateGraph {
                 );
 
         CATEGORY_INPUT_SYNAPSE_TEMPLATE =
-                init(
+                Synapse.init(
                         new CategoryInputSynapse(),
                         BINDING_TEMPLATE,
                         BINDING_TEMPLATE,
@@ -119,7 +119,7 @@ public class SimpleTemplateGraph {
                 );
 
         SAME_PATTERN_SYNAPSE_TEMPLATE =
-                init(
+                Synapse.init(
                         new SamePatternSynapse(),
                         BINDING_TEMPLATE,
                         BINDING_TEMPLATE,
@@ -127,7 +127,7 @@ public class SimpleTemplateGraph {
                 );
 
         POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE =
-                init(
+                Synapse.init(
                         new PositiveFeedbackSynapse(),
                         PATTERN_TEMPLATE,
                         BINDING_TEMPLATE,
@@ -135,7 +135,7 @@ public class SimpleTemplateGraph {
                 );
 
         POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE =
-                init(
+                Synapse.init(
                         new PositiveFeedbackSynapse(),
                         CATEGORY_TEMPLATE,
                         BINDING_TEMPLATE,
@@ -143,7 +143,7 @@ public class SimpleTemplateGraph {
                 );
 
         REVERSE_PATTERN_SYNAPSE_FROM_PATTERN_TEMPLATE =
-                init(
+                Synapse.init(
                         new ReversePatternSynapse(),
                         PATTERN_TEMPLATE,
                         BINDING_TEMPLATE,
@@ -151,7 +151,7 @@ public class SimpleTemplateGraph {
                 );
 
         REVERSE_PATTERN_SYNAPSE_FROM_CATEGORY_TEMPLATE =
-                init(
+                Synapse.init(
                         new ReversePatternSynapse(),
                         CATEGORY_TEMPLATE,
                         BINDING_TEMPLATE,
@@ -159,7 +159,7 @@ public class SimpleTemplateGraph {
                 );
 
         NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE =
-                init(
+                Synapse.init(
                         new NegativeFeedbackSynapse(),
                         INHIBITORY_TEMPLATE,
                         BINDING_TEMPLATE,
@@ -167,7 +167,7 @@ public class SimpleTemplateGraph {
                 );
 
         PATTERN_SYNAPSE_TEMPLATE =
-                init(
+                Synapse.init(
                         new PatternSynapse(),
                         BINDING_TEMPLATE,
                         PATTERN_TEMPLATE,
@@ -175,7 +175,7 @@ public class SimpleTemplateGraph {
                 );
 
         INPUT_INHIBITORY_SYNAPSE_TEMPLATE =
-                init(
+                Synapse.init(
                         new InputInhibitorySynapse(),
                         BINDING_TEMPLATE,
                         INHIBITORY_TEMPLATE,
@@ -183,7 +183,7 @@ public class SimpleTemplateGraph {
                 );
 
         SAME_INHIBITORY_SYNAPSE_TEMPLATE =
-                init(
+                Synapse.init(
                         new SameInhibitorySynapse(),
                         BINDING_TEMPLATE,
                         INHIBITORY_TEMPLATE,
@@ -191,7 +191,7 @@ public class SimpleTemplateGraph {
                 );
 
         CATEGORY_SYNAPSE_TEMPLATE =
-                init(
+                Synapse.init(
                         new CategorySynapse(),
                         PATTERN_TEMPLATE,
                         CATEGORY_TEMPLATE,
@@ -200,7 +200,7 @@ public class SimpleTemplateGraph {
 
 
         BINDING_CATEGORY_SYNAPSE_TEMPLATE =
-                init(
+                Synapse.init(
                         new BindingCategorySynapse(),
                         BINDING_TEMPLATE,
                         BINDING_CATEGORY_TEMPLATE,
@@ -210,27 +210,5 @@ public class SimpleTemplateGraph {
 
     public TokenActivation addToken(Document doc, String t, Integer pos, int i, int j) {
         return doc.addToken(TOKEN_TEMPLATE.lookupToken(t), pos, i, j);
-    }
-
-    private <N extends Neuron> N init(String label, double initialBias, NeuronProducer<N> np) {
-        N n = model.lookupNeuron(label, np);
-
-        n.setLabel(label);
-        n.getBias().setValue(initialBias);
-        n.setTemplate(true);
-
-        n.getProvider().save();
-        return n;
-    }
-
-    private <S extends Synapse> S init(S ts, Neuron input, Neuron output, double initialWeight) {
-        ts.setInput(input);
-        ts.setOutput(output);
-        ts.getWeight().setValue(initialWeight);
-
-        ts.linkInput();
-        ts.linkOutput();
-
-        return ts;
     }
 }

@@ -156,6 +156,6 @@ public class GradientTest {
     }
 
     private void processDoc(SimpleTemplateGraph t, Document doc) {
-        processTokens(t, doc, Arrays.asList(doc.getContent().split(" ")));
+        processTokens(t.TOKEN_TEMPLATE, doc, Arrays.asList(doc.getContent().split(" ")));
     }
 }

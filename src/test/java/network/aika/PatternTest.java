@@ -52,7 +52,7 @@ public class PatternTest {
 
         AIKADebugger.createAndShowGUI(doc);
 
-        processTokens(tg, doc, List.of("A", "B", "C"));
+        processTokens(tg.TOKEN_TEMPLATE, doc, List.of("A", "B", "C"));
 
         System.out.println(doc);
 
@@ -70,8 +70,8 @@ public class PatternTest {
 
         Document doc = new Document(m, "ABC");
 
-        addToken(tg, doc, "A", 0, 0, 1);
-        addToken(tg, doc, "B", 1, 1, 2);
+        addToken(tg.TOKEN_TEMPLATE, doc, "A", 0, 0, 1);
+        addToken(tg.TOKEN_TEMPLATE, doc, "B", 1, 1, 2);
 
         doc.postProcessing();
         doc.updateModel();

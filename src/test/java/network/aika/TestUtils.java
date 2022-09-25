@@ -25,6 +25,7 @@ import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
+import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.neuron.disjunctive.CategoryNeuron;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import network.aika.text.Document;
@@ -42,7 +43,7 @@ import static network.aika.steps.Phase.PROCESSING;
  */
 public class TestUtils {
 
-    public static void processTokens(SimpleTemplateGraph tg, Document doc, Iterable<String> tokens) {
+    public static void processTokens(TokenNeuron tn, Document doc, Iterable<String> tokens) {
         int i = 0;
         int pos = 0;
 
@@ -51,7 +52,7 @@ public class TestUtils {
             int j = i + t.length();
 
             tokenActs.add(
-                    addToken(tg, doc, t, pos++, i,  j)
+                    addToken(tn, doc, t, pos++, i,  j)
             );
 
             i = j + 1;
@@ -89,8 +90,8 @@ public class TestUtils {
         doc.updateModel();
     }
 
-    public static TokenActivation addToken(SimpleTemplateGraph tg, Document doc, String t, Integer pos, int i, int j) {
-        return doc.addToken(tg.TOKEN_TEMPLATE.lookupToken(t), pos, i, j);
+    public static TokenActivation addToken(TokenNeuron tn, Document doc, String t, Integer pos, int i, int j) {
+        return doc.addToken(tn.lookupToken(t), pos, i, j);
     }
 
     public static Config getConfig() {

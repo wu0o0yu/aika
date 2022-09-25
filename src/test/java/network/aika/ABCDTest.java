@@ -186,7 +186,7 @@ public class ABCDTest {
         camera.setViewPercent(1.2);
         camera.setViewCenter(1.978, 0.47, 0);
 
-        processTokens(t, doc, List.of("a", "b", "c", "d"));
+        processTokens(t.TOKEN_TEMPLATE, doc, List.of("a", "b", "c", "d"));
 
         doc.postProcessing();
         doc.updateModel();

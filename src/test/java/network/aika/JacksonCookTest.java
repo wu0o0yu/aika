@@ -214,7 +214,7 @@ public class JacksonCookTest {
         camera.setViewPercent(1.5);
         camera.setViewCenter(1.702, 2.272, 0);
 
-        processTokens(t, doc, List.of("Jackson", "Cook"));
+        processTokens(t.TOKEN_TEMPLATE, doc, List.of("Jackson", "Cook"));
 
         doc.postProcessing();
         doc.updateModel();

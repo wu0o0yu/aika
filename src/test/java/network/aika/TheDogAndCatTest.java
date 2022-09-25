@@ -140,7 +140,7 @@ public class TheDogAndCatTest {
         camera.setViewPercent(1.35);
         camera.setViewCenter(2.595, 0.808, 0);
 
-        processTokens(t, doc, List.of("the", "dog", "and", "the", "cat"));
+        processTokens(t.TOKEN_TEMPLATE, doc, List.of("the", "dog", "and", "the", "cat"));
 
 
         doc.postProcessing();

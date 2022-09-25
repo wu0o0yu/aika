@@ -77,7 +77,7 @@ public class TestFsModel {
         int pos = 0;
         for(String t: doc.getContent().split(" ")) {
             int j = i + t.length();
-            addToken(tg, doc, t, pos++, i, j);
+            addToken(tg.TOKEN_TEMPLATE, doc, t, pos++, i, j);
             i = j + 1;
         }
         return doc;

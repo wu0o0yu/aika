@@ -116,8 +116,8 @@ public class InductionTest {
         );
         System.out.println("  " + phrase);
 
-        TokenActivation actDer = addToken(t, doc, "der", 0, 0, 4);
-        TokenActivation actHund = addToken(t, doc, "Hund", 1, 4, 8);
+        TokenActivation actDer = addToken(t.TOKEN_TEMPLATE, doc, "der", 0, 0, 4);
+        TokenActivation actHund = addToken(t.TOKEN_TEMPLATE, doc, "Hund", 1, 4, 8);
 
         model.setN(1000);
         actDer.getNeuron().setFrequency(50);

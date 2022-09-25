@@ -18,6 +18,7 @@ package network.aika.neuron;
 
 import network.aika.Model;
 import network.aika.Thought;
+import network.aika.callbacks.NeuronProducer;
 import network.aika.direction.Direction;
 import network.aika.fields.LimitedField;
 import network.aika.fields.QueueField;
@@ -481,6 +482,18 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     @Override
     public Thought getThought() {
         return getModel().getCurrentThought();
+    }
+
+
+    public static <N extends Neuron> N init(Model m, String label, double initialBias, boolean isTemplate, NeuronProducer<N> np) {
+        N n = m.lookupNeuron(label, np);
+
+        n.setLabel(label);
+        n.getBias().setValue(initialBias);
+        n.setTemplate(isTemplate);
+
+        n.getProvider().save();
+        return n;
     }
 
     public String toKeyString() {
