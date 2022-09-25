@@ -64,7 +64,9 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
             initWeightInput();
 
             if (getConfig().isTrainingEnabled() && getSynapse().isAllowTraining())
-                initGradients();
+                output.isFinal.addEventListener(() ->
+                        initGradients()
+                );
         }
 
         getThought().onLinkCreationEvent(this);
