@@ -45,10 +45,6 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         super.setModified();
     }
 
-    protected void initFromTemplate(ConjunctiveNeuron n) {
-        super.initFromTemplate(n);
-    }
-
     public void addInactiveLinks(BindingSignal bs) {
         inputSynapses
                 .stream()

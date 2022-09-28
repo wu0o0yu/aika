@@ -16,7 +16,6 @@
  */
 package network.aika;
 
-import network.aika.callbacks.NeuronProducer;
 import network.aika.neuron.*;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.*;
@@ -24,11 +23,6 @@ import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.neuron.conjunctive.text.TokenPositionRelationNeuron;
 import network.aika.neuron.disjunctive.*;
 import network.aika.text.Document;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  *
@@ -49,7 +43,7 @@ public class SimpleTemplateGraph {
     public PrimaryInputSynapse PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE;
     public RelatedInputSynapse RELATED_INPUT_SYNAPSE_TEMPLATE;
     public RelatedInputSynapse RELATED_INPUT_SYNAPSE_FROM_LATENT_RELATION_TEMPLATE;
-    public CategoryInputSynapse CATEGORY_INPUT_SYNAPSE_TEMPLATE;
+    public BCategoryInputSynapse CATEGORY_INPUT_SYNAPSE_TEMPLATE;
     public SamePatternSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
     public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE;
     public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE;
@@ -112,7 +106,7 @@ public class SimpleTemplateGraph {
 
         CATEGORY_INPUT_SYNAPSE_TEMPLATE =
                 Synapse.init(
-                        new CategoryInputSynapse(),
+                        new BCategoryInputSynapse(),
                         BINDING_TEMPLATE,
                         BINDING_TEMPLATE,
                         0.0

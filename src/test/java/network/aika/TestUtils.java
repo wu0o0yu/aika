@@ -58,6 +58,10 @@ public class TestUtils {
             i = j + 1;
         }
 
+        process(doc, tokenActs);
+    }
+
+    public static void process(Document doc, List<TokenActivation> tokenActs) {
         for(TokenActivation tAct: tokenActs) {
             tAct.setNet(10.0);
             doc.process(PROCESSING);
@@ -70,18 +74,6 @@ public class TestUtils {
                     .map(act -> (BindingActivation)act)
                     .forEach(act ->
                             act.getIsOpen().setValue(xFinal)
-                    );
-
-            doc.process(PROCESSING);
-        }
-
-        for(double x = 1.0; x > -0.001; x -= 0.05) {
-            final double xFinal = x;
-            doc.getActivations().stream()
-                    .filter(act -> act instanceof BindingActivation)
-                    .map(act -> (BindingActivation)act)
-                    .forEach(act ->
-                            act.getMix().setValue(xFinal)
                     );
 
             doc.process(PROCESSING);

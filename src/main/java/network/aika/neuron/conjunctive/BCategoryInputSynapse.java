@@ -18,7 +18,7 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.BindingCategoryActivation;
-import network.aika.neuron.activation.CategoryInputLink;
+import network.aika.neuron.activation.BCategoryInputLink;
 import network.aika.neuron.bindingsignal.PrimitiveTransition;
 import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.disjunctive.BindingCategoryNeuron;
@@ -37,10 +37,10 @@ import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
  *
  * @author Lukas Molzberger
  */
-public class CategoryInputSynapse extends BindingNeuronSynapse<
-        CategoryInputSynapse,
+public class BCategoryInputSynapse extends BindingNeuronSynapse<
+        BCategoryInputSynapse,
         BindingCategoryNeuron,
-        CategoryInputLink,
+        BCategoryInputLink,
         BindingCategoryActivation
         >
 {
@@ -48,28 +48,28 @@ public class CategoryInputSynapse extends BindingNeuronSynapse<
             fixed(INPUT),
             fixed(INPUT),
             MATCH_AND_PROPAGATE,
-            CategoryInputSynapse.class
+            BCategoryInputSynapse.class
     );
 
     private static PrimitiveTransition SAME_TRANSITION = transition(
             fixed(SAME),
             fixed(SAME),
             MATCH_AND_PROPAGATE,
-            CategoryInputSynapse.class
+            BCategoryInputSynapse.class
     );
 
     private static PrimitiveTransition RELATED_INPUT_TRANSITION = transition(
             variable(RELATED_INPUT),
             variable(RELATED_INPUT),
             MATCH_AND_PROPAGATE,
-            CategoryInputSynapse.class
+            BCategoryInputSynapse.class
     );
 
     private static PrimitiveTransition RELATED_SAME_TRANSITION = transition(
             fixed(RELATED_SAME),
             fixed(RELATED_SAME),
             MATCH_AND_PROPAGATE,
-            CategoryInputSynapse.class
+            BCategoryInputSynapse.class
     );
 
     private static List<Transition> TRANSITIONS = List.of(
@@ -80,8 +80,8 @@ public class CategoryInputSynapse extends BindingNeuronSynapse<
     );
 
     @Override
-    public CategoryInputLink createLink(BindingCategoryActivation input, BindingActivation output) {
-        return new CategoryInputLink(this, input, output);
+    public BCategoryInputLink createLink(BindingCategoryActivation input, BindingActivation output) {
+        return new BCategoryInputLink(this, input, output);
     }
 
     @Override

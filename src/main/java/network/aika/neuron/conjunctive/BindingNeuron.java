@@ -17,8 +17,11 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.Thought;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.axons.BindingAxon;
+import network.aika.neuron.disjunctive.BindingCategorySynapse;
+import network.aika.neuron.disjunctive.CategorySynapse;
 
 
 /**
@@ -40,5 +43,15 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
         initFromTemplate(n);
 
         return n;
+    }
+
+    protected void initFromTemplate(BindingNeuron n) {
+        super.initFromTemplate(n);
+
+        getInputSynapses()
+                .filter(s -> s instanceof BCategoryInputSynapse)
+                .forEach(s ->
+                        Synapse.init(new BindingCategorySynapse(), n, s.getInput(), 1.0)
+                );
     }
 }

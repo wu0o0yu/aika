@@ -18,8 +18,10 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
 import network.aika.Thought;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.axons.PatternAxon;
+import network.aika.neuron.disjunctive.CategorySynapse;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -29,7 +31,7 @@ import java.io.IOException;
  *
  * @author Lukas Molzberger
  */
-public class PatternNeuron extends ConjunctiveNeuron<PatternSynapse, PatternActivation> implements PatternAxon {
+public class PatternNeuron extends ConjunctiveNeuron<PatternNeuronSynapse, PatternActivation> implements PatternAxon {
 
     private String tokenLabel;
 
@@ -46,6 +48,16 @@ public class PatternNeuron extends ConjunctiveNeuron<PatternSynapse, PatternActi
 
         initFromTemplate(n);
         return n;
+    }
+
+    protected void initFromTemplate(PatternNeuron n) {
+        super.initFromTemplate(n);
+
+        getInputSynapses()
+                .filter(s -> s instanceof PCategoryInputSynapse)
+                .forEach(s ->
+                        Synapse.init(new CategorySynapse(), n, s.getInput(), 1.0)
+                );
     }
 
     @Override

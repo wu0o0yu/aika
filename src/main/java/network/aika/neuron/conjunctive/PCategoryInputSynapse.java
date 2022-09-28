@@ -17,57 +17,47 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.*;
+import network.aika.neuron.bindingsignal.PrimitiveTransition;
 import network.aika.neuron.bindingsignal.Transition;
+import network.aika.neuron.disjunctive.CategoryNeuron;
 
 import java.util.List;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
-import static network.aika.neuron.bindingsignal.TransitionMode.*;
+import static network.aika.neuron.bindingsignal.State.*;
+import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 
 /**
+ * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
  *
  * @author Lukas Molzberger
  */
-public class PatternSynapse extends PatternNeuronSynapse<
-        PatternSynapse,
-        BindingNeuron,
-        PatternLink,
-        BindingActivation
+public class PCategoryInputSynapse extends PatternNeuronSynapse<
+        PCategoryInputSynapse,
+        CategoryNeuron,
+        PCategoryInputLink,
+        CategoryActivation
         >
 {
 
+    private static PrimitiveTransition SAME_TRANSITION = transition(
+            fixed(SAME),
+            fixed(ABSTRACT_SAME),
+            MATCH_AND_PROPAGATE,
+            PCategoryInputSynapse.class
+    );
+
+
     private static List<Transition> TRANSITIONS = List.of(
-            transition(
-                    fixed(SAME),
-                    fixed(SAME),
-                    MATCH_ONLY,
-                    PatternSynapse.class
-            ),
-            transition(
-                    fixed(INPUT),
-                    variable(INPUT),
-                    MATCH_AND_PROPAGATE,
-                    PatternSynapse.class
-            )
+            SAME_TRANSITION
     );
 
     @Override
-    public boolean isPropagate() {
-        return true;
-    }
-
-    @Override
-    public boolean propagateCheck(BindingActivation iAct) {
-        return true;
-    }
-
-    @Override
-    public PatternLink createLink(BindingActivation input, PatternActivation output) {
-        return new PatternLink(this, input, output);
+    public PCategoryInputLink createLink(CategoryActivation input, PatternActivation output) {
+        return new PCategoryInputLink(this, input, output);
     }
 
     @Override

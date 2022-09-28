@@ -16,14 +16,16 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.disjunctive.CategorySynapse;
+import network.aika.neuron.conjunctive.BCategoryInputSynapse;
+import network.aika.neuron.conjunctive.PCategoryInputSynapse;
+
 
 /**
  * @author Lukas Molzberger
  */
-public class CategoryLink extends DisjunctiveLink<CategorySynapse, PatternActivation, CategoryActivation> {
+public class PCategoryInputLink extends PatternNeuronLink<PCategoryInputSynapse, CategoryActivation> {
 
-    public CategoryLink(CategorySynapse s, PatternActivation input, CategoryActivation output) {
+    public PCategoryInputLink(PCategoryInputSynapse s, CategoryActivation input, PatternActivation output) {
         super(s, input, output);
     }
 }
