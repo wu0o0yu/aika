@@ -19,13 +19,12 @@ package network.aika.neuron.disjunctive;
 import network.aika.Thought;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.activation.InhibitoryActivation;
-import network.aika.neuron.axons.BindingAxon;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitorySynapse, InhibitoryActivation> implements BindingAxon {
+public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitorySynapse, InhibitoryActivation> {
 
     @Override
     public InhibitoryActivation createActivation(Thought t) {

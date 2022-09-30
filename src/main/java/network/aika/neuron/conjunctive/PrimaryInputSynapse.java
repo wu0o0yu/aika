@@ -16,13 +16,9 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.PrimaryInputLink;
-import network.aika.neuron.axons.PatternAxon;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.PrimitiveTransition;
 import network.aika.neuron.bindingsignal.Transition;
 
@@ -41,7 +37,7 @@ import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
  *
  * @author Lukas Molzberger
  */
-public class PrimaryInputSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<
+public class PrimaryInputSynapse<I extends PatternNeuron, IA extends Activation<?>> extends BindingNeuronSynapse<
         PrimaryInputSynapse,
         I,
         PrimaryInputLink<IA>,

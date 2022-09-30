@@ -529,9 +529,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         this.neuron = n;
     }
 
-    public void connectNorm(BindingSignal bs) {
-    }
-
     public ActivationFunction getActivationFunction() {
         return neuron.getActivationFunction();
     }

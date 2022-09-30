@@ -22,7 +22,6 @@ import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.neuron.disjunctive.BindingCategoryNeuron;
-import network.aika.neuron.disjunctive.CategoryNeuron;
 import network.aika.text.Document;
 import org.graphstream.ui.view.camera.Camera;
 import org.junit.jupiter.api.Test;
@@ -136,7 +135,7 @@ public class JacksonCookTest {
         BindingCategoryNeuron jacksonForenameCN = createNeuron(t.BINDING_CATEGORY_TEMPLATE, "jackson (forename)");
         createSynapse(t.BINDING_CATEGORY_SYNAPSE_TEMPLATE, jacksonJCBN, jacksonForenameCN, 10.0);
 
-        createSynapse(t.CATEGORY_INPUT_SYNAPSE_TEMPLATE, jacksonForenameCN, jacksonForenameBN, 10.0);
+        createSynapse(t.B_CATEGORY_INPUT_SYNAPSE_TEMPLATE, jacksonForenameCN, jacksonForenameBN, 10.0);
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, jacksonIN, jacksonForenameBN, 10.0);
         BindingCategoryNeuron forenameCN = createNeuron(t.BINDING_CATEGORY_TEMPLATE, "forename");
         createSynapse(t.BINDING_CATEGORY_SYNAPSE_TEMPLATE, jacksonForenameBN, forenameCN, 10.0);
@@ -152,7 +151,7 @@ public class JacksonCookTest {
         BindingCategoryNeuron cookSurnameCN = createNeuron(t.BINDING_CATEGORY_TEMPLATE, "cook (surname)");
         createSynapse(t.BINDING_CATEGORY_SYNAPSE_TEMPLATE, cookJCBN, cookSurnameCN, 10.0);
 
-        createSynapse(t.CATEGORY_INPUT_SYNAPSE_TEMPLATE, cookSurnameCN, cookSurnameBN, 10.0);
+        createSynapse(t.B_CATEGORY_INPUT_SYNAPSE_TEMPLATE, cookSurnameCN, cookSurnameBN, 10.0);
         createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, cookIN, cookSurnameBN, 10.0);
         BindingCategoryNeuron surnameCN = createNeuron(t.BINDING_CATEGORY_TEMPLATE, "surname");
         createSynapse(t.BINDING_CATEGORY_SYNAPSE_TEMPLATE, cookSurnameBN, surnameCN, 10.0);
@@ -172,8 +171,8 @@ public class JacksonCookTest {
         updateBias(cookSurnameBN, 2.0);
         updateBias(cookProfessionBN, 3.0);
 
-        createSynapse(t.CATEGORY_INPUT_SYNAPSE_TEMPLATE, forenameCN, forenameBN, 10.0);
-        createSynapse(t.CATEGORY_INPUT_SYNAPSE_TEMPLATE, surnameCN, surnameBN, 10.0);
+        createSynapse(t.B_CATEGORY_INPUT_SYNAPSE_TEMPLATE, forenameCN, forenameBN, 10.0);
+        createSynapse(t.B_CATEGORY_INPUT_SYNAPSE_TEMPLATE, surnameCN, surnameBN, 10.0);
 
         createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, surnameBN, 5.0);
         createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, forenameBN, surnameBN, 10.0);

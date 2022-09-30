@@ -23,7 +23,6 @@ import network.aika.fields.FieldOutput;
 import network.aika.fields.QueueField;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
-import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.PrimitiveTransition;
 import network.aika.neuron.bindingsignal.State;
@@ -52,7 +51,7 @@ import static network.aika.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O extends Neuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends Activation> implements Element, Writable {
+public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends Activation> implements Element, Writable {
 
     private static final Logger log = LoggerFactory.getLogger(Synapse.class);
 
@@ -235,7 +234,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
     public S instantiateTemplate(L l, I input, O output) {
         S s = instantiateTemplate(input, output);
 
-        s.weight.setValue(computeInitialWeight(l.getInput()));
+        if(l != null)
+            s.weight.setValue(computeInitialWeight(l.getInput()));
 
         return s;
     }
@@ -253,12 +253,16 @@ public abstract class Synapse<S extends Synapse, I extends Neuron & Axon, O exte
         S s;
         try {
             s = (S) getClass().getConstructor().newInstance();
-            s.template = this;
-            s.weight.setValue(weight.getCurrentValue());
+            initNewInstance(s);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return s;
+    }
+
+    protected void initNewInstance(S s) {
+        s.template = this;
+        s.weight.setValue(weight.getCurrentValue());
     }
 
     public abstract L createLink(IA input, OA output);

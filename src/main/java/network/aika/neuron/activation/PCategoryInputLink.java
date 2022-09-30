@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.conjunctive.BCategoryInputSynapse;
 import network.aika.neuron.conjunctive.PCategoryInputSynapse;
 
 

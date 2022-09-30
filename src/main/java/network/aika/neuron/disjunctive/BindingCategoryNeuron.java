@@ -19,13 +19,12 @@ package network.aika.neuron.disjunctive;
 import network.aika.Thought;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.activation.BindingCategoryActivation;
-import network.aika.neuron.axons.BindingAxon;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class BindingCategoryNeuron extends DisjunctiveNeuron<BindingCategorySynapse, BindingCategoryActivation> implements BindingAxon {
+public class BindingCategoryNeuron extends DisjunctiveNeuron<BindingCategorySynapse, BindingCategoryActivation> {
 
     @Override
     public BindingCategoryActivation createActivation(Thought t) {

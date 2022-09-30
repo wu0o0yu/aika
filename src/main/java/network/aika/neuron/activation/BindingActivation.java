@@ -94,13 +94,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 );
     }
 
-    @Override
-    public void addBindingSignal(BindingSignal bs) {
-        super.addBindingSignal(bs);
-
-        if(bs.getState() == INPUT)
-            connectNorm(bs);
-    }
 
     public SlotField getSlot(State s) {
         return switch(s) {

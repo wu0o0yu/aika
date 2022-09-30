@@ -20,15 +20,12 @@ import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.axons.Axon;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.Transition;
 
 
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.fields.Fields.mul;
 
 /**
  *
@@ -36,7 +33,7 @@ import static network.aika.fields.Fields.mul;
  */
 public abstract class DisjunctiveSynapse<
         S extends DisjunctiveSynapse,
-        I extends Neuron & Axon,
+        I extends Neuron,
         O extends DisjunctiveNeuron<?, OA>,
         L extends Link<S, IA, OA>,
         IA extends Activation<?>,

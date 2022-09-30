@@ -18,6 +18,7 @@ package network.aika;
 
 import network.aika.neuron.*;
 import network.aika.neuron.activation.text.TokenActivation;
+import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.*;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.neuron.conjunctive.text.TokenPositionRelationNeuron;
@@ -43,7 +44,7 @@ public class SimpleTemplateGraph {
     public PrimaryInputSynapse PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE;
     public RelatedInputSynapse RELATED_INPUT_SYNAPSE_TEMPLATE;
     public RelatedInputSynapse RELATED_INPUT_SYNAPSE_FROM_LATENT_RELATION_TEMPLATE;
-    public BCategoryInputSynapse CATEGORY_INPUT_SYNAPSE_TEMPLATE;
+    public BCategoryInputSynapse B_CATEGORY_INPUT_SYNAPSE_TEMPLATE;
     public SamePatternSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
     public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE;
     public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE;
@@ -51,6 +52,7 @@ public class SimpleTemplateGraph {
     public ReversePatternSynapse REVERSE_PATTERN_SYNAPSE_FROM_CATEGORY_TEMPLATE;
     public NegativeFeedbackSynapse NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE;
     public PatternSynapse PATTERN_SYNAPSE_TEMPLATE;
+    public PCategoryInputSynapse P_CATEGORY_INPUT_SYNAPSE_TEMPLATE;
     public InhibitorySynapse INPUT_INHIBITORY_SYNAPSE_TEMPLATE;
     public InhibitorySynapse SAME_INHIBITORY_SYNAPSE_TEMPLATE;
     public CategorySynapse CATEGORY_SYNAPSE_TEMPLATE;
@@ -104,11 +106,19 @@ public class SimpleTemplateGraph {
                         0.0
                 );
 
-        CATEGORY_INPUT_SYNAPSE_TEMPLATE =
+        B_CATEGORY_INPUT_SYNAPSE_TEMPLATE =
                 Synapse.init(
                         new BCategoryInputSynapse(),
+                        BINDING_CATEGORY_TEMPLATE,
                         BINDING_TEMPLATE,
-                        BINDING_TEMPLATE,
+                        0.0
+                );
+
+        P_CATEGORY_INPUT_SYNAPSE_TEMPLATE =
+                Synapse.init(
+                        new PCategoryInputSynapse(),
+                        CATEGORY_TEMPLATE,
+                        PATTERN_TEMPLATE,
                         0.0
                 );
 
@@ -170,7 +180,7 @@ public class SimpleTemplateGraph {
 
         INPUT_INHIBITORY_SYNAPSE_TEMPLATE =
                 Synapse.init(
-                        new InputInhibitorySynapse(),
+                        new InhibitorySynapse(State.INPUT),
                         BINDING_TEMPLATE,
                         INHIBITORY_TEMPLATE,
                         1.0
@@ -178,7 +188,7 @@ public class SimpleTemplateGraph {
 
         SAME_INHIBITORY_SYNAPSE_TEMPLATE =
                 Synapse.init(
-                        new SameInhibitorySynapse(),
+                        new InhibitorySynapse(State.SAME),
                         BINDING_TEMPLATE,
                         INHIBITORY_TEMPLATE,
                         1.0

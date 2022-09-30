@@ -18,16 +18,14 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.axons.Axon;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class PatternNeuronSynapse<S extends PatternNeuronSynapse, I extends Neuron & Axon, L extends Link<S, IA, PatternActivation>, IA extends Activation<?>> extends
+public abstract class PatternNeuronSynapse<S extends PatternNeuronSynapse, I extends Neuron, L extends Link<S, IA, PatternActivation>, IA extends Activation<?>> extends
         ConjunctiveSynapse<
                 S,
                 I,
