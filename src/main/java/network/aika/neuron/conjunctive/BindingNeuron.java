@@ -21,11 +21,18 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.disjunctive.BindingCategorySynapse;
 
+import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.BINDING;
+
 
 /**
  * @author Lukas Molzberger
  */
-public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, BindingActivation> {
+public class BindingNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, BindingActivation> {
+
+
+    public BindingNeuron() {
+        super(BINDING);
+    }
 
     @Override
     public BindingActivation createActivation(Thought t) {
@@ -47,7 +54,7 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
         super.initFromTemplate(n);
 
         getInputSynapses()
-                .filter(s -> s instanceof BCategoryInputSynapse)
+                .filter(s -> s instanceof CategoryInputSynapse)
                 .forEach(s ->
                         Synapse.init(new BindingCategorySynapse(), n, s.getInput(), 1.0)
                 );

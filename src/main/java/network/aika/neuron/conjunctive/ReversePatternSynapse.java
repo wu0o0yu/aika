@@ -16,11 +16,9 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.ReversePatternLink;
-import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.PrimitiveTransition;
 import network.aika.neuron.bindingsignal.Transition;
 
@@ -38,12 +36,12 @@ import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
  *
  * @author Lukas Molzberger
  */
-public class ReversePatternSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends
+public class ReversePatternSynapse extends
         BindingNeuronSynapse<
                 ReversePatternSynapse,
-                I,
-                ReversePatternLink<IA>,
-                IA
+                PatternNeuron,
+                ReversePatternLink<PatternActivation>,
+                PatternActivation
                 >
 {
 
@@ -71,7 +69,7 @@ public class ReversePatternSynapse<I extends Neuron & PatternAxon, IA extends Ac
     );
 
     @Override
-    public ReversePatternLink createLink(IA input, BindingActivation output) {
+    public ReversePatternLink createLink(PatternActivation input, BindingActivation output) {
         return new ReversePatternLink(this, input, output);
     }
 

@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 
 import static network.aika.fields.Fields.*;
@@ -25,9 +26,9 @@ import static network.aika.fields.ThresholdOperator.Type.ABOVE;
  *
  * @author Lukas Molzberger
  */
-public class PositiveFeedbackLink<IA extends Activation<?>> extends BindingNeuronLink<PositiveFeedbackSynapse, IA> {
+public class PositiveFeedbackLink extends BindingNeuronLink<PositiveFeedbackSynapse, PatternActivation> {
 
-    public PositiveFeedbackLink(PositiveFeedbackSynapse s, IA input, BindingActivation output) {
+    public PositiveFeedbackLink(PositiveFeedbackSynapse s, PatternActivation input, BindingActivation output) {
         super(s, input, output);
     }
 

@@ -18,7 +18,6 @@ package network.aika.neuron.disjunctive;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
@@ -37,7 +36,7 @@ import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
  *
  * @author Lukas Molzberger
  */
-public class CategorySynapse<N extends Neuron & PatternAxon> extends DisjunctiveSynapse<
+public class CategorySynapse<N extends Neuron> extends DisjunctiveSynapse<
         CategorySynapse,
         N,
         CategoryNeuron,

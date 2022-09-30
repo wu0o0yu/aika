@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.Model;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.ConjunctiveActivation;
@@ -23,6 +24,9 @@ import network.aika.neuron.bindingsignal.BindingSignal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -36,8 +40,16 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
 
     private static final Logger log = LoggerFactory.getLogger(ConjunctiveNeuron.class);
 
-    public ConjunctiveNeuron() {
+    protected ConjunctiveNeuronType type;
+
+    public ConjunctiveNeuron(ConjunctiveNeuronType type) {
+        this.type = type;
         bias.addEventListener(this::updateSumOfLowerWeights);
+    }
+
+
+    public ConjunctiveNeuronType getType() {
+        return type;
     }
 
     @Override
@@ -77,5 +89,19 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
                 inputSynapses,
                 Comparator.<ConjunctiveSynapse>comparingDouble(s -> s.getSortingWeight())
         );
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+
+        out.writeInt(type.ordinal());
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws Exception {
+        super.readFields(in, m);
+
+        type = ConjunctiveNeuronType.values()[in.readInt()];
     }
 }

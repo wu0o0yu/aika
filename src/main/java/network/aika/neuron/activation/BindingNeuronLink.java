@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.BindingNeuronSynapse;
 
 /**

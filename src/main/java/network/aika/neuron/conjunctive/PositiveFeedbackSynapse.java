@@ -18,11 +18,10 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.direction.Direction;
 import network.aika.fields.*;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.PositiveFeedbackLink;
-import network.aika.neuron.axons.PatternAxon;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
@@ -42,11 +41,11 @@ import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
  *
  * @author Lukas Molzberger
  */
-public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends Activation<?>> extends BindingNeuronSynapse<
+public class PositiveFeedbackSynapse extends BindingNeuronSynapse<
         PositiveFeedbackSynapse,
-        I,
-        PositiveFeedbackLink<IA>,
-        IA
+        PatternNeuron,
+        PositiveFeedbackLink,
+        PatternActivation
         >
 {
 
@@ -69,7 +68,7 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
             )
     );
 
-    public PositiveFeedbackLink createLink(IA input, BindingActivation output) {
+    public PositiveFeedbackLink createLink(PatternActivation input, BindingActivation output) {
         return new PositiveFeedbackLink(this, input, output);
     }
 
@@ -86,7 +85,7 @@ public class PositiveFeedbackSynapse<I extends Neuron & PatternAxon, IA extends 
     }
 
     @Override
-    public boolean propagateCheck(IA iAct) {
+    public boolean propagateCheck(PatternActivation iAct) {
         return false;
     }
 

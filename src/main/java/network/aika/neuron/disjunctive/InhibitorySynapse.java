@@ -65,7 +65,6 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
             )
     );
 
-
     private static List<Transition> TRANSITIONS_INPUT = List.of(
             transition(
                     fixed(INPUT),
@@ -86,7 +85,6 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
     public InhibitoryLink createLink(BindingActivation input, InhibitoryActivation output) {
         return new InhibitoryLink(this, input, output);
     }
-
 
     @Override
     public Stream<Transition> getTransitions() {

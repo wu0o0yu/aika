@@ -25,6 +25,9 @@ import network.aika.neuron.conjunctive.text.TokenPositionRelationNeuron;
 import network.aika.neuron.disjunctive.*;
 import network.aika.text.Document;
 
+import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.BINDING;
+import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
+
 /**
  *
  * @author Lukas Molzberger
@@ -44,7 +47,7 @@ public class SimpleTemplateGraph {
     public PrimaryInputSynapse PRIMARY_INPUT_SYNAPSE_FROM_CATEGORY_TEMPLATE;
     public RelatedInputSynapse RELATED_INPUT_SYNAPSE_TEMPLATE;
     public RelatedInputSynapse RELATED_INPUT_SYNAPSE_FROM_LATENT_RELATION_TEMPLATE;
-    public BCategoryInputSynapse B_CATEGORY_INPUT_SYNAPSE_TEMPLATE;
+    public CategoryInputSynapse B_CATEGORY_INPUT_SYNAPSE_TEMPLATE;
     public SamePatternSynapse SAME_PATTERN_SYNAPSE_TEMPLATE;
     public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE;
     public PositiveFeedbackSynapse POSITIVE_FEEDBACK_SYNAPSE_FROM_CATEGORY_TEMPLATE;
@@ -52,7 +55,7 @@ public class SimpleTemplateGraph {
     public ReversePatternSynapse REVERSE_PATTERN_SYNAPSE_FROM_CATEGORY_TEMPLATE;
     public NegativeFeedbackSynapse NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE;
     public PatternSynapse PATTERN_SYNAPSE_TEMPLATE;
-    public PCategoryInputSynapse P_CATEGORY_INPUT_SYNAPSE_TEMPLATE;
+    public CategoryInputSynapse P_CATEGORY_INPUT_SYNAPSE_TEMPLATE;
     public InhibitorySynapse INPUT_INHIBITORY_SYNAPSE_TEMPLATE;
     public InhibitorySynapse SAME_INHIBITORY_SYNAPSE_TEMPLATE;
     public CategorySynapse CATEGORY_SYNAPSE_TEMPLATE;
@@ -108,7 +111,7 @@ public class SimpleTemplateGraph {
 
         B_CATEGORY_INPUT_SYNAPSE_TEMPLATE =
                 Synapse.init(
-                        new BCategoryInputSynapse(),
+                        new CategoryInputSynapse(BINDING),
                         BINDING_CATEGORY_TEMPLATE,
                         BINDING_TEMPLATE,
                         0.0
@@ -116,7 +119,7 @@ public class SimpleTemplateGraph {
 
         P_CATEGORY_INPUT_SYNAPSE_TEMPLATE =
                 Synapse.init(
-                        new PCategoryInputSynapse(),
+                        new CategoryInputSynapse(PATTERN),
                         CATEGORY_TEMPLATE,
                         PATTERN_TEMPLATE,
                         0.0

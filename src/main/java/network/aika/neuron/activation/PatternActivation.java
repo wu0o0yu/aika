@@ -67,10 +67,6 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
             range = Range.join(range, bs.getOriginActivation().getRange());
     }
 
-    @Override
-    public void connectNorm(BindingSignal bs) {
-    }
-
     public void registerReverseBindingSignal(BindingSignal bindingSignal) {
         reverseBindingSignals.put(BSKey.createReverseKey(bindingSignal), bindingSignal);
     }

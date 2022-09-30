@@ -27,16 +27,19 @@ import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
 import static network.aika.neuron.bindingsignal.TransitionMode.*;
 import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
+import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PatternSynapse extends PatternNeuronSynapse<
+public class PatternSynapse extends ConjunctiveSynapse<
         PatternSynapse,
         BindingNeuron,
+        PatternNeuron,
         PatternLink,
-        BindingActivation
+        BindingActivation,
+        PatternActivation
         >
 {
 
@@ -54,6 +57,10 @@ public class PatternSynapse extends PatternNeuronSynapse<
                     PatternSynapse.class
             )
     );
+
+    public PatternSynapse() {
+        super(PATTERN);
+    }
 
     @Override
     public boolean isPropagate() {

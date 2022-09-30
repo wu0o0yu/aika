@@ -3,9 +3,8 @@ package network.aika;
 import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.text.TokenActivation;
-import network.aika.neuron.conjunctive.BCategoryInputSynapse;
 import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.neuron.conjunctive.PCategoryInputSynapse;
+import network.aika.neuron.conjunctive.CategoryInputSynapse;
 import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.neuron.disjunctive.BindingCategoryNeuron;
@@ -19,10 +18,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static network.aika.TestUtils.*;
-import static network.aika.TestUtils.processTokens;
+import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.BINDING;
+import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
 
 public class MetaNeuronTest {
-
 
 
     public Map<Integer, double[]> getActCoordinateMap() {
@@ -66,7 +65,7 @@ public class MetaNeuronTest {
         letterPN.setTemplate(true);
         letterPN.getBias().setValue(3.0);
 
-        Synapse.init(new PCategoryInputSynapse(), letterCategory, letterPN, 1.0);
+        Synapse.init(new CategoryInputSynapse(PATTERN), letterCategory, letterPN, 1.0);
 
         BindingCategoryNeuron letterBindingCategory = new BindingCategoryNeuron();
         letterBindingCategory.addProvider(m);
@@ -79,7 +78,7 @@ public class MetaNeuronTest {
         letterBN.getBias().setValue(3.0);
 
         Synapse.init(new PrimaryInputSynapse(), letterPN, letterBN, 10.0);
-        Synapse.init(new BCategoryInputSynapse(), letterBindingCategory, letterBN, 1.0);
+        Synapse.init(new CategoryInputSynapse(BINDING), letterBindingCategory, letterBN, 1.0);
 
         // Concrete
         TokenNeuron letterS = letterPN.instantiateTemplate(true);
