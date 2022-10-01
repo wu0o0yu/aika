@@ -25,8 +25,6 @@ import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.LatentLinking.latentLinking;
 import static network.aika.neuron.bindingsignal.State.RELATED_SAME;
-import static network.aika.neuron.conjunctive.PrimaryInputSynapse.SAME_RELATED_SAME_TRANSITION;
-import static network.aika.neuron.conjunctive.SamePatternSynapse.INPUT_TRANSITION;
 
 /**
  * @author Lukas Molzberger

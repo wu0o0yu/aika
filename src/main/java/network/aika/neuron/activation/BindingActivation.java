@@ -55,6 +55,12 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     @Override
+    public BindingSignal getAbstractBindingSignal() {
+        return getBindingSignal(ABSTRACT_INPUT);
+    }
+
+
+    @Override
     protected void initFields() {
         isOpen = new Field(this, "isOpen", 1.0);
         mix = new Field(this, "mix", 1.0);

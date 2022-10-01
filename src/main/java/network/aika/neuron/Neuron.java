@@ -142,7 +142,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public abstract A createActivation(Thought t);
 
-    public abstract Neuron<?, ?> instantiateTemplate(boolean addProvider);
+    public abstract Neuron<S, A> instantiateTemplate(boolean addProvider);
 
     public abstract void addInactiveLinks(BindingSignal bs);
 

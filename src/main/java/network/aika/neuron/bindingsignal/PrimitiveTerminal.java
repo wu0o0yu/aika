@@ -18,6 +18,8 @@ package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 
 import java.util.stream.Stream;
 
@@ -73,14 +75,14 @@ public abstract class PrimitiveTerminal implements Terminal {
     public abstract BindingSignal getBindingSignal(FieldOutput bsEvent);
 
     @Override
-    public Stream<BindingSignal> propagate(BindingSignal bs) {
+    public void propagate(BindingSignal bs, Link l, Activation act) {
         if(bs.getState() != state)
-            return Stream.empty();
+            return;
 
         if(!transition.isPropagate())
-            return Stream.empty();
+            return;
 
-        return Stream.of(bs.next(this));
+        bs.propagate(this, l, act);
     }
 
     @Override

@@ -52,6 +52,11 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         this.type = type;
     }
 
+    public void setOutput(O output) {
+        assert type == output.getType();
+        super.setOutput(output);
+    }
+
     protected double getSortingWeight() {
         return getWeight().getCurrentValue();
     }

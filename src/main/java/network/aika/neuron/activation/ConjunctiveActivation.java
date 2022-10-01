@@ -27,6 +27,7 @@ import java.util.List;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.neuron.bindingsignal.State.ABSTRACT_SAME;
 
 /**
  *
@@ -40,5 +41,34 @@ public abstract class ConjunctiveActivation<N extends Neuron> extends Activation
 
     public ConjunctiveActivation(int id, Thought t, N n) {
         super(id, t, n);
+    }
+
+    public abstract BindingSignal getAbstractBindingSignal();
+
+    public void instantiateTemplate() {
+        assert isTemplate();
+
+        BindingSignal abstractBS = getAbstractBindingSignal();
+        if(abstractBS == null)
+            return;
+
+        if(abstractBS.getActivation().getNeuron().getTemplate() == getNeuron())
+            return;
+
+        N n = (N) neuron.instantiateTemplate(true);
+        ConjunctiveActivation<N> act = (ConjunctiveActivation<N>) n.createActivation(thought);
+
+        act.init(null, this);
+
+        getInputLinks()
+                .forEach(l ->
+                        l.instantiateTemplate(act, INPUT)
+                );
+/*
+        getOutputLinks()
+                .forEach(l ->
+                        l.instantiateTemplate(act, OUTPUT)
+                );
+ */
     }
 }

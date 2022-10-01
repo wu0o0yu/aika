@@ -52,8 +52,16 @@ public class CategoryInputSynapse extends ConjunctiveSynapse<
     );
 
 
+    private static PrimitiveTransition INPUT_TRANSITION = transition(
+            fixed(INPUT),
+            fixed(ABSTRACT_INPUT),
+            MATCH_AND_PROPAGATE,
+            CategoryInputSynapse.class
+    );
+
     private static List<Transition> TRANSITIONS = List.of(
-            SAME_TRANSITION
+            SAME_TRANSITION,
+            INPUT_TRANSITION
     );
 
     public CategoryInputSynapse(ConjunctiveNeuronType type) {

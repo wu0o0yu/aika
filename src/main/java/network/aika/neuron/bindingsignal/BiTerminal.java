@@ -17,6 +17,8 @@
 package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 
 import java.util.InputMismatchException;
 import java.util.stream.Stream;
@@ -84,11 +86,9 @@ public abstract class BiTerminal<A extends PrimitiveTerminal> implements Termina
     }
 
     @Override
-    public Stream<BindingSignal> propagate(BindingSignal bs) {
-        return Stream.concat(
-                firstTerminal.propagate(bs),
-                secondTerminal.propagate(bs)
-        );
+    public void propagate(BindingSignal bs, Link l, Activation act) {
+        firstTerminal.propagate(bs, l, act);
+        secondTerminal.propagate(bs, l, act);
     }
 
     @Override

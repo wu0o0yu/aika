@@ -20,6 +20,7 @@ import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 
 import java.util.stream.Stream;
 
@@ -44,7 +45,7 @@ public interface Terminal {
 
     void notify(Synapse ts, BindingSignal bs);
 
-    Stream<BindingSignal> propagate(BindingSignal bs);
+    void propagate(BindingSignal bs, Link l, Activation act);
 
     static FieldOutput getPreconditionEvent(Synapse ts, Activation act, Direction dir, FieldOutput inputEvent) {
         FieldOutput actEvent = ts.getLinkingEvent(act, dir);

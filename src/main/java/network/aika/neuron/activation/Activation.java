@@ -414,22 +414,10 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     public void instantiateTemplate() {
         assert isTemplate();
 
-        BindingSignal abstractSameBS = getBindingSignal(ABSTRACT_SAME);
-        if(abstractSameBS == null)
-            return;
-
-        if(abstractSameBS.getActivation().getNeuron().getTemplate() == getNeuron())
-            return;
-
         Activation<N> act = neuron.instantiateTemplate(true)
                 .createActivation(thought);
 
         act.init(null, this);
-
-        getInputLinks()
-                .forEach(l ->
-                    l.instantiateTemplate(act)
-                );
     }
 
     public Thought getThought() {
@@ -462,15 +450,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return getPatternBindingSignals().values().stream();
     }
 
-    public void addBindingSignal(BindingSignal bs) {
-        bs.init(this);
-
-        if (bs.shorterBSExists())
-            return;
-
-        bs.link();
-    }
-
     public void propagateBindingSignal(BindingSignal fromBS) {
         getOutputLinks().forEach(l ->
                 fromBS.propagate(l)
@@ -499,6 +478,14 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     public BindingSignal getBindingSignal(State s) {
         return getBindingSignals(s)
                 .findFirst()
+                .orElse(null);
+    }
+
+    public BindingSignal getBindingSignal(Activation originAct, State s) {
+        return getBindingSignals(s)
+                .filter(bs ->
+                        bs.getOriginActivation() == originAct
+                ).findFirst()
                 .orElse(null);
     }
 

@@ -32,8 +32,7 @@ import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.BSKey.COMPARATOR;
-import static network.aika.neuron.bindingsignal.State.INPUT;
-import static network.aika.neuron.bindingsignal.State.SAME;
+import static network.aika.neuron.bindingsignal.State.*;
 
 /**
  *
@@ -54,9 +53,15 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     }
 
     @Override
+    public BindingSignal getAbstractBindingSignal() {
+        return getBindingSignal(ABSTRACT_SAME);
+    }
+
+    @Override
     public void init(Synapse originSynapse, Activation originAct) {
         super.init(originSynapse, originAct);
-        addBindingSignal(new BindingSignal(this, SAME));
+
+        new BindingSignal(this, SAME);
     }
 
     @Override

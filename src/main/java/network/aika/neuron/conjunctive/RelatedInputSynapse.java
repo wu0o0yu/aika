@@ -19,6 +19,7 @@ package network.aika.neuron.conjunctive;
 import network.aika.direction.Direction;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.LatentRelationActivation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.RelatedInputLink;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.PrimitiveTransition;
@@ -86,26 +87,17 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<
         BindingSignal relatedInputBS = fromBSs[0];
         BindingSignal relatedSameBS = fromBSs[1];
 
-        BindingSignal inputBS = INPUT_TRANSITION.getOutput().propagate(relatedInputBS).findFirst().orElse(null);
-        BindingSignal sameBS = SAME_TRANSITION.getOutput().propagate(relatedSameBS).findFirst().orElse(null);
-
         LatentRelationActivation latentRelAct = getInput().createOrLookupLatentActivation(
-                inputBS.getOriginActivation(),
-                inputBS.getState(),
-                sameBS.getOriginActivation(),
-                sameBS.getState()
+                relatedInputBS.getOriginActivation(),
+                INPUT_TRANSITION.getInput().getState(),
+                relatedSameBS.getOriginActivation(),
+                SAME_TRANSITION.getInput().getState()
         );
 
-        addAndInitBindingSignal(latentRelAct, inputBS);
-        addAndInitBindingSignal(latentRelAct, sameBS);
+        Link l = createLink(latentRelAct, (BindingActivation) relatedSameBS.getActivation());
 
-        createLink(latentRelAct, (BindingActivation) relatedSameBS.getActivation());
-    }
-
-    private void addAndInitBindingSignal(LatentRelationActivation act, BindingSignal bs) {
-        act.addBindingSignal(
-                new BindingSignal(bs.getOrigin(), bs.getState())
-        );
+        INPUT_TRANSITION.getOutput().propagate(relatedInputBS, l, latentRelAct);
+        SAME_TRANSITION.getOutput().propagate(relatedSameBS, l, latentRelAct);
     }
 
     @Override

@@ -26,6 +26,7 @@ import network.aika.fields.SlotField;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 
+import java.util.*;
 import java.util.stream.Stream;
 
 import static network.aika.fields.Fields.mul;
@@ -38,12 +39,14 @@ import static network.aika.neuron.bindingsignal.State.INPUT;
  */
 public class BindingSignal implements Element {
 
-    private BindingSignal parent;
+    private Map<Link, BindingSignal> parents = new TreeMap<>(
+            Comparator.comparing(l -> l.getInput())
+    );
     private Activation activation;
     private Link link;
     private PrimitiveTransition transition;
     private BindingSignal origin;
-    private int depth;
+    private int depth = Integer.MAX_VALUE;
     private State state;
 
     private QueueField onArrived;
@@ -56,65 +59,53 @@ public class BindingSignal implements Element {
         this.depth = 0;
         this.state = state;
         this.activation = act;
+
+        link();
     }
 
-    private BindingSignal(BindingSignal parent) {
-        this.parent = parent;
+    public BindingSignal(BindingSignal parent, State s, PrimitiveTransition t, Activation act, Link l) {
+        this.parents.put(l, parent);
         this.origin = parent.getOrigin();
         this.depth = parent.depth + 1;
-    }
-
-    public BindingSignal(BindingSignal parent, State s) {
-        this(parent);
-
         this.state = s;
-    }
-
-    public BindingSignal(BindingSignal parent, PrimitiveTerminal fromTerminal) {
-        this(parent);
-
-        Direction toDirection = fromTerminal.getType().invert();
-        this.transition = fromTerminal.getTransition();
-        this.state = toDirection.getTerminal(transition).getState();
-    }
-
-    public void init(Activation act) {
+        this.transition = t;
         this.activation = act;
-        onArrived = new QueueField(this, "arrived", 0.0);
-        onArrived.addEventListener(() ->
-                activation.receiveBindingSignal(this)
-        );
+        this.link = l;
 
-        initFields();
+        link();
     }
 
     public void propagate(Link l) {
-        propagate(l.getSynapse())
-                .forEach(toBS -> {
-                            toBS.setLink(l);
-                            l.getOutput().addBindingSignal(toBS);
-                        }
-                );
-    }
-
-    public Stream<BindingSignal> propagate(Synapse s) {
-//        if(depth >= 3)
-//            return Stream.empty();
-
-        Stream<Transition> transitions = s.getTransitions();
-        return transitions
+        Stream<Transition> transitions = l.getSynapse().getTransitions();
+        transitions
                 .flatMap(transition ->
                         transition.getInputTerminals()
                 )
-                .flatMap(terminal ->
-                        terminal.propagate(this)
+                .forEach(terminal ->
+                        terminal.propagate(this, l, l.getOutput())
                 );
     }
 
-    public BindingSignal next(PrimitiveTerminal t) {
-        return t != null ?
-                new BindingSignal(this, t) :
-                null;
+    public void propagate(PrimitiveTerminal fromTerminal, Link l, Activation act) {
+        if(fromTerminal == null)
+            return;
+
+        Direction toDirection = fromTerminal.getType().invert();
+        State toState = toDirection.getTerminal(fromTerminal.getTransition()).getState();
+
+        BindingSignal bs = act.getBindingSignal(getOriginActivation(), toState);
+        if(bs != null) {
+            bs.parents.put(l, this);
+            return;
+        }
+
+        new BindingSignal(
+                this,
+                toState,
+                fromTerminal.getTransition(),
+                act,
+                l
+        );
     }
 
     public void setLink(Link l) {
@@ -122,12 +113,17 @@ public class BindingSignal implements Element {
     }
 
     private void initFields() {
-        if (!activation.getNeuron().isNetworkInput()) {
-            if(state == INPUT && activation.getLabel() == null) {
-                onArrived.addEventListener(() ->
-                        activation.initNeuronLabel(this)
-                );
-            }
+        onArrived = new QueueField(this, "arrived", 0.0);
+        onArrived.addEventListener(() ->
+                getActivation().receiveBindingSignal(this)
+        );
+
+        if (!activation.getNeuron().isNetworkInput() &&
+                state == INPUT &&
+                activation.getLabel() == null) {
+            onArrived.addEventListener(() ->
+                    activation.initNeuronLabel(this)
+            );
         }
 
         onArrivedFired = mul(
@@ -199,6 +195,8 @@ public class BindingSignal implements Element {
     }
 
     public void link() {
+        initFields();
+
         getActivation().registerBindingSignal(this);
         SlotField bsSlot = getActivation().getSlot(getState());
         if(bsSlot != null)
@@ -207,23 +205,17 @@ public class BindingSignal implements Element {
         getOriginActivation().registerReverseBindingSignal(this);
     }
 
-    public boolean shorterBSExists() {
-        BindingSignal existingBS = getActivation().getBindingSignal(createKey(this));
-        if(existingBS == null)
-            return false;
-
-        return existingBS.getState() == state &&
-                existingBS.depth <= depth;
-    }
-
     public boolean isSelfRef(BindingSignal outputBS) {
         if(this == outputBS)
             return true;
 
-        if(parent == null)
+        if(parents == null)
             return false;
 
-        return parent.isSelfRef(outputBS);
+        return parents.values().stream()
+                .anyMatch(p ->
+                        p.isSelfRef(outputBS)
+                );
     }
 
     @Override
