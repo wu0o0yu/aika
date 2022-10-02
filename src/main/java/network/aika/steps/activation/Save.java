@@ -28,9 +28,6 @@ import network.aika.steps.Step;
 public class Save extends Step<Neuron> {
 
     public static void add(Neuron n) {
-        if(n.isTemplate())
-            return;
-
         Step.add(new Save(n));
     }
 

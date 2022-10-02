@@ -93,13 +93,9 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected Map<Synapse, LinkSlot> lbLinkSlots = new TreeMap<>(SYN_COMP);
 
 
-    protected Activation(int id, N n) {
+    public Activation(int id, Thought t, N n) {
         this.id = id;
         this.neuron = n;
-    }
-
-    public Activation(int id, Thought t, N n) {
-        this(id, n);
         this.thought = t;
         setCreated(t.getCurrentTimestamp());
 
@@ -187,9 +183,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     protected void initGradientFields() {
-        if(isTemplate())
-            instantiateTemplate();
-
         ownInputGradient = new QueueField(this, "Own-Input-Gradient");
         backpropInputGradient = new QueueField(this, "Backprop-Input-Gradient", 0.0);
         ownOutputGradient = new QueueField(this, "Own-Output-Gradient");
@@ -412,8 +405,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public void instantiateTemplate() {
-        assert isTemplate();
-
         Activation<N> act = neuron.instantiateTemplate(true)
                 .createActivation(thought);
 
@@ -426,10 +417,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public boolean isNetworkInput() {
         return getNeuron().isNetworkInput();
-    }
-
-    public boolean isTemplate() {
-        return getNeuron().isTemplate();
     }
 
     public abstract Range getRange();
@@ -621,7 +608,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public String toString() {
-        return (isTemplate() ? "Template-" : "") + getClass().getSimpleName() + " " + toKeyString();
+        return getClass().getSimpleName() + " " + toKeyString();
     }
 
     public String toKeyString() {

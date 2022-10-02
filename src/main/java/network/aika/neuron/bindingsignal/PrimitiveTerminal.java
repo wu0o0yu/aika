@@ -82,7 +82,15 @@ public abstract class PrimitiveTerminal implements Terminal {
         if(!transition.isPropagate())
             return;
 
-        bs.propagate(this, l, act);
+        Direction toDirection = getType().invert();
+        State toState = toDirection.getTerminal(transition).getState();
+
+        BindingSignal nextBS = act.getBindingSignal(bs.getOriginActivation(), toState);
+
+        if(nextBS == null)
+            nextBS = new BindingSignal(bs, toState, act);
+
+        nextBS.addParent(l, bs);
     }
 
     @Override

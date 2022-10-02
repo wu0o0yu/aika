@@ -30,10 +30,6 @@ import network.aika.neuron.conjunctive.LatentRelationNeuron;
  */
 public class LatentRelationActivation extends BindingActivation {
 
-    protected LatentRelationActivation(int id, LatentRelationNeuron n) {
-        super(id, n);
-    }
-
     public LatentRelationActivation(int id, Thought t, LatentRelationNeuron n) {
         super(id, t, n);
     }
@@ -43,5 +39,4 @@ public class LatentRelationActivation extends BindingActivation {
         netUB = new ValueSortedQueueField(this, "net UB", 10.0);
         netLB = new ValueSortedQueueField(this, "net LB", 10.0);
     }
-
 }

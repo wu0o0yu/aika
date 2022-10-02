@@ -62,7 +62,6 @@ public class MetaNeuronTest {
         letterPN.addProvider(m);
 
         letterPN.setLabel("Abstract Letter");
-        letterPN.setTemplate(true);
         letterPN.getBias().setValue(3.0);
 
         Synapse.init(new CategoryInputSynapse(PATTERN), letterCategory, letterPN, 1.0);
@@ -74,7 +73,6 @@ public class MetaNeuronTest {
         BindingNeuron letterBN = new BindingNeuron();
         letterBN.addProvider(m);
         letterBN.setLabel("Abstract BN-letter");
-        letterBN.setTemplate(true);
         letterBN.getBias().setValue(3.0);
 
         Synapse.init(new PrimaryInputSynapse(), letterPN, letterBN, 10.0);

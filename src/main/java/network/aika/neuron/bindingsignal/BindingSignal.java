@@ -18,19 +18,16 @@ package network.aika.neuron.bindingsignal;
 
 import network.aika.Config;
 import network.aika.Thought;
-import network.aika.direction.Direction;
 import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.QueueField;
 import network.aika.fields.SlotField;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 
 import java.util.*;
 import java.util.stream.Stream;
 
 import static network.aika.fields.Fields.mul;
-import static network.aika.neuron.bindingsignal.BSKey.createKey;
 import static network.aika.neuron.bindingsignal.State.INPUT;
 
 
@@ -43,10 +40,8 @@ public class BindingSignal implements Element {
             Comparator.comparing(l -> l.getInput())
     );
     private Activation activation;
-    private Link link;
-    private PrimitiveTransition transition;
     private BindingSignal origin;
-    private int depth = Integer.MAX_VALUE;
+    private int depth;
     private State state;
 
     private QueueField onArrived;
@@ -63,16 +58,25 @@ public class BindingSignal implements Element {
         link();
     }
 
-    public BindingSignal(BindingSignal parent, State s, PrimitiveTransition t, Activation act, Link l) {
-        this.parents.put(l, parent);
+    public BindingSignal(BindingSignal parent, State s, Activation act) {
         this.origin = parent.getOrigin();
         this.depth = parent.depth + 1;
         this.state = s;
-        this.transition = t;
         this.activation = act;
-        this.link = l;
 
         link();
+    }
+
+    public void addParent(Link l, BindingSignal parent) {
+        parents.put(l, parent);
+    }
+
+    public BindingSignal getParent(Link l) {
+        return parents.get(l);
+    }
+
+    public Map<Link, BindingSignal> getParents() {
+        return parents;
     }
 
     public void propagate(Link l) {
@@ -84,32 +88,6 @@ public class BindingSignal implements Element {
                 .forEach(terminal ->
                         terminal.propagate(this, l, l.getOutput())
                 );
-    }
-
-    public void propagate(PrimitiveTerminal fromTerminal, Link l, Activation act) {
-        if(fromTerminal == null)
-            return;
-
-        Direction toDirection = fromTerminal.getType().invert();
-        State toState = toDirection.getTerminal(fromTerminal.getTransition()).getState();
-
-        BindingSignal bs = act.getBindingSignal(getOriginActivation(), toState);
-        if(bs != null) {
-            bs.parents.put(l, this);
-            return;
-        }
-
-        new BindingSignal(
-                this,
-                toState,
-                fromTerminal.getTransition(),
-                act,
-                l
-        );
-    }
-
-    public void setLink(Link l) {
-        this.link = l;
     }
 
     private void initFields() {
@@ -158,32 +136,8 @@ public class BindingSignal implements Element {
         return activation;
     }
 
-    public Link getLink() {
-        return link;
-    }
-
-    public PrimitiveTransition getTransition() {
-        return transition;
-    }
-
     public int getDepth() {
         return depth;
-    }
-
-    public boolean isNetworkInput() {
-        return activation != null && activation.isNetworkInput();
-    }
-
-    public Field getNorm() {
-        return norm;
-    }
-
-    public void setNorm(Field norm) {
-        this.norm = norm;
-    }
-
-    public static boolean originEquals(BindingSignal bsA, BindingSignal bsB) {
-        return bsA != null && bsB != null && bsA.getOrigin() == bsB.getOrigin();
     }
 
     public State getState() {

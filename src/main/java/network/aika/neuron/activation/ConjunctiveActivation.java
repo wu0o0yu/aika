@@ -22,6 +22,8 @@ import network.aika.fields.Fields;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.conjunctive.ConjunctiveNeuron;
+import network.aika.neuron.disjunctive.CategoryNeuron;
 
 import java.util.List;
 
@@ -33,21 +35,20 @@ import static network.aika.neuron.bindingsignal.State.ABSTRACT_SAME;
  *
  * @author Lukas Molzberger
  */
-public abstract class ConjunctiveActivation<N extends Neuron> extends Activation<N> {
-
-    protected ConjunctiveActivation(int id, N n) {
-        super(id, n);
-    }
+public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> extends Activation<N> {
 
     public ConjunctiveActivation(int id, Thought t, N n) {
         super(id, t, n);
+
+        if (!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled() && n.hasCategoryInputSynapse())
+            isFinal.addEventListener(() ->
+                    instantiateTemplate()
+            );
     }
 
     public abstract BindingSignal getAbstractBindingSignal();
 
     public void instantiateTemplate() {
-        assert isTemplate();
-
         BindingSignal abstractBS = getAbstractBindingSignal();
         if(abstractBS == null)
             return;
@@ -56,7 +57,7 @@ public abstract class ConjunctiveActivation<N extends Neuron> extends Activation
             return;
 
         N n = (N) neuron.instantiateTemplate(true);
-        ConjunctiveActivation<N> act = (ConjunctiveActivation<N>) n.createActivation(thought);
+        ConjunctiveActivation<N> act = n.createActivation(thought);
 
         act.init(null, this);
 

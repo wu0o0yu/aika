@@ -44,10 +44,6 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     protected Range range;
 
-    protected PatternActivation(int id, PatternNeuron n) {
-        super(id, n);
-    }
-
     public PatternActivation(int id, Thought t, PatternNeuron patternNeuron) {
         super(id, t, patternNeuron);
     }

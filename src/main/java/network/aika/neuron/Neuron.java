@@ -81,8 +81,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     protected boolean allowTraining = true;
 
-    private boolean isTemplate;
-
     private Neuron<?, ?> template;
 
     private WeakHashMap<Long, WeakReference<SortedSet<A>>> activations = new WeakHashMap<>();
@@ -156,17 +154,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         this.allowTraining = allowTraining;
     }
 
-    public void setTemplate(boolean template) {
-        isTemplate = template;
-    }
-
-    public boolean isTemplate() {
-        return isTemplate;
-    }
-
     public Neuron getTemplate() {
-        if(isTemplate())
-            return this;
         return template;
     }
 
@@ -183,9 +171,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     public double getCandidateGradient(Activation act) {
         Range range = act.getAbsoluteRange();
         assert range != null;
-
-        if(isTemplate())
-            return 0.0;
 
         return getSurprisal(POS, range, true);
     }
@@ -424,7 +409,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         out.writeDouble(frequency);
         sampleSpace.write(out);
 
-        out.writeBoolean(isTemplate);
         out.writeBoolean(isNetworkInput);
 
         out.writeBoolean(customData != null);
@@ -460,7 +444,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         frequency = in.readDouble();
         sampleSpace = SampleSpace.read(in, m);
 
-        isTemplate = in.readBoolean();
         isNetworkInput = in.readBoolean();
 
         if(in.readBoolean()) {
@@ -490,7 +473,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
         n.setLabel(label);
         n.getBias().setValue(initialBias);
-        n.setTemplate(isTemplate);
 
         n.getProvider().save();
         return n;
@@ -501,6 +483,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public String toString() {
-        return (isTemplate() ? "Template-" : "") + getClass().getSimpleName() + " " + toKeyString();
+        return getClass().getSimpleName() + " " + toKeyString();
     }
 }

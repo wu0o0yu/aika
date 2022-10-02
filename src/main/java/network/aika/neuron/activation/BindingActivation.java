@@ -45,11 +45,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     private Field isOpen;
     private Field mix;
 
-
-    protected BindingActivation(int id, BindingNeuron n) {
-        super(id, n);
-    }
-
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
     }
