@@ -17,19 +17,11 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.direction.Direction;
-import network.aika.fields.Fields;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.conjunctive.CategoryInputSynapse;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
-import network.aika.neuron.disjunctive.CategoryNeuron;
-
-import java.util.List;
 
 import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.neuron.bindingsignal.State.ABSTRACT_SAME;
 
 /**
  *
@@ -40,7 +32,9 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
     public ConjunctiveActivation(int id, Thought t, N n) {
         super(id, t, n);
 
-        if (!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled() && n.hasCategoryInputSynapse())
+        if (!getNeuron().isNetworkInput() &&
+                getConfig().isTrainingEnabled() &&
+                n.getCategoryInputSynapse() != null)
             isFinal.addEventListener(() ->
                     instantiateTemplate()
             );
@@ -62,8 +56,9 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         act.init(null, this);
 
         getInputLinks()
+                .filter(l -> !(l.getSynapse() instanceof CategoryInputSynapse))
                 .forEach(l ->
-                        l.instantiateTemplate(act, INPUT)
+                        l.instantiateTemplate(abstractBS, act, INPUT)
                 );
 /*
         getOutputLinks()
@@ -71,5 +66,8 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
                         l.instantiateTemplate(act, OUTPUT)
                 );
  */
+
+        CategoryInputSynapse cis = neuron.getCategoryInputSynapse();
+        CategoryActivation cAct = cis.getInput().createActivation(thought);
     }
 }

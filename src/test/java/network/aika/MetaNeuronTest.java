@@ -7,7 +7,6 @@ import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.CategoryInputSynapse;
 import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
-import network.aika.neuron.disjunctive.BindingCategoryNeuron;
 import network.aika.neuron.disjunctive.CategoryNeuron;
 import network.aika.text.Document;
 import org.graphstream.ui.view.camera.Camera;
@@ -54,9 +53,9 @@ public class MetaNeuronTest {
         Model m = new Model();
 
         // Abstract
-        CategoryNeuron letterCategory = new CategoryNeuron();
+        CategoryNeuron letterCategory = new CategoryNeuron(PATTERN);
         letterCategory.addProvider(m);
-        letterCategory.setLabel("C-letter");
+        letterCategory.setLabel("PC-letter");
 
         TokenNeuron letterPN = new TokenNeuron();
         letterPN.addProvider(m);
@@ -66,7 +65,7 @@ public class MetaNeuronTest {
 
         Synapse.init(new CategoryInputSynapse(PATTERN), letterCategory, letterPN, 1.0);
 
-        BindingCategoryNeuron letterBindingCategory = new BindingCategoryNeuron();
+        CategoryNeuron letterBindingCategory = new CategoryNeuron(BINDING);
         letterBindingCategory.addProvider(m);
         letterBindingCategory.setLabel("BC-letter");
 

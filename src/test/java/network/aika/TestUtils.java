@@ -111,10 +111,10 @@ public class TestUtils {
     }
 
     public static CategoryNeuron initCategory(SimpleTemplateGraph t, String label, PatternNeuron... inputPatterns) {
-        CategoryNeuron categoryN = createNeuron(t.CATEGORY_TEMPLATE, "C-" + label);
+        CategoryNeuron categoryN = createNeuron(t.PATTERN_CATEGORY_TEMPLATE, "C-" + label);
 
         for (PatternNeuron pn : inputPatterns) {
-            createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, pn, categoryN, 1.0);
+            createSynapse(t.PATTERN_CATEGORY_SYNAPSE_TEMPLATE, pn, categoryN, 1.0);
         }
 
         return categoryN;

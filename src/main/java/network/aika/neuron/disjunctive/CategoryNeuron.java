@@ -17,7 +17,11 @@
 package network.aika.neuron.disjunctive;
 
 import network.aika.Thought;
+import network.aika.neuron.activation.BindingCategoryActivation;
 import network.aika.neuron.activation.CategoryActivation;
+import network.aika.neuron.conjunctive.ConjunctiveNeuronType;
+
+import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
 
 /**
  *
@@ -25,14 +29,26 @@ import network.aika.neuron.activation.CategoryActivation;
  */
 public class CategoryNeuron extends DisjunctiveNeuron<CategorySynapse, CategoryActivation> {
 
+    protected ConjunctiveNeuronType type;
+
+    public CategoryNeuron(ConjunctiveNeuronType type) {
+        this.type = type;
+    }
+
+    public ConjunctiveNeuronType getType() {
+        return type;
+    }
+
     @Override
     public CategoryActivation createActivation(Thought t) {
-        return new CategoryActivation(t.createActivationId(), t, this);
+        return type == PATTERN ?
+                new CategoryActivation(t.createActivationId(), t, this) :
+                new BindingCategoryActivation(t.createActivationId(), t, this);
     }
 
     @Override
     public CategoryNeuron instantiateTemplate(boolean addProvider) {
-        CategoryNeuron n = new CategoryNeuron();
+        CategoryNeuron n = new CategoryNeuron(type);
         if(addProvider)
             n.addProvider(getModel());
 

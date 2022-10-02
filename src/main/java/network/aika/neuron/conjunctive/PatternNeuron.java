@@ -61,7 +61,7 @@ public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, Pattern
         getInputSynapses()
                 .filter(s -> s instanceof CategoryInputSynapse)
                 .forEach(s ->
-                        Synapse.init(new CategorySynapse(), n, s.getInput(), 1.0)
+                        Synapse.init(new CategorySynapse(type), n, s.getInput(), 1.0)
                 );
     }
 

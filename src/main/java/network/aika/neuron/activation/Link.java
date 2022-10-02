@@ -21,11 +21,11 @@ import network.aika.direction.Direction;
 import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.sign.Sign;
 import network.aika.steps.link.Cleanup;
 import network.aika.steps.link.LinkCounting;
 
-import static network.aika.direction.Direction.INPUT;
 import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.*;
@@ -233,18 +233,24 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return FIRED_COMPARATOR.compare(iAct.getFired(), oAct.getFired()) < 0;
     }
 
-    public Link instantiateTemplate(Activation act, Direction dir) {
+    public Link instantiateTemplate(BindingSignal abstractBS, Activation act, Direction dir) {
+        I iAct = abstractBS.getParents().values().stream()
+                .filter(bs -> bs.getActivation() == input)
+                .map(bs -> (I)bs.getOriginActivation())
+                .findAny()
+                .orElse(input);
+
         S instSyn = (S) synapse
                 .instantiateTemplate(
                         this,
-                        input.getNeuron(),
+                        iAct.getNeuron(),
                         output.getNeuron()
                 );
         instSyn.linkOutput();
 
         Link l = instSyn.createLink(
-                dir.getInput(act, input),
-                dir.getOutput(act, input)
+                dir.getInput(act, iAct),
+                dir.getOutput(act, iAct)
         );
 
         Cleanup.add(l);
@@ -262,7 +268,10 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     public void linkOutput() {
-        output.inputLinks.put(input != null ? input.getNeuronProvider() : synapse.getPInput(), this);
+        output.inputLinks.put(
+                input != null ? input.getNeuronProvider() : synapse.getPInput(),
+                this
+        );
     }
 
     public void unlinkInput() {

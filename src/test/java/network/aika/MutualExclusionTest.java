@@ -110,9 +110,9 @@ public class MutualExclusionTest {
         createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, nc, -100.0);
         TestUtils.updateBias(nc, 1.2);
 
-        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, na, inhib, 1.0);
-        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, nb, inhib, 1.0);
-        createSynapse(t.CATEGORY_SYNAPSE_TEMPLATE, nc, inhib, 1.0);
+        createSynapse(t.PATTERN_CATEGORY_SYNAPSE_TEMPLATE, na, inhib, 1.0);
+        createSynapse(t.PATTERN_CATEGORY_SYNAPSE_TEMPLATE, nb, inhib, 1.0);
+        createSynapse(t.PATTERN_CATEGORY_SYNAPSE_TEMPLATE, nc, inhib, 1.0);
 
 
         Document doc = new Document(m, "test");

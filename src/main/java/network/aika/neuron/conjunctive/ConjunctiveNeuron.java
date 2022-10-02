@@ -57,9 +57,12 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         super.setModified();
     }
 
-    public boolean hasCategoryInputSynapse() {
+    public CategoryInputSynapse getCategoryInputSynapse() {
         return inputSynapses.stream()
-                .anyMatch(s -> s instanceof CategoryInputSynapse);
+                .filter(s -> s instanceof CategoryInputSynapse)
+                .map(s -> (CategoryInputSynapse) s)
+                .findAny()
+                .orElse(null);
     }
 
     public void addInactiveLinks(BindingSignal bs) {

@@ -18,24 +18,21 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.fields.SlotField;
-import network.aika.neuron.Range;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.State;
-import network.aika.neuron.disjunctive.BindingCategoryNeuron;
+import network.aika.neuron.disjunctive.CategoryNeuron;
 
-import static network.aika.neuron.bindingsignal.State.INPUT;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class BindingCategoryActivation extends DisjunctiveActivation<BindingCategoryNeuron> {
+public class BindingCategoryActivation extends CategoryActivation {
 
     protected SlotField inputBSSlot = new SlotField(this, "inputBSSlot");
     protected SlotField relatedSameBSSlot = new SlotField(this, "relatedSameBSSlot");
 
 
-    public BindingCategoryActivation(int id, Thought t, BindingCategoryNeuron neuron) {
+    public BindingCategoryActivation(int id, Thought t, CategoryNeuron neuron) {
         super(id, t, neuron);
     }
 
@@ -45,23 +42,5 @@ public class BindingCategoryActivation extends DisjunctiveActivation<BindingCate
             case RELATED_SAME -> relatedSameBSSlot;
             default -> super.getSlot(s);
         };
-    }
-
-    @Override
-    public Range getRange() {
-        BindingSignal bs = getPrimaryBranchBindingSignal();
-        if(bs == null)
-            return null;
-
-        return bs.getOriginActivation()
-                .getRange();
-    }
-
-    private BindingSignal getPrimaryBranchBindingSignal() {
-        return getBindingSignals()
-                .filter(bs -> bs.getState() == INPUT)
-                .filter(bs -> bs.getDepth() == 1)
-                .findFirst()
-                .orElse(null);
     }
 }

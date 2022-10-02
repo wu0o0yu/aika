@@ -16,9 +16,10 @@
  */
 package network.aika.neuron.disjunctive;
 
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.Transition;
+import network.aika.neuron.conjunctive.ConjunctiveNeuron;
+import network.aika.neuron.conjunctive.ConjunctiveNeuronType;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -36,15 +37,17 @@ import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
  *
  * @author Lukas Molzberger
  */
-public class CategorySynapse<N extends Neuron> extends DisjunctiveSynapse<
+public class CategorySynapse<N extends ConjunctiveNeuron> extends DisjunctiveSynapse<
         CategorySynapse,
         N,
         CategoryNeuron,
         CategoryLink,
-        PatternActivation,
+        ConjunctiveActivation<?>,
         CategoryActivation
         >
 {
+
+    protected ConjunctiveNeuronType type;
 
     private static List<Transition> TRANSITIONS = List.of(
             transition(
@@ -61,8 +64,22 @@ public class CategorySynapse<N extends Neuron> extends DisjunctiveSynapse<
             )
     );
 
+    public CategorySynapse(ConjunctiveNeuronType type) {
+        this.type = type;
+    }
+
+    public void setInput(N input) {
+        assert type == input.getType();
+        super.setInput(input);
+    }
+
+    public void setOutput(CategoryNeuron output) {
+        assert type == output.getType();
+        super.setOutput(output);
+    }
+
     @Override
-    public CategoryLink createLink(PatternActivation input, CategoryActivation output) {
+    public CategoryLink createLink(ConjunctiveActivation input, CategoryActivation output) {
         return new CategoryLink(this, input, output);
     }
 
