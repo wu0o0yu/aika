@@ -33,9 +33,7 @@ public class GradientTest {
 
     @Test
     public void gradientAndInduction2() {
-        SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        t.init(m);
 
         m.setN(912);
 
@@ -61,7 +59,7 @@ public class GradientTest {
 
         AIKADebugger.createAndShowGUI(doc);
 
-        processDoc(t, doc);
+        processDoc(m, doc);
 
         doc.postProcessing();
 
@@ -71,9 +69,7 @@ public class GradientTest {
 
     @Test
     public void gradientAndInduction3() {
-        SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        t.init(m);
 
         m.setN(912);
 
@@ -85,7 +81,7 @@ public class GradientTest {
                         .setTrainingEnabled(true)
         );
 
-        processDoc(t, doc);
+        processDoc(m, doc);
 
         Neuron nA = m.getNeuron("A");
         setStatistic(nA, 53.0,299,899l);
@@ -108,12 +104,10 @@ public class GradientTest {
 
     @Test
     public void gradientAndInduction2With2Docs() {
-        SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        t.init(m);
 
         m.setN(912);
-        t.BINDING_TEMPLATE.getBias().receiveUpdate(-0.32);
+     //   t.BINDING_TEMPLATE.getBias().receiveUpdate(-0.32);
 
         Document doc1 = new Document(m, "A B ");
         doc1.setConfig(
@@ -122,7 +116,7 @@ public class GradientTest {
                         .setLearnRate(-0.1)
                         .setTrainingEnabled(true)
         );
-        processDoc(t, doc1);
+        processDoc(m, doc1);
 
         Neuron nA = m.getNeuron("A");
         setStatistic(nA, 53.0, 299, 899l);
@@ -142,7 +136,7 @@ public class GradientTest {
                         .setLearnRate(-0.1)
                         .setTrainingEnabled(true)
         );
-        processDoc(t, doc2);
+        processDoc(m, doc2);
 
         Neuron nC = m.getNeuron("C");
         setStatistic(nC, 30.0, 234, 867l);
@@ -155,7 +149,7 @@ public class GradientTest {
         System.out.println();
     }
 
-    private void processDoc(SimpleTemplateGraph t, Document doc) {
-        processTokens(t.TOKEN_TEMPLATE, doc, Arrays.asList(doc.getContent().split(" ")));
+    private void processDoc(Model m, Document doc) {
+        processTokens(m, doc, Arrays.asList(doc.getContent().split(" ")));
     }
 }

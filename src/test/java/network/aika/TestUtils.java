@@ -21,19 +21,21 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.neuron.conjunctive.ConjunctiveNeuron;
-import network.aika.neuron.conjunctive.PatternNeuron;
-import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
+import network.aika.neuron.conjunctive.*;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.neuron.disjunctive.CategoryNeuron;
+import network.aika.neuron.disjunctive.CategorySynapse;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
+import network.aika.neuron.disjunctive.InhibitorySynapse;
 import network.aika.text.Document;
 import network.aika.neuron.activation.text.TokenActivation;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static network.aika.neuron.bindingsignal.State.INPUT;
+import static network.aika.neuron.bindingsignal.State.SAME;
+import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
 import static network.aika.steps.Phase.PROCESSING;
 
 
@@ -43,7 +45,7 @@ import static network.aika.steps.Phase.PROCESSING;
  */
 public class TestUtils {
 
-    public static void processTokens(TokenNeuron tn, Document doc, Iterable<String> tokens) {
+    public static void processTokens(Model m, Document doc, Iterable<String> tokens) {
         int i = 0;
         int pos = 0;
 
@@ -52,7 +54,7 @@ public class TestUtils {
             int j = i + t.length();
 
             tokenActs.add(
-                    addToken(tn, doc, t, pos++, i,  j)
+                    addToken(m, doc, t, pos++, i,  j)
             );
 
             i = j + 1;
@@ -82,8 +84,8 @@ public class TestUtils {
         doc.updateModel();
     }
 
-    public static TokenActivation addToken(TokenNeuron tn, Document doc, String t, Integer pos, int i, int j) {
-        return doc.addToken(tn.lookupToken(t), pos, i, j);
+    public static TokenActivation addToken(Model m, Document doc, String t, Integer pos, int i, int j) {
+        return doc.addToken(TokenNeuron.lookupToken(m, t), pos, i, j);
     }
 
     public static Config getConfig() {
@@ -110,43 +112,41 @@ public class TestUtils {
         return l.substring(l.indexOf("-") + 1);
     }
 
-    public static CategoryNeuron initCategory(SimpleTemplateGraph t, String label, PatternNeuron... inputPatterns) {
-        CategoryNeuron categoryN = createNeuron(t.PATTERN_CATEGORY_TEMPLATE, "C-" + label);
+    public static CategoryNeuron initCategory(Model m, String label, PatternNeuron... inputPatterns) {
+        CategoryNeuron categoryN = createNeuron(new CategoryNeuron(PATTERN), "C-" + label);
 
         for (PatternNeuron pn : inputPatterns) {
-            createSynapse(t.PATTERN_CATEGORY_SYNAPSE_TEMPLATE, pn, categoryN, 1.0);
+            createSynapse(new CategorySynapse(PATTERN), pn, categoryN, 1.0);
         }
 
         return categoryN;
     }
 
-    public static InhibitoryNeuron initInhibitoryLoop(SimpleTemplateGraph t, String label, boolean sameInhibSynapse, BindingNeuron... bns) {
-        InhibitoryNeuron inhibN = createNeuron(t.INHIBITORY_TEMPLATE, "I-" + label);
+    public static InhibitoryNeuron initInhibitoryLoop(Model m, String label, boolean sameInhibSynapse, BindingNeuron... bns) {
+        InhibitoryNeuron inhibN = createNeuron(new InhibitoryNeuron(), "I-" + label);
 
-        return addInhibitoryLoop(t, inhibN, sameInhibSynapse, bns);
+        return addInhibitoryLoop(m, inhibN, sameInhibSynapse, bns);
     }
 
-    public static InhibitoryNeuron addInhibitoryLoop(SimpleTemplateGraph t, InhibitoryNeuron inhibN, boolean sameInhibSynapse, BindingNeuron... bns) {
+    public static InhibitoryNeuron addInhibitoryLoop(Model m, InhibitoryNeuron inhibN, boolean sameInhibSynapse, BindingNeuron... bns) {
         for(BindingNeuron bn: bns) {
             createSynapse(
-                    sameInhibSynapse ?
-                            t.SAME_INHIBITORY_SYNAPSE_TEMPLATE :
-                            t.INPUT_INHIBITORY_SYNAPSE_TEMPLATE,
+                    new InhibitorySynapse(sameInhibSynapse ? SAME : INPUT),
                     bn,
                     inhibN,
                     1.0
             );
-            createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhibN, bn, -20.0);
+            createSynapse(new NegativeFeedbackSynapse(), inhibN, bn, -20.0);
         }
         return inhibN;
     }
 
-    public static PatternNeuron initPatternLoop(SimpleTemplateGraph t, String label, BindingNeuron... bns) {
-        PatternNeuron patternN = createNeuron(t.PATTERN_TEMPLATE, "P-" + label);
+    public static PatternNeuron initPatternLoop(Model m, String label, BindingNeuron... bns) {
+        PatternNeuron patternN = createNeuron(new PatternNeuron(), "P-" + label);
 
         for(BindingNeuron bn: bns) {
-            createSynapse(t.PATTERN_SYNAPSE_TEMPLATE, bn, patternN, 10.0);
-            createPositiveFeedbackSynapse(t.POSITIVE_FEEDBACK_SYNAPSE_FROM_PATTERN_TEMPLATE, patternN, bn, 0.0, 10.0);
+            createSynapse(new PatternSynapse(), bn, patternN, 10.0);
+            createPositiveFeedbackSynapse(new PositiveFeedbackSynapse(), patternN, bn, 0.0, 10.0);
         }
         return patternN;
     }
@@ -179,9 +179,7 @@ public class TestUtils {
         return s;
     }
 
-    public static <S extends Synapse> S createSynapse(Synapse templateSynapse, Neuron input, Neuron output, double weight) {
-        Synapse s = templateSynapse.instantiateTemplate(null, input, output);
-
+    public static <S extends Synapse> S createSynapse(Synapse s, Neuron input, Neuron output, double weight) {
         s.setWeight(weight);
 
         s.linkInput();

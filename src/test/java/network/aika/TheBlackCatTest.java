@@ -17,6 +17,7 @@
 package network.aika;
 
 import network.aika.debugger.AIKADebugger;
+import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import network.aika.text.Document;
 import org.graphstream.ui.view.camera.Camera;
@@ -96,14 +97,12 @@ public class TheBlackCatTest {
     }
 
     public void setupTheBlackCatTest(AIKADebugger debugger) {
-        SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        t.init(m);
 
-        InhibitoryNeuron inhibNThe = createNeuron(t.INHIBITORY_TEMPLATE, "I-the");
-        InhibitoryNeuron inhibNCat = createNeuron(t.INHIBITORY_TEMPLATE, "I-cat");
-        initPatternTheCat(t, inhibNThe, inhibNCat, 0);
-        initPatternBlackCat(t);
+        InhibitoryNeuron inhibNThe = createNeuron(new InhibitoryNeuron(), "I-the");
+        InhibitoryNeuron inhibNCat = createNeuron(new InhibitoryNeuron(), "I-cat");
+        initPatternTheCat(m, inhibNThe, inhibNCat, 0);
+        initPatternBlackCat(m);
 
         Document doc = new Document(m, "the black cat");
         debugger.setDocument(doc);
@@ -130,7 +129,7 @@ public class TheBlackCatTest {
         camera.setViewPercent(1.3);
         camera.setViewCenter(1.921, 1.449, 0);
 
-        processTokens(t.TOKEN_TEMPLATE, doc, List.of("the", "black", "cat"));
+        processTokens(m, doc, List.of("the", "black", "cat"));
 
         doc.postProcessing();
         doc.updateModel();

@@ -199,13 +199,11 @@ public class TheCatTest {
     }
 
     public void setupTheCatTest(AIKADebugger debugger, int variant) {
-        SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        t.init(m);
 
-        InhibitoryNeuron inhibNThe = createNeuron(t.INHIBITORY_TEMPLATE, "I-the");
-        InhibitoryNeuron inhibNCat = createNeuron(t.INHIBITORY_TEMPLATE, "I-cat");
-        initPatternTheCat(t, inhibNThe, inhibNCat, variant);
+        InhibitoryNeuron inhibNThe = createNeuron(new InhibitoryNeuron(), "I-the");
+        InhibitoryNeuron inhibNCat = createNeuron(new InhibitoryNeuron(), "I-cat");
+        initPatternTheCat(m, inhibNThe, inhibNCat, variant);
 
         Document doc = new Document(m, "the cat");
         debugger.setDocument(doc);
@@ -232,7 +230,7 @@ public class TheCatTest {
         camera.setViewPercent(1.5);
         camera.setViewCenter(1.528, 0.828, 0);
 
-        processTokens(t.TOKEN_TEMPLATE, doc, List.of("the", "cat"));
+        processTokens(m, doc, List.of("the", "cat"));
 
         doc.postProcessing();
         doc.updateModel();

@@ -34,16 +34,14 @@ public class TestFsModel {
 
     @Test
     public void testOpenModel() throws IOException {
-        SimpleTemplateGraph tg = new SimpleTemplateGraph();
         Model m = new Model(
                 new FSSuspensionCallback(new File("/Users/lukas.molzberger/models").toPath(), "AIKA-2.0-10", true)
         );
-        tg.init(m);
 
         m.open(false);
 
         {
-            Document doc = generateDocument(tg, m, "arbeit fair arbeitsvermittlung ", true);
+            Document doc = generateDocument(m, "arbeit fair arbeitsvermittlung ", true);
 
             AIKADebugger debugger = AIKADebugger.createAndShowGUI(doc);
 
@@ -53,7 +51,7 @@ public class TestFsModel {
 
 
         {
-            Document doc = generateDocument(tg, m, "arbeit fair arbeitsvermittlung ", false);
+            Document doc = generateDocument(m, "arbeit fair arbeitsvermittlung ", false);
 
             AIKADebugger debugger = AIKADebugger.createAndShowGUI(doc);
 
@@ -64,7 +62,7 @@ public class TestFsModel {
         m.close();
     }
 
-    private Document generateDocument(SimpleTemplateGraph tg, Model m, String txt, boolean train) {
+    private Document generateDocument(Model m, String txt, boolean train) {
         Document doc = new Document(m, txt);
 
         Config c = TestUtils.getConfig()
@@ -77,7 +75,7 @@ public class TestFsModel {
         int pos = 0;
         for(String t: doc.getContent().split(" ")) {
             int j = i + t.length();
-            addToken(tg.TOKEN_TEMPLATE, doc, t, pos++, i, j);
+            addToken(m, doc, t, pos++, i, j);
             i = j + 1;
         }
         return doc;

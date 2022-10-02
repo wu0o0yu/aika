@@ -37,9 +37,13 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
+import network.aika.neuron.disjunctive.CategorySynapse;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
+import network.aika.neuron.disjunctive.InhibitorySynapse;
 import network.aika.text.Document;
 import org.graphstream.ui.view.camera.Camera;
 import org.junit.jupiter.api.Test;
@@ -49,6 +53,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import static network.aika.TestUtils.*;
+import static network.aika.neuron.bindingsignal.State.INPUT;
+import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
 import static network.aika.steps.Phase.PROCESSING;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -88,31 +94,29 @@ public class MutualExclusionTest {
 
     @Test
     public void testPropagation() {
-        SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        t.init(m);
 
-        TokenNeuron in = createNeuron(t.PATTERN_TEMPLATE, "I", true);
-        BindingNeuron na = createNeuron(t.BINDING_TEMPLATE, "A");
-        BindingNeuron nb = createNeuron(t.BINDING_TEMPLATE, "B");
-        BindingNeuron nc = createNeuron(t.BINDING_TEMPLATE, "C");
-        InhibitoryNeuron inhib = createNeuron(t.INHIBITORY_TEMPLATE, "I");
+        TokenNeuron in = createNeuron(new PatternNeuron(), "I", true);
+        BindingNeuron na = createNeuron(new BindingNeuron(), "A");
+        BindingNeuron nb = createNeuron(new BindingNeuron(), "B");
+        BindingNeuron nc = createNeuron(new BindingNeuron(), "C");
+        InhibitoryNeuron inhib = createNeuron(new InhibitoryNeuron(), "I");
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, in, na, 10.0);
-        createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, na, -100.0);
+        createSynapse(new PrimaryInputSynapse(), in, na, 10.0);
+        createSynapse(new NegativeFeedbackSynapse(), inhib, na, -100.0);
         TestUtils.updateBias(na, 1.0);
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, in, nb, 10.0);
-        createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, nb, -100.0);
+        createSynapse(new PrimaryInputSynapse(), in, nb, 10.0);
+        createSynapse(new NegativeFeedbackSynapse(), inhib, nb, -100.0);
         TestUtils.updateBias(nb, 1.5);
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, in, nc, 10.0);
-        createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, nc, -100.0);
+        createSynapse(new PrimaryInputSynapse(), in, nc, 10.0);
+        createSynapse(new NegativeFeedbackSynapse(), inhib, nc, -100.0);
         TestUtils.updateBias(nc, 1.2);
 
-        createSynapse(t.PATTERN_CATEGORY_SYNAPSE_TEMPLATE, na, inhib, 1.0);
-        createSynapse(t.PATTERN_CATEGORY_SYNAPSE_TEMPLATE, nb, inhib, 1.0);
-        createSynapse(t.PATTERN_CATEGORY_SYNAPSE_TEMPLATE, nc, inhib, 1.0);
+        createSynapse(new InhibitorySynapse(INPUT), na, inhib, 1.0);
+        createSynapse(new InhibitorySynapse(INPUT), nb, inhib, 1.0);
+        createSynapse(new InhibitorySynapse(INPUT), nc, inhib, 1.0);
 
 
         Document doc = new Document(m, "test");
@@ -139,30 +143,28 @@ public class MutualExclusionTest {
 
     @Test
     public void testPropagationWithPrimaryLink() {
-        SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        t.init(m);
 
-        TokenNeuron in = createNeuron(t.TOKEN_TEMPLATE, "I", true);
-        BindingNeuron na = createNeuron(t.BINDING_TEMPLATE, "A");
-        BindingNeuron nb = createNeuron(t.BINDING_TEMPLATE, "B");
-        InhibitoryNeuron inhib = createNeuron(t.INHIBITORY_TEMPLATE, "I");
+        TokenNeuron in = createNeuron(new TokenNeuron(), "I", true);
+        BindingNeuron na = createNeuron(new BindingNeuron(), "A");
+        BindingNeuron nb = createNeuron(new BindingNeuron(), "B");
+        InhibitoryNeuron inhib = createNeuron(new InhibitoryNeuron(), "I");
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, in, na, 10.0);
-        createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, na, -20.0);
+        createSynapse(new PrimaryInputSynapse(), in, na, 10.0);
+        createSynapse(new NegativeFeedbackSynapse(), inhib, na, -20.0);
         updateBias(na, 1.0);
-        PatternNeuron pa = initPatternLoop(t, "A", na);
+        PatternNeuron pa = initPatternLoop(m, "A", na);
         updateBias(pa, 3.0);
 
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, in, nb, 10.0);
-        createSynapse(t.NEGATIVE_FEEDBACK_SYNAPSE_TEMPLATE, inhib, nb, -20.0);
+        createSynapse(new PrimaryInputSynapse(), in, nb, 10.0);
+        createSynapse(new NegativeFeedbackSynapse(), inhib, nb, -20.0);
         updateBias(nb, 1.5);
-        PatternNeuron pb = initPatternLoop(t, "B", nb);
+        PatternNeuron pb = initPatternLoop(m, "B", nb);
         updateBias(pb, 3.0);
 
-        createSynapse(t.INPUT_INHIBITORY_SYNAPSE_TEMPLATE, na, inhib, 1.0);
-        createSynapse(t.INPUT_INHIBITORY_SYNAPSE_TEMPLATE, nb, inhib, 1.0);
+        createSynapse(new InhibitorySynapse(INPUT), na, inhib, 1.0);
+        createSynapse(new InhibitorySynapse(INPUT), nb, inhib, 1.0);
 
 
 

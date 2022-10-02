@@ -45,9 +45,7 @@ public class SimplePhraseTest {
 
     @Test
     public void simplePhraseTest() {
-        SimpleTemplateGraph tg = new SimpleTemplateGraph();
         Model model = new Model();
-        tg.init(model);
 
         Config c = getConfig()
                         .setAlpha(0.99)
@@ -68,7 +66,7 @@ public class SimplePhraseTest {
             int pos = 0;
             for(String t: doc.getContent().split(" ")) {
                 int j = i + t.length();
-                addToken(tg.TOKEN_TEMPLATE, doc, t, pos++, i, j);
+                addToken(model, doc, t, pos++, i, j);
 
                 i = j + 1;
             }

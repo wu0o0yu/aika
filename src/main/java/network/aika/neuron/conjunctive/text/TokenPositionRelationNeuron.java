@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.conjunctive.text;
 
+import network.aika.Model;
 import network.aika.direction.Direction;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.text.TokenActivation;
@@ -54,10 +55,13 @@ public class TokenPositionRelationNeuron extends LatentRelationNeuron {
         this.rangeEnd = rangeEnd;
     }
 
-    public TokenPositionRelationNeuron lookupRelation(int rangeBegin, int rangeEnd) {
-        return getModel().lookupNeuron("TP-Rel.: " + rangeBegin + "," + rangeEnd, l ->
-                instantiateTemplate(true)
-                        .initTokenPositionRelationNeuron(rangeBegin, rangeEnd, l)
+    public static TokenPositionRelationNeuron lookupRelation(Model m, int rangeBegin, int rangeEnd) {
+        return m.lookupNeuron("TP-Rel.: " + rangeBegin + "," + rangeEnd, l -> {
+                    TokenPositionRelationNeuron n = new TokenPositionRelationNeuron();
+                    n.addProvider(m);
+                    n.initTokenPositionRelationNeuron(rangeBegin, rangeEnd, l);
+                    return n;
+                }
         );
     }
 

@@ -106,15 +106,13 @@ public class TheDogAndCatTest {
     }
 
     public void setupTheDogAndTheCatTest(AIKADebugger debugger) {
-        SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        t.init(m);
 
-        InhibitoryNeuron inhibNThe = createNeuron(t.INHIBITORY_TEMPLATE, "I-the");
-        InhibitoryNeuron inhibNCat = createNeuron(t.INHIBITORY_TEMPLATE, "I-cat");
-        InhibitoryNeuron inhibNDog = createNeuron(t.INHIBITORY_TEMPLATE, "I-dog");
-        initPatternTheCat(t, inhibNThe, inhibNCat, 3);
-        initPatternTheDog(t, inhibNThe, inhibNDog, 3);
+        InhibitoryNeuron inhibNThe = createNeuron(new InhibitoryNeuron(), "I-the");
+        InhibitoryNeuron inhibNCat = createNeuron(new InhibitoryNeuron(), "I-cat");
+        InhibitoryNeuron inhibNDog = createNeuron(new InhibitoryNeuron(), "I-dog");
+        initPatternTheCat(m, inhibNThe, inhibNCat, 3);
+        initPatternTheDog(m, inhibNThe, inhibNDog, 3);
 
         Document doc = new Document(m, "the dog and the cat");
         debugger.setDocument(doc);
@@ -140,7 +138,7 @@ public class TheDogAndCatTest {
         camera.setViewPercent(1.35);
         camera.setViewCenter(2.595, 0.808, 0);
 
-        processTokens(t.TOKEN_TEMPLATE, doc, List.of("the", "dog", "and", "the", "cat"));
+        processTokens(m, doc, List.of("the", "dog", "and", "the", "cat"));
 
 
         doc.postProcessing();

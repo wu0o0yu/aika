@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.conjunctive.text;
 
+import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.conjunctive.PatternNeuron;
@@ -26,9 +27,10 @@ import network.aika.neuron.conjunctive.PatternNeuron;
  */
 public class TokenNeuron extends PatternNeuron {
 
-    public TokenNeuron lookupToken(String tokenLabel) {
-        return getModel().lookupNeuron(tokenLabel, l -> {
-            TokenNeuron n = instantiateTemplate(true);
+    public static TokenNeuron lookupToken(Model m, String tokenLabel) {
+        return m.lookupNeuron(tokenLabel, l -> {
+            TokenNeuron n = new TokenNeuron();
+            n.addProvider(m);
 
             n.setTokenLabel(l);
             n.setNetworkInput(true);

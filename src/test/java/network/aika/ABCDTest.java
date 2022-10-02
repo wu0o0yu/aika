@@ -17,9 +17,10 @@
 package network.aika;
 
 import network.aika.debugger.AIKADebugger;
-import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.neuron.conjunctive.LatentRelationNeuron;
-import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.neuron.conjunctive.*;
+import network.aika.neuron.conjunctive.text.TokenNeuron;
+import network.aika.neuron.conjunctive.text.TokenPositionRelationNeuron;
+import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import network.aika.text.Document;
 import org.graphstream.ui.view.camera.Camera;
 import org.junit.jupiter.api.Test;
@@ -100,66 +101,64 @@ public class ABCDTest {
      */
     @Test
     public void testABCD() throws InterruptedException {
-        SimpleTemplateGraph t = new SimpleTemplateGraph();
         Model m = new Model();
-        t.init(m);
 
-        PatternNeuron a_IN = t.TOKEN_TEMPLATE.lookupToken("a");
+        PatternNeuron a_IN = TokenNeuron.lookupToken(m, "a");
 
-        PatternNeuron b_IN = t.TOKEN_TEMPLATE.lookupToken("b");
-        PatternNeuron c_IN = t.TOKEN_TEMPLATE.lookupToken("c");
-        PatternNeuron d_IN = t.TOKEN_TEMPLATE.lookupToken("d");
+        PatternNeuron b_IN = TokenNeuron.lookupToken(m, "b");
+        PatternNeuron c_IN = TokenNeuron.lookupToken(m, "c");
+        PatternNeuron d_IN = TokenNeuron.lookupToken(m, "d");
 
         // Pattern ab
-        BindingNeuron a_abBN = createNeuron(t.BINDING_TEMPLATE, "a (ab)");
-        BindingNeuron b_abBN = createNeuron(t.BINDING_TEMPLATE, "b (ab)");
+        BindingNeuron a_abBN = createNeuron(new BindingNeuron(), "a (ab)");
+        BindingNeuron b_abBN = createNeuron(new BindingNeuron(), "b (ab)");
 
-        LatentRelationNeuron relPT = t.TOKEN_POSITION_RELATION_TEMPLATE.lookupRelation(-1, -1);
+        LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, -1, -1);
 
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, b_abBN, 10.0);
-        createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, a_abBN, b_abBN, 11.0);
+        createSynapse(new RelatedInputSynapse(), relPT, b_abBN, 10.0);
+        createSynapse(new SamePatternSynapse(), a_abBN, b_abBN, 11.0);
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, a_IN, a_abBN, 10.0);
+        createSynapse(new PrimaryInputSynapse(), a_IN, a_abBN, 10.0);
         updateBias(a_abBN, 2.5);
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, b_IN, b_abBN, 10.0);
+        createSynapse(new PrimaryInputSynapse(), b_IN, b_abBN, 10.0);
 
-        PatternNeuron abPattern = initPatternLoop(t, "ab", a_abBN, b_abBN);
+        PatternNeuron abPattern = initPatternLoop(m, "ab", a_abBN, b_abBN);
         updateBias(abPattern, 3.0);
 
         // Pattern bc
-        BindingNeuron b_bcBN = createNeuron(t.BINDING_TEMPLATE, "b (bc)");
-        BindingNeuron c_bcBN = createNeuron(t.BINDING_TEMPLATE, "c (bc)");
+        BindingNeuron b_bcBN = createNeuron(new BindingNeuron(), "b (bc)");
+        BindingNeuron c_bcBN = createNeuron(new BindingNeuron(), "c (bc)");
 
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, c_bcBN, 10.0);
-        createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, b_bcBN, c_bcBN, 11.0);
+        createSynapse(new RelatedInputSynapse(), relPT, c_bcBN, 10.0);
+        createSynapse(new SamePatternSynapse(), b_bcBN, c_bcBN, 11.0);
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, b_IN, b_bcBN, 10.0);
-        addInhibitoryLoop(t, createNeuron(t.INHIBITORY_TEMPLATE, "I-b"), false, b_abBN, b_bcBN);
+        createSynapse(new PrimaryInputSynapse(), b_IN, b_bcBN, 10.0);
+        addInhibitoryLoop(m, createNeuron(new InhibitoryNeuron(), "I-b"), false, b_abBN, b_bcBN);
         updateBias(b_abBN, 3.0);
         updateBias(b_bcBN, 2.5);
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, c_IN, c_bcBN, 10.0);
+        createSynapse(new PrimaryInputSynapse(), c_IN, c_bcBN, 10.0);
         updateBias(c_bcBN, 3.0);
 
-        PatternNeuron bcPattern = initPatternLoop(t, "bc", b_bcBN, c_bcBN);
+        PatternNeuron bcPattern = initPatternLoop(m, "bc", b_bcBN, c_bcBN);
         updateBias(bcPattern, 3.0);
 
         // Pattern bcd
-        BindingNeuron bc_bcdBN = createNeuron(t.BINDING_TEMPLATE, "bc (bcd)");
-        BindingNeuron d_bcdBN = createNeuron(t.BINDING_TEMPLATE, "d (bcd)");
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, c_bcBN, bc_bcdBN, 10.0);
+        BindingNeuron bc_bcdBN = createNeuron(new BindingNeuron(), "bc (bcd)");
+        BindingNeuron d_bcdBN = createNeuron(new BindingNeuron(), "d (bcd)");
+        createSynapse(new RelatedInputSynapse(), c_bcBN, bc_bcdBN, 10.0);
 
-        createSynapse(t.RELATED_INPUT_SYNAPSE_TEMPLATE, relPT, d_bcdBN, 10.0);
-        createSynapse(t.SAME_PATTERN_SYNAPSE_TEMPLATE, bc_bcdBN, d_bcdBN, 11.0);
+        createSynapse(new RelatedInputSynapse(), relPT, d_bcdBN, 10.0);
+        createSynapse(new SamePatternSynapse(), bc_bcdBN, d_bcdBN, 11.0);
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, bcPattern, bc_bcdBN, 10.0);
+        createSynapse(new PrimaryInputSynapse(), bcPattern, bc_bcdBN, 10.0);
         updateBias(bc_bcdBN, 2.5);
 
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, d_IN, d_bcdBN, 10.0);
+        createSynapse(new PrimaryInputSynapse(), d_IN, d_bcdBN, 10.0);
         updateBias(d_bcdBN, 3.0);
 
-        PatternNeuron bcdPattern = initPatternLoop(t, "bcd", bc_bcdBN, d_bcdBN);
+        PatternNeuron bcdPattern = initPatternLoop(m, "bcd", bc_bcdBN, d_bcdBN);
         updateBias(bcdPattern, 3.0);
 
 
@@ -186,7 +185,7 @@ public class ABCDTest {
         camera.setViewPercent(1.2);
         camera.setViewCenter(1.978, 0.47, 0);
 
-        processTokens(t.TOKEN_TEMPLATE, doc, List.of("a", "b", "c", "d"));
+        processTokens(m, doc, List.of("a", "b", "c", "d"));
 
         doc.postProcessing();
         doc.updateModel();

@@ -17,9 +17,11 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.CategoryInputSynapse;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
+import network.aika.neuron.disjunctive.CategorySynapse;
 
 import static network.aika.direction.Direction.INPUT;
 
@@ -68,6 +70,6 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
  */
 
         CategoryInputSynapse cis = neuron.getCategoryInputSynapse();
-        CategoryActivation cAct = cis.getInput().createActivation(thought);
+        Synapse.init(new CategorySynapse(neuron.getType()), n, cis.getInput(), 1.0);
     }
 }
