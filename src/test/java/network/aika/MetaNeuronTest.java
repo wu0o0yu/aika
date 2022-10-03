@@ -26,11 +26,24 @@ public class MetaNeuronTest {
     public Map<Integer, double[]> getActCoordinateMap() {
         Map<Integer, double[]> coords = new TreeMap<>();
 
+        coords.put(0, new double[]{0.0, 0.0});
+        coords.put(1, new double[]{-0.004, 0.197});
+        coords.put(2, new double[]{0.0, 0.403});
+        coords.put(3, new double[]{0.245, 0.603});
+        coords.put(4, new double[]{0.269, 0.204});
+
         return coords;
     }
 
     public Map<Long, double[]> getNeuronCoordinateMap() {
         Map<Long, double[]> coords = new TreeMap<>();
+
+        coords.put(1l, new double[]{0.049, 0.091});
+        coords.put(2l, new double[]{0.046, 0.364});
+        coords.put(3l, new double[]{0.328, 0.08});
+        coords.put(4l, new double[]{0.322, 0.369});
+        coords.put(5l, new double[]{0.055, -0.178});
+        coords.put(6l, new double[]{0.333, -0.17});
 
         return coords;
     }

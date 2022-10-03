@@ -16,15 +16,11 @@
  */
 package network.aika;
 
-import network.aika.neuron.activation.Timestamp;
 import network.aika.steps.Phase;
 import network.aika.steps.QueueKey;
-import network.aika.steps.Step;
 import org.junit.jupiter.api.Test;
 
 import java.util.TreeMap;
-
-import static network.aika.neuron.activation.Timestamp.NOT_SET;
 
 /**
  *

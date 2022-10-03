@@ -310,7 +310,10 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         for(Direction dir: DIRECTIONS)
             n.getTargetSynapses(dir)
                     .forEach(s ->
-                            s.notifyVariableTransitions(bs, dir)
+                            s.notifyVariableTransitions(
+                                    bs,
+                                    dir.invert()
+                            )
                     );
     }
 
@@ -320,7 +323,10 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         for(Direction dir: DIRECTIONS)
             n.getTargetSynapses(dir)
                     .forEach(s ->
-                            s.initFixedTransitions(this, dir)
+                            s.initFixedTransitions(
+                                    this,
+                                    dir.invert()
+                            )
                     );
     }
 
@@ -413,10 +419,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public Thought getThought() {
         return thought;
-    }
-
-    public boolean isNetworkInput() {
-        return getNeuron().isNetworkInput();
     }
 
     public abstract Range getRange();

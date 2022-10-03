@@ -48,8 +48,12 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
 
     private double sumOfLowerWeights;
 
-    public ConjunctiveSynapse(ConjunctiveNeuronType type) {
-        this.type = type;
+    public ConjunctiveSynapse(ConjunctiveNeuronType t) {
+        this.type = t;
+    }
+
+    public ConjunctiveNeuronType getType() {
+        return type;
     }
 
     public void setOutput(O output) {

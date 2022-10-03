@@ -55,16 +55,6 @@ public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, Pattern
         return n;
     }
 
-    protected void initFromTemplate(PatternNeuron n) {
-        super.initFromTemplate(n);
-
-        getInputSynapses()
-                .filter(s -> s instanceof CategoryInputSynapse)
-                .forEach(s ->
-                        Synapse.init(new CategorySynapse(type), n, s.getInput(), 1.0)
-                );
-    }
-
     @Override
     protected void updateSumOfLowerWeights() {
     }

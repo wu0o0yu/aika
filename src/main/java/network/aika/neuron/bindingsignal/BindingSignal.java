@@ -23,6 +23,7 @@ import network.aika.fields.FieldOutput;
 import network.aika.fields.QueueField;
 import network.aika.fields.SlotField;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -170,6 +171,27 @@ public class BindingSignal implements Element {
                 .anyMatch(p ->
                         p.isSelfRef(outputBS)
                 );
+    }
+
+
+    public boolean hasInstanceOf(ConjunctiveNeuron templateN) {
+        BindingSignal catBS = parents.entrySet().stream()
+                .filter(e -> e.getKey() instanceof CategoryInputLink)
+                .map(e -> e.getValue())
+                .findAny()
+                .orElse(null);
+
+        if(catBS == null)
+            return false;
+
+        BindingSignal instBS = catBS.parents.values().stream()
+                .findAny()
+                .orElse(null);
+
+        if(instBS == null)
+            return false;
+
+        return instBS.getActivation().getNeuron().getTemplate() == templateN;
     }
 
     @Override

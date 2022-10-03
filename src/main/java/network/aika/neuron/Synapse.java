@@ -39,8 +39,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.direction.Direction.*;
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.activation.Timestamp.MAX;
 import static network.aika.neuron.activation.Timestamp.MIN;
@@ -188,10 +187,26 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return act.getIsFired();
     }
 
+    public void registerTerminals(Thought t) {
+        for (Direction dir : DIRECTIONS) {
+            Neuron<?, ?> n = dir.getNeuron(this);
+            n.getActivations(t).stream()
+                    .forEach(act -> {
+                                initFixedTransitions(act, dir);
+
+                                Stream<BindingSignal> BSs = act.getBindingSignals();
+                                BSs.forEach(bs ->
+                                        notifyVariableTransitions(bs, dir)
+                                );
+                            }
+                    );
+        }
+    }
+
     public void initFixedTransitions(Activation act, Direction dir) {
         getTransitions()
                 .flatMap(transition ->
-                        dir.invert().getTerminals(transition)
+                        dir.getTerminals(transition)
                 )
                 .forEach(terminal ->
                         terminal.initFixedTerminal(this, act)
@@ -201,7 +216,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     public void notifyVariableTransitions(BindingSignal bs, Direction dir) {
         getTransitions()
                 .flatMap(transition ->
-                        dir.invert().getTerminals(transition)
+                        dir.getTerminals(transition)
                 )
                 .forEach(t ->
                         t.notify(this, bs)

@@ -22,8 +22,8 @@ import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 import network.aika.sign.Sign;
-import network.aika.steps.link.Cleanup;
 import network.aika.steps.link.LinkCounting;
 
 import static network.aika.fields.ConstantField.ZERO;
@@ -233,28 +233,33 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return FIRED_COMPARATOR.compare(iAct.getFired(), oAct.getFired()) < 0;
     }
 
-    public Link instantiateTemplate(BindingSignal abstractBS, Activation act, Direction dir) {
-        I iAct = abstractBS.getParents().values().stream()
-                .filter(bs -> bs.getActivation() == input)
-                .map(bs -> (I)bs.getOriginActivation())
-                .findAny()
-                .orElse(input);
+    public void instantiateTemplate(BindingSignal abstractBS, ConjunctiveNeuron on, Direction dir) {
+        I iAct = resolveAbstractInputActivation(abstractBS);
 
         S instSyn = (S) synapse
                 .instantiateTemplate(
                         this,
                         iAct.getNeuron(),
-                        output.getNeuron()
+                        on
                 );
         instSyn.linkOutput();
-
+        instSyn.registerTerminals(getThought());
+/*
         Link l = instSyn.createLink(
                 dir.getInput(act, iAct),
                 dir.getOutput(act, iAct)
         );
 
-        Cleanup.add(l);
-        return l;
+        Cleanup.add(l);l
+ */
+    }
+
+    private I resolveAbstractInputActivation(BindingSignal abstractBS) {
+        return abstractBS.getParents().values().stream()
+                .filter(bs -> bs.getActivation() == input)
+                .map(bs -> (I) bs.getOriginActivation())
+                .findAny()
+                .orElse(input);
     }
 
     public void linkInput() {

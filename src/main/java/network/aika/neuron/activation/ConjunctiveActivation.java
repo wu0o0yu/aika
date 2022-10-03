@@ -19,9 +19,7 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.conjunctive.CategoryInputSynapse;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
-import network.aika.neuron.disjunctive.CategorySynapse;
 
 import static network.aika.direction.Direction.INPUT;
 
@@ -49,18 +47,15 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         if(abstractBS == null)
             return;
 
-        if(abstractBS.getActivation().getNeuron().getTemplate() == getNeuron())
+        if(abstractBS.hasInstanceOf(getNeuron()))
             return;
 
         N n = (N) neuron.instantiateTemplate(true);
-        ConjunctiveActivation<N> act = n.createActivation(thought);
-
-        act.init(null, this);
 
         getInputLinks()
-                .filter(l -> !(l.getSynapse() instanceof CategoryInputSynapse))
+//                .filter(l -> !(l.getSynapse() instanceof CategoryInputSynapse))
                 .forEach(l ->
-                        l.instantiateTemplate(abstractBS, act, INPUT)
+                        l.instantiateTemplate(abstractBS, n, INPUT)
                 );
 /*
         getOutputLinks()
@@ -68,8 +63,5 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
                         l.instantiateTemplate(act, OUTPUT)
                 );
  */
-
-        CategoryInputSynapse cis = neuron.getCategoryInputSynapse();
-        Synapse.init(new CategorySynapse(neuron.getType()), n, cis.getInput(), 1.0);
     }
 }

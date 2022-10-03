@@ -19,8 +19,10 @@ package network.aika.neuron.conjunctive;
 import network.aika.Model;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.disjunctive.CategorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +52,17 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
 
     public ConjunctiveNeuronType getType() {
         return type;
+    }
+
+    @Override
+    protected void initFromTemplate(Neuron n) {
+        super.initFromTemplate(n);
+
+        getInputSynapses()
+                .filter(s -> s instanceof CategoryInputSynapse)
+                .forEach(s ->
+                        Synapse.init(new CategorySynapse(type), n, s.getInput(), 1.0)
+                );
     }
 
     @Override

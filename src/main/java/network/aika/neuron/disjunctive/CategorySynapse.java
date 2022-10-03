@@ -64,8 +64,8 @@ public class CategorySynapse<N extends ConjunctiveNeuron> extends DisjunctiveSyn
             )
     );
 
-    public CategorySynapse(ConjunctiveNeuronType type) {
-        this.type = type;
+    public CategorySynapse(ConjunctiveNeuronType t) {
+        this.type = t;
     }
 
     public void setInput(N input) {

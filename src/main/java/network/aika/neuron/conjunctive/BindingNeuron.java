@@ -49,14 +49,4 @@ public class BindingNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, Binding
 
         return n;
     }
-
-    protected void initFromTemplate(BindingNeuron n) {
-        super.initFromTemplate(n);
-
-        getInputSynapses()
-                .filter(s -> s instanceof CategoryInputSynapse)
-                .forEach(s ->
-                        Synapse.init(new CategorySynapse(type), n, s.getInput(), 1.0)
-                );
-    }
 }
