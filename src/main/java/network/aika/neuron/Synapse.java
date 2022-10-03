@@ -74,10 +74,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected boolean allowTraining = true;
 
-    public boolean isRecurrent() {
-        return false;
-    }
-
     public PrimitiveTransition getRelatedTransition() {
         return null;
     }
@@ -139,16 +135,17 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         if(linkExists(iAct, oAct))
             return null;
 
-        if(!(isRecurrent() || Link.isCausal(iAct, oAct)))
+        if(!checkCausal(iAct, oAct))
             return null;
 
         return createLink(iAct, oAct);
     }
 
-    public boolean isPropagate() {
-        if(isRecurrent())
-            return false;
+    protected boolean checkCausal(IA iAct, OA oAct) {
+        return !Link.isCausal(iAct, oAct);
+    }
 
+    public boolean isPropagate() {
         double tsWeight = getWeight().getCurrentValue();
         double tnBias = getOutput().getBias().getCurrentValue();
         return tsWeight + tnBias > 0.0;

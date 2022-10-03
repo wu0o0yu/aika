@@ -18,10 +18,7 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.direction.Direction;
 import network.aika.fields.*;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.activation.PositiveFeedbackLink;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
@@ -95,8 +92,13 @@ public class PositiveFeedbackSynapse extends BindingNeuronSynapse<
     }
 
     @Override
-    public boolean isRecurrent() {
+    protected boolean checkCausal(PatternActivation iAct, BindingActivation oAct) {
         return true;
+    }
+
+    @Override
+    public boolean isPropagate() {
+        return false;
     }
 
     @Override

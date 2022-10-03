@@ -95,8 +95,13 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<
     }
 
     @Override
-    public boolean isRecurrent() {
+    protected boolean checkCausal(InhibitoryActivation iAct, BindingActivation oAct) {
         return true;
+    }
+
+    @Override
+    public boolean isPropagate() {
+        return false;
     }
 
     @Override

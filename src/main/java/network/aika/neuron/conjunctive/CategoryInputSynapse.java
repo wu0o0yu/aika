@@ -74,6 +74,11 @@ public class CategoryInputSynapse extends ConjunctiveSynapse<
     }
 
     @Override
+    protected boolean checkCausal(CategoryActivation iAct, ConjunctiveActivation oAct) {
+        return true; // Workaround
+    }
+
+    @Override
     public Stream<Transition> getTransitions() {
         return TRANSITIONS.stream();
     }

@@ -221,10 +221,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return output;
     }
 
-    public boolean isRecurrent() {
-        return synapse.isRecurrent();
-    }
-
     public boolean isCausal() {
         return input == null || isCausal(input, output);
     }
