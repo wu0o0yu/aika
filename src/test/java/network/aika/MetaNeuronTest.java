@@ -3,9 +3,7 @@ package network.aika;
 import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.text.TokenActivation;
-import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.neuron.conjunctive.CategoryInputSynapse;
-import network.aika.neuron.conjunctive.PrimaryInputSynapse;
+import network.aika.neuron.conjunctive.*;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.neuron.disjunctive.BindingCategoryNeuron;
 import network.aika.neuron.disjunctive.CategoryNeuron;
@@ -29,10 +27,12 @@ public class MetaNeuronTest {
         Map<Integer, double[]> coords = new TreeMap<>();
 
         coords.put(0, new double[]{0.0, 0.0});
-        coords.put(1, new double[]{-0.004, 0.197});
-        coords.put(2, new double[]{0.0, 0.403});
-        coords.put(3, new double[]{0.245, 0.603});
-        coords.put(4, new double[]{0.269, 0.204});
+        coords.put(1, new double[]{-0.001, 0.201});
+        coords.put(2, new double[]{0.0, 0.406});
+        coords.put(3, new double[]{0.242, 0.623});
+        coords.put(4, new double[]{0.464, 0.823});
+        coords.put(5, new double[]{0.249, 0.201});
+        coords.put(6, new double[]{0.245, 0.401});
 
         return coords;
     }
@@ -40,12 +40,14 @@ public class MetaNeuronTest {
     public Map<Long, double[]> getNeuronCoordinateMap() {
         Map<Long, double[]> coords = new TreeMap<>();
 
-        coords.put(1l, new double[]{0.049, 0.091});
-        coords.put(2l, new double[]{0.046, 0.364});
-        coords.put(3l, new double[]{0.328, 0.08});
-        coords.put(4l, new double[]{0.322, 0.369});
-        coords.put(5l, new double[]{0.055, -0.178});
-        coords.put(6l, new double[]{0.333, -0.17});
+        coords.put(1l, new double[]{-0.347, 0.137});
+        coords.put(2l, new double[]{-0.33, 0.75});
+        coords.put(3l, new double[]{1.082, 0.098});
+        coords.put(4l, new double[]{0.417, 0.123});
+        coords.put(5l, new double[]{0.421, 0.741});
+        coords.put(6l, new double[]{1.092, 0.741});
+        coords.put(7l, new double[]{-0.353, -0.728});
+        coords.put(8l, new double[]{0.415, -0.724});
 
         return coords;
     }
@@ -80,6 +82,11 @@ public class MetaNeuronTest {
 
         Synapse.init(new CategoryInputSynapse(PATTERN), letterCategory, letterPN, 1.0);
 
+        CategoryNeuron syllableCategory = new PatternCategoryNeuron();
+        syllableCategory.addProvider(m);
+        syllableCategory.setLabel("PC-syllable");
+
+
         CategoryNeuron letterBindingCategory = new BindingCategoryNeuron();
         letterBindingCategory.addProvider(m);
         letterBindingCategory.setLabel("BC-letter");
@@ -89,6 +96,13 @@ public class MetaNeuronTest {
         letterBN.setLabel("Abstract BN-letter");
         letterBN.getBias().setValue(3.0);
 
+        PatternNeuron syllable = new PatternNeuron();
+        syllable.addProvider(m);
+        syllable.setLabel("Syllable");
+
+        Synapse.init(new PatternSynapse(), letterBN, syllable, 10.0);
+        Synapse.init(new CategoryInputSynapse(PATTERN), syllableCategory, syllable, 1.0);
+
         Synapse.init(new PrimaryInputSynapse(), letterPN, letterBN, 10.0);
         Synapse.init(new CategoryInputSynapse(BINDING), letterBindingCategory, letterBN, 1.0);
 
@@ -97,23 +111,6 @@ public class MetaNeuronTest {
         letterS.setLabel("L-s");
         letterS.setNetworkInput(true);
 
-
-
-
-    //    TokenNeuron letterSIN = TOKEN_TEMPLATE.lookupToken("Letter-s");
-
-        /*
-        BindingNeuron forenameBN = createNeuron(t.BINDING_TEMPLATE, "forename (person name)");
-
-
-        BindingNeuron jacksonForenameBN = createNeuron(forenameBN, "jackson (forename)");
-        BindingNeuron jacksonJCBN = createNeuron(jacksonForenameBN, "jackson (jackson cook)");
-        createSynapse(t.PRIMARY_INPUT_SYNAPSE_FROM_PATTERN_TEMPLATE, jacksonIN, jacksonJCBN, 10.0);
-        BindingCategoryNeuron jacksonForenameCN = createNeuron(t.BINDING_CATEGORY_TEMPLATE, "jackson (forename)");
-        addInhibitoryLoop(t, createNeuron(t.INHIBITORY_TEMPLATE, "I-cook"), false, cookSurnameBN, cookProfessionBN);
-
-        updateBias(jacksonJCBN, 2.0);
-*/
 
 
         Document doc = new Document(m, "s c h");
@@ -133,13 +130,13 @@ public class MetaNeuronTest {
         debugger.getActivationViewManager().setCoordinateListener(act -> actCoords.get(act.getId()));
 
         Camera camera = debugger.getActivationViewManager().getCamera();
-  //      camera.setViewPercent(4.7);
-  //      camera.setViewCenter(1.293, 1.279, 0);
+        camera.setViewPercent(1.35);
+        camera.setViewCenter(0.267, 0.367, 0);
 
         debugger.getNeuronViewManager().setCoordinateListener(n -> neuronCoords.get(n.getId()));
         camera = debugger.getNeuronViewManager().getCamera();
-   //     camera.setViewPercent(1.5);
-   //     camera.setViewCenter(1.702, 2.272, 0);
+        camera.setViewPercent(2.3);
+        camera.setViewCenter(0.0, 0.0, 0);
 
         TokenActivation letterSAct = doc.addToken(letterS, 0, 0, 1);
         process(doc, List.of(letterSAct));
