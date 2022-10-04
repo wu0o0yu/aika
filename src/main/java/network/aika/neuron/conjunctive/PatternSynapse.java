@@ -17,6 +17,7 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.*;
+import network.aika.neuron.bindingsignal.PrimitiveTransition;
 import network.aika.neuron.bindingsignal.Transition;
 
 import java.util.List;
@@ -40,19 +41,32 @@ public class PatternSynapse extends ConjunctiveSynapse<
         >
 {
 
+
+    public static PrimitiveTransition SAME_SAME_TRANSITION = transition(
+            BindingNeuron.SAME_OUT,
+            PatternNeuron.SAME_IN,
+            MATCH_ONLY,
+            PatternSynapse.class
+    );
+
+    public static PrimitiveTransition INPUT_INPUT_TRANSITION = transition(
+            BindingNeuron.INPUT_OUT,
+            PatternNeuron.INPUT_IN,
+            MATCH_AND_PROPAGATE,
+            PatternSynapse.class
+    );
+
+    public static PrimitiveTransition ABSTRACT_INPUT_ABSTRACT_INPUT_TRANSITION = transition(
+            PatternNeuron.ABSTRACT_INPUT_OUT,
+            BindingNeuron.ABSTRACT_INPUT_IN,
+            MATCH_AND_PROPAGATE,
+            PatternSynapse.class
+    );
+
     private static List<Transition> TRANSITIONS = List.of(
-            transition(
-                    BindingNeuron.SAME_OUT,
-                    PatternNeuron.SAME_IN,
-                    MATCH_ONLY,
-                    PatternSynapse.class
-            ),
-            transition(
-                    BindingNeuron.INPUT_OUT,
-                    PatternNeuron.INPUT_IN,
-                    MATCH_AND_PROPAGATE,
-                    PatternSynapse.class
-            )
+            SAME_SAME_TRANSITION,
+            INPUT_INPUT_TRANSITION,
+            ABSTRACT_INPUT_ABSTRACT_INPUT_TRANSITION
     );
 
     public PatternSynapse() {
