@@ -19,14 +19,14 @@ package network.aika.neuron.conjunctive;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.bindingsignal.PrimitiveTransition;
 import network.aika.neuron.bindingsignal.Transition;
+import network.aika.neuron.disjunctive.BindingCategoryNeuron;
 import network.aika.neuron.disjunctive.CategoryNeuron;
+import network.aika.neuron.disjunctive.PatternCategoryNeuron;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
-import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 
 /**
@@ -39,30 +39,37 @@ public class CategoryInputSynapse extends ConjunctiveSynapse<
         CategoryNeuron,
         ConjunctiveNeuron<CategoryInputSynapse, ConjunctiveActivation>,
         CategoryInputLink,
-        CategoryActivation,
+        CategoryActivation<?>,
         ConjunctiveActivation
         >
 {
 
     private static PrimitiveTransition SAME_TRANSITION = transition(
-            fixed(SAME),
-            fixed(ABSTRACT_SAME),
+            CategoryNeuron.SAME_OUT,
+            ConjunctiveNeuron.ABSTRACT_SAME_IN,
             MATCH_AND_PROPAGATE,
             CategoryInputSynapse.class
     );
 
-
-    private static PrimitiveTransition INPUT_TRANSITION = transition(
-            fixed(INPUT),
-            fixed(ABSTRACT_INPUT),
+    private static PrimitiveTransition PATTERN_INPUT_TRANSITION = transition(
+            PatternCategoryNeuron.INPUT_OUT,
+            ConjunctiveNeuron.ABSTRACT_INPUT_IN,
             MATCH_AND_PROPAGATE,
             CategoryInputSynapse.class
     );
 
-    private static List<Transition> TRANSITIONS = List.of(
-            SAME_TRANSITION,
-            INPUT_TRANSITION
+    private static PrimitiveTransition BINDING_INPUT_TRANSITION = transition(
+            BindingCategoryNeuron.INPUT_OUT,
+            ConjunctiveNeuron.ABSTRACT_INPUT_IN,
+            MATCH_AND_PROPAGATE,
+            CategoryInputSynapse.class
     );
+
+    private Transition getInputTransition() {
+        return type == ConjunctiveNeuronType.PATTERN ?
+                PATTERN_INPUT_TRANSITION :
+                BINDING_INPUT_TRANSITION;
+    }
 
     public CategoryInputSynapse(ConjunctiveNeuronType type) {
         super(type);
@@ -80,6 +87,9 @@ public class CategoryInputSynapse extends ConjunctiveSynapse<
 
     @Override
     public Stream<Transition> getTransitions() {
-        return TRANSITIONS.stream();
+        return List.of(
+                SAME_TRANSITION,
+                getInputTransition()
+        ).stream();
     }
 }

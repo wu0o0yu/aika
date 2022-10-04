@@ -25,10 +25,7 @@ import org.apache.commons.math3.ode.UnknownParameterException;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
-import static network.aika.neuron.bindingsignal.State.INPUT;
-import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 
 /**
@@ -58,8 +55,8 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
 
     private static List<Transition> TRANSITIONS_SAME = List.of(
             transition(
-                    fixed(SAME),
-                    fixed(SAME),
+                    BindingNeuron.SAME_OUT,
+                    InhibitoryNeuron.SAME_IN,
                     MATCH_AND_PROPAGATE,
                     InhibitorySynapse.class
             )
@@ -67,8 +64,8 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
 
     private static List<Transition> TRANSITIONS_INPUT = List.of(
             transition(
-                    fixed(INPUT),
-                    fixed(INPUT),
+                    BindingNeuron.INPUT_OUT,
+                    InhibitoryNeuron.INPUT_IN,
                     MATCH_AND_PROPAGATE,
                     InhibitorySynapse.class
             )

@@ -51,7 +51,7 @@ public class LatentLinking {
     }
 
     private static void latentLinking(PrimitiveTransition tA, BindingSignal bsA, Synapse synA, Synapse synB) {
-        Stream<PrimitiveTransition> relTrans = synB.getRelatedTransitions(tA);
+        Stream<PrimitiveTransition> relTrans = tA.getOutput().getTransitions(INPUT).stream();
         relTrans.filter(tB ->
                         tB.getMode() == TransitionMode.MATCH_AND_PROPAGATE
                 )

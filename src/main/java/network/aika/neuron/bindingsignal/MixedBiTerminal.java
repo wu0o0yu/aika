@@ -31,12 +31,12 @@ import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
  */
 public class MixedBiTerminal extends BiTerminal<VariableTerminal> {
 
-    public MixedBiTerminal(Direction type, BiTransition transition, VariableTerminal firstTerminal, FixedTerminal secondTerminal) {
-        super(type, transition, firstTerminal, secondTerminal);
+    public MixedBiTerminal(Direction type, VariableTerminal firstTerminal, FixedTerminal secondTerminal) {
+        super(type, firstTerminal, secondTerminal);
     }
 
     @Override
-    public void initFixedTerminal(Synapse ts, Activation act) {
+    public void initFixedTerminal(BiTransition t, Synapse ts, Activation act) {
         SlotField secondSlot = secondTerminal.getSlot(act);
         Terminal.getPreconditionEvent(
                         ts,
@@ -45,16 +45,16 @@ public class MixedBiTerminal extends BiTerminal<VariableTerminal> {
                         secondSlot
                 )
                 .addEventListener(() ->
-                        notifyInternal(ts, act, secondSlot)
+                        notifyInternal(t, ts, act, secondSlot)
                 );
     }
 
-    private void notifyInternal(Synapse ts, Activation act, SlotField secondSlot) {
+    private void notifyInternal(BiTransition t, Synapse ts, Activation act, SlotField secondSlot) {
         Stream<BindingSignal> bsStream = act.getBindingSignals(firstTerminal.state);
         bsStream
                 .forEach(bs ->
                         ts.linkAndPropagate(
-                                transition,
+                                t,
                                 type.invert(),
                                 bs,
                                 secondTerminal.getBindingSignal(secondSlot)
@@ -63,8 +63,8 @@ public class MixedBiTerminal extends BiTerminal<VariableTerminal> {
     }
 
     @Override
-    public void notify(Synapse ts, BindingSignal bs) {
-        if(transition.getMode() == PROPAGATE_ONLY)
+    public void notify(BiTransition t, Synapse ts, BindingSignal bs) {
+        if(t.getMode() == PROPAGATE_ONLY)
             return;
 
         if(firstTerminal.getState() != bs.getState())
@@ -74,7 +74,7 @@ public class MixedBiTerminal extends BiTerminal<VariableTerminal> {
 
         if(isTrue(secondSlot))
             ts.linkAndPropagate(
-                    transition,
+                    t,
                     type.invert(),
                     bs,
                     secondTerminal.getBindingSignal(secondSlot)

@@ -18,23 +18,37 @@ package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
+import network.aika.fields.SlotField;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 
 import java.util.stream.Stream;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class PrimitiveTerminal implements Terminal {
+public abstract class PrimitiveTerminal extends Terminal<PrimitiveTransition> {
 
     protected BiTerminal parent = null;
-    protected PrimitiveTransition transition;
     protected State state;
     protected Direction type;
 
-    public PrimitiveTerminal(State state) {
+    private Class<? extends Neuron> neuronClazz;
+
+    public PrimitiveTerminal(State state, Direction type, Class<? extends Neuron> neuronClazz) {
         this.state = state;
+        this.type = type;
+        this.neuronClazz = neuronClazz;
+    }
+
+    public SlotField getSlot(Activation act) {
+        return act != null ?
+                act.getSlot(state) :
+                null;
+    }
+
+    public Class<? extends Neuron> getNeuronClazz() {
+        return neuronClazz;
     }
 
     public BiTerminal getParent() {
@@ -50,21 +64,8 @@ public abstract class PrimitiveTerminal implements Terminal {
     }
 
     @Override
-    public void setType(Direction type) {
-        this.type = type;
-    }
-
-    @Override
     public Direction getType() {
         return type;
-    }
-
-    public void setTransition(PrimitiveTransition transition) {
-        this.transition = transition;
-    }
-
-    public PrimitiveTransition getTransition() {
-        return transition;
     }
 
     @Override
@@ -73,25 +74,6 @@ public abstract class PrimitiveTerminal implements Terminal {
     }
 
     public abstract BindingSignal getBindingSignal(FieldOutput bsEvent);
-
-    @Override
-    public void propagate(BindingSignal bs, Link l, Activation act) {
-        if(bs.getState() != state)
-            return;
-
-        if(!transition.isPropagate())
-            return;
-
-        Direction toDirection = getType().invert();
-        State toState = toDirection.getTerminal(transition).getState();
-
-        BindingSignal nextBS = act.getBindingSignal(bs.getOriginActivation(), toState);
-
-        if(nextBS == null)
-            nextBS = new BindingSignal(bs, toState, act);
-
-        nextBS.addParent(l, bs);
-    }
 
     @Override
     public boolean matchesState(State s) {

@@ -25,12 +25,8 @@ import network.aika.neuron.bindingsignal.Transition;
 import java.util.List;
 import java.util.stream.Stream;
 
-
-import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
-import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.TransitionMode.*;
-import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 
 /**
  *
@@ -45,30 +41,30 @@ public class PrimaryInputSynapse extends BindingNeuronSynapse<
 {
 
     public static PrimitiveTransition SAME_INPUT_TRANSITION = transition(
-            fixed(SAME),
-            fixed(INPUT),
+            PatternNeuron.SAME_OUT,
+            BindingNeuron.INPUT_IN,
             MATCH_AND_PROPAGATE,
             PrimaryInputSynapse.class
     );
 
 
     public static PrimitiveTransition ABSTRACT_SAME_ABSTRACT_INPUT_TRANSITION = transition(
-            fixed(ABSTRACT_SAME),
-            fixed(ABSTRACT_INPUT),
+            PatternNeuron.ABSTRACT_SAME_OUT,
+            BindingNeuron.ABSTRACT_INPUT_IN,
             MATCH_AND_PROPAGATE,
             PrimaryInputSynapse.class
     );
 
     public static PrimitiveTransition SAME_RELATED_SAME_TRANSITION = transition(
-            fixed(SAME),
-            fixed(RELATED_SAME),
+            PatternNeuron.SAME_OUT,
+            BindingNeuron.RELATED_SAME_IN,
             MATCH_AND_PROPAGATE,
             PrimaryInputSynapse.class
     );
 
     public static PrimitiveTransition INPUT_RELATED_INPUT_TRANSITION = transition(
-            variable(INPUT),
-            variable(RELATED_INPUT),
+            PatternNeuron.INPUT_OUT,
+            BindingNeuron.RELATED_INPUT_IN,
             MATCH_AND_PROPAGATE,
             PrimaryInputSynapse.class
     );

@@ -29,12 +29,12 @@ import static network.aika.fields.Fields.mul;
  */
 public class FixedBiTerminal extends BiTerminal<FixedTerminal> {
 
-    public FixedBiTerminal(Direction type, BiTransition transition, FixedTerminal firstTerminal, FixedTerminal secondTerminal) {
-        super(type, transition, firstTerminal, secondTerminal);
+    public FixedBiTerminal(Direction type, FixedTerminal firstTerminal, FixedTerminal secondTerminal) {
+        super(type, firstTerminal, secondTerminal);
     }
 
     @Override
-    public void initFixedTerminal(Synapse ts, Activation act) {
+    public void initFixedTerminal(BiTransition t, Synapse ts, Activation act) {
         SlotField firstSlot = firstTerminal.getSlot(act);
         SlotField secondSlot = secondTerminal.getSlot(act);
 
@@ -49,7 +49,7 @@ public class FixedBiTerminal extends BiTerminal<FixedTerminal> {
         Terminal.getPreconditionEvent(ts, act, dir, inputEvent)
                 .addEventListener(() ->
                         ts.linkAndPropagate(
-                                transition,
+                                t,
                                 dir,
                                 firstTerminal.getBindingSignal(firstSlot),
                                 secondTerminal.getBindingSignal(secondSlot)
@@ -58,7 +58,7 @@ public class FixedBiTerminal extends BiTerminal<FixedTerminal> {
     }
 
     @Override
-    public void notify(Synapse ts, BindingSignal bs) {
+    public void notify(BiTransition t, Synapse ts, BindingSignal bs) {
         // nothing to do
     }
 }

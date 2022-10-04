@@ -29,11 +29,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
-import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
-import static network.aika.neuron.bindingsignal.State.*;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
-import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 
 
 /**
@@ -49,15 +46,15 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<
 {
 
     private static PrimitiveTransition INPUT_TRANSITION = transition(
-            fixed(INPUT),
-            variable(RELATED_INPUT),
+            LatentRelationNeuron.INPUT_OUT,
+            BindingNeuron.RELATED_INPUT_IN,
             MATCH_AND_PROPAGATE,
             RelatedInputSynapse.class
     );
 
     private static PrimitiveTransition SAME_TRANSITION = transition(
-            fixed(SAME),
-            fixed(RELATED_SAME),
+            LatentRelationNeuron.SAME_OUT,
+            BindingNeuron.RELATED_SAME_IN,
             MATCH_AND_PROPAGATE,
             RelatedInputSynapse.class
     );
@@ -96,8 +93,8 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<
 
         Link l = createLink(latentRelAct, (BindingActivation) relatedSameBS.getActivation());
 
-        INPUT_TRANSITION.getOutput().propagate(relatedInputBS, l, latentRelAct);
-        SAME_TRANSITION.getOutput().propagate(relatedSameBS, l, latentRelAct);
+        INPUT_TRANSITION.propagate(INPUT_TRANSITION.getOutput(), relatedInputBS, l, latentRelAct);
+        SAME_TRANSITION.propagate(SAME_TRANSITION.getOutput(), relatedSameBS, l, latentRelAct);
     }
 
     @Override

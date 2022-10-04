@@ -33,6 +33,7 @@ import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
 import static network.aika.neuron.bindingsignal.TransitionMode.*;
 import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
+import static network.aika.neuron.conjunctive.PatternNeuron.INPUT_OUT;
 
 /**
  *
@@ -49,14 +50,14 @@ public class PositiveFeedbackSynapse extends BindingNeuronSynapse<
     private static List<Transition> TRANSITIONS = List.of(
             biTransition(
                     transition(
-                            variable(INPUT),
-                            fixed(INPUT),
+                            PatternNeuron.INPUT_OUT,
+                            BindingNeuron.INPUT_IN,
                             MATCH_ONLY,
                             PositiveFeedbackSynapse.class
                     ),
                     transition(
-                            fixed(SAME),
-                            fixed(SAME),
+                            PatternNeuron.SAME_OUT,
+                            BindingNeuron.SAME_IN,
                             MATCH_AND_PROPAGATE,
                             PositiveFeedbackSynapse.class
                     ),

@@ -23,10 +23,7 @@ import network.aika.fields.FieldOutput;
 import network.aika.fields.QueueField;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.PrimitiveTransition;
-import network.aika.neuron.bindingsignal.State;
-import network.aika.neuron.bindingsignal.Transition;
+import network.aika.neuron.bindingsignal.*;
 import network.aika.sign.Sign;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
@@ -80,7 +77,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     public Stream<BindingSignal> getRelatedBindingSignals(PatternActivation fromOriginAct, PrimitiveTransition t, Direction dir) {
         return dir.getNeuron(this)
-                .getRelatedBindingSignals(fromOriginAct, dir.getTerminal(t).getState());
+                .getRelatedBindingSignals(fromOriginAct, dir.getPrimitiveTerminal(t).getState());
     }
 
     public abstract double getSumOfLowerWeights();
@@ -160,17 +157,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return synA.getWeight().getCurrentValue() + synB.getWeight().getCurrentValue() + sumOfLowerWeights > 0.0;
     }
 
-    public Stream<PrimitiveTransition> getRelatedTransitions(PrimitiveTransition fromTransition) {
-        return getTransitions()
-                .flatMap(toTransition ->
-                        toTransition.getPrimitiveOutputTerminalsByState(fromTransition.getOutput().getState())
-                )
-                .map(toTerminal -> toTerminal.getTransition());
-    }
-
     public boolean hasOutputTerminal(State s) {
         return getTransitions()
-                .flatMap(t -> t.getOutputTerminals())
+                .map(t -> t.getOutput())
                 .anyMatch(t -> t.matchesState(s));
     }
 
@@ -202,21 +191,22 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     public void initFixedTransitions(Activation act, Direction dir) {
         getTransitions()
-                .flatMap(transition ->
-                        dir.getTerminals(transition)
-                )
-                .forEach(terminal ->
-                        terminal.initFixedTerminal(this, act)
+                .forEach(t ->
+                        dir.getTerminal(t).initFixedTerminal(t, this, act)
                 );
     }
 
     public void notifyVariableTransitions(BindingSignal bs, Direction dir) {
         getTransitions()
-                .flatMap(transition ->
-                        dir.getTerminals(transition)
-                )
                 .forEach(t ->
-                        t.notify(this, bs)
+                        dir.getTerminal(t).notify(t, this, bs)
+                );
+    }
+
+    public Stream<Terminal> getTerminals(Direction dir) {
+        return getTransitions()
+                .map(transition ->
+                        dir.getTerminal(transition)
                 );
     }
 

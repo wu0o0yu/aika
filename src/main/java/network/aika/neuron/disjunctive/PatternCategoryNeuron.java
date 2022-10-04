@@ -17,44 +17,42 @@
 package network.aika.neuron.disjunctive;
 
 import network.aika.Thought;
-import network.aika.neuron.ActivationFunction;
-import network.aika.neuron.activation.InhibitoryActivation;
+import network.aika.neuron.activation.CategoryActivation;
 import network.aika.neuron.bindingsignal.PrimitiveTerminal;
 import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.conjunctive.ConjunctiveNeuronType;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.State.SAME;
+import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitorySynapse, InhibitoryActivation> {
+public class PatternCategoryNeuron extends CategoryNeuron<PatternCategorySynapse, CategoryActivation> {
 
-    public static PrimitiveTerminal SAME_IN = fixed(SAME, INPUT, InhibitoryNeuron.class);
-    public static PrimitiveTerminal INPUT_IN = fixed(State.INPUT, INPUT, InhibitoryNeuron.class);
+    public static PrimitiveTerminal INPUT_IN = variable(State.INPUT, INPUT, PatternCategoryNeuron.class);
+    public static PrimitiveTerminal INPUT_OUT = variable(State.INPUT, OUTPUT, PatternCategoryNeuron.class);
 
-    public static PrimitiveTerminal SAME_OUT = fixed(SAME, OUTPUT, InhibitoryNeuron.class);
-    public static PrimitiveTerminal INPUT_OUT = fixed(State.INPUT, OUTPUT, InhibitoryNeuron.class);
+
+    public PatternCategoryNeuron() {
+        super(ConjunctiveNeuronType.PATTERN);
+    }
+
 
     @Override
-    public InhibitoryActivation createActivation(Thought t) {
-        return new InhibitoryActivation(t.createActivationId(), t, this);
+    public CategoryActivation createActivation(Thought t) {
+        return new CategoryActivation(t.createActivationId(), t, this);
     }
 
     @Override
-    public InhibitoryNeuron instantiateTemplate(boolean addProvider) {
-        InhibitoryNeuron n = new InhibitoryNeuron();
+    public CategoryNeuron instantiateTemplate(boolean addProvider) {
+        CategoryNeuron n = new PatternCategoryNeuron();
         if(addProvider)
             n.addProvider(getModel());
 
         initFromTemplate(n);
         return n;
-    }
-
-    public ActivationFunction getActivationFunction() {
-        return ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
     }
 }

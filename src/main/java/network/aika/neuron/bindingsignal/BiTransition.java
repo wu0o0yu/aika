@@ -20,10 +20,9 @@ package network.aika.neuron.bindingsignal;
 import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 
-import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
@@ -33,10 +32,10 @@ import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
 /**
  * @author Lukas Molzberger
  */
-public class BiTransition implements Transition {
+public class BiTransition implements Transition<BiTerminal, BiTerminal> {
 
-    protected List<Terminal> inputTerminals;
-    protected List<Terminal> outputTerminals;
+    protected BiTerminal inputTerminal;
+    protected BiTerminal outputTerminal;
 
     protected PrimitiveTransition<FixedTerminal, ?> firstTransition;
     protected PrimitiveTransition<FixedTerminal, FixedTerminal> secondTransition;
@@ -49,14 +48,17 @@ public class BiTransition implements Transition {
         this.secondTransition.setParent(this);
 
         if(inputBiTerminal)
-            inputTerminals = List.of(BiTerminal.biTerminal(INPUT, this, firstTransition.getInput(), secondTransition.getInput()));
+            inputTerminal = BiTerminal.biTerminal(INPUT, firstTransition.getInput(), secondTransition.getInput());
         else
-            inputTerminals = List.of(BiTerminal.optionalBiTerminal(INPUT, this, firstTransition.getInput(), secondTransition.getInput()));
+            inputTerminal = BiTerminal.optionalBiTerminal(INPUT, firstTransition.getInput(), secondTransition.getInput());
 
         if(outputBiTerminal)
-            outputTerminals = List.of(BiTerminal.biTerminal(OUTPUT, this, firstTransition.getOutput(), secondTransition.getOutput()));
+            outputTerminal = BiTerminal.biTerminal(OUTPUT, firstTransition.getOutput(), secondTransition.getOutput());
         else
-            outputTerminals = List.of(BiTerminal.optionalBiTerminal(OUTPUT, this, firstTransition.getOutput(), secondTransition.getOutput()));
+            outputTerminal = BiTerminal.optionalBiTerminal(OUTPUT, firstTransition.getOutput(), secondTransition.getOutput());
+
+        inputTerminal.getTransitions(OUTPUT).add(this);
+        outputTerminal.getTransitions(INPUT).add(this);
     }
 
     public static BiTransition biTransition(PrimitiveTransition firstTransition, PrimitiveTransition secondTransition, boolean inputBiTerminal, boolean outputBiTerminal) {
@@ -64,25 +66,24 @@ public class BiTransition implements Transition {
     }
 
     @Override
-    public Stream<Terminal> getInputTerminals() {
-        return inputTerminals.stream();
+    public BiTerminal getInput() {
+        return inputTerminal;
     }
 
     @Override
-    public Stream<Terminal> getOutputTerminals() {
-        return outputTerminals.stream();
-    }
-
-    @Override
-    public Stream<PrimitiveTerminal> getPrimitiveOutputTerminalsByState(State s) {
-        return outputTerminals.stream()
-                .flatMap(ot -> ot.getPrimitiveTerminals())
-                .filter(ot -> ot.getState() == s);
+    public BiTerminal getOutput() {
+        return outputTerminal;
     }
 
     @Override
     public TransitionMode getMode() {
         return MATCH_ONLY;
+    }
+
+    @Override
+    public void propagate(BiTerminal fromTerminal, BindingSignal bs, Link l, Activation act) {
+        firstTransition.propagate(fromTerminal.getFirstTerminal(), bs, l, act);
+        secondTransition.propagate(fromTerminal.getSecondTerminal(), bs, l, act);
     }
 
     @Override
@@ -120,7 +121,7 @@ public class BiTransition implements Transition {
     }
 
     private static boolean checkRelated(PrimitiveTransition relTransition, BindingSignal relFromBS, Activation toAct, Direction dir) {
-        State relToState = dir.getTerminal(relTransition).getState();
+        State relToState = dir.getPrimitiveTerminal(relTransition).getState();
         BindingSignal relToBS = toAct.getBindingSignal(relToState);
 
         if(relToBS == null)

@@ -16,7 +16,9 @@
  */
 package network.aika.neuron.bindingsignal;
 
+import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 
@@ -27,27 +29,27 @@ import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
  */
 public class VariableTerminal extends PrimitiveTerminal {
 
-    public VariableTerminal(State state) {
-        super(state);
+    public VariableTerminal(State state, Direction type, Class<? extends Neuron> neuronClazz) {
+        super(state, type, neuronClazz);
+    }
+
+    public static VariableTerminal variable(State s, Direction type, Class<? extends Neuron> neuronClazz) {
+        return new VariableTerminal(s, type, neuronClazz);
     }
 
     @Override
-    public void initFixedTerminal(Synapse ts, Activation act) {
+    public void initFixedTerminal(PrimitiveTransition t, Synapse ts, Activation act) {
         // nothing to do
     }
 
-    public static VariableTerminal variable(State s) {
-        return new VariableTerminal(s);
-    }
-
-    public void notify(Synapse ts, BindingSignal bs) {
-        if(transition.getMode() == PROPAGATE_ONLY)
+    public void notify(PrimitiveTransition t, Synapse ts, BindingSignal bs) {
+        if(t.getMode() == PROPAGATE_ONLY)
             return;
 
         if(getState() != bs.getState())
             return;
 
-        ts.linkAndPropagate(transition, type.invert(), bs);
+        ts.linkAndPropagate(t, type, bs);
     }
 
     public BindingSignal getBindingSignal(FieldOutput bsEvent) {

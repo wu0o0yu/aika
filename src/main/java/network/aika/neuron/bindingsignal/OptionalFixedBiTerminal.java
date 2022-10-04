@@ -28,12 +28,12 @@ import static network.aika.fields.Fields.isTrue;
  */
 public class OptionalFixedBiTerminal extends BiTerminal<FixedTerminal> {
 
-    public OptionalFixedBiTerminal(Direction type, BiTransition transition, FixedTerminal firstTerminal, FixedTerminal secondTerminal) {
-        super(type, transition, firstTerminal, secondTerminal);
+    public OptionalFixedBiTerminal(Direction type, FixedTerminal firstTerminal, FixedTerminal secondTerminal) {
+        super(type, firstTerminal, secondTerminal);
     }
 
     @Override
-    public void initFixedTerminal(Synapse ts, Activation act) {
+    public void initFixedTerminal(BiTransition t, Synapse ts, Activation act) {
         SlotField firstSlot = firstTerminal.getSlot(act);
         SlotField secondSlot = secondTerminal.getSlot(act);
 
@@ -41,19 +41,19 @@ public class OptionalFixedBiTerminal extends BiTerminal<FixedTerminal> {
         Terminal.getPreconditionEvent(ts, act, dir, firstSlot)
                 .addEventListener(() -> {
                     if(!secondSlot.isBound() || isTrue(secondSlot))
-                        linkAndPropagate(ts, firstSlot, secondSlot, dir);
+                        linkAndPropagate(t, ts, firstSlot, secondSlot, dir);
                 });
 
         Terminal.getPreconditionEvent(ts, act, dir, secondSlot)
                 .addEventListener(() -> {
                     if(!firstSlot.isBound() || isTrue(firstSlot))
-                        linkAndPropagate(ts, firstSlot, secondSlot, dir);
+                        linkAndPropagate(t, ts, firstSlot, secondSlot, dir);
                 });
     }
 
-    private void linkAndPropagate(Synapse ts, SlotField firstSlot, SlotField secondSlot, Direction dir) {
+    private void linkAndPropagate(BiTransition t, Synapse ts, SlotField firstSlot, SlotField secondSlot, Direction dir) {
         ts.linkAndPropagate(
-                transition,
+                t,
                 dir,
                 firstTerminal.getBindingSignal(firstSlot),
                 secondTerminal.getBindingSignal(secondSlot)
@@ -61,7 +61,7 @@ public class OptionalFixedBiTerminal extends BiTerminal<FixedTerminal> {
     }
 
     @Override
-    public void notify(Synapse ts, BindingSignal bs) {
+    public void notify(BiTransition t, Synapse ts, BindingSignal bs) {
         // nothing to do
     }
 }

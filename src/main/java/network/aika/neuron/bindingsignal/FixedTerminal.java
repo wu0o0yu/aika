@@ -19,6 +19,7 @@ package network.aika.neuron.bindingsignal;
 import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.SlotField;
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 
@@ -30,28 +31,28 @@ import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
  */
 public class FixedTerminal extends PrimitiveTerminal {
 
-    public FixedTerminal(State state) {
-        super(state);
+    public FixedTerminal(State state, Direction type, Class<? extends Neuron> neuronClazz) {
+        super(state, type, neuronClazz);
     }
 
-    public static FixedTerminal fixed(State s) {
-        return new FixedTerminal(s);
+    public static FixedTerminal fixed(State s, Direction type, Class<? extends Neuron> neuronClazz) {
+        return new FixedTerminal(s, type, neuronClazz);
     }
 
     @Override
-    public void initFixedTerminal(Synapse ts, Activation act) {
-        if(transition.getMode() == PROPAGATE_ONLY)
+    public void initFixedTerminal(PrimitiveTransition t, Synapse ts, Activation act) {
+        if(t.getMode() == PROPAGATE_ONLY)
             return;
 
         FieldOutput bsEvent = getSlot(act);
         if(bsEvent == null)
             return;
 
-        Direction dir = type.invert();
+        Direction dir = type;
         Terminal.getPreconditionEvent(ts, act, dir, bsEvent)
                 .addEventListener(() ->
                         ts.linkAndPropagate(
-                                transition,
+                                t,
                                 dir,
                                 getBindingSignal(bsEvent)
                         )
@@ -59,15 +60,11 @@ public class FixedTerminal extends PrimitiveTerminal {
     }
 
     @Override
-    public void notify(Synapse ts, BindingSignal bs) {
+    public void notify(PrimitiveTransition t, Synapse ts, BindingSignal bs) {
         // nothing to do here
     }
 
-    public SlotField getSlot(Activation act) {
-        return act != null ?
-                act.getSlot(state) :
-                null;
-    }
+
 
     public BindingSignal getBindingSignal(Activation act) {
         return getBindingSignal(getSlot(act));

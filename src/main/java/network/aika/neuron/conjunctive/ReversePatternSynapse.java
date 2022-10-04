@@ -46,15 +46,15 @@ public class ReversePatternSynapse extends
 {
 
     public static PrimitiveTransition SAME_SAME_TRANSITION = transition(
-            fixed(SAME),
-            fixed(SAME),
+            PatternNeuron.SAME_OUT,
+            BindingNeuron.SAME_IN,
             MATCH_AND_PROPAGATE,
             ReversePatternSynapse.class
     );
 
     public static PrimitiveTransition INPUT_RELATED_SAME_TRANSITION = transition(
-            variable(INPUT),
-            fixed(RELATED_SAME),
+            PatternNeuron.INPUT_OUT,
+            BindingNeuron.RELATED_SAME_IN,
             MATCH_AND_PROPAGATE,
             ReversePatternSynapse.class
     );

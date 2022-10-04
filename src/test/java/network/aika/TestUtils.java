@@ -23,10 +23,7 @@ import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.*;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
-import network.aika.neuron.disjunctive.CategoryNeuron;
-import network.aika.neuron.disjunctive.CategorySynapse;
-import network.aika.neuron.disjunctive.InhibitoryNeuron;
-import network.aika.neuron.disjunctive.InhibitorySynapse;
+import network.aika.neuron.disjunctive.*;
 import network.aika.text.Document;
 import network.aika.neuron.activation.text.TokenActivation;
 
@@ -36,6 +33,7 @@ import java.util.List;
 import static network.aika.neuron.bindingsignal.State.INPUT;
 import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
+import static network.aika.neuron.disjunctive.CategorySynapse.newCategorySynapse;
 import static network.aika.steps.Phase.PROCESSING;
 
 
@@ -113,10 +111,10 @@ public class TestUtils {
     }
 
     public static CategoryNeuron initCategory(Model m, String label, PatternNeuron... inputPatterns) {
-        CategoryNeuron categoryN = createNeuron(new CategoryNeuron(PATTERN), "C-" + label);
+        CategoryNeuron categoryN = createNeuron(new PatternCategoryNeuron(), "C-" + label);
 
         for (PatternNeuron pn : inputPatterns) {
-            createSynapse(new CategorySynapse(PATTERN), pn, categoryN, 1.0);
+            createSynapse(newCategorySynapse(PATTERN), pn, categoryN, 1.0);
         }
 
         return categoryN;

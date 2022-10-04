@@ -22,7 +22,7 @@ import network.aika.neuron.conjunctive.CategoryInputSynapse;
 /**
  * @author Lukas Molzberger
  */
-public class CategoryInputLink extends ConjunctiveLink<CategoryInputSynapse, CategoryActivation, ConjunctiveActivation> {
+public class CategoryInputLink extends ConjunctiveLink<CategoryInputSynapse, CategoryActivation<?>, ConjunctiveActivation> {
 
     public CategoryInputLink(CategoryInputSynapse s, CategoryActivation input, ConjunctiveActivation output) {
         super(s, input, output);

@@ -59,18 +59,8 @@ public class Output implements Direction {
     }
 
     @Override
-    public Activation getToActivation(Activation iAct, Activation oAct) {
-        return oAct;
-    }
-
-    @Override
-    public PrimitiveTerminal getTerminal(PrimitiveTransition t) {
+    public PrimitiveTerminal getPrimitiveTerminal(PrimitiveTransition t) {
         return t.getOutput();
-    }
-
-    @Override
-    public PrimitiveTerminal getFromTerminal(PrimitiveTransition t) {
-        return t.getInput();
     }
 
     @Override
@@ -84,8 +74,8 @@ public class Output implements Direction {
     }
 
     @Override
-    public Stream<? extends Terminal> getTerminals(Transition t) {
-        return t.getOutputTerminals();
+    public Terminal getTerminal(Transition t) {
+        return t.getOutput();
     }
 
     public String toString() {

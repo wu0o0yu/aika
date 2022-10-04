@@ -83,11 +83,8 @@ public class BindingSignal implements Element {
     public void propagate(Link l) {
         Stream<Transition> transitions = l.getSynapse().getTransitions();
         transitions
-                .flatMap(transition ->
-                        transition.getInputTerminals()
-                )
-                .forEach(terminal ->
-                        terminal.propagate(this, l, l.getOutput())
+                .forEach(transition ->
+                        transition.propagate(transition.getInput(), this, l, l.getOutput())
                 );
     }
 

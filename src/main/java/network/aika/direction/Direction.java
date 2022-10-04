@@ -44,17 +44,13 @@ public interface Direction {
 
     Activation getActivation(Link l);
 
-    Activation getToActivation(Activation iAct, Activation oAct);
-
-    PrimitiveTerminal getTerminal(PrimitiveTransition t);
-
-    PrimitiveTerminal getFromTerminal(PrimitiveTransition t);
+    PrimitiveTerminal getPrimitiveTerminal(PrimitiveTransition t);
 
     Stream<Link> getLinks(Activation act);
 
     Stream<? extends Synapse> getSynapses(Neuron n);
 
-    Stream<? extends Terminal> getTerminals(Transition t);
+    Terminal getTerminal(Transition t);
 
     static int compare(Direction a, Direction b) {
         if(a == b) return 0;

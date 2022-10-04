@@ -28,10 +28,7 @@ import java.util.stream.Stream;
 
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.mul;
-import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
 import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
-import static network.aika.neuron.bindingsignal.State.INPUT;
-import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
 
 
@@ -49,14 +46,14 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<
 
     private static List<Transition> TRANSITIONS = List.of(
             transition(
-                    fixed(SAME),
-                    fixed(SAME),
+                    InhibitoryNeuron.SAME_OUT,
+                    BindingNeuron.SAME_IN,
                     MATCH_ONLY,
                     NegativeFeedbackSynapse.class
             ),
             transition(
-                    fixed(INPUT),
-                    fixed(INPUT),
+                    InhibitoryNeuron.INPUT_OUT,
+                    BindingNeuron.INPUT_IN,
                     MATCH_ONLY,
                     NegativeFeedbackSynapse.class
             )

@@ -18,6 +18,8 @@ package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +33,7 @@ import static network.aika.neuron.bindingsignal.TransitionMode.*;
 /**
  * @author Lukas Molzberger
  */
-public class PrimitiveTransition<I extends PrimitiveTerminal, O extends PrimitiveTerminal> implements Transition {
+public class PrimitiveTransition<I extends PrimitiveTerminal, O extends PrimitiveTerminal> implements Transition<I, O> {
 
     private static final Logger log = LoggerFactory.getLogger(PrimitiveTransition.class);
 
@@ -47,11 +49,8 @@ public class PrimitiveTransition<I extends PrimitiveTerminal, O extends Primitiv
         this.mode = mode;
         this.synClazz = synClazz;
 
-        input.setType(INPUT);
-        output.setType(OUTPUT);
-
-        input.setTransition(this);
-        output.setTransition(this);
+        input.getTransitions(OUTPUT).add(this);
+        output.getTransitions(INPUT).add(this);
     }
 
     public static <I extends PrimitiveTerminal, O extends PrimitiveTerminal> PrimitiveTransition<I, O> transition(
@@ -69,6 +68,25 @@ public class PrimitiveTransition<I extends PrimitiveTerminal, O extends Primitiv
 
     public void setParent(BiTransition parent) {
         this.parent = parent;
+    }
+
+
+    @Override
+    public void propagate(PrimitiveTerminal fromTerminal, BindingSignal bs, Link l, Activation act) {
+        if(bs.getState() != fromTerminal.state)
+            return;
+
+        if(!isPropagate())
+            return;
+
+        State toState = fromTerminal.type.getPrimitiveTerminal(this).getState();
+
+        BindingSignal nextBS = act.getBindingSignal(bs.getOriginActivation(), toState);
+
+        if(nextBS == null)
+            nextBS = new BindingSignal(bs, toState, act);
+
+        nextBS.addParent(l, bs);
     }
 
     @Override
@@ -108,26 +126,11 @@ public class PrimitiveTransition<I extends PrimitiveTerminal, O extends Primitiv
     }
 
     @Override
-    public Stream<Terminal> getInputTerminals() {
-        return Stream.of(input);
-    }
-
-    @Override
-    public Stream<Terminal> getOutputTerminals() {
-        return Stream.of(output);
-    }
-
-    @Override
-    public Stream<PrimitiveTerminal> getPrimitiveOutputTerminalsByState(State s) {
-        return output.getState() == s ?
-                Stream.of(output) :
-                Stream.empty();
-    }
-
     public I getInput() {
         return input;
     }
 
+    @Override
     public O getOutput() {
         return output;
     }

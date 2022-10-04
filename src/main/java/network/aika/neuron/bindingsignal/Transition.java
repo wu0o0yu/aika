@@ -18,24 +18,24 @@ package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
-
-import java.util.stream.Stream;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 
 
 /**
  * @author Lukas Molzberger
  */
-public interface Transition {
+public interface Transition<I extends Terminal, O extends Terminal> {
+
+    void propagate(I fromTerminal, BindingSignal bs, Link l, Activation act);
 
     void link(Synapse ts, Direction dir, BindingSignal... fromBSs);
 
     void latentLinking(Synapse ts, BindingSignal... fromBSs);
 
-    Stream<Terminal> getInputTerminals();
+    I getInput();
 
-    Stream<Terminal> getOutputTerminals();
-
-    Stream<PrimitiveTerminal> getPrimitiveOutputTerminalsByState(State s);
+    O getOutput();
 
     TransitionMode getMode();
 }

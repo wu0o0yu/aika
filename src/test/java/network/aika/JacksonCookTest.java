@@ -20,9 +20,7 @@ import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.conjunctive.*;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.neuron.conjunctive.text.TokenPositionRelationNeuron;
-import network.aika.neuron.disjunctive.CategoryNeuron;
-import network.aika.neuron.disjunctive.CategorySynapse;
-import network.aika.neuron.disjunctive.InhibitoryNeuron;
+import network.aika.neuron.disjunctive.*;
 import network.aika.text.Document;
 import org.graphstream.ui.view.camera.Camera;
 import org.junit.jupiter.api.Test;
@@ -132,34 +130,34 @@ public class JacksonCookTest {
         BindingNeuron jacksonForenameBN = createNeuron(forenameBN, "jackson (forename)");
         BindingNeuron jacksonJCBN = createNeuron(jacksonForenameBN, "jackson (jackson cook)");
         createSynapse(new PrimaryInputSynapse(), jacksonIN, jacksonJCBN, 10.0);
-        CategoryNeuron jacksonForenameCN = createNeuron(new CategoryNeuron(BINDING), "jackson (forename)");
-        createSynapse(new CategorySynapse(BINDING), jacksonJCBN, jacksonForenameCN, 10.0);
+        CategoryNeuron jacksonForenameCN = createNeuron(new BindingCategoryNeuron(), "jackson (forename)");
+        createSynapse(new BindingCategorySynapse(), jacksonJCBN, jacksonForenameCN, 10.0);
 
         createSynapse(new CategoryInputSynapse(BINDING), jacksonForenameCN, jacksonForenameBN, 10.0);
         createSynapse(new PrimaryInputSynapse(), jacksonIN, jacksonForenameBN, 10.0);
-        CategoryNeuron forenameCN = createNeuron(new CategoryNeuron(BINDING), "forename");
-        createSynapse(new CategorySynapse(BINDING), jacksonForenameBN, forenameCN, 10.0);
+        CategoryNeuron forenameCN = createNeuron(new BindingCategoryNeuron(), "forename");
+        createSynapse(new BindingCategorySynapse(), jacksonForenameBN, forenameCN, 10.0);
 
         BindingNeuron jacksonCityBN = createNeuron(new BindingNeuron(), "jackson (city)");
         createSynapse(new PrimaryInputSynapse(), jacksonIN, jacksonCityBN, 10.0);
-        CategoryNeuron cityCN = createNeuron(new CategoryNeuron(BINDING), "city");
-        createSynapse(new CategorySynapse(BINDING), jacksonCityBN, cityCN, 10.0);
+        CategoryNeuron cityCN = createNeuron(new BindingCategoryNeuron(), "city");
+        createSynapse(new BindingCategorySynapse(), jacksonCityBN, cityCN, 10.0);
 
         BindingNeuron cookSurnameBN = createNeuron(surnameBN, "cook (surname)");
         BindingNeuron cookJCBN = createNeuron(cookSurnameBN, "cook (jackson cook)");
         createSynapse(new PrimaryInputSynapse(), cookIN, cookJCBN, 10.0);
-        CategoryNeuron cookSurnameCN = createNeuron(new CategoryNeuron(BINDING), "cook (surname)");
-        createSynapse(new CategorySynapse(BINDING), cookJCBN, cookSurnameCN, 10.0);
+        CategoryNeuron cookSurnameCN = createNeuron(new BindingCategoryNeuron(), "cook (surname)");
+        createSynapse(new BindingCategorySynapse(), cookJCBN, cookSurnameCN, 10.0);
 
         createSynapse(new CategoryInputSynapse(BINDING), cookSurnameCN, cookSurnameBN, 10.0);
         createSynapse(new PrimaryInputSynapse(), cookIN, cookSurnameBN, 10.0);
-        CategoryNeuron surnameCN = createNeuron(new CategoryNeuron(BINDING), "surname");
-        createSynapse(new CategorySynapse(BINDING), cookSurnameBN, surnameCN, 10.0);
+        CategoryNeuron surnameCN = createNeuron(new BindingCategoryNeuron(), "surname");
+        createSynapse(new BindingCategorySynapse(), cookSurnameBN, surnameCN, 10.0);
 
         BindingNeuron cookProfessionBN = createNeuron(new BindingNeuron(), "cook (profession)");
         createSynapse(new PrimaryInputSynapse(), cookIN, cookProfessionBN, 10.0);
-        CategoryNeuron professionCN = createNeuron(new CategoryNeuron(BINDING), "profession");
-        createSynapse(new CategorySynapse(BINDING), cookProfessionBN, professionCN, 10.0);
+        CategoryNeuron professionCN = createNeuron(new BindingCategoryNeuron(), "profession");
+        createSynapse(new BindingCategorySynapse(), cookProfessionBN, professionCN, 10.0);
 
         addInhibitoryLoop(m, createNeuron(new InhibitoryNeuron(), "I-jackson"), false, jacksonForenameBN, jacksonCityBN);
         addInhibitoryLoop(m, createNeuron(new InhibitoryNeuron(), "I-cook"), false, cookSurnameBN, cookProfessionBN);

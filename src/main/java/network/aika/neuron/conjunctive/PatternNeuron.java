@@ -18,14 +18,19 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.disjunctive.CategorySynapse;
+import network.aika.neuron.bindingsignal.PrimitiveTerminal;
+import network.aika.neuron.bindingsignal.State;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
+import static network.aika.neuron.bindingsignal.State.ABSTRACT_SAME;
+import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
 
 /**
@@ -33,6 +38,14 @@ import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
  * @author Lukas Molzberger
  */
 public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, PatternActivation> {
+
+    public static PrimitiveTerminal INPUT_IN = variable(State.INPUT, INPUT, PatternNeuron.class);
+    public static PrimitiveTerminal ABSTRACT_SAME_IN = fixed(ABSTRACT_SAME, INPUT, PatternNeuron.class);
+
+    public static PrimitiveTerminal INPUT_OUT = variable(State.INPUT, OUTPUT, PatternNeuron.class);
+    public static PrimitiveTerminal ABSTRACT_SAME_OUT = fixed(ABSTRACT_SAME, OUTPUT, PatternNeuron.class);
+
+
 
     private String tokenLabel;
 

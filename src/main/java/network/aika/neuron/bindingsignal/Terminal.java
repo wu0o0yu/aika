@@ -20,8 +20,9 @@ import network.aika.direction.Direction;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static network.aika.fields.Fields.mul;
@@ -29,23 +30,27 @@ import static network.aika.fields.Fields.mul;
 /**
  * @author Lukas Molzberger
  */
-public interface Terminal {
+public abstract class Terminal<T extends Transition> {
 
-    void setType(Direction type);
+    protected List<T> inputTransitions = new ArrayList<>();
+    protected List<T> outputTransitions = new ArrayList<>();
 
-    Direction getType();
+    public abstract Direction getType();
 
-    boolean matchesState(State s);
+    public List<T> getTransitions(Direction dir) {
+        return dir == Direction.INPUT ?
+                inputTransitions :
+                outputTransitions;
+    }
 
-    Transition getTransition();
+    public abstract void initFixedTerminal(T t, Synapse ts, Activation act);
 
-    Stream<PrimitiveTerminal> getPrimitiveTerminals();
+    public abstract void notify(T t, Synapse ts, BindingSignal bs);
 
-    void initFixedTerminal(Synapse ts, Activation act);
 
-    void notify(Synapse ts, BindingSignal bs);
+    public abstract boolean matchesState(State s);
 
-    void propagate(BindingSignal bs, Link l, Activation act);
+    public abstract Stream<PrimitiveTerminal> getPrimitiveTerminals();
 
     static FieldOutput getPreconditionEvent(Synapse ts, Activation act, Direction dir, FieldOutput inputEvent) {
         FieldOutput actEvent = ts.getLinkingEvent(act, dir);

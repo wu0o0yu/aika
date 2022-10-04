@@ -17,27 +17,22 @@
 package network.aika.neuron.bindingsignal;
 
 import network.aika.direction.Direction;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 
 import java.util.InputMismatchException;
 import java.util.stream.Stream;
 
-import static network.aika.fields.Fields.mul;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class BiTerminal<A extends PrimitiveTerminal> implements Terminal {
+public abstract class BiTerminal<A extends PrimitiveTerminal> extends Terminal<BiTransition> {
 
     protected Direction type;
-    protected BiTransition transition;
     protected A firstTerminal;
     protected FixedTerminal secondTerminal;
 
-    public BiTerminal(Direction type, BiTransition transition, A firstTerminal, FixedTerminal secondTerminal) {
+    public BiTerminal(Direction type, A firstTerminal, FixedTerminal secondTerminal) {
         this.type = type;
-        this.transition = transition;
         this.firstTerminal = firstTerminal;
         this.secondTerminal = secondTerminal;
 
@@ -45,29 +40,25 @@ public abstract class BiTerminal<A extends PrimitiveTerminal> implements Termina
         this.secondTerminal.setParent(this);
     }
 
-    public static BiTerminal biTerminal(Direction type, BiTransition biTransition, PrimitiveTerminal activeTerminal, FixedTerminal passiveTerminal) {
+    public static BiTerminal biTerminal(Direction type, PrimitiveTerminal activeTerminal, FixedTerminal passiveTerminal) {
         if(activeTerminal instanceof FixedTerminal)
-            return new FixedBiTerminal(type, biTransition, (FixedTerminal) activeTerminal, passiveTerminal);
+            return new FixedBiTerminal(type, (FixedTerminal) activeTerminal, passiveTerminal);
 
         if(activeTerminal instanceof VariableTerminal)
-            return new MixedBiTerminal(type, biTransition, (VariableTerminal) activeTerminal, passiveTerminal);
+            return new MixedBiTerminal(type, (VariableTerminal) activeTerminal, passiveTerminal);
 
         throw new InputMismatchException();
     }
 
 
-    public static BiTerminal optionalBiTerminal(Direction type, BiTransition biTransition, PrimitiveTerminal activeTerminal, FixedTerminal passiveTerminal) {
+    public static BiTerminal optionalBiTerminal(Direction type, PrimitiveTerminal activeTerminal, FixedTerminal passiveTerminal) {
         if(activeTerminal instanceof FixedTerminal)
-            return new OptionalFixedBiTerminal(type, biTransition, (FixedTerminal) activeTerminal, passiveTerminal);
+            return new OptionalFixedBiTerminal(type, (FixedTerminal) activeTerminal, passiveTerminal);
 
         if(activeTerminal instanceof VariableTerminal)
-            return new MixedBiTerminal(type, biTransition, (VariableTerminal) activeTerminal, passiveTerminal);
+            return new MixedBiTerminal(type, (VariableTerminal) activeTerminal, passiveTerminal);
 
         throw new InputMismatchException();
-    }
-    @Override
-    public void setType(Direction type) {
-        this.type = type;
     }
 
     @Override
@@ -76,19 +67,16 @@ public abstract class BiTerminal<A extends PrimitiveTerminal> implements Termina
     }
 
     @Override
-    public Transition getTransition() {
-        return transition;
-    }
-
-    @Override
     public Stream<PrimitiveTerminal> getPrimitiveTerminals() {
         return Stream.of(firstTerminal, secondTerminal);
     }
 
-    @Override
-    public void propagate(BindingSignal bs, Link l, Activation act) {
-        firstTerminal.propagate(bs, l, act);
-        secondTerminal.propagate(bs, l, act);
+    public A getFirstTerminal() {
+        return firstTerminal;
+    }
+
+    public FixedTerminal getSecondTerminal() {
+        return secondTerminal;
     }
 
     @Override

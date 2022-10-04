@@ -16,18 +16,23 @@
  */
 package network.aika.neuron.disjunctive;
 
-import network.aika.Thought;
-import network.aika.neuron.activation.BindingCategoryActivation;
 import network.aika.neuron.activation.CategoryActivation;
+import network.aika.neuron.bindingsignal.PrimitiveTerminal;
 import network.aika.neuron.conjunctive.ConjunctiveNeuronType;
 
-import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
+import static network.aika.neuron.bindingsignal.State.SAME;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class CategoryNeuron extends DisjunctiveNeuron<CategorySynapse, CategoryActivation> {
+public abstract class CategoryNeuron<S extends CategorySynapse, A extends CategoryActivation> extends DisjunctiveNeuron<S, A> {
+
+    public static PrimitiveTerminal SAME_IN = fixed(SAME, INPUT, CategoryNeuron.class);
+    public static PrimitiveTerminal SAME_OUT = fixed(SAME, OUTPUT, CategoryNeuron.class);
 
     protected ConjunctiveNeuronType type;
 
@@ -39,20 +44,4 @@ public class CategoryNeuron extends DisjunctiveNeuron<CategorySynapse, CategoryA
         return type;
     }
 
-    @Override
-    public CategoryActivation createActivation(Thought t) {
-        return type == PATTERN ?
-                new CategoryActivation(t.createActivationId(), t, this) :
-                new BindingCategoryActivation(t.createActivationId(), t, this);
-    }
-
-    @Override
-    public CategoryNeuron instantiateTemplate(boolean addProvider) {
-        CategoryNeuron n = new CategoryNeuron(type);
-        if(addProvider)
-            n.addProvider(getModel());
-
-        initFromTemplate(n);
-        return n;
-    }
 }

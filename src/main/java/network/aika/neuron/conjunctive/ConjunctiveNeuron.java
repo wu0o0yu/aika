@@ -22,6 +22,9 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.PrimitiveTerminal;
+import network.aika.neuron.bindingsignal.Terminal;
+import network.aika.neuron.disjunctive.CategoryNeuron;
 import network.aika.neuron.disjunctive.CategorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,13 +35,26 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
+import static network.aika.neuron.bindingsignal.State.*;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends ConjunctiveActivation> extends Neuron<S, A> {
+
+    public static PrimitiveTerminal SAME_IN = fixed(SAME, INPUT, ConjunctiveNeuron.class);
+    public static PrimitiveTerminal ABSTRACT_SAME_IN = fixed(ABSTRACT_SAME, INPUT, ConjunctiveNeuron.class);
+    public static PrimitiveTerminal ABSTRACT_INPUT_IN = fixed(ABSTRACT_INPUT, INPUT, ConjunctiveNeuron.class);
+
+    public static PrimitiveTerminal SAME_OUT = fixed(SAME, OUTPUT, ConjunctiveNeuron.class);
+    public static PrimitiveTerminal ABSTRACT_SAME_OUT = fixed(ABSTRACT_SAME, OUTPUT, ConjunctiveNeuron.class);
+    public static PrimitiveTerminal ABSTRACT_INPUT_OUT = fixed(ABSTRACT_INPUT, OUTPUT, ConjunctiveNeuron.class);
+
 
     private static final Logger log = LoggerFactory.getLogger(ConjunctiveNeuron.class);
 
@@ -61,7 +77,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         getInputSynapses()
                 .filter(s -> s instanceof CategoryInputSynapse)
                 .forEach(s ->
-                        Synapse.init(new CategorySynapse(type), n, s.getInput(), 1.0)
+                        Synapse.init(CategorySynapse.newCategorySynapse(type), n, s.getInput(), 1.0)
                 );
     }
 

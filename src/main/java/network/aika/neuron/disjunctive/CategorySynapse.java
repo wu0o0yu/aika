@@ -17,94 +17,50 @@
 package network.aika.neuron.disjunctive;
 
 import network.aika.neuron.activation.*;
-import network.aika.neuron.bindingsignal.PrimitiveTransition;
-import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 import network.aika.neuron.conjunctive.ConjunctiveNeuronType;
-import network.aika.neuron.conjunctive.SamePatternSynapse;
-
-import java.util.List;
-import java.util.stream.Stream;
-
-import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.TransitionMode.PROPAGATE_ONLY;
-import static network.aika.neuron.bindingsignal.State.INPUT;
-import static network.aika.neuron.bindingsignal.State.SAME;
-import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
-import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
-import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
-import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
-
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class CategorySynapse<N extends ConjunctiveNeuron> extends DisjunctiveSynapse<
-        CategorySynapse,
-        N,
-        CategoryNeuron,
-        CategoryLink,
-        ConjunctiveActivation<?>,
-        CategoryActivation
+public abstract class CategorySynapse<S extends CategorySynapse, I extends ConjunctiveNeuron, O extends CategoryNeuron<?, OA>, IA extends Activation<?>, OA extends CategoryActivation> extends DisjunctiveSynapse<
+        S,
+        I,
+        O,
+        CategoryLink<S, IA, OA>,
+        IA,
+        OA
         >
 {
 
     protected ConjunctiveNeuronType type;
-
-    public static PrimitiveTransition SAME_TRANSITION = transition(
-            fixed(SAME),
-            fixed(SAME),
-            MATCH_AND_PROPAGATE,
-            CategorySynapse.class
-    );
-
-
-    public static PrimitiveTransition PATTERN_INPUT_TRANSITION = transition(
-            variable(INPUT),
-            variable(INPUT),
-            MATCH_AND_PROPAGATE,
-            CategorySynapse.class
-    );
-
-    public static PrimitiveTransition BINDING_INPUT_TRANSITION = transition(
-            fixed(INPUT),
-            fixed(INPUT),
-            MATCH_AND_PROPAGATE,
-            CategorySynapse.class
-    );
 
 
     public CategorySynapse(ConjunctiveNeuronType t) {
         this.type = t;
     }
 
-    public void setInput(N input) {
+    public static CategorySynapse newCategorySynapse(ConjunctiveNeuronType type) {
+        return switch (type) {
+            case BINDING -> new BindingCategorySynapse();
+            case PATTERN -> new PatternCategorySynapse();
+            default -> null;
+        };
+    }
+
+    public void setInput(I input) {
         assert type == input.getType();
         super.setInput(input);
     }
 
-    public void setOutput(CategoryNeuron output) {
+    public void setOutput(O output) {
         assert type == output.getType();
         super.setOutput(output);
     }
 
     @Override
-    public CategoryLink createLink(ConjunctiveActivation input, CategoryActivation output) {
+    public CategoryLink createLink(IA input, OA output) {
         return new CategoryLink(this, input, output);
-    }
-
-    @Override
-    public Stream<Transition> getTransitions() {
-        return List.of(
-                SAME_TRANSITION,
-                getInputTransition()
-        ).stream();
-    }
-
-    private Transition getInputTransition() {
-        return type == PATTERN ?
-                PATTERN_INPUT_TRANSITION :
-                BINDING_INPUT_TRANSITION;
     }
 }
