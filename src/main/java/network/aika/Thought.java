@@ -40,7 +40,7 @@ public abstract class Thought {
 
     protected final Model model;
 
-    private long id;
+    private Long id;
     private long absoluteBegin;
 
     private Timestamp timestampOnProcess = new Timestamp(0);
@@ -62,7 +62,7 @@ public abstract class Thought {
         m.setCurrentThought(this);
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
