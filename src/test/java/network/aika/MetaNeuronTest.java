@@ -114,6 +114,9 @@ public class MetaNeuronTest {
         letterS.setLabel("L-s");
         letterS.setNetworkInput(true);
 
+        TokenNeuron letterC = letterPN.instantiateTemplate(true);
+        letterC.setLabel("L-c");
+        letterC.setNetworkInput(true);
 
 
         Document doc = new Document(m, "s c h");
@@ -141,8 +144,9 @@ public class MetaNeuronTest {
         camera.setViewPercent(2.3);
         camera.setViewCenter(0.0, 0.0, 0);
 
-        TokenActivation letterSAct = doc.addToken(letterS, 0, 0, 1);
-        process(doc, List.of(letterSAct));
+        TokenActivation letterSAct = doc.addToken(letterS, 0, 0, 2);
+        TokenActivation letterCAct = doc.addToken(letterC, 1, 2, 4);
+        process(doc, List.of(letterSAct, letterCAct));
 
         doc.postProcessing();
         doc.updateModel();
