@@ -29,10 +29,12 @@ public class MetaNeuronTest {
         coords.put(0, new double[]{0.0, 0.0});
         coords.put(1, new double[]{-0.001, 0.201});
         coords.put(2, new double[]{0.0, 0.406});
-        coords.put(3, new double[]{0.242, 0.623});
-        coords.put(4, new double[]{0.464, 0.823});
+        coords.put(3, new double[]{0.261, 0.645});
+        coords.put(4, new double[]{0.499, 0.861});
         coords.put(5, new double[]{0.249, 0.201});
-        coords.put(6, new double[]{0.245, 0.401});
+        coords.put(6, new double[]{0.256, 0.414});
+        coords.put(7, new double[]{0.486, 0.415});
+        coords.put(8, new double[]{0.492, 0.649});
 
         return coords;
     }
@@ -48,6 +50,7 @@ public class MetaNeuronTest {
         coords.put(6l, new double[]{1.092, 0.741});
         coords.put(7l, new double[]{-0.353, -0.728});
         coords.put(8l, new double[]{0.415, -0.724});
+        coords.put(9l, new double[]{1.092, -0.716});
 
         return coords;
     }

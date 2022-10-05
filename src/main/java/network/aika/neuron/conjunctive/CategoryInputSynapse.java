@@ -46,21 +46,21 @@ public class CategoryInputSynapse extends ConjunctiveSynapse<
 
     private static PrimitiveTransition SAME_TRANSITION = transition(
             CategoryNeuron.SAME_OUT,
-            ConjunctiveNeuron.ABSTRACT_SAME_IN,
+            ConjunctiveNeuron.ABSTRACT_IN,
             MATCH_AND_PROPAGATE,
             CategoryInputSynapse.class
     );
 
     private static PrimitiveTransition PATTERN_INPUT_TRANSITION = transition(
             PatternCategoryNeuron.INPUT_OUT,
-            ConjunctiveNeuron.ABSTRACT_INPUT_IN,
+            ConjunctiveNeuron.ABSTRACT_IN,
             MATCH_AND_PROPAGATE,
             CategoryInputSynapse.class
     );
 
     private static PrimitiveTransition BINDING_INPUT_TRANSITION = transition(
             BindingCategoryNeuron.INPUT_OUT,
-            ConjunctiveNeuron.ABSTRACT_INPUT_IN,
+            ConjunctiveNeuron.ABSTRACT_IN,
             MATCH_AND_PROPAGATE,
             CategoryInputSynapse.class
     );

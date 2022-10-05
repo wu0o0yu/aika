@@ -22,9 +22,12 @@ import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 import network.aika.sign.Sign;
 import network.aika.steps.link.LinkCounting;
+
+import java.util.stream.Stream;
 
 import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.FieldLink.connect;
@@ -251,11 +254,25 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     private I resolveAbstractInputActivation(BindingSignal abstractBS) {
-        return abstractBS.getParents().values().stream()
-                .filter(bs -> bs.getActivation() == input)
-                .map(bs -> (I) bs.getOriginActivation())
+        return getAbstractInputBS(abstractBS)
+                .flatMap(bs -> getConcreteActivation(bs.getOriginActivation()))
                 .findAny()
                 .orElse(input);
+    }
+
+    private Stream<I> getConcreteActivation(PatternActivation origin) {
+        if(origin.getNeuron().getTemplate() == input.getNeuron())
+            return Stream.of((I) origin);
+
+        return origin.getReverseBindingSignals()
+                .filter(bs -> bs.getState() == State.SAME || bs.getState() == State.INPUT)
+                .filter(bs -> bs.getActivation().getNeuron().getTemplate() == input.getNeuron())
+                .map(bs -> (I) bs.getActivation());
+    }
+
+    private Stream<BindingSignal> getAbstractInputBS(BindingSignal abstractBS) {
+        return abstractBS.getParents().values().stream()
+                .filter(bs -> bs.getActivation() == input);
     }
 
     public void linkInput() {

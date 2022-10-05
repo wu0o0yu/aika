@@ -23,8 +23,6 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.bindingsignal.PrimitiveTerminal;
-import network.aika.neuron.bindingsignal.Terminal;
-import network.aika.neuron.disjunctive.CategoryNeuron;
 import network.aika.neuron.disjunctive.CategorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,12 +46,10 @@ import static network.aika.neuron.bindingsignal.State.*;
 public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends ConjunctiveActivation> extends Neuron<S, A> {
 
     public static PrimitiveTerminal SAME_IN = fixed(SAME, INPUT, ConjunctiveNeuron.class);
-    public static PrimitiveTerminal ABSTRACT_SAME_IN = fixed(ABSTRACT_SAME, INPUT, ConjunctiveNeuron.class);
-    public static PrimitiveTerminal ABSTRACT_INPUT_IN = fixed(ABSTRACT_INPUT, INPUT, ConjunctiveNeuron.class);
+    public static PrimitiveTerminal ABSTRACT_IN = fixed(ABSTRACT, INPUT, ConjunctiveNeuron.class);
 
     public static PrimitiveTerminal SAME_OUT = fixed(SAME, OUTPUT, ConjunctiveNeuron.class);
-    public static PrimitiveTerminal ABSTRACT_SAME_OUT = fixed(ABSTRACT_SAME, OUTPUT, ConjunctiveNeuron.class);
-    public static PrimitiveTerminal ABSTRACT_INPUT_OUT = fixed(ABSTRACT_INPUT, OUTPUT, ConjunctiveNeuron.class);
+    public static PrimitiveTerminal ABSTRACT_OUT = fixed(ABSTRACT, OUTPUT, ConjunctiveNeuron.class);
 
 
     private static final Logger log = LoggerFactory.getLogger(ConjunctiveNeuron.class);

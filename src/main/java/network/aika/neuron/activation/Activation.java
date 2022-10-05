@@ -40,7 +40,6 @@ import static network.aika.fields.LinkSlotMode.MIN;
 import static network.aika.fields.ThresholdOperator.Type.*;
 import static network.aika.neuron.bindingsignal.BSKey.COMPARATOR;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
-import static network.aika.neuron.bindingsignal.State.ABSTRACT_SAME;
 
 /**
  * @author Lukas Molzberger

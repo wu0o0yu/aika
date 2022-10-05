@@ -51,7 +51,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     public BindingSignal getAbstractBindingSignal() {
-        return getBindingSignal(ABSTRACT_INPUT);
+        return getBindingSignal(ABSTRACT);
     }
 
 

@@ -17,8 +17,6 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.fields.Field;
-import network.aika.fields.FieldOutput;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
@@ -50,7 +48,7 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     @Override
     public BindingSignal getAbstractBindingSignal() {
-        return getBindingSignal(ABSTRACT_SAME);
+        return getBindingSignal(ABSTRACT);
     }
 
     @Override
@@ -77,6 +75,10 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
                 new BSKey(toNeuron, s.ordinal(), 0),
                 new BSKey(toNeuron, s.ordinal(), Integer.MAX_VALUE)
         ).values().stream();
+    }
+
+    public Stream<BindingSignal> getReverseBindingSignals() {
+        return reverseBindingSignals.values().stream();
     }
 
     @Override
