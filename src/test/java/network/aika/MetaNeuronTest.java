@@ -5,6 +5,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.*;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
+import network.aika.neuron.conjunctive.text.TokenPositionRelationNeuron;
 import network.aika.neuron.disjunctive.BindingCategoryNeuron;
 import network.aika.neuron.disjunctive.CategoryNeuron;
 import network.aika.neuron.disjunctive.PatternCategoryNeuron;
@@ -72,6 +73,8 @@ public class MetaNeuronTest {
     public void setupMetaNeuronTest(AIKADebugger debugger) {
         Model m = new Model();
 
+        LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, -1, -1);
+
         // Abstract
         CategoryNeuron letterCategory = new PatternCategoryNeuron();
         letterCategory.addProvider(m);
@@ -98,6 +101,9 @@ public class MetaNeuronTest {
         letterBN.addProvider(m);
         letterBN.setLabel("Abstract BN-letter");
         letterBN.getBias().setValue(3.0);
+
+        Synapse.init(new RelatedInputSynapse(), relPT, letterBN, 5.0);
+        Synapse.init(new SamePatternSynapse(), letterBN, letterBN, 10.0);
 
         PatternNeuron syllable = new PatternNeuron();
         syllable.addProvider(m);
