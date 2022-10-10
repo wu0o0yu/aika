@@ -31,9 +31,6 @@ import static network.aika.neuron.bindingsignal.State.SAME;
  */
 public abstract class CategoryNeuron<S extends CategorySynapse, A extends CategoryActivation> extends DisjunctiveNeuron<S, A> {
 
-    public static PrimitiveTerminal SAME_IN = fixed(SAME, INPUT, CategoryNeuron.class);
-    public static PrimitiveTerminal SAME_OUT = fixed(SAME, OUTPUT, CategoryNeuron.class);
-
     protected ConjunctiveNeuronType type;
 
     public CategoryNeuron(ConjunctiveNeuronType type) {

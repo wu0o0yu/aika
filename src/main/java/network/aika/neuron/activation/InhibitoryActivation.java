@@ -39,6 +39,7 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
     }
 
 
+    @Override
     public SlotField getSlot(State s) {
         return switch(s) {
             case INPUT -> inputBSSlot;

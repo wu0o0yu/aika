@@ -36,6 +36,7 @@ public class BindingCategoryActivation extends CategoryActivation {
         super(id, t, neuron);
     }
 
+    @Override
     public SlotField getSlot(State s) {
         return switch(s) {
             case INPUT -> inputBSSlot;

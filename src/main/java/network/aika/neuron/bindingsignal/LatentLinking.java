@@ -43,7 +43,6 @@ public class LatentLinking {
 
         toNeuron.getTargetSynapses(INPUT)
                 .filter(synB -> synA != synB)
-                .filter(synB -> !synA.isOfTemplate(synB) && !synB.isOfTemplate(synA))
                 .filter(synB -> isLatentLinking(synA, synB))
                 .forEach(synB ->
                         latentLinking(t, fromBS, synA, synB)

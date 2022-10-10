@@ -95,7 +95,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 );
     }
 
-
+    @Override
     public SlotField getSlot(State s) {
         return switch(s) {
             case INPUT -> inputBSSlot;

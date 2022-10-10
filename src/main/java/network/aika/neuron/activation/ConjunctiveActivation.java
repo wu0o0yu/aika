@@ -17,8 +17,9 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.neuron.Synapse;
+import network.aika.fields.SlotField;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 
 import static network.aika.direction.Direction.INPUT;
@@ -29,15 +30,26 @@ import static network.aika.direction.Direction.INPUT;
  */
 public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> extends Activation<N> {
 
+    protected SlotField abstractBSSlot = new SlotField(this, "abstractBSSlot");
+
+
     public ConjunctiveActivation(int id, Thought t, N n) {
         super(id, t, n);
 
         if (!getNeuron().isNetworkInput() &&
                 getConfig().isTrainingEnabled() &&
-                n.getCategoryInputSynapse() != null)
-            isFinal.addEventListener(() ->
+                n.isTemplate())
+            isFinalAndFired.addEventListener(() ->
                     instantiateTemplate()
             );
+    }
+
+    @Override
+    public SlotField getSlot(State s) {
+        return switch(s) {
+            case ABSTRACT -> abstractBSSlot;
+            default -> super.getSlot(s);
+        };
     }
 
     public abstract BindingSignal getAbstractBindingSignal();

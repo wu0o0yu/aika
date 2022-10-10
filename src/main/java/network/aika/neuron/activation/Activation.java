@@ -69,6 +69,9 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     protected FieldOutput isFinal;
 
+    protected FieldOutput isFinalAndFired;
+
+
     private FieldFunction entropy;
     protected FieldFunction netOuterGradient;
     protected QueueField ownInputGradient;
@@ -142,6 +145,13 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
                 0.01,
                 BELOW,
                 netDiff
+        );
+
+        isFinalAndFired = mul(
+                this,
+                "final and fired",
+                isFinal,
+                isFired
         );
 
         if (!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled())

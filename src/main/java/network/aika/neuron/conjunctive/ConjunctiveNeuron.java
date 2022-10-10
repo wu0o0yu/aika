@@ -45,10 +45,8 @@ import static network.aika.neuron.bindingsignal.State.*;
  */
 public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends ConjunctiveActivation> extends Neuron<S, A> {
 
-    public static PrimitiveTerminal SAME_IN = fixed(SAME, INPUT, ConjunctiveNeuron.class);
     public static PrimitiveTerminal ABSTRACT_IN = fixed(ABSTRACT, INPUT, ConjunctiveNeuron.class);
 
-    public static PrimitiveTerminal SAME_OUT = fixed(SAME, OUTPUT, ConjunctiveNeuron.class);
     public static PrimitiveTerminal ABSTRACT_OUT = fixed(ABSTRACT, OUTPUT, ConjunctiveNeuron.class);
 
 
@@ -81,6 +79,10 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     @Override
     public void setModified() {
         super.setModified();
+    }
+
+    public boolean isTemplate() {
+        return getCategoryInputSynapse() != null;
     }
 
     public CategoryInputSynapse getCategoryInputSynapse() {

@@ -28,7 +28,9 @@ import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.Timestamp;
 import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.bindingsignal.PrimitiveTerminal;
 import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Save;
 import network.aika.utils.Bound;
@@ -45,8 +47,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.activation.Timestamp.MAX;
 import static network.aika.neuron.activation.Timestamp.MIN;
+import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
+import static network.aika.neuron.bindingsignal.State.SAME;
 import static network.aika.sign.Sign.POS;
 
 /**
@@ -54,6 +60,10 @@ import static network.aika.sign.Sign.POS;
  * @author Lukas Molzberger
  */
 public abstract class Neuron<S extends Synapse, A extends Activation> implements Element, Writable {
+
+    public static PrimitiveTerminal SAME_IN = fixed(SAME, INPUT, Neuron.class);
+
+    public static PrimitiveTerminal SAME_OUT = fixed(SAME, OUTPUT, Neuron.class);
 
     volatile long retrievalCount = 0;
 
