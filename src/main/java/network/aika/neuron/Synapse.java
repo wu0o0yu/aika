@@ -537,14 +537,14 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
                 null;
     }
 
-    public static <S extends Synapse> S init(S ts, Neuron input, Neuron output, double initialWeight) {
-        ts.setInput(input);
-        ts.setOutput(output);
-        ts.getWeight().setValue(initialWeight);
-        ts.linkInput();
-        ts.linkOutput();
+    public S init(Neuron input, Neuron output, double initialWeight) {
+        setInput((I) input);
+        setOutput((O) output);
+        getWeight().setValue(initialWeight);
+        linkInput();
+        linkOutput();
 
-        return ts;
+        return (S) this;
     }
 
     public String toString() {

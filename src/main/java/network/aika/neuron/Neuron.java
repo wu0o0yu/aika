@@ -86,7 +86,8 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     private WeakHashMap<Long, WeakReference<SortedSet<A>>> activations = new WeakHashMap<>();
 
     public void addProvider(Model m) {
-        provider = new NeuronProvider(m, this);
+        if(provider == null)
+            provider = new NeuronProvider(m, this);
         setModified();
     }
 
@@ -140,7 +141,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public abstract A createActivation(Thought t);
 
-    public abstract Neuron<S, A> instantiateTemplate(boolean addProvider);
+    public abstract <N extends Neuron<S, A>> N instantiateTemplate(boolean addProvider);
 
     public abstract void addInactiveLinks(BindingSignal bs);
 
@@ -468,14 +469,22 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
 
-    public static <N extends Neuron> N init(Model m, String label, double initialBias, boolean isTemplate, NeuronProducer<N> np) {
-        N n = m.lookupNeuron(label, np);
+    public <N extends Neuron> N init(Model m, String label) {
+        addProvider(m);
+        setLabel(label);
+        return (N) this;
+    }
 
-        n.setLabel(label);
-        n.getBias().setValue(initialBias);
+    public <N extends Neuron> N init(Model m, String label, boolean isNetworkInput) {
+        addProvider(m);
+        setLabel(label);
+        setNetworkInput(isNetworkInput);
+        return (N) this;
+    }
 
-        n.getProvider().save();
-        return n;
+    public Neuron updateBias(double bias) {
+        getBias().receiveUpdate(bias);
+        return this;
     }
 
     public String toKeyString() {

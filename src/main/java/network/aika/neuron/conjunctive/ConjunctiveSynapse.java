@@ -107,4 +107,11 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     public void initDummyLink(BindingActivation bindingActivation) {
 
     }
+
+    public S adjustBias() {
+        if(weight.getCurrentValue() > 0.0)
+            getOutput().getBias().receiveUpdate(-weight.getCurrentValue());
+
+        return (S) this;
+    }
 }

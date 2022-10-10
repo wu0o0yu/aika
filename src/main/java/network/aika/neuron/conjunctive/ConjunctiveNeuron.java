@@ -73,7 +73,8 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         getInputSynapses()
                 .filter(s -> s instanceof CategoryInputSynapse)
                 .forEach(s ->
-                        Synapse.init(CategorySynapse.newCategorySynapse(type), n, s.getInput(), 1.0)
+                        CategorySynapse.newCategorySynapse(type)
+                                .init(n, s.getInput(), 1.0)
                 );
     }
 

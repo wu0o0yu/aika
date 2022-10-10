@@ -102,21 +102,40 @@ public class MutualExclusionTest {
         BindingNeuron nc = createNeuron(new BindingNeuron(), "C");
         InhibitoryNeuron inhib = createNeuron(new InhibitoryNeuron(), "I");
 
-        createSynapse(new PrimaryInputSynapse(), in, na, 10.0);
-        createSynapse(new NegativeFeedbackSynapse(), inhib, na, -100.0);
+        new PrimaryInputSynapse()
+                .init(in, na, 10.0)
+                .adjustBias();
+        new NegativeFeedbackSynapse()
+                .init(inhib, na, -100.0);
+
         TestUtils.updateBias(na, 1.0);
 
-        createSynapse(new PrimaryInputSynapse(), in, nb, 10.0);
-        createSynapse(new NegativeFeedbackSynapse(), inhib, nb, -100.0);
+        new PrimaryInputSynapse()
+                .init(in, nb, 10.0)
+                .adjustBias();
+
+        new NegativeFeedbackSynapse()
+                .init(inhib, nb, -100.0);
+
         TestUtils.updateBias(nb, 1.5);
 
-        createSynapse(new PrimaryInputSynapse(), in, nc, 10.0);
-        createSynapse(new NegativeFeedbackSynapse(), inhib, nc, -100.0);
+        new PrimaryInputSynapse()
+                .init(in, nc, 10.0)
+                .adjustBias();
+
+        new NegativeFeedbackSynapse()
+                .init(inhib, nc, -100.0);
+
         TestUtils.updateBias(nc, 1.2);
 
-        createSynapse(new InhibitorySynapse(INPUT), na, inhib, 1.0);
-        createSynapse(new InhibitorySynapse(INPUT), nb, inhib, 1.0);
-        createSynapse(new InhibitorySynapse(INPUT), nc, inhib, 1.0);
+        new InhibitorySynapse(INPUT)
+                .init(na, inhib, 1.0);
+
+        new InhibitorySynapse(INPUT)
+                .init(nb, inhib, 1.0);
+
+        new InhibitorySynapse(INPUT)
+                .init(nc, inhib, 1.0);
 
 
         Document doc = new Document(m, "test");
@@ -150,21 +169,35 @@ public class MutualExclusionTest {
         BindingNeuron nb = createNeuron(new BindingNeuron(), "B");
         InhibitoryNeuron inhib = createNeuron(new InhibitoryNeuron(), "I");
 
-        createSynapse(new PrimaryInputSynapse(), in, na, 10.0);
-        createSynapse(new NegativeFeedbackSynapse(), inhib, na, -20.0);
+        new PrimaryInputSynapse()
+                .init(in, na, 10.0)
+                .adjustBias();
+
+        new NegativeFeedbackSynapse()
+                .init(inhib, na, -20.0)
+                .adjustBias();
+
         updateBias(na, 1.0);
         PatternNeuron pa = initPatternLoop(m, "A", na);
         updateBias(pa, 3.0);
 
 
-        createSynapse(new PrimaryInputSynapse(), in, nb, 10.0);
-        createSynapse(new NegativeFeedbackSynapse(), inhib, nb, -20.0);
+        new PrimaryInputSynapse()
+                .init(in, nb, 10.0)
+                .adjustBias();
+
+        new NegativeFeedbackSynapse()
+                .init(inhib, nb, -20.0);
+
         updateBias(nb, 1.5);
         PatternNeuron pb = initPatternLoop(m, "B", nb);
         updateBias(pb, 3.0);
 
-        createSynapse(new InhibitorySynapse(INPUT), na, inhib, 1.0);
-        createSynapse(new InhibitorySynapse(INPUT), nb, inhib, 1.0);
+        new InhibitorySynapse(INPUT)
+                .init(na, inhib, 1.0);
+
+        new InhibitorySynapse(INPUT)
+                .init(nb, inhib, 1.0);
 
 
 

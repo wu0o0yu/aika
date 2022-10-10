@@ -114,7 +114,8 @@ public class TestUtils {
         CategoryNeuron categoryN = createNeuron(new PatternCategoryNeuron(), "C-" + label);
 
         for (PatternNeuron pn : inputPatterns) {
-            createSynapse(newCategorySynapse(PATTERN), pn, categoryN, 1.0);
+            newCategorySynapse(PATTERN)
+                    .init(pn, categoryN, 1.0);
         }
 
         return categoryN;
@@ -128,13 +129,11 @@ public class TestUtils {
 
     public static InhibitoryNeuron addInhibitoryLoop(Model m, InhibitoryNeuron inhibN, boolean sameInhibSynapse, BindingNeuron... bns) {
         for(BindingNeuron bn: bns) {
-            createSynapse(
-                    new InhibitorySynapse(sameInhibSynapse ? SAME : INPUT),
-                    bn,
-                    inhibN,
-                    1.0
-            );
-            createSynapse(new NegativeFeedbackSynapse(), inhibN, bn, -20.0);
+            new InhibitorySynapse(sameInhibSynapse ? SAME : INPUT)
+                    .init(bn, inhibN, 1.0);
+
+            new NegativeFeedbackSynapse()
+                    .init(inhibN, bn, -20.0);
         }
         return inhibN;
     }
@@ -143,7 +142,10 @@ public class TestUtils {
         PatternNeuron patternN = createNeuron(new PatternNeuron(), "P-" + label);
 
         for(BindingNeuron bn: bns) {
-            createSynapse(new PatternSynapse(), bn, patternN, 10.0);
+            new PatternSynapse()
+                    .init(bn, patternN, 10.0)
+                    .adjustBias();
+
             createPositiveFeedbackSynapse(new PositiveFeedbackSynapse(), patternN, bn, 0.0, 10.0);
         }
         return patternN;
@@ -166,7 +168,7 @@ public class TestUtils {
     }
 
     public static PositiveFeedbackSynapse createPositiveFeedbackSynapse(PositiveFeedbackSynapse templateSynapse, PatternNeuron input, BindingNeuron output, double weight, double feedbackWeight) {
-        PositiveFeedbackSynapse s = (PositiveFeedbackSynapse) templateSynapse.instantiateTemplate(null, input, output);
+        PositiveFeedbackSynapse s = templateSynapse.instantiateTemplate(null, input, output);
 
         s.setWeight(weight);
 
@@ -175,19 +177,6 @@ public class TestUtils {
         s.getOutput().getBias().receiveUpdate(-weight);
         s.getWeight().receiveUpdate(feedbackWeight);
         return s;
-    }
-
-    public static <S extends Synapse> S createSynapse(Synapse s, Neuron input, Neuron output, double weight) {
-        s.setWeight(weight);
-
-        s.linkInput();
-        if(output instanceof ConjunctiveNeuron) {
-            s.linkOutput();
-            if(weight > 0.0)
-                s.getOutput().getBias().receiveUpdate(-weight);
-        }
-
-        return (S) s;
     }
 
     public static void setStatistic(Neuron n, double frequency, int N, long lastPosition) {

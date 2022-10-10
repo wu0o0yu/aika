@@ -38,7 +38,9 @@ public class PropagateTest {
         TokenNeuron in = createNeuron(new TokenNeuron(), "IN", true);
         BindingNeuron out = createNeuron(new BindingNeuron(), "OUT");
 
-        createSynapse(new PrimaryInputSynapse(), in, out, 10.0);
+        new PrimaryInputSynapse()
+                .init(in, out, 10.0);
+
         updateBias(out, 1.0);
 
         Document doc = new Document(m, "test");
