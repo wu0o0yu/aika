@@ -56,17 +56,9 @@ public class PatternSynapse extends ConjunctiveSynapse<
             PatternSynapse.class
     );
 
-    public static PrimitiveTransition ABSTRACT_INPUT_ABSTRACT_INPUT_TRANSITION = transition(
-            PatternNeuron.ABSTRACT_OUT,
-            BindingNeuron.ABSTRACT_IN,
-            MATCH_AND_PROPAGATE,
-            PatternSynapse.class
-    );
-
     private static List<Transition> TRANSITIONS = List.of(
             SAME_SAME_TRANSITION,
-            INPUT_INPUT_TRANSITION,
-            ABSTRACT_INPUT_ABSTRACT_INPUT_TRANSITION
+            INPUT_INPUT_TRANSITION
     );
 
     public PatternSynapse() {

@@ -47,13 +47,6 @@ public class PrimaryInputSynapse extends BindingNeuronSynapse<
             PrimaryInputSynapse.class
     );
 
-    public static PrimitiveTransition ABSTRACT_ABSTRACT_TRANSITION = transition(
-            PatternNeuron.ABSTRACT_OUT,
-            BindingNeuron.ABSTRACT_IN,
-            MATCH_AND_PROPAGATE,
-            PrimaryInputSynapse.class
-    );
-
     public static PrimitiveTransition SAME_RELATED_SAME_TRANSITION = transition(
             PatternNeuron.SAME_OUT,
             BindingNeuron.RELATED_SAME_IN,
@@ -70,7 +63,6 @@ public class PrimaryInputSynapse extends BindingNeuronSynapse<
 
     private static List<Transition> TRANSITIONS = List.of(
             SAME_INPUT_TRANSITION,
-            ABSTRACT_ABSTRACT_TRANSITION,
             SAME_RELATED_SAME_TRANSITION,
             INPUT_RELATED_INPUT_TRANSITION
     );

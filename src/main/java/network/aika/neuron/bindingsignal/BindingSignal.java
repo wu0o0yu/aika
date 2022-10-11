@@ -122,6 +122,10 @@ public class BindingSignal implements Element {
         return onArrivedFired;
     }
 
+    public boolean isAbstract() {
+
+    }
+
     public boolean isOrigin() {
         return this == origin;
     }

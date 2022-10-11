@@ -48,7 +48,10 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     @Override
     public BindingSignal getAbstractBindingSignal() {
-        return getBindingSignal(ABSTRACT);
+        return getBindingSignals(INPUT)
+                .filter(bs -> bs.isAbstract())
+                .findAny()
+                .orElse(null);
     }
 
     @Override

@@ -45,11 +45,6 @@ import static network.aika.neuron.bindingsignal.State.*;
  */
 public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends ConjunctiveActivation> extends Neuron<S, A> {
 
-    public static PrimitiveTerminal ABSTRACT_IN = fixed(ABSTRACT, INPUT, ConjunctiveNeuron.class);
-
-    public static PrimitiveTerminal ABSTRACT_OUT = fixed(ABSTRACT, OUTPUT, ConjunctiveNeuron.class);
-
-
     private static final Logger log = LoggerFactory.getLogger(ConjunctiveNeuron.class);
 
     protected ConjunctiveNeuronType type;

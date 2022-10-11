@@ -24,6 +24,5 @@ public enum State {
     SAME,
     INPUT,
     RELATED_SAME,
-    RELATED_INPUT,
-    ABSTRACT
+    RELATED_INPUT
 }
