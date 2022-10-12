@@ -159,9 +159,9 @@ public class TestUtils {
         n.getBias().receiveUpdate(bias);
     }
 
-    public static PositiveFeedbackSynapse createPositiveFeedbackSynapse(PositiveFeedbackSynapse templateSynapse, PatternNeuron input, BindingNeuron output, double weight, double feedbackWeight) {
-        PositiveFeedbackSynapse s = templateSynapse.instantiateTemplate(null, input, output);
-
+    public static PositiveFeedbackSynapse createPositiveFeedbackSynapse(PositiveFeedbackSynapse s, PatternNeuron input, BindingNeuron output, double weight, double feedbackWeight) {
+        s.setInput(input);
+        s.setOutput(output);
         s.setWeight(weight);
 
         s.linkInput();

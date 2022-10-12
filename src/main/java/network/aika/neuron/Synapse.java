@@ -163,7 +163,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     protected boolean checkCausal(IA iAct, OA oAct) {
-        return !Link.isCausal(iAct, oAct);
+        return Link.isCausal(iAct, oAct);
     }
 
     public boolean isPropagate() {

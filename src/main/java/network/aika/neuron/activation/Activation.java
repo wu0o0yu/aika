@@ -218,13 +218,13 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
-        if(visited == v.getV())
-            return;
-
-        followBindingSignal(v, p);
         p.test(this);
 
+        if(visited == v.getV())
+            return;
         visited = v.getV();
+
+        followBindingSignal(v, p);
     }
 
     protected void followBindingSignal(Visitor v, Predicate<Activation> p) {

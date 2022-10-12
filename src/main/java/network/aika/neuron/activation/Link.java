@@ -78,10 +78,9 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
         if(visited == v.getV())
             return;
-
-        followBindingSignal(v, p);
-
         visited = v.getV();
+        
+        followBindingSignal(v, p);
     }
 
     protected void followBindingSignal(Visitor v, Predicate<Activation> p) {

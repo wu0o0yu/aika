@@ -18,16 +18,11 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.direction.Direction;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.linking.Visitor;
 
-import java.util.Comparator;
-import java.util.NavigableMap;
-import java.util.TreeMap;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 /**
  *
@@ -47,14 +42,13 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     }
 
     public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
+        p.test(this);
+
         if(visited == v.getV())
             return;
+        visited = v.getV();
 
         super.followBindingSignal(v, p);
         super.followBindingSignal(v.next(Direction.OUTPUT), p);
-
-        p.test(this);
-
-        visited = v.getV();
     }
 }

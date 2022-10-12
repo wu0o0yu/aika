@@ -40,10 +40,9 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
     public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
         if(visited == v.getV())
             return;
+        visited = v.getV();
 
         followBindingSignal(v, p);
-
-        visited = v.getV();
     }
 
 
