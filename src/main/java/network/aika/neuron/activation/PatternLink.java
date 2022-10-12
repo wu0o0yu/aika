@@ -16,7 +16,11 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.direction.Direction;
 import network.aika.neuron.conjunctive.PatternSynapse;
+import network.aika.neuron.linking.Visitor;
+
+import java.util.function.Predicate;
 
 /**
  * @author Lukas Molzberger
@@ -25,5 +29,12 @@ public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivati
 
     public PatternLink(PatternSynapse s, BindingActivation input, PatternActivation output) {
         super(s, input, output);
+    }
+
+    public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
+        if(v.getDir() == Direction.INPUT)
+            return;
+
+        super.trackBindingSignal(v, p);
     }
 }

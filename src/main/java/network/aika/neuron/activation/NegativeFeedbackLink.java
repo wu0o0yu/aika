@@ -16,8 +16,11 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.direction.Direction;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
+import network.aika.neuron.linking.Visitor;
 
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static network.aika.fields.FieldLink.connect;
@@ -34,25 +37,16 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
         super(s, input, output);
     }
 
-    @Override
-    public void registerReverseBindingSignal(Activation bsAct) {
-        input.registerReverseBindingSignal(bsAct);
+    public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
+        if(visited == v.getV())
+            return;
+
+        followBindingSignal(v, p);
+
+        visited = v.getV();
     }
 
-    @Override
-    public Stream<PatternActivation> getBindingSignals() {
-        return Stream.empty();
-    }
 
-    public boolean isSelfRef() {
-        BindingSignal iBS = input.getBindingSignal();
-        if(iBS == null)
-            return false;
-
-        return iBS.isSelfRef(
-                output.getBindingSignal(iBS.getState())
-        );
-    }
 
     @Override
     protected void initWeightInput() {
@@ -64,6 +58,10 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
 
         connect(weightedInputUB, input.getId(), getOutput().lookupLinkSlot(synapse, true));
         connect(weightedInputLB, input.getId(), getOutput().lookupLinkSlot(synapse, false));
+    }
+
+    private boolean isSelfRef() {
+        return input.isSelfRef(output);
     }
 
     @Override

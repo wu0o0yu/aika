@@ -103,23 +103,14 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         }
     }
 
-    public void linkAndPropagate(Activation act) {
-        for (Direction dir : DIRECTIONS)
-            getTargetSynapses(dir)
-                    .forEach(s ->
-                            s.linkAndPropagate(
-                                    dir.invert(),
-                                    act
-                            )
-                    );
-    }
-
-    public Stream<Activation> getRelatedBindingSignals(PatternActivation fromOriginAct) {
-        Stream<Activation> relatedBSs = fromOriginAct
-                .getReverseBindingSignals(this);
-        return relatedBSs
-                .collect(Collectors.toList())
-                .stream();
+    public void linkAndPropagate(Activation act, Direction dir) {
+        getTargetSynapses(dir)
+                .forEach(s ->
+                        s.linkAndPropagate(
+                                dir,
+                                act
+                        )
+                );
     }
 
     private TreeSet<A> initActivationsSet(Thought t) {

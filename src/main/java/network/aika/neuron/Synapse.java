@@ -23,6 +23,7 @@ import network.aika.fields.FieldOutput;
 import network.aika.fields.QueueField;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
+import network.aika.neuron.linking.Visitor;
 import network.aika.sign.Sign;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -72,11 +74,16 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected boolean allowTraining = true;
 
-    public Stream<Activation> getRelatedBindingSignals(Activation fromBS, Direction dir) {
+    public Stream<Activation> getRelatedBindingSignals(Activation<?> fromBS, Direction dir) {
+        Neuron tn = dir.getNeuron(this);
+
+        return fromBS.getRelatedBindingSignals(tn);
+/*
         Stream<PatternActivation> originActs = fromBS.getBindingSignals();
         return originActs.flatMap(bsOrigin ->
                 dir.getNeuron(this).getRelatedBindingSignals(bsOrigin)
         );
+ */
     }
 
     public abstract double getSumOfLowerWeights();
@@ -90,7 +97,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return linkingEvent == null || isTrue(linkingEvent);
     }
 
-    public boolean linkCheck(Activation inputBS, Activation outputBS) {
+    public boolean linkCheck(IA inputBS, OA outputBS) {
         return true;
     }
 
@@ -112,8 +119,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         bsStream.filter(toBS -> fromBS != toBS)
                 .filter(toBS ->
                         linkCheck(
-                                dir.getInput(fromBS, toBS),
-                                dir.getOutput(fromBS, toBS)
+                                (IA) dir.getInput(fromBS, toBS),
+                                (OA) dir.getOutput(fromBS, toBS)
                         )
                 )
                 .forEach(toBS ->

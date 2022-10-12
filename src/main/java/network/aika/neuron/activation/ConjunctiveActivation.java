@@ -39,10 +39,8 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
             );
     }
 
-    public abstract Activation getAbstractBindingSignal();
-
     public void instantiateTemplate() {
-        Activation abstractBS = getAbstractBindingSignal();
+/*        Activation abstractBS = getAbstractBindingSignal();
         if(abstractBS == null)
             return;
 
@@ -56,6 +54,8 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
                 .forEach(l ->
                         l.instantiateTemplate(abstractBS, n, INPUT)
                 );
+
+ */
 /*
         getOutputLinks()
                 .forEach(l ->

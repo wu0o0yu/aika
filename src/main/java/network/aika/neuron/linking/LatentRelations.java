@@ -22,8 +22,10 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.*;
 
+import java.util.List;
 import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.INPUT;
 import static network.aika.neuron.linking.LatentLinking.latentLinking;
 
 /**
@@ -32,20 +34,26 @@ import static network.aika.neuron.linking.LatentLinking.latentLinking;
 public class LatentRelations {
 
     public static void expandRelation(Activation bsA, Synapse synA, Synapse synB) {
-        if(!(bsA.getOriginActivation() instanceof TokenActivation))
-            return;
-
-        Direction dir = synA.getRelatedTransition().getOutput().getState() == RELATED_SAME ?
-                Direction.INPUT :
-                Direction.OUTPUT;
+        Direction dir;
+        if(synA instanceof PrimaryInputSynapse)
+            dir = Direction.INPUT;
+        else if(synA instanceof SamePatternSynapse)
+            dir = Direction.OUTPUT;
+        else return;
 
         Stream<Activation> relatedBSs = findLatentRelationNeurons((BindingNeuron) synA.getOutput())
-                .flatMap(n -> n.evaluateLatentRelation(bsA.getOriginActivation(), dir))
-                .map(bs -> bs.getOriginActivation().getReverseBindingSignals(
-                        synB.getInput()
-                ));
+                .flatMap(n -> evaluateLatentRelation(n, bsA, dir))
+                .flatMap(bs -> synB.getRelatedBindingSignals(bs, INPUT));
 
         latentLinking(bsA, synA, synB, relatedBSs);
+    }
+
+    private static Stream<TokenActivation> evaluateLatentRelation(LatentRelationNeuron n, Activation bs, Direction dir) {
+        List<TokenActivation> origins = bs.findBindingSignalOrigins(TokenActivation.class);
+
+        return origins.stream().flatMap(o ->
+                n.evaluateLatentRelation(o, dir)
+        );
     }
 
     private static Stream<LatentRelationNeuron> findLatentRelationNeurons(BindingNeuron n) {

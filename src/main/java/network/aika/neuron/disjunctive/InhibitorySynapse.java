@@ -33,13 +33,13 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
         >
 {
 
-    private int type;
+    private InhibSynType type;
 
-    public InhibitorySynapse(int type) {
+    public InhibitorySynapse(InhibSynType type) {
         this.type = type;
     }
 
-    public int getType() {
+    public InhibSynType getType() {
         return type;
     }
 

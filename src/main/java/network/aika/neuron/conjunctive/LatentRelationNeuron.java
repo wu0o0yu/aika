@@ -21,6 +21,7 @@ import network.aika.direction.Direction;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.LatentRelationActivation;
 import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.activation.text.TokenActivation;
 
 
 import java.util.stream.Stream;
@@ -31,13 +32,13 @@ import java.util.stream.Stream;
  */
 public abstract class LatentRelationNeuron extends BindingNeuron {
 
-    public abstract Stream<Activation> evaluateLatentRelation(PatternActivation fromOriginAct, Direction dir);
+    public abstract Stream<TokenActivation> evaluateLatentRelation(TokenActivation fromOriginAct, Direction dir);
 
     @Override
     public LatentRelationActivation createActivation(Thought t) {
         return new LatentRelationActivation(t.createActivationId(), t, this);
     }
-
+/*
     protected LatentRelationActivation createOrLookupLatentActivation(PatternActivation fromOriginAct, PatternActivation toOriginAct) {
         LatentRelationActivation latentRelAct = getLatentRelAct(fromOriginAct, toOriginAct);
         if (latentRelAct != null)
@@ -55,5 +56,5 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
                         act.getBindingSignal(toOriginAct) != null
                 ).findAny()
                 .orElse(null);
-    }
+    }*/
 }

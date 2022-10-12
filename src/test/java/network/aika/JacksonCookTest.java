@@ -123,17 +123,17 @@ public class JacksonCookTest {
 
         LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, -1, -1);
 
-        BindingNeuron forenameBN = createNeuron(new BindingNeuron(), "forename (person name)");
-        BindingNeuron surnameBN = createNeuron(new BindingNeuron(), "surname (person name)");
+        BindingNeuron forenameBN = new BindingNeuron().init(m, "forename (person name)");
+        BindingNeuron surnameBN = new BindingNeuron().init(m, "surname (person name)");
 
 
-        BindingNeuron jacksonForenameBN = createNeuron(forenameBN, "jackson (forename)");
-        BindingNeuron jacksonJCBN = createNeuron(jacksonForenameBN, "jackson (jackson cook)");
+        BindingNeuron jacksonForenameBN = forenameBN.instantiateTemplate(true).init(m, "jackson (forename)");
+        BindingNeuron jacksonJCBN = jacksonForenameBN.instantiateTemplate(true).init(m, "jackson (jackson cook)");
         new PrimaryInputSynapse()
                 .init(jacksonIN, jacksonJCBN, 10.0)
                 .adjustBias();
 
-        CategoryNeuron jacksonForenameCN = createNeuron(new BindingCategoryNeuron(), "jackson (forename)");
+        CategoryNeuron jacksonForenameCN = new BindingCategoryNeuron().init(m, "jackson (forename)");
         new BindingCategorySynapse()
                 .init(jacksonJCBN, jacksonForenameCN, 10.0);
 
@@ -145,26 +145,26 @@ public class JacksonCookTest {
                 .init(jacksonIN, jacksonForenameBN, 10.0)
                 .adjustBias();
 
-        CategoryNeuron forenameCN = createNeuron(new BindingCategoryNeuron(), "forename");
+        CategoryNeuron forenameCN = new BindingCategoryNeuron().init(m, "forename");
         new BindingCategorySynapse()
                 .init(jacksonForenameBN, forenameCN, 10.0);
 
-        BindingNeuron jacksonCityBN = createNeuron(new BindingNeuron(), "jackson (city)");
+        BindingNeuron jacksonCityBN = new BindingNeuron().init(m, "jackson (city)");
         new PrimaryInputSynapse()
                 .init(jacksonIN, jacksonCityBN, 10.0)
                 .adjustBias();
 
-        CategoryNeuron cityCN = createNeuron(new BindingCategoryNeuron(), "city");
+        CategoryNeuron cityCN = new BindingCategoryNeuron().init(m, "city");
         new BindingCategorySynapse()
                 .init(jacksonCityBN, cityCN, 10.0);
 
-        BindingNeuron cookSurnameBN = createNeuron(surnameBN, "cook (surname)");
-        BindingNeuron cookJCBN = createNeuron(cookSurnameBN, "cook (jackson cook)");
+        BindingNeuron cookSurnameBN =  surnameBN.init(m, "cook (surname)");
+        BindingNeuron cookJCBN =  cookSurnameBN.init(m, "cook (jackson cook)");
         new PrimaryInputSynapse()
                 .init(cookIN, cookJCBN, 10.0)
                 .adjustBias();
 
-        CategoryNeuron cookSurnameCN = createNeuron(new BindingCategoryNeuron(), "cook (surname)");
+        CategoryNeuron cookSurnameCN =  new BindingCategoryNeuron().init(m, "cook (surname)");
         new BindingCategorySynapse()
                 .init(cookJCBN, cookSurnameCN, 10.0);
 
@@ -176,21 +176,21 @@ public class JacksonCookTest {
                 .init(cookIN, cookSurnameBN, 10.0)
                 .adjustBias();
 
-        CategoryNeuron surnameCN = createNeuron(new BindingCategoryNeuron(), "surname");
+        CategoryNeuron surnameCN =  new BindingCategoryNeuron().init(m, "surname");
         new BindingCategorySynapse()
                 .init(cookSurnameBN, surnameCN, 10.0);
 
-        BindingNeuron cookProfessionBN = createNeuron(new BindingNeuron(), "cook (profession)");
+        BindingNeuron cookProfessionBN =  new BindingNeuron().init(m, "cook (profession)");
         new PrimaryInputSynapse()
                 .init(cookIN, cookProfessionBN, 10.0)
                 .adjustBias();
 
-        CategoryNeuron professionCN = createNeuron(new BindingCategoryNeuron(), "profession");
+        CategoryNeuron professionCN =  new BindingCategoryNeuron().init(m, "profession");
         new BindingCategorySynapse()
                 .init(cookProfessionBN, professionCN, 10.0);
 
-        addInhibitoryLoop(m, createNeuron(new InhibitoryNeuron(), "I-jackson"), false, jacksonForenameBN, jacksonCityBN);
-        addInhibitoryLoop(m, createNeuron(new InhibitoryNeuron(), "I-cook"), false, cookSurnameBN, cookProfessionBN);
+        addInhibitoryLoop(new InhibitoryNeuron().init(m, "I-jackson"), false, jacksonForenameBN, jacksonCityBN);
+        addInhibitoryLoop(new InhibitoryNeuron().init(m, "I-cook"), false, cookSurnameBN, cookProfessionBN);
 
         updateBias(jacksonJCBN, 2.0);
         updateBias(jacksonForenameBN, 2.0);

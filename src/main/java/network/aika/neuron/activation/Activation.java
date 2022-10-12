@@ -21,15 +21,20 @@ import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.fields.*;
 import network.aika.neuron.*;
+import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
+import network.aika.neuron.linking.Visitor;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
 
 import java.util.*;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.direction.Direction.DIRECTIONS;
+import static network.aika.direction.Direction.*;
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.LinkSlotMode.MAX;
@@ -85,6 +90,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected Map<Synapse, LinkSlot> ubLinkSlots = new TreeMap<>(SYN_COMP);
     protected Map<Synapse, LinkSlot> lbLinkSlots = new TreeMap<>(SYN_COMP);
 
+    protected long visited;
 
     public Activation(int id, Thought t, N n) {
         this.id = id;
@@ -104,8 +110,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         isFired.addEventListener(() -> {
                     fired = thought.getCurrentTimestamp();
-                    registerReverseBindingSignal(this);
-                    neuron.linkAndPropagate(this);
+                    neuron.linkAndPropagate(this, OUTPUT);
                     Counting.add(this);
                 }
         );
@@ -154,6 +159,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         thought.register(this);
         neuron.register(this);
+
+        neuron.linkAndPropagate(this, INPUT);
     }
 
     protected void initNet() {
@@ -168,15 +175,61 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         netLB.process();
     }
 
-    public void registerReverseBindingSignal(Activation bsAct) {
-        inputLinks.values().forEach(l ->
-                l.registerReverseBindingSignal(bsAct)
-        );
+    public boolean isSelfRef(Activation oAct) {
+        boolean[] isSelfRef = new boolean[1];
+
+        trackBindingSignal(new Visitor(getThought(), Direction.INPUT), bs -> {
+            if(bs == oAct)
+                isSelfRef[0] = true;
+
+            return isSelfRef[0];
+        });
+
+        return isSelfRef[0];
     }
 
-    public Stream<PatternActivation> getBindingSignals() {
-        return inputLinks.values().stream()
-                .flatMap(l -> l.getBindingSignals());
+    public Stream<Activation> getRelatedBindingSignals(Neuron n) {
+        ArrayList<Activation> results = new ArrayList<>();
+        trackBindingSignal(new Visitor(getThought(), INPUT), bs -> {
+            if(bs.getNeuron() == n) {
+                results.add(bs);
+                return false;
+            }
+
+            return true;
+        });
+
+        return results.stream();
+    }
+
+    public <O extends PatternActivation> List<O> findBindingSignalOrigins(Class<O> clazz) {
+        ArrayList<O> results = new ArrayList<>();
+
+        trackBindingSignal(new Visitor(getThought(), INPUT), bs -> {
+            if(clazz.isInstance(bs)) {
+                results.add((O) bs);
+                return false;
+            }
+
+            return true;
+        });
+
+        return results;
+    }
+
+    public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
+        if(visited == v.getV())
+            return;
+
+        followBindingSignal(v, p);
+        p.test(this);
+
+        visited = v.getV();
+    }
+
+    protected void followBindingSignal(Visitor v, Predicate<Activation> p) {
+        v.getDir().getLinks(this)
+                .forEach(l -> l.trackBindingSignal(v, p));
     }
 
     public Map<Synapse, LinkSlot> getLinkSlots(boolean upperBound) {

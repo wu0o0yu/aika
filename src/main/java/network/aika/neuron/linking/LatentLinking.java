@@ -61,10 +61,10 @@ public class LatentLinking {
         Thought t = bsA.getThought();
 
         bsStream
-/*                .filter(bsB ->
+                .filter(bsB ->
                         bsA != bsB &&
-                                isTrue(bsB.getOnArrivedFired())
-                )*/
+                                isTrue(bsB.getIsFired())
+                )
                 .filter(bsB ->
                         synB.checkLinkingEvent(bsB, INPUT)
                 )

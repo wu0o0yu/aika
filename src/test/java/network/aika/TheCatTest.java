@@ -201,8 +201,8 @@ public class TheCatTest {
     public void setupTheCatTest(AIKADebugger debugger, int variant) {
         Model m = new Model();
 
-        InhibitoryNeuron inhibNThe = createNeuron(new InhibitoryNeuron(), "I-the");
-        InhibitoryNeuron inhibNCat = createNeuron(new InhibitoryNeuron(), "I-cat");
+        InhibitoryNeuron inhibNThe = null; //new InhibitoryNeuron().init(m, "I-the");
+        InhibitoryNeuron inhibNCat = null; //new InhibitoryNeuron().init(m, "I-cat");
         initPatternTheCat(m, inhibNThe, inhibNCat, variant);
 
         Document doc = new Document(m, "the cat");

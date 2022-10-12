@@ -17,13 +17,16 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.conjunctive.PatternNeuron;
+import network.aika.neuron.linking.Visitor;
 
 import java.util.Comparator;
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -32,34 +35,26 @@ import java.util.stream.Stream;
  */
 public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
-    protected NavigableMap<Neuron, Activation> reverseBindingSignals = new TreeMap<>(Comparator.comparing(n -> n.getId()));
-
     protected Range range;
 
     public PatternActivation(int id, Thought t, PatternNeuron patternNeuron) {
         super(id, t, patternNeuron);
     }
-/*
-    @Override
-    public void registerBindingSignal(BindingSignal bs) {
-        super.registerBindingSignal(bs);
-
-        if(bs.getState() == INPUT) 
-            range = Range.join(range, bs.getOriginActivation().getRange());
-    }
-*/
-
-    @Override
-    public void registerReverseBindingSignal(Activation bsAct) {
-        reverseBindingSignals.put(bsAct.getNeuron(), bsAct);
-    }
-
-    public Activation getReverseBindingSignals(Neuron toNeuron) {
-        return reverseBindingSignals.get(toNeuron);
-    }
 
     @Override
     public Range getRange() {
         return range;
+    }
+
+    public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
+        if(visited == v.getV())
+            return;
+
+        super.followBindingSignal(v, p);
+        super.followBindingSignal(v.next(Direction.OUTPUT), p);
+
+        p.test(this);
+
+        visited = v.getV();
     }
 }

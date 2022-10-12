@@ -33,23 +33,7 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
 
     @Override
     public Range getRange() {
-/*        BindingSignal bs = getPrimaryBranchBindingSignal();
-        if(bs == null)
-            return null;
 
-        return bs.getOriginActivation()
-                .getRange();
- */
         return null;
     }
-
-    /*
-    private BindingSignal getPrimaryBranchBindingSignal() {
-        return getBindingSignals()
-                .filter(bs -> bs.getState() == INPUT)
-                .filter(bs -> bs.getDepth() == 1)
-                .findFirst()
-                .orElse(null);
-    }
-     */
 }

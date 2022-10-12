@@ -26,8 +26,4 @@ public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingAc
     public InhibitoryLink(InhibitorySynapse s, BindingActivation input, InhibitoryActivation output) {
         super(s, input, output);
     }
-
-    @Override
-    public void registerReverseBindingSignal(Activation bsAct) {
-    }
 }

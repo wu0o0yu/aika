@@ -35,13 +35,15 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<
         return new RelatedInputLink(this, input, output);
     }
 
+    @Override
     public void linkAndPropagate(Direction dir, Activation fromBS) {
         if (dir == Direction.INPUT) {
-            latentBackwardsPropagation(fromBS);
+ //           latentBackwardsPropagation(fromBS);
         }
         super.linkAndPropagate(dir, fromBS);
     }
 
+    /*
     private void latentBackwardsPropagation(Activation fromBS) {
         Activation relatedInputBS = fromBSs[0];
         Activation relatedSameBS = fromBSs[1];
@@ -57,5 +59,5 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<
 
         INPUT_TRANSITION.propagate(INPUT_TRANSITION.getOutput(), relatedInputBS, l, latentRelAct);
         SAME_TRANSITION.propagate(SAME_TRANSITION.getOutput(), relatedSameBS, l, latentRelAct);
-    }
+    }*/
 }

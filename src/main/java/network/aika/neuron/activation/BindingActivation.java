@@ -109,25 +109,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     public Range getRange() {
         return null;
     }
-/*
-    @Override
-    public Range getRange() {
-        BindingSignal bs = getPrimaryPatternBindingSignal();
-        if(bs == null)
-            return null;
 
-        return bs.getOriginActivation()
-                .getRange();
-    }
-
-    private BindingSignal getPrimaryPatternBindingSignal() {
-        return getPatternBindingSignals().values().stream()
-                .filter(bs -> FIRED_COMPARATOR.compare(bs.getOriginActivation().getFired(), fired) < 0)
-                .filter(bs -> bs.getState() == SAME || bs.getState() == INPUT || bs.getState() == RELATED_SAME)
-                .min(Comparator.comparing(bs -> bs.getState().ordinal()))
-                .orElse(null);
-    }
-*/
     public void updateBias(double u) {
         getNetUB().receiveUpdate(u);
         getNetLB().receiveUpdate(u);

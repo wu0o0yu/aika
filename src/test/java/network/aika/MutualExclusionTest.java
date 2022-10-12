@@ -52,7 +52,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import static network.aika.TestUtils.*;
-import static network.aika.neuron.linking.State.INPUT;
+import static network.aika.neuron.disjunctive.InhibSynType.INPUT;
 import static network.aika.steps.Phase.PROCESSING;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -94,11 +94,11 @@ public class MutualExclusionTest {
     public void testPropagation() {
         Model m = new Model();
 
-        TokenNeuron in = createNeuron(new PatternNeuron(), "I", true);
-        BindingNeuron na = createNeuron(new BindingNeuron(), "A");
-        BindingNeuron nb = createNeuron(new BindingNeuron(), "B");
-        BindingNeuron nc = createNeuron(new BindingNeuron(), "C");
-        InhibitoryNeuron inhib = createNeuron(new InhibitoryNeuron(), "I");
+        TokenNeuron in = new PatternNeuron().init(m, "I", true);
+        BindingNeuron na = new BindingNeuron().init(m, "A");
+        BindingNeuron nb = new BindingNeuron().init(m, "B");
+        BindingNeuron nc = new BindingNeuron().init(m, "C");
+        InhibitoryNeuron inhib = new InhibitoryNeuron().init(m, "I");
 
         new PrimaryInputSynapse()
                 .init(in, na, 10.0)
@@ -162,10 +162,10 @@ public class MutualExclusionTest {
     public void testPropagationWithPrimaryLink() {
         Model m = new Model();
 
-        TokenNeuron in = createNeuron(new TokenNeuron(), "I", true);
-        BindingNeuron na = createNeuron(new BindingNeuron(), "A");
-        BindingNeuron nb = createNeuron(new BindingNeuron(), "B");
-        InhibitoryNeuron inhib = createNeuron(new InhibitoryNeuron(), "I");
+        TokenNeuron in = new TokenNeuron().init(m, "I", true);
+        BindingNeuron na = new BindingNeuron().init(m, "A");
+        BindingNeuron nb = new BindingNeuron().init(m, "B");
+        InhibitoryNeuron inhib =new InhibitoryNeuron().init(m, "I");
 
         new PrimaryInputSynapse()
                 .init(in, na, 10.0)

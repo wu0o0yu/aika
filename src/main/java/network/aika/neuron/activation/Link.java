@@ -22,9 +22,11 @@ import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
+import network.aika.neuron.linking.Visitor;
 import network.aika.sign.Sign;
 import network.aika.steps.link.LinkCounting;
 
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static network.aika.fields.ConstantField.ZERO;
@@ -51,6 +53,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected ThresholdOperator onTransparent;
 
+    protected long visited;
+
     public Link(S s, I input, O output) {
         this.synapse = s;
         this.input = input;
@@ -69,6 +73,20 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         }
 
         getThought().onLinkCreationEvent(this);
+    }
+
+    public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
+        if(visited == v.getV())
+            return;
+
+        followBindingSignal(v, p);
+
+        visited = v.getV();
+    }
+
+    protected void followBindingSignal(Visitor v, Predicate<Activation> p) {
+        v.getDir().getActivation(this)
+                .trackBindingSignal(v, p);
     }
 
     protected void initOnTransparent() {
@@ -210,15 +228,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return output;
     }
 
-
-    public void registerReverseBindingSignal(Activation bsAct) {
-        input.registerReverseBindingSignal(bsAct);
-    }
-
-    public Stream<PatternActivation> getBindingSignals() {
-        return input.getBindingSignals();
-    }
-
     public boolean isCausal() {
         return input == null || isCausal(input, output);
     }
@@ -228,7 +237,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     public void instantiateTemplate(Activation abstractBS, ConjunctiveNeuron on, Direction dir) {
-        I iAct = resolveAbstractInputActivation(abstractBS);
+ /*       I iAct = resolveAbstractInputActivation(abstractBS);
 
         S instSyn = (S) synapse
                 .instantiateTemplate(
@@ -237,6 +246,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
                         on
                 );
         instSyn.linkOutput();
+
+  */
 /*
         Link l = instSyn.createLink(
                 dir.getInput(act, iAct),
@@ -246,7 +257,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         Cleanup.add(l);l
  */
     }
-
+/*
     private I resolveAbstractInputActivation(Activation abstractBS) {
         return getAbstractInputBS(abstractBS)
                 .flatMap(bs -> getConcreteActivation(bs.getOriginActivation()))
@@ -268,7 +279,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return abstractBS.getParents().values().stream()
                 .filter(bs -> bs.getActivation() == input);
     }
-
+*/
     public void linkInput() {
         if(input == null)
             return;

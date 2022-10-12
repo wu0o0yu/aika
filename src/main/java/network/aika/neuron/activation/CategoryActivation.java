@@ -31,19 +31,6 @@ public class CategoryActivation<N extends CategoryNeuron<?, ?>> extends Disjunct
 
     @Override
     public Range getRange() {
-/*        BindingSignal bs = getPrimaryPatternBindingSignal();
-        if(bs == null)
-            return null;
-
-        return bs.getOriginActivation()
-                .getRange();*/
         return null;
     }
-/*
-    private BindingSignal getPrimaryPatternBindingSignal() {
-        return getPatternBindingSignals().values().stream()
-                .filter(bs -> bs.getState() == State.SAME)
-                .findFirst()
-                .orElse(null);
-    }*/
 }

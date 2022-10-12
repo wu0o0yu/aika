@@ -28,10 +28,11 @@ import network.aika.neuron.activation.text.TokenActivation;
 import java.util.ArrayList;
 import java.util.List;
 
-import static network.aika.neuron.linking.State.INPUT;
-import static network.aika.neuron.linking.State.SAME;
+
 import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
 import static network.aika.neuron.disjunctive.CategorySynapse.newCategorySynapse;
+import static network.aika.neuron.disjunctive.InhibSynType.INPUT;
+import static network.aika.neuron.disjunctive.InhibSynType.SAME;
 import static network.aika.steps.Phase.PROCESSING;
 
 
@@ -86,19 +87,18 @@ public class TestUtils {
 
     public static Config getConfig() {
         return new Config() {
-            public String getLabel(BindingSignal bs) {
-                Activation iAct = bs.getOriginActivation();
-                Activation act = bs.getActivation();
+            public String getLabel(Activation act) {
+               // Activation iAct = bs.getOriginActivation();
                 Neuron n = act.getNeuron();
 
                 if(n instanceof BindingNeuron) {
-                    return "B-" + trimPrefix(iAct.getLabel());
+                    return "B-"; // + trimPrefix(iAct.getLabel());
                 } else if (n instanceof PatternNeuron) {
                     return "P-" + ((Document)act.getThought()).getContent();
                 }else if (n instanceof CategoryNeuron) {
                     return "C-" + ((Document)act.getThought()).getContent();
                 } else {
-                    return "I-" + trimPrefix(iAct.getLabel());
+                    return "I-"; // + trimPrefix(iAct.getLabel());
                 }
             }
         };
@@ -109,7 +109,8 @@ public class TestUtils {
     }
 
     public static CategoryNeuron initCategory(Model m, String label, PatternNeuron... inputPatterns) {
-        CategoryNeuron categoryN = createNeuron(new PatternCategoryNeuron(), "C-" + label);
+        CategoryNeuron categoryN = new PatternCategoryNeuron()
+                .init(m, "C-" + label);
 
         for (PatternNeuron pn : inputPatterns) {
             newCategorySynapse(PATTERN)
@@ -120,12 +121,16 @@ public class TestUtils {
     }
 
     public static InhibitoryNeuron initInhibitoryLoop(Model m, String label, boolean sameInhibSynapse, BindingNeuron... bns) {
-        InhibitoryNeuron inhibN = createNeuron(new InhibitoryNeuron(), "I-" + label);
+        InhibitoryNeuron inhibN = new InhibitoryNeuron()
+                .init(m, "I-" + label);
 
-        return addInhibitoryLoop(m, inhibN, sameInhibSynapse, bns);
+        return addInhibitoryLoop(inhibN, sameInhibSynapse, bns);
     }
 
-    public static InhibitoryNeuron addInhibitoryLoop(Model m, InhibitoryNeuron inhibN, boolean sameInhibSynapse, BindingNeuron... bns) {
+    public static InhibitoryNeuron addInhibitoryLoop(InhibitoryNeuron inhibN, boolean sameInhibSynapse, BindingNeuron... bns) {
+        if(inhibN == null)
+            return null;
+
         for(BindingNeuron bn: bns) {
             new InhibitorySynapse(sameInhibSynapse ? SAME : INPUT)
                     .init(bn, inhibN, 1.0);
@@ -137,7 +142,8 @@ public class TestUtils {
     }
 
     public static PatternNeuron initPatternLoop(Model m, String label, BindingNeuron... bns) {
-        PatternNeuron patternN = createNeuron(new PatternNeuron(), "P-" + label);
+        PatternNeuron patternN = new PatternNeuron()
+                .init(m, "P-" + label);
 
         for(BindingNeuron bn: bns) {
             new PatternSynapse()
@@ -147,18 +153,6 @@ public class TestUtils {
             createPositiveFeedbackSynapse(new PositiveFeedbackSynapse(), patternN, bn, 0.0, 10.0);
         }
         return patternN;
-    }
-
-    public static <N extends Neuron> N createNeuron(Neuron templateNeuron, String label, boolean inputNeuron) {
-        Neuron n = createNeuron(templateNeuron, label);
-        n.setNetworkInput(inputNeuron);
-        return (N) n;
-    }
-
-    public static <N extends Neuron> N createNeuron(Neuron templateNeuron, String label) {
-        Neuron n = templateNeuron.instantiateTemplate(true);
-        n.setLabel(label);
-        return (N) n;
     }
 
     public static void updateBias(Neuron n, double bias) {

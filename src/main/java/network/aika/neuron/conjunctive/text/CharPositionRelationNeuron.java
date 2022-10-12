@@ -19,6 +19,7 @@ package network.aika.neuron.conjunctive.text;
 import network.aika.direction.Direction;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.text.Document;
 
@@ -79,7 +80,7 @@ public class CharPositionRelationNeuron extends LatentRelationNeuron {
     }
 
     @Override
-    public Stream<Activation> evaluateLatentRelation(PatternActivation fromOriginAct, Direction dir) {
+    public Stream<TokenActivation> evaluateLatentRelation(TokenActivation fromOriginAct, Direction dir) {
         Document doc = (Document) fromOriginAct.getThought();
 /*
         Range r = fromOriginAct.getRange();
