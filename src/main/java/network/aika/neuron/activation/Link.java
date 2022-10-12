@@ -21,8 +21,6 @@ import network.aika.direction.Direction;
 import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 import network.aika.sign.Sign;
 import network.aika.steps.link.LinkCounting;
@@ -62,11 +60,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
         if(input != null && output != null) {
             initOnTransparent();
-
-            onTransparent.addEventListener(() ->
-                   propagateAllBindingSignals()
-            );
-
             initWeightInput();
 
             if (getConfig().isTrainingEnabled() && getSynapse().isAllowTraining())
@@ -156,13 +149,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
             LinkCounting.add(this);
     }
 
-    public void propagateAllBindingSignals() {
-        input.getBindingSignals()
-                .forEach(fromBS ->
-                        fromBS.propagate(this)
-                );
-    }
-
     public FieldOutput getOnTransparent() {
         return onTransparent;
     }
@@ -224,6 +210,15 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return output;
     }
 
+
+    public void registerReverseBindingSignal(Activation bsAct) {
+        input.registerReverseBindingSignal(bsAct);
+    }
+
+    public Stream<PatternActivation> getBindingSignals() {
+        return input.getBindingSignals();
+    }
+
     public boolean isCausal() {
         return input == null || isCausal(input, output);
     }
@@ -232,7 +227,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return FIRED_COMPARATOR.compare(iAct.getFired(), oAct.getFired()) < 0;
     }
 
-    public void instantiateTemplate(BindingSignal abstractBS, ConjunctiveNeuron on, Direction dir) {
+    public void instantiateTemplate(Activation abstractBS, ConjunctiveNeuron on, Direction dir) {
         I iAct = resolveAbstractInputActivation(abstractBS);
 
         S instSyn = (S) synapse
@@ -242,7 +237,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
                         on
                 );
         instSyn.linkOutput();
-        instSyn.registerTerminals(getThought());
 /*
         Link l = instSyn.createLink(
                 dir.getInput(act, iAct),
@@ -253,7 +247,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
  */
     }
 
-    private I resolveAbstractInputActivation(BindingSignal abstractBS) {
+    private I resolveAbstractInputActivation(Activation abstractBS) {
         return getAbstractInputBS(abstractBS)
                 .flatMap(bs -> getConcreteActivation(bs.getOriginActivation()))
                 .findAny()
@@ -270,7 +264,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
                 .map(bs -> (I) bs.getActivation());
     }
 
-    private Stream<BindingSignal> getAbstractInputBS(BindingSignal abstractBS) {
+    private Stream<Activation> getAbstractInputBS(Activation abstractBS) {
         return abstractBS.getParents().values().stream()
                 .filter(bs -> bs.getActivation() == input);
     }

@@ -18,8 +18,6 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.neuron.Range;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.disjunctive.CategoryNeuron;
 
 /**
@@ -33,18 +31,19 @@ public class CategoryActivation<N extends CategoryNeuron<?, ?>> extends Disjunct
 
     @Override
     public Range getRange() {
-        BindingSignal bs = getPrimaryPatternBindingSignal();
+/*        BindingSignal bs = getPrimaryPatternBindingSignal();
         if(bs == null)
             return null;
 
         return bs.getOriginActivation()
-                .getRange();
+                .getRange();*/
+        return null;
     }
-
+/*
     private BindingSignal getPrimaryPatternBindingSignal() {
         return getPatternBindingSignals().values().stream()
                 .filter(bs -> bs.getState() == State.SAME)
                 .findFirst()
                 .orElse(null);
-    }
+    }*/
 }

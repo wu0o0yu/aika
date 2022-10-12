@@ -17,16 +17,13 @@
 package network.aika.neuron.conjunctive.text;
 
 import network.aika.direction.Direction;
-import network.aika.neuron.Range;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.text.Document;
 
 import java.util.stream.Stream;
 
-import static network.aika.neuron.bindingsignal.State.SAME;
 
 /**
  *
@@ -82,7 +79,7 @@ public class CharPositionRelationNeuron extends LatentRelationNeuron {
     }
 
     @Override
-    public Stream<BindingSignal> evaluateLatentRelation(PatternActivation fromOriginAct, Direction dir) {
+    public Stream<Activation> evaluateLatentRelation(PatternActivation fromOriginAct, Direction dir) {
         Document doc = (Document) fromOriginAct.getThought();
 /*
         Range r = fromOriginAct.getRange();

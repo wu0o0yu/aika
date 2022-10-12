@@ -19,18 +19,12 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.bindingsignal.BSKey;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.PatternNeuron;
 
+import java.util.Comparator;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.stream.Stream;
-
-import static network.aika.neuron.bindingsignal.BSKey.COMPARATOR;
-import static network.aika.neuron.bindingsignal.State.*;
 
 /**
  *
@@ -38,29 +32,14 @@ import static network.aika.neuron.bindingsignal.State.*;
  */
 public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
-    protected NavigableMap<BSKey, BindingSignal> reverseBindingSignals = new TreeMap<>(COMPARATOR);
+    protected NavigableMap<Neuron, Activation> reverseBindingSignals = new TreeMap<>(Comparator.comparing(n -> n.getId()));
 
     protected Range range;
 
     public PatternActivation(int id, Thought t, PatternNeuron patternNeuron) {
         super(id, t, patternNeuron);
     }
-
-    @Override
-    public BindingSignal getAbstractBindingSignal() {
-        return getBindingSignals(INPUT)
-                .filter(bs -> bs.isAbstract())
-                .findAny()
-                .orElse(null);
-    }
-
-    @Override
-    public void init(Synapse originSynapse, Activation originAct) {
-        super.init(originSynapse, originAct);
-
-        new BindingSignal(this, SAME);
-    }
-
+/*
     @Override
     public void registerBindingSignal(BindingSignal bs) {
         super.registerBindingSignal(bs);
@@ -68,20 +47,15 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
         if(bs.getState() == INPUT) 
             range = Range.join(range, bs.getOriginActivation().getRange());
     }
+*/
 
-    public void registerReverseBindingSignal(BindingSignal bindingSignal) {
-        reverseBindingSignals.put(BSKey.createReverseKey(bindingSignal), bindingSignal);
+    @Override
+    public void registerReverseBindingSignal(Activation bsAct) {
+        reverseBindingSignals.put(bsAct.getNeuron(), bsAct);
     }
 
-    public Stream<BindingSignal> getReverseBindingSignals(Neuron toNeuron, State s) {
-        return reverseBindingSignals.subMap(
-                new BSKey(toNeuron, s.ordinal(), 0),
-                new BSKey(toNeuron, s.ordinal(), Integer.MAX_VALUE)
-        ).values().stream();
-    }
-
-    public Stream<BindingSignal> getReverseBindingSignals() {
-        return reverseBindingSignals.values().stream();
+    public Activation getReverseBindingSignals(Neuron toNeuron) {
+        return reverseBindingSignals.get(toNeuron);
     }
 
     @Override

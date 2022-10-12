@@ -16,8 +16,9 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
+
+import java.util.stream.Stream;
 
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.*;
@@ -31,6 +32,16 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
 
     public NegativeFeedbackLink(NegativeFeedbackSynapse s, InhibitoryActivation input, BindingActivation output) {
         super(s, input, output);
+    }
+
+    @Override
+    public void registerReverseBindingSignal(Activation bsAct) {
+        input.registerReverseBindingSignal(bsAct);
+    }
+
+    @Override
+    public Stream<PatternActivation> getBindingSignals() {
+        return Stream.empty();
     }
 
     public boolean isSelfRef() {

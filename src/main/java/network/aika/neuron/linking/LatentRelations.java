@@ -14,43 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.bindingsignal;
+package network.aika.neuron.linking;
 
 import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.*;
 
 import java.util.stream.Stream;
 
-import static network.aika.neuron.bindingsignal.LatentLinking.latentLinking;
-import static network.aika.neuron.bindingsignal.State.RELATED_SAME;
+import static network.aika.neuron.linking.LatentLinking.latentLinking;
 
 /**
  * @author Lukas Molzberger
  */
 public class LatentRelations {
 
-    public static void expandRelation(BindingSignal bsA, Synapse synA, Synapse synB, PrimitiveTransition tA) {
+    public static void expandRelation(Activation bsA, Synapse synA, Synapse synB) {
         if(!(bsA.getOriginActivation() instanceof TokenActivation))
-            return;
-
-        if(synA.getRelatedTransition() != tA)
-            return;
-
-        PrimitiveTransition tB = synB.getRelatedTransition();
-        if(tB == null)
             return;
 
         Direction dir = synA.getRelatedTransition().getOutput().getState() == RELATED_SAME ?
                 Direction.INPUT :
                 Direction.OUTPUT;
 
-        Stream<BindingSignal> relatedBSs = findLatentRelationNeurons((BindingNeuron) synA.getOutput())
+        Stream<Activation> relatedBSs = findLatentRelationNeurons((BindingNeuron) synA.getOutput())
                 .flatMap(n -> n.evaluateLatentRelation(bsA.getOriginActivation(), dir))
-                .flatMap(bs -> bs.getOriginActivation().getReverseBindingSignals(
-                        synB.getInput(),
-                        tB.getInput().getState()
+                .map(bs -> bs.getOriginActivation().getReverseBindingSignals(
+                        synB.getInput()
                 ));
 
         latentLinking(bsA, synA, synB, relatedBSs);

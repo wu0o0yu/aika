@@ -17,10 +17,8 @@
 package network.aika;
 
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.*;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.neuron.disjunctive.*;
@@ -30,8 +28,8 @@ import network.aika.neuron.activation.text.TokenActivation;
 import java.util.ArrayList;
 import java.util.List;
 
-import static network.aika.neuron.bindingsignal.State.INPUT;
-import static network.aika.neuron.bindingsignal.State.SAME;
+import static network.aika.neuron.linking.State.INPUT;
+import static network.aika.neuron.linking.State.SAME;
 import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
 import static network.aika.neuron.disjunctive.CategorySynapse.newCategorySynapse;
 import static network.aika.steps.Phase.PROCESSING;

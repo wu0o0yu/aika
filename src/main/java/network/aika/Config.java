@@ -16,7 +16,7 @@
  */
 package network.aika;
 
-import network.aika.neuron.bindingsignal.BindingSignal;
+import network.aika.neuron.activation.Activation;
 
 /**
  *
@@ -75,7 +75,7 @@ public class Config {
         return countingEnabled;
     }
 
-    public String getLabel(BindingSignal bs) {
+    public String getLabel(Activation bs) {
         return "";
     }
 

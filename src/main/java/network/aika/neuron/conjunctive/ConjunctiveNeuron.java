@@ -19,10 +19,8 @@ package network.aika.neuron.conjunctive;
 import network.aika.Model;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.PrimitiveTerminal;
 import network.aika.neuron.disjunctive.CategorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +31,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
-import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.State.*;
 
 /**
  *
@@ -88,12 +82,12 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
                 .orElse(null);
     }
 
-    public void addInactiveLinks(BindingSignal bs) {
+    public void addInactiveLinks(Activation bs) {
         inputSynapses
                 .stream()
-                .filter(s -> !bs.getActivation().inputLinkExists(s))
+                .filter(s -> !bs.inputLinkExists(s))
                 .forEach(s ->
-                        s.createLink(null, bs.getActivation())
+                        s.createLink(null, bs)
                 );
     }
 

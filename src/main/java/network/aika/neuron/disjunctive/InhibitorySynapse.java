@@ -17,16 +17,7 @@
 package network.aika.neuron.disjunctive;
 
 import network.aika.neuron.activation.*;
-import network.aika.neuron.bindingsignal.State;
-import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.conjunctive.BindingNeuron;
-import org.apache.commons.math3.ode.UnknownParameterException;
-
-import java.util.List;
-import java.util.stream.Stream;
-
-import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
-import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 
 /**
  *
@@ -42,34 +33,16 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
         >
 {
 
-    private State type;
+    private int type;
 
-    public InhibitorySynapse(State type) {
+    public InhibitorySynapse(int type) {
         this.type = type;
     }
 
-    public State getType() {
+    public int getType() {
         return type;
     }
 
-
-    private static List<Transition> TRANSITIONS_SAME = List.of(
-            transition(
-                    BindingNeuron.SAME_OUT,
-                    InhibitoryNeuron.SAME_IN,
-                    MATCH_AND_PROPAGATE,
-                    InhibitorySynapse.class
-            )
-    );
-
-    private static List<Transition> TRANSITIONS_INPUT = List.of(
-            transition(
-                    BindingNeuron.INPUT_OUT,
-                    InhibitoryNeuron.INPUT_IN,
-                    MATCH_AND_PROPAGATE,
-                    InhibitorySynapse.class
-            )
-    );
 
     @Override
     public InhibitorySynapse instantiateTemplate() {
@@ -81,14 +54,5 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
     @Override
     public InhibitoryLink createLink(BindingActivation input, InhibitoryActivation output) {
         return new InhibitoryLink(this, input, output);
-    }
-
-    @Override
-    public Stream<Transition> getTransitions() {
-        return switch(type) {
-            case SAME -> TRANSITIONS_SAME.stream();
-            case INPUT -> TRANSITIONS_INPUT.stream();
-            default -> throw new UnknownParameterException(type.name());
-        };
     }
 }

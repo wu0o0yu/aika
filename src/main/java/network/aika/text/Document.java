@@ -18,12 +18,9 @@ package network.aika.text;
 
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.text.TokenActivation;
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 
 import java.util.*;

@@ -17,13 +17,8 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.fields.SlotField;
 import network.aika.neuron.Range;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
-
-import static network.aika.neuron.bindingsignal.State.INPUT;
 
 /**
  *
@@ -31,32 +26,24 @@ import static network.aika.neuron.bindingsignal.State.INPUT;
  */
 public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron> {
 
-    protected SlotField inputBSSlot = new SlotField(this, "inputBSSlot");
-
 
     public InhibitoryActivation(int id, Thought t, InhibitoryNeuron neuron) {
         super(id, t, neuron);
     }
 
-
-    @Override
-    public SlotField getSlot(State s) {
-        return switch(s) {
-            case INPUT -> inputBSSlot;
-            default -> super.getSlot(s);
-        };
-    }
-
     @Override
     public Range getRange() {
-        BindingSignal bs = getPrimaryBranchBindingSignal();
+/*        BindingSignal bs = getPrimaryBranchBindingSignal();
         if(bs == null)
             return null;
 
         return bs.getOriginActivation()
                 .getRange();
+ */
+        return null;
     }
 
+    /*
     private BindingSignal getPrimaryBranchBindingSignal() {
         return getBindingSignals()
                 .filter(bs -> bs.getState() == INPUT)
@@ -64,4 +51,5 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
                 .findFirst()
                 .orElse(null);
     }
+     */
 }

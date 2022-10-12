@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.bindingsignal;
+package network.aika.neuron.linking;
 
 import network.aika.Thought;
 import network.aika.neuron.Neuron;
@@ -28,64 +28,55 @@ import java.util.stream.Stream;
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.Synapse.isLatentLinking;
-import static network.aika.neuron.bindingsignal.LatentRelations.expandRelation;
+import static network.aika.neuron.linking.LatentRelations.expandRelation;
 
 /**
  * @author Lukas Molzberger
  */
 public class LatentLinking {
 
-    public static void latentLinking(PrimitiveTransition t, Synapse synA, BindingSignal fromBS) {
-        if(t.getMode() != TransitionMode.MATCH_AND_PROPAGATE)
-            return;
-
+    public static void latentLinking(Synapse synA, Activation fromBS) {
         Neuron<?, ?> toNeuron = synA.getOutput();
 
         toNeuron.getTargetSynapses(INPUT)
                 .filter(synB -> synA != synB)
                 .filter(synB -> isLatentLinking(synA, synB))
                 .forEach(synB ->
-                        latentLinking(t, fromBS, synA, synB)
+                        latentLinking(fromBS, synA, synB)
                 );
     }
 
-    private static void latentLinking(PrimitiveTransition tA, BindingSignal bsA, Synapse synA, Synapse synB) {
-        Stream<PrimitiveTransition> relTrans = tA.getOutput().getTransitions(INPUT).stream();
-        relTrans.filter(tB ->
-                        tB.getMode() == TransitionMode.MATCH_AND_PROPAGATE
-                )
-                .forEach(tB ->
-                        latentLinking(
-                                bsA,
-                                synA,
-                                synB,
-                                synB.getRelatedBindingSignals(bsA.getOriginActivation(), tB, INPUT)
-                        )
-                );
+    private static void latentLinking(Activation bsA, Synapse synA, Synapse synB) {
+        latentLinking(
+                bsA,
+                synA,
+                synB,
+                synB.getRelatedBindingSignals(bsA, INPUT)
+        );
 
-        expandRelation(bsA, synA, synB, tA);
+        expandRelation(bsA, synA, synB);
     }
 
-    public static void latentLinking(BindingSignal bsA, Synapse synA, Synapse synB, Stream<BindingSignal> bsStream) {
-        Activation iActA = bsA.getActivation();
-        Thought t = iActA.getThought();
+    public static void latentLinking(Activation bsA, Synapse synA, Synapse synB, Stream<Activation> bsStream) {
+        Thought t = bsA.getThought();
 
-        bsStream.filter(bsB ->
+        bsStream
+/*                .filter(bsB ->
                         bsA != bsB &&
                                 isTrue(bsB.getOnArrivedFired())
+                )*/
+                .filter(bsB ->
+                        synB.checkLinkingEvent(bsB, INPUT)
                 )
                 .filter(bsB ->
-                        synB.checkLinkingEvent(bsB.getActivation(), INPUT)
-                )
-                .filter(bsB ->
-                        !latentActivationExists(synA, synB, iActA, bsB.getActivation())
+                        !latentActivationExists(synA, synB, bsA, bsB)
                 )
                 .forEach(bsB -> {
                     Activation oAct = synA.getOutput().createActivation(t);
-                    oAct.init(synA, iActA);
+                    oAct.init(synA, bsA);
 
-                    synA.createLink(iActA, oAct);
-                    synB.createLink(bsB.getActivation(), oAct);
+                    synA.createLink(bsA, oAct);
+                    synB.createLink(bsB, oAct);
                 });
     }
 

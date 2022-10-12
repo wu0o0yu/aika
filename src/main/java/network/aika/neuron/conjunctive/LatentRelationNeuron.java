@@ -18,19 +18,12 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.Thought;
 import network.aika.direction.Direction;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.LatentRelationActivation;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.bindingsignal.BSKey;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.PrimitiveTransition;
-import network.aika.neuron.bindingsignal.State;
 
 
 import java.util.stream.Stream;
-
-import static network.aika.neuron.bindingsignal.State.SAME;
-import static network.aika.neuron.conjunctive.PrimaryInputSynapse.SAME_INPUT_TRANSITION;
-import static network.aika.neuron.conjunctive.ReversePatternSynapse.SAME_SAME_TRANSITION;
 
 /**
  *
@@ -38,15 +31,15 @@ import static network.aika.neuron.conjunctive.ReversePatternSynapse.SAME_SAME_TR
  */
 public abstract class LatentRelationNeuron extends BindingNeuron {
 
-    public abstract Stream<BindingSignal> evaluateLatentRelation(PatternActivation fromOriginAct, Direction dir);
+    public abstract Stream<Activation> evaluateLatentRelation(PatternActivation fromOriginAct, Direction dir);
 
     @Override
     public LatentRelationActivation createActivation(Thought t) {
         return new LatentRelationActivation(t.createActivationId(), t, this);
     }
 
-    protected LatentRelationActivation createOrLookupLatentActivation(PatternActivation fromOriginAct, State fromState, PatternActivation toOriginAct, State toState) {
-        LatentRelationActivation latentRelAct = getLatentRelAct(fromOriginAct, fromState, toOriginAct, toState);
+    protected LatentRelationActivation createOrLookupLatentActivation(PatternActivation fromOriginAct, PatternActivation toOriginAct) {
+        LatentRelationActivation latentRelAct = getLatentRelAct(fromOriginAct, toOriginAct);
         if (latentRelAct != null)
             return latentRelAct;
 
@@ -56,11 +49,10 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
         return latentRelAct;
     }
 
-    private LatentRelationActivation getLatentRelAct(PatternActivation fromOriginAct, State fromState, PatternActivation toOriginAct, State toState) {
-        return (LatentRelationActivation) fromOriginAct.getReverseBindingSignals(this, fromState)
-                .map(bs -> bs.getActivation())
+    private LatentRelationActivation getLatentRelAct(PatternActivation fromOriginAct, PatternActivation toOriginAct) {
+        return (LatentRelationActivation) fromOriginAct.getReverseBindingSignals(this)
                 .filter(act ->
-                        act.getBindingSignal(BSKey.createKey(toOriginAct, toState)) != null
+                        act.getBindingSignal(toOriginAct) != null
                 ).findAny()
                 .orElse(null);
     }

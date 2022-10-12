@@ -23,7 +23,6 @@ import network.aika.fields.FieldOutput;
 import network.aika.fields.QueueField;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
-import network.aika.neuron.bindingsignal.*;
 import network.aika.sign.Sign;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
@@ -34,12 +33,14 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.*;
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.activation.Timestamp.MAX;
 import static network.aika.neuron.activation.Timestamp.MIN;
+import static network.aika.neuron.linking.LatentLinking.latentLinking;
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
 
@@ -71,13 +72,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected boolean allowTraining = true;
 
-    public PrimitiveTransition getRelatedTransition() {
-        return null;
-    }
-
-    public Stream<BindingSignal> getRelatedBindingSignals(PatternActivation fromOriginAct, PrimitiveTransition t, Direction dir) {
-        return dir.getNeuron(this)
-                .getRelatedBindingSignals(fromOriginAct, dir.getPrimitiveTerminal(t).getState());
+    public Stream<Activation> getRelatedBindingSignals(Activation fromBS, Direction dir) {
+        Stream<PatternActivation> originActs = fromBS.getBindingSignals();
+        return originActs.flatMap(bsOrigin ->
+                dir.getNeuron(this).getRelatedBindingSignals(bsOrigin)
+        );
     }
 
     public abstract double getSumOfLowerWeights();
@@ -91,25 +90,43 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return linkingEvent == null || isTrue(linkingEvent);
     }
 
-    public boolean linkCheck(BindingSignal inputBS, BindingSignal outputBS) {
-        return inputBS.getOrigin() == outputBS.getOrigin();
+    public boolean linkCheck(Activation inputBS, Activation outputBS) {
+        return true;
     }
 
-    public void linkAndPropagate(Transition t, Direction dir, BindingSignal... fromBSs) {
-        t.link(this, dir, fromBSs);
+    public void linkAndPropagate(Direction dir, Activation bs) {
+        link(dir, bs);
 
         if (dir != OUTPUT)
             return;
 
-        t.latentLinking(this, fromBSs);
+        latentLinking(this, bs);
 
         if (isPropagate())
-            propagate(fromBSs[0]);
+            propagate((IA) bs);
     }
 
-    public L propagate(BindingSignal inputBS) {
-        IA iAct = (IA) inputBS.getActivation();
+    public void link(Direction dir, Activation fromBS) {
+        Stream<Activation> bsStream = getRelatedBindingSignals(fromBS, dir);
 
+        bsStream.filter(toBS -> fromBS != toBS)
+                .filter(toBS ->
+                        linkCheck(
+                                dir.getInput(fromBS, toBS),
+                                dir.getOutput(fromBS, toBS)
+                        )
+                )
+                .forEach(toBS ->
+                        linkIntern(
+                                fromBS,
+                                toBS,
+                                dir
+                        )
+                );
+    }
+
+
+    public L propagate(IA iAct) {
 //        if(!propagateCheck(iAct))
 //            return null;
 
@@ -122,7 +139,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return createLink(iAct, oAct);
     }
 
-    public L link(Activation fromAct, Activation toAct, Direction dir) {
+    public L linkIntern(Activation fromAct, Activation toAct, Direction dir) {
         if(!checkLinkingEvent(toAct, dir))
             return null;
 
@@ -157,12 +174,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return synA.getWeight().getCurrentValue() + synB.getWeight().getCurrentValue() + sumOfLowerWeights > 0.0;
     }
 
-    public boolean hasOutputTerminal(State s) {
-        return getTransitions()
-                .map(t -> t.getOutput())
-                .anyMatch(t -> t.matchesState(s));
-    }
-
     public FieldOutput getLinkingEvent(Activation act, Direction dir) {
         if(act == null)
             return null;
@@ -171,43 +182,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
             return null;
 
         return act.getIsFired();
-    }
-
-    public void registerTerminals(Thought t) {
-        for (Direction dir : DIRECTIONS) {
-            Neuron<?, ?> n = dir.getNeuron(this);
-            n.getActivations(t).stream()
-                    .forEach(act -> {
-                                initFixedTransitions(act, dir);
-
-                                Stream<BindingSignal> BSs = act.getBindingSignals();
-                                BSs.forEach(bs ->
-                                        notifyVariableTransitions(bs, dir)
-                                );
-                            }
-                    );
-        }
-    }
-
-    public void initFixedTransitions(Activation act, Direction dir) {
-        getTransitions()
-                .forEach(t ->
-                        dir.getTerminal(t).initFixedTerminal(t, this, act)
-                );
-    }
-
-    public void notifyVariableTransitions(BindingSignal bs, Direction dir) {
-        getTransitions()
-                .forEach(t ->
-                        dir.getTerminal(t).notify(t, this, bs)
-                );
-    }
-
-    public Stream<Terminal> getTerminals(Direction dir) {
-        return getTransitions()
-                .map(transition ->
-                        dir.getTerminal(transition)
-                );
     }
 
     public boolean linkExists(IA iAct, OA oAct) {
@@ -220,8 +194,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
                         .findAny()
                         .isPresent();
     }
-
-    public abstract Stream<Transition> getTransitions();
 
     public abstract void setModified();
 

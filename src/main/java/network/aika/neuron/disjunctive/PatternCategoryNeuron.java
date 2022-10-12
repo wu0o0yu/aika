@@ -18,22 +18,13 @@ package network.aika.neuron.disjunctive;
 
 import network.aika.Thought;
 import network.aika.neuron.activation.CategoryActivation;
-import network.aika.neuron.bindingsignal.PrimitiveTerminal;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.ConjunctiveNeuronType;
-
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public class PatternCategoryNeuron extends CategoryNeuron<PatternCategorySynapse, CategoryActivation> {
-
-    public static PrimitiveTerminal INPUT_IN = variable(State.INPUT, INPUT, PatternCategoryNeuron.class);
-    public static PrimitiveTerminal INPUT_OUT = variable(State.INPUT, OUTPUT, PatternCategoryNeuron.class);
 
 
     public PatternCategoryNeuron() {

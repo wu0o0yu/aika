@@ -17,21 +17,7 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.direction.Direction;
-import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.LatentRelationActivation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.RelatedInputLink;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.PrimitiveTransition;
-import network.aika.neuron.bindingsignal.Transition;
-
-import java.util.List;
-import java.util.stream.Stream;
-
-import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
-import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
-import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
-
+import network.aika.neuron.activation.*;
 
 /**
  *
@@ -44,45 +30,21 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<
         BindingActivation
         >
 {
-
-    private static PrimitiveTransition INPUT_TRANSITION = transition(
-            LatentRelationNeuron.INPUT_OUT,
-            BindingNeuron.RELATED_INPUT_IN,
-            MATCH_AND_PROPAGATE,
-            RelatedInputSynapse.class
-    );
-
-    private static PrimitiveTransition SAME_TRANSITION = transition(
-            LatentRelationNeuron.SAME_OUT,
-            BindingNeuron.RELATED_SAME_IN,
-            MATCH_AND_PROPAGATE,
-            RelatedInputSynapse.class
-    );
-
-    private static List<Transition> TRANSITIONS = List.of(
-            biTransition(
-                    INPUT_TRANSITION,
-                    SAME_TRANSITION,
-                    true,
-                    true
-            )
-    );
-
     @Override
     public RelatedInputLink createLink(BindingActivation input, BindingActivation output) {
         return new RelatedInputLink(this, input, output);
     }
 
-    public void linkAndPropagate(Transition t, Direction dir, BindingSignal... fromBSs) {
+    public void linkAndPropagate(Direction dir, Activation fromBS) {
         if (dir == Direction.INPUT) {
-            latentBackwardsPropagation(fromBSs);
+            latentBackwardsPropagation(fromBS);
         }
-        super.linkAndPropagate(t, dir, fromBSs);
+        super.linkAndPropagate(dir, fromBS);
     }
 
-    private void latentBackwardsPropagation(BindingSignal[] fromBSs) {
-        BindingSignal relatedInputBS = fromBSs[0];
-        BindingSignal relatedSameBS = fromBSs[1];
+    private void latentBackwardsPropagation(Activation fromBS) {
+        Activation relatedInputBS = fromBSs[0];
+        Activation relatedSameBS = fromBSs[1];
 
         LatentRelationActivation latentRelAct = getInput().createOrLookupLatentActivation(
                 relatedInputBS.getOriginActivation(),
@@ -91,14 +53,9 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<
                 SAME_TRANSITION.getInput().getState()
         );
 
-        Link l = createLink(latentRelAct, (BindingActivation) relatedSameBS.getActivation());
+        Link l = createLink(latentRelAct, (BindingActivation) relatedSameBS);
 
         INPUT_TRANSITION.propagate(INPUT_TRANSITION.getOutput(), relatedInputBS, l, latentRelAct);
         SAME_TRANSITION.propagate(SAME_TRANSITION.getOutput(), relatedSameBS, l, latentRelAct);
-    }
-
-    @Override
-    public Stream<Transition> getTransitions() {
-        return TRANSITIONS.stream();
     }
 }

@@ -17,17 +17,7 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.*;
-import network.aika.neuron.bindingsignal.PrimitiveTransition;
-import network.aika.neuron.bindingsignal.Transition;
-import network.aika.neuron.disjunctive.BindingCategoryNeuron;
 import network.aika.neuron.disjunctive.CategoryNeuron;
-import network.aika.neuron.disjunctive.PatternCategoryNeuron;
-
-import java.util.List;
-import java.util.stream.Stream;
-
-import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
-import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 
 /**
  * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
@@ -43,34 +33,6 @@ public class CategoryInputSynapse extends ConjunctiveSynapse<
         ConjunctiveActivation
         >
 {
-
-    private static PrimitiveTransition SAME_TRANSITION = transition(
-            CategoryNeuron.SAME_OUT,
-            ConjunctiveNeuron.ABSTRACT_IN,
-            MATCH_AND_PROPAGATE,
-            CategoryInputSynapse.class
-    );
-
-    private static PrimitiveTransition PATTERN_INPUT_TRANSITION = transition(
-            PatternCategoryNeuron.INPUT_OUT,
-            ConjunctiveNeuron.ABSTRACT_IN,
-            MATCH_AND_PROPAGATE,
-            CategoryInputSynapse.class
-    );
-
-    private static PrimitiveTransition BINDING_INPUT_TRANSITION = transition(
-            BindingCategoryNeuron.INPUT_OUT,
-            ConjunctiveNeuron.ABSTRACT_IN,
-            MATCH_AND_PROPAGATE,
-            CategoryInputSynapse.class
-    );
-
-    private Transition getInputTransition() {
-        return type == ConjunctiveNeuronType.PATTERN ?
-                PATTERN_INPUT_TRANSITION :
-                BINDING_INPUT_TRANSITION;
-    }
-
     public CategoryInputSynapse(ConjunctiveNeuronType type) {
         super(type);
     }
@@ -83,13 +45,5 @@ public class CategoryInputSynapse extends ConjunctiveSynapse<
     @Override
     protected boolean checkCausal(CategoryActivation iAct, ConjunctiveActivation oAct) {
         return true; // Workaround
-    }
-
-    @Override
-    public Stream<Transition> getTransitions() {
-        return List.of(
-                SAME_TRANSITION,
-                getInputTransition()
-        ).stream();
     }
 }

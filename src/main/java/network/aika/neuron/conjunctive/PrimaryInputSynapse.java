@@ -19,14 +19,6 @@ package network.aika.neuron.conjunctive;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.PrimaryInputLink;
-import network.aika.neuron.bindingsignal.PrimitiveTransition;
-import network.aika.neuron.bindingsignal.Transition;
-
-import java.util.List;
-import java.util.stream.Stream;
-
-import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
-import static network.aika.neuron.bindingsignal.TransitionMode.*;
 
 /**
  *
@@ -39,34 +31,6 @@ public class PrimaryInputSynapse extends BindingNeuronSynapse<
         PatternActivation
         >
 {
-
-    public static PrimitiveTransition SAME_INPUT_TRANSITION = transition(
-            PatternNeuron.SAME_OUT,
-            BindingNeuron.INPUT_IN,
-            MATCH_AND_PROPAGATE,
-            PrimaryInputSynapse.class
-    );
-
-    public static PrimitiveTransition SAME_RELATED_SAME_TRANSITION = transition(
-            PatternNeuron.SAME_OUT,
-            BindingNeuron.RELATED_SAME_IN,
-            MATCH_AND_PROPAGATE,
-            PrimaryInputSynapse.class
-    );
-
-    public static PrimitiveTransition INPUT_RELATED_INPUT_TRANSITION = transition(
-            PatternNeuron.INPUT_OUT,
-            BindingNeuron.RELATED_INPUT_IN,
-            MATCH_AND_PROPAGATE,
-            PrimaryInputSynapse.class
-    );
-
-    private static List<Transition> TRANSITIONS = List.of(
-            SAME_INPUT_TRANSITION,
-            SAME_RELATED_SAME_TRANSITION,
-            INPUT_RELATED_INPUT_TRANSITION
-    );
-
     @Override
     public PrimaryInputLink createLink(PatternActivation input, BindingActivation output) {
         return new PrimaryInputLink(this, input, output);
@@ -75,15 +39,5 @@ public class PrimaryInputSynapse extends BindingNeuronSynapse<
     @Override
     public boolean propagateCheck(PatternActivation iAct) {
         return checkCandidateSynapse(iAct);
-    }
-
-    @Override
-    public PrimitiveTransition getRelatedTransition() {
-        return SAME_RELATED_SAME_TRANSITION;
-    }
-
-    @Override
-    public Stream<Transition> getTransitions() {
-        return TRANSITIONS.stream();
     }
 }

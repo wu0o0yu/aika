@@ -41,7 +41,6 @@ import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.conjunctive.PrimaryInputSynapse;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
-import network.aika.neuron.disjunctive.CategorySynapse;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import network.aika.neuron.disjunctive.InhibitorySynapse;
 import network.aika.text.Document;
@@ -53,8 +52,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import static network.aika.TestUtils.*;
-import static network.aika.neuron.bindingsignal.State.INPUT;
-import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
+import static network.aika.neuron.linking.State.INPUT;
 import static network.aika.steps.Phase.PROCESSING;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

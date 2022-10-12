@@ -17,9 +17,6 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.fields.SlotField;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 
 import static network.aika.direction.Direction.INPUT;
@@ -42,10 +39,10 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
             );
     }
 
-    public abstract BindingSignal getAbstractBindingSignal();
+    public abstract Activation getAbstractBindingSignal();
 
     public void instantiateTemplate() {
-        BindingSignal abstractBS = getAbstractBindingSignal();
+        Activation abstractBS = getAbstractBindingSignal();
         if(abstractBS == null)
             return;
 

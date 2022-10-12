@@ -19,17 +19,10 @@ package network.aika.neuron.conjunctive;
 import network.aika.fields.LinkSlot;
 import network.aika.fields.Multiplication;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.Transition;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
-
-import java.util.List;
-import java.util.stream.Stream;
 
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.mul;
-import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
-import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_ONLY;
 
 
 /**
@@ -43,21 +36,6 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<
         InhibitoryActivation
         >
 {
-
-    private static List<Transition> TRANSITIONS = List.of(
-            transition(
-                    InhibitoryNeuron.SAME_OUT,
-                    BindingNeuron.SAME_IN,
-                    MATCH_ONLY,
-                    NegativeFeedbackSynapse.class
-            ),
-            transition(
-                    InhibitoryNeuron.INPUT_OUT,
-                    BindingNeuron.INPUT_IN,
-                    MATCH_ONLY,
-                    NegativeFeedbackSynapse.class
-            )
-    );
 
     @Override
     public NegativeFeedbackLink createLink(InhibitoryActivation input, BindingActivation output) {
@@ -82,7 +60,7 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<
     }
 
     @Override
-    public boolean linkCheck(BindingSignal iBS, BindingSignal oBS) {
+    public boolean linkCheck(Activation iBS, Activation oBS) {
         return iBS.isSelfRef(oBS);
     }
 
@@ -99,10 +77,5 @@ public class NegativeFeedbackSynapse extends BindingNeuronSynapse<
     @Override
     public boolean isPropagate() {
         return false;
-    }
-
-    @Override
-    public Stream<Transition> getTransitions() {
-        return TRANSITIONS.stream();
     }
 }
