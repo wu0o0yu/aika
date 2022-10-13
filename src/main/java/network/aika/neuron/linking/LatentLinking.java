@@ -35,28 +35,6 @@ import static network.aika.neuron.linking.LatentRelations.expandRelation;
  */
 public class LatentLinking {
 
-    public static void latentLinking(Synapse synA, Activation fromBS) {
-        Neuron<?, ?> toNeuron = synA.getOutput();
-
-        toNeuron.getTargetSynapses(INPUT)
-                .filter(synB -> synA != synB)
-                .filter(synB -> isLatentLinking(synA, synB))
-                .forEach(synB ->
-                        latentLinking(fromBS, synA, synB)
-                );
-    }
-
-    private static void latentLinking(Activation bsA, Synapse synA, Synapse synB) {
-        latentLinking(
-                bsA,
-                synA,
-                synB,
-                synB.getRelatedBindingSignals(bsA, INPUT)
-        );
-
-        expandRelation(bsA, synA, synB);
-    }
-
     public static void latentLinking(Activation bsA, Synapse synA, Synapse synB, Stream<Activation> bsStream) {
         Thought t = bsA.getThought();
 

@@ -16,15 +16,26 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.conjunctive.CategoryInputSynapse;
-
+import network.aika.neuron.conjunctive.AbstractPatternSynapse;
+import network.aika.neuron.conjunctive.PatternSynapse;
 
 /**
  * @author Lukas Molzberger
  */
-public class CategoryInputLink extends ConjunctiveLink<CategoryInputSynapse, CategoryActivation<?>, ConjunctiveActivation> {
+public abstract class AbstractPatternLink<S extends AbstractPatternSynapse, IA extends Activation<?>> extends ConjunctiveLink<S, IA, PatternActivation> {
 
-    public CategoryInputLink(CategoryInputSynapse s, CategoryActivation input, ConjunctiveActivation output) {
+    public AbstractPatternLink(S s, IA input, PatternActivation output) {
         super(s, input, output);
     }
+
+
+    /*
+    OP-2
+    public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
+        if(v.getDir() == Direction.INPUT)
+            return;
+
+        super.trackBindingSignal(v, p);
+    }
+     */
 }

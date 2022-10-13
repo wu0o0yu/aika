@@ -14,31 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.disjunctive;
+package network.aika.neuron.conjunctive;
 
-import network.aika.Thought;
-import network.aika.neuron.activation.BindingCategoryActivation;
-
+import network.aika.neuron.activation.*;
+import network.aika.neuron.disjunctive.CategoryNeuron;
+import network.aika.neuron.disjunctive.PatternCategoryNeuron;
 
 /**
+ * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
  *
  * @author Lukas Molzberger
  */
-public class BindingCategoryNeuron extends CategoryNeuron<BindingCategorySynapse, BindingCategoryActivation> {
-
+public class PatternCategoryInputSynapse extends AbstractPatternSynapse<
+        PatternCategoryInputSynapse,
+        PatternCategoryNeuron,
+        PatternCategoryInputLink,
+        CategoryActivation<?>
+        > implements CategoryInputSynapse<PatternCategoryInputSynapse>
+{
 
     @Override
-    public BindingCategoryActivation createActivation(Thought t) {
-        return new BindingCategoryActivation(t.createActivationId(), t, this);
+    public PatternCategoryInputLink createLink(CategoryActivation input, PatternActivation output) {
+        return new PatternCategoryInputLink(this, input, output);
     }
 
     @Override
-    public CategoryNeuron instantiateTemplate(boolean addProvider) {
-        CategoryNeuron n = new BindingCategoryNeuron();
-        if(addProvider)
-            n.addProvider(getModel());
-
-        initFromTemplate(n);
-        return n;
+    protected boolean checkCausal(CategoryActivation iAct, PatternActivation oAct) {
+        return true; // Workaround
     }
 }

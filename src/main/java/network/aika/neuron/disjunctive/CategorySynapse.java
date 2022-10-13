@@ -18,7 +18,6 @@ package network.aika.neuron.disjunctive;
 
 import network.aika.neuron.activation.*;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
-import network.aika.neuron.conjunctive.ConjunctiveNeuronType;
 
 /**
  *
@@ -33,31 +32,6 @@ public abstract class CategorySynapse<S extends CategorySynapse, I extends Conju
         OA
         >
 {
-
-    protected ConjunctiveNeuronType type;
-
-
-    public CategorySynapse(ConjunctiveNeuronType t) {
-        this.type = t;
-    }
-
-    public static CategorySynapse newCategorySynapse(ConjunctiveNeuronType type) {
-        return switch (type) {
-            case BINDING -> new BindingCategorySynapse();
-            case PATTERN -> new PatternCategorySynapse();
-            default -> null;
-        };
-    }
-
-    public void setInput(I input) {
-        assert type == input.getType();
-        super.setInput(input);
-    }
-
-    public void setOutput(O output) {
-        assert type == output.getType();
-        super.setOutput(output);
-    }
 
     @Override
     public CategoryLink createLink(IA input, OA output) {

@@ -19,19 +19,20 @@ package network.aika.neuron.conjunctive;
 import network.aika.Model;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.disjunctive.CategorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 
+import static network.aika.direction.Direction.INPUT;
 import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
+import static network.aika.neuron.Synapse.isLatentLinking;
+import static network.aika.neuron.linking.LatentLinking.latentLinking;
 
 /**
  *
@@ -41,16 +42,27 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
 
     private static final Logger log = LoggerFactory.getLogger(ConjunctiveNeuron.class);
 
-    protected ConjunctiveNeuronType type;
-
-    public ConjunctiveNeuron(ConjunctiveNeuronType type) {
-        this.type = type;
+    public ConjunctiveNeuron() {
         bias.addEventListener(this::updateSumOfLowerWeights);
     }
 
+    @Override
+    public void latentLinkingStepA(Synapse synA, Activation fromBS) {
+        getTargetInputSynapses()
+                .filter(synB -> synA != synB)
+                .filter(synB -> isLatentLinking(synA, synB))
+                .forEach(synB ->
+                        latentLinkingStepB(fromBS, (S) synA, synB)
+                );
+    }
 
-    public ConjunctiveNeuronType getType() {
-        return type;
+    protected void latentLinkingStepB(Activation bsA, S synA, S synB) {
+        latentLinking(
+                bsA,
+                synA,
+                synB,
+                synB.getRelatedBindingSignals(bsA, INPUT)
+        );
     }
 
     @Override
@@ -60,10 +72,12 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         getInputSynapses()
                 .filter(s -> s instanceof CategoryInputSynapse)
                 .forEach(s ->
-                        CategorySynapse.newCategorySynapse(type)
+                                newCategorySynapse()
                                 .init(n, s.getInput(), 1.0)
                 );
     }
+
+    public abstract CategorySynapse newCategorySynapse();
 
     @Override
     public void setModified() {
@@ -74,10 +88,10 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         return getCategoryInputSynapse() != null;
     }
 
-    public CategoryInputSynapse getCategoryInputSynapse() {
+    public PatternCategoryInputSynapse getCategoryInputSynapse() {
         return inputSynapses.stream()
-                .filter(s -> s instanceof CategoryInputSynapse)
-                .map(s -> (CategoryInputSynapse) s)
+                .filter(s -> s instanceof PatternCategoryInputSynapse)
+                .map(s -> (PatternCategoryInputSynapse) s)
                 .findAny()
                 .orElse(null);
     }
@@ -114,19 +128,5 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
                 inputSynapses,
                 Comparator.<ConjunctiveSynapse>comparingDouble(s -> s.getSortingWeight())
         );
-    }
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-        super.write(out);
-
-        out.writeInt(type.ordinal());
-    }
-
-    @Override
-    public void readFields(DataInput in, Model m) throws Exception {
-        super.readFields(in, m);
-
-        type = ConjunctiveNeuronType.values()[in.readInt()];
     }
 }

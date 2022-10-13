@@ -19,7 +19,6 @@ package network.aika.neuron.conjunctive;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
 
-import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.BINDING;
 
 /**
  *
@@ -36,9 +35,6 @@ public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I ext
                 >
 {
 
-    public BindingNeuronSynapse() {
-        super(BINDING);
-    }
 
     public void initDummyLink(BindingActivation oAct) {
     }

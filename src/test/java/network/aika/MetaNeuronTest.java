@@ -1,7 +1,6 @@
 package network.aika;
 
 import network.aika.debugger.AIKADebugger;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.*;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
@@ -18,8 +17,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static network.aika.TestUtils.*;
-import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.BINDING;
-import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
 
 public class MetaNeuronTest {
 
@@ -90,7 +87,7 @@ public class MetaNeuronTest {
                 .init(m, "Abstract Letter");
 
 
-        new CategoryInputSynapse(PATTERN)
+        new PatternCategoryInputSynapse()
                 .init(letterCategory, letterPN, 1.0);
 
         CategoryNeuron syllableCategory = new PatternCategoryNeuron()
@@ -125,7 +122,7 @@ public class MetaNeuronTest {
                 .init(sylContinueRightBN, syllable, 6.0)
                 .adjustBias();
 
-        new CategoryInputSynapse(PATTERN)
+        new PatternCategoryInputSynapse()
                 .init(syllableCategory, syllable, 1.0)
                 .adjustBias();
 
@@ -133,7 +130,7 @@ public class MetaNeuronTest {
                 .init(letterPN, sylBeginBN, 10.0)
                 .adjustBias();
 
-        new CategoryInputSynapse(BINDING)
+        new BindingCategoryInputSynapse()
                 .init(letterBindingCategory, sylBeginBN, 1.0)
                 .adjustBias();
 
@@ -141,7 +138,7 @@ public class MetaNeuronTest {
                 .init(letterPN, sylContinueRightBN, 10.0)
                 .adjustBias();
 
-        new CategoryInputSynapse(BINDING)
+        new BindingCategoryInputSynapse()
                 .init(letterBindingCategory, sylContinueRightBN, 1.0)
                 .adjustBias();
 

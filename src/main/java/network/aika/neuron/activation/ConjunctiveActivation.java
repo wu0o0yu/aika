@@ -39,12 +39,16 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
             );
     }
 
-    public ConjunctiveActivation getInstance() {
-        CategoryActivation catBS = inputLinks.values().stream()
-                .filter(l -> l instanceof CategoryInputLink)
+    public CategoryActivation getInputCategory() {
+        return inputLinks.values().stream()
+                .filter(l -> l instanceof PatternCategoryInputLink)
                 .map(l -> (CategoryActivation) l.getInput())
                 .findAny()
                 .orElse(null);
+    }
+
+    public ConjunctiveActivation getInstance() {
+        CategoryActivation catBS = getInputCategory();
 
         if(catBS == null)
             return null;

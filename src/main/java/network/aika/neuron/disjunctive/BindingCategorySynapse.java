@@ -19,17 +19,11 @@ package network.aika.neuron.disjunctive;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.BindingCategoryActivation;
 import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.neuron.conjunctive.ConjunctiveNeuronType;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public class BindingCategorySynapse extends CategorySynapse<BindingCategorySynapse, BindingNeuron, BindingCategoryNeuron, BindingActivation, BindingCategoryActivation> {
-
-
-    public BindingCategorySynapse() {
-        super(ConjunctiveNeuronType.BINDING);
-    }
 
 }

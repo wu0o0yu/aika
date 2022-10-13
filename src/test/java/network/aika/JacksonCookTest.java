@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static network.aika.TestUtils.*;
-import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.BINDING;
 
 /**
  *
@@ -137,7 +136,7 @@ public class JacksonCookTest {
         new BindingCategorySynapse()
                 .init(jacksonJCBN, jacksonForenameCN, 10.0);
 
-        new CategoryInputSynapse(BINDING)
+        new BindingCategoryInputSynapse()
                 .init(jacksonForenameCN, jacksonForenameBN, 10.0)
                 .adjustBias();
 
@@ -168,7 +167,7 @@ public class JacksonCookTest {
         new BindingCategorySynapse()
                 .init(cookJCBN, cookSurnameCN, 10.0);
 
-        new CategoryInputSynapse(BINDING)
+        new BindingCategoryInputSynapse()
                 .init(cookSurnameCN, cookSurnameBN, 10.0)
                 .adjustBias();
 
@@ -199,11 +198,11 @@ public class JacksonCookTest {
         updateBias(cookSurnameBN, 2.0);
         updateBias(cookProfessionBN, 3.0);
 
-        new CategoryInputSynapse(BINDING)
+        new BindingCategoryInputSynapse()
                 .init(forenameCN, forenameBN, 10.0)
                 .adjustBias();
 
-        new CategoryInputSynapse(BINDING)
+        new BindingCategoryInputSynapse()
                 .init(surnameCN, surnameBN, 10.0)
                 .adjustBias();
 

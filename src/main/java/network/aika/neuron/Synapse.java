@@ -23,7 +23,6 @@ import network.aika.fields.FieldOutput;
 import network.aika.fields.QueueField;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
-import network.aika.neuron.linking.Visitor;
 import network.aika.sign.Sign;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
@@ -34,15 +33,12 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.*;
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.activation.Timestamp.MAX;
 import static network.aika.neuron.activation.Timestamp.MIN;
-import static network.aika.neuron.linking.LatentLinking.latentLinking;
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
 
@@ -101,16 +97,18 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return true;
     }
 
-    public void linkAndPropagate(Direction dir, Activation bs) {
-        link(dir, bs);
+    public void linkAndPropagateOut(Activation bs) {
+        link(OUTPUT, bs);
 
-        if (dir != OUTPUT)
-            return;
-
-        latentLinking(this, bs);
+        getOutput()
+                .latentLinkingStepA(this, bs);
 
         if (isPropagate())
             propagate((IA) bs);
+    }
+
+    public void linkAndPropagateIn(Activation bs) {
+        link(INPUT, bs);
     }
 
     public void link(Direction dir, Activation fromBS) {

@@ -29,8 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
-import static network.aika.neuron.disjunctive.CategorySynapse.newCategorySynapse;
 import static network.aika.neuron.disjunctive.InhibSynType.INPUT;
 import static network.aika.neuron.disjunctive.InhibSynType.SAME;
 import static network.aika.steps.Phase.PROCESSING;
@@ -113,7 +111,7 @@ public class TestUtils {
                 .init(m, "C-" + label);
 
         for (PatternNeuron pn : inputPatterns) {
-            newCategorySynapse(PATTERN)
+            pn.newCategorySynapse()
                     .init(pn, categoryN, 1.0);
         }
 

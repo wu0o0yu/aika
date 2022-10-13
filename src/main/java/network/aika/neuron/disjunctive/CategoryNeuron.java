@@ -17,7 +17,6 @@
 package network.aika.neuron.disjunctive;
 
 import network.aika.neuron.activation.CategoryActivation;
-import network.aika.neuron.conjunctive.ConjunctiveNeuronType;
 
 
 /**
@@ -26,14 +25,7 @@ import network.aika.neuron.conjunctive.ConjunctiveNeuronType;
  */
 public abstract class CategoryNeuron<S extends CategorySynapse, A extends CategoryActivation> extends DisjunctiveNeuron<S, A> {
 
-    protected ConjunctiveNeuronType type;
-
-    public CategoryNeuron(ConjunctiveNeuronType type) {
-        this.type = type;
-    }
-
-    public ConjunctiveNeuronType getType() {
-        return type;
+    public CategoryNeuron() {
     }
 
 }

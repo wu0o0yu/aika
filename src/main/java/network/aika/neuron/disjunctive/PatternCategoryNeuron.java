@@ -18,18 +18,12 @@ package network.aika.neuron.disjunctive;
 
 import network.aika.Thought;
 import network.aika.neuron.activation.CategoryActivation;
-import network.aika.neuron.conjunctive.ConjunctiveNeuronType;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public class PatternCategoryNeuron extends CategoryNeuron<PatternCategorySynapse, CategoryActivation> {
-
-
-    public PatternCategoryNeuron() {
-        super(ConjunctiveNeuronType.PATTERN);
-    }
 
 
     @Override

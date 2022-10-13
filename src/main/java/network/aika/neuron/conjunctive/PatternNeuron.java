@@ -16,15 +16,10 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.activation.PatternActivation;
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
-import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
+import network.aika.neuron.disjunctive.CategorySynapse;
+import network.aika.neuron.disjunctive.PatternCategorySynapse;
 
 /**
  *
@@ -32,10 +27,13 @@ import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
  */
 public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, PatternActivation> {
 
-    private String tokenLabel;
-
     public PatternNeuron() {
-        super(PATTERN);
+        super();
+    }
+
+    @Override
+    public CategorySynapse newCategorySynapse() {
+        return new PatternCategorySynapse();
     }
 
     @Override
@@ -55,30 +53,5 @@ public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, Pattern
 
     @Override
     protected void updateSumOfLowerWeights() {
-    }
-
-    public void setTokenLabel(String tokenLabel) {
-        this.tokenLabel = tokenLabel;
-    }
-
-    public String getTokenLabel() {
-        return tokenLabel;
-    }
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-        super.write(out);
-
-        out.writeBoolean(tokenLabel != null);
-        if(tokenLabel != null)
-            out.writeUTF(tokenLabel);
-    }
-
-    @Override
-    public void readFields(DataInput in, Model m) throws Exception {
-        super.readFields(in, m);
-
-        if(in.readBoolean())
-            tokenLabel = in.readUTF();
     }
 }

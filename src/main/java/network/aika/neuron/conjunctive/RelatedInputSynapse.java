@@ -36,11 +36,10 @@ public class RelatedInputSynapse extends BindingNeuronSynapse<
     }
 
     @Override
-    public void linkAndPropagate(Direction dir, Activation fromBS) {
-        if (dir == Direction.INPUT) {
- //           latentBackwardsPropagation(fromBS);
-        }
-        super.linkAndPropagate(dir, fromBS);
+    public void linkAndPropagateIn(Activation fromBS) {
+ // OP-3
+ //     latentBackwardsPropagation(fromBS);
+        super.linkAndPropagateIn(fromBS);
     }
 
     /*

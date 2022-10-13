@@ -14,16 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.disjunctive;
+package network.aika.neuron.conjunctive;
 
-import network.aika.neuron.activation.CategoryActivation;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.AbstractPatternLink;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.conjunctive.PatternNeuron;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PatternCategorySynapse extends CategorySynapse<PatternCategorySynapse, PatternNeuron, PatternCategoryNeuron, PatternActivation, CategoryActivation> {
+public abstract class AbstractPatternSynapse<S extends AbstractPatternSynapse, I extends Neuron, L extends AbstractPatternLink<S, IA>, IA extends Activation<?>> extends ConjunctiveSynapse<
+        S,
+        I,
+        PatternNeuron,
+        L,
+        IA,
+        PatternActivation
+        >
+{
 
+    @Override
+    public boolean isPropagate() {
+        return true;
+    }
+
+    @Override
+    public boolean propagateCheck(IA iAct) {
+        return true;
+    }
 }

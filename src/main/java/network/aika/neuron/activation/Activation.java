@@ -108,7 +108,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         isFired.addEventListener(() -> {
                     fired = thought.getCurrentTimestamp();
-                    neuron.linkAndPropagate(this, OUTPUT);
+                    neuron.linkAndPropagateOut(this);
                     Counting.add(this);
                 }
         );
@@ -158,7 +158,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         thought.register(this);
         neuron.register(this);
 
-        neuron.linkAndPropagate(this, INPUT);
+        neuron.linkAndPropagateIn(this);
     }
 
     protected void initNet() {

@@ -21,11 +21,8 @@ import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.fields.LimitedField;
 import network.aika.fields.QueueField;
-import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
-import network.aika.neuron.activation.Element;
-import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.activation.Timestamp;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Save;
 import network.aika.utils.Bound;
@@ -39,10 +36,8 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.*;
 import static network.aika.neuron.activation.Timestamp.MAX;
 import static network.aika.neuron.activation.Timestamp.MIN;
 import static network.aika.sign.Sign.POS;
@@ -103,15 +98,19 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         }
     }
 
-    public void linkAndPropagate(Activation act, Direction dir) {
-        getTargetSynapses(dir)
-                .forEach(s ->
-                        s.linkAndPropagate(
-                                dir,
-                                act
-                        )
-                );
+    public void linkAndPropagateOut(Activation act) {
+        getTargetOutputSynapses().forEach(s ->
+                s.linkAndPropagateOut(act)
+        );
     }
+
+    public void linkAndPropagateIn(Activation act) {
+        getTargetInputSynapses().forEach(s ->
+                s.linkAndPropagateIn(act)
+        );
+    }
+
+    public abstract void latentLinkingStepA(Synapse synA, Activation fromBS);
 
     private TreeSet<A> initActivationsSet(Thought t) {
         TreeSet<A> acts = new TreeSet<>();
@@ -146,11 +145,11 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     public abstract void addInactiveLinks(Activation bs);
 
     public abstract ActivationFunction getActivationFunction();
-
+/*
     public boolean isAllowTraining() {
         return allowTraining;
     }
-
+*/
     public void setAllowTraining(boolean allowTraining) {
         this.allowTraining = allowTraining;
     }
@@ -159,6 +158,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return template;
     }
 
+    /*
     public boolean isOfTemplate(Neuron templateNeuron) {
         if(template == templateNeuron)
             return true;
@@ -168,6 +168,8 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
         return template.isOfTemplate(templateNeuron);
     }
+*/
+
 
     public double getCandidateGradient(Activation act) {
         Range range = act.getAbsoluteRange();
@@ -204,8 +206,12 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return isNetworkInput;
     }
 
-    public Stream<? extends Synapse> getTargetSynapses(Direction dir) {
-        return dir.getSynapses(this);
+    public Stream<S> getTargetInputSynapses() {
+        return getInputSynapses();
+    }
+
+    public Stream<? extends Synapse> getTargetOutputSynapses() {
+        return getOutputSynapses();
     }
 
     public Synapse getOutputSynapse(NeuronProvider n) {

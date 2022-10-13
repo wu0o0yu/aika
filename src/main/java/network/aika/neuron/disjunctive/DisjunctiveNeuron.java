@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.disjunctive;
 
-import network.aika.direction.Direction;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
@@ -24,7 +23,6 @@ import network.aika.neuron.activation.Activation;
 
 import java.util.stream.Stream;
 
-import static network.aika.direction.Direction.INPUT;
 
 /**
  *
@@ -36,11 +34,12 @@ public abstract class DisjunctiveNeuron<S extends DisjunctiveSynapse, A extends 
         super();
     }
 
-    public Stream<? extends Synapse> getTargetSynapses(Direction dir) {
-        if(dir == INPUT)
-            return Stream.empty();
+    public Stream<S> getTargetInputSynapses() {
+        return Stream.empty();
+    }
 
-        return super.getTargetSynapses(dir);
+    @Override
+    public void latentLinkingStepA(Synapse synA, Activation fromBS) {
     }
 
     @Override

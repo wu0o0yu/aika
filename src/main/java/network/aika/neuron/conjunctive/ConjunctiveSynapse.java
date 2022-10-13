@@ -44,20 +44,10 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
                 OA
                 >
 {
-    protected ConjunctiveNeuronType type;
 
     private double sumOfLowerWeights;
 
-    public ConjunctiveSynapse(ConjunctiveNeuronType t) {
-        this.type = t;
-    }
-
-    public ConjunctiveNeuronType getType() {
-        return type;
-    }
-
     public void setOutput(O output) {
-        assert type == output.getType();
         super.setOutput(output);
     }
 
@@ -92,7 +82,6 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     public void write(DataOutput out) throws IOException {
         super.write(out);
 
-        out.writeInt(type.ordinal());
         out.writeDouble(sumOfLowerWeights);
     }
 
@@ -100,7 +89,6 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     public void readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
 
-        type = ConjunctiveNeuronType.values()[in.readInt()];
         sumOfLowerWeights = in.readDouble();
     }
 
