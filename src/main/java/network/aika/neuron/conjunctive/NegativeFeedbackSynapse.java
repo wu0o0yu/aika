@@ -44,16 +44,8 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
         return new NegativeFeedbackLink(this, input, output);
     }
 
-    public void initDummyLink(BindingActivation oAct) {
-        Multiplication dummyWeight = mul(
-                oAct,
-                "neg-dummy-weight-" + getInput().getId(),
-                oAct.getIsOpen(),
-                getWeight()
-        );
-
-        LinkSlot ls = oAct.lookupLinkSlot(this, false);
-        connect(dummyWeight, -1, ls);
+    protected boolean getDummyLinkUB() {
+        return false;
     }
 
     @Override

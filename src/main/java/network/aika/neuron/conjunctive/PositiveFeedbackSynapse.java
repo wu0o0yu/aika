@@ -38,16 +38,8 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
         return new PositiveFeedbackLink(this, input, output);
     }
 
-    public void initDummyLink(BindingActivation oAct) {
-        Multiplication dummyWeight = mul(
-                oAct,
-                 "pos-dummy-weight-" + getInput().getId(),
-                 oAct.getIsOpen(),
-                 getWeight()
-         );
-
-        LinkSlot ls = oAct.lookupLinkSlot(this, true);
-        connect(dummyWeight, -1, ls);
+    protected boolean getDummyLinkUB() {
+        return true;
     }
 
     @Override

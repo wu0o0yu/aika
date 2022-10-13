@@ -39,12 +39,21 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
             );
     }
 
-    public void instantiateTemplate() {
-/*        Activation abstractBS = getAbstractBindingSignal();
-        if(abstractBS == null)
-            return;
+    public ConjunctiveActivation getInstance() {
+        CategoryActivation catBS = inputLinks.values().stream()
+                .filter(l -> l instanceof CategoryInputLink)
+                .map(l -> (CategoryActivation) l.getInput())
+                .findAny()
+                .orElse(null);
 
-        if(abstractBS.hasInstanceOf(getNeuron()))
+        if(catBS == null)
+            return null;
+
+        return (ConjunctiveActivation) catBS.getInput().getInput();
+    }
+
+    public void instantiateTemplate() {
+        if(getInstance() != null)
             return;
 
         N n = (N) neuron.instantiateTemplate(true);
@@ -52,10 +61,10 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         getInputLinks()
 //                .filter(l -> !(l.getSynapse() instanceof CategoryInputSynapse))
                 .forEach(l ->
-                        l.instantiateTemplate(abstractBS, n, INPUT)
+                        l.instantiateTemplate(this, n, INPUT)
                 );
 
- */
+
 /*
         getOutputLinks()
                 .forEach(l ->

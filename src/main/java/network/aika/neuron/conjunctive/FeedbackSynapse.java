@@ -16,8 +16,13 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.fields.LinkSlot;
+import network.aika.fields.Multiplication;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
+
+import static network.aika.fields.FieldLink.connect;
+import static network.aika.fields.Fields.mul;
 
 /**
  *
@@ -29,4 +34,18 @@ public abstract class FeedbackSynapse<S extends FeedbackSynapse, I extends Neuro
         L,
         IA
         > {
+
+    public void initDummyLink(BindingActivation oAct) {
+        Multiplication dummyWeight = mul(
+                oAct,
+                (getDummyLinkUB() ? "pos" : "neg")  + "-" + getInput().getId(),
+                oAct.getIsOpen(),
+                getWeight()
+        );
+
+        LinkSlot ls = oAct.lookupLinkSlot(this, getDummyLinkUB());
+        connect(dummyWeight, -1, ls);
+    }
+
+    protected abstract boolean getDummyLinkUB();
 }

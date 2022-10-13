@@ -349,7 +349,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public void init(Synapse originSynapse, Activation originAct) {
-//        initFixedTransitionEvents();
         thought.onActivationCreationEvent(this, originSynapse, originAct);
     }
 

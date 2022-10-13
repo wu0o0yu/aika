@@ -31,4 +31,13 @@ public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivati
         super(s, input, output);
     }
 
+
+    /*
+    public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
+        if(v.getDir() == Direction.INPUT)
+            return;
+
+        super.trackBindingSignal(v, p);
+    }
+     */
 }
