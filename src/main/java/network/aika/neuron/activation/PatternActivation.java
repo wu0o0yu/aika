@@ -44,10 +44,6 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
         p.test(this);
 
-        if(visited == v.getV())
-            return;
-        visited = v.getV();
-
         super.followBindingSignal(v, p);
         super.followBindingSignal(v.next(Direction.OUTPUT), p);
     }

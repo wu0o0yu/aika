@@ -14,21 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.neuron.conjunctive;
 
-import network.aika.direction.Direction;
-import network.aika.neuron.conjunctive.PatternSynapse;
-import network.aika.neuron.linking.Visitor;
-
-import java.util.function.Predicate;
+import network.aika.neuron.Neuron;
+import network.aika.neuron.activation.*;
 
 /**
+ *
  * @author Lukas Molzberger
  */
-public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivation, PatternActivation> {
-
-    public PatternLink(PatternSynapse s, BindingActivation input, PatternActivation output) {
-        super(s, input, output);
-    }
-
+public abstract class FeedbackSynapse<S extends FeedbackSynapse, I extends Neuron, L extends Link<S, IA, BindingActivation>, IA extends Activation<?>> extends BindingNeuronSynapse<
+        S,
+        I,
+        L,
+        IA
+        > {
 }

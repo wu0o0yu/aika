@@ -90,8 +90,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected Map<Synapse, LinkSlot> ubLinkSlots = new TreeMap<>(SYN_COMP);
     protected Map<Synapse, LinkSlot> lbLinkSlots = new TreeMap<>(SYN_COMP);
 
-    protected long visited;
-
     public Activation(int id, Thought t, N n) {
         this.id = id;
         this.neuron = n;
@@ -219,10 +217,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
         p.test(this);
-
-        if(visited == v.getV())
-            return;
-        visited = v.getV();
 
         followBindingSignal(v, p);
     }

@@ -16,19 +16,33 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.direction.Direction;
-import network.aika.neuron.conjunctive.PatternSynapse;
+import network.aika.neuron.conjunctive.FeedbackSynapse;
 import network.aika.neuron.linking.Visitor;
 
 import java.util.function.Predicate;
 
+
 /**
  * @author Lukas Molzberger
+ *
  */
-public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivation, PatternActivation> {
+public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activation<?>> extends BindingNeuronLink<S, IA> {
 
-    public PatternLink(PatternSynapse s, BindingActivation input, PatternActivation output) {
+    protected long visited;
+
+    public FeedbackLink(S s, IA input, BindingActivation output) {
         super(s, input, output);
     }
 
+    protected boolean isSelfRef() {
+        return input.isSelfRef(output);
+    }
+
+    public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
+        if(visited == v.getV())
+            return;
+        visited = v.getV();
+
+        followBindingSignal(v, p);
+    }
 }

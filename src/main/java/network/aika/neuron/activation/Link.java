@@ -53,8 +53,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected ThresholdOperator onTransparent;
 
-    protected long visited;
-
     public Link(S s, I input, O output) {
         this.synapse = s;
         this.input = input;
@@ -76,10 +74,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
-        if(visited == v.getV())
-            return;
-        visited = v.getV();
-        
         followBindingSignal(v, p);
     }
 

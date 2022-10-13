@@ -27,7 +27,7 @@ import static network.aika.fields.Fields.mul;
  *
  * @author Lukas Molzberger
  */
-public class PositiveFeedbackSynapse extends BindingNeuronSynapse<
+public class PositiveFeedbackSynapse extends FeedbackSynapse<
         PositiveFeedbackSynapse,
         PatternNeuron,
         PositiveFeedbackLink,

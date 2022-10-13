@@ -21,7 +21,6 @@ import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 import network.aika.neuron.linking.Visitor;
 
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.*;
@@ -30,21 +29,12 @@ import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 /**
  * @author Lukas Molzberger
  */
-public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSynapse, InhibitoryActivation> {
+public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, InhibitoryActivation> {
 
 
     public NegativeFeedbackLink(NegativeFeedbackSynapse s, InhibitoryActivation input, BindingActivation output) {
         super(s, input, output);
     }
-
-    public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
-        if(visited == v.getV())
-            return;
-        visited = v.getV();
-
-        followBindingSignal(v, p);
-    }
-
 
 
     @Override
@@ -57,10 +47,6 @@ public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSyna
 
         connect(weightedInputUB, input.getId(), getOutput().lookupLinkSlot(synapse, true));
         connect(weightedInputLB, input.getId(), getOutput().lookupLinkSlot(synapse, false));
-    }
-
-    private boolean isSelfRef() {
-        return input.isSelfRef(output);
     }
 
     @Override

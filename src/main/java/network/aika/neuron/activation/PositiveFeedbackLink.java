@@ -16,7 +16,11 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.direction.Direction;
 import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
+import network.aika.neuron.linking.Visitor;
+
+import java.util.function.Predicate;
 
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
@@ -25,7 +29,7 @@ import static network.aika.fields.ThresholdOperator.Type.ABOVE;
  *
  * @author Lukas Molzberger
  */
-public class PositiveFeedbackLink extends BindingNeuronLink<PositiveFeedbackSynapse, PatternActivation> {
+public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, PatternActivation> {
 
     public PositiveFeedbackLink(PositiveFeedbackSynapse s, PatternActivation input, BindingActivation output) {
         super(s, input, output);
