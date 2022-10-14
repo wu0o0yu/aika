@@ -71,15 +71,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     protected boolean allowTraining = true;
 
     public Stream<Activation> getRelatedBindingSignals(Activation<?> fromBS, Direction dir) {
-        Neuron tn = dir.getNeuron(this);
-
-        return fromBS.getRelatedBindingSignals(tn);
-/*
-        Stream<PatternActivation> originActs = fromBS.getBindingSignals();
-        return originActs.flatMap(bsOrigin ->
-                dir.getNeuron(this).getRelatedBindingSignals(bsOrigin)
+        return fromBS.getRelatedBindingSignals(
+                dir.getNeuron(this)
         );
- */
     }
 
     public abstract double getSumOfLowerWeights();
