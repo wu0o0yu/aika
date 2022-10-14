@@ -16,23 +16,22 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.direction.Direction;
 import network.aika.neuron.activation.*;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class RelatedInputSynapse extends BindingNeuronSynapse<
-        RelatedInputSynapse,
+public class RelationInputSynapse extends BindingNeuronSynapse<
+        RelationInputSynapse,
         LatentRelationNeuron,
-        RelatedInputLink,
+        RelationInputLink,
         BindingActivation
         >
 {
     @Override
-    public RelatedInputLink createLink(BindingActivation input, BindingActivation output) {
-        return new RelatedInputLink(this, input, output);
+    public RelationInputLink createLink(BindingActivation input, BindingActivation output) {
+        return new RelationInputLink(this, input, output);
     }
 
     @Override

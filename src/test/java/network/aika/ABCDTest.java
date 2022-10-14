@@ -115,7 +115,7 @@ public class ABCDTest {
 
         LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, -1, -1);
 
-        new RelatedInputSynapse()
+        new RelationInputSynapse()
                 .init(relPT, b_abBN, 10.0)
                 .adjustBias();
         new SamePatternSynapse()
@@ -138,7 +138,7 @@ public class ABCDTest {
         BindingNeuron b_bcBN = new BindingNeuron().init(m, "b (bc)");
         BindingNeuron c_bcBN = new BindingNeuron().init(m, "c (bc)");
 
-        new RelatedInputSynapse()
+        new RelationInputSynapse()
                 .init(relPT, c_bcBN, 10.0)
                 .adjustBias();
         new SamePatternSynapse()
@@ -163,11 +163,11 @@ public class ABCDTest {
         // Pattern bcd
         BindingNeuron bc_bcdBN = new BindingNeuron().init(m, "bc (bcd)");
         BindingNeuron d_bcdBN = new BindingNeuron().init(m, "d (bcd)");
-        new RelatedInputSynapse()
+        new RelationInputSynapse()
                 .init(c_bcBN, bc_bcdBN, 10.0)
                 .adjustBias();
 
-        new RelatedInputSynapse()
+        new RelationInputSynapse()
                 .init(relPT, d_bcdBN, 10.0)
                 .adjustBias();
 

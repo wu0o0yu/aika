@@ -52,6 +52,15 @@ public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, Pattern
     }
 
     @Override
+    public PatternCategoryInputSynapse getCategoryInputSynapse() {
+        return inputSynapses.stream()
+                .filter(s -> s instanceof PatternCategoryInputSynapse)
+                .map(s -> (PatternCategoryInputSynapse) s)
+                .findAny()
+                .orElse(null);
+    }
+
+    @Override
     protected void updateSumOfLowerWeights() {
     }
 }

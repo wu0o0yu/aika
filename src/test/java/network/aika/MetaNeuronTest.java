@@ -103,7 +103,7 @@ public class MetaNeuronTest {
         BindingNeuron sylContinueRightBN = new BindingNeuron()
                 .init(m, "Abstract Syl. Cont. Right");
 
-        new RelatedInputSynapse()
+        new RelationInputSynapse()
                 .init(relPT, sylContinueRightBN, 5.0)
                 .adjustBias();
 

@@ -186,6 +186,10 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return isSelfRef[0];
     }
 
+    public Activation<N> resolveAbstractInputActivation() {
+        return this;
+    }
+
     public Stream<Activation> getRelatedBindingSignals(Neuron n) {
         ArrayList<Activation> results = new ArrayList<>();
         trackBindingSignal(new Visitor(getThought(), INPUT), bs -> {
@@ -327,6 +331,10 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public FieldOutput getIsFinal() {
         return isFinal;
+    }
+
+    public FieldOutput getIsFinalAndFired() {
+        return isFinalAndFired;
     }
 
     protected void initFields() {

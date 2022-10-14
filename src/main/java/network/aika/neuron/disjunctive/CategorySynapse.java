@@ -23,7 +23,7 @@ import network.aika.neuron.conjunctive.ConjunctiveNeuron;
  *
  * @author Lukas Molzberger
  */
-public abstract class CategorySynapse<S extends CategorySynapse, I extends ConjunctiveNeuron, O extends CategoryNeuron<?, OA>, IA extends Activation<?>, OA extends CategoryActivation> extends DisjunctiveSynapse<
+public abstract class CategorySynapse<S extends CategorySynapse, I extends ConjunctiveNeuron, O extends CategoryNeuron<?, OA>, IA extends ConjunctiveActivation<?>, OA extends CategoryActivation> extends DisjunctiveSynapse<
         S,
         I,
         O,

@@ -69,12 +69,9 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     protected void initFromTemplate(Neuron n) {
         super.initFromTemplate(n);
 
-        getInputSynapses()
-                .filter(s -> s instanceof CategoryInputSynapse)
-                .forEach(s ->
-                                newCategorySynapse()
-                                .init(n, s.getInput(), 1.0)
-                );
+        S cis = (S) getCategoryInputSynapse();
+        newCategorySynapse()
+                .init(n, cis.getInput(), 1.0);
     }
 
     public abstract CategorySynapse newCategorySynapse();
@@ -88,13 +85,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         return getCategoryInputSynapse() != null;
     }
 
-    public PatternCategoryInputSynapse getCategoryInputSynapse() {
-        return inputSynapses.stream()
-                .filter(s -> s instanceof PatternCategoryInputSynapse)
-                .map(s -> (PatternCategoryInputSynapse) s)
-                .findAny()
-                .orElse(null);
-    }
+    public abstract CategoryInputSynapse getCategoryInputSynapse();
 
     public void addInactiveLinks(Activation bs) {
         inputSynapses

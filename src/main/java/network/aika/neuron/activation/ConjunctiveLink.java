@@ -16,19 +16,41 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.neuron.Neuron;
+import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 import network.aika.neuron.conjunctive.ConjunctiveSynapse;
+import network.aika.neuron.linking.Visitor;
 
+import java.util.ArrayList;
+import java.util.stream.Stream;
+
+import static network.aika.direction.Direction.INPUT;
 import static network.aika.fields.Fields.mul;
 
 
 /**
  * @author Lukas Molzberger
  */
-public class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends Activation<?>, OA extends ConjunctiveActivation> extends Link<S, IA, OA> {
+public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends Activation<?>, OA extends ConjunctiveActivation> extends Link<S, IA, OA> {
 
 
     public ConjunctiveLink(S s, IA input, OA output) {
         super(s, input, output);
+    }
+
+    public void instantiateTemplate(ConjunctiveActivation instAct) {
+        OA oAct = (OA) instAct;
+        IA iAct = (IA) input.resolveAbstractInputActivation();
+
+        S instSyn = (S) synapse
+                .instantiateTemplate(
+                        this,
+                        iAct.getNeuron(),
+                        oAct.getNeuron()
+                );
+        instSyn.linkOutput();
+
+        instSyn.createLink(iAct, oAct);
     }
 
     @Override

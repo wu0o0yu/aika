@@ -33,7 +33,7 @@ import static network.aika.neuron.linking.LatentLinking.latentLinking;
  */
 public class LatentRelations {
 
-    public static void expandRelation(Activation bsA, BindingNeuronSynapse<?, ?, ?, ?> synA, BindingNeuronSynapse synB) {
+    public static void expandRelation(Activation bsA, BindingNeuronSynapse synA, BindingNeuronSynapse synB, RelationInputSynapse relSyn) {
         Direction dir;
         if(synA instanceof PrimaryInputSynapse)
             dir = Direction.INPUT;
@@ -41,9 +41,8 @@ public class LatentRelations {
             dir = Direction.OUTPUT;
         else return;
 
-        BindingNeuron toNeuron = synA.getOutput();
-        Stream<Activation> relatedBSs = toNeuron.findLatentRelationNeurons()
-                .flatMap(n -> evaluateLatentRelation(n, bsA, dir))
+        Stream<Activation> relatedBSs =
+                evaluateLatentRelation(relSyn.getInput(), bsA, dir)
                 .flatMap(bs -> synB.getRelatedBindingSignals(bs, INPUT));
 
         latentLinking(bsA, synA, synB, relatedBSs);

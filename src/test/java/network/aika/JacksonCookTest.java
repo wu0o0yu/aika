@@ -206,7 +206,7 @@ public class JacksonCookTest {
                 .init(surnameCN, surnameBN, 10.0)
                 .adjustBias();
 
-        new RelatedInputSynapse()
+        new RelationInputSynapse()
                 .init(relPT, surnameBN, 5.0)
                 .adjustBias();
 

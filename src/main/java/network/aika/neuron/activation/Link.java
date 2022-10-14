@@ -17,17 +17,14 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.direction.Direction;
 import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 import network.aika.neuron.linking.Visitor;
 import network.aika.sign.Sign;
 import network.aika.steps.link.LinkCounting;
 
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.FieldLink.connect;
@@ -229,50 +226,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return FIRED_COMPARATOR.compare(iAct.getFired(), oAct.getFired()) < 0;
     }
 
-    public void instantiateTemplate(Activation abstractBS, ConjunctiveNeuron on, Direction dir) {
- /*       I iAct = resolveAbstractInputActivation(abstractBS);
-
-        S instSyn = (S) synapse
-                .instantiateTemplate(
-                        this,
-                        iAct.getNeuron(),
-                        on
-                );
-        instSyn.linkOutput();
-
-  */
-/*
-        Link l = instSyn.createLink(
-                dir.getInput(act, iAct),
-                dir.getOutput(act, iAct)
-        );
-
-        Cleanup.add(l);l
- */
-    }
-/*
-    private I resolveAbstractInputActivation(Activation abstractBS) {
-        return getAbstractInputBS(abstractBS)
-                .flatMap(bs -> getConcreteActivation(bs.getOriginActivation()))
-                .findAny()
-                .orElse(input);
-    }
-
-    private Stream<I> getConcreteActivation(PatternActivation origin) {
-        if(origin.getNeuron().getTemplate() == input.getNeuron())
-            return Stream.of((I) origin);
-
-        return origin.getReverseBindingSignals()
-                .filter(bs -> bs.getState() == State.SAME || bs.getState() == State.INPUT)
-                .filter(bs -> bs.getActivation().getNeuron().getTemplate() == input.getNeuron())
-                .map(bs -> (I) bs.getActivation());
-    }
-
-    private Stream<Activation> getAbstractInputBS(Activation abstractBS) {
-        return abstractBS.getParents().values().stream()
-                .filter(bs -> bs.getActivation() == input);
-    }
-*/
     public void linkInput() {
         if(input == null)
             return;

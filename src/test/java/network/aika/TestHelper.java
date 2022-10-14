@@ -49,14 +49,14 @@ public class TestHelper {
                 .adjustBias();
 
         if(variant < 2) {
-            new RelatedInputSynapse()
+            new RelationInputSynapse()
                     .init(relPT, catBN, 5.0)
                     .adjustBias();
             new SamePatternSynapse()
                     .init(theBN, catBN, variant == 1 || variant == 3 ? 10.0 : 5.0)
                     .adjustBias();
         } else {
-            new RelatedInputSynapse()
+            new RelationInputSynapse()
                     .init(relPT, theBN, 5.0)
                     .adjustBias();
             new SamePatternSynapse()
@@ -91,7 +91,7 @@ public class TestHelper {
                 .init(catIN, catBN, 20.0)
                 .adjustBias();
 
-        new RelatedInputSynapse()
+        new RelationInputSynapse()
                 .init(relPT, catBN, 5.0)
                 .adjustBias();
 
@@ -126,14 +126,14 @@ public class TestHelper {
                 .adjustBias();
 
         if(variant < 2) {
-            new RelatedInputSynapse()
+            new RelationInputSynapse()
                     .init(relPT, dogBN, 5.0)
                     .adjustBias();
             new SamePatternSynapse()
                     .init(theBN, dogBN, variant == 1 || variant == 3 ? 10.0 : 5.0)
                     .adjustBias();
         } else {
-            new RelatedInputSynapse()
+            new RelationInputSynapse()
                     .init(relPT, theBN, 5.0)
                     .adjustBias();
             new SamePatternSynapse()

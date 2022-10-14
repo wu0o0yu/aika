@@ -22,7 +22,8 @@ import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.disjunctive.BindingCategorySynapse;
 import network.aika.neuron.disjunctive.CategorySynapse;
 
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static network.aika.neuron.linking.LatentRelations.expandRelation;
 
@@ -35,9 +36,12 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
 
     @Override
     protected void latentLinkingStepB(Activation bsA, BindingNeuronSynapse synA, BindingNeuronSynapse synB) {
-        super.latentLinkingStepB(bsA, synA, synB);
-
-        expandRelation(bsA, synA, synB);
+        List<RelationInputSynapse> relInputs = findLatentRelationNeurons();
+        relInputs.forEach(relSyn ->
+                expandRelation(bsA, synA, synB, relSyn)
+        );
+        if(relInputs.isEmpty())
+            super.latentLinkingStepB(bsA, synA, synB);
     }
 
     @Override
@@ -45,10 +49,11 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
         return new BindingCategorySynapse();
     }
 
-    public Stream<LatentRelationNeuron> findLatentRelationNeurons() {
+    public List<RelationInputSynapse> findLatentRelationNeurons() {
         return getInputSynapses()
-                .filter(s -> s instanceof RelatedInputSynapse)
-                .map(s -> (LatentRelationNeuron) s.getInput());
+                .filter(s -> s instanceof RelationInputSynapse)
+                .map(s -> (RelationInputSynapse) s)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -65,5 +70,14 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
         initFromTemplate(n);
 
         return n;
+    }
+
+    @Override
+    public BindingCategoryInputSynapse getCategoryInputSynapse() {
+        return inputSynapses.stream()
+                .filter(s -> s instanceof BindingCategoryInputSynapse)
+                .map(s -> (BindingCategoryInputSynapse) s)
+                .findAny()
+                .orElse(null);
     }
 }

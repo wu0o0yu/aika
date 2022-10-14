@@ -17,15 +17,15 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.Range;
-import network.aika.neuron.conjunctive.RelatedInputSynapse;
+import network.aika.neuron.conjunctive.RelationInputSynapse;
 import network.aika.sign.Sign;
 
 /**
  * @author Lukas Molzberger
  */
-public class RelatedInputLink extends BindingNeuronLink<RelatedInputSynapse, BindingActivation> {
+public class RelationInputLink extends BindingNeuronLink<RelationInputSynapse, BindingActivation> {
 
-    public RelatedInputLink(RelatedInputSynapse s, BindingActivation input, BindingActivation output) {
+    public RelationInputLink(RelationInputSynapse s, BindingActivation input, BindingActivation output) {
         super(s, input, output);
     }
 

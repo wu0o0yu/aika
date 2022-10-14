@@ -32,7 +32,6 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
         super(s, input, output);
     }
 
-
     /*
     OP-2
     public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
