@@ -16,8 +16,12 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.linking.LinkingVisitor;
+import network.aika.neuron.linking.LinkingOperator;
+import network.aika.neuron.linking.RelationLinkingVisitor;
 
 
 /**
@@ -34,7 +38,16 @@ public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I ext
                 BindingActivation
                 >
 {
+    public BindingNeuronSynapse(Scope scope) {
+        super(scope);
+    }
 
+    @Override
+    public LinkingVisitor createVisitor(Thought t, LinkingOperator c) {
+        LatentRelationNeuron rel = getOutput().findLatentRelationNeurons().stream().map(relSyn -> relSyn.getInput()).findAny().orElse(null);
+
+        return new RelationLinkingVisitor(t, c, rel, scope.getRelationDir());
+    }
 
     public void initDummyLink(BindingActivation oAct) {
     }

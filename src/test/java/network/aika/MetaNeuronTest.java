@@ -126,7 +126,7 @@ public class MetaNeuronTest {
                 .init(syllableCategory, syllable, 1.0)
                 .adjustBias();
 
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(letterPN, sylBeginBN, 10.0)
                 .adjustBias();
 
@@ -134,7 +134,7 @@ public class MetaNeuronTest {
                 .init(letterBindingCategory, sylBeginBN, 1.0)
                 .adjustBias();
 
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(letterPN, sylContinueRightBN, 10.0)
                 .adjustBias();
 

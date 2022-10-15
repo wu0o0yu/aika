@@ -122,12 +122,12 @@ public class ABCDTest {
                 .init(a_abBN, b_abBN, 11.0)
                 .adjustBias();
 
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(a_IN, a_abBN, 10.0)
                 .adjustBias();
         updateBias(a_abBN, 2.5);
 
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(b_IN, b_abBN, 10.0)
                 .adjustBias();
 
@@ -145,14 +145,14 @@ public class ABCDTest {
                 .init(b_bcBN, c_bcBN, 11.0)
                 .adjustBias();
 
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(b_IN, b_bcBN, 10.0)
                 .adjustBias();
         addInhibitoryLoop(new InhibitoryNeuron().init(m, "I-b"), false, b_abBN, b_bcBN);
         updateBias(b_abBN, 3.0);
         updateBias(b_bcBN, 2.5);
 
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(c_IN, c_bcBN, 10.0)
                 .adjustBias();
         updateBias(c_bcBN, 3.0);
@@ -175,12 +175,12 @@ public class ABCDTest {
                 .init(bc_bcdBN, d_bcdBN, 11.0)
                 .adjustBias();
 
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(bcPattern, bc_bcdBN, 10.0)
                 .adjustBias();
         updateBias(bc_bcdBN, 2.5);
 
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(d_IN, d_bcdBN, 10.0)
                 .adjustBias();
         updateBias(d_bcdBN, 3.0);

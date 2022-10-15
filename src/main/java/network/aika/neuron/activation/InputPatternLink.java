@@ -14,36 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika;
+package network.aika.neuron.activation;
 
-import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.InputPatternSynapse;
-import network.aika.neuron.conjunctive.text.TokenNeuron;
-import network.aika.text.Document;
-import org.junit.jupiter.api.Test;
-
-import static network.aika.TestUtils.*;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class PropagateTest {
+public class InputPatternLink extends BindingNeuronLink<InputPatternSynapse, ConjunctiveActivation<?>> {
 
-    @Test
-    public void testPropagation() {
-        Model m = new Model();
-
-        TokenNeuron in = new TokenNeuron().init(m, "IN", true);
-        BindingNeuron out = new BindingNeuron().init(m, "OUT");
-
-        new InputPatternSynapse()
-                .init(in, out, 10.0);
-
-        updateBias(out, 1.0);
-
-        Document doc = new Document(m, "test");
-        doc.addToken(in, 0, 0, 4);
-        System.out.println(doc);
+    public InputPatternLink(InputPatternSynapse s, ConjunctiveActivation input, BindingActivation output) {
+        super(s, input, output);
     }
 }

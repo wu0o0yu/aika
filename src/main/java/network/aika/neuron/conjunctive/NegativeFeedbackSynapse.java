@@ -16,12 +16,8 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.direction.Direction;
-import network.aika.fields.LinkSlot;
-import network.aika.fields.Multiplication;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
-import network.aika.neuron.linking.Visitor;
 
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.mul;
@@ -38,6 +34,9 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
         InhibitoryActivation
         >
 {
+    public NegativeFeedbackSynapse() {
+        super(Scope.INPUT);
+    }
 
     @Override
     public NegativeFeedbackLink createLink(InhibitoryActivation input, BindingActivation output) {
@@ -52,11 +51,12 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
     public boolean propagateCheck(InhibitoryActivation iAct) {
         return true;
     }
-
+/*
     @Override
     public boolean linkCheck(InhibitoryActivation iBS, BindingActivation oBS) {
         return iBS.isSelfRef(oBS);
     }
+*/
 
     @Override
     public void setWeight(double w) {

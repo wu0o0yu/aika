@@ -39,7 +39,7 @@ import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 import network.aika.neuron.conjunctive.PatternNeuron;
-import network.aika.neuron.conjunctive.PrimaryInputSynapse;
+import network.aika.neuron.conjunctive.InputPatternSynapse;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 import network.aika.neuron.disjunctive.InhibitorySynapse;
@@ -100,7 +100,7 @@ public class MutualExclusionTest {
         BindingNeuron nc = new BindingNeuron().init(m, "C");
         InhibitoryNeuron inhib = new InhibitoryNeuron().init(m, "I");
 
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(in, na, 10.0)
                 .adjustBias();
         new NegativeFeedbackSynapse()
@@ -108,7 +108,7 @@ public class MutualExclusionTest {
 
         TestUtils.updateBias(na, 1.0);
 
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(in, nb, 10.0)
                 .adjustBias();
 
@@ -117,7 +117,7 @@ public class MutualExclusionTest {
 
         TestUtils.updateBias(nb, 1.5);
 
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(in, nc, 10.0)
                 .adjustBias();
 
@@ -167,7 +167,7 @@ public class MutualExclusionTest {
         BindingNeuron nb = new BindingNeuron().init(m, "B");
         InhibitoryNeuron inhib =new InhibitoryNeuron().init(m, "I");
 
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(in, na, 10.0)
                 .adjustBias();
 
@@ -180,7 +180,7 @@ public class MutualExclusionTest {
         updateBias(pa, 3.0);
 
 
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(in, nb, 10.0)
                 .adjustBias();
 

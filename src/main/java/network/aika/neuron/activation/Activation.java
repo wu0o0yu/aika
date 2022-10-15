@@ -18,23 +18,18 @@ package network.aika.neuron.activation;
 
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.direction.Direction;
 import network.aika.fields.*;
 import network.aika.neuron.*;
-import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
+import network.aika.neuron.linking.SelfRefVisitor;
 import network.aika.neuron.linking.Visitor;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
 
 import java.util.*;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.direction.Direction.*;
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.LinkSlotMode.MAX;
@@ -174,60 +169,24 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public boolean isSelfRef(Activation oAct) {
-        boolean[] isSelfRef = new boolean[1];
-
-        trackBindingSignal(new Visitor(getThought(), Direction.INPUT), bs -> {
-            if(bs == oAct)
-                isSelfRef[0] = true;
-
-            return isSelfRef[0];
-        });
-
-        return isSelfRef[0];
+        SelfRefVisitor v = new SelfRefVisitor(oAct);
+        visit(v, null);
+        return v.isSelfRef();
     }
 
     public Activation<N> resolveAbstractInputActivation() {
         return this;
     }
 
-    public Stream<Activation> getRelatedBindingSignals(Neuron n) {
-        ArrayList<Activation> results = new ArrayList<>();
-        trackBindingSignal(new Visitor(getThought(), INPUT), bs -> {
-            if(bs.getNeuron() == n) {
-                results.add(bs);
-                return false;
-            }
+    public void visit(Visitor v, Link lastLink) {
+        v.check(lastLink, this);
 
-            return true;
-        });
-
-        return results.stream();
+        next(v);
     }
 
-    public <O extends PatternActivation> List<O> findBindingSignalOrigins(Class<O> clazz) {
-        ArrayList<O> results = new ArrayList<>();
-
-        trackBindingSignal(new Visitor(getThought(), INPUT), bs -> {
-            if(clazz.isInstance(bs)) {
-                results.add((O) bs);
-                return false;
-            }
-
-            return true;
-        });
-
-        return results;
-    }
-
-    public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
-        p.test(this);
-
-        followBindingSignal(v, p);
-    }
-
-    protected void followBindingSignal(Visitor v, Predicate<Activation> p) {
+    protected void next(Visitor v) {
         v.getDir().getLinks(this)
-                .forEach(l -> l.trackBindingSignal(v, p));
+                .forEach(l -> l.visit(v));
     }
 
     public Map<Synapse, LinkSlot> getLinkSlots(boolean upperBound) {

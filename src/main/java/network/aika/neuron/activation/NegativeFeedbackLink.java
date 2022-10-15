@@ -16,11 +16,7 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.direction.Direction;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
-import network.aika.neuron.linking.Visitor;
-
-import java.util.function.Predicate;
 
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.*;

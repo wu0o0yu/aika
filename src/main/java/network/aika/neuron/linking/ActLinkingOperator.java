@@ -14,16 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.neuron.linking;
 
-import network.aika.neuron.conjunctive.PrimaryInputSynapse;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 
 /**
  * @author Lukas Molzberger
  */
-public class PrimaryInputLink extends BindingNeuronLink<PrimaryInputSynapse, PatternActivation> {
+public class ActLinkingOperator extends LinkingOperator<Activation> {
 
-    public PrimaryInputLink(PrimaryInputSynapse s, PatternActivation input, BindingActivation output) {
-        super(s, input, output);
+    public ActLinkingOperator(Activation fromBS, Synapse syn) {
+        super(fromBS, syn);
+    }
+
+    @Override
+    public void check(Link lastLink, Activation act) {
+        if(act == fromBS)
+            return;
+
+        if(act.getNeuron() == syn.getInput()) {
+            results.add(act);
+        }
     }
 }

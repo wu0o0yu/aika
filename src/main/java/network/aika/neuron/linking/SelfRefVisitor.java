@@ -16,47 +16,40 @@
  */
 package network.aika.neuron.linking;
 
-import network.aika.Thought;
 import network.aika.direction.Direction;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.conjunctive.LatentRelationNeuron;
-
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class Visitor {
+public class SelfRefVisitor extends Visitor {
 
-    long v;
-    Direction dir;
+    Activation oAct;
 
-    public Visitor(Thought t) {
-        this.v = t.getNewVisitorId();
-        this.dir = Direction.INPUT;
+    boolean isSelfRef;
+
+    public SelfRefVisitor(Activation oAct) {
+        super(oAct.getThought());
     }
 
-    protected Visitor(Visitor parent, Direction dir) {
-        this.v = parent.v;
-        this.dir = dir;
+    protected SelfRefVisitor(SelfRefVisitor parent, Direction dir) {
+        super(parent, dir);
     }
 
-    public abstract Visitor up(PatternActivation origin);
-    public long getV() {
-        return v;
+    public boolean isSelfRef() {
+        return isSelfRef;
     }
 
-    public Direction getDir() {
-        return dir;
+    @Override
+    public Visitor up(PatternActivation origin) {
+        return new SelfRefVisitor(this, Direction.OUTPUT);
     }
 
-    public void setDir(Direction dir) {
-        this.dir = dir;
+    @Override
+    public void check(Link lastLink, Activation act) {
+        if(act == oAct)
+            isSelfRef = true;
     }
-
-    public abstract void check(Link lastLink, Activation act);
 }

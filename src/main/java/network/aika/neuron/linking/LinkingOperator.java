@@ -14,30 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.conjunctive;
+package network.aika.neuron.linking;
 
-import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.activation.PrimaryInputLink;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Element;
+import network.aika.neuron.activation.Link;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class PrimaryInputSynapse extends BindingNeuronSynapse<
-        PrimaryInputSynapse,
-        PatternNeuron,
-        PrimaryInputLink,
-        PatternActivation
-        >
-{
-    @Override
-    public PrimaryInputLink createLink(PatternActivation input, BindingActivation output) {
-        return new PrimaryInputLink(this, input, output);
+public abstract class LinkingOperator<E extends Element> {
+
+    protected Activation fromBS;
+
+    protected Synapse syn;
+
+    protected ArrayList<E> results = new ArrayList<>();
+
+    public LinkingOperator(Activation fromBS, Synapse syn) {
+        this.fromBS = fromBS;
+        this.syn = syn;
     }
 
-    @Override
-    public boolean propagateCheck(PatternActivation iAct) {
-        return checkCandidateSynapse(iAct);
+    public List<E> getResults() {
+        return results;
     }
+
+    public abstract void check(Link lastLink, Activation act);
+
 }

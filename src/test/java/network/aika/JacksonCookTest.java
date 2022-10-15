@@ -128,7 +128,7 @@ public class JacksonCookTest {
 
         BindingNeuron jacksonForenameBN = forenameBN.instantiateTemplate(true).init(m, "jackson (forename)");
         BindingNeuron jacksonJCBN = jacksonForenameBN.instantiateTemplate(true).init(m, "jackson (jackson cook)");
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(jacksonIN, jacksonJCBN, 10.0)
                 .adjustBias();
 
@@ -140,7 +140,7 @@ public class JacksonCookTest {
                 .init(jacksonForenameCN, jacksonForenameBN, 10.0)
                 .adjustBias();
 
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(jacksonIN, jacksonForenameBN, 10.0)
                 .adjustBias();
 
@@ -149,7 +149,7 @@ public class JacksonCookTest {
                 .init(jacksonForenameBN, forenameCN, 10.0);
 
         BindingNeuron jacksonCityBN = new BindingNeuron().init(m, "jackson (city)");
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(jacksonIN, jacksonCityBN, 10.0)
                 .adjustBias();
 
@@ -159,7 +159,7 @@ public class JacksonCookTest {
 
         BindingNeuron cookSurnameBN =  surnameBN.init(m, "cook (surname)");
         BindingNeuron cookJCBN =  cookSurnameBN.init(m, "cook (jackson cook)");
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(cookIN, cookJCBN, 10.0)
                 .adjustBias();
 
@@ -171,7 +171,7 @@ public class JacksonCookTest {
                 .init(cookSurnameCN, cookSurnameBN, 10.0)
                 .adjustBias();
 
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(cookIN, cookSurnameBN, 10.0)
                 .adjustBias();
 
@@ -180,7 +180,7 @@ public class JacksonCookTest {
                 .init(cookSurnameBN, surnameCN, 10.0);
 
         BindingNeuron cookProfessionBN =  new BindingNeuron().init(m, "cook (profession)");
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(cookIN, cookProfessionBN, 10.0)
                 .adjustBias();
 

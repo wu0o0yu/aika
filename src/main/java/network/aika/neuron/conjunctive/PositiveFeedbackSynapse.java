@@ -34,6 +34,10 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
         PatternActivation
         >
 {
+    public PositiveFeedbackSynapse() {
+        super(Scope.SAME);
+    }
+
     public PositiveFeedbackLink createLink(PatternActivation input, BindingActivation output) {
         return new PositiveFeedbackLink(this, input, output);
     }

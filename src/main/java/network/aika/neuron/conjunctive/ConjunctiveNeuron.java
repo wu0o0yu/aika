@@ -16,23 +16,27 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.Model;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.disjunctive.CategorySynapse;
+import network.aika.neuron.linking.Linker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 import static network.aika.neuron.Synapse.isLatentLinking;
-import static network.aika.neuron.linking.LatentLinking.latentLinking;
+import static network.aika.neuron.linking.Linker.link;
+import static network.aika.neuron.linking.Linker.link;
 
 /**
  *
@@ -52,16 +56,31 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
                 .filter(synB -> synA != synB)
                 .filter(synB -> isLatentLinking(synA, synB))
                 .forEach(synB ->
-                        latentLinkingStepB(fromBS, (S) synA, synB)
+                        linkStepB(fromBS, (S) synA, null, synB)
                 );
     }
 
-    protected void latentLinkingStepB(Activation bsA, S synA, S synB) {
-        latentLinking(
+    public void linkStepAOutput(ConjunctiveSynapse syn, Activation fromBS) {
+        Stream<Link> links = syn.getRelatedLinks(fromBS);
+        links.forEach(l ->
+                link(l.getInput(), l.getSynapse(), l, fromBS, syn)
+        );
+    }
+
+    public void linkStepAInput(ConjunctiveSynapse syn, Activation fromBS) {
+        Stream<Link> inputs = fromBS.getInputLinks();
+        inputs.forEach(l ->
+                linkStepB(l.getInput(), (S) l.getSynapse(), l, (S) syn)
+        );
+    }
+
+    protected void linkStepB(Activation bsA, S synA, Link linkA, S synB) {
+        Linker.link(
                 bsA,
                 synA,
+                linkA,
                 synB,
-                synB.getRelatedBindingSignals(bsA, INPUT)
+                synB.getRelatedActs(bsA, synA.getScope())
         );
     }
 

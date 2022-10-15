@@ -17,12 +17,9 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.direction.Direction;
 import network.aika.neuron.Range;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.linking.Visitor;
-
-import java.util.function.Predicate;
 
 /**
  *
@@ -41,10 +38,10 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
         return range;
     }
 
-    public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
-        p.test(this);
+    @Override
+    public void visit(Visitor v, Link lastLink) {
+        super.visit(v, lastLink);
 
-        super.followBindingSignal(v, p);
-        super.followBindingSignal(v.next(Direction.OUTPUT), p);
+        next(v.up(this));
     }
 }

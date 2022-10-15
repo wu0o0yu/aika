@@ -24,8 +24,6 @@ import network.aika.neuron.linking.Visitor;
 import network.aika.sign.Sign;
 import network.aika.steps.link.LinkCounting;
 
-import java.util.function.Predicate;
-
 import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.*;
@@ -70,13 +68,13 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         getThought().onLinkCreationEvent(this);
     }
 
-    public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
-        followBindingSignal(v, p);
+    public void visit(Visitor v) {
+        next(v);
     }
 
-    protected void followBindingSignal(Visitor v, Predicate<Activation> p) {
+    protected void next(Visitor v) {
         v.getDir().getActivation(this)
-                .trackBindingSignal(v, p);
+                .visit(v, this);
     }
 
     protected void initOnTransparent() {

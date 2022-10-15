@@ -29,13 +29,17 @@ public class RelationInputSynapse extends BindingNeuronSynapse<
         BindingActivation
         >
 {
+    public RelationInputSynapse() {
+        super(Scope.INPUT);
+    }
+
     @Override
     public RelationInputLink createLink(BindingActivation input, BindingActivation output) {
         return new RelationInputLink(this, input, output);
     }
 
     @Override
-    public void linkAndPropagateIn(Activation fromBS) {
+    public void linkAndPropagateIn(BindingActivation fromBS) {
  // OP-3
  //     latentBackwardsPropagation(fromBS);
         super.linkAndPropagateIn(fromBS);

@@ -23,6 +23,7 @@ import network.aika.fields.FieldOutput;
 import network.aika.fields.QueueField;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
+import network.aika.neuron.linking.Visitor;
 import network.aika.sign.Sign;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.stream.Stream;
+import java.util.function.BiPredicate;
 
 import static network.aika.direction.Direction.*;
 import static network.aika.fields.Fields.isTrue;
@@ -70,11 +71,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected boolean allowTraining = true;
 
-    public Stream<Activation> getRelatedBindingSignals(Activation<?> fromBS, Direction dir) {
-        return fromBS.getRelatedBindingSignals(
-                dir.getNeuron(this)
-        );
-    }
 
     public abstract double getSumOfLowerWeights();
 
@@ -86,27 +82,21 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         FieldOutput linkingEvent = getLinkingEvent(act, dir.invert());
         return linkingEvent == null || isTrue(linkingEvent);
     }
-
+/*
     public boolean linkCheck(IA inputBS, OA outputBS) {
         return true;
     }
-
-    public void linkAndPropagateOut(Activation bs) {
-        link(OUTPUT, bs);
-
-        getOutput()
-                .latentLinkingStepA(this, bs);
-
+*/
+    public void linkAndPropagateOut(IA bs) {
         if (isPropagate())
-            propagate((IA) bs);
+            propagate(bs);
     }
 
-    public void linkAndPropagateIn(Activation bs) {
-        link(INPUT, bs);
+    public void linkAndPropagateIn(OA bs) {
     }
-
+/*
     public void link(Direction dir, Activation fromBS) {
-        Stream<Activation> bsStream = getRelatedBindingSignals(fromBS, dir);
+        Stream<Activation> bsStream = getRelatedActs(fromBS, dir);
 
         bsStream.filter(toBS -> fromBS != toBS)
                 .filter(toBS ->
@@ -123,7 +113,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
                         )
                 );
     }
-
+*/
 
     public L propagate(IA iAct) {
 //        if(!propagateCheck(iAct))
@@ -137,7 +127,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
         return createLink(iAct, oAct);
     }
-
+/*
     public L linkIntern(Activation fromAct, Activation toAct, Direction dir) {
         if(!checkLinkingEvent(toAct, dir))
             return null;
@@ -153,6 +143,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
         return createLink(iAct, oAct);
     }
+*/
 
     protected boolean checkCausal(IA iAct, OA oAct) {
         return Link.isCausal(iAct, oAct);

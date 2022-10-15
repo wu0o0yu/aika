@@ -19,8 +19,6 @@ package network.aika.neuron.activation;
 import network.aika.neuron.conjunctive.FeedbackSynapse;
 import network.aika.neuron.linking.Visitor;
 
-import java.util.function.Predicate;
-
 
 /**
  * @author Lukas Molzberger
@@ -38,11 +36,11 @@ public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activat
         return input.isSelfRef(output);
     }
 
-    public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
+    public void visit(Visitor v) {
         if(visited == v.getV())
             return;
         visited = v.getV();
 
-        followBindingSignal(v, p);
+        next(v);
     }
 }

@@ -16,47 +16,27 @@
  */
 package network.aika.neuron.linking;
 
-import network.aika.Thought;
-import network.aika.direction.Direction;
-import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.conjunctive.LatentRelationNeuron;
-
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class Visitor {
+public class LinkLinkingOperator extends LinkingOperator<Link> {
 
-    long v;
-    Direction dir;
 
-    public Visitor(Thought t) {
-        this.v = t.getNewVisitorId();
-        this.dir = Direction.INPUT;
+    public LinkLinkingOperator(Activation fromBS, Synapse syn) {
+        super(fromBS, syn);
     }
 
-    protected Visitor(Visitor parent, Direction dir) {
-        this.v = parent.v;
-        this.dir = dir;
-    }
+    @Override
+    public void check(Link lastLink, Activation act) {
+        if(act == fromBS)
+            return;
 
-    public abstract Visitor up(PatternActivation origin);
-    public long getV() {
-        return v;
+        if(act.getNeuron() == syn.getOutput()) {
+            results.add(lastLink);
+        }
     }
-
-    public Direction getDir() {
-        return dir;
-    }
-
-    public void setDir(Direction dir) {
-        this.dir = dir;
-    }
-
-    public abstract void check(Link lastLink, Activation act);
 }

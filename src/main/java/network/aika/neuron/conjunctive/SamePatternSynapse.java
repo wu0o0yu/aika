@@ -31,6 +31,10 @@ public class SamePatternSynapse extends BindingNeuronSynapse<
         BindingActivation
         >
 {
+    public SamePatternSynapse() {
+        super(Scope.SAME);
+    }
+
     @Override
     public SamePatternLink createLink(BindingActivation input, BindingActivation output) {
         return new SamePatternLink(this, input, output);

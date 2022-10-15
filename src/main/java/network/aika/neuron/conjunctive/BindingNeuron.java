@@ -17,7 +17,6 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.Thought;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.disjunctive.BindingCategorySynapse;
 import network.aika.neuron.disjunctive.CategorySynapse;
@@ -25,24 +24,10 @@ import network.aika.neuron.disjunctive.CategorySynapse;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static network.aika.neuron.linking.LatentRelations.expandRelation;
-
-
 /**
  * @author Lukas Molzberger
  */
 public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, BindingActivation> {
-
-
-    @Override
-    protected void latentLinkingStepB(Activation bsA, BindingNeuronSynapse synA, BindingNeuronSynapse synB) {
-        List<RelationInputSynapse> relInputs = findLatentRelationNeurons();
-        relInputs.forEach(relSyn ->
-                expandRelation(bsA, synA, synB, relSyn)
-        );
-        if(relInputs.isEmpty())
-            super.latentLinkingStepB(bsA, synA, synB);
-    }
 
     @Override
     public CategorySynapse newCategorySynapse() {

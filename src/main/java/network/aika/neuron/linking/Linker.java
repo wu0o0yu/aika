@@ -16,8 +16,6 @@
  */
 package network.aika.neuron.linking;
 
-import network.aika.Thought;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
@@ -26,36 +24,35 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
-import static network.aika.fields.Fields.isTrue;
-import static network.aika.neuron.Synapse.isLatentLinking;
-import static network.aika.neuron.linking.LatentRelations.expandRelation;
 
 /**
  * @author Lukas Molzberger
  */
-public class LatentLinking {
+public class Linker {
 
-    public static void latentLinking(Activation bsA, Synapse synA, Synapse synB, Stream<Activation> bsStream) {
-        Thought t = bsA.getThought();
-
+    public static void link(Activation bsA, Synapse synA, Link linkA, Synapse synB, Stream<Activation> bsStream) {
         bsStream
                 .filter(bsB ->
-                        bsA != bsB &&
-                                isTrue(bsB.getIsFired())
-                )
-                .filter(bsB ->
                         synB.checkLinkingEvent(bsB, INPUT)
-                )
-                .filter(bsB ->
-                        !latentActivationExists(synA, synB, bsA, bsB)
-                )
-                .forEach(bsB -> {
-                    Activation oAct = synA.getOutput().createActivation(t);
-                    oAct.init(synA, bsA);
+                ).forEach(bsB ->
+                        link(bsA, synA, linkA, bsB, synB)
+                );
+    }
 
-                    synA.createLink(bsA, oAct);
-                    synB.createLink(bsB, oAct);
-                });
+    public static void link(Activation bsA, Synapse synA, Link linkA, Activation bsB, Synapse synB) {
+        Activation oAct;
+        if (linkA == null) {
+            if(latentActivationExists(synA, synB, bsA, bsB))
+                return;
+
+            oAct = synA.getOutput().createActivation(bsA.getThought());
+            oAct.init(synA, bsA);
+
+            synA.createLink(bsA, oAct);
+        } else {
+            oAct = linkA.getOutput();
+        }
+        synB.createLink(bsB, oAct);
     }
 
     private static boolean latentActivationExists(Synapse synA, Synapse synB, Activation iActA, Activation iActB) {

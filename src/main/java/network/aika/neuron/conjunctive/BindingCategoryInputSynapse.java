@@ -18,7 +18,6 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.*;
 import network.aika.neuron.disjunctive.BindingCategoryNeuron;
-import network.aika.neuron.disjunctive.CategoryNeuron;
 
 /**
  * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
@@ -33,7 +32,7 @@ public class BindingCategoryInputSynapse extends BindingNeuronSynapse<
         > implements CategoryInputSynapse<BindingCategoryInputSynapse>
 {
     public BindingCategoryInputSynapse() {
-        super();
+        super(Scope.INPUT);
     }
 
     @Override

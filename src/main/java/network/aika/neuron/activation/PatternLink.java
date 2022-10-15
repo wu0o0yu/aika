@@ -16,12 +16,7 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.direction.Direction;
-import network.aika.neuron.conjunctive.BindingNeuronSynapse;
 import network.aika.neuron.conjunctive.PatternSynapse;
-import network.aika.neuron.linking.Visitor;
-
-import java.util.function.Predicate;
 
 /**
  * @author Lukas Molzberger

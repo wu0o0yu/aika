@@ -33,6 +33,10 @@ public class ReversePatternSynapse extends
                 >
 {
 
+    public ReversePatternSynapse() {
+        super(Scope.SAME);
+    }
+
     @Override
     public ReversePatternLink createLink(PatternActivation input, BindingActivation output) {
         return new ReversePatternLink(this, input, output);

@@ -17,17 +17,20 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
+import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.linking.*;
 import network.aika.utils.Utils;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.stream.Stream;
 
 
 /**
@@ -46,6 +49,55 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
 {
 
     private double sumOfLowerWeights;
+
+    protected Scope scope;
+
+    public ConjunctiveSynapse(Scope scope) {
+        this.scope = scope;
+    }
+
+    public Scope getScope() {
+        return scope;
+    }
+
+    public LinkingVisitor createVisitor(Thought t, LinkingOperator c) {
+        return new LinkingVisitor(t, c);
+    }
+
+    public Stream<Activation> getRelatedActs(Activation bs, Scope relScope) {
+        ActLinkingOperator operator = new ActLinkingOperator(bs, this);
+
+        LinkingVisitor v = createVisitor(getThought(), operator); // , scope.getRelationDir()
+        bs.visit(v, null);
+        return operator.getResults().stream();
+    }
+
+    public Stream<Link> getRelatedLinks(Activation bs) {
+        LinkLinkingOperator operator = new LinkLinkingOperator(bs, this);
+
+        LinkingVisitor v = createVisitor(getThought(), operator);
+        bs.visit(v, null);
+
+        return operator.getResults().stream();
+    }
+
+    @Override
+    public void linkAndPropagateOut(IA bs) {
+        //link(OUTPUT, bs);
+
+        getOutput()
+                .linkStepAOutput(this, bs);
+
+        getOutput()
+                .latentLinkingStepA(this, bs);
+
+        super.linkAndPropagateOut(bs);
+    }
+
+    @Override
+    public void linkAndPropagateIn(OA bs) {
+        getOutput().linkStepAInput(this, bs);
+    }
 
     public void setOutput(O output) {
         super.setOutput(output);

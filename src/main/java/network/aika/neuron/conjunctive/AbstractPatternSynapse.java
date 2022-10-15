@@ -35,6 +35,10 @@ public abstract class AbstractPatternSynapse<S extends AbstractPatternSynapse, I
         >
 {
 
+    public AbstractPatternSynapse() {
+        super(Scope.SAME);
+    }
+
     @Override
     public boolean isPropagate() {
         return true;
