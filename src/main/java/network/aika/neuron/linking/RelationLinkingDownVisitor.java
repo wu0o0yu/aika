@@ -21,6 +21,7 @@ import network.aika.direction.Direction;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
+import network.aika.neuron.conjunctive.RelationInputSynapse;
 import network.aika.neuron.conjunctive.Scope;
 
 import static network.aika.neuron.conjunctive.Scope.INPUT;
@@ -30,18 +31,18 @@ import static network.aika.neuron.conjunctive.Scope.INPUT;
  */
 public class RelationLinkingDownVisitor extends LinkingDownVisitor {
 
-    protected LatentRelationNeuron relation;
+    protected RelationInputSynapse relation;
     protected Direction relationDir;
 
 
-    public RelationLinkingDownVisitor(Thought t, LinkingOperator operator, LatentRelationNeuron rel, Direction relationDir) {
+    public RelationLinkingDownVisitor(Thought t, LinkingOperator operator, RelationInputSynapse rel, Direction relationDir) {
         super(t, operator);
 
         this.relation = rel;
         this.relationDir = relationDir;
     }
 
-    public LatentRelationNeuron getRelation() {
+    public RelationInputSynapse getRelation() {
         return relation;
     }
 
@@ -54,7 +55,7 @@ public class RelationLinkingDownVisitor extends LinkingDownVisitor {
     }
 
     public void expandRelations(TokenActivation origin) {
-        getRelation()
+        getRelation().getInput()
                 .evaluateLatentRelation(origin, getRelationDir())
                 .forEach(relTokenAct ->
                         up(origin, relTokenAct)

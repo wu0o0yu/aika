@@ -44,7 +44,10 @@ public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I ext
 
     @Override
     public LinkingDownVisitor createVisitor(Thought t, LinkingOperator c) {
-        LatentRelationNeuron rel = getOutput().findLatentRelationNeurons().stream().map(relSyn -> relSyn.getInput()).findAny().orElse(null);
+        RelationInputSynapse rel = getOutput().findLatentRelationNeurons()
+                .stream()
+                .findAny()
+                .orElse(null);
 
         if(rel != null)
             return new RelationLinkingDownVisitor(t, c, rel, scope.getRelationDir());

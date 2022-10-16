@@ -17,6 +17,7 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.*;
+import network.aika.neuron.linking.Linker;
 
 /**
  *
@@ -37,29 +38,4 @@ public class RelationInputSynapse extends BindingNeuronSynapse<
     public RelationInputLink createLink(BindingActivation input, BindingActivation output) {
         return new RelationInputLink(this, input, output);
     }
-
-    @Override
-    public void linkAndPropagateIn(BindingActivation fromBS) {
- // OP-3
- //     latentBackwardsPropagation(fromBS);
-        super.linkAndPropagateIn(fromBS);
-    }
-
-    /*
-    private void latentBackwardsPropagation(Activation fromBS) {
-        Activation relatedInputBS = fromBSs[0];
-        Activation relatedSameBS = fromBSs[1];
-
-        LatentRelationActivation latentRelAct = getInput().createOrLookupLatentActivation(
-                relatedInputBS.getOriginActivation(),
-                INPUT_TRANSITION.getInput().getState(),
-                relatedSameBS.getOriginActivation(),
-                SAME_TRANSITION.getInput().getState()
-        );
-
-        Link l = createLink(latentRelAct, (BindingActivation) relatedSameBS);
-
-        INPUT_TRANSITION.propagate(INPUT_TRANSITION.getOutput(), relatedInputBS, l, latentRelAct);
-        SAME_TRANSITION.propagate(SAME_TRANSITION.getOutput(), relatedSameBS, l, latentRelAct);
-    }*/
 }

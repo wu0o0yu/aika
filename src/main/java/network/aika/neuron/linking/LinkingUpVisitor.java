@@ -17,9 +17,7 @@
 package network.aika.neuron.linking;
 
 import network.aika.Thought;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.conjunctive.Scope;
 
 import static network.aika.neuron.conjunctive.Scope.INPUT;
@@ -54,5 +52,8 @@ public class LinkingUpVisitor extends UpVisitor {
             return false;
 
         return from != to || from == INPUT;
+    }
+
+    public void createRelation(Link l) {
     }
 }

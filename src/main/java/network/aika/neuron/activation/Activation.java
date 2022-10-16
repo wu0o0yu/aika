@@ -153,8 +153,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         thought.register(this);
         neuron.register(this);
-
-        neuron.linkAndPropagateIn(this);
     }
 
     protected void initNet() {

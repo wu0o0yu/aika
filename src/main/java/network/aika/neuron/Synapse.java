@@ -92,33 +92,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
             propagate(bs);
     }
 
-    public void linkAndPropagateIn(OA bs) {
-    }
-/*
-    public void link(Direction dir, Activation fromBS) {
-        Stream<Activation> bsStream = getRelatedActs(fromBS, dir);
-
-        bsStream.filter(toBS -> fromBS != toBS)
-                .filter(toBS ->
-                        linkCheck(
-                                (IA) dir.getInput(fromBS, toBS),
-                                (OA) dir.getOutput(fromBS, toBS)
-                        )
-                )
-                .forEach(toBS ->
-                        linkIntern(
-                                fromBS,
-                                toBS,
-                                dir
-                        )
-                );
+ /*   public void linkAndPropagateIn(OA bs) {
     }
 */
 
     public L propagate(IA iAct) {
-//        if(!propagateCheck(iAct))
-//            return null;
-
         if(propagateLinkExists(iAct))
             return null;
 
@@ -127,23 +105,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
         return createLink(iAct, oAct);
     }
-/*
-    public L linkIntern(Activation fromAct, Activation toAct, Direction dir) {
-        if(!checkLinkingEvent(toAct, dir))
-            return null;
-
-        IA iAct = (IA) dir.getInput(fromAct, toAct);
-        OA oAct = (OA) dir.getOutput(fromAct, toAct);
-
-        if(linkExists(iAct, oAct))
-            return null;
-
-        if(!checkCausal(iAct, oAct))
-            return null;
-
-        return createLink(iAct, oAct);
-    }
-*/
 
     protected boolean checkCausal(IA iAct, OA oAct) {
         return Link.isCausal(iAct, oAct);

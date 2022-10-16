@@ -32,6 +32,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.INPUT;
+
 
 /**
  *
@@ -64,21 +66,11 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         return new LinkingDownVisitor(t, c);
     }
 
-    public Stream<Activation> getRelatedActs(Activation bs, Scope toScope) {
-        ActLinkingOperator operator = new ActLinkingOperator(bs, this, toScope);
-
-        LinkingDownVisitor v = createVisitor(getThought(), operator); // , scope.getRelationDir()
-        bs.visitDown(v, null);
-        return operator.getResults().stream();
-    }
-
-    public Stream<? extends Link> getRelatedLinks(Activation bs) {
-        LinkLinkingOperator operator = new LinkLinkingOperator(bs, this);
+    protected void linkStepB(Activation bsA, ConjunctiveSynapse synA, Link linkA) {
+        ActLinkingOperator operator = new ActLinkingOperator(bsA, synA, linkA, this);
 
         LinkingDownVisitor v = createVisitor(getThought(), operator);
-        bs.visitDown(v, null);
-
-        return operator.getResults().stream();
+        bsA.visitDown(v, null);
     }
 
     @Override
@@ -90,11 +82,6 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
                 .latentLinkingStepA(this, bs);
 
         super.linkAndPropagateOut(bs);
-    }
-
-    @Override
-    public void linkAndPropagateIn(OA bs) {
-        getOutput().linkStepAInput(this, bs);
     }
 
     public void setOutput(O output) {

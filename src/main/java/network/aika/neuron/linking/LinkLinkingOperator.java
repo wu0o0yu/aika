@@ -21,10 +21,12 @@ import network.aika.neuron.activation.ConjunctiveLink;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.conjunctive.ConjunctiveSynapse;
 
+import static network.aika.neuron.linking.Linker.link;
+
 /**
  * @author Lukas Molzberger
  */
-public class LinkLinkingOperator extends LinkingOperator<ConjunctiveLink> {
+public class LinkLinkingOperator extends LinkingOperator {
 
 
     public LinkLinkingOperator(Activation fromBS, ConjunctiveSynapse syn) {
@@ -36,7 +38,6 @@ public class LinkLinkingOperator extends LinkingOperator<ConjunctiveLink> {
         if(act.getNeuron() != syn.getOutput())
             return;
 
-
         if(act == fromBS)
             return;
 
@@ -44,6 +45,6 @@ public class LinkLinkingOperator extends LinkingOperator<ConjunctiveLink> {
         if(!v.compatible(syn.getScope(), l.getSynapse().getScope()))
             return;
 
-        results.add(l);
+        link(l.getInput(), l.getSynapse(), l, fromBS, syn);
     }
 }

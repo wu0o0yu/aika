@@ -25,6 +25,10 @@ import network.aika.neuron.linking.DownVisitor;
 import network.aika.neuron.linking.Visitor;
 import network.aika.text.Document;
 
+import java.util.Comparator;
+import java.util.Map;
+import java.util.TreeMap;
+
 
 /**
  *
@@ -34,12 +38,20 @@ public class TokenActivation extends PatternActivation {
 
     private Integer position;
 
+    private Map<TokenActivation, LatentRelationActivation> toRelations = new TreeMap<>(
+            Comparator.comparingInt(act -> act.getId())
+    );
+
     public TokenActivation(int id, Integer pos, int begin, int end, Document doc, TokenNeuron tokenNeuron) {
         super(id, doc, tokenNeuron);
         position = pos;
         range = new Range(begin, end);
 
         doc.registerTokenActivation(this);
+    }
+
+    public Map<TokenActivation, LatentRelationActivation> getToRelations() {
+        return toRelations;
     }
 
     @Override

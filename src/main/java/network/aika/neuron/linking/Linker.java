@@ -39,20 +39,20 @@ public class Linker {
                 );
     }
 
-    public static void link(Activation bsA, Synapse synA, Link linkA, Activation bsB, Synapse synB) {
+    public static Link link(Activation bsA, Synapse synA, Link linkA, Activation bsB, Synapse synB) {
         Activation oAct;
         if (linkA == null) {
             if(latentActivationExists(synA, synB, bsA, bsB))
-                return;
+                return null;
 
             oAct = synA.getOutput().createActivation(bsA.getThought());
             oAct.init(synA, bsA);
 
-            synA.createLink(bsA, oAct);
+            return synA.createLink(bsA, oAct);
         } else {
             oAct = linkA.getOutput();
         }
-        synB.createLink(bsB, oAct);
+        return synB.createLink(bsB, oAct);
     }
 
     private static boolean latentActivationExists(Synapse synA, Synapse synB, Activation iActA, Activation iActB) {

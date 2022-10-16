@@ -93,9 +93,11 @@ public class MetaNeuronTest {
         CategoryNeuron syllableCategory = new PatternCategoryNeuron()
                 .init(m, "PC-syllable");
 
+        CategoryNeuron sylBeginCategory = new BindingCategoryNeuron()
+                .init(m, "Syl. Begin");
 
-        CategoryNeuron letterBindingCategory = new BindingCategoryNeuron()
-                .init(m, "BC-letter");
+        CategoryNeuron sylContinueRightCategory = new BindingCategoryNeuron()
+                .init(m, "Cont. Right Begin");
 
         BindingNeuron sylBeginBN = new BindingNeuron()
                 .init(m, "Abstract Syl. Begin");
@@ -131,7 +133,7 @@ public class MetaNeuronTest {
                 .adjustBias();
 
         new BindingCategoryInputSynapse()
-                .init(letterBindingCategory, sylBeginBN, 1.0)
+                .init(sylBeginCategory, sylBeginBN, 1.0)
                 .adjustBias();
 
         new InputPatternSynapse()
@@ -139,7 +141,7 @@ public class MetaNeuronTest {
                 .adjustBias();
 
         new BindingCategoryInputSynapse()
-                .init(letterBindingCategory, sylContinueRightBN, 1.0)
+                .init(sylContinueRightCategory, sylContinueRightBN, 1.0)
                 .adjustBias();
 
         // Concrete

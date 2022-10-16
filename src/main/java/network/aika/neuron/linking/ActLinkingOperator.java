@@ -21,16 +21,22 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.conjunctive.ConjunctiveSynapse;
 import network.aika.neuron.conjunctive.Scope;
 
+import static network.aika.direction.Direction.INPUT;
+
 /**
  * @author Lukas Molzberger
  */
-public class ActLinkingOperator extends LinkingOperator<Activation> {
+public class ActLinkingOperator extends LinkingOperator {
 
     private Scope toScope;
+    private ConjunctiveSynapse synA;
+    private Link linkA;
 
-    public ActLinkingOperator(Activation fromBS, ConjunctiveSynapse syn, Scope toScope) {
-        super(fromBS, syn);
-        this.toScope = toScope;
+    public ActLinkingOperator(Activation fromBS, ConjunctiveSynapse synA, Link linkA, ConjunctiveSynapse synB) {
+        super(fromBS, synB);
+        this.synA = synA;
+        this.linkA = linkA;
+        this.toScope = synA.getScope();
     }
 
     @Override
@@ -44,6 +50,12 @@ public class ActLinkingOperator extends LinkingOperator<Activation> {
         if(!v.compatible(syn.getScope(), toScope))
             return;
 
-        results.add(act);
+        if(!syn.checkLinkingEvent(act, INPUT))
+                return;
+
+        Link l = Linker.link(fromBS, synA, linkA, act, syn);
+        if(l != null) {
+            v.createRelation(l);
+        }
     }
 }

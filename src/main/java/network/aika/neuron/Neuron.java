@@ -104,12 +104,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         );
     }
 
-    public void linkAndPropagateIn(Activation act) {
-        getTargetInputSynapses().forEach(s ->
-                s.linkAndPropagateIn(act)
-        );
-    }
-
     public abstract void latentLinkingStepA(Synapse synA, Activation fromBS);
 
     private TreeSet<A> initActivationsSet(Thought t) {
