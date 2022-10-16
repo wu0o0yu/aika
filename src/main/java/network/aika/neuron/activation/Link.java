@@ -20,6 +20,8 @@ import network.aika.Thought;
 import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.linking.DownVisitor;
+import network.aika.neuron.linking.UpVisitor;
 import network.aika.neuron.linking.Visitor;
 import network.aika.sign.Sign;
 import network.aika.steps.link.LinkCounting;
@@ -68,13 +70,12 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         getThought().onLinkCreationEvent(this);
     }
 
-    public void visit(Visitor v) {
-        next(v);
+    public void visitDown(DownVisitor v) {
+        v.next(this);
     }
 
-    protected void next(Visitor v) {
-        v.getDir().getActivation(this)
-                .visit(v, this);
+    public void visitUp(UpVisitor v) {
+        v.next(this);
     }
 
     protected void initOnTransparent() {

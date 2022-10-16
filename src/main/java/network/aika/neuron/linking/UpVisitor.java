@@ -16,40 +16,32 @@
  */
 package network.aika.neuron.linking;
 
-import network.aika.direction.Direction;
+import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.PatternActivation;
 
 /**
  * @author Lukas Molzberger
  */
-public class SelfRefVisitor extends Visitor {
+public abstract class UpVisitor extends Visitor {
 
-    Activation oAct;
-
-    boolean isSelfRef;
-
-    public SelfRefVisitor(Activation oAct) {
-        super(oAct.getThought());
+    public UpVisitor(Thought t) {
+        super(t);
     }
 
-    protected SelfRefVisitor(SelfRefVisitor parent, Direction dir) {
-        super(parent, dir);
+    protected UpVisitor(DownVisitor parent) {
+        super(parent);
     }
 
-    public boolean isSelfRef() {
-        return isSelfRef;
+    public abstract void check(Link lastLink, Activation act);
+
+    public void next(Activation<?> act) {
+        act.getOutputLinks()
+                .forEach(l -> l.visitUp(this));
     }
 
-    @Override
-    public Visitor up(PatternActivation origin) {
-        return new SelfRefVisitor(this, Direction.OUTPUT);
-    }
-
-    @Override
-    public void check(Link lastLink, Activation act) {
-        if(act == oAct)
-            isSelfRef = true;
+    public void next(Link<?, ?, ?> l) {
+        l.getOutput()
+                .visitUp(this, l);
     }
 }

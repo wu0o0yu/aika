@@ -21,8 +21,9 @@ import network.aika.Thought;
 import network.aika.fields.*;
 import network.aika.neuron.*;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
-import network.aika.neuron.linking.SelfRefVisitor;
-import network.aika.neuron.linking.Visitor;
+import network.aika.neuron.linking.DownVisitor;
+import network.aika.neuron.linking.SelfRefDownVisitor;
+import network.aika.neuron.linking.UpVisitor;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
 
@@ -169,8 +170,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public boolean isSelfRef(Activation oAct) {
-        SelfRefVisitor v = new SelfRefVisitor(oAct);
-        visit(v, null);
+        SelfRefDownVisitor v = new SelfRefDownVisitor(oAct);
+        visitDown(v, null);
         return v.isSelfRef();
     }
 
@@ -178,15 +179,13 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return this;
     }
 
-    public void visit(Visitor v, Link lastLink) {
-        v.check(lastLink, this);
-
-        next(v);
+    public void visitDown(DownVisitor v, Link lastLink) {
+        v.next(this);
     }
 
-    protected void next(Visitor v) {
-        v.getDir().getLinks(this)
-                .forEach(l -> l.visit(v));
+    public void visitUp(UpVisitor v, Link lastLink) {
+        v.check(lastLink, this);
+        v.next(this);
     }
 
     public Map<Synapse, LinkSlot> getLinkSlots(boolean upperBound) {

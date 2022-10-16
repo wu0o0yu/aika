@@ -19,9 +19,9 @@ package network.aika.neuron.conjunctive;
 import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.linking.LinkingVisitor;
+import network.aika.neuron.linking.LinkingDownVisitor;
 import network.aika.neuron.linking.LinkingOperator;
-import network.aika.neuron.linking.RelationLinkingVisitor;
+import network.aika.neuron.linking.RelationLinkingDownVisitor;
 
 
 /**
@@ -43,11 +43,11 @@ public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I ext
     }
 
     @Override
-    public LinkingVisitor createVisitor(Thought t, LinkingOperator c) {
+    public LinkingDownVisitor createVisitor(Thought t, LinkingOperator c) {
         LatentRelationNeuron rel = getOutput().findLatentRelationNeurons().stream().map(relSyn -> relSyn.getInput()).findAny().orElse(null);
 
         if(rel != null)
-            return new RelationLinkingVisitor(t, c, rel, scope.getRelationDir());
+            return new RelationLinkingDownVisitor(t, c, rel, scope.getRelationDir());
 
         return super.createVisitor(t, c);
     }

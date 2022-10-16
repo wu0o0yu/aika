@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.linking;
 
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;
@@ -45,6 +44,6 @@ public abstract class LinkingOperator<E extends Element> {
         return results;
     }
 
-    public abstract void check(LinkingVisitor v, Link lastLink, Activation act);
+    public abstract void check(LinkingUpVisitor v, Link lastLink, Activation act);
 
 }

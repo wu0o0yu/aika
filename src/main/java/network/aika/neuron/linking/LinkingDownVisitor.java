@@ -17,9 +17,6 @@
 package network.aika.neuron.linking;
 
 import network.aika.Thought;
-import network.aika.direction.Direction;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.conjunctive.Scope;
 
@@ -28,31 +25,21 @@ import static network.aika.neuron.conjunctive.Scope.INPUT;
 /**
  * @author Lukas Molzberger
  */
-public class LinkingVisitor extends Visitor {
+public class LinkingDownVisitor extends DownVisitor {
 
     LinkingOperator operator;
 
     PatternActivation origin;
 
-    public LinkingVisitor(Thought t, LinkingOperator operator) {
+    public LinkingDownVisitor(Thought t, LinkingOperator operator) {
         super(t);
 
         this.operator = operator;
     }
 
-    protected LinkingVisitor(LinkingVisitor parent, Direction dir, PatternActivation origin) {
-        super(parent, dir);
-        this.origin = origin;
-        this.operator = parent.operator;
-    }
-
     @Override
-    public LinkingVisitor up(PatternActivation origin) {
-        return new LinkingVisitor(this, Direction.OUTPUT, origin);
-    }
-
-    public void check(Link lastLink, Activation act) {
-        operator.check(this, lastLink, act);
+    public LinkingUpVisitor up(PatternActivation origin) {
+        return new LinkingUpVisitor(this, origin);
     }
 
     public boolean compatible(Scope from, Scope to) {

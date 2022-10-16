@@ -14,36 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.neuron.linking;
 
 import network.aika.Thought;
-import network.aika.direction.Direction;
-import network.aika.neuron.Range;
-import network.aika.neuron.conjunctive.PatternNeuron;
-import network.aika.neuron.linking.DownVisitor;
-import network.aika.neuron.linking.Visitor;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.activation.text.TokenActivation;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
+public abstract class DownVisitor extends Visitor {
 
-    protected Range range;
-
-    public PatternActivation(int id, Thought t, PatternNeuron patternNeuron) {
-        super(id, t, patternNeuron);
+    public DownVisitor(Thought t) {
+        super(t);
     }
 
-    @Override
-    public Range getRange() {
-        return range;
+    public final void check(Link lastLink, Activation act) {
+        // Nothing to do
     }
 
-    @Override
-    public void visitDown(DownVisitor v, Link lastLink) {
-        super.visitDown(v, lastLink);
+    public void next(Activation<?> act) {
+        act.getInputLinks()
+                .forEach(l -> l.visitDown(this));
+    }
 
-        v.up(this).next(this);
+    public void next(Link<?, ?, ?> l) {
+        l.getInput()
+                .visitDown(this, l);
+    }
+
+    public abstract Visitor up(PatternActivation origin);
+
+    public void expandRelations(TokenActivation tAct) {
     }
 }

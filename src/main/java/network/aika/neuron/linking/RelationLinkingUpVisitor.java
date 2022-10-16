@@ -16,40 +16,45 @@
  */
 package network.aika.neuron.linking;
 
-import network.aika.Thought;
-import network.aika.direction.Direction;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.text.TokenActivation;
-import network.aika.neuron.conjunctive.LatentRelationNeuron;
+import network.aika.neuron.conjunctive.Scope;
 
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
+import static network.aika.neuron.conjunctive.Scope.INPUT;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class Visitor {
+public class RelationLinkingUpVisitor extends LinkingUpVisitor {
 
-    long v;
+    protected PatternActivation downOrigin;
+    protected TokenActivation upOrigin;
 
-    public Visitor(Thought t) {
-        this.v = t.getNewVisitorId();
+    protected RelationLinkingUpVisitor(RelationLinkingDownVisitor parent, PatternActivation downOrigin, TokenActivation upOrigin) {
+        super(parent, downOrigin);
+        this.downOrigin = downOrigin;
+        this.upOrigin = upOrigin;
     }
 
-    protected Visitor(Visitor parent) {
-        this.v = parent.v;
+    public PatternActivation getDownOrigin() {
+        return downOrigin;
     }
 
-    public abstract void next(Activation<?> act);
-
-    public abstract void next(Link<?, ?, ?> l);
-
-    public long getV() {
-        return v;
+    public TokenActivation getUpOrigin() {
+        return upOrigin;
     }
 
-    public abstract void check(Link lastLink, Activation act);
+    @Override
+    public boolean compatible(Scope from, Scope to) {
+        if(downOrigin == null)
+            return false;
+
+        if(from == INPUT)
+            return downOrigin == upOrigin;
+
+        if(from != to)
+            return downOrigin != upOrigin;
+
+        return false;
+    }
 }

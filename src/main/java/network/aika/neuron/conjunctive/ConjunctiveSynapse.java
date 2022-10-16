@@ -60,23 +60,23 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         return scope;
     }
 
-    public LinkingVisitor createVisitor(Thought t, LinkingOperator c) {
-        return new LinkingVisitor(t, c);
+    public LinkingDownVisitor createVisitor(Thought t, LinkingOperator c) {
+        return new LinkingDownVisitor(t, c);
     }
 
     public Stream<Activation> getRelatedActs(Activation bs, Scope toScope) {
         ActLinkingOperator operator = new ActLinkingOperator(bs, this, toScope);
 
-        LinkingVisitor v = createVisitor(getThought(), operator); // , scope.getRelationDir()
-        bs.visit(v, null);
+        LinkingDownVisitor v = createVisitor(getThought(), operator); // , scope.getRelationDir()
+        bs.visitDown(v, null);
         return operator.getResults().stream();
     }
 
     public Stream<? extends Link> getRelatedLinks(Activation bs) {
         LinkLinkingOperator operator = new LinkLinkingOperator(bs, this);
 
-        LinkingVisitor v = createVisitor(getThought(), operator);
-        bs.visit(v, null);
+        LinkingDownVisitor v = createVisitor(getThought(), operator);
+        bs.visitDown(v, null);
 
         return operator.getResults().stream();
     }

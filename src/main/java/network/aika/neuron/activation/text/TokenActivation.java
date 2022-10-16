@@ -16,11 +16,12 @@
  */
 package network.aika.neuron.activation.text;
 
+import network.aika.direction.Direction;
 import network.aika.fields.ValueSortedQueueField;
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
-import network.aika.neuron.linking.RelationLinkingVisitor;
+import network.aika.neuron.linking.DownVisitor;
 import network.aika.neuron.linking.Visitor;
 import network.aika.text.Document;
 
@@ -42,18 +43,9 @@ public class TokenActivation extends PatternActivation {
     }
 
     @Override
-    public void visit(Visitor v, Link lastLink) {
-        super.visit(v, lastLink);
-
-        if (v instanceof RelationLinkingVisitor) {
-            RelationLinkingVisitor relV = (RelationLinkingVisitor) v;
-
-            relV.getRelation()
-                    .evaluateLatentRelation(this, relV.getRelationDir())
-                    .forEach(relTokenAct ->
-                            next(relV.up(this, relTokenAct))
-                    );
-        }
+    public void visitDown(DownVisitor v, Link lastLink) {
+        super.visitDown(v, lastLink);
+        v.expandRelations(this);
     }
 
     public Integer getPosition() {

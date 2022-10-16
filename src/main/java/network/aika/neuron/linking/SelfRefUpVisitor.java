@@ -14,36 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.neuron.linking;
 
-import network.aika.Thought;
-import network.aika.direction.Direction;
-import network.aika.neuron.Range;
-import network.aika.neuron.conjunctive.PatternNeuron;
-import network.aika.neuron.linking.DownVisitor;
-import network.aika.neuron.linking.Visitor;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
+public class SelfRefUpVisitor extends UpVisitor {
 
-    protected Range range;
+    Activation oAct;
 
-    public PatternActivation(int id, Thought t, PatternNeuron patternNeuron) {
-        super(id, t, patternNeuron);
+    boolean isSelfRef;
+
+    protected SelfRefUpVisitor(SelfRefDownVisitor parent) {
+        super(parent);
+        this.oAct = parent.oAct;
+        this.isSelfRef = parent.isSelfRef;
+    }
+
+    public boolean isSelfRef() {
+        return isSelfRef;
     }
 
     @Override
-    public Range getRange() {
-        return range;
-    }
-
-    @Override
-    public void visitDown(DownVisitor v, Link lastLink) {
-        super.visitDown(v, lastLink);
-
-        v.up(this).next(this);
+    public void check(Link lastLink, Activation act) {
+        if(act == oAct)
+            isSelfRef = true;
     }
 }

@@ -17,39 +17,42 @@
 package network.aika.neuron.linking;
 
 import network.aika.Thought;
-import network.aika.direction.Direction;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.activation.text.TokenActivation;
-import network.aika.neuron.conjunctive.LatentRelationNeuron;
+import network.aika.neuron.conjunctive.Scope;
 
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
+import static network.aika.neuron.conjunctive.Scope.INPUT;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class Visitor {
+public class LinkingUpVisitor extends UpVisitor {
 
-    long v;
+    LinkingOperator operator;
 
-    public Visitor(Thought t) {
-        this.v = t.getNewVisitorId();
+    PatternActivation origin;
+
+    public LinkingUpVisitor(Thought t, LinkingOperator operator) {
+        super(t);
+
+        this.operator = operator;
     }
 
-    protected Visitor(Visitor parent) {
-        this.v = parent.v;
+    protected LinkingUpVisitor(LinkingDownVisitor parent, PatternActivation origin) {
+        super(parent);
+        this.origin = origin;
+        this.operator = parent.operator;
     }
 
-    public abstract void next(Activation<?> act);
-
-    public abstract void next(Link<?, ?, ?> l);
-
-    public long getV() {
-        return v;
+    public void check(Link lastLink, Activation act) {
+        operator.check(this, lastLink, act);
     }
 
-    public abstract void check(Link lastLink, Activation act);
+    public boolean compatible(Scope from, Scope to) {
+        if(origin == null)
+            return false;
+
+        return from != to || from == INPUT;
+    }
 }

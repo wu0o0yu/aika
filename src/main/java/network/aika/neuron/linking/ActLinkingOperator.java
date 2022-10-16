@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.linking;
 
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.conjunctive.ConjunctiveSynapse;
@@ -35,7 +34,7 @@ public class ActLinkingOperator extends LinkingOperator<Activation> {
     }
 
     @Override
-    public void check(LinkingVisitor v, Link lastLink, Activation act) {
+    public void check(LinkingUpVisitor v, Link lastLink, Activation act) {
         if(act.getNeuron() != syn.getInput())
             return;
 

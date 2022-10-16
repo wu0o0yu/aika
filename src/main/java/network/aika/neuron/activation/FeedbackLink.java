@@ -41,6 +41,6 @@ public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activat
             return;
         visited = v.getV();
 
-        next(v);
+        v.next(this);
     }
 }

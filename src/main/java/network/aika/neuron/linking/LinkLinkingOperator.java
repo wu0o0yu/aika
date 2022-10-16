@@ -32,7 +32,7 @@ public class LinkLinkingOperator extends LinkingOperator<ConjunctiveLink> {
     }
 
     @Override
-    public void check(LinkingVisitor v, Link lastLink, Activation act) {
+    public void check(LinkingUpVisitor v, Link lastLink, Activation act) {
         if(act.getNeuron() != syn.getOutput())
             return;
 

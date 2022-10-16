@@ -18,8 +18,6 @@ package network.aika.neuron.linking;
 
 import network.aika.Thought;
 import network.aika.direction.Direction;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
@@ -30,28 +28,17 @@ import static network.aika.neuron.conjunctive.Scope.INPUT;
 /**
  * @author Lukas Molzberger
  */
-public class RelationLinkingVisitor extends LinkingVisitor {
+public class RelationLinkingDownVisitor extends LinkingDownVisitor {
 
     protected LatentRelationNeuron relation;
     protected Direction relationDir;
 
-    protected PatternActivation downOrigin;
-    protected TokenActivation upOrigin;
 
-
-    public RelationLinkingVisitor(Thought t, LinkingOperator callback, LatentRelationNeuron rel, Direction relationDir) {
-        super(t, callback);
+    public RelationLinkingDownVisitor(Thought t, LinkingOperator operator, LatentRelationNeuron rel, Direction relationDir) {
+        super(t, operator);
 
         this.relation = rel;
         this.relationDir = relationDir;
-    }
-
-    protected RelationLinkingVisitor(RelationLinkingVisitor parent, Direction dir, PatternActivation downOrigin, TokenActivation upOrigin) {
-        super(parent, dir, downOrigin);
-        this.relation = parent.relation;
-        this.relationDir = parent.relationDir;
-        this.downOrigin = downOrigin;
-        this.upOrigin = upOrigin;
     }
 
     public LatentRelationNeuron getRelation() {
@@ -62,34 +49,21 @@ public class RelationLinkingVisitor extends LinkingVisitor {
         return relationDir;
     }
 
-    public PatternActivation getDownOrigin() {
-        return downOrigin;
-    }
-
-    public TokenActivation getUpOrigin() {
-        return upOrigin;
-    }
-
     @Override
-    public LinkingVisitor up(PatternActivation origin) {
-        return new RelationLinkingVisitor(this, Direction.OUTPUT, origin, null);
+    public RelationLinkingUpVisitor up(PatternActivation origin) {
+        return new RelationLinkingUpVisitor(this, origin, null);
     }
 
-    public LinkingVisitor up(TokenActivation origin, TokenActivation relOrigin) {
-        return new RelationLinkingVisitor(this, Direction.OUTPUT, origin, relOrigin);
+    private RelationLinkingUpVisitor up(TokenActivation origin, TokenActivation relOrigin) {
+        return new RelationLinkingUpVisitor(this, origin, relOrigin);
     }
 
-    @Override
-    public boolean compatible(Scope from, Scope to) {
-        if(downOrigin == null)
-            return false;
-
-        if(from == INPUT)
-            return downOrigin == upOrigin;
-
-        if(from != to)
-            return downOrigin != upOrigin;
-
-        return false;
+    public void expandRelations(TokenActivation origin) {
+        getRelation()
+                .evaluateLatentRelation(origin, getRelationDir())
+                .forEach(relTokenAct ->
+                        up(origin, relTokenAct)
+                                .next(relTokenAct)
+                );
     }
 }
