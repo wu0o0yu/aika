@@ -64,15 +64,15 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         return new LinkingVisitor(t, c);
     }
 
-    public Stream<Activation> getRelatedActs(Activation bs, Scope relScope) {
-        ActLinkingOperator operator = new ActLinkingOperator(bs, this);
+    public Stream<Activation> getRelatedActs(Activation bs, Scope toScope) {
+        ActLinkingOperator operator = new ActLinkingOperator(bs, this, toScope);
 
         LinkingVisitor v = createVisitor(getThought(), operator); // , scope.getRelationDir()
         bs.visit(v, null);
         return operator.getResults().stream();
     }
 
-    public Stream<Link> getRelatedLinks(Activation bs) {
+    public Stream<? extends Link> getRelatedLinks(Activation bs) {
         LinkLinkingOperator operator = new LinkLinkingOperator(bs, this);
 
         LinkingVisitor v = createVisitor(getThought(), operator);
@@ -83,8 +83,6 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
 
     @Override
     public void linkAndPropagateOut(IA bs) {
-        //link(OUTPUT, bs);
-
         getOutput()
                 .linkStepAOutput(this, bs);
 

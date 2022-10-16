@@ -13,10 +13,6 @@ public enum Scope {
         this.relationDir = relationDir;
     }
 
-    public boolean compatible(Scope relScope) {
-        return this != relScope || this == INPUT;
-    }
-
     public Direction getRelationDir() {
         return relationDir;
     }

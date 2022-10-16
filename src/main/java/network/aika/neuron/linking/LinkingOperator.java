@@ -20,6 +20,7 @@ import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.conjunctive.ConjunctiveSynapse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +32,11 @@ public abstract class LinkingOperator<E extends Element> {
 
     protected Activation fromBS;
 
-    protected Synapse syn;
+    protected ConjunctiveSynapse syn;
 
     protected ArrayList<E> results = new ArrayList<>();
 
-    public LinkingOperator(Activation fromBS, Synapse syn) {
+    public LinkingOperator(Activation fromBS, ConjunctiveSynapse syn) {
         this.fromBS = fromBS;
         this.syn = syn;
     }
@@ -44,6 +45,6 @@ public abstract class LinkingOperator<E extends Element> {
         return results;
     }
 
-    public abstract void check(Link lastLink, Activation act);
+    public abstract void check(LinkingVisitor v, Link lastLink, Activation act);
 
 }

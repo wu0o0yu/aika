@@ -46,7 +46,10 @@ public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I ext
     public LinkingVisitor createVisitor(Thought t, LinkingOperator c) {
         LatentRelationNeuron rel = getOutput().findLatentRelationNeurons().stream().map(relSyn -> relSyn.getInput()).findAny().orElse(null);
 
-        return new RelationLinkingVisitor(t, c, rel, scope.getRelationDir());
+        if(rel != null)
+            return new RelationLinkingVisitor(t, c, rel, scope.getRelationDir());
+
+        return super.createVisitor(t, c);
     }
 
     public void initDummyLink(BindingActivation oAct) {

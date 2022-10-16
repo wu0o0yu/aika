@@ -23,6 +23,9 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
+import network.aika.neuron.conjunctive.Scope;
+
+import static network.aika.neuron.conjunctive.Scope.INPUT;
 
 /**
  * @author Lukas Molzberger
@@ -32,10 +35,9 @@ public class RelationLinkingVisitor extends LinkingVisitor {
     protected LatentRelationNeuron relation;
     protected Direction relationDir;
 
-    protected TokenActivation downOrigin;
+    protected PatternActivation downOrigin;
     protected TokenActivation upOrigin;
 
-    LinkingOperator callback;
 
     public RelationLinkingVisitor(Thought t, LinkingOperator callback, LatentRelationNeuron rel, Direction relationDir) {
         super(t, callback);
@@ -44,9 +46,8 @@ public class RelationLinkingVisitor extends LinkingVisitor {
         this.relationDir = relationDir;
     }
 
-    protected RelationLinkingVisitor(RelationLinkingVisitor parent, Direction dir, TokenActivation downOrigin, TokenActivation upOrigin) {
-        super(parent, dir);
-        this.callback = parent.callback;
+    protected RelationLinkingVisitor(RelationLinkingVisitor parent, Direction dir, PatternActivation downOrigin, TokenActivation upOrigin) {
+        super(parent, dir, downOrigin);
         this.relation = parent.relation;
         this.relationDir = parent.relationDir;
         this.downOrigin = downOrigin;
@@ -65,15 +66,30 @@ public class RelationLinkingVisitor extends LinkingVisitor {
         return downOrigin;
     }
 
-    public PatternActivation getUpOrigin() {
+    public TokenActivation getUpOrigin() {
         return upOrigin;
+    }
+
+    @Override
+    public LinkingVisitor up(PatternActivation origin) {
+        return new RelationLinkingVisitor(this, Direction.OUTPUT, origin, null);
     }
 
     public LinkingVisitor up(TokenActivation origin, TokenActivation relOrigin) {
         return new RelationLinkingVisitor(this, Direction.OUTPUT, origin, relOrigin);
     }
 
-    public void check(Link lastLink, Activation act) {
-        callback.check(lastLink, act);
+    @Override
+    public boolean compatible(Scope from, Scope to) {
+        if(downOrigin == null)
+            return false;
+
+        if(from == INPUT)
+            return downOrigin == upOrigin;
+
+        if(from != to)
+            return downOrigin != upOrigin;
+
+        return false;
     }
 }

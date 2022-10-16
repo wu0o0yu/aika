@@ -16,27 +16,34 @@
  */
 package network.aika.neuron.linking;
 
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.ConjunctiveLink;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.conjunctive.ConjunctiveSynapse;
 
 /**
  * @author Lukas Molzberger
  */
-public class LinkLinkingOperator extends LinkingOperator<Link> {
+public class LinkLinkingOperator extends LinkingOperator<ConjunctiveLink> {
 
 
-    public LinkLinkingOperator(Activation fromBS, Synapse syn) {
+    public LinkLinkingOperator(Activation fromBS, ConjunctiveSynapse syn) {
         super(fromBS, syn);
     }
 
     @Override
-    public void check(Link lastLink, Activation act) {
+    public void check(LinkingVisitor v, Link lastLink, Activation act) {
+        if(act.getNeuron() != syn.getOutput())
+            return;
+
+
         if(act == fromBS)
             return;
 
-        if(act.getNeuron() == syn.getOutput()) {
-            results.add(lastLink);
-        }
+        ConjunctiveLink<?, ?, ?> l = (ConjunctiveLink) lastLink;
+        if(!v.compatible(syn.getScope(), l.getSynapse().getScope()))
+            return;
+
+        results.add(l);
     }
 }
