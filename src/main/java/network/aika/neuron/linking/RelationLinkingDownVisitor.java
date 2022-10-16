@@ -50,12 +50,7 @@ public class RelationLinkingDownVisitor extends LinkingDownVisitor {
     }
 
     @Override
-    public RelationLinkingUpVisitor up(PatternActivation origin) {
-        return new RelationLinkingUpVisitor(this, origin, null);
-    }
-
-    private RelationLinkingUpVisitor up(TokenActivation origin, TokenActivation relOrigin) {
-        return new RelationLinkingUpVisitor(this, origin, relOrigin);
+    public void up(PatternActivation origin) {
     }
 
     public void expandRelations(TokenActivation origin) {
@@ -63,7 +58,11 @@ public class RelationLinkingDownVisitor extends LinkingDownVisitor {
                 .evaluateLatentRelation(origin, getRelationDir())
                 .forEach(relTokenAct ->
                         up(origin, relTokenAct)
-                                .next(relTokenAct)
                 );
+    }
+
+    private void up(TokenActivation origin, TokenActivation relOrigin) {
+        new RelationLinkingUpVisitor(this, origin, relOrigin)
+                .next(relOrigin);
     }
 }

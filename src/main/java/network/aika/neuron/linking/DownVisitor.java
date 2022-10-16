@@ -45,7 +45,7 @@ public abstract class DownVisitor extends Visitor {
                 .visitDown(this, l);
     }
 
-    public abstract Visitor up(PatternActivation origin);
+    public abstract void up(PatternActivation origin);
 
     public void expandRelations(TokenActivation tAct) {
     }

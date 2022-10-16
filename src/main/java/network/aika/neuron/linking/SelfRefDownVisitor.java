@@ -39,7 +39,8 @@ public class SelfRefDownVisitor extends DownVisitor {
     }
 
     @Override
-    public Visitor up(PatternActivation origin) {
-        return new SelfRefUpVisitor(this);
+    public void up(PatternActivation origin) {
+        new SelfRefUpVisitor(this)
+                .next(origin);
     }
 }

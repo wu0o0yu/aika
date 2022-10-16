@@ -44,6 +44,6 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     public void visitDown(DownVisitor v, Link lastLink) {
         super.visitDown(v, lastLink);
 
-        v.up(this).next(this);
+        v.up(this);
     }
 }

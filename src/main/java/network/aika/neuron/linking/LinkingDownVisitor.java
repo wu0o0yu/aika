@@ -38,8 +38,9 @@ public class LinkingDownVisitor extends DownVisitor {
     }
 
     @Override
-    public LinkingUpVisitor up(PatternActivation origin) {
-        return new LinkingUpVisitor(this, origin);
+    public void up(PatternActivation origin) {
+        new LinkingUpVisitor(this, origin)
+                .next(origin);
     }
 
     public boolean compatible(Scope from, Scope to) {
