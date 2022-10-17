@@ -120,9 +120,15 @@ public class MetaNeuronTest {
                 .init(sylBeginBN, syllable, 10.0)
                 .adjustBias();
 
+        new PositiveFeedbackSynapse()
+                .init(syllable, sylBeginBN, 10.0);
+
         new PatternSynapse()
                 .init(sylContinueRightBN, syllable, 6.0)
                 .adjustBias();
+
+        new PositiveFeedbackSynapse()
+                .init(syllable, sylContinueRightBN, 10.0);
 
         new PatternCategoryInputSynapse()
                 .init(syllableCategory, syllable, 1.0)

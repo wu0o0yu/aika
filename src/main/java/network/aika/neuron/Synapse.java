@@ -82,19 +82,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         FieldOutput linkingEvent = getLinkingEvent(act, dir.invert());
         return linkingEvent == null || isTrue(linkingEvent);
     }
-/*
-    public boolean linkCheck(IA inputBS, OA outputBS) {
-        return true;
-    }
-*/
+
     public void linkAndPropagateOut(IA bs) {
         if (isPropagate())
             propagate(bs);
     }
-
- /*   public void linkAndPropagateIn(OA bs) {
-    }
-*/
 
     public L propagate(IA iAct) {
         if(propagateLinkExists(iAct))
@@ -105,11 +97,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
         return createLink(iAct, oAct);
     }
-
+/*
     protected boolean checkCausal(IA iAct, OA oAct) {
         return Link.isCausal(iAct, oAct);
     }
-
+*/
     public boolean isPropagate() {
         double tsWeight = getWeight().getCurrentValue();
         double tnBias = getOutput().getBias().getCurrentValue();

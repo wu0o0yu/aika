@@ -33,6 +33,9 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     public PatternActivation(int id, Thought t, PatternNeuron patternNeuron) {
         super(id, t, patternNeuron);
+
+        // Only to link the positive feedback synapses
+        neuron.linkAndPropagateOut(this);
     }
 
     @Override

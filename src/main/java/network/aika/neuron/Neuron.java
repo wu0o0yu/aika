@@ -99,9 +99,13 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public void linkAndPropagateOut(Activation act) {
-        getTargetOutputSynapses().forEach(s ->
-                s.linkAndPropagateOut(act)
-        );
+        getTargetOutputSynapses()
+                .filter(s ->
+                        s.checkLinkingEvent(act, Direction.OUTPUT)
+                )
+                .forEach(s ->
+                        s.linkAndPropagateOut(act)
+                );
     }
 
     public abstract void latentLinkingStepA(Synapse synA, Activation fromBS);
