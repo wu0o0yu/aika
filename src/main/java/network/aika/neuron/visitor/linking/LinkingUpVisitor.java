@@ -14,27 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.linking;
+package network.aika.neuron.visitor.linking;
 
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Element;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.conjunctive.ConjunctiveSynapse;
+import network.aika.neuron.activation.*;
+import network.aika.neuron.conjunctive.Scope;
+import network.aika.neuron.visitor.UpVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class LinkingOperator {
+public abstract class LinkingUpVisitor<T extends Activation> extends UpVisitor implements LinkingCallback {
 
-    protected Activation fromBS;
+    protected LinkingOperator operator;
 
-    protected ConjunctiveSynapse syn;
+    protected T origin;
 
-    public LinkingOperator(Activation fromBS, ConjunctiveSynapse syn) {
-        this.fromBS = fromBS;
-        this.syn = syn;
+    protected LinkingUpVisitor(LinkingDownVisitor parent, T origin) {
+        super(parent);
+        this.origin = origin;
+        this.operator = parent.operator;
     }
 
-    public abstract void check(LinkingUpVisitor v, Link lastLink, Activation act);
-
+    public void check(Link lastLink, Activation act) {
+        operator.check(this, lastLink, act);
+    }
 }

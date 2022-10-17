@@ -14,34 +14,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.linking;
+package network.aika.neuron.visitor.linking.binding;
 
 import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.conjunctive.Scope;
+import network.aika.neuron.visitor.linking.LinkingCallback;
+import network.aika.neuron.visitor.linking.LinkingDownVisitor;
+import network.aika.neuron.visitor.linking.LinkingOperator;
 
 /**
  * @author Lukas Molzberger
  */
-public class PatternDownVisitor extends LinkingDownVisitor<BindingActivation> {
+public class PosFeedbackDownVisitor extends LinkingDownVisitor<BindingActivation> implements LinkingCallback {
 
-    public PatternDownVisitor(Thought t, LinkingOperator operator) {
+    public PosFeedbackDownVisitor(Thought t, LinkingOperator operator) {
         super(t, operator);
     }
 
     @Override
+    public void check(Link lastLink, Activation act) {
+        operator.check(this, lastLink, act);
+    }
+
+    @Override
     public void up(BindingActivation origin) {
-        new PatternUpVisitor(this, origin)
-                .next(origin);
     }
 
     protected void visitDown(Link l) {
-        l.patternVisitDown(this);
+        l.visitDown(this);
     }
 
     protected void visitDown(Activation act, Link l) {
-        act.patternVisitDown(this, l);
+        act.posFeedVisitDown(this, l);
+    }
+
+    @Override
+    public boolean compatible(Scope from, Scope to) {
+        return true;
+    }
+
+    @Override
+    public void createRelation(Link l) {
+
     }
 }

@@ -20,9 +20,8 @@ import network.aika.Thought;
 import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.linking.DownVisitor;
-import network.aika.neuron.linking.UpVisitor;
-import network.aika.neuron.linking.Visitor;
+import network.aika.neuron.visitor.DownVisitor;
+import network.aika.neuron.visitor.UpVisitor;
 import network.aika.sign.Sign;
 import network.aika.steps.link.LinkCounting;
 

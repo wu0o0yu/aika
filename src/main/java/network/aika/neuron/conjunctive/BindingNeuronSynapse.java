@@ -19,10 +19,10 @@ package network.aika.neuron.conjunctive;
 import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.linking.BindingDownVisitor;
-import network.aika.neuron.linking.LinkingDownVisitor;
-import network.aika.neuron.linking.LinkingOperator;
-import network.aika.neuron.linking.RelationLinkingDownVisitor;
+import network.aika.neuron.visitor.linking.binding.BindingDownVisitor;
+import network.aika.neuron.visitor.linking.LinkingDownVisitor;
+import network.aika.neuron.visitor.linking.LinkingOperator;
+import network.aika.neuron.visitor.linking.binding.RelationLinkingDownVisitor;
 
 
 /**

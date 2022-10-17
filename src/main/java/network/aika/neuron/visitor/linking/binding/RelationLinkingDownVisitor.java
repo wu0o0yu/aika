@@ -14,17 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.linking;
+package network.aika.neuron.visitor.linking.binding;
 
 import network.aika.Thought;
 import network.aika.direction.Direction;
-import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.text.TokenActivation;
-import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.neuron.conjunctive.RelationInputSynapse;
-import network.aika.neuron.conjunctive.Scope;
-
-import static network.aika.neuron.conjunctive.Scope.INPUT;
+import network.aika.neuron.visitor.linking.LinkingOperator;
 
 /**
  * @author Lukas Molzberger

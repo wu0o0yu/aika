@@ -19,10 +19,6 @@ package network.aika.neuron.conjunctive;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 
-import static network.aika.fields.FieldLink.connect;
-import static network.aika.fields.Fields.mul;
-
-
 /**
  *
  * @author Lukas Molzberger
@@ -62,9 +58,14 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
     public void setWeight(double w) {
         weight.receiveUpdate(w);
     }
-
+/*
     @Override
     protected boolean checkCausal(InhibitoryActivation iAct, BindingActivation oAct) {
+        return true;
+    }
+*/
+    @Override
+    public boolean checkLinkingEvent(Activation act) {
         return true;
     }
 

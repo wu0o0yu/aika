@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.conjunctive.ConjunctiveSynapse;
+import network.aika.steps.link.Linking;
 
 import static network.aika.fields.Fields.mul;
 
@@ -30,8 +31,7 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
     public ConjunctiveLink(S s, IA input, OA output) {
         super(s, input, output);
 
-        output.getNeuron()
-                .linkAndPropagateIn(this);
+        Linking.add(this);
     }
 
     public void instantiateTemplate(ConjunctiveActivation instAct) {

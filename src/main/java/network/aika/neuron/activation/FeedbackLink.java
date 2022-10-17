@@ -17,7 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.conjunctive.FeedbackSynapse;
-import network.aika.neuron.linking.Visitor;
+import network.aika.neuron.visitor.Visitor;
 
 
 /**

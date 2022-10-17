@@ -14,48 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.linking;
+package network.aika.neuron.visitor;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.ConjunctiveLink;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.conjunctive.ConjunctiveSynapse;
-import network.aika.neuron.conjunctive.Scope;
+import network.aika.neuron.visitor.linking.LinkingCallback;
+import network.aika.neuron.visitor.linking.LinkingOperator;
+import network.aika.neuron.visitor.linking.LinkingUpVisitor;
 
-import static network.aika.direction.Direction.INPUT;
+import static network.aika.neuron.visitor.linking.Linker.link;
 
 /**
  * @author Lukas Molzberger
  */
-public class ActLinkingOperator extends LinkingOperator {
+public class LinkLinkingOperator extends LinkingOperator {
 
-    private Scope toScope;
-    private ConjunctiveSynapse synA;
-    private Link linkA;
 
-    public ActLinkingOperator(Activation fromBS, ConjunctiveSynapse synA, Link linkA, ConjunctiveSynapse synB) {
-        super(fromBS, synB);
-        this.synA = synA;
-        this.linkA = linkA;
-        this.toScope = synA.getScope();
+    public LinkLinkingOperator(Activation fromBS, ConjunctiveSynapse syn) {
+        super(fromBS, syn);
     }
 
     @Override
-    public void check(LinkingUpVisitor v, Link lastLink, Activation act) {
-        if(act.getNeuron() != syn.getInput())
+    public void check(LinkingCallback v, Link lastLink, Activation act) {
+        if(act.getNeuron() != syn.getOutput())
             return;
 
         if(act == fromBS)
             return;
 
-        if(!v.compatible(syn.getScope(), toScope))
+        ConjunctiveLink<?, ?, ?> l = (ConjunctiveLink) lastLink;
+        if(!v.compatible(syn.getScope(), l.getSynapse().getScope()))
             return;
 
-        if(!syn.checkLinkingEvent(act, INPUT))
-                return;
-
-        Link l = Linker.link(fromBS, synA, linkA, act, syn);
-        if(l != null) {
-            v.createRelation(l);
-        }
+        link(l.getInput(), l.getSynapse(), l, fromBS, syn);
     }
 }

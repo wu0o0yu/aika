@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.linking;
+package network.aika.neuron.visitor;
 
 import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
@@ -25,9 +25,6 @@ import network.aika.neuron.activation.Link;
  */
 public abstract class UpVisitor extends Visitor {
 
-    public UpVisitor(Thought t) {
-        super(t);
-    }
 
     protected UpVisitor(DownVisitor parent) {
         super(parent);

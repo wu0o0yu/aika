@@ -23,19 +23,16 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.disjunctive.CategorySynapse;
-import network.aika.neuron.linking.LinkLinkingOperator;
-import network.aika.neuron.linking.Linker;
-import network.aika.neuron.linking.LinkingDownVisitor;
+import network.aika.neuron.visitor.LinkLinkingOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.stream.Stream;
 
 import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 import static network.aika.neuron.Synapse.isLatentLinking;
-import static network.aika.neuron.linking.Linker.link;
+import static network.aika.neuron.visitor.linking.Linker.link;
 
 /**
  *

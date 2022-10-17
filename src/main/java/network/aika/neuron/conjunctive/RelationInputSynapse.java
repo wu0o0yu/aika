@@ -17,7 +17,6 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.*;
-import network.aika.neuron.linking.Linker;
 
 /**
  *

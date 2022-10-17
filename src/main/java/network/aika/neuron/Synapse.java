@@ -18,12 +18,9 @@ package network.aika.neuron;
 
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.direction.Direction;
-import network.aika.fields.FieldOutput;
 import network.aika.fields.QueueField;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
-import network.aika.neuron.linking.Visitor;
 import network.aika.sign.Sign;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
@@ -34,9 +31,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.function.BiPredicate;
 
-import static network.aika.direction.Direction.*;
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.activation.Timestamp.MAX;
 import static network.aika.neuron.activation.Timestamp.MIN;
@@ -78,9 +73,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return true;
     }
 
-    public boolean checkLinkingEvent(Activation act, Direction dir) {
-        FieldOutput linkingEvent = getLinkingEvent(act, dir.invert());
-        return linkingEvent == null || isTrue(linkingEvent);
+    public boolean checkLinkingEvent(Activation act) {
+        return isTrue(act.getIsFired());
     }
 
     public void linkAndPropagateOut(IA bs) {
@@ -115,16 +109,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     public static boolean isLatentLinking(Synapse synA, Synapse synB) {
         double sumOfLowerWeights = Math.min(synA.getSumOfLowerWeights(), synB.getSumOfLowerWeights());
         return synA.getWeight().getCurrentValue() + synB.getWeight().getCurrentValue() + sumOfLowerWeights > 0.0;
-    }
-
-    public FieldOutput getLinkingEvent(Activation act, Direction dir) {
-        if(act == null)
-            return null;
-
-        if(dir == INPUT)
-            return null;
-
-        return act.getIsFired();
     }
 
     public boolean linkExists(IA iAct, OA oAct) {

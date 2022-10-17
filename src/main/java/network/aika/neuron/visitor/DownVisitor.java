@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.linking;
+package network.aika.neuron.visitor;
 
 import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
@@ -30,7 +30,7 @@ public abstract class DownVisitor<T extends Activation> extends Visitor {
         super(t);
     }
 
-    public final void check(Link lastLink, Activation act) {
+    public void check(Link lastLink, Activation act) {
         // Nothing to do
     }
 

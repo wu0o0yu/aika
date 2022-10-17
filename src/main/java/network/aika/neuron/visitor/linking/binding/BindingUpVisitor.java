@@ -14,26 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.linking;
+package network.aika.neuron.visitor.linking.binding;
 
-import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.conjunctive.Scope;
+import network.aika.neuron.visitor.linking.LinkingUpVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class PatternUpVisitor extends LinkingUpVisitor<BindingActivation> {
+public class BindingUpVisitor extends LinkingUpVisitor<PatternActivation> {
 
-
-    public PatternUpVisitor(Thought t, LinkingOperator operator) {
-        super(t, operator);
-    }
-
-    protected PatternUpVisitor(PatternDownVisitor parent, BindingActivation origin) {
+    protected BindingUpVisitor(BindingDownVisitor parent, PatternActivation origin) {
         super(parent, origin);
     }
 
@@ -52,6 +46,6 @@ public class PatternUpVisitor extends LinkingUpVisitor<BindingActivation> {
     }
 
     protected void visitUp(Link l) {
-        l.patternVisitUp(this);
+        l.bindingVisitUp(this);
     }
 }

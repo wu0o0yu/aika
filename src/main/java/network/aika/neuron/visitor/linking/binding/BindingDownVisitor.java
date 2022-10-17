@@ -14,42 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.linking;
+package network.aika.neuron.visitor.linking.binding;
 
 import network.aika.Thought;
-import network.aika.direction.Direction;
-import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.activation.text.TokenActivation;
-import network.aika.neuron.conjunctive.LatentRelationNeuron;
-
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
+import network.aika.neuron.visitor.linking.LinkingDownVisitor;
+import network.aika.neuron.visitor.linking.LinkingOperator;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class Visitor {
+public class BindingDownVisitor extends LinkingDownVisitor<PatternActivation> {
 
-    long v;
-
-    public Visitor(Thought t) {
-        this.v = t.getNewVisitorId();
+    public BindingDownVisitor(Thought t, LinkingOperator operator) {
+        super(t, operator);
     }
 
-    protected Visitor(Visitor parent) {
-        this.v = parent.v;
+    @Override
+    public void up(PatternActivation origin) {
+        new BindingUpVisitor(this, origin)
+                .next(origin);
     }
 
-    public abstract void next(Activation<?> act);
-
-    public abstract void next(Link<?, ?, ?> l);
-
-    public long getV() {
-        return v;
+    protected void visitDown(Link l) {
+        l.bindingVisitDown(this);
     }
 
-    public abstract void check(Link lastLink, Activation act);
+    protected void visitDown(Activation act, Link l) {
+        act.bindingVisitDown(this, l);
+    }
 }

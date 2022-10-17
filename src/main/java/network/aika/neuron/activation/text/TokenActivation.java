@@ -16,13 +16,11 @@
  */
 package network.aika.neuron.activation.text;
 
-import network.aika.direction.Direction;
 import network.aika.fields.ValueSortedQueueField;
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
-import network.aika.neuron.linking.DownVisitor;
-import network.aika.neuron.linking.Visitor;
+import network.aika.neuron.visitor.DownVisitor;
 import network.aika.text.Document;
 
 import java.util.Comparator;

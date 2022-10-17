@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.linking;
+package network.aika.neuron.visitor.linking;
 
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -22,8 +22,6 @@ import network.aika.neuron.activation.Link;
 
 import java.util.Objects;
 import java.util.stream.Stream;
-
-import static network.aika.direction.Direction.INPUT;
 
 /**
  * @author Lukas Molzberger
@@ -33,7 +31,7 @@ public class Linker {
     public static void link(Activation bsA, Synapse synA, Link linkA, Synapse synB, Stream<Activation> bsStream) {
         bsStream
                 .filter(bsB ->
-                        synB.checkLinkingEvent(bsB, INPUT)
+                        synB.checkLinkingEvent(bsB)
                 ).forEach(bsB ->
                         link(bsA, synA, linkA, bsB, synB)
                 );

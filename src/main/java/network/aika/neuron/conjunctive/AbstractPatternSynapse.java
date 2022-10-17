@@ -21,7 +21,9 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.AbstractPatternLink;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.linking.*;
+import network.aika.neuron.visitor.linking.LinkingDownVisitor;
+import network.aika.neuron.visitor.linking.LinkingOperator;
+import network.aika.neuron.visitor.linking.pattern.PatternDownVisitor;
 
 /**
  *

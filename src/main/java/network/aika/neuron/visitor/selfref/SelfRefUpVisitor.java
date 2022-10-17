@@ -14,22 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.linking;
+package network.aika.neuron.visitor.selfref;
 
-import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
-
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.visitor.UpVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class LinkingDownVisitor<T extends Activation> extends DownVisitor<T> {
+public class SelfRefUpVisitor extends UpVisitor {
 
-    LinkingOperator operator;
+    Activation oAct;
 
-    public LinkingDownVisitor(Thought t, LinkingOperator operator) {
-        super(t);
+    boolean isSelfRef;
 
-        this.operator = operator;
+    protected SelfRefUpVisitor(SelfRefDownVisitor parent) {
+        super(parent);
+        this.oAct = parent.oAct;
+        this.isSelfRef = parent.isSelfRef;
+    }
+
+    public boolean isSelfRef() {
+        return isSelfRef;
+    }
+
+    @Override
+    public void check(Link lastLink, Activation act) {
+        if(act == oAct)
+            isSelfRef = true;
     }
 }

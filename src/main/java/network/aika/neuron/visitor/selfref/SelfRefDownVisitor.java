@@ -14,37 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.linking;
+package network.aika.neuron.visitor.selfref;
 
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.ConjunctiveLink;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.conjunctive.ConjunctiveSynapse;
-
-import static network.aika.neuron.linking.Linker.link;
+import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.visitor.DownVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class LinkLinkingOperator extends LinkingOperator {
+public class SelfRefDownVisitor extends DownVisitor<PatternActivation> {
 
+    Activation oAct;
 
-    public LinkLinkingOperator(Activation fromBS, ConjunctiveSynapse syn) {
-        super(fromBS, syn);
+    boolean isSelfRef;
+
+    public SelfRefDownVisitor(Activation oAct) {
+        super(oAct.getThought());
+    }
+
+    public boolean isSelfRef() {
+        return isSelfRef;
     }
 
     @Override
-    public void check(LinkingUpVisitor v, Link lastLink, Activation act) {
-        if(act.getNeuron() != syn.getOutput())
-            return;
-
-        if(act == fromBS)
-            return;
-
-        ConjunctiveLink<?, ?, ?> l = (ConjunctiveLink) lastLink;
-        if(!v.compatible(syn.getScope(), l.getSynapse().getScope()))
-            return;
-
-        link(l.getInput(), l.getSynapse(), l, fromBS, syn);
+    public void up(PatternActivation origin) {
+        new SelfRefUpVisitor(this)
+                .next(origin);
     }
 }

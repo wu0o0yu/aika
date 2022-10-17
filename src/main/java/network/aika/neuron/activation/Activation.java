@@ -21,9 +21,9 @@ import network.aika.Thought;
 import network.aika.fields.*;
 import network.aika.neuron.*;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
-import network.aika.neuron.linking.DownVisitor;
-import network.aika.neuron.linking.SelfRefDownVisitor;
-import network.aika.neuron.linking.UpVisitor;
+import network.aika.neuron.visitor.DownVisitor;
+import network.aika.neuron.visitor.selfref.SelfRefDownVisitor;
+import network.aika.neuron.visitor.UpVisitor;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
 
@@ -104,7 +104,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         isFired.addEventListener(() -> {
                     fired = thought.getCurrentTimestamp();
-                    neuron.linkAndPropagateOut(this);
+                    neuron.linkAndPropagateOut(this, false);
                     Counting.add(this);
                 }
         );
@@ -186,6 +186,10 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public void patternVisitDown(DownVisitor v, Link lastLink) {
+        v.next(this);
+    }
+
+    public void posFeedVisitDown(DownVisitor v, Link lastLink) {
         v.next(this);
     }
 

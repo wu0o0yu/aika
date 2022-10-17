@@ -17,8 +17,8 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.conjunctive.SamePatternSynapse;
-import network.aika.neuron.linking.DownVisitor;
-import network.aika.neuron.linking.UpVisitor;
+import network.aika.neuron.visitor.DownVisitor;
+import network.aika.neuron.visitor.UpVisitor;
 
 /**
  * @author Lukas Molzberger

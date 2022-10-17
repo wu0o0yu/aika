@@ -16,12 +16,11 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.direction.Direction;
-import network.aika.fields.*;
+import network.aika.Thought;
 import network.aika.neuron.activation.*;
-
-import static network.aika.fields.FieldLink.connect;
-import static network.aika.fields.Fields.mul;
+import network.aika.neuron.visitor.linking.LinkingDownVisitor;
+import network.aika.neuron.visitor.linking.LinkingOperator;
+import network.aika.neuron.visitor.linking.binding.PosFeedbackDownVisitor;
 
 /**
  *
@@ -52,15 +51,21 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
     }
 
     @Override
-    public FieldOutput getLinkingEvent(Activation act, Direction dir) {
-        return null;
+    public boolean checkLinkingEvent(Activation act) {
+        return true;
     }
 
+    @Override
+    public LinkingDownVisitor createVisitor(Thought t, LinkingOperator c) {
+        return new PosFeedbackDownVisitor(t, c);
+    }
+
+    /*
     @Override
     protected boolean checkCausal(PatternActivation iAct, BindingActivation oAct) {
         return true;
     }
-
+*/
     @Override
     public boolean isPropagate() {
         return false;

@@ -24,15 +24,14 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.linking.*;
+import network.aika.neuron.visitor.*;
+import network.aika.neuron.visitor.linking.LinkingDownVisitor;
+import network.aika.neuron.visitor.linking.LinkingOperator;
 import network.aika.utils.Utils;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.stream.Stream;
-
-import static network.aika.direction.Direction.INPUT;
 
 
 /**

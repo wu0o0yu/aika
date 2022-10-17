@@ -98,12 +98,16 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         }
     }
 
-    public void linkAndPropagateOut(Activation act) {
-        getTargetOutputSynapses()
-                .filter(s ->
-                        s.checkLinkingEvent(act, Direction.OUTPUT)
-                )
-                .forEach(s ->
+    public void linkAndPropagateOut(Activation act, boolean checkLinkingEvent) {
+        Stream<? extends Synapse> targetSyns = getTargetOutputSynapses();
+
+        if(checkLinkingEvent) {
+            targetSyns = targetSyns.filter(s ->
+                    s.checkLinkingEvent(act)
+            );
+        }
+
+        targetSyns.forEach(s ->
                         s.linkAndPropagateOut(act)
                 );
     }
