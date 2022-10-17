@@ -30,7 +30,7 @@ import static network.aika.neuron.conjunctive.Scope.INPUT;
 /**
  * @author Lukas Molzberger
  */
-public class RelationLinkingUpVisitor extends LinkingUpVisitor {
+public class RelationLinkingUpVisitor extends BindingUpVisitor {
 
     protected RelationInputSynapse relation;
 

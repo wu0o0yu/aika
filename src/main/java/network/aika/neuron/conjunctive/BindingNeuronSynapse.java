@@ -19,6 +19,7 @@ package network.aika.neuron.conjunctive;
 import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.linking.BindingDownVisitor;
 import network.aika.neuron.linking.LinkingDownVisitor;
 import network.aika.neuron.linking.LinkingOperator;
 import network.aika.neuron.linking.RelationLinkingDownVisitor;
@@ -52,7 +53,7 @@ public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I ext
         if(rel != null)
             return new RelationLinkingDownVisitor(t, c, rel, scope.getRelationDir());
 
-        return super.createVisitor(t, c);
+        return new BindingDownVisitor(t, c);
     }
 
     public void initDummyLink(BindingActivation oAct) {

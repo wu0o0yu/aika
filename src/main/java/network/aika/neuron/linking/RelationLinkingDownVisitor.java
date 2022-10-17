@@ -29,7 +29,7 @@ import static network.aika.neuron.conjunctive.Scope.INPUT;
 /**
  * @author Lukas Molzberger
  */
-public class RelationLinkingDownVisitor extends LinkingDownVisitor {
+public class RelationLinkingDownVisitor extends BindingDownVisitor {
 
     protected RelationInputSynapse relation;
     protected Direction relationDir;
@@ -48,10 +48,6 @@ public class RelationLinkingDownVisitor extends LinkingDownVisitor {
 
     public Direction getRelationDir() {
         return relationDir;
-    }
-
-    @Override
-    public void up(PatternActivation origin) {
     }
 
     public void expandRelations(TokenActivation origin) {

@@ -37,11 +37,18 @@ public abstract class UpVisitor extends Visitor {
 
     public void next(Activation<?> act) {
         act.getOutputLinks()
-                .forEach(l -> l.visitUp(this));
+                .forEach(l -> visitUp(l));
     }
 
     public void next(Link<?, ?, ?> l) {
-        l.getOutput()
-                .visitUp(this, l);
+        visitUp(l.getOutput(), l);
+    }
+
+    protected void visitUp(Link l) {
+        l.visitUp(this);
+    }
+
+    public void visitUp(Activation act, Link l) {
+        act.visitUp(this, l);
     }
 }

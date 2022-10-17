@@ -62,15 +62,13 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         return scope;
     }
 
-    public LinkingDownVisitor createVisitor(Thought t, LinkingOperator c) {
-        return new LinkingDownVisitor(t, c);
-    }
+    public abstract LinkingDownVisitor createVisitor(Thought t, LinkingOperator c);
 
     protected void linkStepB(Activation bsA, ConjunctiveSynapse synA, Link linkA) {
-        ActLinkingOperator operator = new ActLinkingOperator(bsA, synA, linkA, this);
-
-        LinkingDownVisitor v = createVisitor(getThought(), operator);
-        bsA.visitDown(v, null);
+        createVisitor(getThought(),
+                new ActLinkingOperator(bsA, synA, linkA, this)
+        )
+                .start(bsA);
     }
 
     @Override

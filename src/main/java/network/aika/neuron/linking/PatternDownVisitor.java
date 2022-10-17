@@ -14,26 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.neuron.linking;
 
-import network.aika.neuron.conjunctive.SamePatternSynapse;
-import network.aika.neuron.linking.DownVisitor;
-import network.aika.neuron.linking.UpVisitor;
+import network.aika.Thought;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.PatternActivation;
 
 /**
  * @author Lukas Molzberger
  */
-public class SamePatternLink extends BindingNeuronLink<SamePatternSynapse, BindingActivation> {
+public class PatternDownVisitor extends LinkingDownVisitor<BindingActivation> {
 
-    public SamePatternLink(SamePatternSynapse s, BindingActivation input, BindingActivation output) {
-        super(s, input, output);
+    public PatternDownVisitor(Thought t, LinkingOperator operator) {
+        super(t, operator);
     }
 
     @Override
-    public void bindingVisitDown(DownVisitor v) {
+    public void up(BindingActivation origin) {
+        new PatternUpVisitor(this, origin)
+                .next(origin);
     }
 
-    @Override
-    public void bindingVisitUp(UpVisitor v) {
+    protected void visitDown(Link l) {
+        l.patternVisitDown(this);
+    }
+
+    protected void visitDown(Activation act, Link l) {
+        act.patternVisitDown(this, l);
     }
 }

@@ -16,10 +16,12 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.AbstractPatternLink;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.linking.*;
 
 /**
  *
@@ -47,5 +49,10 @@ public abstract class AbstractPatternSynapse<S extends AbstractPatternSynapse, I
     @Override
     public boolean propagateCheck(IA iAct) {
         return true;
+    }
+
+    @Override
+    public LinkingDownVisitor createVisitor(Thought t, LinkingOperator c) {
+        return new PatternDownVisitor(t, c);
     }
 }

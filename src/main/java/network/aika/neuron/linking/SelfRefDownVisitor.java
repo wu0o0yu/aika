@@ -24,7 +24,7 @@ import network.aika.neuron.activation.PatternActivation;
 /**
  * @author Lukas Molzberger
  */
-public class SelfRefDownVisitor extends DownVisitor {
+public class SelfRefDownVisitor extends DownVisitor<PatternActivation> {
 
     Activation oAct;
 

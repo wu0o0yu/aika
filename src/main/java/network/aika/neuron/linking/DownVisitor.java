@@ -19,13 +19,12 @@ package network.aika.neuron.linking;
 import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.text.TokenActivation;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class DownVisitor extends Visitor {
+public abstract class DownVisitor<T extends Activation> extends Visitor {
 
     public DownVisitor(Thought t) {
         super(t);
@@ -35,17 +34,28 @@ public abstract class DownVisitor extends Visitor {
         // Nothing to do
     }
 
+    public void start(Activation<?> act) {
+        visitDown(act, null);
+    }
+
     public void next(Activation<?> act) {
         act.getInputLinks()
-                .forEach(l -> l.visitDown(this));
+                .forEach(l -> visitDown(l));
     }
 
     public void next(Link<?, ?, ?> l) {
-        l.getInput()
-                .visitDown(this, l);
+        visitDown(l.getInput(), l);
     }
 
-    public abstract void up(PatternActivation origin);
+    protected void visitDown(Link l) {
+        l.visitDown(this);
+    }
+
+    protected void visitDown(Activation act, Link l) {
+        act.visitDown(this, l);
+    }
+
+    public abstract void up(T origin);
 
     public void expandRelations(TokenActivation tAct) {
     }

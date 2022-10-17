@@ -18,18 +18,40 @@ package network.aika.neuron.linking;
 
 import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
-
+import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.conjunctive.Scope;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class LinkingDownVisitor<T extends Activation> extends DownVisitor<T> {
+public class PatternUpVisitor extends LinkingUpVisitor<BindingActivation> {
 
-    LinkingOperator operator;
 
-    public LinkingDownVisitor(Thought t, LinkingOperator operator) {
-        super(t);
+    public PatternUpVisitor(Thought t, LinkingOperator operator) {
+        super(t, operator);
+    }
 
-        this.operator = operator;
+    protected PatternUpVisitor(PatternDownVisitor parent, BindingActivation origin) {
+        super(parent, origin);
+    }
+
+    public void check(Link lastLink, Activation act) {
+        operator.check(this, lastLink, act);
+    }
+
+    public boolean compatible(Scope from, Scope to) {
+        if(origin == null)
+            return false;
+
+        return from == to;
+    }
+
+    public void createRelation(Link l) {
+    }
+
+    protected void visitUp(Link l) {
+        l.patternVisitUp(this);
     }
 }

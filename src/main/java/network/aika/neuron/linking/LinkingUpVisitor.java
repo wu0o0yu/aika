@@ -25,11 +25,11 @@ import static network.aika.neuron.conjunctive.Scope.INPUT;
 /**
  * @author Lukas Molzberger
  */
-public class LinkingUpVisitor extends UpVisitor {
+public abstract class LinkingUpVisitor<T extends Activation> extends UpVisitor {
 
     LinkingOperator operator;
 
-    PatternActivation origin;
+    T origin;
 
     public LinkingUpVisitor(Thought t, LinkingOperator operator) {
         super(t);
@@ -37,7 +37,7 @@ public class LinkingUpVisitor extends UpVisitor {
         this.operator = operator;
     }
 
-    protected LinkingUpVisitor(LinkingDownVisitor parent, PatternActivation origin) {
+    protected LinkingUpVisitor(LinkingDownVisitor parent, T origin) {
         super(parent);
         this.origin = origin;
         this.operator = parent.operator;
@@ -47,12 +47,7 @@ public class LinkingUpVisitor extends UpVisitor {
         operator.check(this, lastLink, act);
     }
 
-    public boolean compatible(Scope from, Scope to) {
-        if(origin == null)
-            return false;
-
-        return from != to || from == INPUT;
-    }
+    public abstract boolean compatible(Scope from, Scope to);
 
     public void createRelation(Link l) {
     }

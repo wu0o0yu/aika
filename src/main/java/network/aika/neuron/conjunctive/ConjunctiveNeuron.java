@@ -60,10 +60,10 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     }
 
     public void linkStepAOutput(ConjunctiveSynapse syn, Activation fromBS) {
-        LinkLinkingOperator operator = new LinkLinkingOperator(fromBS, syn);
-
-        LinkingDownVisitor v = syn.createVisitor(getThought(), operator);
-        fromBS.visitDown(v, null);
+        syn.createVisitor(getThought(),
+                        new LinkLinkingOperator(fromBS, syn)
+                )
+                .start(fromBS);
     }
 
     public void linkAndPropagateIn(Link l) {

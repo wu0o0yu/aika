@@ -20,6 +20,7 @@ import network.aika.Thought;
 import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.linking.DownVisitor;
 
 
 import static network.aika.fields.Fields.*;
@@ -113,5 +114,10 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     public void updateBias(double u) {
         getNetUB().receiveUpdate(u);
         getNetLB().receiveUpdate(u);
+    }
+
+    @Override
+    public void patternVisitDown(DownVisitor v, Link lastLink) {
+        v.up(this);
     }
 }

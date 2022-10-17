@@ -169,7 +169,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public boolean isSelfRef(Activation oAct) {
         SelfRefDownVisitor v = new SelfRefDownVisitor(oAct);
-        visitDown(v, null);
+        v.start(this);
         return v.isSelfRef();
     }
 
@@ -180,6 +180,15 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     public void visitDown(DownVisitor v, Link lastLink) {
         v.next(this);
     }
+
+    public void bindingVisitDown(DownVisitor v, Link lastLink) {
+        v.next(this);
+    }
+
+    public void patternVisitDown(DownVisitor v, Link lastLink) {
+        v.next(this);
+    }
+
 
     public void visitUp(UpVisitor v, Link lastLink) {
         v.check(lastLink, this);
