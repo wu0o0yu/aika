@@ -46,10 +46,13 @@ public class Linker {
             oAct = synA.getOutput().createActivation(bsA.getThought());
             oAct.init(synA, bsA);
 
-            return synA.createLink(bsA, oAct);
+            synA.createLink(bsA, oAct);
         } else {
             oAct = linkA.getOutput();
+            if(synB.linkExists(bsB, oAct))
+                return null;
         }
+
         return synB.createLink(bsB, oAct);
     }
 

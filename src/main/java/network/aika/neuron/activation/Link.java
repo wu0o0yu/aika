@@ -86,11 +86,9 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     public void patternVisitDown(DownVisitor v) {
-        v.next(this);
     }
 
     public void patternVisitUp(UpVisitor v) {
-        v.next(this);
     }
 
     protected void initOnTransparent() {

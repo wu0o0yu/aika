@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.conjunctive.PatternSynapse;
+import network.aika.neuron.visitor.UpVisitor;
 
 /**
  * @author Lukas Molzberger
@@ -27,13 +28,7 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
         super(s, input, output);
     }
 
-    /*
-    OP-2
-    public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
-        if(v.getDir() == Direction.INPUT)
-            return;
-
-        super.trackBindingSignal(v, p);
+    public void patternVisitUp(UpVisitor v) {
+        v.next(this);
     }
-     */
 }

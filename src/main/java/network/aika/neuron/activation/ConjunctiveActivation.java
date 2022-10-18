@@ -27,7 +27,6 @@ import static network.aika.direction.Direction.INPUT;
  */
 public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> extends Activation<N> {
 
-
     public ConjunctiveActivation(int id, Thought t, N n) {
         super(id, t, n);
 

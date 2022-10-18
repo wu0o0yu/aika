@@ -104,7 +104,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         isFired.addEventListener(() -> {
                     fired = thought.getCurrentTimestamp();
-                    neuron.linkAndPropagateOut(this, false);
+                    neuron.linkAndPropagateOut(this);
                     Counting.add(this);
                 }
         );
@@ -188,11 +188,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     public void patternVisitDown(DownVisitor v, Link lastLink) {
         v.next(this);
     }
-
-    public void posFeedVisitDown(DownVisitor v, Link lastLink) {
-        v.next(this);
-    }
-
 
     public void visitUp(UpVisitor v, Link lastLink) {
         v.check(lastLink, this);

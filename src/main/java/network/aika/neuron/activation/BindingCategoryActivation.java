@@ -19,13 +19,11 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.neuron.disjunctive.CategoryNeuron;
 
-
 /**
  *
  * @author Lukas Molzberger
  */
 public class BindingCategoryActivation extends CategoryActivation {
-
 
     public BindingCategoryActivation(int id, Thought t, CategoryNeuron neuron) {
         super(id, t, neuron);

@@ -20,7 +20,6 @@ import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.visitor.DownVisitor;
-import network.aika.steps.activation.Linking;
 
 /**
  *
@@ -32,9 +31,6 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     public PatternActivation(int id, Thought t, PatternNeuron patternNeuron) {
         super(id, t, patternNeuron);
-
-        // Only to link the positive feedback synapses
-        Linking.add(this);
     }
 
     @Override

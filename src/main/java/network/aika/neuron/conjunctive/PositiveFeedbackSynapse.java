@@ -20,7 +20,6 @@ import network.aika.Thought;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.visitor.linking.LinkingDownVisitor;
 import network.aika.neuron.visitor.linking.LinkingOperator;
-import network.aika.neuron.visitor.linking.binding.PosFeedbackDownVisitor;
 
 /**
  *
@@ -53,11 +52,6 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
     @Override
     public boolean checkLinkingEvent(Activation act) {
         return true;
-    }
-
-    @Override
-    public LinkingDownVisitor createVisitor(Thought t, LinkingOperator c) {
-        return new PosFeedbackDownVisitor(t, c);
     }
 
     /*
