@@ -35,7 +35,7 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
     }
 
     @Override
-    public NegativeFeedbackLink createUnconnectedLink(InhibitoryActivation input, BindingActivation output) {
+    public NegativeFeedbackLink createLink(InhibitoryActivation input, BindingActivation output) {
         return new NegativeFeedbackLink(this, input, output);
     }
 

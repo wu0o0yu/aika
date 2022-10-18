@@ -21,38 +21,21 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.conjunctive.ConjunctiveSynapse;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class LinkingOperator implements Consumer<Link> {
+public abstract class LinkingOperator {
 
     protected Activation fromBS;
 
     protected ConjunctiveSynapse syn;
 
-    private List<Link> newLinks = new ArrayList<>();
-
     public LinkingOperator(Activation fromBS, ConjunctiveSynapse syn) {
         this.fromBS = fromBS;
         this.syn = syn;
-    }
-
-    @Override
-    public void accept(Link l) {
-        if(l != null)
-            newLinks.add(l);
-    }
-
-    public void finalizeLinks() {
-        newLinks.forEach(l ->
-                l.link()
-        );
     }
 
     public abstract void check(LinkingCallback v, Link lastLink, Activation act);
@@ -75,14 +58,14 @@ public abstract class LinkingOperator implements Consumer<Link> {
             oAct = synA.getOutput().createActivation(bsA.getThought());
             oAct.init(synA, bsA);
 
-            synA.createAndCollectLink(bsA, oAct, this);
+            synA.createLink(bsA, oAct);
         } else {
             oAct = linkA.getOutput();
             if(synB.linkExists(bsB, oAct))
                 return null;
         }
 
-        return synB.createAndCollectLink(bsB, oAct, this);
+        return synB.createLink(bsB, oAct);
     }
 
     private static boolean latentActivationExists(Synapse synA, Synapse synB, Activation iActA, Activation iActB) {

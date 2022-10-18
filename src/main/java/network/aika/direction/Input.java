@@ -49,21 +49,6 @@ public class Input implements Direction {
         return s.getInput();
     }
 
-    @Override
-    public Activation getActivation(Link l) {
-        return l.getInput();
-    }
-
-    @Override
-    public Stream<Link> getLinks(Activation act) {
-        return act.getInputLinks();
-    }
-
-    @Override
-    public Stream<? extends Synapse> getSynapses(Neuron n) {
-        return n.getInputSynapses();
-    }
-
     public String toString() {
         return "INPUT";
     }

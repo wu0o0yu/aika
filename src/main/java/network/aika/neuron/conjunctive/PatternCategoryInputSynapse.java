@@ -33,7 +33,7 @@ public class PatternCategoryInputSynapse extends AbstractPatternSynapse<
         > implements CategoryInputSynapse<PatternCategoryInputSynapse>
 {
     @Override
-    public PatternCategoryInputLink createUnconnectedLink(CategoryActivation input, PatternActivation output) {
+    public PatternCategoryInputLink createLink(CategoryActivation input, PatternActivation output) {
         return new PatternCategoryInputLink(this, input, output);
     }
 /*

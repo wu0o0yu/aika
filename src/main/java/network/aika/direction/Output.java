@@ -49,21 +49,6 @@ public class Output implements Direction {
         return s.getOutput();
     }
 
-    @Override
-    public Activation getActivation(Link l) {
-        return l.getOutput();
-    }
-
-    @Override
-    public Stream<Link> getLinks(Activation act) {
-        return act.getOutputLinks();
-    }
-
-    @Override
-    public Stream<? extends Synapse> getSynapses(Neuron n) {
-        return n.getOutputSynapses();
-    }
-
     public String toString() {
         return "OUTPUT";
     }

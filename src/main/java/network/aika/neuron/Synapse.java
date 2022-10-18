@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.function.Consumer;
 
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.activation.Timestamp.MAX;
@@ -167,20 +166,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         s.weight.setValue(weight.getCurrentValue());
     }
 
-    public abstract L createUnconnectedLink(IA input, OA output);
-
-    public L createLink(IA input, OA output) {
-        L l = createUnconnectedLink(input, output);
-        l.link();
-        return l;
-    }
-
-    public L createAndCollectLink(IA input, OA output, Consumer<Link> collector) {
-        L l = createUnconnectedLink(input, output);
-        collector.accept(l);
-        return l;
-    }
-
+    public abstract L createLink(IA input, OA output);
 
     public boolean checkCandidateSynapse(IA iAct) {
         double candidateWeight = computeInitialWeight(iAct);

@@ -21,8 +21,6 @@ import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.RelationInputSynapse;
 import network.aika.neuron.conjunctive.Scope;
 
-import java.util.function.Consumer;
-
 import static network.aika.neuron.conjunctive.Scope.INPUT;
 
 /**
@@ -71,9 +69,9 @@ public class RelationLinkingUpVisitor extends BindingUpVisitor {
                 upOrigin
         );
 
-        if (relation.linkExists(latentRelAct, (BindingActivation) l.getOutput()))
+        if(relation.linkExists(latentRelAct, (BindingActivation) l.getOutput()))
             return;
 
-        relation.createAndCollectLink(latentRelAct, (BindingActivation) l.getOutput(), operator);
+        relation.createLink(latentRelAct, (BindingActivation) l.getOutput());
     }
 }

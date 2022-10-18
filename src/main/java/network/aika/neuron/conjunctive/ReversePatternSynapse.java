@@ -38,7 +38,7 @@ public class ReversePatternSynapse extends
     }
 
     @Override
-    public ReversePatternLink createUnconnectedLink(PatternActivation input, BindingActivation output) {
+    public ReversePatternLink createLink(PatternActivation input, BindingActivation output) {
         return new ReversePatternLink(this, input, output);
     }
 }

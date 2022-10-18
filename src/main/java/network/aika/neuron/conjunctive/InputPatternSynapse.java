@@ -36,7 +36,7 @@ public class InputPatternSynapse extends BindingNeuronSynapse<
     }
 
     @Override
-    public InputPatternLink createUnconnectedLink(ConjunctiveActivation input, BindingActivation output) {
+    public InputPatternLink createLink(ConjunctiveActivation input, BindingActivation output) {
         return new InputPatternLink(this, input, output);
     }
 

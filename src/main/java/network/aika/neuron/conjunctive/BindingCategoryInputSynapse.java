@@ -36,7 +36,7 @@ public class BindingCategoryInputSynapse extends BindingNeuronSynapse<
     }
 
     @Override
-    public BindingCategoryInputLink createUnconnectedLink(CategoryActivation input, BindingActivation output) {
+    public BindingCategoryInputLink createLink(CategoryActivation input, BindingActivation output) {
         return new BindingCategoryInputLink(this, input, output);
     }
 /*

@@ -33,10 +33,4 @@ public abstract class LinkingDownVisitor<T extends Activation> extends DownVisit
 
         this.operator = operator;
     }
-
-    @Override
-    public void start(Activation<?> act) {
-        super.start(act);
-        operator.finalizeLinks();
-    }
 }

@@ -20,6 +20,8 @@ import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 
+import java.util.stream.Collectors;
+
 /**
  * @author Lukas Molzberger
  */

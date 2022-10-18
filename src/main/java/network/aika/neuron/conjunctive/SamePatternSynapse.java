@@ -36,7 +36,7 @@ public class SamePatternSynapse extends BindingNeuronSynapse<
     }
 
     @Override
-    public SamePatternLink createUnconnectedLink(BindingActivation input, BindingActivation output) {
+    public SamePatternLink createLink(BindingActivation input, BindingActivation output) {
         return new SamePatternLink(this, input, output);
     }
 }

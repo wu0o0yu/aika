@@ -34,7 +34,7 @@ public abstract class CategorySynapse<S extends CategorySynapse, I extends Conju
 {
 
     @Override
-    public CategoryLink createUnconnectedLink(IA input, OA output) {
+    public CategoryLink createLink(IA input, OA output) {
         return new CategoryLink(this, input, output);
     }
 }
