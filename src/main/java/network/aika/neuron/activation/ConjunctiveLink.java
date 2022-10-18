@@ -29,9 +29,15 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
 
     public ConjunctiveLink(S s, IA input, OA output) {
         super(s, input, output);
+    }
+
+    public Link link() {
+        super.link();
 
         output.getNeuron()
                 .linkAndPropagateIn(this);
+
+        return this;
     }
 
     public void instantiateTemplate(ConjunctiveActivation instAct) {

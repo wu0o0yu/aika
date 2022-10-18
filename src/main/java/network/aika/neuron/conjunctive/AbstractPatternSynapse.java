@@ -54,7 +54,8 @@ public abstract class AbstractPatternSynapse<S extends AbstractPatternSynapse, I
     }
 
     @Override
-    public LinkingDownVisitor createVisitor(Thought t, LinkingOperator c) {
-        return new PatternDownVisitor(t, c);
+    public void startVisitor(LinkingOperator c, Activation bs) {
+        new PatternDownVisitor(bs.getThought(), c)
+                .start(bs);
     }
 }

@@ -39,10 +39,6 @@ public abstract class DisjunctiveNeuron<S extends DisjunctiveSynapse, A extends 
     }
 
     @Override
-    public void latentLinkingStepA(Synapse synA, Activation fromBS) {
-    }
-
-    @Override
     public void addInactiveLinks(Activation bs) {
     }
 

@@ -45,7 +45,7 @@ public class PatternSynapse extends AbstractPatternSynapse<
     }
 
     @Override
-    public PatternLink createLink(BindingActivation input, PatternActivation output) {
+    public PatternLink createUnconnectedLink(BindingActivation input, PatternActivation output) {
         PositiveFeedbackSynapse posFeedbackSyn = (PositiveFeedbackSynapse) input.getNeuron().getInputSynapse(output.getNeuronProvider());
         if(posFeedbackSyn != null)
             new PositiveFeedbackLink(posFeedbackSyn, output, input);

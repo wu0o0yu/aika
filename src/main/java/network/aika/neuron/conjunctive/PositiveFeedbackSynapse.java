@@ -20,6 +20,8 @@ import network.aika.Thought;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.visitor.linking.LinkingDownVisitor;
 import network.aika.neuron.visitor.linking.LinkingOperator;
+import network.aika.neuron.visitor.linking.binding.BindingDownVisitor;
+import network.aika.neuron.visitor.linking.binding.RelationLinkingDownVisitor;
 
 /**
  *
@@ -36,8 +38,12 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
         super(Scope.SAME);
     }
 
-    public PositiveFeedbackLink createLink(PatternActivation input, BindingActivation output) {
+    public PositiveFeedbackLink createUnconnectedLink(PatternActivation input, BindingActivation output) {
         return new PositiveFeedbackLink(this, input, output);
+    }
+
+    @Override
+    public void startVisitor(LinkingOperator c, Activation bs) {
     }
 
     protected boolean getDummyLinkUB() {

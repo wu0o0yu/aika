@@ -18,7 +18,6 @@ package network.aika.neuron;
 
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.direction.Direction;
 import network.aika.fields.LimitedField;
 import network.aika.fields.QueueField;
 import network.aika.neuron.activation.*;
@@ -103,8 +102,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
                 s.linkAndPropagateOut(act)
         );
     }
-
-    public abstract void latentLinkingStepA(Synapse synA, Activation fromBS);
 
     private TreeSet<A> initActivationsSet(Thought t) {
         TreeSet<A> acts = new TreeSet<>();

@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.function.Consumer;
 
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.activation.Timestamp.MAX;
@@ -82,14 +83,14 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
             propagate(bs);
     }
 
-    public L propagate(IA iAct) {
+    public void propagate(IA iAct) {
         if(propagateLinkExists(iAct))
-            return null;
+            return;
 
         OA oAct = getOutput().createActivation(iAct.getThought());
         oAct.init(this, iAct);
 
-        return createLink(iAct, oAct);
+        L l = createLink(iAct, oAct);
     }
 /*
     protected boolean checkCausal(IA iAct, OA oAct) {
@@ -166,7 +167,20 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         s.weight.setValue(weight.getCurrentValue());
     }
 
-    public abstract L createLink(IA input, OA output);
+    public abstract L createUnconnectedLink(IA input, OA output);
+
+    public L createLink(IA input, OA output) {
+        L l = createUnconnectedLink(input, output);
+        l.link();
+        return l;
+    }
+
+    public L createAndCollectLink(IA input, OA output, Consumer<? super L> collector) {
+        L l = createUnconnectedLink(input, output);
+        collector.accept(l);
+        return l;
+    }
+
 
     public boolean checkCandidateSynapse(IA iAct) {
         double candidateWeight = computeInitialWeight(iAct);

@@ -22,9 +22,6 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.conjunctive.ConjunctiveSynapse;
 import network.aika.neuron.visitor.linking.LinkingCallback;
 import network.aika.neuron.visitor.linking.LinkingOperator;
-import network.aika.neuron.visitor.linking.LinkingUpVisitor;
-
-import static network.aika.neuron.visitor.linking.Linker.link;
 
 /**
  * @author Lukas Molzberger

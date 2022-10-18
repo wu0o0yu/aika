@@ -27,11 +27,9 @@ import static network.aika.fields.ThresholdOperator.Type.ABOVE;
  */
 public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, InhibitoryActivation> {
 
-
     public NegativeFeedbackLink(NegativeFeedbackSynapse s, InhibitoryActivation input, BindingActivation output) {
         super(s, input, output);
     }
-
 
     @Override
     protected void initWeightInput() {

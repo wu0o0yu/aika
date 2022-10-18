@@ -16,24 +16,81 @@
  */
 package network.aika.neuron.visitor.linking;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.conjunctive.ConjunctiveSynapse;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+
 /**
  * @author Lukas Molzberger
  */
-public abstract class LinkingOperator {
+public abstract class LinkingOperator implements Consumer<Link> {
 
     protected Activation fromBS;
 
     protected ConjunctiveSynapse syn;
+
+    private List<Link> newLinks = new ArrayList<>();
 
     public LinkingOperator(Activation fromBS, ConjunctiveSynapse syn) {
         this.fromBS = fromBS;
         this.syn = syn;
     }
 
+    @Override
+    public void accept(Link l) {
+        if(l != null)
+            newLinks.add(l);
+    }
+
+    public void finalizeLinks() {
+        newLinks.forEach(l ->
+                l.link()
+        );
+    }
+
     public abstract void check(LinkingCallback v, Link lastLink, Activation act);
 
+    public void link(Activation bsA, Synapse synA, Link linkA, Synapse synB, Stream<Activation> bsStream) {
+        bsStream
+                .filter(bsB ->
+                        synB.checkLinkingEvent(bsB)
+                ).forEach(bsB ->
+                        link(bsA, synA, linkA, bsB, synB)
+                );
+    }
+
+    public Link link(Activation bsA, Synapse synA, Link linkA, Activation bsB, Synapse synB) {
+        Activation oAct;
+        if (linkA == null) {
+            if(latentActivationExists(synA, synB, bsA, bsB))
+                return null;
+
+            oAct = synA.getOutput().createActivation(bsA.getThought());
+            oAct.init(synA, bsA);
+
+            synA.createAndCollectLink(bsA, oAct, this);
+        } else {
+            oAct = linkA.getOutput();
+            if(synB.linkExists(bsB, oAct))
+                return null;
+        }
+
+        return synB.createAndCollectLink(bsB, oAct, this);
+    }
+
+    private static boolean latentActivationExists(Synapse synA, Synapse synB, Activation iActA, Activation iActB) {
+        Stream<Link> linksA = iActA.getOutputLinks(synA);
+        return linksA.map(lA -> lA.getOutput())
+                .map(oAct -> oAct.getInputLink(synB))
+                .filter(Objects::nonNull)
+                .map(lB -> lB.getInput())
+                .anyMatch(iAct -> iAct == iActB);
+    }
 }

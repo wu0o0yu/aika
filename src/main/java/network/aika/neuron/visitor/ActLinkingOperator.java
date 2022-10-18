@@ -20,10 +20,8 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.conjunctive.ConjunctiveSynapse;
 import network.aika.neuron.conjunctive.Scope;
-import network.aika.neuron.visitor.linking.Linker;
 import network.aika.neuron.visitor.linking.LinkingCallback;
 import network.aika.neuron.visitor.linking.LinkingOperator;
-import network.aika.neuron.visitor.linking.LinkingUpVisitor;
 
 
 /**
@@ -56,9 +54,8 @@ public class ActLinkingOperator extends LinkingOperator {
         if(!syn.checkLinkingEvent(act))
                 return;
 
-        Link l = Linker.link(fromBS, synA, linkA, act, syn);
-        if(l != null) {
+        Link l = link(fromBS, synA, linkA, act, syn);
+        if(l != null)
             v.createRelation(l);
-        }
     }
 }

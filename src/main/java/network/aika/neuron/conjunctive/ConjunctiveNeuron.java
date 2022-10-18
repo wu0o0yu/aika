@@ -18,7 +18,6 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.activation.Link;
@@ -32,7 +31,6 @@ import java.util.Comparator;
 
 import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
 import static network.aika.neuron.Synapse.isLatentLinking;
-import static network.aika.neuron.visitor.linking.Linker.link;
 
 /**
  *
@@ -46,21 +44,20 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         bias.addEventListener(this::updateSumOfLowerWeights);
     }
 
-    @Override
-    public void latentLinkingStepA(Synapse synA, Activation fromBS) {
+    public void linkOutgoing(ConjunctiveSynapse synA, Activation fromBS) {
+        // direct out linking
+        synA.startVisitor(
+                new LinkLinkingOperator(fromBS, synA),
+                fromBS
+        );
+
+        // latent linking
         getTargetInputSynapses()
                 .filter(synB -> synA != synB)
                 .filter(synB -> isLatentLinking(synA, synB))
                 .forEach(synB ->
-                        synB.linkStepB(fromBS, (S) synA, null)
+                        synB.linkStepB(fromBS, synA, null)
                 );
-    }
-
-    public void linkStepAOutput(ConjunctiveSynapse syn, Activation fromBS) {
-        syn.createVisitor(getThought(),
-                        new LinkLinkingOperator(fromBS, syn)
-                )
-                .start(fromBS);
     }
 
     public void linkAndPropagateIn(Link l) {

@@ -159,14 +159,20 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     public void init() {
+//        link();
+
+        if(getConfig().isCountingEnabled())
+            LinkCounting.add(this);
+    }
+
+    public Link link() {
         if(getInput() != null)
             linkInput();
 
         if(getOutput() != null)
             linkOutput();
 
-        if(getConfig().isCountingEnabled())
-            LinkCounting.add(this);
+        return this;
     }
 
     public FieldOutput getOnTransparent() {

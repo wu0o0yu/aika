@@ -36,11 +36,6 @@ public abstract class DisjunctiveSynapse<
         > extends Synapse<S,I,O,L,IA,OA>
 {
 
-    public void linkAndPropagate(Direction dir, Activation fromBS) {
-        if(isPropagate())
-            propagate((IA) fromBS);
-    }
-
     @Override
     public void setModified() {
         if(input != null)

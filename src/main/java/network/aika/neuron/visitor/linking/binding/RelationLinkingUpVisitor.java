@@ -16,13 +16,12 @@
  */
 package network.aika.neuron.visitor.linking.binding;
 
-import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.LatentRelationActivation;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.RelationInputSynapse;
 import network.aika.neuron.conjunctive.Scope;
+
+import java.util.function.Consumer;
 
 import static network.aika.neuron.conjunctive.Scope.INPUT;
 
@@ -65,15 +64,16 @@ public class RelationLinkingUpVisitor extends BindingUpVisitor {
         return false;
     }
 
+    @Override
     public void createRelation(Link l) {
         LatentRelationActivation latentRelAct = relation.getInput().createOrLookupLatentActivation(
                 downOrigin,
                 upOrigin
         );
 
-        if(relation.linkExists(latentRelAct, (BindingActivation) l.getOutput()))
+        if (relation.linkExists(latentRelAct, (BindingActivation) l.getOutput()))
             return;
 
-        relation.createLink(latentRelAct, (BindingActivation) l.getOutput());
+        relation.createAndCollectLink(latentRelAct, (BindingActivation) l.getOutput(), operator);
     }
 }
