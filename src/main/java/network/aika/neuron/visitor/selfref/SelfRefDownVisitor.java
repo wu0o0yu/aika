@@ -14,17 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.neuron.visitor.selfref;
 
-import network.aika.neuron.conjunctive.CategoryInputSynapse;
-
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.visitor.DownVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class CategoryInputLink extends ConjunctiveLink<CategoryInputSynapse, CategoryActivation<?>, ConjunctiveActivation> {
+public class SelfRefDownVisitor extends DownVisitor<PatternActivation> {
 
-    public CategoryInputLink(CategoryInputSynapse s, CategoryActivation input, ConjunctiveActivation output) {
-        super(s, input, output);
+    Activation oAct;
+
+    boolean isSelfRef;
+
+    public SelfRefDownVisitor(Activation oAct) {
+        super(oAct.getThought());
+    }
+
+    public boolean isSelfRef() {
+        return isSelfRef;
+    }
+
+    @Override
+    public void up(PatternActivation origin) {
+        new SelfRefUpVisitor(this)
+                .next(origin);
     }
 }

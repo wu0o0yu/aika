@@ -17,12 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.neuron.Neuron;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.disjunctive.DisjunctiveNeuron;
-
-import java.util.stream.Stream;
 
 /**
  *
@@ -34,4 +29,9 @@ public abstract class DisjunctiveActivation<N extends DisjunctiveNeuron> extends
         super(id, t, neuron);
     }
 
+    public DisjunctiveLink getInput() {
+        return (DisjunctiveLink) inputLinks.values().stream()
+                .findAny()
+                .orElse(null);
+    }
 }

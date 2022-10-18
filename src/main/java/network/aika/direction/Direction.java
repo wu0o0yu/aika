@@ -20,7 +20,6 @@ import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.bindingsignal.*;
 
 import java.util.stream.Stream;
 
@@ -44,13 +43,9 @@ public interface Direction {
 
     Activation getActivation(Link l);
 
-    PrimitiveTerminal getPrimitiveTerminal(PrimitiveTransition t);
-
     Stream<Link> getLinks(Activation act);
 
     Stream<? extends Synapse> getSynapses(Neuron n);
-
-    Terminal getTerminal(Transition t);
 
     static int compare(Direction a, Direction b) {
         if(a == b) return 0;

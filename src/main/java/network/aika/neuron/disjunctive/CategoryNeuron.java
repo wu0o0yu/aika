@@ -17,13 +17,7 @@
 package network.aika.neuron.disjunctive;
 
 import network.aika.neuron.activation.CategoryActivation;
-import network.aika.neuron.bindingsignal.PrimitiveTerminal;
-import network.aika.neuron.conjunctive.ConjunctiveNeuronType;
 
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.State.SAME;
 
 /**
  *
@@ -31,14 +25,7 @@ import static network.aika.neuron.bindingsignal.State.SAME;
  */
 public abstract class CategoryNeuron<S extends CategorySynapse, A extends CategoryActivation> extends DisjunctiveNeuron<S, A> {
 
-    protected ConjunctiveNeuronType type;
-
-    public CategoryNeuron(ConjunctiveNeuronType type) {
-        this.type = type;
-    }
-
-    public ConjunctiveNeuronType getType() {
-        return type;
+    public CategoryNeuron() {
     }
 
 }

@@ -17,6 +17,8 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.conjunctive.SamePatternSynapse;
+import network.aika.neuron.visitor.DownVisitor;
+import network.aika.neuron.visitor.UpVisitor;
 
 /**
  * @author Lukas Molzberger
@@ -25,5 +27,17 @@ public class SamePatternLink extends BindingNeuronLink<SamePatternSynapse, Bindi
 
     public SamePatternLink(SamePatternSynapse s, BindingActivation input, BindingActivation output) {
         super(s, input, output);
+    }
+
+    @Override
+    public void bindingVisitDown(DownVisitor v) {
+    }
+
+    @Override
+    public void bindingVisitUp(UpVisitor v) {
+    }
+
+    public void patternVisitDown(DownVisitor v) {
+        v.next(this);
     }
 }

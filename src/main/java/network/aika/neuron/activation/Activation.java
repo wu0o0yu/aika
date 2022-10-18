@@ -18,13 +18,12 @@ package network.aika.neuron.activation;
 
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.direction.Direction;
 import network.aika.fields.*;
 import network.aika.neuron.*;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.BSKey;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
+import network.aika.neuron.visitor.DownVisitor;
+import network.aika.neuron.visitor.selfref.SelfRefDownVisitor;
+import network.aika.neuron.visitor.UpVisitor;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
 
@@ -32,13 +31,11 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.direction.Direction.DIRECTIONS;
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.LinkSlotMode.MAX;
 import static network.aika.fields.LinkSlotMode.MIN;
 import static network.aika.fields.ThresholdOperator.Type.*;
-import static network.aika.neuron.bindingsignal.BSKey.COMPARATOR;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 
 /**
@@ -82,18 +79,12 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected FieldOutput updateValue;
     protected FieldOutput inductionThreshold;
 
-    protected SlotField sameBSSlot = new SlotField(this, "sameBSSlot");
-
-
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
-
-    protected SortedMap<BSKey, BindingSignal> bindingSignals = new TreeMap<>(COMPARATOR);
 
     private static final Comparator<Synapse> SYN_COMP = Comparator.comparing(s -> s.getInput().getId());
     protected Map<Synapse, LinkSlot> ubLinkSlots = new TreeMap<>(SYN_COMP);
     protected Map<Synapse, LinkSlot> lbLinkSlots = new TreeMap<>(SYN_COMP);
-
 
     public Activation(int id, Thought t, N n) {
         this.id = id;
@@ -113,6 +104,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         isFired.addEventListener(() -> {
                     fired = thought.getCurrentTimestamp();
+                    neuron.linkAndPropagateOut(this);
                     Counting.add(this);
                 }
         );
@@ -173,6 +165,33 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         netUB.process();
         netLB.setValue(v);
         netLB.process();
+    }
+
+    public boolean isSelfRef(Activation oAct) {
+        SelfRefDownVisitor v = new SelfRefDownVisitor(oAct);
+        v.start(this);
+        return v.isSelfRef();
+    }
+
+    public Activation<N> resolveAbstractInputActivation() {
+        return this;
+    }
+
+    public void visitDown(DownVisitor v, Link lastLink) {
+        v.next(this);
+    }
+
+    public void bindingVisitDown(DownVisitor v, Link lastLink) {
+        v.next(this);
+    }
+
+    public void patternVisitDown(DownVisitor v, Link lastLink) {
+        v.next(this);
+    }
+
+    public void visitUp(UpVisitor v, Link lastLink) {
+        v.check(lastLink, this);
+        v.next(this);
     }
 
     public Map<Synapse, LinkSlot> getLinkSlots(boolean upperBound) {
@@ -278,6 +297,10 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return isFinal;
     }
 
+    public FieldOutput getIsFinalAndFired() {
+        return isFinalAndFired;
+    }
+
     protected void initFields() {
         valueUB = func(
                 this,
@@ -298,45 +321,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public void init(Synapse originSynapse, Activation originAct) {
-        initFixedTransitionEvents();
         thought.onActivationCreationEvent(this, originSynapse, originAct);
-    }
-
-    public SlotField getSlot(State s) {
-        return switch(s) {
-            case SAME -> sameBSSlot;
-            default -> null;
-        };
-    }
-
-    public void receiveBindingSignal(BindingSignal bs) {
-        notifyVariableTransitions(bs);
-    }
-
-    private void notifyVariableTransitions(BindingSignal bs) {
-        Neuron<?, ?> n = getNeuron();
-
-        for(Direction dir: DIRECTIONS)
-            n.getTargetSynapses(dir)
-                    .forEach(s ->
-                            s.notifyVariableTransitions(
-                                    bs,
-                                    dir.invert()
-                            )
-                    );
-    }
-
-    private void initFixedTransitionEvents() {
-        Neuron<?, ?> n = getNeuron();
-
-        for(Direction dir: DIRECTIONS)
-            n.getTargetSynapses(dir)
-                    .forEach(s ->
-                            s.initFixedTransitions(
-                                    this,
-                                    dir.invert()
-                            )
-                    );
     }
 
     public FieldOutput getEntropy() {
@@ -436,61 +421,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         Range r = getRange();
         if(r == null) return null;
         return r.getAbsoluteRange(thought.getRange());
-    }
-
-    public void initNeuronLabel(BindingSignal bs) {
-        getNeuron().setLabel(
-                getConfig().getLabel(bs)
-        );
-    }
-
-    public Stream<BindingSignal> getBindingSignals() {
-        return getPatternBindingSignals().values().stream();
-    }
-
-    public void propagateBindingSignal(BindingSignal fromBS) {
-        getOutputLinks().forEach(l ->
-                fromBS.propagate(l)
-        );
-    }
-
-    public void registerBindingSignal(BindingSignal bs) {
-        bindingSignals.put(BSKey.createKey(bs), bs);
-        bs.getOnArrived().setValue(1.0);
-    }
-
-    public Map<BSKey, BindingSignal> getPatternBindingSignals() {
-        return bindingSignals;
-    }
-
-    public BindingSignal getBindingSignal(BSKey bsKey) {
-        return bindingSignals.get(bsKey);
-    }
-
-    public BindingSignal getBindingSignal() {
-        return getBindingSignals()
-                .findFirst()
-                .orElse(null);
-    }
-
-    public BindingSignal getBindingSignal(State s) {
-        return getBindingSignals(s)
-                .findFirst()
-                .orElse(null);
-    }
-
-    public BindingSignal getBindingSignal(Activation originAct, State s) {
-        return getBindingSignals(s)
-                .filter(bs ->
-                        bs.getOriginActivation() == originAct
-                ).findFirst()
-                .orElse(null);
-    }
-
-    public Stream<BindingSignal> getBindingSignals(State s) {
-        return bindingSignals.values()
-                .stream()
-                .filter(bs -> bs.getState() == s);
     }
 
     @Override

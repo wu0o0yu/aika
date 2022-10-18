@@ -19,25 +19,12 @@ package network.aika.neuron.disjunctive;
 import network.aika.Thought;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.activation.InhibitoryActivation;
-import network.aika.neuron.bindingsignal.PrimitiveTerminal;
-import network.aika.neuron.bindingsignal.State;
-
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.State.SAME;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitorySynapse, InhibitoryActivation> {
-
-    public static PrimitiveTerminal SAME_IN = fixed(SAME, INPUT, InhibitoryNeuron.class);
-    public static PrimitiveTerminal INPUT_IN = fixed(State.INPUT, INPUT, InhibitoryNeuron.class);
-
-    public static PrimitiveTerminal SAME_OUT = fixed(SAME, OUTPUT, InhibitoryNeuron.class);
-    public static PrimitiveTerminal INPUT_OUT = fixed(State.INPUT, OUTPUT, InhibitoryNeuron.class);
 
     @Override
     public InhibitoryActivation createActivation(Thought t) {

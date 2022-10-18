@@ -47,6 +47,8 @@ public abstract class Thought {
     private long timestampCounter = 0;
     private int activationIdCounter = 0;
 
+    private long visitorCounter = 0;
+
     private final NavigableMap<QueueKey, Step> queue = new TreeMap<>(QueueKey.COMPARATOR);
 
     private final TreeMap<Integer, Activation> activationsById = new TreeMap<>();
@@ -60,6 +62,10 @@ public abstract class Thought {
         id = model.createThoughtId();
         absoluteBegin = m.getN();
         m.setCurrentThought(this);
+    }
+
+    public long getNewVisitorId() {
+        return visitorCounter++;
     }
 
     public Long getId() {

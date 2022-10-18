@@ -17,12 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.fields.Field;
-import network.aika.fields.QueueField;
 import network.aika.fields.ValueSortedQueueField;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.PrimitiveTransition;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
 
 /**

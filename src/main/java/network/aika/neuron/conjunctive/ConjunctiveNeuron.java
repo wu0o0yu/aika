@@ -16,28 +16,23 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.Model;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.PrimitiveTerminal;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.disjunctive.CategorySynapse;
+import network.aika.neuron.visitor.LinkLinkingOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
-import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.State.*;
+import static network.aika.neuron.Synapse.isLatentLinking;
+import static network.aika.neuron.visitor.linking.Linker.link;
 
 /**
  *
@@ -47,29 +42,45 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
 
     private static final Logger log = LoggerFactory.getLogger(ConjunctiveNeuron.class);
 
-    protected ConjunctiveNeuronType type;
-
-    public ConjunctiveNeuron(ConjunctiveNeuronType type) {
-        this.type = type;
+    public ConjunctiveNeuron() {
         bias.addEventListener(this::updateSumOfLowerWeights);
     }
 
+    @Override
+    public void latentLinkingStepA(Synapse synA, Activation fromBS) {
+        getTargetInputSynapses()
+                .filter(synB -> synA != synB)
+                .filter(synB -> isLatentLinking(synA, synB))
+                .forEach(synB ->
+                        synB.linkStepB(fromBS, (S) synA, null)
+                );
+    }
 
-    public ConjunctiveNeuronType getType() {
-        return type;
+    public void linkStepAOutput(ConjunctiveSynapse syn, Activation fromBS) {
+        syn.createVisitor(getThought(),
+                        new LinkLinkingOperator(fromBS, syn)
+                )
+                .start(fromBS);
+    }
+
+    public void linkAndPropagateIn(Link l) {
+        getTargetInputSynapses()
+                .filter(synB -> synB != l.getSynapse())
+                .forEach(synB ->
+                        synB.linkStepB(l.getInput(), (S) l.getSynapse(), l)
+        );
     }
 
     @Override
     protected void initFromTemplate(Neuron n) {
         super.initFromTemplate(n);
 
-        getInputSynapses()
-                .filter(s -> s instanceof CategoryInputSynapse)
-                .forEach(s ->
-                        CategorySynapse.newCategorySynapse(type)
-                                .init(n, s.getInput(), 1.0)
-                );
+        S cis = (S) getCategoryInputSynapse();
+        newCategorySynapse()
+                .init(n, cis.getInput(), 1.0);
     }
+
+    public abstract CategorySynapse newCategorySynapse();
 
     @Override
     public void setModified() {
@@ -80,20 +91,14 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         return getCategoryInputSynapse() != null;
     }
 
-    public CategoryInputSynapse getCategoryInputSynapse() {
-        return inputSynapses.stream()
-                .filter(s -> s instanceof CategoryInputSynapse)
-                .map(s -> (CategoryInputSynapse) s)
-                .findAny()
-                .orElse(null);
-    }
+    public abstract CategoryInputSynapse getCategoryInputSynapse();
 
-    public void addInactiveLinks(BindingSignal bs) {
+    public void addInactiveLinks(Activation bs) {
         inputSynapses
                 .stream()
-                .filter(s -> !bs.getActivation().inputLinkExists(s))
+                .filter(s -> !bs.inputLinkExists(s))
                 .forEach(s ->
-                        s.createLink(null, bs.getActivation())
+                        s.createLink(null, bs)
                 );
     }
 
@@ -120,19 +125,5 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
                 inputSynapses,
                 Comparator.<ConjunctiveSynapse>comparingDouble(s -> s.getSortingWeight())
         );
-    }
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-        super.write(out);
-
-        out.writeInt(type.ordinal());
-    }
-
-    @Override
-    public void readFields(DataInput in, Model m) throws Exception {
-        super.readFields(in, m);
-
-        type = ConjunctiveNeuronType.values()[in.readInt()];
     }
 }

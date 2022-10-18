@@ -20,7 +20,12 @@ import network.aika.fields.ValueSortedQueueField;
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
+import network.aika.neuron.visitor.DownVisitor;
 import network.aika.text.Document;
+
+import java.util.Comparator;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 /**
@@ -31,12 +36,26 @@ public class TokenActivation extends PatternActivation {
 
     private Integer position;
 
+    private Map<TokenActivation, LatentRelationActivation> toRelations = new TreeMap<>(
+            Comparator.comparingInt(act -> act.getId())
+    );
+
     public TokenActivation(int id, Integer pos, int begin, int end, Document doc, TokenNeuron tokenNeuron) {
         super(id, doc, tokenNeuron);
         position = pos;
         range = new Range(begin, end);
 
         doc.registerTokenActivation(this);
+    }
+
+    public Map<TokenActivation, LatentRelationActivation> getToRelations() {
+        return toRelations;
+    }
+
+    @Override
+    public void bindingVisitDown(DownVisitor v, Link lastLink) {
+        super.visitDown(v, lastLink);
+        v.expandRelations(this);
     }
 
     public Integer getPosition() {

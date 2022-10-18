@@ -17,8 +17,7 @@
 package network.aika;
 
 import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.neuron.conjunctive.PatternNeuron;
-import network.aika.neuron.conjunctive.PrimaryInputSynapse;
+import network.aika.neuron.conjunctive.InputPatternSynapse;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.text.Document;
 import org.junit.jupiter.api.Test;
@@ -35,10 +34,10 @@ public class PropagateTest {
     public void testPropagation() {
         Model m = new Model();
 
-        TokenNeuron in = createNeuron(new TokenNeuron(), "IN", true);
-        BindingNeuron out = createNeuron(new BindingNeuron(), "OUT");
+        TokenNeuron in = new TokenNeuron().init(m, "IN", true);
+        BindingNeuron out = new BindingNeuron().init(m, "OUT");
 
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(in, out, 10.0);
 
         updateBias(out, 1.0);

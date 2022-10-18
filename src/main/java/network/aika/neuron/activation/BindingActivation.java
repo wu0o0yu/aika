@@ -19,15 +19,11 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.fields.*;
 import network.aika.neuron.Range;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.visitor.DownVisitor;
 
-import java.util.*;
 
 import static network.aika.fields.Fields.*;
-import static network.aika.neuron.activation.Timestamp.FIRED_COMPARATOR;
-import static network.aika.neuron.bindingsignal.State.*;
 
 /**
  * @author Lukas Molzberger
@@ -35,9 +31,6 @@ import static network.aika.neuron.bindingsignal.State.*;
 public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     private boolean isInput;
-
-    protected SlotField inputBSSlot = new SlotField(this, "inputBSSlot");
-    protected SlotField relatedSameBSSlot = new SlotField(this, "relatedSameBSSlot");
 
     protected Field mixedNetUB;
     protected Field mixedNetLB;
@@ -50,11 +43,9 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     @Override
-    public BindingSignal getAbstractBindingSignal() {
-        return getBindingSignals(INPUT)
-                .filter(bs -> bs.isAbstract())
-                .findAny()
-                .orElse(null);
+    public void patternVisitDown(DownVisitor v, Link lastLink) {
+        super.patternVisitDown(v, lastLink);
+        v.up(this);
     }
 
     @Override
@@ -97,15 +88,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 );
     }
 
-    @Override
-    public SlotField getSlot(State s) {
-        return switch(s) {
-            case INPUT -> inputBSSlot;
-            case RELATED_SAME -> relatedSameBSSlot;
-            default -> super.getSlot(s);
-        };
-    }
-
     public boolean isInput() {
         return isInput;
     }
@@ -132,20 +114,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     public Range getRange() {
-        BindingSignal bs = getPrimaryPatternBindingSignal();
-        if(bs == null)
-            return null;
-
-        return bs.getOriginActivation()
-                .getRange();
-    }
-
-    private BindingSignal getPrimaryPatternBindingSignal() {
-        return getPatternBindingSignals().values().stream()
-                .filter(bs -> FIRED_COMPARATOR.compare(bs.getOriginActivation().getFired(), fired) < 0)
-                .filter(bs -> bs.getState() == SAME || bs.getState() == INPUT || bs.getState() == RELATED_SAME)
-                .min(Comparator.comparing(bs -> bs.getState().ordinal()))
-                .orElse(null);
+        return null;
     }
 
     public void updateBias(double u) {

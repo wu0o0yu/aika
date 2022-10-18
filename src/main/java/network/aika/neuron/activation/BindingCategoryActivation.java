@@ -17,10 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.fields.SlotField;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.disjunctive.CategoryNeuron;
-
 
 /**
  *
@@ -28,20 +25,8 @@ import network.aika.neuron.disjunctive.CategoryNeuron;
  */
 public class BindingCategoryActivation extends CategoryActivation {
 
-    protected SlotField inputBSSlot = new SlotField(this, "inputBSSlot");
-    protected SlotField relatedSameBSSlot = new SlotField(this, "relatedSameBSSlot");
-
-
     public BindingCategoryActivation(int id, Thought t, CategoryNeuron neuron) {
         super(id, t, neuron);
     }
 
-    @Override
-    public SlotField getSlot(State s) {
-        return switch(s) {
-            case INPUT -> inputBSSlot;
-            case RELATED_SAME -> relatedSameBSSlot;
-            default -> super.getSlot(s);
-        };
-    }
 }

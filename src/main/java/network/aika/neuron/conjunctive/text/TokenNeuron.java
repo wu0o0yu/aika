@@ -21,11 +21,18 @@ import network.aika.Thought;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.conjunctive.PatternNeuron;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 /**
  *
  * @author Lukas Molzberger
  */
 public class TokenNeuron extends PatternNeuron {
+
+    private String tokenLabel;
+
 
     public static TokenNeuron lookupToken(Model m, String tokenLabel) {
         return m.lookupNeuron(tokenLabel, l -> {
@@ -53,5 +60,31 @@ public class TokenNeuron extends PatternNeuron {
 
         initFromTemplate(n);
         return n;
+    }
+
+
+    public void setTokenLabel(String tokenLabel) {
+        this.tokenLabel = tokenLabel;
+    }
+
+    public String getTokenLabel() {
+        return tokenLabel;
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+
+        out.writeBoolean(tokenLabel != null);
+        if(tokenLabel != null)
+            out.writeUTF(tokenLabel);
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws Exception {
+        super.readFields(in, m);
+
+        if(in.readBoolean())
+            tokenLabel = in.readUTF();
     }
 }

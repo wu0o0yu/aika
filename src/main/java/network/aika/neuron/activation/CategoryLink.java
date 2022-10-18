@@ -21,7 +21,7 @@ import network.aika.neuron.disjunctive.CategorySynapse;
 /**
  * @author Lukas Molzberger
  */
-public class CategoryLink<S extends CategorySynapse, IA extends Activation<?>, OA extends CategoryActivation> extends DisjunctiveLink<S, IA, OA> {
+public class CategoryLink<S extends CategorySynapse, IA extends ConjunctiveActivation<?>, OA extends CategoryActivation> extends DisjunctiveLink<S, IA, OA> {
 
     public CategoryLink(S s, IA input, OA output) {
         super(s, input, output);

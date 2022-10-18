@@ -17,12 +17,16 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
+import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.visitor.*;
+import network.aika.neuron.visitor.linking.LinkingDownVisitor;
+import network.aika.neuron.visitor.linking.LinkingOperator;
 import network.aika.utils.Utils;
 
 import java.io.DataInput;
@@ -44,20 +48,40 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
                 OA
                 >
 {
-    protected ConjunctiveNeuronType type;
 
     private double sumOfLowerWeights;
 
-    public ConjunctiveSynapse(ConjunctiveNeuronType t) {
-        this.type = t;
+    protected Scope scope;
+
+    public ConjunctiveSynapse(Scope scope) {
+        this.scope = scope;
     }
 
-    public ConjunctiveNeuronType getType() {
-        return type;
+    public Scope getScope() {
+        return scope;
+    }
+
+    public abstract LinkingDownVisitor createVisitor(Thought t, LinkingOperator c);
+
+    protected void linkStepB(Activation bsA, ConjunctiveSynapse synA, Link linkA) {
+        createVisitor(getThought(),
+                new ActLinkingOperator(bsA, synA, linkA, this)
+        )
+                .start(bsA);
+    }
+
+    @Override
+    public void linkAndPropagateOut(IA bs) {
+        getOutput()
+                .linkStepAOutput(this, bs);
+
+        getOutput()
+                .latentLinkingStepA(this, bs);
+
+        super.linkAndPropagateOut(bs);
     }
 
     public void setOutput(O output) {
-        assert type == output.getType();
         super.setOutput(output);
     }
 
@@ -92,7 +116,6 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     public void write(DataOutput out) throws IOException {
         super.write(out);
 
-        out.writeInt(type.ordinal());
         out.writeDouble(sumOfLowerWeights);
     }
 
@@ -100,7 +123,6 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     public void readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
 
-        type = ConjunctiveNeuronType.values()[in.readInt()];
         sumOfLowerWeights = in.readDouble();
     }
 

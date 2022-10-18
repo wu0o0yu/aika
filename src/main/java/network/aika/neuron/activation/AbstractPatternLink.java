@@ -14,28 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.bindingsignal;
+package network.aika.neuron.activation;
 
-import network.aika.direction.Direction;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-
+import network.aika.neuron.conjunctive.AbstractPatternSynapse;
+import network.aika.neuron.conjunctive.PatternSynapse;
 
 /**
  * @author Lukas Molzberger
  */
-public interface Transition<I extends Terminal, O extends Terminal> {
+public abstract class AbstractPatternLink<S extends AbstractPatternSynapse, IA extends Activation<?>> extends ConjunctiveLink<S, IA, PatternActivation> {
 
-    void propagate(I fromTerminal, BindingSignal bs, Link l, Activation act);
+    public AbstractPatternLink(S s, IA input, PatternActivation output) {
+        super(s, input, output);
+    }
 
-    void link(Synapse ts, Direction dir, BindingSignal... fromBSs);
 
-    void latentLinking(Synapse ts, BindingSignal... fromBSs);
+    /*
+    OP-2
+    public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
+        if(v.getDir() == Direction.INPUT)
+            return;
 
-    I getInput();
-
-    O getOutput();
-
-    TransitionMode getMode();
+        super.trackBindingSignal(v, p);
+    }
+     */
 }

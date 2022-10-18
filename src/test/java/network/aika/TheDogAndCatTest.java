@@ -108,9 +108,15 @@ public class TheDogAndCatTest {
     public void setupTheDogAndTheCatTest(AIKADebugger debugger) {
         Model m = new Model();
 
-        InhibitoryNeuron inhibNThe = createNeuron(new InhibitoryNeuron(), "I-the");
-        InhibitoryNeuron inhibNCat = createNeuron(new InhibitoryNeuron(), "I-cat");
-        InhibitoryNeuron inhibNDog = createNeuron(new InhibitoryNeuron(), "I-dog");
+        InhibitoryNeuron inhibNThe = new InhibitoryNeuron()
+                .init(m, "I-the");
+
+        InhibitoryNeuron inhibNCat = new InhibitoryNeuron()
+                .init(m, "I-cat");
+
+        InhibitoryNeuron inhibNDog = new InhibitoryNeuron()
+                .init(m, "I-dog");
+
         initPatternTheCat(m, inhibNThe, inhibNCat, 3);
         initPatternTheDog(m, inhibNThe, inhibNDog, 3);
 

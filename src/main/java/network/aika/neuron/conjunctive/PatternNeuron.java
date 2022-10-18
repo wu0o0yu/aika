@@ -16,20 +16,10 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.bindingsignal.PrimitiveTerminal;
-import network.aika.neuron.bindingsignal.State;
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
-import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
+import network.aika.neuron.disjunctive.CategorySynapse;
+import network.aika.neuron.disjunctive.PatternCategorySynapse;
 
 /**
  *
@@ -37,14 +27,13 @@ import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
  */
 public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, PatternActivation> {
 
-    public static PrimitiveTerminal INPUT_IN = variable(State.INPUT, INPUT, PatternNeuron.class);
-
-    public static PrimitiveTerminal INPUT_OUT = variable(State.INPUT, OUTPUT, PatternNeuron.class);
-
-    private String tokenLabel;
-
     public PatternNeuron() {
-        super(PATTERN);
+        super();
+    }
+
+    @Override
+    public CategorySynapse newCategorySynapse() {
+        return new PatternCategorySynapse();
     }
 
     @Override
@@ -63,31 +52,15 @@ public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, Pattern
     }
 
     @Override
+    public PatternCategoryInputSynapse getCategoryInputSynapse() {
+        return inputSynapses.stream()
+                .filter(s -> s instanceof PatternCategoryInputSynapse)
+                .map(s -> (PatternCategoryInputSynapse) s)
+                .findAny()
+                .orElse(null);
+    }
+
+    @Override
     protected void updateSumOfLowerWeights() {
-    }
-
-    public void setTokenLabel(String tokenLabel) {
-        this.tokenLabel = tokenLabel;
-    }
-
-    public String getTokenLabel() {
-        return tokenLabel;
-    }
-
-    @Override
-    public void write(DataOutput out) throws IOException {
-        super.write(out);
-
-        out.writeBoolean(tokenLabel != null);
-        if(tokenLabel != null)
-            out.writeUTF(tokenLabel);
-    }
-
-    @Override
-    public void readFields(DataInput in, Model m) throws Exception {
-        super.readFields(in, m);
-
-        if(in.readBoolean())
-            tokenLabel = in.readUTF();
     }
 }

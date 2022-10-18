@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.ConjunctiveSynapse;
 
 import static network.aika.fields.Fields.mul;
@@ -25,11 +24,29 @@ import static network.aika.fields.Fields.mul;
 /**
  * @author Lukas Molzberger
  */
-public class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends Activation<?>, OA extends ConjunctiveActivation> extends Link<S, IA, OA> {
+public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends Activation<?>, OA extends ConjunctiveActivation<?>> extends Link<S, IA, OA> {
 
 
     public ConjunctiveLink(S s, IA input, OA output) {
         super(s, input, output);
+
+        output.getNeuron()
+                .linkAndPropagateIn(this);
+    }
+
+    public void instantiateTemplate(ConjunctiveActivation instAct) {
+        OA oAct = (OA) instAct;
+        IA iAct = (IA) input.resolveAbstractInputActivation();
+
+        S instSyn = (S) synapse
+                .instantiateTemplate(
+                        this,
+                        iAct.getNeuron(),
+                        oAct.getNeuron()
+                );
+        instSyn.linkOutput();
+
+        instSyn.createLink(iAct, oAct);
     }
 
     @Override

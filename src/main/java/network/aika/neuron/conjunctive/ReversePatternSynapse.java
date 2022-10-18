@@ -19,15 +19,6 @@ package network.aika.neuron.conjunctive;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.ReversePatternLink;
-import network.aika.neuron.bindingsignal.PrimitiveTransition;
-import network.aika.neuron.bindingsignal.Transition;
-
-import java.util.List;
-import java.util.stream.Stream;
-
-import static network.aika.neuron.bindingsignal.BiTransition.biTransition;
-import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
-import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 
 /**
  *
@@ -42,36 +33,12 @@ public class ReversePatternSynapse extends
                 >
 {
 
-    public static PrimitiveTransition SAME_SAME_TRANSITION = transition(
-            PatternNeuron.SAME_OUT,
-            BindingNeuron.SAME_IN,
-            MATCH_AND_PROPAGATE,
-            ReversePatternSynapse.class
-    );
-
-    public static PrimitiveTransition INPUT_RELATED_SAME_TRANSITION = transition(
-            PatternNeuron.INPUT_OUT,
-            BindingNeuron.RELATED_SAME_IN,
-            MATCH_AND_PROPAGATE,
-            ReversePatternSynapse.class
-    );
-
-    private static List<Transition> TRANSITIONS = List.of(
-            biTransition(
-                    INPUT_RELATED_SAME_TRANSITION,
-                    SAME_SAME_TRANSITION,
-                    true,
-                    false
-            )
-    );
+    public ReversePatternSynapse() {
+        super(Scope.SAME);
+    }
 
     @Override
     public ReversePatternLink createLink(PatternActivation input, BindingActivation output) {
         return new ReversePatternLink(this, input, output);
-    }
-
-    @Override
-    public Stream<Transition> getTransitions() {
-        return TRANSITIONS.stream();
     }
 }

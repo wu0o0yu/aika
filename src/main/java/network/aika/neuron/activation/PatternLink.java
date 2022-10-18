@@ -17,13 +17,18 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.conjunctive.PatternSynapse;
+import network.aika.neuron.visitor.UpVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivation, PatternActivation> {
+public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActivation> {
 
     public PatternLink(PatternSynapse s, BindingActivation input, PatternActivation output) {
         super(s, input, output);
+    }
+
+    public void patternVisitUp(UpVisitor v) {
+        v.next(this);
     }
 }

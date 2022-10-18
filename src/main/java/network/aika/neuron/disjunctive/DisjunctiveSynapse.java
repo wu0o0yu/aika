@@ -20,11 +20,6 @@ import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.Transition;
-
-
-import java.util.stream.Stream;
 
 
 /**
@@ -41,14 +36,9 @@ public abstract class DisjunctiveSynapse<
         > extends Synapse<S,I,O,L,IA,OA>
 {
 
-    public void linkAndPropagate(Transition t, Direction dir, BindingSignal... fromBSs) {
+    public void linkAndPropagate(Direction dir, Activation fromBS) {
         if(isPropagate())
-            propagate(fromBSs[0]);
-    }
-
-    @Override
-    public Stream<Transition> getTransitions() {
-        return Stream.empty();
+            propagate((IA) fromBS);
     }
 
     @Override

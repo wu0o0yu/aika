@@ -14,27 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.neuron.visitor.linking;
 
-import network.aika.neuron.Range;
-import network.aika.neuron.conjunctive.RelatedInputSynapse;
-import network.aika.sign.Sign;
+import network.aika.neuron.activation.*;
+import network.aika.neuron.conjunctive.Scope;
+import network.aika.neuron.visitor.UpVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class RelatedInputLink extends BindingNeuronLink<RelatedInputSynapse, BindingActivation> {
+public abstract class LinkingUpVisitor<T extends Activation> extends UpVisitor implements LinkingCallback {
 
-    public RelatedInputLink(RelatedInputSynapse s, BindingActivation input, BindingActivation output) {
-        super(s, input, output);
+    protected LinkingOperator operator;
+
+    protected T origin;
+
+    protected LinkingUpVisitor(LinkingDownVisitor parent, T origin) {
+        super(parent);
+        this.origin = origin;
+        this.operator = parent.operator;
     }
 
-    @Override
-    public double getRelativeSurprisal(Sign si, Sign so, Range range) {
-        double s = super.getRelativeSurprisal(si, so, range);
-
-//        s += input.getBoundPatternBindingSignal().getOriginActivation().getNeuron()
-//                .getSurprisal(si, range, true);
-        return s;
+    public void check(Link lastLink, Activation act) {
+        operator.check(this, lastLink, act);
     }
 }

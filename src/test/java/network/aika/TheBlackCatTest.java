@@ -99,8 +99,8 @@ public class TheBlackCatTest {
     public void setupTheBlackCatTest(AIKADebugger debugger) {
         Model m = new Model();
 
-        InhibitoryNeuron inhibNThe = createNeuron(new InhibitoryNeuron(), "I-the");
-        InhibitoryNeuron inhibNCat = createNeuron(new InhibitoryNeuron(), "I-cat");
+        InhibitoryNeuron inhibNThe = new InhibitoryNeuron().init(m, "I-the");
+        InhibitoryNeuron inhibNCat = new InhibitoryNeuron().init(m, "I-cat");
         initPatternTheCat(m, inhibNThe, inhibNCat, 0);
         initPatternBlackCat(m);
 

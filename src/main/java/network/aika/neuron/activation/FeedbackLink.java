@@ -14,15 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.bindingsignal;
+package network.aika.neuron.activation;
+
+import network.aika.neuron.conjunctive.FeedbackSynapse;
+import network.aika.neuron.visitor.Visitor;
 
 
 /**
  * @author Lukas Molzberger
+ *
  */
-public enum State {
-    SAME,
-    INPUT,
-    RELATED_SAME,
-    RELATED_INPUT
+public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activation<?>> extends BindingNeuronLink<S, IA> {
+
+    protected long visited;
+
+    public FeedbackLink(S s, IA input, BindingActivation output) {
+        super(s, input, output);
+    }
+
+    protected boolean isSelfRef() {
+        return input.isSelfRef(output);
+    }
+
+    public void visit(Visitor v) {
+        if(visited == v.getV())
+            return;
+        visited = v.getV();
+
+        v.next(this);
+    }
 }

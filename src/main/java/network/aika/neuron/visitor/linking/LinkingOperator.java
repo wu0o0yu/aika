@@ -14,13 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.bindingsignal;
+package network.aika.neuron.visitor.linking;
+
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.conjunctive.ConjunctiveSynapse;
 
 /**
  * @author Lukas Molzberger
  */
-public enum TransitionMode {
-    MATCH_AND_PROPAGATE,
-    MATCH_ONLY,
-    PROPAGATE_ONLY
+public abstract class LinkingOperator {
+
+    protected Activation fromBS;
+
+    protected ConjunctiveSynapse syn;
+
+    public LinkingOperator(Activation fromBS, ConjunctiveSynapse syn) {
+        this.fromBS = fromBS;
+        this.syn = syn;
+    }
+
+    public abstract void check(LinkingCallback v, Link lastLink, Activation act);
+
 }

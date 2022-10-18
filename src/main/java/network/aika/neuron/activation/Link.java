@@ -17,17 +17,13 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.direction.Direction;
 import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.State;
-import network.aika.neuron.conjunctive.ConjunctiveNeuron;
+import network.aika.neuron.visitor.DownVisitor;
+import network.aika.neuron.visitor.UpVisitor;
 import network.aika.sign.Sign;
 import network.aika.steps.link.LinkCounting;
-
-import java.util.stream.Stream;
 
 import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.FieldLink.connect;
@@ -62,11 +58,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
         if(input != null && output != null) {
             initOnTransparent();
-
-            onTransparent.addEventListener(() ->
-                   propagateAllBindingSignals()
-            );
-
             initWeightInput();
 
             if (getConfig().isTrainingEnabled() && getSynapse().isAllowTraining())
@@ -76,6 +67,28 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         }
 
         getThought().onLinkCreationEvent(this);
+    }
+
+    public void visitDown(DownVisitor v) {
+        v.next(this);
+    }
+
+    public void visitUp(UpVisitor v) {
+        v.next(this);
+    }
+
+    public void bindingVisitDown(DownVisitor v) {
+        v.next(this);
+    }
+
+    public void bindingVisitUp(UpVisitor v) {
+        v.next(this);
+    }
+
+    public void patternVisitDown(DownVisitor v) {
+    }
+
+    public void patternVisitUp(UpVisitor v) {
     }
 
     protected void initOnTransparent() {
@@ -156,13 +169,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
             LinkCounting.add(this);
     }
 
-    public void propagateAllBindingSignals() {
-        input.getBindingSignals()
-                .forEach(fromBS ->
-                        fromBS.propagate(this)
-                );
-    }
-
     public FieldOutput getOnTransparent() {
         return onTransparent;
     }
@@ -230,49 +236,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     public static boolean isCausal(Activation iAct, Activation oAct) {
         return FIRED_COMPARATOR.compare(iAct.getFired(), oAct.getFired()) < 0;
-    }
-
-    public void instantiateTemplate(BindingSignal abstractBS, ConjunctiveNeuron on, Direction dir) {
-        I iAct = resolveAbstractInputActivation(abstractBS);
-
-        S instSyn = (S) synapse
-                .instantiateTemplate(
-                        this,
-                        iAct.getNeuron(),
-                        on
-                );
-        instSyn.linkOutput();
-        instSyn.registerTerminals(getThought());
-/*
-        Link l = instSyn.createLink(
-                dir.getInput(act, iAct),
-                dir.getOutput(act, iAct)
-        );
-
-        Cleanup.add(l);l
- */
-    }
-
-    private I resolveAbstractInputActivation(BindingSignal abstractBS) {
-        return getAbstractInputBS(abstractBS)
-                .flatMap(bs -> getConcreteActivation(bs.getOriginActivation()))
-                .findAny()
-                .orElse(input);
-    }
-
-    private Stream<I> getConcreteActivation(PatternActivation origin) {
-        if(origin.getNeuron().getTemplate() == input.getNeuron())
-            return Stream.of((I) origin);
-
-        return origin.getReverseBindingSignals()
-                .filter(bs -> bs.getState() == State.SAME || bs.getState() == State.INPUT)
-                .filter(bs -> bs.getActivation().getNeuron().getTemplate() == input.getNeuron())
-                .map(bs -> (I) bs.getActivation());
-    }
-
-    private Stream<BindingSignal> getAbstractInputBS(BindingSignal abstractBS) {
-        return abstractBS.getParents().values().stream()
-                .filter(bs -> bs.getActivation() == input);
     }
 
     public void linkInput() {

@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.bindingsignal.BindingSignal;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 
 import static network.aika.fields.FieldLink.connect;
@@ -26,22 +25,13 @@ import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 /**
  * @author Lukas Molzberger
  */
-public class NegativeFeedbackLink extends BindingNeuronLink<NegativeFeedbackSynapse, InhibitoryActivation> {
+public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, InhibitoryActivation> {
 
 
     public NegativeFeedbackLink(NegativeFeedbackSynapse s, InhibitoryActivation input, BindingActivation output) {
         super(s, input, output);
     }
 
-    public boolean isSelfRef() {
-        BindingSignal iBS = input.getBindingSignal();
-        if(iBS == null)
-            return false;
-
-        return iBS.isSelfRef(
-                output.getBindingSignal(iBS.getState())
-        );
-    }
 
     @Override
     protected void initWeightInput() {

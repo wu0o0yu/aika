@@ -1,7 +1,6 @@
 package network.aika;
 
 import network.aika.debugger.AIKADebugger;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.*;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
@@ -18,8 +17,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static network.aika.TestUtils.*;
-import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.BINDING;
-import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
 
 public class MetaNeuronTest {
 
@@ -90,15 +87,17 @@ public class MetaNeuronTest {
                 .init(m, "Abstract Letter");
 
 
-        new CategoryInputSynapse(PATTERN)
+        new PatternCategoryInputSynapse()
                 .init(letterCategory, letterPN, 1.0);
 
         CategoryNeuron syllableCategory = new PatternCategoryNeuron()
                 .init(m, "PC-syllable");
 
+        CategoryNeuron sylBeginCategory = new BindingCategoryNeuron()
+                .init(m, "Syl. Begin");
 
-        CategoryNeuron letterBindingCategory = new BindingCategoryNeuron()
-                .init(m, "BC-letter");
+        CategoryNeuron sylContinueRightCategory = new BindingCategoryNeuron()
+                .init(m, "Cont. Right Begin");
 
         BindingNeuron sylBeginBN = new BindingNeuron()
                 .init(m, "Abstract Syl. Begin");
@@ -106,7 +105,7 @@ public class MetaNeuronTest {
         BindingNeuron sylContinueRightBN = new BindingNeuron()
                 .init(m, "Abstract Syl. Cont. Right");
 
-        new RelatedInputSynapse()
+        new RelationInputSynapse()
                 .init(relPT, sylContinueRightBN, 5.0)
                 .adjustBias();
 
@@ -114,36 +113,39 @@ public class MetaNeuronTest {
                 .init(sylBeginBN, sylContinueRightBN, 10.0)
                 .adjustBias();
 
-        PatternNeuron syllable = new PatternNeuron()
+        PatternNeuron syllablePN = new PatternNeuron()
                 .init(m, "Syllable");
 
         new PatternSynapse()
-                .init(sylBeginBN, syllable, 10.0)
+                .init(sylBeginBN, syllablePN, 10.0)
                 .adjustBias();
+
+        new PositiveFeedbackSynapse()
+                .init(syllablePN, sylBeginBN, 10.0);
 
         new PatternSynapse()
-                .init(sylContinueRightBN, syllable, 6.0)
+                .init(sylContinueRightBN, syllablePN, 6.0)
                 .adjustBias();
 
-        new CategoryInputSynapse(PATTERN)
-                .init(syllableCategory, syllable, 1.0)
-                .adjustBias();
+        new PositiveFeedbackSynapse()
+                .init(syllablePN, sylContinueRightBN, 10.0);
 
-        new PrimaryInputSynapse()
+        new PatternCategoryInputSynapse()
+                .init(syllableCategory, syllablePN, 1.0);
+
+        new InputPatternSynapse()
                 .init(letterPN, sylBeginBN, 10.0)
                 .adjustBias();
 
-        new CategoryInputSynapse(BINDING)
-                .init(letterBindingCategory, sylBeginBN, 1.0)
-                .adjustBias();
+        new BindingCategoryInputSynapse()
+                .init(sylBeginCategory, sylBeginBN, 1.0);
 
-        new PrimaryInputSynapse()
+        new InputPatternSynapse()
                 .init(letterPN, sylContinueRightBN, 10.0)
                 .adjustBias();
 
-        new CategoryInputSynapse(BINDING)
-                .init(letterBindingCategory, sylContinueRightBN, 1.0)
-                .adjustBias();
+        new BindingCategoryInputSynapse()
+                .init(sylContinueRightCategory, sylContinueRightBN, 1.0);
 
         // Concrete
         TokenNeuron letterS = letterPN.instantiateTemplate(true)
@@ -155,6 +157,8 @@ public class MetaNeuronTest {
         letterPN.updateBias(3.0);
         sylBeginBN.updateBias(3.0);
         sylContinueRightBN.updateBias(3.0);
+        syllablePN.updateBias(3.0);
+
 
         Document doc = new Document(m, "s c h");
         debugger.setDocument(doc);

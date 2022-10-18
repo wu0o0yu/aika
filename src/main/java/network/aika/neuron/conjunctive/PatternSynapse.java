@@ -17,52 +17,21 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.*;
-import network.aika.neuron.bindingsignal.PrimitiveTransition;
-import network.aika.neuron.bindingsignal.Transition;
 
-import java.util.List;
-import java.util.stream.Stream;
-
-import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
-import static network.aika.neuron.bindingsignal.TransitionMode.*;
-import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.PATTERN;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class PatternSynapse extends ConjunctiveSynapse<
+public class PatternSynapse extends AbstractPatternSynapse<
         PatternSynapse,
         BindingNeuron,
-        PatternNeuron,
         PatternLink,
-        BindingActivation,
-        PatternActivation
+        BindingActivation
         >
 {
-
-
-    public static PrimitiveTransition SAME_SAME_TRANSITION = transition(
-            BindingNeuron.SAME_OUT,
-            PatternNeuron.SAME_IN,
-            MATCH_ONLY,
-            PatternSynapse.class
-    );
-
-    public static PrimitiveTransition INPUT_INPUT_TRANSITION = transition(
-            BindingNeuron.INPUT_OUT,
-            PatternNeuron.INPUT_IN,
-            MATCH_AND_PROPAGATE,
-            PatternSynapse.class
-    );
-
-    private static List<Transition> TRANSITIONS = List.of(
-            SAME_SAME_TRANSITION,
-            INPUT_INPUT_TRANSITION
-    );
-
     public PatternSynapse() {
-        super(PATTERN);
+        super();
     }
 
     @Override
@@ -77,11 +46,10 @@ public class PatternSynapse extends ConjunctiveSynapse<
 
     @Override
     public PatternLink createLink(BindingActivation input, PatternActivation output) {
-        return new PatternLink(this, input, output);
-    }
+        PositiveFeedbackSynapse posFeedbackSyn = (PositiveFeedbackSynapse) input.getNeuron().getInputSynapse(output.getNeuronProvider());
+        if(posFeedbackSyn != null)
+            new PositiveFeedbackLink(posFeedbackSyn, output, input);
 
-    @Override
-    public Stream<Transition> getTransitions() {
-        return TRANSITIONS.stream();
+        return new PatternLink(this, input, output);
     }
 }

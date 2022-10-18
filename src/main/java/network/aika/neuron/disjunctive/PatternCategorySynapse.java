@@ -18,15 +18,7 @@ package network.aika.neuron.disjunctive;
 
 import network.aika.neuron.activation.CategoryActivation;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.bindingsignal.Transition;
-import network.aika.neuron.conjunctive.ConjunctiveNeuronType;
 import network.aika.neuron.conjunctive.PatternNeuron;
-
-import java.util.List;
-import java.util.stream.Stream;
-
-import static network.aika.neuron.bindingsignal.PrimitiveTransition.transition;
-import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGATE;
 
 /**
  *
@@ -34,30 +26,4 @@ import static network.aika.neuron.bindingsignal.TransitionMode.MATCH_AND_PROPAGA
  */
 public class PatternCategorySynapse extends CategorySynapse<PatternCategorySynapse, PatternNeuron, PatternCategoryNeuron, PatternActivation, CategoryActivation> {
 
-
-    public static Transition SAME_TRANSITION = transition(
-            PatternNeuron.SAME_OUT,
-            CategoryNeuron.SAME_IN,
-            MATCH_AND_PROPAGATE,
-            PatternCategorySynapse.class
-    );
-
-    public static Transition INPUT_TRANSITION = transition(
-            PatternNeuron.INPUT_OUT,
-            PatternCategoryNeuron.INPUT_IN,
-            MATCH_AND_PROPAGATE,
-            PatternCategorySynapse.class
-    );
-
-    public PatternCategorySynapse() {
-        super(ConjunctiveNeuronType.PATTERN);
-    }
-
-    @Override
-    public Stream<Transition> getTransitions() {
-        return List.of(
-                SAME_TRANSITION,
-                INPUT_TRANSITION
-        ).stream();
-    }
 }

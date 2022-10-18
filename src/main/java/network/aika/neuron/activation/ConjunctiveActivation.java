@@ -17,9 +17,6 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.fields.SlotField;
-import network.aika.neuron.bindingsignal.BindingSignal;
-import network.aika.neuron.bindingsignal.State;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 
 import static network.aika.direction.Direction.INPUT;
@@ -29,7 +26,6 @@ import static network.aika.direction.Direction.INPUT;
  * @author Lukas Molzberger
  */
 public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> extends Activation<N> {
-
 
     public ConjunctiveActivation(int id, Thought t, N n) {
         super(id, t, n);
@@ -42,23 +38,45 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
             );
     }
 
-    public abstract BindingSignal getAbstractBindingSignal();
+    public CategoryActivation getInputCategory() {
+        return inputLinks.values().stream()
+                .filter(l -> l.getInput() instanceof CategoryActivation)
+                .map(l -> (CategoryActivation) l.getInput())
+                .findAny()
+                .orElse(null);
+    }
+
+    public ConjunctiveActivation resolveAbstractInputActivation() {
+        ConjunctiveActivation inst = getInstance();
+        return inst != null ? inst : this;
+    }
+
+    public ConjunctiveActivation getInstance() {
+        CategoryActivation catBS = getInputCategory();
+
+        if(catBS == null)
+            return null;
+
+        DisjunctiveLink<?, ?, ?> l = catBS.getInput();
+        return l.getInput();
+    }
 
     public void instantiateTemplate() {
-        BindingSignal abstractBS = getAbstractBindingSignal();
-        if(abstractBS == null)
-            return;
-
-        if(abstractBS.hasInstanceOf(getNeuron()))
+        if(getInstance() != null)
             return;
 
         N n = (N) neuron.instantiateTemplate(true);
 
+        ConjunctiveActivation<N> instAct = n.createActivation(thought);
+        instAct.init(null, null);
+
         getInputLinks()
 //                .filter(l -> !(l.getSynapse() instanceof CategoryInputSynapse))
                 .forEach(l ->
-                        l.instantiateTemplate(abstractBS, n, INPUT)
+                        ((ConjunctiveLink)l).instantiateTemplate(instAct)
                 );
+
+
 /*
         getOutputLinks()
                 .forEach(l ->

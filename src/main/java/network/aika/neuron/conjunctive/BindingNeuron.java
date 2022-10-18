@@ -18,33 +18,27 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.Thought;
 import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.bindingsignal.PrimitiveTerminal;
-import network.aika.neuron.bindingsignal.State;
+import network.aika.neuron.disjunctive.BindingCategorySynapse;
+import network.aika.neuron.disjunctive.CategorySynapse;
 
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.neuron.bindingsignal.FixedTerminal.fixed;
-import static network.aika.neuron.bindingsignal.State.*;
-import static network.aika.neuron.bindingsignal.VariableTerminal.variable;
-import static network.aika.neuron.conjunctive.ConjunctiveNeuronType.BINDING;
-
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Lukas Molzberger
  */
-public class BindingNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, BindingActivation> {
+public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, BindingActivation> {
 
-    public static PrimitiveTerminal INPUT_IN = fixed(State.INPUT, INPUT, BindingNeuron.class);
-    public static PrimitiveTerminal RELATED_SAME_IN = fixed(RELATED_SAME, INPUT, BindingNeuron.class);
-    public static PrimitiveTerminal RELATED_INPUT_IN = variable(RELATED_INPUT, INPUT, BindingNeuron.class);
+    @Override
+    public CategorySynapse newCategorySynapse() {
+        return new BindingCategorySynapse();
+    }
 
-    public static PrimitiveTerminal INPUT_OUT = fixed(State.INPUT, OUTPUT, BindingNeuron.class);
-    public static PrimitiveTerminal RELATED_SAME_OUT = fixed(RELATED_SAME, OUTPUT, BindingNeuron.class);
-    public static PrimitiveTerminal RELATED_INPUT_OUT = variable(RELATED_INPUT, OUTPUT, BindingNeuron.class);
-
-
-    public BindingNeuron() {
-        super(BINDING);
+    public List<RelationInputSynapse> findLatentRelationNeurons() {
+        return getInputSynapses()
+                .filter(s -> s instanceof RelationInputSynapse)
+                .map(s -> (RelationInputSynapse) s)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -61,5 +55,14 @@ public class BindingNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, Binding
         initFromTemplate(n);
 
         return n;
+    }
+
+    @Override
+    public BindingCategoryInputSynapse getCategoryInputSynapse() {
+        return inputSynapses.stream()
+                .filter(s -> s instanceof BindingCategoryInputSynapse)
+                .map(s -> (BindingCategoryInputSynapse) s)
+                .findAny()
+                .orElse(null);
     }
 }

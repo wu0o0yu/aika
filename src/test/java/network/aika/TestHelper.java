@@ -38,25 +38,25 @@ public class TestHelper {
 
         LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, relFrom, relTo);
 
-        BindingNeuron theBN = createNeuron(new BindingNeuron(), "the (the cat)");
-        new PrimaryInputSynapse()
+        BindingNeuron theBN = new BindingNeuron().init(m, "the (the cat)");
+        new InputPatternSynapse()
                 .init(theIN, theBN, 10.0)
                 .adjustBias();
 
-        BindingNeuron catBN = createNeuron(new BindingNeuron(), "cat (the cat)");
-        new PrimaryInputSynapse()
+        BindingNeuron catBN = new BindingNeuron().init(m, "cat (the cat)");
+        new InputPatternSynapse()
                 .init(catIN, catBN, variant == 0  || variant == 2 ? 10.0 : 5.0)
                 .adjustBias();
 
         if(variant < 2) {
-            new RelatedInputSynapse()
+            new RelationInputSynapse()
                     .init(relPT, catBN, 5.0)
                     .adjustBias();
             new SamePatternSynapse()
                     .init(theBN, catBN, variant == 1 || variant == 3 ? 10.0 : 5.0)
                     .adjustBias();
         } else {
-            new RelatedInputSynapse()
+            new RelationInputSynapse()
                     .init(relPT, theBN, 5.0)
                     .adjustBias();
             new SamePatternSynapse()
@@ -66,8 +66,8 @@ public class TestHelper {
 
         PatternNeuron theCatP = initPatternLoop(m, "the cat", theBN, catBN);
 
-        addInhibitoryLoop(m, inhibNThe, false, theBN);
-        addInhibitoryLoop(m, createNeuron(new InhibitoryNeuron(), "I-the (tc)"), true, theBN);
+        //addInhibitoryLoop(inhibNThe, false, theBN);
+        //addInhibitoryLoop(new InhibitoryNeuron().init(m, "I-the (tc)"), true, theBN);
 
         updateBias(theCatP, 3.0);
 
@@ -81,17 +81,17 @@ public class TestHelper {
 
         LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, -1, -1);
 
-        BindingNeuron blackBN = createNeuron(new BindingNeuron(), "black (black cat)");
-        new PrimaryInputSynapse()
+        BindingNeuron blackBN = new BindingNeuron().init(m, "black (black cat)");
+        new InputPatternSynapse()
                 .init(blackIN, blackBN, 10.0)
                 .adjustBias();
 
-        BindingNeuron catBN = createNeuron(new BindingNeuron(), "cat (black cat)");
-        new PrimaryInputSynapse()
+        BindingNeuron catBN = new BindingNeuron().init(m, "cat (black cat)");
+        new InputPatternSynapse()
                 .init(catIN, catBN, 20.0)
                 .adjustBias();
 
-        new RelatedInputSynapse()
+        new RelationInputSynapse()
                 .init(relPT, catBN, 5.0)
                 .adjustBias();
 
@@ -115,25 +115,25 @@ public class TestHelper {
 
         LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, relFrom, relTo);
 
-        BindingNeuron theBN = createNeuron(new BindingNeuron(), "the (the dog)");
-        new PrimaryInputSynapse()
+        BindingNeuron theBN = new BindingNeuron().init(m, "the (the dog)");
+        new InputPatternSynapse()
                 .init(theIN, theBN, 10.0)
                 .adjustBias();
 
-        BindingNeuron dogBN = createNeuron(new BindingNeuron(), "dog (the dog)");
-        new PrimaryInputSynapse()
+        BindingNeuron dogBN = new BindingNeuron().init(m, "dog (the dog)");
+        new InputPatternSynapse()
                 .init(dogIN, dogBN, variant == 0  || variant == 2 ? 10.0 : 5.0)
                 .adjustBias();
 
         if(variant < 2) {
-            new RelatedInputSynapse()
+            new RelationInputSynapse()
                     .init(relPT, dogBN, 5.0)
                     .adjustBias();
             new SamePatternSynapse()
                     .init(theBN, dogBN, variant == 1 || variant == 3 ? 10.0 : 5.0)
                     .adjustBias();
         } else {
-            new RelatedInputSynapse()
+            new RelationInputSynapse()
                     .init(relPT, theBN, 5.0)
                     .adjustBias();
             new SamePatternSynapse()
@@ -143,8 +143,8 @@ public class TestHelper {
 
         PatternNeuron theDogP = initPatternLoop(m, "the dog", theBN, dogBN);
 
-        addInhibitoryLoop(m, inhibNThe, false, theBN);
-        addInhibitoryLoop(m, createNeuron(new InhibitoryNeuron(), "I-the (tg)"), true, theBN);
+        addInhibitoryLoop(inhibNThe, false, theBN);
+        addInhibitoryLoop(new InhibitoryNeuron().init(m, "I-the (tg)"), true, theBN);
 
         updateBias(theDogP, 3.0);
 
