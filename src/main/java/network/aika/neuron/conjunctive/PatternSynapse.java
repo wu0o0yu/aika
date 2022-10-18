@@ -18,6 +18,8 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.*;
 
+import java.util.function.Consumer;
+
 
 /**
  *
@@ -46,10 +48,30 @@ public class PatternSynapse extends AbstractPatternSynapse<
 
     @Override
     public PatternLink createUnconnectedLink(BindingActivation input, PatternActivation output) {
-        PositiveFeedbackSynapse posFeedbackSyn = (PositiveFeedbackSynapse) input.getNeuron().getInputSynapse(output.getNeuronProvider());
-        if(posFeedbackSyn != null)
-            new PositiveFeedbackLink(posFeedbackSyn, output, input);
-
         return new PatternLink(this, input, output);
+    }
+
+    @Override
+    public PatternLink createLink(BindingActivation input, PatternActivation output) {
+        createPosFeedbackLink(input, output);
+
+        return createUnconnectedLink(input, output);
+    }
+
+    @Override
+    public PatternLink createAndCollectLink(BindingActivation input, PatternActivation output, Consumer<Link> collector) {
+        Link pfl = createPosFeedbackLink(input, output);
+        if(pfl != null)
+            collector.accept(pfl);
+
+        PatternLink l = createUnconnectedLink(input, output);
+        collector.accept(l);
+        return l;
+    }
+
+    private static Link createPosFeedbackLink(BindingActivation input, PatternActivation output) {
+        PositiveFeedbackSynapse posFeedbackSyn = (PositiveFeedbackSynapse) input.getNeuron().getInputSynapse(output.getNeuronProvider());
+        return posFeedbackSyn != null ?
+                new PositiveFeedbackLink(posFeedbackSyn, output, input) : null;
     }
 }

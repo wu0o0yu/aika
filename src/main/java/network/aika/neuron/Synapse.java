@@ -90,7 +90,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         OA oAct = getOutput().createActivation(iAct.getThought());
         oAct.init(this, iAct);
 
-        L l = createLink(iAct, oAct);
+        createLink(iAct, oAct);
     }
 /*
     protected boolean checkCausal(IA iAct, OA oAct) {
@@ -175,7 +175,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return l;
     }
 
-    public L createAndCollectLink(IA input, OA output, Consumer<? super L> collector) {
+    public L createAndCollectLink(IA input, OA output, Consumer<Link> collector) {
         L l = createUnconnectedLink(input, output);
         collector.accept(l);
         return l;
