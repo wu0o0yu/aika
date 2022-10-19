@@ -23,6 +23,7 @@ import network.aika.fields.QueueField;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
 import network.aika.sign.Sign;
+import network.aika.steps.activation.LinkingOut;
 import network.aika.steps.activation.Save;
 import network.aika.utils.Bound;
 import network.aika.utils.ReadWriteLock;
@@ -99,7 +100,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public void linkAndPropagateOut(Activation act) {
         getTargetOutputSynapses().forEach(s ->
-                s.linkAndPropagateOut(act)
+                LinkingOut.add(act, s)
         );
     }
 

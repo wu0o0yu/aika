@@ -18,6 +18,7 @@ package network.aika.neuron.activation;
 
 import network.aika.neuron.conjunctive.FeedbackSynapse;
 import network.aika.neuron.visitor.Visitor;
+import network.aika.steps.link.LinkingIn;
 
 
 /**
@@ -30,6 +31,10 @@ public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activat
 
     public FeedbackLink(S s, IA input, BindingActivation output) {
         super(s, input, output);
+    }
+
+    @Override
+    protected void performInputLinking() {
     }
 
     protected boolean isSelfRef() {

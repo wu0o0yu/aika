@@ -29,15 +29,14 @@ public class MetaNeuronTest {
         coords.put(2, new double[]{-0.001, 0.298});
         coords.put(3, new double[]{0.002, 0.623});
         coords.put(4, new double[]{0.244, 0.826});
-        coords.put(5, new double[]{0.487, 1.026});
-        coords.put(6, new double[]{0.25, 0.299});
-        coords.put(7, new double[]{0.249, 0.619});
-        coords.put(8, new double[]{0.71, 0.296});
-        coords.put(9, new double[]{0.71, 0.496});
-        coords.put(10, new double[]{0.71, 0.696});
-        coords.put(11, new double[]{0.71, 0.896});
-        coords.put(12, new double[]{0.716, 0.202});
-        coords.put(13, new double[]{0.716, 0.402});
+        coords.put(5, new double[]{0.487, 1.03});
+        coords.put(6, new double[]{0.713, 0.257});
+        coords.put(7, new double[]{0.71, 0.604});
+        coords.put(8, new double[]{1.053, 0.804});
+        coords.put(9, new double[]{0.715, 0.83});
+        coords.put(10, new double[]{0.299, 0.024});
+        coords.put(11, new double[]{0.71, 1.004});
+        coords.put(12, new double[]{0.998, 1.147});
 
         return coords;
     }
@@ -45,16 +44,17 @@ public class MetaNeuronTest {
     public Map<Long, double[]> getNeuronCoordinateMap() {
         Map<Long, double[]> coords = new TreeMap<>();
 
-        coords.put(1l, new double[]{1.973, 2.034});
-        coords.put(2l, new double[]{-0.191, 1.951});
-        coords.put(3l, new double[]{-0.199, 4.045});
-        coords.put(4l, new double[]{4.766, 6.952});
-        coords.put(5l, new double[]{4.189, 2.034});
-        coords.put(6l, new double[]{-1.7, 6.769});
-        coords.put(7l, new double[]{1.911, 6.853});
-        coords.put(8l, new double[]{-0.033, 10.715});
-        coords.put(9l, new double[]{-1.762, -2.218});
-        coords.put(10l, new double[]{1.062, -2.155});
+        coords.put(1l, new double[]{3.653, 5.614});
+        coords.put(2l, new double[]{-3.127, -0.2});
+        coords.put(3l, new double[]{-3.06, 5.322});
+        coords.put(4l, new double[]{-2.841, 15.017});
+        coords.put(5l, new double[]{-10.958, 5.141});
+        coords.put(6l, new double[]{7.238, 5.682});
+        coords.put(7l, new double[]{-11.176, 12.639});
+        coords.put(8l, new double[]{3.592, 12.772});
+        coords.put(9l, new double[]{-2.603, 20.359});
+        coords.put(10l, new double[]{-8.632, -6.736});
+        coords.put(11l, new double[]{0.792, -6.933});
 
 
         return coords;

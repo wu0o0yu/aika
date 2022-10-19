@@ -25,7 +25,7 @@ import network.aika.utils.Utils;
 /**
  * @author Lukas Molzberger
  */
-public abstract class Step<E extends Element> implements Cloneable {
+public abstract class Step<E extends Element> {
 
     private E element;
     private QueueKey queueKey;
@@ -69,15 +69,6 @@ public abstract class Step<E extends Element> implements Cloneable {
         return (int) (1000.0 * newSortValue);
     }
 
-    public Step copy(Element newElement) {
-        Step newStep = null;
-        try {
-            newStep = (Step) clone();
-        } catch (CloneNotSupportedException e) {
-        }
-        newStep.element = newElement;
-        return newStep;
-    }
 
     public String getStepName() {
         return getClass().getSimpleName();
