@@ -191,6 +191,15 @@ public class Fields {
         return op;
     }
 
+    public static ThresholdOperator threshold(Element ref, String label, double threshold, ThresholdOperator.Type type, boolean isFinal, FieldOutput in) {
+        if(in == null)
+            return null;
+
+        ThresholdOperator op = new ThresholdOperator(ref, label, threshold, type, isFinal);
+        connect(in, op);
+        return op;
+    }
+
     public static ThresholdOperator threshold(Element ref, String label, double threshold, ThresholdOperator.Type type, FieldOutput in, FieldInput... out) {
         ThresholdOperator op = threshold(ref, label, threshold, type, in, out);
         connectAll(op, out);

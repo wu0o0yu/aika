@@ -31,6 +31,7 @@ public class ThresholdOperator extends AbstractFunction {
 
     private double threshold;
     private Type type;
+    private boolean isFinal = false;
 
     public ThresholdOperator(Element ref, String label, double threshold, Type type) {
         super(ref, label);
@@ -38,8 +39,16 @@ public class ThresholdOperator extends AbstractFunction {
         this.type = type;
     }
 
+    public ThresholdOperator(Element ref, String label, double threshold, Type type, boolean isFinal) {
+        this(ref, label, threshold, type);
+        this.isFinal = isFinal;
+    }
+
     @Override
     protected double computeUpdate(FieldLink fl, double u) {
+        if(isFinal && currentValue > 0.5)
+            return currentValue;
+
         return threshold(fl.getInput().getNewValue()) - currentValue;
     }
 

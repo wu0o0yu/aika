@@ -56,7 +56,6 @@ public class MetaNeuronTest {
         coords.put(10l, new double[]{-8.632, -6.736});
         coords.put(11l, new double[]{0.792, -6.933});
 
-
         return coords;
     }
 

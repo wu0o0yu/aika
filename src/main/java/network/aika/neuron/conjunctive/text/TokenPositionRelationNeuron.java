@@ -54,7 +54,7 @@ public class TokenPositionRelationNeuron extends LatentRelationNeuron {
     }
 
     public static TokenPositionRelationNeuron lookupRelation(Model m, int rangeBegin, int rangeEnd) {
-        return m.lookupNeuron("TP-Rel.: " + rangeBegin + "," + rangeEnd, l -> {
+        return m.lookupNeuron("Prev. Token Rel.: " + rangeBegin + "," + rangeEnd, l -> {
                     TokenPositionRelationNeuron n = new TokenPositionRelationNeuron();
                     n.addProvider(m);
                     n.initTokenPositionRelationNeuron(rangeBegin, rangeEnd, l);
