@@ -14,39 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.steps.link;
+package network.aika.steps.activation;
 
-import network.aika.neuron.activation.ConjunctiveLink;
-import network.aika.neuron.conjunctive.ConjunctiveNeuron;
+import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
-import static network.aika.steps.Phase.INPUT_LINKING;
+import static network.aika.steps.Phase.PROCESSING;
+
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class LinkingIn extends Step<ConjunctiveLink> {
+public class Instantiation extends Step<Activation> {
 
 
-    public static void add(ConjunctiveLink l) {
-        Step.add(new LinkingIn(l));
+    public static void add(Activation act) {
+        Step.add(new Instantiation(act));
     }
 
-    public LinkingIn(ConjunctiveLink l) {
-        super(l);
+    public Instantiation(Activation act) {
+        super(act);
     }
 
     @Override
     public void process() {
-        ConjunctiveLink l = getElement();
-        ConjunctiveNeuron n = (ConjunctiveNeuron) l.getOutput().getNeuron();
-        n.linkAndPropagateIn(l);
+        getElement()
+                .instantiateTemplate();
     }
 
     @Override
     public Phase getPhase() {
-        return INPUT_LINKING;
+        return PROCESSING;
     }
 }

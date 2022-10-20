@@ -38,6 +38,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.activation.Timestamp.MAX;
 import static network.aika.neuron.activation.Timestamp.MIN;
 import static network.aika.sign.Sign.POS;
@@ -128,6 +129,10 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     protected void initFromTemplate(Neuron n) {
         n.bias.setValue(bias.getCurrentValue());
         n.template = this;
+    }
+
+    public boolean isAbstract() {
+        return false;
     }
 
     public abstract A createActivation(Thought t);

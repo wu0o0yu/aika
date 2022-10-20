@@ -84,7 +84,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         super.setModified();
     }
 
-    public boolean isTemplate() {
+    public boolean isAbstract() {
         return getCategoryInputSynapse() != null;
     }
 

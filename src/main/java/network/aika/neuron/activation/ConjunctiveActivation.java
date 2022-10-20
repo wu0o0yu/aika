@@ -18,8 +18,9 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
+import network.aika.steps.activation.Instantiation;
 
-import static network.aika.direction.Direction.INPUT;
+import static network.aika.fields.Fields.isTrue;
 
 /**
  *
@@ -32,9 +33,9 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
 
         if (!getNeuron().isNetworkInput() &&
                 getConfig().isTrainingEnabled() &&
-                n.isTemplate())
+                n.isAbstract())
             isFinalAndFired.addEventListener(() ->
-                    instantiateTemplate()
+                    Instantiation.add(this)
             );
     }
 
@@ -51,6 +52,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         return inst != null ? inst : this;
     }
 
+    @Override
     public ConjunctiveActivation getInstance() {
         CategoryActivation catBS = getInputCategory();
 
@@ -65,6 +67,9 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         if(getInstance() != null)
             return;
 
+        if(!isAbleToInstantiate())
+            return;
+
         N n = (N) neuron.instantiateTemplate(true);
 
         ConjunctiveActivation<N> instAct = n.createActivation(thought);
@@ -77,11 +82,25 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
                 );
 
 
-/*
         getOutputLinks()
-                .forEach(l ->
-                        l.instantiateTemplate(act, OUTPUT)
+                .map(l -> l.getOutput())
+                .filter(oAct -> oAct.getNeuron().isAbstract())
+                .filter(oAct -> isTrue(oAct.isFinalAndFired))
+                .forEach(oAct ->
+                        Instantiation.add(oAct)
                 );
- */
+    }
+
+    @Override
+    public boolean isUnresolvedAbstract() {
+        return neuron.isAbstract() &&
+                !isTrue(isFinalAndFired) &&
+                getInstance() == null;
+    }
+
+    private boolean isAbleToInstantiate() {
+        return !getInputLinks()
+                .map(l -> l.getInput())
+                .anyMatch(iAct -> iAct.isUnresolvedAbstract());
     }
 }
