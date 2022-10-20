@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.conjunctive.PatternSynapse;
+import network.aika.neuron.visitor.DownVisitor;
 import network.aika.neuron.visitor.UpVisitor;
 
 /**
@@ -30,5 +31,13 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
 
     public void patternVisitUp(UpVisitor v) {
         v.next(this);
+    }
+
+    @Override
+    public void bindingVisitDown(DownVisitor v) {
+    }
+
+    @Override
+    public void bindingVisitUp(UpVisitor v) {
     }
 }
