@@ -18,6 +18,8 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.Thought;
 import network.aika.direction.Direction;
+import network.aika.fields.LimitedField;
+import network.aika.fields.QueueField;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.LatentRelationActivation;
 import network.aika.neuron.activation.PatternActivation;
@@ -33,6 +35,11 @@ import java.util.stream.Stream;
 public abstract class LatentRelationNeuron extends BindingNeuron {
 
     public abstract Stream<TokenActivation> evaluateLatentRelation(TokenActivation fromOriginAct, Direction dir);
+
+    @Override
+    protected QueueField initBias() {
+        return new QueueField(this, "bias", 10.0);
+    }
 
     @Override
     public LatentRelationActivation createActivation(Thought t) {

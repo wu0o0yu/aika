@@ -26,7 +26,6 @@ import network.aika.neuron.visitor.selfref.SelfRefDownVisitor;
 import network.aika.neuron.visitor.UpVisitor;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
-import network.aika.steps.activation.LinkingOut;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -56,8 +55,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected Field valueUB;
     protected Field valueLB;
 
-    protected QueueField netUB;
-    protected QueueField netLB;
+    protected Field netUB;
+    protected Field netLB;
 
     private FieldOutput netDiff;
 
@@ -166,9 +165,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public void setNet(double v) {
         netUB.setValue(v);
-        netUB.process();
         netLB.setValue(v);
-        netLB.process();
     }
 
     public boolean isSelfRef(Activation oAct) {

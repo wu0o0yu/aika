@@ -17,8 +17,11 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.fields.Field;
 import network.aika.fields.ValueSortedQueueField;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
+
+import static network.aika.fields.Fields.func;
 
 /**
  * @author Lukas Molzberger
@@ -27,11 +30,5 @@ public class LatentRelationActivation extends BindingActivation {
 
     public LatentRelationActivation(int id, Thought t, LatentRelationNeuron n) {
         super(id, t, n);
-    }
-
-    @Override
-    protected void initNet() {
-        netUB = new ValueSortedQueueField(this, "net UB", 10.0);
-        netLB = new ValueSortedQueueField(this, "net LB", 10.0);
     }
 }

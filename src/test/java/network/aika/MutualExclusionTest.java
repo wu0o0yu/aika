@@ -226,7 +226,6 @@ public class MutualExclusionTest {
 
         TokenActivation tAct = doc.addToken(in, 0, 0, 4);
         tAct.setNet(10.0);
-
         doc.process(PROCESSING);
 
         for(double x = 1.0; x >= 0.0; x -= 0.05) {

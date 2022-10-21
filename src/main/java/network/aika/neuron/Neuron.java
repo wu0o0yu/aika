@@ -38,7 +38,6 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.activation.Timestamp.MAX;
 import static network.aika.neuron.activation.Timestamp.MIN;
 import static network.aika.sign.Sign.POS;
@@ -59,9 +58,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Writable customData;
 
-    protected QueueField bias = new LimitedField(this, "bias", 0.0, () -> {
-        setModified();
-    });
+    protected QueueField bias = initBias();
 
     protected List<S> inputSynapses = new ArrayList<>();
     protected List<Synapse> outputSynapses = new ArrayList<>();
@@ -147,6 +144,13 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return allowTraining;
     }
 */
+
+    protected QueueField initBias() {
+        return new LimitedField(this, "bias", 0.0, () -> {
+            setModified();
+        });
+    }
+
     public void setAllowTraining(boolean allowTraining) {
         this.allowTraining = allowTraining;
     }
