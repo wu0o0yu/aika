@@ -54,7 +54,7 @@ public class TokenActivation extends PatternActivation {
 
     @Override
     public void bindingVisitDown(DownVisitor v, Link lastLink) {
-        super.visitDown(v, lastLink);
+        super.bindingVisitDown(v, lastLink);
         v.expandRelations(this);
     }
 

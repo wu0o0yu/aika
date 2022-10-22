@@ -48,6 +48,10 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         v.up(this);
     }
 
+    public void selfRefVisitDown(DownVisitor v, Link lastLink) {
+        v.up(this);
+    }
+
     @Override
     protected void initFields() {
         isOpen = new Field(this, "isOpen", 1.0);

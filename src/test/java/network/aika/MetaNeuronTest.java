@@ -5,9 +5,7 @@ import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.*;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.neuron.conjunctive.text.TokenPositionRelationNeuron;
-import network.aika.neuron.disjunctive.BindingCategoryNeuron;
-import network.aika.neuron.disjunctive.CategoryNeuron;
-import network.aika.neuron.disjunctive.PatternCategoryNeuron;
+import network.aika.neuron.disjunctive.*;
 import network.aika.text.Document;
 import org.graphstream.ui.view.camera.Camera;
 import org.junit.jupiter.api.Test;
@@ -17,6 +15,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static network.aika.TestUtils.*;
+import static network.aika.neuron.disjunctive.InhibSynType.INPUT;
 
 public class MetaNeuronTest {
 
@@ -25,18 +24,20 @@ public class MetaNeuronTest {
         Map<Integer, double[]> coords = new TreeMap<>();
 
         coords.put(0, new double[]{0.0, 0.0});
-        coords.put(1, new double[]{0.716, 0.002});
+        coords.put(1, new double[]{1.082, 0.004});
         coords.put(2, new double[]{-0.001, 0.298});
         coords.put(3, new double[]{0.002, 0.623});
         coords.put(4, new double[]{0.244, 0.826});
-        coords.put(5, new double[]{0.487, 1.03});
-        coords.put(6, new double[]{0.713, 0.257});
-        coords.put(7, new double[]{0.71, 0.604});
-        coords.put(8, new double[]{1.053, 0.804});
-        coords.put(9, new double[]{0.715, 0.83});
-        coords.put(10, new double[]{0.299, 0.024});
-        coords.put(11, new double[]{0.71, 1.004});
+        coords.put(5, new double[]{0.092, 1.055});
+        coords.put(6, new double[]{0.507, 1.03});
+        coords.put(7, new double[]{1.082, 0.296});
+        coords.put(8, new double[]{1.061, 0.574});
+        coords.put(9, new double[]{1.243, 0.813});
+        coords.put(10, new double[]{0.632, 0.83});
+        coords.put(11, new double[]{0.472, 0.009});
         coords.put(12, new double[]{0.998, 1.147});
+        coords.put(13, new double[]{1.243, 1.013});
+        coords.put(14, new double[]{0.849, 1.117});
 
         return coords;
     }
@@ -104,6 +105,25 @@ public class MetaNeuronTest {
         BindingNeuron sylContinueRightBN = new BindingNeuron()
                 .init(m, "Abstract Syl. Cont. Right");
 
+
+        InhibitoryNeuron inhib =new InhibitoryNeuron()
+                .init(m, "I");
+
+        new InhibitorySynapse(INPUT)
+                .init(sylBeginBN, inhib, 1.0);
+
+        new NegativeFeedbackSynapse()
+                .init(inhib, sylBeginBN, -20.0)
+                .adjustBias();
+
+        new InhibitorySynapse(INPUT)
+                .init(sylContinueRightBN, inhib, 1.0);
+
+        new NegativeFeedbackSynapse()
+                .init(inhib, sylContinueRightBN, -20.0)
+                .adjustBias();
+
+
         new RelationInputSynapse()
                 .init(relPT, sylContinueRightBN, 5.0)
                 .adjustBias();
@@ -111,7 +131,10 @@ public class MetaNeuronTest {
         new SamePatternSynapse()
                 .init(sylBeginBN, sylContinueRightBN, 10.0)
                 .adjustBias();
-
+/*
+        new SamePatternSynapse()
+                .init(sylContinueRightBN, sylContinueRightBN, 10.0);
+*/
         PatternNeuron syllablePN = new PatternNeuron()
                 .init(m, "Syllable");
 

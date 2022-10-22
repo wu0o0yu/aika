@@ -73,6 +73,9 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         getOutput()
                 .linkOutgoing(this, bs);
 
+        getOutput()
+                .latentLinkOutgoing(this, bs);
+
         super.linkAndPropagateOut(bs);
     }
 

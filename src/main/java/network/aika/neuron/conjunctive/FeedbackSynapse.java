@@ -39,10 +39,6 @@ public abstract class FeedbackSynapse<S extends FeedbackSynapse, I extends Neuro
         super(scope);
     }
 
-    @Override
-    public void linkAndPropagateOut(IA bs) {
-    }
-
     public void initDummyLink(BindingActivation oAct) {
         Multiplication dummyWeight = mul(
                 oAct,

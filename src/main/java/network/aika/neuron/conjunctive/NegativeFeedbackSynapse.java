@@ -39,6 +39,12 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
         return new NegativeFeedbackLink(this, input, output);
     }
 
+    @Override
+    public void linkAndPropagateOut(InhibitoryActivation bs) {
+        getOutput()
+                .linkOutgoing(this, bs);
+    }
+
     protected boolean getDummyLinkUB() {
         return false;
     }
@@ -47,23 +53,12 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
     public boolean propagateCheck(InhibitoryActivation iAct) {
         return true;
     }
-/*
-    @Override
-    public boolean linkCheck(InhibitoryActivation iBS, BindingActivation oBS) {
-        return iBS.isSelfRef(oBS);
-    }
-*/
 
     @Override
     public void setWeight(double w) {
         weight.receiveUpdate(w);
     }
-/*
-    @Override
-    protected boolean checkCausal(InhibitoryActivation iAct, BindingActivation oAct) {
-        return true;
-    }
-*/
+
     @Override
     public boolean checkLinkingEvent(Activation act) {
         return true;

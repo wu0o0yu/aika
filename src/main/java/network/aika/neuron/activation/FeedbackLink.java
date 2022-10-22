@@ -17,9 +17,10 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.conjunctive.FeedbackSynapse;
+import network.aika.neuron.visitor.DownVisitor;
+import network.aika.neuron.visitor.UpVisitor;
 import network.aika.neuron.visitor.Visitor;
-import network.aika.steps.link.LinkingIn;
-
+import network.aika.neuron.visitor.selfref.SelfRefDownVisitor;
 
 /**
  * @author Lukas Molzberger
@@ -33,19 +34,56 @@ public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activat
         super(s, input, output);
     }
 
+
     @Override
-    protected void performInputLinking() {
+    public void selfRefVisitDown(SelfRefDownVisitor v) {
+        if(checkVisited(v))
+            return;
+
+        super.selfRefVisitDown(v);
+    }
+
+    @Override
+    public void bindingVisitDown(DownVisitor v) {
+        if(checkVisited(v))
+            return;
+
+        super.bindingVisitDown(v);
+    }
+
+    @Override
+    public void bindingVisitUp(UpVisitor v) {
+        if(checkVisited(v))
+            return;
+
+        super.bindingVisitUp(v);
+    }
+
+    @Override
+    public void patternVisitDown(DownVisitor v) {
+        if(checkVisited(v))
+            return;
+
+        super.patternVisitDown(v);
+    }
+
+    @Override
+    public void patternVisitUp(UpVisitor v) {
+        if(checkVisited(v))
+            return;
+
+        super.patternVisitUp(v);
     }
 
     protected boolean isSelfRef() {
         return input.isSelfRef(output);
     }
 
-    public void visit(Visitor v) {
-        if(visited == v.getV())
-            return;
-        visited = v.getV();
 
-        v.next(this);
+    private boolean checkVisited(Visitor v) {
+        if(visited == v.getV())
+            return true;
+        visited = v.getV();
+        return false;
     }
 }

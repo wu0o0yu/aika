@@ -42,7 +42,7 @@ public class LinkingOut extends Step<Activation> {
 
     @Override
     public void process() {
-        synapse.linkAndPropagateOut(getElement());
+       synapse.linkAndPropagateOut(getElement());
     }
 
     @Override

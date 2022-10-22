@@ -43,11 +43,7 @@ public abstract class UpVisitor extends Visitor {
         visitUp(l.getOutput(), l);
     }
 
-    protected void visitUp(Link l) {
-        l.visitUp(this);
-    }
+    protected abstract void visitUp(Link l);
 
-    public void visitUp(Activation act, Link l) {
-        act.visitUp(this, l);
-    }
+    public abstract void visitUp(Activation act, Link l);
 }

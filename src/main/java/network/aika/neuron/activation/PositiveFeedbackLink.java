@@ -34,6 +34,10 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
     }
 
     @Override
+    protected void performInputLinking() {
+    }
+
+    @Override
     protected void initOnTransparent() {
         onTransparent = threshold(
                 this,
@@ -44,15 +48,19 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
         );
     }
 
+    @Override
     public void bindingVisitDown(DownVisitor v) {
     }
 
+    @Override
     public void bindingVisitUp(UpVisitor v) {
     }
 
+    @Override
     public void patternVisitDown(DownVisitor v) {
     }
 
+    @Override
     public void patternVisitUp(UpVisitor v) {
     }
 }

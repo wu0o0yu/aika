@@ -40,6 +40,10 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
     }
 
     @Override
+    public void linkAndPropagateOut(PatternActivation bs) {
+    }
+
+    @Override
     public void startVisitor(LinkingOperator c, Activation bs) {
     }
 

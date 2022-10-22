@@ -64,17 +64,8 @@ public class TestUtils {
             doc.process(PROCESSING);
         }
 
-        for(double x = 1.0; x > -0.001; x -= 0.05) {
-            final double xFinal = x;
-            doc.getActivations().stream()
-                    .filter(act -> act instanceof BindingActivation)
-                    .map(act -> (BindingActivation)act)
-                    .forEach(act ->
-                            act.getIsOpen().setValue(xFinal)
-                    );
-
-            doc.process(PROCESSING);
-        }
+        doc.annealIsOpen(0.05);
+        doc.annealMix(0.05);
 
         doc.updateModel();
     }

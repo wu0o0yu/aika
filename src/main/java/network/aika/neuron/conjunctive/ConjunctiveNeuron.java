@@ -45,13 +45,13 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     }
 
     public void linkOutgoing(ConjunctiveSynapse synA, Activation fromBS) {
-        // direct out linking
         synA.startVisitor(
                 new LinkLinkingOperator(fromBS, synA),
                 fromBS
         );
+    }
 
-        // latent linking
+    public void latentLinkOutgoing(ConjunctiveSynapse synA, Activation fromBS) {
         getTargetInputSynapses()
                 .filter(synB -> synA != synB)
                 .filter(synB -> isLatentLinking(synA, synB))

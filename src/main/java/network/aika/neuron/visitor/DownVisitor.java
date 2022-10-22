@@ -47,13 +47,9 @@ public abstract class DownVisitor<T extends Activation> extends Visitor {
         visitDown(l.getInput(), l);
     }
 
-    protected void visitDown(Link l) {
-        l.visitDown(this);
-    }
+    protected abstract void visitDown(Link l);
 
-    protected void visitDown(Activation act, Link l) {
-        act.visitDown(this, l);
-    }
+    protected abstract void visitDown(Activation act, Link l);
 
     public abstract void up(T origin);
 

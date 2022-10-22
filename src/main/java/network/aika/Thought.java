@@ -27,6 +27,7 @@ import network.aika.steps.QueueKey;
 import network.aika.steps.Step;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -231,6 +232,32 @@ public abstract class Thought {
         getActivations().forEach(act ->
                 act.disconnect()
         );
+    }
+
+    public void annealIsOpen(double stepSize) {
+        anneal(stepSize, (act, x) ->
+                act.getIsOpen().setValue(x)
+        );
+    }
+
+    public void annealMix(double stepSize) {
+        anneal(stepSize, (act, x) ->
+                act.getMix().setValue(x)
+        );
+    }
+
+    private void anneal(double stepSize, BiConsumer<BindingActivation, Double> c) {
+        for(double x = 1.0; x > -0.001; x -= stepSize) {
+            final double xFinal = x;
+            getActivations().stream()
+                    .filter(act -> act instanceof BindingActivation)
+                    .map(act -> (BindingActivation)act)
+                    .forEach(act ->
+                            c.accept(act, xFinal)
+                    );
+
+            process(PROCESSING);
+        }
     }
 
     public String toString() {

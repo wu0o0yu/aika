@@ -39,13 +39,13 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     }
 
     @Override
-    public void visitDown(DownVisitor v, Link lastLink) {
+    public void selfRefVisitDown(DownVisitor v, Link lastLink) {
         v.up(this);
     }
 
     @Override
     public void bindingVisitDown(DownVisitor v, Link lastLink) {
-        super.visitDown(v, lastLink);
+        super.bindingVisitDown(v, lastLink);
         v.up(this);
     }
 }

@@ -178,11 +178,13 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return this;
     }
 
-    public void visitDown(DownVisitor v, Link lastLink) {
+
+    public void bindingVisitDown(DownVisitor v, Link lastLink) {
         v.next(this);
     }
 
-    public void bindingVisitDown(DownVisitor v, Link lastLink) {
+    public void bindingVisitUp(UpVisitor v, Link lastLink) {
+        v.check(lastLink, this);
         v.next(this);
     }
 
@@ -190,7 +192,16 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         v.next(this);
     }
 
-    public void visitUp(UpVisitor v, Link lastLink) {
+    public void patternVisitUp(UpVisitor v, Link lastLink) {
+        v.check(lastLink, this);
+        v.next(this);
+    }
+
+    public void selfRefVisitDown(DownVisitor v, Link lastLink) {
+        v.next(this);
+    }
+
+    public void selfRefVisitUp(UpVisitor v, Link lastLink) {
         v.check(lastLink, this);
         v.next(this);
     }

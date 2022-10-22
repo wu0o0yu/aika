@@ -17,13 +17,15 @@
 package network.aika.neuron.visitor.selfref;
 
 import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.visitor.DownVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class SelfRefDownVisitor extends DownVisitor<PatternActivation> {
+public class SelfRefDownVisitor extends DownVisitor<BindingActivation> {
 
     Activation oAct;
 
@@ -31,6 +33,7 @@ public class SelfRefDownVisitor extends DownVisitor<PatternActivation> {
 
     public SelfRefDownVisitor(Activation oAct) {
         super(oAct.getThought());
+        this.oAct = oAct;
     }
 
     public boolean isSelfRef() {
@@ -38,8 +41,16 @@ public class SelfRefDownVisitor extends DownVisitor<PatternActivation> {
     }
 
     @Override
-    public void up(PatternActivation origin) {
-        new SelfRefUpVisitor(this)
-                .next(origin);
+    public void up(BindingActivation origin) {
+        if(origin == oAct)
+            isSelfRef = true;
+    }
+
+    protected void visitDown(Link l) {
+        l.selfRefVisitDown(this);
+    }
+
+    protected void visitDown(Activation act, Link l) {
+        act.selfRefVisitDown(this, l);
     }
 }

@@ -28,14 +28,4 @@ public abstract class AbstractPatternLink<S extends AbstractPatternSynapse, IA e
         super(s, input, output);
     }
 
-
-    /*
-    OP-2
-    public void trackBindingSignal(Visitor v, Predicate<Activation> p) {
-        if(v.getDir() == Direction.INPUT)
-            return;
-
-        super.trackBindingSignal(v, p);
-    }
-     */
 }
