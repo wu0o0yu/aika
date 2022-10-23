@@ -31,9 +31,9 @@ public abstract class LinkingOperator {
 
     protected Activation fromBS;
 
-    protected ConjunctiveSynapse syn;
+    protected Synapse syn;
 
-    public LinkingOperator(Activation fromBS, ConjunctiveSynapse syn) {
+    public LinkingOperator(Activation fromBS, Synapse syn) {
         this.fromBS = fromBS;
         this.syn = syn;
     }

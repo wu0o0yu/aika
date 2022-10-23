@@ -44,30 +44,6 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         bias.addEventListener(this::updateSumOfLowerWeights);
     }
 
-    public void linkOutgoing(ConjunctiveSynapse synA, Activation fromBS) {
-        synA.startVisitor(
-                new LinkLinkingOperator(fromBS, synA),
-                fromBS
-        );
-    }
-
-    public void latentLinkOutgoing(ConjunctiveSynapse synA, Activation fromBS) {
-        getTargetInputSynapses()
-                .filter(synB -> synA != synB)
-                .filter(synB -> isLatentLinking(synA, synB))
-                .forEach(synB ->
-                        synB.linkStepB(fromBS, synA, null)
-                );
-    }
-
-    public void linkAndPropagateIn(Link l) {
-        getTargetInputSynapses()
-                .filter(synB -> synB != l.getSynapse())
-                .forEach(synB ->
-                        synB.linkStepB(l.getInput(), (S) l.getSynapse(), l)
-        );
-    }
-
     @Override
     protected void initFromTemplate(Neuron n) {
         super.initFromTemplate(n);

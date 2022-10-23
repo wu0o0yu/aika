@@ -21,6 +21,10 @@ import network.aika.Thought;
 import network.aika.fields.QueueField;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
+import network.aika.neuron.conjunctive.ConjunctiveSynapse;
+import network.aika.neuron.conjunctive.Scope;
+import network.aika.neuron.visitor.ActLinkingOperator;
+import network.aika.neuron.visitor.linking.LinkingOperator;
 import network.aika.sign.Sign;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
@@ -66,6 +70,15 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected boolean allowTraining = true;
 
+    protected Scope scope;
+
+    public Synapse() {
+        this.scope = null;
+    }
+
+    public Synapse(Scope scope) {
+        this.scope = scope;
+    }
 
     public abstract double getSumOfLowerWeights();
 
@@ -77,10 +90,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return isTrue(act.getIsFired());
     }
 
-    public void linkAndPropagateOut(IA bs) {
-        if (isPropagate())
-            propagate(bs);
+    public Scope getScope() {
+        return scope;
     }
+
 
     public void propagate(IA iAct) {
         if(propagateLinkExists(iAct))
@@ -120,6 +133,26 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return iAct.getOutputLinks(this)
                         .findAny()
                         .isPresent();
+    }
+
+    public abstract void startVisitor(LinkingOperator c, Activation bs);
+
+    protected void linkStepB(Activation bsA, Synapse synA, Link linkA) {
+        startVisitor(
+                new ActLinkingOperator(bsA, synA, linkA, this),
+                bsA
+        );
+    }
+
+    public void linkAndPropagateOut(IA bs) {
+        getOutput()
+                .linkOutgoing(this, bs);
+
+        getOutput()
+                .latentLinkOutgoing(this, bs);
+
+        if (isPropagate())
+            propagate(bs);
     }
 
     public abstract void setModified();

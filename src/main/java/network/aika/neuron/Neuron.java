@@ -22,6 +22,8 @@ import network.aika.fields.LimitedField;
 import network.aika.fields.QueueField;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
+import network.aika.neuron.conjunctive.ConjunctiveSynapse;
+import network.aika.neuron.visitor.LinkLinkingOperator;
 import network.aika.sign.Sign;
 import network.aika.steps.activation.LinkingOut;
 import network.aika.steps.activation.Save;
@@ -38,6 +40,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static network.aika.neuron.Synapse.isLatentLinking;
 import static network.aika.neuron.activation.Timestamp.MAX;
 import static network.aika.neuron.activation.Timestamp.MIN;
 import static network.aika.sign.Sign.POS;
@@ -101,6 +104,32 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
                 LinkingOut.add(act, s)
         );
     }
+
+
+    public void linkOutgoing(Synapse synA, Activation fromBS) {
+        synA.startVisitor(
+                new LinkLinkingOperator(fromBS, synA),
+                fromBS
+        );
+    }
+
+    public void latentLinkOutgoing(Synapse synA, Activation fromBS) {
+        getTargetInputSynapses()
+                .filter(synB -> synA != synB)
+                .filter(synB -> isLatentLinking(synA, synB))
+                .forEach(synB ->
+                        synB.linkStepB(fromBS, synA, null)
+                );
+    }
+
+    public void linkAndPropagateIn(Link l) {
+        getTargetInputSynapses()
+                .filter(synB -> synB != l.getSynapse())
+                .forEach(synB ->
+                        synB.linkStepB(l.getInput(), (S) l.getSynapse(), l)
+                );
+    }
+
 
     private TreeSet<A> initActivationsSet(Thought t) {
         TreeSet<A> acts = new TreeSet<>();

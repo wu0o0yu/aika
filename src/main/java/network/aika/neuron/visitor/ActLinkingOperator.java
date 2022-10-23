@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.visitor;
 
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.conjunctive.ConjunctiveSynapse;
@@ -30,10 +31,10 @@ import network.aika.neuron.visitor.linking.LinkingOperator;
 public class ActLinkingOperator extends LinkingOperator {
 
     private Scope toScope;
-    private ConjunctiveSynapse synA;
+    private Synapse synA;
     private Link linkA;
 
-    public ActLinkingOperator(Activation fromBS, ConjunctiveSynapse synA, Link linkA, ConjunctiveSynapse synB) {
+    public ActLinkingOperator(Activation fromBS, Synapse synA, Link linkA, Synapse synB) {
         super(fromBS, synB);
         this.synA = synA;
         this.linkA = linkA;

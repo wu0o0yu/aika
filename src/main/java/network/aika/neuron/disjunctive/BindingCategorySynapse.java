@@ -16,9 +16,11 @@
  */
 package network.aika.neuron.disjunctive;
 
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.BindingCategoryActivation;
 import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.visitor.linking.LinkingOperator;
 
 /**
  *

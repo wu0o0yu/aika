@@ -49,34 +49,9 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
 
     private double sumOfLowerWeights;
 
-    protected Scope scope;
 
     public ConjunctiveSynapse(Scope scope) {
-        this.scope = scope;
-    }
-
-    public Scope getScope() {
-        return scope;
-    }
-
-    public abstract void startVisitor(LinkingOperator c, Activation bs);
-
-    protected void linkStepB(Activation bsA, ConjunctiveSynapse synA, Link linkA) {
-        startVisitor(
-                new ActLinkingOperator(bsA, synA, linkA, this),
-                bsA
-        );
-    }
-
-    @Override
-    public void linkAndPropagateOut(IA bs) {
-        getOutput()
-                .linkOutgoing(this, bs);
-
-        getOutput()
-                .latentLinkOutgoing(this, bs);
-
-        super.linkAndPropagateOut(bs);
+        super(scope);
     }
 
     public void setOutput(O output) {
