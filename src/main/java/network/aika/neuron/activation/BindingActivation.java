@@ -21,6 +21,7 @@ import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.visitor.DownVisitor;
+import network.aika.neuron.visitor.selfref.SelfRefDownVisitor;
 
 
 import static network.aika.fields.Fields.*;

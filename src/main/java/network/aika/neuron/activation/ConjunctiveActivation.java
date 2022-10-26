@@ -28,6 +28,11 @@ import static network.aika.fields.Fields.isTrue;
  */
 public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> extends Activation<N> {
 
+
+    protected ConjunctiveActivation<N>  template;
+
+    protected ConjunctiveActivation<N>  templateInstance;
+
     public ConjunctiveActivation(int id, Thought t, N n) {
         super(id, t, n);
 
@@ -64,6 +69,15 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         return l.getInput();
     }
 
+
+    public ConjunctiveActivation<N> getTemplate() {
+        return template;
+    }
+
+    public ConjunctiveActivation<N> getTemplateInstance() {
+        return templateInstance;
+    }
+
     public void instantiateTemplate() {
         if(getInstance() != null)
             return;
@@ -73,19 +87,20 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
 
         N n = (N) neuron.instantiateTemplate(true);
 
-        ConjunctiveActivation<N> instAct = n.createActivation(thought);
-        instAct.init(null, null);
+        templateInstance = n.createActivation(thought);
+        templateInstance.init(null, null);
+        templateInstance.template = this;
 
         getInputLinks()
                 .filter(l -> !(l instanceof PositiveFeedbackLink))
                 .forEach(l ->
-                        ((ConjunctiveLink)l).instantiateTemplate(instAct)
+                        ((ConjunctiveLink)l).instantiateTemplate(templateInstance)
                 );
 
         getOutputLinks()
                 .filter(l -> l instanceof PositiveFeedbackLink)
                 .forEach(l ->
-                        ((ConjunctiveLink)l).instantiateTemplate(instAct)
+                        ((ConjunctiveLink)l).instantiateTemplate(templateInstance)
                 );
 
         getOutputLinks()

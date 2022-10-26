@@ -27,11 +27,11 @@ import network.aika.neuron.visitor.DownVisitor;
  */
 public class SelfRefDownVisitor extends DownVisitor<BindingActivation> {
 
-    Activation oAct;
+    BindingActivation oAct;
 
     boolean isSelfRef;
 
-    public SelfRefDownVisitor(Activation oAct) {
+    public SelfRefDownVisitor(BindingActivation oAct) {
         super(oAct.getThought());
         this.oAct = oAct;
     }
@@ -42,7 +42,7 @@ public class SelfRefDownVisitor extends DownVisitor<BindingActivation> {
 
     @Override
     public void up(BindingActivation origin) {
-        if(origin == oAct)
+        if(origin == oAct || origin == oAct.getTemplate())
             isSelfRef = true;
     }
 

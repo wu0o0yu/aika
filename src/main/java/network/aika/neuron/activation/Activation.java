@@ -168,7 +168,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         netLB.setValue(v);
     }
 
-    public boolean isSelfRef(Activation oAct) {
+    public boolean isSelfRef(BindingActivation oAct) {
         SelfRefDownVisitor v = new SelfRefDownVisitor(oAct);
         v.start(this);
         return v.isSelfRef();
