@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
+import network.aika.neuron.visitor.UpVisitor;
 
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.*;
@@ -44,6 +45,10 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
     }
 
     @Override
+    public void bindingVisitUp(UpVisitor v) {
+        // don't allow negative feedback links to create new links; i.d. do nothing
+    }
+    @Override
     protected void initOnTransparent() {
         onTransparent = threshold(
                 this,
@@ -69,4 +74,6 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
                 synapse.getWeight()
         );
     }
+
+
 }
