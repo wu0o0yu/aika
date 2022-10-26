@@ -37,21 +37,6 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
         LinkingIn.add(this);
     }
 
-    public void instantiateTemplate(ConjunctiveActivation instAct) {
-        OA oAct = (OA) instAct;
-        IA iAct = (IA) input.resolveAbstractInputActivation();
-
-        S instSyn = (S) synapse
-                .instantiateTemplate(
-                        this,
-                        iAct.getNeuron(),
-                        oAct.getNeuron()
-                );
-        instSyn.linkOutput();
-
-        instSyn.createLink(iAct, oAct);
-    }
-
     @Override
     public void initWeightUpdate() {
         mul(

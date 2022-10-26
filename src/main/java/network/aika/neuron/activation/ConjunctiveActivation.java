@@ -51,7 +51,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
                 .findAny()
                 .orElse(null);
     }
-
+    @Override
     public ConjunctiveActivation resolveAbstractInputActivation() {
         return neuron.isAbstract() ?
                 getInstance() :
@@ -78,6 +78,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         return templateInstance;
     }
 
+    @Override
     public void instantiateTemplate() {
         if(getInstance() != null)
             return;
@@ -94,14 +95,21 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         getInputLinks()
                 .filter(l -> !(l instanceof PositiveFeedbackLink))
                 .forEach(l ->
-                        ((ConjunctiveLink)l).instantiateTemplate(templateInstance)
+                        l.instantiateTemplate(
+                                l.getInput().resolveAbstractInputActivation(),
+                                templateInstance
+                        )
                 );
 
         getOutputLinks()
-                .filter(l -> l instanceof PositiveFeedbackLink)
+                .filter(l -> l instanceof InhibitoryLink)
                 .forEach(l ->
-                        ((ConjunctiveLink)l).instantiateTemplate(templateInstance)
+                        l.instantiateTemplate(
+                                templateInstance,
+                                l.getOutput().resolveAbstractInputActivation()
+                        )
                 );
+
 
         getOutputLinks()
                 .map(l -> l.getOutput())

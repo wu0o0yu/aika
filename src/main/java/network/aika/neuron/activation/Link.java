@@ -136,6 +136,20 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         );
     }
 
+    public void instantiateTemplate( Activation iAct, Activation oAct) {
+
+
+        S instSyn = (S) synapse
+                .instantiateTemplate(
+                        this,
+                        iAct.getNeuron(),
+                        oAct.getNeuron()
+                );
+        instSyn.linkOutput();
+
+        instSyn.createLink(iAct, oAct);
+    }
+
     public abstract void initWeightUpdate();
 
     protected void initWeightInput() {
