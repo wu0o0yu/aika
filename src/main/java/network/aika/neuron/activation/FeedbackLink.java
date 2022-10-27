@@ -77,6 +77,14 @@ public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activat
         super.patternVisitUp(v);
     }
 
+    @Override
+    public void inhibVisitDown(DownVisitor v) {
+    }
+
+    @Override
+    public void inhibVisitUp(UpVisitor v) {
+    }
+
     private boolean checkVisited(Visitor v) {
         if(visited == v.getV())
             return true;

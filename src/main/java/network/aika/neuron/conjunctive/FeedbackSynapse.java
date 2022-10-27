@@ -42,7 +42,7 @@ public abstract class FeedbackSynapse<S extends FeedbackSynapse, I extends Neuro
     public void initDummyLink(BindingActivation oAct) {
         Multiplication dummyWeight = mul(
                 oAct,
-                (getDummyLinkUB() ? "pos" : "neg")  + "-" + getInput().getId(),
+                (getDummyLinkUB() ? "pos" : "neg")  + "-feedback-dummy",
                 oAct.getIsOpen(),
                 getWeight()
         );

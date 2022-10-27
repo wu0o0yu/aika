@@ -23,6 +23,7 @@ public class InvertFunction extends AbstractFunction {
 
     public InvertFunction(String label) {
         super(null, label);
+        currentValue = 1.0;
     }
 
     @Override
