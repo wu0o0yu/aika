@@ -19,10 +19,10 @@ package network.aika.neuron.visitor.linking;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.conjunctive.ConjunctiveSynapse;
 
-import java.util.Objects;
 import java.util.stream.Stream;
+
+import static network.aika.neuron.Synapse.latentActivationExists;
 
 /**
  * @author Lukas Molzberger
@@ -66,14 +66,5 @@ public abstract class LinkingOperator {
         }
 
         return synB.createLink(bsB, oAct);
-    }
-
-    private static boolean latentActivationExists(Synapse synA, Synapse synB, Activation iActA, Activation iActB) {
-        Stream<Link> linksA = iActA.getOutputLinks(synA);
-        return linksA.map(lA -> lA.getOutput())
-                .map(oAct -> oAct.getInputLink(synB))
-                .filter(Objects::nonNull)
-                .map(lB -> lB.getInput())
-                .anyMatch(iAct -> iAct == iActB);
     }
 }

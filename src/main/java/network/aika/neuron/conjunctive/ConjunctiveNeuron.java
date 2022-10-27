@@ -20,9 +20,7 @@ import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
-import network.aika.neuron.activation.Link;
 import network.aika.neuron.disjunctive.CategorySynapse;
-import network.aika.neuron.visitor.LinkLinkingOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +28,6 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import static network.aika.neuron.ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT;
-import static network.aika.neuron.Synapse.isLatentLinking;
 
 /**
  *
@@ -69,7 +66,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     public void addInactiveLinks(Activation bs) {
         inputSynapses
                 .stream()
-                .filter(s -> !bs.inputLinkExists(s))
+                .filter(s -> !s.linkExists(bs))
                 .forEach(s ->
                         s.createLink(null, bs)
                 );

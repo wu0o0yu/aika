@@ -484,10 +484,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return inputLinks.get(s.getPInput());
     }
 
-    public boolean inputLinkExists(Synapse s) {
-        return inputLinks.containsKey(s.getPInput());
-    }
-
     public Stream<Link> getOutputLinks(Synapse s) {
         return outputLinks
                 .subMap(

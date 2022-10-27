@@ -21,7 +21,6 @@ import network.aika.Thought;
 import network.aika.fields.QueueField;
 import network.aika.neuron.activation.*;
 import network.aika.fields.Field;
-import network.aika.neuron.conjunctive.ConjunctiveSynapse;
 import network.aika.neuron.conjunctive.Scope;
 import network.aika.neuron.visitor.ActLinkingOperator;
 import network.aika.neuron.visitor.linking.LinkingOperator;
@@ -35,6 +34,8 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.activation.Timestamp.MAX;
@@ -124,9 +125,30 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return synA.getWeight().getCurrentValue() + synB.getWeight().getCurrentValue() + sumOfLowerWeights > 0.0;
     }
 
+    public static boolean latentActivationExists(Synapse synA, Synapse synB, Activation iActA, Activation iActB) {
+        Stream<Link> linksA = iActA.getOutputLinks(synA);
+        return linksA.map(lA -> lA.getOutput())
+                .map(oAct -> oAct.getInputLink(synB))
+                .filter(Objects::nonNull)
+                .map(lB -> lB.getInput())
+                .anyMatch(iAct -> iAct == iActB);
+    }
+
     public boolean linkExists(IA iAct, OA oAct) {
+        assert iAct.getNeuron() == getInput();
+
         Link existingLink = oAct.getInputLink(iAct.getNeuron());
-        return existingLink != null && existingLink.getInput() == iAct;
+        if(existingLink == null)
+            return false;
+
+        assert existingLink.getSynapse() == this;
+        assert existingLink.getInput() == iAct;
+
+        return true;
+    }
+
+    public boolean linkExists(OA oAct) {
+        return oAct.getInputLink(getInput()) != null;
     }
 
     public boolean propagateLinkExists(IA iAct) {
