@@ -16,8 +16,11 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.fields.Multiplication;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
+
+import static network.aika.fields.FieldLink.connect;
 
 /**
  *
@@ -45,6 +48,7 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
                 .linkOutgoing(this, bs);
     }
 
+    @Override
     protected boolean getDummyLinkUB() {
         return false;
     }

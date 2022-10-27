@@ -17,20 +17,19 @@
 package network.aika.fields;
 
 import network.aika.neuron.Synapse;
+import network.aika.neuron.activation.Element;
 
 import java.util.Comparator;
-
-import static network.aika.fields.LinkSlotMode.MAX;
 
 /**
  * @author Lukas Molzberger
  */
-public class LinkSlot extends Field<Synapse> implements FieldInput, FieldOutput {
+public class MinMaxField extends Field<Element> implements FieldInput, FieldOutput {
 
-    LinkSlotMode mode;
+    MinMax mode;
     private FieldLink selectedInput;
 
-    public LinkSlot(Synapse ref, LinkSlotMode m, String label) {
+    public MinMaxField(Element ref, MinMax m, String label) {
         super(ref, label);
         mode = m;
     }
@@ -39,7 +38,7 @@ public class LinkSlot extends Field<Synapse> implements FieldInput, FieldOutput 
         return selectedInput;
     }
 
-    public LinkSlotMode getMode() {
+    public MinMax getMode() {
         return mode;
     }
 

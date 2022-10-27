@@ -33,8 +33,8 @@ import java.util.stream.Stream;
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.*;
-import static network.aika.fields.LinkSlotMode.MAX;
-import static network.aika.fields.LinkSlotMode.MIN;
+import static network.aika.fields.MinMax.MAX;
+import static network.aika.fields.MinMax.MIN;
 import static network.aika.fields.ThresholdOperator.Type.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 
@@ -83,9 +83,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected NavigableMap<OutputKey, Link> outputLinks;
 
     private static final Comparator<Synapse> SYN_COMP = Comparator.comparing(s -> s.getInput().getId());
-    protected Map<Synapse, LinkSlot> ubLinkSlots = new TreeMap<>(SYN_COMP);
-    protected Map<Synapse, LinkSlot> lbLinkSlots = new TreeMap<>(SYN_COMP);
-
     public boolean instantiationIsQueued;
 
     public Activation(int id, Thought t, N n) {
@@ -197,30 +194,19 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         v.next(this);
     }
 
-    public void selfRefVisitDown(DownVisitor v, Link lastLink) {
+    public void inhibVisitDown(DownVisitor v, Link lastLink) {
         v.next(this);
     }
 
-    public void selfRefVisitUp(UpVisitor v, Link lastLink) {
+    public void inhibVisitUp(UpVisitor v, Link lastLink) {
         v.check(lastLink, this);
         v.next(this);
     }
 
-    public Map<Synapse, LinkSlot> getLinkSlots(boolean upperBound) {
-        return upperBound ? ubLinkSlots : lbLinkSlots;
+    public void selfRefVisitDown(DownVisitor v, Link lastLink) {
+        v.next(this);
     }
 
-    public LinkSlot lookupLinkSlot(Synapse syn, boolean upperBound) {
-        return getLinkSlots(upperBound).computeIfAbsent(syn, s -> {
-            LinkSlot ls = new LinkSlot(
-                    s,
-                    syn instanceof NegativeFeedbackSynapse ? MIN : MAX,
-                    "link slot " + (upperBound ? "ub" : "lb")
-            );
-            connect(ls, getNet(upperBound));
-            return ls;
-        });
-    }
 
     protected void initGradientFields() {
         ownInputGradient = new QueueField(this, "Own-Input-Gradient");

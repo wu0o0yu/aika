@@ -20,7 +20,7 @@ package network.aika.fields;
 /**
  * @author Lukas Molzberger
  */
-public enum LinkSlotMode {
+public enum MinMax {
     MAX,
     MIN
 }

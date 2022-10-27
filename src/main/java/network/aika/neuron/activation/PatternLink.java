@@ -40,4 +40,12 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
     @Override
     public void bindingVisitUp(UpVisitor v) {
     }
+
+    @Override
+    public void inhibVisitDown(DownVisitor v) {
+    }
+
+    @Override
+    public void inhibVisitUp(UpVisitor v) {
+    }
 }

@@ -18,6 +18,9 @@ package network.aika.neuron.disjunctive;
 
 import network.aika.neuron.activation.*;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
+import network.aika.neuron.visitor.linking.LinkingOperator;
+
+import java.util.stream.Stream;
 
 /**
  *
@@ -32,6 +35,17 @@ public abstract class CategorySynapse<S extends CategorySynapse, I extends Conju
         OA
         >
 {
+
+    @Override
+    public void startVisitor(LinkingOperator c, Activation bs) {
+
+    }
+
+    @Override
+    public void linkAndPropagateOut(IA bs) {
+        if (isPropagate())
+            propagate(bs);
+    }
 
     @Override
     public CategoryLink createLink(IA input, OA output) {

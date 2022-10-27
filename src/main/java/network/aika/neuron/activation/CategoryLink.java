@@ -26,4 +26,8 @@ public class CategoryLink<S extends CategorySynapse, IA extends ConjunctiveActiv
     public CategoryLink(S s, IA input, OA output) {
         super(s, input, output);
     }
+
+    @Override
+    protected void addInputLinkingStep() {
+    }
 }

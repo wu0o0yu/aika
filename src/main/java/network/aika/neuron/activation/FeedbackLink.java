@@ -16,11 +16,14 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.fields.Multiplication;
 import network.aika.neuron.conjunctive.FeedbackSynapse;
 import network.aika.neuron.visitor.DownVisitor;
 import network.aika.neuron.visitor.UpVisitor;
 import network.aika.neuron.visitor.Visitor;
 import network.aika.neuron.visitor.selfref.SelfRefDownVisitor;
+
+import static network.aika.fields.FieldLink.connect;
 
 /**
  * @author Lukas Molzberger
@@ -33,7 +36,6 @@ public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activat
     public FeedbackLink(S s, IA input, BindingActivation output) {
         super(s, input, output);
     }
-
 
     @Override
     public void selfRefVisitDown(SelfRefDownVisitor v) {
@@ -74,11 +76,6 @@ public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activat
 
         super.patternVisitUp(v);
     }
-
-    protected boolean isSelfRef() {
-        return input.isSelfRef(output);
-    }
-
 
     private boolean checkVisited(Visitor v) {
         if(visited == v.getV())

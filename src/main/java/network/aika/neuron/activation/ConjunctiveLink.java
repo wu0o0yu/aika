@@ -30,10 +30,7 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
 
     public ConjunctiveLink(S s, IA input, OA output) {
         super(s, input, output);
-        performInputLinking();
-    }
 
-    protected void performInputLinking() {
         LinkingIn.add(this);
     }
 

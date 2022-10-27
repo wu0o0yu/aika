@@ -35,14 +35,13 @@ public class LinkLinkingOperator extends LinkingOperator {
     }
 
     @Override
-    public void check(LinkingCallback v, Link lastLink, Activation act) {
+    public void check(LinkingCallback v, Link l, Activation act) {
         if(act.getNeuron() != syn.getOutput())
             return;
 
         if(act == fromBS)
             return;
 
-        ConjunctiveLink<?, ?, ?> l = (ConjunctiveLink) lastLink;
         if(!v.compatible(syn.getScope(), l.getSynapse().getScope()))
             return;
 

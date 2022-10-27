@@ -41,4 +41,12 @@ public class SamePatternLink extends BindingNeuronLink<SamePatternSynapse, Bindi
     public void patternVisitDown(DownVisitor v) {
         v.next(this);
     }
+
+    @Override
+    public void inhibVisitDown(DownVisitor v) {
+    }
+
+    @Override
+    public void inhibVisitUp(UpVisitor v) {
+    }
 }

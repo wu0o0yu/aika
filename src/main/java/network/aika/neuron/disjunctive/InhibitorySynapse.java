@@ -18,6 +18,9 @@ package network.aika.neuron.disjunctive;
 
 import network.aika.neuron.activation.*;
 import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.visitor.linking.LinkingOperator;
+import network.aika.neuron.visitor.linking.inhibitory.InhibitoryDownVisitor;
+import network.aika.neuron.visitor.linking.pattern.PatternDownVisitor;
 
 /**
  *
@@ -43,6 +46,12 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
         return type;
     }
 
+
+    @Override
+    public void startVisitor(LinkingOperator c, Activation bs) {
+        new InhibitoryDownVisitor(bs.getThought(), c)
+                .start(bs);
+    }
 
     @Override
     public InhibitorySynapse instantiateTemplate() {

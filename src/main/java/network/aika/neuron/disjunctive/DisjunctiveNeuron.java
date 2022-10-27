@@ -34,10 +34,6 @@ public abstract class DisjunctiveNeuron<S extends DisjunctiveSynapse, A extends 
         super();
     }
 
-    public Stream<S> getTargetInputSynapses() {
-        return Stream.empty();
-    }
-
     @Override
     public void addInactiveLinks(Activation bs) {
     }

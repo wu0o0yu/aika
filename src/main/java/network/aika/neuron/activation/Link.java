@@ -25,8 +25,8 @@ import network.aika.neuron.visitor.UpVisitor;
 import network.aika.neuron.visitor.selfref.SelfRefDownVisitor;
 import network.aika.sign.Sign;
 import network.aika.steps.link.LinkCounting;
+import network.aika.steps.link.LinkingIn;
 
-import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
@@ -59,7 +59,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
         if(input != null && output != null) {
             initOnTransparent();
-            initWeightInput();
+            initWeightInputUB();
+            initWeightInputLB();
 
             if (getConfig().isTrainingEnabled() && getSynapse().isAllowTraining())
                 output.isFinal.addEventListener(() ->
@@ -68,6 +69,12 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         }
 
         getThought().onLinkCreationEvent(this);
+
+        addInputLinkingStep();
+    }
+
+    protected void addInputLinkingStep() {
+        LinkingIn.add(this);
     }
 
     public void selfRefVisitDown(SelfRefDownVisitor v) {
@@ -87,6 +94,15 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     public void patternVisitUp(UpVisitor v) {
     }
+
+    public void inhibVisitDown(DownVisitor v) {
+        v.next(this);
+    }
+
+    public void inhibVisitUp(UpVisitor v) {
+        v.next(this);
+    }
+
 
     protected void initOnTransparent() {
         onTransparent = threshold(
@@ -137,8 +153,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     public void instantiateTemplate( Activation iAct, Activation oAct) {
-
-
         S instSyn = (S) synapse
                 .instantiateTemplate(
                         this,
@@ -152,19 +166,21 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     public abstract void initWeightUpdate();
 
-    protected void initWeightInput() {
+    protected void initWeightInputUB() {
         weightedInputUB = initWeightedInput(true);
-        weightedInputLB = initWeightedInput(false);
+        connect(weightedInputUB, getOutput().getNet(true));
+    }
 
-        connect(weightedInputUB, getOutput().lookupLinkSlot(synapse, true));
-        connect(weightedInputLB, getOutput().lookupLinkSlot(synapse, false));
+    protected void initWeightInputLB() {
+        weightedInputLB = initWeightedInput(false);
+        connect(weightedInputLB, getOutput().getNet(false));
     }
 
     protected Multiplication initWeightedInput(boolean upperBound) {
         return mul(
                 this,
                 "iAct(id:" + getInput().getId() + ").value" + (upperBound ? "UB" : "LB") + " * s.weight",
-                input.getValue(upperBound),
+                getInputValue(upperBound),
                 synapse.getWeight()
         );
     }
@@ -221,8 +237,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return s;
     }
 
-    public FieldOutput getInputValue(Sign s, boolean upperBound) {
-        return s.getValue(input != null ? input.getValue(upperBound) : ZERO);
+    public FieldOutput getInputValue(boolean upperBound) {
+        return input.getValue(upperBound);
     }
 
     public S getSynapse() {
@@ -253,17 +269,20 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         if(input == null)
             return;
 
-        input.outputLinks.put(
+        Link el = input.outputLinks.put(
                 new OutputKey(output.getNeuronProvider(), output.getId()),
                 this
         );
+
+        assert el == null;
     }
 
     public void linkOutput() {
-        output.inputLinks.put(
+        Link el = (Link) output.inputLinks.put(
                 input != null ? input.getNeuronProvider() : synapse.getPInput(),
                 this
         );
+        assert el == null;
     }
 
     public void unlinkInput() {

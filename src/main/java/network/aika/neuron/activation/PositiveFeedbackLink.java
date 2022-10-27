@@ -16,10 +16,14 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.fields.MinMax;
+import network.aika.fields.MinMaxField;
+import network.aika.fields.Multiplication;
 import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 import network.aika.neuron.visitor.DownVisitor;
 import network.aika.neuron.visitor.UpVisitor;
 
+import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 
@@ -34,7 +38,7 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
     }
 
     @Override
-    protected void performInputLinking() {
+    protected void addInputLinkingStep() {
     }
 
     @Override
@@ -46,6 +50,18 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
                 ABOVE,
                 synapse.getWeight()
         );
+    }
+
+    @Override
+    protected void initWeightInputUB() {
+        Multiplication weightedLB = mul(
+                this,
+                "!isOpen * x * weight",
+                invert("!isOpen", output.getIsOpen()),
+                initWeightedInput(true)
+        );
+
+        connect(weightedLB, getOutput().getNet(true));
     }
 
     @Override
@@ -62,5 +78,13 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
 
     @Override
     public void patternVisitUp(UpVisitor v) {
+    }
+
+    @Override
+    public void inhibVisitDown(DownVisitor v) {
+    }
+
+    @Override
+    public void inhibVisitUp(UpVisitor v) {
     }
 }

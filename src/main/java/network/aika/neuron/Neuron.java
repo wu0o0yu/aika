@@ -126,7 +126,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         getTargetInputSynapses()
                 .filter(synB -> synB != l.getSynapse())
                 .forEach(synB ->
-                        synB.linkStepB(l.getInput(), (S) l.getSynapse(), l)
+                        synB.linkStepB(l.getInput(), l.getSynapse(), l)
                 );
     }
 

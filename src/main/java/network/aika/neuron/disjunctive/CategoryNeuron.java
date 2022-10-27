@@ -18,6 +18,8 @@ package network.aika.neuron.disjunctive;
 
 import network.aika.neuron.activation.CategoryActivation;
 
+import java.util.stream.Stream;
+
 
 /**
  *
@@ -28,4 +30,8 @@ public abstract class CategoryNeuron<S extends CategorySynapse, A extends Catego
     public CategoryNeuron() {
     }
 
+    @Override
+    public Stream<S> getTargetInputSynapses() {
+        return Stream.empty();
+    }
 }

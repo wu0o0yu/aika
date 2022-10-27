@@ -17,8 +17,11 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.Thought;
+import network.aika.fields.Multiplication;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.visitor.linking.LinkingOperator;
+
+import static network.aika.fields.FieldLink.connect;
 
 /**
  *
@@ -47,6 +50,7 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
     public void startVisitor(LinkingOperator c, Activation bs) {
     }
 
+    @Override
     protected boolean getDummyLinkUB() {
         return true;
     }

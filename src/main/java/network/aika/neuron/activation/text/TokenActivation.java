@@ -62,11 +62,6 @@ public class TokenActivation extends PatternActivation {
         return position;
     }
 
-    protected void initNet() {
-        netUB = new ValueSortedQueueField(this, "net UB");
-        netLB = new ValueSortedQueueField(this, "net LB");
-    }
-
     public boolean isInput() {
         return true;
     }

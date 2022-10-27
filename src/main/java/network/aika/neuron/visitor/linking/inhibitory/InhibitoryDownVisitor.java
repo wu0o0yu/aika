@@ -14,36 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.neuron.visitor.linking.inhibitory;
 
 import network.aika.Thought;
-import network.aika.neuron.Range;
-import network.aika.neuron.disjunctive.InhibitoryNeuron;
-
-import static network.aika.fields.FieldLink.connect;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.BindingActivation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.visitor.linking.LinkingDownVisitor;
+import network.aika.neuron.visitor.linking.LinkingOperator;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron> {
+public class InhibitoryDownVisitor extends LinkingDownVisitor<PatternActivation> {
 
-
-    public InhibitoryActivation(int id, Thought t, InhibitoryNeuron neuron) {
-        super(id, t, neuron);
+    public InhibitoryDownVisitor(Thought t, LinkingOperator operator) {
+        super(t, operator);
     }
 
     @Override
-    public Range getRange() {
-
-        return null;
+    public void up(PatternActivation origin) {
+        new InhibitoryUpVisitor(this, origin)
+                .next(origin);
     }
 
-    public void connectFields(InhibitoryLink in, NegativeFeedbackLink out) {
-        if(in.getInput().isSelfRef(out.getOutput()))
-            return;
+    protected void visitDown(Link l) {
+        l.inhibVisitDown(this);
+    }
 
-        connect(in.netUB, out.maxInputUB);
-        connect(in.netLB, out.maxInputLB);
+    protected void visitDown(Activation act, Link l) {
+        act.inhibVisitDown(this, l);
     }
 }

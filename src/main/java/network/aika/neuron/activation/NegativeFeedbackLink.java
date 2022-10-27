@@ -16,6 +16,10 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.fields.FieldOutput;
+import network.aika.fields.MinMax;
+import network.aika.fields.MinMaxField;
+import network.aika.fields.Multiplication;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 import network.aika.neuron.visitor.UpVisitor;
 
@@ -28,26 +32,50 @@ import static network.aika.fields.ThresholdOperator.Type.ABOVE;
  */
 public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, InhibitoryActivation> {
 
+    MinMaxField maxInputUB;
+    MinMaxField maxInputLB;
+
     public NegativeFeedbackLink(NegativeFeedbackSynapse s, InhibitoryActivation input, BindingActivation output) {
         super(s, input, output);
+
+        input.getInputLinks().forEach(l ->
+                input.connectFields((InhibitoryLink) l, this)
+        );
     }
 
     @Override
-    protected void initWeightInput() {
-        if(isSelfRef())
-            return;
+    protected void initWeightInputUB() {
+        maxInputUB = new MinMaxField(this, MinMax.MAX, "maxUB");
 
-        weightedInputUB = initWeightedInput(false);
-        weightedInputLB = initWeightedInput(true);
+        super.initWeightInputUB();
+    }
 
-        connect(weightedInputUB, input.getId(), getOutput().lookupLinkSlot(synapse, true));
-        connect(weightedInputLB, input.getId(), getOutput().lookupLinkSlot(synapse, false));
+    @Override
+    protected void initWeightInputLB() {
+        maxInputLB = new MinMaxField(this, MinMax.MIN, "minLB");
+
+        Multiplication weightedLB = mul(
+                this,
+                "!isOpen * x * weight",
+                invert("!isOpen", output.getIsOpen()),
+                initWeightedInput(false)
+        );
+
+        connect(weightedLB, getOutput().getNet(false));
+    }
+
+    @Override
+    public FieldOutput getInputValue(boolean upperBound) {
+        return upperBound ?
+                maxInputUB :
+                maxInputLB;
     }
 
     @Override
     public void bindingVisitUp(UpVisitor v) {
         // don't allow negative feedback links to create new links; i.d. do nothing
     }
+
     @Override
     protected void initOnTransparent() {
         onTransparent = threshold(
@@ -75,5 +103,11 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
         );
     }
 
+    public MinMaxField getMaxInputUB() {
+        return maxInputUB;
+    }
 
+    public MinMaxField getMaxInputLB() {
+        return maxInputLB;
+    }
 }

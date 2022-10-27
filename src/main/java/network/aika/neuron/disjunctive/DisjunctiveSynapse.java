@@ -36,18 +36,6 @@ public abstract class DisjunctiveSynapse<
         OA extends DisjunctiveActivation
         > extends Synapse<S,I,O,L,IA,OA>
 {
-
-    @Override
-    public void startVisitor(LinkingOperator c, Activation bs) {
-
-    }
-
-    @Override
-    public void linkAndPropagateOut(IA bs) {
-        if (isPropagate())
-            propagate(bs);
-    }
-
     @Override
     public void setModified() {
         if(input != null)
