@@ -26,5 +26,7 @@ public class PatternCategoryInputLink extends AbstractPatternLink<PatternCategor
 
     public PatternCategoryInputLink(PatternCategoryInputSynapse s, CategoryActivation input, PatternActivation output) {
         super(s, input, output);
+
+        output.setRange(input.getRange());
     }
 }
