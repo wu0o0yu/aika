@@ -28,7 +28,7 @@ public class MetaNeuronTest {
         coords.put(2, new double[]{-0.001, 0.298});
         coords.put(3, new double[]{0.002, 0.623});
         coords.put(4, new double[]{0.244, 0.826});
-        coords.put(5, new double[]{0.092, 1.055});
+        coords.put(5, new double[]{0.047, 0.926});
         coords.put(6, new double[]{0.507, 1.03});
         coords.put(7, new double[]{1.082, 0.296});
         coords.put(8, new double[]{1.061, 0.574});
@@ -37,7 +37,12 @@ public class MetaNeuronTest {
         coords.put(11, new double[]{0.472, 0.009});
         coords.put(12, new double[]{0.998, 1.147});
         coords.put(13, new double[]{1.243, 1.013});
-        coords.put(14, new double[]{0.849, 1.117});
+        coords.put(14, new double[]{0.272, 0.287});
+        coords.put(15, new double[]{0.272, 0.487});
+        coords.put(16, new double[]{0.664, 0.289});
+        coords.put(17, new double[]{0.655, 0.513});
+        coords.put(18, new double[]{0.44, 0.525});
+        coords.put(19, new double[]{0.44, 0.725});
 
         return coords;
     }
@@ -45,17 +50,21 @@ public class MetaNeuronTest {
     public Map<Long, double[]> getNeuronCoordinateMap() {
         Map<Long, double[]> coords = new TreeMap<>();
 
-        coords.put(1l, new double[]{3.653, 5.614});
-        coords.put(2l, new double[]{-3.127, -0.2});
-        coords.put(3l, new double[]{-3.06, 5.322});
-        coords.put(4l, new double[]{-2.841, 15.017});
-        coords.put(5l, new double[]{-10.958, 5.141});
-        coords.put(6l, new double[]{7.238, 5.682});
-        coords.put(7l, new double[]{-11.176, 12.639});
-        coords.put(8l, new double[]{3.592, 12.772});
-        coords.put(9l, new double[]{-2.603, 20.359});
-        coords.put(10l, new double[]{-8.632, -6.736});
-        coords.put(11l, new double[]{0.792, -6.933});
+        coords.put(1l, new double[]{0.077, -15.728});
+        coords.put(2l, new double[]{-3.301, 6.852});
+        coords.put(3l, new double[]{-3.236, 12.599});
+        coords.put(4l, new double[]{9.227, 38.369});
+        coords.put(5l, new double[]{-5.69, 38.367});
+        coords.put(6l, new double[]{2.188, 12.729});
+        coords.put(7l, new double[]{-15.7, 8.66});
+        coords.put(8l, new double[]{-7.929, 21.224});
+        coords.put(9l, new double[]{14.846, 7.498});
+        coords.put(10l, new double[]{14.858, 21.224});
+        coords.put(11l, new double[]{-11.775, -16.114});
+        coords.put(12l, new double[]{11.394, -15.651});
+        coords.put(13l, new double[]{-12.148, -3.61});
+        coords.put(14l, new double[]{14.523, -3.094});
+        coords.put(15l, new double[]{2.156, 6.443});
 
         return coords;
     }
@@ -73,6 +82,93 @@ public class MetaNeuronTest {
         debugger.run();
     }
 
+    private BindingNeuron createInitialSyllableBindingNeuron(
+            Model m,
+            TokenNeuron letterPN,
+            InhibitoryNeuron inhib,
+            PatternNeuron syllablePN
+    ) {
+        CategoryNeuron sylBeginCategory = new BindingCategoryNeuron()
+                .init(m, "Syl. Cat. Pos-0");
+
+        BindingNeuron sylBeginBN = new BindingNeuron()
+                .init(m, "Abstract Syl. Pos-0");
+
+        new InhibitorySynapse(INPUT)
+                .init(sylBeginBN, inhib, 1.0);
+
+        new NegativeFeedbackSynapse()
+                .init(inhib, sylBeginBN, -20.0)
+                .adjustBias();
+
+        new PatternSynapse()
+                .init(sylBeginBN, syllablePN, 10.0)
+                .adjustBias();
+
+        new PositiveFeedbackSynapse()
+                .init(syllablePN, sylBeginBN, 10.0);
+
+        new InputPatternSynapse()
+                .init(letterPN, sylBeginBN, 10.0)
+                .adjustBias();
+
+        new BindingCategoryInputSynapse()
+                .init(sylBeginCategory, sylBeginBN, 1.0);
+
+        return sylBeginBN;
+    }
+
+
+    private BindingNeuron createContinueRightBindingNeuron(
+            Model m,
+            int pos,
+            TokenNeuron letterPN,
+            LatentRelationNeuron relPT,
+            BindingNeuron lastBN,
+            InhibitoryNeuron inhib,
+            PatternNeuron syllablePN
+    ) {
+
+        CategoryNeuron sylContinueRightCategory = new BindingCategoryNeuron()
+                .init(m, "Syl. Cat. Pos-R" + pos);
+
+        BindingNeuron sylContinueRightBN = new BindingNeuron()
+                .init(m, "Abstract Syl. Pos-R" + pos);
+
+        new InhibitorySynapse(INPUT)
+                .init(sylContinueRightBN, inhib, 1.0);
+
+        new NegativeFeedbackSynapse()
+                .init(inhib, sylContinueRightBN, -20.0)
+                .adjustBias();
+
+        new RelationInputSynapse()
+                .init(relPT, sylContinueRightBN, 5.0)
+                .adjustBias();
+
+        new SamePatternSynapse()
+                .init(lastBN, sylContinueRightBN, 10.0)
+                .adjustBias();
+
+        new PatternSynapse()
+                .init(sylContinueRightBN, syllablePN, 6.0)
+                .adjustBias();
+
+        new PositiveFeedbackSynapse()
+                .init(syllablePN, sylContinueRightBN, 10.0);
+
+
+        new InputPatternSynapse()
+                .init(letterPN, sylContinueRightBN, 10.0)
+                .adjustBias();
+
+        new BindingCategoryInputSynapse()
+                .init(sylContinueRightCategory, sylContinueRightBN, 1.0);
+
+        sylContinueRightBN.updateBias(3.0);
+        return sylContinueRightBN;
+    }
+
 
     public void setupMetaNeuronTest(AIKADebugger debugger) {
         Model m = new Model();
@@ -86,88 +182,38 @@ public class MetaNeuronTest {
         TokenNeuron letterPN = new TokenNeuron()
                 .init(m, "Abstract Letter");
 
+        PatternNeuron syllablePN = new PatternNeuron()
+                .init(m, "Syllable");
+
+        InhibitoryNeuron inhib =new InhibitoryNeuron()
+                .init(m, "I");
+
 
         new PatternCategoryInputSynapse()
                 .init(letterCategory, letterPN, 1.0);
 
         CategoryNeuron syllableCategory = new PatternCategoryNeuron()
-                .init(m, "PC-syllable");
+                .init(m, "Syllable Category");
 
-        CategoryNeuron sylBeginCategory = new BindingCategoryNeuron()
-                .init(m, "Syl. Begin");
+        BindingNeuron sylBeginBN = createInitialSyllableBindingNeuron(
+                m,
+                letterPN,
+                inhib,
+                syllablePN
+        );
 
-        CategoryNeuron sylContinueRightCategory = new BindingCategoryNeuron()
-                .init(m, "Cont. Right Begin");
-
-        BindingNeuron sylBeginBN = new BindingNeuron()
-                .init(m, "Abstract Syl. Begin");
-
-        BindingNeuron sylContinueRightBN = new BindingNeuron()
-                .init(m, "Abstract Syl. Cont. Right");
-
-
-        InhibitoryNeuron inhib =new InhibitoryNeuron()
-                .init(m, "I");
-
-        new InhibitorySynapse(INPUT)
-                .init(sylBeginBN, inhib, 1.0);
-
-        new NegativeFeedbackSynapse()
-                .init(inhib, sylBeginBN, -20.0)
-                .adjustBias();
-
-        new InhibitorySynapse(INPUT)
-                .init(sylContinueRightBN, inhib, 1.0);
-
-        new NegativeFeedbackSynapse()
-                .init(inhib, sylContinueRightBN, -20.0)
-                .adjustBias();
-
-
-        new RelationInputSynapse()
-                .init(relPT, sylContinueRightBN, 5.0)
-                .adjustBias();
-
-        new SamePatternSynapse()
-                .init(sylBeginBN, sylContinueRightBN, 10.0)
-                .adjustBias();
-/*
-        new SamePatternSynapse()
-                .init(sylContinueRightBN, sylContinueRightBN, 10.0);
-*/
-        PatternNeuron syllablePN = new PatternNeuron()
-                .init(m, "Syllable");
-
-        new PatternSynapse()
-                .init(sylBeginBN, syllablePN, 10.0)
-                .adjustBias();
-
-        new PositiveFeedbackSynapse()
-                .init(syllablePN, sylBeginBN, 10.0);
-
-        new PatternSynapse()
-                .init(sylContinueRightBN, syllablePN, 6.0)
-                .adjustBias();
-
-        new PositiveFeedbackSynapse()
-                .init(syllablePN, sylContinueRightBN, 10.0);
+        BindingNeuron sylRightPos1BN = createContinueRightBindingNeuron(
+                m,
+                1,
+                letterPN,
+                relPT,
+                sylBeginBN,
+                inhib,
+                syllablePN
+        );
 
         new PatternCategoryInputSynapse()
                 .init(syllableCategory, syllablePN, 1.0);
-
-        new InputPatternSynapse()
-                .init(letterPN, sylBeginBN, 10.0)
-                .adjustBias();
-
-        new BindingCategoryInputSynapse()
-                .init(sylBeginCategory, sylBeginBN, 1.0);
-
-        new InputPatternSynapse()
-                .init(letterPN, sylContinueRightBN, 10.0)
-                .adjustBias();
-
-        new BindingCategoryInputSynapse()
-                .init(sylContinueRightCategory, sylContinueRightBN, 1.0);
 
         // Concrete
         TokenNeuron letterS = letterPN.instantiateTemplate(true)
@@ -178,7 +224,6 @@ public class MetaNeuronTest {
 
         letterPN.updateBias(3.0);
         sylBeginBN.updateBias(3.0);
-        sylContinueRightBN.updateBias(3.0);
         syllablePN.updateBias(3.0);
 
 
@@ -199,13 +244,13 @@ public class MetaNeuronTest {
         debugger.getActivationViewManager().setCoordinateListener(act -> actCoords.get(act.getId()));
 
         Camera camera = debugger.getActivationViewManager().getCamera();
-        camera.setViewPercent(1.35);
-        camera.setViewCenter(0.267, 0.367, 0);
+        camera.setViewPercent(1.65);
+        camera.setViewCenter(0.557, 0.473, 0);
 
         debugger.getNeuronViewManager().setCoordinateListener(n -> neuronCoords.get(n.getId()));
         camera = debugger.getNeuronViewManager().getCamera();
-        camera.setViewPercent(2.3);
-        camera.setViewCenter(0.0, 0.0, 0);
+        camera.setViewPercent(1.1);
+        camera.setViewCenter(-0.782, 10.985, 0);
 
         TokenActivation letterSAct = doc.addToken(letterS, 0, 0, 2);
         TokenActivation letterCAct = doc.addToken(letterC, 1, 2, 4);
