@@ -106,28 +106,6 @@ public class TestUtils {
         };
     }
 
-    private static String trimPrefix(String l) {
-        return l.substring(l.indexOf("-") + 1);
-    }
-
-    public static CategoryNeuron initCategory(Model m, String label, PatternNeuron... inputPatterns) {
-        CategoryNeuron categoryN = new PatternCategoryNeuron()
-                .init(m, "C-" + label);
-
-        for (PatternNeuron pn : inputPatterns) {
-            pn.newCategorySynapse()
-                    .init(pn, categoryN, 1.0);
-        }
-
-        return categoryN;
-    }
-
-    public static InhibitoryNeuron initInhibitoryLoop(Model m, String label, boolean sameInhibSynapse, BindingNeuron... bns) {
-        InhibitoryNeuron inhibN = new InhibitoryNeuron()
-                .init(m, "I-" + label);
-
-        return addInhibitoryLoop(inhibN, sameInhibSynapse, bns);
-    }
 
     public static InhibitoryNeuron addInhibitoryLoop(InhibitoryNeuron inhibN, boolean sameInhibSynapse, BindingNeuron... bns) {
         if(inhibN == null)
