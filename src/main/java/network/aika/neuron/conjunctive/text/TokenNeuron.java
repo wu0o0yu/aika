@@ -34,20 +34,6 @@ public class TokenNeuron extends PatternNeuron {
     private String tokenLabel;
 
 
-    //TODO: check me! Do I need to be static in this class?
-    public static TokenNeuron lookupToken(Model m, String tokenLabel) {
-        return m.lookupNeuron(tokenLabel, l -> {
-            TokenNeuron n = new TokenNeuron();
-            n.addProvider(m);
-
-            n.setTokenLabel(l);
-            n.setNetworkInput(true);
-            n.setLabel(l);
-            n.setAllowTraining(false);
-            return n;
-        });
-    }
-
     @Override
     public PatternActivation createActivation(Thought t) {
         return new PatternActivation(t.createActivationId(), t, this);

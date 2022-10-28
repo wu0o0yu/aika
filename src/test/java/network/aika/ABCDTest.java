@@ -103,11 +103,11 @@ public class ABCDTest {
     public void testABCD() throws InterruptedException {
         Model m = new Model();
 
-        PatternNeuron a_IN = TokenNeuron.lookupToken(m, "a");
+        PatternNeuron a_IN = lookupToken(m, "a");
 
-        PatternNeuron b_IN = TokenNeuron.lookupToken(m, "b");
-        PatternNeuron c_IN = TokenNeuron.lookupToken(m, "c");
-        PatternNeuron d_IN = TokenNeuron.lookupToken(m, "d");
+        PatternNeuron b_IN = lookupToken(m, "b");
+        PatternNeuron c_IN = lookupToken(m, "c");
+        PatternNeuron d_IN = lookupToken(m, "d");
 
         // Pattern ab
         BindingNeuron a_abBN = new BindingNeuron().init(m, "a (ab)");

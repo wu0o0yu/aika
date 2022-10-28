@@ -71,7 +71,20 @@ public class TestUtils {
     }
 
     public static TokenActivation addToken(Model m, Document doc, String t, Integer pos, int i, int j) {
-        return doc.addToken(TokenNeuron.lookupToken(m, t), pos, i, j);
+        return doc.addToken(lookupToken(m, t), pos, i, j);
+    }
+
+    public static TokenNeuron lookupToken(Model m, String tokenLabel) {
+        return m.lookupNeuron(tokenLabel, l -> {
+            TokenNeuron n = new TokenNeuron();
+            n.addProvider(m);
+
+            n.setTokenLabel(l);
+            n.setNetworkInput(true);
+            n.setLabel(l);
+            n.setAllowTraining(false);
+            return n;
+        });
     }
 
     public static Config getConfig() {

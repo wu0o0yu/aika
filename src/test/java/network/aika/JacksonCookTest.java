@@ -117,8 +117,8 @@ public class JacksonCookTest {
     public void setupJacksonCookTest(AIKADebugger debugger) {
         Model m = new Model();
 
-        TokenNeuron jacksonIN = TokenNeuron.lookupToken(m, "Jackson");
-        TokenNeuron cookIN = TokenNeuron.lookupToken(m, "Cook");
+        TokenNeuron jacksonIN = lookupToken(m, "Jackson");
+        TokenNeuron cookIN = lookupToken(m, "Cook");
 
         LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, -1, -1);
 

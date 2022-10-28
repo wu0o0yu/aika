@@ -30,8 +30,8 @@ import static network.aika.TestUtils.*;
 public class TestHelper {
 
     public static void initPatternTheCat(Model m, InhibitoryNeuron inhibNThe, InhibitoryNeuron inhibNCat, int variant) {
-        PatternNeuron theIN = TokenNeuron.lookupToken(m, "the");
-        PatternNeuron catIN = TokenNeuron.lookupToken(m, "cat");
+        PatternNeuron theIN = lookupToken(m, "the");
+        PatternNeuron catIN = lookupToken(m, "cat");
 
         int relFrom = variant < 2 ? -5 : 1;
         int relTo = variant < 2 ? -1 : 5;
@@ -76,8 +76,8 @@ public class TestHelper {
     }
 
     public static void initPatternBlackCat(Model m) {
-        PatternNeuron blackIN = TokenNeuron.lookupToken(m, "black");
-        PatternNeuron catIN = TokenNeuron.lookupToken(m, "cat");
+        PatternNeuron blackIN = lookupToken(m, "black");
+        PatternNeuron catIN = lookupToken(m, "cat");
 
         LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, -1, -1);
 
@@ -107,8 +107,8 @@ public class TestHelper {
     }
 
     public static void initPatternTheDog(Model m, InhibitoryNeuron inhibNThe, InhibitoryNeuron inhibNDog, int variant) {
-        PatternNeuron theIN = TokenNeuron.lookupToken(m, "the");
-        PatternNeuron dogIN = TokenNeuron.lookupToken(m, "dog");
+        PatternNeuron theIN = lookupToken(m, "the");
+        PatternNeuron dogIN = lookupToken(m, "dog");
 
         int relFrom = variant < 2 ? -5 : 1;
         int relTo = variant < 2 ? -1 : 5;
