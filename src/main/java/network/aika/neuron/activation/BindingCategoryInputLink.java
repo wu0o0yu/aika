@@ -18,6 +18,8 @@ package network.aika.neuron.activation;
 
 import network.aika.neuron.conjunctive.BindingCategoryInputSynapse;
 import network.aika.neuron.conjunctive.PatternCategoryInputSynapse;
+import network.aika.neuron.visitor.DownVisitor;
+import network.aika.neuron.visitor.UpVisitor;
 
 
 /**
@@ -27,5 +29,15 @@ public class BindingCategoryInputLink extends BindingNeuronLink<BindingCategoryI
 
     public BindingCategoryInputLink(BindingCategoryInputSynapse s, CategoryActivation input, BindingActivation output) {
         super(s, input, output);
+    }
+
+    @Override
+    public void patternVisitDown(DownVisitor v) {
+        v.next(this);
+    }
+
+    @Override
+    public void patternVisitUp(UpVisitor v) {
+        v.next(this);
     }
 }

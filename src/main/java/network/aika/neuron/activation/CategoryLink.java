@@ -17,6 +17,8 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.disjunctive.CategorySynapse;
+import network.aika.neuron.visitor.DownVisitor;
+import network.aika.neuron.visitor.UpVisitor;
 
 /**
  * @author Lukas Molzberger
@@ -29,5 +31,15 @@ public class CategoryLink<S extends CategorySynapse, IA extends ConjunctiveActiv
 
     @Override
     protected void addInputLinkingStep() {
+    }
+
+    @Override
+    public void patternVisitDown(DownVisitor v) {
+        v.next(this);
+    }
+
+    @Override
+    public void patternVisitUp(UpVisitor v) {
+        v.next(this);
     }
 }

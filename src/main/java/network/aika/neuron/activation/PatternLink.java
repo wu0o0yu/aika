@@ -29,6 +29,12 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
         super(s, input, output);
     }
 
+    @Override
+    public void patternVisitDown(DownVisitor v) {
+        v.next(this);
+    }
+
+    @Override
     public void patternVisitUp(UpVisitor v) {
         v.next(this);
     }
