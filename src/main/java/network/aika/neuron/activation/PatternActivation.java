@@ -33,6 +33,10 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
         super(id, t, patternNeuron);
     }
 
+    public void setRange(Range range) {
+        this.range = range;
+    }
+
     @Override
     public Range getRange() {
         return range;

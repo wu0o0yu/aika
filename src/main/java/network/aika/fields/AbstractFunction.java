@@ -35,4 +35,8 @@ public abstract class AbstractFunction extends Field implements FieldInput, Fiel
 
         triggerUpdate();
     }
+
+    @Override
+    public void removeInput(FieldLink l) {
+    }
 }

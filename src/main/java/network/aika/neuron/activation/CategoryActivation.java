@@ -31,6 +31,11 @@ public class CategoryActivation<N extends CategoryNeuron<?, ?>> extends Disjunct
 
     @Override
     public Range getRange() {
-        return null;
+        return inputLinks.values()
+                .stream()
+                .map(l -> l.getInput())
+                .map(iAct -> iAct.getRange())
+                .findFirst()
+                .orElse(null);
     }
 }
