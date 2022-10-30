@@ -16,10 +16,10 @@
  */
 package network.aika.neuron.visitor;
 
+import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.conjunctive.ConjunctiveSynapse;
 import network.aika.neuron.conjunctive.Scope;
 import network.aika.neuron.visitor.linking.LinkingCallback;
 import network.aika.neuron.visitor.linking.LinkingOperator;
@@ -39,6 +39,11 @@ public class ActLinkingOperator extends LinkingOperator {
         this.synA = synA;
         this.linkA = linkA;
         this.toScope = synA.getScope();
+    }
+
+    @Override
+    public Direction getRelationDir(Scope fromScope) {
+        return fromScope.getRelationDir();
     }
 
     @Override

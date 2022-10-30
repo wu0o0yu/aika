@@ -20,7 +20,6 @@ import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.visitor.linking.binding.BindingDownVisitor;
-import network.aika.neuron.visitor.linking.LinkingDownVisitor;
 import network.aika.neuron.visitor.linking.LinkingOperator;
 import network.aika.neuron.visitor.linking.binding.RelationLinkingDownVisitor;
 
@@ -52,7 +51,7 @@ public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I ext
                 .orElse(null);
 
         BindingDownVisitor v = rel != null ?
-                new RelationLinkingDownVisitor(t, c, rel, scope.getRelationDir()) :
+                new RelationLinkingDownVisitor(t, c, rel, c.getRelationDir(scope)) :
                 new BindingDownVisitor(t, c);
 
         v.start(bs);

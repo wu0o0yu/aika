@@ -16,9 +16,11 @@
  */
 package network.aika.neuron.visitor.linking;
 
+import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
+import network.aika.neuron.conjunctive.Scope;
 
 import java.util.stream.Stream;
 
@@ -37,6 +39,8 @@ public abstract class LinkingOperator {
         this.fromBS = fromBS;
         this.syn = syn;
     }
+
+    public abstract Direction getRelationDir(Scope fromScope);
 
     public abstract void check(LinkingCallback v, Link lastLink, Activation act);
 

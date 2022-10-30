@@ -229,6 +229,9 @@ public abstract class Thought {
     }
 
     public void disconnect() {
+        if(model.getCurrentThought() == this)
+            model.setCurrentThought(null);
+
         getActivations().forEach(act ->
                 act.disconnect()
         );
