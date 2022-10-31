@@ -20,6 +20,7 @@ import network.aika.Thought;
 import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 import network.aika.neuron.visitor.DownVisitor;
 import network.aika.neuron.visitor.selfref.SelfRefDownVisitor;
 import network.aika.sign.Sign;
@@ -47,13 +48,24 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     public PatternActivation getTrainingInput() {
-        return null;
+        return inputLinks.values().stream()
+                .filter(l -> l instanceof InputPatternLink)
+                .map(l -> (InputPatternLink)l)
+                .map(l -> l.getInput())
+                .filter(iAct -> iAct instanceof PatternActivation)
+                .map(iAct -> (PatternActivation) iAct)
+                .findFirst()
+                .orElse(null);
     }
 
     public PatternActivation getTrainingOutput() {
-        return null;
+        return inputLinks.values().stream()
+                .filter(l -> l instanceof PositiveFeedbackLink)
+                .map(l -> (PositiveFeedbackLink)l)
+                .map(l -> l.getInput())
+                .findFirst()
+                .orElse(null);
     }
-
 
     @Override
     public void initGradientFields() {

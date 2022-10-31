@@ -186,10 +186,20 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         S s = instantiateTemplate(input, output);
 
         if(l != null)
-            s.weight.setValue(computeInitialWeight(l.getInput()));
+            s.weight.setValue(weight.getCurrentValue());
+ //           s.weight.setValue(computeInitialWeight(l.getInput()));
 
         return s;
     }
+
+    /*
+    protected double computeInitialWeight(IA iAct) {
+        double initialWeight = weight.getCurrentValue();
+        initialWeight -= iAct.getConfig().getLearnRate() *
+                iAct.getNeuron().getSurprisal(POS, iAct.getAbsoluteRange(), true);
+        return initialWeight;
+    }
+*/
 
     public S instantiateTemplate(I input, O output) {
         S s = instantiateTemplate();
@@ -218,13 +228,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     public abstract L createLink(IA input, OA output);
 
-
-    protected double computeInitialWeight(IA iAct) {
-        double initialWeight = weight.getCurrentValue();
-        initialWeight -= iAct.getConfig().getLearnRate() *
-                        iAct.getNeuron().getSurprisal(POS, iAct.getAbsoluteRange(), true);
-        return initialWeight;
-    }
 
     public void setWeight(double w) {
         weight.setValue(w);
