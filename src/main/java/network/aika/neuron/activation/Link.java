@@ -18,13 +18,10 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.fields.*;
-import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.visitor.DownVisitor;
 import network.aika.neuron.visitor.UpVisitor;
 import network.aika.neuron.visitor.selfref.SelfRefDownVisitor;
-import network.aika.sign.Sign;
-import network.aika.steps.link.LinkCounting;
 import network.aika.steps.link.LinkingIn;
 
 import static network.aika.fields.FieldLink.connect;
@@ -43,7 +40,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected final I input;
     protected O output;
 
-    private BiFunction igGradient;
     protected AbstractFunction weightedInputUB;
     protected AbstractFunction weightedInputLB;
     protected AbstractFunction backPropGradient;
@@ -120,22 +116,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     private void initGradients() {
-        igGradient = func(
-                this,
-                "Information-Gain",
-                input.netUB,
-                output.netUB,
-                (x1, x2) ->
-                        getRelativeSurprisal(
-                                Sign.getSign(x1),
-                                Sign.getSign(x2),
-                                input.getAbsoluteRange()
-                        ),
-                output.ownInputGradient
-        );
-
         initBackpropGradient();
-
         initWeightUpdate();
     }
 
@@ -191,17 +172,10 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
         if(getOutput() != null)
             linkOutput();
-
-        if(getConfig().isCountingEnabled())
-            LinkCounting.add(this);
     }
 
     public FieldOutput getOnTransparent() {
         return onTransparent;
-    }
-
-    public FieldOutput getInformationGainGradient() {
-        return igGradient;
     }
 
     public AbstractFunction getWeightedInput(boolean upperBound) {
@@ -228,13 +202,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     @Override
     public Timestamp getCreated() {
         return isCausal() ? input.getCreated() : output.getCreated();
-    }
-
-    public double getRelativeSurprisal(Sign si, Sign so, Range range) {
-        double s = synapse.getSurprisal(si, so, range, true);
-        s -= input.getNeuron().getSurprisal(si, range, true);
-        s -= output.getNeuron().getSurprisal(so, range, true);
-        return s;
     }
 
     public FieldOutput getInputValue(boolean upperBound) {

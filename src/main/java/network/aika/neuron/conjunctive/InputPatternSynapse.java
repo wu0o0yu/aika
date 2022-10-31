@@ -39,9 +39,4 @@ public class InputPatternSynapse extends BindingNeuronSynapse<
     public InputPatternLink createLink(ConjunctiveActivation input, BindingActivation output) {
         return new InputPatternLink(this, input, output);
     }
-
-    @Override
-    public boolean propagateCheck(ConjunctiveActivation iAct) {
-        return checkCandidateSynapse(iAct);
-    }
 }

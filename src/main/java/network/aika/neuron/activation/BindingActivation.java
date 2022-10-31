@@ -22,6 +22,7 @@ import network.aika.neuron.Range;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.visitor.DownVisitor;
 import network.aika.neuron.visitor.selfref.SelfRefDownVisitor;
+import network.aika.sign.Sign;
 
 
 import static network.aika.fields.Fields.*;
@@ -39,8 +40,49 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     private Field isOpen;
     private Field mix;
 
+    private BiFunction igGradient;
+
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
+    }
+
+    public PatternActivation getTrainingInput() {
+        return null;
+    }
+
+    public PatternActivation getTrainingOutput() {
+        return null;
+    }
+
+
+    @Override
+    public void initGradientFields() {
+        igGradient = func(
+                this,
+                "Information-Gain",
+                getTrainingInput().netUB,
+                getTrainingOutput().netUB,
+                (x1, x2) ->
+                        getRelativeSurprisal(
+                                Sign.getSign(x1),
+                                Sign.getSign(x2),
+                                getAbsoluteRange()
+                        ),
+                ownInputGradient
+        );
+
+        super.initGradientFields();
+    }
+
+    public double getRelativeSurprisal(Sign si, Sign so, Range range) {
+        double s = neuron.getSurprisal(si, so, range, true);
+        s -= getTrainingInput().getNeuron().getSurprisal(si, range, true);
+        s -= getTrainingOutput().getNeuron().getSurprisal(so, range, true);
+        return s;
+    }
+
+    public FieldOutput getInformationGainGradient() {
+        return igGradient;
     }
 
     @Override

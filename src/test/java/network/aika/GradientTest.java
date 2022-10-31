@@ -18,6 +18,7 @@ package network.aika;
 
 import network.aika.debugger.AIKADebugger;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.text.Document;
 import org.junit.jupiter.api.Test;
 
@@ -83,13 +84,13 @@ public class GradientTest {
 
         processDoc(m, doc);
 
-        Neuron nA = m.getNeuron("A");
+        PatternNeuron nA = (PatternNeuron) m.getNeuron("A");
         setStatistic(nA, 53.0,299,899l);
 
-        Neuron nB = m.getNeuron("B");
+        PatternNeuron nB = (PatternNeuron) m.getNeuron("B");
         setStatistic(nB, 10.0, 121, 739l);
 
-        Neuron nC = m.getNeuron("C");
+        PatternNeuron nC = (PatternNeuron) m.getNeuron("C");
         setStatistic(nC, 30.0, 234, 867l);
 
 
@@ -118,10 +119,10 @@ public class GradientTest {
         );
         processDoc(m, doc1);
 
-        Neuron nA = m.getNeuron("A");
+        PatternNeuron nA = (PatternNeuron) m.getNeuron("A");
         setStatistic(nA, 53.0, 299, 899l);
 
-        Neuron nB = m.getNeuron("B");
+        PatternNeuron nB = (PatternNeuron) m.getNeuron("B");
         setStatistic(nB, 10.0, 121, 739l);
 
         AIKADebugger.createAndShowGUI(doc1);
@@ -138,7 +139,7 @@ public class GradientTest {
         );
         processDoc(m, doc2);
 
-        Neuron nC = m.getNeuron("C");
+        PatternNeuron nC = (PatternNeuron) m.getNeuron("C");
         setStatistic(nC, 30.0, 234, 867l);
 
         AIKADebugger.createAndShowGUI(doc2);

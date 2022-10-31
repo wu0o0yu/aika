@@ -151,7 +151,7 @@ public class TestUtils {
         return s;
     }
 
-    public static void setStatistic(Neuron n, double frequency, int N, long lastPosition) {
+    public static void setStatistic(PatternNeuron n, double frequency, int N, long lastPosition) {
         n.setFrequency(frequency);
         n.getSampleSpace().setN(N);
         n.getSampleSpace().setLastPosition(lastPosition);

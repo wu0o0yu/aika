@@ -68,8 +68,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     protected FieldOutput isFinalAndFired;
 
-
-    private FieldFunction entropy;
     protected FieldFunction netOuterGradient;
     protected QueueField ownInputGradient;
     protected QueueField backpropInputGradient;
@@ -214,19 +212,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         ownOutputGradient = new QueueField(this, "Own-Output-Gradient");
         backpropOutputGradient = new QueueField(this, "Backprop-Output-Gradient");
 
-        entropy = func(
-                this,
-                "Entropy",
-                netUB,
-                x ->
-                        getNeuron().getSurprisal(
-                                Sign.getSign(x),
-                                getAbsoluteRange(),
-                                true
-                        ),
-                ownInputGradient
-        );
-
         netOuterGradient =
                 func(
                         this,
@@ -320,10 +305,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public void init(Synapse originSynapse, Activation originAct) {
         thought.onActivationCreationEvent(this, originSynapse, originAct);
-    }
-
-    public FieldOutput getEntropy() {
-        return entropy;
     }
 
     public Field getOwnInputGradient() {
@@ -526,7 +507,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
                 isFiredForWeight,
                 isFiredForBias,
                 isFinal,
-                entropy,
                 netOuterGradient,
                 ownInputGradient,
                 backpropInputGradient,

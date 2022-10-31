@@ -17,9 +17,14 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.fields.FieldFunction;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.Range;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.visitor.DownVisitor;
+import network.aika.sign.Sign;
+
+import static network.aika.fields.Fields.func;
 
 /**
  *
@@ -29,8 +34,33 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     protected Range range;
 
+
+    private FieldFunction entropy;
+
     public PatternActivation(int id, Thought t, PatternNeuron patternNeuron) {
         super(id, t, patternNeuron);
+    }
+
+    @Override
+    public void initGradientFields() {
+        entropy = func(
+                this,
+                "Entropy",
+                netUB,
+                x ->
+                        getNeuron().getSurprisal(
+                                Sign.getSign(x),
+                                getAbsoluteRange(),
+                                true
+                        ),
+                ownInputGradient
+        );
+
+        super.initGradientFields();
+    }
+
+    public FieldOutput getEntropy() {
+        return entropy;
     }
 
     public void setRange(Range range) {

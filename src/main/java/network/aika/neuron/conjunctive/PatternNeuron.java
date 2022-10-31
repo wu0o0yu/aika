@@ -16,16 +16,31 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.Model;
 import network.aika.Thought;
+import network.aika.neuron.Range;
+import network.aika.neuron.SampleSpace;
+import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.disjunctive.CategorySynapse;
 import network.aika.neuron.disjunctive.PatternCategorySynapse;
+import network.aika.sign.Sign;
+import network.aika.utils.Bound;
+import network.aika.utils.Utils;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
+import static network.aika.sign.Sign.POS;
 
 /**
  *
  * @author Lukas Molzberger
  */
 public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, PatternActivation> {
+
+    protected double frequency;
 
     public PatternNeuron() {
         super();
@@ -62,5 +77,78 @@ public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, Pattern
 
     @Override
     protected void updateSumOfLowerWeights() {
+    }
+
+    @Override
+    public void count(PatternActivation act) {
+        double oldN = sampleSpace.getN();
+
+        Range absoluteRange = act.getAbsoluteRange();
+        sampleSpace.countSkippedInstances(absoluteRange);
+
+        sampleSpace.count();
+        frequency += 1.0;
+
+        Double alpha = act.getConfig().getAlpha();
+        if (alpha != null)
+            applyMovingAverage(
+                    Math.pow(alpha, sampleSpace.getN() - oldN)
+            );
+
+        sampleSpace.updateLastPosition(absoluteRange);
+        setModified();
+    }
+
+    public void applyMovingAverage(double alpha) {
+        sampleSpace.applyMovingAverage(alpha);
+        frequency *= alpha;
+        setModified();
+    }
+
+
+    public double getFrequency() {
+        return frequency;
+    }
+
+    public double getFrequency(Sign s, double n) {
+        return s == POS ?
+                frequency :
+                n - frequency;
+    }
+
+    public void setFrequency(double f) {
+        frequency = f;
+        setModified();
+    }
+
+    public double getSurprisal(Sign s, Range range, boolean addCurrentInstance) {
+        double n = sampleSpace.getN(range);
+        double p = getProbability(s, n, addCurrentInstance);
+        return Utils.surprisal(p);
+    }
+
+    public double getProbability(Sign s, double n, boolean addCurrentInstance) {
+        double f = getFrequency(s, n);
+
+        if(addCurrentInstance) {
+            f += 1.0;
+            n += 1.0;
+        }
+
+        return Bound.UPPER.probability(f, n);
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+
+        out.writeDouble(frequency);
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws Exception {
+        super.readFields(in, m);
+
+        frequency = in.readDouble();
     }
 }

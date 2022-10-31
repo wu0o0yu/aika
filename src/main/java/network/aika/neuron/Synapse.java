@@ -63,11 +63,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         setModified();
     });
 
-    protected SampleSpace sampleSpace = new SampleSpace();
-
-    protected double frequencyIPosOPos;
-    protected double frequencyIPosONeg;
-    protected double frequencyINegOPos;
 
     protected boolean allowTraining = true;
 
@@ -223,12 +218,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     public abstract L createLink(IA input, OA output);
 
-    public boolean checkCandidateSynapse(IA iAct) {
-        double candidateWeight = computeInitialWeight(iAct);
-        double candidateNet = (iAct.getValueLB().getCurrentValue() * candidateWeight) + getOutput().getBias().getCurrentValue();
-
-        return candidateNet >= 0.0;
-    }
 
     protected double computeInitialWeight(IA iAct) {
         double initialWeight = weight.getCurrentValue();
@@ -321,101 +310,12 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return (O) output.getNeuron();
     }
 
-    public SampleSpace getSampleSpace() {
-        return sampleSpace;
-    }
-
-    public double getFrequency(Sign is, Sign os, double n) {
-        if(is == POS && os == POS) {
-            return frequencyIPosOPos;
-        } else if(is == POS && os == NEG) {
-            return frequencyIPosONeg;
-        } else if(is == NEG && os == POS) {
-            return frequencyINegOPos;
-        }
-
-        //TODO:
-        return Math.max(n - (frequencyIPosOPos + frequencyIPosONeg + frequencyINegOPos), 0);
-    }
-
-    public void setFrequency(Sign is, Sign os, double f) {
-        if(is == POS && os == POS) {
-            frequencyIPosOPos = f;
-        } else if(is == POS && os == NEG) {
-            frequencyIPosONeg = f;
-        } else if(is == NEG && os == POS) {
-            frequencyINegOPos = f;
-        } else {
-            throw new UnsupportedOperationException();
-        }
-        setModified();
-    }
-
-    public void applyMovingAverage(double alpha) {
-        sampleSpace.applyMovingAverage(alpha);
-        frequencyIPosOPos *= alpha;
-        frequencyIPosONeg *= alpha;
-        frequencyINegOPos *= alpha;
-        setModified();
-    }
-
-    public void count(Link l) {
-        double oldN = sampleSpace.getN();
-
-        boolean iActive = l.getInput().isFired();
-        boolean oActive = l.getOutput().isFired();
-
-        Range absoluteRange = l.getInput().getAbsoluteRange();
-
-        sampleSpace.countSkippedInstances(absoluteRange);
-
-        sampleSpace.count();
-
-        if(oActive) {
-            Double alpha = l.getConfig().getAlpha();
-            if (alpha != null)
-                applyMovingAverage(
-                        Math.pow(alpha, sampleSpace.getN() - oldN)
-                );
-        }
-
-        if(iActive && oActive) {
-            frequencyIPosOPos += 1.0;
-            setModified();
-        } else if(iActive) {
-            frequencyIPosONeg += 1.0;
-            setModified();
-        } else if(oActive) {
-            frequencyINegOPos += 1.0;
-            setModified();
-        }
-
-        sampleSpace.updateLastPosition(absoluteRange);
-    }
-
     public Model getModel() {
         return output != null ?
                 output.getModel() :
                 null;
     }
 
-    public double getSurprisal(Sign si, Sign so, Range range, boolean addCurrentInstance) {
-        double n = sampleSpace.getN(range);
-        double p = getProbability(si, so, n, addCurrentInstance);
-        return Utils.surprisal(p);
-    }
-
-    public double getProbability(Sign si, Sign so, double n, boolean addCurrentInstance) {
-        double f = getFrequency(si, so, n);
-
-        // Add the current instance
-        if(addCurrentInstance) {
-            f += 1.0;
-            n += 1.0;
-        }
-
-        return Bound.UPPER.probability(f, n);
-    }
 
     public Field getWeight() {
         return weight;
@@ -440,12 +340,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         out.writeBoolean(isOutputLinked);
 
         weight.write(out);
-
-        out.writeDouble(frequencyIPosOPos);
-        out.writeDouble(frequencyIPosONeg);
-        out.writeDouble(frequencyINegOPos);
-
-        sampleSpace.write(out);
     }
 
     public static Synapse read(DataInput in, Model m) throws IOException {
@@ -465,12 +359,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         isOutputLinked = in.readBoolean();
 
         weight.readFields(in, m);
-
-        frequencyIPosOPos = in.readDouble();
-        frequencyIPosONeg = in.readDouble();
-        frequencyINegOPos = in.readDouble();
-
-        sampleSpace = SampleSpace.read(in, m);
     }
 
     @Override

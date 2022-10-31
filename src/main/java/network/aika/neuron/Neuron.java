@@ -68,7 +68,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     protected final ReadWriteLock lock = new ReadWriteLock();
 
-    protected double frequency;
     protected SampleSpace sampleSpace = new SampleSpace();
 
     protected boolean isNetworkInput; // Input Neurons won't be trained!
@@ -199,14 +198,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return template.isOfTemplate(templateNeuron);
     }
 */
-
-
-    public double getCandidateGradient(Activation act) {
-        Range range = act.getAbsoluteRange();
-        assert range != null;
-
-        return getSurprisal(POS, range, true);
-    }
 
     public SampleSpace getSampleSpace() {
         return sampleSpace;
@@ -348,67 +339,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return lock;
     }
 
-    public void count(Activation act) {
-        double oldN = sampleSpace.getN();
-
-        Range absoluteRange = act.getAbsoluteRange();
-        sampleSpace.countSkippedInstances(absoluteRange);
-
-        sampleSpace.count();
-        frequency += 1.0;
-
-        Double alpha = act.getConfig().getAlpha();
-        if (alpha != null)
-            applyMovingAverage(
-                    Math.pow(alpha, sampleSpace.getN() - oldN)
-            );
-
-        sampleSpace.updateLastPosition(absoluteRange);
-        setModified();
-    }
-
-    public void applyMovingAverage(double alpha) {
-        sampleSpace.applyMovingAverage(alpha);
-        frequency *= alpha;
-        setModified();
-    }
-
-    public double getSurprisal(Sign s, Range range, boolean addCurrentInstance) {
-        double n = sampleSpace.getN(range);
-        double p = getProbability(s, n, addCurrentInstance);
-        return Utils.surprisal(p);
-    }
-
-    public double getProbability(Sign s, double n, boolean addCurrentInstance) {
-        double f = getFrequency(s, n);
-
-        if(addCurrentInstance) {
-            f += 1.0;
-            n += 1.0;
-        }
-
-        return Bound.UPPER.probability(f, n);
-    }
-
-    public double getFrequency() {
-        return frequency;
-    }
-
-    public double getFrequency(Sign s, double n) {
-        return s == POS ?
-                frequency :
-                n - frequency;
-    }
-
-    public void setFrequency(double f) {
-        frequency = f;
-        setModified();
-    }
-
-    public boolean checkTemplateInductionThreshold(Activation act)  {
-        return Math.abs(getCandidateGradient(act)) > act.getConfig().getInductionThreshold();
-    }
-
     public void reactivate(Model m) {
         m.incrementRetrievalCounter();
         retrievalCount = m.getCurrentRetrievalCount();
@@ -443,7 +373,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         }
         out.writeBoolean(false);
 
-        out.writeDouble(frequency);
         sampleSpace.write(out);
 
         out.writeBoolean(isNetworkInput);
@@ -478,7 +407,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
             outputSynapses.add(syn);
         }
 
-        frequency = in.readDouble();
         sampleSpace = SampleSpace.read(in, m);
 
         isNetworkInput = in.readBoolean();
@@ -529,5 +457,8 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public String toString() {
         return getClass().getSimpleName() + " " + toKeyString();
+    }
+
+    public void count(A act) {
     }
 }
