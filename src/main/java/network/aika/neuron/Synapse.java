@@ -95,11 +95,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     public double getPropagatePreNetUB(IA iAct) {
         return getOutput().getBias().getCurrentValue() +
-                getWeight().getCurrentValue() +
-                computeInitialWeightUpdate(iAct);
+                getWeight().getCurrentValue();
     }
 
-    public static double getLatentLinkingPreNetUB(Activation iActA, Synapse synA, Synapse synB) {
+    public static double getLatentLinkingPreNetUB(Synapse synA, Synapse synB) {
         double preUB = synA.getOutput().getBias().getCurrentValue() +
                 synA.getWeight().getCurrentValue();
 
@@ -177,17 +176,12 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         this.output = output.getProvider();
     }
 
-    protected double computeInitialWeightUpdate(IA iAct) {
-        return 0.0;
-    }
-
     public S instantiateTemplate(L l, I input, O output) {
         S s = instantiateTemplate(input, output);
 
         if(l != null)
             s.weight.setValue(
-                    weight.getCurrentValue() +
-                    computeInitialWeightUpdate(l.getInput())
+                    weight.getCurrentValue()
             );
 
         return s;

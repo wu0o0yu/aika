@@ -115,7 +115,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     public void latentLinkOutgoing(Synapse synA, Activation bsA) {
         getTargetInputSynapses()
                 .filter(synB -> synA != synB)
-                .filter(synB -> getLatentLinkingPreNetUB(bsA, synA, synB) > 0.0)
+                .filter(synB -> getLatentLinkingPreNetUB(synA, synB) > 0.0)
                 .forEach(synB ->
                         synB.startVisitor(
                                 new ActLinkingOperator(bsA, synA, null, synB),
