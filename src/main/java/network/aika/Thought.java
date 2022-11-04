@@ -62,6 +62,8 @@ public abstract class Thought {
         model = m;
         id = model.createThoughtId();
         absoluteBegin = m.getN();
+
+        assert m.getCurrentThought() == null;
         m.setCurrentThought(this);
     }
 

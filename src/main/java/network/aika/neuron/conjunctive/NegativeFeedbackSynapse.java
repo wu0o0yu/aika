@@ -54,11 +54,6 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
     }
 
     @Override
-    public boolean propagateCheck(InhibitoryActivation iAct) {
-        return true;
-    }
-
-    @Override
     public void setWeight(double w) {
         weight.receiveUpdate(w);
     }
@@ -69,7 +64,7 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
     }
 
     @Override
-    public boolean isPropagate() {
-        return false;
+    public double getPropagatePreNetUB(InhibitoryActivation iAct) {
+        return weight.getCurrentValue();
     }
 }

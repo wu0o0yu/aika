@@ -35,16 +35,6 @@ public class PatternSynapse extends AbstractPatternSynapse<
     }
 
     @Override
-    public boolean isPropagate() {
-        return true;
-    }
-
-    @Override
-    public boolean propagateCheck(BindingActivation iAct) {
-        return true;
-    }
-
-    @Override
     public PatternLink createLink(BindingActivation input, PatternActivation output) {
         PositiveFeedbackSynapse posFeedbackSyn = (PositiveFeedbackSynapse) input.getNeuron().getInputSynapse(output.getNeuronProvider());
         if(posFeedbackSyn != null)

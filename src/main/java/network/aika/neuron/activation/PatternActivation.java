@@ -25,6 +25,7 @@ import network.aika.neuron.visitor.DownVisitor;
 import network.aika.sign.Sign;
 
 import static network.aika.fields.Fields.func;
+import static network.aika.sign.Sign.POS;
 
 /**
  *
@@ -87,5 +88,18 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     public void inhibVisitDown(DownVisitor v, Link lastLink) {
         super.inhibVisitDown(v, lastLink);
         v.up(this);
+    }
+
+    public double getPreGradient() {
+/*        PatternCategoryInputLink catIL = inputLinks.values().stream()
+                .filter(l -> l instanceof PatternCategoryInputLink)
+                .map(l -> (PatternCategoryInputLink) l)
+                .findAny()
+                .orElse(null);
+
+        if(catIL != null)
+*/
+
+        return -getNeuron().getSurprisal(POS, getAbsoluteRange(), true);
     }
 }

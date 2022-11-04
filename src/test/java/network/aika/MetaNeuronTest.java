@@ -106,7 +106,8 @@ public class MetaNeuronTest {
                 .adjustBias();
 
         new PositiveFeedbackSynapse()
-                .init(syllablePN, sylBeginBN, 10.0);
+                .init(syllablePN, sylBeginBN, 10.0)
+                .adjustBias();
 
         new InputPatternSynapse()
                 .init(letterPN, sylBeginBN, 10.0)
@@ -115,7 +116,7 @@ public class MetaNeuronTest {
         new BindingCategoryInputSynapse()
                 .init(sylBeginCategory, sylBeginBN, 1.0);
 
-        sylBeginBN.updateBias(3.0);
+//        sylBeginBN.updateBias(3.0);
 
         return sylBeginBN;
     }

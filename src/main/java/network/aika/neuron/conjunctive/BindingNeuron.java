@@ -179,6 +179,12 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
         return Bound.UPPER.probability(f, n);
     }
 
+    public double getPreNetUBDummyWeightSum() {
+        return inputSynapses.stream()
+                .mapToDouble(s -> s.getPreNetUBDummyWeight())
+                .sum();
+    }
+
     @Override
     public void write(DataOutput out) throws IOException {
         super.write(out);

@@ -23,8 +23,6 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.visitor.*;
-import network.aika.neuron.visitor.linking.LinkingOperator;
 import network.aika.utils.Utils;
 
 import java.io.DataInput;
@@ -63,11 +61,6 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     @Override
-    public boolean propagateCheck(IA iAct) {
-        return getWeight().getCurrentValue() + sumOfLowerWeights > 0.0;
-    }
-
-    @Override
     public double getSumOfLowerWeights() {
         return sumOfLowerWeights;
     }
@@ -85,6 +78,16 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
             getOutput().setModified();
     }
 
+    public void initDummyLink(BindingActivation bindingActivation) {
+    }
+
+    public S adjustBias() {
+        if(weight.getCurrentValue() > 0.0)
+            getOutput().getBias().receiveUpdate(-weight.getCurrentValue());
+
+        return (S) this;
+    }
+
     @Override
     public void write(DataOutput out) throws IOException {
         super.write(out);
@@ -97,16 +100,5 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         super.readFields(in, m);
 
         sumOfLowerWeights = in.readDouble();
-    }
-
-    public void initDummyLink(BindingActivation bindingActivation) {
-
-    }
-
-    public S adjustBias() {
-        if(weight.getCurrentValue() > 0.0)
-            getOutput().getBias().receiveUpdate(-weight.getCurrentValue());
-
-        return (S) this;
     }
 }

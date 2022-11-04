@@ -44,13 +44,8 @@ public abstract class AbstractPatternSynapse<S extends AbstractPatternSynapse, I
     }
 
     @Override
-    public boolean isPropagate() {
-        return true;
-    }
-
-    @Override
-    public boolean propagateCheck(IA iAct) {
-        return true;
+    public double getPropagatePreNetUB(IA iAct) {
+        return weight.getCurrentValue();
     }
 
     @Override

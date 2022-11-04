@@ -20,8 +20,6 @@ import network.aika.neuron.activation.*;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 import network.aika.neuron.visitor.linking.LinkingOperator;
 
-import java.util.stream.Stream;
-
 /**
  *
  * @author Lukas Molzberger
@@ -43,7 +41,7 @@ public abstract class CategorySynapse<S extends CategorySynapse, I extends Conju
 
     @Override
     public void linkAndPropagateOut(IA bs) {
-        if (isPropagate())
+        if (getPropagatePreNetUB(bs) > 0.0)
             propagate(bs);
     }
 

@@ -37,4 +37,9 @@ public class RelationInputSynapse extends BindingNeuronSynapse<
     public RelationInputLink createLink(BindingActivation input, BindingActivation output) {
         return new RelationInputLink(this, input, output);
     }
+
+    @Override
+    protected double getSortingWeight() {
+        return 0.0;
+    }
 }

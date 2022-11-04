@@ -24,8 +24,6 @@ import network.aika.fields.Field;
 import network.aika.neuron.conjunctive.Scope;
 import network.aika.neuron.visitor.ActLinkingOperator;
 import network.aika.neuron.visitor.linking.LinkingOperator;
-import network.aika.sign.Sign;
-import network.aika.utils.Bound;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 import org.slf4j.Logger;
@@ -40,8 +38,6 @@ import java.util.stream.Stream;
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.activation.Timestamp.MAX;
 import static network.aika.neuron.activation.Timestamp.MIN;
-import static network.aika.sign.Sign.NEG;
-import static network.aika.sign.Sign.POS;
 
 /**
  *
@@ -78,10 +74,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     public abstract double getSumOfLowerWeights();
 
-    public boolean propagateCheck(IA iAct) {
-        return true;
-    }
-
     public boolean checkLinkingEvent(Activation act) {
         return isTrue(act.getIsFired());
     }
@@ -100,24 +92,27 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
         createLink(iAct, oAct);
     }
-/*
-    protected boolean checkCausal(IA iAct, OA oAct) {
-        return Link.isCausal(iAct, oAct);
-    }
-*/
-    public boolean isPropagate() {
-        double tsWeight = getWeight().getCurrentValue();
-        double tnBias = getOutput().getBias().getCurrentValue();
-        return tsWeight + tnBias > 0.0;
+
+    public double getPropagatePreNetUB(IA iAct) {
+        return getOutput().getBias().getCurrentValue() +
+                getWeight().getCurrentValue() +
+                computeInitialWeightUpdate(iAct);
     }
 
-    public boolean isLatentLinking() {
-        return getWeight().getCurrentValue() + getSumOfLowerWeights() > 0.0;
-    }
+    public static double getLatentLinkingPreNetUB(Activation iActA, Synapse synA, Synapse synB) {
+        double preUB = synA.getOutput().getBias().getCurrentValue() +
+                synA.getWeight().getCurrentValue();
 
-    public static boolean isLatentLinking(Synapse synA, Synapse synB) {
-        double sumOfLowerWeights = Math.min(synA.getSumOfLowerWeights(), synB.getSumOfLowerWeights());
-        return synA.getWeight().getCurrentValue() + synB.getWeight().getCurrentValue() + sumOfLowerWeights > 0.0;
+        if(synB != null) {
+            preUB += synB.getWeight().getCurrentValue() +
+                    Math.min(
+                            synA.getSumOfLowerWeights(),
+                            synB.getSumOfLowerWeights()
+                    );
+        } else
+            preUB += synA.getSumOfLowerWeights();
+
+        return preUB;
     }
 
     public static boolean latentActivationExists(Synapse synA, Synapse synB, Activation iActA, Activation iActB) {
@@ -168,7 +163,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         getOutput()
                 .latentLinkOutgoing(this, bs);
 
-        if (isPropagate())
+        if (getPropagatePreNetUB(bs) > 0.0)
             propagate(bs);
     }
 
@@ -182,24 +177,22 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         this.output = output.getProvider();
     }
 
+    protected double computeInitialWeightUpdate(IA iAct) {
+        return 0.0;
+    }
+
     public S instantiateTemplate(L l, I input, O output) {
         S s = instantiateTemplate(input, output);
 
         if(l != null)
-            s.weight.setValue(weight.getCurrentValue());
- //           s.weight.setValue(computeInitialWeight(l.getInput()));
+            s.weight.setValue(
+                    weight.getCurrentValue() +
+                    computeInitialWeightUpdate(l.getInput())
+            );
 
         return s;
     }
 
-    /*
-    protected double computeInitialWeight(IA iAct) {
-        double initialWeight = weight.getCurrentValue();
-        initialWeight -= iAct.getConfig().getLearnRate() *
-                iAct.getNeuron().getSurprisal(POS, iAct.getAbsoluteRange(), true);
-        return initialWeight;
-    }
-*/
 
     public S instantiateTemplate(I input, O output) {
         S s = instantiateTemplate();
@@ -227,7 +220,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public abstract L createLink(IA input, OA output);
-
 
     public void setWeight(double w) {
         weight.setValue(w);
@@ -400,10 +392,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     private String getArrow() {
-        if(isPropagate())
-            return "==>";
-        if(isLatentLinking())
-            return "-=>";
         return "-->";
     }
 }

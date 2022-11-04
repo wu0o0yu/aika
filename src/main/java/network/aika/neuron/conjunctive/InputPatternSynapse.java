@@ -19,6 +19,7 @@ package network.aika.neuron.conjunctive;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.activation.InputPatternLink;
+import network.aika.neuron.activation.PatternActivation;
 
 /**
  *
@@ -38,5 +39,28 @@ public class InputPatternSynapse extends BindingNeuronSynapse<
     @Override
     public InputPatternLink createLink(ConjunctiveActivation input, BindingActivation output) {
         return new InputPatternLink(this, input, output);
+    }
+
+    /*
+    public boolean checkCandidateSynapse(PatternActivation iAct) {
+        double candidateWeight = computeInitialWeightDelta(iAct);
+        double candidateNet = (iAct.getValueLB().getCurrentValue() * candidateWeight) + getOutput().getBias().getCurrentValue();
+
+        return candidateNet >= 0.0;
+    }
+*/
+
+    @Override
+    protected double computeInitialWeightUpdate(ConjunctiveActivation iAct) {
+        if(iAct == null || !(iAct instanceof PatternActivation))
+            return 0.0;
+
+        PatternActivation inputAct = (PatternActivation) iAct;
+
+        double initialWeightUpdate =
+                iAct.getConfig().getLearnRate() *
+                inputAct.getPreGradient();
+
+        return initialWeightUpdate;
     }
 }
