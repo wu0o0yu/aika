@@ -28,7 +28,7 @@ import network.aika.neuron.visitor.linking.binding.RelationLinkingDownVisitor;
  *
  * @author Lukas Molzberger
  */
-public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I extends Neuron, L extends Link<S, IA, BindingActivation>, IA extends Activation<?>> extends
+public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I extends Neuron, L extends BindingNeuronLink<S, IA>, IA extends Activation<?>> extends
         ConjunctiveSynapse<
                 S,
                 I,

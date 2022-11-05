@@ -25,7 +25,6 @@ import network.aika.neuron.activation.Activation;
 public class Config {
     private Double alpha = null; //0.99;
     private double learnRate;
-    private double inductionThreshold;
 
     private boolean trainingEnabled;
     private boolean countingEnabled;
@@ -45,15 +44,6 @@ public class Config {
 
     public Config setAlpha(Double alpha) {
         this.alpha = alpha;
-        return this;
-    }
-
-    public double getInductionThreshold() {
-        return inductionThreshold;
-    }
-
-    public Config setInductionThreshold(double inductionThreshold) {
-        this.inductionThreshold = inductionThreshold;
         return this;
     }
 

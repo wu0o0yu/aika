@@ -20,11 +20,9 @@ import network.aika.Model;
 import network.aika.Thought;
 import network.aika.fields.*;
 import network.aika.neuron.*;
-import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 import network.aika.neuron.visitor.DownVisitor;
 import network.aika.neuron.visitor.selfref.SelfRefDownVisitor;
 import network.aika.neuron.visitor.UpVisitor;
-import network.aika.sign.Sign;
 import network.aika.steps.activation.Counting;
 
 import java.util.*;
@@ -33,8 +31,6 @@ import java.util.stream.Stream;
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.*;
-import static network.aika.fields.MinMax.MAX;
-import static network.aika.fields.MinMax.MIN;
 import static network.aika.fields.ThresholdOperator.Type.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
 
@@ -69,18 +65,14 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected FieldOutput isFinalAndFired;
 
     protected FieldFunction netOuterGradient;
-    protected QueueField ownInputGradient;
-    protected QueueField backpropInputGradient;
-    protected QueueField ownOutputGradient;
-    protected QueueField backpropOutputGradient;
-    protected FieldOutput outputGradient;
+    protected QueueField forwardsGradient;
+    protected QueueField backwardsGradientIn;
+    protected QueueField backwardsGradientOut;
     protected FieldOutput updateValue;
-    protected FieldOutput inductionThreshold;
 
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
 
-    private static final Comparator<Synapse> SYN_COMP = Comparator.comparing(s -> s.getInput().getId());
     public boolean instantiationIsQueued;
 
     public Activation(int id, Thought t, N n) {
@@ -144,7 +136,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
                 isFired
         );
 
-        if (!getNeuron().isNetworkInput() && getConfig().isTrainingEnabled())
+        if (getConfig().isTrainingEnabled())
             isFinal.addEventListener(() ->
                     initGradientFields()
             );
@@ -207,10 +199,9 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
 
     protected void initGradientFields() {
-        ownInputGradient = new QueueField(this, "Own-Input-Gradient");
-        backpropInputGradient = new QueueField(this, "Backprop-Input-Gradient", 0.0);
-        ownOutputGradient = new QueueField(this, "Own-Output-Gradient");
-        backpropOutputGradient = new QueueField(this, "Backprop-Output-Gradient");
+        forwardsGradient = new QueueField(this, "Forwards-Gradient");
+        backwardsGradientIn = new QueueField(this, "Backwards-Gradient-In", 0.0);
+        backwardsGradientOut = new QueueField(this, "Backwards-Gradient-Out");
 
         netOuterGradient =
                 func(
@@ -223,42 +214,21 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         mul(
                 this,
                 "ig * f'(net)",
-                ownInputGradient,
+                backwardsGradientIn,
                 netOuterGradient,
-                ownOutputGradient
-        );
-
-        mul(
-                this,
-                "ig * f'(net)",
-                backpropInputGradient,
-                netOuterGradient,
-                backpropOutputGradient
-        );
-
-        outputGradient = add(
-                this,
-                "ownOG + backpropOG",
-                ownOutputGradient,
-                backpropOutputGradient
+                backwardsGradientOut
         );
 
         updateValue = scale(
                 this,
                 "learn-rate * og",
                 getConfig().getLearnRate(),
-                outputGradient
+                getOutputGradient()
         );
         connect(updateValue, getNeuron().getBias());
-
-        inductionThreshold = threshold(
-                this,
-                "induction threshold",
-                getConfig().getInductionThreshold(),
-                ABOVE_ABS,
-                outputGradient
-        );
     }
+
+    public abstract FieldOutput getOutputGradient();
 
     public FieldOutput getIsFired() {
         return isFired;
@@ -307,32 +277,20 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         thought.onActivationCreationEvent(this, originSynapse, originAct);
     }
 
-    public Field getOwnInputGradient() {
-        return ownInputGradient;
+    public Field getForwardsGradient() {
+        return forwardsGradient;
     }
 
-    public Field getBackpropInputGradient() {
-        return backpropInputGradient;
+    public Field getBackwardsGradientIn() {
+        return backwardsGradientIn;
     }
 
-    public FieldOutput getOwnOutputGradient() {
-        return ownOutputGradient;
-    }
-
-    public FieldOutput getBackpropOutputGradient() {
-        return backpropOutputGradient;
-    }
-
-    public FieldOutput getOutputGradient() {
-        return outputGradient;
+    public FieldOutput getBackwardsGradientOut() {
+        return backwardsGradientOut;
     }
 
     public FieldOutput getUpdateValue() {
         return updateValue;
-    }
-
-    public FieldOutput getInductionThreshold() {
-        return inductionThreshold;
     }
 
     public int getId() {
@@ -508,11 +466,9 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
                 isFiredForBias,
                 isFinal,
                 netOuterGradient,
-                ownInputGradient,
-                backpropInputGradient,
-                ownOutputGradient,
-                backpropOutputGradient,
-                outputGradient
+                forwardsGradient,
+                backwardsGradientIn,
+                backwardsGradientOut
         };
 
         for(FieldOutput f: fields) {

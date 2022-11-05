@@ -39,12 +39,12 @@ public class TestHelper {
         LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, relFrom, relTo);
 
         BindingNeuron theBN = new BindingNeuron().init(m, "the (the cat)");
-        new InputPatternSynapse()
+        new InputPatternFromPatternSynapse()
                 .init(theIN, theBN, 10.0)
                 .adjustBias();
 
         BindingNeuron catBN = new BindingNeuron().init(m, "cat (the cat)");
-        new InputPatternSynapse()
+        new InputPatternFromPatternSynapse()
                 .init(catIN, catBN, variant == 0  || variant == 2 ? 10.0 : 5.0)
                 .adjustBias();
 
@@ -82,12 +82,12 @@ public class TestHelper {
         LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, -1, -1);
 
         BindingNeuron blackBN = new BindingNeuron().init(m, "black (black cat)");
-        new InputPatternSynapse()
+        new InputPatternFromPatternSynapse()
                 .init(blackIN, blackBN, 10.0)
                 .adjustBias();
 
         BindingNeuron catBN = new BindingNeuron().init(m, "cat (black cat)");
-        new InputPatternSynapse()
+        new InputPatternFromPatternSynapse()
                 .init(catIN, catBN, 20.0)
                 .adjustBias();
 
@@ -116,12 +116,12 @@ public class TestHelper {
         LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, relFrom, relTo);
 
         BindingNeuron theBN = new BindingNeuron().init(m, "the (the dog)");
-        new InputPatternSynapse()
+        new InputPatternFromPatternSynapse()
                 .init(theIN, theBN, 10.0)
                 .adjustBias();
 
         BindingNeuron dogBN = new BindingNeuron().init(m, "dog (the dog)");
-        new InputPatternSynapse()
+        new InputPatternFromPatternSynapse()
                 .init(dogIN, dogBN, variant == 0  || variant == 2 ? 10.0 : 5.0)
                 .adjustBias();
 

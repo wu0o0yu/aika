@@ -17,7 +17,10 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.disjunctive.DisjunctiveNeuron;
+
+import static network.aika.fields.ConstantField.ZERO;
 
 /**
  *
@@ -33,5 +36,10 @@ public abstract class DisjunctiveActivation<N extends DisjunctiveNeuron> extends
         return (DisjunctiveLink) inputLinks.values().stream()
                 .findAny()
                 .orElse(null);
+    }
+
+    @Override
+    public FieldOutput getOutputGradient() {
+        return ZERO;
     }
 }

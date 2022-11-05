@@ -21,9 +21,9 @@ import network.aika.neuron.conjunctive.InputPatternSynapse;
 /**
  * @author Lukas Molzberger
  */
-public class InputPatternLink extends BindingNeuronLink<InputPatternSynapse, ConjunctiveActivation<?>> {
+public class InputPatternLink<S extends InputPatternSynapse, I extends ConjunctiveActivation<?>> extends BindingNeuronLink<S, I> {
 
-    public InputPatternLink(InputPatternSynapse s, ConjunctiveActivation input, BindingActivation output) {
+    public InputPatternLink(S s, I input, BindingActivation output) {
         super(s, input, output);
     }
 }

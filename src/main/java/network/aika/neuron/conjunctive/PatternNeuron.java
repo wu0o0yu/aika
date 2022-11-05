@@ -42,6 +42,8 @@ public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, Pattern
 
     protected double frequency;
 
+    protected SampleSpace sampleSpace = new SampleSpace();
+
     public PatternNeuron() {
         super();
     }
@@ -77,6 +79,10 @@ public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, Pattern
 
     @Override
     protected void updateSumOfLowerWeights() {
+    }
+
+    public SampleSpace getSampleSpace() {
+        return sampleSpace;
     }
 
     @Override
@@ -143,6 +149,7 @@ public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, Pattern
         super.write(out);
 
         out.writeDouble(frequency);
+        sampleSpace.write(out);
     }
 
     @Override
@@ -150,5 +157,6 @@ public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, Pattern
         super.readFields(in, m);
 
         frequency = in.readDouble();
+        sampleSpace = SampleSpace.read(in, m);
     }
 }

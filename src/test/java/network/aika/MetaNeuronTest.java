@@ -109,7 +109,7 @@ public class MetaNeuronTest {
                 .init(syllablePN, sylBeginBN, 10.0)
                 .adjustBias();
 
-        new InputPatternSynapse()
+        new InputPatternFromPatternSynapse()
                 .init(letterPN, sylBeginBN, 10.0)
                 .adjustBias();
 
@@ -161,7 +161,7 @@ public class MetaNeuronTest {
                 .init(syllablePN, sylContinueRightBN, 10.0);
 
 
-        new InputPatternSynapse()
+        new InputPatternFromPatternSynapse()
                 .init(letterPN, sylContinueRightBN, 10.0)
                 .adjustBias();
 
@@ -236,7 +236,6 @@ public class MetaNeuronTest {
         Config c = getConfig()
                 .setAlpha(0.99)
                 .setLearnRate(-0.011)
-                .setInductionThreshold(0.1)
                 .setTrainingEnabled(true);
         doc.setConfig(c);
 

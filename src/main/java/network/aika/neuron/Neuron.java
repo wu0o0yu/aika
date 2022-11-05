@@ -68,8 +68,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     protected final ReadWriteLock lock = new ReadWriteLock();
 
-    protected SampleSpace sampleSpace = new SampleSpace();
-
     protected boolean isNetworkInput; // Input Neurons won't be trained!
 
     protected boolean allowTraining = true;
@@ -203,10 +201,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return template.isOfTemplate(templateNeuron);
     }
 */
-
-    public SampleSpace getSampleSpace() {
-        return sampleSpace;
-    }
 
     public NeuronProvider getProvider() {
         return provider;
@@ -378,8 +372,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         }
         out.writeBoolean(false);
 
-        sampleSpace.write(out);
-
         out.writeBoolean(isNetworkInput);
 
         out.writeBoolean(customData != null);
@@ -411,8 +403,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
             Synapse syn = Synapse.read(in, m);
             outputSynapses.add(syn);
         }
-
-        sampleSpace = SampleSpace.read(in, m);
 
         isNetworkInput = in.readBoolean();
 

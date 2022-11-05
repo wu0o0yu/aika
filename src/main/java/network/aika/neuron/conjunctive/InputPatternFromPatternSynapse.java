@@ -16,28 +16,22 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.ConjunctiveActivation;
-import network.aika.neuron.activation.InputPatternLink;
-import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.activation.*;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class InputPatternSynapse<S extends InputPatternSynapse, I extends ConjunctiveNeuron, L extends InputPatternLink<S, IA>, IA extends ConjunctiveActivation<?>> extends BindingNeuronSynapse<
-        S,
-        I,
-        L,
-        IA
+public class InputPatternFromPatternSynapse extends InputPatternSynapse<
+        InputPatternFromPatternSynapse,
+        PatternNeuron,
+        InputPatternFromPatternLink,
+        PatternActivation
         >
 {
-    public InputPatternSynapse() {
-        super(Scope.INPUT);
-    }
 
     @Override
-    public InputPatternLink createLink(ConjunctiveActivation input, BindingActivation output) {
-        return new InputPatternLink(this, input, output);
+    public InputPatternFromPatternLink createLink(PatternActivation input, BindingActivation output) {
+        return new InputPatternFromPatternLink(this, input, output);
     }
 }

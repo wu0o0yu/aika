@@ -42,7 +42,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected AbstractFunction weightedInputUB;
     protected AbstractFunction weightedInputLB;
-    protected AbstractFunction backPropGradient;
+    protected AbstractFunction backwardsGradient;
 
     protected ThresholdOperator onTransparent;
 
@@ -115,22 +115,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         );
     }
 
-    private void initGradients() {
-        initBackpropGradient();
+    protected void initGradients() {
         initWeightUpdate();
-    }
-
-    protected void initBackpropGradient() {
-        if(output.ownOutputGradient == null)
-            return;
-
-        backPropGradient = mul(
-                this,
-                "oAct.ownOutputGradient * s.weight",
-                output.ownOutputGradient,
-                synapse.getWeight(),
-                input.backpropInputGradient
-        );
     }
 
     public void instantiateTemplate( Activation iAct, Activation oAct) {
@@ -190,8 +176,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return weightedInputLB;
     }
 
-    public FieldOutput getBackPropGradient() {
-        return backPropGradient;
+    public FieldOutput getBackwardsGradient() {
+        return backwardsGradient;
     }
 
     @Override

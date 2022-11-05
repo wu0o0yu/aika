@@ -19,6 +19,12 @@ package network.aika.neuron.activation;
 import network.aika.neuron.conjunctive.PatternSynapse;
 import network.aika.neuron.visitor.DownVisitor;
 import network.aika.neuron.visitor.UpVisitor;
+import network.aika.sign.Sign;
+import network.aika.steps.link.LinkCounting;
+
+import static network.aika.fields.FieldLink.connect;
+import static network.aika.fields.Fields.func;
+import static network.aika.fields.Fields.scale;
 
 /**
  * @author Lukas Molzberger
@@ -27,7 +33,45 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
 
     public PatternLink(PatternSynapse s, BindingActivation input, PatternActivation output) {
         super(s, input, output);
+
+        LinkCounting.add(this);
     }
+
+    @Override
+    public void initGradients() {
+        func(
+                this,
+                "Information-Gain",
+                input.netUB,
+                output.netUB,
+                (x1, x2) ->
+                        synapse.getSurprisal(
+                                Sign.getSign(x1),
+                                Sign.getSign(x2),
+                                input.getAbsoluteRange(),
+                                true
+                        ),
+                forwardsGradient
+        );
+
+        connect(
+                scale(this, "-Entropy", -1,
+                        output.getEntropy()
+                ),
+                forwardsGradient
+        );
+
+        super.initGradients();
+    }
+
+/*
+    public double getRelativeSurprisal(Sign si, Sign so, Range range) {
+        double s = input.getNeuron().getSurprisal(si, so, range, true);
+        s -= getTrainingInput().getNeuron().getSurprisal(si, range, true);
+        s -= getTrainingOutput().getNeuron().getSurprisal(so, range, true);
+        return s;
+    }
+*/
 
     @Override
     public void patternVisitDown(DownVisitor v) {

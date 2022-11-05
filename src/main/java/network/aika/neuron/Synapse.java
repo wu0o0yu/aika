@@ -168,6 +168,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     public abstract void setModified();
 
+    public void count(L l) {
+    }
+
     public void setInput(I input) {
         this.input = input.getProvider();
     }

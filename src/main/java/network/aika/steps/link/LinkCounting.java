@@ -14,30 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.conjunctive;
+package network.aika.steps.link;
 
-import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.ConjunctiveActivation;
-import network.aika.neuron.activation.InputPatternLink;
-import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.activation.Link;
+import network.aika.steps.Phase;
+import network.aika.steps.Step;
 
 /**
+ * Counts the number of activations a particular neuron has encountered.
  *
  * @author Lukas Molzberger
  */
-public class InputPatternSynapse<S extends InputPatternSynapse, I extends ConjunctiveNeuron, L extends InputPatternLink<S, IA>, IA extends ConjunctiveActivation<?>> extends BindingNeuronSynapse<
-        S,
-        I,
-        L,
-        IA
-        >
-{
-    public InputPatternSynapse() {
-        super(Scope.INPUT);
+public class LinkCounting extends Step<Link> {
+
+    public static void add(Link l) {
+        if (l.getConfig().isCountingEnabled())
+            Step.add(new LinkCounting(l));
+    }
+
+    private LinkCounting(Link act) {
+        super(act);
     }
 
     @Override
-    public InputPatternLink createLink(ConjunctiveActivation input, BindingActivation output) {
-        return new InputPatternLink(this, input, output);
+    public Phase getPhase() {
+        return Phase.POST_PROCESSING;
+    }
+
+    @Override
+    public void process() {
+        Link l = getElement();
+
+        l.getSynapse()
+                .count(l);
     }
 }

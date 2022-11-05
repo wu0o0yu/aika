@@ -212,7 +212,6 @@ public class TheCatTest {
         Config c = getConfig()
                 .setAlpha(0.99)
                 .setLearnRate(-0.011)
-                .setInductionThreshold(0.1)
                 .setTrainingEnabled(true);
         doc.setConfig(c);
 

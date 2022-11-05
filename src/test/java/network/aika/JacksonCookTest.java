@@ -128,7 +128,7 @@ public class JacksonCookTest {
 
         BindingNeuron jacksonForenameBN = forenameBN.instantiateTemplate(true).init(m, "jackson (forename)");
         BindingNeuron jacksonJCBN = jacksonForenameBN.instantiateTemplate(true).init(m, "jackson (jackson cook)");
-        new InputPatternSynapse()
+        new InputPatternFromPatternSynapse()
                 .init(jacksonIN, jacksonJCBN, 10.0)
                 .adjustBias();
 
@@ -140,7 +140,7 @@ public class JacksonCookTest {
                 .init(jacksonForenameCN, jacksonForenameBN, 10.0)
                 .adjustBias();
 
-        new InputPatternSynapse()
+        new InputPatternFromPatternSynapse()
                 .init(jacksonIN, jacksonForenameBN, 10.0)
                 .adjustBias();
 
@@ -149,7 +149,7 @@ public class JacksonCookTest {
                 .init(jacksonForenameBN, forenameCN, 10.0);
 
         BindingNeuron jacksonCityBN = new BindingNeuron().init(m, "jackson (city)");
-        new InputPatternSynapse()
+        new InputPatternFromPatternSynapse()
                 .init(jacksonIN, jacksonCityBN, 10.0)
                 .adjustBias();
 
@@ -159,7 +159,7 @@ public class JacksonCookTest {
 
         BindingNeuron cookSurnameBN =  surnameBN.init(m, "cook (surname)");
         BindingNeuron cookJCBN =  cookSurnameBN.init(m, "cook (jackson cook)");
-        new InputPatternSynapse()
+        new InputPatternFromPatternSynapse()
                 .init(cookIN, cookJCBN, 10.0)
                 .adjustBias();
 
@@ -171,7 +171,7 @@ public class JacksonCookTest {
                 .init(cookSurnameCN, cookSurnameBN, 10.0)
                 .adjustBias();
 
-        new InputPatternSynapse()
+        new InputPatternFromPatternSynapse()
                 .init(cookIN, cookSurnameBN, 10.0)
                 .adjustBias();
 
@@ -180,7 +180,7 @@ public class JacksonCookTest {
                 .init(cookSurnameBN, surnameCN, 10.0);
 
         BindingNeuron cookProfessionBN =  new BindingNeuron().init(m, "cook (profession)");
-        new InputPatternSynapse()
+        new InputPatternFromPatternSynapse()
                 .init(cookIN, cookProfessionBN, 10.0)
                 .adjustBias();
 
@@ -232,7 +232,6 @@ public class JacksonCookTest {
         Config c = getConfig()
                 .setAlpha(0.99)
                 .setLearnRate(-0.011)
-                .setInductionThreshold(0.1)
                 .setTrainingEnabled(true);
         doc.setConfig(c);
 

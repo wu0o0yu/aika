@@ -14,30 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.conjunctive;
+package network.aika.neuron.activation;
 
-import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.ConjunctiveActivation;
-import network.aika.neuron.activation.InputPatternLink;
-import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.conjunctive.InputPatternFromPatternSynapse;
+
+import static network.aika.fields.FieldLink.connect;
+import static network.aika.fields.Fields.scale;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class InputPatternSynapse<S extends InputPatternSynapse, I extends ConjunctiveNeuron, L extends InputPatternLink<S, IA>, IA extends ConjunctiveActivation<?>> extends BindingNeuronSynapse<
-        S,
-        I,
-        L,
-        IA
-        >
-{
-    public InputPatternSynapse() {
-        super(Scope.INPUT);
+public class InputPatternFromPatternLink extends InputPatternLink<InputPatternFromPatternSynapse, PatternActivation> {
+
+    public InputPatternFromPatternLink(InputPatternFromPatternSynapse s, PatternActivation input, BindingActivation output) {
+        super(s, input, output);
     }
 
     @Override
-    public InputPatternLink createLink(ConjunctiveActivation input, BindingActivation output) {
-        return new InputPatternLink(this, input, output);
+    public void initGradients() {
+        connect(
+                scale(this, "-Entropy", -1,
+                        input.getEntropy()
+                ),
+                output.getForwardsGradient()
+        );
+
+        super.initGradients();
     }
 }

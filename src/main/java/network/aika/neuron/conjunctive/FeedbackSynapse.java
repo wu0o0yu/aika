@@ -27,7 +27,7 @@ import static network.aika.fields.Fields.mul;
  *
  * @author Lukas Molzberger
  */
-public abstract class FeedbackSynapse<S extends FeedbackSynapse, I extends Neuron, L extends Link<S, IA, BindingActivation>, IA extends Activation<?>> extends BindingNeuronSynapse<
+public abstract class FeedbackSynapse<S extends FeedbackSynapse, I extends Neuron, L extends BindingNeuronLink<S, IA>, IA extends Activation<?>> extends BindingNeuronSynapse<
         S,
         I,
         L,
