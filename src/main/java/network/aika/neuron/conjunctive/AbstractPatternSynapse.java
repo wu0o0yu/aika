@@ -16,12 +16,10 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.Thought;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.AbstractPatternLink;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.visitor.linking.LinkingDownVisitor;
 import network.aika.neuron.visitor.linking.LinkingOperator;
 import network.aika.neuron.visitor.linking.pattern.PatternDownVisitor;
 
@@ -43,10 +41,14 @@ public abstract class AbstractPatternSynapse<S extends AbstractPatternSynapse, I
         super(Scope.SAME);
     }
 
+
     @Override
     public double getPropagatePreNetUB(IA iAct) {
-        return weight.getCurrentValue();
+        return getOutput().getBias().getCurrentValue() +
+                weight.getCurrentValue() +
+                getSumOfLowerWeights();
     }
+
 
     @Override
     public void startVisitor(LinkingOperator c, Activation bs) {
