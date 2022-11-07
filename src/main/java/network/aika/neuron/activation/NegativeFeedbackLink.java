@@ -45,23 +45,25 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
 
     @Override
     protected void initWeightInputUB() {
-        maxInputUB = new MinMaxField(this, MinMax.MAX, "maxUB");
-
-        super.initWeightInputUB();
-    }
-
-    @Override
-    protected void initWeightInputLB() {
         maxInputLB = new MinMaxField(this, MinMax.MIN, "minLB");
 
-        Multiplication weightedLB = mul(
+        Multiplication weightedUB = mul(
                 this,
                 "!isOpen * x * weight",
                 invert("!isOpen", output.getIsOpen()),
                 initWeightedInput(false)
         );
 
-        connect(weightedLB, getOutput().getNet(false));
+        connect(weightedUB, getOutput().getNet(true));
+    }
+
+    @Override
+    protected void initWeightInputLB() {
+        maxInputUB = new MinMaxField(this, MinMax.MAX, "maxUB");
+
+        weightedInputLB = initWeightedInput(true);
+
+        connect(weightedInputLB, getOutput().getNet(false));
     }
 
     @Override

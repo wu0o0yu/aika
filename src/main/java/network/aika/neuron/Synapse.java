@@ -99,8 +99,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public static double getLatentLinkingPreNetUB(Synapse synA, Synapse synB) {
-        double preUB = synA.getOutput().getBias().getCurrentValue() +
-                synA.getWeight().getCurrentValue();
+        double preUB = synA.getWeight().getCurrentValue();
 
         if(synB != null) {
             preUB += synB.getWeight().getCurrentValue() +
@@ -147,13 +146,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public abstract void startVisitor(LinkingOperator c, Activation bs);
-
-    protected void linkStepB(Activation bsA, Synapse synA, Link linkA) {
-        startVisitor(
-                new ActLinkingOperator(bsA, synA, linkA, this),
-                bsA
-        );
-    }
 
     public void linkAndPropagateOut(IA bs) {
         getOutput()

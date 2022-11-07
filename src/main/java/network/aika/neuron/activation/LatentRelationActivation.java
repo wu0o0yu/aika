@@ -19,6 +19,7 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.fields.Field;
 import network.aika.fields.ValueSortedQueueField;
+import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
 
 import static network.aika.fields.Fields.func;
@@ -28,7 +29,26 @@ import static network.aika.fields.Fields.func;
  */
 public class LatentRelationActivation extends BindingActivation {
 
+    private TokenActivation fromAct;
+    private TokenActivation toAct;
+
     public LatentRelationActivation(int id, Thought t, LatentRelationNeuron n) {
         super(id, t, n);
+    }
+
+    public TokenActivation getFromAct() {
+        return fromAct;
+    }
+
+    public void setFromAct(TokenActivation fromAct) {
+        this.fromAct = fromAct;
+    }
+
+    public TokenActivation getToAct() {
+        return toAct;
+    }
+
+    public void setToAct(TokenActivation toAct) {
+        this.toAct = toAct;
     }
 }
