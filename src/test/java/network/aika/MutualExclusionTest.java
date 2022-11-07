@@ -91,7 +91,7 @@ public class MutualExclusionTest {
     public void testPropagation() {
         Model m = new Model();
 
-        TokenNeuron in = new PatternNeuron().init(m, "I", true);
+        TokenNeuron in = new TokenNeuron().init(m, "I");
         BindingNeuron na = new BindingNeuron().init(m, "A");
         BindingNeuron nb = new BindingNeuron().init(m, "B");
         BindingNeuron nc = new BindingNeuron().init(m, "C");
@@ -159,7 +159,7 @@ public class MutualExclusionTest {
     public void testPropagationWithPrimaryLink() {
         Model m = new Model();
 
-        TokenNeuron in = new TokenNeuron().init(m, "I", true);
+        TokenNeuron in = new TokenNeuron().init(m, "I");
         BindingNeuron na = new BindingNeuron().init(m, "A");
         BindingNeuron nb = new BindingNeuron().init(m, "B");
         InhibitoryNeuron inhib =new InhibitoryNeuron().init(m, "I");

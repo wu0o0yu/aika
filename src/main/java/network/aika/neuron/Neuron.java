@@ -68,8 +68,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     protected final ReadWriteLock lock = new ReadWriteLock();
 
-    protected boolean isNetworkInput; // Input Neurons won't be trained!
-
     protected boolean allowTraining = true;
 
     private Neuron<?, ?> template;
@@ -218,14 +216,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return outputSynapses.stream();
     }
 
-    public void setNetworkInput(boolean networkInput) {
-        isNetworkInput = networkInput;
-    }
-
-    public boolean isNetworkInput() {
-        return isNetworkInput;
-    }
-
     public Stream<S> getTargetInputSynapses() {
         return getInputSynapses();
     }
@@ -372,8 +362,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         }
         out.writeBoolean(false);
 
-        out.writeBoolean(isNetworkInput);
-
         out.writeBoolean(customData != null);
         if(customData != null)
             customData.write(out);
@@ -404,8 +392,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
             outputSynapses.add(syn);
         }
 
-        isNetworkInput = in.readBoolean();
-
         if(in.readBoolean()) {
             customData = m.getCustomDataInstanceSupplier().get();
             customData.readFields(in, m);
@@ -431,13 +417,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     public <N extends Neuron> N init(Model m, String label) {
         addProvider(m);
         setLabel(label);
-        return (N) this;
-    }
-
-    public <N extends Neuron> N init(Model m, String label, boolean isNetworkInput) {
-        addProvider(m);
-        setLabel(label);
-        setNetworkInput(isNetworkInput);
         return (N) this;
     }
 

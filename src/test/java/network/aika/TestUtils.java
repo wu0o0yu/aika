@@ -80,7 +80,6 @@ public class TestUtils {
             n.addProvider(m);
 
             n.setTokenLabel(l);
-            n.setNetworkInput(true);
             n.setLabel(l);
             n.setAllowTraining(false);
             return n;

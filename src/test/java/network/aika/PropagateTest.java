@@ -34,7 +34,7 @@ public class PropagateTest {
     public void testPropagation() {
         Model m = new Model();
 
-        TokenNeuron in = new TokenNeuron().init(m, "IN", true);
+        TokenNeuron in = new TokenNeuron().init(m, "IN");
         BindingNeuron out = new BindingNeuron().init(m, "OUT");
 
         new InputPatternSynapse()

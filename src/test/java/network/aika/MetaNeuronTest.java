@@ -220,10 +220,10 @@ public class MetaNeuronTest {
 
         // Concrete
         TokenNeuron letterS = letterPN.instantiateTemplate(true)
-                .init(m, "L-s", true);
+                .init(m, "L-s");
 
         TokenNeuron letterC = letterPN.instantiateTemplate(true)
-                .init(m, "L-c", true);
+                .init(m, "L-c");
 
         letterPN.updateBias(3.0);
         syllablePN.updateBias(3.0);

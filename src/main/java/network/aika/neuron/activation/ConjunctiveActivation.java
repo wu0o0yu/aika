@@ -36,9 +36,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
     public ConjunctiveActivation(int id, Thought t, N n) {
         super(id, t, n);
 
-        if (!getNeuron().isNetworkInput() &&
-                getConfig().isTrainingEnabled() &&
-                n.isAbstract())
+        if (getConfig().isTrainingEnabled() && n.isAbstract())
             isFinalAndFired.addEventListener(() ->
                     Instantiation.add(this)
             );
