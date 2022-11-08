@@ -136,9 +136,15 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
                 isFired
         );
 
+        forwardsGradient = new QueueField(this, "Forwards-Gradient");
+        backwardsGradientIn = new QueueField(this, "Backwards-Gradient-In", 0.0);
+        backwardsGradientOut = new QueueField(this, "Backwards-Gradient-Out");
+
         if (getConfig().isTrainingEnabled())
-            isFinal.addEventListener(() ->
-                    initGradientFields()
+            isFinal.addEventListener(() -> {
+                        connectGradientFields();
+                        connectWeightUpdate();
+                    }
             );
 
         thought.register(this);
@@ -198,11 +204,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
 
-    protected void initGradientFields() {
-        forwardsGradient = new QueueField(this, "Forwards-Gradient");
-        backwardsGradientIn = new QueueField(this, "Backwards-Gradient-In", 0.0);
-        backwardsGradientOut = new QueueField(this, "Backwards-Gradient-Out");
-
+    protected void connectGradientFields() {
         netOuterGradient =
                 func(
                         this,
@@ -218,7 +220,9 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
                 netOuterGradient,
                 backwardsGradientOut
         );
+    }
 
+    protected void connectWeightUpdate() {
         updateValue = scale(
                 this,
                 "learn-rate * og",

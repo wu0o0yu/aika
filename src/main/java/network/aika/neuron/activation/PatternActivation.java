@@ -45,7 +45,7 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     }
 
     @Override
-    public void initGradientFields() {
+    public void connectGradientFields() {
         entropy = func(
                 this,
                 "Entropy",
@@ -61,7 +61,7 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
         outputGradient = new Field(this, "outputGradient");
 
-        super.initGradientFields();
+        super.connectGradientFields();
 
         connect(forwardsGradient, outputGradient);
         connect(backwardsGradientOut, outputGradient);

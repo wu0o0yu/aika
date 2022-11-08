@@ -27,6 +27,9 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static network.aika.fields.FieldLink.connect;
+import static network.aika.fields.Fields.scale;
+
 
 /**
  *
@@ -46,6 +49,11 @@ public class TokenActivation extends PatternActivation {
         range = new Range(begin, end);
 
         doc.registerTokenActivation(this);
+    }
+
+    @Override
+    protected void connectWeightUpdate() {
+        // Input activations don't need weight updates
     }
 
     public Map<TokenActivation, LatentRelationActivation> getToRelations() {

@@ -30,7 +30,7 @@ public class DisjunctiveLink<S extends DisjunctiveSynapse, IA extends Conjunctiv
     }
 
     @Override
-    public void initWeightUpdate() {
+    public void connectWeightUpdate() {
         mul(
                 this,
                 "weight update",

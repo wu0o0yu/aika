@@ -90,7 +90,7 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
     }
 
     @Override
-    public void initWeightUpdate() {
+    public void connectWeightUpdate() {
         mul(
                 this,
                 "weight update",

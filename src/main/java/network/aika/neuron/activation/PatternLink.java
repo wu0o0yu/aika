@@ -38,7 +38,9 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
     }
 
     @Override
-    public void initGradients() {
+    public void connectGradientFields() {
+        super.connectGradientFields();
+
         func(
                 this,
                 "Information-Gain",
@@ -60,8 +62,6 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
                 ),
                 forwardsGradient
         );
-
-        super.initGradients();
     }
 
 /*

@@ -31,7 +31,7 @@ public class InputPatternFromPatternLink extends InputPatternLink<InputPatternFr
     }
 
     @Override
-    public void initGradients() {
+    public void connectGradientFields() {
         connect(
                 scale(this, "-Entropy", -1,
                         input.getEntropy()
@@ -39,6 +39,6 @@ public class InputPatternFromPatternLink extends InputPatternLink<InputPatternFr
                 output.getForwardsGradient()
         );
 
-        super.initGradients();
+        super.connectGradientFields();
     }
 }

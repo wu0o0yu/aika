@@ -59,8 +59,10 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
             initWeightInputLB();
 
             if (getConfig().isTrainingEnabled() && getSynapse().isAllowTraining())
-                output.isFinal.addEventListener(() ->
-                        initGradients()
+                output.isFinal.addEventListener(() -> {
+                            connectGradientFields();
+                            connectWeightUpdate();
+                        }
                 );
         }
 
@@ -115,8 +117,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         );
     }
 
-    protected void initGradients() {
-        initWeightUpdate();
+    protected void connectGradientFields() {
     }
 
     public void instantiateTemplate( Activation iAct, Activation oAct) {
@@ -131,7 +132,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         instSyn.createLink(iAct, oAct);
     }
 
-    public abstract void initWeightUpdate();
+    public abstract void connectWeightUpdate();
 
     protected void initWeightInputUB() {
         weightedInputUB = initWeightedInput(true);

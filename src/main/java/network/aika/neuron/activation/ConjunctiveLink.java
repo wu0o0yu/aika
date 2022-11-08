@@ -35,7 +35,7 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
     }
 
     @Override
-    public void initWeightUpdate() {
+    public void connectWeightUpdate() {
         mul(
                 this,
                 "weight update",

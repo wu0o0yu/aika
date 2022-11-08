@@ -16,7 +16,7 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.fields.QueueField;
+import network.aika.fields.Field;
 import network.aika.neuron.conjunctive.AbstractPatternSynapse;
 
 import static network.aika.fields.FieldLink.connect;
@@ -27,24 +27,25 @@ import static network.aika.fields.Fields.mul;
  */
 public abstract class AbstractPatternLink<S extends AbstractPatternSynapse, IA extends Activation<?>> extends ConjunctiveLink<S, IA, PatternActivation> {
 
-    protected QueueField forwardsGradient;
+    protected Field forwardsGradient;
 
     public AbstractPatternLink(S s, IA input, PatternActivation output) {
         super(s, input, output);
+
+        forwardsGradient = new Field(this, "Forwards-Gradient");
     }
 
-    public QueueField getForwardsGradient() {
+    public Field getForwardsGradient() {
         return forwardsGradient;
     }
 
     @Override
-    protected void initGradients() {
-        forwardsGradient = new QueueField(this, "Forwards-Gradient");
+    protected void connectGradientFields() {
         connect(input.forwardsGradient, forwardsGradient);
         connect(forwardsGradient, output.forwardsGradient);
 
         initBackwardsGradient();
-        super.initGradients();
+        super.connectGradientFields();
     }
 
     protected void initBackwardsGradient() {
