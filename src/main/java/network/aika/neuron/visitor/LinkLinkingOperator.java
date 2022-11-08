@@ -41,6 +41,9 @@ public class LinkLinkingOperator extends LinkingOperator {
 
     @Override
     public void check(LinkingCallback v, Link l, Activation act) {
+        if(l == null)
+            return;
+
         if(act.getNeuron() != syn.getOutput())
             return;
 

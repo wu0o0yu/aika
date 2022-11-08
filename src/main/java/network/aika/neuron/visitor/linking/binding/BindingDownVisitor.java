@@ -35,7 +35,7 @@ public class BindingDownVisitor extends LinkingDownVisitor<PatternActivation> {
     @Override
     public void up(PatternActivation origin) {
         new BindingUpVisitor(this, origin)
-                .next(origin);
+                .visitUp(origin, null);
     }
 
     protected void visitDown(Link l) {

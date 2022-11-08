@@ -36,7 +36,7 @@ public class InhibitoryDownVisitor extends LinkingDownVisitor<PatternActivation>
     @Override
     public void up(PatternActivation origin) {
         new InhibitoryUpVisitor(this, origin)
-                .next(origin);
+                .visitUp(origin, null);
     }
 
     protected void visitDown(Link l) {

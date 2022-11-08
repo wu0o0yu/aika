@@ -56,6 +56,6 @@ public class RelationLinkingDownVisitor extends BindingDownVisitor {
 
     private void up(TokenActivation origin, TokenActivation relOrigin) {
         new RelationLinkingUpVisitor(this, origin, relOrigin)
-                .next(relOrigin);
+                .visitUp(relOrigin, null);
     }
 }
