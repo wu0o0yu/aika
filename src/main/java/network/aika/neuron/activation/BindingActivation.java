@@ -32,7 +32,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     private boolean isInput;
 
-    protected Field mixedNetUB;
     protected Field mixedNetLB;
 
     private Field isOpen;
@@ -63,14 +62,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         isOpen = new Field(this, "isOpen", 1.0);
         mix = new Field(this, "mix", 1.0);
 
-        mixedNetUB = mix(
-                this,
-                "mixedNetUB",
-                mix,
-                netUB,
-                netLB
-        );
-
         mixedNetLB = mix(
                 this,
                 "mixedNetLB",
@@ -82,7 +73,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         valueUB = func(
                 this,
                 "value = f(mixedNetUB)",
-                mixedNetUB,
+                netUB,
                 x -> getActivationFunction().f(x)
         );
         valueLB = func(
@@ -112,10 +103,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     public Field getMix() {
         return mix;
-    }
-
-    public Field getMixedNetUB() {
-        return mixedNetUB;
     }
 
     public Field getMixedNetLB() {
