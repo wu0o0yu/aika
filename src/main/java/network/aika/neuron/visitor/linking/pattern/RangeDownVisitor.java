@@ -14,37 +14,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.neuron.visitor.linking.pattern;
 
-import network.aika.neuron.disjunctive.CategorySynapse;
+import network.aika.Thought;
+import network.aika.neuron.Range;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.visitor.DownVisitor;
-import network.aika.neuron.visitor.UpVisitor;
+
+import static network.aika.neuron.Range.join;
 
 /**
  * @author Lukas Molzberger
  */
-public class CategoryLink<S extends CategorySynapse, IA extends ConjunctiveActivation<?>, OA extends CategoryActivation> extends DisjunctiveLink<S, IA, OA> {
+public class RangeDownVisitor extends DownVisitor<PatternActivation> {
 
-    public CategoryLink(S s, IA input, OA output) {
-        super(s, input, output);
+    private Range range = null;
+
+    public RangeDownVisitor(Thought t) {
+        super(t);
+    }
+
+    public Range getRange() {
+        return range;
     }
 
     @Override
-    protected void addInputLinkingStep() {
+    public void check(Link lastLink, Activation act) {
+        PatternActivation pAct = (PatternActivation) act;
+        range = join(range, pAct.getRange());
     }
 
     @Override
-    public void patternVisitDown(DownVisitor v) {
-        v.next(this);
+    public void up(PatternActivation origin) {
     }
 
-    @Override
-    public void patternVisitUp(UpVisitor v) {
-        v.next(this);
+    protected void visitDown(Link l) {
+        l.rangeVisitDown(this);
     }
 
-    @Override
-    public void rangeVisitDown(DownVisitor v) {
-        v.next(this);
+    protected void visitDown(Activation act, Link l) {
+        act.rangeVisitDown(this, l);
     }
 }

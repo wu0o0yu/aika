@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.activation.text;
 
-import network.aika.fields.ValueSortedQueueField;
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
@@ -27,8 +26,6 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static network.aika.fields.FieldLink.connect;
-import static network.aika.fields.Fields.scale;
 
 
 /**
@@ -49,6 +46,10 @@ public class TokenActivation extends PatternActivation {
         range = new Range(begin, end);
 
         doc.registerTokenActivation(this);
+    }
+
+    @Override
+    public void updateRange() {
     }
 
     @Override
@@ -74,8 +75,4 @@ public class TokenActivation extends PatternActivation {
         return true;
     }
 
-    @Override
-    public Range getRange() {
-        return range;
-    }
 }

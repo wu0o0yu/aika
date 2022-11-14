@@ -78,6 +78,10 @@ public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activat
     }
 
     @Override
+    public void rangeVisitDown(DownVisitor v) {
+    }
+
+    @Override
     public void inhibVisitDown(DownVisitor v) {
     }
 

@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.conjunctive.InputPatternFromPatternSynapse;
+import network.aika.neuron.visitor.DownVisitor;
 
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.scale;
@@ -40,5 +41,10 @@ public class InputPatternFromPatternLink extends InputPatternLink<InputPatternFr
         );
 
         super.connectGradientFields();
+    }
+
+    @Override
+    public void rangeVisitDown(DownVisitor v) {
+        v.next(this);
     }
 }

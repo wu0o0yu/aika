@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.conjunctive.PatternCategoryInputSynapse;
+import network.aika.neuron.visitor.DownVisitor;
 
 
 /**
@@ -28,5 +29,10 @@ public class PatternCategoryInputLink extends AbstractPatternLink<PatternCategor
         super(s, input, output);
 
         output.setRange(input.getRange());
+    }
+
+    @Override
+    public void rangeVisitDown(DownVisitor v) {
+        v.next(this);
     }
 }

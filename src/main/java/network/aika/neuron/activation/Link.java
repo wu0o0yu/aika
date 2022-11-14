@@ -93,6 +93,9 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     public void patternVisitUp(UpVisitor v) {
     }
 
+    public void rangeVisitDown(DownVisitor v) {
+    }
+
     public void inhibVisitDown(DownVisitor v) {
         v.next(this);
     }
