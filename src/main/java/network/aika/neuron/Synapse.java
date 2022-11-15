@@ -18,11 +18,14 @@ package network.aika.neuron;
 
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.fields.QueueField;
-import network.aika.neuron.activation.*;
+import network.aika.callbacks.ActivationCheckCallback;
 import network.aika.fields.Field;
+import network.aika.fields.QueueField;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Element;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Timestamp;
 import network.aika.neuron.conjunctive.Scope;
-import network.aika.neuron.visitor.ActLinkingOperator;
 import network.aika.neuron.visitor.linking.LinkingOperator;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
@@ -94,6 +97,12 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public double getPropagatePreNetUB(IA iAct) {
+        ActivationCheckCallback activationCheckCallback = getOutput().getActivationCheckCallBack();
+
+        if (activationCheckCallback != null && !activationCheckCallback.check(iAct)) {
+            return 0.0;
+        }
+
         return getOutput().getBias().getCurrentValue() +
                 getWeight().getCurrentValue();
     }

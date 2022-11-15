@@ -18,19 +18,19 @@ package network.aika.neuron;
 
 import network.aika.Model;
 import network.aika.Thought;
+import network.aika.callbacks.ActivationCheckCallback;
+import network.aika.fields.Field;
 import network.aika.fields.LimitedField;
 import network.aika.fields.QueueField;
-import network.aika.neuron.activation.*;
-import network.aika.fields.Field;
-import network.aika.neuron.conjunctive.ConjunctiveSynapse;
+import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.Element;
+import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Timestamp;
 import network.aika.neuron.visitor.ActLinkingOperator;
 import network.aika.neuron.visitor.LinkLinkingOperator;
-import network.aika.sign.Sign;
 import network.aika.steps.activation.LinkingOut;
 import network.aika.steps.activation.Save;
-import network.aika.utils.Bound;
 import network.aika.utils.ReadWriteLock;
-import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 
 import java.io.DataInput;
@@ -72,10 +72,11 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Neuron<?, ?> template;
 
-    private WeakHashMap<Long, WeakReference<SortedSet<A>>> activations = new WeakHashMap<>();
+    private final WeakHashMap<Long, WeakReference<SortedSet<A>>> activations = new WeakHashMap<>();
+    private ActivationCheckCallback activationCheckCallback;
 
     public void addProvider(Model m) {
-        if(provider == null)
+        if (provider == null)
             provider = new NeuronProvider(m, this);
         setModified();
     }
@@ -305,8 +306,16 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return retrievalCount;
     }
 
+    public ActivationCheckCallback getActivationCheckCallBack() {
+        return this.activationCheckCallback;
+    }
+
+    public void setActivationCheckCallback(ActivationCheckCallback activationCheckCallback) {
+        this.activationCheckCallback = activationCheckCallback;
+    }
+
     public void setModified() {
-        if(!modified)
+        if (!modified)
             Save.add(this);
 
         modified = true;
