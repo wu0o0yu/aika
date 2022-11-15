@@ -100,7 +100,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         ActivationCheckCallback activationCheckCallback = getOutput().getActivationCheckCallBack();
 
         if (activationCheckCallback != null && !activationCheckCallback.check(iAct)) {
-            return 0.0;
+            return -1000.0;
         }
 
         return getOutput().getBias().getCurrentValue() +
