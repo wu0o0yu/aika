@@ -42,6 +42,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected AbstractFunction weightedInputUB;
     protected AbstractFunction weightedInputLB;
+
+    protected Field forwardsGradient;
     protected AbstractFunction backwardsGradient;
 
     protected ThresholdOperator onTransparent;
@@ -123,6 +125,13 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected void connectGradientFields() {
     }
 
+
+    protected void initForwardsGradient() {
+        forwardsGradient = new Field(this, "Forwards-Gradient");
+        connect(input.forwardsGradient, forwardsGradient);
+        connect(forwardsGradient, output.forwardsGradient);
+    }
+
     public void instantiateTemplate( Activation iAct, Activation oAct) {
         S instSyn = (S) synapse
                 .instantiateTemplate(
@@ -180,6 +189,9 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return weightedInputLB;
     }
 
+    public Field getForwardsGradient() {
+        return forwardsGradient;
+    }
     public FieldOutput getBackwardsGradient() {
         return backwardsGradient;
     }

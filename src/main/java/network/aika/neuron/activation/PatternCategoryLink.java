@@ -16,30 +16,22 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.conjunctive.PatternCategoryInputSynapse;
-import network.aika.neuron.visitor.DownVisitor;
-
+import network.aika.neuron.disjunctive.PatternCategorySynapse;
 
 /**
  * @author Lukas Molzberger
  */
-public class PatternCategoryInputLink extends AbstractPatternLink<PatternCategoryInputSynapse, CategoryActivation<?>> {
+public class PatternCategoryLink extends CategoryLink<PatternCategorySynapse, PatternActivation, CategoryActivation> {
 
-    public PatternCategoryInputLink(PatternCategoryInputSynapse s, CategoryActivation input, PatternActivation output) {
+    public PatternCategoryLink(PatternCategorySynapse s, PatternActivation input, CategoryActivation output) {
         super(s, input, output);
-
-        output.setRange(input.getRange());
     }
+
 
     @Override
     protected void connectGradientFields() {
         initForwardsGradient();
 
         super.connectGradientFields();
-    }
-
-    @Override
-    public void rangeVisitDown(DownVisitor v) {
-        v.next(this);
     }
 }

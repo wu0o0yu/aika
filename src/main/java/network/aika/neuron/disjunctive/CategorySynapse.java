@@ -44,9 +44,4 @@ public abstract class CategorySynapse<S extends CategorySynapse, I extends Conju
         if (getPropagatePreNetUB(bs) > 0.0)
             propagate(bs);
     }
-
-    @Override
-    public CategoryLink createLink(IA input, OA output) {
-        return new CategoryLink(this, input, output);
-    }
 }

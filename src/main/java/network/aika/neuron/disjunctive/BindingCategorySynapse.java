@@ -19,6 +19,7 @@ package network.aika.neuron.disjunctive;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.BindingCategoryActivation;
+import network.aika.neuron.activation.CategoryLink;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.visitor.linking.LinkingOperator;
 
@@ -28,4 +29,9 @@ import network.aika.neuron.visitor.linking.LinkingOperator;
  */
 public class BindingCategorySynapse extends CategorySynapse<BindingCategorySynapse, BindingNeuron, BindingCategoryNeuron, BindingActivation, BindingCategoryActivation> {
 
+
+    @Override
+    public CategoryLink createLink(BindingActivation input, BindingCategoryActivation output) {
+        return new CategoryLink(this, input, output);
+    }
 }
