@@ -82,7 +82,7 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     }
 
     public void updateRange() {
-        RangeDownVisitor v = new RangeDownVisitor(thought);
+        RangeDownVisitor v = new RangeDownVisitor(this);
         v.start(this);
         range = v.getRange();
     }
@@ -119,5 +119,21 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
             super.rangeVisitDown(v, lastLink);
 
         v.check(lastLink, this);
+    }
+
+    @Override
+    public void disconnect() {
+        super.disconnect();
+
+        FieldOutput[] fields = new FieldOutput[]{
+                entropy,
+                outputGradient
+        };
+
+        for(FieldOutput f: fields) {
+            if(f == null)
+                continue;
+            f.disconnect();
+        }
     }
 }

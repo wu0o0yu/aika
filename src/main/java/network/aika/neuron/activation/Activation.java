@@ -467,16 +467,19 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         FieldOutput[] fields = new FieldOutput[] {
                 netUB,
                 netLB,
+                netDiff,
                 valueUB,
                 valueLB,
                 isFired,
                 isFiredForWeight,
                 isFiredForBias,
                 isFinal,
+                isFinalAndFired,
                 netOuterGradient,
                 forwardsGradient,
                 backwardsGradientIn,
-                backwardsGradientOut
+                backwardsGradientOut,
+                updateValue
         };
 
         for(FieldOutput f: fields) {
@@ -484,6 +487,10 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
                 continue;
             f.disconnect();
         }
+
+        getInputLinks().forEach(l ->
+                l.disconnect()
+        );
     }
 
     public Stream<Link> getInputLinks() {

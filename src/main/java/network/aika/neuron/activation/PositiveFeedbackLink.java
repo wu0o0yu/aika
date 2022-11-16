@@ -16,8 +16,6 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.fields.MinMax;
-import network.aika.fields.MinMaxField;
 import network.aika.fields.Multiplication;
 import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 import network.aika.neuron.visitor.DownVisitor;

@@ -17,8 +17,8 @@
 package network.aika.neuron.activation;
 
 import network.aika.fields.Field;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.disjunctive.InhibitorySynapse;
-import network.aika.steps.link.LinkingIn;
 
 import static network.aika.fields.Fields.add;
 import static network.aika.fields.Fields.func;
@@ -88,5 +88,23 @@ public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingAc
 
     public Field getNetLB() {
         return netLB;
+    }
+
+    @Override
+    public void disconnect() {
+        super.disconnect();
+
+        FieldOutput[] fields = new FieldOutput[]{
+                valueUB,
+                valueLB,
+                netUB,
+                netLB
+        };
+
+        for(FieldOutput f: fields) {
+            if(f == null)
+                continue;
+            f.disconnect();
+        }
     }
 }

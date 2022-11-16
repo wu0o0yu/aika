@@ -48,8 +48,6 @@ import static network.aika.neuron.activation.Timestamp.MIN;
  */
 public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends Activation> implements Element, Writable {
 
-    private static final Logger log = LoggerFactory.getLogger(Synapse.class);
-
     protected NeuronProvider input;
     protected NeuronProvider output;
 
@@ -58,9 +56,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected S template;
 
-    protected QueueField weight = new QueueField(this, "weight", () -> {
-        setModified();
-    });
+    protected QueueField weight = new QueueField(this, "weight", true, () ->
+        setModified()
+    );
 
 
     protected boolean allowTraining = true;

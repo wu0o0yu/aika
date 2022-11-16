@@ -272,6 +272,22 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return output.getThought();
     }
 
+    public void disconnect() {
+        FieldOutput[] fields = new FieldOutput[] {
+                weightedInputUB,
+                weightedInputLB,
+                forwardsGradient,
+                backwardsGradient,
+                onTransparent
+        };
+
+        for(FieldOutput f: fields) {
+            if(f == null)
+                continue;
+            f.disconnect();
+        }
+    }
+
     private String getInputKeyString() {
         return (input != null ? input.toKeyString() : "id:X n:[" + synapse.getInput() + "]");
     }

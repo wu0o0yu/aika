@@ -112,4 +112,20 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
     public MinMaxField getMaxInputLB() {
         return maxInputLB;
     }
+
+    @Override
+    public void disconnect() {
+        super.disconnect();
+
+        FieldOutput[] fields = new FieldOutput[]{
+                maxInputUB,
+                maxInputLB
+        };
+
+        for(FieldOutput f: fields) {
+            if(f == null)
+                continue;
+            f.disconnect();
+        }
+    }
 }

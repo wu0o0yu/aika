@@ -28,7 +28,6 @@ import static network.aika.fields.Fields.isTrue;
  */
 public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> extends Activation<N> {
 
-
     protected ConjunctiveActivation<N>  template;
 
     protected ConjunctiveActivation<N>  templateInstance;

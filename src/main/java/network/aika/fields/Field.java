@@ -25,7 +25,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 
 /**
@@ -41,19 +41,38 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
 
     protected boolean withinUpdate;
 
-    private List<FieldLink> inputs = new ArrayList<>();
+    private Collection<FieldLink> inputs;
 
-    private List<FieldLink> receivers = new ArrayList<>();
+    private Collection<FieldLink> receivers;
+
 
     public Field(R reference, String label) {
+        this(reference, label, false);
+    }
+
+    public Field(R reference, String label, boolean weakRefs) {
         this.reference = reference;
         this.label = label;
+
+        initIO(weakRefs);
+    }
+
+    public Field(R reference, String label, boolean weakRefs, double initialValue) {
+        this(reference, label, weakRefs);
+
+        currentValue = initialValue;
     }
 
     public Field(R reference, String label, double initialValue) {
-        this(reference, label);
+        this(reference, label, false);
 
         currentValue = initialValue;
+    }
+
+    private void initIO(boolean weakRefs) {
+        // TODO: implement weakRefs
+        inputs = new ArrayList<>();
+        receivers = new ArrayList<>();
     }
 
     public void setCurrentValue(double currentValue) {
@@ -92,7 +111,7 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
         return newValue;
     }
 
-    public List<FieldLink> getReceivers() {
+    public Collection<FieldLink> getReceivers() {
         return receivers;
     }
 
@@ -134,10 +153,10 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
     }
 
     protected void propagateUpdate(double update) {
-        int i = 0;
-        while(i < receivers.size()) {
-            receivers.get(i++)
-                    .receiveUpdate(update);
+        FieldLink[] recs = receivers.toArray(new FieldLink[0]);
+
+        for(int i = 0; i < recs.length; i++) {
+            recs[i].receiveUpdate(update);
         }
     }
 
@@ -163,7 +182,8 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
     }
 
     public FieldLink getInputLinkByArg(int arg) {
-        return inputs.get(arg);
+        FieldLink[] in = inputs.toArray(new FieldLink[0]);
+        return in[arg];
     }
 
     public double getInputValueByArg(int arg) {
@@ -171,7 +191,7 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
     }
 
     @Override
-    public List<FieldLink> getInputs() {
+    public Collection<FieldLink> getInputs() {
         return inputs;
     }
 

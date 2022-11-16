@@ -18,7 +18,7 @@ package network.aika.fields;
 
 import network.aika.neuron.activation.Element;
 
-import java.util.List;
+import java.util.Collection;
 
 import static network.aika.fields.FieldLink.createEventListener;
 
@@ -39,7 +39,7 @@ public interface FieldOutput {
 
     void removeOutput(FieldLink fl);
 
-    List<FieldLink> getReceivers();
+    Collection<FieldLink> getReceivers();
 
     void disconnect();
 

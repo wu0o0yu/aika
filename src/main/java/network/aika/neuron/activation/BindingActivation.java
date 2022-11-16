@@ -118,4 +118,21 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         getNetUB().receiveUpdate(u);
         getNetLB().receiveUpdate(u);
     }
+
+    @Override
+    public void disconnect() {
+        super.disconnect();
+
+        FieldOutput[] fields = new FieldOutput[]{
+                mixedNetLB,
+                isOpen,
+                mix
+        };
+
+        for(FieldOutput f: fields) {
+            if(f == null)
+                continue;
+            f.disconnect();
+        }
+    }
 }

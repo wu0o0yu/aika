@@ -43,13 +43,22 @@ public class QueueField extends Field {
         step = new FieldStep(e, this);
     }
 
-    public QueueField(Element e, String label, double initialValue) {
-        super(e, label, initialValue);
+    public QueueField(Element e, String label, boolean weakRefs) {
+        super(e, label, weakRefs);
         step = new FieldStep(e, this);
     }
 
-    public QueueField(Element e, String label, FieldOnTrueEvent fieldListener) {
-        this(e, label);
+    public QueueField(Element e, String label, double initialValue) {
+        this(e, label, false, initialValue);
+    }
+
+    public QueueField(Element e, String label, boolean weakRefs, double initialValue) {
+        super(e, label, weakRefs, initialValue);
+        step = new FieldStep(e, this);
+    }
+
+    public QueueField(Element e, String label, boolean weakRefs, FieldOnTrueEvent fieldListener) {
+        this(e, label, weakRefs);
         addOutput(createEventListener(this, fieldListener));
     }
 

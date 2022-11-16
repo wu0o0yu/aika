@@ -28,13 +28,9 @@ public class LimitedField extends QueueField {
 
     private double limit;
 
-    public LimitedField(Element refObj, String label, double limit) {
-        super(refObj, label);
-        this.limit = limit;
-    }
 
-    public LimitedField(Element refObj, String label, double limit, double initialValue) {
-        super(refObj, label, initialValue);
+    public LimitedField(Element refObj, String label, boolean weakRefs, double limit, double initialValue) {
+        super(refObj, label, weakRefs, initialValue);
         this.limit = limit;
     }
 
