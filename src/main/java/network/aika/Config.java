@@ -28,6 +28,7 @@ public class Config {
 
     private boolean trainingEnabled;
     private boolean countingEnabled;
+    private boolean metaInstantiationEnabled;
 
     public double getLearnRate() {
         return learnRate;
@@ -63,6 +64,16 @@ public class Config {
 
     public boolean isCountingEnabled() {
         return countingEnabled;
+    }
+
+
+    public boolean isMetaInstantiationEnabled() {
+        return metaInstantiationEnabled;
+    }
+
+    public Config setMetaInstantiationEnabled(boolean metaInstantiationEnabled) {
+        this.metaInstantiationEnabled = metaInstantiationEnabled;
+        return this;
     }
 
     public String getLabel(Activation bs) {
