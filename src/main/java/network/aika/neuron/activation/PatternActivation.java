@@ -17,16 +17,13 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.fields.Field;
 import network.aika.fields.FieldFunction;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.SumField;
 import network.aika.neuron.Range;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.visitor.DownVisitor;
-import network.aika.neuron.visitor.UpVisitor;
 import network.aika.neuron.visitor.linking.pattern.RangeDownVisitor;
-import network.aika.neuron.visitor.selfref.SelfRefDownVisitor;
 import network.aika.sign.Sign;
 
 import static network.aika.fields.FieldLink.connect;
@@ -37,8 +34,6 @@ import static network.aika.fields.Fields.*;
  * @author Lukas Molzberger
  */
 public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
-
-    protected Range range;
 
     private FieldFunction entropy;
 
@@ -69,8 +64,6 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
         connect(forwardsGradient, outputGradient);
         connect(backwardsGradientOut, outputGradient);
-
-        updateRange();
     }
 
     @Override
@@ -82,19 +75,9 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
         return entropy;
     }
 
-    public void updateRange() {
-        RangeDownVisitor v = new RangeDownVisitor(this);
-        v.start(this);
-        range = v.getRange();
-    }
 
     public void setRange(Range range) {
         this.range = range;
-    }
-
-    @Override
-    public Range getRange() {
-        return range;
     }
 
     @Override

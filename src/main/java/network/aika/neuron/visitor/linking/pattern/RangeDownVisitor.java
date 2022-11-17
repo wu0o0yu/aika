@@ -16,7 +16,6 @@
  */
 package network.aika.neuron.visitor.linking.pattern;
 
-import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Link;
@@ -30,10 +29,10 @@ import static network.aika.neuron.Range.join;
  */
 public class RangeDownVisitor extends DownVisitor<PatternActivation> {
 
-    private PatternActivation fromAct;
+    private Activation fromAct;
     private Range range = null;
 
-    public RangeDownVisitor(PatternActivation fromAct) {
+    public RangeDownVisitor(Activation fromAct) {
         super(fromAct.getThought());
         this.fromAct = fromAct;
     }

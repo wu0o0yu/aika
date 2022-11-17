@@ -21,6 +21,7 @@ import network.aika.Thought;
 import network.aika.fields.*;
 import network.aika.neuron.*;
 import network.aika.neuron.visitor.DownVisitor;
+import network.aika.neuron.visitor.linking.pattern.RangeDownVisitor;
 import network.aika.neuron.visitor.selfref.SelfRefDownVisitor;
 import network.aika.neuron.visitor.UpVisitor;
 import network.aika.steps.activation.Counting;
@@ -74,6 +75,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected NavigableMap<OutputKey, Link> outputLinks;
 
     public boolean instantiationIsQueued;
+
+    protected Range range;
 
     protected List<FieldLink> disconnectFieldLinks = new ArrayList<>();
 
@@ -372,7 +375,18 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return thought;
     }
 
-    public abstract Range getRange();
+    public void updateRange() {
+        RangeDownVisitor v = new RangeDownVisitor(this);
+        v.start(this);
+        range = v.getRange();
+    }
+
+    public Range getRange() {
+        if(range == null)
+            updateRange();
+
+        return range;
+    }
 
     public Range getAbsoluteRange() {
         Range r = getRange();

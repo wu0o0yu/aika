@@ -112,11 +112,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         return mixedNetLB;
     }
 
-    @Override
-    public Range getRange() {
-        return null;
-    }
-
     public void updateBias(double u) {
         getNetUB().receiveUpdate(u);
         getNetLB().receiveUpdate(u);
