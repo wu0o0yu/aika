@@ -210,7 +210,7 @@ public class Fields {
             return null;
 
         ScaleFunction f = new ScaleFunction(ref, label, scale);
-        connect(in, f);
+        connect(in, 0, f);
         return f;
     }
 
