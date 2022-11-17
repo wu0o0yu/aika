@@ -91,17 +91,20 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
 
     @Override
     public void connectWeightUpdate() {
-        mul(
-                this,
-                "weight update",
-                getInput().getIsFired(),
-                scale(
-                        this,
-                        "-1 * og",
-                        -1,
-                        getOutput().getUpdateValue()
-                ),
-                synapse.getWeight()
+        disconnectFieldLinks.add(
+                connect(
+                        mul(
+                                this,
+                                "weight update",
+                                getInput().getIsFired(),
+                                scale(
+                                        this,
+                                        "-1 * og",
+                                        -1,
+                                        getOutput().getUpdateValue()
+                                )
+                        ), synapse.getWeight()
+                )
         );
     }
 
@@ -111,21 +114,5 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
 
     public MinMaxField getMaxInputLB() {
         return maxInputLB;
-    }
-
-    @Override
-    public void disconnect() {
-        super.disconnect();
-
-        FieldOutput[] fields = new FieldOutput[]{
-                maxInputUB,
-                maxInputLB
-        };
-
-        for(FieldOutput f: fields) {
-            if(f == null)
-                continue;
-            f.disconnect();
-        }
     }
 }

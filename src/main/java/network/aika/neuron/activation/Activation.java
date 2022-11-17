@@ -75,6 +75,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public boolean instantiationIsQueued;
 
+    protected List<FieldLink> disconnectFieldLinks = new ArrayList<>();
+
     public Activation(int id, Thought t, N n) {
         this.id = id;
         this.neuron = n;
@@ -86,8 +88,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         initNet();
 
-        connect(getNeuron().getBias(), netUB);
-        connect(getNeuron().getBias(), netLB);
+        disconnectFieldLinks.add(connect(getNeuron().getBias(), netUB));
+        disconnectFieldLinks.add(connect(getNeuron().getBias(), netLB));
 
         isFired = threshold(this, "isFired", 0.0, ABOVE, netUB);
 
@@ -235,7 +237,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
                 getConfig().getLearnRate(),
                 getOutputGradient()
         );
-        connect(updateValue, getNeuron().getBias());
+        disconnectFieldLinks.add(connect(updateValue, getNeuron().getBias()));
     }
 
     public abstract FieldOutput getOutputGradient();
@@ -466,28 +468,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public void disconnect() {
-        FieldOutput[] fields = new FieldOutput[] {
-                netUB,
-                netLB,
-                netDiff,
-                valueUB,
-                valueLB,
-                isFired,
-                isFiredForWeight,
-                isFiredForBias,
-                isFinal,
-                isFinalAndFired,
-                netOuterGradient,
-                forwardsGradient,
-                backwardsGradientIn,
-                backwardsGradientOut,
-                updateValue
-        };
-
-        for(FieldOutput f: fields) {
-            if(f == null)
-                continue;
-            f.disconnect();
+        for(FieldLink fl: disconnectFieldLinks) {
+            fl.disconnect();
         }
 
         getInputLinks().forEach(l ->

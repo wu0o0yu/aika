@@ -16,9 +16,11 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.fields.Multiplication;
 import network.aika.neuron.conjunctive.ConjunctiveSynapse;
 import network.aika.steps.link.LinkingIn;
 
+import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.mul;
 
 
@@ -36,20 +38,27 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
 
     @Override
     public void connectWeightUpdate() {
-        mul(
-                this,
-                "weight update",
-                getInput().getIsFiredForWeight(),
-                getOutput().getUpdateValue(),
-                synapse.getWeight()
+        disconnectFieldLinks.add(
+                connect(
+                        mul(
+                                this,
+                                "weight update",
+                                getInput().getIsFiredForWeight(),
+                                getOutput().getUpdateValue()
+                        ),
+                        synapse.getWeight()
+                )
         );
 
-        mul(
-                this,
-                "bias update",
-                getInput().getIsFiredForBias(),
-                getOutput().getUpdateValue(),
-                output.getNeuron().getBias()
+        disconnectFieldLinks.add(
+                connect(
+                        mul(
+                                this,
+                                "bias update",
+                                getInput().getIsFiredForBias(),
+                                getOutput().getUpdateValue()
+                        ),
+                        output.getNeuron().getBias())
         );
     }
 }

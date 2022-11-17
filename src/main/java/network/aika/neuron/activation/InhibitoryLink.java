@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.fields.AbstractFunction;
 import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.disjunctive.InhibitorySynapse;
@@ -28,11 +29,11 @@ import static network.aika.fields.Fields.func;
  */
 public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingActivation, InhibitoryActivation> {
 
-    protected Field valueUB;
-    protected Field valueLB;
+    protected FieldOutput valueUB;
+    protected FieldOutput valueLB;
 
-    protected Field netUB;
-    protected Field netLB;
+    protected AbstractFunction netUB;
+    protected AbstractFunction netLB;
 
     public InhibitoryLink(InhibitorySynapse s, BindingActivation input, InhibitoryActivation output) {
         super(s, input, output);
@@ -48,12 +49,16 @@ public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingAc
                 input.getValue(true)
         );
 
+        disconnectFieldLinks.add(netUB.getInputLinkByArg(0));
+
         netLB = add(
                 this,
                 "netLB",
                 output.getNeuron().getBias(),
                 input.getValue(false)
         );
+
+        disconnectFieldLinks.add(netLB.getInputLinkByArg(0));
 
         valueUB = func(
                 this,
@@ -74,37 +79,19 @@ public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingAc
         );
     }
 
-    public Field getValueUB() {
+    public FieldOutput getValueUB() {
         return valueUB;
     }
 
-    public Field getValueLB() {
+    public FieldOutput getValueLB() {
         return valueLB;
     }
 
-    public Field getNetUB() {
+    public FieldOutput getNetUB() {
         return netUB;
     }
 
-    public Field getNetLB() {
+    public FieldOutput getNetLB() {
         return netLB;
-    }
-
-    @Override
-    public void disconnect() {
-        super.disconnect();
-
-        FieldOutput[] fields = new FieldOutput[]{
-                valueUB,
-                valueLB,
-                netUB,
-                netLB
-        };
-
-        for(FieldOutput f: fields) {
-            if(f == null)
-                continue;
-            f.disconnect();
-        }
     }
 }

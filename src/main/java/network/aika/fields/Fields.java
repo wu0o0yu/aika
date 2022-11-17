@@ -134,22 +134,12 @@ public class Fields {
         return div;
     }
 
-
-    public static FieldFunction pow(Element ref, FieldOutput a, double b) {
-        return func(
-                ref,
-                "pow(a, b)",
-                a,
-                x -> Math.pow(x, b)
-        );
-    }
-
     public static FieldFunction func(Element ref, String label, FieldOutput in, DoubleFunction<Double> f) {
         if(in == null)
             return null;
 
         FieldFunction func = new FieldFunction(ref, label, f);
-        connect(in, func);
+        connect(in, 0, func);
         return func;
     }
 
@@ -187,7 +177,7 @@ public class Fields {
             return null;
 
         ThresholdOperator op = new ThresholdOperator(ref, label, threshold, type);
-        connect(in, op);
+        connect(in, 0, op);
         return op;
     }
 
@@ -196,7 +186,7 @@ public class Fields {
             return null;
 
         ThresholdOperator op = new ThresholdOperator(ref, label, threshold, type, isFinal);
-        connect(in, op);
+        connect(in, 0, op);
         return op;
     }
 
@@ -211,7 +201,7 @@ public class Fields {
             return null;
 
         InvertFunction f = new InvertFunction(label);
-        connect(in, f);
+        connect(in, 0, f);
         return f;
     }
 

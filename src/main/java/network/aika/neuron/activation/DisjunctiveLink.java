@@ -18,6 +18,7 @@ package network.aika.neuron.activation;
 
 import network.aika.neuron.disjunctive.DisjunctiveSynapse;
 
+import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.mul;
 
 /**
@@ -31,12 +32,16 @@ public class DisjunctiveLink<S extends DisjunctiveSynapse, IA extends Conjunctiv
 
     @Override
     public void connectWeightUpdate() {
-        mul(
-                this,
-                "weight update",
-                getInput().getIsFired(),
-                getOutput().getUpdateValue(),
-                synapse.getWeight()
+        disconnectFieldLinks.add(
+                connect(
+                        mul(
+                                this,
+                                "weight update",
+                                getInput().getIsFired(),
+                                getOutput().getUpdateValue()
+                        ),
+                        synapse.getWeight()
+                )
         );
     }
 }

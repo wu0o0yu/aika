@@ -48,6 +48,8 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
                 ABOVE,
                 synapse.getWeight()
         );
+
+        disconnectFieldLinks.add(onTransparent.getInputLinkByArg(0));
     }
 
     @Override

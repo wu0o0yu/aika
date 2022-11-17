@@ -24,6 +24,9 @@ import network.aika.neuron.visitor.UpVisitor;
 import network.aika.neuron.visitor.selfref.SelfRefDownVisitor;
 import network.aika.steps.link.LinkingIn;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
@@ -40,13 +43,16 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected final I input;
     protected O output;
 
-    protected AbstractFunction weightedInputUB;
-    protected AbstractFunction weightedInputLB;
+    protected FieldOutput weightedInputUB;
+    protected FieldOutput weightedInputLB;
 
     protected SumField forwardsGradient;
     protected AbstractFunction backwardsGradient;
 
     protected ThresholdOperator onTransparent;
+
+    protected List<FieldLink> disconnectFieldLinks = new ArrayList<>();
+
 
     public Link(S s, I input, O output) {
         this.synapse = s;
@@ -108,17 +114,20 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
 
     protected void initOnTransparent() {
+        AbstractFunction weightIfIsFired = mul(
+                this,
+                "isFired * weight",
+                synapse.getWeight(),
+                input.isFired
+        );
+        disconnectFieldLinks.add(weightIfIsFired.getInputLinkByArg(0));
+
         onTransparent = threshold(
                 this,
                 "onTransparent",
                 0.0,
                 ABOVE,
-                mul(
-                        this,
-                        "isFired * weight",
-                        synapse.getWeight(),
-                        input.isFired
-                )
+                weightIfIsFired
         );
     }
 
@@ -156,13 +165,16 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         connect(weightedInputLB, getOutput().getNet(false));
     }
 
-    protected Multiplication initWeightedInput(boolean upperBound) {
-        return mul(
+    protected FieldOutput initWeightedInput(boolean upperBound) {
+        Multiplication weightedInput = mul(
                 this,
                 "iAct(id:" + getInput().getId() + ").value" + (upperBound ? "UB" : "LB") + " * s.weight",
                 getInputValue(upperBound),
                 synapse.getWeight()
         );
+        disconnectFieldLinks.add(weightedInput.getInputLinkByArg(1));
+
+        return weightedInput;
     }
 
     public void init() {
@@ -177,15 +189,15 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return onTransparent;
     }
 
-    public AbstractFunction getWeightedInput(boolean upperBound) {
+    public FieldOutput getWeightedInput(boolean upperBound) {
         return upperBound ? weightedInputUB : weightedInputLB;
     }
 
-    public AbstractFunction getWeightedInputUB() {
+    public FieldOutput getWeightedInputUB() {
         return weightedInputUB;
     }
 
-    public AbstractFunction getWeightedInputLB() {
+    public FieldOutput getWeightedInputLB() {
         return weightedInputLB;
     }
 
@@ -273,18 +285,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     public void disconnect() {
-        FieldOutput[] fields = new FieldOutput[] {
-                weightedInputUB,
-                weightedInputLB,
-                forwardsGradient,
-                backwardsGradient,
-                onTransparent
-        };
-
-        for(FieldOutput f: fields) {
-            if(f == null)
-                continue;
-            f.disconnect();
+        for(FieldLink fl: disconnectFieldLinks) {
+            fl.disconnect();
         }
     }
 

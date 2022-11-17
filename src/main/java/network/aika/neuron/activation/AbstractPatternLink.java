@@ -48,5 +48,6 @@ public abstract class AbstractPatternLink<S extends AbstractPatternSynapse, IA e
                 synapse.getWeight(),
                 input.backwardsGradientIn
         );
+        disconnectFieldLinks.add(backwardsGradient.getInputLinkByArg(1));
     }
 }

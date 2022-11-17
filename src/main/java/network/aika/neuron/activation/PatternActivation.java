@@ -121,20 +121,4 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
         v.check(lastLink, this);
     }
-
-    @Override
-    public void disconnect() {
-        super.disconnect();
-
-        FieldOutput[] fields = new FieldOutput[]{
-                entropy,
-                outputGradient
-        };
-
-        for(FieldOutput f: fields) {
-            if(f == null)
-                continue;
-            f.disconnect();
-        }
-    }
 }
