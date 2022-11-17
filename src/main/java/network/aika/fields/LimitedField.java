@@ -24,7 +24,7 @@ import static network.aika.fields.FieldLink.createEventListener;
 /**
  * @author Lukas Molzberger
  */
-public class LimitedField extends QueueField {
+public class LimitedField extends QueueSumField {
 
     private double limit;
 

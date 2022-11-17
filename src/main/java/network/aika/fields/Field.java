@@ -31,7 +31,7 @@ import java.util.Collection;
 /**
  * @author Lukas Molzberger
  */
-public class Field<R extends Element> implements FieldInput, FieldOutput, Writable {
+public class Field<R extends Element> implements FieldOutput, Writable {
 
     private String label;
     private R reference;
@@ -41,7 +41,6 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
 
     protected boolean withinUpdate;
 
-    private Collection<FieldLink> inputs;
 
     private Collection<FieldLink> receivers;
 
@@ -69,9 +68,7 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
         currentValue = initialValue;
     }
 
-    private void initIO(boolean weakRefs) {
-        // TODO: implement weakRefs
-        inputs = new ArrayList<>();
+    protected void initIO(boolean weakRefs) {
         receivers = new ArrayList<>();
     }
 
@@ -160,53 +157,12 @@ public class Field<R extends Element> implements FieldInput, FieldOutput, Writab
         }
     }
 
-    public int getNextArg() {
-        return inputs.size();
-    }
-
-    @Override
-    public void addInput(FieldLink l) {
-        inputs.add(l);
-    }
-
-    @Override
-    public void removeInput(FieldLink l) {
-        inputs.remove(l);
-    }
-
-    public FieldLink getInputLink(Field f) {
-        return inputs.stream()
-                .filter(l -> l.getInput() == f)
-                .findFirst()
-                .orElse(null);
-    }
-
-    public FieldLink getInputLinkByArg(int arg) {
-        FieldLink[] in = inputs.toArray(new FieldLink[0]);
-        return in[arg];
-    }
-
-    public double getInputValueByArg(int arg) {
-        return getInputLinkByArg(arg).getCurrentInputValue();
-    }
-
-    @Override
-    public Collection<FieldLink> getInputs() {
-        return inputs;
-    }
-
     @Override
     public void disconnect() {
         receivers.forEach(lf ->
                 lf.disconnectAndUnlink()
         );
         receivers.clear();
-
-        inputs.stream()
-                .forEach(l ->
-                        l.getInput().removeOutput(l)
-                );
-        inputs.clear();
     }
 
     @Override

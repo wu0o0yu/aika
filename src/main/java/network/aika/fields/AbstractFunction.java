@@ -18,13 +18,58 @@ package network.aika.fields;
 
 import network.aika.neuron.activation.Element;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 /**
  * @author Lukas Molzberger
  */
 public abstract class AbstractFunction extends Field implements FieldInput, FieldOutput {
 
+    private FieldLink[] inputs;
+
     public AbstractFunction(Element ref, String label) {
         super(ref, label);
+    }
+
+    @Override
+    protected void initIO(boolean weakRefs) {
+        super.initIO(weakRefs);
+
+        // TODO: implement weakRefs
+        inputs = new FieldLink[getNumberOfFunctionArguments()];
+    }
+
+    protected int getNumberOfFunctionArguments() {
+        return 1;
+    }
+
+    @Override
+    public int getNextArg() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void addInput(FieldLink l) {
+        inputs[l.getArgument()] = l;
+    }
+
+    @Override
+    public void removeInput(FieldLink l) {
+        inputs[l.getArgument()] = null;
+    }
+
+    @Override
+    public Collection<FieldLink> getInputs() {
+        return Arrays.asList(inputs);
+    }
+
+    public double getInputValueByArg(int arg) {
+        return getInputLinkByArg(arg).getCurrentInputValue();
+    }
+
+    public FieldLink getInputLinkByArg(int arg) {
+        return inputs[arg];
     }
 
     protected abstract double computeUpdate(FieldLink fl, double u);
@@ -36,7 +81,4 @@ public abstract class AbstractFunction extends Field implements FieldInput, Fiel
         triggerUpdate();
     }
 
-    @Override
-    public void removeInput(FieldLink l) {
-    }
 }

@@ -24,7 +24,7 @@ import java.util.Comparator;
 /**
  * @author Lukas Molzberger
  */
-public class MinMaxField extends Field<Element> implements FieldInput, FieldOutput {
+public class MinMaxField extends SumField<Element> implements FieldInput, FieldOutput {
 
     MinMax mode;
     private FieldLink selectedInput;

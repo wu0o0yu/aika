@@ -20,6 +20,7 @@ import network.aika.Thought;
 import network.aika.fields.Field;
 import network.aika.fields.FieldFunction;
 import network.aika.fields.FieldOutput;
+import network.aika.fields.SumField;
 import network.aika.neuron.Range;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.visitor.DownVisitor;
@@ -41,7 +42,7 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     private FieldFunction entropy;
 
-    protected Field outputGradient;
+    protected SumField outputGradient;
 
     public PatternActivation(int id, Thought t, PatternNeuron patternNeuron) {
         super(id, t, patternNeuron);
@@ -62,7 +63,7 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
                 forwardsGradient
         );
 
-        outputGradient = new Field(this, "outputGradient");
+        outputGradient = new SumField(this, "outputGradient");
 
         super.connectGradientFields();
 

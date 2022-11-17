@@ -28,6 +28,11 @@ public class Subtraction extends AbstractFunction {
     }
 
     @Override
+    protected int getNumberOfFunctionArguments() {
+        return 2;
+    }
+
+    @Override
     protected double computeUpdate(FieldLink fl, double u) {
         return fl.getArgument() == 0 ? u : -u;
     }

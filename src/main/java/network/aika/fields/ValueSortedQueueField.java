@@ -22,7 +22,7 @@ import network.aika.utils.Utils;
 /**
  * @author Lukas Molzberger
  */
-public class ValueSortedQueueField extends QueueField {
+public class ValueSortedQueueField extends QueueSumField {
 
     public ValueSortedQueueField(Element e, String label) {
         super(e, label);

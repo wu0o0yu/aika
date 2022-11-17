@@ -35,7 +35,6 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
 
     @Override
     public Range getRange() {
-
         return null;
     }
 

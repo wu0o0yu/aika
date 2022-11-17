@@ -43,7 +43,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected AbstractFunction weightedInputUB;
     protected AbstractFunction weightedInputLB;
 
-    protected Field forwardsGradient;
+    protected SumField forwardsGradient;
     protected AbstractFunction backwardsGradient;
 
     protected ThresholdOperator onTransparent;
@@ -127,7 +127,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
 
     protected void initForwardsGradient() {
-        forwardsGradient = new Field(this, "Forwards-Gradient");
+        forwardsGradient = new SumField(this, "Forwards-Gradient");
         connect(input.forwardsGradient, forwardsGradient);
         connect(forwardsGradient, output.forwardsGradient);
     }

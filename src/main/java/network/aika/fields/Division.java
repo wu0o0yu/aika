@@ -28,6 +28,11 @@ public class Division extends AbstractFunction {
     }
 
     @Override
+    protected int getNumberOfFunctionArguments() {
+        return 2;
+    }
+
+    @Override
     protected double computeUpdate(FieldLink fl, double u) {
         return switch (fl.getArgument()) {
             case 0 -> updateDiv1(u);

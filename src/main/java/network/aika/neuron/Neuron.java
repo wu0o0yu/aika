@@ -19,9 +19,7 @@ package network.aika.neuron;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.callbacks.ActivationCheckCallback;
-import network.aika.fields.Field;
-import network.aika.fields.LimitedField;
-import network.aika.fields.QueueField;
+import network.aika.fields.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;
@@ -61,7 +59,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Writable customData;
 
-    protected QueueField bias = initBias();
+    protected SumField bias = initBias();
 
     protected List<S> inputSynapses = new ArrayList<>();
     protected List<Synapse> outputSynapses = new ArrayList<>();
@@ -175,10 +173,10 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 */
 
-    protected QueueField initBias() {
-        return new LimitedField(this, "bias", 0.0, () -> {
-            setModified();
-        });
+    protected SumField initBias() {
+        return new LimitedField(this, "bias", 0.0, () ->
+            setModified()
+        );
     }
 
     public void setAllowTraining(boolean allowTraining) {
@@ -329,7 +327,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return modified;
     }
 
-    public Field getBias() {
+    public SumField getBias() {
         return bias;
     }
 

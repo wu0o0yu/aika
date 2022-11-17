@@ -28,6 +28,11 @@ public class Multiplication extends AbstractFunction {
     }
 
     @Override
+    protected int getNumberOfFunctionArguments() {
+        return 2;
+    }
+
+    @Override
     protected double computeUpdate(FieldLink fl, double u) {
         return u * getInputValueByArg(fl.getArgument() == 0 ? 1 : 0);
     }

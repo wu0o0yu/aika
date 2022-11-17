@@ -48,11 +48,11 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected Timestamp created = NOT_SET;
     protected Timestamp fired = NOT_SET;
 
-    protected Field valueUB;
-    protected Field valueLB;
+    protected FieldOutput valueUB;
+    protected FieldOutput valueLB;
 
-    protected Field netUB;
-    protected Field netLB;
+    protected SumField netUB;
+    protected SumField netLB;
 
     private FieldOutput netDiff;
 
@@ -65,9 +65,9 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected FieldOutput isFinalAndFired;
 
     protected FieldFunction netOuterGradient;
-    protected QueueField forwardsGradient;
-    protected QueueField backwardsGradientIn;
-    protected QueueField backwardsGradientOut;
+    protected SumField forwardsGradient;
+    protected SumField backwardsGradientIn;
+    protected SumField backwardsGradientOut;
     protected FieldOutput updateValue;
 
     protected Map<NeuronProvider, Link> inputLinks;
@@ -136,9 +136,9 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
                 isFired
         );
 
-        forwardsGradient = new QueueField(this, "Forwards-Gradient");
-        backwardsGradientIn = new QueueField(this, "Backwards-Gradient-In", 0.0);
-        backwardsGradientOut = new QueueField(this, "Backwards-Gradient-Out");
+        forwardsGradient = new QueueSumField(this, "Forwards-Gradient");
+        backwardsGradientIn = new QueueSumField(this, "Backwards-Gradient-In", 0.0);
+        backwardsGradientOut = new QueueSumField(this, "Backwards-Gradient-Out");
 
         if (getConfig().isTrainingEnabled())
             isFinal.addEventListener(() -> {
@@ -285,11 +285,11 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         thought.onActivationCreationEvent(this, originSynapse, originAct);
     }
 
-    public Field getForwardsGradient() {
+    public SumField getForwardsGradient() {
         return forwardsGradient;
     }
 
-    public Field getBackwardsGradientIn() {
+    public FieldOutput getBackwardsGradientIn() {
         return backwardsGradientIn;
     }
 
@@ -321,15 +321,15 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return false;
     }
 
-    public Field getNet(boolean upperBound) {
+    public SumField getNet(boolean upperBound) {
         return upperBound ? netUB : netLB;
     }
 
-    public Field getNetUB() {
+    public SumField getNetUB() {
         return netUB;
     }
 
-    public Field getNetLB() {
+    public SumField getNetLB() {
         return netLB;
     }
 

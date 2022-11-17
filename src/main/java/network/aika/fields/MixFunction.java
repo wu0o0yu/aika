@@ -28,6 +28,11 @@ public class MixFunction extends AbstractFunction implements FieldInput, FieldOu
     }
 
     @Override
+    protected int getNumberOfFunctionArguments() {
+        return 2;
+    }
+
+    @Override
     public Element getReference() {
         return null;
     }

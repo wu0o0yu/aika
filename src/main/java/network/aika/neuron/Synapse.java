@@ -21,6 +21,8 @@ import network.aika.Thought;
 import network.aika.callbacks.ActivationCheckCallback;
 import network.aika.fields.Field;
 import network.aika.fields.QueueField;
+import network.aika.fields.QueueSumField;
+import network.aika.fields.SumField;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Element;
 import network.aika.neuron.activation.Link;
@@ -56,7 +58,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected S template;
 
-    protected QueueField weight = new QueueField(this, "weight", true, () ->
+    protected SumField weight = new QueueSumField(this, "weight", true, () ->
         setModified()
     );
 
@@ -308,7 +310,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
 
-    public Field getWeight() {
+    public SumField getWeight() {
         return weight;
     }
 
