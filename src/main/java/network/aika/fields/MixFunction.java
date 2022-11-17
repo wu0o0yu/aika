@@ -29,7 +29,7 @@ public class MixFunction extends AbstractFunction implements FieldInput, FieldOu
 
     @Override
     protected int getNumberOfFunctionArguments() {
-        return 2;
+        return 3;
     }
 
     @Override
