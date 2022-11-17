@@ -17,13 +17,6 @@ public class SumField<R extends Element> extends Field<R> implements FieldInput 
         super(reference, label, weakRefs);
     }
 
-    public SumField(R reference, String label, boolean weakRefs, double initialValue) {
-        super(reference, label, weakRefs, initialValue);
-    }
-
-    public SumField(R reference, String label, double initialValue) {
-        super(reference, label, initialValue);
-    }
 
     @Override
     protected void initIO(boolean weakRefs) {

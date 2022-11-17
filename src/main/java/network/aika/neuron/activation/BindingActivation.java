@@ -59,8 +59,11 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     protected void initFields() {
-        isOpen = new Field(this, "isOpen", 1.0);
-        mix = new Field(this, "mix", 1.0);
+        isOpen = new Field(this, "isOpen")
+                .setInitialValue(1.0);
+
+        mix = new Field(this, "mix")
+                .setInitialValue(1.0);
 
         mixedNetLB = mix(
                 this,

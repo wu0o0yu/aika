@@ -137,7 +137,9 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         );
 
         forwardsGradient = new QueueSumField(this, "Forwards-Gradient");
-        backwardsGradientIn = new QueueSumField(this, "Backwards-Gradient-In", 0.0);
+        backwardsGradientIn = (SumField) new QueueSumField(this, "Backwards-Gradient-In")
+                .setInitialValue(0.0);
+
         backwardsGradientOut = new QueueSumField(this, "Backwards-Gradient-Out");
 
         if (getConfig().isTrainingEnabled())

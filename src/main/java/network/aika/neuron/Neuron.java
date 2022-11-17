@@ -174,9 +174,10 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 */
 
     protected SumField initBias() {
-        return new LimitedField(this, "bias", 0.0, () ->
-            setModified()
-        );
+        return (SumField) new LimitedField(this, "bias", 0.0)
+                .addListener(() ->
+                        setModified()
+                );
     }
 
     public void setAllowTraining(boolean allowTraining) {

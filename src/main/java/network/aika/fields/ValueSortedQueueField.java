@@ -28,10 +28,6 @@ public class ValueSortedQueueField extends QueueSumField {
         super(e, label);
     }
 
-    public ValueSortedQueueField(Element e, String label, double initialValue) {
-        super(e, label, initialValue);
-    }
-
     @Override
     public void triggerUpdate() {
         if(Utils.belowTolerance(newValue - currentValue))

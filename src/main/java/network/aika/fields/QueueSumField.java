@@ -48,20 +48,6 @@ public class QueueSumField extends SumField implements IQueueField {
         step = new FieldStep(e, this);
     }
 
-    public QueueSumField(Element e, String label, double initialValue) {
-        this(e, label, false, initialValue);
-    }
-
-    public QueueSumField(Element e, String label, boolean weakRefs, double initialValue) {
-        super(e, label, weakRefs, initialValue);
-        step = new FieldStep(e, this);
-    }
-
-    public QueueSumField(Element e, String label, boolean weakRefs, FieldOnTrueEvent fieldListener) {
-        this(e, label, weakRefs);
-        addOutput(createEventListener(this, fieldListener));
-    }
-
     public void setStep(FieldStep s) {
         this.step = s;
     }

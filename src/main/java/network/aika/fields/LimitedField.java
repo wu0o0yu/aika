@@ -29,15 +29,9 @@ public class LimitedField extends QueueSumField {
     private double limit;
 
 
-    public LimitedField(Element refObj, String label, boolean weakRefs, double limit, double initialValue) {
-        super(refObj, label, weakRefs, initialValue);
-        this.limit = limit;
-    }
-
-    public LimitedField(Element refObj, String label, double limit, FieldOnTrueEvent fieldListener) {
+    public LimitedField(Element refObj, String label, double limit) {
         super(refObj, label);
         this.limit = limit;
-        addOutput(createEventListener(this, fieldListener));
     }
 
     @Override

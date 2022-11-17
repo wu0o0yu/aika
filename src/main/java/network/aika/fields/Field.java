@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static network.aika.fields.FieldLink.createEventListener;
+
 
 /**
  * @author Lukas Molzberger
@@ -56,16 +58,15 @@ public class Field<R extends Element> implements FieldOutput, Writable {
         initIO(weakRefs);
     }
 
-    public Field(R reference, String label, boolean weakRefs, double initialValue) {
-        this(reference, label, weakRefs);
-
+    public Field setInitialValue(double initialValue) {
         currentValue = initialValue;
+        return this;
     }
 
-    public Field(R reference, String label, double initialValue) {
-        this(reference, label, false);
 
-        currentValue = initialValue;
+    public Field addListener(FieldOnTrueEvent fieldListener) {
+        addOutput(createEventListener(this, fieldListener));
+        return this;
     }
 
     protected void initIO(boolean weakRefs) {
