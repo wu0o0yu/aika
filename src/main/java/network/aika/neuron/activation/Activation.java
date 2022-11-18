@@ -25,6 +25,7 @@ import network.aika.neuron.visitor.linking.pattern.RangeDownVisitor;
 import network.aika.neuron.visitor.selfref.SelfRefDownVisitor;
 import network.aika.neuron.visitor.UpVisitor;
 import network.aika.steps.activation.Counting;
+import network.aika.steps.activation.LinkingOut;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -98,7 +99,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         isFired.addEventListener(() -> {
                     fired = thought.getCurrentTimestamp();
-                    getNeuron().linkAndPropagateOut(this);
+                    LinkingOut.add(this);
                     Counting.add(this);
                 }
         );

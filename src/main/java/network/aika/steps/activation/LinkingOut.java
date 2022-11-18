@@ -16,6 +16,7 @@
  */
 package network.aika.steps.activation;
 
+import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.steps.Phase;
@@ -29,20 +30,22 @@ import static network.aika.steps.Phase.OUTPUT_LINKING;
  */
 public class LinkingOut extends Step<Activation> {
 
-    private Synapse synapse;
-
-    public static void add(Activation act, Synapse s) {
-        Step.add(new LinkingOut(act, s));
+    public static void add(Activation act) {
+        Step.add(new LinkingOut(act));
     }
 
-    public LinkingOut(Activation act, Synapse s) {
+    public LinkingOut(Activation act) {
         super(act);
-        this.synapse = s;
     }
 
     @Override
     public void process() {
-       synapse.linkAndPropagateOut(getElement());
+        Activation<?> act = getElement();
+        Neuron<?, ?> n = act.getNeuron();
+
+        n.getTargetOutputSynapses().forEach(s ->
+                s.linkAndPropagateOut(act)
+        );
     }
 
     @Override

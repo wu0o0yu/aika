@@ -93,12 +93,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         }
     }
 
-    public void linkAndPropagateOut(Activation act) {
-        getTargetOutputSynapses().forEach(s ->
-                LinkingOut.add(act, s)
-        );
-    }
-
 
     public void linkOutgoing(Synapse synA, Activation fromBS) {
         synA.startVisitor(
