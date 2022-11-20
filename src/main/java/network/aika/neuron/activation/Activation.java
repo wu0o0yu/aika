@@ -357,7 +357,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return fired != NOT_SET;
     }
 
-    public Activation getInstance() {
+    public Activation getTemplateInstance() {
         return null;
     }
 

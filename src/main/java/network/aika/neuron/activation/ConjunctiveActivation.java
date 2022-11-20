@@ -51,33 +51,31 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
     @Override
     public ConjunctiveActivation resolveAbstractInputActivation() {
         return neuron.isAbstract() ?
-                getInstance() :
+                getTemplateInstance() :
                 this;
     }
 
     @Override
-    public ConjunctiveActivation getInstance() {
-        CategoryActivation catBS = getInputCategory();
+    public ConjunctiveActivation getTemplateInstance() {
+        if(templateInstance == null) {
+            CategoryActivation catBS = getInputCategory();
 
-        if(catBS == null)
-            return null;
+            if (catBS == null)
+                return null;
 
-        DisjunctiveLink<?, ?, ?> l = catBS.getInput();
-        return l.getInput();
+            DisjunctiveLink<?, ConjunctiveActivation<N>, ?> l = catBS.getInput();
+            templateInstance = l.getInput();
+        }
+        return templateInstance;
     }
-
 
     public ConjunctiveActivation<N> getTemplate() {
         return template;
     }
 
-    public ConjunctiveActivation<N> getTemplateInstance() {
-        return templateInstance;
-    }
-
     @Override
     public void instantiateTemplate() {
-        if(getInstance() != null)
+        if(getTemplateInstance() != null)
             return;
 
         if(!isAbleToInstantiate())
@@ -120,7 +118,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
     @Override
     public boolean isUnresolvedAbstract() {
         return neuron.isAbstract() &&
-                getInstance() == null;
+                getTemplateInstance() == null;
     }
 
     private boolean isAbleToInstantiate() {
