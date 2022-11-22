@@ -85,7 +85,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return scope;
     }
 
-
     public void propagate(IA iAct) {
         if(propagateLinkExists(iAct))
             return;
@@ -181,25 +180,35 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public S instantiateTemplate(I input, O output) {
-        S s = instantiateTemplate();
-        s.init(input, output, weight.getCurrentValue());
-        return s;
-    }
-
-    public S instantiateTemplate() {
         S s;
         try {
             s = (S) getClass().getConstructor().newInstance();
-            initNewInstance(s);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        s.init(input, output, this, weight.getCurrentValue());
         return s;
     }
 
-    protected void initNewInstance(S s) {
-        s.template = this;
-        s.weight.setValue(weight.getCurrentValue());
+    public S init(Neuron input, Neuron output, double initialWeight) {
+        return init(input, output, null, initialWeight);
+    }
+
+    public S init(Neuron input, Neuron output, S templateSyn, double initialWeight) {
+        setInput((I) input);
+        setOutput((O) output);
+        weight.setValue(initialWeight);
+        template = templateSyn;
+
+        link();
+
+        return (S) this;
+    }
+
+    protected void link() {
+        linkInput();
+        linkOutput();
     }
 
     public abstract L createLink(IA input, OA output);
@@ -355,16 +364,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return m != null ?
                 m.getCurrentThought() :
                 null;
-    }
-
-    public S init(Neuron input, Neuron output, double initialWeight) {
-        setInput((I) input);
-        setOutput((O) output);
-        weight.setValue(initialWeight);
-        linkInput();
-        linkOutput();
-
-        return (S) this;
     }
 
     public String toString() {

@@ -55,15 +55,6 @@ public class PatternSynapse extends AbstractPatternSynapse<
     }
 
     @Override
-    public PatternSynapse instantiateTemplate(BindingNeuron in, PatternNeuron out) {
-        PositiveFeedbackSynapse posFeedbackSyn = (PositiveFeedbackSynapse) input.getNeuron().getInputSynapse(output);
-        if(posFeedbackSyn != null)
-            posFeedbackSyn.instantiateTemplate(out, in);
-
-        return super.instantiateTemplate(in, out);
-    }
-
-    @Override
     public PatternLink createLink(BindingActivation input, PatternActivation output) {
         PositiveFeedbackSynapse posFeedbackSyn = (PositiveFeedbackSynapse) input.getNeuron().getInputSynapse(output.getNeuronProvider());
         if(posFeedbackSyn != null)

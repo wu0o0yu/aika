@@ -134,22 +134,23 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected void connectGradientFields() {
     }
 
-
     protected void initForwardsGradient() {
         forwardsGradient = new SumField(this, "Forwards-Gradient");
         connect(input.forwardsGradient, forwardsGradient);
         connect(forwardsGradient, output.forwardsGradient);
     }
 
-    public S instantiateTemplate(I iAct, O oAct) {
-        S instSyn = (S) synapse
-                .instantiateTemplate(
-                        iAct.getNeuron(),
-                        oAct.getNeuron()
-                );
-
+    public S instantiateTemplateAndCreateLink(I iAct, O oAct) {
+        S instSyn = instantiateTemplate(iAct, oAct);
         instSyn.createLink(iAct, oAct);
         return instSyn;
+    }
+
+    protected S instantiateTemplate(I iAct, O oAct) {
+        return (S) synapse.instantiateTemplate(
+                iAct.getNeuron(),
+                oAct.getNeuron()
+        );
     }
 
     public abstract void connectWeightUpdate();

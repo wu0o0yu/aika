@@ -54,9 +54,9 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
     }
 
     @Override
-    public InhibitorySynapse instantiateTemplate() {
+    public InhibitorySynapse instantiateTemplate(BindingNeuron input, InhibitoryNeuron output) {
         InhibitorySynapse s = new InhibitorySynapse(type);
-        initNewInstance(s);
+        s.init(input, output, this, weight.getCurrentValue());
         return s;
     }
 

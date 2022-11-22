@@ -90,7 +90,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         getInputLinks()
                 .filter(l -> !(l instanceof PositiveFeedbackLink))
                 .forEach(l ->
-                        l.instantiateTemplate(
+                        l.instantiateTemplateAndCreateLink(
                                 l.getInput().resolveAbstractInputActivation(),
                                 templateInstance
                         )
@@ -99,7 +99,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         getOutputLinks()
                 .filter(l -> l instanceof InhibitoryLink)
                 .forEach(l ->
-                        l.instantiateTemplate(
+                        l.instantiateTemplateAndCreateLink(
                                 templateInstance,
                                 l.getOutput().resolveAbstractInputActivation()
                         )

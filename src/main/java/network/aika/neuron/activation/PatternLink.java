@@ -16,7 +16,10 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.neuron.conjunctive.BindingNeuron;
+import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.conjunctive.PatternSynapse;
+import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 import network.aika.neuron.visitor.DownVisitor;
 import network.aika.neuron.visitor.UpVisitor;
 import network.aika.sign.Sign;
@@ -36,6 +39,16 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
 
         LinkCounting.add(this);
     }
+
+    @Override
+    protected PatternSynapse instantiateTemplate(BindingActivation iAct, PatternActivation oAct) {
+        PositiveFeedbackLink posFeedbackLink = (PositiveFeedbackLink) input.getInputLink(output.getNeuron());
+        if(posFeedbackLink != null)
+            posFeedbackLink.instantiateTemplate(oAct, iAct);
+
+        return super.instantiateTemplate(iAct, oAct);
+    }
+
 
     @Override
     public void connectGradientFields() {
@@ -63,15 +76,6 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
                 forwardsGradient
         );
     }
-
-/*
-    public double getRelativeSurprisal(Sign si, Sign so, Range range) {
-        double s = input.getNeuron().getSurprisal(si, so, range, true);
-        s -= getTrainingInput().getNeuron().getSurprisal(si, range, true);
-        s -= getTrainingOutput().getNeuron().getSurprisal(so, range, true);
-        return s;
-    }
-*/
 
     @Override
     public void patternVisitDown(DownVisitor v) {
