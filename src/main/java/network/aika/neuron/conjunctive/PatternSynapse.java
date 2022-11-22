@@ -44,7 +44,6 @@ public class PatternSynapse extends AbstractPatternSynapse<
         >
 {
 
-
     protected double frequencyIPosOPos;
     protected double frequencyIPosONeg;
     protected double frequencyINegOPos;
@@ -53,6 +52,15 @@ public class PatternSynapse extends AbstractPatternSynapse<
 
     public PatternSynapse() {
         super();
+    }
+
+    @Override
+    public PatternSynapse instantiateTemplate(BindingNeuron in, PatternNeuron out) {
+        PositiveFeedbackSynapse posFeedbackSyn = (PositiveFeedbackSynapse) input.getNeuron().getInputSynapse(output);
+        if(posFeedbackSyn != null)
+            posFeedbackSyn.instantiateTemplate(out, in);
+
+        return super.instantiateTemplate(in, out);
     }
 
     @Override

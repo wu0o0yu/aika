@@ -180,24 +180,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         this.output = output.getProvider();
     }
 
-    public S instantiateTemplate(L l, I input, O output) {
-        S s = instantiateTemplate(input, output);
-
-        if(l != null)
-            s.weight.setValue(
-                    weight.getCurrentValue()
-            );
-
-        return s;
-    }
-
-
     public S instantiateTemplate(I input, O output) {
         S s = instantiateTemplate();
-
-        s.input = input.getProvider();
-        s.output = output.getProvider();
-
+        s.init(input, output, weight.getCurrentValue());
         return s;
     }
 
@@ -375,7 +360,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     public S init(Neuron input, Neuron output, double initialWeight) {
         setInput((I) input);
         setOutput((O) output);
-        getWeight().setValue(initialWeight);
+        weight.setValue(initialWeight);
         linkInput();
         linkOutput();
 

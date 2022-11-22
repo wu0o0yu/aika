@@ -141,16 +141,15 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         connect(forwardsGradient, output.forwardsGradient);
     }
 
-    public void instantiateTemplate( Activation iAct, Activation oAct) {
+    public S instantiateTemplate(I iAct, O oAct) {
         S instSyn = (S) synapse
                 .instantiateTemplate(
-                        this,
                         iAct.getNeuron(),
                         oAct.getNeuron()
                 );
-        instSyn.linkOutput();
 
         instSyn.createLink(iAct, oAct);
+        return instSyn;
     }
 
     public abstract void connectWeightUpdate();
