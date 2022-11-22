@@ -35,6 +35,11 @@ public abstract class CategorySynapse<S extends CategorySynapse, I extends Conju
 {
 
     @Override
+    protected void link() {
+        linkInput();
+    }
+
+    @Override
     public void startVisitor(LinkingOperator c, Activation bs) {
 
     }
