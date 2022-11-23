@@ -87,6 +87,13 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         templateInstance.init(null, null);
         templateInstance.template = this;
 
+        templateInstance.isFired.addEventListener(() -> {
+            updateRange();
+            n.setLabel(
+                    getConfig().getLabel(this)
+            );
+        });
+
         getInputLinks()
                 .filter(l -> !(l instanceof PositiveFeedbackLink))
                 .forEach(l ->

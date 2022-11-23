@@ -61,6 +61,7 @@ public class QueueField extends Field implements IQueueField {
         return step.isQueued();
     }
 
+    @Override
     public void addObserver(FieldObserver observer) {
         if(observers.contains(observer))
             return;
@@ -68,6 +69,7 @@ public class QueueField extends Field implements IQueueField {
         observers.add(observer);
     }
 
+    @Override
     public void removeObserver(FieldObserver observer) {
         observers.remove(observer);
     }
