@@ -29,6 +29,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import static network.aika.fields.FieldLink.connect;
+
 
 /**
  *
@@ -52,8 +54,10 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         super(scope);
     }
 
+    @Override
     public void setOutput(O output) {
         super.setOutput(output);
+        weight.addEventListener(output::updateSumOfLowerWeights);
     }
 
     protected double getSortingWeight() {

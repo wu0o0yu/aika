@@ -415,7 +415,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return getModel().getCurrentThought();
     }
 
-
     public <N extends Neuron> N init(Model m, String label) {
         addProvider(m);
         setLabel(label);
