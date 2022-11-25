@@ -46,10 +46,6 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
         return type;
     }
 
-    @Override
-    public int getRank() {
-        return -1;
-    }
 
     @Override
     public void startVisitor(LinkingOperator c, Activation bs) {

@@ -19,7 +19,6 @@ package network.aika.neuron.visitor.selfref;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.visitor.DownVisitor;
 
 /**
@@ -42,7 +41,8 @@ public class SelfRefDownVisitor extends DownVisitor<BindingActivation> {
 
     @Override
     public void up(BindingActivation origin) {
-
+        if(origin == oAct || origin == oAct.getTemplate() || origin == oAct.getTemplateInstance())
+            isSelfRef = true;
     }
 
     protected void visitDown(Link l) {

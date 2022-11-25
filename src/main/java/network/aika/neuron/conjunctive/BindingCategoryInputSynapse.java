@@ -39,10 +39,4 @@ public class BindingCategoryInputSynapse extends BindingNeuronSynapse<
     public BindingCategoryInputLink createLink(CategoryActivation input, BindingActivation output) {
         return new BindingCategoryInputLink(this, input, output);
     }
-/*
-    @Override
-    protected boolean checkCausal(CategoryActivation iAct, BindingActivation oAct) {
-        return true; // Workaround
-    }
- */
 }

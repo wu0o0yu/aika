@@ -26,5 +26,4 @@ public class BindingCategoryLink extends CategoryLink<BindingCategorySynapse, Bi
     public BindingCategoryLink(BindingCategorySynapse s, BindingActivation input, BindingCategoryActivation output) {
         super(s, input, output);
     }
-
 }

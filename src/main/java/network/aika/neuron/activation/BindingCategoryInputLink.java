@@ -17,7 +17,6 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.conjunctive.BindingCategoryInputSynapse;
-import network.aika.neuron.conjunctive.PatternCategoryInputSynapse;
 import network.aika.neuron.visitor.DownVisitor;
 import network.aika.neuron.visitor.UpVisitor;
 

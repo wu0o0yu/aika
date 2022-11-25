@@ -168,10 +168,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     public abstract void setModified();
 
-    public int getRank() {
-        return 0;
-    }
-
     public void count(L l) {
     }
 

@@ -48,7 +48,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
 
         S cis = (S) getCategoryInputSynapse();
         newCategorySynapse()
-                .init(n, cis.getInput(), 1.0);
+                .init(n, cis.getInput(), 10.0);
     }
 
     public abstract CategorySynapse newCategorySynapse();
@@ -97,23 +97,10 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         s.getWeight().addEventListener(this::updateSumOfLowerWeights);
     }
 
-    @Override
-    public void addOutputSynapse(Synapse s) {
-        super.addOutputSynapse(s);
-        sortOutputSynapses();
-    }
-
     private void sortInputSynapses() {
         Collections.sort(
                 inputSynapses,
                 Comparator.<ConjunctiveSynapse>comparingDouble(s -> s.getSortingWeight())
-        );
-    }
-
-    private void sortOutputSynapses() {
-        Collections.sort(
-                outputSynapses,
-                Comparator.comparingInt(s -> -s.getRank())
         );
     }
 }

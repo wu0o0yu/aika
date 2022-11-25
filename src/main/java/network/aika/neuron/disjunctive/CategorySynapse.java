@@ -35,11 +35,6 @@ public abstract class CategorySynapse<S extends CategorySynapse, I extends Conju
 {
 
     @Override
-    public int getRank() {
-        return 1;
-    }
-
-    @Override
     protected void link() {
         linkInput();
     }
