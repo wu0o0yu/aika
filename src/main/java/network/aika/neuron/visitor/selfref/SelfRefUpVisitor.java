@@ -20,36 +20,37 @@ import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.PatternActivation;
-import network.aika.neuron.visitor.DownVisitor;
+import network.aika.neuron.conjunctive.Scope;
+import network.aika.neuron.visitor.UpVisitor;
+import network.aika.neuron.visitor.linking.LinkingUpVisitor;
+import network.aika.neuron.visitor.linking.binding.BindingDownVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class SelfRefDownVisitor extends DownVisitor<BindingActivation> {
+public class SelfRefUpVisitor extends UpVisitor {
 
-    BindingActivation oAct;
+    protected BindingActivation oAct;
 
-    boolean isSelfRef;
+    protected SelfRefUpVisitor(SelfRefDownVisitor parent, BindingActivation oAct) {
+        super(parent);
 
-    public SelfRefDownVisitor(BindingActivation oAct) {
-        super(oAct.getThought());
         this.oAct = oAct;
     }
 
-    public boolean isSelfRef() {
-        return isSelfRef;
+    public void check(Link lastLink, Activation act) {
+        if(origin == oAct || origin == oAct.getTemplate() || origin == oAct.getTemplateInstance())
+            isSelfRef = true;
+    }
+
+
+    @Override
+    protected void visitUp(Link l) {
+        l.selfRefVisitUp(this);
     }
 
     @Override
-    public void up(BindingActivation origin) {
-
-    }
-
-    protected void visitDown(Link l) {
-        l.selfRefVisitDown(this);
-    }
-
-    protected void visitDown(Activation act, Link l) {
-        act.selfRefVisitDown(this, l);
+    public void visitUp(Activation act, Link l) {
+        act.selfRefVisitUp(this, l);
     }
 }

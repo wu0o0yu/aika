@@ -54,12 +54,6 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         super(scope);
     }
 
-    @Override
-    public void setOutput(O output) {
-        super.setOutput(output);
-        weight.addEventListener(output::updateSumOfLowerWeights);
-    }
-
     protected double getSortingWeight() {
         return getWeight().getCurrentValue();
     }

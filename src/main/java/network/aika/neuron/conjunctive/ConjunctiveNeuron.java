@@ -18,6 +18,7 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.disjunctive.CategorySynapse;
@@ -90,10 +91,29 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         }
     }
 
+    @Override
+    public void addInputSynapse(S s) {
+        super.addInputSynapse(s);
+        s.getWeight().addEventListener(this::updateSumOfLowerWeights);
+    }
+
+    @Override
+    public void addOutputSynapse(Synapse s) {
+        super.addOutputSynapse(s);
+        sortOutputSynapses();
+    }
+
     private void sortInputSynapses() {
         Collections.sort(
                 inputSynapses,
                 Comparator.<ConjunctiveSynapse>comparingDouble(s -> s.getSortingWeight())
+        );
+    }
+
+    private void sortOutputSynapses() {
+        Collections.sort(
+                outputSynapses,
+                Comparator.comparingInt(s -> -s.getRank())
         );
     }
 }
