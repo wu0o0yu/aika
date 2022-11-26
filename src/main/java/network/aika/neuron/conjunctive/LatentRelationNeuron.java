@@ -18,13 +18,9 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.Thought;
 import network.aika.direction.Direction;
-import network.aika.fields.LimitedField;
-import network.aika.fields.QueueField;
 import network.aika.fields.QueueSumField;
 import network.aika.fields.SumField;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.LatentRelationActivation;
-import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.text.TokenActivation;
 
 
@@ -35,6 +31,27 @@ import java.util.stream.Stream;
  * @author Lukas Molzberger
  */
 public abstract class LatentRelationNeuron extends BindingNeuron {
+
+    private int rangeBegin = -1;
+    private int rangeEnd = -1;
+
+
+    public int getRangeBegin() {
+        return rangeBegin;
+    }
+
+    public void setRangeBegin(int rangeBegin) {
+        this.rangeBegin = rangeBegin;
+    }
+
+    public int getRangeEnd() {
+        return rangeEnd;
+    }
+
+    public void setRangeEnd(int rangeEnd) {
+        this.rangeEnd = rangeEnd;
+    }
+
 
     public abstract Stream<TokenActivation> evaluateLatentRelation(TokenActivation fromOriginAct, Direction dir);
 

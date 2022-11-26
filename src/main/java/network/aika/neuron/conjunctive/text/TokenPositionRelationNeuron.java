@@ -18,8 +18,6 @@ package network.aika.neuron.conjunctive.text;
 
 import network.aika.Model;
 import network.aika.direction.Direction;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.text.Document;
@@ -33,25 +31,6 @@ import java.util.stream.Stream;
  */
 public class TokenPositionRelationNeuron extends LatentRelationNeuron {
 
-    private int rangeBegin = -1;
-    private int rangeEnd = -1;
-
-
-    public int getRangeBegin() {
-        return rangeBegin;
-    }
-
-    public void setRangeBegin(int rangeBegin) {
-        this.rangeBegin = rangeBegin;
-    }
-
-    public int getRangeEnd() {
-        return rangeEnd;
-    }
-
-    public void setRangeEnd(int rangeEnd) {
-        this.rangeEnd = rangeEnd;
-    }
 
     public static TokenPositionRelationNeuron lookupRelation(Model m, int rangeBegin, int rangeEnd) {
         return m.lookupNeuron("Prev. Token Rel.: " + rangeBegin + "," + rangeEnd, l -> {
@@ -91,10 +70,10 @@ public class TokenPositionRelationNeuron extends LatentRelationNeuron {
     }
 
     private int getRelFrom(Direction dir) {
-        return dir == Direction.INPUT ? rangeBegin : -rangeEnd;
+        return dir == Direction.INPUT ? getRangeBegin() : -getRangeEnd();
     }
 
     private int getRelTo(Direction dir) {
-        return dir == Direction.INPUT ? rangeEnd : -rangeBegin;
+        return dir == Direction.INPUT ? getRangeEnd() : -getRangeBegin();
     }
 }

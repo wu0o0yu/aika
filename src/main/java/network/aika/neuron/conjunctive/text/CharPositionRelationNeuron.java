@@ -17,8 +17,6 @@
 package network.aika.neuron.conjunctive.text;
 
 import network.aika.direction.Direction;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.text.Document;
@@ -31,25 +29,6 @@ import java.util.stream.Stream;
  * @author Lukas Molzberger
  */
 public class CharPositionRelationNeuron extends LatentRelationNeuron {
-
-    private int rangeBegin = -1;
-    private int rangeEnd = -1;
-
-    public int getRangeBegin() {
-        return rangeBegin;
-    }
-
-    public void setRangeBegin(int rangeBegin) {
-        this.rangeBegin = rangeBegin;
-    }
-
-    public int getRangeEnd() {
-        return rangeEnd;
-    }
-
-    public void setRangeEnd(int rangeEnd) {
-        this.rangeEnd = rangeEnd;
-    }
 
     public CharPositionRelationNeuron lookupRelation(int rangeBegin, int rangeEnd) {
         return getModel().lookupNeuron("CP-Rel.: " + rangeBegin + "," + rangeEnd, l ->
