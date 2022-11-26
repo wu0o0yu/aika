@@ -80,14 +80,14 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     protected void updateSumOfLowerWeights() {
         sortInputSynapses();
 
-        double sum = getBias().getNewValue();
+        double sum = getBias().getUpdatedCurrentValue();
         for(ConjunctiveSynapse s: inputSynapses) {
-            if(s.getWeight().getCurrentValue() <= 0.0)
+            if(s.getWeight().getUpdatedCurrentValue() <= 0.0)
                 continue;
 
             s.setSumOfLowerWeights(sum);
 
-            sum += s.getWeight().getCurrentValue();
+            sum += s.getWeight().getUpdatedCurrentValue();
         }
     }
 

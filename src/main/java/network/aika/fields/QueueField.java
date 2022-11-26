@@ -74,6 +74,7 @@ public class QueueField extends Field implements IQueueField {
         observers.remove(observer);
     }
 
+    @Override
     public void triggerUpdate() {
         if(Utils.belowTolerance(newValue - currentValue))
             return;

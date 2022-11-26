@@ -101,10 +101,19 @@ public class Field<R extends Element> implements FieldOutput, Writable {
         return label;
     }
 
+    @Override
     public double getCurrentValue() {
         return currentValue;
     }
 
+    @Override
+    public double getUpdatedCurrentValue() {
+        return withinUpdate ?
+                newValue :
+                currentValue;
+    }
+
+    @Override
     public double getNewValue() {
         return newValue;
     }

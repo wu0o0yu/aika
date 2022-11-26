@@ -54,8 +54,8 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         super(scope);
     }
 
-    protected double getSortingWeight() {
-        return getWeight().getCurrentValue();
+    public double getSortingWeight() {
+        return getWeight().getUpdatedCurrentValue();
     }
 
     @Override

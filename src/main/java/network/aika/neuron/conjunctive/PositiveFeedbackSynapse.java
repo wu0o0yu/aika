@@ -57,7 +57,7 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
     }
 
     @Override
-    protected double getSortingWeight() {
+    public double getSortingWeight() {
         return 0.0;
     }
 

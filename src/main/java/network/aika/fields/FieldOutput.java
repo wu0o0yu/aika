@@ -33,6 +33,8 @@ public interface FieldOutput {
 
     double getCurrentValue();
 
+    double getUpdatedCurrentValue();
+
     double getNewValue();
 
     void addOutput(FieldLink fl);
