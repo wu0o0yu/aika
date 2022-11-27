@@ -53,7 +53,7 @@ public class RelationLinkingUpVisitor extends BindingUpVisitor {
         if(downOrigin == null)
             return false;
 
-        if(from == INPUT)
+        if(from == to)
             return downOrigin == upOrigin;
 
         if(from != to)
