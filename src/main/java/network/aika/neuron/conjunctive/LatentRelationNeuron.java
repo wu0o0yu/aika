@@ -65,14 +65,4 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
     public LatentRelationActivation createActivation(Thought t) {
         return new LatentRelationActivation(t.createActivationId(), t, this);
     }
-
-    public LatentRelationActivation createOrLookupLatentActivation(TokenActivation fromOriginAct, TokenActivation toOriginAct) {
-        return fromOriginAct.getToRelations().computeIfAbsent(toOriginAct, toAct -> {
-            LatentRelationActivation relAct = createActivation(fromOriginAct.getThought());
-            relAct.setFromAct(fromOriginAct);
-            relAct.setToAct(toOriginAct);
-            relAct.init(null, null);
-            return relAct;
-        });
-    }
 }

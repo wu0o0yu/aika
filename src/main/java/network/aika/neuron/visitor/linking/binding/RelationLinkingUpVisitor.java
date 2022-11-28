@@ -64,7 +64,7 @@ public class RelationLinkingUpVisitor extends BindingUpVisitor {
 
     @Override
     public void createRelation(Link l) {
-        LatentRelationActivation latentRelAct = relation.getInput().createOrLookupLatentActivation(
+        LatentRelationActivation latentRelAct = relation.createOrLookupLatentActivation(
                 downOrigin,
                 upOrigin
         );

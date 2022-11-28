@@ -17,6 +17,7 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.*;
+import network.aika.neuron.activation.text.TokenActivation;
 
 /**
  *
@@ -36,6 +37,16 @@ public class RelationInputSynapse extends BindingNeuronSynapse<
     @Override
     public RelationInputLink createLink(BindingActivation input, BindingActivation output) {
         return new RelationInputLink(this, input, output);
+    }
+
+    public LatentRelationActivation createOrLookupLatentActivation(TokenActivation fromOriginAct, TokenActivation toOriginAct) {
+        return fromOriginAct.getToRelations().computeIfAbsent(getInput(), n -> {
+            LatentRelationActivation relAct = getInput().createActivation(fromOriginAct.getThought());
+            relAct.setFromAct(fromOriginAct);
+            relAct.setToAct(toOriginAct);
+            relAct.init(null, null);
+            return relAct;
+        });
     }
 
     @Override

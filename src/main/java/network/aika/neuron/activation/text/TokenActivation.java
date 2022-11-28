@@ -18,6 +18,7 @@ package network.aika.neuron.activation.text;
 
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.*;
+import network.aika.neuron.conjunctive.LatentRelationNeuron;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.neuron.visitor.DownVisitor;
 import network.aika.text.Document;
@@ -36,8 +37,8 @@ public class TokenActivation extends PatternActivation {
 
     private Integer position;
 
-    private Map<TokenActivation, LatentRelationActivation> toRelations = new TreeMap<>(
-            Comparator.comparingInt(act -> act.getId())
+    private Map<LatentRelationNeuron, LatentRelationActivation> toRelations = new TreeMap<>(
+            Comparator.comparingLong(n -> n.getId())
     );
 
     public TokenActivation(int id, Integer pos, int begin, int end, Document doc, TokenNeuron tokenNeuron) {
@@ -57,7 +58,7 @@ public class TokenActivation extends PatternActivation {
         // Input activations don't need weight updates
     }
 
-    public Map<TokenActivation, LatentRelationActivation> getToRelations() {
+    public Map<LatentRelationNeuron, LatentRelationActivation> getToRelations() {
         return toRelations;
     }
 
