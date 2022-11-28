@@ -16,9 +16,13 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.Thought;
 import network.aika.fields.Multiplication;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
+import network.aika.neuron.visitor.linking.LinkingOperator;
+import network.aika.neuron.visitor.linking.binding.BindingDownVisitor;
+import network.aika.neuron.visitor.linking.binding.RelationLinkingDownVisitor;
 
 import static network.aika.fields.FieldLink.connect;
 
@@ -35,6 +39,12 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
 {
     public NegativeFeedbackSynapse() {
         super(Scope.INPUT);
+    }
+
+    @Override
+    public void startVisitor(LinkingOperator c, Activation bs) {
+        new BindingDownVisitor(bs.getThought(), c)
+                .start(bs);
     }
 
     @Override
