@@ -16,11 +16,17 @@
  */
 package network.aika.neuron.disjunctive;
 
+import network.aika.Model;
+import network.aika.neuron.SampleSpace;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.visitor.linking.LinkingOperator;
 import network.aika.neuron.visitor.linking.inhibitory.InhibitoryDownVisitor;
 import network.aika.neuron.visitor.linking.pattern.PatternDownVisitor;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  *
@@ -37,6 +43,9 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
 {
 
     private InhibSynType type;
+
+    public InhibitorySynapse() {
+    }
 
     public InhibitorySynapse(InhibSynType type) {
         this.type = type;
@@ -63,5 +72,20 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
     @Override
     public InhibitoryLink createLink(BindingActivation input, InhibitoryActivation output) {
         return new InhibitoryLink(this, input, output);
+    }
+
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+
+        out.writeInt(type.ordinal());
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws IOException {
+        super.readFields(in, m);
+
+        type = InhibSynType.values()[in.readInt()];
     }
 }
