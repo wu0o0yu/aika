@@ -36,6 +36,7 @@ public abstract class DisjunctiveSynapse<
         OA extends DisjunctiveActivation
         > extends Synapse<S,I,O,L,IA,OA>
 {
+
     @Override
     public void setModified() {
         if(input != null)

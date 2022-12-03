@@ -18,9 +18,7 @@ package network.aika.neuron;
 
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.callbacks.ActivationCheckCallback;
-import network.aika.fields.Field;
-import network.aika.fields.QueueField;
+import network.aika.direction.Direction;
 import network.aika.fields.QueueSumField;
 import network.aika.fields.SumField;
 import network.aika.neuron.activation.Activation;
@@ -31,8 +29,6 @@ import network.aika.neuron.conjunctive.Scope;
 import network.aika.neuron.visitor.linking.LinkingOperator;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -96,9 +92,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public double getPropagatePreNetUB(IA iAct) {
-        ActivationCheckCallback activationCheckCallback = getOutput().getActivationCheckCallBack();
-
-        if (activationCheckCallback != null && !activationCheckCallback.check(iAct)) {
+        if (getOutput().isCallActivationCheckCallback() &&
+                !getModel().getActivationCheckCallBack().check(iAct)) {
             return -1000.0;
         }
 

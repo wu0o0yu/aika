@@ -18,7 +18,6 @@ package network.aika.neuron;
 
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.callbacks.ActivationCheckCallback;
 import network.aika.fields.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Element;
@@ -26,7 +25,6 @@ import network.aika.neuron.activation.Link;
 import network.aika.neuron.activation.Timestamp;
 import network.aika.neuron.visitor.ActLinkingOperator;
 import network.aika.neuron.visitor.LinkLinkingOperator;
-import network.aika.steps.activation.LinkingOut;
 import network.aika.steps.activation.Save;
 import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Writable;
@@ -71,7 +69,17 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     private Neuron<?, ?> template;
 
     private final WeakHashMap<Long, WeakReference<SortedSet<A>>> activations = new WeakHashMap<>();
-    private ActivationCheckCallback activationCheckCallback;
+
+    private boolean callActivationCheckCallback;
+
+
+    public boolean isCallActivationCheckCallback() {
+        return callActivationCheckCallback;
+    }
+
+    public void setCallActivationCheckCallback(boolean callActivationCheckCallback) {
+        this.callActivationCheckCallback = callActivationCheckCallback;
+    }
 
     public void addProvider(Model m) {
         if (provider == null)
@@ -299,13 +307,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return retrievalCount;
     }
 
-    public ActivationCheckCallback getActivationCheckCallBack() {
-        return this.activationCheckCallback;
-    }
-
-    public void setActivationCheckCallback(ActivationCheckCallback activationCheckCallback) {
-        this.activationCheckCallback = activationCheckCallback;
-    }
 
     public void setModified() {
         if (!modified)
@@ -367,6 +368,8 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         out.writeBoolean(customData != null);
         if(customData != null)
             customData.write(out);
+
+        out.writeBoolean(callActivationCheckCallback);
     }
 
     public static Neuron read(DataInput in, Model m) throws Exception {
@@ -398,6 +401,8 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
             customData = m.getCustomDataInstanceSupplier().get();
             customData.readFields(in, m);
         }
+
+        callActivationCheckCallback = in.readBoolean();
     }
 
     @Override

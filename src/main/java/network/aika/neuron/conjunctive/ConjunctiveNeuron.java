@@ -18,7 +18,6 @@ package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.disjunctive.CategorySynapse;

@@ -17,6 +17,7 @@
 package network.aika;
 
 
+import network.aika.callbacks.ActivationCheckCallback;
 import network.aika.callbacks.InMemorySuspensionCallback;
 import network.aika.callbacks.NeuronProducer;
 import network.aika.callbacks.SuspensionCallback;
@@ -52,12 +53,24 @@ public class Model implements Writable {
 
     private Supplier<Writable> customDataInstanceSupplier;
 
+    private ActivationCheckCallback activationCheckCallback;
+
+
     public Model() {
         this(new InMemorySuspensionCallback());
     }
 
     public Model(SuspensionCallback sc) {
         suspensionCallback = sc;
+    }
+
+
+    public ActivationCheckCallback getActivationCheckCallBack() {
+        return this.activationCheckCallback;
+    }
+
+    public void setActivationCheckCallback(ActivationCheckCallback activationCheckCallback) {
+        this.activationCheckCallback = activationCheckCallback;
     }
 
     public Long getIdByLabel(String label) {
