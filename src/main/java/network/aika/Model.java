@@ -25,7 +25,6 @@ import network.aika.neuron.*;
 import network.aika.utils.Writable;
 
 import java.io.*;
-import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
@@ -45,9 +44,7 @@ public class Model implements Writable {
     private final AtomicLong retrievalCounter = new AtomicLong(0);
     private final AtomicLong thoughtIdCounter = new AtomicLong(0);
 
-    // Important: the id field needs to be referenced by the provider!
-    private final WeakHashMap<Long, WeakReference<NeuronProvider>> providers = new WeakHashMap<>();
-    public final Map<Long, NeuronProvider> activeProviders = new TreeMap<>();
+    public final Map<Long, NeuronProvider> providers = new TreeMap<>();
 
     private Thought currentThought;
 
@@ -110,7 +107,7 @@ public class Model implements Writable {
     }
 
     public Collection<NeuronProvider> getActiveNeurons() {
-        return new ArrayList<>(activeProviders.values());
+        return new ArrayList<>(providers.values());
     }
 
     public <N extends Neuron> N lookupNeuron(String tokenLabel, NeuronProducer<N> onNewCallback) {
@@ -149,11 +146,11 @@ public class Model implements Writable {
         }
     }
 
-    public SuspensionCallback getSuspensionHook() {
+    public SuspensionCallback getSuspensionCallback() {
         return suspensionCallback;
     }
 
-    public void setSuspensionHook(SuspensionCallback suspensionCallback) {
+    public void setSuspensionCallback(SuspensionCallback suspensionCallback) {
         this.suspensionCallback = suspensionCallback;
     }
 
@@ -171,20 +168,17 @@ public class Model implements Writable {
 
     public NeuronProvider lookupNeuron(Long id) {
         synchronized (providers) {
-            WeakReference<NeuronProvider> wr = providers.get(id);
-            if(wr != null) {
-                NeuronProvider n = wr.get();
-                if (n != null)
-                    return n;
-            }
+            NeuronProvider n = providers.get(id);
+            if(n != null)
+                return n;
 
             return new NeuronProvider(this, id);
         }
     }
 
     public void suspendUnusedNeurons(long retrievalCount, SuspensionMode sm) {
-        synchronized (activeProviders) {
-            activeProviders
+        synchronized (providers) {
+            providers
                     .values()
                     .stream()
                     .filter(n -> !n.isSuspended())
@@ -204,21 +198,15 @@ public class Model implements Writable {
         }
     }
 
-    public void registerWeakReference(NeuronProvider p) {
-        synchronized (providers) {
-            providers.put(p.getId(), new WeakReference<>(p));
-        }
-    }
-
     public void register(NeuronProvider p) {
-        synchronized (activeProviders) {
-            activeProviders.put(p.getId(), p);
+        synchronized (providers) {
+            providers.put(p.getId(), p);
         }
     }
 
     public void unregister(NeuronProvider p) {
-        synchronized (activeProviders) {
-            activeProviders.remove(p.getId());
+        synchronized (providers) {
+            providers.remove(p.getId());
         }
     }
 

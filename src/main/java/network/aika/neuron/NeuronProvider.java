@@ -17,10 +17,17 @@
 package network.aika.neuron;
 
 import network.aika.Model;
+import network.aika.utils.ReadWriteLock;
 
 import java.io.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import static network.aika.neuron.SuspensionMode.SAVE;
 
 /**
  * The {@code NeuronProvider} class is a proxy implementation for the real neuron implementation in the class {@code Neuron}.
@@ -40,6 +47,14 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
 
     private volatile Neuron neuron;
 
+    HashMap<Long, Synapse> activeInputSynapses = new HashMap<>();
+    HashMap<Long, Synapse> activeOutputSynapses = new HashMap<>();
+
+    protected final ReadWriteLock lock = new ReadWriteLock();
+
+    private boolean permanent;
+    private boolean isRegistered;
+
     public NeuronProvider(long id) {
         this.id = id;
     }
@@ -48,9 +63,6 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
         this(id);
         assert model != null;
         this.model = model;
-
-        model.registerWeakReference(this);
-        model.register(this);
     }
 
     public NeuronProvider(Model model, Neuron n) {
@@ -91,14 +103,28 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
         return neuron;
     }
 
+    public boolean isPermanent() {
+        return permanent;
+    }
+
+    public void setPermanent(boolean permanent) {
+        this.permanent = permanent;
+
+        if(permanent)
+            checkRegister();
+        else
+            checkUnregister();
+    }
+
     public synchronized void suspend(SuspensionMode sm) {
         if(neuron == null) return;
-        assert model.getSuspensionHook() != null;
+        assert model.getSuspensionCallback() != null;
+
         neuron.suspend();
 
-        model.unregister(this);
+        checkUnregister();
 
-        if(sm == SuspensionMode.SAVE)
+        if(sm == SAVE)
             save();
 
         neuron = null;
@@ -109,13 +135,10 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
             return;
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (DataOutputStream dos = getDataOutputStream(
-                baos,
-                ENABLE_COMPRESSION
-        )) {
+        try (DataOutputStream dos = new DataOutputStream(baos)) {
             neuron.write(dos);
 
-            model.getSuspensionHook().store(
+            model.getSuspensionCallback().store(
                     id,
                     neuron.getLabel(),
                     neuron.getCustomData(),
@@ -128,35 +151,110 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
     }
 
     private void reactivate() {
-        assert model.getSuspensionHook() != null;
+        assert model.getSuspensionCallback() != null;
 
-        try (DataInputStream dis = getDataInputStream(
-                model.getSuspensionHook().retrieve(id),
-                ENABLE_COMPRESSION
+        Neuron n;
+        try (DataInputStream dis = new DataInputStream(
+                new ByteArrayInputStream(
+                        model.getSuspensionCallback().retrieve(id)
+                )
         )) {
-            neuron = Neuron.read(dis, model);
+            n = Neuron.read(dis, model);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        neuron.setProvider(this);
-
-        neuron.reactivate(model);
-        model.register(this);
+        n.setProvider(this);
+        n.reactivate(model);
+        neuron = n;
+        checkRegister();
     }
 
-    private DataOutputStream getDataOutputStream(OutputStream os, boolean compressed) throws IOException {
-        if(compressed)
-            os = new GZIPOutputStream(os);
+    public void linkInput(Synapse s, boolean force) {
+        lock.acquireWriteLock();
+        s.isInputLinked = true;
+        if(force || !isSuspended())
+            neuron.addOutputSynapse(s);
 
-        return new DataOutputStream(os);
+        addOutputSynapse(s);
+        lock.releaseWriteLock();
     }
 
-    private DataInputStream getDataInputStream(byte[] data, boolean compressed) throws IOException {
-        InputStream is = new ByteArrayInputStream(data);
-        if(compressed)
-            is = new GZIPInputStream(is);
+    public void unlinkInput(Synapse s, boolean force) {
+        lock.acquireWriteLock();
+        s.isInputLinked = false;
+        if(force || !isSuspended())
+            neuron.removeOutputSynapse(s);
+        removeOutputSynapse(s);
+        lock.releaseWriteLock();
+    }
 
-        return new DataInputStream(is);
+    public void linkOutput(Synapse s, boolean force) {
+        lock.acquireWriteLock();
+        s.isOutputLinked = true;
+        if(force || !isSuspended())
+            neuron.addInputSynapse(s);
+
+        addInputSynapse(s);
+        lock.releaseWriteLock();
+    }
+
+    public void unlinkOutput(Synapse s, boolean force) {
+        lock.acquireWriteLock();
+        s.isOutputLinked = false;
+        if(force || !isSuspended())
+            neuron.removeInputSynapse(s);
+
+        removeOutputSynapse(s);
+        lock.releaseWriteLock();
+    }
+
+    public void addInputSynapse(Synapse s) {
+        lock.acquireWriteLock();
+        activeInputSynapses.put(s.input.getId(), s);
+        checkRegister();
+        lock.releaseWriteLock();
+    }
+
+    public void removeInputSynapse(Synapse s) {
+        lock.acquireWriteLock();
+        activeInputSynapses.remove(s.input.getId());
+        checkUnregister();
+        lock.releaseWriteLock();
+    }
+
+    public void addOutputSynapse(Synapse s) {
+        lock.acquireWriteLock();
+        activeOutputSynapses.put(s.output.getId(), s);
+        checkRegister();
+        lock.releaseWriteLock();
+    }
+
+    public void removeOutputSynapse(Synapse s) {
+        lock.acquireWriteLock();
+        activeOutputSynapses.remove(s.output.getId());
+        checkUnregister();
+        lock.releaseWriteLock();
+    }
+
+    private void checkRegister() {
+        if(!isRegistered && isReferenced()) {
+            model.register(this);
+            isRegistered = true;
+        }
+    }
+
+    private void checkUnregister() {
+        if(isRegistered && !isReferenced()) {
+            model.unregister(this);
+            isRegistered = false;
+        }
+    }
+
+    private boolean isReferenced() {
+        return permanent ||
+                neuron != null ||
+                !activeInputSynapses.isEmpty() ||
+                !activeOutputSynapses.isEmpty();
     }
 
     @Override

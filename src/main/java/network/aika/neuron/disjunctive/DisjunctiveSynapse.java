@@ -16,12 +16,9 @@
  */
 package network.aika.neuron.disjunctive;
 
-import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
-import network.aika.neuron.visitor.linking.LinkingOperator;
-
 
 /**
  *

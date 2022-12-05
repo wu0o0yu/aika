@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.INPUT;
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.activation.Timestamp.MAX;
 import static network.aika.neuron.activation.Timestamp.MIN;
@@ -49,8 +50,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     protected NeuronProvider input;
     protected NeuronProvider output;
 
-    private boolean isInputLinked;
-    private boolean isOutputLinked;
+    boolean isInputLinked;
+    boolean isOutputLinked;
 
     protected S template;
 
@@ -202,8 +203,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     protected void link() {
-        linkInput();
-        linkOutput();
+        input.linkInput(this, true);
+        output.linkOutput(this, true);
     }
 
     public abstract L createLink(IA input, OA output);
@@ -234,46 +235,16 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return template.isOfTemplate(templateSynapse);
     }
 
+    public Direction getStoredAt() {
+        return INPUT;
+    }
+
     public boolean isInputLinked() {
         return isInputLinked;
     }
 
-    public void linkInput() {
-        Neuron in = getInput();
-        in.getLock().acquireWriteLock();
-        isInputLinked = true;
-        in.addOutputSynapse(this);
-        in.getLock().releaseWriteLock();
-    }
-
-    public void unlinkInput() {
-        Neuron in = getInput();
-        in.getLock().acquireWriteLock();
-        isInputLinked = false;
-        in.removeOutputSynapse(this);
-        in.getLock().releaseWriteLock();
-    }
-
     public boolean isOutputLinked() {
         return isOutputLinked;
-    }
-
-    public void linkOutput() {
-        Neuron out = output.getNeuron();
-
-        out.getLock().acquireWriteLock();
-        isOutputLinked = true;
-        out.addInputSynapse(this);
-        out.getLock().releaseWriteLock();
-    }
-
-    public void unlinkOutput() {
-        Neuron out = output.getNeuron();
-
-        out.getLock().acquireWriteLock();
-        isOutputLinked = false;
-        out.removeInputSynapse(this);
-        out.getLock().releaseWriteLock();
     }
 
     public NeuronProvider getPInput() {

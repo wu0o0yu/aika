@@ -26,7 +26,6 @@ import network.aika.neuron.activation.Timestamp;
 import network.aika.neuron.visitor.ActLinkingOperator;
 import network.aika.neuron.visitor.LinkLinkingOperator;
 import network.aika.steps.activation.Save;
-import network.aika.utils.ReadWriteLock;
 import network.aika.utils.Writable;
 
 import java.io.DataInput;
@@ -37,6 +36,8 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.Synapse.getLatentLinkingPreNetUB;
 import static network.aika.neuron.activation.Timestamp.MAX;
 import static network.aika.neuron.activation.Timestamp.MIN;
@@ -61,8 +62,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     protected List<S> inputSynapses = new ArrayList<>();
     protected List<Synapse> outputSynapses = new ArrayList<>();
-
-    protected final ReadWriteLock lock = new ReadWriteLock();
 
     protected boolean allowTraining = true;
 
@@ -190,19 +189,13 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return template;
     }
 
-    /*
-    public boolean isOfTemplate(Neuron templateNeuron) {
-        if(template == templateNeuron)
-            return true;
-
-        if(template == null)
-            return false;
-
-        return template.isOfTemplate(templateNeuron);
-    }
-*/
 
     public NeuronProvider getProvider() {
+        return provider;
+    }
+
+    public NeuronProvider getProvider(boolean permanent) {
+        provider.setPermanent(permanent);
         return provider;
     }
 
@@ -227,21 +220,21 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public Synapse getOutputSynapse(NeuronProvider n) {
-        lock.acquireReadLock();
+        provider.lock.acquireReadLock();
         Synapse syn = selectOutputSynapse(s ->
                 s.getPOutput().getId() == n.getId()
         );
-        lock.releaseReadLock();
+        provider.lock.releaseReadLock();
         return syn;
     }
 
     public Synapse getInputSynapse(NeuronProvider n) {
-        lock.acquireReadLock();
+        provider.lock.acquireReadLock();
         Synapse syn = selectInputSynapse(s ->
                 s.getPInput().getId() == n.getId()
         );
 
-        lock.releaseReadLock();
+        provider.lock.releaseReadLock();
         return syn;
     }
 
@@ -327,16 +320,39 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return bias;
     }
 
-    public ReadWriteLock getLock() {
-        return lock;
+    public void suspend() {
+        for (Synapse s : inputSynapses) {
+            if(s.getStoredAt() == OUTPUT)
+                s.input.removeOutputSynapse(s);
+        }
+        for (Synapse s : outputSynapses) {
+            if(s.getStoredAt() == INPUT)
+                s.output.removeInputSynapse(s);
+        }
     }
 
     public void reactivate(Model m) {
         m.incrementRetrievalCounter();
         retrievalCount = m.getCurrentRetrievalCount();
-    }
 
-    public void suspend() {
+        Synapse[] initialInputSyns = provider.activeInputSynapses.values().toArray(new Synapse[0]);
+        Synapse[] initialOutputSyns = provider.activeOutputSynapses.values().toArray(new Synapse[0]);
+
+        for (Synapse s : inputSynapses) {
+            s.input.linkInput(s, false);
+            provider.addInputSynapse(s);
+        }
+        for (Synapse s : outputSynapses) {
+            s.output.linkOutput(s, false);
+            provider.addOutputSynapse(s);
+        }
+
+        for(Synapse s: initialInputSyns) {
+            addInputSynapse((S)s);
+        }
+        for(Synapse s: initialOutputSyns) {
+            addOutputSynapse(s);
+        }
     }
 
     @Override
@@ -350,7 +366,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         bias.write(out);
 
         for (Synapse s : inputSynapses) {
-            if (s.getInput() != null) {
+            if (s.getStoredAt() == OUTPUT) {
                 out.writeBoolean(true);
                 s.write(out);
             }
@@ -358,7 +374,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         out.writeBoolean(false);
 
         for (Synapse s : outputSynapses) {
-            if (s.getOutput() != null) {
+            if (s.getStoredAt() == INPUT) {
                 out.writeBoolean(true);
                 s.write(out);
             }

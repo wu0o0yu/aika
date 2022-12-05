@@ -17,6 +17,7 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
+import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -29,6 +30,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.FieldLink.connect;
 
 
@@ -52,6 +55,13 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
 
     public ConjunctiveSynapse(Scope scope) {
         super(scope);
+    }
+
+    @Override
+    public Direction getStoredAt() {
+        return sumOfLowerWeights + weight.getCurrentValue() < 0 ?
+                OUTPUT :
+                INPUT;
     }
 
     public double getSortingWeight() {

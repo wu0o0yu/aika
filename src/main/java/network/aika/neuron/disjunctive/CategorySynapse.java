@@ -36,7 +36,7 @@ public abstract class CategorySynapse<S extends CategorySynapse, I extends Conju
 
     @Override
     protected void link() {
-        linkInput();
+        input.linkInput(this, true);
     }
 
     @Override
