@@ -48,8 +48,15 @@ public interface FieldOutput {
     Element getReference();
 
     default void addEventListener(FieldOnTrueEvent eventListener) {
+        addEventListener(eventListener, false);
+    }
+
+    default void addEventListener(FieldOnTrueEvent eventListener, boolean assumeInitialized) {
         FieldLink fl = createEventListener(this, eventListener);
         addOutput(fl);
-        fl.connect();
+        if(assumeInitialized)
+            fl.setInitialized(true);
+        else
+            fl.connect();
     }
 }

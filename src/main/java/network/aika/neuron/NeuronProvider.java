@@ -20,12 +20,7 @@ import network.aika.Model;
 import network.aika.utils.ReadWriteLock;
 
 import java.io.*;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import static network.aika.neuron.SuspensionMode.SAVE;
 
@@ -36,8 +31,6 @@ import static network.aika.neuron.SuspensionMode.SAVE;
  * @author Lukas Molzberger
  */
 public class NeuronProvider implements Comparable<NeuronProvider> {
-
-    public static boolean ENABLE_COMPRESSION = false;
 
     public static final NeuronProvider MIN_NEURON = new NeuronProvider(Long.MIN_VALUE);
     public static final NeuronProvider MAX_NEURON = new NeuronProvider(Long.MAX_VALUE);
@@ -119,6 +112,12 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
     public synchronized void suspend(SuspensionMode sm) {
         if(neuron == null) return;
         assert model.getSuspensionCallback() != null;
+
+        if(permanent) {
+            if(sm == SAVE)
+                save();
+            return;
+        }
 
         neuron.suspend();
 
@@ -276,5 +275,12 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
         if(this == MAX_NEURON) return "MAX_NEURON";
 
         return "p(" + (neuron != null ? neuron : id + ":" + "SUSPENDED") + ")";
+    }
+
+    public String toKeyString() {
+        if(this == MIN_NEURON) return "MIN_NEURON";
+        if(this == MAX_NEURON) return "MAX_NEURON";
+
+        return "p(" + (neuron != null ? neuron.toKeyString() : id + ":" + "SUSPENDED") + ")";
     }
 }

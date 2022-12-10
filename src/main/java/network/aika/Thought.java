@@ -18,6 +18,7 @@ package network.aika;
 
 
 import network.aika.callbacks.EventListener;
+import network.aika.neuron.PreActivation;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
@@ -53,7 +54,7 @@ public abstract class Thought {
     private final NavigableMap<QueueKey, Step> queue = new TreeMap<>(QueueKey.COMPARATOR);
 
     private final TreeMap<Integer, Activation> activationsById = new TreeMap<>();
-    private final Map<NeuronProvider, SortedSet<Activation>> actsPerNeuron = new HashMap<>();
+    private final Map<NeuronProvider, PreActivation<? extends Activation>> actsPerNeuron = new HashMap<>();
     private final List<EventListener> eventListeners = new ArrayList<>();
 
     private Config config;
@@ -143,7 +144,7 @@ public abstract class Thought {
         activationsById.put(act.getId(), act);
     }
 
-    public void register(NeuronProvider np, SortedSet<Activation> acts) {
+    public void register(NeuronProvider np, PreActivation<? extends Activation> acts) {
         actsPerNeuron.put(np, acts);
     }
 

@@ -92,6 +92,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         createLink(iAct, oAct);
     }
 
+    protected void warmUpRelatedInputNeurons(IA bs) {
+    }
+
     public double getPropagatePreNetUB(IA iAct) {
         if (getOutput().isCallActivationCheckCallback() &&
                 !getModel().getActivationCheckCallBack().check(iAct)) {
@@ -160,9 +163,15 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
         if (getPropagatePreNetUB(bs) > 0.0)
             propagate(bs);
+        else if(getStoredAt() == INPUT)
+            warmUpRelatedInputNeurons(bs);
     }
 
-    public abstract void setModified();
+    public void setModified() {
+        getStoredAt()
+                .getNeuron(this)
+                .setModified();
+    }
 
     public void count(L l) {
     }
@@ -194,10 +203,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     public S init(Neuron input, Neuron output, S templateSyn, double initialWeight) {
         setInput((I) input);
         setOutput((O) output);
-        weight.setValue(initialWeight);
         template = templateSyn;
 
         link();
+
+        weight.setValue(initialWeight);
 
         return (S) this;
     }
@@ -334,9 +344,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     public String toString() {
         return getClass().getSimpleName() +
-                " in:[" + (input != null ? input.getNeuron().toKeyString() : "--")  + "](" + (isInputLinked ? "+" : "-") + ") " +
+                " in:[" + (input != null ? input.toKeyString() : "--")  + "](" + (isInputLinked ? "+" : "-") + ") " +
                 getArrow() +
-                " out:[" + (output != null ? output.getNeuron().toKeyString() : "--") + "](" + (isOutputLinked ? "+" : "-") + ")";
+                " out:[" + (output != null ? output.toKeyString() : "--") + "](" + (isOutputLinked ? "+" : "-") + ")";
     }
 
     private String getArrow() {

@@ -17,6 +17,7 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.Model;
+import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.Synapse;
@@ -29,10 +30,10 @@ import network.aika.utils.Utils;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.fields.FieldLink.connect;
 
 
 /**
@@ -51,6 +52,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
 {
 
     private double sumOfLowerWeights;
+    protected Direction currentStoredAt = INPUT;
 
 
     public ConjunctiveSynapse(Scope scope) {
@@ -58,10 +60,36 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     @Override
+    protected void warmUpRelatedInputNeurons(IA bs) {
+        Stream<S> iSyns = output.getNeuron().getInputSynapses();
+        iSyns.filter(s -> s.getStoredAt() == OUTPUT)
+                .forEach(s ->
+                        s.warmUpInputNeuron(bs.getThought())
+                );
+    }
+
+    protected void warmUpInputNeuron(Thought t) {
+        input.getNeuron()
+                .getOrCreatePreActivation(t)
+                .addOutputSynapse(this);
+    }
+
+    @Override
     public Direction getStoredAt() {
-        return sumOfLowerWeights + weight.getCurrentValue() < 0 ?
-                OUTPUT :
-                INPUT;
+        return currentStoredAt;
+    }
+
+    public void setStoredAt(Direction newStoredAt) {
+        if(currentStoredAt != newStoredAt) {
+            input.getNeuron().setModified();
+            output.getNeuron().setModified();
+        }
+
+        currentStoredAt = newStoredAt;
+    }
+
+    public boolean isWeak() {
+        return sumOfLowerWeights + weight.getCurrentValue() < 0;
     }
 
     public double getSortingWeight() {
@@ -80,12 +108,6 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         this.sumOfLowerWeights = sumOfLowerWeights;
     }
 
-    @Override
-    public void setModified() {
-        if(output != null)
-            getOutput().setModified();
-    }
-
     public void initDummyLink(BindingActivation bindingActivation) {
     }
 
@@ -101,6 +123,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         super.write(out);
 
         out.writeDouble(sumOfLowerWeights);
+        out.writeBoolean(currentStoredAt == OUTPUT);
     }
 
     @Override
@@ -108,5 +131,6 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         super.readFields(in, m);
 
         sumOfLowerWeights = in.readDouble();
+        currentStoredAt = in.readBoolean() ? OUTPUT : INPUT;
     }
 }

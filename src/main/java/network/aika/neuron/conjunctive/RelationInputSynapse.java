@@ -16,6 +16,8 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.Thought;
+import network.aika.direction.Direction;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.text.TokenActivation;
 
@@ -32,6 +34,15 @@ public class RelationInputSynapse extends BindingNeuronSynapse<
 {
     public RelationInputSynapse() {
         super(Scope.INPUT);
+        currentStoredAt = Direction.OUTPUT;
+    }
+
+    @Override
+    public void setStoredAt(Direction storedAt) {
+    }
+
+    @Override
+    protected void warmUpInputNeuron(Thought t) {
     }
 
     @Override

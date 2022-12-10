@@ -45,7 +45,7 @@ import org.graphstream.ui.view.camera.Camera;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
 
 import static network.aika.TestUtils.*;
@@ -148,7 +148,7 @@ public class MutualExclusionTest {
 
         System.out.println(doc);
 
-        Set<BindingActivation> nbActs = nb.getActivations(doc);
+        SortedSet<BindingActivation> nbActs = nb.getActivations(doc);
         Activation nbAct = nbActs.iterator().next();
 
         assertTrue(nbAct.getValue(true).getCurrentValue() > 0.38);

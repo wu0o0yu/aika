@@ -14,43 +14,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.steps.activation;
+package network.aika.neuron;
 
-import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
+
+import network.aika.Thought;
 import network.aika.neuron.activation.Activation;
-import network.aika.steps.Phase;
-import network.aika.steps.Step;
 
-import static network.aika.steps.Phase.OUTPUT_LINKING;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class LinkingOut extends Step<Activation> {
+public class PreActivation<A extends Activation> {
 
-    public static void add(Activation act) {
-        Step.add(new LinkingOut(act));
+    private SortedSet<A> activations = new TreeSet<>();
+    private Set<Synapse> outputSynapses = new TreeSet<>(
+            Comparator.comparingLong(s -> s.output.getId())
+    );
+
+    public PreActivation(Thought t, NeuronProvider provider) {
+        t.register(provider, this);
     }
 
-    public LinkingOut(Activation act) {
-        super(act);
+    public SortedSet<A> getActivations() {
+        return activations;
     }
 
-    @Override
-    public void process() {
-        Activation<?> act = getElement();
-        Neuron<?, ?> n = act.getNeuron();
-
-        n.getOutputSynapses(act.getThought())
-                .forEach(s ->
-                        s.linkAndPropagateOut(act)
-                );
+    public void addActivation(A act) {
+        activations.add(act);
     }
 
-    @Override
-    public Phase getPhase() {
-        return OUTPUT_LINKING;
+    public void addOutputSynapse(Synapse s) {
+        outputSynapses.add(s);
+    }
+
+    public void removeOutputSynapse(Synapse s) {
+        outputSynapses.remove(s);
+    }
+
+    public Stream<Synapse> getOutputSynapses() {
+        return outputSynapses.stream();
     }
 }

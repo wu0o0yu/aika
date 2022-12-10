@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.Thought;
 import network.aika.fields.Multiplication;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
@@ -51,4 +52,8 @@ public abstract class FeedbackSynapse<S extends FeedbackSynapse, I extends Neuro
     }
 
     protected abstract boolean getDummyLinkUB();
+
+    @Override
+    protected void warmUpInputNeuron(Thought t) {
+    }
 }

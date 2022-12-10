@@ -35,12 +35,6 @@ public abstract class DisjunctiveSynapse<
 {
 
     @Override
-    public void setModified() {
-        if(input != null)
-            getInput().setModified();
-    }
-
-    @Override
     public double getSumOfLowerWeights() {
         return 0.0;
     }

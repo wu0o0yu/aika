@@ -41,6 +41,10 @@ public class FieldLink {
         return new FieldLink(in, 0, updateListener);
     }
 
+    public void setInitialized(boolean initialized) {
+        isInitialized = initialized;
+    }
+
     public static FieldLink connect(FieldOutput in, FieldInput out) {
         return connect(in, out.getNextArg(), out);
     }

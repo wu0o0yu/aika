@@ -67,7 +67,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     private Neuron<?, ?> template;
 
-    private final WeakHashMap<Long, WeakReference<SortedSet<A>>> activations = new WeakHashMap<>();
+    private final WeakHashMap<Long, WeakReference<PreActivation<A>>> activations = new WeakHashMap<>();
 
     private boolean callActivationCheckCallback;
 
@@ -88,18 +88,37 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public void register(A act) {
         Thought t = act.getThought();
-        synchronized (activations) {
-            WeakReference<SortedSet<A>> weakRef = activations
-                    .computeIfAbsent(
-                            t.getId(),
-                            n -> new WeakReference<>(initActivationsSet(t))
-                    );
-
-            weakRef.get()
-                    .add(act);
-        }
+        PreActivation<A> npd = getOrCreatePreActivation(t);
+        npd.addActivation(act);
     }
 
+    public PreActivation<A> getOrCreatePreActivation(Thought t) {
+        PreActivation<A> npd;
+        synchronized (activations) {
+            WeakReference<PreActivation<A>> weakRef = activations
+                    .computeIfAbsent(
+                            t.getId(),
+                            n -> new WeakReference<>(
+                                    new PreActivation<>(t, provider)
+                            )
+                    );
+
+            npd = weakRef.get();
+        }
+        return npd;
+    }
+
+    public PreActivation<A> getPreActivation(Thought t) {
+        PreActivation<A> npd = null;
+        synchronized (activations) {
+            WeakReference<PreActivation<A>> weakRef = activations
+                    .get(t.getId());
+
+            if(weakRef != null)
+                npd = weakRef.get();
+        }
+        return npd;
+    }
 
     public void linkOutgoing(Synapse synA, Activation fromBS) {
         synA.startVisitor(
@@ -109,7 +128,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public void latentLinkOutgoing(Synapse synA, Activation bsA) {
-        getTargetInputSynapses()
+        getInputSynapses()
                 .filter(synB -> synA != synB)
                 .filter(synB -> getLatentLinkingPreNetUB(synA, synB) > 0.0)
                 .forEach(synB ->
@@ -121,7 +140,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public void linkAndPropagateIn(Link l) {
-        getTargetInputSynapses()
+        getInputSynapses()
                 .filter(synB -> synB != l.getSynapse())
                 .forEach(synB ->
                         synB.startVisitor(
@@ -131,25 +150,19 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
                 );
     }
 
-    private TreeSet<A> initActivationsSet(Thought t) {
-        TreeSet<A> acts = new TreeSet<>();
-        t.register(provider, (TreeSet<Activation>) acts);
-        return acts;
-    }
-
     public SortedSet<A> getActivations(Thought t) {
         if(t == null)
             return Collections.emptySortedSet();
 
-        WeakReference<SortedSet<A>> weakRef = activations.get(t.getId());
+        WeakReference<PreActivation<A>> weakRef = activations.get(t.getId());
         if(weakRef == null)
             return Collections.emptyNavigableSet();
 
-        SortedSet<A> acts = weakRef.get();
+        PreActivation<A> acts = weakRef.get();
         if(acts == null)
             return Collections.emptyNavigableSet();
 
-        return acts;
+        return acts.getActivations();
     }
 
     protected void initFromTemplate(Neuron n) {
@@ -168,11 +181,9 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     public abstract void addInactiveLinks(Activation bs);
 
     public abstract ActivationFunction getActivationFunction();
-/*
-    public boolean isAllowTraining() {
-        return allowTraining;
+
+    public void count(A act) {
     }
-*/
 
     protected SumField initBias() {
         return (SumField) new LimitedField(this, "bias", 0.0)
@@ -211,19 +222,27 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return outputSynapses.stream();
     }
 
-    public Stream<S> getTargetInputSynapses() {
-        return getInputSynapses();
-    }
+    public Stream<? extends Synapse> getOutputSynapses(Thought t) {
+        WeakReference<PreActivation<A>> wRefNpd = activations.get(t.getId());
+        if(wRefNpd == null)
+            return getOutputSynapses();
 
-    public Stream<? extends Synapse> getTargetOutputSynapses() {
-        return getOutputSynapses();
+        PreActivation<A> npd = wRefNpd.get();
+        if(npd == null)
+            return getOutputSynapses();
+
+        return Stream.concat(
+                npd.getOutputSynapses(),
+                getOutputSynapses()
+        );
     }
 
     public Synapse getOutputSynapse(NeuronProvider n) {
         provider.lock.acquireReadLock();
-        Synapse syn = selectOutputSynapse(s ->
-                s.getPOutput().getId() == n.getId()
-        );
+        Synapse syn = outputSynapses.stream()
+                .filter(s -> s.getPOutput().getId() == n.getId())
+                .findFirst()
+                .orElse(null);
         provider.lock.releaseReadLock();
         return syn;
     }
@@ -240,13 +259,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     protected Synapse selectInputSynapse(Predicate<? super Synapse> predicate) {
         return inputSynapses.stream()
-                .filter(predicate)
-                .findFirst()
-                .orElse(null);
-    }
-
-    protected Synapse selectOutputSynapse(Predicate<? super Synapse> predicate) {
-        return outputSynapses.stream()
                 .filter(predicate)
                 .findFirst()
                 .orElse(null);
@@ -453,8 +465,5 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public String toString() {
         return getClass().getSimpleName() + " " + toKeyString();
-    }
-
-    public void count(A act) {
     }
 }
