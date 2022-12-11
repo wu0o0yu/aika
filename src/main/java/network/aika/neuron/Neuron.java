@@ -31,6 +31,7 @@ import network.aika.utils.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.function.Predicate;
@@ -118,6 +119,15 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
                 npd = weakRef.get();
         }
         return npd;
+    }
+
+    public Stream<PreActivation<A>> getPreActivations() {
+        synchronized (activations) {
+            return activations.values()
+                    .stream()
+                    .map(Reference::get)
+                    .filter(Objects::nonNull);
+        }
     }
 
     public void linkOutgoing(Synapse synA, Activation fromBS) {
