@@ -344,12 +344,16 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public void suspend() {
         for (Synapse s : inputSynapses) {
-            if(s.getStoredAt() == OUTPUT)
+            if(s.getStoredAt() == OUTPUT) {
+                provider.removeInputSynapse((S)s);
                 s.input.removeOutputSynapse(s);
+            }
         }
         for (Synapse s : outputSynapses) {
-            if(s.getStoredAt() == INPUT)
+            if(s.getStoredAt() == INPUT) {
+                provider.removeOutputSynapse(s);
                 s.output.removeInputSynapse(s);
+            }
         }
     }
 

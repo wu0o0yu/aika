@@ -55,6 +55,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected S template;
 
+    public static int dbgCounter = 0;
+    public int dbgId = dbgCounter++;
+
     protected SumField weight = (SumField) new QueueSumField(this, "weight", true)
             .addListener(() ->
                     setModified()
