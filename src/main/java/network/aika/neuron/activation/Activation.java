@@ -78,6 +78,7 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     public boolean instantiationIsQueued;
 
     protected Range range;
+    protected Integer tokenPos;
 
     protected List<FieldLink> disconnectFieldLinks = new ArrayList<>();
 
@@ -376,17 +377,25 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return thought;
     }
 
-    public void updateRange() {
+    public void updateRangeAndTokenPosition() {
         RangeDownVisitor v = new RangeDownVisitor(this);
         v.start(this);
         range = v.getRange();
+        tokenPos = v.getTokenPos();
     }
 
     public Range getRange() {
         if(range == null)
-            updateRange();
+            updateRangeAndTokenPosition();
 
         return range;
+    }
+
+    public Integer getTokenPos() {
+        if(tokenPos == null)
+            updateRangeAndTokenPosition();
+
+        return tokenPos;
     }
 
     public Range getAbsoluteRange() {

@@ -80,6 +80,10 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
         this.range = range;
     }
 
+    public void setTokenPos(Integer tokenPos) {
+        this.tokenPos = tokenPos;
+    }
+
     @Override
     public void selfRefVisitDown(DownVisitor v, Link lastLink) {
         v.up(this);

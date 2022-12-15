@@ -32,6 +32,8 @@ public class RangeDownVisitor extends DownVisitor<PatternActivation> {
     private Activation fromAct;
     private Range range = null;
 
+    private Integer tokenPos = null;
+
     public RangeDownVisitor(Activation fromAct) {
         super(fromAct.getThought());
         this.fromAct = fromAct;
@@ -41,6 +43,10 @@ public class RangeDownVisitor extends DownVisitor<PatternActivation> {
         return range;
     }
 
+    public Integer getTokenPos() {
+        return tokenPos;
+    }
+
     @Override
     public void check(Link lastLink, Activation act) {
         if(act == fromAct)
@@ -48,6 +54,9 @@ public class RangeDownVisitor extends DownVisitor<PatternActivation> {
 
         PatternActivation pAct = (PatternActivation) act;
         range = join(range, pAct.getRange());
+        tokenPos = tokenPos != null ?
+                Integer.valueOf(Math.min(tokenPos, pAct.getTokenPos())) :
+                pAct.getTokenPos();
     }
 
     @Override

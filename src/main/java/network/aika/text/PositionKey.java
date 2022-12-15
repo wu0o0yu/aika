@@ -33,7 +33,7 @@ public class PositionKey {
     }
 
     public PositionKey(TokenActivation tokenAct) {
-        this.tokenPosition = tokenAct.getPosition();
+        this.tokenPosition = tokenAct.getTokenPos();
         this.actId = tokenAct.getId();
     }
 

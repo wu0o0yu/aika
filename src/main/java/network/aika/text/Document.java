@@ -58,7 +58,7 @@ public class Document extends Thought {
     }
 
     public void registerTokenActivation(TokenActivation tokenAct) {
-        if(tokenAct.getPosition() != null)
+        if(tokenAct.getTokenPos() != null)
             tokenPosIndex.put(new PositionKey(tokenAct), tokenAct);
 
         if(tokenAct.getRange() != null)
@@ -67,8 +67,8 @@ public class Document extends Thought {
 
     public Stream<TokenActivation> getRelatedTokensByTokenPosition(TokenActivation fromTokenAct, int relFrom, int relTo) {
         return tokenPosIndex.subMap(
-                new PositionKey(fromTokenAct.getPosition() + relFrom, Integer.MIN_VALUE),
-                new PositionKey(fromTokenAct.getPosition() + relTo, Integer.MAX_VALUE)
+                new PositionKey(fromTokenAct.getTokenPos() + relFrom, Integer.MIN_VALUE),
+                new PositionKey(fromTokenAct.getTokenPos() + relTo, Integer.MAX_VALUE)
         ).values().stream();
     }
 

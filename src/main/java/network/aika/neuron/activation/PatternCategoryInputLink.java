@@ -29,6 +29,7 @@ public class PatternCategoryInputLink extends AbstractPatternLink<PatternCategor
         super(s, input, output);
 
         output.setRange(input.getRange());
+        output.setTokenPos(input.getTokenPos());
     }
 
     @Override

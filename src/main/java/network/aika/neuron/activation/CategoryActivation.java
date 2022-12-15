@@ -38,4 +38,14 @@ public class CategoryActivation<N extends CategoryNeuron<?, ?>> extends Disjunct
                 .findFirst()
                 .orElse(null);
     }
+
+    @Override
+    public Integer getTokenPos() {
+        return inputLinks.values()
+                .stream()
+                .map(l -> l.getInput())
+                .map(iAct -> iAct.getTokenPos())
+                .findFirst()
+                .orElse(null);
+    }
 }
