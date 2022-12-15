@@ -42,9 +42,4 @@ public abstract class CategoryLink<S extends CategorySynapse, IA extends Conjunc
     public void patternVisitUp(UpVisitor v) {
         v.next(this);
     }
-
-    @Override
-    public void rangeVisitDown(DownVisitor v) {
-        v.next(this);
-    }
 }

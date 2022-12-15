@@ -16,10 +16,7 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.conjunctive.PatternSynapse;
-import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 import network.aika.neuron.visitor.DownVisitor;
 import network.aika.neuron.visitor.UpVisitor;
 import network.aika.sign.Sign;
@@ -48,7 +45,6 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
 
         return super.instantiateTemplate(iAct, oAct);
     }
-
 
     @Override
     public void connectGradientFields() {
@@ -101,10 +97,5 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
 
     @Override
     public void inhibVisitUp(UpVisitor v) {
-    }
-
-    @Override
-    public void rangeVisitDown(DownVisitor v) {
-        v.next(this);
     }
 }

@@ -42,9 +42,4 @@ public class InputPatternFromPatternLink extends InputPatternLink<InputPatternFr
 
         super.connectGradientFields();
     }
-
-    @Override
-    public void rangeVisitDown(DownVisitor v) {
-        v.next(this);
-    }
 }

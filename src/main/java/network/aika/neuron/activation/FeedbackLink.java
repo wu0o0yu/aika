@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.neuron.Range;
 import network.aika.neuron.conjunctive.FeedbackSynapse;
 import network.aika.neuron.visitor.DownVisitor;
 import network.aika.neuron.visitor.UpVisitor;
@@ -35,6 +36,9 @@ public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activat
         super(s, input, output);
     }
 
+    @Override
+    public void propagateRangeOrTokenPos(Range r, Integer tokenPos) {
+    }
 
     @Override
     public S instantiateTemplate(IA iAct, BindingActivation oAct) {
@@ -81,10 +85,6 @@ public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activat
             return;
 
         super.patternVisitUp(v);
-    }
-
-    @Override
-    public void rangeVisitDown(DownVisitor v) {
     }
 
     @Override

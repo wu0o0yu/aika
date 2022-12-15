@@ -27,9 +27,6 @@ public class PatternCategoryInputLink extends AbstractPatternLink<PatternCategor
 
     public PatternCategoryInputLink(PatternCategoryInputSynapse s, CategoryActivation input, PatternActivation output) {
         super(s, input, output);
-
-        output.setRange(input.getRange());
-        output.setTokenPos(input.getTokenPos());
     }
 
     @Override
@@ -37,10 +34,5 @@ public class PatternCategoryInputLink extends AbstractPatternLink<PatternCategor
         initForwardsGradient();
 
         super.connectGradientFields();
-    }
-
-    @Override
-    public void rangeVisitDown(DownVisitor v) {
-        v.next(this);
     }
 }

@@ -41,14 +41,13 @@ public class TokenActivation extends PatternActivation {
 
     public TokenActivation(int id, Integer pos, int begin, int end, Document doc, TokenNeuron tokenNeuron) {
         super(id, doc, tokenNeuron);
-        tokenPos = pos;
-        range = new Range(begin, end);
+
+        updateRangeAndTokenPos(
+                new Range(begin, end),
+                pos
+        );
 
         doc.registerTokenActivation(this);
-    }
-
-    @Override
-    public void updateRangeAndTokenPosition() {
     }
 
     @Override

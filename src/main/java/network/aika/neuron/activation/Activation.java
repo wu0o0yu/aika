@@ -21,13 +21,13 @@ import network.aika.Thought;
 import network.aika.fields.*;
 import network.aika.neuron.*;
 import network.aika.neuron.visitor.DownVisitor;
-import network.aika.neuron.visitor.linking.pattern.RangeDownVisitor;
 import network.aika.neuron.visitor.selfref.SelfRefDownVisitor;
 import network.aika.neuron.visitor.UpVisitor;
 import network.aika.steps.activation.Counting;
 import network.aika.steps.activation.LinkingOut;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
@@ -79,6 +79,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     protected Range range;
     protected Integer tokenPos;
+
+    protected Consumer<Integer> onTokenPosUpdate;
 
     protected List<FieldLink> disconnectFieldLinks = new ArrayList<>();
 
@@ -180,7 +182,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return this;
     }
 
-
     public void bindingVisitDown(DownVisitor v, Link lastLink) {
         v.next(this);
     }
@@ -196,10 +197,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public void patternVisitUp(UpVisitor v, Link lastLink) {
         v.check(lastLink, this);
-        v.next(this);
-    }
-
-    public void rangeVisitDown(DownVisitor v, Link lastLink) {
         v.next(this);
     }
 
@@ -377,25 +374,36 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         return thought;
     }
 
-    public void updateRangeAndTokenPosition() {
-        RangeDownVisitor v = new RangeDownVisitor(this);
-        v.start(this);
-        range = v.getRange();
-        tokenPos = v.getTokenPos();
-    }
-
     public Range getRange() {
-        if(range == null)
-            updateRangeAndTokenPosition();
-
         return range;
     }
 
     public Integer getTokenPos() {
-        if(tokenPos == null)
-            updateRangeAndTokenPosition();
-
         return tokenPos;
+    }
+
+    public void updateRangeAndTokenPos(Range r, Integer tp) {
+        Range newRange = Range.join(range, r);
+        Integer newTokenPos = tokenPos != null ? Integer.min(tokenPos, tp) : tp;
+
+        if(!r.equals(range) || tokenPos.intValue() != newTokenPos.intValue()) {
+            propagateRangeAndTokenPosition();
+        }
+
+        this.range = newRange;
+        this.tokenPos = newTokenPos;
+        if(onTokenPosUpdate != null)
+            onTokenPosUpdate.accept(newTokenPos);
+    }
+
+    protected void propagateRangeAndTokenPosition() {
+        outputLinks.values().forEach(l ->
+                l.propagateRangeOrTokenPos(range, tokenPos)
+        );
+    }
+
+    public void setOnTokenPosUpdate(Consumer<Integer> onTokenPosUpdate) {
+        this.onTokenPosUpdate = onTokenPosUpdate;
     }
 
     public Range getAbsoluteRange() {

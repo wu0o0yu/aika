@@ -17,6 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.neuron.Range;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 import network.aika.steps.activation.Instantiation;
 
@@ -88,7 +89,6 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         templateInstance.template = this;
 
         templateInstance.isFired.addEventListener(() -> {
-            updateRangeAndTokenPosition();
             n.setLabel(
                     getConfig().getLabel(this)
             );

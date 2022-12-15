@@ -18,6 +18,7 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.fields.*;
+import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.visitor.DownVisitor;
 import network.aika.neuron.visitor.UpVisitor;
@@ -77,6 +78,11 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         getThought().onLinkCreationEvent(this);
 
         addInputLinkingStep();
+
+        propagateRangeOrTokenPos(
+                input.getRange(),
+                input.getTokenPos()
+        );
     }
 
     protected void addInputLinkingStep() {
@@ -99,9 +105,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     public void patternVisitUp(UpVisitor v) {
-    }
-
-    public void rangeVisitDown(DownVisitor v) {
     }
 
     public void inhibVisitDown(DownVisitor v) {
@@ -273,6 +276,11 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     public void unlinkOutput() {
         output.inputLinks.remove(input.getNeuronProvider(), this);
+    }
+
+    public void propagateRangeOrTokenPos(Range r, Integer tokenPos) {
+        if(r != null || tokenPos != null)
+            output.updateRangeAndTokenPos(r, tokenPos);
     }
 
     public boolean isNegative() {
