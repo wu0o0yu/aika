@@ -21,6 +21,7 @@ import network.aika.utils.ReadWriteLock;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.stream.Stream;
 
 import static network.aika.neuron.SuspensionMode.SAVE;
 
@@ -50,6 +51,10 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
 
     public NeuronProvider(long id) {
         this.id = id;
+    }
+
+    public Stream<Synapse> getActiveInputSynapses() {
+        return activeInputSynapses.values().stream();
     }
 
     public NeuronProvider(Model model, long id) {

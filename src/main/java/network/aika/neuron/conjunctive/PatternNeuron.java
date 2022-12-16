@@ -20,7 +20,6 @@ import network.aika.Model;
 import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.SampleSpace;
-import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.PatternActivation;
 import network.aika.neuron.disjunctive.CategorySynapse;
 import network.aika.neuron.disjunctive.PatternCategorySynapse;
@@ -70,7 +69,7 @@ public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, Pattern
 
     @Override
     public PatternCategoryInputSynapse getCategoryInputSynapse() {
-        return inputSynapses.stream()
+        return getProvider().getActiveInputSynapses()
                 .filter(s -> s instanceof PatternCategoryInputSynapse)
                 .map(s -> (PatternCategoryInputSynapse) s)
                 .findAny()

@@ -61,9 +61,9 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
 
     @Override
     public BindingCategoryInputSynapse getCategoryInputSynapse() {
-        return inputSynapses.stream()
-                .filter(s -> s instanceof BindingCategoryInputSynapse)
-                .map(s -> (BindingCategoryInputSynapse) s)
+        return getProvider().getActiveInputSynapses()
+                .filter(BindingCategoryInputSynapse.class::isInstance)
+                .map(BindingCategoryInputSynapse.class::cast)
                 .findAny()
                 .orElse(null);
     }
