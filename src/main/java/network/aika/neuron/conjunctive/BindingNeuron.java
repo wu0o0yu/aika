@@ -37,7 +37,7 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
     }
 
     public List<RelationInputSynapse> findLatentRelationNeurons() {
-        return getInputSynapses()
+        return getInputSynapsesAsStream()
                 .filter(s -> s instanceof RelationInputSynapse)
                 .map(s -> (RelationInputSynapse) s)
                 .collect(Collectors.toList());
@@ -61,7 +61,7 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
 
     @Override
     public BindingCategoryInputSynapse getCategoryInputSynapse() {
-        return getProvider().getActiveInputSynapses()
+        return getProvider().getInputSynapses()
                 .filter(BindingCategoryInputSynapse.class::isInstance)
                 .map(BindingCategoryInputSynapse.class::cast)
                 .findAny()
@@ -69,7 +69,7 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
     }
 
     public double getPreNetUBDummyWeightSum() {
-        return inputSynapses.stream()
+        return getInputSynapsesAsStream()
                 .mapToDouble(s -> s.getPreNetUBDummyWeight())
                 .sum();
     }

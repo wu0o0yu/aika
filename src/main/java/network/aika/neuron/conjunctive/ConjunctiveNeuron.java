@@ -19,12 +19,14 @@ package network.aika.neuron.conjunctive;
 import network.aika.direction.Direction;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.disjunctive.CategorySynapse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -67,8 +69,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     public abstract CategoryInputSynapse getCategoryInputSynapse();
 
     public void addInactiveLinks(Activation bs) {
-        inputSynapses
-                .stream()
+        getInputSynapsesAsStream()
                 .filter(s -> !s.linkExists(bs))
                 .forEach(s ->
                         s.createLink(null, bs)
@@ -80,21 +81,22 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     }
 
     protected void updateSumOfLowerWeights() {
-        sortInputSynapses();
+        ConjunctiveSynapse[] inputSynapses = sortInputSynapses();
 
         double sum = getBias().getUpdatedCurrentValue();
         for(ConjunctiveSynapse s: inputSynapses) {
-            if(s.getWeight().getUpdatedCurrentValue() <= 0.0)
+            double w = s.getWeight().getUpdatedCurrentValue();
+            if(w <= 0.0)
                 continue;
 
             s.setSumOfLowerWeights(sum);
+            sum += w;
+
             s.setStoredAt(
-                    s.isWeak() ?
+                    sum < 0 ?
                             OUTPUT :
                             INPUT
             );
-
-            sum += s.getWeight().getUpdatedCurrentValue();
         }
     }
 
@@ -104,10 +106,12 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         s.getWeight().addEventListener(this::updateSumOfLowerWeights, true);
     }
 
-    private void sortInputSynapses() {
-        Collections.sort(
-                inputSynapses,
-                Comparator.<ConjunctiveSynapse>comparingDouble(s -> s.getSortingWeight())
+    private ConjunctiveSynapse[] sortInputSynapses() {
+        ConjunctiveSynapse[] inputsSynapses = getInputSynapses().toArray(new ConjunctiveSynapse[0]);
+        Arrays.sort(
+                inputsSynapses,
+                Comparator.comparingDouble(s -> s.getSortingWeight())
         );
+        return inputsSynapses;
     }
 }

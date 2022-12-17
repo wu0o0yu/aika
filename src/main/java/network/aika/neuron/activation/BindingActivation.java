@@ -87,7 +87,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
                 x -> getActivationFunction().f(x)
         );
 
-        neuron.getInputSynapses()
+        neuron.getInputSynapsesAsStream()
                 .forEach(s ->
                         s.initDummyLink(this)
                 );

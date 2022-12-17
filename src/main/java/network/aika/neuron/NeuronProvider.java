@@ -41,8 +41,8 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
 
     private volatile Neuron neuron;
 
-    HashMap<Long, Synapse> activeInputSynapses = new HashMap<>();
-    HashMap<Long, Synapse> activeOutputSynapses = new HashMap<>();
+    HashMap<Long, Synapse> inputSynapses = new HashMap<>();
+    HashMap<Long, Synapse> outputSynapses = new HashMap<>();
 
     protected final ReadWriteLock lock = new ReadWriteLock();
 
@@ -51,10 +51,6 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
 
     public NeuronProvider(long id) {
         this.id = id;
-    }
-
-    public Stream<Synapse> getActiveInputSynapses() {
-        return activeInputSynapses.values().stream();
     }
 
     public NeuronProvider(Model model, long id) {
@@ -99,6 +95,14 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
 
     public Neuron getIfNotSuspended() {
         return neuron;
+    }
+
+    public Stream<Synapse> getInputSynapses() {
+        return inputSynapses.values().stream();
+    }
+
+    public Stream<Synapse> getOutputSynapses() {
+        return outputSynapses.values().stream();
     }
 
     public boolean isPermanent() {
@@ -173,69 +177,54 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
         checkRegister();
     }
 
-    public void linkInput(Synapse s, boolean force) {
+    public void linkInput(Synapse s) {
         lock.acquireWriteLock();
-        s.isInputLinked = true;
-        if(force || !isSuspended())
-            neuron.addOutputSynapse(s);
-
         addOutputSynapse(s);
         lock.releaseWriteLock();
     }
 
-    public void unlinkInput(Synapse s, boolean force) {
+    public void unlinkInput(Synapse s) {
         lock.acquireWriteLock();
-        s.isInputLinked = false;
-        if(force || !isSuspended())
-            neuron.removeOutputSynapse(s);
         removeOutputSynapse(s);
         lock.releaseWriteLock();
     }
 
-    public void linkOutput(Synapse s, boolean force) {
+    public void linkOutput(Synapse s) {
         lock.acquireWriteLock();
-        s.isOutputLinked = true;
-        if(force || !isSuspended())
-            neuron.addInputSynapse(s);
-
         addInputSynapse(s);
         lock.releaseWriteLock();
     }
 
-    public void unlinkOutput(Synapse s, boolean force) {
+    public void unlinkOutput(Synapse s) {
         lock.acquireWriteLock();
-        s.isOutputLinked = false;
-        if(force || !isSuspended())
-            neuron.removeInputSynapse(s);
-
         removeOutputSynapse(s);
         lock.releaseWriteLock();
     }
 
     public void addInputSynapse(Synapse s) {
         lock.acquireWriteLock();
-        activeInputSynapses.put(s.input.getId(), s);
+        inputSynapses.put(s.input.getId(), s);
         checkRegister();
         lock.releaseWriteLock();
     }
 
     public void removeInputSynapse(Synapse s) {
         lock.acquireWriteLock();
-        activeInputSynapses.remove(s.input.getId());
+        inputSynapses.remove(s.input.getId());
         checkUnregister();
         lock.releaseWriteLock();
     }
 
     public void addOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
-        activeOutputSynapses.put(s.output.getId(), s);
+        outputSynapses.put(s.output.getId(), s);
         checkRegister();
         lock.releaseWriteLock();
     }
 
     public void removeOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
-        activeOutputSynapses.remove(s.output.getId());
+        outputSynapses.remove(s.output.getId());
         checkUnregister();
         lock.releaseWriteLock();
     }
@@ -257,8 +246,8 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
     private boolean isReferenced() {
         return permanent ||
                 neuron != null ||
-                !activeInputSynapses.isEmpty() ||
-                !activeOutputSynapses.isEmpty();
+                !inputSynapses.isEmpty() ||
+                !outputSynapses.isEmpty();
     }
 
     @Override

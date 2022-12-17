@@ -50,13 +50,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     protected NeuronProvider input;
     protected NeuronProvider output;
 
-    boolean isInputLinked;
-    boolean isOutputLinked;
-
     protected S template;
-
-    public static int dbgCounter = 0;
-    public int dbgId = dbgCounter++;
 
     protected SumField weight = (SumField) new QueueSumField(this, "weight", true)
             .addListener(() ->
@@ -164,10 +158,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         getOutput()
                 .latentLinkOutgoing(this, bs);
 
-        if (getPropagatePreNetUB(bs) > 0.0)
+        if (getPropagatePreNetUB(bs) > 0.0) {
             propagate(bs);
-        else if(getStoredAt() == INPUT)
+        } else if(getStoredAt() == INPUT) {
             warmUpRelatedInputNeurons(bs);
+        }
     }
 
     public void setModified() {
@@ -216,8 +211,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     protected void link() {
-        input.linkInput(this, true);
-        output.linkOutput(this, true);
+        input.linkInput(this);
+        output.linkOutput(this);
     }
 
     public abstract L createLink(IA input, OA output);
@@ -250,14 +245,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     public Direction getStoredAt() {
         return INPUT;
-    }
-
-    public boolean isInputLinked() {
-        return isInputLinked;
-    }
-
-    public boolean isOutputLinked() {
-        return isOutputLinked;
     }
 
     public NeuronProvider getPInput() {
@@ -302,9 +289,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         out.writeLong(input.getId());
         out.writeLong(output.getId());
 
-        out.writeBoolean(isInputLinked);
-        out.writeBoolean(isOutputLinked);
-
         weight.write(out);
     }
 
@@ -320,9 +304,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     public void readFields(DataInput in, Model m) throws IOException {
         input = m.lookupNeuron(in.readLong());
         output = m.lookupNeuron(in.readLong());
-
-        isInputLinked = in.readBoolean();
-        isOutputLinked = in.readBoolean();
 
         weight.readFields(in, m);
     }
@@ -347,9 +328,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     public String toString() {
         return getClass().getSimpleName() +
-                " in:[" + (input != null ? input.toKeyString() : "--")  + "](" + (isInputLinked ? "+" : "-") + ") " +
+                " in:[" + (input != null ? input.toKeyString() : "--")  + "] " +
                 getArrow() +
-                " out:[" + (output != null ? output.toKeyString() : "--") + "](" + (isOutputLinked ? "+" : "-") + ")";
+                " out:[" + (output != null ? output.toKeyString() : "--") + "])";
     }
 
     private String getArrow() {

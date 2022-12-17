@@ -29,9 +29,4 @@ public abstract class CategoryNeuron<S extends CategorySynapse, A extends Catego
 
     public CategoryNeuron() {
     }
-
-    @Override
-    public Stream<S> getInputSynapses() {
-        return Stream.empty();
-    }
 }

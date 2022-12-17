@@ -69,7 +69,7 @@ public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, Pattern
 
     @Override
     public PatternCategoryInputSynapse getCategoryInputSynapse() {
-        return getProvider().getActiveInputSynapses()
+        return getProvider().getInputSynapses()
                 .filter(s -> s instanceof PatternCategoryInputSynapse)
                 .map(s -> (PatternCategoryInputSynapse) s)
                 .findAny()

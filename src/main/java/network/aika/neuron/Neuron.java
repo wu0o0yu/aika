@@ -35,6 +35,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
@@ -60,9 +61,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     private Writable customData;
 
     protected SumField bias = initBias();
-
-    protected List<S> inputSynapses = new ArrayList<>();
-    protected List<Synapse> outputSynapses = new ArrayList<>();
 
     protected boolean allowTraining = true;
 
@@ -138,7 +136,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public void latentLinkOutgoing(Synapse synA, Activation bsA) {
-        getInputSynapses()
+        getInputSynapsesAsStream()
                 .filter(synB -> synA != synB)
                 .filter(synB -> getLatentLinkingPreNetUB(synA, synB) > 0.0)
                 .forEach(synB ->
@@ -150,7 +148,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public void linkAndPropagateIn(Link l) {
-        getInputSynapses()
+        getInputSynapsesAsStream()
                 .filter(synB -> synB != l.getSynapse())
                 .forEach(synB ->
                         synB.startVisitor(
@@ -224,32 +222,40 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         this.provider = p;
     }
 
-    public Stream<S> getInputSynapses() {
-        return inputSynapses.stream();
+    public Stream<S> getInputSynapsesAsStream() {
+        return getInputSynapses().stream();
     }
 
-    public Stream<? extends Synapse> getOutputSynapses() {
-        return outputSynapses.stream();
+    public Collection<S> getInputSynapses() {
+        return (Collection<S>) provider.inputSynapses.values();
     }
 
-    public Stream<? extends Synapse> getOutputSynapses(Thought t) {
+    public Stream<? extends Synapse> getOutputSynapsesAsStream() {
+        return getOutputSynapses().stream();
+    }
+
+    public Collection<? extends Synapse> getOutputSynapses() {
+        return provider.outputSynapses.values();
+    }
+
+    public Stream<? extends Synapse> getOutputSynapsesAsStream(Thought t) {
         WeakReference<PreActivation<A>> wRefNpd = activations.get(t.getId());
         if(wRefNpd == null)
-            return getOutputSynapses();
+            return getOutputSynapsesAsStream();
 
         PreActivation<A> npd = wRefNpd.get();
         if(npd == null)
-            return getOutputSynapses();
+            return getOutputSynapsesAsStream();
 
         return Stream.concat(
                 npd.getOutputSynapses(),
-                getOutputSynapses()
+                getOutputSynapsesAsStream()
         );
     }
 
     public Synapse getOutputSynapse(NeuronProvider n) {
         provider.lock.acquireReadLock();
-        Synapse syn = outputSynapses.stream()
+        Synapse syn = getOutputSynapsesAsStream()
                 .filter(s -> s.getPOutput().getId() == n.getId())
                 .findFirst()
                 .orElse(null);
@@ -268,30 +274,30 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     protected Synapse selectInputSynapse(Predicate<? super Synapse> predicate) {
-        return inputSynapses.stream()
+        return getInputSynapsesAsStream()
                 .filter(predicate)
                 .findFirst()
                 .orElse(null);
     }
 
     public void addInputSynapse(S s) {
-        inputSynapses.add(s);
+        provider.addInputSynapse(s);
         setModified();
     }
 
     public void removeInputSynapse(S s) {
-        if(inputSynapses.remove(s))
-            setModified();
+        provider.removeInputSynapse(s);
+        setModified();
     }
 
     public void addOutputSynapse(Synapse s) {
-        outputSynapses.add(s);
+        provider.addOutputSynapse(s);
         setModified();
     }
 
     public void removeOutputSynapse(Synapse s) {
-        if(outputSynapses.remove(s))
-            setModified();
+        provider.removeOutputSynapse(s);
+        setModified();
     }
 
     public Long getId() {
@@ -343,42 +349,25 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     }
 
     public void suspend() {
-        for (Synapse s : inputSynapses) {
-            if(s.getStoredAt() == OUTPUT) {
-                provider.removeInputSynapse((S)s);
-                s.input.removeOutputSynapse(s);
-            }
+        for (Synapse s : getInputSynapsesAsStream()
+                .filter(s -> s.getStoredAt() == OUTPUT)
+                .collect(Collectors.toList())
+        ) {
+            provider.removeInputSynapse(s);
+            s.input.removeOutputSynapse(s);
         }
-        for (Synapse s : outputSynapses) {
-            if(s.getStoredAt() == INPUT) {
-                provider.removeOutputSynapse(s);
-                s.output.removeInputSynapse(s);
-            }
+        for (Synapse s : getOutputSynapsesAsStream()
+                .filter(s -> s.getStoredAt() == INPUT)
+                .collect(Collectors.toList())
+        ) {
+            provider.removeOutputSynapse(s);
+            s.output.removeInputSynapse(s);
         }
     }
 
     public void reactivate(Model m) {
         m.incrementRetrievalCounter();
         retrievalCount = m.getCurrentRetrievalCount();
-
-        Synapse[] initialInputSyns = provider.activeInputSynapses.values().toArray(new Synapse[0]);
-        Synapse[] initialOutputSyns = provider.activeOutputSynapses.values().toArray(new Synapse[0]);
-
-        for (Synapse s : inputSynapses) {
-            s.input.linkInput(s, false);
-            provider.addInputSynapse(s);
-        }
-        for (Synapse s : outputSynapses) {
-            s.output.linkOutput(s, false);
-            provider.addOutputSynapse(s);
-        }
-
-        for(Synapse s: initialInputSyns) {
-            addInputSynapse((S)s);
-        }
-        for(Synapse s: initialOutputSyns) {
-            addOutputSynapse(s);
-        }
     }
 
     @Override
@@ -391,7 +380,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
         bias.write(out);
 
-        for (Synapse s : inputSynapses) {
+        for (Synapse s : getInputSynapses()) {
             if (s.getStoredAt() == OUTPUT) {
                 out.writeBoolean(true);
                 s.write(out);
@@ -399,7 +388,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         }
         out.writeBoolean(false);
 
-        for (Synapse s : outputSynapses) {
+        for (Synapse s : getOutputSynapses()) {
             if (s.getStoredAt() == INPUT) {
                 out.writeBoolean(true);
                 s.write(out);
@@ -431,12 +420,12 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
         while (in.readBoolean()) {
             S syn = (S) Synapse.read(in, m);
-            inputSynapses.add(syn);
+            syn.link();
         }
 
         while (in.readBoolean()) {
             Synapse syn = Synapse.read(in, m);
-            outputSynapses.add(syn);
+            syn.link();
         }
 
         if(in.readBoolean()) {

@@ -61,7 +61,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
 
     @Override
     protected void warmUpRelatedInputNeurons(IA bs) {
-        Stream<S> iSyns = output.getNeuron().getInputSynapses();
+        Stream<S> iSyns = output.getNeuron().getInputSynapsesAsStream();
         iSyns.filter(s -> s.getStoredAt() == OUTPUT)
                 .forEach(s ->
                         s.warmUpInputNeuron(bs.getThought())
@@ -86,10 +86,6 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         }
 
         currentStoredAt = newStoredAt;
-    }
-
-    public boolean isWeak() {
-        return sumOfLowerWeights + weight.getCurrentValue() < 0;
     }
 
     public double getSortingWeight() {
