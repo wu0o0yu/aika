@@ -144,6 +144,13 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     public S instantiateTemplateAndCreateLink(I iAct, O oAct) {
+        if(iAct == null || oAct == null)
+            return null;
+
+        Link l = oAct.getInputLink(iAct.getNeuron());
+        if(l != null)
+            return (S) l.getSynapse();
+
         S instSyn = instantiateTemplate(iAct, oAct);
         instSyn.createLink(iAct, oAct);
         return instSyn;

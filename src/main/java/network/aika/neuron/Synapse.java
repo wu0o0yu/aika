@@ -21,10 +21,7 @@ import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.fields.QueueSumField;
 import network.aika.fields.SumField;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Element;
-import network.aika.neuron.activation.Link;
-import network.aika.neuron.activation.Timestamp;
+import network.aika.neuron.activation.*;
 import network.aika.neuron.conjunctive.Scope;
 import network.aika.neuron.visitor.linking.LinkingOperator;
 import network.aika.utils.Utils;
@@ -141,6 +138,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     public boolean linkExists(OA oAct) {
         return oAct.getInputLink(getInput()) != null;
+    }
+
+    public static boolean synapseExists(Activation iAct, Activation oAct) {
+        return oAct.getNeuron().getInputSynapse(iAct.getNeuronProvider()) != null;
     }
 
     public boolean propagateLinkExists(IA iAct) {

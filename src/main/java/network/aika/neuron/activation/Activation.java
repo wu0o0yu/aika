@@ -366,10 +366,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         act.init(null, this);
     }
 
-    public boolean isUnresolvedAbstract() {
-        return false;
-    }
-
     public Thought getThought() {
         return thought;
     }

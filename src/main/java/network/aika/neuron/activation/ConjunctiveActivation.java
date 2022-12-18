@@ -79,9 +79,6 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         if(getTemplateInstance() != null)
             return;
 
-        if(!isAbleToInstantiate())
-            return;
-
         N n = (N) neuron.instantiateTemplate(true);
 
         templateInstance = n.createActivation(thought);
@@ -95,7 +92,6 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         });
 
         getInputLinks()
-                .filter(l -> !(l instanceof PositiveFeedbackLink))
                 .forEach(l ->
                         l.instantiateTemplateAndCreateLink(
                                 l.getInput().resolveAbstractInputActivation(),
@@ -104,7 +100,6 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
                 );
 
         getOutputLinks()
-                .filter(l -> l instanceof InhibitoryLink)
                 .forEach(l ->
                         l.instantiateTemplateAndCreateLink(
                                 templateInstance,
@@ -120,18 +115,5 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
                 .forEach(oAct ->
                         Instantiation.add(oAct)
                 );
-    }
-
-    @Override
-    public boolean isUnresolvedAbstract() {
-        return neuron.isAbstract() &&
-                getTemplateInstance() == null;
-    }
-
-    private boolean isAbleToInstantiate() {
-        return !getInputLinks()
-                .filter(l -> !(l instanceof FeedbackLink))
-                .map(l -> l.getInput())
-                .anyMatch(iAct -> iAct.isUnresolvedAbstract());
     }
 }

@@ -25,6 +25,7 @@ import network.aika.steps.link.LinkCounting;
 import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.func;
 import static network.aika.fields.Fields.scale;
+import static network.aika.neuron.Synapse.synapseExists;
 
 /**
  * @author Lukas Molzberger
@@ -40,7 +41,7 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
     @Override
     protected PatternSynapse instantiateTemplate(BindingActivation iAct, PatternActivation oAct) {
         PositiveFeedbackLink posFeedbackLink = (PositiveFeedbackLink) input.getInputLink(output.getNeuron());
-        if(posFeedbackLink != null)
+        if(posFeedbackLink != null && !synapseExists(oAct, iAct))
             posFeedbackLink.instantiateTemplate(oAct, iAct);
 
         return super.instantiateTemplate(iAct, oAct);
