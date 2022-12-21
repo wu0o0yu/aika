@@ -16,14 +16,11 @@
  */
 package network.aika.steps.activation;
 
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
 import static network.aika.steps.Phase.POST_PROCESSING;
-import static network.aika.steps.Phase.PROCESSING;
 
 
 /**

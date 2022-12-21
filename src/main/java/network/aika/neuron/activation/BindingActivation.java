@@ -18,7 +18,6 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.fields.*;
-import network.aika.neuron.Range;
 import network.aika.neuron.conjunctive.BindingNeuron;
 import network.aika.neuron.visitor.DownVisitor;
 
@@ -33,10 +32,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     private boolean isInput;
 
     protected Field mixedNetLB;
-
-    private Field isOpen;
-    private Field mix;
-
 
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
@@ -60,16 +55,10 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     protected void initFields() {
-        isOpen = new Field(this, "isOpen")
-                .setInitialValue(1.0);
-
-        mix = new Field(this, "mix")
-                .setInitialValue(1.0);
-
         mixedNetLB = mix(
                 this,
                 "mixedNetLB",
-                mix,
+                thought.getAnnealing(),
                 netLB,
                 netUB
         );
@@ -99,14 +88,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     public void setInput(boolean input) {
         isInput = input;
-    }
-
-    public Field getIsOpen() {
-        return isOpen;
-    }
-
-    public Field getMix() {
-        return mix;
     }
 
     public Field getMixedNetLB() {

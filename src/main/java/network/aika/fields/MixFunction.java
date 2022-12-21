@@ -16,14 +16,14 @@
  */
 package network.aika.fields;
 
-import network.aika.neuron.activation.Element;
+import network.aika.FieldObject;
 
 /**
  * @author Lukas Molzberger
  */
 public class MixFunction extends AbstractFunction implements FieldInput, FieldOutput {
 
-    public MixFunction(Element ref, String label) {
+    public MixFunction(FieldObject ref, String label) {
         super(ref, label);
     }
 
@@ -33,12 +33,7 @@ public class MixFunction extends AbstractFunction implements FieldInput, FieldOu
     }
 
     @Override
-    public Element getReference() {
-        return null;
-    }
-
-    @Override
-    protected double computeUpdate(FieldLink fl, double u) {
+    protected double computeUpdate(AbstractFieldLink fl, double u) {
         int arg = fl.getArgument();
         if(arg == 0) {
             double a = getInputValueByArg(1);

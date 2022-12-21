@@ -16,7 +16,7 @@
  */
 package network.aika.fields;
 
-import network.aika.neuron.activation.Element;
+import network.aika.FieldObject;
 
 import java.util.function.DoubleFunction;
 
@@ -27,13 +27,13 @@ public class FieldFunction extends AbstractFunction {
 
     private DoubleFunction<Double> function;
 
-    public FieldFunction(Element ref, String label, DoubleFunction<Double> f) {
+    public FieldFunction(FieldObject ref, String label, DoubleFunction<Double> f) {
         super(ref, label);
         this.function = f;
     }
 
     @Override
-    protected double computeUpdate(FieldLink fl, double u) {
+    protected double computeUpdate(AbstractFieldLink fl, double u) {
         return function.apply(fl.getInput().getNewValue()) - currentValue;
     }
 }

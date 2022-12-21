@@ -16,6 +16,7 @@
  */
 package network.aika.sign;
 
+import network.aika.FieldObject;
 import network.aika.neuron.activation.Activation;
 import network.aika.fields.FieldOutput;
 
@@ -41,7 +42,7 @@ public interface Sign {
         return x >= 0.0 ? POS : NEG;
     }
 
-    FieldOutput getValue(FieldOutput v);
+    FieldOutput getValue(FieldObject ref, FieldOutput v);
 
     int index();
 }

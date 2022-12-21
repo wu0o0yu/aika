@@ -16,8 +16,8 @@
  */
 package network.aika.fields;
 
+import network.aika.FieldObject;
 import network.aika.Model;
-import network.aika.neuron.activation.Element;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
 
@@ -27,33 +27,34 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static network.aika.fields.FieldLink.createEventListener;
+import static network.aika.fields.ListenerFieldLink.createEventListener;
 
 
 /**
  * @author Lukas Molzberger
  */
-public class Field<R extends Element> implements FieldOutput, Writable {
+public abstract class Field implements FieldInput, FieldOutput, Writable {
 
     private String label;
-    private R reference;
+    private FieldObject reference;
 
     protected double currentValue;
     protected double newValue;
 
     protected boolean withinUpdate;
 
+    private Collection<AbstractFieldLink> receivers;
 
-    private Collection<FieldLink> receivers;
-
-
-    public Field(R reference, String label) {
+    public Field(FieldObject reference, String label) {
         this(reference, label, false);
     }
 
-    public Field(R reference, String label, boolean weakRefs) {
+    public Field(FieldObject reference, String label, boolean weakRefs) {
         this.reference = reference;
         this.label = label;
+
+        if(reference != null)
+            reference.register(this);
 
         initIO(weakRefs);
     }
@@ -62,7 +63,6 @@ public class Field<R extends Element> implements FieldOutput, Writable {
         currentValue = initialValue;
         return this;
     }
-
 
     public Field addListener(FieldOnTrueEvent fieldListener) {
         addOutput(createEventListener(this, fieldListener));
@@ -88,11 +88,11 @@ public class Field<R extends Element> implements FieldOutput, Writable {
     }
 
     @Override
-    public R getReference() {
+    public FieldObject getReference() {
         return reference;
     }
 
-    public void setReference(R reference) {
+    public void setReference(FieldObject reference) {
         this.reference = reference;
     }
 
@@ -118,21 +118,27 @@ public class Field<R extends Element> implements FieldOutput, Writable {
         return newValue;
     }
 
-    public Collection<FieldLink> getReceivers() {
+    @Override
+    public void copyState(Field to) {
+        to.currentValue = getCurrentValue();
+        to.newValue = getNewValue();
+    }
+
+    public Collection<AbstractFieldLink> getReceivers() {
         return receivers;
     }
 
     @Override
-    public void addOutput(FieldLink fl) {
+    public void addOutput(AbstractFieldLink fl) {
         this.receivers.add(fl);
     }
 
     @Override
-    public void removeOutput(FieldLink fl) {
+    public void removeOutput(AbstractFieldLink fl) {
         this.receivers.remove(fl);
     }
 
-    public void receiveUpdate(FieldLink fl, double u) {
+    public void receiveUpdate(AbstractFieldLink fl, double u) {
         receiveUpdate(u);
     }
 
@@ -160,19 +166,11 @@ public class Field<R extends Element> implements FieldOutput, Writable {
     }
 
     protected void propagateUpdate(double update) {
-        FieldLink[] recs = receivers.toArray(new FieldLink[0]);
+        AbstractFieldLink[] recs = receivers.toArray(new AbstractFieldLink[0]);
 
         for(int i = 0; i < recs.length; i++) {
             recs[i].receiveUpdate(update);
         }
-    }
-
-    @Override
-    public void disconnect() {
-        receivers.forEach(lf ->
-                lf.disconnectAndUnlink()
-        );
-        receivers.clear();
     }
 
     @Override

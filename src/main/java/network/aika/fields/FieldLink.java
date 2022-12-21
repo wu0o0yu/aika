@@ -16,47 +16,19 @@
  */
 package network.aika.fields;
 
-import network.aika.callbacks.UpdateListener;
-import network.aika.utils.Utils;
-
 /**
  * @author Lukas Molzberger
  */
-public class FieldLink {
+public class FieldLink extends AbstractFieldLink<FieldInput> {
 
-    private FieldOutput input;
-    private int arg;
-    private UpdateListener output;
 
-    private boolean isInitialized;
-
-    public static FieldLink createEventListener(FieldOutput in, FieldOnTrueEvent eventListener) {
-        return createUpdateListener(in, (arg, u) -> {
-            if (u > 0.0)
-                eventListener.onTrue();
-        });
-    }
-
-    public static FieldLink createUpdateListener(FieldOutput in, UpdateListener updateListener) {
-        return new FieldLink(in, 0, updateListener);
-    }
-
-    public void setInitialized(boolean initialized) {
-        isInitialized = initialized;
-    }
-
-    public static FieldLink connect(FieldOutput in, FieldInput out) {
-        return connect(in, out.getNextArg(), out);
+    @Override
+    public boolean crossesBorder() {
+        return input.getReference() != ((FieldOutput) output).getReference();
     }
 
     public static FieldLink link(FieldOutput in, FieldInput out) {
         return link(in, out.getNextArg(), out);
-    }
-
-    public static FieldLink connect(FieldOutput in, int arg, FieldInput out) {
-        FieldLink fl = link(in, arg, out);
-        fl.connect();
-        return fl;
     }
 
     public static FieldLink link(FieldOutput in, int arg, FieldInput out) {
@@ -66,104 +38,23 @@ public class FieldLink {
         return fl;
     }
 
-    public static void connectAll(FieldOutput in, FieldInput... out) {
+    public static void linkAll(FieldOutput in, FieldInput... out) {
         assert in != null;
 
         for(FieldInput o : out) {
             if(o != null) {
-                connect(in, 0, o);
+                link(in, 0, o);
             }
         }
     }
 
-    public static void disconnect(FieldOutput in, FieldInput out) {
-        disconnect(in, 0, out);
-    }
-
-    public static void disconnect(FieldOutput in, int arg, FieldInput out) {
-        FieldLink fl = new FieldLink(in, arg, out);
-        out.removeInput(fl);
-        in.removeOutput(fl);
-    }
-
-    public FieldLink(FieldOutput input, int arg, UpdateListener output) {
-        this.input = input;
-        this.arg = arg;
-        this.output = output;
-    }
-
-    public void setInput(FieldOutput input) {
-        this.input = input;
-    }
-
-    public void receiveUpdate(double u) {
-        output.receiveUpdate(this, u);
-    }
-
-    public void connect() {
-        assert !isInitialized;
-
-        double cv = input.getCurrentValue();
-        if(!Utils.belowTolerance(cv))
-            output.receiveUpdate(this, cv);
-
-        isInitialized = true;
-    }
-
-    public void disconnect() {
-        assert isInitialized;
-
-        double cv = input.getCurrentValue();
-        if(!Utils.belowTolerance(cv))
-            output.receiveUpdate(this, -cv);
-
-        isInitialized = false;
-    }
-
-    public void disconnectAndUnlink() {
-        disconnect();
-        unlinkOutput();
-    }
-
-    private void unlinkOutput() {
-        if(output instanceof FieldInput) {
-            FieldInput fo = (FieldInput) output;
-            fo.removeInput(this);
-        }
-    }
-
-    public double getCurrentInputValue() {
-        return isInitialized ? input.getCurrentValue() : 0.0;
-    }
-
-    public int getArgument() {
-        return arg;
-    }
-
-    public FieldOutput getInput() {
-        return input;
-    }
-
-    public UpdateListener getOutput() {
-        return output;
+    public FieldLink(FieldOutput input, int arg, FieldInput output) {
+        super(input, arg, output);
     }
 
     @Override
-    public boolean equals(Object o) {
-        FieldLink fLink = (FieldLink) o;
-        if(arg != fLink.arg)
-            return false;
-
-        if(!output.equals(fLink.output))
-            return false;
-
-        if(input == fLink.input)
-            return true;
-
-        return input != null && input.equals(fLink.input);
-    }
-
-    public String toString() {
-        return input + " --" + arg + "--> " + output;
+    public void unlink() {
+        input.removeOutput(this);
+        output.removeInput(this);
     }
 }

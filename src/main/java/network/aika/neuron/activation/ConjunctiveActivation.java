@@ -17,7 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
-import network.aika.neuron.Range;
+import network.aika.neuron.Synapse;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
 import network.aika.steps.activation.Instantiation;
 
@@ -74,16 +74,27 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         return template;
     }
 
+    public void setTemplate(Activation template) {
+        this.template = (ConjunctiveActivation<N>) template;
+    }
+
     @Override
     public void instantiateTemplate() {
         if(getTemplateInstance() != null)
             return;
 
-        N n = (N) neuron.instantiateTemplate(true);
+        N n = (N) neuron.instantiateTemplate();
 
-        templateInstance = n.createActivation(thought);
-        templateInstance.init(null, null);
-        templateInstance.template = this;
+        templateInstance = n.createActivation(getThought());
+
+        getInputLinks()
+                .forEach(l -> {
+                    Activation iAct = l.getInput().resolveAbstractInputActivation();
+                    if(iAct != null) {
+                        Synapse s = l.instantiateTemplate(iAct, templateInstance);
+                        s.createLinkFromTemplate(iAct, templateInstance, l);
+                    }
+                });
 
         templateInstance.isFired.addEventListener(() -> {
             n.setLabel(
@@ -91,21 +102,16 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
             );
         });
 
-        getInputLinks()
-                .forEach(l ->
-                        l.instantiateTemplateAndCreateLink(
-                                l.getInput().resolveAbstractInputActivation(),
-                                templateInstance
-                        )
-                );
+        templateInstance.initFromTemplate(this);
 
         getOutputLinks()
-                .forEach(l ->
-                        l.instantiateTemplateAndCreateLink(
-                                templateInstance,
-                                l.getOutput().resolveAbstractInputActivation()
-                        )
-                );
+                .forEach(l -> {
+                    Activation oAct = l.getOutput().resolveAbstractInputActivation();
+                    if(oAct != null) {
+                        Synapse s = l.instantiateTemplate(templateInstance, oAct);
+                        s.createLinkFromTemplate(templateInstance, oAct, l);
+                    }
+                });
 
 
         getOutputLinks()
@@ -115,5 +121,6 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
                 .forEach(oAct ->
                         Instantiation.add(oAct)
                 );
+
     }
 }

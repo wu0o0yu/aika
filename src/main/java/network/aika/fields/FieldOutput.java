@@ -16,11 +16,9 @@
  */
 package network.aika.fields;
 
-import network.aika.neuron.activation.Element;
-
 import java.util.Collection;
 
-import static network.aika.fields.FieldLink.createEventListener;
+import static network.aika.fields.ListenerFieldLink.createEventListener;
 
 /**
  * @author Lukas Molzberger
@@ -37,26 +35,23 @@ public interface FieldOutput {
 
     double getNewValue();
 
-    void addOutput(FieldLink fl);
+    void copyState(Field from);
 
-    void removeOutput(FieldLink fl);
+    void addOutput(AbstractFieldLink fl);
 
-    Collection<FieldLink> getReceivers();
+    void removeOutput(AbstractFieldLink fl);
 
-    void disconnect();
+    Collection<AbstractFieldLink> getReceivers();
 
-    Element getReference();
+    Object getReference();
 
     default void addEventListener(FieldOnTrueEvent eventListener) {
         addEventListener(eventListener, false);
     }
 
     default void addEventListener(FieldOnTrueEvent eventListener, boolean assumeInitialized) {
-        FieldLink fl = createEventListener(this, eventListener);
+        AbstractFieldLink fl = createEventListener(this, eventListener);
         addOutput(fl);
-        if(assumeInitialized)
-            fl.setInitialized(true);
-        else
-            fl.connect();
+        fl.connect(!assumeInitialized);
     }
 }

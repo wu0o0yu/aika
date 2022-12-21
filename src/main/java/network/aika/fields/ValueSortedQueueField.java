@@ -16,7 +16,7 @@
  */
 package network.aika.fields;
 
-import network.aika.neuron.activation.Element;
+import network.aika.FieldObject;
 import network.aika.utils.Utils;
 
 /**
@@ -24,7 +24,7 @@ import network.aika.utils.Utils;
  */
 public class ValueSortedQueueField extends QueueSumField {
 
-    public ValueSortedQueueField(Element e, String label) {
+    public ValueSortedQueueField(FieldObject e, String label) {
         super(e, label);
     }
 

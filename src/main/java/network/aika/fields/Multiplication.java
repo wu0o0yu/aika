@@ -16,14 +16,14 @@
  */
 package network.aika.fields;
 
-import network.aika.neuron.activation.Element;
+import network.aika.FieldObject;
 
 /**
  * @author Lukas Molzberger
  */
 public class Multiplication extends AbstractFunction {
 
-    public Multiplication(Element ref, String label) {
+    public Multiplication(FieldObject ref, String label) {
         super(ref, label);
     }
 
@@ -33,7 +33,7 @@ public class Multiplication extends AbstractFunction {
     }
 
     @Override
-    protected double computeUpdate(FieldLink fl, double u) {
+    protected double computeUpdate(AbstractFieldLink fl, double u) {
         return u * getInputValueByArg(fl.getArgument() == 0 ? 1 : 0);
     }
 }

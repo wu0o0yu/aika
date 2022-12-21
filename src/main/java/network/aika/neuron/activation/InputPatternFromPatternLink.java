@@ -17,9 +17,7 @@
 package network.aika.neuron.activation;
 
 import network.aika.neuron.conjunctive.InputPatternFromPatternSynapse;
-import network.aika.neuron.visitor.DownVisitor;
-
-import static network.aika.fields.FieldLink.connect;
+import static network.aika.fields.FieldLink.link;
 import static network.aika.fields.Fields.scale;
 
 /**
@@ -33,7 +31,7 @@ public class InputPatternFromPatternLink extends InputPatternLink<InputPatternFr
 
     @Override
     public void connectGradientFields() {
-        connect(
+        link(
                 scale(this, "-Entropy", -1,
                         input.getEntropy()
                 ),

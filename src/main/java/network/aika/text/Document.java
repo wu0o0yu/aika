@@ -16,8 +16,10 @@
  */
 package network.aika.text;
 
+import network.aika.FieldObject;
 import network.aika.Model;
 import network.aika.Thought;
+import network.aika.direction.Direction;
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.text.TokenActivation;
@@ -25,6 +27,8 @@ import network.aika.neuron.conjunctive.text.TokenNeuron;
 
 import java.util.*;
 import java.util.stream.Stream;
+
+import static network.aika.callbacks.EventType.CREATE;
 
 
 /**
@@ -109,9 +113,8 @@ public class Document extends Thought {
 
     public TokenActivation addToken(TokenNeuron n, Integer pos, int begin, int end) {
         TokenActivation act = new TokenActivation(createActivationId(), pos, begin, end, this, n);
-
-        act.init(null, null);
-
+        act.connect(Direction.INPUT, true, false);
+        onElementEvent(CREATE, act);
         return act;
     }
 

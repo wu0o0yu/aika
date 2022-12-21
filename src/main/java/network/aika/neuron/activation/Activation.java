@@ -16,8 +16,10 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.FieldObject;
 import network.aika.Model;
 import network.aika.Thought;
+import network.aika.direction.Direction;
 import network.aika.fields.*;
 import network.aika.neuron.*;
 import network.aika.neuron.visitor.DownVisitor;
@@ -31,7 +33,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
-import static network.aika.fields.FieldLink.connect;
+import static network.aika.callbacks.EventType.CREATE;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
@@ -39,7 +41,7 @@ import static network.aika.neuron.activation.Timestamp.NOT_SET;
 /**
  * @author Lukas Molzberger
  */
-public abstract class Activation<N extends Neuron> implements Element, Comparable<Activation> {
+public abstract class Activation<N extends Neuron> extends FieldObject implements Element, Comparable<Activation> {
 
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(Activation::getId);
 
@@ -82,8 +84,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     protected Consumer<Integer> onTokenPosUpdate;
 
-    protected List<FieldLink> disconnectFieldLinks = new ArrayList<>();
-
     public Activation(int id, Thought t, N n) {
         this.id = id;
         this.neuron = n;
@@ -95,8 +95,8 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
         initNet();
 
-        disconnectFieldLinks.add(connect(getNeuron().getBias(), netUB));
-        disconnectFieldLinks.add(connect(getNeuron().getBias(), netLB));
+        FieldLink.link(getNeuron().getBias(), netUB);
+        FieldLink.link(getNeuron().getBias(), netLB);
 
         isFired = threshold(this, "isFired", 0.0, ABOVE, netUB);
 
@@ -239,7 +239,11 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
                 getConfig().getLearnRate(),
                 getOutputGradient()
         );
-        disconnectFieldLinks.add(connect(updateValue, getNeuron().getBias()));
+
+        FieldLink.link(
+                updateValue,
+                getNeuron().getBias()
+        );
     }
 
     public abstract FieldOutput getOutputGradient();
@@ -285,10 +289,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public FieldFunction getNetOuterGradient() {
         return netOuterGradient;
-    }
-
-    public void init(Synapse originSynapse, Activation originAct) {
-        thought.onActivationCreationEvent(this, originSynapse, originAct);
     }
 
     public SumField getForwardsGradient() {
@@ -360,10 +360,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     public void instantiateTemplate() {
-        Activation<N> act = neuron.instantiateTemplate(true)
-                .createActivation(thought);
-
-        act.init(null, this);
     }
 
     public Thought getThought() {
@@ -419,6 +415,16 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public String getLabel() {
         return getNeuron().getLabel();
+    }
+
+    public void setTemplate(Activation template) {
+    }
+
+    public void initFromTemplate(Activation template) {
+        setTemplate(template);
+        template.copyState(this);
+        connect(Direction.INPUT, false, false);
+        template.getThought().onElementEvent(CREATE, this);
     }
 
     public N getNeuron() {
@@ -495,10 +501,9 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
         unlinkOutputs();
     }
 
+    @Override
     public void disconnect() {
-        for(FieldLink fl: disconnectFieldLinks) {
-            fl.disconnect();
-        }
+        super.disconnect();
 
         getInputLinks().forEach(l ->
                 l.disconnect()

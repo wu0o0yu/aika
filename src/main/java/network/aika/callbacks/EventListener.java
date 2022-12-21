@@ -16,9 +16,7 @@
  */
 package network.aika.callbacks;
 
-import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
+import network.aika.neuron.activation.Element;
 import network.aika.steps.Step;
 
 /**
@@ -27,13 +25,7 @@ import network.aika.steps.Step;
  */
 public interface EventListener {
 
-    void queueEntryAddedEvent(Step s);
+    void onQueueEvent(EventType et, Step s);
 
-    void beforeProcessedEvent(Step s);
-
-    void afterProcessedEvent(Step s);
-
-    void onActivationCreationEvent(Activation act, Synapse originSynapse, Activation originAct);
-
-    void onLinkCreationEvent(Link l);
+    void onElementEvent(EventType et, Element e);
 }

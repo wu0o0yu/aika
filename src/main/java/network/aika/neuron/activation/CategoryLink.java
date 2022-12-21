@@ -30,7 +30,7 @@ public abstract class CategoryLink<S extends CategorySynapse, IA extends Conjunc
     }
 
     @Override
-    protected void addInputLinkingStep() {
+    public void addInputLinkingStep() {
     }
 
     @Override

@@ -16,7 +16,7 @@
  */
 package network.aika.fields;
 
-import network.aika.neuron.activation.Element;
+import network.aika.FieldObject;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,11 +24,11 @@ import java.util.Collection;
 /**
  * @author Lukas Molzberger
  */
-public abstract class AbstractFunction extends Field implements FieldInput, FieldOutput {
+public abstract class AbstractFunction extends Field implements FieldInput {
 
     private FieldLink[] inputs;
 
-    public AbstractFunction(Element ref, String label) {
+    public AbstractFunction(FieldObject ref, String label) {
         super(ref, label);
     }
 
@@ -72,13 +72,12 @@ public abstract class AbstractFunction extends Field implements FieldInput, Fiel
         return inputs[arg];
     }
 
-    protected abstract double computeUpdate(FieldLink fl, double u);
+    protected abstract double computeUpdate(AbstractFieldLink fl, double u);
 
     @Override
-    public void receiveUpdate(FieldLink fl, double u) {
+    public void receiveUpdate(AbstractFieldLink fl, double u) {
         newValue += computeUpdate(fl, u);
 
         triggerUpdate();
     }
-
 }

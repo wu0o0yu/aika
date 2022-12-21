@@ -39,17 +39,6 @@ public class TokenNeuron extends PatternNeuron {
         return new PatternActivation(t.createActivationId(), t, this);
     }
 
-    @Override
-    public TokenNeuron instantiateTemplate(boolean addProvider) {
-        TokenNeuron n = new TokenNeuron();
-        if(addProvider)
-            n.addProvider(getModel());
-
-        initFromTemplate(n);
-        return n;
-    }
-
-
     public void setTokenLabel(String tokenLabel) {
         this.tokenLabel = tokenLabel;
     }

@@ -126,8 +126,8 @@ public class JacksonCookTest {
         BindingNeuron surnameBN = new BindingNeuron().init(m, "surname (person name)");
 
 
-        BindingNeuron jacksonForenameBN = forenameBN.instantiateTemplate(true).init(m, "jackson (forename)");
-        BindingNeuron jacksonJCBN = jacksonForenameBN.instantiateTemplate(true).init(m, "jackson (jackson cook)");
+        BindingNeuron jacksonForenameBN = forenameBN.instantiateTemplate().init(m, "jackson (forename)");
+        BindingNeuron jacksonJCBN = jacksonForenameBN.instantiateTemplate().init(m, "jackson (jackson cook)");
         new InputPatternFromPatternSynapse()
                 .init(jacksonIN, jacksonJCBN, 10.0)
                 .adjustBias();

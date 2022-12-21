@@ -219,10 +219,10 @@ public class MetaNeuronTest {
                 .init(syllableCategory, syllablePN, 1.0);
 
         // Concrete
-        TokenNeuron letterS = letterPN.instantiateTemplate(true)
+        TokenNeuron letterS = letterPN.instantiateTemplate()
                 .init(m, "L-s");
 
-        TokenNeuron letterC = letterPN.instantiateTemplate(true)
+        TokenNeuron letterC = letterPN.instantiateTemplate()
                 .init(m, "L-c");
 
         letterPN.updateBias(3.0);

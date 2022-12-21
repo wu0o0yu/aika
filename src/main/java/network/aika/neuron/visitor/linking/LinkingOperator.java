@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.visitor.linking;
 
+import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
@@ -59,16 +60,16 @@ public abstract class LinkingOperator {
             if(latentActivationExists(synA, synB, bsA, bsB))
                 return null;
 
-            oAct = synA.getOutput().createActivation(bsA.getThought());
-            oAct.init(synA, bsA);
+            Thought t = bsA.getThought();
+            oAct = synA.getOutput().createAndInitActivation(t);
 
-            synA.createLink(bsA, oAct);
+            synA.createAndInitLink(bsA, oAct);
         } else {
             oAct = linkA.getOutput();
             if(synB.linkExists(bsB, oAct))
                 return null;
         }
 
-        return synB.createLink(bsB, oAct);
+        return synB.createAndInitLink(bsB, oAct);
     }
 }

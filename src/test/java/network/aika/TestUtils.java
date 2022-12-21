@@ -18,7 +18,6 @@ package network.aika;
 
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingActivation;
 import network.aika.neuron.conjunctive.*;
 import network.aika.neuron.conjunctive.text.TokenNeuron;
 import network.aika.neuron.disjunctive.*;
@@ -64,8 +63,7 @@ public class TestUtils {
             doc.process(PROCESSING);
         }
 
-        doc.annealIsOpen(0.05);
-        doc.annealMix(0.05);
+        doc.anneal(0.05);
 
         doc.updateModel();
     }

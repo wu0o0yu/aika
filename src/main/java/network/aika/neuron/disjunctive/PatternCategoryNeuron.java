@@ -30,14 +30,4 @@ public class PatternCategoryNeuron extends CategoryNeuron<PatternCategorySynapse
     public CategoryActivation createActivation(Thought t) {
         return new CategoryActivation(t.createActivationId(), t, this);
     }
-
-    @Override
-    public CategoryNeuron instantiateTemplate(boolean addProvider) {
-        CategoryNeuron n = new PatternCategoryNeuron();
-        if(addProvider)
-            n.addProvider(getModel());
-
-        initFromTemplate(n);
-        return n;
-    }
 }

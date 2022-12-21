@@ -16,10 +16,8 @@
  */
 package network.aika.neuron.conjunctive;
 
-import network.aika.direction.Direction;
 import network.aika.neuron.ActivationFunction;
 import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.neuron.disjunctive.CategorySynapse;
@@ -27,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 
 import static network.aika.direction.Direction.INPUT;
@@ -47,12 +44,12 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     }
 
     @Override
-    protected void initFromTemplate(Neuron n) {
-        super.initFromTemplate(n);
+    protected void initFromTemplate(Neuron templateN) {
+        super.initFromTemplate(templateN);
 
-        S cis = (S) getCategoryInputSynapse();
+        S cis = (S) ((ConjunctiveNeuron)templateN).getCategoryInputSynapse();
         newCategorySynapse()
-                .init(n, cis.getInput(), 10.0);
+                .init(this, cis.getInput(), 10.0);
     }
 
     public abstract CategorySynapse newCategorySynapse();
@@ -72,7 +69,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         getInputSynapsesAsStream()
                 .filter(s -> !s.linkExists(bs))
                 .forEach(s ->
-                        s.createLink(null, bs)
+                        s.createAndInitLink(null, bs)
                 );
     }
 

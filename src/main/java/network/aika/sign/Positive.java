@@ -16,6 +16,7 @@
  */
 package network.aika.sign;
 
+import network.aika.FieldObject;
 import network.aika.fields.FieldOutput;
 
 /**
@@ -29,7 +30,7 @@ public class Positive implements Sign {
     }
 
     @Override
-    public FieldOutput getValue(FieldOutput v) {
+    public FieldOutput getValue(FieldObject ref, FieldOutput v) {
         return v;
     }
 

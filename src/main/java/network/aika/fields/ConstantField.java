@@ -16,16 +16,38 @@
  */
 package network.aika.fields;
 
+import network.aika.FieldObject;
+
+import java.util.Collection;
+
 /**
  * @author Lukas Molzberger
  */
 public class ConstantField extends Field implements FieldOutput {
 
-    public static final ConstantField ZERO = new ConstantField("ZERO", 0.0);
-    public static final ConstantField ONE = new ConstantField("ONE", 1.0);
+    public static final ConstantField ZERO = new ConstantField(null, "ZERO", 0.0);
+    public static final ConstantField ONE = new ConstantField(null, "ONE", 1.0);
 
-    public ConstantField(String label, double value) {
+    public ConstantField(FieldObject ref, String label, double value) {
         super(null, label);
         this.currentValue = value;
+    }
+
+    @Override
+    public void addInput(FieldLink fl) {
+    }
+
+    @Override
+    public void removeInput(FieldLink fl) {
+    }
+
+    @Override
+    public Collection<FieldLink> getInputs() {
+        return null;
+    }
+
+    @Override
+    public int getNextArg() {
+        return 0;
     }
 }

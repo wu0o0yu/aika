@@ -16,8 +16,10 @@
  */
 package network.aika.neuron;
 
+import network.aika.FieldObject;
 import network.aika.Model;
 import network.aika.Thought;
+import network.aika.direction.Direction;
 import network.aika.fields.*;
 import network.aika.neuron.activation.Activation;
 import network.aika.neuron.activation.Element;
@@ -38,6 +40,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static network.aika.callbacks.EventType.CREATE;
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.Synapse.getLatentLinkingPreNetUB;
@@ -48,7 +51,7 @@ import static network.aika.neuron.activation.Timestamp.MIN;
  *
  * @author Lukas Molzberger
  */
-public abstract class Neuron<S extends Synapse, A extends Activation> implements Element, Writable {
+public abstract class Neuron<S extends Synapse, A extends Activation> extends FieldObject implements Element, Writable {
 
     volatile long retrievalCount = 0;
 
@@ -173,9 +176,26 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
         return acts.getActivations();
     }
 
-    protected void initFromTemplate(Neuron n) {
-        n.bias.setValue(bias.getCurrentValue());
-        n.template = this;
+    public <N extends Neuron<S, A>> N  instantiateTemplate() {
+        N n;
+        try {
+            n = (N) getClass().getConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        n.initFromTemplate(this);
+        return n;
+    }
+
+    protected void initFromTemplate(Neuron templateN) {
+        addProvider(templateN.getModel());
+
+        templateN.copyState(this);
+        connect(Direction.INPUT, false, false);
+        connect(Direction.OUTPUT, false, true);
+
+        this.template = templateN;
     }
 
     public boolean isAbstract() {
@@ -184,7 +204,13 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
 
     public abstract A createActivation(Thought t);
 
-    public abstract <N extends Neuron<S, A>> N instantiateTemplate(boolean addProvider);
+    public A createAndInitActivation(Thought t) {
+        A act = createActivation(t);
+        act.connect(Direction.INPUT, true, false);
+        t.onElementEvent(CREATE, act);
+
+        return act;
+    }
 
     public abstract void addInactiveLinks(Activation bs);
 
@@ -454,6 +480,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> implements
     public <N extends Neuron> N init(Model m, String label) {
         addProvider(m);
         setLabel(label);
+        connect(INPUT, true, false);
         return (N) this;
     }
 

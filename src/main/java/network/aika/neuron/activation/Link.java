@@ -16,7 +16,9 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.FieldObject;
 import network.aika.Thought;
+import network.aika.direction.Direction;
 import network.aika.fields.*;
 import network.aika.neuron.Range;
 import network.aika.neuron.Synapse;
@@ -25,10 +27,8 @@ import network.aika.neuron.visitor.UpVisitor;
 import network.aika.neuron.visitor.selfref.SelfRefDownVisitor;
 import network.aika.steps.link.LinkingIn;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static network.aika.fields.FieldLink.connect;
+import static network.aika.callbacks.EventType.CREATE;
+import static network.aika.fields.FieldLink.link;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 import static network.aika.neuron.activation.Timestamp.FIRED_COMPARATOR;
@@ -37,7 +37,7 @@ import static network.aika.neuron.activation.Timestamp.FIRED_COMPARATOR;
  *
  * @author Lukas Molzberger
  */
-public abstract class Link<S extends Synapse, I extends Activation<?>, O extends Activation> implements Element {
+public abstract class Link<S extends Synapse, I extends Activation<?>, O extends Activation> extends FieldObject implements Element {
 
     protected S synapse;
 
@@ -51,9 +51,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected AbstractFunction backwardsGradient;
 
     protected ThresholdOperator onTransparent;
-
-    protected List<FieldLink> disconnectFieldLinks = new ArrayList<>();
-
 
     public Link(S s, I input, O output) {
         this.synapse = s;
@@ -75,9 +72,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
                 );
         }
 
-        getThought().onLinkCreationEvent(this);
-
-        addInputLinkingStep();
+        getThought().onElementEvent(CREATE, this);
 
         propagateRangeOrTokenPos(
                 input.getRange(),
@@ -85,7 +80,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         );
     }
 
-    protected void addInputLinkingStep() {
+    public void addInputLinkingStep() {
         LinkingIn.add(this);
     }
 
@@ -123,7 +118,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
                 synapse.getWeight(),
                 input.isFired
         );
-        disconnectFieldLinks.add(weightIfIsFired.getInputLinkByArg(0));
 
         onTransparent = threshold(
                 this,
@@ -139,11 +133,11 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected void initForwardsGradient() {
         forwardsGradient = new SumField(this, "Forwards-Gradient");
-        connect(input.forwardsGradient, forwardsGradient);
-        connect(forwardsGradient, output.forwardsGradient);
+        link(input.forwardsGradient, forwardsGradient);
+        link(forwardsGradient, output.forwardsGradient);
     }
 
-    public S instantiateTemplateAndCreateLink(I iAct, O oAct) {
+    protected S instantiateTemplate(I iAct, O oAct) {
         if(iAct == null || oAct == null)
             return null;
 
@@ -151,28 +145,33 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         if(l != null)
             return (S) l.getSynapse();
 
-        S instSyn = instantiateTemplate(iAct, oAct);
-        instSyn.createLink(iAct, oAct);
-        return instSyn;
-    }
-
-    protected S instantiateTemplate(I iAct, O oAct) {
-        return (S) synapse.instantiateTemplate(
+        S s = (S) synapse.instantiateTemplate(
                 iAct.getNeuron(),
                 oAct.getNeuron()
         );
+        synapse.copyState(s);
+        s.connect(Direction.INPUT, false, false);
+        s.connect(Direction.OUTPUT, false, true);
+
+        return s;
+    }
+
+    public void initFromTemplate(Link template) {
+        template.copyState(this);
+        connect(Direction.INPUT, false, false);
+        connect(Direction.OUTPUT, false, true);
     }
 
     public abstract void connectWeightUpdate();
 
     protected void initWeightInputUB() {
         weightedInputUB = initWeightedInput(true);
-        connect(weightedInputUB, getOutput().getNet(true));
+        link(weightedInputUB, getOutput().getNet(true));
     }
 
     protected void initWeightInputLB() {
         weightedInputLB = initWeightedInput(false);
-        connect(weightedInputLB, getOutput().getNet(false));
+        link(weightedInputLB, getOutput().getNet(false));
     }
 
     protected FieldOutput initWeightedInput(boolean upperBound) {
@@ -182,7 +181,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
                 getInputValue(upperBound),
                 synapse.getWeight()
         );
-        disconnectFieldLinks.add(weightedInput.getInputLinkByArg(1));
 
         return weightedInput;
     }
@@ -297,12 +295,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     @Override
     public Thought getThought() {
         return output.getThought();
-    }
-
-    public void disconnect() {
-        for(FieldLink fl: disconnectFieldLinks) {
-            fl.disconnect();
-        }
     }
 
     private String getInputKeyString() {

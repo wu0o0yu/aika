@@ -18,7 +18,6 @@ package network.aika.neuron.activation;
 
 import network.aika.neuron.conjunctive.AbstractPatternSynapse;
 
-import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.mul;
 
 /**
@@ -48,6 +47,5 @@ public abstract class AbstractPatternLink<S extends AbstractPatternSynapse, IA e
                 synapse.getWeight(),
                 input.backwardsGradientIn
         );
-        disconnectFieldLinks.add(backwardsGradient.getInputLinkByArg(1));
     }
 }

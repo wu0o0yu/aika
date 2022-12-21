@@ -16,11 +16,10 @@
  */
 package network.aika.neuron.activation;
 
-import network.aika.fields.Multiplication;
 import network.aika.neuron.conjunctive.ConjunctiveSynapse;
 import network.aika.steps.link.LinkingIn;
 
-import static network.aika.fields.FieldLink.connect;
+import static network.aika.fields.FieldLink.link;
 import static network.aika.fields.Fields.mul;
 
 
@@ -32,33 +31,28 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
 
     public ConjunctiveLink(S s, IA input, OA output) {
         super(s, input, output);
-
-        LinkingIn.add(this);
     }
 
     @Override
     public void connectWeightUpdate() {
-        disconnectFieldLinks.add(
-                connect(
-                        mul(
-                                this,
-                                "weight update",
-                                getInput().getIsFiredForWeight(),
-                                getOutput().getUpdateValue()
-                        ),
-                        synapse.getWeight()
-                )
+        link(
+                mul(
+                        this,
+                        "weight update",
+                        getInput().getIsFiredForWeight(),
+                        getOutput().getUpdateValue()
+                ),
+                synapse.getWeight()
         );
 
-        disconnectFieldLinks.add(
-                connect(
-                        mul(
-                                this,
-                                "bias update",
-                                getInput().getIsFiredForBias(),
-                                getOutput().getUpdateValue()
-                        ),
-                        output.getNeuron().getBias())
+        link(
+                mul(
+                        this,
+                        "bias update",
+                        getInput().getIsFiredForBias(),
+                        getOutput().getUpdateValue()
+                ),
+                output.getNeuron().getBias()
         );
     }
 }

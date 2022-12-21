@@ -16,20 +16,19 @@
  */
 package network.aika.fields;
 
-import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Element;
+import network.aika.FieldObject;
 
 import java.util.Comparator;
 
 /**
  * @author Lukas Molzberger
  */
-public class MinMaxField extends SumField<Element> implements FieldInput, FieldOutput {
+public class MinMaxField extends SumField {
 
     MinMax mode;
     private FieldLink selectedInput;
 
-    public MinMaxField(Element ref, MinMax m, String label) {
+    public MinMaxField(FieldObject ref, MinMax m, String label) {
         super(ref, label);
         mode = m;
     }

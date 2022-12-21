@@ -16,9 +16,7 @@
  */
 package network.aika.fields;
 
-import network.aika.neuron.activation.Element;
-
-import static network.aika.fields.FieldLink.createEventListener;
+import network.aika.FieldObject;
 
 
 /**
@@ -29,7 +27,7 @@ public class LimitedField extends QueueSumField {
     private double limit;
 
 
-    public LimitedField(Element refObj, String label, double limit) {
+    public LimitedField(FieldObject refObj, String label, double limit) {
         super(refObj, label);
         this.limit = limit;
     }
@@ -40,7 +38,7 @@ public class LimitedField extends QueueSumField {
     }
 
     @Override
-    public void receiveUpdate(FieldLink fl, double u) {
+    public void receiveUpdate(AbstractFieldLink fl, double u) {
         double cv = currentValue;
         double nv = getLimitedValue(cv + u);
         super.receiveUpdate(fl, nv - cv);

@@ -17,11 +17,11 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.Thought;
+import network.aika.fields.FieldLink;
 import network.aika.fields.Multiplication;
 import network.aika.neuron.Neuron;
 import network.aika.neuron.activation.*;
 
-import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.mul;
 
 /**
@@ -44,11 +44,11 @@ public abstract class FeedbackSynapse<S extends FeedbackSynapse, I extends Neuro
         Multiplication dummyWeight = mul(
                 oAct,
                 (getDummyLinkUB() ? "pos" : "neg")  + "-feedback-dummy",
-                oAct.getIsOpen(),
+                oAct.getThought().getAnnealing(),
                 getWeight()
         );
 
-        connect(dummyWeight, -1, oAct.getNet(getDummyLinkUB()));
+        FieldLink.link(dummyWeight, -1, oAct.getNet(getDummyLinkUB()));
     }
 
     protected abstract boolean getDummyLinkUB();

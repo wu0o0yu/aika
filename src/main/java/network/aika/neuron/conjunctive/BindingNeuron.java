@@ -49,17 +49,6 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
     }
 
     @Override
-    public BindingNeuron instantiateTemplate(boolean addProvider) {
-        BindingNeuron n = new BindingNeuron();
-        if(addProvider)
-            n.addProvider(getModel());
-
-        initFromTemplate(n);
-
-        return n;
-    }
-
-    @Override
     public BindingCategoryInputSynapse getCategoryInputSynapse() {
         return getProvider().getInputSynapses()
                 .filter(BindingCategoryInputSynapse.class::isInstance)

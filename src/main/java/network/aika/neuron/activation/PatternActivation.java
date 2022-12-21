@@ -18,14 +18,13 @@ package network.aika.neuron.activation;
 
 import network.aika.Thought;
 import network.aika.fields.FieldFunction;
+import network.aika.fields.FieldLink;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.SumField;
-import network.aika.neuron.Range;
 import network.aika.neuron.conjunctive.PatternNeuron;
 import network.aika.neuron.visitor.DownVisitor;
 import network.aika.sign.Sign;
 
-import static network.aika.fields.FieldLink.connect;
 import static network.aika.fields.Fields.*;
 
 /**
@@ -61,8 +60,8 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
         super.connectGradientFields();
 
-        connect(forwardsGradient, outputGradient);
-        connect(backwardsGradientOut, outputGradient);
+        FieldLink.link(forwardsGradient, outputGradient);
+        FieldLink.link(backwardsGradientOut, outputGradient);
     }
 
     @Override

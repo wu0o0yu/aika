@@ -17,7 +17,6 @@
 package network.aika.neuron.activation;
 
 import network.aika.fields.AbstractFunction;
-import network.aika.fields.Field;
 import network.aika.fields.FieldOutput;
 import network.aika.neuron.disjunctive.InhibitorySynapse;
 
@@ -49,16 +48,12 @@ public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingAc
                 input.getValue(true)
         );
 
-        disconnectFieldLinks.add(netUB.getInputLinkByArg(0));
-
         netLB = add(
                 this,
                 "netLB",
                 output.getNeuron().getBias(),
                 input.getValue(false)
         );
-
-        disconnectFieldLinks.add(netLB.getInputLinkByArg(0));
 
         valueUB = func(
                 this,

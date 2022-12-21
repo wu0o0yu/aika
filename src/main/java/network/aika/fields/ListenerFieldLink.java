@@ -16,24 +16,39 @@
  */
 package network.aika.fields;
 
-import network.aika.FieldObject;
+import network.aika.callbacks.UpdateListener;
 
 /**
  * @author Lukas Molzberger
  */
-public class Subtraction extends AbstractFunction {
+public class ListenerFieldLink extends AbstractFieldLink<UpdateListener> {
 
-    public Subtraction(FieldObject ref, String label) {
-        super(ref, label);
+    public static ListenerFieldLink createEventListener(FieldOutput in, FieldOnTrueEvent eventListener) {
+        return createUpdateListener(in, (arg, u) -> {
+            if (u > 0.0)
+                eventListener.onTrue();
+        });
+    }
+
+    public static ListenerFieldLink createUpdateListener(FieldOutput in, UpdateListener updateListener) {
+        return new ListenerFieldLink(in, 0, updateListener);
+    }
+
+    public ListenerFieldLink(FieldOutput input, int arg, UpdateListener output) {
+        super(input, arg, output);
     }
 
     @Override
-    protected int getNumberOfFunctionArguments() {
-        return 2;
+    public boolean crossesBorder() {
+        return false;
+    }
+
+    public void setInput(FieldOutput input) {
+        this.input = input;
     }
 
     @Override
-    protected double computeUpdate(AbstractFieldLink fl, double u) {
-        return fl.getArgument() == 0 ? u : -u;
+    public void unlink() {
+
     }
 }

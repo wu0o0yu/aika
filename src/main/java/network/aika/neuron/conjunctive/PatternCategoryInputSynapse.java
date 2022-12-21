@@ -17,7 +17,6 @@
 package network.aika.neuron.conjunctive;
 
 import network.aika.neuron.activation.*;
-import network.aika.neuron.disjunctive.CategoryNeuron;
 import network.aika.neuron.disjunctive.PatternCategoryNeuron;
 
 /**
@@ -36,10 +35,4 @@ public class PatternCategoryInputSynapse extends AbstractPatternSynapse<
     public PatternCategoryInputLink createLink(CategoryActivation input, PatternActivation output) {
         return new PatternCategoryInputLink(this, input, output);
     }
-/*
-    @Override
-    protected boolean checkCausal(CategoryActivation iAct, PatternActivation oAct) {
-        return true; // Workaround
-    }
- */
 }

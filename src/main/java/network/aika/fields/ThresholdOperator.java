@@ -16,7 +16,7 @@
  */
 package network.aika.fields;
 
-import network.aika.neuron.activation.Element;
+import network.aika.FieldObject;
 
 /**
  * @author Lukas Molzberger
@@ -33,19 +33,19 @@ public class ThresholdOperator extends AbstractFunction {
     private Type type;
     private boolean isFinal = false;
 
-    public ThresholdOperator(Element ref, String label, double threshold, Type type) {
+    public ThresholdOperator(FieldObject ref, String label, double threshold, Type type) {
         super(ref, label);
         this.threshold = threshold;
         this.type = type;
     }
 
-    public ThresholdOperator(Element ref, String label, double threshold, Type type, boolean isFinal) {
+    public ThresholdOperator(FieldObject ref, String label, double threshold, Type type, boolean isFinal) {
         this(ref, label, threshold, type);
         this.isFinal = isFinal;
     }
 
     @Override
-    protected double computeUpdate(FieldLink fl, double u) {
+    protected double computeUpdate(AbstractFieldLink fl, double u) {
         if(isFinal && currentValue > 0.5)
             return 0.0;
 

@@ -18,10 +18,13 @@ package network.aika;
 
 
 import network.aika.callbacks.EventListener;
+import network.aika.callbacks.EventType;
+import network.aika.fields.ConstantField;
+import network.aika.fields.Field;
+import network.aika.fields.FieldOutput;
 import network.aika.neuron.PreActivation;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Range;
-import network.aika.neuron.Synapse;
 import network.aika.neuron.activation.*;
 import network.aika.steps.Phase;
 import network.aika.steps.QueueKey;
@@ -32,13 +35,21 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static network.aika.ExternalPhase.*;
+import static network.aika.callbacks.EventType.*;
+import static network.aika.fields.Fields.invert;
 import static network.aika.steps.Phase.*;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class Thought {
+public abstract class Thought extends FieldObject {
+
+    private Field annealing;
+    private FieldOutput annealingInverted;
+
+    private ExternalPhase externalPhase = NEUTRAL;
 
     protected final Model model;
 
@@ -64,6 +75,9 @@ public abstract class Thought {
         id = model.createThoughtId();
         absoluteBegin = m.getN();
 
+        annealing = new ConstantField(this, "anneal", 1.0);
+        annealingInverted = invert(this, "!anneal", annealing);
+
         assert m.getCurrentThought() == null;
         m.setCurrentThought(this);
     }
@@ -84,6 +98,14 @@ public abstract class Thought {
         return model;
     }
 
+    public Field getAnnealing() {
+        return annealing;
+    }
+
+    public FieldOutput getAnnealingInverted() {
+        return annealingInverted;
+    }
+
     public abstract int length();
 
     public Config getConfig() {
@@ -94,34 +116,24 @@ public abstract class Thought {
         this.config = config;
     }
 
-    public void queueEntryAddedEvent(Step s) {
+    public void queueEvent(EventType et, Step s) {
         callEventListener(el ->
-                el.queueEntryAddedEvent(s)
+                el.onQueueEvent(et, s)
         );
     }
 
-    public void beforeProcessedEvent(Step s) {
+    public void onElementEvent(EventType et, Element e) {
         callEventListener(el ->
-                el.beforeProcessedEvent(s)
+                el.onElementEvent(et, e)
         );
     }
 
-    public void afterProcessedEvent(Step s) {
-        callEventListener(el ->
-                el.afterProcessedEvent(s)
-        );
+    public ExternalPhase getExternalPhase() {
+        return externalPhase;
     }
 
-    public void onActivationCreationEvent(Activation act, Synapse originSynapse, Activation originAct) {
-        callEventListener(el ->
-                el.onActivationCreationEvent(act, originSynapse, originAct)
-        );
-    }
-
-    public void onLinkCreationEvent(Link l) {
-        callEventListener(el ->
-                el.onLinkCreationEvent(l)
-        );
+    public void setExternalPhase(ExternalPhase externalPhase) {
+        this.externalPhase = externalPhase;
     }
 
     private void callEventListener(Consumer<EventListener> el) {
@@ -151,7 +163,7 @@ public abstract class Thought {
     public void addStep(Step s) {
         s.createQueueKey(getNextTimestamp());
         queue.put(s.getQueueKey(), s);
-        queueEntryAddedEvent(s);
+        queueEvent(ADDED, s);
     }
 
     public void removeStep(Step s) {
@@ -178,9 +190,9 @@ public abstract class Thought {
 
             timestampOnProcess = getCurrentTimestamp();
 
-            beforeProcessedEvent(s);
+            queueEvent(BEFORE, s);
             s.process();
-            afterProcessedEvent(s);
+            queueEvent(AFTER, s);
         }
     }
 
@@ -192,7 +204,9 @@ public abstract class Thought {
      * The postprocessing steps such as counting, cleanup or save are executed.
      */
     public void postProcessing() {
+        externalPhase = POST;
         process(POST_PROCESSING);
+        externalPhase = NEUTRAL;
     }
 
     public Timestamp getTimestampOnProcess() {
@@ -232,24 +246,22 @@ public abstract class Thought {
     }
 
     public void disconnect() {
+        externalPhase = DISCONNECT;
         if(model.getCurrentThought() == this)
             model.setCurrentThought(null);
 
         getActivations().forEach(act ->
                 act.disconnect()
         );
+        externalPhase = NEUTRAL;
     }
 
-    public void annealIsOpen(double stepSize) {
+    public void anneal(double stepSize) {
+        externalPhase = ANNEAL;
         anneal(stepSize, (act, x) ->
-                act.getIsOpen().setValue(x)
+                annealing.setValue(x)
         );
-    }
-
-    public void annealMix(double stepSize) {
-        anneal(stepSize, (act, x) ->
-                act.getMix().setValue(x)
-        );
+        externalPhase = NEUTRAL;
     }
 
     private void anneal(double stepSize, BiConsumer<BindingActivation, Double> c) {
@@ -268,6 +280,8 @@ public abstract class Thought {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append("External Phase:" + externalPhase + "\n");
+
         for(Activation act: activationsById.values()) {
             sb.append(act.toString());
             sb.append("\n");

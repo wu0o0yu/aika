@@ -14,32 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika;
 
-import network.aika.neuron.disjunctive.DisjunctiveSynapse;
-
-import static network.aika.fields.FieldLink.link;
-import static network.aika.fields.Fields.mul;
 
 /**
+ *
  * @author Lukas Molzberger
  */
-public class DisjunctiveLink<S extends DisjunctiveSynapse, IA extends ConjunctiveActivation<?>, OA extends DisjunctiveActivation> extends Link<S, IA, OA> {
+public enum ExternalPhase {
+    MONOTONIC('M'),
+    ANNEAL('A'),
+    POST('P'),
+    DISCONNECT('D'),
+    NEUTRAL(' ');
 
-    public DisjunctiveLink(S s, IA input, OA output) {
-        super(s, input, output);
+    char label;
+
+    ExternalPhase(char l) {
+        label = l;
     }
 
-    @Override
-    public void connectWeightUpdate() {
-        link(
-                mul(
-                        this,
-                        "weight update",
-                        getInput().getIsFired(),
-                        getOutput().getUpdateValue()
-                ),
-                synapse.getWeight()
-        );
+    public char getLabel() {
+        return label;
     }
 }

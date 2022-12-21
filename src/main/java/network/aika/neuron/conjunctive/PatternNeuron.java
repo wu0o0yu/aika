@@ -58,16 +58,6 @@ public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, Pattern
     }
 
     @Override
-    public PatternNeuron instantiateTemplate(boolean addProvider) {
-        PatternNeuron n = new PatternNeuron();
-        if(addProvider)
-            n.addProvider(getModel());
-
-        initFromTemplate(n);
-        return n;
-    }
-
-    @Override
     public PatternCategoryInputSynapse getCategoryInputSynapse() {
         return getProvider().getInputSynapses()
                 .filter(s -> s instanceof PatternCategoryInputSynapse)

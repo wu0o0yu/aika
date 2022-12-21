@@ -16,14 +16,14 @@
  */
 package network.aika.fields;
 
-import network.aika.neuron.activation.Element;
+import network.aika.FieldObject;
 
 /**
  * @author Lukas Molzberger
  */
 public class Addition extends AbstractFunction {
 
-    public Addition(Element ref, String label) {
+    public Addition(FieldObject ref, String label) {
         super(ref, label);
     }
 
@@ -33,7 +33,7 @@ public class Addition extends AbstractFunction {
     }
 
     @Override
-    protected double computeUpdate(FieldLink fl, double u) {
+    protected double computeUpdate(AbstractFieldLink fl, double u) {
         return u;
     }
 }

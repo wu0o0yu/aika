@@ -16,7 +16,7 @@
  */
 package network.aika.fields;
 
-import network.aika.neuron.activation.Element;
+import network.aika.FieldObject;
 
 import java.util.function.DoubleBinaryOperator;
 
@@ -27,7 +27,7 @@ public class BiFunction extends AbstractFunction {
 
     private DoubleBinaryOperator function;
 
-    public BiFunction(Element ref, String label, DoubleBinaryOperator f) {
+    public BiFunction(FieldObject ref, String label, DoubleBinaryOperator f) {
         super(ref, label);
         this.function = f;
     }
@@ -38,7 +38,7 @@ public class BiFunction extends AbstractFunction {
     }
 
     @Override
-    protected double computeUpdate(FieldLink fl, double u) {
+    protected double computeUpdate(AbstractFieldLink fl, double u) {
         return switch (fl.getArgument()) {
             case 0 -> function.applyAsDouble(
                     fl.getInput().getNewValue(),

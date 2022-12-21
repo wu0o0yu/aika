@@ -19,11 +19,10 @@ package network.aika.neuron.activation;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.MinMax;
 import network.aika.fields.MinMaxField;
-import network.aika.fields.Multiplication;
 import network.aika.neuron.conjunctive.NegativeFeedbackSynapse;
 import network.aika.neuron.visitor.UpVisitor;
 
-import static network.aika.fields.FieldLink.connect;
+import static network.aika.fields.FieldLink.link;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 
@@ -48,22 +47,27 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
         maxInputLB = new MinMaxField(this, MinMax.MIN, "minLB");
 
         weightedInputUB = initWeightedInput(false);
-
-        connect(weightedInputUB, getOutput().getNet(true));
+        link(
+                weightedInputUB,
+                getOutput().getNet(true)
+        );
     }
 
     @Override
     protected void initWeightInputLB() {
         maxInputUB = new MinMaxField(this, MinMax.MAX, "maxUB");
 
-        Multiplication weightedLB = mul(
+        weightedInputLB = mul(
                 this,
-                "!isOpen * x * weight",
-                invert("!isOpen", output.getIsOpen()),
+                "!annealing * x * weight",
+                getThought().getAnnealingInverted(),
                 initWeightedInput(true)
         );
 
-        connect(weightedLB, getOutput().getNet(false));
+        link(
+                weightedInputLB,
+                getOutput().getNet(false)
+        );
     }
 
     @Override
@@ -91,20 +95,19 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
 
     @Override
     public void connectWeightUpdate() {
-        disconnectFieldLinks.add(
-                connect(
-                        mul(
+        link(
+                mul(
+                        this,
+                        "weight update",
+                        getInput().getIsFired(),
+                        scale(
                                 this,
-                                "weight update",
-                                getInput().getIsFired(),
-                                scale(
-                                        this,
-                                        "-1 * og",
-                                        -1,
-                                        getOutput().getUpdateValue()
-                                )
-                        ), synapse.getWeight()
-                )
+                                "-1 * og",
+                                -1,
+                                getOutput().getUpdateValue()
+                        )
+                ),
+                synapse.getWeight()
         );
     }
 

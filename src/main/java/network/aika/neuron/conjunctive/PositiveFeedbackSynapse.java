@@ -66,12 +66,6 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
         return true;
     }
 
-    /*
-    @Override
-    protected boolean checkCausal(PatternActivation iAct, BindingActivation oAct) {
-        return true;
-    }
-*/
     @Override
     public double getPropagatePreNetUB(PatternActivation iAct) {
         return 0.0;

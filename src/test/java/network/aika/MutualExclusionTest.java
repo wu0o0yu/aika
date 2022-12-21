@@ -224,8 +224,7 @@ public class MutualExclusionTest {
         tAct.setNet(10.0);
         doc.process(PROCESSING);
 
-        doc.annealIsOpen(0.05);
-        doc.annealMix(0.05);
+        doc.anneal(0.05);
 
         doc.postProcessing();
         doc.updateModel();

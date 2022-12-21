@@ -31,14 +31,4 @@ public class BindingCategoryNeuron extends CategoryNeuron<BindingCategorySynapse
     public BindingCategoryActivation createActivation(Thought t) {
         return new BindingCategoryActivation(t.createActivationId(), t, this);
     }
-
-    @Override
-    public CategoryNeuron instantiateTemplate(boolean addProvider) {
-        CategoryNeuron n = new BindingCategoryNeuron();
-        if(addProvider)
-            n.addProvider(getModel());
-
-        initFromTemplate(n);
-        return n;
-    }
 }

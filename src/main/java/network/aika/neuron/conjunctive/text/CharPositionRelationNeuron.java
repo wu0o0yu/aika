@@ -32,7 +32,7 @@ public class CharPositionRelationNeuron extends LatentRelationNeuron {
 
     public CharPositionRelationNeuron lookupRelation(int rangeBegin, int rangeEnd) {
         return getModel().lookupNeuron("CP-Rel.: " + rangeBegin + "," + rangeEnd, l ->
-                instantiateTemplate(true)
+                ((CharPositionRelationNeuron) instantiateTemplate())
                         .initCharPositionRelationNeuron(rangeBegin, rangeEnd, l)
         );
     }
@@ -45,16 +45,6 @@ public class CharPositionRelationNeuron extends LatentRelationNeuron {
 
         setAllowTraining(false);
         return this;
-    }
-
-    @Override
-    public CharPositionRelationNeuron instantiateTemplate(boolean addProvider) {
-        CharPositionRelationNeuron n = new CharPositionRelationNeuron();
-        if(addProvider)
-            n.addProvider(getModel());
-
-        initFromTemplate(n);
-        return n;
     }
 
     @Override

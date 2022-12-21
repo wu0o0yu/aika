@@ -17,6 +17,7 @@
 package network.aika.fields;
 
 
+import network.aika.FieldObject;
 import network.aika.callbacks.FieldObserver;
 import network.aika.neuron.activation.Element;
 import network.aika.steps.FieldStep;
@@ -26,26 +27,24 @@ import network.aika.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static network.aika.fields.FieldLink.createEventListener;
-
 
 /**
  * @author Lukas Molzberger
  */
-public class QueueField extends Field implements IQueueField {
+public abstract class QueueField extends Field implements IQueueField {
 
     protected FieldStep step;
 
     protected List<FieldObserver> observers = new ArrayList<>();
 
-    public QueueField(Element e, String label) {
+    public QueueField(FieldObject e, String label) {
         super(e, label);
-        step = new FieldStep(e, this);
+        step = new FieldStep((Element) e, this);
     }
 
-    public QueueField(Element e, String label, boolean weakRefs) {
+    public QueueField(FieldObject e, String label, boolean weakRefs) {
         super(e, label, weakRefs);
-        step = new FieldStep(e, this);
+        step = new FieldStep((Element) e, this);
     }
 
 

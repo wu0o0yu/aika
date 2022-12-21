@@ -1,19 +1,20 @@
 package network.aika.fields;
 
+import network.aika.FieldObject;
 import network.aika.neuron.activation.Element;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class SumField<R extends Element> extends Field<R> implements FieldInput {
+public class SumField extends Field {
 
     private Collection<FieldLink> inputs;
 
-    public SumField(R reference, String label) {
+    public SumField(FieldObject reference, String label) {
         super(reference, label);
     }
 
-    public SumField(R reference, String label, boolean weakRefs) {
+    public SumField(FieldObject reference, String label, boolean weakRefs) {
         super(reference, label, weakRefs);
     }
 
@@ -44,16 +45,5 @@ public class SumField<R extends Element> extends Field<R> implements FieldInput 
     @Override
     public Collection<FieldLink> getInputs() {
         return inputs;
-    }
-
-    @Override
-    public void disconnect() {
-        super.disconnect();
-
-        inputs.stream()
-                .forEach(l ->
-                        l.getInput().removeOutput(l)
-                );
-        inputs.clear();
     }
 }

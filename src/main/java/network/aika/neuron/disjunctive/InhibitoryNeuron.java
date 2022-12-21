@@ -31,16 +31,6 @@ public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitorySynapse, Inhib
         return new InhibitoryActivation(t.createActivationId(), t, this);
     }
 
-    @Override
-    public InhibitoryNeuron instantiateTemplate(boolean addProvider) {
-        InhibitoryNeuron n = new InhibitoryNeuron();
-        if(addProvider)
-            n.addProvider(getModel());
-
-        initFromTemplate(n);
-        return n;
-    }
-
     public ActivationFunction getActivationFunction() {
         return ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
     }

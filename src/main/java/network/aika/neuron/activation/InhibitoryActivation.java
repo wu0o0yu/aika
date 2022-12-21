@@ -17,10 +17,10 @@
 package network.aika.neuron.activation;
 
 import network.aika.Thought;
+import network.aika.fields.FieldLink;
 import network.aika.neuron.Range;
 import network.aika.neuron.disjunctive.InhibitoryNeuron;
 
-import static network.aika.fields.FieldLink.connect;
 
 /**
  *
@@ -44,7 +44,7 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
                 out.getOutput().isSelfRef(in.getInput())
         ) return;
 
-        connect(in.netUB, out.maxInputUB);
-        connect(in.netLB, out.maxInputLB);
+        FieldLink.link(in.netUB, out.maxInputUB);
+        FieldLink.link(in.netLB, out.maxInputLB);
     }
 }

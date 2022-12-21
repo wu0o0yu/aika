@@ -16,14 +16,14 @@
  */
 package network.aika.fields;
 
-import network.aika.neuron.activation.Element;
+import network.aika.FieldObject;
 
 /**
  * @author Lukas Molzberger
  */
 public class Division extends AbstractFunction {
 
-    public Division(Element ref, String label) {
+    public Division(FieldObject ref, String label) {
         super(ref, label);
     }
 
@@ -33,7 +33,7 @@ public class Division extends AbstractFunction {
     }
 
     @Override
-    protected double computeUpdate(FieldLink fl, double u) {
+    protected double computeUpdate(AbstractFieldLink fl, double u) {
         return switch (fl.getArgument()) {
             case 0 -> updateDiv1(u);
             case 1 -> -(u * getInputValueByArg(0)) / Math.pow(fl.getCurrentInputValue(), 2.0);

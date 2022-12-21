@@ -53,16 +53,6 @@ public class TokenPositionRelationNeuron extends LatentRelationNeuron {
     }
 
     @Override
-    public TokenPositionRelationNeuron instantiateTemplate(boolean addProvider) {
-        TokenPositionRelationNeuron n = new TokenPositionRelationNeuron();
-        if(addProvider)
-            n.addProvider(getModel());
-
-        initFromTemplate(n);
-        return n;
-    }
-
-    @Override
     public Stream<TokenActivation> evaluateLatentRelation(TokenActivation fromOriginAct, Direction dir) {
         Document doc = (Document) fromOriginAct.getThought();
 

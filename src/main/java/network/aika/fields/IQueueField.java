@@ -1,8 +1,8 @@
 package network.aika.fields;
 
 
+import network.aika.FieldObject;
 import network.aika.callbacks.FieldObserver;
-import network.aika.neuron.activation.Element;
 import network.aika.steps.FieldStep;
 
 public interface IQueueField extends FieldOutput {
@@ -20,5 +20,5 @@ public interface IQueueField extends FieldOutput {
 
     void process();
 
-    Element getReference();
+    FieldObject getReference();
 }

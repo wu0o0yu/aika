@@ -16,6 +16,7 @@
  */
 package network.aika.neuron;
 
+import network.aika.FieldObject;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.direction.Direction;
@@ -34,6 +35,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.activation.Timestamp.MAX;
 import static network.aika.neuron.activation.Timestamp.MIN;
@@ -42,7 +44,7 @@ import static network.aika.neuron.activation.Timestamp.MIN;
  *
  * @author Lukas Molzberger
  */
-public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends Activation> implements Element, Writable {
+public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends Activation> extends FieldObject implements Element, Writable {
 
     protected NeuronProvider input;
     protected NeuronProvider output;
@@ -80,10 +82,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         if(propagateLinkExists(iAct))
             return;
 
-        OA oAct = getOutput().createActivation(iAct.getThought());
-        oAct.init(this, iAct);
+        Thought t = iAct.getThought();
+        OA oAct = getOutput().createAndInitActivation(t);
 
-        createLink(iAct, oAct);
+        createAndInitLink(iAct, oAct);
     }
 
     protected void warmUpRelatedInputNeurons(IA bs) {
@@ -191,22 +193,31 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
             throw new RuntimeException(e);
         }
 
-        s.init(input, output, this, weight.getCurrentValue());
+        s.initFromTemplate(input, output, this);
         return s;
     }
 
-    public S init(Neuron input, Neuron output, double initialWeight) {
-        return init(input, output, null, initialWeight);
-    }
-
-    public S init(Neuron input, Neuron output, S templateSyn, double initialWeight) {
-        setInput((I) input);
-        setOutput((O) output);
-        template = templateSyn;
+    protected void initFromTemplate(I input, O output, S templateSyn) {
+        setInput(input);
+        setOutput(output);
 
         link();
 
-        weight.setValue(initialWeight);
+        templateSyn.copyState(this);
+        connect(Direction.INPUT, false, false);
+        connect(Direction.OUTPUT, false, true);
+    }
+
+    public S init(Neuron input, Neuron output, double initialWeight) {
+        setInput((I) input);
+        setOutput((O) output);
+
+        link();
+
+        weight.setInitialValue(initialWeight);
+
+        connect(INPUT, true, false);
+        connect(OUTPUT, true, false);
 
         return (S) this;
     }
@@ -217,6 +228,20 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public abstract L createLink(IA input, OA output);
+
+    public L createAndInitLink(IA input, OA output) {
+        L l = createLink(input, output);
+        l.connect(INPUT, true, false);
+        l.connect(OUTPUT, true, true);
+        l.addInputLinkingStep();
+        return l;
+    }
+
+    public L createLinkFromTemplate(IA input, OA output, L template) {
+        L l = createLink(input, output);
+        l.initFromTemplate(template);
+        return l;
+    }
 
     public void setWeight(double w) {
         weight.setValue(w);
@@ -269,7 +294,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
                 output.getModel() :
                 null;
     }
-
 
     public SumField getWeight() {
         return weight;
