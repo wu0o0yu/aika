@@ -14,32 +14,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.neuron.activation;
+package network.aika.steps.activation;
 
-import network.aika.neuron.conjunctive.PatternCategoryInputSynapse;
-import network.aika.neuron.visitor.DownVisitor;
+import network.aika.neuron.activation.Activation;
+import network.aika.steps.Phase;
+import network.aika.steps.Step;
+
+import static network.aika.steps.Phase.POST_PROCESSING;
 
 
 /**
+ *
  * @author Lukas Molzberger
  */
-public class PatternCategoryInputLink extends AbstractPatternLink<PatternCategoryInputSynapse, CategoryActivation<?>> {
+public class InstantiationB extends Step<Activation> {
 
-    public PatternCategoryInputLink(PatternCategoryInputSynapse s, CategoryActivation input, PatternActivation output) {
-        super(s, input, output);
+
+    public static void add(Activation act) {
+        if(act.instantiationIsQueued)
+            return;
+
+        act.instantiationIsQueued = true;
+
+        Step.add(new InstantiationB(act));
+    }
+
+    public InstantiationB(Activation act) {
+        super(act);
     }
 
     @Override
-    protected void connectGradientFields() {
-        initForwardsGradient();
+    public void process() {
+        getElement()
+                .instantiateTemplateB();
 
-        super.connectGradientFields();
+        getElement().instantiationIsQueued = false;
     }
 
     @Override
-    public void addInputLinkingStep() {
-        super.addInputLinkingStep();
-
-        linkTemplateAndInstance(input.getCategoryInput());
+    public Phase getPhase() {
+        return POST_PROCESSING;
     }
 }

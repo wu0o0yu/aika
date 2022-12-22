@@ -31,6 +31,13 @@ public class BindingCategoryInputLink extends BindingNeuronLink<BindingCategoryI
     }
 
     @Override
+    public void addInputLinkingStep() {
+        super.addInputLinkingStep();
+
+        linkTemplateAndInstance(input.getCategoryInput());
+    }
+
+    @Override
     public void patternVisitDown(DownVisitor v) {
         v.next(this);
     }

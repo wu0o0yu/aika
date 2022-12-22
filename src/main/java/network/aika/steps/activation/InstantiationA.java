@@ -16,7 +16,7 @@
  */
 package network.aika.steps.activation;
 
-import network.aika.neuron.activation.Activation;
+import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
@@ -27,28 +27,32 @@ import static network.aika.steps.Phase.POST_PROCESSING;
  *
  * @author Lukas Molzberger
  */
-public class Instantiation extends Step<Activation> {
+public class InstantiationA extends Step<ConjunctiveActivation> {
 
-
-    public static void add(Activation act) {
+    public static void add(ConjunctiveActivation act) {
         if(act.instantiationIsQueued)
             return;
 
         act.instantiationIsQueued = true;
 
-        Step.add(new Instantiation(act));
+        if(act.getTemplateInstance() != null)
+            return;
+
+        Step.add(new InstantiationA(act));
     }
 
-    public Instantiation(Activation act) {
+    public InstantiationA(ConjunctiveActivation act) {
         super(act);
     }
 
     @Override
     public void process() {
         getElement()
-                .instantiateTemplate();
+                .instantiateTemplateA();
 
         getElement().instantiationIsQueued = false;
+
+        InstantiationB.add(getElement());
     }
 
     @Override

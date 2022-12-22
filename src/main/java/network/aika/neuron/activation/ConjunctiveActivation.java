@@ -19,9 +19,8 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
-import network.aika.steps.activation.Instantiation;
+import network.aika.steps.activation.InstantiationA;
 
-import static network.aika.fields.Fields.isTrue;
 
 /**
  *
@@ -38,17 +37,10 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
 
         if (getConfig().isMetaInstantiationEnabled() && n.isAbstract())
             isFinalAndFired.addEventListener(() ->
-                    Instantiation.add(this)
+                    InstantiationA.add(this)
             );
     }
 
-    public CategoryActivation getInputCategory() {
-        return inputLinks.values().stream()
-                .filter(l -> l.getInput() instanceof CategoryActivation)
-                .map(l -> (CategoryActivation) l.getInput())
-                .findAny()
-                .orElse(null);
-    }
     @Override
     public ConjunctiveActivation resolveAbstractInputActivation() {
         return neuron.isAbstract() ?
@@ -58,15 +50,6 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
 
     @Override
     public ConjunctiveActivation getTemplateInstance() {
-        if(templateInstance == null) {
-            CategoryActivation catBS = getInputCategory();
-
-            if (catBS == null)
-                return null;
-
-            DisjunctiveLink<?, ConjunctiveActivation<N>, ?> l = catBS.getInput();
-            templateInstance = l.getInput();
-        }
         return templateInstance;
     }
 
@@ -79,14 +62,14 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
     }
 
     @Override
-    public void instantiateTemplate() {
-        if(getTemplateInstance() != null)
-            return;
-
+    public void instantiateTemplateA() {
         N n = (N) neuron.instantiateTemplate();
 
         templateInstance = n.createActivation(getThought());
+    }
 
+    @Override
+    public void instantiateTemplateB() {
         getInputLinks()
                 .forEach(l -> {
                     Activation iAct = l.getInput().resolveAbstractInputActivation();
@@ -97,7 +80,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
                 });
 
         templateInstance.isFired.addEventListener(() -> {
-            n.setLabel(
+            templateInstance.getNeuron().setLabel(
                     getConfig().getLabel(this)
             );
         });
@@ -112,15 +95,5 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
                         s.createLinkFromTemplate(templateInstance, oAct, l);
                     }
                 });
-
-
-        getOutputLinks()
-                .map(l -> l.getOutput())
-                .filter(oAct -> oAct.getNeuron().isAbstract())
-                .filter(oAct -> isTrue(oAct.isFinalAndFired))
-                .forEach(oAct ->
-                        Instantiation.add(oAct)
-                );
-
     }
 }

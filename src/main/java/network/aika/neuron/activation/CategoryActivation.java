@@ -29,23 +29,23 @@ public class CategoryActivation<N extends CategoryNeuron<?, ?>> extends Disjunct
         super(id, t, neuron);
     }
 
-    @Override
-    public Range getRange() {
-        return inputLinks.values()
+    public ConjunctiveActivation getCategoryInput() {
+        return (ConjunctiveActivation) inputLinks.values()
                 .stream()
                 .map(l -> l.getInput())
-                .map(iAct -> iAct.getRange())
                 .findFirst()
                 .orElse(null);
     }
 
     @Override
+    public Range getRange() {
+        Activation iAct = getCategoryInput();
+        return iAct != null ? iAct.getRange() : null;
+    }
+
+    @Override
     public Integer getTokenPos() {
-        return inputLinks.values()
-                .stream()
-                .map(l -> l.getInput())
-                .map(iAct -> iAct.getTokenPos())
-                .findFirst()
-                .orElse(null);
+        Activation iAct = getCategoryInput();
+        return iAct != null ? iAct.getTokenPos() : null;
     }
 }

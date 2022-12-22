@@ -359,7 +359,10 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         return null;
     }
 
-    public void instantiateTemplate() {
+    public void instantiateTemplateA() {
+    }
+
+    public void instantiateTemplateB() {
     }
 
     public Thought getThought() {
