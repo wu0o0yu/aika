@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.callbacks.EventType.CREATE;
+import static network.aika.callbacks.EventType.UPDATE;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
@@ -160,6 +161,8 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
         thought.register(this);
         neuron.register(this);
+
+        thought.onElementEvent(CREATE, this);
     }
 
     protected void initNet() {
@@ -429,8 +432,9 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     public void initFromTemplate(Activation template) {
         setTemplate(template);
         template.copyState(this);
+        fired = template.fired;
         connect(Direction.INPUT, false, false);
-        template.getThought().onElementEvent(CREATE, this);
+        thought.onElementEvent(UPDATE, this);
     }
 
     public N getNeuron() {

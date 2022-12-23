@@ -21,6 +21,8 @@ import network.aika.direction.Direction;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.activation.text.TokenActivation;
 
+import static network.aika.callbacks.EventType.UPDATE;
+
 /**
  *
  * @author Lukas Molzberger
@@ -55,6 +57,7 @@ public class RelationInputSynapse extends BindingNeuronSynapse<
             LatentRelationActivation relAct = (LatentRelationActivation) getInput().createAndInitActivation(fromOriginAct.getThought());
             relAct.setFromAct(fromOriginAct);
             relAct.setToAct(toOriginAct);
+            fromOriginAct.getThought().onElementEvent(UPDATE, relAct);
             return relAct;
         });
     }

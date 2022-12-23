@@ -88,10 +88,6 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         currentStoredAt = newStoredAt;
     }
 
-    public double getSortingWeight() {
-        return getWeight().getUpdatedCurrentValue();
-    }
-
     @Override
     public double getSumOfLowerWeights() {
         return sumOfLowerWeights;

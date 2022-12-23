@@ -207,7 +207,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
     public A createAndInitActivation(Thought t) {
         A act = createActivation(t);
         act.connect(Direction.INPUT, true, false);
-        t.onElementEvent(CREATE, act);
 
         return act;
     }

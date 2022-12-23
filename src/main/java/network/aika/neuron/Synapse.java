@@ -269,6 +269,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return template.isOfTemplate(templateSynapse);
     }
 
+    public double getSortingWeight() {
+        return getWeight().getUpdatedCurrentValue();
+    }
+
     public Direction getStoredAt() {
         return INPUT;
     }

@@ -114,7 +114,7 @@ public class Document extends Thought {
     public TokenActivation addToken(TokenNeuron n, Integer pos, int begin, int end) {
         TokenActivation act = new TokenActivation(createActivationId(), pos, begin, end, this, n);
         act.connect(Direction.INPUT, true, false);
-        onElementEvent(CREATE, act);
+
         return act;
     }
 
