@@ -38,7 +38,7 @@ public class InactiveLinks extends Step<Activation> {
 
     @Override
     public Phase getPhase() {
-        return Phase.POST_PROCESSING;
+        return Phase.COUNTING;
     }
 
     @Override

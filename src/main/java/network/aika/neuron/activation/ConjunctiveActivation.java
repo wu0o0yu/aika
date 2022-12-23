@@ -66,6 +66,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         N n = (N) neuron.instantiateTemplate();
 
         templateInstance = n.createActivation(getThought());
+        templateInstance.template = this;
     }
 
     @Override
@@ -75,7 +76,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
                     Activation iAct = l.getInput().resolveAbstractInputActivation();
                     if(iAct != null) {
                         Synapse s = l.instantiateTemplate(iAct, templateInstance);
-                        s.createLinkFromTemplate(iAct, templateInstance, l);
+                        s.createLinkFromTemplate(iAct, templateInstance, l, false);
                     }
                 });
 
@@ -85,14 +86,16 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
             );
         });
 
+        templateInstance.initDummyLinks();
         templateInstance.initFromTemplate(this);
 
         getOutputLinks()
+                .filter(l -> !l.getOutput().getNeuron().isAbstract())
                 .forEach(l -> {
                     Activation oAct = l.getOutput().resolveAbstractInputActivation();
                     if(oAct != null) {
                         Synapse s = l.instantiateTemplate(templateInstance, oAct);
-                        s.createLinkFromTemplate(templateInstance, oAct, l);
+                        s.createLinkFromTemplate(templateInstance, oAct, l, true);
                     }
                 });
     }

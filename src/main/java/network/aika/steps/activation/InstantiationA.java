@@ -20,7 +20,7 @@ import network.aika.neuron.activation.ConjunctiveActivation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
-import static network.aika.steps.Phase.POST_PROCESSING;
+import static network.aika.steps.Phase.INSTANTIATION_A;
 
 
 /**
@@ -57,6 +57,6 @@ public class InstantiationA extends Step<ConjunctiveActivation> {
 
     @Override
     public Phase getPhase() {
-        return POST_PROCESSING;
+        return INSTANTIATION_A;
     }
 }

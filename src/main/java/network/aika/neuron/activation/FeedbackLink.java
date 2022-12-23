@@ -41,13 +41,6 @@ public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activat
     }
 
     @Override
-    public S instantiateTemplate(IA iAct, BindingActivation oAct) {
-        S instSyn = super.instantiateTemplate(iAct, oAct);
-        instSyn.initDummyLink(oAct);
-        return instSyn;
-    }
-
-    @Override
     public void selfRefVisitDown(SelfRefDownVisitor v) {
         if(checkVisited(v))
             return;

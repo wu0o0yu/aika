@@ -37,7 +37,7 @@ public class Save extends Step<Neuron> {
 
     @Override
     public Phase getPhase() {
-        return Phase.POST_PROCESSING;
+        return Phase.SAVE;
     }
 
     @Override

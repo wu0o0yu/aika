@@ -197,7 +197,9 @@ public abstract class Thought extends FieldObject {
     }
 
     private boolean checkMaxPhaseReached(Phase maxPhase) {
-        return maxPhase.compareTo(queue.firstEntry().getValue().getPhase()) < 0;
+        return maxPhase == null ?
+                false :
+                maxPhase.compareTo(queue.firstEntry().getValue().getPhase()) < 0;
     }
 
     /**
@@ -205,7 +207,7 @@ public abstract class Thought extends FieldObject {
      */
     public void postProcessing() {
         externalPhase = POST;
-        process(POST_PROCESSING);
+        process(null);
         externalPhase = NEUTRAL;
     }
 

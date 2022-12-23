@@ -20,7 +20,7 @@ import network.aika.neuron.activation.Activation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
-import static network.aika.steps.Phase.POST_PROCESSING;
+import static network.aika.steps.Phase.INSTANTIATION_B;
 
 
 /**
@@ -53,6 +53,6 @@ public class InstantiationB extends Step<Activation> {
 
     @Override
     public Phase getPhase() {
-        return POST_PROCESSING;
+        return INSTANTIATION_B;
     }
 }

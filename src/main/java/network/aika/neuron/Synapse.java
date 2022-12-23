@@ -237,9 +237,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return l;
     }
 
-    public L createLinkFromTemplate(IA input, OA output, L template) {
+    public L createLinkFromTemplate(IA input, OA output, L template, boolean connectOutput) {
         L l = createLink(input, output);
-        l.initFromTemplate(template);
+        l.initFromTemplate(template, connectOutput);
         return l;
     }
 

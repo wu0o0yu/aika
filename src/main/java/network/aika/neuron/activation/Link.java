@@ -156,10 +156,11 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return s;
     }
 
-    public void initFromTemplate(Link template) {
+    public void initFromTemplate(Link template, boolean connectOutput) {
         template.copyState(this);
         connect(Direction.INPUT, false, false);
-        connect(Direction.OUTPUT, false, true);
+        if(connectOutput)
+            connect(Direction.OUTPUT, false, true);
     }
 
     public abstract void connectWeightUpdate();

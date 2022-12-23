@@ -151,12 +151,12 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
         backwardsGradientOut = new QueueSumField(this, "Backwards-Gradient-Out");
 
-        if (getConfig().isTrainingEnabled())
-            isFinal.addEventListener(() -> {
-                        connectGradientFields();
-                        connectWeightUpdate();
-                    }
-            );
+        if (getConfig().isTrainingEnabled()) {
+            connectGradientFields();
+            connectWeightUpdate();
+        }
+
+        initDummyLinks();
 
         thought.register(this);
         neuron.register(this);
@@ -165,6 +165,9 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     protected void initNet() {
         netUB = new ValueSortedQueueField(this, "net UB");
         netLB = new ValueSortedQueueField(this, "net LB");
+    }
+
+    protected void initDummyLinks() {
     }
 
     public void setNet(double v) {
