@@ -25,7 +25,6 @@ import network.aika.neuron.activation.CategoryActivation;
  */
 public class PatternCategoryNeuron extends CategoryNeuron<PatternCategorySynapse, CategoryActivation> {
 
-
     @Override
     public CategoryActivation createActivation(Thought t) {
         return new CategoryActivation(t.createActivationId(), t, this);

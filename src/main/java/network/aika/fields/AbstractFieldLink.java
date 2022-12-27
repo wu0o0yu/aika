@@ -62,7 +62,8 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
     }
 
     public void connect(boolean initialize) {
-        assert !connected;
+        if(connected)
+            return;
 
         if(initialize) {
             double cv = input.getCurrentValue();
@@ -74,7 +75,8 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
     }
 
     public void disconnect(boolean deinitialize) {
-        assert connected;
+        if(!connected)
+            return;
 
         if(deinitialize) {
             double cv = input.getCurrentValue();

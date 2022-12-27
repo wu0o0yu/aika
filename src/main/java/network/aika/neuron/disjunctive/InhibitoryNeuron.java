@@ -34,4 +34,9 @@ public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitorySynapse, Inhib
     public ActivationFunction getActivationFunction() {
         return ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
     }
+
+    @Override
+    public boolean isTrainingAllowed() {
+        return false;
+    }
 }

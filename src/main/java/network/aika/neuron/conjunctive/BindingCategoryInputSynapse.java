@@ -39,4 +39,9 @@ public class BindingCategoryInputSynapse extends BindingNeuronSynapse<
     public BindingCategoryInputLink createLink(CategoryActivation input, BindingActivation output) {
         return new BindingCategoryInputLink(this, input, output);
     }
+
+    @Override
+    public boolean isTrainingAllowed() {
+        return false;
+    }
 }

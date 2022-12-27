@@ -56,7 +56,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
                     setModified()
             );
 
-    protected boolean allowTraining = true;
+    protected boolean trainingAllowed = true;
 
     protected Scope scope;
 
@@ -237,9 +237,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return l;
     }
 
-    public L createLinkFromTemplate(IA input, OA output, L template, boolean connectOutput) {
+    public L createLinkFromTemplate(IA input, OA output, L template) {
         L l = createLink(input, output);
-        l.initFromTemplate(template, connectOutput);
+        l.initFromTemplate(template);
         return l;
     }
 
@@ -247,12 +247,12 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         weight.setValue(w);
     }
 
-    public boolean isAllowTraining() {
-        return allowTraining;
+    public boolean isTrainingAllowed() {
+        return trainingAllowed && getOutput().isTrainingAllowed();
     }
 
-    public void setAllowTraining(boolean allowTraining) {
-        this.allowTraining = allowTraining;
+    public void setTrainingAllowed(boolean trainingAllowed) {
+        this.trainingAllowed = trainingAllowed;
     }
 
     public S getTemplate() {

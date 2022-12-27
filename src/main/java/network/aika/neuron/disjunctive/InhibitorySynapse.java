@@ -55,7 +55,6 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
         return type;
     }
 
-
     @Override
     public void startVisitor(LinkingOperator c, Activation bs) {
         new InhibitoryDownVisitor(bs.getThought(), c)
@@ -73,7 +72,6 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
     public InhibitoryLink createLink(BindingActivation input, InhibitoryActivation output) {
         return new InhibitoryLink(this, input, output);
     }
-
 
     @Override
     public void write(DataOutput out) throws IOException {

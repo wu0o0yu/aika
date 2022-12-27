@@ -29,4 +29,9 @@ public abstract class CategoryNeuron<S extends CategorySynapse, A extends Catego
 
     public CategoryNeuron() {
     }
+
+    @Override
+    public boolean isTrainingAllowed() {
+        return false;
+    }
 }

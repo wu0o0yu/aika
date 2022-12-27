@@ -18,7 +18,6 @@ package network.aika.steps;
 
 import network.aika.fields.IQueueField;
 import network.aika.neuron.activation.Element;
-import network.aika.fields.QueueField;
 
 /**
  *

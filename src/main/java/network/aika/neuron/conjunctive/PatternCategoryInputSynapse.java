@@ -35,4 +35,9 @@ public class PatternCategoryInputSynapse extends AbstractPatternSynapse<
     public PatternCategoryInputLink createLink(CategoryActivation input, PatternActivation output) {
         return new PatternCategoryInputLink(this, input, output);
     }
+
+    @Override
+    public boolean isTrainingAllowed() {
+        return false;
+    }
 }

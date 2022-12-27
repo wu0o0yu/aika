@@ -26,14 +26,14 @@ import java.util.Comparator;
 public class MinMaxField extends SumField {
 
     MinMax mode;
-    private FieldLink selectedInput;
+    private AbstractFieldLink selectedInput;
 
     public MinMaxField(FieldObject ref, MinMax m, String label) {
         super(ref, label);
         mode = m;
     }
 
-    public FieldLink getSelectedInput() {
+    public AbstractFieldLink getSelectedInput() {
         return selectedInput;
     }
 
@@ -41,12 +41,13 @@ public class MinMaxField extends SumField {
         return mode;
     }
 
-    public void receiveUpdate(FieldLink fl, double u) {
+    @Override
+    public void receiveUpdate(AbstractFieldLink fl, double u) {
         computeUpdate(fl);
         triggerUpdate();
     }
 
-    private void computeUpdate(FieldLink fl) {
+    private void computeUpdate(AbstractFieldLink fl) {
         double inputNV = fl.getInput().getNewValue();
 
         if(selectedInput == null) {
@@ -57,7 +58,7 @@ public class MinMaxField extends SumField {
 
         double outputOV = selectedInput.getCurrentInputValue();
 
-        FieldLink mFL = compare(inputNV, outputOV) ?
+        AbstractFieldLink mFL = compare(inputNV, outputOV) ?
             fl :
             getInputs().stream()
                     .max(getComparator())

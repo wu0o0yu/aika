@@ -26,7 +26,6 @@ import network.aika.neuron.visitor.linking.LinkingOperator;
  */
 public class BindingCategorySynapse extends CategorySynapse<BindingCategorySynapse, BindingNeuron, BindingCategoryNeuron, BindingActivation, BindingCategoryActivation> {
 
-
     @Override
     public BindingCategoryLink createLink(BindingActivation input, BindingCategoryActivation output) {
         return new BindingCategoryLink(this, input, output);

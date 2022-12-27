@@ -39,10 +39,8 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
     }
 
     public void connectFields(InhibitoryLink in, NegativeFeedbackLink out) {
-        if(
-                in.getInput().isSelfRef(out.getOutput()) ||
-                out.getOutput().isSelfRef(in.getInput())
-        ) return;
+        if(isSelfRef(in.getInput(), out.getOutput()))
+            return;
 
         FieldLink.link(in.netUB, out.maxInputUB);
         FieldLink.link(in.netLB, out.maxInputLB);

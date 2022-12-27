@@ -28,7 +28,6 @@ import network.aika.neuron.conjunctive.PatternNeuron;
  */
 public class PatternCategorySynapse extends CategorySynapse<PatternCategorySynapse, PatternNeuron, PatternCategoryNeuron, PatternActivation, CategoryActivation> {
 
-
     @Override
     public PatternCategoryLink createLink(PatternActivation input, CategoryActivation output) {
         return new PatternCategoryLink(this, input, output);

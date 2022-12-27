@@ -152,7 +152,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
         backwardsGradientOut = new QueueSumField(this, "Backwards-Gradient-Out");
 
-        if (getConfig().isTrainingEnabled()) {
+        if (getConfig().isTrainingEnabled() && neuron.isTrainingAllowed()) {
             connectGradientFields();
             connectWeightUpdate();
         }
@@ -182,6 +182,13 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         SelfRefDownVisitor v = new SelfRefDownVisitor(oAct);
         v.start(this);
         return v.isSelfRef();
+    }
+
+    public static boolean isSelfRef(BindingActivation in, BindingActivation out) {
+        return in.isSelfRef(out) ||
+                out.isSelfRef(in) ||
+                in.templateInstance == out.template ||
+                in.template == out.templateInstance;
     }
 
     public Activation<N> resolveAbstractInputActivation() {
@@ -242,7 +249,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         updateValue = scale(
                 this,
                 "learn-rate * og",
-                getConfig().getLearnRate(),
+                getConfig().getLearnRate(neuron.isAbstract()),
                 getOutputGradient()
         );
 

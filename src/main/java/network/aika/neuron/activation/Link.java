@@ -64,12 +64,10 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
             initWeightInputUB();
             initWeightInputLB();
 
-            if (getConfig().isTrainingEnabled() && getSynapse().isAllowTraining())
-                output.isFinal.addEventListener(() -> {
-                            connectGradientFields();
-                            connectWeightUpdate();
-                        }
-                );
+            if (getConfig().isTrainingEnabled() && getSynapse().isTrainingAllowed()) {
+                connectGradientFields();
+                connectWeightUpdate();
+            }
         }
 
         getThought().onElementEvent(CREATE, this);
@@ -156,11 +154,10 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return s;
     }
 
-    public void initFromTemplate(Link template, boolean connectOutput) {
+    public void initFromTemplate(Link template) {
         template.copyState(this);
         connect(Direction.INPUT, false, false);
-        if(connectOutput)
-            connect(Direction.OUTPUT, false, true);
+        connect(Direction.OUTPUT, false, true);
     }
 
     public abstract void connectWeightUpdate();

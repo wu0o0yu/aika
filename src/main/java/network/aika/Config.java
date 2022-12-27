@@ -26,9 +26,17 @@ public class Config {
     private Double alpha = null; //0.99;
     private double learnRate;
 
+    private double learnRateForAbstract;
+
     private boolean trainingEnabled;
     private boolean countingEnabled;
     private boolean metaInstantiationEnabled;
+
+
+    public double getLearnRate(boolean isAbstract) {
+        return isAbstract ? learnRateForAbstract : learnRate;
+    }
+
 
     public double getLearnRate() {
         return learnRate;
@@ -36,6 +44,15 @@ public class Config {
 
     public Config setLearnRate(double learnRate) {
         this.learnRate = learnRate;
+        return this;
+    }
+
+    public double getLearnRateForAbstract() {
+        return learnRateForAbstract;
+    }
+
+    public Config setLearnRateForAbstract(double learnRate) {
+        this.learnRateForAbstract = learnRateForAbstract;
         return this;
     }
 

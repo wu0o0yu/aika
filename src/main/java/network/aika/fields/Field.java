@@ -59,11 +59,6 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         initIO(weakRefs);
     }
 
-    public Field setInitialValue(double initialValue) {
-        currentValue = initialValue;
-        return this;
-    }
-
     public Field addListener(FieldOnTrueEvent fieldListener) {
         addOutput(createEventListener(this, fieldListener));
         return this;
@@ -71,6 +66,12 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
 
     protected void initIO(boolean weakRefs) {
         receivers = new ArrayList<>();
+    }
+
+    public Field setInitialValue(double initialValue) {
+        currentValue = initialValue;
+        newValue = initialValue;
+        return this;
     }
 
     public void setCurrentValue(double currentValue) {

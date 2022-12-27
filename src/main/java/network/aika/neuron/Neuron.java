@@ -202,11 +202,16 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
         return false;
     }
 
+    public boolean isTrainingAllowed() {
+        return true;
+    }
+
     public abstract A createActivation(Thought t);
 
     public A createAndInitActivation(Thought t) {
         A act = createActivation(t);
-        act.connect(Direction.INPUT, true, false);
+        act.connect(INPUT, true, false);
+        act.connect(OUTPUT, true, true);
 
         return act;
     }
