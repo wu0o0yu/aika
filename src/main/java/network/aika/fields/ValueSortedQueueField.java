@@ -17,6 +17,7 @@
 package network.aika.fields;
 
 import network.aika.FieldObject;
+import network.aika.steps.Phase;
 import network.aika.utils.Utils;
 
 /**
@@ -24,8 +25,8 @@ import network.aika.utils.Utils;
  */
 public class ValueSortedQueueField extends QueueSumField {
 
-    public ValueSortedQueueField(FieldObject e, String label) {
-        super(e, label);
+    public ValueSortedQueueField(FieldObject e, Phase p, String label) {
+        super(e, p, label);
     }
 
     @Override

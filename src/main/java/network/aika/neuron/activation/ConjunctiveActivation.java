@@ -19,7 +19,6 @@ package network.aika.neuron.activation;
 import network.aika.Thought;
 import network.aika.neuron.Synapse;
 import network.aika.neuron.conjunctive.ConjunctiveNeuron;
-import network.aika.steps.activation.InstantiationA;
 
 
 /**
@@ -34,11 +33,6 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
 
     public ConjunctiveActivation(int id, Thought t, N n) {
         super(id, t, n);
-
-        if (getConfig().isMetaInstantiationEnabled() && n.isAbstract())
-            isFinalAndFired.addEventListener(() ->
-                    InstantiationA.add(this)
-            );
     }
 
     @Override
@@ -55,6 +49,12 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
 
     public ConjunctiveActivation<N> getTemplate() {
         return template;
+    }
+
+    public boolean isInstanceOf(ConjunctiveActivation templateAct) {
+        return template != null &&
+                templateAct.templateInstance != null &&
+                template == templateAct.templateInstance;
     }
 
     public void setTemplate(Activation template) {

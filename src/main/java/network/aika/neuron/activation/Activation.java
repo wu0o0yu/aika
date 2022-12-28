@@ -38,6 +38,8 @@ import static network.aika.callbacks.EventType.UPDATE;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.*;
 import static network.aika.neuron.activation.Timestamp.NOT_SET;
+import static network.aika.steps.Phase.INFERENCE;
+import static network.aika.steps.Phase.TRAINING;
 
 /**
  * @author Lukas Molzberger
@@ -53,21 +55,13 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     protected Timestamp created = NOT_SET;
     protected Timestamp fired = NOT_SET;
 
-    protected FieldOutput valueUB;
-    protected FieldOutput valueLB;
+    protected FieldOutput value;
 
-    protected SumField netUB;
-    protected SumField netLB;
-
-    private FieldOutput netDiff;
+    protected SumField net;
 
     protected FieldOutput isFired;
     protected FieldOutput isFiredForWeight;
     protected FieldOutput isFiredForBias;
-
-    protected FieldOutput isFinal;
-
-    protected FieldOutput isFinalAndFired;
 
     protected FieldFunction netOuterGradient;
     protected SumField forwardsGradient;
@@ -96,10 +90,9 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
         initNet();
 
-        FieldLink.link(getNeuron().getBias(), netUB);
-        FieldLink.link(getNeuron().getBias(), netLB);
+        FieldLink.link(getNeuron().getBias(), net);
 
-        isFired = threshold(this, "isFired", 0.0, ABOVE, netUB);
+        isFired = threshold(this, "isFired", 0.0, ABOVE, net);
 
         isFired.addEventListener(() -> {
                     fired = thought.getCurrentTimestamp();
@@ -121,36 +114,18 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 x -> (x * -1.0) + 1.0
         );
 
-        initFields();
-
-        netDiff = sub(
+        value = func(
                 this,
-                "netDiff",
-                netUB,
-                netLB
+                "value = f(net)",
+                net,
+                x -> getActivationFunction().f(x)
         );
 
-        isFinal = threshold(
-                this,
-                "isFinal",
-                0.01,
-                BELOW,
-                true,
-                netDiff
-        );
-
-        isFinalAndFired = mul(
-                this,
-                "final and fired",
-                isFinal,
-                isFired
-        );
-
-        forwardsGradient = new QueueSumField(this, "Forwards-Gradient");
-        backwardsGradientIn = (SumField) new QueueSumField(this, "Backwards-Gradient-In")
+        forwardsGradient = new QueueSumField(this, TRAINING, "Forwards-Gradient");
+        backwardsGradientIn = (SumField) new QueueSumField(this, TRAINING, "Backwards-Gradient-In")
                 .setInitialValue(0.0);
 
-        backwardsGradientOut = new QueueSumField(this, "Backwards-Gradient-Out");
+        backwardsGradientOut = new QueueSumField(this, TRAINING, "Backwards-Gradient-Out");
 
         if (getConfig().isTrainingEnabled() && neuron.isTrainingAllowed()) {
             connectGradientFields();
@@ -166,16 +141,14 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     }
 
     protected void initNet() {
-        netUB = new ValueSortedQueueField(this, "net UB");
-        netLB = new ValueSortedQueueField(this, "net LB");
+        net = new ValueSortedQueueField(this, INFERENCE, "net");
     }
 
     protected void initDummyLinks() {
     }
 
     public void setNet(double v) {
-        netUB.setValue(v);
-        netLB.setValue(v);
+        net.setValue(v);
     }
 
     public boolean isSelfRef(BindingActivation oAct) {
@@ -187,8 +160,8 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     public static boolean isSelfRef(BindingActivation in, BindingActivation out) {
         return in.isSelfRef(out) ||
                 out.isSelfRef(in) ||
-                in.templateInstance == out.template ||
-                in.template == out.templateInstance;
+                in.isInstanceOf(out) ||
+                out.isInstanceOf(in);
     }
 
     public Activation<N> resolveAbstractInputActivation() {
@@ -232,7 +205,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 func(
                         this,
                         "f'(net)",
-                        netUB,
+                        net,
                         x -> getNeuron().getActivationFunction().outerGrad(x)
         );
 
@@ -273,33 +246,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         return isFiredForBias;
     }
 
-    public FieldOutput getNetDiff() {
-        return netDiff;
-    }
-
-    public FieldOutput getIsFinal() {
-        return isFinal;
-    }
-
-    public FieldOutput getIsFinalAndFired() {
-        return isFinalAndFired;
-    }
-
-    protected void initFields() {
-        valueUB = func(
-                this,
-                "value = f(netUB)",
-                netUB,
-                x -> getActivationFunction().f(x)
-        );
-        valueLB = func(
-                this,
-                "value = f(netLB)",
-                netLB,
-                x -> getActivationFunction().f(x)
-        );
-    }
-
     public FieldFunction getNetOuterGradient() {
         return netOuterGradient;
     }
@@ -324,32 +270,16 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         return id;
     }
 
-    public FieldOutput getValue(boolean upperBound) {
-        return upperBound ? valueUB : valueLB;
-    }
-
-    public FieldOutput getValueUB() {
-        return valueUB;
-    }
-
-    public FieldOutput getValueLB() {
-        return valueLB;
+    public FieldOutput getValue() {
+        return value;
     }
 
     public boolean isInput() {
         return false;
     }
 
-    public SumField getNet(boolean upperBound) {
-        return upperBound ? netUB : netLB;
-    }
-
-    public SumField getNetUB() {
-        return netUB;
-    }
-
-    public SumField getNetLB() {
-        return netLB;
+    public SumField getNet() {
+        return net;
     }
 
     public Timestamp getCreated() {

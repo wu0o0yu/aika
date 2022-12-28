@@ -30,7 +30,7 @@ import java.util.List;
 
 import static network.aika.neuron.disjunctive.InhibSynType.INPUT;
 import static network.aika.neuron.disjunctive.InhibSynType.SAME;
-import static network.aika.steps.Phase.PROCESSING;
+import static network.aika.steps.Phase.INFERENCE;
 
 
 /**
@@ -60,10 +60,10 @@ public class TestUtils {
     public static void process(Document doc, List<TokenActivation> tokenActs) {
         for(TokenActivation tAct: tokenActs) {
             tAct.setNet(10.0);
-            doc.process(PROCESSING);
+            doc.process(INFERENCE);
         }
 
-        doc.anneal(0.05);
+        doc.anneal();
 
         doc.updateModel();
     }

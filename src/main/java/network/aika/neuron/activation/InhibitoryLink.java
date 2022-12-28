@@ -28,11 +28,9 @@ import static network.aika.fields.Fields.func;
  */
 public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingActivation, InhibitoryActivation> {
 
-    protected FieldOutput valueUB;
-    protected FieldOutput valueLB;
+    protected FieldOutput value;
 
-    protected AbstractFunction netUB;
-    protected AbstractFunction netLB;
+    protected AbstractFunction net;
 
     public InhibitoryLink(InhibitorySynapse s, BindingActivation input, InhibitoryActivation output) {
         super(s, input, output);
@@ -41,31 +39,17 @@ public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingAc
     }
 
     protected void initFields() {
-        netUB = add(
+        net = add(
                 this,
-                "netUB",
+                "net",
                 output.getNeuron().getBias(),
-                input.getValue(true)
+                input.getValue()
         );
 
-        netLB = add(
+        value = func(
                 this,
-                "netLB",
-                output.getNeuron().getBias(),
-                input.getValue(false)
-        );
-
-        valueUB = func(
-                this,
-                "value = f(netUB)",
-                netUB,
-                x -> output.getActivationFunction().f(x)
-        );
-
-        valueLB = func(
-                this,
-                "value = f(netLB)",
-                netLB,
+                "value = f(net)",
+                net,
                 x -> output.getActivationFunction().f(x)
         );
 
@@ -74,19 +58,11 @@ public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingAc
         );
     }
 
-    public FieldOutput getValueUB() {
-        return valueUB;
+    public FieldOutput getValue() {
+        return value;
     }
 
-    public FieldOutput getValueLB() {
-        return valueLB;
-    }
-
-    public FieldOutput getNetUB() {
-        return netUB;
-    }
-
-    public FieldOutput getNetLB() {
-        return netLB;
+    public FieldOutput getNet() {
+        return net;
     }
 }

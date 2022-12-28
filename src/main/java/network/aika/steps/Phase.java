@@ -3,9 +3,10 @@ package network.aika.steps;
 public enum Phase {
     INPUT_LINKING("IL"),
     OUTPUT_LINKING("OL"),
-    PROCESSING("P"),
+    INFERENCE("I"),
     INSTANTIATION_A("IA"),
     INSTANTIATION_B("IB"),
+    TRAINING("T"),
     COUNTING("C"),
     SAVE("S");
 

@@ -46,7 +46,7 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
         entropy = func(
                 this,
                 "Entropy",
-                netUB,
+                net,
                 x ->
                         getNeuron().getSurprisal(
                                 Sign.getSign(x),

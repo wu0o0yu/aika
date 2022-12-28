@@ -27,9 +27,12 @@ public class FieldStep<E extends Element> extends Step<E> {
 
     private IQueueField field;
 
-    public FieldStep(E e, IQueueField qf) {
+    private Phase phase;
+
+    public FieldStep(E e, Phase p, IQueueField qf) {
         super(e);
         this.field = qf;
+        this.phase = p;
         this.field.setStep(this);
     }
 
@@ -40,7 +43,7 @@ public class FieldStep<E extends Element> extends Step<E> {
 
     @Override
     public Phase getPhase() {
-        return Phase.PROCESSING;
+        return phase;
     }
 
     public String toString() {

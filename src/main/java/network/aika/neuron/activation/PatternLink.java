@@ -54,8 +54,8 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
         func(
                 this,
                 "Information-Gain",
-                input.netUB,
-                output.netUB,
+                input.net,
+                output.net,
                 (x1, x2) ->
                         synapse.getSurprisal(
                                 Sign.getSign(x1),

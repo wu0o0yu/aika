@@ -30,7 +30,6 @@ import network.aika.steps.link.LinkingIn;
 import static network.aika.callbacks.EventType.CREATE;
 import static network.aika.fields.FieldLink.link;
 import static network.aika.fields.Fields.*;
-import static network.aika.fields.ThresholdOperator.Type.ABOVE;
 import static network.aika.neuron.activation.Timestamp.FIRED_COMPARATOR;
 
 /**
@@ -44,13 +43,10 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected final I input;
     protected O output;
 
-    protected FieldOutput weightedInputUB;
-    protected FieldOutput weightedInputLB;
+    protected FieldOutput weightedInput;
 
     protected SumField forwardsGradient;
     protected AbstractFunction backwardsGradient;
-
-    protected ThresholdOperator onTransparent;
 
     public Link(S s, I input, O output) {
         this.synapse = s;
@@ -60,9 +56,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         init();
 
         if(input != null && output != null) {
-            initOnTransparent();
-            initWeightInputUB();
-            initWeightInputLB();
+            initWeightInput();
 
             if (getConfig().isTrainingEnabled() && getSynapse().isTrainingAllowed()) {
                 connectGradientFields();
@@ -108,24 +102,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         v.next(this);
     }
 
-
-    protected void initOnTransparent() {
-        AbstractFunction weightIfIsFired = mul(
-                this,
-                "isFired * weight",
-                synapse.getWeight(),
-                input.isFired
-        );
-
-        onTransparent = threshold(
-                this,
-                "onTransparent",
-                0.0,
-                ABOVE,
-                weightIfIsFired
-        );
-    }
-
     protected void connectGradientFields() {
     }
 
@@ -162,21 +138,16 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     public abstract void connectWeightUpdate();
 
-    protected void initWeightInputUB() {
-        weightedInputUB = initWeightedInput(true);
-        link(weightedInputUB, getOutput().getNet(true));
+    protected void initWeightInput() {
+        weightedInput = initWeightedInput();
+        link(weightedInput, getOutput().getNet());
     }
 
-    protected void initWeightInputLB() {
-        weightedInputLB = initWeightedInput(false);
-        link(weightedInputLB, getOutput().getNet(false));
-    }
-
-    protected FieldOutput initWeightedInput(boolean upperBound) {
+    protected FieldOutput initWeightedInput() {
         Multiplication weightedInput = mul(
                 this,
-                "iAct(id:" + getInput().getId() + ").value" + (upperBound ? "UB" : "LB") + " * s.weight",
-                getInputValue(upperBound),
+                "iAct(id:" + getInput().getId() + ").value * s.weight",
+                getInputValue(),
                 synapse.getWeight()
         );
 
@@ -191,20 +162,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
             linkOutput();
     }
 
-    public FieldOutput getOnTransparent() {
-        return onTransparent;
-    }
-
-    public FieldOutput getWeightedInput(boolean upperBound) {
-        return upperBound ? weightedInputUB : weightedInputLB;
-    }
-
-    public FieldOutput getWeightedInputUB() {
-        return weightedInputUB;
-    }
-
-    public FieldOutput getWeightedInputLB() {
-        return weightedInputLB;
+    public FieldOutput getWeightedInput() {
+        return weightedInput;
     }
 
     public Field getForwardsGradient() {
@@ -224,8 +183,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return isCausal() ? input.getCreated() : output.getCreated();
     }
 
-    public FieldOutput getInputValue(boolean upperBound) {
-        return input.getValue(upperBound);
+    public FieldOutput getInputValue() {
+        return input.getValue();
     }
 
     public S getSynapse() {

@@ -31,8 +31,7 @@ import static network.aika.fields.ThresholdOperator.Type.ABOVE;
  */
 public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, InhibitoryActivation> {
 
-    MinMaxField maxInputUB;
-    MinMaxField maxInputLB;
+    MinMaxField maxInput;
 
     public NegativeFeedbackLink(NegativeFeedbackSynapse s, InhibitoryActivation input, BindingActivation output) {
         super(s, input, output);
@@ -43,54 +42,30 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
     }
 
     @Override
-    protected void initWeightInputUB() {
-        maxInputLB = new MinMaxField(this, MinMax.MIN, "minLB");
+    protected void initWeightInput() {
+        maxInput = new MinMaxField(this, MinMax.MAX, "max");
 
-        weightedInputUB = initWeightedInput(false);
-        link(
-                weightedInputUB,
-                getOutput().getNet(true)
-        );
-    }
-
-    @Override
-    protected void initWeightInputLB() {
-        maxInputUB = new MinMaxField(this, MinMax.MAX, "maxUB");
-
-        weightedInputLB = mul(
+        weightedInput = mul(
                 this,
-                "!annealing * x * weight",
-                getThought().getAnnealingInverted(),
-                initWeightedInput(true)
+                "annealing * iAct(id:" + getInput().getId() + ").value * weight",
+                getThought().getAnnealing(),
+                initWeightedInput()
         );
 
         link(
-                weightedInputLB,
-                getOutput().getNet(false)
+                weightedInput,
+                getOutput().getNet()
         );
     }
 
     @Override
-    public FieldOutput getInputValue(boolean upperBound) {
-        return upperBound ?
-                maxInputUB :
-                maxInputLB;
+    public FieldOutput getInputValue() {
+        return maxInput;
     }
 
     @Override
     public void bindingVisitUp(UpVisitor v) {
         // don't allow negative feedback links to create new links; i.d. do nothing
-    }
-
-    @Override
-    protected void initOnTransparent() {
-        onTransparent = threshold(
-                this,
-                "onTransparent",
-                0.0,
-                ABOVE,
-                input.isFired
-        );
     }
 
     @Override
@@ -111,11 +86,7 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
         );
     }
 
-    public MinMaxField getMaxInputUB() {
-        return maxInputUB;
-    }
-
-    public MinMaxField getMaxInputLB() {
-        return maxInputLB;
+    public MinMaxField getMaxInput() {
+        return maxInput;
     }
 }

@@ -39,26 +39,15 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
     }
 
     @Override
-    protected void initOnTransparent() {
-        onTransparent = threshold(
+    protected void initWeightInput() {
+        weightedInput = mul(
                 this,
-                "onTransparent",
-                0.0,
-                ABOVE,
-                synapse.getWeight()
-        );
-    }
-
-    @Override
-    protected void initWeightInputUB() {
-        weightedInputUB = mul(
-                this,
-                "!annealing * x * weight",
-                getThought().getAnnealingInverted(),
-                initWeightedInput(true)
+                "isClosed * iAct(id:" + getInput().getId() + ").value * weight",
+                getThought().getIsClosed(),
+                initWeightedInput()
         );
 
-        link(weightedInputUB, getOutput().getNet(true));
+        link(weightedInput, getOutput().getNet());
     }
 
     @Override

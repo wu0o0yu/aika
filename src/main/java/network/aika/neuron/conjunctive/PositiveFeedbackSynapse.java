@@ -16,8 +16,12 @@
  */
 package network.aika.neuron.conjunctive;
 
+import network.aika.fields.FieldLink;
+import network.aika.fields.Multiplication;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.visitor.linking.LinkingOperator;
+
+import static network.aika.fields.Fields.mul;
 
 /**
  *
@@ -39,6 +43,18 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
     }
 
     @Override
+    public void initDummyLink(BindingActivation oAct) {
+        Multiplication dummyWeight = mul(
+                oAct,
+                "pos-feedback-dummy",
+                oAct.getThought().getIsOpen(),
+                getWeight()
+        );
+
+        FieldLink.link(dummyWeight, -1, oAct.getNet());
+    }
+
+    @Override
     public void linkAndPropagateOut(PatternActivation bs) {
     }
 
@@ -47,12 +63,7 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
     }
 
     @Override
-    protected boolean getDummyLinkUB() {
-        return true;
-    }
-
-    @Override
-    public double getPreNetUBDummyWeight() {
+    public double getPreNetDummyWeight() {
         return weight.getCurrentValue();
     }
 

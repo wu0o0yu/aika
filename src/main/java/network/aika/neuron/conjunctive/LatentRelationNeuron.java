@@ -26,6 +26,8 @@ import network.aika.neuron.activation.text.TokenActivation;
 
 import java.util.stream.Stream;
 
+import static network.aika.steps.Phase.TRAINING;
+
 /**
  *
  * @author Lukas Molzberger
@@ -57,7 +59,7 @@ public abstract class LatentRelationNeuron extends BindingNeuron {
 
     @Override
     protected SumField initBias() {
-        return (SumField) new QueueSumField(this, "bias")
+        return (SumField) new QueueSumField(this, TRAINING, "bias")
                 .setInitialValue(10.0);
     }
 

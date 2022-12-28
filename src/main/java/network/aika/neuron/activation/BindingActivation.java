@@ -31,8 +31,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     private boolean isInput;
 
-    protected Field mixedNetLB;
-
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
     }
@@ -53,30 +51,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         v.up(this);
     }
 
-    @Override
-    protected void initFields() {
-        mixedNetLB = mix(
-                this,
-                "mixedNetLB",
-                thought.getAnnealing(),
-                netLB,
-                netUB
-        );
-
-        valueUB = func(
-                this,
-                "value = f(mixedNetUB)",
-                netUB,
-                x -> getActivationFunction().f(x)
-        );
-        valueLB = func(
-                this,
-                "value = f(mixedNetLB)",
-                mixedNetLB,
-                x -> getActivationFunction().f(x)
-        );
-    }
-
     protected void initDummyLinks() {
         neuron.getInputSynapsesAsStream()
                 .forEach(s ->
@@ -92,12 +66,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         isInput = input;
     }
 
-    public Field getMixedNetLB() {
-        return mixedNetLB;
-    }
-
     public void updateBias(double u) {
-        getNetUB().receiveUpdate(u);
-        getNetLB().receiveUpdate(u);
+        getNet().receiveUpdate(u);
     }
 }

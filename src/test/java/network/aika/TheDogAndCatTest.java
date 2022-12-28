@@ -29,7 +29,6 @@ import java.util.TreeMap;
 import static network.aika.TestHelper.initPatternTheCat;
 import static network.aika.TestHelper.initPatternTheDog;
 import static network.aika.TestUtils.*;
-import static network.aika.steps.Phase.PROCESSING;
 
 
 /**

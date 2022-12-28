@@ -21,6 +21,7 @@ import network.aika.FieldObject;
 import network.aika.callbacks.FieldObserver;
 import network.aika.neuron.activation.Element;
 import network.aika.steps.FieldStep;
+import network.aika.steps.Phase;
 import network.aika.steps.Step;
 import network.aika.utils.Utils;
 
@@ -37,14 +38,14 @@ public abstract class QueueField extends Field implements IQueueField {
 
     protected List<FieldObserver> observers = new ArrayList<>();
 
-    public QueueField(FieldObject e, String label) {
+    public QueueField(FieldObject e, Phase p, String label) {
         super(e, label);
-        step = new FieldStep((Element) e, this);
+        step = new FieldStep((Element) e, p, this);
     }
 
-    public QueueField(FieldObject e, String label, boolean weakRefs) {
+    public QueueField(FieldObject e, Phase p, String label, boolean weakRefs) {
         super(e, label, weakRefs);
-        step = new FieldStep((Element) e, this);
+        step = new FieldStep((Element) e, p, this);
     }
 
 

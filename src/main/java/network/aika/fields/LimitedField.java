@@ -17,6 +17,7 @@
 package network.aika.fields;
 
 import network.aika.FieldObject;
+import network.aika.steps.Phase;
 
 
 /**
@@ -27,8 +28,8 @@ public class LimitedField extends QueueSumField {
     private double limit;
 
 
-    public LimitedField(FieldObject refObj, String label, double limit) {
-        super(refObj, label);
+    public LimitedField(FieldObject refObj, Phase p, String label, double limit) {
+        super(refObj, p, label);
         this.limit = limit;
     }
 

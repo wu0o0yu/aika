@@ -36,12 +36,12 @@ public class QueueSortTest {
         testQueue.put(new TestQueueKey(337l, 316, 0.0, 384), 2);
 */
 
-        QueueKey tqk3 = new QueueKey(Phase.PROCESSING, null, 36, -1802, 78);
+        QueueKey tqk3 = new QueueKey(Phase.INFERENCE, null, 36, -1802, 78);
 
         testQueue.put(tqk3, 3);
 
-        testQueue.put(new QueueKey(Phase.PROCESSING, null, 386, 0, 393), 2);
-        testQueue.put(new QueueKey(Phase.PROCESSING, 6l, 2, 0, 339), 1);
+        testQueue.put(new QueueKey(Phase.INFERENCE, null, 386, 0, 393), 2);
+        testQueue.put(new QueueKey(Phase.INFERENCE, 6l, 2, 0, 339), 1);
 
         System.out.println();
 

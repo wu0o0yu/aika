@@ -54,11 +54,6 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
     }
 
     @Override
-    protected boolean getDummyLinkUB() {
-        return false;
-    }
-
-    @Override
     public void setWeight(double w) {
         weight.receiveUpdate(w);
     }

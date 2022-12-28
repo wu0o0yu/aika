@@ -50,7 +50,7 @@ import java.util.TreeMap;
 
 import static network.aika.TestUtils.*;
 import static network.aika.neuron.disjunctive.InhibSynType.INPUT;
-import static network.aika.steps.Phase.PROCESSING;
+import static network.aika.steps.Phase.INFERENCE;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -151,7 +151,7 @@ public class MutualExclusionTest {
         SortedSet<BindingActivation> nbActs = nb.getActivations(doc);
         Activation nbAct = nbActs.iterator().next();
 
-        assertTrue(nbAct.getValue(true).getCurrentValue() > 0.38);
+        assertTrue(nbAct.getValue().getCurrentValue() > 0.38);
     }
 
 
@@ -222,9 +222,9 @@ public class MutualExclusionTest {
 
         TokenActivation tAct = doc.addToken(in, 0, 0, 4);
         tAct.setNet(10.0);
-        doc.process(PROCESSING);
+        doc.process(INFERENCE);
 
-        doc.anneal(0.05);
+        doc.anneal();
 
         doc.postProcessing();
         doc.updateModel();

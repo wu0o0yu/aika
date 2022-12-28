@@ -19,9 +19,7 @@ package network.aika;
 
 import network.aika.callbacks.EventListener;
 import network.aika.callbacks.EventType;
-import network.aika.fields.ConstantField;
-import network.aika.fields.Field;
-import network.aika.fields.FieldOutput;
+import network.aika.fields.*;
 import network.aika.neuron.PreActivation;
 import network.aika.neuron.NeuronProvider;
 import network.aika.neuron.Range;
@@ -29,14 +27,14 @@ import network.aika.neuron.activation.*;
 import network.aika.steps.Phase;
 import network.aika.steps.QueueKey;
 import network.aika.steps.Step;
+import network.aika.steps.activation.InstantiationA;
 
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static network.aika.ExternalPhase.*;
 import static network.aika.callbacks.EventType.*;
+import static network.aika.direction.Direction.INPUT;
 import static network.aika.fields.Fields.invert;
 import static network.aika.steps.Phase.*;
 
@@ -47,9 +45,9 @@ import static network.aika.steps.Phase.*;
 public abstract class Thought extends FieldObject {
 
     private Field annealing;
-    private FieldOutput annealingInverted;
+    private Field isOpen;
 
-    private ExternalPhase externalPhase = NEUTRAL;
+    private Field isClosed;
 
     protected final Model model;
 
@@ -75,8 +73,12 @@ public abstract class Thought extends FieldObject {
         id = model.createThoughtId();
         absoluteBegin = m.getN();
 
-        annealing = new ConstantField(this, "anneal", 1.0);
-        annealingInverted = invert(this, "!anneal", annealing);
+        isOpen = new ConstantField(this, "isOpen", 1.0);
+        isClosed = invert(this, "isClosed", isOpen);
+
+        annealing = new ConstantField(this, "anneal", 0.0);
+
+        connect(INPUT, true, false);
 
         assert m.getCurrentThought() == null;
         m.setCurrentThought(this);
@@ -98,12 +100,20 @@ public abstract class Thought extends FieldObject {
         return model;
     }
 
-    public Field getAnnealing() {
-        return annealing;
+    public Field getIsOpen() {
+        return isOpen;
     }
 
-    public FieldOutput getAnnealingInverted() {
-        return annealingInverted;
+    public Field getIsClosed() {
+        return isClosed;
+    }
+
+    public void setIsOpen(double isOpen) {
+        this.isOpen.setValue(isOpen);
+    }
+
+    public Field getAnnealing() {
+        return annealing;
     }
 
     public abstract int length();
@@ -126,14 +136,6 @@ public abstract class Thought extends FieldObject {
         callEventListener(el ->
                 el.onElementEvent(et, e)
         );
-    }
-
-    public ExternalPhase getExternalPhase() {
-        return externalPhase;
-    }
-
-    public void setExternalPhase(ExternalPhase externalPhase) {
-        this.externalPhase = externalPhase;
     }
 
     private void callEventListener(Consumer<EventListener> el) {
@@ -202,13 +204,15 @@ public abstract class Thought extends FieldObject {
                 maxPhase.compareTo(queue.firstEntry().getValue().getPhase()) < 0;
     }
 
+    public void train() {
+        process(TRAINING);
+    }
+
     /**
      * The postprocessing steps such as counting, cleanup or save are executed.
      */
     public void postProcessing() {
-        externalPhase = POST;
         process(null);
-        externalPhase = NEUTRAL;
     }
 
     public Timestamp getTimestampOnProcess() {
@@ -248,41 +252,67 @@ public abstract class Thought extends FieldObject {
     }
 
     public void disconnect() {
-        externalPhase = DISCONNECT;
         if(model.getCurrentThought() == this)
             model.setCurrentThought(null);
 
         getActivations().forEach(act ->
                 act.disconnect()
         );
-        externalPhase = NEUTRAL;
     }
 
-    public void anneal(double stepSize) {
-        externalPhase = ANNEAL;
-        anneal(stepSize, (act, x) ->
-                annealing.setValue(x)
-        );
-        externalPhase = NEUTRAL;
-    }
+    public void anneal() {
+        double maxAnnealStep;
 
-    private void anneal(double stepSize, BiConsumer<BindingActivation, Double> c) {
-        for(double x = 1.0; x > -0.001; x -= stepSize) {
-            final double xFinal = x;
-            getActivations().stream()
-                    .filter(act -> act instanceof BindingActivation)
-                    .map(act -> (BindingActivation)act)
-                    .forEach(act ->
-                            c.accept(act, xFinal)
-                    );
+        while(true) {
+            maxAnnealStep = Double.MAX_VALUE;
+            for (AbstractFieldLink fl : annealing.getReceivers()) {
+                if (!(fl.getOutput() instanceof Field))
+                    continue;
 
-            process(PROCESSING);
+                Field f = (Field) fl.getOutput();
+                NegativeFeedbackLink negFeedbackLink = (NegativeFeedbackLink) f.getReference();
+                double x = negFeedbackLink.getMaxInput().getCurrentValue();
+                double w = negFeedbackLink.getSynapse().getWeight().getCurrentValue();
+                double wi = x * w;
+                if(wi >= 0.0)
+                    continue;
+
+                for (AbstractFieldLink flNet : f.getReceivers()) {
+                    if (!(flNet.getOutput() instanceof Field))
+                        continue;
+
+                    Field fNet = (Field) flNet.getOutput();
+                    if (fNet.getCurrentValue() > 0.0) {
+                        System.out.println(negFeedbackLink + " " + fNet.getReference() + " " + fNet.getLabel() + " " + fNet.getCurrentValue());
+
+                        maxAnnealStep = Math.min(maxAnnealStep, fNet.getCurrentValue() / -wi);
+                    }
+                }
+            }
+
+            if(maxAnnealStep <= 0.0 || maxAnnealStep == Double.MAX_VALUE)
+                break;
+
+            annealing.setValue(maxAnnealStep);
+            process(INFERENCE);
         }
+    }
+
+    public void instantiateTemplates() {
+        if (!getConfig().isMetaInstantiationEnabled())
+            return;
+
+        activationsById.values().stream()
+                .filter(act -> act.getNeuron().isAbstract())
+                .filter(act -> act.isFired())
+                .filter(act -> act instanceof ConjunctiveActivation<?>)
+                .forEach(act ->
+                        InstantiationA.add((ConjunctiveActivation) act)
+                );
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("External Phase:" + externalPhase + "\n");
 
         for(Activation act: activationsById.values()) {
             sb.append(act.toString());

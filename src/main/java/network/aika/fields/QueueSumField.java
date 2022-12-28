@@ -21,6 +21,7 @@ import network.aika.FieldObject;
 import network.aika.callbacks.FieldObserver;
 import network.aika.neuron.activation.Element;
 import network.aika.steps.FieldStep;
+import network.aika.steps.Phase;
 import network.aika.steps.Step;
 import network.aika.utils.Utils;
 
@@ -38,14 +39,14 @@ public class QueueSumField extends SumField implements IQueueField {
 
     protected List<FieldObserver> observers = new ArrayList<>();
 
-    public QueueSumField(FieldObject e, String label) {
+    public QueueSumField(FieldObject e, Phase p, String label) {
         super(e, label);
-        step = new FieldStep((Element) e, this);
+        step = new FieldStep((Element) e, p, this);
     }
 
-    public QueueSumField(FieldObject e, String label, boolean weakRefs) {
+    public QueueSumField(FieldObject e, Phase p, String label, boolean weakRefs) {
         super(e, label, weakRefs);
-        step = new FieldStep((Element) e, this);
+        step = new FieldStep((Element) e, p, this);
     }
 
     public void setStep(FieldStep s) {

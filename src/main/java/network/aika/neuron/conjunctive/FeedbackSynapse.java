@@ -40,20 +40,6 @@ public abstract class FeedbackSynapse<S extends FeedbackSynapse, I extends Neuro
     }
 
     @Override
-    public void initDummyLink(BindingActivation oAct) {
-        Multiplication dummyWeight = mul(
-                oAct,
-                (getDummyLinkUB() ? "pos" : "neg")  + "-feedback-dummy",
-                oAct.getThought().getAnnealing(),
-                getWeight()
-        );
-
-        FieldLink.link(dummyWeight, -1, oAct.getNet(getDummyLinkUB()));
-    }
-
-    protected abstract boolean getDummyLinkUB();
-
-    @Override
     protected void warmUpInputNeuron(Thought t) {
     }
 }

@@ -103,7 +103,7 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
         return input;
     }
 
-    public UpdateListener getOutput() {
+    public O getOutput() {
         return output;
     }
 

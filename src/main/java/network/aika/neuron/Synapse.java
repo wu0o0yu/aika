@@ -39,6 +39,7 @@ import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.neuron.activation.Timestamp.MAX;
 import static network.aika.neuron.activation.Timestamp.MIN;
+import static network.aika.steps.Phase.TRAINING;
 
 /**
  *
@@ -51,7 +52,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected S template;
 
-    protected SumField weight = (SumField) new QueueSumField(this, "weight", true)
+    protected SumField weight = (SumField) new QueueSumField(this, TRAINING, "weight", true)
             .addListener(() ->
                     setModified()
             );

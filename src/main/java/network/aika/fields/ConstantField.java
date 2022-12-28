@@ -19,6 +19,7 @@ package network.aika.fields;
 import network.aika.FieldObject;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @author Lukas Molzberger
@@ -29,8 +30,8 @@ public class ConstantField extends Field implements FieldOutput {
     public static final ConstantField ONE = new ConstantField(null, "ONE", 1.0);
 
     public ConstantField(FieldObject ref, String label, double value) {
-        super(null, label);
-        this.currentValue = value;
+        super(ref, label);
+        setInitialValue(value);
     }
 
     @Override
@@ -43,7 +44,7 @@ public class ConstantField extends Field implements FieldOutput {
 
     @Override
     public Collection<FieldLink> getInputs() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override

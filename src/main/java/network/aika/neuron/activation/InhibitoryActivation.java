@@ -42,7 +42,6 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
         if(isSelfRef(in.getInput(), out.getOutput()))
             return;
 
-        FieldLink.link(in.netUB, out.maxInputUB);
-        FieldLink.link(in.netLB, out.maxInputLB);
+        FieldLink.link(in.net, out.maxInput);
     }
 }

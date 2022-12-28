@@ -40,12 +40,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static network.aika.callbacks.EventType.CREATE;
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.neuron.Synapse.getLatentLinkingPreNetUB;
 import static network.aika.neuron.activation.Timestamp.MAX;
 import static network.aika.neuron.activation.Timestamp.MIN;
+import static network.aika.steps.Phase.TRAINING;
 
 /**
  *
@@ -224,7 +224,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
     }
 
     protected SumField initBias() {
-        return (SumField) new LimitedField(this, "bias", 0.0)
+        return (SumField) new LimitedField(this, TRAINING, "bias", 0.0)
                 .addListener(() ->
                         setModified()
                 );
