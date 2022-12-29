@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation;
 
+import network.aika.fields.AbstractFunction;
 import network.aika.neuron.conjunctive.PatternSynapse;
 import network.aika.neuron.conjunctive.PositiveFeedbackSynapse;
 import network.aika.neuron.visitor.DownVisitor;
@@ -23,7 +24,6 @@ import network.aika.neuron.visitor.UpVisitor;
 import network.aika.sign.Sign;
 import network.aika.steps.link.LinkCounting;
 
-import static network.aika.fields.FieldLink.link;
 import static network.aika.fields.Fields.func;
 import static network.aika.fields.Fields.scale;
 
@@ -31,6 +31,9 @@ import static network.aika.fields.Fields.scale;
  * @author Lukas Molzberger
  */
 public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActivation> {
+
+    private AbstractFunction outputEntropy;
+    private AbstractFunction informationGain;
 
     public PatternLink(PatternSynapse s, BindingActivation input, PatternActivation output) {
         super(s, input, output);
@@ -51,7 +54,7 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
     public void connectGradientFields() {
         super.connectGradientFields();
 
-        func(
+        informationGain = func(
                 this,
                 "Information-Gain",
                 input.net,
@@ -66,12 +69,18 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
                 forwardsGradient
         );
 
-        link(
-                scale(this, "-Entropy", -1,
-                        output.getEntropy()
-                ),
+        outputEntropy = scale(this, "-Entropy", -1,
+                output.getEntropy(),
                 forwardsGradient
         );
+    }
+
+    public AbstractFunction getOutputEntropy() {
+        return outputEntropy;
+    }
+
+    public AbstractFunction getInformationGain() {
+        return informationGain;
     }
 
     @Override
