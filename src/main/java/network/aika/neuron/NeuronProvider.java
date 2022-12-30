@@ -128,14 +128,13 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
             return;
         }
 
-        neuron.suspend();
-
-        checkUnregister();
-
         if(sm == SAVE)
             save();
 
+        neuron.suspend();
         neuron = null;
+
+        checkUnregister();
     }
 
     public void save() {
