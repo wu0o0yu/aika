@@ -16,6 +16,7 @@
  */
 package network.aika.neuron.activation.text;
 
+import network.aika.Thought;
 import network.aika.neuron.Range;
 import network.aika.neuron.activation.*;
 import network.aika.neuron.conjunctive.LatentRelationNeuron;
@@ -39,8 +40,13 @@ public class TokenActivation extends PatternActivation {
             Comparator.comparingLong(n -> n.getId())
     );
 
+
+    public TokenActivation(int id, Thought t, TokenNeuron tokenNeuron) {
+        super(id, t, tokenNeuron);
+    }
+
     public TokenActivation(int id, Integer pos, int begin, int end, Document doc, TokenNeuron tokenNeuron) {
-        super(id, doc, tokenNeuron);
+        this(id, doc, tokenNeuron);
 
         updateRangeAndTokenPos(
                 new Range(begin, end),

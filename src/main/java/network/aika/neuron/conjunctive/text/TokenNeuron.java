@@ -18,7 +18,7 @@ package network.aika.neuron.conjunctive.text;
 
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.neuron.activation.PatternActivation;
+import network.aika.neuron.activation.text.TokenActivation;
 import network.aika.neuron.conjunctive.PatternNeuron;
 
 import java.io.DataInput;
@@ -35,8 +35,8 @@ public class TokenNeuron extends PatternNeuron {
 
 
     @Override
-    public PatternActivation createActivation(Thought t) {
-        return new PatternActivation(t.createActivationId(), t, this);
+    public TokenActivation createActivation(Thought t) {
+        return new TokenActivation(t.createActivationId(), t, this);
     }
 
     public void setTokenLabel(String tokenLabel) {
