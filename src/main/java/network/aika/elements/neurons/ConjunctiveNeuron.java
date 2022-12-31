@@ -62,7 +62,21 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         return getCategoryInputSynapse() != null;
     }
 
+    public boolean isInstanceOf(ConjunctiveNeuron templateNeuron) {
+        CategorySynapse<?,?,?,?,?> cs = getCategoryOutputSynapse();
+        if(cs == null)
+            return false;
+
+        CategoryInputSynapse cis = cs.getOutput().getOutgoingCategoryInputSynapse();
+        if(cis == null)
+            return false;
+
+        return cis.getOutput().getId() == templateNeuron.getId();
+    }
+
     public abstract CategoryInputSynapse getCategoryInputSynapse();
+
+    public abstract CategorySynapse getCategoryOutputSynapse();
 
     public void addInactiveLinks(Activation bs) {
         getInputSynapsesAsStream()

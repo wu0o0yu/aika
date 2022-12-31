@@ -18,6 +18,7 @@ package network.aika.elements.neurons;
 
 import network.aika.Thought;
 import network.aika.elements.activations.BindingCategoryActivation;
+import network.aika.elements.synapses.BindingCategoryInputSynapse;
 import network.aika.elements.synapses.BindingCategorySynapse;
 
 
@@ -31,5 +32,10 @@ public class BindingCategoryNeuron extends CategoryNeuron<BindingCategorySynapse
     @Override
     public BindingCategoryActivation createActivation(Thought t) {
         return new BindingCategoryActivation(t.createActivationId(), t, this);
+    }
+
+    @Override
+    public BindingCategoryInputSynapse getOutgoingCategoryInputSynapse() {
+        return getOutputSynapseByType(BindingCategoryInputSynapse.class);
     }
 }

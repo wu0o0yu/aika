@@ -17,6 +17,7 @@
 package network.aika.elements.neurons;
 
 import network.aika.elements.activations.CategoryActivation;
+import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.elements.synapses.CategorySynapse;
 
 
@@ -28,6 +29,8 @@ public abstract class CategoryNeuron<S extends CategorySynapse, A extends Catego
 
     public CategoryNeuron() {
     }
+
+    public abstract CategoryInputSynapse getOutgoingCategoryInputSynapse();
 
     @Override
     public boolean isTrainingAllowed() {

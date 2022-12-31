@@ -53,11 +53,12 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
 
     @Override
     public BindingCategoryInputSynapse getCategoryInputSynapse() {
-        return getProvider().getInputSynapses()
-                .filter(BindingCategoryInputSynapse.class::isInstance)
-                .map(BindingCategoryInputSynapse.class::cast)
-                .findAny()
-                .orElse(null);
+        return getInputSynapseByType(BindingCategoryInputSynapse.class);
+    }
+
+    @Override
+    public BindingCategorySynapse getCategoryOutputSynapse() {
+        return getOutputSynapseByType(BindingCategorySynapse.class);
     }
 
     public double getPreNetUBDummyWeightSum() {

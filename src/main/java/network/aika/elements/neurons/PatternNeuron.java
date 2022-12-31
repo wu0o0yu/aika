@@ -19,11 +19,8 @@ package network.aika.elements.neurons;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.synapses.CategorySynapse;
-import network.aika.elements.synapses.PatternCategorySynapse;
+import network.aika.elements.synapses.*;
 import network.aika.sign.Sign;
-import network.aika.elements.synapses.ConjunctiveSynapse;
-import network.aika.elements.synapses.PatternCategoryInputSynapse;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
 
@@ -59,11 +56,12 @@ public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, Pattern
 
     @Override
     public PatternCategoryInputSynapse getCategoryInputSynapse() {
-        return getProvider().getInputSynapses()
-                .filter(s -> s instanceof PatternCategoryInputSynapse)
-                .map(s -> (PatternCategoryInputSynapse) s)
-                .findAny()
-                .orElse(null);
+        return getInputSynapseByType(PatternCategoryInputSynapse.class);
+    }
+
+    @Override
+    public PatternCategorySynapse getCategoryOutputSynapse() {
+        return getOutputSynapseByType(PatternCategorySynapse.class);
     }
 
     @Override

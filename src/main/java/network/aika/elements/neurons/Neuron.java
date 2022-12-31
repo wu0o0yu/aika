@@ -304,6 +304,22 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
         return syn;
     }
 
+    public <IS extends S> IS getInputSynapseByType(Class<IS> synapseType) {
+        return getProvider().getInputSynapses()
+                .filter(synapseType::isInstance)
+                .map(synapseType::cast)
+                .findAny()
+                .orElse(null);
+    }
+
+    public <OS extends Synapse> OS getOutputSynapseByType(Class<OS> synapseType) {
+        return getProvider().getOutputSynapses()
+                .filter(synapseType::isInstance)
+                .map(synapseType::cast)
+                .findAny()
+                .orElse(null);
+    }
+
     protected Synapse selectInputSynapse(Predicate<? super Synapse> predicate) {
         return getInputSynapsesAsStream()
                 .filter(predicate)

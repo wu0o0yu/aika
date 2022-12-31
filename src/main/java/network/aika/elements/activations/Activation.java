@@ -165,8 +165,8 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     public static boolean isSelfRef(BindingActivation in, BindingActivation out) {
         return in.isSelfRef(out) ||
                 out.isSelfRef(in) ||
-                in.isInstanceOf(out) ||
-                out.isInstanceOf(in);
+                in.getNeuron().isInstanceOf(out.getNeuron()) ||
+                out.getNeuron().isInstanceOf(in.getNeuron());
     }
 
     public Activation<N> resolveAbstractInputActivation() {

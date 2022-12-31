@@ -41,7 +41,7 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
 
     @Override
     protected void initWeightInput() {
-        maxInput = new MinMaxField(this, MinMax.MAX, "max");
+        maxInput = new MinMaxField(this, MinMax.MAX, "max-input-value");
 
         weightedInput = Fields.mul(
                 this,
