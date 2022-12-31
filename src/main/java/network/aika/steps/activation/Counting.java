@@ -16,8 +16,7 @@
  */
 package network.aika.steps.activation;
 
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.PatternActivation;
+import network.aika.elements.activations.Activation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 

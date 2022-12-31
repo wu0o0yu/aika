@@ -16,12 +16,8 @@
  */
 package network.aika.direction;
 
-import network.aika.neuron.Neuron;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.Link;
-
-import java.util.stream.Stream;
+import network.aika.elements.neurons.Neuron;
+import network.aika.elements.synapses.Synapse;
 
 /**
  *

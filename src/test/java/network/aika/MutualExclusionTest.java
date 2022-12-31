@@ -33,13 +33,16 @@
 package network.aika;
 
 import network.aika.debugger.AIKADebugger;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.BindingActivation;
-import network.aika.neuron.activation.text.TokenActivation;
-import network.aika.neuron.conjunctive.*;
-import network.aika.neuron.conjunctive.text.TokenNeuron;
-import network.aika.neuron.disjunctive.InhibitoryNeuron;
-import network.aika.neuron.disjunctive.InhibitorySynapse;
+import network.aika.elements.activations.Activation;
+import network.aika.elements.activations.BindingActivation;
+import network.aika.elements.activations.TokenActivation;
+import network.aika.elements.neurons.BindingNeuron;
+import network.aika.elements.neurons.PatternNeuron;
+import network.aika.elements.neurons.TokenNeuron;
+import network.aika.elements.neurons.InhibitoryNeuron;
+import network.aika.elements.synapses.InhibitorySynapse;
+import network.aika.elements.synapses.InputPatternFromPatternSynapse;
+import network.aika.elements.synapses.NegativeFeedbackSynapse;
 import network.aika.text.Document;
 import org.graphstream.ui.view.camera.Camera;
 import org.junit.jupiter.api.Test;
@@ -49,7 +52,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 
 import static network.aika.TestUtils.*;
-import static network.aika.neuron.disjunctive.InhibSynType.INPUT;
+import static network.aika.elements.synapses.InhibSynType.INPUT;
 import static network.aika.steps.Phase.INFERENCE;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

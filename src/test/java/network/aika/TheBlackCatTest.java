@@ -17,8 +17,7 @@
 package network.aika;
 
 import network.aika.debugger.AIKADebugger;
-import network.aika.neuron.conjunctive.text.TokenNeuron;
-import network.aika.neuron.disjunctive.InhibitoryNeuron;
+import network.aika.elements.neurons.InhibitoryNeuron;
 import network.aika.text.Document;
 import org.graphstream.ui.view.camera.Camera;
 import org.junit.jupiter.api.Test;

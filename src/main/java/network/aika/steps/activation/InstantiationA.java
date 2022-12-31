@@ -16,7 +16,7 @@
  */
 package network.aika.steps.activation;
 
-import network.aika.neuron.activation.ConjunctiveActivation;
+import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 

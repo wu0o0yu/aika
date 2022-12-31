@@ -19,7 +19,7 @@ package network.aika.fields;
 
 import network.aika.FieldObject;
 import network.aika.callbacks.FieldObserver;
-import network.aika.neuron.activation.Element;
+import network.aika.elements.Element;
 import network.aika.steps.FieldStep;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;

@@ -16,10 +16,14 @@
  */
 package network.aika;
 
-import network.aika.neuron.conjunctive.*;
-import network.aika.neuron.conjunctive.text.TokenNeuron;
-import network.aika.neuron.conjunctive.text.TokenPositionRelationNeuron;
-import network.aika.neuron.disjunctive.InhibitoryNeuron;
+import network.aika.elements.neurons.BindingNeuron;
+import network.aika.elements.neurons.LatentRelationNeuron;
+import network.aika.elements.neurons.PatternNeuron;
+import network.aika.elements.neurons.TokenPositionRelationNeuron;
+import network.aika.elements.neurons.InhibitoryNeuron;
+import network.aika.elements.synapses.InputPatternFromPatternSynapse;
+import network.aika.elements.synapses.RelationInputSynapse;
+import network.aika.elements.synapses.SamePatternSynapse;
 
 import static network.aika.TestUtils.*;
 

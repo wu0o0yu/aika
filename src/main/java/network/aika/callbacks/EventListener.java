@@ -16,7 +16,7 @@
  */
 package network.aika.callbacks;
 
-import network.aika.neuron.activation.Element;
+import network.aika.elements.Element;
 import network.aika.steps.Step;
 
 /**

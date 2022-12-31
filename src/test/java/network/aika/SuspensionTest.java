@@ -19,11 +19,11 @@ package network.aika;
 
 
 import network.aika.callbacks.SuspensionCallback;
-import network.aika.neuron.NeuronProvider;
-import network.aika.neuron.Synapse;
-import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.neuron.conjunctive.InputPatternFromPatternSynapse;
-import network.aika.neuron.conjunctive.text.TokenNeuron;
+import network.aika.elements.neurons.NeuronProvider;
+import network.aika.elements.synapses.Synapse;
+import network.aika.elements.neurons.BindingNeuron;
+import network.aika.elements.synapses.InputPatternFromPatternSynapse;
+import network.aika.elements.neurons.TokenNeuron;
 import network.aika.text.Document;
 import network.aika.utils.Writable;
 import org.junit.jupiter.api.Assertions;
@@ -38,7 +38,7 @@ import static network.aika.TestUtils.getConfig;
 import static network.aika.TestUtils.updateBias;
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.neuron.SuspensionMode.SAVE;
+import static network.aika.elements.neurons.SuspensionMode.SAVE;
 
 /**
  *

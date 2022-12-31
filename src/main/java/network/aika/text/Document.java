@@ -16,19 +16,16 @@
  */
 package network.aika.text;
 
-import network.aika.FieldObject;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.direction.Direction;
-import network.aika.neuron.Range;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.activation.text.TokenActivation;
-import network.aika.neuron.conjunctive.text.TokenNeuron;
+import network.aika.elements.neurons.Range;
+import network.aika.elements.activations.Activation;
+import network.aika.elements.activations.TokenActivation;
+import network.aika.elements.neurons.TokenNeuron;
 
 import java.util.*;
 import java.util.stream.Stream;
-
-import static network.aika.callbacks.EventType.CREATE;
 
 
 /**

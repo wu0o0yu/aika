@@ -1,7 +1,6 @@
 package network.aika.fields;
 
 import network.aika.FieldObject;
-import network.aika.neuron.activation.Element;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -17,7 +17,7 @@
 package network.aika.sign;
 
 import network.aika.FieldObject;
-import network.aika.neuron.activation.Activation;
+import network.aika.elements.activations.Activation;
 import network.aika.fields.FieldOutput;
 
 

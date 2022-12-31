@@ -16,20 +16,26 @@
  */
 package network.aika;
 
-import network.aika.neuron.Neuron;
-import network.aika.neuron.activation.Activation;
-import network.aika.neuron.conjunctive.*;
-import network.aika.neuron.conjunctive.text.TokenNeuron;
-import network.aika.neuron.disjunctive.*;
+import network.aika.elements.neurons.Neuron;
+import network.aika.elements.activations.Activation;
+import network.aika.elements.neurons.BindingNeuron;
+import network.aika.elements.neurons.PatternNeuron;
+import network.aika.elements.neurons.CategoryNeuron;
+import network.aika.elements.neurons.InhibitoryNeuron;
+import network.aika.elements.neurons.TokenNeuron;
+import network.aika.elements.synapses.InhibitorySynapse;
+import network.aika.elements.synapses.NegativeFeedbackSynapse;
+import network.aika.elements.synapses.PatternSynapse;
+import network.aika.elements.synapses.PositiveFeedbackSynapse;
 import network.aika.text.Document;
-import network.aika.neuron.activation.text.TokenActivation;
+import network.aika.elements.activations.TokenActivation;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-import static network.aika.neuron.disjunctive.InhibSynType.INPUT;
-import static network.aika.neuron.disjunctive.InhibSynType.SAME;
+import static network.aika.elements.synapses.InhibSynType.INPUT;
+import static network.aika.elements.synapses.InhibSynType.SAME;
 import static network.aika.steps.Phase.INFERENCE;
 
 

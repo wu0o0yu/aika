@@ -21,7 +21,9 @@ import network.aika.callbacks.ActivationCheckCallback;
 import network.aika.callbacks.InMemorySuspensionCallback;
 import network.aika.callbacks.NeuronProducer;
 import network.aika.callbacks.SuspensionCallback;
-import network.aika.neuron.*;
+import network.aika.elements.neurons.Neuron;
+import network.aika.elements.neurons.NeuronProvider;
+import network.aika.elements.neurons.SuspensionMode;
 import network.aika.utils.Writable;
 
 import java.io.*;

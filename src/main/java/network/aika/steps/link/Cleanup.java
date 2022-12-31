@@ -16,7 +16,7 @@
  */
 package network.aika.steps.link;
 
-import network.aika.neuron.activation.Link;
+import network.aika.elements.links.Link;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 

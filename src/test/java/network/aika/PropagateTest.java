@@ -16,9 +16,9 @@
  */
 package network.aika;
 
-import network.aika.neuron.conjunctive.BindingNeuron;
-import network.aika.neuron.conjunctive.InputPatternSynapse;
-import network.aika.neuron.conjunctive.text.TokenNeuron;
+import network.aika.elements.neurons.BindingNeuron;
+import network.aika.elements.synapses.InputPatternSynapse;
+import network.aika.elements.neurons.TokenNeuron;
 import network.aika.text.Document;
 import org.junit.jupiter.api.Test;
 

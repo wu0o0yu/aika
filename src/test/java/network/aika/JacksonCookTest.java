@@ -17,10 +17,15 @@
 package network.aika;
 
 import network.aika.debugger.AIKADebugger;
-import network.aika.neuron.conjunctive.*;
-import network.aika.neuron.conjunctive.text.TokenNeuron;
-import network.aika.neuron.conjunctive.text.TokenPositionRelationNeuron;
-import network.aika.neuron.disjunctive.*;
+import network.aika.elements.neurons.BindingNeuron;
+import network.aika.elements.neurons.LatentRelationNeuron;
+import network.aika.elements.neurons.PatternNeuron;
+import network.aika.elements.neurons.BindingCategoryNeuron;
+import network.aika.elements.neurons.CategoryNeuron;
+import network.aika.elements.neurons.InhibitoryNeuron;
+import network.aika.elements.synapses.*;
+import network.aika.elements.neurons.TokenNeuron;
+import network.aika.elements.neurons.TokenPositionRelationNeuron;
 import network.aika.text.Document;
 import org.graphstream.ui.view.camera.Camera;
 import org.junit.jupiter.api.Test;

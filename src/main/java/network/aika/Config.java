@@ -16,7 +16,7 @@
  */
 package network.aika;
 
-import network.aika.neuron.activation.Activation;
+import network.aika.elements.activations.Activation;
 
 /**
  *

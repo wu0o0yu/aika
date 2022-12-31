@@ -16,7 +16,7 @@
  */
 package network.aika.callbacks;
 
-import network.aika.neuron.Neuron;
+import network.aika.elements.neurons.Neuron;
 
 /**
  *

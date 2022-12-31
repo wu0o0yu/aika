@@ -16,13 +16,13 @@
  */
 package network.aika.steps;
 
-import network.aika.neuron.activation.Element;
-import network.aika.neuron.activation.Timestamp;
+import network.aika.elements.Element;
+import network.aika.elements.activations.Timestamp;
 
 import java.util.Comparator;
 
-import static network.aika.neuron.activation.Timestamp.FIRED_COMPARATOR;
-import static network.aika.neuron.activation.Timestamp.NOT_SET;
+import static network.aika.elements.activations.Timestamp.FIRED_COMPARATOR;
+import static network.aika.elements.activations.Timestamp.NOT_SET;
 
 /**
  * @author Lukas Molzberger
