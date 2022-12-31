@@ -21,6 +21,8 @@ import network.aika.elements.activations.Activation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
+import java.util.stream.Collectors;
+
 import static network.aika.steps.Phase.OUTPUT_LINKING;
 
 /**
@@ -43,6 +45,7 @@ public class LinkingOut extends Step<Activation> {
         Neuron<?, ?> n = act.getNeuron();
 
         n.getOutputSynapsesAsStream(act.getThought())
+                .collect(Collectors.toList())
                 .forEach(s ->
                         s.linkAndPropagateOut(act)
                 );
