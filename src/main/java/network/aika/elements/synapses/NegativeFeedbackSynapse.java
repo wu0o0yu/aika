@@ -51,9 +51,9 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
     }
 
     @Override
-    public void linkAndPropagateOut(InhibitoryActivation bs) {
+    public void linkAndPropagateOut(InhibitoryActivation act) {
         getOutput()
-                .linkOutgoing(this, bs);
+                .linkOutgoing(this, act);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
     }
 
     @Override
-    public double getPropagatePreNetUB(InhibitoryActivation iAct) {
+    public double getPropagatePreNet(InhibitoryActivation iAct) {
         return weight.getCurrentValue();
     }
 }

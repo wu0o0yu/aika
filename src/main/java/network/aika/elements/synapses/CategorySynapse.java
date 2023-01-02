@@ -49,8 +49,8 @@ public abstract class CategorySynapse<S extends CategorySynapse, I extends Conju
     }
 
     @Override
-    public void linkAndPropagateOut(IA bs) {
-        if (getPropagatePreNetUB(bs) > 0.0)
-            propagate(bs);
+    public void linkAndPropagateOut(IA act) {
+        if (getPropagatePreNet(act) > 0.0)
+            propagate(act);
     }
 }

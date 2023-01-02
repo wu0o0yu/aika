@@ -31,7 +31,7 @@ public class BindingCategoryInputSynapse extends BindingNeuronSynapse<
         BindingCategoryNeuron,
         BindingCategoryInputLink,
         CategoryActivation<?>
-        > implements CategoryInputSynapse<BindingCategoryInputSynapse>
+        > implements CategoryInputSynapse<BindingCategoryNeuron, BindingCategoryInputSynapse>
 {
     public BindingCategoryInputSynapse() {
         super(Scope.INPUT);

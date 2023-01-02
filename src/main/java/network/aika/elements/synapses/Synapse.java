@@ -96,7 +96,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     protected void warmUpRelatedInputNeurons(IA bs) {
     }
 
-    public double getPropagatePreNetUB(IA iAct) {
+    public double getPropagatePreNet(IA iAct) {
         if (getOutput().isCallActivationCheckCallback() &&
                 !getModel().getActivationCheckCallBack().check(iAct)) {
             return -1000.0;
@@ -106,7 +106,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
                 getWeight().getCurrentValue();
     }
 
-    public static double getLatentLinkingPreNetUB(Synapse synA, Synapse synB) {
+    public static double getLatentLinkingPreNet(Synapse synA, Synapse synB) {
         double preUB = synA.getWeight().getCurrentValue();
 
         if(synB != null) {
@@ -159,17 +159,17 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     public abstract void startVisitor(LinkingOperator c, Activation bs);
 
-    public void linkAndPropagateOut(IA bs) {
+    public void linkAndPropagateOut(IA act) {
         getOutput()
-                .linkOutgoing(this, bs);
+                .linkOutgoing(this, act);
 
         getOutput()
-                .latentLinkOutgoing(this, bs);
+                .latentLinkOutgoing(this, act);
 
-        if (getPropagatePreNetUB(bs) > 0.0) {
-            propagate(bs);
+        if (getPropagatePreNet(act) > 0.0) {
+            propagate(act);
         } else if(getStoredAt() == INPUT) {
-            warmUpRelatedInputNeurons(bs);
+            warmUpRelatedInputNeurons(act);
         }
     }
 

@@ -31,7 +31,7 @@ public class PatternCategoryInputSynapse extends AbstractPatternSynapse<
         PatternCategoryNeuron,
         PatternCategoryInputLink,
         CategoryActivation<?>
-        > implements CategoryInputSynapse<PatternCategoryInputSynapse>
+        > implements CategoryInputSynapse<PatternCategoryNeuron, PatternCategoryInputSynapse>
 {
     @Override
     public PatternCategoryInputLink createLink(CategoryActivation input, PatternActivation output) {

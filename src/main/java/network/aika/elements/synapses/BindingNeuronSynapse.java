@@ -64,9 +64,9 @@ public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I ext
     }
 
     @Override
-    public double getPropagatePreNetUB(IA iAct) {
+    public double getPropagatePreNet(IA iAct) {
         return getOutput().getPreNetUBDummyWeightSum() +
-                super.getPropagatePreNetUB(iAct);
+                super.getPropagatePreNet(iAct);
     }
 
     public double getPreNetDummyWeight() {

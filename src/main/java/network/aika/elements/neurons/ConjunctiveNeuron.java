@@ -46,7 +46,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     protected void initFromTemplate(Neuron templateN) {
         super.initFromTemplate(templateN);
 
-        S cis = (S) ((ConjunctiveNeuron)templateN).getCategoryInputSynapse();
+        CategoryInputSynapse cis = ((ConjunctiveNeuron)templateN).getCategoryInputSynapse();
         newCategorySynapse()
                 .init(this, cis.getInput(), 10.0);
     }

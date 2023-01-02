@@ -43,7 +43,7 @@ import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
-import static network.aika.elements.synapses.Synapse.getLatentLinkingPreNetUB;
+import static network.aika.elements.synapses.Synapse.getLatentLinkingPreNet;
 import static network.aika.elements.activations.Timestamp.MAX;
 import static network.aika.elements.activations.Timestamp.MIN;
 import static network.aika.steps.Phase.TRAINING;
@@ -142,7 +142,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
     public void latentLinkOutgoing(Synapse synA, Activation bsA) {
         getInputSynapsesAsStream()
                 .filter(synB -> synA != synB)
-                .filter(synB -> getLatentLinkingPreNetUB(synA, synB) > 0.0)
+                .filter(synB -> getLatentLinkingPreNet(synA, synB) > 0.0)
                 .forEach(synB ->
                         synB.startVisitor(
                                 new ActLinkingOperator(bsA, synA, null, synB),

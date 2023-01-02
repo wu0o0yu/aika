@@ -44,7 +44,7 @@ public abstract class AbstractPatternSynapse<S extends AbstractPatternSynapse, I
 
 
     @Override
-    public double getPropagatePreNetUB(IA iAct) {
+    public double getPropagatePreNet(IA iAct) {
         return getOutput().getBias().getCurrentValue() +
                 weight.getCurrentValue() +
                 getSumOfLowerWeights();

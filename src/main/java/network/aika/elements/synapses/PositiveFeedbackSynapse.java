@@ -59,7 +59,7 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
     }
 
     @Override
-    public void linkAndPropagateOut(PatternActivation bs) {
+    public void linkAndPropagateOut(PatternActivation act) {
     }
 
     @Override
@@ -82,7 +82,7 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
     }
 
     @Override
-    public double getPropagatePreNetUB(PatternActivation iAct) {
+    public double getPropagatePreNet(PatternActivation iAct) {
         return 0.0;
     }
 }

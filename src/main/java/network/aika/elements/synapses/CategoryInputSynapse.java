@@ -1,11 +1,14 @@
 package network.aika.elements.synapses;
 
+import network.aika.elements.neurons.CategoryNeuron;
 import network.aika.elements.neurons.ConjunctiveNeuron;
 import network.aika.elements.neurons.Neuron;
 
-public interface CategoryInputSynapse<S extends ConjunctiveSynapse> {
+public interface CategoryInputSynapse<N extends CategoryNeuron, S extends ConjunctiveSynapse> {
 
     S init(Neuron input, Neuron output, double initialWeight);
+
+    N getInput();
 
     ConjunctiveNeuron getOutput();
 }
