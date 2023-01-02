@@ -66,7 +66,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
     }
 
     @Override
-    public void instantiateTemplateA() {
+    public void instantiateTemplateNodes() {
         N n = (N) neuron.instantiateTemplate();
 
         templateInstance = n.createActivation(getThought());
@@ -74,7 +74,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
     }
 
     @Override
-    public void instantiateTemplateB() {
+    public void instantiateTemplateEdges() {
         getInputLinks()
                 .forEach(l -> {
                     Activation iAct = l.getInput().resolveAbstractInputActivation();

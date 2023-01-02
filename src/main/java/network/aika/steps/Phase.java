@@ -4,8 +4,8 @@ public enum Phase {
     INPUT_LINKING("IL"),
     OUTPUT_LINKING("OL"),
     INFERENCE("I"),
-    INSTANTIATION_A("IA"),
-    INSTANTIATION_B("IB"),
+    INSTANTIATION_NODES("IA"),
+    INSTANTIATION_EDGES("IB"),
     TRAINING("T"),
     COUNTING("C"),
     SAVE("S");

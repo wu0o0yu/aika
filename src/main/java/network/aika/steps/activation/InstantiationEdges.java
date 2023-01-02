@@ -20,14 +20,14 @@ import network.aika.elements.activations.Activation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
-import static network.aika.steps.Phase.INSTANTIATION_B;
+import static network.aika.steps.Phase.INSTANTIATION_EDGES;
 
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class InstantiationB extends Step<Activation> {
+public class InstantiationEdges extends Step<Activation> {
 
 
     public static void add(Activation act) {
@@ -36,23 +36,23 @@ public class InstantiationB extends Step<Activation> {
 
         act.instantiationIsQueued = true;
 
-        Step.add(new InstantiationB(act));
+        Step.add(new InstantiationEdges(act));
     }
 
-    public InstantiationB(Activation act) {
+    public InstantiationEdges(Activation act) {
         super(act);
     }
 
     @Override
     public void process() {
         getElement()
-                .instantiateTemplateB();
+                .instantiateTemplateEdges();
 
         getElement().instantiationIsQueued = false;
     }
 
     @Override
     public Phase getPhase() {
-        return INSTANTIATION_B;
+        return INSTANTIATION_EDGES;
     }
 }

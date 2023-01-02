@@ -20,14 +20,14 @@ import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
-import static network.aika.steps.Phase.INSTANTIATION_A;
+import static network.aika.steps.Phase.INSTANTIATION_NODES;
 
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class InstantiationA extends Step<ConjunctiveActivation> {
+public class InstantiationNodes extends Step<ConjunctiveActivation> {
 
     public static void add(ConjunctiveActivation act) {
         if(act.instantiationIsQueued)
@@ -38,25 +38,25 @@ public class InstantiationA extends Step<ConjunctiveActivation> {
         if(act.getTemplateInstance() != null)
             return;
 
-        Step.add(new InstantiationA(act));
+        Step.add(new InstantiationNodes(act));
     }
 
-    public InstantiationA(ConjunctiveActivation act) {
+    public InstantiationNodes(ConjunctiveActivation act) {
         super(act);
     }
 
     @Override
     public void process() {
         getElement()
-                .instantiateTemplateA();
+                .instantiateTemplateNodes();
 
         getElement().instantiationIsQueued = false;
 
-        InstantiationB.add(getElement());
+        InstantiationEdges.add(getElement());
     }
 
     @Override
     public Phase getPhase() {
-        return INSTANTIATION_A;
+        return INSTANTIATION_NODES;
     }
 }
