@@ -97,7 +97,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
         FieldLink.link(getNeuron().getBias(), net);
 
-        isFired = threshold(this, "isFired", 0.0, ABOVE, net);
+        isFired = threshold(this, "isFired", 0.0, ABOVE, true, net);
 
         isFired.addEventListener(() -> {
                     fired = thought.getCurrentTimestamp();
