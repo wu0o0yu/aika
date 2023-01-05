@@ -341,7 +341,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
     protected void propagateRangeAndTokenPosition() {
         outputLinks.values().forEach(l ->
-                l.propagateRangeOrTokenPos(range, tokenPos)
+                l.propagateRangeOrTokenPos()
         );
     }
 

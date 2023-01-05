@@ -70,10 +70,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
         getThought().onElementEvent(CREATE, this);
 
-        propagateRangeOrTokenPos(
-                input.getRange(),
-                input.getTokenPos()
-        );
+        propagateRangeOrTokenPos();
     }
 
     public void addInputLinkingStep() {
@@ -232,9 +229,9 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         output.unlinkInputLink(this);
     }
 
-    public void propagateRangeOrTokenPos(Range r, Integer tokenPos) {
-        if(r != null || tokenPos != null)
-            output.updateRangeAndTokenPos(r, tokenPos);
+    public void propagateRangeOrTokenPos() {
+        if(input.getRange() != null || input.getTokenPos() != null)
+            output.updateRangeAndTokenPos(input.getRange(), input.getTokenPos());
     }
 
     public boolean isNegative() {

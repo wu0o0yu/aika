@@ -17,7 +17,6 @@
 package network.aika.elements.links;
 
 import network.aika.elements.activations.BindingActivation;
-import network.aika.elements.neurons.Range;
 import network.aika.elements.synapses.RelationInputSynapse;
 
 /**
@@ -30,6 +29,6 @@ public class RelationInputLink extends BindingNeuronLink<RelationInputSynapse, B
     }
 
     @Override
-    public void propagateRangeOrTokenPos(Range r, Integer tokenPos) {
+    public void propagateRangeOrTokenPos() {
     }
 }

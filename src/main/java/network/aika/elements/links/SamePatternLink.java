@@ -31,6 +31,10 @@ public class SamePatternLink extends BindingNeuronLink<SamePatternSynapse, Bindi
     }
 
     @Override
+    public void propagateRangeOrTokenPos() {
+    }
+
+    @Override
     public void bindingVisitDown(DownVisitor v) {
     }
 
