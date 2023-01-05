@@ -97,8 +97,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public double getPropagatePreNet(IA iAct) {
-        if (getOutput().isCallActivationCheckCallback() &&
-                !getModel().getActivationCheckCallBack().check(iAct)) {
+        if (
+                getOutput().isCallActivationCheckCallback() &&
+                        iAct != null &&
+                        !iAct.getThought().getActivationCheckCallBack().check(iAct)
+        ) {
             return -1000.0;
         }
 
@@ -336,8 +339,8 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-        input = m.lookupNeuron(in.readLong());
-        output = m.lookupNeuron(in.readLong());
+        input = m.lookupNeuronProvider(in.readLong());
+        output = m.lookupNeuronProvider(in.readLong());
 
         weight.readFields(in, m);
     }

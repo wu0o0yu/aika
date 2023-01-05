@@ -17,6 +17,7 @@
 package network.aika;
 
 
+import network.aika.callbacks.ActivationCheckCallback;
 import network.aika.callbacks.EventListener;
 import network.aika.callbacks.EventType;
 import network.aika.elements.activations.Activation;
@@ -71,6 +72,9 @@ public abstract class Thought extends FieldObject {
     private final List<EventListener> eventListeners = new ArrayList<>();
 
     private Config config;
+
+    private ActivationCheckCallback activationCheckCallback;
+
 
     public Thought(Model m) {
         model = m;
@@ -140,6 +144,14 @@ public abstract class Thought extends FieldObject {
         callEventListener(el ->
                 el.onElementEvent(et, e)
         );
+    }
+
+    public ActivationCheckCallback getActivationCheckCallBack() {
+        return this.activationCheckCallback;
+    }
+
+    public void setActivationCheckCallback(ActivationCheckCallback activationCheckCallback) {
+        this.activationCheckCallback = activationCheckCallback;
     }
 
     private void callEventListener(Consumer<EventListener> el) {
@@ -265,41 +277,42 @@ public abstract class Thought extends FieldObject {
     }
 
     public void anneal() {
-        double maxAnnealStep;
+        double annealStep = 0.0;
 
-        while(true) {
-            maxAnnealStep = Double.MAX_VALUE;
-            for (AbstractFieldLink fl : annealing.getReceivers()) {
-                if (!(fl.getOutput() instanceof Field))
-                    continue;
+        while(annealStep < 1.0) {
+            System.out.println("Anneal-Step: " + annealStep);
+            annealStep += getMaxAnnealStep();
 
-                Field f = (Field) fl.getOutput();
-                NegativeFeedbackLink negFeedbackLink = (NegativeFeedbackLink) f.getReference();
-                double x = negFeedbackLink.getMaxInput().getCurrentValue();
-                double w = negFeedbackLink.getSynapse().getWeight().getCurrentValue();
-                double wi = x * w;
-                if(wi >= 0.0)
-                    continue;
-
-                for (AbstractFieldLink flNet : f.getReceivers()) {
-                    if (!(flNet.getOutput() instanceof Field))
-                        continue;
-
-                    Field fNet = (Field) flNet.getOutput();
-                    if (fNet.getCurrentValue() > 0.0) {
-                        System.out.println(negFeedbackLink + " " + fNet.getReference() + " " + fNet.getLabel() + " " + fNet.getCurrentValue());
-
-                        maxAnnealStep = Math.min(maxAnnealStep, fNet.getCurrentValue() / -wi);
-                    }
-                }
-            }
-
-            if(maxAnnealStep <= 0.0 || maxAnnealStep == Double.MAX_VALUE)
-                break;
-
-            annealing.setValue(maxAnnealStep);
+            annealing.setValue(annealStep);
             process(INFERENCE);
         }
+    }
+
+    private double getMaxAnnealStep() {
+        double maxAnnealStep = 1.0;
+        for (AbstractFieldLink fl : annealing.getReceivers()) {
+            if (!(fl.getOutput() instanceof Field))
+                continue;
+
+            Field f = (Field) fl.getOutput();
+            NegativeFeedbackLink negFeedbackLink = (NegativeFeedbackLink) f.getReference();
+            double x = negFeedbackLink.getMaxInput().getCurrentValue();
+            double w = negFeedbackLink.getSynapse().getWeight().getCurrentValue();
+            double wi = x * w;
+            if(wi >= 0.0)
+                continue;
+
+            for (AbstractFieldLink flNet : f.getReceivers()) {
+                if (!(flNet.getOutput() instanceof Field))
+                    continue;
+
+                Field fNet = (Field) flNet.getOutput();
+                if (fNet.getCurrentValue() > 0.0) {
+                    maxAnnealStep = Math.min(maxAnnealStep, fNet.getCurrentValue() / -wi);
+                }
+            }
+        }
+        return maxAnnealStep;
     }
 
     public void instantiateTemplates() {

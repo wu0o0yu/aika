@@ -79,7 +79,7 @@ public class TestUtils {
     }
 
     public static TokenNeuron lookupToken(Model m, String tokenLabel) {
-        return m.lookupNeuron(tokenLabel, l -> {
+        return m.lookupNeuronByLabel(tokenLabel, l -> {
             TokenNeuron n = new TokenNeuron();
             n.addProvider(m);
 

@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 public class CharPositionRelationNeuron extends LatentRelationNeuron {
 
     public CharPositionRelationNeuron lookupRelation(int rangeBegin, int rangeEnd) {
-        return getModel().lookupNeuron("CP-Rel.: " + rangeBegin + "," + rangeEnd, l ->
+        return getModel().lookupNeuronByLabel("CP-Rel.: " + rangeBegin + "," + rangeEnd, l ->
                 ((CharPositionRelationNeuron) instantiateTemplate())
                         .initCharPositionRelationNeuron(rangeBegin, rangeEnd, l)
         );

@@ -17,7 +17,6 @@
 package network.aika;
 
 
-import network.aika.callbacks.ActivationCheckCallback;
 import network.aika.callbacks.InMemorySuspensionCallback;
 import network.aika.callbacks.NeuronProducer;
 import network.aika.callbacks.SuspensionCallback;
@@ -52,24 +51,12 @@ public class Model implements Writable {
 
     private Supplier<Writable> customDataInstanceSupplier;
 
-    private ActivationCheckCallback activationCheckCallback;
-
-
     public Model() {
         this(new InMemorySuspensionCallback());
     }
 
     public Model(SuspensionCallback sc) {
         suspensionCallback = sc;
-    }
-
-
-    public ActivationCheckCallback getActivationCheckCallBack() {
-        return this.activationCheckCallback;
-    }
-
-    public void setActivationCheckCallback(ActivationCheckCallback activationCheckCallback) {
-        this.activationCheckCallback = activationCheckCallback;
     }
 
     public Long getIdByLabel(String label) {
@@ -112,10 +99,10 @@ public class Model implements Writable {
         return new ArrayList<>(providers.values());
     }
 
-    public <N extends Neuron> N lookupNeuron(String tokenLabel, NeuronProducer<N> onNewCallback) {
+    public <N extends Neuron> N lookupNeuronByLabel(String tokenLabel, NeuronProducer<N> onNewCallback) {
         Long id = suspensionCallback.getIdByLabel(tokenLabel);
         if(id != null)
-            return (N) lookupNeuron(id).getNeuron();
+            return (N) lookupNeuronProvider(id).getNeuron();
 
         N n = onNewCallback.createNeuron(tokenLabel);
         n.addProvider(this);
@@ -128,7 +115,7 @@ public class Model implements Writable {
     public NeuronProvider getNeuronProvider(String tokenLabel) {
         Long id = suspensionCallback.getIdByLabel(tokenLabel);
         if(id == null) return null;
-        return lookupNeuron(id);
+        return lookupNeuronProvider(id);
     }
 
     public Neuron getNeuron(String tokenLabel) {
@@ -139,7 +126,7 @@ public class Model implements Writable {
     public Stream<NeuronProvider> getAllNeurons() {
         return suspensionCallback
                 .getAllIds().stream()
-                .map(this::lookupNeuron);
+                .map(this::lookupNeuronProvider);
     }
 
     public void applyMovingAverage(Config trainingConfig) {
@@ -168,7 +155,7 @@ public class Model implements Writable {
         N = n;
     }
 
-    public NeuronProvider lookupNeuron(Long id) {
+    public NeuronProvider lookupNeuronProvider(Long id) {
         synchronized (providers) {
             NeuronProvider n = providers.get(id);
             if(n != null)

@@ -75,7 +75,7 @@ public class SuspensionTest {
         out.suspend(SAVE);
 
         // Reactivate
-        inStrong = m.lookupNeuron(inStrong.getId());
+        inStrong = m.lookupNeuronProvider(inStrong.getId());
 
         Config c = getConfig()
                 .setAlpha(0.99)
