@@ -202,6 +202,9 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
     public void addInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inputSynapses.put(s.getPInput().getId(), s);
+        if(neuron != null)
+            neuron.addInputSynapse(s);
+
         checkRegister();
         lock.releaseWriteLock();
     }
@@ -209,6 +212,9 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
     public void removeInputSynapse(Synapse s) {
         lock.acquireWriteLock();
         inputSynapses.remove(s.getPInput().getId());
+        if(neuron != null)
+            neuron.removeInputSynapse(s);
+
         checkUnregister();
         lock.releaseWriteLock();
     }
@@ -216,6 +222,9 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
     public void addOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
         outputSynapses.put(s.getPOutput().getId(), s);
+        if(neuron != null)
+            neuron.addOutputSynapse(s);
+
         checkRegister();
         lock.releaseWriteLock();
     }
@@ -223,6 +232,9 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
     public void removeOutputSynapse(Synapse s) {
         lock.acquireWriteLock();
         outputSynapses.remove(s.getPOutput().getId());
+        if(neuron != null)
+            neuron.removeOutputSynapse(s);
+
         checkUnregister();
         lock.releaseWriteLock();
     }

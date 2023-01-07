@@ -14,31 +14,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.steps;
+package network.aika.steps.thought;
+
+import network.aika.Thought;
+import network.aika.steps.Phase;
+import network.aika.steps.Step;
+import network.aika.text.Document;
+
+import static network.aika.steps.Phase.CLOSE;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public enum Phase {
-    INPUT_LINKING("IL"),
-    OUTPUT_LINKING("OL"),
-    INFERENCE("I"),
-    CLOSE("C"),
-    ANNEAL("A"),
-    INSTANTIATION_NODES("IA"),
-    INSTANTIATION_EDGES("IB"),
-    TRAINING("T"),
-    COUNTING("C"),
-    SAVE("S");
+public class CloseStep extends Step<Thought> {
 
-    String label;
-
-    Phase(String l) {
-        label = l;
+    public static void add(Thought t) {
+        Step.add(new CloseStep(t));
     }
 
-    public String getLabel() {
-        return label;
+    public CloseStep(Thought element) {
+        super(element);
+    }
+
+    @Override
+    public void process() {
+        getElement().setIsOpen(0.0);
+    }
+
+    @Override
+    public Phase getPhase() {
+        return CLOSE;
+    }
+
+    @Override
+    public String toString() {
+        return ((Document)getElement()).getContent();
     }
 }

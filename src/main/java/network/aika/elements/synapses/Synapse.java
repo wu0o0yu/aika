@@ -222,7 +222,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
         link();
 
-        weight.setInitialValue(initialWeight);
+        weight.setValue(initialWeight);
 
         connect(INPUT, true, false);
         connect(OUTPUT, true, false);

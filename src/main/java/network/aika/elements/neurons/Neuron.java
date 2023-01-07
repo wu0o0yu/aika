@@ -75,6 +75,19 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
     private boolean callActivationCheckCallback;
 
 
+
+    public Long getId() {
+        return provider.getId();
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
     public boolean isCallActivationCheckCallback() {
         return callActivationCheckCallback;
     }
@@ -328,35 +341,19 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
     }
 
     public void addInputSynapse(S s) {
-        provider.addInputSynapse(s);
         setModified();
     }
 
     public void removeInputSynapse(S s) {
-        provider.removeInputSynapse(s);
         setModified();
     }
 
     public void addOutputSynapse(Synapse s) {
-        provider.addOutputSynapse(s);
         setModified();
     }
 
     public void removeOutputSynapse(Synapse s) {
-        provider.removeOutputSynapse(s);
         setModified();
-    }
-
-    public Long getId() {
-        return provider.getId();
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 
     public Writable getCustomData() {
@@ -505,8 +502,8 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
         return (N) this;
     }
 
-    public Neuron updateBias(double bias) {
-        getBias().receiveUpdate(bias);
+    public Neuron setBias(double bias) {
+        getBias().setValue(bias);
         return this;
     }
 

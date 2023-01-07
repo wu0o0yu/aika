@@ -174,7 +174,7 @@ public class MetaNeuronTest {
         new BindingCategoryInputSynapse()
                 .init(sylContinueRightCategory, sylContinueRightBN, 1.0);
 
-        sylContinueRightBN.updateBias(3.0);
+        sylContinueRightBN.setBias(3.0);
         return sylContinueRightBN;
     }
 
@@ -231,8 +231,8 @@ public class MetaNeuronTest {
         TokenNeuron letterC = letterPN.instantiateTemplate()
                 .init(m, "L-c");
 
-        letterPN.updateBias(3.0);
-        syllablePN.updateBias(3.0);
+        letterPN.setBias(3.0);
+        syllablePN.setBias(3.0);
 
 
         Document doc = new Document(m, "s c h");

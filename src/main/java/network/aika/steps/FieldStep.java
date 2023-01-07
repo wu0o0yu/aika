@@ -46,7 +46,11 @@ public class FieldStep<E extends Element> extends Step<E> {
         return phase;
     }
 
+    public IQueueField getField() {
+        return field;
+    }
+
     public String toString() {
-        return "Field: " + field + "  Ref:" + field.getReference();
+        return "Phase:" + phase + " Field: " + field + "  Ref:" + field.getReference();
     }
 }

@@ -25,7 +25,6 @@ import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.Element;
 import network.aika.elements.activations.Timestamp;
 import network.aika.fields.*;
-import network.aika.elements.links.NegativeFeedbackLink;
 import network.aika.elements.neurons.PreActivation;
 import network.aika.elements.neurons.NeuronProvider;
 import network.aika.elements.neurons.Range;
@@ -33,6 +32,8 @@ import network.aika.steps.Phase;
 import network.aika.steps.QueueKey;
 import network.aika.steps.Step;
 import network.aika.steps.activation.InstantiationNodes;
+import network.aika.steps.thought.AnnealStep;
+import network.aika.steps.thought.CloseStep;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -47,7 +48,7 @@ import static network.aika.steps.Phase.*;
  *
  * @author Lukas Molzberger
  */
-public abstract class Thought extends FieldObject {
+public abstract class Thought extends FieldObject implements Element {
 
     private Field annealing;
     private Field isOpen;
@@ -276,43 +277,12 @@ public abstract class Thought extends FieldObject {
         );
     }
 
-    public void anneal() {
-        double annealStep = 0.0;
-
-        while(annealStep < 1.0) {
-            System.out.println("Anneal-Step: " + annealStep);
-            annealStep += getMaxAnnealStep();
-
-            annealing.setValue(annealStep);
-            process(INFERENCE);
-        }
+    public void close() {
+        CloseStep.add(this);
     }
 
-    private double getMaxAnnealStep() {
-        double maxAnnealStep = 1.0;
-        for (AbstractFieldLink fl : annealing.getReceivers()) {
-            if (!(fl.getOutput() instanceof Field))
-                continue;
-
-            Field f = (Field) fl.getOutput();
-            NegativeFeedbackLink negFeedbackLink = (NegativeFeedbackLink) f.getReference();
-            double x = negFeedbackLink.getMaxInput().getCurrentValue();
-            double w = negFeedbackLink.getSynapse().getWeight().getCurrentValue();
-            double wi = x * w;
-            if(wi >= 0.0)
-                continue;
-
-            for (AbstractFieldLink flNet : f.getReceivers()) {
-                if (!(flNet.getOutput() instanceof Field))
-                    continue;
-
-                Field fNet = (Field) flNet.getOutput();
-                if (fNet.getCurrentValue() > 0.0) {
-                    maxAnnealStep = Math.min(maxAnnealStep, fNet.getCurrentValue() / -wi);
-                }
-            }
-        }
-        return maxAnnealStep;
+    public void anneal() {
+        AnnealStep.add(this);
     }
 
     public void instantiateTemplates() {

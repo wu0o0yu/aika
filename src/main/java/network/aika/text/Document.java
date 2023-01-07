@@ -19,6 +19,7 @@ package network.aika.text;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.direction.Direction;
+import network.aika.elements.activations.Timestamp;
 import network.aika.elements.neurons.Range;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.TokenActivation;
@@ -26,6 +27,9 @@ import network.aika.elements.neurons.TokenNeuron;
 
 import java.util.*;
 import java.util.stream.Stream;
+
+import static network.aika.elements.activations.Timestamp.MIN;
+import static network.aika.elements.activations.Timestamp.NOT_SET;
 
 
 /**
@@ -113,6 +117,21 @@ public class Document extends Thought {
         act.connect(Direction.INPUT, true, false);
 
         return act;
+    }
+
+    @Override
+    public Timestamp getCreated() {
+        return MIN;
+    }
+
+    @Override
+    public Timestamp getFired() {
+        return NOT_SET;
+    }
+
+    @Override
+    public Thought getThought() {
+        return this;
     }
 
     public String toString() {
