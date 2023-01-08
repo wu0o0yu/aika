@@ -502,8 +502,8 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
         return (N) this;
     }
 
-    public Neuron setBias(double bias) {
-        getBias().setValue(bias);
+    public Neuron updateBias(double bias) {
+        getBias().receiveUpdate(bias);
         return this;
     }
 
