@@ -19,8 +19,6 @@ package network.aika.elements.links;
 import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.synapses.CategorySynapse;
-import network.aika.visitor.DownVisitor;
-import network.aika.visitor.UpVisitor;
 
 /**
  * @author Lukas Molzberger
@@ -33,15 +31,5 @@ public abstract class CategoryLink<S extends CategorySynapse, IA extends Conjunc
 
     @Override
     public void addInputLinkingStep() {
-    }
-
-    @Override
-    public void patternVisitDown(DownVisitor v) {
-        v.next(this);
-    }
-
-    @Override
-    public void patternVisitUp(UpVisitor v) {
-        v.next(this);
     }
 }

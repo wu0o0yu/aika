@@ -48,7 +48,7 @@ public class InhibitoryUpVisitor extends LinkingUpVisitor<PatternActivation> {
 
     @Override
     protected void visitUp(Link l) {
-        l.inhibVisitUp(this);
+        l.inhibVisit(this);
     }
 
     @Override

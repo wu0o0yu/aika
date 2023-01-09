@@ -21,10 +21,9 @@ import network.aika.elements.activations.PatternActivation;
 import network.aika.fields.AbstractFunction;
 import network.aika.elements.synapses.PatternSynapse;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
-import network.aika.visitor.DownVisitor;
-import network.aika.visitor.UpVisitor;
 import network.aika.sign.Sign;
 import network.aika.steps.link.LinkCounting;
+import network.aika.visitor.Visitor;
 
 import static network.aika.fields.Fields.func;
 import static network.aika.fields.Fields.scale;
@@ -86,28 +85,10 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
     }
 
     @Override
-    public void patternVisitDown(DownVisitor v) {
-        v.next(this);
+    public void bindingVisit(Visitor v) {
     }
 
     @Override
-    public void patternVisitUp(UpVisitor v) {
-        v.next(this);
-    }
-
-    @Override
-    public void bindingVisitDown(DownVisitor v) {
-    }
-
-    @Override
-    public void bindingVisitUp(UpVisitor v) {
-    }
-
-    @Override
-    public void inhibVisitDown(DownVisitor v) {
-    }
-
-    @Override
-    public void inhibVisitUp(UpVisitor v) {
+    public void inhibVisit(Visitor v) {
     }
 }

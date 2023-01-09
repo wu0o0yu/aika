@@ -39,7 +39,7 @@ public class PatternDownVisitor extends LinkingDownVisitor<BindingActivation> {
     }
 
     protected void visitDown(Link l) {
-        l.patternVisitDown(this);
+        l.patternVisit(this);
     }
 
     protected void visitDown(Activation act, Link l) {

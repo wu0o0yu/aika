@@ -19,6 +19,7 @@ package network.aika.elements.links;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.synapses.InputPatternSynapse;
+import network.aika.visitor.Visitor;
 
 /**
  * @author Lukas Molzberger
@@ -27,5 +28,9 @@ public class InputPatternLink<S extends InputPatternSynapse, I extends Conjuncti
 
     public InputPatternLink(S s, I input, BindingActivation output) {
         super(s, input, output);
+    }
+
+    @Override
+    public void patternVisit(Visitor v) {
     }
 }

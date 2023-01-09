@@ -20,8 +20,7 @@ import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.fields.Fields;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
-import network.aika.visitor.DownVisitor;
-import network.aika.visitor.UpVisitor;
+import network.aika.visitor.Visitor;
 
 import static network.aika.fields.FieldLink.link;
 
@@ -56,22 +55,16 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
     }
 */
     @Override
-    public void bindingVisitUp(UpVisitor v) {
+    public void bindingVisit(Visitor v) {
+        if(v.isDown())
+            super.bindingVisit(v);
     }
 
     @Override
-    public void patternVisitDown(DownVisitor v) {
+    public void patternVisit(Visitor v) {
     }
 
     @Override
-    public void patternVisitUp(UpVisitor v) {
-    }
-
-    @Override
-    public void inhibVisitDown(DownVisitor v) {
-    }
-
-    @Override
-    public void inhibVisitUp(UpVisitor v) {
+    public void inhibVisit(Visitor v) {
     }
 }

@@ -19,6 +19,7 @@ package network.aika.elements.links;
 import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.synapses.PatternCategoryInputSynapse;
+import network.aika.visitor.Visitor;
 
 
 /**
@@ -42,5 +43,9 @@ public class PatternCategoryInputLink extends AbstractPatternLink<PatternCategor
         super.addInputLinkingStep();
 
         linkTemplateAndInstance(input.getCategoryInput());
+    }
+
+    @Override
+    public void patternVisit(Visitor v) {
     }
 }

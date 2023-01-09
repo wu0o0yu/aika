@@ -29,6 +29,7 @@ import network.aika.elements.neurons.Range;
 import network.aika.fields.*;
 import network.aika.elements.synapses.Synapse;
 import network.aika.visitor.DownVisitor;
+import network.aika.visitor.Visitor;
 import network.aika.visitor.selfref.SelfRefDownVisitor;
 import network.aika.visitor.UpVisitor;
 import network.aika.steps.activation.Counting;
@@ -203,7 +204,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     public void selfRefVisitDown(DownVisitor v, Link lastLink) {
         v.next(this);
     }
-
 
     protected void connectGradientFields() {
         netOuterGradient =

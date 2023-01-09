@@ -55,4 +55,12 @@ public abstract class DownVisitor<T extends Activation> extends Visitor {
 
     public void expandRelations(TokenActivation tAct) {
     }
+
+    public boolean isDown() {
+        return true;
+    }
+
+    public boolean isUp() {
+        return false;
+    }
 }

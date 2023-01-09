@@ -48,7 +48,7 @@ public class PatternUpVisitor extends LinkingUpVisitor<BindingActivation> {
 
     @Override
     protected void visitUp(Link l) {
-        l.patternVisitUp(this);
+        l.patternVisit(this);
     }
 
     @Override

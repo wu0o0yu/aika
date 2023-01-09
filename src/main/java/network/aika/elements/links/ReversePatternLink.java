@@ -19,6 +19,7 @@ package network.aika.elements.links;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.synapses.ReversePatternSynapse;
+import network.aika.visitor.Visitor;
 
 
 /**
@@ -29,5 +30,9 @@ public class ReversePatternLink<IA extends Activation<?>> extends BindingNeuronL
 
     public ReversePatternLink(ReversePatternSynapse s, IA input, BindingActivation output) {
         super(s, input, output);
+    }
+
+    @Override
+    public void patternVisit(Visitor v) {
     }
 }

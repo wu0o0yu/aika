@@ -43,51 +43,31 @@ public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activat
     }
 
     @Override
-    public void selfRefVisitDown(SelfRefDownVisitor v) {
+    public void selfRefVisit(SelfRefDownVisitor v) {
         if(checkVisited(v))
             return;
 
-        super.selfRefVisitDown(v);
+        super.selfRefVisit(v);
     }
 
     @Override
-    public void bindingVisitDown(DownVisitor v) {
+    public void bindingVisit(Visitor v) {
         if(checkVisited(v))
             return;
 
-        super.bindingVisitDown(v);
+        super.bindingVisit(v);
     }
 
     @Override
-    public void bindingVisitUp(UpVisitor v) {
+    public void patternVisit(Visitor v) {
         if(checkVisited(v))
             return;
 
-        super.bindingVisitUp(v);
+        super.patternVisit(v);
     }
 
     @Override
-    public void patternVisitDown(DownVisitor v) {
-        if(checkVisited(v))
-            return;
-
-        super.patternVisitDown(v);
-    }
-
-    @Override
-    public void patternVisitUp(UpVisitor v) {
-        if(checkVisited(v))
-            return;
-
-        super.patternVisitUp(v);
-    }
-
-    @Override
-    public void inhibVisitDown(DownVisitor v) {
-    }
-
-    @Override
-    public void inhibVisitUp(UpVisitor v) {
+    public void inhibVisit(Visitor v) {
     }
 
     private boolean checkVisited(Visitor v) {

@@ -21,13 +21,10 @@ import network.aika.Thought;
 import network.aika.direction.Direction;
 import network.aika.elements.Element;
 import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.OutputKey;
 import network.aika.elements.activations.Timestamp;
 import network.aika.fields.*;
-import network.aika.elements.neurons.Range;
 import network.aika.elements.synapses.Synapse;
-import network.aika.visitor.DownVisitor;
-import network.aika.visitor.UpVisitor;
+import network.aika.visitor.Visitor;
 import network.aika.visitor.selfref.SelfRefDownVisitor;
 import network.aika.steps.link.LinkingIn;
 
@@ -77,29 +74,19 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         LinkingIn.add(this);
     }
 
-    public void selfRefVisitDown(SelfRefDownVisitor v) {
+    public void selfRefVisit(SelfRefDownVisitor v) {
         v.next(this);
     }
 
-    public void bindingVisitDown(DownVisitor v) {
+    public void bindingVisit(Visitor v) {
         v.next(this);
     }
 
-    public void bindingVisitUp(UpVisitor v) {
+    public void patternVisit(Visitor v) {
         v.next(this);
     }
 
-    public void patternVisitDown(DownVisitor v) {
-    }
-
-    public void patternVisitUp(UpVisitor v) {
-    }
-
-    public void inhibVisitDown(DownVisitor v) {
-        v.next(this);
-    }
-
-    public void inhibVisitUp(UpVisitor v) {
+    public void inhibVisit(Visitor v) {
         v.next(this);
     }
 
@@ -170,6 +157,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     public Field getForwardsGradient() {
         return forwardsGradient;
     }
+
     public FieldOutput getBackwardsGradient() {
         return backwardsGradient;
     }

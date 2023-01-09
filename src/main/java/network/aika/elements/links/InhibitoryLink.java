@@ -22,9 +22,7 @@ import network.aika.fields.AbstractFunction;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.Fields;
 import network.aika.elements.synapses.InhibitorySynapse;
-
-import static network.aika.fields.Fields.add;
-import static network.aika.fields.Fields.func;
+import network.aika.visitor.Visitor;
 
 /**
  * @author Lukas Molzberger
@@ -67,5 +65,9 @@ public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingAc
 
     public FieldOutput getNet() {
         return net;
+    }
+
+    @Override
+    public void patternVisit(Visitor v) {
     }
 }

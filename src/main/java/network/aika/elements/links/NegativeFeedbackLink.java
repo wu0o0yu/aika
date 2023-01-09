@@ -20,7 +20,7 @@ import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.InhibitoryActivation;
 import network.aika.fields.*;
 import network.aika.elements.synapses.NegativeFeedbackSynapse;
-import network.aika.visitor.UpVisitor;
+import network.aika.visitor.Visitor;
 
 import static network.aika.fields.FieldLink.link;
 
@@ -62,7 +62,7 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
     }
 
     @Override
-    public void bindingVisitUp(UpVisitor v) {
+    public void bindingVisit(Visitor v) {
         // don't allow negative feedback links to create new links; i.d. do nothing
     }
 

@@ -46,7 +46,7 @@ public class SelfRefDownVisitor extends DownVisitor<BindingActivation> {
     }
 
     protected void visitDown(Link l) {
-        l.selfRefVisitDown(this);
+        l.selfRefVisit(this);
     }
 
     protected void visitDown(Activation act, Link l) {

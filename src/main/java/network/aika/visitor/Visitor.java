@@ -44,4 +44,8 @@ public abstract class Visitor {
     }
 
     public abstract void check(Link lastLink, Activation act);
+
+    public abstract boolean isDown();
+
+    public abstract boolean isUp();
 }

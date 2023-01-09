@@ -39,7 +39,7 @@ public class InhibitoryDownVisitor extends LinkingDownVisitor<PatternActivation>
     }
 
     protected void visitDown(Link l) {
-        l.inhibVisitDown(this);
+        l.inhibVisit(this);
     }
 
     protected void visitDown(Activation act, Link l) {

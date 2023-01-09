@@ -19,8 +19,6 @@ package network.aika.elements.links;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.synapses.BindingCategoryInputSynapse;
-import network.aika.visitor.DownVisitor;
-import network.aika.visitor.UpVisitor;
 
 
 /**
@@ -37,15 +35,5 @@ public class BindingCategoryInputLink extends BindingNeuronLink<BindingCategoryI
         super.addInputLinkingStep();
 
         linkTemplateAndInstance(input.getCategoryInput());
-    }
-
-    @Override
-    public void patternVisitDown(DownVisitor v) {
-        v.next(this);
-    }
-
-    @Override
-    public void patternVisitUp(UpVisitor v) {
-        v.next(this);
     }
 }

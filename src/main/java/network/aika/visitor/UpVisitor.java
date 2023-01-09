@@ -43,4 +43,12 @@ public abstract class UpVisitor extends Visitor {
     protected abstract void visitUp(Link l);
 
     public abstract void visitUp(Activation act, Link l);
+
+    public boolean isDown() {
+        return false;
+    }
+
+    public boolean isUp() {
+        return true;
+    }
 }

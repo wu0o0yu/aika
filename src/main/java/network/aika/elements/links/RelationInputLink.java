@@ -18,6 +18,7 @@ package network.aika.elements.links;
 
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.synapses.RelationInputSynapse;
+import network.aika.visitor.Visitor;
 
 /**
  * @author Lukas Molzberger
@@ -30,5 +31,9 @@ public class RelationInputLink extends BindingNeuronLink<RelationInputSynapse, B
 
     @Override
     public void propagateRangeOrTokenPos() {
+    }
+
+    @Override
+    public void patternVisit(Visitor v) {
     }
 }
