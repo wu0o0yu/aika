@@ -58,13 +58,16 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
         FieldLink.link(dummyWeight, -1, oAct.getNet());
     }
 
+
     @Override
     public void linkAndPropagateOut(PatternActivation act) {
     }
 
+/*
     @Override
-    public void startVisitor(LinkingOperator c, Activation bs) {
+    public void startVisitor(LinkingOperator c, Activation act) {
     }
+*/
 
     @Override
     public double getPreNetDummyWeight() {

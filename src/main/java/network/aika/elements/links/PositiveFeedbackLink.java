@@ -50,11 +50,11 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
 
         link(weightedInput, getOutput().getNet());
     }
-
+/*
     @Override
     public void bindingVisitDown(DownVisitor v) {
     }
-
+*/
     @Override
     public void bindingVisitUp(UpVisitor v) {
     }

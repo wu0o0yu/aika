@@ -44,7 +44,7 @@ public abstract class AbstractPatternLink<S extends AbstractPatternSynapse, IA e
 
         backwardsGradient = mul(
                 this,
-                "output.forwardsGradient * s.weight",
+                "output.outputGradient * s.weight",
                 output.getOutputGradient(),
                 synapse.getWeight(),
                 input.getBackwardsGradientIn()
