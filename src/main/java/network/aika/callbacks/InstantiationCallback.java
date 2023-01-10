@@ -14,33 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.elements.synapses;
+package network.aika.callbacks;
 
-import network.aika.Thought;
-import network.aika.elements.activations.Activation;
-import network.aika.elements.links.BindingNeuronLink;
-import network.aika.elements.neurons.Neuron;
+import network.aika.elements.activations.ConjunctiveActivation;
+
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class FeedbackSynapse<S extends FeedbackSynapse, I extends Neuron, L extends BindingNeuronLink<S, IA>, IA extends Activation<?>> extends BindingNeuronSynapse<
-        S,
-        I,
-        L,
-        IA
-        > {
+public interface InstantiationCallback {
 
-    public FeedbackSynapse(Scope scope) {
-        super(scope);
-    }
-
-    @Override
-    protected void warmUpInputNeuron(Thought t) {
-    }
-
-    public boolean isFeedbackSynapse() {
-        return true;
-    }
+    void onInstantiation(ConjunctiveActivation act);
 }

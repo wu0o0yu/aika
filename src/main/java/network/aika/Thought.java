@@ -20,6 +20,7 @@ package network.aika;
 import network.aika.callbacks.ActivationCheckCallback;
 import network.aika.callbacks.EventListener;
 import network.aika.callbacks.EventType;
+import network.aika.callbacks.InstantiationCallback;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.Element;
@@ -75,6 +76,7 @@ public abstract class Thought extends FieldObject implements Element {
     private Config config;
 
     private ActivationCheckCallback activationCheckCallback;
+    private InstantiationCallback instantiationCallback;
 
 
     public Thought(Model m) {
@@ -153,6 +155,14 @@ public abstract class Thought extends FieldObject implements Element {
 
     public void setActivationCheckCallback(ActivationCheckCallback activationCheckCallback) {
         this.activationCheckCallback = activationCheckCallback;
+    }
+
+    public InstantiationCallback getInstantiationCallback() {
+        return instantiationCallback;
+    }
+
+    public void setInstantiationCallback(InstantiationCallback instantiationCallback) {
+        this.instantiationCallback = instantiationCallback;
     }
 
     private void callEventListener(Consumer<EventListener> el) {

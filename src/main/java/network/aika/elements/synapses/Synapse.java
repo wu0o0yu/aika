@@ -166,14 +166,19 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         getOutput()
                 .linkOutgoing(this, act);
 
-        getOutput()
-                .latentLinkOutgoing(this, act);
+        if (!isFeedbackSynapse())
+            getOutput()
+                    .latentLinkOutgoing(this, act);
 
         if (getPropagatePreNet(act) > 0.0) {
             propagate(act);
         } else if(getStoredAt() == INPUT) {
             warmUpRelatedInputNeurons(act);
         }
+    }
+
+    public boolean isFeedbackSynapse() {
+        return false;
     }
 
     public void setModified() {

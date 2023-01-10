@@ -145,21 +145,22 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
         }
     }
 
-    public void linkOutgoing(Synapse synA, Activation fromBS) {
+    public void linkOutgoing(Synapse synA, Activation iAct) {
         synA.startVisitor(
-                new LinkLinkingOperator(fromBS, synA),
-                fromBS
+                new LinkLinkingOperator(iAct, synA),
+                iAct
         );
     }
 
-    public void latentLinkOutgoing(Synapse synA, Activation bsA) {
+    public void latentLinkOutgoing(Synapse synA, Activation iActA) {
         getInputSynapsesAsStream()
                 .filter(synB -> synA != synB)
+                .filter(synB -> !synB.isFeedbackSynapse())
                 .filter(synB -> getLatentLinkingPreNet(synA, synB) > 0.0)
                 .forEach(synB ->
                         synB.startVisitor(
-                                new ActLinkingOperator(bsA, synA, null, synB),
-                                bsA
+                                new ActLinkingOperator(iActA, synA, null, synB),
+                                iActA
                         )
                 );
     }

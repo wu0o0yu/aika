@@ -71,6 +71,9 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
 
         templateInstance = n.createActivation(getThought());
         templateInstance.template = this;
+
+        if(thought.getInstantiationCallback() != null)
+            thought.getInstantiationCallback().onInstantiation(templateInstance);
     }
 
     @Override
