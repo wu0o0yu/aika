@@ -176,6 +176,10 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return input.getValue();
     }
 
+    public FieldOutput getNegInputValue() {
+        return input.getNegValue();
+    }
+
     public S getSynapse() {
         return synapse;
     }

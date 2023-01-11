@@ -26,6 +26,7 @@ public class ThresholdOperator extends AbstractFunction {
     public enum Type {
         ABOVE,
         BELOW,
+        BELOW_OR_EQUAL,
         ABOVE_ABS
     }
 
@@ -56,6 +57,7 @@ public class ThresholdOperator extends AbstractFunction {
         return switch (type) {
             case ABOVE -> x > threshold ? 1.0 : 0.0;
             case BELOW -> x < threshold ? 1.0 : 0.0;
+            case BELOW_OR_EQUAL -> x <= threshold ? 1.0 : 0.0;
             case ABOVE_ABS -> Math.abs(x) > threshold ? 1.0 : 0.0;
         };
     }

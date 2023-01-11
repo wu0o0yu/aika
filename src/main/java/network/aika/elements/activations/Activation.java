@@ -62,18 +62,18 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     protected Timestamp fired = Timestamp.NOT_SET;
 
     protected FieldOutput value;
+    protected FieldOutput negValue;
 
     protected SumField net;
 
     protected FieldOutput isFired;
-    protected FieldOutput isFiredForWeight;
-    protected FieldOutput isFiredForBias;
 
     protected FieldFunction netOuterGradient;
     protected SumField forwardsGradient;
     protected SumField backwardsGradientIn;
     protected SumField backwardsGradientOut;
     protected FieldOutput updateValue;
+    protected FieldOutput negUpdateValue;
 
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
@@ -107,24 +107,19 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 }
         );
 
-        isFiredForWeight = func(
-                this,
-                "(isFired * 2) - 1",
-                isFired,
-                x -> (x * 2.0) - 1.0
-        );
-        isFiredForBias = func(
-                this,
-                "(isFired * -1) + 1",
-                isFired,
-                x -> (x * -1.0) + 1.0
-        );
-
         value = func(
                 this,
                 "value = f(net)",
                 net,
                 x -> getActivationFunction().f(x)
+        );
+
+        negValue = threshold(
+                this,
+                "!value",
+                0.0,
+                BELOW_OR_EQUAL,
+                value
         );
 
         forwardsGradient = new QueueSumField(this, TRAINING, "Forwards-Gradient");
@@ -231,6 +226,13 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 getOutputGradient()
         );
 
+        negUpdateValue = scale(
+                this,
+                "-updateValue",
+                -1.0,
+                updateValue
+        );
+
         FieldLink.link(
                 updateValue,
                 getNeuron().getBias()
@@ -241,14 +243,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
     public FieldOutput getIsFired() {
         return isFired;
-    }
-
-    public FieldOutput getIsFiredForWeight() {
-        return isFiredForWeight;
-    }
-
-    public FieldOutput getIsFiredForBias() {
-        return isFiredForBias;
     }
 
     public FieldFunction getNetOuterGradient() {
@@ -271,12 +265,20 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         return updateValue;
     }
 
+    public FieldOutput getNegUpdateValue() {
+        return negUpdateValue;
+    }
+
     public int getId() {
         return id;
     }
 
     public FieldOutput getValue() {
         return value;
+    }
+
+    public FieldOutput getNegValue() {
+        return negValue;
     }
 
     public boolean isInput() {

@@ -19,6 +19,7 @@ package network.aika.elements.links;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.synapses.ConjunctiveSynapse;
+import network.aika.fields.FieldOutput;
 
 import static network.aika.fields.FieldLink.link;
 import static network.aika.fields.Fields.mul;
@@ -29,6 +30,9 @@ import static network.aika.fields.Fields.mul;
  */
 public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends Activation<?>, OA extends ConjunctiveActivation<?>> extends Link<S, IA, OA> {
 
+    private FieldOutput weightUpdatePosCase;
+    private FieldOutput weightUpdateNegCase;
+    private FieldOutput biasUpdateNegCase;
 
     public ConjunctiveLink(S s, IA input, OA output) {
         super(s, input, output);
@@ -41,24 +45,40 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
 
     @Override
     public void connectWeightUpdate() {
-        link(
-                mul(
-                        this,
-                        "weight update",
-                        getInput().getIsFiredForWeight(),
-                        getOutput().getUpdateValue()
-                ),
+        weightUpdatePosCase = mul(
+                this,
+                "weight update (pos case)",
+                getInputValue(),
+                getOutput().getUpdateValue(),
                 synapse.getWeight()
         );
 
-        link(
-                mul(
-                        this,
-                        "bias update",
-                        getInput().getIsFiredForBias(),
-                        getOutput().getUpdateValue()
-                ),
+        weightUpdateNegCase = mul(
+                this,
+                "weight update (neg case)",
+                getNegInputValue(),
+                getOutput().getNegUpdateValue(),
+                synapse.getWeight()
+        );
+
+        biasUpdateNegCase = mul(
+                this,
+                "bias update (neg case)",
+                getNegInputValue(),
+                getOutput().getNegUpdateValue(),
                 output.getNeuron().getBias()
         );
+    }
+
+    public FieldOutput getWeightUpdatePosCase() {
+        return weightUpdatePosCase;
+    }
+
+    public FieldOutput getWeightUpdateNegCase() {
+        return weightUpdateNegCase;
+    }
+
+    public FieldOutput getBiasUpdateNegCase() {
+        return biasUpdateNegCase;
     }
 }

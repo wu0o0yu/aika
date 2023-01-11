@@ -20,6 +20,7 @@ import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.fields.Fields;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
+import network.aika.fields.Multiplication;
 import network.aika.visitor.Visitor;
 
 import static network.aika.fields.FieldLink.link;
@@ -40,20 +41,26 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
 
     @Override
     protected void initWeightInput() {
-        weightedInput = Fields.mul(
-                this,
-                "isClosed * iAct(id:" + getInput().getId() + ").value * weight",
-                getThought().getIsClosed(),
-                initWeightedInput()
-        );
+        weightedInput = initWeightedInput();
 
         link(weightedInput, getOutput().getNet());
     }
-/*
+
     @Override
-    public void bindingVisitDown(DownVisitor v) {
+    protected Multiplication initWeightedInput() {
+        return Fields.mul(
+                this,
+                "isClosed * iAct(id:" + getInput().getId() + ").value * weight",
+                getThought().getIsClosed(),
+                super.initWeightedInput()
+        );
     }
-*/
+
+    /*
+        @Override
+        public void bindingVisitDown(DownVisitor v) {
+        }
+    */
     @Override
     public void bindingVisit(Visitor v) {
         if(v.isDown())

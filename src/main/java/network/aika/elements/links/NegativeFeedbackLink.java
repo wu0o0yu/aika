@@ -43,16 +43,21 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
     protected void initWeightInput() {
         maxInput = new MinMaxField(this, MinMax.MAX, "max-input-value");
 
-        weightedInput = Fields.mul(
-                this,
-                "annealing * iAct(id:" + getInput().getId() + ").value * weight",
-                getThought().getAnnealing(),
-                initWeightedInput()
-        );
+        weightedInput = initWeightedInput();
 
         link(
                 weightedInput,
                 getOutput().getNet()
+        );
+    }
+
+    @Override
+    protected FieldOutput initWeightedInput() {
+        return Fields.mul(
+                this,
+                "annealing * iAct(id:" + getInput().getId() + ").value * weight",
+                getThought().getAnnealing(),
+                super.initWeightedInput()
         );
     }
 

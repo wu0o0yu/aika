@@ -293,6 +293,7 @@ public abstract class Thought extends FieldObject implements Element {
 
     public void anneal() {
         AnnealStep.add(this);
+        process(ANNEAL); // Anneal needs to be finished before instantiation can start.
     }
 
     public void instantiateTemplates() {
