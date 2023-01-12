@@ -45,8 +45,8 @@ public class Counting extends Step<Activation> {
     public void process() {
         Activation act = getElement();
 
-        assert act.isFired();
-        act.getNeuron()
-                .count(act);
+        if (act.isFired())
+            act.getNeuron()
+                    .count(act);
     }
 }

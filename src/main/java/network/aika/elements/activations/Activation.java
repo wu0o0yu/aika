@@ -302,7 +302,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     }
 
     public boolean isFired() {
-        return fired != Timestamp.NOT_SET;
+        return isTrue(isFired);
     }
 
     public Activation getTemplateInstance() {
