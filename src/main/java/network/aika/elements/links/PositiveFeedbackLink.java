@@ -24,6 +24,8 @@ import network.aika.fields.Multiplication;
 import network.aika.visitor.Visitor;
 
 import static network.aika.fields.FieldLink.link;
+import static network.aika.fields.Fields.mul;
+import static network.aika.fields.Fields.scale;
 
 /**
  *
@@ -34,6 +36,25 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
     public PositiveFeedbackLink(PositiveFeedbackSynapse s, PatternActivation input, BindingActivation output) {
         super(s, input, output);
     }
+
+    @Override
+    protected void connectGradientFields() {
+        super.connectGradientFields();
+
+        scale(
+                this,
+                "updateValue = lr * in.grad * f'(out.net)",
+                getConfig().getLearnRate(output.getNeuron().isAbstract()),
+                mul(
+                        this,
+                        "in.gradient * f'(out.net)",
+                        input.getGradient(),
+                        output.getNetOuterGradient()
+                ),
+                output.getUpdateValue()
+        );
+    }
+
 
     @Override
     public void addInputLinkingStep() {
@@ -56,11 +77,6 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
         );
     }
 
-    /*
-        @Override
-        public void bindingVisitDown(DownVisitor v) {
-        }
-    */
     @Override
     public void bindingVisit(Visitor v) {
         if(v.isDown())

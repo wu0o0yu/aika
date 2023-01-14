@@ -33,21 +33,7 @@ public abstract class AbstractPatternLink<S extends AbstractPatternSynapse, IA e
 
     @Override
     protected void connectGradientFields() {
-        initForwardsGradient();
-        initBackwardsGradient();
+        initGradient();
         super.connectGradientFields();
-    }
-
-    protected void initBackwardsGradient() {
-        if(output.getOutputGradient() == null)
-            return;
-
-        backwardsGradient = mul(
-                this,
-                "output.outputGradient * s.weight",
-                output.getOutputGradient(),
-                synapse.getWeight(),
-                input.getBackwardsGradientIn()
-        );
     }
 }

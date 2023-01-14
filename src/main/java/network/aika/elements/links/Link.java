@@ -46,8 +46,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected FieldOutput weightedInput;
 
-    protected SumField forwardsGradient;
-    protected AbstractFunction backwardsGradient;
+    protected SumField gradient;
 
     public Link(S s, I input, O output) {
         this.synapse = s;
@@ -93,10 +92,10 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected void connectGradientFields() {
     }
 
-    protected void initForwardsGradient() {
-        forwardsGradient = new SumField(this, "Forwards-Gradient");
-        link(input.getForwardsGradient(), forwardsGradient);
-        link(forwardsGradient, output.getForwardsGradient());
+    protected void initGradient() {
+        gradient = new SumField(this, "Gradient");
+        link(input.getGradient(), gradient);
+        link(gradient, output.getGradient());
     }
 
     public S instantiateTemplate(I iAct, O oAct) {
@@ -154,12 +153,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return weightedInput;
     }
 
-    public Field getForwardsGradient() {
-        return forwardsGradient;
-    }
-
-    public FieldOutput getBackwardsGradient() {
-        return backwardsGradient;
+    public Field getGradient() {
+        return gradient;
     }
 
     @Override

@@ -29,7 +29,6 @@ import network.aika.elements.neurons.Range;
 import network.aika.fields.*;
 import network.aika.elements.synapses.Synapse;
 import network.aika.visitor.DownVisitor;
-import network.aika.visitor.Visitor;
 import network.aika.visitor.selfref.SelfRefDownVisitor;
 import network.aika.visitor.UpVisitor;
 import network.aika.steps.activation.Counting;
@@ -69,10 +68,10 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     protected FieldOutput isFired;
 
     protected FieldFunction netOuterGradient;
-    protected SumField forwardsGradient;
-    protected SumField backwardsGradientIn;
-    protected SumField backwardsGradientOut;
-    protected FieldOutput updateValue;
+    protected SumField gradient;
+
+    protected Field updateValue;
+
     protected FieldOutput negUpdateValue;
 
     protected Map<NeuronProvider, Link> inputLinks;
@@ -122,11 +121,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 value
         );
 
-        forwardsGradient = new QueueSumField(this, TRAINING, "Forwards-Gradient");
-        backwardsGradientIn = (SumField) new QueueSumField(this, TRAINING, "Backwards-Gradient-In")
-                .setInitialValue(0.0);
-
-        backwardsGradientOut = new QueueSumField(this, TRAINING, "Backwards-Gradient-Out");
+        gradient = new QueueSumField(this, TRAINING, "Gradient");
 
         if (getConfig().isTrainingEnabled() && neuron.isTrainingAllowed()) {
             connectGradientFields();
@@ -139,6 +134,10 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         neuron.register(this);
 
         thought.onElementEvent(CREATE, this);
+    }
+
+    protected void connectWeightUpdate() {
+
     }
 
     protected void initNet() {
@@ -208,38 +207,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                         net,
                         x -> getNeuron().getActivationFunction().outerGrad(x)
         );
-
-        mul(
-                this,
-                "ig * f'(net)",
-                backwardsGradientIn,
-                netOuterGradient,
-                backwardsGradientOut
-        );
     }
-
-    protected void connectWeightUpdate() {
-        updateValue = scale(
-                this,
-                "learn-rate * og",
-                getConfig().getLearnRate(neuron.isAbstract()),
-                getOutputGradient()
-        );
-
-        negUpdateValue = scale(
-                this,
-                "-updateValue",
-                -1.0,
-                updateValue
-        );
-
-        FieldLink.link(
-                updateValue,
-                getNeuron().getBias()
-        );
-    }
-
-    public abstract FieldOutput getOutputGradient();
 
     public FieldOutput getIsFired() {
         return isFired;
@@ -249,19 +217,11 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         return netOuterGradient;
     }
 
-    public SumField getForwardsGradient() {
-        return forwardsGradient;
+    public SumField getGradient() {
+        return gradient;
     }
 
-    public Field getBackwardsGradientIn() {
-        return backwardsGradientIn;
-    }
-
-    public FieldOutput getBackwardsGradientOut() {
-        return backwardsGradientOut;
-    }
-
-    public FieldOutput getUpdateValue() {
+    public Field getUpdateValue() {
         return updateValue;
     }
 

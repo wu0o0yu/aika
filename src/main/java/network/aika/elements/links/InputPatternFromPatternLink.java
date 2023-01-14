@@ -18,27 +18,30 @@ package network.aika.elements.links;
 
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
+import network.aika.fields.AbstractFunction;
 import network.aika.fields.Fields;
 import network.aika.elements.synapses.InputPatternFromPatternSynapse;
-import static network.aika.fields.FieldLink.link;
-import static network.aika.fields.Fields.scale;
 
 /**
  * @author Lukas Molzberger
  */
 public class InputPatternFromPatternLink extends InputPatternLink<InputPatternFromPatternSynapse, PatternActivation> {
 
+    private AbstractFunction inputEntropy;
+
     public InputPatternFromPatternLink(InputPatternFromPatternSynapse s, PatternActivation input, BindingActivation output) {
         super(s, input, output);
     }
 
+    public AbstractFunction getInputEntropy() {
+        return inputEntropy;
+    }
+
     @Override
     public void connectGradientFields() {
-        link(
-                Fields.scale(this, "-Entropy", -1,
-                        input.getEntropy()
-                ),
-                output.getForwardsGradient()
+        inputEntropy = Fields.scale(this, "-Entropy", -1,
+                input.getEntropy(),
+                output.getGradient()
         );
 
         super.connectGradientFields();

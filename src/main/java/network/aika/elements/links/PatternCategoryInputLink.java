@@ -33,7 +33,7 @@ public class PatternCategoryInputLink extends AbstractPatternLink<PatternCategor
 
     @Override
     protected void connectGradientFields() {
-        initForwardsGradient();
+        initGradient();
 
         super.connectGradientFields();
     }

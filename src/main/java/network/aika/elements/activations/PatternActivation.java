@@ -36,8 +36,6 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     private FieldFunction entropy;
 
-    protected SumField outputGradient;
-
     public PatternActivation(int id, Thought t, PatternNeuron patternNeuron) {
         super(id, t, patternNeuron);
     }
@@ -54,20 +52,27 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
                                 getAbsoluteRange(),
                                 true
                         ),
-                forwardsGradient
+                gradient
         );
 
-        outputGradient = new SumField(this, "outputGradient");
-
         super.connectGradientFields();
-
-        FieldLink.link(forwardsGradient, outputGradient);
-        FieldLink.link(backwardsGradientOut, outputGradient);
     }
 
     @Override
-    public FieldOutput getOutputGradient() {
-        return outputGradient;
+    protected void connectWeightUpdate() {
+        updateValue = scale(
+                this,
+                "updateValue = lr * grad * f'(net)",
+                getConfig().getLearnRate(neuron.isAbstract()),
+                mul(
+                        this,
+                        "gradient * f'(net)",
+                        gradient,
+                        netOuterGradient
+                )
+        );
+
+        super.connectWeightUpdate();
     }
 
     public FieldOutput getEntropy() {

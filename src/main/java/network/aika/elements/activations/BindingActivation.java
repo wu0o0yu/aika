@@ -34,8 +34,10 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     @Override
-    public FieldOutput getOutputGradient() {
-        return backwardsGradientOut;
+    protected void connectWeightUpdate() {
+        updateValue = new SumField(this, "updateValue");
+
+        super.connectWeightUpdate();
     }
 
     @Override

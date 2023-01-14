@@ -19,6 +19,9 @@ package network.aika.elements.activations;
 import network.aika.Thought;
 import network.aika.elements.synapses.Synapse;
 import network.aika.elements.neurons.ConjunctiveNeuron;
+import network.aika.fields.FieldLink;
+
+import static network.aika.fields.Fields.scale;
 
 
 /**
@@ -33,6 +36,22 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
 
     public ConjunctiveActivation(int id, Thought t, N n) {
         super(id, t, n);
+    }
+
+
+    @Override
+    protected void connectWeightUpdate() {
+        negUpdateValue = scale(
+                this,
+                "-updateValue",
+                -1.0,
+                updateValue
+        );
+
+        FieldLink.link(
+                updateValue,
+                getNeuron().getBias()
+        );
     }
 
     @Override

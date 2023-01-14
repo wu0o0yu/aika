@@ -67,12 +67,12 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
                                 input.getAbsoluteRange(),
                                 true
                         ),
-                forwardsGradient
+                gradient
         );
 
         outputEntropy = scale(this, "-Entropy", -1,
                 output.getEntropy(),
-                forwardsGradient
+                gradient
         );
     }
 
