@@ -16,10 +16,11 @@
  */
 package network.aika.elements.links;
 
-import network.aika.elements.activations.BindingActivation;
-import network.aika.elements.activations.BindingCategoryActivation;
-import network.aika.elements.activations.CategoryActivation;
+import network.aika.direction.Direction;
+import network.aika.elements.activations.*;
 import network.aika.elements.synapses.BindingCategoryInputSynapse;
+import network.aika.elements.synapses.BindingCategorySynapse;
+import network.aika.elements.synapses.PatternCategorySynapse;
 
 
 /**
@@ -29,6 +30,26 @@ public class BindingCategoryInputLink extends BindingNeuronLink<BindingCategoryI
 
     public BindingCategoryInputLink(BindingCategoryInputSynapse s, BindingCategoryActivation input, BindingActivation output) {
         super(s, input, output);
+    }
+
+    @Override
+    public void instantiateTemplate(BindingCategoryActivation iAct, BindingActivation oAct) {
+        if(iAct == null || oAct == null)
+            return;
+
+        Link l = iAct.getInputLink(oAct.getNeuron());
+
+        if(l != null)
+            return;
+
+        BindingCategorySynapse s = new BindingCategorySynapse();
+        s.initFromTemplate(oAct.getNeuron(), iAct.getNeuron(), synapse);
+
+        synapse.copyState(s);
+        s.connect(Direction.INPUT, false, false);
+        s.connect(Direction.OUTPUT, false, true);
+
+        s.createLinkFromTemplate(oAct, iAct, this);
     }
 
     @Override

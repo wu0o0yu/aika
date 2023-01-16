@@ -48,6 +48,9 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
 
     @Override
     public void initDummyLink(BindingActivation oAct) {
+        if(oAct.getPosFeedbackDummy() != null)
+            return;
+
         Multiplication dummyWeight = mul(
                 oAct,
                 "pos-feedback-dummy",
@@ -55,19 +58,13 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
                 getWeight()
         );
 
+        oAct.setPosFeedbackDummy(dummyWeight);
         FieldLink.link(dummyWeight, -1, oAct.getNet());
     }
-
 
     @Override
     public void linkAndPropagateOut(PatternActivation act) {
     }
-
-/*
-    @Override
-    public void startVisitor(LinkingOperator c, Activation act) {
-    }
-*/
 
     @Override
     public double getPreNetDummyWeight() {

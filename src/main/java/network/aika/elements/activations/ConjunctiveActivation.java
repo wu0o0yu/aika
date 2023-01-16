@@ -110,7 +110,9 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         );
 
         templateInstance.initDummyLinks();
-        templateInstance.initFromTemplate(this);
+
+        if(templateInstance.template == null)
+            templateInstance.initFromTemplate(this);
 
         getOutputLinks()
                 .filter(l -> !l.getOutput().getNeuron().isAbstract())

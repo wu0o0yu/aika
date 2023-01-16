@@ -29,6 +29,8 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     private boolean isInput;
 
+    private Multiplication posFeedbackDummy;
+
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
     }
@@ -64,6 +66,14 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     public void setInput(boolean input) {
         isInput = input;
+    }
+
+    public Multiplication getPosFeedbackDummy() {
+        return posFeedbackDummy;
+    }
+
+    public void setPosFeedbackDummy(Multiplication posFeedbackDummy) {
+        this.posFeedbackDummy = posFeedbackDummy;
     }
 
     public void updateBias(double u) {
