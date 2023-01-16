@@ -18,6 +18,7 @@ package network.aika.elements.neurons;
 
 import network.aika.Thought;
 import network.aika.elements.activations.CategoryActivation;
+import network.aika.elements.activations.PatternCategoryActivation;
 import network.aika.elements.synapses.PatternCategoryInputSynapse;
 import network.aika.elements.synapses.PatternCategorySynapse;
 
@@ -29,7 +30,7 @@ public class PatternCategoryNeuron extends CategoryNeuron<PatternCategorySynapse
 
     @Override
     public CategoryActivation createActivation(Thought t) {
-        return new CategoryActivation(t.createActivationId(), t, this);
+        return new PatternCategoryActivation(t.createActivationId(), t, this);
     }
 
     @Override

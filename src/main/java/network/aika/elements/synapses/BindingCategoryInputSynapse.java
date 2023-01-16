@@ -17,6 +17,8 @@
 package network.aika.elements.synapses;
 
 import network.aika.elements.activations.BindingActivation;
+import network.aika.elements.activations.BindingCategoryActivation;
+import network.aika.elements.activations.PatternCategoryActivation;
 import network.aika.elements.links.BindingCategoryInputLink;
 import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.neurons.BindingCategoryNeuron;
@@ -30,7 +32,7 @@ public class BindingCategoryInputSynapse extends BindingNeuronSynapse<
         BindingCategoryInputSynapse,
         BindingCategoryNeuron,
         BindingCategoryInputLink,
-        CategoryActivation<?>
+        BindingCategoryActivation
         > implements CategoryInputSynapse<BindingCategoryNeuron, BindingCategoryInputSynapse>
 {
     public BindingCategoryInputSynapse() {
@@ -38,7 +40,7 @@ public class BindingCategoryInputSynapse extends BindingNeuronSynapse<
     }
 
     @Override
-    public BindingCategoryInputLink createLink(CategoryActivation input, BindingActivation output) {
+    public BindingCategoryInputLink createLink(BindingCategoryActivation input, BindingActivation output) {
         return new BindingCategoryInputLink(this, input, output);
     }
 

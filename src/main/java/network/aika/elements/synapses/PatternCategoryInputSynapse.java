@@ -18,7 +18,9 @@ package network.aika.elements.synapses;
 
 import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.activations.PatternActivation;
+import network.aika.elements.activations.PatternCategoryActivation;
 import network.aika.elements.links.PatternCategoryInputLink;
+import network.aika.elements.neurons.BindingCategoryNeuron;
 import network.aika.elements.neurons.PatternCategoryNeuron;
 
 /**
@@ -30,11 +32,11 @@ public class PatternCategoryInputSynapse extends AbstractPatternSynapse<
         PatternCategoryInputSynapse,
         PatternCategoryNeuron,
         PatternCategoryInputLink,
-        CategoryActivation<?>
+        PatternCategoryActivation
         > implements CategoryInputSynapse<PatternCategoryNeuron, PatternCategoryInputSynapse>
 {
     @Override
-    public PatternCategoryInputLink createLink(CategoryActivation input, PatternActivation output) {
+    public PatternCategoryInputLink createLink(PatternCategoryActivation input, PatternActivation output) {
         return new PatternCategoryInputLink(this, input, output);
     }
 

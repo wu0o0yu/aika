@@ -17,15 +17,16 @@
 package network.aika.elements.activations;
 
 import network.aika.Thought;
+import network.aika.elements.neurons.BindingCategoryNeuron;
 import network.aika.elements.neurons.CategoryNeuron;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class BindingCategoryActivation extends CategoryActivation {
+public class BindingCategoryActivation extends CategoryActivation<BindingCategoryNeuron> {
 
-    public BindingCategoryActivation(int id, Thought t, CategoryNeuron neuron) {
+    public BindingCategoryActivation(int id, Thought t, BindingCategoryNeuron neuron) {
         super(id, t, neuron);
     }
 

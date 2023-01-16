@@ -98,13 +98,12 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
     @Override
     public void instantiateTemplateEdges() {
         getInputLinks()
-                .forEach(l -> {
-                    Activation iAct = l.getInput().resolveAbstractInputActivation();
-                    if(iAct != null) {
-                        Synapse s = l.instantiateTemplate(iAct, templateInstance);
-                        s.createLinkFromTemplate(iAct, templateInstance, l);
-                    }
-                });
+                .forEach(l ->
+                    l.instantiateTemplate(
+                            l.getInput().resolveAbstractInputActivation(),
+                            templateInstance
+                    )
+                );
 
         templateInstance.getNeuron().setLabel(
                 getConfig().getLabel(this)
@@ -115,12 +114,11 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
 
         getOutputLinks()
                 .filter(l -> !l.getOutput().getNeuron().isAbstract())
-                .forEach(l -> {
-                    Activation oAct = l.getOutput().resolveAbstractInputActivation();
-                    if(oAct != null) {
-                        Synapse s = l.instantiateTemplate(templateInstance, oAct);
-                        s.createLinkFromTemplate(templateInstance, oAct, l);
-                    }
-                });
+                .forEach(l ->
+                    l.instantiateTemplate(
+                            templateInstance,
+                            l.getOutput().resolveAbstractInputActivation()
+                    )
+                );
     }
 }

@@ -30,10 +30,10 @@ import static network.aika.steps.Phase.INSTANTIATION_NODES;
 public class InstantiationNodes extends Step<ConjunctiveActivation> {
 
     public static void add(ConjunctiveActivation act) {
-        if(act.instantiationIsQueued)
+        if(act.instantiationNodesIsQueued)
             return;
 
-        act.instantiationIsQueued = true;
+        act.instantiationNodesIsQueued = true;
 
         if(act.getTemplateInstance() != null)
             return;
@@ -50,9 +50,7 @@ public class InstantiationNodes extends Step<ConjunctiveActivation> {
         getElement()
                 .instantiateTemplateNodes();
 
-        getElement().instantiationIsQueued = false;
-
-        InstantiationEdges.add(getElement());
+        getElement().instantiationNodesIsQueued = false;
     }
 
     @Override

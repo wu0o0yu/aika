@@ -210,7 +210,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return s;
     }
 
-    protected void initFromTemplate(I input, O output, S templateSyn) {
+    public void initFromTemplate(I input, O output, Synapse templateSyn) {
         setInput(input);
         setOutput(output);
 
@@ -250,7 +250,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return l;
     }
 
-    public L createLinkFromTemplate(IA input, OA output, L template) {
+    public L createLinkFromTemplate(IA input, OA output, Link template) {
         L l = createLink(input, output);
         l.initFromTemplate(template);
         return l;

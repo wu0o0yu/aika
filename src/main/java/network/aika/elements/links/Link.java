@@ -98,13 +98,14 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         link(gradient, output.getGradient());
     }
 
-    public S instantiateTemplate(I iAct, O oAct) {
+    public void instantiateTemplate(I iAct, O oAct) {
         if(iAct == null || oAct == null)
-            return null;
+            return;
 
         Link l = oAct.getInputLink(iAct.getNeuron());
+
         if(l != null)
-            return (S) l.getSynapse();
+            return;
 
         S s = (S) synapse.instantiateTemplate(
                 iAct.getNeuron(),
@@ -114,7 +115,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         s.connect(Direction.INPUT, false, false);
         s.connect(Direction.OUTPUT, false, true);
 
-        return s;
+        s.createLinkFromTemplate(iAct, oAct, this);
     }
 
     public void initFromTemplate(Link template) {

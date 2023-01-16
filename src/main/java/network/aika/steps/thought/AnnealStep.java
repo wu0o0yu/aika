@@ -18,12 +18,10 @@ package network.aika.steps.thought;
 
 import network.aika.Thought;
 import network.aika.elements.links.NegativeFeedbackLink;
-import network.aika.elements.neurons.Neuron;
 import network.aika.fields.AbstractFieldLink;
 import network.aika.fields.Field;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
-import network.aika.steps.activation.Save;
 import network.aika.text.Document;
 
 import static network.aika.steps.Phase.*;
@@ -47,18 +45,17 @@ public class AnnealStep extends Step<Thought> {
     public void process() {
         Thought t = getElement();
 
-        double annealStep = t.getAnnealing().getCurrentValue();
-        System.out.println("Anneal-Step: " + annealStep);
-        annealStep += getMaxAnnealStep();
+        double nextAnnealValue = getNextAnnealValue(
+                t.getAnnealing().getCurrentValue()
+        );
+        t.getAnnealing().setValue(nextAnnealValue);
 
-        t.getAnnealing().setValue(annealStep);
-
-        if (annealStep < 1.0)
+        if (nextAnnealValue < 1.0)
             AnnealStep.add(t);
     }
 
-    public double getMaxAnnealStep() {
-        double maxAnnealStep = 1.0;
+    public double getNextAnnealValue(double currentAnnealValue) {
+        double maxAnnealValue = 1.0 - currentAnnealValue;
         for (AbstractFieldLink fl : getElement().getAnnealing().getReceivers()) {
             if (!(fl.getOutput() instanceof Field))
                 continue;
@@ -77,11 +74,11 @@ public class AnnealStep extends Step<Thought> {
 
                 Field fNet = (Field) flNet.getOutput();
                 if (fNet.getCurrentValue() > 0.0) {
-                    maxAnnealStep = Math.min(maxAnnealStep, fNet.getCurrentValue() / -wi);
+                    maxAnnealValue = Math.min(maxAnnealValue, fNet.getCurrentValue() / -wi);
                 }
             }
         }
-        return maxAnnealStep;
+        return currentAnnealValue + maxAnnealValue;
     }
 
     @Override

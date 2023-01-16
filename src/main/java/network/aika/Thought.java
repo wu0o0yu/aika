@@ -32,6 +32,7 @@ import network.aika.elements.neurons.Range;
 import network.aika.steps.Phase;
 import network.aika.steps.QueueKey;
 import network.aika.steps.Step;
+import network.aika.steps.activation.InstantiationEdges;
 import network.aika.steps.activation.InstantiationNodes;
 import network.aika.steps.thought.AnnealStep;
 import network.aika.steps.thought.CloseStep;
@@ -304,9 +305,11 @@ public abstract class Thought extends FieldObject implements Element {
                 .filter(act -> act.getNeuron().isAbstract())
                 .filter(act -> act.isFired())
                 .filter(act -> act instanceof ConjunctiveActivation<?>)
-                .forEach(act ->
-                        InstantiationNodes.add((ConjunctiveActivation) act)
-                );
+                .map(act -> (ConjunctiveActivation) act)
+                .forEach(act -> {
+                    InstantiationNodes.add(act);
+                    InstantiationEdges.add(act);
+                });
     }
 
     public String toString() {

@@ -77,7 +77,8 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
 
-    public boolean instantiationIsQueued;
+    public boolean instantiationNodesIsQueued;
+    public boolean instantiationEdgesIsQueued;
 
     protected Range range;
     protected Integer tokenPos;

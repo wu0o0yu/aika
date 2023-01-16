@@ -14,45 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.steps.activation;
+package network.aika.elements.activations;
 
-import network.aika.elements.activations.Activation;
-import network.aika.steps.Phase;
-import network.aika.steps.Step;
-
-import static network.aika.steps.Phase.INSTANTIATION_EDGES;
-
+import network.aika.Thought;
+import network.aika.elements.neurons.CategoryNeuron;
+import network.aika.elements.neurons.PatternCategoryNeuron;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class InstantiationEdges extends Step<Activation> {
+public class PatternCategoryActivation extends CategoryActivation<PatternCategoryNeuron> {
 
-
-    public static void add(Activation act) {
-        if(act.instantiationEdgesIsQueued)
-            return;
-
-        act.instantiationEdgesIsQueued = true;
-
-        Step.add(new InstantiationEdges(act));
-    }
-
-    public InstantiationEdges(Activation act) {
-        super(act);
-    }
-
-    @Override
-    public void process() {
-        getElement()
-                .instantiateTemplateEdges();
-
-        getElement().instantiationEdgesIsQueued = false;
-    }
-
-    @Override
-    public Phase getPhase() {
-        return INSTANTIATION_EDGES;
+    public PatternCategoryActivation(int id, Thought t, PatternCategoryNeuron neuron) {
+        super(id, t, neuron);
     }
 }
