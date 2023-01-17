@@ -59,8 +59,8 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         initIO(weakRefs);
     }
 
-    public Field addListener(FieldOnTrueEvent fieldListener) {
-        addOutput(createEventListener(this, fieldListener));
+    public Field addListener(String listenerName, FieldOnTrueEvent fieldListener) {
+        addOutput(createEventListener(this, listenerName, fieldListener));
         return this;
     }
 

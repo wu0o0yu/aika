@@ -122,6 +122,7 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
         return input != null && input.equals(fLink.input);
     }
 
+    @Override
     public String toString() {
         return input + " --" + arg + "--> " + output;
     }

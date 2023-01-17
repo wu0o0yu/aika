@@ -23,19 +23,22 @@ import network.aika.callbacks.UpdateListener;
  */
 public class ListenerFieldLink extends AbstractFieldLink<UpdateListener> {
 
-    public static ListenerFieldLink createEventListener(FieldOutput in, FieldOnTrueEvent eventListener) {
-        return createUpdateListener(in, (arg, u) -> {
+    private String listenerName;
+
+    public static ListenerFieldLink createEventListener(FieldOutput in, String listenerName, FieldOnTrueEvent eventListener) {
+        return createUpdateListener(in, listenerName, (arg, u) -> {
             if (u > 0.0)
                 eventListener.onTrue();
         });
     }
 
-    public static ListenerFieldLink createUpdateListener(FieldOutput in, UpdateListener updateListener) {
-        return new ListenerFieldLink(in, 0, updateListener);
+    public static ListenerFieldLink createUpdateListener(FieldOutput in, String listenerName, UpdateListener updateListener) {
+        return new ListenerFieldLink(in, listenerName, updateListener);
     }
 
-    public ListenerFieldLink(FieldOutput input, int arg, UpdateListener output) {
-        super(input, arg, output);
+    public ListenerFieldLink(FieldOutput input, String listenerName, UpdateListener output) {
+        super(input, 0, output);
+        this.listenerName = listenerName;
     }
 
     @Override
@@ -50,5 +53,10 @@ public class ListenerFieldLink extends AbstractFieldLink<UpdateListener> {
     @Override
     public void unlink() {
 
+    }
+
+    @Override
+    public String toString() {
+        return input + " --> listener: " + listenerName;
     }
 }

@@ -17,10 +17,11 @@
 package network.aika.elements.activations;
 
 import network.aika.Thought;
-import network.aika.elements.synapses.Synapse;
+import network.aika.direction.Direction;
 import network.aika.elements.neurons.ConjunctiveNeuron;
 import network.aika.fields.FieldLink;
 
+import static network.aika.callbacks.EventType.UPDATE;
 import static network.aika.fields.Fields.scale;
 
 
@@ -33,6 +34,8 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
     protected ConjunctiveActivation<N>  template;
 
     protected ConjunctiveActivation<N>  templateInstance;
+
+    private boolean initialized = true;
 
     public ConjunctiveActivation(int id, Thought t, N n) {
         super(id, t, n);
@@ -84,12 +87,17 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         this.templateInstance = instanceAct;
     }
 
+    public void linkTemplateAndInstance(ConjunctiveActivation instanceAct) {
+        setTemplateInstance(instanceAct);
+        instanceAct.setTemplate(this);
+    }
+
     @Override
     public void instantiateTemplateNodes() {
         N n = (N) neuron.instantiateTemplate();
 
-        templateInstance = n.createActivation(getThought());
-        templateInstance.template = this;
+        linkTemplateAndInstance(n.createActivation(getThought()));
+        templateInstance.initialized = false;
 
         if(thought.getInstantiationCallback() != null)
             thought.getInstantiationCallback().onInstantiation(templateInstance);
@@ -110,9 +118,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         );
 
         templateInstance.initDummyLinks();
-
-        if(templateInstance.template == null)
-            templateInstance.initFromTemplate(this);
+        templateInstance.initFromTemplate();
 
         getOutputLinks()
                 .filter(l -> !l.getOutput().getNeuron().isAbstract())
@@ -122,5 +128,17 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
                             l.getOutput().resolveAbstractInputActivation()
                     )
                 );
+    }
+
+    public void initFromTemplate() {
+        if(initialized)
+            return;
+
+        template.copyState(this);
+        fired = template.fired;
+        connect(Direction.INPUT, false, false);
+        thought.onElementEvent(UPDATE, this);
+
+        initialized = true;
     }
 }

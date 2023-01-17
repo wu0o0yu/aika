@@ -65,7 +65,7 @@ public class PatternCategoryInputLink extends AbstractPatternLink<PatternCategor
     public void addInputLinkingStep() {
         super.addInputLinkingStep();
 
-        linkTemplateAndInstance(input.getCategoryInput());
+        output.linkTemplateAndInstance(input.getCategoryInput());
     }
 
     @Override

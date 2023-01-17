@@ -39,7 +39,11 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     private static final Logger log = LoggerFactory.getLogger(ConjunctiveNeuron.class);
 
     public ConjunctiveNeuron() {
-        bias.addEventListener(this::updateSumOfLowerWeights, true);
+        bias.addEventListener(
+                "onBiasUpdate",
+                this::updateSumOfLowerWeights,
+                true
+        );
     }
 
     @Override
@@ -113,7 +117,11 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     @Override
     public void addInputSynapse(S s) {
         super.addInputSynapse(s);
-        s.getWeight().addEventListener(this::updateSumOfLowerWeights, true);
+        s.getWeight().addEventListener(
+                "onWeightUpdate",
+                this::updateSumOfLowerWeights,
+                true
+        );
     }
 
     private ConjunctiveSynapse[] sortInputSynapses() {

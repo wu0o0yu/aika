@@ -16,7 +16,6 @@
  */
 package network.aika.utils;
 
-import org.apache.commons.math3.distribution.BetaDistribution;
 
 /**
  *
@@ -24,7 +23,7 @@ import org.apache.commons.math3.distribution.BetaDistribution;
  */
 public class Utils {
 
-    public static double TOLERANCE = 0.0001;
+    public static double TOLERANCE = 0.001;
 
 
     public static double surprisal(double p) {

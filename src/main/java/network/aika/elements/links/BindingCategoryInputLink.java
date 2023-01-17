@@ -56,6 +56,6 @@ public class BindingCategoryInputLink extends BindingNeuronLink<BindingCategoryI
     public void addInputLinkingStep() {
         super.addInputLinkingStep();
 
-        linkTemplateAndInstance(input.getCategoryInput());
+        output.linkTemplateAndInstance(input.getCategoryInput());
     }
 }

@@ -100,7 +100,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
         isFired = threshold(this, "isFired", 0.0, ABOVE, net);
 
-        isFired.addEventListener(() -> {
+        isFired.addEventListener("onFired", () -> {
                     fired = thought.getCurrentTimestamp();
                     LinkingOut.add(this);
                     Counting.add(this);
@@ -332,14 +332,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     }
 
     public void setTemplate(Activation template) {
-    }
-
-    public void initFromTemplate(Activation template) {
-        setTemplate(template);
-        template.copyState(this);
-        fired = template.fired;
-        connect(Direction.INPUT, false, false);
-        thought.onElementEvent(UPDATE, this);
     }
 
     public N getNeuron() {

@@ -45,12 +45,12 @@ public interface FieldOutput {
 
     Object getReference();
 
-    default void addEventListener(FieldOnTrueEvent eventListener) {
-        addEventListener(eventListener, false);
+    default void addEventListener(String listenerName, FieldOnTrueEvent eventListener) {
+        addEventListener(listenerName, eventListener, false);
     }
 
-    default void addEventListener(FieldOnTrueEvent eventListener, boolean assumeInitialized) {
-        AbstractFieldLink fl = createEventListener(this, eventListener);
+    default void addEventListener(String listenerName, FieldOnTrueEvent eventListener, boolean assumeInitialized) {
+        AbstractFieldLink fl = createEventListener(this, listenerName, eventListener);
         addOutput(fl);
         fl.connect(!assumeInitialized);
     }

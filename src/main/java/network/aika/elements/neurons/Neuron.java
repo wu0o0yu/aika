@@ -240,7 +240,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
 
     protected SumField initBias() {
         return (SumField) new LimitedField(this, TRAINING, "bias", 0.0)
-                .addListener(() ->
+                .addListener("onBiasModified", () ->
                         setModified()
                 );
     }

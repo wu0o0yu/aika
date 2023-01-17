@@ -38,11 +38,6 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
         super(s, input, output);
     }
 
-    protected void linkTemplateAndInstance(ConjunctiveActivation instanceAct) {
-        output.setTemplateInstance(instanceAct);
-        instanceAct.setTemplate(output);
-    }
-
     @Override
     public void connectWeightUpdate() {
         weightUpdatePosCase = mul(
