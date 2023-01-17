@@ -78,12 +78,7 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
                         this,
                         "weight update",
                         getInput().getIsFired(),
-                        Fields.scale(
-                                this,
-                                "-1 * og",
-                                -1,
-                                getOutput().getUpdateValue()
-                        )
+                        getOutput().getNegUpdateValue()
                 ),
                 synapse.getWeight()
         );
