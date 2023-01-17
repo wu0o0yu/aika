@@ -55,6 +55,10 @@ public class ListenerFieldLink extends AbstractFieldLink<UpdateListener> {
 
     }
 
+    public String getListenerName() {
+        return listenerName;
+    }
+
     @Override
     public String toString() {
         return input + " --> listener: " + listenerName;
