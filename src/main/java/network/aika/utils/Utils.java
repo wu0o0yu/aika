@@ -24,7 +24,7 @@ import org.apache.commons.math3.distribution.BetaDistribution;
  */
 public class Utils {
 
-    public static double TOLERANCE = 0.001;
+    public static double TOLERANCE = 0.0001;
 
 
     public static double surprisal(double p) {
@@ -69,7 +69,7 @@ public class Utils {
     }
 
     public static double round(double x) {
-        return round(x, 1000.0);
+        return round(x, 10000.0);
     }
 
     public static double round(double x, double precision) {
