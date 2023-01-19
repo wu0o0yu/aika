@@ -12,6 +12,8 @@ public interface IQueueField extends FieldOutput {
 
     void setNewValue(double newValue);
 
+    void setValue(double v);
+
     void addObserver(FieldObserver observer);
 
     void removeObserver(FieldObserver observer);

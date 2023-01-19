@@ -40,7 +40,6 @@ import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.callbacks.EventType.CREATE;
-import static network.aika.callbacks.EventType.UPDATE;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.*;
 import static network.aika.steps.Phase.INFERENCE;
