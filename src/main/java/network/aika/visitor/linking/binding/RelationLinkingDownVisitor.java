@@ -48,7 +48,7 @@ public class RelationLinkingDownVisitor extends BindingDownVisitor {
 
     public void expandRelations(TokenActivation origin) {
         getRelation().getInput()
-                .evaluateLatentRelation(origin, getRelationDir())
+                .evaluateLatentRelation(origin, relationDir)
                 .forEach(relTokenAct ->
                         up(origin, relTokenAct)
                 );

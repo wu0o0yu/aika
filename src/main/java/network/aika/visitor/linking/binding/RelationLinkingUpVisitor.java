@@ -16,6 +16,7 @@
  */
 package network.aika.visitor.linking.binding;
 
+import network.aika.direction.Direction;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.LatentRelationActivation;
 import network.aika.elements.links.Link;
@@ -34,11 +35,14 @@ public class RelationLinkingUpVisitor extends BindingUpVisitor {
     protected TokenActivation downOrigin;
     protected TokenActivation upOrigin;
 
+    protected Direction relationDir;
+
     protected RelationLinkingUpVisitor(RelationLinkingDownVisitor parent, TokenActivation downOrigin, TokenActivation upOrigin) {
         super(parent, downOrigin);
         this.downOrigin = downOrigin;
         this.upOrigin = upOrigin;
         this.relation = parent.relation;
+        this.relationDir = parent.relationDir;
     }
 
     public PatternActivation getDownOrigin() {
@@ -66,8 +70,8 @@ public class RelationLinkingUpVisitor extends BindingUpVisitor {
     @Override
     public void createRelation(Link l) {
         LatentRelationActivation latentRelAct = relation.createOrLookupLatentActivation(
-                downOrigin,
-                upOrigin
+                relationDir.getInput(downOrigin, upOrigin),
+                relationDir.getOutput(downOrigin, upOrigin)
         );
 
         if(relation.linkExists(latentRelAct, (BindingActivation) l.getOutput()))
