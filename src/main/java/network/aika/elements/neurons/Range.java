@@ -30,6 +30,25 @@ public class Range {
         this.end = end;
     }
 
+    public static Integer joinTokenPosition(Integer a, Integer b) {
+        if(a == null)
+            return b;
+        if(b == null)
+            return a;
+
+        return Math.min(a, b);
+    }
+
+    public static boolean tokenPositionEquals(Integer a, Integer b) {
+        if(a == b)
+            return true;
+
+        if(a == null || b == null)
+            return false;
+
+        return a.intValue() == b.intValue();
+    }
+
     public static Range join(Range a, Range b) {
         if(a == null)
             return b;
