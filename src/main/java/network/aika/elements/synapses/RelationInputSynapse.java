@@ -51,6 +51,10 @@ public class RelationInputSynapse extends BindingNeuronSynapse<
     }
 
     @Override
+    public void linkAndPropagateOut(BindingActivation act) {
+    }
+
+    @Override
     public RelationInputLink createLink(BindingActivation input, BindingActivation output) {
         return new RelationInputLink(this, input, output);
     }

@@ -40,6 +40,8 @@ import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.callbacks.EventType.CREATE;
+import static network.aika.elements.neurons.Range.joinTokenPosition;
+import static network.aika.elements.neurons.Range.tokenPositionEquals;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.*;
 import static network.aika.steps.Phase.INFERENCE;
@@ -289,9 +291,10 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
     public void updateRangeAndTokenPos(Range r, Integer tp) {
         Range newRange = Range.join(range, r);
-        Integer newTokenPos = tokenPos != null ? Integer.min(tokenPos, tp) : tp;
 
-        if(!r.equals(range) || tokenPos.intValue() != newTokenPos.intValue()) {
+        Integer newTokenPos = joinTokenPosition(tokenPos, tp);
+
+        if(!r.equals(range) || !tokenPositionEquals(tokenPos, newTokenPos)) {
             propagateRangeAndTokenPosition();
         }
 
