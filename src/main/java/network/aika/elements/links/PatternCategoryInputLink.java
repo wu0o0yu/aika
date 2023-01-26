@@ -18,6 +18,7 @@ package network.aika.elements.links;
 
 import network.aika.direction.Direction;
 import network.aika.elements.activations.CategoryActivation;
+import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.activations.PatternCategoryActivation;
 import network.aika.elements.synapses.PatternCategoryInputSynapse;
@@ -65,7 +66,11 @@ public class PatternCategoryInputLink extends AbstractPatternLink<PatternCategor
     public void addInputLinkingStep() {
         super.addInputLinkingStep();
 
-        output.linkTemplateAndInstance(input.getCategoryInput());
+        input.getInputLinks()
+                .map(l -> (ConjunctiveActivation)l.getInput())
+                .forEach(act ->
+                        output.linkTemplateAndInstance(act)
+                );
     }
 
     @Override

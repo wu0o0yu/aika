@@ -56,6 +56,10 @@ public class BindingCategoryInputLink extends BindingNeuronLink<BindingCategoryI
     public void addInputLinkingStep() {
         super.addInputLinkingStep();
 
-        output.linkTemplateAndInstance(input.getCategoryInput());
+        input.getInputLinks()
+                .map(l -> (ConjunctiveActivation)l.getInput())
+                .forEach(act ->
+                        output.linkTemplateAndInstance(act)
+                );
     }
 }

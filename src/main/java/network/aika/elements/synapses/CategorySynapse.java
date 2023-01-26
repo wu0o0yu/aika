@@ -16,13 +16,11 @@
  */
 package network.aika.elements.synapses;
 
-import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.links.CategoryLink;
 import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.neurons.ConjunctiveNeuron;
 import network.aika.elements.neurons.CategoryNeuron;
-import network.aika.visitor.linking.LinkingOperator;
 
 /**
  *
@@ -43,14 +41,4 @@ public abstract class CategorySynapse<S extends CategorySynapse, I extends Conju
         input.linkInput(this);
     }
 
-    @Override
-    public void startVisitor(LinkingOperator c, Activation bs) {
-
-    }
-
-    @Override
-    public void linkAndPropagateOut(IA act) {
-        if (getPropagatePreNet(act) > 0.0)
-            propagate(act);
-    }
 }

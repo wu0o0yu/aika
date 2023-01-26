@@ -64,7 +64,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
 
     public ConjunctiveActivation getActiveTemplateInstance() {
         return getTemplateInstancesStream()
-                .filter(act -> isTrue(act.getIsFired()))
+                .filter(act -> !act.initialized || isTrue(act.getIsFired()))
                 .findFirst()
                 .orElse(null);
     }

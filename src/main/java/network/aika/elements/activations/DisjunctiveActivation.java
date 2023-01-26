@@ -29,10 +29,4 @@ public abstract class DisjunctiveActivation<N extends DisjunctiveNeuron> extends
     public DisjunctiveActivation(int id, Thought t, N neuron) {
         super(id, t, neuron);
     }
-
-    public DisjunctiveLink getInput() {
-        return (DisjunctiveLink) inputLinks.values().stream()
-                .findAny()
-                .orElse(null);
-    }
 }
