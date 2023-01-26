@@ -38,7 +38,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
 
     protected ConjunctiveActivation<N>  template;
 
-    protected List<ConjunctiveActivation<N>> templateInstances = new ArrayList<>();
+    protected List<ConjunctiveActivation<N>> templateInstances;
 
     private boolean initialized = true;
 
@@ -63,7 +63,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
     }
 
     public ConjunctiveActivation getActiveTemplateInstance() {
-        return getTemplateInstances()
+        return getTemplateInstancesStream()
                 .filter(act -> isTrue(act.getIsFired()))
                 .findFirst()
                 .orElse(null);
@@ -76,8 +76,15 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
                 this;
     }
 
-    public Stream<ConjunctiveActivation<N>> getTemplateInstances() {
-        return templateInstances.stream();
+    public List<ConjunctiveActivation<N>> getTemplateInstances() {
+        if(templateInstances == null)
+            templateInstances = new ArrayList<>();
+
+        return templateInstances;
+    }
+
+    public Stream<ConjunctiveActivation<N>> getTemplateInstancesStream() {
+        return getTemplateInstances().stream();
     }
 
     public ConjunctiveActivation<N> getTemplate() {
@@ -89,7 +96,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
     }
 
     public void addTemplateInstance(ConjunctiveActivation instanceAct) {
-        this.templateInstances.add(instanceAct);
+        getTemplateInstances().add(instanceAct);
     }
 
     public void linkTemplateAndInstance(ConjunctiveActivation instanceAct) {
