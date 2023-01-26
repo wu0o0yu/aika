@@ -267,10 +267,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         return isTrue(isFired);
     }
 
-    public Activation getTemplateInstance() {
-        return null;
-    }
-
     public void instantiateTemplateNodes() {
     }
 

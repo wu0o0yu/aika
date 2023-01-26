@@ -35,7 +35,7 @@ public class InstantiationNodes extends Step<ConjunctiveActivation> {
 
         act.instantiationNodesIsQueued = true;
 
-        if(act.getTemplateInstance() != null)
+        if(act.getActiveTemplateInstance() != null)
             return;
 
         Step.add(new InstantiationNodes(act));

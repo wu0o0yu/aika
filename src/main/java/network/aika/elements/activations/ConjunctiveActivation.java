@@ -21,7 +21,12 @@ import network.aika.direction.Direction;
 import network.aika.elements.neurons.ConjunctiveNeuron;
 import network.aika.fields.FieldLink;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
 import static network.aika.callbacks.EventType.UPDATE;
+import static network.aika.fields.Fields.isTrue;
 import static network.aika.fields.Fields.scale;
 
 
@@ -33,7 +38,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
 
     protected ConjunctiveActivation<N>  template;
 
-    protected ConjunctiveActivation<N>  templateInstance;
+    protected List<ConjunctiveActivation<N>> templateInstances = new ArrayList<>();
 
     private boolean initialized = true;
 
@@ -57,38 +62,38 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         );
     }
 
-    @Override
-    public ConjunctiveActivation resolveAbstractInputActivation() {
-        return neuron.isAbstract() ?
-                getTemplateInstance() :
-                this;
+    public ConjunctiveActivation getActiveTemplateInstance() {
+        return getTemplateInstances()
+                .filter(act -> isTrue(act.getIsFired()))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
-    public ConjunctiveActivation getTemplateInstance() {
-        return templateInstance;
+    public ConjunctiveActivation<N> resolveAbstractInputActivation() {
+        return neuron.isAbstract() ?
+                getActiveTemplateInstance() :
+                this;
+    }
+
+    public Stream<ConjunctiveActivation<N>> getTemplateInstances() {
+        return templateInstances.stream();
     }
 
     public ConjunctiveActivation<N> getTemplate() {
         return template;
     }
 
-    public boolean isInstanceOf(ConjunctiveActivation templateAct) {
-        return template != null &&
-                templateAct.templateInstance != null &&
-                template == templateAct.templateInstance;
-    }
-
     public void setTemplate(Activation template) {
         this.template = (ConjunctiveActivation<N>) template;
     }
 
-    public void setTemplateInstance(ConjunctiveActivation instanceAct) {
-        this.templateInstance = instanceAct;
+    public void addTemplateInstance(ConjunctiveActivation instanceAct) {
+        this.templateInstances.add(instanceAct);
     }
 
     public void linkTemplateAndInstance(ConjunctiveActivation instanceAct) {
-        setTemplateInstance(instanceAct);
+        addTemplateInstance(instanceAct);
         instanceAct.setTemplate(this);
     }
 
@@ -96,35 +101,38 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
     public void instantiateTemplateNodes() {
         N n = (N) neuron.instantiateTemplate();
 
-        linkTemplateAndInstance(n.createActivation(getThought()));
-        templateInstance.initialized = false;
+        ConjunctiveActivation<N> ti = n.createActivation(getThought());
+        linkTemplateAndInstance(ti);
+        ti.initialized = false;
 
         if(thought.getInstantiationCallback() != null)
-            thought.getInstantiationCallback().onInstantiation(templateInstance);
+            thought.getInstantiationCallback().onInstantiation(ti);
     }
 
     @Override
     public void instantiateTemplateEdges() {
+        ConjunctiveActivation<N> ti = getActiveTemplateInstance();
+
         getInputLinks()
                 .forEach(l ->
                     l.instantiateTemplate(
                             l.getInput().resolveAbstractInputActivation(),
-                            templateInstance
+                            ti
                     )
                 );
 
-        templateInstance.getNeuron().setLabel(
+        ti.getNeuron().setLabel(
                 getConfig().getLabel(this)
         );
 
-        templateInstance.initDummyLinks();
-        templateInstance.initFromTemplate();
+        ti.initDummyLinks();
+        ti.initFromTemplate();
 
         getOutputLinks()
                 .filter(l -> !l.getOutput().getNeuron().isAbstract())
                 .forEach(l ->
                     l.instantiateTemplate(
-                            templateInstance,
+                            ti,
                             l.getOutput().resolveAbstractInputActivation()
                     )
                 );

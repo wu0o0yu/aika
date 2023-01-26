@@ -41,7 +41,7 @@ public class SelfRefDownVisitor extends DownVisitor<BindingActivation> {
 
     @Override
     public void up(BindingActivation origin) {
-        if(origin == oAct || origin == oAct.getTemplate() || origin == oAct.getTemplateInstance())
+        if(origin == oAct || origin == oAct.getTemplate() || origin.getTemplate() == oAct)
             isSelfRef = true;
     }
 
