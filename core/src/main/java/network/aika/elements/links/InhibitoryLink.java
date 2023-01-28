@@ -76,4 +76,8 @@ public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingAc
     @Override
     public void patternVisit(Visitor v) {
     }
+
+    @Override
+    public void patternCatVisit(Visitor v) {
+    }
 }

@@ -70,6 +70,11 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     @Override
+    public void patternCatVisitDown(DownVisitor v, Link lastLink) {
+        v.up(this);
+    }
+
+    @Override
     public void selfRefVisitDown(DownVisitor v, Link lastLink) {
         v.up(this);
     }
