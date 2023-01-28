@@ -14,32 +14,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.elements.synapses;
+package network.aika.visitor.linking.pattern;
 
 import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.CategoryActivation;
+import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.links.PatternCategoryLink;
-import network.aika.elements.neurons.PatternNeuron;
-import network.aika.elements.neurons.PatternCategoryNeuron;
-import network.aika.visitor.linking.LinkingOperator;
+import network.aika.elements.links.Link;
+import network.aika.elements.synapses.Scope;
+import network.aika.visitor.linking.LinkingUpVisitor;
 import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
-import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class PatternCategorySynapse extends CategorySynapse<PatternCategorySynapse, PatternNeuron, PatternCategoryNeuron, PatternActivation, CategoryActivation> {
+public class PatternCategoryUpVisitor extends LinkingUpVisitor<BindingActivation> {
 
-    @Override
-    public PatternCategoryLink createLink(PatternActivation input, CategoryActivation output) {
-        return new PatternCategoryLink(this, input, output);
+
+    protected PatternCategoryUpVisitor(PatternCategoryDownVisitor parent, BindingActivation origin) {
+        super(parent, origin);
+    }
+
+    public void check(Link lastLink, Activation act) {
+        operator.check(this, lastLink, act);
+    }
+
+    public boolean compatible(Scope from, Scope to) {
+        if(origin == null)
+            return false;
+
+        return from == to;
+    }
+
+    public void createRelation(Link l) {
     }
 
     @Override
-    public void startVisitor(LinkingOperator c, Activation bs) {
-        new PatternCategoryDownVisitor(bs.getThought(), c)
-                .start(bs);
+    protected void visitUp(Link l) {
+        l.patternCatVisit(this);
+    }
+
+    @Override
+    public void visitUp(Activation act, Link l) {
+        act.patternCatVisitUp(this, l);
     }
 }

@@ -14,40 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.elements.links;
+package network.aika.visitor.linking.pattern;
 
+import network.aika.Thought;
+import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
-import network.aika.elements.synapses.SamePatternSynapse;
-import network.aika.visitor.Visitor;
+import network.aika.elements.activations.PatternActivation;
+import network.aika.elements.links.Link;
+import network.aika.visitor.linking.LinkingDownVisitor;
+import network.aika.visitor.linking.LinkingOperator;
+import network.aika.visitor.linking.inhibitory.InhibitoryUpVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class SamePatternLink extends BindingNeuronLink<SamePatternSynapse, BindingActivation> {
+public class PatternCategoryDownVisitor extends LinkingDownVisitor<BindingActivation> {
 
-    public SamePatternLink(SamePatternSynapse s, BindingActivation input, BindingActivation output) {
-        super(s, input, output);
+    public PatternCategoryDownVisitor(Thought t, LinkingOperator operator) {
+        super(t, operator);
     }
 
     @Override
-    public void propagateRangeOrTokenPos() {
+    public void up(BindingActivation origin) {
+        new PatternCategoryUpVisitor(this, origin)
+                .visitUp(origin, null);
     }
 
-    @Override
-    public void bindingVisit(Visitor v) {
+    protected void visitDown(Link l) {
+        l.patternCatVisit(this);
     }
 
-    @Override
-    public void patternVisit(Visitor v) {
-        if(v.isDown())
-            v.next(this);
-    }
-
-    @Override
-    public void inhibVisit(Visitor v) {
-    }
-
-    @Override
-    public void patternCatVisit(Visitor v) {
+    protected void visitDown(Activation act, Link l) {
+        act.patternCatVisitDown(this, l);
     }
 }

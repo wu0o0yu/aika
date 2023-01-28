@@ -89,6 +89,10 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         v.next(this);
     }
 
+    public void patternCatVisit(Visitor v) {
+        v.next(this);
+    }
+
     protected void connectGradientFields() {
     }
 
