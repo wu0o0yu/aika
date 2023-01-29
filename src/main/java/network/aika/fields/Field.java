@@ -45,13 +45,16 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
 
     private Collection<AbstractFieldLink> receivers;
 
-    public Field(FieldObject reference, String label) {
-        this(reference, label, false);
+    protected Double tolerance;
+
+    public Field(FieldObject reference, String label, Double tolerance) {
+        this(reference, label, tolerance, false);
     }
 
-    public Field(FieldObject reference, String label, boolean weakRefs) {
+    public Field(FieldObject reference, String label, Double tolerance, boolean weakRefs) {
         this.reference = reference;
         this.label = label;
+        this.tolerance = tolerance;
 
         if(reference != null)
             reference.register(this);
@@ -151,7 +154,7 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public void triggerUpdate() {
-        if(Utils.belowTolerance(newValue - currentValue))
+        if(Utils.belowTolerance(tolerance, newValue - currentValue))
             return;
 
         triggerInternal();

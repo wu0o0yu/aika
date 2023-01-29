@@ -28,8 +28,12 @@ public abstract class AbstractFunction extends Field implements FieldInput {
 
     private FieldLink[] inputs;
 
+    public AbstractFunction(FieldObject ref, String label, Double tolerance) {
+        super(ref, label, tolerance);
+    }
+
     public AbstractFunction(FieldObject ref, String label) {
-        super(ref, label);
+        this(ref, label, null);
     }
 
     @Override

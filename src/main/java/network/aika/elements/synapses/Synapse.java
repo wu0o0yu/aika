@@ -19,6 +19,7 @@ package network.aika.elements.synapses;
 import network.aika.FieldObject;
 import network.aika.Model;
 import network.aika.Thought;
+import network.aika.callbacks.ActivationCheckCallback;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.Element;
 import network.aika.elements.links.Link;
@@ -31,6 +32,8 @@ import network.aika.elements.neurons.NeuronProvider;
 import network.aika.visitor.linking.LinkingOperator;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -44,6 +47,7 @@ import static network.aika.fields.Fields.isTrue;
 import static network.aika.elements.activations.Timestamp.MAX;
 import static network.aika.elements.activations.Timestamp.MIN;
 import static network.aika.steps.Phase.TRAINING;
+import static network.aika.utils.Utils.TOLERANCE;
 
 /**
  *
@@ -51,12 +55,14 @@ import static network.aika.steps.Phase.TRAINING;
  */
 public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends Activation> extends FieldObject implements Element, Writable {
 
+    private static final Logger log = LoggerFactory.getLogger(Synapse.class);
+
     protected NeuronProvider input;
     protected NeuronProvider output;
 
     protected S template;
 
-    protected SumField weight = (SumField) new QueueSumField(this, TRAINING, "weight", true)
+    protected SumField weight = (SumField) new QueueSumField(this, TRAINING, "weight", TOLERANCE, true)
             .addListener("onWeightModified", () ->
                     setModified()
             );
@@ -97,12 +103,12 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public double getPropagatePreNet(IA iAct) {
-        if (
-                getOutput().isCallActivationCheckCallback() &&
-                        iAct != null &&
-                        !iAct.getThought().getActivationCheckCallBack().check(iAct)
+        if (getOutput().isCallActivationCheckCallback() &&
+                iAct != null
         ) {
-            return -1000.0;
+            ActivationCheckCallback acc = iAct.getThought().getActivationCheckCallBack();
+            if (acc == null || !acc.check(iAct))
+                return -1000.0;
         }
 
         return getOutput().getBias().getCurrentValue() +
@@ -141,7 +147,14 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
             return false;
 
         assert existingLink.getSynapse() == this;
-        assert existingLink.getInput() == iAct;
+
+        if(existingLink.getInput() != iAct) {
+            log.warn("Invalid relinking: (Previous iAct: " +
+                    existingLink.getInput().getId() + ":" + existingLink.getInput().getLabel() +
+                    " New iAct: " + iAct.getId() + ":" + iAct.getLabel() +
+                    " oAct:" + oAct.getId() + ":" + oAct.getLabel()
+            );
+        }
 
         return true;
     }
@@ -317,7 +330,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public boolean isZero() {
-        return Utils.belowTolerance(weight.getCurrentValue());
+        return Utils.belowTolerance(TOLERANCE, weight.getCurrentValue());
     }
 
     public boolean isNegative() {

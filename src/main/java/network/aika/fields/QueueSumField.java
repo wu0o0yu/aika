@@ -39,13 +39,13 @@ public class QueueSumField extends SumField implements IQueueField {
 
     protected List<FieldObserver> observers = new ArrayList<>();
 
-    public QueueSumField(FieldObject e, Phase p, String label) {
-        super(e, label);
+    public QueueSumField(FieldObject e, Phase p, String label, Double tolerance) {
+        super(e, label, tolerance);
         step = new FieldStep((Element) e, p, this);
     }
 
-    public QueueSumField(FieldObject e, Phase p, String label, boolean weakRefs) {
-        super(e, label, weakRefs);
+    public QueueSumField(FieldObject e, Phase p, String label, Double tolerance, boolean weakRefs) {
+        super(e, label, tolerance, weakRefs);
         step = new FieldStep((Element) e, p, this);
     }
 
@@ -75,7 +75,7 @@ public class QueueSumField extends SumField implements IQueueField {
     }
 
     public void triggerUpdate() {
-        if(Utils.belowTolerance(newValue - currentValue))
+        if(Utils.belowTolerance(tolerance, newValue - currentValue))
             return;
 
         updateObservers();

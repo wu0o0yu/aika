@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.utils.Utils.TOLERANCE;
 
 
 /**
@@ -94,7 +95,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     public void setSumOfLowerWeights(double sumOfLowerWeights) {
-        if(!Utils.belowTolerance(this.sumOfLowerWeights - sumOfLowerWeights))
+        if(!Utils.belowTolerance(TOLERANCE, this.sumOfLowerWeights - sumOfLowerWeights))
             setModified();
 
         this.sumOfLowerWeights = sumOfLowerWeights;

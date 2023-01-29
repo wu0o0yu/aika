@@ -30,7 +30,7 @@ public class ConstantField extends Field implements FieldOutput {
     public static final ConstantField ONE = new ConstantField(null, "ONE", 1.0);
 
     public ConstantField(FieldObject ref, String label, double value) {
-        super(ref, label);
+        super(ref, label, null);
         setInitialValue(value);
     }
 

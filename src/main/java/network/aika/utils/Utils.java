@@ -56,15 +56,21 @@ public class Utils {
         return sum;
     }
 
-    public static boolean belowTolerance(double[] x) {
+    public static boolean belowTolerance(Double tolerance, double[] x) {
         if(x == null)
             return true;
 
-        return Math.abs(sum(x)) < TOLERANCE;
+        if(tolerance == null)
+            return false;
+
+        return Math.abs(sum(x)) < tolerance;
     }
 
-    public static boolean belowTolerance(double x) {
-        return Math.abs(x) < TOLERANCE;
+    public static boolean belowTolerance(Double tolerance, double x) {
+        if(tolerance == null)
+            return false;
+
+        return Math.abs(x) < tolerance;
     }
 
     public static double round(double x) {

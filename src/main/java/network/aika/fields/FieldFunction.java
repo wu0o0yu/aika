@@ -27,8 +27,8 @@ public class FieldFunction extends AbstractFunction {
 
     private DoubleFunction<Double> function;
 
-    public FieldFunction(FieldObject ref, String label, DoubleFunction<Double> f) {
-        super(ref, label);
+    public FieldFunction(FieldObject ref, String label, Double tolerance, DoubleFunction<Double> f) {
+        super(ref, label, tolerance);
         this.function = f;
     }
 

@@ -32,6 +32,7 @@ import static network.aika.callbacks.EventType.CREATE;
 import static network.aika.fields.FieldLink.link;
 import static network.aika.fields.Fields.*;
 import static network.aika.elements.activations.Timestamp.FIRED_COMPARATOR;
+import static network.aika.utils.Utils.TOLERANCE;
 
 /**
  *
@@ -89,15 +90,11 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         v.next(this);
     }
 
-    public void patternCatVisit(Visitor v) {
-        v.next(this);
-    }
-
     protected void connectGradientFields() {
     }
 
     protected void initGradient() {
-        gradient = new SumField(this, "Gradient");
+        gradient = new SumField(this, "Gradient", TOLERANCE);
         link(input.getGradient(), gradient);
         link(gradient, output.getGradient());
     }

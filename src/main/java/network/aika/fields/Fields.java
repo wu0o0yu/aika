@@ -118,20 +118,20 @@ public class Fields {
         return div;
     }
 
-    public static FieldFunction func(FieldObject ref, String label, FieldOutput in, DoubleFunction<Double> f) {
+    public static FieldFunction func(FieldObject ref, String label, Double tolerance, FieldOutput in, DoubleFunction<Double> f) {
         if(in == null)
             return null;
 
-        FieldFunction func = new FieldFunction(ref, label, f);
+        FieldFunction func = new FieldFunction(ref, label, tolerance, f);
         link(in, 0, func);
         return func;
     }
 
-    public static FieldFunction func(FieldObject ref, String label, FieldOutput in, DoubleFunction<Double> f, FieldInput... out) {
+    public static FieldFunction func(FieldObject ref, String label, Double tolerance, FieldOutput in, DoubleFunction<Double> f, FieldInput... out) {
         if(in == null)
             return null;
 
-        FieldFunction func = func(ref, label, in, f);
+        FieldFunction func = func(ref, label, tolerance, in, f);
         linkAll(func, out);
         return func;
     }

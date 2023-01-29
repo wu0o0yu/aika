@@ -28,8 +28,8 @@ public class LimitedField extends QueueSumField {
     private double limit;
 
 
-    public LimitedField(FieldObject refObj, Phase p, String label, double limit) {
-        super(refObj, p, label);
+    public LimitedField(FieldObject refObj, Phase p, String label, Double tolerance, double limit) {
+        super(refObj, p, label, tolerance);
         this.limit = limit;
     }
 

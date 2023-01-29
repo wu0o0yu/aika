@@ -21,6 +21,8 @@ import network.aika.elements.Element;
 import network.aika.elements.activations.Timestamp;
 import network.aika.utils.Utils;
 
+import static network.aika.utils.Utils.TOLERANCE;
+
 
 /**
  * @author Lukas Molzberger
@@ -53,7 +55,7 @@ public abstract class Step<E extends Element> {
     }
 
     public void updateSortValue(double newSortValue) {
-        if(Utils.belowTolerance(sortValue - newSortValue))
+        if(Utils.belowTolerance(TOLERANCE, sortValue - newSortValue))
             return;
 
         if(isQueued()) {

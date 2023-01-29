@@ -47,6 +47,7 @@ import static network.aika.elements.synapses.Synapse.getLatentLinkingPreNet;
 import static network.aika.elements.activations.Timestamp.MAX;
 import static network.aika.elements.activations.Timestamp.MIN;
 import static network.aika.steps.Phase.TRAINING;
+import static network.aika.utils.Utils.TOLERANCE;
 
 /**
  *
@@ -239,7 +240,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
     }
 
     protected SumField initBias() {
-        return (SumField) new LimitedField(this, TRAINING, "bias", 0.0)
+        return (SumField) new LimitedField(this, TRAINING, "bias", TOLERANCE, 0.0)
                 .addListener("onBiasModified", () ->
                         setModified()
                 );

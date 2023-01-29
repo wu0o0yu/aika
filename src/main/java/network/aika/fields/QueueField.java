@@ -38,13 +38,13 @@ public abstract class QueueField extends Field implements IQueueField {
 
     protected List<FieldObserver> observers = new ArrayList<>();
 
-    public QueueField(FieldObject e, Phase p, String label) {
-        super(e, label);
+    public QueueField(FieldObject e, Phase p, String label, Double tolerance) {
+        super(e, label, tolerance);
         step = new FieldStep((Element) e, p, this);
     }
 
-    public QueueField(FieldObject e, Phase p, String label, boolean weakRefs) {
-        super(e, label, weakRefs);
+    public QueueField(FieldObject e, Phase p, String label, Double tolerance, boolean weakRefs) {
+        super(e, label, tolerance, weakRefs);
         step = new FieldStep((Element) e, p, this);
     }
 
@@ -76,7 +76,7 @@ public abstract class QueueField extends Field implements IQueueField {
 
     @Override
     public void triggerUpdate() {
-        if(Utils.belowTolerance(newValue - currentValue))
+        if(Utils.belowTolerance(tolerance, newValue - currentValue))
             return;
 
         updateObservers();

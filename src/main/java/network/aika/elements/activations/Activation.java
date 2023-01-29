@@ -46,6 +46,7 @@ import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.*;
 import static network.aika.steps.Phase.INFERENCE;
 import static network.aika.steps.Phase.TRAINING;
+import static network.aika.utils.Utils.TOLERANCE;
 
 /**
  * @author Lukas Molzberger
@@ -111,6 +112,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         value = func(
                 this,
                 "value = f(net)",
+                TOLERANCE,
                 net,
                 x -> getActivationFunction().f(x)
         );
@@ -123,7 +125,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 value
         );
 
-        gradient = new QueueSumField(this, TRAINING, "Gradient");
+        gradient = new QueueSumField(this, TRAINING, "Gradient", TOLERANCE);
 
         if (getConfig().isTrainingEnabled() && neuron.isTrainingAllowed()) {
             connectGradientFields();
@@ -143,7 +145,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     }
 
     protected void initNet() {
-        net = new ValueSortedQueueField(this, INFERENCE, "net");
+        net = new ValueSortedQueueField(this, INFERENCE, "net", null);
     }
 
     protected void initDummyLinks() {
@@ -197,15 +199,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         v.next(this);
     }
 
-    public void patternCatVisitDown(DownVisitor v, Link lastLink) {
-        v.next(this);
-    }
-
-    public void patternCatVisitUp(UpVisitor v, Link lastLink) {
-        v.check(lastLink, this);
-        v.next(this);
-    }
-
     public void selfRefVisitDown(DownVisitor v, Link lastLink) {
         v.next(this);
     }
@@ -215,6 +208,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 func(
                         this,
                         "f'(net)",
+                        TOLERANCE,
                         net,
                         x -> getNeuron().getActivationFunction().outerGrad(x)
         );

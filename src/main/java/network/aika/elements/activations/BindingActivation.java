@@ -22,6 +22,8 @@ import network.aika.fields.*;
 import network.aika.elements.neurons.BindingNeuron;
 import network.aika.visitor.DownVisitor;
 
+import static network.aika.utils.Utils.TOLERANCE;
+
 /**
  * @author Lukas Molzberger
  */
@@ -37,7 +39,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     protected void connectWeightUpdate() {
-        updateValue = new SumField(this, "updateValue");
+        updateValue = new SumField(this, "updateValue", TOLERANCE);
 
         super.connectWeightUpdate();
     }
@@ -45,11 +47,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     @Override
     public void patternVisitDown(DownVisitor v, Link lastLink) {
         super.patternVisitDown(v, lastLink);
-        v.up(this);
-    }
-
-    @Override
-    public void patternCatVisitDown(DownVisitor v, Link lastLink) {
         v.up(this);
     }
 

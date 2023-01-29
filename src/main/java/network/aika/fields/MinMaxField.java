@@ -29,7 +29,7 @@ public class MinMaxField extends SumField {
     private AbstractFieldLink selectedInput;
 
     public MinMaxField(FieldObject ref, MinMax m, String label) {
-        super(ref, label);
+        super(ref, label, null);
         mode = m;
     }
 

@@ -27,6 +27,7 @@ import network.aika.visitor.DownVisitor;
 import network.aika.sign.Sign;
 
 import static network.aika.fields.Fields.*;
+import static network.aika.utils.Utils.TOLERANCE;
 
 /**
  *
@@ -45,6 +46,7 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
         entropy = func(
                 this,
                 "Entropy",
+                TOLERANCE,
                 net,
                 x ->
                         getNeuron().getSurprisal(
@@ -87,12 +89,15 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
     @Override
     public void bindingVisitDown(DownVisitor v, Link lastLink) {
         super.bindingVisitDown(v, lastLink);
+
         v.up(this);
     }
 
     @Override
     public void inhibVisitDown(DownVisitor v, Link lastLink) {
-        super.inhibVisitDown(v, lastLink);
+        if(lastLink == null)
+            super.inhibVisitDown(v, lastLink);
+
         v.up(this);
     }
 }

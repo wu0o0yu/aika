@@ -67,8 +67,7 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
 
         if(initialize) {
             double cv = input.getCurrentValue();
-            if (!Utils.belowTolerance(cv))
-                output.receiveUpdate(this, cv);
+            output.receiveUpdate(this, cv);
         }
 
         connected = true;
@@ -80,8 +79,7 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
 
         if(deinitialize) {
             double cv = input.getCurrentValue();
-            if (!Utils.belowTolerance(cv))
-                output.receiveUpdate(this, -cv);
+            output.receiveUpdate(this, -cv);
         }
 
         connected = false;

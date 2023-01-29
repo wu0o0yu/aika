@@ -24,6 +24,8 @@ import network.aika.fields.Fields;
 import network.aika.elements.synapses.InhibitorySynapse;
 import network.aika.visitor.Visitor;
 
+import static network.aika.utils.Utils.TOLERANCE;
+
 /**
  * @author Lukas Molzberger
  */
@@ -50,6 +52,7 @@ public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingAc
         value = Fields.func(
                 this,
                 "value = f(net)",
+                TOLERANCE,
                 net,
                 x -> output.getActivationFunction().f(x)
         );
@@ -69,9 +72,5 @@ public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingAc
 
     @Override
     public void patternVisit(Visitor v) {
-    }
-
-    @Override
-    public void patternCatVisit(Visitor v) {
     }
 }

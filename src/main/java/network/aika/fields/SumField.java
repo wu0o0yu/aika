@@ -9,12 +9,12 @@ public class SumField extends Field {
 
     private Collection<FieldLink> inputs;
 
-    public SumField(FieldObject reference, String label) {
-        super(reference, label);
+    public SumField(FieldObject reference, String label, Double tolerance) {
+        super(reference, label, tolerance);
     }
 
-    public SumField(FieldObject reference, String label, boolean weakRefs) {
-        super(reference, label, weakRefs);
+    public SumField(FieldObject reference, String label, Double tolerance, boolean weakRefs) {
+        super(reference, label, tolerance, weakRefs);
     }
 
 

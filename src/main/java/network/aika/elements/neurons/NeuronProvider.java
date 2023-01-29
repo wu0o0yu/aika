@@ -56,6 +56,7 @@ public class NeuronProvider implements Comparable<NeuronProvider> {
         this(id);
         assert model != null;
         this.model = model;
+        model.register(this);
     }
 
     public NeuronProvider(Model model, Neuron n) {

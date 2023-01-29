@@ -25,13 +25,13 @@ import network.aika.utils.Utils;
  */
 public class ValueSortedQueueField extends QueueSumField {
 
-    public ValueSortedQueueField(FieldObject e, Phase p, String label) {
-        super(e, p, label);
+    public ValueSortedQueueField(FieldObject e, Phase p, String label, Double tolerance) {
+        super(e, p, label, tolerance);
     }
 
     @Override
     public void triggerUpdate() {
-        if(Utils.belowTolerance(newValue - currentValue))
+        if(Utils.belowTolerance(tolerance, newValue - currentValue))
             return;
 
         step.updateSortValue(newValue);

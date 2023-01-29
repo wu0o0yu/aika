@@ -24,7 +24,6 @@ import network.aika.elements.neurons.PatternNeuron;
 import network.aika.elements.neurons.PatternCategoryNeuron;
 import network.aika.visitor.linking.LinkingOperator;
 import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
-import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
 
 /**
  *
@@ -38,8 +37,8 @@ public class PatternCategorySynapse extends CategorySynapse<PatternCategorySynap
     }
 
     @Override
-    public void startVisitor(LinkingOperator c, Activation bs) {
-        new PatternCategoryDownVisitor(bs.getThought(), c)
-                .start(bs);
+    public void startVisitor(LinkingOperator c, Activation act) {
+        new InhibitoryDownVisitor(act.getThought(), c)
+                .start(act);
     }
 }
