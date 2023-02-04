@@ -14,31 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.elements.synapses;
+package network.aika.visitor.linking.pattern;
 
+import network.aika.Thought;
 import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.CategoryActivation;
+import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.links.PatternCategoryLink;
-import network.aika.elements.neurons.PatternNeuron;
-import network.aika.elements.neurons.PatternCategoryNeuron;
+import network.aika.elements.links.Link;
+import network.aika.visitor.linking.LinkingDownVisitor;
 import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
+import network.aika.visitor.linking.inhibitory.InhibitoryUpVisitor;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class PatternCategorySynapse extends CategorySynapse<PatternCategorySynapse, PatternNeuron, PatternCategoryNeuron, PatternActivation, CategoryActivation> {
+public class PatternCategoryDownVisitor extends LinkingDownVisitor<BindingActivation> {
 
-    @Override
-    public PatternCategoryLink createLink(PatternActivation input, CategoryActivation output) {
-        return new PatternCategoryLink(this, input, output);
+    public PatternCategoryDownVisitor(Thought t, LinkingOperator operator) {
+        super(t, operator);
     }
 
     @Override
-    public void startVisitor(LinkingOperator c, Activation bs) {
-        new PatternCategoryDownVisitor(bs.getThought(), c)
-                .start(bs);
+    public void up(BindingActivation origin) {
+        new PatternCategoryUpVisitor(this, origin)
+                .visitUp(origin, null);
+    }
+
+    protected void visitDown(Link l) {
+        l.patternCatVisit(this);
+    }
+
+    protected void visitDown(Activation act, Link l) {
+        act.patternCatVisitDown(this, l);
     }
 }

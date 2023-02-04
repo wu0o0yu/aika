@@ -87,4 +87,8 @@ public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActi
     @Override
     public void bindingVisit(Visitor v) {
     }
+
+    @Override
+    public void inhibVisit(Visitor v) {
+    }
 }

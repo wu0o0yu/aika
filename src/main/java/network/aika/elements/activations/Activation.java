@@ -19,7 +19,6 @@ package network.aika.elements.activations;
 import network.aika.FieldObject;
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.direction.Direction;
 import network.aika.elements.Element;
 import network.aika.elements.links.Link;
 import network.aika.elements.neurons.ActivationFunction;
@@ -199,6 +198,14 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         v.next(this);
     }
 
+    public void patternCatVisitDown(DownVisitor v, Link lastLink) {
+        v.next(this);
+    }
+
+    public void patternCatVisitUp(UpVisitor v, Link lastLink) {
+        v.next(this);
+    }
+
     public void selfRefVisitDown(DownVisitor v, Link lastLink) {
         v.next(this);
     }
@@ -361,6 +368,14 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
     public Link getInputLink(Synapse s) {
         return inputLinks.get(s.getPInput());
+    }
+
+    public <IL extends Link> IL getInputLinkByType(Class<IL> linkType) {
+        return getInputLinks()
+                .filter(linkType::isInstance)
+                .map(linkType::cast)
+                .findAny()
+                .orElse(null);
     }
 
     public Stream<Link> getOutputLinks(Synapse s) {

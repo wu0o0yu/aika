@@ -18,13 +18,14 @@ package network.aika.elements.activations;
 
 import network.aika.Thought;
 import network.aika.elements.links.Link;
+import network.aika.elements.links.PatternCategoryInputLink;
+import network.aika.elements.synapses.PatternCategoryInputSynapse;
 import network.aika.fields.FieldFunction;
-import network.aika.fields.FieldLink;
 import network.aika.fields.FieldOutput;
-import network.aika.fields.SumField;
 import network.aika.elements.neurons.PatternNeuron;
 import network.aika.visitor.DownVisitor;
 import network.aika.sign.Sign;
+import network.aika.visitor.UpVisitor;
 
 import static network.aika.fields.Fields.*;
 import static network.aika.utils.Utils.TOLERANCE;
@@ -81,6 +82,10 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
         return entropy;
     }
 
+    public PatternCategoryInputLink getCategoryInputLink() {
+        return getInputLinkByType(PatternCategoryInputLink.class);
+    }
+
     @Override
     public void selfRefVisitDown(DownVisitor v, Link lastLink) {
         v.up(this);
@@ -99,5 +104,10 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
             super.inhibVisitDown(v, lastLink);
 
         v.up(this);
+    }
+
+    @Override
+    public void patternCatVisitUp(UpVisitor v, Link lastLink) {
+        v.check(lastLink, this);
     }
 }
