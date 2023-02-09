@@ -48,39 +48,23 @@ public class MinMaxField extends SumField {
     }
 
     private void computeUpdate(AbstractFieldLink fl) {
-        double inputNV = fl.getInput().getNewValue();
-
         if(selectedInput == null) {
             selectedInput = fl;
-            newValue = inputNV;
+            newValue = fl.getInput().getNewValue();
             return;
         }
 
-        double outputOV = selectedInput.getCurrentInputValue();
+        selectedInput = getInputs().stream()
+                .max(getComparator())
+                .orElse(null);
 
-        AbstractFieldLink mFL = compare(inputNV, outputOV) ?
-            fl :
-            getInputs().stream()
-                    .max(getComparator())
-                    .orElse(null);
-
-        selectedInput = mFL;
-        newValue = mFL == fl ?
-                inputNV :
-                mFL.getCurrentInputValue();
+        newValue = selectedInput.getCurrentInputValue();
     }
 
     private Comparator<FieldLink> getComparator() {
         return switch (mode) {
             case MAX -> Comparator.comparingDouble(in -> in.getCurrentInputValue());
             case MIN -> Comparator.comparingDouble(in -> -in.getCurrentInputValue());
-        };
-    }
-
-    private boolean compare(double inputNV, double outputOV) {
-        return switch (mode) {
-            case MAX -> inputNV >= outputOV;
-            case MIN -> inputNV < outputOV;
         };
     }
 }

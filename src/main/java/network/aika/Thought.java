@@ -25,6 +25,7 @@ import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.Element;
 import network.aika.elements.activations.Timestamp;
+import network.aika.elements.links.NegativeFeedbackLink;
 import network.aika.fields.*;
 import network.aika.elements.neurons.PreActivation;
 import network.aika.elements.neurons.NeuronProvider;
@@ -40,6 +41,7 @@ import network.aika.steps.thought.CloseStep;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static network.aika.callbacks.EventType.*;
 import static network.aika.direction.Direction.INPUT;
@@ -296,6 +298,33 @@ public abstract class Thought extends FieldObject implements Element {
         AnnealStep.add(this);
         process(ANNEAL); // Anneal needs to be finished before instantiation can start.
     }
+
+    public double getStepScale() {
+        return getNegativeFeedbackLinks().mapToDouble(l -> {
+                    double x = l.getMaxInput().getCurrentValue();
+                    double w = l.getSynapse().getWeight().getCurrentValue();
+                    double wi = x * w;
+
+                    Field net = l.getOutput().getNet();
+
+                    if(wi >= 0.0 || net.getCurrentValue() <= 0.0)
+                        return 1.0;
+
+                    return net.getCurrentValue() / -wi;
+                })
+                .min()
+                .getAsDouble();
+    }
+
+    public Stream<NegativeFeedbackLink> getNegativeFeedbackLinks() {
+        return annealing
+                .getReceivers()
+                .stream()
+                .filter(fl -> fl.getOutput() instanceof Field)
+                .map(fl ->  (Field) fl.getOutput())
+                .map(f -> (NegativeFeedbackLink) f.getReference());
+    }
+
 
     public void instantiateTemplates() {
         if (!getConfig().isMetaInstantiationEnabled())

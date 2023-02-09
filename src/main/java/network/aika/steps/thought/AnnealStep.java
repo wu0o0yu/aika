@@ -17,12 +17,9 @@
 package network.aika.steps.thought;
 
 import network.aika.Thought;
-import network.aika.elements.links.NegativeFeedbackLink;
-import network.aika.fields.AbstractFieldLink;
-import network.aika.fields.Field;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
-import network.aika.text.Document;
+import network.aika.utils.Utils;
 
 import static network.aika.steps.Phase.*;
 
@@ -33,52 +30,32 @@ import static network.aika.steps.Phase.*;
  */
 public class AnnealStep extends Step<Thought> {
 
+    public static double STEP_SIZE = 0.05;
+
     public static void add(Thought t) {
-        Step.add(new AnnealStep(t));
+        Step.add(new AnnealStep(t, STEP_SIZE * t.getStepScale()));
     }
 
-    public AnnealStep(Thought t) {
+    public static void add(Thought t, Double normAnnealStepSize) {
+        Step.add(new AnnealStep(t, normAnnealStepSize));
+    }
+
+    private Double normAnnealStepSize;
+
+    public AnnealStep(Thought t, Double normAnnealStepSize) {
         super(t);
+        this.normAnnealStepSize = normAnnealStepSize;
     }
 
     @Override
     public void process() {
         Thought t = getElement();
 
-        double nextAnnealValue = getNextAnnealValue(
-                t.getAnnealing().getCurrentValue()
-        );
+        double nextAnnealValue = normAnnealStepSize + t.getAnnealing().getCurrentValue();
         t.getAnnealing().setValue(nextAnnealValue);
 
         if (nextAnnealValue < 1.0)
             AnnealStep.add(t);
-    }
-
-    public double getNextAnnealValue(double currentAnnealValue) {
-        double maxAnnealValue = 1.0 - currentAnnealValue;
-        for (AbstractFieldLink fl : getElement().getAnnealing().getReceivers()) {
-            if (!(fl.getOutput() instanceof Field))
-                continue;
-
-            Field f = (Field) fl.getOutput();
-            NegativeFeedbackLink negFeedbackLink = (NegativeFeedbackLink) f.getReference();
-            double x = negFeedbackLink.getMaxInput().getCurrentValue();
-            double w = negFeedbackLink.getSynapse().getWeight().getCurrentValue();
-            double wi = x * w;
-            if(wi >= 0.0)
-                continue;
-
-            for (AbstractFieldLink flNet : f.getReceivers()) {
-                if (!(flNet.getOutput() instanceof Field))
-                    continue;
-
-                Field fNet = (Field) flNet.getOutput();
-                if (fNet.getCurrentValue() > 0.0) {
-                    maxAnnealValue = Math.min(maxAnnealValue, fNet.getCurrentValue() / -wi);
-                }
-            }
-        }
-        return currentAnnealValue + maxAnnealValue;
     }
 
     @Override
@@ -88,6 +65,6 @@ public class AnnealStep extends Step<Thought> {
 
     @Override
     public String toString() {
-        return ((Document)getElement()).getContent();
+        return "docId:" + getElement().getId() + " annealStepSize:" + Utils.round(normAnnealStepSize) + " " + getElement().getAnnealing();
     }
 }
