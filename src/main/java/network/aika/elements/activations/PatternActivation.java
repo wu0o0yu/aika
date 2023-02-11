@@ -20,8 +20,7 @@ import network.aika.Thought;
 import network.aika.elements.links.Link;
 import network.aika.elements.links.PatternCategoryInputLink;
 import network.aika.elements.synapses.PatternCategoryInputSynapse;
-import network.aika.fields.FieldFunction;
-import network.aika.fields.FieldOutput;
+import network.aika.fields.*;
 import network.aika.elements.neurons.PatternNeuron;
 import network.aika.visitor.DownVisitor;
 import network.aika.sign.Sign;
@@ -36,7 +35,7 @@ import static network.aika.utils.Utils.TOLERANCE;
  */
 public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
-    private FieldFunction entropy;
+    private Field entropy;
 
     public PatternActivation(int id, Thought t, PatternNeuron patternNeuron) {
         super(id, t, patternNeuron);
@@ -44,21 +43,46 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     @Override
     public void connectGradientFields() {
-        entropy = func(
-                this,
-                "Entropy",
-                TOLERANCE,
-                net,
-                x ->
-                        getNeuron().getSurprisal(
-                                Sign.getSign(x),
-                                getAbsoluteRange(),
-                                true
-                        ),
-                gradient
-        );
+        if(neuron.isAbstract()) {
+            entropy = new SumField(
+                    this,
+                    "Entropy",
+                    TOLERANCE
+            );
+
+            getTemplateInstances()
+                    .forEach(act ->
+                            linkAbstractEntropyField((PatternActivation) act)
+                    );
+        } else {
+            entropy = func(
+                    this,
+                    "Entropy",
+                    TOLERANCE,
+                    net,
+                    x ->
+                            getNeuron().getSurprisal(
+                                    Sign.getSign(x),
+                                    getAbsoluteRange(),
+                                    true
+                            ),
+                    gradient
+            );
+        }
 
         super.connectGradientFields();
+    }
+
+    @Override
+    public void addTemplateInstance(ConjunctiveActivation instanceAct) {
+        linkAbstractEntropyField((PatternActivation) instanceAct);
+        super.addTemplateInstance(instanceAct);
+    }
+
+    private void linkAbstractEntropyField(PatternActivation act) {
+        if(act.entropy != null && entropy != null)
+            FieldLink.link(act.entropy, entropy)
+                    .connect(true);
     }
 
     @Override

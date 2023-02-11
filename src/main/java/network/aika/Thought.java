@@ -33,6 +33,7 @@ import network.aika.elements.neurons.Range;
 import network.aika.steps.Phase;
 import network.aika.steps.QueueKey;
 import network.aika.steps.Step;
+import network.aika.steps.activation.InactiveLinks;
 import network.aika.steps.activation.InstantiationEdges;
 import network.aika.steps.activation.InstantiationNodes;
 import network.aika.steps.thought.AnnealStep;
@@ -234,10 +235,6 @@ public abstract class Thought extends FieldObject implements Element {
                 maxPhase.compareTo(queue.firstEntry().getValue().getPhase()) < 0;
     }
 
-    public void train() {
-        process(TRAINING);
-    }
-
     /**
      * The postprocessing steps such as counting, cleanup or save are executed.
      */
@@ -285,9 +282,10 @@ public abstract class Thought extends FieldObject implements Element {
         if(model.getCurrentThought() == this)
             model.setCurrentThought(null);
 
-        getActivations().forEach(act ->
-                act.disconnect()
-        );
+        getActivations()
+                .forEach(act ->
+                        act.disconnect()
+                );
     }
 
     public void close() {
@@ -297,6 +295,13 @@ public abstract class Thought extends FieldObject implements Element {
     public void anneal() {
         AnnealStep.add(this);
         process(ANNEAL); // Anneal needs to be finished before instantiation can start.
+    }
+
+    public void train() {
+        activationsById.values()
+                .forEach(InactiveLinks::add);
+
+        process(TRAINING);
     }
 
     public double getStepScale() {

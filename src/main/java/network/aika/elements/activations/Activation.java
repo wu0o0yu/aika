@@ -39,6 +39,8 @@ import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.callbacks.EventType.CREATE;
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.elements.neurons.Range.joinTokenPosition;
 import static network.aika.elements.neurons.Range.tokenPositionEquals;
 import static network.aika.fields.Fields.*;
@@ -97,8 +99,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
         initNet();
 
-        FieldLink.link(getNeuron().getBias(), net);
-
         isFired = threshold(this, "isFired", 0.0, ABOVE, net);
 
         isFired.addEventListener("onFired", () -> {
@@ -143,8 +143,14 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
     }
 
+    public void init() {
+        connect(INPUT, true, false);
+        connect(OUTPUT, true, true);
+    }
+
     protected void initNet() {
         net = new ValueSortedQueueField(this, INFERENCE, "net", null);
+        FieldLink.link(getNeuron().getBias(), net);
     }
 
     protected void initDummyLinks() {

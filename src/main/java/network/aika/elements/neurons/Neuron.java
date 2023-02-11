@@ -76,7 +76,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
     private boolean callActivationCheckCallback;
 
 
-
     public Long getId() {
         return provider.getId();
     }
@@ -226,9 +225,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
 
     public A createAndInitActivation(Thought t) {
         A act = createActivation(t);
-        act.connect(INPUT, true, false);
-        act.connect(OUTPUT, true, true);
-
+        act.init();
         return act;
     }
 
@@ -240,7 +237,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
     }
 
     protected SumField initBias() {
-        return (SumField) new LimitedField(this, TRAINING, "bias", TOLERANCE, 0.0)
+        return (SumField) new QueueSumField(this, TRAINING, "bias", TOLERANCE)
                 .addListener("onBiasModified", () ->
                         setModified()
                 );
@@ -394,6 +391,10 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
         return bias;
     }
 
+    public double getCurrentCompleteBias() {
+        return getBias().getUpdatedCurrentValue();
+    }
+
     public void suspend() {
         for (Synapse s : getInputSynapsesAsStream()
                 .filter(s -> s.getStoredAt() == OUTPUT)
@@ -504,9 +505,9 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
         return (N) this;
     }
 
-    public Neuron updateBias(double bias) {
-        getBias().receiveUpdate(bias);
-        return this;
+    public <N extends Neuron> N setBias(double bias) {
+        getBias().setValue(bias);
+        return (N) this;
     }
 
     public String toKeyString() {

@@ -46,8 +46,8 @@ public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I ext
     }
 
     @Override
-    public void startVisitor(LinkingOperator c, Activation bs) {
-        Thought t = bs.getThought();
+    public void startVisitor(LinkingOperator c, Activation act) {
+        Thought t = act.getThought();
         RelationInputSynapse rel = getOutput().findLatentRelationNeurons()
                 .stream()
                 .findAny()
@@ -57,7 +57,7 @@ public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I ext
                 new RelationLinkingDownVisitor(t, c, rel, c.getRelationDir(scope)) :
                 new BindingDownVisitor(t, c);
 
-        v.start(bs);
+        v.start(act);
     }
 
     public void initDummyLink(BindingActivation oAct) {

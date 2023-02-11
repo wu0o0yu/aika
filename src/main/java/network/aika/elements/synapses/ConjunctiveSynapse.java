@@ -25,6 +25,9 @@ import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.links.Link;
+import network.aika.fields.FieldLink;
+import network.aika.fields.QueueSumField;
+import network.aika.fields.SumField;
 import network.aika.utils.Utils;
 
 import java.io.DataInput;
@@ -34,6 +37,7 @@ import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.steps.Phase.TRAINING;
 import static network.aika.utils.Utils.TOLERANCE;
 
 
@@ -52,12 +56,45 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
                 >
 {
 
+    protected SumField synapseBias = (SumField) new QueueSumField(this, TRAINING, "synapseBias", TOLERANCE, true)
+            .addListener("onSynapseBiasModified", () ->
+                    setModified()
+            );
+
+    private boolean optional;
+
     private double sumOfLowerWeights;
     protected Direction currentStoredAt = INPUT;
 
 
     public ConjunctiveSynapse(Scope scope) {
         super(scope);
+    }
+
+    @Override
+    protected void linkFields() {
+        if(!optional)
+            FieldLink.link(synapseBias, getOutput().getSynapseBiasSum());
+    }
+
+    public S setSynapseBias(double b) {
+        synapseBias.setValue(b);
+
+        return (S) this;
+    }
+
+    public SumField getSynapseBias() {
+        return synapseBias;
+    }
+
+    public boolean isOptional() {
+        return optional;
+    }
+
+    public S setOptional(boolean optional) {
+        this.optional = optional;
+
+        return (S) this;
     }
 
     @Override
@@ -106,7 +143,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
 
     public S adjustBias() {
         if(weight.getCurrentValue() > 0.0)
-            getOutput().getBias().receiveUpdate(-weight.getCurrentValue());
+            synapseBias.receiveUpdate(-weight.getCurrentValue());
 
         return (S) this;
     }
@@ -117,13 +154,16 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
 
         out.writeDouble(sumOfLowerWeights);
         out.writeBoolean(currentStoredAt == OUTPUT);
+        out.writeBoolean(optional);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
+        linkFields();
 
         sumOfLowerWeights = in.readDouble();
         currentStoredAt = in.readBoolean() ? OUTPUT : INPUT;
+        optional = in.readBoolean();
     }
 }

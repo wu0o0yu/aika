@@ -111,15 +111,15 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
                 return -1000.0;
         }
 
-        return getOutput().getBias().getCurrentValue() +
-                getWeight().getCurrentValue();
+        return getOutput().getCurrentCompleteBias() +
+                getWeight().getUpdatedCurrentValue();
     }
 
     public static double getLatentLinkingPreNet(Synapse synA, Synapse synB) {
-        double preUB = synA.getWeight().getCurrentValue();
+        double preUB = synA.getWeight().getUpdatedCurrentValue();
 
         if(synB != null) {
-            preUB += synB.getWeight().getCurrentValue() +
+            preUB += synB.getWeight().getUpdatedCurrentValue() +
                     Math.min(
                             synA.getSumOfLowerWeights(),
                             synB.getSumOfLowerWeights()
@@ -228,24 +228,27 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         setOutput(output);
 
         link();
+        linkFields();
 
         templateSyn.copyState(this);
         connect(Direction.INPUT, false, false);
         connect(Direction.OUTPUT, false, true);
     }
 
-    public S init(Neuron input, Neuron output, double initialWeight) {
+    public S init(Neuron input, Neuron output) {
         setInput((I) input);
         setOutput((O) output);
 
         link();
-
-        weight.setValue(initialWeight);
+        linkFields();
 
         connect(INPUT, true, false);
         connect(OUTPUT, true, false);
 
         return (S) this;
+    }
+
+    protected void linkFields() {
     }
 
     public void link() {
@@ -257,9 +260,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     public L createAndInitLink(IA input, OA output) {
         L l = createLink(input, output);
-        l.connect(INPUT, true, false);
-        l.connect(OUTPUT, true, true);
-        l.addInputLinkingStep();
+        l.init();
         return l;
     }
 
@@ -269,8 +270,14 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return l;
     }
 
-    public void setWeight(double w) {
+    public S setWeight(double w) {
         weight.setValue(w);
+
+        return (S) this;
+    }
+
+    public SumField getWeight() {
+        return weight;
     }
 
     public boolean isTrainingAllowed() {
@@ -323,10 +330,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return output != null ?
                 output.getModel() :
                 null;
-    }
-
-    public SumField getWeight() {
-        return weight;
     }
 
     public boolean isZero() {

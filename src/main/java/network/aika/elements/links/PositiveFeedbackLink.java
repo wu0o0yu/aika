@@ -55,16 +55,8 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
         );
     }
 
-
     @Override
     public void addInputLinkingStep() {
-    }
-
-    @Override
-    protected void initWeightInput() {
-        weightedInput = initWeightedInput();
-
-        link(weightedInput, getOutput().getNet());
     }
 
     @Override

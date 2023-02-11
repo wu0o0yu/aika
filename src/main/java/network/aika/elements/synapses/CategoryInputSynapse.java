@@ -6,7 +6,7 @@ import network.aika.elements.neurons.Neuron;
 
 public interface CategoryInputSynapse<N extends CategoryNeuron, S extends ConjunctiveSynapse> {
 
-    S init(Neuron input, Neuron output, double initialWeight);
+    S init(Neuron input, Neuron output);
 
     N getInput();
 

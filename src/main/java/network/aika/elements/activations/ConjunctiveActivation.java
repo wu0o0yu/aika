@@ -62,6 +62,13 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         );
     }
 
+    @Override
+    protected void initNet() {
+        super.initNet();
+
+        FieldLink.link(getNeuron().getSynapseBiasSum(), net);
+    }
+
     public ConjunctiveActivation getActiveTemplateInstance() {
         return getTemplateInstancesStream()
                 .filter(act -> !act.initialized || isTrue(act.getIsFired()))

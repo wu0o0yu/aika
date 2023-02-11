@@ -44,27 +44,33 @@ public class TestHelper {
 
         BindingNeuron theBN = new BindingNeuron().init(m, "the (the cat)");
         new InputPatternFromPatternSynapse()
-                .init(theIN, theBN, 10.0)
+                .setWeight(10.0)
+                .init(theIN, theBN)
                 .adjustBias();
 
         BindingNeuron catBN = new BindingNeuron().init(m, "cat (the cat)");
         new InputPatternFromPatternSynapse()
-                .init(catIN, catBN, variant == 0  || variant == 2 ? 10.0 : 5.0)
+                .setWeight(variant == 0  || variant == 2 ? 10.0 : 5.0)
+                .init(catIN, catBN)
                 .adjustBias();
 
         if(variant < 2) {
             new RelationInputSynapse()
-                    .init(relPT, catBN, 5.0)
+                    .setWeight(5.0)
+                    .init(relPT, catBN)
                     .adjustBias();
             new SamePatternSynapse()
-                    .init(theBN, catBN, variant == 1 || variant == 3 ? 10.0 : 5.0)
+                    .setWeight(variant == 1 || variant == 3 ? 10.0 : 5.0)
+                    .init(theBN, catBN)
                     .adjustBias();
         } else {
             new RelationInputSynapse()
-                    .init(relPT, theBN, 5.0)
+                    .setWeight(5.0)
+                    .init(relPT, theBN)
                     .adjustBias();
             new SamePatternSynapse()
-                    .init(catBN, theBN, variant == 1 || variant == 3 ? 10.0 : 5.0)
+                    .setWeight(variant == 1 || variant == 3 ? 10.0 : 5.0)
+                    .init(catBN, theBN)
                     .adjustBias();
         }
 
@@ -73,10 +79,10 @@ public class TestHelper {
         //addInhibitoryLoop(inhibNThe, false, theBN);
         //addInhibitoryLoop(new InhibitoryNeuron().init(m, "I-the (tc)"), true, theBN);
 
-        updateBias(theCatP, 3.0);
+        setBias(theCatP, 3.0);
 
-        updateBias(theBN, 3.0);
-        updateBias(catBN, 3.0);
+        setBias(theBN, 3.0);
+        setBias(catBN, 3.0);
     }
 
     public static void initPatternBlackCat(Model m) {
@@ -87,27 +93,31 @@ public class TestHelper {
 
         BindingNeuron blackBN = new BindingNeuron().init(m, "black (black cat)");
         new InputPatternFromPatternSynapse()
-                .init(blackIN, blackBN, 10.0)
+                .setWeight(10.0)
+                .init(blackIN, blackBN)
                 .adjustBias();
 
         BindingNeuron catBN = new BindingNeuron().init(m, "cat (black cat)");
         new InputPatternFromPatternSynapse()
-                .init(catIN, catBN, 20.0)
+                .setWeight(20.0)
+                .init(catIN, catBN)
                 .adjustBias();
 
         new RelationInputSynapse()
-                .init(relPT, catBN, 5.0)
+                .setWeight(5.0)
+                .init(relPT, catBN)
                 .adjustBias();
 
         new SamePatternSynapse()
-                .init(blackBN, catBN, 5.0)
+                .setWeight(5.0)
+                .init(blackBN, catBN)
                 .adjustBias();
 
         PatternNeuron blackCat = initPatternLoop(m, "black cat", blackBN, catBN);
-        updateBias(blackCat, 3.0);
+        setBias(blackCat, 3.0);
 
-        updateBias(blackBN, 3.0);
-        updateBias(catBN, 3.0);
+        setBias(blackBN, 3.0);
+        setBias(catBN, 3.0);
     }
 
     public static void initPatternTheDog(Model m, InhibitoryNeuron inhibNThe, InhibitoryNeuron inhibNDog, int variant) {
@@ -121,27 +131,33 @@ public class TestHelper {
 
         BindingNeuron theBN = new BindingNeuron().init(m, "the (the dog)");
         new InputPatternFromPatternSynapse()
-                .init(theIN, theBN, 10.0)
+                .setWeight(10.0)
+                .init(theIN, theBN)
                 .adjustBias();
 
         BindingNeuron dogBN = new BindingNeuron().init(m, "dog (the dog)");
         new InputPatternFromPatternSynapse()
-                .init(dogIN, dogBN, variant == 0  || variant == 2 ? 10.0 : 5.0)
+                .setWeight(variant == 0  || variant == 2 ? 10.0 : 5.0)
+                .init(dogIN, dogBN)
                 .adjustBias();
 
         if(variant < 2) {
             new RelationInputSynapse()
-                    .init(relPT, dogBN, 5.0)
+                    .setWeight(5.0)
+                    .init(relPT, dogBN)
                     .adjustBias();
             new SamePatternSynapse()
-                    .init(theBN, dogBN, variant == 1 || variant == 3 ? 10.0 : 5.0)
+                    .setWeight(variant == 1 || variant == 3 ? 10.0 : 5.0)
+                    .init(theBN, dogBN)
                     .adjustBias();
         } else {
             new RelationInputSynapse()
-                    .init(relPT, theBN, 5.0)
+                    .setWeight(5.0)
+                    .init(relPT, theBN)
                     .adjustBias();
             new SamePatternSynapse()
-                    .init(dogBN, theBN, variant == 1 || variant == 3 ? 10.0 : 5.0)
+                    .setWeight(variant == 1 || variant == 3 ? 10.0 : 5.0)
+                    .init(dogBN, theBN)
                     .adjustBias();
         }
 
@@ -150,9 +166,9 @@ public class TestHelper {
         addInhibitoryLoop(inhibNThe, false, theBN);
         addInhibitoryLoop(new InhibitoryNeuron().init(m, "I-the (tg)"), true, theBN);
 
-        updateBias(theDogP, 3.0);
+        setBias(theDogP, 3.0);
 
-        updateBias(theBN, 3.0);
-        updateBias(dogBN, 3.0);
+        setBias(theBN, 3.0);
+        setBias(dogBN, 3.0);
     }
 }

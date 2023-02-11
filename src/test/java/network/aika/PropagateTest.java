@@ -38,9 +38,10 @@ public class PropagateTest {
         BindingNeuron out = new BindingNeuron().init(m, "OUT");
 
         new InputPatternSynapse()
-                .init(in, out, 10.0);
+                .setWeight(10.0)
+                .init(in, out);
 
-        updateBias(out, 1.0);
+        setBias(out, 1.0);
 
         Document doc = new Document(m, "test");
         doc.addToken(in, 0, 0, 4);

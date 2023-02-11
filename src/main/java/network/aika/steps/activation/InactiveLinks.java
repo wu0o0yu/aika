@@ -27,18 +27,17 @@ import network.aika.steps.Step;
  */
 public class InactiveLinks extends Step<Activation> {
 
-
-    public static void add(Activation bs) {
-        Step.add(new InactiveLinks(bs));
+    public static void add(Activation act) {
+        Step.add(new InactiveLinks(act));
     }
 
-    public InactiveLinks(Activation bs) {
-        super(bs);
+    public InactiveLinks(Activation act) {
+        super(act);
     }
 
     @Override
     public Phase getPhase() {
-        return Phase.COUNTING;
+        return Phase.TRAINING;
     }
 
     @Override

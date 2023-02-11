@@ -101,26 +101,32 @@ public class MetaNeuronTest {
                 .init(m, "Abstract Syl. Pos-0");
 
         new InhibitorySynapse(INPUT)
-                .init(sylBeginBN, inhib, 1.0);
+                .setWeight(1.0)
+                .init(sylBeginBN, inhib);
 
         new NegativeFeedbackSynapse()
-                .init(inhib, sylBeginBN, -20.0)
+                .setWeight(-20.0)
+                .init(inhib, sylBeginBN)
                 .adjustBias();
 
         new PatternSynapse()
-                .init(sylBeginBN, syllablePN, 10.0)
+                .setWeight(10.0)
+                .init(sylBeginBN, syllablePN)
                 .adjustBias();
 
         new PositiveFeedbackSynapse()
-                .init(syllablePN, sylBeginBN, 10.0)
+                .setWeight(10.0)
+                .init(syllablePN, sylBeginBN)
                 .adjustBias();
 
         new InputPatternFromPatternSynapse()
-                .init(letterPN, sylBeginBN, 10.0)
+                .setWeight(10.0)
+                .init(letterPN, sylBeginBN)
                 .adjustBias();
 
         new BindingCategoryInputSynapse()
-                .init(sylBeginCategory, sylBeginBN, 1.0);
+                .setWeight(1.0)
+                .init(sylBeginCategory, sylBeginBN);
 
 //        sylBeginBN.updateBias(3.0);
 
@@ -145,36 +151,44 @@ public class MetaNeuronTest {
                 .init(m, "Abstract Syl. Pos-R" + pos);
 
         new InhibitorySynapse(INPUT)
-                .init(sylContinueRightBN, inhib, 1.0);
+                .setWeight(1.0)
+                .init(sylContinueRightBN, inhib);
 
         new NegativeFeedbackSynapse()
-                .init(inhib, sylContinueRightBN, -20.0)
+                .setWeight(-20.0)
+                .init(inhib, sylContinueRightBN)
                 .adjustBias();
 
         new RelationInputSynapse()
-                .init(relPT, sylContinueRightBN, 5.0)
+                .setWeight(5.0)
+                .init(relPT, sylContinueRightBN)
                 .adjustBias();
 
         new SamePatternSynapse()
-                .init(lastBN, sylContinueRightBN, 10.0)
+                .setWeight(10.0)
+                .init(lastBN, sylContinueRightBN)
                 .adjustBias();
 
         new PatternSynapse()
-                .init(sylContinueRightBN, syllablePN, 6.0)
+                .setWeight(6.0)
+                .init(sylContinueRightBN, syllablePN)
                 .adjustBias();
 
         new PositiveFeedbackSynapse()
-                .init(syllablePN, sylContinueRightBN, 10.0);
+                .setWeight(10.0)
+                .init(syllablePN, sylContinueRightBN);
 
 
         new InputPatternFromPatternSynapse()
-                .init(letterPN, sylContinueRightBN, 10.0)
+                .setWeight(10.0)
+                .init(letterPN, sylContinueRightBN)
                 .adjustBias();
 
         new BindingCategoryInputSynapse()
-                .init(sylContinueRightCategory, sylContinueRightBN, 1.0);
+                .setWeight(1.0)
+                .init(sylContinueRightCategory, sylContinueRightBN);
 
-        sylContinueRightBN.updateBias(3.0);
+        sylContinueRightBN.setBias(3.0);
         return sylContinueRightBN;
     }
 
@@ -199,7 +213,8 @@ public class MetaNeuronTest {
 
 
         new PatternCategoryInputSynapse()
-                .init(letterCategory, letterPN, 1.0);
+                .setWeight(1.0)
+                .init(letterCategory, letterPN);
 
         CategoryNeuron syllableCategory = new PatternCategoryNeuron()
                 .init(m, "Syllable Category");
@@ -222,7 +237,8 @@ public class MetaNeuronTest {
         );
 
         new PatternCategoryInputSynapse()
-                .init(syllableCategory, syllablePN, 1.0);
+                .setWeight(1.0)
+                .init(syllableCategory, syllablePN);
 
         // Concrete
         TokenNeuron letterS = letterPN.instantiateTemplate()
@@ -231,8 +247,8 @@ public class MetaNeuronTest {
         TokenNeuron letterC = letterPN.instantiateTemplate()
                 .init(m, "L-c");
 
-        letterPN.updateBias(3.0);
-        syllablePN.updateBias(3.0);
+        letterPN.setBias(3.0);
+        syllablePN.setBias(3.0);
 
 
         Document doc = new Document(m, "s c h");

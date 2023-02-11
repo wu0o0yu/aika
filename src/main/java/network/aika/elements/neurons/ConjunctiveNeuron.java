@@ -21,6 +21,8 @@ import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.synapses.CategorySynapse;
 import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.elements.synapses.ConjunctiveSynapse;
+import network.aika.fields.QueueSumField;
+import network.aika.fields.SumField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +31,8 @@ import java.util.Comparator;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.steps.Phase.TRAINING;
+import static network.aika.utils.Utils.TOLERANCE;
 
 /**
  *
@@ -38,12 +42,36 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
 
     private static final Logger log = LoggerFactory.getLogger(ConjunctiveNeuron.class);
 
+    protected SumField synapseBiasSum = initSynapseBiasSum();
+
     public ConjunctiveNeuron() {
         bias.addEventListener(
                 "onBiasUpdate",
                 this::updateSumOfLowerWeights,
                 true
         );
+        synapseBiasSum.addEventListener(
+                "onSynapseBiasSumUpdate",
+                this::updateSumOfLowerWeights,
+                true
+        );
+    }
+
+    protected SumField initSynapseBiasSum() {
+        return (SumField) new QueueSumField(this, TRAINING, "synapseBiasSum", TOLERANCE)
+                .addListener("onSynapseBiasSumModified", () ->
+                        setModified()
+                );
+    }
+
+    public SumField getSynapseBiasSum() {
+        return synapseBiasSum;
+    }
+
+    @Override
+    public double getCurrentCompleteBias() {
+        return getBias().getUpdatedCurrentValue() +
+                synapseBiasSum.getUpdatedCurrentValue();
     }
 
     @Override
@@ -52,7 +80,8 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
 
         CategoryInputSynapse cis = ((ConjunctiveNeuron)templateN).getCategoryInputSynapse();
         newCategorySynapse()
-                .init(this, cis.getInput(), 10.0);
+                .setWeight(10.0)
+                .init(this, cis.getInput());
     }
 
     public abstract CategorySynapse newCategorySynapse();
@@ -97,7 +126,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     protected void updateSumOfLowerWeights() {
         ConjunctiveSynapse[] inputSynapses = sortInputSynapses();
 
-        double sum = getBias().getUpdatedCurrentValue();
+        double sum = bias.getUpdatedCurrentValue();
         for(ConjunctiveSynapse s: inputSynapses) {
             double w = s.getWeight().getUpdatedCurrentValue();
             if(w <= 0.0)

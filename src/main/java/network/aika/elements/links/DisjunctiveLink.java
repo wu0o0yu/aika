@@ -19,8 +19,8 @@ package network.aika.elements.links;
 import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.activations.DisjunctiveActivation;
 import network.aika.elements.synapses.DisjunctiveSynapse;
+import network.aika.fields.FieldLink;
 
-import static network.aika.fields.FieldLink.link;
 import static network.aika.fields.Fields.mul;
 
 /**
@@ -34,7 +34,7 @@ public class DisjunctiveLink<S extends DisjunctiveSynapse, IA extends Conjunctiv
 
     @Override
     public void connectWeightUpdate() {
-        link(
+        FieldLink.link(
                 mul(
                         this,
                         "weight update",

@@ -116,10 +116,12 @@ public class TestUtils {
 
         for(BindingNeuron bn: bns) {
             new InhibitorySynapse(sameInhibSynapse ? SAME : INPUT)
-                    .init(bn, inhibN, 1.0);
+                    .setWeight(1.0)
+                    .init(bn, inhibN);
 
             new NegativeFeedbackSynapse()
-                    .init(inhibN, bn, -20.0);
+                    .setWeight(-20.0)
+                    .init(inhibN, bn);
         }
         return inhibN;
     }
@@ -130,7 +132,8 @@ public class TestUtils {
 
         for(BindingNeuron bn: bns) {
             new PatternSynapse()
-                    .init(bn, patternN, 10.0)
+                    .setWeight(10.0)
+                    .init(bn, patternN)
                     .adjustBias();
 
             createPositiveFeedbackSynapse(new PositiveFeedbackSynapse(), patternN, bn, 0.0, 10.0);
@@ -138,8 +141,8 @@ public class TestUtils {
         return patternN;
     }
 
-    public static void updateBias(Neuron n, double bias) {
-        n.getBias().receiveUpdate(bias);
+    public static void setBias(Neuron n, double bias) {
+        n.setBias(bias);
     }
 
     public static PositiveFeedbackSynapse createPositiveFeedbackSynapse(PositiveFeedbackSynapse s, PatternNeuron input, BindingNeuron output, double weight, double feedbackWeight) {

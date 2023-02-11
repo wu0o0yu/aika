@@ -17,7 +17,6 @@ public class SumField extends Field {
         super(reference, label, tolerance, weakRefs);
     }
 
-
     @Override
     protected void initIO(boolean weakRefs) {
         super.initIO(weakRefs);

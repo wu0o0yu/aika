@@ -27,9 +27,13 @@ import network.aika.elements.synapses.Synapse;
 import network.aika.visitor.Visitor;
 import network.aika.visitor.selfref.SelfRefDownVisitor;
 import network.aika.steps.link.LinkingIn;
+import network.aika.fields.FieldLink;
 
 import static network.aika.callbacks.EventType.CREATE;
-import static network.aika.fields.FieldLink.link;
+import static network.aika.direction.Direction.INPUT;
+import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.fields.ConstantField.ONE;
+import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.Fields.*;
 import static network.aika.elements.activations.Timestamp.FIRED_COMPARATOR;
 import static network.aika.utils.Utils.TOLERANCE;
@@ -54,7 +58,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         this.input = input;
         this.output = output;
 
-        init();
+        link();
 
         if(input != null && output != null) {
             initWeightInput();
@@ -99,8 +103,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected void initGradient() {
         gradient = new SumField(this, "Gradient", TOLERANCE);
-        link(input.getGradient(), gradient);
-        link(gradient, output.getGradient());
+        FieldLink.link(input.getGradient(), gradient);
+        FieldLink.link(gradient, output.getGradient());
     }
 
     public void instantiateTemplate(I iAct, O oAct) {
@@ -123,17 +127,12 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         s.createLinkFromTemplate(iAct, oAct, this);
     }
 
-    public void initFromTemplate(Link template) {
-        template.copyState(this);
-        connect(Direction.INPUT, false, false);
-        connect(Direction.OUTPUT, false, true);
-    }
 
     public abstract void connectWeightUpdate();
 
     protected void initWeightInput() {
         weightedInput = initWeightedInput();
-        link(weightedInput, getOutput().getNet());
+        FieldLink.link(weightedInput, getOutput().getNet());
     }
 
     protected FieldOutput initWeightedInput() {
@@ -148,6 +147,20 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     public void init() {
+        connect(INPUT, true, false);
+        connect(OUTPUT, true, true);
+
+        if(input != null)
+            addInputLinkingStep();
+    }
+
+    public void initFromTemplate(Link template) {
+        template.copyState(this);
+        connect(Direction.INPUT, false, false);
+        connect(Direction.OUTPUT, false, true);
+    }
+
+    public void link() {
         if(getInput() != null)
             linkInput();
 
@@ -165,19 +178,25 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     @Override
     public Timestamp getFired() {
-        return isCausal() ? input.getFired() : output.getFired();
+        return input != null && isCausal() ? input.getFired() : output.getFired();
     }
 
     @Override
     public Timestamp getCreated() {
-        return isCausal() ? input.getCreated() : output.getCreated();
+        return input != null && isCausal() ? input.getCreated() : output.getCreated();
     }
 
     public FieldOutput getInputValue() {
+        if(input == null)
+            return ZERO;
+
         return input.getValue();
     }
 
     public FieldOutput getNegInputValue() {
+        if(input == null)
+            return ONE;
+
         return input.getNegValue();
     }
 
@@ -223,6 +242,9 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     public void propagateRangeOrTokenPos() {
+        if(input == null)
+            return;
+
         if(input.getRange() != null || input.getTokenPos() != null)
             output.updateRangeAndTokenPos(input.getRange(), input.getTokenPos());
     }

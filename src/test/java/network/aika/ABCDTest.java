@@ -120,77 +120,90 @@ public class ABCDTest {
         LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, -1, -1);
 
         new RelationInputSynapse()
-                .init(relPT, b_abBN, 10.0)
+                .setWeight(10.0)
+                .init(relPT, b_abBN)
                 .adjustBias();
         new SamePatternSynapse()
-                .init(a_abBN, b_abBN, 11.0)
+                .setWeight(11.0)
+                .init(a_abBN, b_abBN)
                 .adjustBias();
 
         new InputPatternFromPatternSynapse()
-                .init(a_IN, a_abBN, 10.0)
+                .setWeight(10.0)
+                .init(a_IN, a_abBN)
                 .adjustBias();
-        updateBias(a_abBN, 2.5);
+        setBias(a_abBN, 2.5);
 
         new InputPatternFromPatternSynapse()
-                .init(b_IN, b_abBN, 10.0)
+                .setWeight(10.0)
+                .init(b_IN, b_abBN)
                 .adjustBias();
 
         PatternNeuron abPattern = initPatternLoop(m, "ab", a_abBN, b_abBN);
-        updateBias(abPattern, 3.0);
+        setBias(abPattern, 3.0);
 
         // Pattern bc
         BindingNeuron b_bcBN = new BindingNeuron().init(m, "b (bc)");
         BindingNeuron c_bcBN = new BindingNeuron().init(m, "c (bc)");
 
         new RelationInputSynapse()
-                .init(relPT, c_bcBN, 10.0)
+                .setWeight(10.0)
+                .init(relPT, c_bcBN)
                 .adjustBias();
         new SamePatternSynapse()
-                .init(b_bcBN, c_bcBN, 11.0)
+                .setWeight(11.0)
+                .init(b_bcBN, c_bcBN)
                 .adjustBias();
 
         new InputPatternFromPatternSynapse()
-                .init(b_IN, b_bcBN, 10.0)
+                .setWeight(10.0)
+                .init(b_IN, b_bcBN)
                 .adjustBias();
         addInhibitoryLoop(new InhibitoryNeuron().init(m, "I-b"), false, b_abBN, b_bcBN);
-        updateBias(b_abBN, 3.0);
-        updateBias(b_bcBN, 2.5);
+        setBias(b_abBN, 3.0);
+        setBias(b_bcBN, 2.5);
 
         new InputPatternFromPatternSynapse()
-                .init(c_IN, c_bcBN, 10.0)
+                .setWeight(10.0)
+                .init(c_IN, c_bcBN)
                 .adjustBias();
-        updateBias(c_bcBN, 3.0);
+        setBias(c_bcBN, 3.0);
 
         PatternNeuron bcPattern = initPatternLoop(m, "bc", b_bcBN, c_bcBN);
-        updateBias(bcPattern, 3.0);
+        setBias(bcPattern, 3.0);
 
         // Pattern bcd
         BindingNeuron bc_bcdBN = new BindingNeuron().init(m, "bc (bcd)");
         BindingNeuron d_bcdBN = new BindingNeuron().init(m, "d (bcd)");
         new RelationInputSynapse()
-                .init(c_bcBN, bc_bcdBN, 10.0)
+                .setWeight(10.0)
+                .init(c_bcBN, bc_bcdBN)
                 .adjustBias();
 
         new RelationInputSynapse()
-                .init(relPT, d_bcdBN, 10.0)
+                .setWeight(10.0)
+                .init(relPT, d_bcdBN)
                 .adjustBias();
 
         new SamePatternSynapse()
-                .init(bc_bcdBN, d_bcdBN, 11.0)
+                .setWeight(11.0)
+                .init(bc_bcdBN, d_bcdBN)
                 .adjustBias();
 
         new InputPatternFromPatternSynapse()
-                .init(bcPattern, bc_bcdBN, 10.0)
+                .setWeight(10.0)
+                .init(bcPattern, bc_bcdBN)
                 .adjustBias();
-        updateBias(bc_bcdBN, 2.5);
+        setBias(bc_bcdBN, 2.5);
 
         new InputPatternFromPatternSynapse()
-                .init(d_IN, d_bcdBN, 10.0)
+                .setWeight(10.0)
+                .init(d_IN, d_bcdBN)
                 .adjustBias();
-        updateBias(d_bcdBN, 3.0);
+        setBias(d_bcdBN, 3.0);
 
         PatternNeuron bcdPattern = initPatternLoop(m, "bcd", bc_bcdBN, d_bcdBN);
-        updateBias(bcdPattern, 3.0);
+        setBias(bcdPattern, 3.0);
 
 
         Document doc = new Document(m, "abcd");

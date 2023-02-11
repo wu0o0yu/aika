@@ -40,9 +40,9 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
     }
 
     @Override
-    public void startVisitor(LinkingOperator c, Activation bs) {
-        new BindingDownVisitor(bs.getThought(), c)
-                .start(bs);
+    public void startVisitor(LinkingOperator c, Activation act) {
+        new BindingDownVisitor(act.getThought(), c)
+                .start(act);
     }
 
     @Override
@@ -57,8 +57,9 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
     }
 
     @Override
-    public void setWeight(double w) {
+    public NegativeFeedbackSynapse setWeight(double w) {
         weight.receiveUpdate(w);
+        return this;
     }
 
     @Override

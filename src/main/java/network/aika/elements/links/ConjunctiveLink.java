@@ -19,10 +19,10 @@ package network.aika.elements.links;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.synapses.ConjunctiveSynapse;
+import network.aika.fields.FieldLink;
 import network.aika.fields.FieldOutput;
 
-import static network.aika.fields.FieldLink.link;
-import static network.aika.fields.Fields.mul;
+import static network.aika.fields.Fields.*;
 
 
 /**
@@ -33,9 +33,33 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
     private FieldOutput weightUpdatePosCase;
     private FieldOutput weightUpdateNegCase;
     private FieldOutput biasUpdateNegCase;
+    private FieldLink synapseBiasFieldLink;
 
     public ConjunctiveLink(S s, IA input, OA output) {
         super(s, input, output);
+    }
+
+    @Override
+    protected void initWeightInput() {
+        super.initWeightInput();
+
+        if(synapse.isOptional())
+            synapseBiasFieldLink = FieldLink.link(getSynapse().getSynapseBias(), getOutput().getNet());
+    }
+
+    @Override
+    public void init() {
+        if(synapseBiasFieldLink != null)
+            synapseBiasFieldLink.connect(true);
+        super.init();
+    }
+
+    @Override
+    public void initFromTemplate(Link template) {
+        super.initFromTemplate(template);
+
+        if(synapseBiasFieldLink != null)
+            synapseBiasFieldLink.connect(false);
     }
 
     @Override
@@ -48,11 +72,16 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
                 synapse.getWeight()
         );
 
-        weightUpdateNegCase = mul(
+        weightUpdateNegCase = scale(
                 this,
                 "weight update (neg case)",
-                getNegInputValue(),
-                getOutput().getNegUpdateValue(),
+                -1.0,
+                mul(
+                        this,
+                        "weight update (neg case)",
+                        getNegInputValue(),
+                        getOutput().getNegUpdateValue()
+                ),
                 synapse.getWeight()
         );
 
@@ -61,7 +90,7 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
                 "bias update (neg case)",
                 getNegInputValue(),
                 getOutput().getNegUpdateValue(),
-                output.getNeuron().getBias()
+                getSynapse().getSynapseBias()
         );
     }
 
