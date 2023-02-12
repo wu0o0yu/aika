@@ -21,13 +21,11 @@ import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.links.PositiveFeedbackLink;
-import network.aika.fields.FieldLink;
 import network.aika.fields.Multiplication;
 import network.aika.elements.neurons.PatternNeuron;
-import network.aika.visitor.linking.LinkingOperator;
 
-import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.mul;
 
 /**
@@ -62,7 +60,7 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
         );
 
         oAct.setPosFeedbackDummy(dummyWeight);
-        FieldLink.link(dummyWeight, -1, oAct.getNet());
+        linkAndConnect(dummyWeight, -1, oAct.getNet());
     }
 
     public Direction getStoredAt() {

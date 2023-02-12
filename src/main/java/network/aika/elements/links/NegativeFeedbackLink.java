@@ -22,7 +22,7 @@ import network.aika.fields.*;
 import network.aika.elements.synapses.NegativeFeedbackSynapse;
 import network.aika.visitor.Visitor;
 
-import static network.aika.fields.FieldLink.link;
+import static network.aika.fields.FieldLink.linkAndConnect;
 
 /**
  * @author Lukas Molzberger
@@ -68,7 +68,7 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
 
     @Override
     public void connectWeightUpdate() {
-        FieldLink.link(
+        linkAndConnect(
                 Fields.mul(
                         this,
                         "weight update",

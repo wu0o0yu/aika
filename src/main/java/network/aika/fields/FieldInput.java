@@ -33,5 +33,9 @@ public interface FieldInput extends UpdateListener {
 
     Collection<FieldLink> getInputs();
 
+    void connectInputs(boolean initialize);
+
+    void disconnectInputs(boolean deinitialize);
+
     int getNextArg();
 }

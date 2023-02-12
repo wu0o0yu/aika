@@ -107,7 +107,9 @@ public class PatternSynapse extends AbstractPatternSynapse<
         boolean iActive = l.getInput() != null && l.getInput().isFired();
         boolean oActive = l.getOutput().isFired();
 
-        Range absoluteRange = l.getInput().getAbsoluteRange();
+        Range absoluteRange = l.getInput() != null ?
+                l.getInput().getAbsoluteRange() :
+                l.getOutput().getAbsoluteRange(); // TODO: check
 
         sampleSpace.countSkippedInstances(absoluteRange);
 

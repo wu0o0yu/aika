@@ -17,16 +17,17 @@
 package network.aika.elements.activations;
 
 import network.aika.Thought;
-import network.aika.direction.Direction;
+import network.aika.elements.links.ConjunctiveLink;
 import network.aika.elements.neurons.ConjunctiveNeuron;
-import network.aika.fields.FieldLink;
+import network.aika.elements.synapses.ConjunctiveSynapse;
+import network.aika.steps.activation.InstantiationEdges;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static network.aika.callbacks.EventType.UPDATE;
-import static network.aika.fields.Fields.isTrue;
+import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.scale;
 
 
@@ -39,8 +40,6 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
     protected ConjunctiveActivation<N>  template;
 
     protected List<ConjunctiveActivation<N>> templateInstances;
-
-    private boolean initialized = true;
 
     public ConjunctiveActivation(int id, Thought t, N n) {
         super(id, t, n);
@@ -56,7 +55,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
                 updateValue
         );
 
-        FieldLink.link(
+        linkAndConnect(
                 updateValue,
                 getNeuron().getBias()
         );
@@ -66,12 +65,12 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
     protected void initNet() {
         super.initNet();
 
-        FieldLink.link(getNeuron().getSynapseBiasSum(), net);
+        linkAndConnect(getNeuron().getSynapseBiasSum(), net);
     }
 
     public ConjunctiveActivation getActiveTemplateInstance() {
         return getTemplateInstancesStream()
-                .filter(act -> !act.initialized || isTrue(act.getIsFired()))
+//                .filter(act -> !act.initialized || isTrue(act.getIsFired()))
                 .findFirst()
                 .orElse(null);
     }
@@ -117,50 +116,49 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
 
         ConjunctiveActivation<N> ti = n.createActivation(getThought());
         linkTemplateAndInstance(ti);
-        ti.initialized = false;
+
+        double optionalSynBiasSum = getInputLinksByType(ConjunctiveLink.class)
+                .map(l -> (ConjunctiveSynapse) l.getSynapse())
+                .filter(ConjunctiveSynapse::isOptional)
+                .mapToDouble(s -> s.getSynapseBias().getUpdatedCurrentValue())
+                .sum();
+        ti.getNeuron().getSynapseBiasSum().receiveUpdate(optionalSynBiasSum);
+
+        InstantiationEdges.add(this, ti);
 
         if(thought.getInstantiationCallback() != null)
             thought.getInstantiationCallback().onInstantiation(ti);
     }
 
     @Override
-    public void instantiateTemplateEdges() {
-        ConjunctiveActivation<N> ti = getActiveTemplateInstance();
-
+    public void instantiateTemplateEdges(ConjunctiveActivation instanceAct) {
         getInputLinks()
                 .forEach(l ->
                     l.instantiateTemplate(
                             l.getInput().resolveAbstractInputActivation(),
-                            ti
+                            instanceAct
                     )
                 );
 
-        ti.getNeuron().setLabel(
+        instanceAct.getNeuron().setLabel(
                 getConfig().getLabel(this)
         );
 
-        ti.initDummyLinks();
-        ti.initFromTemplate();
+        instanceAct.initDummyLinks();
+        instanceAct.initFromTemplate();
 
         getOutputLinks()
                 .filter(l -> !l.getOutput().getNeuron().isAbstract())
                 .forEach(l ->
                     l.instantiateTemplate(
-                            ti,
+                            instanceAct,
                             l.getOutput().resolveAbstractInputActivation()
                     )
                 );
     }
 
     public void initFromTemplate() {
-        if(initialized)
-            return;
-
-        template.copyState(this);
         fired = template.fired;
-        connect(Direction.INPUT, false, false);
         thought.onElementEvent(UPDATE, this);
-
-        initialized = true;
     }
 }

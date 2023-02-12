@@ -43,6 +43,7 @@ import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.elements.neurons.Range.joinTokenPosition;
 import static network.aika.elements.neurons.Range.tokenPositionEquals;
+import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.*;
 import static network.aika.steps.Phase.INFERENCE;
@@ -124,7 +125,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 value
         );
 
-        gradient = new QueueSumField(this, TRAINING, "Gradient", TOLERANCE);
+        gradient = new QueueSumField(this, TRAINING, "gradient", TOLERANCE);
 
         if (getConfig().isTrainingEnabled() && neuron.isTrainingAllowed()) {
             connectGradientFields();
@@ -143,14 +144,9 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
     }
 
-    public void init() {
-        connect(INPUT, true, false);
-        connect(OUTPUT, true, true);
-    }
-
     protected void initNet() {
         net = new ValueSortedQueueField(this, INFERENCE, "net", null);
-        FieldLink.link(getNeuron().getBias(), net);
+        linkAndConnect(getNeuron().getBias(), net);
     }
 
     protected void initDummyLinks() {
@@ -286,7 +282,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     public void instantiateTemplateNodes() {
     }
 
-    public void instantiateTemplateEdges() {
+    public void instantiateTemplateEdges(ConjunctiveActivation instanceAct) {
     }
 
     public Thought getThought() {
@@ -377,11 +373,15 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     }
 
     public <IL extends Link> IL getInputLinkByType(Class<IL> linkType) {
-        return getInputLinks()
-                .filter(linkType::isInstance)
-                .map(linkType::cast)
+        return getInputLinksByType(linkType)
                 .findAny()
                 .orElse(null);
+    }
+
+    public <IL extends Link> Stream<IL> getInputLinksByType(Class<IL> linkType) {
+        return getInputLinks()
+                .filter(linkType::isInstance)
+                .map(linkType::cast);
     }
 
     public Stream<Link> getOutputLinks(Synapse s) {

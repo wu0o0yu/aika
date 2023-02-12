@@ -75,13 +75,4 @@ public abstract class FieldObject {
         disconnect(Direction.INPUT, false, true, true);
         disconnect(Direction.OUTPUT, false, true, true);
     }
-
-    public void copyState(FieldObject to) {
-        assert fields.size() == to.fields.size();
-
-        int i = 0;
-        for(Field f: fields) {
-            f.copyState(to.fields.get(i++));
-        }
-    }
 }

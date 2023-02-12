@@ -94,7 +94,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
             return;
 
         Thought t = iAct.getThought();
-        OA oAct = getOutput().createAndInitActivation(t);
+        OA oAct = getOutput().createActivation(t);
 
         createAndInitLink(iAct, oAct);
     }
@@ -230,9 +230,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         link();
         linkFields();
 
-        templateSyn.copyState(this);
-        connect(Direction.INPUT, false, false);
-        connect(Direction.OUTPUT, false, true);
+        weight.setInitialValue(
+                templateSyn.weight.getUpdatedCurrentValue()
+        );
     }
 
     public S init(Neuron input, Neuron output) {
@@ -241,9 +241,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
         link();
         linkFields();
-
-        connect(INPUT, true, false);
-        connect(OUTPUT, true, false);
 
         return (S) this;
     }

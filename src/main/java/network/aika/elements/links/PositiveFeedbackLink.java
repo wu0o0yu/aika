@@ -18,12 +18,10 @@ package network.aika.elements.links;
 
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
-import network.aika.fields.Fields;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
 import network.aika.fields.Multiplication;
 import network.aika.visitor.Visitor;
 
-import static network.aika.fields.FieldLink.link;
 import static network.aika.fields.Fields.mul;
 import static network.aika.fields.Fields.scale;
 
@@ -61,7 +59,7 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
 
     @Override
     protected Multiplication initWeightedInput() {
-        return Fields.mul(
+        return mul(
                 this,
                 "isClosed * iAct(id:" + getInput().getId() + ").value * weight",
                 getThought().getIsClosed(),

@@ -17,6 +17,7 @@
 package network.aika.steps.activation;
 
 import network.aika.elements.activations.Activation;
+import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
@@ -29,24 +30,26 @@ import static network.aika.steps.Phase.INSTANTIATION_EDGES;
  */
 public class InstantiationEdges extends Step<Activation> {
 
+    private ConjunctiveActivation instanceAct;
 
-    public static void add(Activation act) {
+    public static void add(Activation act, ConjunctiveActivation instanceAct) {
         if(act.instantiationEdgesIsQueued)
             return;
 
         act.instantiationEdgesIsQueued = true;
 
-        Step.add(new InstantiationEdges(act));
+        Step.add(new InstantiationEdges(act, instanceAct));
     }
 
-    public InstantiationEdges(Activation act) {
+    public InstantiationEdges(Activation act, ConjunctiveActivation instanceAct) {
         super(act);
+        this.instanceAct = instanceAct;
     }
 
     @Override
     public void process() {
         getElement()
-                .instantiateTemplateEdges();
+                .instantiateTemplateEdges(instanceAct);
 
         getElement().instantiationEdgesIsQueued = false;
     }

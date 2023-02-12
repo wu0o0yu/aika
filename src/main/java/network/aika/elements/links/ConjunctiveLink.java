@@ -19,9 +19,9 @@ package network.aika.elements.links;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.synapses.ConjunctiveSynapse;
-import network.aika.fields.FieldLink;
 import network.aika.fields.FieldOutput;
 
+import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.*;
 
 
@@ -33,7 +33,6 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
     private FieldOutput weightUpdatePosCase;
     private FieldOutput weightUpdateNegCase;
     private FieldOutput biasUpdateNegCase;
-    private FieldLink synapseBiasFieldLink;
 
     public ConjunctiveLink(S s, IA input, OA output) {
         super(s, input, output);
@@ -44,22 +43,12 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
         super.initWeightInput();
 
         if(synapse.isOptional())
-            synapseBiasFieldLink = FieldLink.link(getSynapse().getSynapseBias(), getOutput().getNet());
-    }
-
-    @Override
-    public void init() {
-        if(synapseBiasFieldLink != null)
-            synapseBiasFieldLink.connect(true);
-        super.init();
+            linkAndConnect(getSynapse().getSynapseBias(), getOutput().getNet());
     }
 
     @Override
     public void initFromTemplate(Link template) {
         super.initFromTemplate(template);
-
-        if(synapseBiasFieldLink != null)
-            synapseBiasFieldLink.connect(false);
     }
 
     @Override

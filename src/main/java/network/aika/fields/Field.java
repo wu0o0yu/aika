@@ -128,6 +128,18 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         to.newValue = getNewValue();
     }
 
+    public void connectInputs(boolean initialize) {
+        getInputs().forEach(fl ->
+                fl.connect(initialize)
+        );
+    }
+
+    public void disconnectInputs(boolean deinitialize) {
+        getInputs().forEach(fl ->
+                fl.disconnect(deinitialize)
+        );
+    }
+
     public Collection<AbstractFieldLink> getReceivers() {
         return receivers;
     }

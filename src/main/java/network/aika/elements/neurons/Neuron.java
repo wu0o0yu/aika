@@ -206,9 +206,9 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
     protected void initFromTemplate(Neuron templateN) {
         addProvider(templateN.getModel());
 
-        templateN.copyState(this);
-        connect(Direction.INPUT, false, false);
-        connect(Direction.OUTPUT, false, true);
+        bias.setInitialValue(
+                templateN.getBias().getUpdatedCurrentValue()
+        );
 
         this.template = templateN;
     }
@@ -222,12 +222,6 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
     }
 
     public abstract A createActivation(Thought t);
-
-    public A createAndInitActivation(Thought t) {
-        A act = createActivation(t);
-        act.init();
-        return act;
-    }
 
     public abstract void addInactiveLinks(Activation bs);
 
@@ -317,11 +311,15 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
     }
 
     public <IS extends S> IS getInputSynapseByType(Class<IS> synapseType) {
-        return getProvider().getInputSynapses()
-                .filter(synapseType::isInstance)
-                .map(synapseType::cast)
+        return getInputSynapsesByType(synapseType)
                 .findAny()
                 .orElse(null);
+    }
+
+    public <IS extends S> Stream<IS> getInputSynapsesByType(Class<IS> synapseType) {
+        return getProvider().getInputSynapses()
+                .filter(synapseType::isInstance)
+                .map(synapseType::cast);
     }
 
     public <OS extends Synapse> OS getOutputSynapseByType(Class<OS> synapseType) {
@@ -501,7 +499,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
     public <N extends Neuron> N init(Model m, String label) {
         addProvider(m);
         setLabel(label);
-        connect(INPUT, true, false);
+//        connect(INPUT, true, false);
         return (N) this;
     }
 

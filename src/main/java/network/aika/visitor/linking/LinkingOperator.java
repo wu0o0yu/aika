@@ -61,7 +61,7 @@ public abstract class LinkingOperator {
                 return null;
 
             Thought t = bsA.getThought();
-            oAct = synA.getOutput().createAndInitActivation(t);
+            oAct = synA.getOutput().createActivation(t);
 
             synA.createAndInitLink(bsA, oAct);
         } else {

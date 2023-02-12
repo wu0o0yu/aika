@@ -61,7 +61,7 @@ public class RelationInputSynapse extends BindingNeuronSynapse<
 
     public LatentRelationActivation createOrLookupLatentActivation(TokenActivation fromOriginAct, TokenActivation toOriginAct) {
         return fromOriginAct.getToRelations().computeIfAbsent(getInput(), n -> {
-            LatentRelationActivation relAct = (LatentRelationActivation) getInput().createAndInitActivation(fromOriginAct.getThought());
+            LatentRelationActivation relAct = getInput().createActivation(fromOriginAct.getThought());
             relAct.setFromAct(fromOriginAct);
             relAct.setToAct(toOriginAct);
             fromOriginAct.getThought().onElementEvent(UPDATE, relAct);

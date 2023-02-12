@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
+import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.steps.Phase.TRAINING;
 import static network.aika.utils.Utils.TOLERANCE;
 
@@ -74,7 +75,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     @Override
     protected void linkFields() {
         if(!optional)
-            FieldLink.link(synapseBias, getOutput().getSynapseBiasSum());
+            linkAndConnect(synapseBias, getOutput().getSynapseBiasSum());
     }
 
     public S setSynapseBias(double b) {
@@ -95,6 +96,15 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         this.optional = optional;
 
         return (S) this;
+    }
+
+    @Override
+    public void initFromTemplate(I input, O output, Synapse templateSyn) {
+        super.initFromTemplate(input, output, templateSyn);
+
+        synapseBias.setInitialValue(
+                ((ConjunctiveSynapse)templateSyn).synapseBias.getUpdatedCurrentValue()
+        );
     }
 
     @Override

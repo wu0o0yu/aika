@@ -39,13 +39,14 @@ public class Fields {
         Addition add = new Addition(ref, label);
         link(in1, 0, add);
         link(in2, 1, add);
+        add.connectInputs(true);
 
         return add;
     }
 
     public static Addition add(FieldObject ref, String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
         Addition add = add(ref, label, in1, in2);
-        linkAll(add, out);
+        linkAndConnectAll(add, out);
         return add;
     }
 
@@ -56,13 +57,14 @@ public class Fields {
         Subtraction sub = new Subtraction(ref, label);
         link(in1, 0, sub);
         link(in2, 1, sub);
+        sub.connectInputs(true);
 
         return sub;
     }
 
     public static Subtraction sub(FieldObject ref, String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
         Subtraction sub = sub(ref, label, in1, in2);
-        linkAll(sub, out);
+        linkAndConnectAll(sub, out);
         return sub;
     }
 
@@ -74,13 +76,14 @@ public class Fields {
         link(x, 0, mix);
         link(in1, 1, mix);
         link(in2, 2, mix);
+        mix.connectInputs(true);
 
         return mix;
     }
 
     public static MixFunction mix(FieldObject ref, String label, FieldOutput x, FieldOutput in1, FieldOutput in2, FieldInput... out) {
         MixFunction mix = mix(ref, label, x, in1, in2);
-        linkAll(mix, out);
+        linkAndConnectAll(mix, out);
         return mix;
     }
 
@@ -91,13 +94,14 @@ public class Fields {
         Multiplication mul = new Multiplication(ref, label);
         link(in1, 0, mul);
         link(in2, 1, mul);
+        mul.connectInputs(true);
 
         return mul;
     }
 
     public static Multiplication mul(FieldObject ref, String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
         Multiplication mul = mul(ref, label, in1, in2);
-        linkAll(mul, out);
+        linkAndConnectAll(mul, out);
         return mul;
     }
 
@@ -108,13 +112,14 @@ public class Fields {
         Division div = new Division(ref, label);
         link(in1, 0, div);
         link(in2, 1, div);
+        div.connectInputs(true);
 
         return div;
     }
 
     public static Division div(FieldObject ref, String label, FieldOutput in1, FieldOutput in2, FieldInput... out) {
         Division div = div(ref, label, in1, in2);
-        linkAll(div, out);
+        linkAndConnectAll(div, out);
         return div;
     }
 
@@ -123,7 +128,9 @@ public class Fields {
             return null;
 
         FieldFunction func = new FieldFunction(ref, label, tolerance, f);
-        link(in, 0, func);
+        link(in, 0, func)
+                .connect(true);
+
         return func;
     }
 
@@ -132,7 +139,7 @@ public class Fields {
             return null;
 
         FieldFunction func = func(ref, label, tolerance, in, f);
-        linkAll(func, out);
+        linkAndConnectAll(func, out);
         return func;
     }
 
@@ -143,13 +150,14 @@ public class Fields {
         BiFunction func = new BiFunction(ref, label, f);
         link(in1, 0, func);
         link(in2, 1, func);
+        func.connectInputs(true);
 
         return func;
     }
 
     public static BiFunction func(FieldObject ref, String label, FieldOutput in1, FieldOutput in2, DoubleBinaryOperator f, FieldInput... out) {
         BiFunction func = func(ref, label, in1, in2, f);
-        linkAll(func, out);
+        linkAndConnectAll(func, out);
         return func;
     }
 
@@ -158,7 +166,8 @@ public class Fields {
             return null;
 
         ThresholdOperator op = new ThresholdOperator(ref, label, threshold, type);
-        link(in, 0, op);
+        link(in, 0, op)
+                .connect(true);
         return op;
     }
 
@@ -167,22 +176,18 @@ public class Fields {
             return null;
 
         ThresholdOperator op = new ThresholdOperator(ref, label, threshold, type, isFinal);
-        link(in, 0, op);
+        link(in, 0, op)
+                .connect(true);
         return op;
     }
-/*
-    public static ThresholdOperator threshold(FieldObject ref, String label, double threshold, ThresholdOperator.Type type, boolean isFinal, FieldOutput in, FieldInput... out) {
-        ThresholdOperator op = threshold(ref, label, threshold, type, isFinal, in, out);
-        linkAll(op, out);
-        return op;
-    }
-*/
+
     public static InvertFunction invert(FieldObject ref, String label, FieldOutput in) {
         if(in == null)
             return null;
 
         InvertFunction f = new InvertFunction(ref, label);
-        link(in, 0, f);
+        link(in, 0, f)
+                .connect(true);
         return f;
     }
 
@@ -191,13 +196,14 @@ public class Fields {
             return null;
 
         ScaleFunction f = new ScaleFunction(ref, label, scale);
-        link(in, 0, f);
+        link(in, 0, f)
+                .connect(true);
         return f;
     }
 
     public static ScaleFunction scale(FieldObject ref, String label, double scale, FieldOutput in, FieldInput... out) {
         ScaleFunction f = scale(ref, label, scale, in);
-        linkAll(f, out);
+        linkAndConnectAll(f, out);
         return f;
     }
 }

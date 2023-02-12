@@ -48,10 +48,6 @@ public class PatternCategoryInputLink extends AbstractPatternLink<PatternCategor
         PatternCategorySynapse s = new PatternCategorySynapse();
         s.initFromTemplate(oAct.getNeuron(), iAct.getNeuron(), synapse);
 
-        synapse.copyState(s);
-        s.connect(Direction.INPUT, false, false);
-        s.connect(Direction.OUTPUT, false, true);
-
         s.createLinkFromTemplate(oAct, iAct, this);
     }
 

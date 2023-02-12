@@ -27,13 +27,11 @@ import network.aika.elements.synapses.Synapse;
 import network.aika.visitor.Visitor;
 import network.aika.visitor.selfref.SelfRefDownVisitor;
 import network.aika.steps.link.LinkingIn;
-import network.aika.fields.FieldLink;
 
 import static network.aika.callbacks.EventType.CREATE;
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.fields.ConstantField.ONE;
 import static network.aika.fields.ConstantField.ZERO;
+import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.*;
 import static network.aika.elements.activations.Timestamp.FIRED_COMPARATOR;
 import static network.aika.utils.Utils.TOLERANCE;
@@ -103,8 +101,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected void initGradient() {
         gradient = new SumField(this, "Gradient", TOLERANCE);
-        FieldLink.link(input.getGradient(), gradient);
-        FieldLink.link(gradient, output.getGradient());
+        linkAndConnect(input.getGradient(), gradient);
+        linkAndConnect(gradient, output.getGradient());
     }
 
     public void instantiateTemplate(I iAct, O oAct) {
@@ -120,9 +118,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
                 iAct.getNeuron(),
                 oAct.getNeuron()
         );
-        synapse.copyState(s);
-        s.connect(Direction.INPUT, false, false);
-        s.connect(Direction.OUTPUT, false, true);
 
         s.createLinkFromTemplate(iAct, oAct, this);
     }
@@ -132,7 +127,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected void initWeightInput() {
         weightedInput = initWeightedInput();
-        FieldLink.link(weightedInput, getOutput().getNet());
+        linkAndConnect(weightedInput, getOutput().getNet());
     }
 
     protected FieldOutput initWeightedInput() {
@@ -147,17 +142,11 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     public void init() {
-        connect(INPUT, true, false);
-        connect(OUTPUT, true, true);
-
         if(input != null)
             addInputLinkingStep();
     }
 
     public void initFromTemplate(Link template) {
-        template.copyState(this);
-        connect(Direction.INPUT, false, false);
-        connect(Direction.OUTPUT, false, true);
     }
 
     public void link() {

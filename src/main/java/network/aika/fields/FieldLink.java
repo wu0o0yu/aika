@@ -27,8 +27,21 @@ public class FieldLink extends AbstractFieldLink<FieldInput> {
         return input.getReference() != ((FieldOutput) output).getReference();
     }
 
+    public static FieldLink linkAndConnect(FieldOutput in, FieldInput out) {
+        FieldLink fl = link(in, out.getNextArg(), out);
+
+        fl.connect(true);
+        return fl;
+    }
+
     public static FieldLink link(FieldOutput in, FieldInput out) {
         return link(in, out.getNextArg(), out);
+    }
+
+    public static FieldLink linkAndConnect(FieldOutput in, int arg, FieldInput out) {
+        FieldLink fl = link(in, arg, out);
+        fl.connect(true);
+        return fl;
     }
 
     public static FieldLink link(FieldOutput in, int arg, FieldInput out) {
@@ -36,6 +49,17 @@ public class FieldLink extends AbstractFieldLink<FieldInput> {
         out.addInput(fl);
         in.addOutput(fl);
         return fl;
+    }
+
+    public static void linkAndConnectAll(FieldOutput in, FieldInput... out) {
+        assert in != null;
+
+        for(FieldInput o : out) {
+            if(o != null) {
+                link(in, 0, o)
+                        .connect(true);
+            }
+        }
     }
 
     public static void linkAll(FieldOutput in, FieldInput... out) {

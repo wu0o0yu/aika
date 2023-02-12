@@ -60,6 +60,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
         v.up(this);
     }
 
+    @Override
     protected void initDummyLinks() {
         neuron.getInputSynapsesAsStream()
                 .forEach(s ->
