@@ -28,7 +28,7 @@ import network.aika.steps.Step;
 public class Counting extends Step<Activation> {
 
     public static void add(Activation act) {
-        if (act.getConfig().isCountingEnabled())
+        if (act.getConfig().isCountingEnabled() && !act.getNeuron().isAbstract())
             Step.add(new Counting(act));
     }
 

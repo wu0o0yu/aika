@@ -34,6 +34,9 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
     public NegativeFeedbackLink(NegativeFeedbackSynapse s, InhibitoryActivation input, BindingActivation output) {
         super(s, input, output);
 
+        if(input == null)
+            return;
+
         input.getInputLinks().forEach(l ->
                 input.connectFields((InhibitoryLink) l, this)
         );

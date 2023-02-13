@@ -16,11 +16,13 @@
  */
 package network.aika.elements.neurons;
 
+import network.aika.Model;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.synapses.CategorySynapse;
 import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.elements.synapses.ConjunctiveSynapse;
+import network.aika.elements.synapses.Synapse;
 import network.aika.fields.QueueSumField;
 import network.aika.fields.SumField;
 import org.slf4j.Logger;
@@ -66,6 +68,14 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
 
     public SumField getSynapseBiasSum() {
         return synapseBiasSum;
+    }
+
+    @Override
+    public void reactivate(Model m) {
+        super.reactivate(m);
+
+        getProvider().getInputSynapses()
+                .forEach(Synapse::linkFields);
     }
 
     @Override

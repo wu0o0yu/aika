@@ -104,12 +104,15 @@ public class PatternSynapse extends AbstractPatternSynapse<
     public void count(PatternLink l) {
         double oldN = sampleSpace.getN();
 
+        if(l.getInput() == null)
+            return; // TODO: fix
+
         boolean iActive = l.getInput() != null && l.getInput().isFired();
         boolean oActive = l.getOutput().isFired();
 
-        Range absoluteRange = l.getInput() != null ?
-                l.getInput().getAbsoluteRange() :
-                l.getOutput().getAbsoluteRange(); // TODO: check
+        Range absoluteRange = l.getInput().getAbsoluteRange();
+        if(absoluteRange == null)
+            return;
 
         sampleSpace.countSkippedInstances(absoluteRange);
 

@@ -73,8 +73,8 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     @Override
-    protected void linkFields() {
-        if(!optional)
+    public void linkFields() {
+        if(!optional && !output.isSuspended() && synapseBias.getReceivers().isEmpty())
             linkAndConnect(synapseBias, getOutput().getSynapseBiasSum());
     }
 

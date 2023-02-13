@@ -28,7 +28,7 @@ import network.aika.steps.Step;
 public class LinkCounting extends Step<Link> {
 
     public static void add(Link l) {
-        if (l.getConfig().isCountingEnabled())
+        if (l.getConfig().isCountingEnabled() && !l.getOutput().getNeuron().isAbstract())
             Step.add(new LinkCounting(l));
     }
 
