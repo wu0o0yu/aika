@@ -323,7 +323,7 @@ public abstract class Thought extends FieldObject implements Element {
                     return net.getCurrentValue() / -wi;
                 })
                 .min()
-                .getAsDouble();
+                .orElse(1.0);
     }
 
     public Stream<NegativeFeedbackLink> getNegativeFeedbackLinks() {
