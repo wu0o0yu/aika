@@ -74,8 +74,20 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
 
     @Override
     public void linkFields() {
-        if(!optional && !output.isSuspended() && synapseBias.getReceivers().isEmpty())
+        if(!optional && !output.isSuspended()) {
+            if(biasLinkExists(synapseBias, getOutput().getSynapseBiasSum()))
+                return;
+
             linkAndConnect(synapseBias, getOutput().getSynapseBiasSum());
+        }
+    }
+
+    private boolean biasLinkExists(SumField synapseBias, SumField synapseBiasSum) {
+        return synapseBias.getReceivers()
+                .stream()
+                .filter(fl -> fl instanceof FieldLink)
+                .map(fl -> (FieldLink) fl)
+                .anyMatch(fl -> fl.getOutput() == synapseBiasSum);
     }
 
     public S setSynapseBias(double b) {
@@ -170,10 +182,11 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
-        linkFields();
 
         sumOfLowerWeights = in.readDouble();
         currentStoredAt = in.readBoolean() ? OUTPUT : INPUT;
         optional = in.readBoolean();
+
+        linkFields();
     }
 }
