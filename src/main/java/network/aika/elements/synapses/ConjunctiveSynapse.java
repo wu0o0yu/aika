@@ -164,8 +164,12 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     public S adjustBias() {
+        return adjustBias(1.0);
+    }
+
+    public S adjustBias(double x) {
         if(weight.getCurrentValue() > 0.0)
-            synapseBias.receiveUpdate(-weight.getCurrentValue());
+            synapseBias.receiveUpdate(-weight.getCurrentValue() * x);
 
         return (S) this;
     }
