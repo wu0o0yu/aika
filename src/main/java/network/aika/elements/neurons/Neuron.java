@@ -20,6 +20,8 @@ import network.aika.FieldObject;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.direction.Direction;
+import network.aika.elements.synapses.CategoryInputSynapse;
+import network.aika.elements.synapses.CategorySynapse;
 import network.aika.fields.*;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.Element;
@@ -53,7 +55,7 @@ import static network.aika.utils.Utils.TOLERANCE;
  *
  * @author Lukas Molzberger
  */
-public abstract class Neuron<S extends Synapse, A extends Activation> extends FieldObject implements Element, Writable {
+public abstract class Neuron<A extends Activation> extends FieldObject implements Element, Writable {
 
     volatile long retrievalCount = 0;
 
@@ -69,7 +71,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
 
     protected boolean allowTraining = true;
 
-    private Neuron<?, ?> template;
+    private Neuron<?> template;
 
     private final WeakHashMap<Long, WeakReference<PreActivation<A>>> activations = new WeakHashMap<>();
 
@@ -191,7 +193,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
         return acts.getActivations();
     }
 
-    public <N extends Neuron<S, A>> N  instantiateTemplate() {
+    public <N extends Neuron<A>> N  instantiateTemplate() {
         N n;
         try {
             n = (N) getClass().getConstructor().newInstance();
@@ -214,8 +216,12 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
     }
 
     public boolean isAbstract() {
-        return false;
+        return getCategoryInputSynapse() != null;
     }
+
+    public abstract CategoryInputSynapse getCategoryInputSynapse();
+
+    public abstract CategorySynapse getCategoryOutputSynapse();
 
     public boolean isTrainingAllowed() {
         return true;
@@ -259,12 +265,12 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
         this.provider = p;
     }
 
-    public Stream<S> getInputSynapsesAsStream() {
+    public Stream<Synapse> getInputSynapsesAsStream() {
         return getInputSynapses().stream();
     }
 
-    public Collection<S> getInputSynapses() {
-        return (Collection<S>) provider.inputSynapses.values();
+    public Collection<Synapse> getInputSynapses() {
+        return provider.inputSynapses.values();
     }
 
     public Stream<? extends Synapse> getOutputSynapsesAsStream() {
@@ -310,13 +316,13 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
         return syn;
     }
 
-    public <IS extends S> IS getInputSynapseByType(Class<IS> synapseType) {
+    public <IS extends Synapse> IS getInputSynapseByType(Class<IS> synapseType) {
         return getInputSynapsesByType(synapseType)
                 .findAny()
                 .orElse(null);
     }
 
-    public <IS extends S> Stream<IS> getInputSynapsesByType(Class<IS> synapseType) {
+    public <IS extends Synapse> Stream<IS> getInputSynapsesByType(Class<IS> synapseType) {
         return getProvider().getInputSynapses()
                 .filter(synapseType::isInstance)
                 .map(synapseType::cast);
@@ -337,11 +343,11 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
                 .orElse(null);
     }
 
-    public void addInputSynapse(S s) {
+    public void addInputSynapse(Synapse s) {
         setModified();
     }
 
-    public void removeInputSynapse(S s) {
+    public void removeInputSynapse(Synapse s) {
         setModified();
     }
 
@@ -464,7 +470,7 @@ public abstract class Neuron<S extends Synapse, A extends Activation> extends Fi
         bias.readFields(in, m);
 
         while (in.readBoolean()) {
-            S syn = (S) Synapse.read(in, m);
+            Synapse syn = Synapse.read(in, m);
             syn.link();
         }
 

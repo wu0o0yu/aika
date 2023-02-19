@@ -37,10 +37,6 @@ import static network.aika.fields.Fields.scale;
  */
 public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> extends Activation<N> {
 
-    protected ConjunctiveActivation<N>  template;
-
-    protected List<ConjunctiveActivation<N>> templateInstances;
-
     public ConjunctiveActivation(int id, Thought t, N n) {
         super(id, t, n);
     }
@@ -68,97 +64,4 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
         linkAndConnect(getNeuron().getSynapseBiasSum(), net);
     }
 
-    public ConjunctiveActivation getActiveTemplateInstance() {
-        return getTemplateInstancesStream()
-//                .filter(act -> !act.initialized || isTrue(act.getIsFired()))
-                .findFirst()
-                .orElse(null);
-    }
-
-    @Override
-    public ConjunctiveActivation<N> resolveAbstractInputActivation() {
-        return neuron.isAbstract() ?
-                getActiveTemplateInstance() :
-                this;
-    }
-
-    public List<ConjunctiveActivation<N>> getTemplateInstances() {
-        if(templateInstances == null)
-            templateInstances = new ArrayList<>();
-
-        return templateInstances;
-    }
-
-    public Stream<ConjunctiveActivation<N>> getTemplateInstancesStream() {
-        return getTemplateInstances().stream();
-    }
-
-    public ConjunctiveActivation<N> getTemplate() {
-        return template;
-    }
-
-    public void setTemplate(Activation template) {
-        this.template = (ConjunctiveActivation<N>) template;
-    }
-
-    public void addTemplateInstance(ConjunctiveActivation instanceAct) {
-        getTemplateInstances().add(instanceAct);
-    }
-
-    public void linkTemplateAndInstance(ConjunctiveActivation instanceAct) {
-        addTemplateInstance(instanceAct);
-        instanceAct.setTemplate(this);
-    }
-
-    @Override
-    public void instantiateTemplateNodes() {
-        N n = (N) neuron.instantiateTemplate();
-
-        ConjunctiveActivation<N> ti = n.createActivation(getThought());
-        linkTemplateAndInstance(ti);
-
-        double optionalSynBiasSum = getInputLinksByType(ConjunctiveLink.class)
-                .map(l -> (ConjunctiveSynapse) l.getSynapse())
-                .filter(ConjunctiveSynapse::isOptional)
-                .mapToDouble(s -> s.getSynapseBias().getUpdatedCurrentValue())
-                .sum();
-        ti.getNeuron().getSynapseBiasSum().receiveUpdate(optionalSynBiasSum);
-
-        InstantiationEdges.add(this, ti);
-
-        if(thought.getInstantiationCallback() != null)
-            thought.getInstantiationCallback().onInstantiation(ti);
-    }
-
-    @Override
-    public void instantiateTemplateEdges(ConjunctiveActivation instanceAct) {
-        getInputLinks()
-                .forEach(l ->
-                    l.instantiateTemplate(
-                            l.getInput().resolveAbstractInputActivation(),
-                            instanceAct
-                    )
-                );
-
-        instanceAct.getNeuron().setLabel(
-                getConfig().getLabel(this)
-        );
-
-        instanceAct.initDummyLinks();
-        instanceAct.initFromTemplate();
-
-        getOutputLinks()
-                .filter(l -> !l.getOutput().getNeuron().isAbstract())
-                .forEach(l ->
-                    l.instantiateTemplate(
-                            instanceAct,
-                            l.getOutput().resolveAbstractInputActivation()
-                    )
-                );
-    }
-
-    public void initFromTemplate() {
-        fired = template.fired;
-        thought.onElementEvent(UPDATE, this);
-    }
 }

@@ -30,9 +30,9 @@ import static network.aika.steps.Phase.INSTANTIATION_EDGES;
  */
 public class InstantiationEdges extends Step<Activation> {
 
-    private ConjunctiveActivation instanceAct;
+    private Activation instanceAct;
 
-    public static void add(Activation act, ConjunctiveActivation instanceAct) {
+    public static void add(Activation act, Activation instanceAct) {
         if(act.instantiationEdgesIsQueued)
             return;
 
@@ -41,7 +41,7 @@ public class InstantiationEdges extends Step<Activation> {
         Step.add(new InstantiationEdges(act, instanceAct));
     }
 
-    public InstantiationEdges(Activation act, ConjunctiveActivation instanceAct) {
+    public InstantiationEdges(Activation act, Activation instanceAct) {
         super(act);
         this.instanceAct = instanceAct;
     }

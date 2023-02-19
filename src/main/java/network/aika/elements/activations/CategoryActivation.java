@@ -23,9 +23,9 @@ import network.aika.elements.neurons.CategoryNeuron;
 /**
  * @author Lukas Molzberger
  */
-public abstract class CategoryActivation<N extends CategoryNeuron<?, ?>> extends DisjunctiveActivation<N> {
+public class CategoryActivation extends DisjunctiveActivation<CategoryNeuron> {
 
-    public CategoryActivation(int id, Thought t, N neuron) {
+    public CategoryActivation(int id, Thought t, CategoryNeuron neuron) {
         super(id, t, neuron);
     }
 

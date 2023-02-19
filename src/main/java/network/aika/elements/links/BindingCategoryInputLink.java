@@ -26,7 +26,7 @@ import network.aika.elements.synapses.PatternCategorySynapse;
 /**
  * @author Lukas Molzberger
  */
-public class BindingCategoryInputLink extends BindingNeuronLink<BindingCategoryInputSynapse, BindingCategoryActivation> {
+public class BindingCategoryInputLink extends CategoryInputLink<BindingCategoryInputSynapse, BindingCategoryActivation> {
 
     public BindingCategoryInputLink(BindingCategoryInputSynapse s, BindingCategoryActivation input, BindingActivation output) {
         super(s, input, output);

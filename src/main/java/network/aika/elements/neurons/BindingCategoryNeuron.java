@@ -26,7 +26,7 @@ import network.aika.elements.synapses.BindingCategorySynapse;
  *
  * @author Lukas Molzberger
  */
-public class BindingCategoryNeuron extends CategoryNeuron<BindingCategorySynapse, BindingCategoryActivation> {
+public class BindingCategoryNeuron extends CategoryNeuron<BindingCategoryActivation> {
 
 
     @Override

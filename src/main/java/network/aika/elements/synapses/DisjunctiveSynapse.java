@@ -29,10 +29,10 @@ import network.aika.elements.neurons.DisjunctiveNeuron;
 public abstract class DisjunctiveSynapse<
         S extends DisjunctiveSynapse,
         I extends Neuron,
-        O extends DisjunctiveNeuron<?, OA>,
+        O extends Neuron<OA>,
         L extends Link<S, IA, OA>,
         IA extends Activation<?>,
-        OA extends DisjunctiveActivation
+        OA extends Activation
         > extends Synapse<S,I,O,L,IA,OA>
 {
 

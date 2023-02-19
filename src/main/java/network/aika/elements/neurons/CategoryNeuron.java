@@ -16,7 +16,10 @@
  */
 package network.aika.elements.neurons;
 
+import network.aika.Thought;
+import network.aika.elements.activations.BindingCategoryActivation;
 import network.aika.elements.activations.CategoryActivation;
+import network.aika.elements.synapses.BindingCategoryInputSynapse;
 import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.elements.synapses.CategorySynapse;
 
@@ -25,15 +28,22 @@ import network.aika.elements.synapses.CategorySynapse;
  *
  * @author Lukas Molzberger
  */
-public abstract class CategoryNeuron<S extends CategorySynapse, A extends CategoryActivation> extends DisjunctiveNeuron<S, A> {
+public abstract class CategoryNeuron<A extends CategoryActivation> extends DisjunctiveNeuron<A> {
 
     public CategoryNeuron() {
     }
 
-    public abstract CategoryInputSynapse getOutgoingCategoryInputSynapse();
+    public CategoryInputSynapse getOutgoingCategoryInputSynapse() {
+        return getOutputSynapseByType(CategoryInputSynapse.class);
+    }
 
     @Override
     public boolean isTrainingAllowed() {
+        return false;
+    }
+
+    @Override
+    public boolean isAbstract() {
         return false;
     }
 }

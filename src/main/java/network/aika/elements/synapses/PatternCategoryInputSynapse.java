@@ -20,9 +20,12 @@ import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.activations.PatternCategoryActivation;
+import network.aika.elements.links.CategoryLink;
 import network.aika.elements.links.PatternCategoryInputLink;
 import network.aika.elements.neurons.BindingCategoryNeuron;
+import network.aika.elements.neurons.CategoryNeuron;
 import network.aika.elements.neurons.PatternCategoryNeuron;
+import network.aika.elements.neurons.PatternNeuron;
 import network.aika.visitor.linking.LinkingOperator;
 import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
 
@@ -31,13 +34,20 @@ import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
  *
  * @author Lukas Molzberger
  */
-public class PatternCategoryInputSynapse extends AbstractPatternSynapse<
-        PatternCategoryInputSynapse,
-        PatternCategoryNeuron,
-        PatternCategoryInputLink,
-        PatternCategoryActivation
-        > implements CategoryInputSynapse<PatternCategoryNeuron, PatternCategoryInputSynapse>
+public class PatternCategoryInputSynapse extends CategoryInputSynapse<PatternCategoryNeuron, PatternCategoryInputSynapse>
 {
+
+    public PatternCategoryInputSynapse() {
+        super(Scope.SAME);
+    }
+
+    @Override
+    public double getPropagatePreNet(CategoryActivation iAct) {
+        return getOutput().getBias().getCurrentValue() +
+                weight.getCurrentValue() +
+                getSumOfLowerWeights();
+    }
+
     @Override
     public PatternCategoryInputLink createLink(PatternCategoryActivation input, PatternActivation output) {
         return new PatternCategoryInputLink(this, input, output);

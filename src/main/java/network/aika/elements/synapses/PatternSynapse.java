@@ -21,6 +21,7 @@ import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.links.PatternLink;
+import network.aika.elements.neurons.PatternNeuron;
 import network.aika.elements.neurons.Range;
 import network.aika.elements.neurons.SampleSpace;
 import network.aika.elements.neurons.BindingNeuron;
@@ -42,11 +43,13 @@ import static network.aika.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public class PatternSynapse extends AbstractPatternSynapse<
+public class PatternSynapse extends ConjunctiveSynapse<
         PatternSynapse,
         BindingNeuron,
+        PatternNeuron,
         PatternLink,
-        BindingActivation
+        BindingActivation,
+        PatternActivation
         >
 {
 
@@ -57,12 +60,19 @@ public class PatternSynapse extends AbstractPatternSynapse<
     protected SampleSpace sampleSpace = new SampleSpace();
 
     public PatternSynapse() {
-        super();
+        super(Scope.SAME);
     }
 
     @Override
     public PatternLink createLink(BindingActivation input, PatternActivation output) {
         return new PatternLink(this, input, output);
+    }
+
+    @Override
+    public double getPropagatePreNet(BindingActivation iAct) {
+        return getOutput().getBias().getCurrentValue() +
+                weight.getCurrentValue() +
+                getSumOfLowerWeights();
     }
 
     @Override

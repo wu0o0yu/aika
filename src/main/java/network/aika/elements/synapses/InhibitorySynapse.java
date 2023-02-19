@@ -44,16 +44,16 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
         >
 {
 
-    private InhibSynType type;
+    private Scope type;
 
     public InhibitorySynapse() {
     }
 
-    public InhibitorySynapse(InhibSynType type) {
+    public InhibitorySynapse(Scope type) {
         this.type = type;
     }
 
-    public InhibSynType getType() {
+    public Scope getType() {
         return type;
     }
 
@@ -86,6 +86,6 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
     public void readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
 
-        type = InhibSynType.values()[in.readInt()];
+        type = Scope.values()[in.readInt()];
     }
 }
