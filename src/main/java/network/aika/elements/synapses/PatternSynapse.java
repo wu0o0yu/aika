@@ -17,6 +17,7 @@
 package network.aika.elements.synapses;
 
 import network.aika.Model;
+import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.links.PatternLink;
@@ -26,6 +27,8 @@ import network.aika.elements.neurons.BindingNeuron;
 import network.aika.sign.Sign;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
+import network.aika.visitor.linking.LinkingOperator;
+import network.aika.visitor.linking.pattern.PatternDownVisitor;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -60,6 +63,12 @@ public class PatternSynapse extends AbstractPatternSynapse<
     @Override
     public PatternLink createLink(BindingActivation input, PatternActivation output) {
         return new PatternLink(this, input, output);
+    }
+
+    @Override
+    public void startVisitor(LinkingOperator c, Activation act) {
+        new PatternDownVisitor(act.getThought(), c)
+                .start(act);
     }
 
     public SampleSpace getSampleSpace() {

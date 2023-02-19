@@ -49,11 +49,4 @@ public abstract class AbstractPatternSynapse<S extends AbstractPatternSynapse, I
                 weight.getCurrentValue() +
                 getSumOfLowerWeights();
     }
-
-
-    @Override
-    public void startVisitor(LinkingOperator c, Activation bs) {
-        new PatternDownVisitor(bs.getThought(), c)
-                .start(bs);
-    }
 }

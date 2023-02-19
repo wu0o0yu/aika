@@ -37,8 +37,8 @@ public class BindingCategorySynapse extends CategorySynapse<BindingCategorySynap
     }
 
     @Override
-    public void startVisitor(LinkingOperator c, Activation bs) {
-        new InhibitoryDownVisitor(bs.getThought(), c)
-                .start(bs);
+    public void startVisitor(LinkingOperator c, Activation act) {
+        new InhibitoryDownVisitor(act.getThought(), c)
+                .start(act);
     }
 }

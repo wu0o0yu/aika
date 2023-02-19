@@ -37,8 +37,8 @@ public class PatternCategorySynapse extends CategorySynapse<PatternCategorySynap
     }
 
     @Override
-    public void startVisitor(LinkingOperator c, Activation bs) {
-        new PatternCategoryDownVisitor(bs.getThought(), c)
-                .start(bs);
+    public void startVisitor(LinkingOperator c, Activation act) {
+        new PatternCategoryDownVisitor(act.getThought(), c)
+                .start(act);
     }
 }
