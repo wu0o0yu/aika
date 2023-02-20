@@ -31,8 +31,8 @@ import network.aika.elements.neurons.Neuron;
 public abstract class CategorySynapse<S extends CategorySynapse, I extends Neuron, IA extends Activation<?>> extends DisjunctiveSynapse<
         S,
         I,
-        CategoryNeuron<CategoryActivation>,
-        CategoryLink<S, IA, CategoryActivation>,
+        CategoryNeuron,
+        CategoryLink<S, IA>,
         IA,
         CategoryActivation
         >

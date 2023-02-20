@@ -18,6 +18,7 @@ package network.aika.elements.activations;
 
 import network.aika.Thought;
 import network.aika.elements.links.Link;
+import network.aika.elements.synapses.PositiveFeedbackSynapse;
 import network.aika.fields.*;
 import network.aika.elements.neurons.BindingNeuron;
 import network.aika.visitor.DownVisitor;
@@ -62,7 +63,7 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     @Override
     protected void initDummyLinks() {
-        neuron.getInputSynapsesAsStream()
+        neuron.getInputSynapsesByType(PositiveFeedbackSynapse.class)
                 .forEach(s ->
                         s.initDummyLink(this)
                 );

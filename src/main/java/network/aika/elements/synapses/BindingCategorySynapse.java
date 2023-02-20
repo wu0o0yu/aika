@@ -18,10 +18,9 @@ package network.aika.elements.synapses;
 
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
-import network.aika.elements.activations.BindingCategoryActivation;
+import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.links.BindingCategoryLink;
-import network.aika.elements.neurons.BindingNeuron;
-import network.aika.elements.neurons.BindingCategoryNeuron;
+import network.aika.elements.neurons.Neuron;
 import network.aika.visitor.linking.LinkingOperator;
 import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
 
@@ -29,10 +28,10 @@ import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
  *
  * @author Lukas Molzberger
  */
-public class BindingCategorySynapse extends CategorySynapse<BindingCategorySynapse, BindingNeuron, BindingCategoryNeuron, BindingActivation, BindingCategoryActivation> {
+public class BindingCategorySynapse extends CategorySynapse<BindingCategorySynapse, Neuron, BindingActivation> {
 
     @Override
-    public BindingCategoryLink createLink(BindingActivation input, BindingCategoryActivation output) {
+    public BindingCategoryLink createLink(BindingActivation input, CategoryActivation output) {
         return new BindingCategoryLink(this, input, output);
     }
 

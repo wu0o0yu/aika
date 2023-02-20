@@ -16,32 +16,33 @@
  */
 package network.aika.elements.synapses;
 
+import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
-import network.aika.elements.activations.BindingCategoryActivation;
-import network.aika.elements.activations.PatternCategoryActivation;
 import network.aika.elements.links.BindingCategoryInputLink;
 import network.aika.elements.activations.CategoryActivation;
-import network.aika.elements.neurons.BindingCategoryNeuron;
+import network.aika.visitor.linking.LinkingOperator;
+import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
 
 /**
  * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
  *
  * @author Lukas Molzberger
  */
-public class BindingCategoryInputSynapse extends BindingNeuronSynapse<
-        BindingCategoryInputSynapse,
-        BindingCategoryNeuron,
-        BindingCategoryInputLink,
-        BindingCategoryActivation
-        > implements CategoryInputSynapse<BindingCategoryNeuron, BindingCategoryInputSynapse>
+public class BindingCategoryInputSynapse extends CategoryInputSynapse
 {
     public BindingCategoryInputSynapse() {
         super(Scope.INPUT);
     }
 
     @Override
-    public BindingCategoryInputLink createLink(BindingCategoryActivation input, BindingActivation output) {
-        return new BindingCategoryInputLink(this, input, output);
+    public BindingCategoryInputLink createLink(CategoryActivation input, Activation output) {
+        return new BindingCategoryInputLink(this, input, (BindingActivation) output);
+    }
+
+    @Override
+    public void startVisitor(LinkingOperator c, Activation act) {
+        new InhibitoryDownVisitor(act.getThought(), c)
+                .start(act);
     }
 
     @Override

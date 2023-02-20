@@ -16,11 +16,11 @@
  */
 package network.aika.elements.links;
 
-import network.aika.direction.Direction;
+import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.CategoryActivation;
-import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.activations.PatternCategoryActivation;
+import network.aika.elements.synapses.BindingCategorySynapse;
+import network.aika.elements.synapses.CategorySynapse;
 import network.aika.elements.synapses.PatternCategoryInputSynapse;
 import network.aika.elements.synapses.PatternCategorySynapse;
 import network.aika.visitor.Visitor;
@@ -31,10 +31,14 @@ import network.aika.visitor.Visitor;
  */
 public class PatternCategoryInputLink extends CategoryInputLink {
 
-    public PatternCategoryInputLink(PatternCategoryInputSynapse s, PatternCategoryActivation input, PatternActivation output) {
+    public PatternCategoryInputLink(PatternCategoryInputSynapse s, CategoryActivation input, Activation output) {
         super(s, input, output);
     }
 
+    @Override
+    protected CategorySynapse createCategorySynapse() {
+        return new PatternCategorySynapse();
+    }
 
     @Override
     protected void connectGradientFields() {

@@ -40,7 +40,7 @@ import static network.aika.utils.Utils.TOLERANCE;
  *
  * @author Lukas Molzberger
  */
-public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends ConjunctiveActivation> extends Neuron<S, A> {
+public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends Neuron<A> {
 
     private static final Logger log = LoggerFactory.getLogger(ConjunctiveNeuron.class);
 
@@ -101,7 +101,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     public abstract CategorySynapse newCategorySynapse();
 
     public boolean isInstanceOf(ConjunctiveNeuron templateNeuron) {
-        CategorySynapse<?,?,?,?,?> cs = getCategoryOutputSynapse();
+        CategorySynapse<?,?,?> cs = getCategoryOutputSynapse();
         if(cs == null)
             return false;
 
@@ -146,7 +146,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     }
 
     @Override
-    public void addInputSynapse(S s) {
+    public void addInputSynapse(Synapse s) {
         super.addInputSynapse(s);
         s.getWeight().addEventListener(
                 "onWeightUpdate",

@@ -16,7 +16,7 @@
  */
 package network.aika.callbacks;
 
-import network.aika.elements.activations.ConjunctiveActivation;
+import network.aika.elements.activations.Activation;
 
 
 /**
@@ -25,5 +25,5 @@ import network.aika.elements.activations.ConjunctiveActivation;
  */
 public interface InstantiationCallback {
 
-    void onInstantiation(ConjunctiveActivation act);
+    void onInstantiation(Activation act);
 }

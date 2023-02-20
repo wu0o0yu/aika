@@ -35,12 +35,21 @@ import static network.aika.fields.Fields.scale;
  *
  * @author Lukas Molzberger
  */
-public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> extends Activation<N> {
+public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?>> extends Activation<N> {
 
     public ConjunctiveActivation(int id, Thought t, N n) {
         super(id, t, n);
     }
 
+    @Override
+    protected void instantiateBias(Activation<N> ti) {
+        double optionalSynBiasSum = getInputLinksByType(ConjunctiveLink.class)
+                .map(l -> (ConjunctiveSynapse) l.getSynapse())
+                .filter(ConjunctiveSynapse::isOptional)
+                .mapToDouble(s -> s.getSynapseBias().getUpdatedCurrentValue())
+                .sum();
+        ti.getNeuron().getSynapseBiasSum().receiveUpdate(optionalSynBiasSum);
+    }
 
     @Override
     protected void connectWeightUpdate() {
@@ -63,5 +72,4 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?, ?>> e
 
         linkAndConnect(getNeuron().getSynapseBiasSum(), net);
     }
-
 }

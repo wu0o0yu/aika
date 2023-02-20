@@ -4,7 +4,7 @@ import network.aika.elements.activations.*;
 import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.elements.synapses.CategorySynapse;
 
-public class CategoryInputLink extends DisjunctiveLink<CategoryInputSynapse, CategoryActivation, Activation>  {
+public abstract class CategoryInputLink extends DisjunctiveLink<CategoryInputSynapse, CategoryActivation, Activation>  {
 
     public CategoryInputLink(CategoryInputSynapse s, CategoryActivation input, Activation output) {
         super(s, input, output);
@@ -20,11 +20,13 @@ public class CategoryInputLink extends DisjunctiveLink<CategoryInputSynapse, Cat
         if(l != null)
             return;
 
-        CategorySynapse s = new CategorySynapse();
+        CategorySynapse s = createCategorySynapse();
         s.initFromTemplate(oAct.getNeuron(), iAct.getNeuron(), synapse);
 
         s.createLinkFromTemplate(oAct, iAct, this);
     }
+
+    protected abstract CategorySynapse createCategorySynapse();
 
     @Override
     public void addInputLinkingStep() {

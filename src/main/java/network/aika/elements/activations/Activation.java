@@ -524,17 +524,15 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         Activation<N> ti = n.createActivation(getThought());
         linkTemplateAndInstance(ti);
 
-        double optionalSynBiasSum = getInputLinksByType(ConjunctiveLink.class)
-                .map(l -> (ConjunctiveSynapse) l.getSynapse())
-                .filter(ConjunctiveSynapse::isOptional)
-                .mapToDouble(s -> s.getSynapseBias().getUpdatedCurrentValue())
-                .sum();
-        ti.getNeuron().getSynapseBiasSum().receiveUpdate(optionalSynBiasSum);
+        instantiateBias(ti);
 
         InstantiationEdges.add(this, ti);
 
         if(thought.getInstantiationCallback() != null)
             thought.getInstantiationCallback().onInstantiation(ti);
+    }
+
+    protected void instantiateBias(Activation<N> ti) {
     }
 
     public void instantiateTemplateEdges(Activation instanceAct) {
