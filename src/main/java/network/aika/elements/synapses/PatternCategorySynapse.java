@@ -20,6 +20,7 @@ import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.links.PatternCategoryLink;
+import network.aika.elements.neurons.CategoryNeuron;
 import network.aika.elements.neurons.PatternNeuron;
 import network.aika.elements.neurons.PatternCategoryNeuron;
 import network.aika.visitor.linking.LinkingOperator;
@@ -29,7 +30,7 @@ import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
  *
  * @author Lukas Molzberger
  */
-public class PatternCategorySynapse extends CategorySynapse<PatternCategorySynapse, PatternNeuron, PatternCategoryNeuron, PatternActivation, CategoryActivation> {
+public class PatternCategorySynapse extends CategorySynapse<PatternCategorySynapse, PatternNeuron, CategoryNeuron, PatternActivation, CategoryActivation> {
 
     @Override
     public PatternCategoryLink createLink(PatternActivation input, CategoryActivation output) {

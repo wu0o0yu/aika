@@ -6,6 +6,9 @@ import network.aika.elements.synapses.CategorySynapse;
 
 public class CategoryInputLink extends DisjunctiveLink<CategoryInputSynapse, CategoryActivation, Activation>  {
 
+    public CategoryInputLink(CategoryInputSynapse s, CategoryActivation input, Activation output) {
+        super(s, input, output);
+    }
 
     @Override
     public void instantiateTemplate(CategoryActivation iAct, Activation oAct) {
@@ -33,25 +36,4 @@ public class CategoryInputLink extends DisjunctiveLink<CategoryInputSynapse, Cat
                         output.linkTemplateAndInstance(act)
                 );
     }
-
-/*
-
-PatternCategoryInputLink:
-
-    @Override
-    protected void connectGradientFields() {
-        initGradient();
-
-        super.connectGradientFields();
-    }
-
-    @Override
-    public void patternVisit(Visitor v) {
-    }
- */
-
-    /*
-    BindingCategoryInputLink:
-
-     */
 }

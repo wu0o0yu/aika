@@ -16,23 +16,25 @@
  */
 package network.aika.elements.synapses;
 
+import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.links.CategoryLink;
 import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.neurons.ConjunctiveNeuron;
 import network.aika.elements.neurons.CategoryNeuron;
+import network.aika.elements.neurons.Neuron;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class CategorySynapse<S extends CategorySynapse, I extends ConjunctiveNeuron, O extends CategoryNeuron<?, OA>, IA extends ConjunctiveActivation<?>, OA extends CategoryActivation> extends DisjunctiveSynapse<
+public abstract class CategorySynapse<S extends CategorySynapse, I extends Neuron, IA extends Activation<?>> extends DisjunctiveSynapse<
         S,
         I,
-        O,
-        CategoryLink<S, IA, OA>,
+        CategoryNeuron<CategoryActivation>,
+        CategoryLink<S, IA, CategoryActivation>,
         IA,
-        OA
+        CategoryActivation
         >
 {
 

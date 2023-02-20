@@ -29,44 +29,18 @@ import network.aika.visitor.Visitor;
 /**
  * @author Lukas Molzberger
  */
-public class PatternCategoryInputLink extends AbstractPatternLink<PatternCategoryInputSynapse, PatternCategoryActivation> {
+public class PatternCategoryInputLink extends CategoryInputLink {
 
     public PatternCategoryInputLink(PatternCategoryInputSynapse s, PatternCategoryActivation input, PatternActivation output) {
         super(s, input, output);
     }
 
-    @Override
-    public void instantiateTemplate(PatternCategoryActivation iAct, PatternActivation oAct) {
-        if(iAct == null || oAct == null)
-            return;
-
-        Link l = iAct.getInputLink(oAct.getNeuron());
-
-        if(l != null)
-            return;
-
-        PatternCategorySynapse s = new PatternCategorySynapse();
-        s.initFromTemplate(oAct.getNeuron(), iAct.getNeuron(), synapse);
-
-        s.createLinkFromTemplate(oAct, iAct, this);
-    }
 
     @Override
     protected void connectGradientFields() {
         initGradient();
 
         super.connectGradientFields();
-    }
-
-    @Override
-    public void addInputLinkingStep() {
-        super.addInputLinkingStep();
-
-        input.getInputLinks()
-                .map(l -> (ConjunctiveActivation)l.getInput())
-                .forEach(act ->
-                        output.linkTemplateAndInstance(act)
-                );
     }
 
     @Override
