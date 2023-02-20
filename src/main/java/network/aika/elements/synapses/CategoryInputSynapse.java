@@ -23,15 +23,9 @@ public abstract class CategoryInputSynapse extends DisjunctiveSynapse<
         super(scope);
     }
 
-    S init(Neuron input, Neuron output);
-
-    N getInput();
-
-    ConjunctiveNeuron getOutput();
-
     @Override
-    public BindingCategoryInputLink createLink(BindingCategoryActivation input, BindingActivation output) {
-        return new BindingCategoryInputLink(this, input, output);
+    public CategoryInputLink createLink(CategoryActivation input, Activation output) {
+        return new CategoryInputLink(this, input, output);
     }
 
     @Override
