@@ -14,26 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.elements.links;
+package network.aika.elements.synapses;
 
 import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.synapses.AbstractPatternSynapse;
-
-import static network.aika.fields.Fields.mul;
+import network.aika.elements.activations.CategoryActivation;
+import network.aika.elements.activations.InhibitoryActivation;
+import network.aika.elements.links.InhibitoryCategoryLink;
+import network.aika.elements.neurons.Neuron;
+import network.aika.visitor.linking.LinkingOperator;
+import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
 
 /**
+ *
  * @author Lukas Molzberger
  */
-public abstract class AbstractPatternLink<S extends AbstractPatternSynapse, IA extends Activation<?>> extends ConjunctiveLink<S, IA, PatternActivation> {
+public class InhibitoryCategorySynapse extends CategorySynapse<InhibitoryCategorySynapse, Neuron, InhibitoryActivation> {
 
-    public AbstractPatternLink(S s, IA input, PatternActivation output) {
-        super(s, input, output);
+    @Override
+    public InhibitoryCategoryLink createLink(InhibitoryActivation input, CategoryActivation output) {
+        return new InhibitoryCategoryLink(this, input, output);
     }
 
     @Override
-    protected void connectGradientFields() {
-        initGradient();
-        super.connectGradientFields();
+    public void startVisitor(LinkingOperator c, Activation act) {
+        new InhibitoryDownVisitor(act.getThought(), c)
+                .start(act);
     }
 }

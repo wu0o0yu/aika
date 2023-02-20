@@ -20,11 +20,6 @@ public abstract class CategoryInputSynapse extends DisjunctiveSynapse<
     }
 
     @Override
-    public CategoryInputLink createLink(CategoryActivation input, Activation output) {
-        return new CategoryInputLink(this, input, output);
-    }
-
-    @Override
     public boolean isTrainingAllowed() {
         return false;
     }

@@ -14,40 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.elements.neurons;
+package network.aika.elements.links;
 
-import network.aika.Thought;
+import network.aika.elements.activations.BindingActivation;
+import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.activations.InhibitoryActivation;
-import network.aika.elements.synapses.*;
+import network.aika.elements.synapses.BindingCategorySynapse;
+import network.aika.elements.synapses.InhibitoryCategorySynapse;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitoryActivation> {
+public class InhibitoryCategoryLink extends CategoryLink<InhibitoryCategorySynapse, InhibitoryActivation> {
 
-    @Override
-    public InhibitoryActivation createActivation(Thought t) {
-        return new InhibitoryActivation(t.createActivationId(), t, this);
-    }
-
-    public ActivationFunction getActivationFunction() {
-        return ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
-    }
-
-
-    @Override
-    public InhibitoryCategoryInputSynapse getCategoryInputSynapse() {
-        return getInputSynapseByType(InhibitoryCategoryInputSynapse.class);
-    }
-
-    @Override
-    public InhibitoryCategorySynapse getCategoryOutputSynapse() {
-        return getOutputSynapseByType(InhibitoryCategorySynapse.class);
-    }
-
-    @Override
-    public boolean isTrainingAllowed() {
-        return false;
+    public InhibitoryCategoryLink(InhibitoryCategorySynapse s, InhibitoryActivation input, CategoryActivation output) {
+        super(s, input, output);
     }
 }

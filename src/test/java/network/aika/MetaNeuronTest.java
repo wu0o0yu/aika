@@ -5,10 +5,8 @@ import network.aika.elements.activations.TokenActivation;
 import network.aika.elements.neurons.BindingNeuron;
 import network.aika.elements.neurons.LatentRelationNeuron;
 import network.aika.elements.neurons.PatternNeuron;
-import network.aika.elements.neurons.BindingCategoryNeuron;
 import network.aika.elements.neurons.CategoryNeuron;
 import network.aika.elements.neurons.InhibitoryNeuron;
-import network.aika.elements.neurons.PatternCategoryNeuron;
 import network.aika.elements.synapses.*;
 import network.aika.elements.neurons.TokenNeuron;
 import network.aika.elements.neurons.TokenPositionRelationNeuron;
@@ -21,7 +19,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static network.aika.TestUtils.*;
-import static network.aika.elements.synapses.InhibSynType.INPUT;
 
 public class MetaNeuronTest {
 
@@ -94,7 +91,7 @@ public class MetaNeuronTest {
             InhibitoryNeuron inhib,
             PatternNeuron syllablePN
     ) {
-        CategoryNeuron sylBeginCategory = new BindingCategoryNeuron()
+        CategoryNeuron sylBeginCategory = new CategoryNeuron()
                 .init(m, "Syl. Cat. Pos-0");
 
         BindingNeuron sylBeginBN = new BindingNeuron()

@@ -16,15 +16,17 @@
  */
 package network.aika.elements.neurons;
 
+import network.aika.Thought;
 import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.synapses.CategoryInputSynapse;
+import network.aika.elements.synapses.CategorySynapse;
 
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class CategoryNeuron extends DisjunctiveNeuron<CategoryActivation> {
+public class CategoryNeuron extends DisjunctiveNeuron<CategoryActivation> {
 
     public CategoryNeuron() {
     }
@@ -39,7 +41,22 @@ public abstract class CategoryNeuron extends DisjunctiveNeuron<CategoryActivatio
     }
 
     @Override
+    public CategoryActivation createActivation(Thought t) {
+        return
+    }
+
+    @Override
     public boolean isAbstract() {
         return false;
+    }
+
+    @Override
+    public CategoryInputSynapse getCategoryInputSynapse() {
+        return null;
+    }
+
+    @Override
+    public CategorySynapse getCategoryOutputSynapse() {
+        return null;
     }
 }
