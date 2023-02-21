@@ -18,8 +18,6 @@ package network.aika.elements.links;
 
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.CategoryActivation;
-import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.synapses.BindingCategorySynapse;
 import network.aika.elements.synapses.CategorySynapse;
 import network.aika.elements.synapses.PatternCategoryInputSynapse;
 import network.aika.elements.synapses.PatternCategorySynapse;

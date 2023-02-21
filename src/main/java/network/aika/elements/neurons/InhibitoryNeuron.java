@@ -35,6 +35,10 @@ public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitoryActivation> {
         return ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
     }
 
+    @Override
+    public CategorySynapse newCategorySynapse() {
+        return new InhibitoryCategorySynapse();
+    }
 
     @Override
     public InhibitoryCategoryInputSynapse getCategoryInputSynapse() {

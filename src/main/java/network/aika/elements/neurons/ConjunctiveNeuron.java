@@ -89,17 +89,10 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
     protected void initFromTemplate(Neuron templateN) {
         super.initFromTemplate(templateN);
 
-        ConjunctiveNeuron templateCN = (ConjunctiveNeuron)templateN;
-
-        synapseBiasSum.setInitialValue(templateCN.getSynapseBiasSum().getUpdatedCurrentValue());
-
-        CategoryInputSynapse cis = templateCN.getCategoryInputSynapse();
-        newCategorySynapse()
-                .setWeight(10.0)
-                .init(this, cis.getInput());
+        synapseBiasSum.setInitialValue(
+                ((ConjunctiveNeuron)templateN).getSynapseBiasSum().getUpdatedCurrentValue()
+        );
     }
-
-    public abstract CategorySynapse newCategorySynapse();
 
     public boolean isInstanceOf(ConjunctiveNeuron templateNeuron) {
         CategorySynapse<?,?,?> cs = getCategoryOutputSynapse();

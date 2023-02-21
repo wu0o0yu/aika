@@ -46,6 +46,11 @@ public class CategoryNeuron extends DisjunctiveNeuron<CategoryActivation> {
     }
 
     @Override
+    public CategorySynapse newCategorySynapse() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean isAbstract() {
         return false;
     }
@@ -57,6 +62,6 @@ public class CategoryNeuron extends DisjunctiveNeuron<CategoryActivation> {
 
     @Override
     public CategorySynapse getCategoryOutputSynapse() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }

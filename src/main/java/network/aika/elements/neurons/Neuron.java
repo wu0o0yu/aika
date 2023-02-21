@@ -71,7 +71,7 @@ public abstract class Neuron<A extends Activation> extends FieldObject implement
 
     protected boolean allowTraining = true;
 
-    private Neuron<?> template;
+    protected Neuron<?> template;
 
     private final WeakHashMap<Long, WeakReference<PreActivation<A>>> activations = new WeakHashMap<>();
 
@@ -212,8 +212,15 @@ public abstract class Neuron<A extends Activation> extends FieldObject implement
                 templateN.getBias().getUpdatedCurrentValue()
         );
 
+        CategoryInputSynapse cis = templateN.getCategoryInputSynapse();
+        newCategorySynapse()
+                .setWeight(10.0)
+                .init(this, cis.getInput());
+
         this.template = templateN;
     }
+
+    public abstract CategorySynapse newCategorySynapse();
 
     public boolean isAbstract() {
         return getCategoryInputSynapse() != null;
