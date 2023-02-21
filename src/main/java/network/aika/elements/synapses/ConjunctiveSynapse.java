@@ -121,7 +121,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
 
     @Override
     protected void warmUpRelatedInputNeurons(IA bs) {
-        Stream<S> iSyns = output.getNeuron().getInputSynapsesAsStream();
+        Stream<ConjunctiveSynapse> iSyns = output.getNeuron().getInputSynapsesByType(ConjunctiveSynapse.class);
         iSyns.filter(s -> s.getStoredAt() == OUTPUT)
                 .forEach(s ->
                         s.warmUpInputNeuron(bs.getThought())
