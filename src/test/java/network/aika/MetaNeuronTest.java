@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static network.aika.TestUtils.*;
+import static network.aika.elements.synapses.Scope.INPUT;
 
 public class MetaNeuronTest {
 
@@ -141,7 +142,7 @@ public class MetaNeuronTest {
             PatternNeuron syllablePN
     ) {
 
-        CategoryNeuron sylContinueRightCategory = new BindingCategoryNeuron()
+        CategoryNeuron sylContinueRightCategory = new CategoryNeuron()
                 .init(m, "Syl. Cat. Pos-R" + pos);
 
         BindingNeuron sylContinueRightBN = new BindingNeuron()
@@ -196,7 +197,7 @@ public class MetaNeuronTest {
         LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, -1, -1);
 
         // Abstract
-        CategoryNeuron letterCategory = new PatternCategoryNeuron()
+        CategoryNeuron letterCategory = new CategoryNeuron()
                 .init(m, "PC-letter");
 
         TokenNeuron letterPN = new TokenNeuron()
@@ -213,7 +214,7 @@ public class MetaNeuronTest {
                 .setWeight(1.0)
                 .init(letterCategory, letterPN);
 
-        CategoryNeuron syllableCategory = new PatternCategoryNeuron()
+        CategoryNeuron syllableCategory = new CategoryNeuron()
                 .init(m, "Syllable Category");
 
         BindingNeuron sylBeginBN = createInitialSyllableBindingNeuron(

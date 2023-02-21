@@ -42,7 +42,7 @@ public class CategoryNeuron extends DisjunctiveNeuron<CategoryActivation> {
 
     @Override
     public CategoryActivation createActivation(Thought t) {
-        return
+        return new CategoryActivation(t.createActivationId(), t, this);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class CategoryNeuron extends DisjunctiveNeuron<CategoryActivation> {
 
     @Override
     public CategoryInputSynapse getCategoryInputSynapse() {
-        return null;
+        return getOutputSynapseByType(CategoryInputSynapse.class);
     }
 
     @Override

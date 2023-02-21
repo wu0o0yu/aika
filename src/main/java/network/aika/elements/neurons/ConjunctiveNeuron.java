@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.stream.Collectors;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
@@ -156,7 +157,10 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
     }
 
     private ConjunctiveSynapse[] sortInputSynapses() {
-        ConjunctiveSynapse[] inputsSynapses = getInputSynapses().toArray(new ConjunctiveSynapse[0]);
+        ConjunctiveSynapse[] inputsSynapses = getInputSynapsesByType(ConjunctiveSynapse.class)
+                .collect(Collectors.toList())
+                .toArray(new ConjunctiveSynapse[0]);
+
         Arrays.sort(
                 inputsSynapses,
                 Comparator.comparingDouble(s -> s.getSortingWeight())
