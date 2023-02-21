@@ -58,7 +58,7 @@ public class InhibitoryCategoryInputLink extends CategoryInputLink {
         super.addInputLinkingStep();
 
         input.getInputLinks()
-                .map(l -> (ConjunctiveActivation)l.getInput())
+                .map(Link::getInput)
                 .forEach(act ->
                         output.linkTemplateAndInstance(act)
                 );

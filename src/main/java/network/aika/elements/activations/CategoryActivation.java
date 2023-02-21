@@ -29,8 +29,8 @@ public class CategoryActivation extends DisjunctiveActivation<CategoryNeuron> {
         super(id, t, neuron);
     }
 
-    public ConjunctiveActivation getCategoryInput() {
-        return (ConjunctiveActivation) inputLinks.values()
+    public Activation getCategoryInput() {
+        return inputLinks.values()
                 .stream()
                 .map(l -> l.getInput())
                 .findFirst()

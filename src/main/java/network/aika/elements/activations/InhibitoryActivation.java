@@ -36,11 +36,6 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
         super(id, t, neuron);
     }
 
-    @Override
-    public Range getRange() {
-        return null;
-    }
-
     public void connectFields(InhibitoryLink in, NegativeFeedbackLink out) {
         if(isSelfRef(in.getInput(), out.getOutput()))
             return;
