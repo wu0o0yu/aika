@@ -20,6 +20,8 @@ import network.aika.FieldObject;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.elements.Element;
+import network.aika.elements.links.CategoryInputLink;
+import network.aika.elements.links.CategoryLink;
 import network.aika.elements.links.ConjunctiveLink;
 import network.aika.elements.links.Link;
 import network.aika.elements.neurons.ActivationFunction;
@@ -84,10 +86,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
-
-    protected Activation<N>  template;
-
-    protected List<Activation<N>> templateInstances;
 
     public boolean instantiationNodesIsQueued;
     public boolean instantiationEdgesIsQueued;
@@ -379,6 +377,12 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 .map(linkType::cast);
     }
 
+    public <OL extends Link> Stream<OL> getOutputLinksByType(Class<OL> linkType) {
+        return getOutputLinks()
+                .filter(linkType::isInstance)
+                .map(linkType::cast);
+    }
+
     public Stream<Link> getOutputLinks(Synapse s) {
         return outputLinks
                 .subMap(
@@ -470,32 +474,28 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 .stream();
     }
 
-    public List<Activation<N>> getTemplateInstances() {
-        if(templateInstances == null)
-            templateInstances = new ArrayList<>();
-
-        return templateInstances;
-    }
-
-    public Stream<Activation<N>> getTemplateInstancesStream() {
-        return getTemplateInstances().stream();
+    public Stream<Activation> getTemplateInstancesStream() {
+        return getInputLinksByType(CategoryInputLink.class)
+                .map(Link::getInput)
+                .flatMap(Activation::getInputLinks)
+                .map(Link::getInput);
     }
 
     public Activation<N> getTemplate() {
-        return template;
-    }
-
-    public void setTemplate(Activation template) {
-        this.template = template;
-    }
-
-    public void addTemplateInstance(Activation instanceAct) {
-        getTemplateInstances().add(instanceAct);
+        Stream<Link> oLinks = getOutputLinksByType(CategoryLink.class)
+                .map(Link::getOutput)
+                .flatMap(Activation::getOutputLinks);
+        return oLinks.map(Link::getOutput)
+                .findFirst()
+                .orElse(null);
     }
 
     public void linkTemplateAndInstance(Activation instanceAct) {
-        addTemplateInstance(instanceAct);
-        instanceAct.setTemplate(this);
+        CategoryInputLink cl = getInputLinksByType(CategoryInputLink.class)
+                .findFirst()
+                .orElse(null);
+
+        cl.instantiateTemplate(cl.getInput(), instanceAct);
     }
 
     public Activation getActiveTemplateInstance() {
@@ -555,7 +555,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     }
 
     public void initFromTemplate() {
-        fired = template.fired;
+        fired = getTemplate().fired;
         thought.onElementEvent(UPDATE, this);
     }
 

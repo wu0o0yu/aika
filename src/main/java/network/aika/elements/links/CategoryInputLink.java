@@ -28,15 +28,4 @@ public abstract class CategoryInputLink extends DisjunctiveLink<CategoryInputSyn
     }
 
     protected abstract CategorySynapse createCategorySynapse();
-
-    @Override
-    public void addInputLinkingStep() {
-        super.addInputLinkingStep();
-
-        input.getInputLinks()
-                .map(l -> l.getInput())
-                .forEach(act ->
-                        output.linkTemplateAndInstance(act)
-                );
-    }
 }
