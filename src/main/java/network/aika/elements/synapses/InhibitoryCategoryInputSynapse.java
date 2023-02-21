@@ -23,6 +23,7 @@ import network.aika.elements.activations.InhibitoryActivation;
 import network.aika.elements.links.BindingCategoryInputLink;
 import network.aika.elements.links.InhibitoryCategoryInputLink;
 import network.aika.visitor.linking.LinkingOperator;
+import network.aika.visitor.linking.category.CategoryDownVisitor;
 import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
 
 /**
@@ -43,7 +44,7 @@ public class InhibitoryCategoryInputSynapse extends CategoryInputSynapse
 
     @Override
     public void startVisitor(LinkingOperator c, Activation act) {
-        new InhibitoryDownVisitor(act.getThought(), c)
+        new CategoryDownVisitor(act.getThought(), c)
                 .start(act);
     }
 

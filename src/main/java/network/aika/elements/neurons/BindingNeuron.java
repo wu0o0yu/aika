@@ -35,7 +35,7 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingActivation> {
 
 
     @Override
-    public CategorySynapse newCategorySynapse() {
+    public CategorySynapse createCategorySynapse() {
         return new BindingCategorySynapse();
     }
 

@@ -45,7 +45,7 @@ public class PatternNeuron extends ConjunctiveNeuron<PatternActivation> {
     }
 
     @Override
-    public CategorySynapse newCategorySynapse() {
+    public CategorySynapse createCategorySynapse() {
         return new PatternCategorySynapse();
     }
 

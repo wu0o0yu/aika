@@ -46,7 +46,7 @@ public class CategoryNeuron extends DisjunctiveNeuron<CategoryActivation> {
     }
 
     @Override
-    public CategorySynapse newCategorySynapse() {
+    public CategorySynapse createCategorySynapse() {
         throw new UnsupportedOperationException();
     }
 

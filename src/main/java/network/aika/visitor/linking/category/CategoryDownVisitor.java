@@ -14,37 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.visitor.linking.pattern;
+package network.aika.visitor.linking.category;
 
 import network.aika.Thought;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
-import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.links.Link;
 import network.aika.visitor.linking.LinkingDownVisitor;
 import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.inhibitory.InhibitoryUpVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class PatternCategoryDownVisitor extends LinkingDownVisitor<BindingActivation> {
+public class CategoryDownVisitor extends LinkingDownVisitor<BindingActivation> {
 
-    public PatternCategoryDownVisitor(Thought t, LinkingOperator operator) {
+    public CategoryDownVisitor(Thought t, LinkingOperator operator) {
         super(t, operator);
     }
 
     @Override
     public void up(BindingActivation origin) {
-        new PatternCategoryUpVisitor(this, origin)
+        new CategoryUpVisitor(this, origin)
                 .visitUp(origin, null);
     }
 
     protected void visitDown(Link l) {
-        l.patternCatVisit(this);
+        l.categoryVisit(this);
     }
 
     protected void visitDown(Activation act, Link l) {
-        act.patternCatVisitDown(this, l);
+        act.categoryVisitDown(this, l);
     }
 }

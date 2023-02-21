@@ -17,10 +17,7 @@
 package network.aika.elements.links;
 
 import network.aika.elements.activations.*;
-import network.aika.elements.synapses.BindingCategorySynapse;
-import network.aika.elements.synapses.CategorySynapse;
-import network.aika.elements.synapses.InhibitoryCategoryInputSynapse;
-import network.aika.elements.synapses.InhibitoryCategorySynapse;
+import network.aika.elements.synapses.*;
 
 
 /**
@@ -33,34 +30,7 @@ public class InhibitoryCategoryInputLink extends CategoryInputLink {
     }
 
     @Override
-    public void instantiateTemplate(CategoryActivation iAct, Activation oAct) {
-        if(iAct == null || oAct == null)
-            return;
-
-        Link l = iAct.getInputLink(oAct.getNeuron());
-
-        if(l != null)
-            return;
-
-        InhibitoryCategorySynapse s = new InhibitoryCategorySynapse();
-        s.initFromTemplate(oAct.getNeuron(), iAct.getNeuron(), synapse);
-
-        s.createLinkFromTemplate((InhibitoryActivation) oAct, iAct, this);
-    }
-
-    @Override
     protected CategorySynapse createCategorySynapse() {
-        return new BindingCategorySynapse();
-    }
-
-    @Override
-    public void addInputLinkingStep() {
-        super.addInputLinkingStep();
-
-        input.getInputLinks()
-                .map(Link::getInput)
-                .forEach(act ->
-                        output.linkTemplateAndInstance(act)
-                );
+        return new InhibitoryCategorySynapse();
     }
 }

@@ -1,6 +1,7 @@
 package network.aika.elements.links;
 
 import network.aika.elements.activations.*;
+import network.aika.elements.synapses.BindingCategorySynapse;
 import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.elements.synapses.CategorySynapse;
 

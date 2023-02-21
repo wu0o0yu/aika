@@ -38,6 +38,6 @@ public class RelationInputLink extends BindingNeuronLink<RelationInputSynapse, B
     }
 
     @Override
-    public void patternCatVisit(Visitor v) {
+    public void categoryVisit(Visitor v) {
     }
 }

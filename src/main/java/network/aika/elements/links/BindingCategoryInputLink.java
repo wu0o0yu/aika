@@ -16,12 +16,10 @@
  */
 package network.aika.elements.links;
 
-import network.aika.direction.Direction;
 import network.aika.elements.activations.*;
 import network.aika.elements.synapses.BindingCategoryInputSynapse;
 import network.aika.elements.synapses.BindingCategorySynapse;
 import network.aika.elements.synapses.CategorySynapse;
-import network.aika.elements.synapses.PatternCategorySynapse;
 
 
 /**
@@ -34,34 +32,7 @@ public class BindingCategoryInputLink extends CategoryInputLink {
     }
 
     @Override
-    public void instantiateTemplate(CategoryActivation iAct, Activation oAct) {
-        if(iAct == null || oAct == null)
-            return;
-
-        Link l = iAct.getInputLink(oAct.getNeuron());
-
-        if(l != null)
-            return;
-
-        BindingCategorySynapse s = new BindingCategorySynapse();
-        s.initFromTemplate(oAct.getNeuron(), iAct.getNeuron(), synapse);
-
-        s.createLinkFromTemplate((BindingActivation) oAct, iAct, this);
-    }
-
-    @Override
     protected CategorySynapse createCategorySynapse() {
         return new BindingCategorySynapse();
-    }
-
-    @Override
-    public void addInputLinkingStep() {
-        super.addInputLinkingStep();
-
-        input.getInputLinks()
-                .map(l -> (ConjunctiveActivation)l.getInput())
-                .forEach(act ->
-                        output.linkTemplateAndInstance(act)
-                );
     }
 }

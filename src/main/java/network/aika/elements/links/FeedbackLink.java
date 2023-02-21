@@ -71,7 +71,7 @@ public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activat
     }
 
     @Override
-    public void patternCatVisit(Visitor v) {
+    public void categoryVisit(Visitor v) {
     }
 
     private boolean checkVisited(Visitor v) {

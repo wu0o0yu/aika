@@ -21,6 +21,7 @@ import network.aika.elements.activations.PatternActivation;
 import network.aika.fields.AbstractFunction;
 import network.aika.fields.Fields;
 import network.aika.elements.synapses.InputPatternFromPatternSynapse;
+import network.aika.visitor.Visitor;
 
 /**
  * @author Lukas Molzberger
@@ -45,5 +46,9 @@ public class InputPatternFromPatternLink extends InputPatternLink<InputPatternFr
         );
 
         super.connectGradientFields();
+    }
+
+    @Override
+    public void categoryVisit(Visitor v) {
     }
 }

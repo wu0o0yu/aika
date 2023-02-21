@@ -204,11 +204,11 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         v.next(this);
     }
 
-    public void patternCatVisitDown(DownVisitor v, Link lastLink) {
+    public void categoryVisitDown(DownVisitor v, Link lastLink) {
         v.next(this);
     }
 
-    public void patternCatVisitUp(UpVisitor v, Link lastLink) {
+    public void categoryVisitUp(UpVisitor v, Link lastLink) {
         v.next(this);
     }
 
@@ -281,10 +281,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
     public boolean isFired() {
         return isTrue(isFired);
-    }
-
-
-    public void instantiateTemplateEdges(ConjunctiveActivation instanceAct) {
     }
 
     public Thought getThought() {
@@ -474,8 +470,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 .stream();
     }
 
-
-
     public List<Activation<N>> getTemplateInstances() {
         if(templateInstances == null)
             templateInstances = new ArrayList<>();
@@ -503,7 +497,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         addTemplateInstance(instanceAct);
         instanceAct.setTemplate(this);
     }
-
 
     public Activation getActiveTemplateInstance() {
         return getTemplateInstancesStream()

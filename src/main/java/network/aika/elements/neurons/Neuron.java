@@ -19,7 +19,6 @@ package network.aika.elements.neurons;
 import network.aika.FieldObject;
 import network.aika.Model;
 import network.aika.Thought;
-import network.aika.direction.Direction;
 import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.elements.synapses.CategorySynapse;
 import network.aika.fields.*;
@@ -213,14 +212,14 @@ public abstract class Neuron<A extends Activation> extends FieldObject implement
         );
 
         CategoryInputSynapse cis = templateN.getCategoryInputSynapse();
-        newCategorySynapse()
+        createCategorySynapse()
                 .setWeight(10.0)
                 .init(this, cis.getInput());
 
         this.template = templateN;
     }
 
-    public abstract CategorySynapse newCategorySynapse();
+    public abstract CategorySynapse createCategorySynapse();
 
     public boolean isAbstract() {
         return getCategoryInputSynapse() != null;

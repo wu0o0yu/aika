@@ -36,7 +36,7 @@ public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitoryActivation> {
     }
 
     @Override
-    public CategorySynapse newCategorySynapse() {
+    public CategorySynapse createCategorySynapse() {
         return new InhibitoryCategorySynapse();
     }
 

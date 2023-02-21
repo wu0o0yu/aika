@@ -22,7 +22,7 @@ import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.links.PatternCategoryLink;
 import network.aika.elements.neurons.PatternNeuron;
 import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
+import network.aika.visitor.linking.category.CategoryDownVisitor;
 
 /**
  *
@@ -37,7 +37,7 @@ public class PatternCategorySynapse extends CategorySynapse<PatternCategorySynap
 
     @Override
     public void startVisitor(LinkingOperator c, Activation act) {
-        new PatternCategoryDownVisitor(act.getThought(), c)
+        new CategoryDownVisitor(act.getThought(), c)
                 .start(act);
     }
 }
