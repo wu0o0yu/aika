@@ -28,6 +28,7 @@ import network.aika.elements.neurons.ActivationFunction;
 import network.aika.elements.neurons.Neuron;
 import network.aika.elements.neurons.NeuronProvider;
 import network.aika.elements.neurons.Range;
+import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.elements.synapses.ConjunctiveSynapse;
 import network.aika.fields.*;
 import network.aika.elements.synapses.Synapse;
@@ -491,11 +492,24 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     }
 
     public void linkTemplateAndInstance(Activation instanceAct) {
-        CategoryInputLink cl = getInputLinksByType(CategoryInputLink.class)
+        CategoryInputLink catLink = getCategoryInputLink();
+
+        if(catLink == null) {
+            CategoryInputSynapse catSyn = getNeuron().getCategoryInputSynapse();
+            if(catSyn == null)
+                return;
+
+            CategoryActivation catAct = catSyn.getInput().createActivation(thought);
+            catLink = catSyn.createAndInitLink(catAct, this);
+        }
+
+        catLink.instantiateTemplate(catLink.getInput(), instanceAct);
+    }
+
+    public CategoryInputLink getCategoryInputLink() {
+        return getInputLinksByType(CategoryInputLink.class)
                 .findFirst()
                 .orElse(null);
-
-        cl.instantiateTemplate(cl.getInput(), instanceAct);
     }
 
     public Activation getActiveTemplateInstance() {

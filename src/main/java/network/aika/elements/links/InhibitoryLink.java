@@ -57,9 +57,10 @@ public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingAc
                 x -> output.getActivationFunction().f(x)
         );
 
-        output.getOutputLinks().forEach(l ->
-                output.connectFields(this, (NegativeFeedbackLink) l)
-        );
+        output.getOutputLinksByType(NegativeFeedbackLink.class)
+                .forEach(l ->
+                        output.connectFields(this, l)
+                );
     }
 
     public FieldOutput getValue() {
