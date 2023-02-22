@@ -28,6 +28,9 @@ import network.aika.fields.SumField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Collectors;
@@ -159,5 +162,20 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
                 Comparator.comparingDouble(s -> s.getSortingWeight())
         );
         return inputsSynapses;
+    }
+
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+
+        synapseBiasSum.write(out);
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws Exception {
+        super.readFields(in, m);
+
+        synapseBiasSum.readFields(in, m);
     }
 }
