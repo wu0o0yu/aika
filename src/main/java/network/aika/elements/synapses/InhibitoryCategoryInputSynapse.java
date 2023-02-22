@@ -43,9 +43,9 @@ public class InhibitoryCategoryInputSynapse extends CategoryInputSynapse
     }
 
     @Override
-    public void startVisitor(LinkingOperator c, Activation act) {
-        new CategoryDownVisitor(act.getThought(), c)
-                .start(act);
+    public void startVisitor(LinkingOperator c, Activation bs) {
+        new InhibitoryDownVisitor(bs.getThought(), c)
+                .start(bs);
     }
 
     @Override

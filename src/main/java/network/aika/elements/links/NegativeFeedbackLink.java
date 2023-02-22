@@ -37,9 +37,10 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
         if(input == null)
             return;
 
-        input.getInputLinks().forEach(l ->
-                input.connectFields((InhibitoryLink) l, this)
-        );
+        input.getInputLinksByType(InhibitoryLink.class)
+                .forEach(l ->
+                        input.connectFields(l, this)
+                );
     }
 
     @Override
