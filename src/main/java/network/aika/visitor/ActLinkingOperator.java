@@ -34,8 +34,8 @@ public class ActLinkingOperator extends LinkingOperator {
     private Synapse synA;
     private Link linkA;
 
-    public ActLinkingOperator(Activation fromBS, Synapse synA, Link linkA, Synapse synB) {
-        super(fromBS, synB);
+    public ActLinkingOperator(Activation fromAct, Synapse synA, Link linkA, Synapse synB) {
+        super(fromAct, synB);
         this.synA = synA;
         this.linkA = linkA;
         this.toScope = synA.getScope();
@@ -51,7 +51,7 @@ public class ActLinkingOperator extends LinkingOperator {
         if(act.getNeuron() != syn.getInput())
             return;
 
-        if(act == fromBS)
+        if(act == fromAct)
             return;
 
         if(!v.compatible(syn.getScope(), toScope))
@@ -60,7 +60,7 @@ public class ActLinkingOperator extends LinkingOperator {
         if(!syn.checkLinkingEvent(act))
                 return;
 
-        Link l = link(fromBS, synA, linkA, act, syn);
+        Link l = link(fromAct, synA, linkA, act, syn);
         if(l != null)
             v.createRelation(l);
     }

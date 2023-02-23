@@ -32,12 +32,12 @@ import static network.aika.elements.synapses.Synapse.latentActivationExists;
  */
 public abstract class LinkingOperator {
 
-    protected Activation fromBS;
+    protected Activation fromAct;
 
     protected Synapse syn;
 
-    public LinkingOperator(Activation fromBS, Synapse syn) {
-        this.fromBS = fromBS;
+    public LinkingOperator(Activation fromAct, Synapse syn) {
+        this.fromAct = fromAct;
         this.syn = syn;
     }
 

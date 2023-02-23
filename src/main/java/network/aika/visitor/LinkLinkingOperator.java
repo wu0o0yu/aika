@@ -30,8 +30,8 @@ import network.aika.visitor.linking.LinkingOperator;
 public class LinkLinkingOperator extends LinkingOperator {
 
 
-    public LinkLinkingOperator(Activation fromBS, Synapse syn) {
-        super(fromBS, syn);
+    public LinkLinkingOperator(Activation fromAct, Synapse syn) {
+        super(fromAct, syn);
     }
 
     @Override
@@ -47,12 +47,12 @@ public class LinkLinkingOperator extends LinkingOperator {
         if(act.getNeuron() != syn.getOutput())
             return;
 
-        if(act == fromBS)
+        if(act == fromAct)
             return;
 
         if(!v.compatible(syn.getScope(), l.getSynapse().getScope()))
             return;
 
-        link(l.getInput(), l.getSynapse(), l, fromBS, syn);
+        link(l.getInput(), l.getSynapse(), l, fromAct, syn);
     }
 }
