@@ -35,12 +35,7 @@ public class CategoryUpVisitor extends LinkingUpVisitor<BindingActivation> {
     }
 
     public void check(Link lastLink, Activation act) {
-        PatternActivation pAct = (PatternActivation) act;
-        PatternCategoryInputLink catInputLink = pAct.getCategoryInputLink();
-        if(catInputLink == null)
-            return;
-
-        operator.check(this, catInputLink, catInputLink.getInput());
+        operator.check(this, lastLink, act);
     }
 
     public boolean compatible(Scope from, Scope to) {

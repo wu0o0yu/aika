@@ -30,6 +30,10 @@ import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
  */
 public class BindingCategorySynapse extends CategorySynapse<BindingCategorySynapse, Neuron, BindingActivation> {
 
+    public BindingCategorySynapse() {
+        super(Scope.SAME);
+    }
+
     @Override
     public BindingCategoryLink createLink(BindingActivation input, CategoryActivation output) {
         return new BindingCategoryLink(this, input, output);

@@ -43,13 +43,14 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
         InhibitoryActivation
         >
 {
-
     private Scope type;
 
     public InhibitorySynapse() {
+        super(null);
     }
 
     public InhibitorySynapse(Scope type) {
+        this();
         this.type = type;
     }
 

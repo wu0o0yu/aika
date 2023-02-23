@@ -38,6 +38,10 @@ public abstract class CategorySynapse<S extends CategorySynapse, I extends Neuro
         >
 {
 
+    public CategorySynapse(Scope scope) {
+        super(scope);
+    }
+
     @Override
     public void link() {
         input.linkInput(this);

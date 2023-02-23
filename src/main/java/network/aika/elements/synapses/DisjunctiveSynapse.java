@@ -35,10 +35,6 @@ public abstract class DisjunctiveSynapse<
         OA extends Activation
         > extends Synapse<S,I,O,L,IA,OA>
 {
-    public DisjunctiveSynapse() {
-        this.scope = null;
-    }
-
     public DisjunctiveSynapse(Scope scope) {
         super(scope);
     }

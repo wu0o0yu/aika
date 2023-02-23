@@ -30,6 +30,10 @@ import network.aika.visitor.linking.category.CategoryDownVisitor;
  */
 public class PatternCategorySynapse extends CategorySynapse<PatternCategorySynapse, PatternNeuron, PatternActivation> {
 
+    public PatternCategorySynapse() {
+        super(Scope.SAME);
+    }
+
     @Override
     public PatternCategoryLink createLink(PatternActivation input, CategoryActivation output) {
         return new PatternCategoryLink(this, input, output);

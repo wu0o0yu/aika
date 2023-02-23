@@ -34,7 +34,7 @@ import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
 public class InhibitoryCategoryInputSynapse extends CategoryInputSynapse
 {
     public InhibitoryCategoryInputSynapse() {
-        super(Scope.INPUT);
+        super(null);
     }
 
     @Override

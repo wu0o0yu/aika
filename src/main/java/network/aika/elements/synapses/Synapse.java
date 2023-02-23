@@ -71,10 +71,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected Scope scope;
 
-    public Synapse() {
-        this.scope = null;
-    }
-
     public Synapse(Scope scope) {
         this.scope = scope;
     }

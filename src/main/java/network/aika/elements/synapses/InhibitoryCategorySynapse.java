@@ -22,7 +22,6 @@ import network.aika.elements.activations.InhibitoryActivation;
 import network.aika.elements.links.InhibitoryCategoryLink;
 import network.aika.elements.neurons.Neuron;
 import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.category.CategoryDownVisitor;
 import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
 
 /**
@@ -30,6 +29,10 @@ import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
  * @author Lukas Molzberger
  */
 public class InhibitoryCategorySynapse extends CategorySynapse<InhibitoryCategorySynapse, Neuron, InhibitoryActivation> {
+
+    public InhibitoryCategorySynapse() {
+        super(null);
+    }
 
     @Override
     public InhibitoryCategoryLink createLink(InhibitoryActivation input, CategoryActivation output) {
