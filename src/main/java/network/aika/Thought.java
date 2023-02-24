@@ -344,8 +344,6 @@ public abstract class Thought extends FieldObject implements Element {
         activationsById.values().stream()
                 .filter(act -> act.getNeuron().isAbstract())
                 .filter(act -> act.isFired())
-                .filter(act -> act instanceof ConjunctiveActivation<?>)
-                .map(act -> (ConjunctiveActivation) act)
                 .forEach(InstantiationNodes::add);
     }
 

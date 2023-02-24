@@ -16,24 +16,21 @@
  */
 package network.aika.elements.links;
 
-import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.synapses.AbstractPatternSynapse;
+import network.aika.elements.activations.*;
+import network.aika.elements.synapses.*;
 
-import static network.aika.fields.Fields.mul;
 
 /**
  * @author Lukas Molzberger
  */
-public abstract class AbstractPatternLink<S extends AbstractPatternSynapse, IA extends Activation<?>> extends ConjunctiveLink<S, IA, PatternActivation> {
+public class InhibitoryCategoryInputLink extends CategoryInputLink {
 
-    public AbstractPatternLink(S s, IA input, PatternActivation output) {
+    public InhibitoryCategoryInputLink(InhibitoryCategoryInputSynapse s, CategoryActivation input, InhibitoryActivation output) {
         super(s, input, output);
     }
 
     @Override
-    protected void connectGradientFields() {
-        initGradient();
-        super.connectGradientFields();
+    protected CategorySynapse createCategorySynapse() {
+        return new InhibitoryCategorySynapse();
     }
 }

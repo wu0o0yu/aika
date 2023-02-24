@@ -48,6 +48,6 @@ public class SamePatternLink extends BindingNeuronLink<SamePatternSynapse, Bindi
     }
 
     @Override
-    public void patternCatVisit(Visitor v) {
+    public void categoryVisit(Visitor v) {
     }
 }

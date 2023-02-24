@@ -34,7 +34,7 @@ import static network.aika.sign.Sign.POS;
  *
  * @author Lukas Molzberger
  */
-public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, PatternActivation> {
+public class PatternNeuron extends ConjunctiveNeuron<PatternActivation> {
 
     protected double frequency;
 
@@ -45,7 +45,7 @@ public class PatternNeuron extends ConjunctiveNeuron<ConjunctiveSynapse, Pattern
     }
 
     @Override
-    public CategorySynapse newCategorySynapse() {
+    public CategorySynapse createCategorySynapse() {
         return new PatternCategorySynapse();
     }
 

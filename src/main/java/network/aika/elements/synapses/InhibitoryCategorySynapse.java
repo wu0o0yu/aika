@@ -16,37 +16,32 @@
  */
 package network.aika.elements.synapses;
 
-import network.aika.elements.neurons.Neuron;
-import network.aika.elements.links.AbstractPatternLink;
 import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.neurons.PatternNeuron;
+import network.aika.elements.activations.CategoryActivation;
+import network.aika.elements.activations.InhibitoryActivation;
+import network.aika.elements.links.InhibitoryCategoryLink;
+import network.aika.elements.neurons.Neuron;
 import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.pattern.PatternDownVisitor;
+import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public abstract class AbstractPatternSynapse<S extends AbstractPatternSynapse, I extends Neuron, L extends AbstractPatternLink<S, IA>, IA extends Activation<?>> extends ConjunctiveSynapse<
-        S,
-        I,
-        PatternNeuron,
-        L,
-        IA,
-        PatternActivation
-        >
-{
+public class InhibitoryCategorySynapse extends CategorySynapse<InhibitoryCategorySynapse, Neuron, InhibitoryActivation> {
 
-    public AbstractPatternSynapse() {
-        super(Scope.SAME);
+    public InhibitoryCategorySynapse() {
+        super(null);
     }
 
+    @Override
+    public InhibitoryCategoryLink createLink(InhibitoryActivation input, CategoryActivation output) {
+        return new InhibitoryCategoryLink(this, input, output);
+    }
 
     @Override
-    public double getPropagatePreNet(IA iAct) {
-        return getOutput().getBias().getCurrentValue() +
-                weight.getCurrentValue() +
-                getSumOfLowerWeights();
+    public void startVisitor(LinkingOperator c, Activation bs) {
+        new InhibitoryDownVisitor(bs.getThought(), c)
+                .start(bs);
     }
 }

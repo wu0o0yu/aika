@@ -18,13 +18,13 @@ package network.aika.elements.neurons;
 
 import network.aika.Thought;
 import network.aika.elements.activations.InhibitoryActivation;
-import network.aika.elements.synapses.InhibitorySynapse;
+import network.aika.elements.synapses.*;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitorySynapse, InhibitoryActivation> {
+public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitoryActivation> {
 
     @Override
     public InhibitoryActivation createActivation(Thought t) {
@@ -33,6 +33,21 @@ public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitorySynapse, Inhib
 
     public ActivationFunction getActivationFunction() {
         return ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
+    }
+
+    @Override
+    public CategorySynapse createCategorySynapse() {
+        return new InhibitoryCategorySynapse();
+    }
+
+    @Override
+    public InhibitoryCategoryInputSynapse getCategoryInputSynapse() {
+        return getInputSynapseByType(InhibitoryCategoryInputSynapse.class);
+    }
+
+    @Override
+    public InhibitoryCategorySynapse getCategoryOutputSynapse() {
+        return getOutputSynapseByType(InhibitoryCategorySynapse.class);
     }
 
     @Override

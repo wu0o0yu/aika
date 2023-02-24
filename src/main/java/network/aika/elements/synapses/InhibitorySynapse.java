@@ -43,24 +43,25 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
         InhibitoryActivation
         >
 {
-
-    private InhibSynType type;
+    private Scope type;
 
     public InhibitorySynapse() {
+        super(null);
     }
 
-    public InhibitorySynapse(InhibSynType type) {
+    public InhibitorySynapse(Scope type) {
+        this();
         this.type = type;
     }
 
-    public InhibSynType getType() {
+    public Scope getType() {
         return type;
     }
 
     @Override
-    public void startVisitor(LinkingOperator c, Activation bs) {
-        new InhibitoryDownVisitor(bs.getThought(), c)
-                .start(bs);
+    public void startVisitor(LinkingOperator c, Activation act) {
+        new InhibitoryDownVisitor(act.getThought(), c)
+                .start(act);
     }
 
     @Override
@@ -86,6 +87,6 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
     public void readFields(DataInput in, Model m) throws IOException {
         super.readFields(in, m);
 
-        type = InhibSynType.values()[in.readInt()];
+        type = Scope.values()[in.readInt()];
     }
 }

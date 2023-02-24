@@ -18,34 +18,37 @@ package network.aika.elements.synapses;
 
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.CategoryActivation;
-import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.activations.PatternCategoryActivation;
+import network.aika.elements.links.CategoryInputLink;
 import network.aika.elements.links.PatternCategoryInputLink;
-import network.aika.elements.neurons.BindingCategoryNeuron;
-import network.aika.elements.neurons.PatternCategoryNeuron;
 import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
+import network.aika.visitor.linking.category.CategoryDownVisitor;
 
 /**
  * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
  *
  * @author Lukas Molzberger
  */
-public class PatternCategoryInputSynapse extends AbstractPatternSynapse<
-        PatternCategoryInputSynapse,
-        PatternCategoryNeuron,
-        PatternCategoryInputLink,
-        PatternCategoryActivation
-        > implements CategoryInputSynapse<PatternCategoryNeuron, PatternCategoryInputSynapse>
-{
+public class PatternCategoryInputSynapse extends CategoryInputSynapse {
+
+    public PatternCategoryInputSynapse() {
+        super(Scope.SAME);
+    }
+
     @Override
-    public PatternCategoryInputLink createLink(PatternCategoryActivation input, PatternActivation output) {
+    public double getPropagatePreNet(CategoryActivation iAct) {
+        return getOutput().getBias().getCurrentValue() +
+                weight.getCurrentValue() +
+                getSumOfLowerWeights();
+    }
+
+    @Override
+    public CategoryInputLink createLink(CategoryActivation input, Activation output) {
         return new PatternCategoryInputLink(this, input, output);
     }
 
     @Override
     public void startVisitor(LinkingOperator c, Activation act) {
-        new PatternCategoryDownVisitor(act.getThought(), c)
+        new CategoryDownVisitor(act.getThought(), c)
                 .start(act);
     }
 

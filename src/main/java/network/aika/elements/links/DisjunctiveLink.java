@@ -16,6 +16,7 @@
  */
 package network.aika.elements.links;
 
+import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.activations.DisjunctiveActivation;
 import network.aika.elements.synapses.DisjunctiveSynapse;
@@ -26,7 +27,7 @@ import static network.aika.fields.Fields.mul;
 /**
  * @author Lukas Molzberger
  */
-public class DisjunctiveLink<S extends DisjunctiveSynapse, IA extends ConjunctiveActivation<?>, OA extends DisjunctiveActivation> extends Link<S, IA, OA> {
+public class DisjunctiveLink<S extends DisjunctiveSynapse, IA extends Activation<?>, OA extends Activation> extends Link<S, IA, OA> {
 
     public DisjunctiveLink(S s, IA input, OA output) {
         super(s, input, output);

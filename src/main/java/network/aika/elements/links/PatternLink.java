@@ -31,7 +31,7 @@ import static network.aika.fields.Fields.scale;
 /**
  * @author Lukas Molzberger
  */
-public class PatternLink extends AbstractPatternLink<PatternSynapse, BindingActivation> {
+public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivation, PatternActivation> {
 
     private AbstractFunction outputEntropy;
     private AbstractFunction informationGain;

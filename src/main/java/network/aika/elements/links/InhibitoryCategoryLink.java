@@ -14,27 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.elements.neurons;
+package network.aika.elements.links;
 
-import network.aika.Thought;
+import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.CategoryActivation;
-import network.aika.elements.activations.PatternCategoryActivation;
-import network.aika.elements.synapses.PatternCategoryInputSynapse;
-import network.aika.elements.synapses.PatternCategorySynapse;
+import network.aika.elements.activations.InhibitoryActivation;
+import network.aika.elements.synapses.BindingCategorySynapse;
+import network.aika.elements.synapses.InhibitoryCategorySynapse;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class PatternCategoryNeuron extends CategoryNeuron<PatternCategorySynapse, CategoryActivation> {
+public class InhibitoryCategoryLink extends CategoryLink<InhibitoryCategorySynapse, InhibitoryActivation> {
 
-    @Override
-    public CategoryActivation createActivation(Thought t) {
-        return new PatternCategoryActivation(t.createActivationId(), t, this);
-    }
-
-    @Override
-    public PatternCategoryInputSynapse getOutgoingCategoryInputSynapse() {
-        return getOutputSynapseByType(PatternCategoryInputSynapse.class);
+    public InhibitoryCategoryLink(InhibitoryCategorySynapse s, InhibitoryActivation input, CategoryActivation output) {
+        super(s, input, output);
     }
 }

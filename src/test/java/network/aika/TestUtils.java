@@ -33,9 +33,8 @@ import network.aika.elements.activations.TokenActivation;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import static network.aika.elements.synapses.InhibSynType.INPUT;
-import static network.aika.elements.synapses.InhibSynType.SAME;
+import static network.aika.elements.synapses.Scope.INPUT;
+import static network.aika.elements.synapses.Scope.SAME;
 import static network.aika.steps.Phase.INFERENCE;
 
 

@@ -20,13 +20,19 @@ import network.aika.FieldObject;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.elements.Element;
+import network.aika.elements.links.CategoryInputLink;
+import network.aika.elements.links.CategoryLink;
+import network.aika.elements.links.ConjunctiveLink;
 import network.aika.elements.links.Link;
 import network.aika.elements.neurons.ActivationFunction;
 import network.aika.elements.neurons.Neuron;
 import network.aika.elements.neurons.NeuronProvider;
 import network.aika.elements.neurons.Range;
+import network.aika.elements.synapses.CategoryInputSynapse;
+import network.aika.elements.synapses.ConjunctiveSynapse;
 import network.aika.fields.*;
 import network.aika.elements.synapses.Synapse;
+import network.aika.steps.activation.InstantiationEdges;
 import network.aika.visitor.DownVisitor;
 import network.aika.visitor.selfref.SelfRefDownVisitor;
 import network.aika.visitor.UpVisitor;
@@ -39,6 +45,7 @@ import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.callbacks.EventType.CREATE;
+import static network.aika.callbacks.EventType.UPDATE;
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.elements.neurons.Range.joinTokenPosition;
@@ -169,10 +176,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 out.getNeuron().isInstanceOf(in.getNeuron());
     }
 
-    public Activation<N> resolveAbstractInputActivation() {
-        return this;
-    }
-
     public void bindingVisitDown(DownVisitor v, Link lastLink) {
         v.next(this);
     }
@@ -200,11 +203,11 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         v.next(this);
     }
 
-    public void patternCatVisitDown(DownVisitor v, Link lastLink) {
+    public void categoryVisitDown(DownVisitor v, Link lastLink) {
         v.next(this);
     }
 
-    public void patternCatVisitUp(UpVisitor v, Link lastLink) {
+    public void categoryVisitUp(UpVisitor v, Link lastLink) {
         v.next(this);
     }
 
@@ -279,12 +282,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         return isTrue(isFired);
     }
 
-    public void instantiateTemplateNodes() {
-    }
-
-    public void instantiateTemplateEdges(ConjunctiveActivation instanceAct) {
-    }
-
     public Thought getThought() {
         return thought;
     }
@@ -341,9 +338,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         return getNeuron().getLabel();
     }
 
-    public void setTemplate(Activation template) {
-    }
-
     public N getNeuron() {
         return neuron;
     }
@@ -380,6 +374,12 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
     public <IL extends Link> Stream<IL> getInputLinksByType(Class<IL> linkType) {
         return getInputLinks()
+                .filter(linkType::isInstance)
+                .map(linkType::cast);
+    }
+
+    public <OL extends Link> Stream<OL> getOutputLinksByType(Class<OL> linkType) {
+        return getOutputLinks()
                 .filter(linkType::isInstance)
                 .map(linkType::cast);
     }
@@ -473,6 +473,104 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     public Stream<Link> getOutputLinks() {
         return new ArrayList<>(outputLinks.values())
                 .stream();
+    }
+
+    public Stream<Activation> getTemplateInstancesStream() {
+        return getInputLinksByType(CategoryInputLink.class)
+                .map(Link::getInput)
+                .flatMap(Activation::getInputLinks)
+                .map(Link::getInput);
+    }
+
+    public Activation<N> getTemplate() {
+        Stream<Link> oLinks = getOutputLinksByType(CategoryLink.class)
+                .map(Link::getOutput)
+                .flatMap(Activation::getOutputLinks);
+        return oLinks.map(Link::getOutput)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void linkTemplateAndInstance(Activation instanceAct) {
+        CategoryInputLink catLink = getCategoryInputLink();
+
+        if(catLink == null) {
+            CategoryInputSynapse catSyn = getNeuron().getCategoryInputSynapse();
+            if(catSyn == null)
+                return;
+
+            CategoryActivation catAct = catSyn.getInput().createActivation(thought);
+            catLink = catSyn.createAndInitLink(catAct, this);
+        }
+
+        catLink.instantiateTemplate(catLink.getInput(), instanceAct);
+    }
+
+    public CategoryInputLink getCategoryInputLink() {
+        return getInputLinksByType(CategoryInputLink.class)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Activation getActiveTemplateInstance() {
+        return getTemplateInstancesStream()
+//                .filter(act -> !act.initialized || isTrue(act.getIsFired()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Activation<N> resolveAbstractInputActivation() {
+        return neuron.isAbstract() ?
+                getActiveTemplateInstance() :
+                this;
+    }
+
+    public void instantiateTemplateNodes() {
+        N n = (N) neuron.instantiateTemplate();
+
+        Activation<N> ti = n.createActivation(getThought());
+        linkTemplateAndInstance(ti);
+
+        instantiateBias(ti);
+
+        InstantiationEdges.add(this, ti);
+
+        if(thought.getInstantiationCallback() != null)
+            thought.getInstantiationCallback().onInstantiation(ti);
+    }
+
+    protected void instantiateBias(Activation<N> ti) {
+    }
+
+    public void instantiateTemplateEdges(Activation instanceAct) {
+        getInputLinks()
+                .forEach(l ->
+                        l.instantiateTemplate(
+                                l.getInput().resolveAbstractInputActivation(),
+                                instanceAct
+                        )
+                );
+
+        instanceAct.getNeuron().setLabel(
+                getConfig().getLabel(this)
+        );
+
+        instanceAct.initDummyLinks();
+        instanceAct.initFromTemplate();
+
+        getOutputLinks()
+                .filter(l -> !l.getOutput().getNeuron().isAbstract())
+                .forEach(l ->
+                        l.instantiateTemplate(
+                                instanceAct,
+                                l.getOutput().resolveAbstractInputActivation()
+                        )
+                );
+    }
+
+    public void initFromTemplate() {
+        fired = getTemplate().fired;
+        thought.onElementEvent(UPDATE, this);
     }
 
     public String toString() {

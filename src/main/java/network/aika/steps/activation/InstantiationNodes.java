@@ -16,6 +16,7 @@
  */
 package network.aika.steps.activation;
 
+import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
@@ -27,9 +28,9 @@ import static network.aika.steps.Phase.INSTANTIATION_NODES;
  *
  * @author Lukas Molzberger
  */
-public class InstantiationNodes extends Step<ConjunctiveActivation> {
+public class InstantiationNodes extends Step<Activation> {
 
-    public static void add(ConjunctiveActivation act) {
+    public static void add(Activation act) {
         if(act.instantiationNodesIsQueued)
             return;
 
@@ -41,7 +42,7 @@ public class InstantiationNodes extends Step<ConjunctiveActivation> {
         Step.add(new InstantiationNodes(act));
     }
 
-    public InstantiationNodes(ConjunctiveActivation act) {
+    public InstantiationNodes(Activation act) {
         super(act);
     }
 

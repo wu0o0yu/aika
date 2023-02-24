@@ -52,7 +52,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 
 import static network.aika.TestUtils.*;
-import static network.aika.elements.synapses.InhibSynType.INPUT;
+import static network.aika.elements.synapses.Scope.INPUT;
 import static network.aika.steps.Phase.INFERENCE;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

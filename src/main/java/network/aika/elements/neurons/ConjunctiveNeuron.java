@@ -28,8 +28,12 @@ import network.aika.fields.SumField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.stream.Collectors;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
@@ -40,7 +44,7 @@ import static network.aika.utils.Utils.TOLERANCE;
  *
  * @author Lukas Molzberger
  */
-public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends ConjunctiveActivation> extends Neuron<S, A> {
+public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends Neuron<A> {
 
     private static final Logger log = LoggerFactory.getLogger(ConjunctiveNeuron.class);
 
@@ -88,29 +92,13 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     protected void initFromTemplate(Neuron templateN) {
         super.initFromTemplate(templateN);
 
-        ConjunctiveNeuron templateCN = (ConjunctiveNeuron)templateN;
-
-        synapseBiasSum.setInitialValue(templateCN.getSynapseBiasSum().getUpdatedCurrentValue());
-
-        CategoryInputSynapse cis = templateCN.getCategoryInputSynapse();
-        newCategorySynapse()
-                .setWeight(10.0)
-                .init(this, cis.getInput());
-    }
-
-    public abstract CategorySynapse newCategorySynapse();
-
-    @Override
-    public void setModified() {
-        super.setModified();
-    }
-
-    public boolean isAbstract() {
-        return getCategoryInputSynapse() != null;
+        synapseBiasSum.setInitialValue(
+                ((ConjunctiveNeuron)templateN).getSynapseBiasSum().getUpdatedCurrentValue()
+        );
     }
 
     public boolean isInstanceOf(ConjunctiveNeuron templateNeuron) {
-        CategorySynapse<?,?,?,?,?> cs = getCategoryOutputSynapse();
+        CategorySynapse<?,?,?> cs = getCategoryOutputSynapse();
         if(cs == null)
             return false;
 
@@ -121,15 +109,12 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
         return cis.getOutput().getId() == templateNeuron.getId();
     }
 
-    public abstract CategoryInputSynapse getCategoryInputSynapse();
-
-    public abstract CategorySynapse getCategoryOutputSynapse();
-
-    public void addInactiveLinks(Activation bs) {
+    @Override
+    public void addInactiveLinks(Activation act) {
         getInputSynapsesAsStream()
-                .filter(s -> !s.linkExists(bs))
+                .filter(s -> !s.linkExists(act))
                 .forEach(s ->
-                        s.createAndInitLink(null, bs)
+                        s.createAndInitLink(null, act)
                 );
     }
 
@@ -158,7 +143,7 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     }
 
     @Override
-    public void addInputSynapse(S s) {
+    public void addInputSynapse(Synapse s) {
         super.addInputSynapse(s);
         s.getWeight().addEventListener(
                 "onWeightUpdate",
@@ -168,11 +153,29 @@ public abstract class ConjunctiveNeuron<S extends ConjunctiveSynapse, A extends 
     }
 
     private ConjunctiveSynapse[] sortInputSynapses() {
-        ConjunctiveSynapse[] inputsSynapses = getInputSynapses().toArray(new ConjunctiveSynapse[0]);
+        ConjunctiveSynapse[] inputsSynapses = getInputSynapsesByType(ConjunctiveSynapse.class)
+                .collect(Collectors.toList())
+                .toArray(new ConjunctiveSynapse[0]);
+
         Arrays.sort(
                 inputsSynapses,
                 Comparator.comparingDouble(s -> s.getSortingWeight())
         );
         return inputsSynapses;
+    }
+
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+
+        synapseBiasSum.write(out);
+    }
+
+    @Override
+    public void readFields(DataInput in, Model m) throws Exception {
+        super.readFields(in, m);
+
+        synapseBiasSum.readFields(in, m);
     }
 }

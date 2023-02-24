@@ -16,11 +16,9 @@
  */
 package network.aika.elements.links;
 
-import network.aika.direction.Direction;
+import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.CategoryActivation;
-import network.aika.elements.activations.ConjunctiveActivation;
-import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.activations.PatternCategoryActivation;
+import network.aika.elements.synapses.CategorySynapse;
 import network.aika.elements.synapses.PatternCategoryInputSynapse;
 import network.aika.elements.synapses.PatternCategorySynapse;
 import network.aika.visitor.Visitor;
@@ -29,26 +27,15 @@ import network.aika.visitor.Visitor;
 /**
  * @author Lukas Molzberger
  */
-public class PatternCategoryInputLink extends AbstractPatternLink<PatternCategoryInputSynapse, PatternCategoryActivation> {
+public class PatternCategoryInputLink extends CategoryInputLink {
 
-    public PatternCategoryInputLink(PatternCategoryInputSynapse s, PatternCategoryActivation input, PatternActivation output) {
+    public PatternCategoryInputLink(PatternCategoryInputSynapse s, CategoryActivation input, Activation output) {
         super(s, input, output);
     }
 
     @Override
-    public void instantiateTemplate(PatternCategoryActivation iAct, PatternActivation oAct) {
-        if(iAct == null || oAct == null)
-            return;
-
-        Link l = iAct.getInputLink(oAct.getNeuron());
-
-        if(l != null)
-            return;
-
-        PatternCategorySynapse s = new PatternCategorySynapse();
-        s.initFromTemplate(oAct.getNeuron(), iAct.getNeuron(), synapse);
-
-        s.createLinkFromTemplate(oAct, iAct, this);
+    protected CategorySynapse createCategorySynapse() {
+        return new PatternCategorySynapse();
     }
 
     @Override
@@ -56,17 +43,6 @@ public class PatternCategoryInputLink extends AbstractPatternLink<PatternCategor
         initGradient();
 
         super.connectGradientFields();
-    }
-
-    @Override
-    public void addInputLinkingStep() {
-        super.addInputLinkingStep();
-
-        input.getInputLinks()
-                .map(l -> (ConjunctiveActivation)l.getInput())
-                .forEach(act ->
-                        output.linkTemplateAndInstance(act)
-                );
     }
 
     @Override

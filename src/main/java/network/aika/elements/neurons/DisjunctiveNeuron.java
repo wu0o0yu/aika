@@ -26,14 +26,14 @@ import network.aika.elements.synapses.DisjunctiveSynapse;
  *
  * @author Lukas Molzberger
  */
-public abstract class DisjunctiveNeuron<S extends DisjunctiveSynapse, A extends Activation> extends Neuron<S, A> {
+public abstract class DisjunctiveNeuron<A extends Activation> extends Neuron<A> {
 
     public DisjunctiveNeuron() {
         super();
     }
 
     @Override
-    public void addInactiveLinks(Activation bs) {
+    public void addInactiveLinks(Activation act) {
     }
 
     public ActivationFunction getActivationFunction() {

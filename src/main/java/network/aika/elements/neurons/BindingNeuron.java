@@ -31,11 +31,11 @@ import java.util.stream.Collectors;
 /**
  * @author Lukas Molzberger
  */
-public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, BindingActivation> {
+public class BindingNeuron extends ConjunctiveNeuron<BindingActivation> {
 
 
     @Override
-    public CategorySynapse newCategorySynapse() {
+    public CategorySynapse createCategorySynapse() {
         return new BindingCategorySynapse();
     }
 
@@ -62,7 +62,7 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingNeuronSynapse, Bindi
     }
 
     public double getPreNetUBDummyWeightSum() {
-        return getInputSynapsesAsStream()
+        return getInputSynapsesByType(BindingNeuronSynapse.class)
                 .mapToDouble(s -> s.getPreNetDummyWeight())
                 .sum();
     }

@@ -17,15 +17,15 @@
 package network.aika.elements.links;
 
 import network.aika.elements.activations.BindingActivation;
-import network.aika.elements.activations.BindingCategoryActivation;
+import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.synapses.BindingCategorySynapse;
 
 /**
  * @author Lukas Molzberger
  */
-public class BindingCategoryLink extends CategoryLink<BindingCategorySynapse, BindingActivation, BindingCategoryActivation> {
+public class BindingCategoryLink extends CategoryLink<BindingCategorySynapse, BindingActivation> {
 
-    public BindingCategoryLink(BindingCategorySynapse s, BindingActivation input, BindingCategoryActivation output) {
+    public BindingCategoryLink(BindingCategorySynapse s, BindingActivation input, CategoryActivation output) {
         super(s, input, output);
     }
 }

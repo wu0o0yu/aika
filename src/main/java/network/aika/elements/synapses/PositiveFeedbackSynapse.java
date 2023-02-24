@@ -47,7 +47,6 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
         return new PositiveFeedbackLink(this, input, output);
     }
 
-    @Override
     public void initDummyLink(BindingActivation oAct) {
         if(oAct.getPosFeedbackDummy() != null)
             return;

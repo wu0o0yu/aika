@@ -23,7 +23,7 @@ import network.aika.elements.synapses.PatternCategorySynapse;
 /**
  * @author Lukas Molzberger
  */
-public class PatternCategoryLink extends CategoryLink<PatternCategorySynapse, PatternActivation, CategoryActivation> {
+public class PatternCategoryLink extends CategoryLink<PatternCategorySynapse, PatternActivation> {
 
     public PatternCategoryLink(PatternCategorySynapse s, PatternActivation input, CategoryActivation output) {
         super(s, input, output);

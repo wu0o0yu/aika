@@ -46,7 +46,7 @@ import static network.aika.utils.Utils.TOLERANCE;
  *
  * @author Lukas Molzberger
  */
-public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends Neuron, O extends ConjunctiveNeuron<?, OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends ConjunctiveActivation> extends
+public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends Neuron, O extends ConjunctiveNeuron<OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends ConjunctiveActivation> extends
         Synapse<
                 S,
                 I,
@@ -121,7 +121,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
 
     @Override
     protected void warmUpRelatedInputNeurons(IA bs) {
-        Stream<S> iSyns = output.getNeuron().getInputSynapsesAsStream();
+        Stream<ConjunctiveSynapse> iSyns = output.getNeuron().getInputSynapsesByType(ConjunctiveSynapse.class);
         iSyns.filter(s -> s.getStoredAt() == OUTPUT)
                 .forEach(s ->
                         s.warmUpInputNeuron(bs.getThought())

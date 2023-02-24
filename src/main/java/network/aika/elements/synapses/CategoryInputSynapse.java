@@ -1,14 +1,26 @@
 package network.aika.elements.synapses;
 
+import network.aika.elements.activations.Activation;
+import network.aika.elements.activations.CategoryActivation;
+import network.aika.elements.links.CategoryInputLink;
 import network.aika.elements.neurons.CategoryNeuron;
-import network.aika.elements.neurons.ConjunctiveNeuron;
 import network.aika.elements.neurons.Neuron;
 
-public interface CategoryInputSynapse<N extends CategoryNeuron, S extends ConjunctiveSynapse> {
+public abstract class CategoryInputSynapse extends DisjunctiveSynapse<
+        CategoryInputSynapse,
+        CategoryNeuron,
+        Neuron<Activation>,
+        CategoryInputLink,
+        CategoryActivation,
+        Activation
+        > {
 
-    S init(Neuron input, Neuron output);
+    public CategoryInputSynapse(Scope scope) {
+        super(scope);
+    }
 
-    N getInput();
-
-    ConjunctiveNeuron getOutput();
+    @Override
+    public boolean isTrainingAllowed() {
+        return false;
+    }
 }
