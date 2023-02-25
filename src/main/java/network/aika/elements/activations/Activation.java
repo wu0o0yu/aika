@@ -478,8 +478,10 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     public Stream<Activation> getTemplateInstancesStream() {
         return getInputLinksByType(CategoryInputLink.class)
                 .map(Link::getInput)
+                .filter(Objects::nonNull)
                 .flatMap(Activation::getInputLinks)
-                .map(Link::getInput);
+                .map(Link::getInput)
+                .filter(Objects::nonNull);
     }
 
     public Activation<N> getTemplate() {
@@ -514,7 +516,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
     public Activation getActiveTemplateInstance() {
         return getTemplateInstancesStream()
-//                .filter(act -> !act.initialized || isTrue(act.getIsFired()))
                 .findFirst()
                 .orElse(null);
     }
