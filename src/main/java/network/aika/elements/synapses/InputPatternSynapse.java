@@ -18,18 +18,20 @@ package network.aika.elements.synapses;
 
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.ConjunctiveActivation;
+import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.links.InputPatternLink;
 import network.aika.elements.neurons.ConjunctiveNeuron;
+import network.aika.elements.neurons.PatternNeuron;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class InputPatternSynapse<S extends InputPatternSynapse, I extends ConjunctiveNeuron, L extends InputPatternLink<S, IA>, IA extends ConjunctiveActivation<?>> extends BindingNeuronSynapse<
-        S,
-        I,
-        L,
-        IA
+public class InputPatternSynapse extends BindingNeuronSynapse<
+        InputPatternSynapse,
+        PatternNeuron,
+        InputPatternLink,
+        PatternActivation
         >
 {
     public InputPatternSynapse() {
@@ -37,7 +39,7 @@ public class InputPatternSynapse<S extends InputPatternSynapse, I extends Conjun
     }
 
     @Override
-    public InputPatternLink createLink(ConjunctiveActivation input, BindingActivation output) {
+    public InputPatternLink createLink(PatternActivation input, BindingActivation output) {
         return new InputPatternLink(this, input, output);
     }
 }

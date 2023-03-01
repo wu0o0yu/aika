@@ -22,7 +22,7 @@ import network.aika.elements.neurons.LatentRelationNeuron;
 import network.aika.elements.neurons.PatternNeuron;
 import network.aika.elements.neurons.TokenPositionRelationNeuron;
 import network.aika.elements.neurons.InhibitoryNeuron;
-import network.aika.elements.synapses.InputPatternFromPatternSynapse;
+import network.aika.elements.synapses.InputPatternSynapse;
 import network.aika.elements.synapses.RelationInputSynapse;
 import network.aika.elements.synapses.SamePatternSynapse;
 import network.aika.text.Document;
@@ -128,13 +128,13 @@ public class ABCDTest {
                 .init(a_abBN, b_abBN)
                 .adjustBias();
 
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(a_IN, a_abBN)
                 .adjustBias();
         setBias(a_abBN, 2.5);
 
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(b_IN, b_abBN)
                 .adjustBias();
@@ -155,7 +155,7 @@ public class ABCDTest {
                 .init(b_bcBN, c_bcBN)
                 .adjustBias();
 
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(b_IN, b_bcBN)
                 .adjustBias();
@@ -163,7 +163,7 @@ public class ABCDTest {
         setBias(b_abBN, 3.0);
         setBias(b_bcBN, 2.5);
 
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(c_IN, c_bcBN)
                 .adjustBias();
@@ -190,13 +190,13 @@ public class ABCDTest {
                 .init(bc_bcdBN, d_bcdBN)
                 .adjustBias();
 
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(bcPattern, bc_bcdBN)
                 .adjustBias();
         setBias(bc_bcdBN, 2.5);
 
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(d_IN, d_bcdBN)
                 .adjustBias();

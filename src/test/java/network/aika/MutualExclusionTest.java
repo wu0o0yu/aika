@@ -41,7 +41,7 @@ import network.aika.elements.neurons.PatternNeuron;
 import network.aika.elements.neurons.TokenNeuron;
 import network.aika.elements.neurons.InhibitoryNeuron;
 import network.aika.elements.synapses.InhibitorySynapse;
-import network.aika.elements.synapses.InputPatternFromPatternSynapse;
+import network.aika.elements.synapses.InputPatternSynapse;
 import network.aika.elements.synapses.NegativeFeedbackSynapse;
 import network.aika.text.Document;
 import org.graphstream.ui.view.camera.Camera;
@@ -100,7 +100,7 @@ public class MutualExclusionTest {
         BindingNeuron nc = new BindingNeuron().init(m, "C");
         InhibitoryNeuron inhib = new InhibitoryNeuron().init(m, "I");
 
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(in, na)
                 .adjustBias();
@@ -110,7 +110,7 @@ public class MutualExclusionTest {
 
         TestUtils.setBias(na, 1.0);
 
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(in, nb)
                 .adjustBias();
@@ -121,7 +121,7 @@ public class MutualExclusionTest {
 
         TestUtils.setBias(nb, 1.5);
 
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(in, nc)
                 .adjustBias();
@@ -176,7 +176,7 @@ public class MutualExclusionTest {
         BindingNeuron nb = new BindingNeuron().init(m, "B");
         InhibitoryNeuron inhib =new InhibitoryNeuron().init(m, "I");
 
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(in, na)
                 .adjustBias();
@@ -191,7 +191,7 @@ public class MutualExclusionTest {
         setBias(pa, 3.0);
 
 
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(in, nb)
                 .adjustBias();

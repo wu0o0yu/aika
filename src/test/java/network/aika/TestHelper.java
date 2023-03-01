@@ -21,7 +21,7 @@ import network.aika.elements.neurons.LatentRelationNeuron;
 import network.aika.elements.neurons.PatternNeuron;
 import network.aika.elements.neurons.TokenPositionRelationNeuron;
 import network.aika.elements.neurons.InhibitoryNeuron;
-import network.aika.elements.synapses.InputPatternFromPatternSynapse;
+import network.aika.elements.synapses.InputPatternSynapse;
 import network.aika.elements.synapses.RelationInputSynapse;
 import network.aika.elements.synapses.SamePatternSynapse;
 
@@ -43,13 +43,13 @@ public class TestHelper {
         LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, relFrom, relTo);
 
         BindingNeuron theBN = new BindingNeuron().init(m, "the (the cat)");
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(theIN, theBN)
                 .adjustBias();
 
         BindingNeuron catBN = new BindingNeuron().init(m, "cat (the cat)");
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(variant == 0  || variant == 2 ? 10.0 : 5.0)
                 .init(catIN, catBN)
                 .adjustBias();
@@ -92,13 +92,13 @@ public class TestHelper {
         LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, -1, -1);
 
         BindingNeuron blackBN = new BindingNeuron().init(m, "black (black cat)");
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(blackIN, blackBN)
                 .adjustBias();
 
         BindingNeuron catBN = new BindingNeuron().init(m, "cat (black cat)");
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(20.0)
                 .init(catIN, catBN)
                 .adjustBias();
@@ -130,13 +130,13 @@ public class TestHelper {
         LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, relFrom, relTo);
 
         BindingNeuron theBN = new BindingNeuron().init(m, "the (the dog)");
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(theIN, theBN)
                 .adjustBias();
 
         BindingNeuron dogBN = new BindingNeuron().init(m, "dog (the dog)");
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(variant == 0  || variant == 2 ? 10.0 : 5.0)
                 .init(dogIN, dogBN)
                 .adjustBias();
