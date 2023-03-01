@@ -203,14 +203,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         v.next(this);
     }
 
-    public void categoryVisitDown(DownVisitor v, Link lastLink) {
-        v.next(this);
-    }
-
-    public void categoryVisitUp(UpVisitor v, Link lastLink) {
-        v.next(this);
-    }
-
     public void selfRefVisitDown(DownVisitor v, Link lastLink) {
         v.next(this);
     }

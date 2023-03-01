@@ -46,8 +46,4 @@ public class SamePatternLink extends BindingNeuronLink<SamePatternSynapse, Bindi
     @Override
     public void inhibVisit(Visitor v) {
     }
-
-    @Override
-    public void categoryVisit(Visitor v) {
-    }
 }

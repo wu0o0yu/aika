@@ -70,10 +70,6 @@ public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activat
     public void inhibVisit(Visitor v) {
     }
 
-    @Override
-    public void categoryVisit(Visitor v) {
-    }
-
     private boolean checkVisited(Visitor v) {
         if(visited == v.getV())
             return true;

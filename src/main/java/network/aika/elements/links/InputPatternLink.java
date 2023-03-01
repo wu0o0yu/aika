@@ -51,10 +51,6 @@ public class InputPatternLink extends BindingNeuronLink<InputPatternSynapse, Pat
     }
 
     @Override
-    public void categoryVisit(Visitor v) {
-    }
-
-    @Override
     public void patternVisit(Visitor v) {
     }
 }
