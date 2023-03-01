@@ -59,12 +59,6 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
     }
 
     @Override
-    public void startVisitor(LinkingOperator c, Activation act) {
-        new InhibitoryDownVisitor(act.getThought(), c)
-                .start(act);
-    }
-
-    @Override
     public InhibitorySynapse instantiateTemplate(BindingNeuron input, InhibitoryNeuron output) {
         InhibitorySynapse s = new InhibitorySynapse(type);
         s.initFromTemplate(input, output, this);

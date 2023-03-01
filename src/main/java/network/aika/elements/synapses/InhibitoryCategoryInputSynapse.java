@@ -17,14 +17,9 @@
 package network.aika.elements.synapses;
 
 import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.activations.InhibitoryActivation;
-import network.aika.elements.links.BindingCategoryInputLink;
 import network.aika.elements.links.InhibitoryCategoryInputLink;
-import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.category.CategoryDownVisitor;
-import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
 
 /**
  * The Inhibitory Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
@@ -40,12 +35,6 @@ public class InhibitoryCategoryInputSynapse extends CategoryInputSynapse
     @Override
     public InhibitoryCategoryInputLink createLink(CategoryActivation input, Activation output) {
         return new InhibitoryCategoryInputLink(this, input, (InhibitoryActivation) output);
-    }
-
-    @Override
-    public void startVisitor(LinkingOperator c, Activation bs) {
-        new InhibitoryDownVisitor(bs.getThought(), c)
-                .start(bs);
     }
 
     @Override

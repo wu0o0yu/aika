@@ -45,20 +45,6 @@ public abstract class BindingNeuronSynapse<S extends BindingNeuronSynapse, I ext
         super(scope);
     }
 
-    @Override
-    public void startVisitor(LinkingOperator c, Activation act) {
-        Thought t = act.getThought();
-        RelationInputSynapse rel = getOutput().findLatentRelationNeurons()
-                .stream()
-                .findAny()
-                .orElse(null);
-
-        BindingDownVisitor v = rel != null ?
-                new RelationLinkingDownVisitor(t, c, rel, c.getRelationDir(scope)) :
-                new BindingDownVisitor(t, c);
-
-        v.start(act);
-    }
 
     @Override
     public double getPropagatePreNet(IA iAct) {

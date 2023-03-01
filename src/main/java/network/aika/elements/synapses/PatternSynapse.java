@@ -75,12 +75,6 @@ public class PatternSynapse extends ConjunctiveSynapse<
                 getSumOfLowerWeights();
     }
 
-    @Override
-    public void startVisitor(LinkingOperator c, Activation act) {
-        new PatternDownVisitor(act.getThought(), c)
-                .start(act);
-    }
-
     public SampleSpace getSampleSpace() {
         return sampleSpace;
     }

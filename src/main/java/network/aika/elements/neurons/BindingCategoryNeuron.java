@@ -14,31 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.elements.synapses;
+package network.aika.elements.neurons;
 
 import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.BindingActivation;
-import network.aika.elements.links.BindingCategoryInputLink;
-import network.aika.elements.activations.CategoryActivation;
+import network.aika.elements.synapses.Synapse;
+import network.aika.visitor.linking.LinkingOperator;
+import network.aika.visitor.linking.binding.BindingDownVisitor;
 
 /**
- * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
- *
  * @author Lukas Molzberger
  */
-public class BindingCategoryInputSynapse extends CategoryInputSynapse
-{
-    public BindingCategoryInputSynapse() {
-        super(Scope.INPUT);
-    }
+public class BindingCategoryNeuron extends CategoryNeuron {
 
     @Override
-    public BindingCategoryInputLink createLink(CategoryActivation input, Activation output) {
-        return new BindingCategoryInputLink(this, input, (BindingActivation) output);
-    }
-
-    @Override
-    public boolean isTrainingAllowed() {
-        return false;
+    public void startVisitor(LinkingOperator c, Activation act, Synapse syn) {
+        new BindingDownVisitor(act.getThought(), c)
+                .start(act);
     }
 }

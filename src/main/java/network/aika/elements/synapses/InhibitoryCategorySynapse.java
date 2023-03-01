@@ -16,13 +16,10 @@
  */
 package network.aika.elements.synapses;
 
-import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.activations.InhibitoryActivation;
 import network.aika.elements.links.InhibitoryCategoryLink;
 import network.aika.elements.neurons.Neuron;
-import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
 
 /**
  *
@@ -37,11 +34,5 @@ public class InhibitoryCategorySynapse extends CategorySynapse<InhibitoryCategor
     @Override
     public InhibitoryCategoryLink createLink(InhibitoryActivation input, CategoryActivation output) {
         return new InhibitoryCategoryLink(this, input, output);
-    }
-
-    @Override
-    public void startVisitor(LinkingOperator c, Activation bs) {
-        new InhibitoryDownVisitor(bs.getThought(), c)
-                .start(bs);
     }
 }

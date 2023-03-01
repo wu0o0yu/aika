@@ -17,8 +17,11 @@
 package network.aika.elements.neurons;
 
 import network.aika.Thought;
+import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.InhibitoryActivation;
 import network.aika.elements.synapses.*;
+import network.aika.visitor.linking.LinkingOperator;
+import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
 
 /**
  *
@@ -33,6 +36,13 @@ public class InhibitoryNeuron extends DisjunctiveNeuron<InhibitoryActivation> {
 
     public ActivationFunction getActivationFunction() {
         return ActivationFunction.LIMITED_RECTIFIED_LINEAR_UNIT;
+    }
+
+
+    @Override
+    public void startVisitor(LinkingOperator c, Activation act, Synapse syn) {
+        new InhibitoryDownVisitor(act.getThought(), c)
+                .start(act);
     }
 
     @Override

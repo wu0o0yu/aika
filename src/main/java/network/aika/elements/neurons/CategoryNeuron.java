@@ -17,16 +17,18 @@
 package network.aika.elements.neurons;
 
 import network.aika.Thought;
+import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.elements.synapses.CategorySynapse;
+import network.aika.visitor.linking.LinkingOperator;
 
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class CategoryNeuron extends DisjunctiveNeuron<CategoryActivation> {
+public abstract class CategoryNeuron extends DisjunctiveNeuron<CategoryActivation> {
 
     public CategoryNeuron() {
     }

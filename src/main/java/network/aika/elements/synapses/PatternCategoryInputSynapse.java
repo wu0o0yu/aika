@@ -20,8 +20,6 @@ import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.links.CategoryInputLink;
 import network.aika.elements.links.PatternCategoryInputLink;
-import network.aika.visitor.linking.LinkingOperator;
-import network.aika.visitor.linking.category.CategoryDownVisitor;
 
 /**
  * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
@@ -44,12 +42,6 @@ public class PatternCategoryInputSynapse extends CategoryInputSynapse {
     @Override
     public CategoryInputLink createLink(CategoryActivation input, Activation output) {
         return new PatternCategoryInputLink(this, input, output);
-    }
-
-    @Override
-    public void startVisitor(LinkingOperator c, Activation act) {
-        new CategoryDownVisitor(act.getThought(), c)
-                .start(act);
     }
 
     @Override
