@@ -508,6 +508,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
     public Activation getActiveTemplateInstance() {
         return getTemplateInstancesStream()
+                .filter(act -> isTrue(act.isFired))
                 .findFirst()
                 .orElse(null);
     }
