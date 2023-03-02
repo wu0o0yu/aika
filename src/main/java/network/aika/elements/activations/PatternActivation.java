@@ -103,9 +103,4 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
         v.up(this);
     }
-
-    @Override
-    public void categoryVisitUp(UpVisitor v, Link lastLink) {
-        v.check(lastLink, this);
-    }
 }

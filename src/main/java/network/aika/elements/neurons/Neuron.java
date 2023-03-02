@@ -31,6 +31,7 @@ import network.aika.visitor.ActLinkingOperator;
 import network.aika.visitor.LinkLinkingOperator;
 import network.aika.steps.activation.Save;
 import network.aika.utils.Writable;
+import network.aika.visitor.linking.LinkingOperator;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -146,10 +147,14 @@ public abstract class Neuron<A extends Activation> extends FieldObject implement
         }
     }
 
+    public abstract void startVisitor(LinkingOperator c, Activation act, Synapse syn);
+
+
     public void linkOutgoing(Synapse synA, Activation iAct) {
-        synA.startVisitor(
+        synA.getOutput().startVisitor(
                 new LinkLinkingOperator(iAct, synA),
-                iAct
+                iAct,
+                synA
         );
     }
 
@@ -159,9 +164,10 @@ public abstract class Neuron<A extends Activation> extends FieldObject implement
                 .filter(synB -> !synB.isFeedbackSynapse())
                 .filter(synB -> getLatentLinkingPreNet(synA, synB) > 0.0)
                 .forEach(synB ->
-                        synB.startVisitor(
+                        synB.getOutput().startVisitor(
                                 new ActLinkingOperator(iActA, synA, null, synB),
-                                iActA
+                                iActA,
+                                synB
                         )
                 );
     }
@@ -170,9 +176,10 @@ public abstract class Neuron<A extends Activation> extends FieldObject implement
         getInputSynapsesAsStream()
                 .filter(synB -> synB != l.getSynapse())
                 .forEach(synB ->
-                        synB.startVisitor(
+                        startVisitor(
                                 new ActLinkingOperator(l.getInput(), l.getSynapse(), l, synB),
-                                l.getInput()
+                                l.getInput(),
+                                synB
                         )
                 );
     }

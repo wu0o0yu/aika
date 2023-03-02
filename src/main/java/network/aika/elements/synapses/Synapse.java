@@ -169,8 +169,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
                         .isPresent();
     }
 
-    public abstract void startVisitor(LinkingOperator c, Activation bs);
-
     public void linkAndPropagateOut(IA act) {
         getOutput()
                 .linkOutgoing(this, act);

@@ -40,12 +40,6 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
     }
 
     @Override
-    public void startVisitor(LinkingOperator c, Activation act) {
-        new BindingDownVisitor(act.getThought(), c)
-                .start(act);
-    }
-
-    @Override
     public NegativeFeedbackLink createLink(InhibitoryActivation input, BindingActivation output) {
         return new NegativeFeedbackLink(this, input, output);
     }

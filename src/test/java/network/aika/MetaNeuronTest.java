@@ -2,14 +2,8 @@ package network.aika;
 
 import network.aika.debugger.AIKADebugger;
 import network.aika.elements.activations.TokenActivation;
-import network.aika.elements.neurons.BindingNeuron;
-import network.aika.elements.neurons.LatentRelationNeuron;
-import network.aika.elements.neurons.PatternNeuron;
-import network.aika.elements.neurons.CategoryNeuron;
-import network.aika.elements.neurons.InhibitoryNeuron;
+import network.aika.elements.neurons.*;
 import network.aika.elements.synapses.*;
-import network.aika.elements.neurons.TokenNeuron;
-import network.aika.elements.neurons.TokenPositionRelationNeuron;
 import network.aika.text.Document;
 import org.graphstream.ui.view.camera.Camera;
 import org.junit.jupiter.api.Test;
@@ -92,7 +86,7 @@ public class MetaNeuronTest {
             InhibitoryNeuron inhib,
             PatternNeuron syllablePN
     ) {
-        CategoryNeuron sylBeginCategory = new CategoryNeuron()
+        CategoryNeuron sylBeginCategory = new BindingCategoryNeuron()
                 .init(m, "Syl. Cat. Pos-0");
 
         BindingNeuron sylBeginBN = new BindingNeuron()
@@ -117,7 +111,7 @@ public class MetaNeuronTest {
                 .init(syllablePN, sylBeginBN)
                 .adjustBias();
 
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(letterPN, sylBeginBN)
                 .adjustBias();
@@ -142,7 +136,7 @@ public class MetaNeuronTest {
             PatternNeuron syllablePN
     ) {
 
-        CategoryNeuron sylContinueRightCategory = new CategoryNeuron()
+        CategoryNeuron sylContinueRightCategory = new BindingCategoryNeuron()
                 .init(m, "Syl. Cat. Pos-R" + pos);
 
         BindingNeuron sylContinueRightBN = new BindingNeuron()
@@ -177,7 +171,7 @@ public class MetaNeuronTest {
                 .init(syllablePN, sylContinueRightBN);
 
 
-        new InputPatternFromPatternSynapse()
+        new InputPatternSynapse()
                 .setWeight(10.0)
                 .init(letterPN, sylContinueRightBN)
                 .adjustBias();
@@ -197,7 +191,7 @@ public class MetaNeuronTest {
         LatentRelationNeuron relPT = TokenPositionRelationNeuron.lookupRelation(m, -1, -1);
 
         // Abstract
-        CategoryNeuron letterCategory = new CategoryNeuron()
+        CategoryNeuron letterCategory = new BindingCategoryNeuron()
                 .init(m, "PC-letter");
 
         TokenNeuron letterPN = new TokenNeuron()
@@ -214,7 +208,7 @@ public class MetaNeuronTest {
                 .setWeight(1.0)
                 .init(letterCategory, letterPN);
 
-        CategoryNeuron syllableCategory = new CategoryNeuron()
+        CategoryNeuron syllableCategory = new BindingCategoryNeuron()
                 .init(m, "Syllable Category");
 
         BindingNeuron sylBeginBN = createInitialSyllableBindingNeuron(

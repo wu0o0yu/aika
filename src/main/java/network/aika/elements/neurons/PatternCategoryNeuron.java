@@ -14,27 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.elements.synapses;
+package network.aika.elements.neurons;
 
-import network.aika.elements.activations.BindingActivation;
-import network.aika.elements.links.InputPatternFromPatternLink;
-import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.neurons.PatternNeuron;
+import network.aika.elements.activations.Activation;
+import network.aika.elements.synapses.Synapse;
+import network.aika.visitor.linking.LinkingOperator;
+import network.aika.visitor.linking.pattern.PatternDownVisitor;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class InputPatternFromPatternSynapse extends InputPatternSynapse<
-        InputPatternFromPatternSynapse,
-        PatternNeuron,
-        InputPatternFromPatternLink,
-        PatternActivation
-        >
-{
+public class PatternCategoryNeuron extends CategoryNeuron {
 
     @Override
-    public InputPatternFromPatternLink createLink(PatternActivation input, BindingActivation output) {
-        return new InputPatternFromPatternLink(this, input, output);
+    public void startVisitor(LinkingOperator c, Activation act, Synapse syn) {
+        new PatternDownVisitor(act.getThought(), c)
+                .start(act);
     }
 }

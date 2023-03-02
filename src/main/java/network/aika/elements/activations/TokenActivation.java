@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 
-
 /**
  *
  * @author Lukas Molzberger
@@ -39,7 +38,6 @@ public class TokenActivation extends PatternActivation {
     private Map<LatentRelationNeuron, LatentRelationActivation> toRelations = new TreeMap<>(
             Comparator.comparingLong(n -> n.getId())
     );
-
 
     public TokenActivation(int id, Thought t, TokenNeuron tokenNeuron) {
         super(id, t, tokenNeuron);

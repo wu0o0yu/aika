@@ -14,36 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.elements.links;
+package network.aika.elements.neurons;
 
-import network.aika.elements.activations.BindingActivation;
-import network.aika.elements.synapses.SamePatternSynapse;
-import network.aika.visitor.Visitor;
+import network.aika.elements.activations.Activation;
+import network.aika.elements.synapses.Synapse;
+import network.aika.visitor.linking.LinkingOperator;
+import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class SamePatternLink extends BindingNeuronLink<SamePatternSynapse, BindingActivation> {
-
-    public SamePatternLink(SamePatternSynapse s, BindingActivation input, BindingActivation output) {
-        super(s, input, output);
-    }
+public class InhibitoryCategoryNeuron extends CategoryNeuron {
 
     @Override
-    public void propagateRangeOrTokenPos() {
-    }
-
-    @Override
-    public void bindingVisit(Visitor v) {
-    }
-
-    @Override
-    public void patternVisit(Visitor v) {
-        if(v.isDown())
-            v.next(this);
-    }
-
-    @Override
-    public void inhibVisit(Visitor v) {
+    public void startVisitor(LinkingOperator c, Activation act, Synapse syn) {
+        new InhibitoryDownVisitor(act.getThought(), c)
+                .start(act);
     }
 }

@@ -18,11 +18,14 @@ package network.aika.elements.neurons;
 
 import network.aika.Model;
 import network.aika.Thought;
+import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.synapses.*;
 import network.aika.sign.Sign;
 import network.aika.utils.Bound;
 import network.aika.utils.Utils;
+import network.aika.visitor.linking.LinkingOperator;
+import network.aika.visitor.linking.pattern.PatternDownVisitor;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -52,6 +55,12 @@ public class PatternNeuron extends ConjunctiveNeuron<PatternActivation> {
     @Override
     public PatternActivation createActivation(Thought t) {
         return new PatternActivation(t.createActivationId(), t, this);
+    }
+
+    @Override
+    public void startVisitor(LinkingOperator c, Activation act, Synapse syn) {
+        new PatternDownVisitor(act.getThought(), c)
+                .start(act);
     }
 
     @Override

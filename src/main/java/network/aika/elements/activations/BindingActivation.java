@@ -52,14 +52,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     @Override
-    public void categoryVisitDown(DownVisitor v, Link lastLink) {
-        if(getNeuron().isAbstract())
-            super.patternVisitDown(v, lastLink);
-        else
-            v.up(this);
-    }
-
-    @Override
     public void selfRefVisitDown(DownVisitor v, Link lastLink) {
         v.up(this);
     }

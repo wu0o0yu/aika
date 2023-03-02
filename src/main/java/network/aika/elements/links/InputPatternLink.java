@@ -18,16 +18,36 @@ package network.aika.elements.links;
 
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.ConjunctiveActivation;
+import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.synapses.InputPatternSynapse;
+import network.aika.fields.AbstractFunction;
+import network.aika.fields.Fields;
 import network.aika.visitor.Visitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class InputPatternLink<S extends InputPatternSynapse, I extends ConjunctiveActivation<?>> extends BindingNeuronLink<S, I> {
+public class InputPatternLink extends BindingNeuronLink<InputPatternSynapse, PatternActivation> {
 
-    public InputPatternLink(S s, I input, BindingActivation output) {
+    private AbstractFunction inputEntropy;
+
+    public InputPatternLink(InputPatternSynapse s, PatternActivation input, BindingActivation output) {
         super(s, input, output);
+    }
+
+
+    public AbstractFunction getInputEntropy() {
+        return inputEntropy;
+    }
+
+    @Override
+    public void connectGradientFields() {
+        inputEntropy = Fields.scale(this, "-Entropy", -1,
+                input.getEntropy(),
+                output.getGradient()
+        );
+
+        super.connectGradientFields();
     }
 
     @Override

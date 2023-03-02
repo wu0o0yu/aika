@@ -35,8 +35,4 @@ public class ReversePatternLink<IA extends Activation<?>> extends BindingNeuronL
     @Override
     public void patternVisit(Visitor v) {
     }
-
-    @Override
-    public void categoryVisit(Visitor v) {
-    }
 }

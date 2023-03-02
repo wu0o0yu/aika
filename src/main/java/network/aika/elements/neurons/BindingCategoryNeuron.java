@@ -14,35 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.visitor.linking.category;
+package network.aika.elements.neurons;
 
-import network.aika.Thought;
 import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.BindingActivation;
-import network.aika.elements.links.Link;
-import network.aika.visitor.linking.LinkingDownVisitor;
+import network.aika.elements.synapses.Synapse;
 import network.aika.visitor.linking.LinkingOperator;
+import network.aika.visitor.linking.binding.BindingDownVisitor;
 
 /**
  * @author Lukas Molzberger
  */
-public class CategoryDownVisitor extends LinkingDownVisitor<BindingActivation> {
-
-    public CategoryDownVisitor(Thought t, LinkingOperator operator) {
-        super(t, operator);
-    }
+public class BindingCategoryNeuron extends CategoryNeuron {
 
     @Override
-    public void up(BindingActivation origin) {
-        new CategoryUpVisitor(this, origin)
-                .visitUp(origin, null);
-    }
-
-    protected void visitDown(Link l) {
-        l.categoryVisit(this);
-    }
-
-    protected void visitDown(Activation act, Link l) {
-        act.categoryVisitDown(this, l);
+    public void startVisitor(LinkingOperator c, Activation act, Synapse syn) {
+        new BindingDownVisitor(act.getThought(), c)
+                .start(act);
     }
 }
