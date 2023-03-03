@@ -498,6 +498,9 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         }
 
         catLink.instantiateTemplate(catLink.getInput(), instanceAct);
+
+        instanceAct.tokenPos = tokenPos;
+        instanceAct.range = range;
     }
 
     public CategoryInputLink getCategoryInputLink() {
