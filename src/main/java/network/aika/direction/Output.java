@@ -16,6 +16,8 @@
  */
 package network.aika.direction;
 
+import network.aika.elements.activations.Activation;
+import network.aika.elements.links.Link;
 import network.aika.elements.neurons.Neuron;
 import network.aika.elements.synapses.Synapse;
 
@@ -43,6 +45,11 @@ public class Output implements Direction {
     @Override
     public Neuron getNeuron(Synapse s) {
         return s.getOutput();
+    }
+
+    @Override
+    public Activation getActivation(Link l) {
+        return l.getOutput();
     }
 
     public String toString() {

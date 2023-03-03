@@ -16,6 +16,8 @@
  */
 package network.aika.direction;
 
+import network.aika.elements.activations.Activation;
+import network.aika.elements.links.Link;
 import network.aika.elements.neurons.Neuron;
 import network.aika.elements.synapses.Synapse;
 
@@ -34,4 +36,6 @@ public interface Direction {
     <O> O getOutput(O from, O to);
 
     Neuron getNeuron(Synapse s);
+
+    Activation getActivation(Link l);
 }
