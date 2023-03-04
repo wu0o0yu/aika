@@ -218,13 +218,13 @@ public class TheCatTest {
 
         Map<Integer, double[]> actCoords = getActCoordinateMap(variant);
         Map<Long, double[]> neuronCoords = getNeuronCoordinateMap(variant);
-        debugger.getActivationViewManager().setCoordinateListener(act -> actCoords.get(act.getId()));
+//        debugger.getActivationViewManager().setCoordinateListener(act -> actCoords.get(act.getId()));
 
         Camera camera = debugger.getActivationViewManager().getCamera();
         camera.setViewPercent(1.85);
         camera.setViewCenter(0.385, 0.461, 0);
 
-        debugger.getNeuronViewManager().setCoordinateListener(n -> neuronCoords.get(n.getId()));
+//        debugger.getNeuronViewManager().setCoordinateListener(n -> neuronCoords.get(n.getId()));
         camera = debugger.getNeuronViewManager().getCamera();
         camera.setViewPercent(1.5);
         camera.setViewCenter(1.528, 0.828, 0);

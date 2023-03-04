@@ -131,13 +131,13 @@ public class TheDogAndCatTest {
 
         Map<Integer, double[]> actCoords = getActCoordinateMap();
         Map<Long, double[]> neuronCoords = getNeuronCoordinateMap();
-        debugger.getActivationViewManager().setCoordinateListener(act -> actCoords.get(act.getId()));
+//        debugger.getActivationViewManager().setCoordinateListener(act -> actCoords.get(act.getId()));
 
         Camera camera = debugger.getActivationViewManager().getCamera();
         camera.setViewPercent(1.8);
         camera.setViewCenter(0.385, 0.461, 0);
 
-        debugger.getNeuronViewManager().setCoordinateListener(n -> neuronCoords.get(n.getId()));
+//        debugger.getNeuronViewManager().setCoordinateListener(n -> neuronCoords.get(n.getId()));
         camera = debugger.getNeuronViewManager().getCamera();
         camera.setViewPercent(1.35);
         camera.setViewCenter(2.595, 0.808, 0);

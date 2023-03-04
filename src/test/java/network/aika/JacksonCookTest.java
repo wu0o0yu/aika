@@ -260,13 +260,13 @@ public class JacksonCookTest {
 
         Map<Integer, double[]> actCoords = getActCoordinateMap();
         Map<Long, double[]> neuronCoords = getNeuronCoordinateMap();
-        debugger.getActivationViewManager().setCoordinateListener(act -> actCoords.get(act.getId()));
+//        debugger.getActivationViewManager().setCoordinateListener(act -> actCoords.get(act.getId()));
 
         Camera camera = debugger.getActivationViewManager().getCamera();
         camera.setViewPercent(4.7);
         camera.setViewCenter(1.293, 1.279, 0);
 
-        debugger.getNeuronViewManager().setCoordinateListener(n -> neuronCoords.get(n.getId()));
+//        debugger.getNeuronViewManager().setCoordinateListener(n -> neuronCoords.get(n.getId()));
         camera = debugger.getNeuronViewManager().getCamera();
         camera.setViewPercent(1.5);
         camera.setViewCenter(1.702, 2.272, 0);

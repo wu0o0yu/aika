@@ -22,14 +22,12 @@ import network.aika.Thought;
 import network.aika.elements.Element;
 import network.aika.elements.links.CategoryInputLink;
 import network.aika.elements.links.CategoryLink;
-import network.aika.elements.links.ConjunctiveLink;
 import network.aika.elements.links.Link;
 import network.aika.elements.neurons.ActivationFunction;
 import network.aika.elements.neurons.Neuron;
 import network.aika.elements.neurons.NeuronProvider;
 import network.aika.elements.neurons.Range;
 import network.aika.elements.synapses.CategoryInputSynapse;
-import network.aika.elements.synapses.ConjunctiveSynapse;
 import network.aika.fields.*;
 import network.aika.elements.synapses.Synapse;
 import network.aika.steps.activation.InstantiationEdges;
@@ -46,8 +44,6 @@ import java.util.stream.Stream;
 import static java.lang.Integer.MAX_VALUE;
 import static network.aika.callbacks.EventType.CREATE;
 import static network.aika.callbacks.EventType.UPDATE;
-import static network.aika.direction.Direction.INPUT;
-import static network.aika.direction.Direction.OUTPUT;
 import static network.aika.elements.neurons.Range.joinTokenPosition;
 import static network.aika.elements.neurons.Range.tokenPositionEquals;
 import static network.aika.fields.FieldLink.linkAndConnect;
@@ -486,6 +482,9 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     }
 
     public void linkTemplateAndInstance(Activation instanceAct) {
+        instanceAct.tokenPos = tokenPos;
+        instanceAct.range = range;
+
         CategoryInputLink catLink = getCategoryInputLink();
 
         if(catLink == null) {
@@ -498,9 +497,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         }
 
         catLink.instantiateTemplate(catLink.getInput(), instanceAct);
-
-        instanceAct.tokenPos = tokenPos;
-        instanceAct.range = range;
     }
 
     public CategoryInputLink getCategoryInputLink() {
@@ -509,16 +505,16 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 .orElse(null);
     }
 
-    public Activation getActiveTemplateInstance() {
+    public Activation getTemplateInstance(boolean checkIsFired) {
         return getTemplateInstancesStream()
-                .filter(act -> isTrue(act.isFired))
+                .filter(act -> !checkIsFired || isTrue(act.isFired))
                 .findFirst()
                 .orElse(null);
     }
 
     public Activation<N> resolveAbstractInputActivation() {
         return neuron.isAbstract() ?
-                getActiveTemplateInstance() :
+                getTemplateInstance(false) :
                 this;
     }
 

@@ -217,13 +217,13 @@ public class ABCDTest {
         AIKADebugger debugger = AIKADebugger.createAndShowGUI(doc);
         Map<Integer, double[]> actCoords = getActCoordinateMap();
         Map<Long, double[]> neuronCoords = getNeuronCoordinateMap();
-        debugger.getActivationViewManager().setCoordinateListener(act -> actCoords.get(act.getId()));
+//        debugger.getActivationViewManager().setCoordinateListener(act -> actCoords.get(act.getId()));
 
         Camera camera = debugger.getActivationViewManager().getCamera();
         camera.setViewPercent(2.95);
         camera.setViewCenter(0.451, 0.579, 0);
 
-        debugger.getNeuronViewManager().setCoordinateListener(n -> neuronCoords.get(n.getId()));
+//        debugger.getNeuronViewManager().setCoordinateListener(n -> neuronCoords.get(n.getId()));
         camera = debugger.getNeuronViewManager().getCamera();
         camera.setViewPercent(1.2);
         camera.setViewCenter(1.978, 0.47, 0);

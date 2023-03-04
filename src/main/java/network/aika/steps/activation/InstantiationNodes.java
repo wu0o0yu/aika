@@ -17,7 +17,6 @@
 package network.aika.steps.activation;
 
 import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
@@ -36,7 +35,7 @@ public class InstantiationNodes extends Step<Activation> {
 
         act.instantiationNodesIsQueued = true;
 
-        if(act.getActiveTemplateInstance() != null)
+        if(act.getTemplateInstance(true) != null)
             return;
 
         Step.add(new InstantiationNodes(act));

@@ -116,13 +116,13 @@ public class TheBlackCatTest {
 
         Map<Integer, double[]> actCoords = getActCoordinateMap();
         Map<Long, double[]> neuronCoords = getNeuronCoordinateMap();
-        debugger.getActivationViewManager().setCoordinateListener(act -> actCoords.get(act.getId()));
+//        debugger.getActivationViewManager().setCoordinateListener(act -> actCoords.get(act.getId()));
 
         Camera camera = debugger.getActivationViewManager().getCamera();
         camera.setViewPercent(1.65);
         camera.setViewCenter(0.385, 0.461, 0);
 
-        debugger.getNeuronViewManager().setCoordinateListener(n -> neuronCoords.get(n.getId()));
+//        debugger.getNeuronViewManager().setCoordinateListener(n -> neuronCoords.get(n.getId()));
         camera = debugger.getNeuronViewManager().getCamera();
         camera.setViewPercent(1.3);
         camera.setViewCenter(1.921, 1.449, 0);

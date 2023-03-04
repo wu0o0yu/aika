@@ -226,13 +226,13 @@ public class MutualExclusionTest {
 
         Map<Integer, double[]> actCoords = getActCoordinateMap();
         Map<Long, double[]> neuronCoords = getNeuronCoordinateMap();
-        debugger.getActivationViewManager().setCoordinateListener(act -> actCoords.get(act.getId()));
+//        debugger.getActivationViewManager().setCoordinateListener(act -> actCoords.get(act.getId()));
 
         Camera camera = debugger.getActivationViewManager().getCamera();
         camera.setViewPercent(1.0);
         camera.setViewCenter(0.2, 0.2, 0);
 
-        debugger.getNeuronViewManager().setCoordinateListener(n -> neuronCoords.get(n.getId()));
+//        debugger.getNeuronViewManager().setCoordinateListener(n -> neuronCoords.get(n.getId()));
         camera = debugger.getNeuronViewManager().getCamera();
         camera.setViewPercent(1.75);
         camera.setViewCenter(0.64, 0.375, 0);
