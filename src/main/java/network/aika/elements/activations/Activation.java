@@ -483,28 +483,22 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     }
 
 
-    public Optional<CategoryInputLink> getCategoryInputLink() {
+    public CategoryInputLink getCategoryInputLink() {
         return getInputLinksByType(CategoryInputLink.class)
-                .findFirst();
-    }
-
-    public Activation getActiveTemplateInstance() {
-        return getTemplateInstancesStream()
-                .filter(act -> isTrue(act.isFired))
                 .findFirst()
                 .orElse(null);
     }
 
-    public Activation getNewTemplateInstance() {
+    public Activation getActiveTemplateInstance() {
         return getTemplateInstancesStream()
-                .filter(act -> act.isNewInstance)
+                .filter(act -> act.isNewInstance || isTrue(act.isFired))
                 .findFirst()
                 .orElse(null);
     }
 
     public Activation<N> resolveAbstractInputActivation() {
         return neuron.isAbstract() ?
-                getNewTemplateInstance() :
+                getActiveTemplateInstance() :
                 this;
     }
 
@@ -528,8 +522,9 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     }
 
     private void linkTemplateAndInstance(Activation<N> ti) {
-        CategoryInputLink cl = getCategoryInputLink()
-                .orElse(createCategoryInputLink());
+        CategoryInputLink cl = getCategoryInputLink();
+        if(cl == null)
+            cl = createCategoryInputLink();
 
         cl.instantiateTemplate(cl.getInput(), ti);
     }
