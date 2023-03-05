@@ -25,6 +25,8 @@ import network.aika.visitor.DownVisitor;
 import network.aika.sign.Sign;
 import network.aika.visitor.UpVisitor;
 
+import java.util.Optional;
+
 import static network.aika.fields.Fields.*;
 import static network.aika.utils.Utils.TOLERANCE;
 
@@ -78,10 +80,6 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     public FieldOutput getEntropy() {
         return entropy;
-    }
-
-    public PatternCategoryInputLink getCategoryInputLink() {
-        return getInputLinkByType(PatternCategoryInputLink.class);
     }
 
     @Override

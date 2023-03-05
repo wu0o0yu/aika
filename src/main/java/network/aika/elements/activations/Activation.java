@@ -87,6 +87,8 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     public boolean instantiationNodesIsQueued;
     public boolean instantiationEdgesIsQueued;
 
+    private boolean isNewInstance;
+
     protected Range range;
     protected Integer tokenPos;
 
@@ -354,10 +356,9 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         return inputLinks.get(s.getPInput());
     }
 
-    public <IL extends Link> IL getInputLinkByType(Class<IL> linkType) {
+    public <IL extends Link> Optional<IL> getInputLinkByType(Class<IL> linkType) {
         return getInputLinksByType(linkType)
-                .findAny()
-                .orElse(null);
+                .findAny();
     }
 
     public <IL extends Link> Stream<IL> getInputLinksByType(Class<IL> linkType) {
@@ -481,40 +482,29 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 .orElse(null);
     }
 
-    public void linkTemplateAndInstance(Activation instanceAct) {
-        instanceAct.tokenPos = tokenPos;
-        instanceAct.range = range;
 
-        CategoryInputLink catLink = getCategoryInputLink();
-
-        if(catLink == null) {
-            CategoryInputSynapse catSyn = getNeuron().getCategoryInputSynapse();
-            if(catSyn == null)
-                return;
-
-            CategoryActivation catAct = catSyn.getInput().createActivation(thought);
-            catLink = catSyn.createAndInitLink(catAct, this);
-        }
-
-        catLink.instantiateTemplate(catLink.getInput(), instanceAct);
+    public Optional<CategoryInputLink> getCategoryInputLink() {
+        return getInputLinksByType(CategoryInputLink.class)
+                .findFirst();
     }
 
-    public CategoryInputLink getCategoryInputLink() {
-        return getInputLinksByType(CategoryInputLink.class)
+    public Activation getActiveTemplateInstance() {
+        return getTemplateInstancesStream()
+                .filter(act -> isTrue(act.isFired))
                 .findFirst()
                 .orElse(null);
     }
 
-    public Activation getTemplateInstance(boolean checkIsFired) {
+    public Activation getNewTemplateInstance() {
         return getTemplateInstancesStream()
-                .filter(act -> !checkIsFired || isTrue(act.isFired))
+                .filter(act -> act.isNewInstance)
                 .findFirst()
                 .orElse(null);
     }
 
     public Activation<N> resolveAbstractInputActivation() {
         return neuron.isAbstract() ?
-                getTemplateInstance(false) :
+                getNewTemplateInstance() :
                 this;
     }
 
@@ -522,6 +512,11 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         N n = (N) neuron.instantiateTemplate();
 
         Activation<N> ti = n.createActivation(getThought());
+
+        ti.tokenPos = tokenPos;
+        ti.range = range;
+        ti.isNewInstance = true;
+
         linkTemplateAndInstance(ti);
 
         instantiateBias(ti);
@@ -530,6 +525,22 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
         if(thought.getInstantiationCallback() != null)
             thought.getInstantiationCallback().onInstantiation(ti);
+    }
+
+    private void linkTemplateAndInstance(Activation<N> ti) {
+        CategoryInputLink cl = getCategoryInputLink()
+                .orElse(createCategoryInputLink());
+
+        cl.instantiateTemplate(cl.getInput(), ti);
+    }
+
+    private CategoryInputLink createCategoryInputLink() {
+        CategoryInputSynapse catSyn = getNeuron().getCategoryInputSynapse();
+        if(catSyn == null)
+            return null;
+
+        CategoryActivation catAct = catSyn.getInput().createActivation(thought);
+        return catSyn.createAndInitLink(catAct, this);
     }
 
     protected void instantiateBias(Activation<N> ti) {

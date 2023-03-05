@@ -35,7 +35,7 @@ public class InstantiationNodes extends Step<Activation> {
 
         act.instantiationNodesIsQueued = true;
 
-        if(act.getTemplateInstance(true) != null)
+        if(act.getActiveTemplateInstance() != null)
             return;
 
         Step.add(new InstantiationNodes(act));
