@@ -87,7 +87,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     public boolean instantiationNodesIsQueued;
     public boolean instantiationEdgesIsQueued;
 
-    private boolean isNewInstance;
+    protected boolean isNewInstance;
 
     protected Range range;
     protected Integer tokenPos;
@@ -464,24 +464,18 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 .stream();
     }
 
-    public Stream<Activation> getTemplateInstancesStream() {
-        return getInputLinksByType(CategoryInputLink.class)
-                .map(Link::getInput)
-                .filter(Objects::nonNull)
-                .flatMap(Activation::getInputLinks)
-                .map(Link::getInput)
-                .filter(Objects::nonNull);
-    }
-
-    public Activation<N> getTemplate() {
-        Stream<Link> oLinks = getOutputLinksByType(CategoryLink.class)
+    public Activation getTemplate() {
+        return getOutputLinksByType(CategoryLink.class)
                 .map(Link::getOutput)
-                .flatMap(Activation::getOutputLinks);
-        return oLinks.map(Link::getOutput)
+                .map(Activation::getTemplate)
+                .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(null);
     }
 
+    public boolean isActiveTemplateInstance() {
+        return isNewInstance || isTrue(isFired);
+    }
 
     public CategoryInputLink getCategoryInputLink() {
         return getInputLinksByType(CategoryInputLink.class)
@@ -490,9 +484,11 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     }
 
     public Activation getActiveTemplateInstance() {
-        return getTemplateInstancesStream()
-                .filter(act -> act.isNewInstance || isTrue(act.isFired))
+        return getInputLinksByType(CategoryInputLink.class)
+                .map(Link::getInput)
+                .filter(Objects::nonNull)
                 .findFirst()
+                .map(Activation::getActiveTemplateInstance)
                 .orElse(null);
     }
 
@@ -541,7 +537,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     protected void instantiateBias(Activation<N> ti) {
     }
 
-    public void instantiateTemplateEdges(Activation instanceAct) {
+    public void instantiateTemplateEdges(Activation<N> instanceAct) {
         getInputLinks()
                 .forEach(l ->
                         l.instantiateTemplate(
@@ -558,7 +554,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         instanceAct.initFromTemplate();
 
         getOutputLinks()
-                .filter(l -> !l.getOutput().getNeuron().isAbstract())
                 .forEach(l ->
                         l.instantiateTemplate(
                                 instanceAct,

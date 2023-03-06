@@ -14,35 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.elements.activations;
+package network.aika.elements.links;
 
-import network.aika.Thought;
-import network.aika.elements.links.InhibitoryLink;
-import network.aika.elements.links.NegativeFeedbackLink;
-import network.aika.elements.neurons.InhibitoryNeuron;
-
-import static network.aika.fields.FieldLink.linkAndConnect;
+import network.aika.elements.activations.InhibitoryActivation;
+import network.aika.elements.activations.PatternActivation;
+import network.aika.elements.synapses.PrimaryInhibitorySynapse;
+import network.aika.visitor.Visitor;
 
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron> {
+public class PrimaryInhibitoryLink extends DisjunctiveLink<PrimaryInhibitorySynapse, PatternActivation, InhibitoryActivation> {
 
+    public PrimaryInhibitoryLink(PrimaryInhibitorySynapse s, PatternActivation input, InhibitoryActivation output) {
+        super(s, input, output);
 
-    public InhibitoryActivation(int id, Thought t, InhibitoryNeuron neuron) {
-        super(id, t, neuron);
+        initFields();
     }
 
-    public void connectFields(InhibitoryLink in, NegativeFeedbackLink out) {
-        if(isSelfRef(in.getInput(), out.getOutput()))
-            return;
-
-        linkAndConnect(in.getNet(), out.getInputValue());
+    protected void initFields() {
     }
 
-    public boolean isActiveTemplateInstance() {
-        return true;
+    @Override
+    public void patternVisit(Visitor v) {
     }
 }

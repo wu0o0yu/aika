@@ -17,8 +17,12 @@
 package network.aika.elements.activations;
 
 import network.aika.Thought;
+import network.aika.elements.links.CategoryInputLink;
+import network.aika.elements.links.Link;
 import network.aika.elements.neurons.Range;
 import network.aika.elements.neurons.CategoryNeuron;
+
+import java.util.stream.Stream;
 
 /**
  * @author Lukas Molzberger
@@ -29,10 +33,30 @@ public class CategoryActivation extends DisjunctiveActivation<CategoryNeuron> {
         super(id, t, neuron);
     }
 
-    public Activation getCategoryInput() {
+    @Override
+    public Activation getTemplate() {
+        return getOutputLinksByType(CategoryInputLink.class)
+                .map(Link::getOutput)
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public Activation getActiveTemplateInstance() {
+        return getCategoryInputs()
+                .filter(act -> act.isActiveTemplateInstance())
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Stream<Activation> getCategoryInputs() {
         return inputLinks.values()
                 .stream()
-                .map(l -> l.getInput())
+                .map(l -> l.getInput());
+    }
+
+    public Activation getCategoryInput() {
+        return getCategoryInputs()
                 .findFirst()
                 .orElse(null);
     }
