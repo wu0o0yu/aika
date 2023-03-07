@@ -82,6 +82,7 @@
         <commons-math.version>3.6.1</commons-math.version>
         <commons-io.version>2.11.0</commons-io.version>
         <slf4j.version>1.7.36</slf4j.version>
+        <commons-csv.version>1.9.0</commons-csv.version>
     </properties>
 
     <build>
@@ -207,7 +208,6 @@
             <version>${commons-io.version}</version>
         </dependency>
 
-
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -233,6 +233,12 @@
             <artifactId>junit-jupiter-api</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>${commons-csv.version}</version>
         </dependency>
     </dependencies>
 <!--
