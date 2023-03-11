@@ -1,12 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-
     <groupId>network.aika</groupId>
-    <artifactId>aika</artifactId>
-    <packaging>jar</packaging>
-    <version>2.0.4-SNAPSHOT</version>
-    <name>aika</name>
+    <artifactId>aika-project</artifactId>
+    <packaging>pom</packaging>
+    <version>${revision}</version>
+    <modules>
+        <module>core</module>
+        <module>debugger</module>
+        <module>experiments</module>
+    </modules>
+    <name>aika-project</name>
     <url>https://aika.network</url>
     <description>An Artificial Intelligence for Knowledge Acquisition</description>
 
@@ -31,7 +35,7 @@
         <url>https://github.com/aika-algorithm/aika</url>
         <connection>scm:git:git://github.com/aika-algorithm/aika.git</connection>
         <developerConnection>scm:git:git@github.com:aika-algorithm/aika.git</developerConnection>
-        <tag>aika-2.0.6</tag>
+        <tag>${revision}</tag>
     </scm>
 
     <repositories>
@@ -46,7 +50,6 @@
         <url>https://github.com/aika-algorithm/aika/issues</url>
     </issueManagement>
 
-    <!--
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -57,22 +60,10 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
--->
-    <distributionManagement>
-        <repository>
-            <id>meinestadt.de-releases</id>
-            <name>meinestadt Release Repository</name>
-            <url>http://repository.meinestadt.de:8081/artifactory/libs-release-local</url>
-        </repository>
-        <snapshotRepository>
-            <id>meinestadt.de-snapshots</id>
-            <name>meinestadt Snapshot Repository</name>
-            <url>http://repository.meinestadt.de:8081/artifactory/libs-snapshot-local</url>
-        </snapshotRepository>
-    </distributionManagement>
-
 
     <properties>
+        <revision>2.0.6-SNAPSHOT</revision>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- dependencies used only for tests: -->
@@ -81,6 +72,7 @@
         <!-- commons dependencies: -->
         <commons-math.version>3.6.1</commons-math.version>
         <commons-io.version>2.11.0</commons-io.version>
+        <logback.version>1.2.11</logback.version>
         <slf4j.version>1.7.36</slf4j.version>
         <commons-csv.version>1.9.0</commons-csv.version>
     </properties>
@@ -188,60 +180,114 @@
         </testResources>
     </build>
 
-    <dependencies>
-        <dependency>
-            <groupId>network.aika</groupId>
-            <artifactId>aika-debugger</artifactId>
-            <version>2.0.5-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>network.aika</groupId>
+                <artifactId>aika</artifactId>
+                <version>${revision}</version>
+            </dependency>
 
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <version>${commons-math.version}</version>
-        </dependency>
+            <dependency>
+                <groupId>network.aika</groupId>
+                <artifactId>aika-debugger</artifactId>
+                <version>${revision}</version>
+            </dependency>
 
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>${commons-io.version}</version>
-        </dependency>
+            <dependency>
+                <groupId>network.aika</groupId>
+                <artifactId>gs-core</artifactId>
+                <version>2.0.2</version>
+            </dependency>
 
-        <!-- Logging -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
+            <dependency>
+                <groupId>network.aika</groupId>
+                <artifactId>gs-ui-swing</artifactId>
+                <version>2.0.2</version>
+            </dependency>
 
-        <!-- dependencies for tests: -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-math3</artifactId>
+                <version>${commons-math.version}</version>
+            </dependency>
 
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-csv</artifactId>
-            <version>${commons-csv.version}</version>
-        </dependency>
-    </dependencies>
-<!--
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- Logging -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-csv</artifactId>
+                <version>${commons-csv.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>org.graphstream</groupId>
+                <artifactId>gs-algo</artifactId>
+                <version>2.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>bouncycastle</groupId>
+                        <artifactId>bcmail-jdk14</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>bouncycastle</groupId>
+                        <artifactId>bcprov-jdk14</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.lowagie</groupId>
+                        <artifactId>itext</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- dependencies for tests: -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-params</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <profiles>
         <profile>
             <id>deploy_artifact</id>
@@ -279,5 +325,4 @@
             </build>
         </profile>
     </profiles>
-    -->
 </project>
