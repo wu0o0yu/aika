@@ -134,22 +134,7 @@ public class SyllablesTest {
             doc.disconnect();
         });
 
-        syllableModel.initMeta(
-                0.7,
-                pos ->
-                        switch (pos) {
-                            case 0 -> 2.5;
-                            case 1 -> 2.0;
-                            case -1 -> 1.8;
-                            default -> pos > 0 ? 0.3 : 0.2;
-                        },
-                pos ->
-                        2.0 + (3.0 * (1.0 / ((double) Math.abs(pos) + 1))),
-                pos ->
-                        1.0,
-                pos ->
-                        Math.abs(pos) <= 1 ? 5.0 : 1.0
-        );
+        syllableModel.initMeta();
 
         int[] counter = new int[1];
 
@@ -164,7 +149,7 @@ public class SyllablesTest {
 
             AIKADebugger debugger = null;
             System.out.println(counter[0] + " " + w);
-            if(counter[0] >= 5) {// 3, 6
+            if(counter[0] >= 6) {// 3, 6
                 debugger = AIKADebugger.createAndShowGUI(doc);
             }
 

@@ -68,13 +68,7 @@ public class SyllableTemplateModel {
     }
 
 
-    public void initMeta(
-            double patternNetTarget,
-            IntToDoubleFunction bindingNetTarget,
-            IntToDoubleFunction patternSynWeight,
-            IntToDoubleFunction propagateBias,
-            IntToDoubleFunction posFeedbackSynWeight
-    ) {
+    public void initMeta() {
         // Abstract
         syllablePatternN = new PatternNeuron()
                 .init(model, "Syllable");
@@ -88,34 +82,26 @@ public class SyllableTemplateModel {
         inhibCat = new InhibitoryCategoryNeuron()
                 .init(model, "Inhib. Category");
 
-        BindingNeuron sylBeginBN = createBindingNeuron(
-                patternNetTarget,
-                bindingNetTarget,
-                patternSynWeight,
-                propagateBias,
-                posFeedbackSynWeight,
+        double patternNetTarget = 0.7;
+        double patternValueTarget = RECTIFIED_HYPERBOLIC_TANGENT
+                .f(patternNetTarget);
+
+        BindingNeuron sylBeginBN = createStrongBindingNeuron(
+                patternValueTarget,
                 0,
                 null,
                 null
         );
 
         expandContinueBindingNeurons(
-                patternNetTarget,
-                bindingNetTarget,
-                patternSynWeight,
-                propagateBias,
-                posFeedbackSynWeight,
+                patternValueTarget,
                 sylBeginBN,
                 5,
                 1
         );
 
         expandContinueBindingNeurons(
-                patternNetTarget,
-                bindingNetTarget,
-                patternSynWeight,
-                propagateBias,
-                posFeedbackSynWeight,
+                patternValueTarget,
                 sylBeginBN,
                 5,
                 -1
@@ -133,11 +119,7 @@ public class SyllableTemplateModel {
     }
 
     private void expandContinueBindingNeurons(
-            double patternNetTarget,
-            IntToDoubleFunction bindingNetTarget,
-            IntToDoubleFunction patternSynWeight,
-            IntToDoubleFunction propagateBias,
-            IntToDoubleFunction posFeedbackSynWeight,
+            double patternValueTarget,
             BindingNeuron sylBeginBN,
             int length,
             int dir
@@ -145,34 +127,31 @@ public class SyllableTemplateModel {
         BindingNeuron lastSylBN = sylBeginBN;
         int lastPos = 0;
         for(int pos = 1; pos <= length; pos++) {
-            lastSylBN = createBindingNeuron(
-                    patternNetTarget,
-                    bindingNetTarget,
-                    patternSynWeight,
-                    propagateBias,
-                    posFeedbackSynWeight,
-                    dir * pos,
-                    dir * lastPos,
-                    lastSylBN
-            );
+            if(pos < 2) {
+                lastSylBN = createStrongBindingNeuron(
+                        patternValueTarget,
+                        dir * pos,
+                        dir * lastPos,
+                        lastSylBN
+                );
+            } else {
+                lastSylBN = createWeakBindingNeuron(
+                        patternValueTarget,
+                        dir * pos,
+                        lastSylBN
+                );
+            }
             lastPos = pos;
         }
     }
 
-    private BindingNeuron createBindingNeuron(
-            double patternNetTarget,
-            IntToDoubleFunction bindingNetTarget,
-            IntToDoubleFunction patternSynWeight,
-            IntToDoubleFunction propagateBias,
-            IntToDoubleFunction posFeedbackSynWeight,
+    private BindingNeuron createStrongBindingNeuron(
+            double patternValueTarget,
             int pos,
             Integer lastPos,
             BindingNeuron lastBN
     ) {
-        double patternValueTarget = RECTIFIED_HYPERBOLIC_TANGENT
-                .f(patternNetTarget);
-
-        double netTarget = bindingNetTarget.applyAsDouble(pos);
+        double netTarget = 2.5;
         double valueTarget = RECTIFIED_HYPERBOLIC_TANGENT
                 .f(netTarget);
 
@@ -181,11 +160,6 @@ public class SyllableTemplateModel {
 
         BindingNeuron bn = new BindingNeuron()
                 .init(model, "Abstract Pos:" + pos);
-
-        System.out.println(bn.getLabel());
-
-        System.out.println("patternNetTarget: " + patternNetTarget + " patternValueTarget: " + patternValueTarget);
-        System.out.println("netTarget: " + netTarget + " valueTarget: " + valueTarget);
 
         new PrimaryInhibitorySynapse()
                 .setWeight(1.0)
@@ -203,12 +177,9 @@ public class SyllableTemplateModel {
         if(lastPos == null || lastBN == null) {
             bn.setCallActivationCheckCallback(true);
         } else {
-            double prevNetTarget = bindingNetTarget.applyAsDouble(lastPos);
+            double prevNetTarget = lastBN.getBias().getCurrentValue();
             double prevValueTarget = RECTIFIED_HYPERBOLIC_TANGENT
                     .f(prevNetTarget);
-
-            System.out.print("prevNetTarget: " + prevNetTarget + " prevValueTarget: " + prevValueTarget);
-            System.out.print(" adjustPropagate: " + propagateBias.applyAsDouble(pos));
 
             if (pos > 0) {
                 new RelationInputSynapse()
@@ -225,17 +196,17 @@ public class SyllableTemplateModel {
             new SamePatternSynapse()
                     .setWeight(10.0)
                     .init(lastBN, bn)
-                    .adjustBias(propagateBias.applyAsDouble(pos));
+                    .adjustBias(prevValueTarget);
         }
 
         new PatternSynapse()
-                .setWeight(patternSynWeight.applyAsDouble(pos))
+                .setWeight(2.5)
                 .setOptional(true)
                 .init(bn, syllablePatternN)
                 .adjustBias(valueTarget);
 
         new PositiveFeedbackSynapse()
-                .setWeight(posFeedbackSynWeight.applyAsDouble(pos))
+                .setWeight(5.0)
                 .init(syllablePatternN, bn)
                 .adjustBias(patternValueTarget);
 
@@ -252,6 +223,80 @@ public class SyllableTemplateModel {
 
         System.out.println();
         System.out.println();
+
+        return bn;
+    }
+
+    private BindingNeuron createWeakBindingNeuron(
+            double patternValueTarget,
+            int pos,
+            BindingNeuron lastBN
+    ) {
+        double netTarget = 2.5;
+        double valueTarget = RECTIFIED_HYPERBOLIC_TANGENT
+                .f(netTarget);
+
+        CategoryNeuron catN = new BindingCategoryNeuron()
+                .init(model, "Cat. Pos:" + pos);
+
+        BindingNeuron bn = new BindingNeuron()
+                .init(model, "Abstract Pos:" + pos);
+
+        new PrimaryInhibitorySynapse()
+                .setWeight(1.0)
+                .init(letterPN, inhibitoryN);
+
+        new InhibitorySynapse(INPUT)
+                .setWeight(1.0)
+                .init(bn, inhibitoryN);
+
+        new NegativeFeedbackSynapse()
+                .setWeight(-20.0)
+                .init(inhibitoryN, bn)
+                .adjustBias();
+
+        double prevNetTarget = lastBN.getBias().getCurrentValue();
+        double prevValueTarget = RECTIFIED_HYPERBOLIC_TANGENT
+                .f(prevNetTarget);
+
+        if (pos > 0) {
+            new RelationInputSynapse()
+                    .setWeight(5.0)
+                    .init(relPT, bn)
+                    .adjustBias();
+        } else {
+            new RelationInputSynapse()
+                    .setWeight(5.0)
+                    .init(relNT, bn)
+                    .adjustBias();
+        }
+
+        new SamePatternSynapse()
+                .setWeight(10.0)
+                .init(lastBN, bn)
+                .adjustBias(prevValueTarget);
+
+        new PatternSynapse()
+                .setWeight(2.5)
+                .setOptional(true)
+                .init(bn, syllablePatternN)
+                .adjustBias(valueTarget);
+
+        new PositiveFeedbackSynapse()
+                .setWeight(5.0)
+                .init(syllablePatternN, bn)
+                .adjustBias(patternValueTarget);
+
+        new InputPatternSynapse()
+                .setWeight(10.0)
+                .init(letterPN, bn)
+                .adjustBias();
+
+        new BindingCategoryInputSynapse()
+                .setWeight(1.0)
+                .init(catN, bn);
+
+        bn.setBias(netTarget);
 
         return bn;
     }
