@@ -31,8 +31,5 @@ public class PatternCategoryLink extends CategoryLink<PatternCategorySynapse, Pa
 
     @Override
     protected void connectGradientFields() {
-        initGradient();
-
-        super.connectGradientFields();
     }
 }

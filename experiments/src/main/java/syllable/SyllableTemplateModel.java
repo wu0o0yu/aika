@@ -157,7 +157,7 @@ public class SyllableTemplateModel {
                 .init(model, "Cat. Pos:" + pos);
 
         BindingNeuron bn = new BindingNeuron()
-                .init(model, "Abstract Pos:" + pos);
+                .init(model, "Abstract (S) Pos:" + pos);
 
         new PrimaryInhibitorySynapse()
                 .setWeight(1.0)
@@ -204,7 +204,7 @@ public class SyllableTemplateModel {
                 .adjustBias(valueTarget);
 
         new PositiveFeedbackSynapse()
-                .setWeight(5.0)
+                .setWeight(netTarget)
                 .init(syllablePatternN, bn)
                 .adjustBias(patternValueTarget);
 
@@ -230,7 +230,7 @@ public class SyllableTemplateModel {
             int pos,
             BindingNeuron lastBN
     ) {
-        double netTarget = 2.5;
+        double netTarget = 0.5;
         double valueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
                 .f(netTarget);
 
@@ -238,7 +238,7 @@ public class SyllableTemplateModel {
                 .init(model, "Cat. Pos:" + pos);
 
         BindingNeuron bn = new BindingNeuron()
-                .init(model, "Abstract Pos:" + pos);
+                .init(model, "Abstract (W) Pos:" + pos);
 
         new PrimaryInhibitorySynapse()
                 .setWeight(1.0)
@@ -253,10 +253,6 @@ public class SyllableTemplateModel {
                 .init(inhibitoryN, bn)
                 .adjustBias();
 
-        double prevNetTarget = lastBN.getBias().getCurrentValue();
-        double prevValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
-                .f(prevNetTarget);
-
         if (pos > 0) {
             new RelationInputSynapse()
                     .setWeight(5.0)
@@ -270,18 +266,18 @@ public class SyllableTemplateModel {
         }
 
         new SamePatternSynapse()
-                .setWeight(10.0)
+                .setWeight(5.0)
                 .init(lastBN, bn)
-                .adjustBias(prevValueTarget);
+                .adjustBias(1.0);
 
         new PatternSynapse()
-                .setWeight(2.5)
+                .setWeight(0.5)
                 .setOptional(true)
                 .init(bn, syllablePatternN)
                 .adjustBias(valueTarget);
 
         new PositiveFeedbackSynapse()
-                .setWeight(5.0)
+                .setWeight(netTarget)
                 .init(syllablePatternN, bn)
                 .adjustBias(patternValueTarget);
 

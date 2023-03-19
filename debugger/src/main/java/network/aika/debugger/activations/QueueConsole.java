@@ -19,6 +19,7 @@ package network.aika.debugger.activations;
 import network.aika.Thought;
 import network.aika.debugger.AbstractConsole;
 import network.aika.debugger.activations.renderer.QueueRenderer;
+import network.aika.elements.Element;
 import network.aika.steps.Step;
 
 import javax.swing.text.StyledDocument;
@@ -28,8 +29,8 @@ import javax.swing.text.StyledDocument;
  */
 public class QueueConsole extends AbstractConsole {
 
-    public void renderQueue(StyledDocument sDoc, Thought t, Step currentQE) {
-        QueueRenderer queueRenderer = new QueueRenderer(currentQE);
+    public void renderQueue(StyledDocument sDoc, Thought t, Step currentQE, Element selectedElement) {
+        QueueRenderer queueRenderer = new QueueRenderer(currentQE, selectedElement);
 
         queueRenderer.render(sDoc, t);
     }

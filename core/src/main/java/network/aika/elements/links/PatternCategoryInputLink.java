@@ -40,9 +40,6 @@ public class PatternCategoryInputLink extends CategoryInputLink {
 
     @Override
     protected void connectGradientFields() {
-        initGradient();
-
-        super.connectGradientFields();
     }
 
     @Override

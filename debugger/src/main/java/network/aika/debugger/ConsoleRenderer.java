@@ -16,8 +16,8 @@
  */
 package network.aika.debugger;
 
-import javax.swing.text.BadLocationException;
-import javax.swing.text.StyledDocument;
+import javax.swing.text.*;
+import java.awt.*;
 
 /**
  * @author Lukas Molzberger
@@ -26,14 +26,17 @@ public interface ConsoleRenderer<E> {
 
     void render(StyledDocument sDoc, E e);
 
-    default void appendEntry(StyledDocument sDoc, String fieldName, String fieldValue, String titleStyle, String style) {
-        appendText(sDoc, fieldName, titleStyle);
-        appendText(sDoc, fieldValue + "\n", style);
+    default void appendEntry(StyledDocument sDoc, String fieldName, String fieldValue, Color c) {
+        appendText(sDoc, fieldName, "bold", c);
+        appendText(sDoc, fieldValue + "\n", "regular", c);
     }
 
-    default void appendText(StyledDocument sDoc, String txt, String style) {
+    default void appendText(StyledDocument sDoc, String txt, String style, Color c) {
         try {
-            sDoc.insertString(sDoc.getLength(), txt, sDoc.getStyle(style));
+            final StyleContext cont = StyleContext.getDefaultStyleContext();
+            final AttributeSet attr = cont.addAttribute(sDoc.getStyle(style), StyleConstants.Foreground, c);
+
+            sDoc.insertString(sDoc.getLength(), txt, attr);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }

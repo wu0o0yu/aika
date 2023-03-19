@@ -150,7 +150,7 @@ public class SyllablesExperiment {
 
             AIKADebugger debugger = null;
             System.out.println(counter[0] + " " + w);
-            if(counter[0] >= 6) {// 3, 6
+            if(counter[0] >= 0) {// 3, 6
                 debugger = AIKADebugger.createAndShowGUI(doc);
             }
 

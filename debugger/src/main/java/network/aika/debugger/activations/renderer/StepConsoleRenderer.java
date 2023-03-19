@@ -22,6 +22,7 @@ import network.aika.elements.activations.Timestamp;
 import network.aika.steps.Step;
 
 import javax.swing.text.StyledDocument;
+import java.awt.*;
 
 /**
  * @author Lukas Molzberger
@@ -29,9 +30,11 @@ import javax.swing.text.StyledDocument;
 public class StepConsoleRenderer implements ConsoleRenderer<Step> {
 
     private Thought t;
+    private boolean selected;
 
-    public StepConsoleRenderer(Thought t) {
+    public StepConsoleRenderer(Thought t, boolean selected) {
         this.t = t;
+        this.selected = selected;
     }
 
     @Override
@@ -39,19 +42,20 @@ public class StepConsoleRenderer implements ConsoleRenderer<Step> {
         boolean showQueueKey = false;
 
         Timestamp currentTimestamp = t.getTimestampOnProcess();
-        String regularColor = "regular";
-        String boldColor = "bold";
-        if(s.getQueueKey() != null && currentTimestamp.compareTo(s.getQueueKey().getCurrentTimestamp()) <= 0) {
-            regularColor = "regularGreen";
-            boldColor = "boldGreen";
-        }
+
+        Color c = new Color(
+                selected ? 150 : 0,
+                s.getQueueKey() != null &&
+                        currentTimestamp.compareTo(s.getQueueKey().getCurrentTimestamp()) <= 0
+                        ? 150 : 0,
+                0
+        );
 
         appendEntry(
                 sDoc,
                 s.getPhase() .getLabel() + " " + s.getStepName() + (showQueueKey && s.getQueueKey() != null ? " QueueKey:" + s.getQueueKey() : "") + " ",
                 s.toString(),
-                boldColor,
-                regularColor
+                c
         );
     }
 }

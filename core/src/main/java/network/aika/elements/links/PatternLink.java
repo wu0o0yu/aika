@@ -21,12 +21,15 @@ import network.aika.elements.activations.PatternActivation;
 import network.aika.fields.AbstractFunction;
 import network.aika.elements.synapses.PatternSynapse;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
+import network.aika.fields.SumField;
 import network.aika.sign.Sign;
 import network.aika.steps.link.LinkCounting;
 import network.aika.visitor.Visitor;
 
+import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.func;
 import static network.aika.fields.Fields.scale;
+import static network.aika.utils.Utils.TOLERANCE;
 
 /**
  * @author Lukas Molzberger
@@ -53,7 +56,10 @@ public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivati
 
     @Override
     public void connectGradientFields() {
-        super.connectGradientFields();
+        gradient = new SumField(this, "Gradient", TOLERANCE);
+
+        linkAndConnect(input.getGradient(), gradient);
+        linkAndConnect(gradient, output.getGradient());
 
         informationGain = func(
                 this,
@@ -74,6 +80,7 @@ public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivati
                 output.getEntropy(),
                 gradient
         );
+
     }
 
     public AbstractFunction getOutputEntropy() {

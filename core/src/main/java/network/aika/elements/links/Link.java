@@ -94,12 +94,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected void connectGradientFields() {
     }
 
-    protected void initGradient() {
-        gradient = new SumField(this, "Gradient", TOLERANCE);
-        linkAndConnect(input.getGradient(), gradient);
-        linkAndConnect(gradient, output.getGradient());
-    }
-
     public void instantiateTemplate(I iAct, O oAct) {
         if(iAct == null || oAct == null)
             return;

@@ -18,9 +18,11 @@ package network.aika.debugger.activations.renderer;
 
 import network.aika.Thought;
 import network.aika.debugger.ConsoleRenderer;
+import network.aika.elements.Element;
 import network.aika.steps.Step;
 
 import javax.swing.text.StyledDocument;
+import java.awt.*;
 
 /**
  * @author Lukas Molzberger
@@ -28,24 +30,30 @@ import javax.swing.text.StyledDocument;
 public class QueueRenderer implements ConsoleRenderer<Thought> {
 
     private Step currentQE;
+    private Element selectedElement;
 
-    public QueueRenderer(Step currentQE) {
+    public QueueRenderer(Step currentQE, Element selectedElement) {
         this.currentQE = currentQE;
+        this.selectedElement = selectedElement;
     }
 
     @Override
     public void render(StyledDocument sDoc, Thought t) {
         if(currentQE != null) {
-            StepConsoleRenderer currentStepRenderer = new StepConsoleRenderer(t);
-            currentStepRenderer.render(sDoc, currentQE);
+            new StepConsoleRenderer(t, currentQE.getElement() == selectedElement)
+                    .render(sDoc, currentQE);
         }
 
-        appendText(sDoc, "---------------------------------------------------------------------------------------------------------------------------------------------------------------------\n", "regular");
+        appendText(sDoc,
+                "---------------------------------------------------------------------------------------------------------------------------------------------------------------------\n",
+                "regular",
+                Color.BLACK
+        );
         for(Step s: t.getQueue()) {
-            StepConsoleRenderer stepRenderer = new StepConsoleRenderer(t);
-            stepRenderer.render(sDoc, s);
+            new StepConsoleRenderer(t, s.getElement() == selectedElement)
+                    .render(sDoc, s);
         }
 
-        appendText(sDoc, "\n\n\n", "regular");
+        appendText(sDoc, "\n\n\n", "regular", Color.BLACK);
     }
 }

@@ -45,8 +45,6 @@ public class InputPatternLink extends BindingNeuronLink<InputPatternSynapse, Pat
                 input.getEntropy(),
                 output.getGradient()
         );
-
-        super.connectGradientFields();
     }
 
     @Override

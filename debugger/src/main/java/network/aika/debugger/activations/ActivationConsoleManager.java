@@ -63,6 +63,7 @@ public class ActivationConsoleManager extends JSplitPane implements EventListene
     public void showSelectedElementContext(Element e) {
         sticky = true;
         update(e, "Selected");
+        updateQueue(e.getThought(), null);
     }
 
     private void update(Element e, String source) {
@@ -86,7 +87,7 @@ public class ActivationConsoleManager extends JSplitPane implements EventListene
 
     private void updateQueue(Thought t, Step s) {
         queueConsole.render(sDoc ->
-                queueConsole.renderQueue(sDoc, t, s)
+                queueConsole.renderQueue(sDoc, t, s, currentSelectedElement)
         );
     }
 
