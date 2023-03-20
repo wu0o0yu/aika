@@ -40,6 +40,7 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
             return;
 
         linkAndConnect(in.getNet(), out.getInputValue());
+        linkAndConnect(in.getNetDelta(), out.getInputValueDelta());
     }
 
     public boolean isActiveTemplateInstance() {

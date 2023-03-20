@@ -24,6 +24,8 @@ import network.aika.fields.Fields;
 import network.aika.elements.synapses.InhibitorySynapse;
 import network.aika.visitor.Visitor;
 
+import static network.aika.fields.Fields.func;
+import static network.aika.fields.Fields.mul;
 import static network.aika.utils.Utils.TOLERANCE;
 
 /**
@@ -33,7 +35,10 @@ public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingAc
 
     protected FieldOutput value;
 
+    protected FieldOutput valueDelta;
+
     protected AbstractFunction net;
+    protected FieldOutput netDelta;
 
     public InhibitoryLink(InhibitorySynapse s, BindingActivation input, InhibitoryActivation output) {
         super(s, input, output);
@@ -49,12 +54,27 @@ public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingAc
                 input.getValue()
         );
 
+        netDelta = input.getValueDelta();
+
         value = Fields.func(
                 this,
                 "value = f(net)",
                 TOLERANCE,
                 net,
                 x -> output.getActivationFunction().f(x)
+        );
+
+        valueDelta = mul(
+                this,
+                "value'",
+                func(
+                        this,
+                        "f'(net)",
+                        TOLERANCE,
+                        net,
+                        x -> output.getActivationFunction().outerGrad(x)
+                ),
+                netDelta
         );
 
         output.getOutputLinksByType(NegativeFeedbackLink.class)
@@ -69,6 +89,10 @@ public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingAc
 
     public FieldOutput getNet() {
         return net;
+    }
+
+    public FieldOutput getNetDelta() {
+        return netDelta;
     }
 
     @Override

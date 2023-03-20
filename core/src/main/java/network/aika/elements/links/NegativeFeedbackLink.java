@@ -30,6 +30,7 @@ import static network.aika.fields.FieldLink.linkAndConnect;
 public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, InhibitoryActivation> {
 
     MinMaxField maxInput;
+    Field maxInputDelta; // TODO: connect
 
     public NegativeFeedbackLink(NegativeFeedbackSynapse s, InhibitoryActivation input, BindingActivation output) {
         super(s, input, output);
@@ -64,6 +65,12 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
     public Field getInputValue() {
         return maxInput;
     }
+
+    @Override
+    public Field getInputValueDelta() {
+        return maxInputDelta;
+    }
+
 
     @Override
     public void bindingVisit(Visitor v) {

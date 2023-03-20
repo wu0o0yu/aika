@@ -47,6 +47,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected O output;
 
     protected FieldOutput weightedInput;
+    protected FieldOutput weightedInputDelta;
 
     protected SumField gradient;
 
@@ -130,6 +131,17 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return weightedInput;
     }
 
+    protected FieldOutput initWeightedInputDelta() {
+        Multiplication weightedInputDelta = mul(
+                this,
+                "iAct(id:" + getInput().getId() + ").value' * s.weight",
+                getInputValue(),
+                synapse.getWeight()
+        );
+
+        return weightedInput;
+    }
+
     public void init() {
         if(input != null)
             addInputLinkingStep();
@@ -148,6 +160,10 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     public FieldOutput getWeightedInput() {
         return weightedInput;
+    }
+
+    public FieldOutput getWeightedInputDelta() {
+        return weightedInputDelta;
     }
 
     public Field getGradient() {
@@ -169,6 +185,13 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
             return ZERO;
 
         return input.getValue();
+    }
+
+    public FieldOutput getInputValueDelta() {
+        if(input == null)
+            return ZERO;
+
+        return input.getValueDelta();
     }
 
     public FieldOutput getNegInputValue() {
