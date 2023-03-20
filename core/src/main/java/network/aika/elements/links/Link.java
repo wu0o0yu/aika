@@ -118,6 +118,10 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected void initWeightInput() {
         weightedInput = initWeightedInput();
         linkAndConnect(weightedInput, getOutput().getNet());
+
+        weightedInputDelta = initWeightedInputDelta();
+        if(weightedInputDelta != null)
+            linkAndConnect(weightedInputDelta, getOutput().getNetDelta());
     }
 
     protected FieldOutput initWeightedInput() {
@@ -135,11 +139,11 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         Multiplication weightedInputDelta = mul(
                 this,
                 "iAct(id:" + getInput().getId() + ").value' * s.weight",
-                getInputValue(),
+                getInputValueDelta(),
                 synapse.getWeight()
         );
 
-        return weightedInput;
+        return weightedInputDelta;
     }
 
     public void init() {

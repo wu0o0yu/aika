@@ -19,11 +19,12 @@ package network.aika.elements.links;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
+import network.aika.fields.FieldOutput;
 import network.aika.fields.Multiplication;
 import network.aika.visitor.Visitor;
 
-import static network.aika.fields.Fields.mul;
-import static network.aika.fields.Fields.scale;
+import static network.aika.fields.ConstantField.ONE;
+import static network.aika.fields.Fields.*;
 
 /**
  *
@@ -65,6 +66,32 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
                 getThought().getIsClosed(),
                 super.initWeightedInput()
         );
+    }
+
+    protected FieldOutput initWeightedInputDelta() {
+        Multiplication weightedInputDelta = mul(
+                this,
+                "iAct(id:" + getInput().getId() + ").value' * s.weight",
+                sub(
+                        this,
+                        "posFeedbackValue'",
+                        ONE,
+                        getInputValue()
+                )
+/*                mix(this, "isClosedMix",
+                        getThought().getIsClosed(),
+                        getInputValueDelta(),
+                        sub(
+                                this,
+                                "posFeedbackValue'",
+                                ONE,
+                                getInputValue()
+                        )
+                )*/,
+                synapse.getWeight()
+        );
+
+        return weightedInputDelta;
     }
 
     @Override
