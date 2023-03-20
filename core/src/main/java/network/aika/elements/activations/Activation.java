@@ -68,13 +68,9 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     protected Timestamp fired = Timestamp.NOT_SET;
 
     protected FieldOutput value;
-    protected FieldOutput valueDelta;
-
     protected FieldOutput negValue;
 
     protected SumField net;
-
-    protected SumField netDelta;
 
     protected FieldOutput isFired;
 
@@ -126,19 +122,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 x -> getActivationFunction().f(x)
         );
 
-        valueDelta = mul(
-                this,
-                "value'",
-                func(
-                        this,
-                        "f'(net)",
-                        TOLERANCE,
-                        net,
-                        x -> getActivationFunction().outerGrad(x)
-                ),
-                netDelta
-        );
-
         negValue = threshold(
                 this,
                 "!value",
@@ -169,8 +152,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     protected void initNet() {
         net = new ValueSortedQueueField(this, INFERENCE, "net", null);
         linkAndConnect(getNeuron().getBias(), net);
-
-        netDelta = new ValueSortedQueueField(this, INFERENCE, "net'", null);
     }
 
     protected void initDummyLinks() {
@@ -263,10 +244,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         return value;
     }
 
-    public FieldOutput getValueDelta() {
-        return valueDelta;
-    }
-
     public FieldOutput getNegValue() {
         return negValue;
     }
@@ -277,10 +254,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
     public SumField getNet() {
         return net;
-    }
-
-    public SumField getNetDelta() {
-        return netDelta;
     }
 
     public Timestamp getCreated() {
