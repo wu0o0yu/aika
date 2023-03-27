@@ -130,17 +130,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return weightedInput;
     }
 
-    protected FieldOutput initWeightedInputDelta() {
-        Multiplication weightedInputDelta = mul(
-                this,
-                "iAct(id:" + getInput().getId() + ").value' * s.weight",
-                getInputValue(),
-                synapse.getWeight()
-        );
-
-        return weightedInput;
-    }
-
     public void init() {
         if(input != null)
             addInputLinkingStep();

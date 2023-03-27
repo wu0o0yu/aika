@@ -192,13 +192,11 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeDouble(currentValue);
-        out.writeDouble(newValue);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
         currentValue = in.readDouble();
-        newValue = in.readDouble();
     }
 
     @Override

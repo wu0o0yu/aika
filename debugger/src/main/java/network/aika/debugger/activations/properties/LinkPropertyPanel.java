@@ -50,9 +50,7 @@ public class LinkPropertyPanel<E extends Link> extends AbstractPropertyPanel {
 
     public void initInferenceSection(E l) {
         addField(l.getInputValue());
-        addField(l.getInputValueDelta());
         addField(l.getWeightedInput());
-        addField(l.getWeightedInputDelta());
     }
 
     public void initInferenceOutSection(E l) {

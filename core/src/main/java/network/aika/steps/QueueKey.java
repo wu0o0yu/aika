@@ -29,27 +29,12 @@ import static network.aika.elements.activations.Timestamp.NOT_SET;
  */
 public class QueueKey {
 
-    public static Comparator<QueueKey> COMPARATOR = (k1, k2) -> {
-        int r = Integer.compare(k1.getPhase().ordinal(), k2.getPhase().ordinal());
-        if(r != 0)
-            return r;
-
-        r = FIRED_COMPARATOR.compare(k1.fired, k2.fired);
-        if (r != 0)
-            return r;
-
-//        if(k1.getFired() == NOT_SET || k2.getFired() == NOT_SET) {
-        r = Integer.compare(k2.getSortValue(), k1.getSortValue());
-        if (r != 0)
-            return r;
-//        }
-
-        r = k1.created.compareTo(k2.created);
-        if (r != 0)
-            return r;
-
-        return k1.getCurrentTimestamp().compareTo(k2.getCurrentTimestamp());
-    };
+    public static Comparator<QueueKey> COMPARATOR = Comparator
+            .<QueueKey>comparingInt(k -> k.getPhase().ordinal())
+            .thenComparing(k -> k.fired)
+            .thenComparingInt(k -> -k.getSortValue())
+            .thenComparing(k -> k.created)
+            .thenComparing(k -> k.currentTimestamp);
 
     private Phase phase;
     private Timestamp created;

@@ -506,6 +506,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         ti.tokenPos = tokenPos;
         ti.range = range;
         ti.isNewInstance = true;
+        ti.fired = fired;
 
         linkTemplateAndInstance(ti);
 
