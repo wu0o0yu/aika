@@ -151,7 +151,8 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
     protected void initNet() {
         net = new ValueSortedQueueField(this, INFERENCE, "net", null);
-        linkAndConnect(getNeuron().getBias(), net);
+        linkAndConnect(getNeuron().getBias(), net)
+                .setPropagateUpdates(false);
     }
 
     protected void initDummyLinks() {

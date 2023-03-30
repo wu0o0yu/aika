@@ -127,6 +127,9 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
                 synapse.getWeight()
         );
 
+        weightedInput.getInputLinkByArg(1)
+                .setPropagateUpdates(false);
+
         return weightedInput;
     }
 

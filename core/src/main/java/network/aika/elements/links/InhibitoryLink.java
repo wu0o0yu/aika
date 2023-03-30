@@ -48,6 +48,8 @@ public class InhibitoryLink extends DisjunctiveLink<InhibitorySynapse, BindingAc
                 output.getNeuron().getBias(),
                 input.getValue()
         );
+        net.getInputLinkByArg(0)
+                .setPropagateUpdates(false);
 
         value = Fields.func(
                 this,

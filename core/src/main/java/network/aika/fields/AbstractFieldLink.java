@@ -29,11 +29,17 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
 
     protected boolean connected;
 
+    protected boolean propagateUpdates = true;
+
 
     public AbstractFieldLink(FieldOutput input, int arg, O output) {
         this.input = input;
         this.arg = arg;
         this.output = output;
+    }
+
+    public void setPropagateUpdates(boolean propagateUpdates) {
+        this.propagateUpdates = propagateUpdates;
     }
 
     public boolean isConnected() {
@@ -56,7 +62,7 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
     }
 
     public void receiveUpdate(double u) {
-        if(connected)
+        if(connected && propagateUpdates)
             output.receiveUpdate(this, u);
     }
 
