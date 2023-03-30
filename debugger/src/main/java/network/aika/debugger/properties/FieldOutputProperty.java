@@ -41,24 +41,26 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     private boolean showReference;
 
     protected Boolean isConnected;
+    protected Boolean isPropagateUpdate;
 
     protected boolean withinUpdate;
 
     protected JLabel jLabel;
     protected JFormattedTextField currentValueField;
 
-    public static FieldOutputProperty createFieldProperty(Container parent, FieldOutput f, boolean showReference, Boolean isConnected) {
+    public static FieldOutputProperty createFieldProperty(Container parent, FieldOutput f, boolean showReference, Boolean isConnected, Boolean isPropagateUpdates) {
         if(f instanceof IQueueField) {
-            return new QueueFieldProperty(parent, (IQueueField) f, showReference, isConnected);
+            return new QueueFieldProperty(parent, (IQueueField) f, showReference, isConnected, isPropagateUpdates);
         } else {
-            return new FieldOutputProperty(parent, f, showReference, isConnected);
+            return new FieldOutputProperty(parent, f, showReference, isConnected, isPropagateUpdates);
         }
     }
 
-    public FieldOutputProperty(Container parent, F f, boolean showReference, Boolean isConnected) {
+    public FieldOutputProperty(Container parent, F f, boolean showReference, Boolean isConnected, Boolean isPropagateUpdate) {
         super(parent);
         this.showReference = showReference;
         this.isConnected = isConnected;
+        this.isPropagateUpdate = isPropagateUpdate;
 
         Frame frame = (Frame) SwingUtilities.getWindowAncestor(parent);
         field = f;
@@ -109,7 +111,7 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
         addGridEntry(currentValueField, 1, pos, 1, insets);
 
         showReference(3, pos, insets);
-        if(isConnected != null)
+        if(isConnected != null || isPropagateUpdate != null)
             showConnected(4, pos, insets);
     }
 
@@ -126,7 +128,15 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     }
 
     protected void showConnected(int xPos, int yPos, Insets insets) {
-        JLabel jOutRef = new JLabel(isConnected ? "connected" : "unconnected");
+        String label = "";
+
+        if(isConnected != null)
+            label += isConnected ? "connected" : "unconnected";
+
+        if(isPropagateUpdate != null)
+            label += isPropagateUpdate ? "prop" : "no prop";
+
+        JLabel jOutRef = new JLabel(label);
         addGridEntry(jOutRef, xPos, yPos, 1, insets);
     }
 

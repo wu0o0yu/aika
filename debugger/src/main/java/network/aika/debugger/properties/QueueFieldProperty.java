@@ -32,8 +32,8 @@ public class QueueFieldProperty extends FieldOutputProperty<IQueueField> impleme
 
     protected JFormattedTextField newValueField;
 
-    public QueueFieldProperty(Container parent, IQueueField field, boolean showReference, Boolean isConnected) {
-        super(parent, field, showReference, isConnected);
+    public QueueFieldProperty(Container parent, IQueueField field, boolean showReference, Boolean isConnected, Boolean isPropagateUpdates) {
+        super(parent, field, showReference, isConnected, isPropagateUpdates);
 
         Format fieldFormatter = NumberFormat.getNumberInstance();
         newValueField = new JFormattedTextField(fieldFormatter);
@@ -97,7 +97,7 @@ public class QueueFieldProperty extends FieldOutputProperty<IQueueField> impleme
         addGridEntry(newValueField, 2, pos, 1, insets);
 
         showReference(3, pos, insets);
-        if(isConnected != null)
+        if(isConnected != null || isPropagateUpdate != null)
             showConnected(4, pos, insets);
     }
 }

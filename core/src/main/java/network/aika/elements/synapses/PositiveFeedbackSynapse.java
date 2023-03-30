@@ -58,6 +58,9 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
                 getWeight()
         );
 
+        dummyWeight.getInputLinkByArg(1)
+                .setPropagateUpdates(false);
+
         oAct.setPosFeedbackDummy(dummyWeight);
         linkAndConnect(dummyWeight, -1, oAct.getNet());
     }

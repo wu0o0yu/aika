@@ -42,6 +42,10 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
         this.propagateUpdates = propagateUpdates;
     }
 
+    public boolean isPropagateUpdates() {
+        return propagateUpdates;
+    }
+
     public boolean isConnected() {
         return connected;
     }
