@@ -19,9 +19,9 @@ public class PatternLogger {
 
     CSVPrinter printer;
 
-    public PatternLogger(String filename)  {
+
+    public void open(File f)  {
         try {
-            File f = new File("experiments/src/main/resources/experiments/", filename);
             if(f.exists())
                 f.delete();
 

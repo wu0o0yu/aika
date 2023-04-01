@@ -86,7 +86,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
     public boolean instantiationNodesIsQueued;
     public boolean instantiationEdgesIsQueued;
-
     protected boolean isNewInstance;
 
     protected Range range;
@@ -156,6 +155,10 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     }
 
     protected void initDummyLinks() {
+    }
+
+    public boolean isNewInstance() {
+        return isNewInstance;
     }
 
     public void setNet(double v) {
