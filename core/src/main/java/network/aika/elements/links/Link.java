@@ -33,7 +33,6 @@ import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.*;
 import static network.aika.elements.activations.Timestamp.FIRED_COMPARATOR;
-import static network.aika.utils.Utils.TOLERANCE;
 
 /**
  *

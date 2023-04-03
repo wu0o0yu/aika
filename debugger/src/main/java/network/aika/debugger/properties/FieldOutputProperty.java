@@ -134,7 +134,7 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
             label += isConnected ? "connected" : "unconnected";
 
         if(isPropagateUpdate != null)
-            label += isPropagateUpdate ? "prop" : "no prop";
+            label += isPropagateUpdate ? " prop" : " no prop";
 
         JLabel jOutRef = new JLabel(label);
         addGridEntry(jOutRef, xPos, yPos, 1, insets);

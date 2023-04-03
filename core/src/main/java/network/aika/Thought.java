@@ -306,32 +306,6 @@ public abstract class Thought extends FieldObject implements Element {
         process(TRAINING);
     }
 
-    public double getStepScale() {
-        return getNegativeFeedbackLinks().mapToDouble(l -> {
-                    double x = l.getMaxInput().getCurrentValue();
-                    double w = l.getSynapse().getWeight().getCurrentValue();
-                    double wi = x * w;
-
-                    Field net = l.getOutput().getNet();
-
-                    if(wi >= 0.0 || net.getCurrentValue() <= 0.0)
-                        return 1.0;
-
-                    return net.getCurrentValue() / -wi;
-                })
-                .min()
-                .orElse(1.0);
-    }
-
-    public Stream<NegativeFeedbackLink> getNegativeFeedbackLinks() {
-        return annealing
-                .getReceivers()
-                .stream()
-                .filter(fl -> fl.getOutput() instanceof Field)
-                .map(fl ->  (Field) fl.getOutput())
-                .map(f -> (NegativeFeedbackLink) f.getReference());
-    }
-
     public void instantiateTemplates() {
         if (!getConfig().isMetaInstantiationEnabled())
             return;

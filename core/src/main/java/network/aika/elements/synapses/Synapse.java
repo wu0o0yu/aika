@@ -187,9 +187,9 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public void setModified() {
-        getStoredAt()
-                .getNeuron(this)
-                .setModified();
+        Neuron n = getStoredAt().getNeuron(this);
+        if(n != null)
+            n.setModified();
     }
 
     public void count(L l) {
@@ -308,10 +308,16 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public I getInput() {
+        if(input == null)
+            return null;
+
         return (I) input.getNeuron();
     }
 
     public O getOutput() {
+        if(output == null)
+            return null;
+
         return (O) output.getNeuron();
     }
 

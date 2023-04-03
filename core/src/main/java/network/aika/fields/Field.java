@@ -63,7 +63,10 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public Field addListener(String listenerName, FieldOnTrueEvent fieldListener) {
-        addOutput(createEventListener(this, listenerName, fieldListener));
+        ListenerFieldLink fl = createEventListener(this, listenerName, fieldListener);
+        addOutput(fl);
+        fl.connect(true);
+
         return this;
     }
 

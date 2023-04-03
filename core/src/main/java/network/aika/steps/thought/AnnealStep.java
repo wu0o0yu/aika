@@ -17,6 +17,7 @@
 package network.aika.steps.thought;
 
 import network.aika.Thought;
+import network.aika.elements.neurons.ActivationFunction;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 import network.aika.utils.Utils;
@@ -31,27 +32,24 @@ import static network.aika.steps.Phase.*;
 public class AnnealStep extends Step<Thought> {
 
     public static double STEP_SIZE = 0.05;
+    double nextStep;
 
     public static void add(Thought t) {
-        add(new AnnealStep(t, STEP_SIZE * t.getStepScale()));
+        add(new AnnealStep(t));
     }
 
-    public static void add(Thought t, Double normAnnealStepSize) {
-        add(new AnnealStep(t, normAnnealStepSize));
-    }
-
-    private Double normAnnealStepSize;
-
-    public AnnealStep(Thought t, Double normAnnealStepSize) {
+    public AnnealStep(Thought t) {
         super(t);
-        this.normAnnealStepSize = normAnnealStepSize;
     }
 
     @Override
     public void process() {
         Thought t = getElement();
 
-        double nextAnnealValue = normAnnealStepSize + t.getAnnealing().getCurrentValue();
+        nextStep = STEP_SIZE / ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT.outerGrad(t.getAnnealing().getCurrentValue());
+        double nextAnnealValue = nextStep + t.getAnnealing().getCurrentValue();
+        nextAnnealValue = Math.min(nextAnnealValue, 1.0);
+
         t.getAnnealing().setValue(nextAnnealValue);
 
         if (nextAnnealValue < 1.0)
@@ -65,6 +63,8 @@ public class AnnealStep extends Step<Thought> {
 
     @Override
     public String toString() {
-        return "docId:" + getElement().getId() + " annealStepSize:" + Utils.round(normAnnealStepSize) + " " + getElement().getAnnealing();
+        return "docId:" + getElement().getId() +
+                " NextStep:" + Utils.round(nextStep, 100000.0) +
+                " NextAnnealValue:" + Utils.round(getElement().getAnnealing().getCurrentValue(), 100000.0);
     }
 }
