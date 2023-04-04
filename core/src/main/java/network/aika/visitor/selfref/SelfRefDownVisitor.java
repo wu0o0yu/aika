@@ -38,11 +38,22 @@ public class SelfRefDownVisitor extends DownVisitor<BindingActivation> {
     public boolean isSelfRef() {
         return isSelfRef;
     }
+    public boolean isActivationMatch(BindingActivation origin){
+        if (origin==oAct){
+            return true;
+        } else if ( origin == oAct.getTemplate() ) {
+            return true;
+        } else if (origin.getTemplate() == oAct) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 
     @Override
     public void up(BindingActivation origin) {
-        if(origin == oAct || origin == oAct.getTemplate() || origin.getTemplate() == oAct)
-            isSelfRef = true;
+        isSelfRef=isActivationMatch(origin);
     }
 
     protected void visitDown(Link l) {
