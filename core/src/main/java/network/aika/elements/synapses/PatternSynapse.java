@@ -76,12 +76,12 @@ public class PatternSynapse extends ConjunctiveSynapse<
         return sampleSpace;
     }
 
-    public double getFrequency(Sign is, Sign os, double n) {
-        if(is == POS && os == POS) {
+    public double getFrequency(Sign inputSign, Sign outputSign, double n) {
+        if(inputSign == POS && outputSign == POS) {
             return frequencyIPosOPos;
-        } else if(is == POS && os == NEG) {
+        } else if(inputSign == POS && outputSign == NEG) {
             return frequencyIPosONeg;
-        } else if(is == NEG && os == POS) {
+        } else if(inputSign == NEG && outputSign == POS) {
             return frequencyINegOPos;
         }
 
@@ -89,12 +89,12 @@ public class PatternSynapse extends ConjunctiveSynapse<
         return Math.max(n - (frequencyIPosOPos + frequencyIPosONeg + frequencyINegOPos), 0);
     }
 
-    public void setFrequency(Sign is, Sign os, double f) {
-        if(is == POS && os == POS) {
+    public void setFrequency(Sign inputSign, Sign outputSign, double f) {
+        if(inputSign == POS && outputSign == POS) {
             frequencyIPosOPos = f;
-        } else if(is == POS && os == NEG) {
+        } else if(inputSign == POS && outputSign == NEG) {
             frequencyIPosONeg = f;
-        } else if(is == NEG && os == POS) {
+        } else if(inputSign == NEG && outputSign == POS) {
             frequencyINegOPos = f;
         } else {
             throw new UnsupportedOperationException();
@@ -110,14 +110,14 @@ public class PatternSynapse extends ConjunctiveSynapse<
         setModified();
     }
 
-    public void updateFrequencyForIandO(boolean iActive,boolean oActive){
-        if(iActive && oActive) {
+    public void updateFrequencyForIandO(boolean inputActive,boolean outputActive){
+        if(inputActive && outputActive) {
             frequencyIPosOPos += 1.0;
             setModified();
-        } else if(iActive) {
+        } else if(inputActive) {
             frequencyIPosONeg += 1.0;
             setModified();
-        } else if(oActive) {
+        } else if(outputActive) {
             frequencyINegOPos += 1.0;
             setModified();
         }
@@ -130,8 +130,8 @@ public class PatternSynapse extends ConjunctiveSynapse<
         if(l.getInput() == null)
             return; // TODO: fix
 
-        boolean iActive = l.getInput() != null && l.getInput().isFired();
-        boolean oActive = l.getOutput().isFired();
+        boolean inputActive = l.getInput() != null && l.getInput().isFired();
+        boolean outputActive = l.getOutput().isFired();
 
         Range absoluteRange = l.getInput().getAbsoluteRange();
         if(absoluteRange == null)
@@ -141,7 +141,7 @@ public class PatternSynapse extends ConjunctiveSynapse<
 
         sampleSpace.count();
 
-        if(oActive) {
+        if(outputActive) {
             Double alpha = l.getConfig().getAlpha();
             if (alpha != null)
                 applyMovingAverage(
@@ -149,26 +149,27 @@ public class PatternSynapse extends ConjunctiveSynapse<
                 );
         }
 
-        updateFrequencyForIandO(iActive,oActive);
+        updateFrequencyForIandO(inputActive,outputActive);
         sampleSpace.updateLastPosition(absoluteRange);
     }
 
-    public double getSurprisal(Sign si, Sign so, Range range, boolean addCurrentInstance) {
+
+    public double getSurprisal(Sign inputSign, Sign outputSign, Range range, boolean addCurrentInstance) {
         double n = sampleSpace.getN(range);
-        double p = getProbability(si, so, n, addCurrentInstance);
-        return Utils.surprisal(p);
+        double probability = getProbability(inputSign, outputSign, n, addCurrentInstance);
+        return Utils.surprisal(probability);
     }
 
-    public double getProbability(Sign si, Sign so, double n, boolean addCurrentInstance) {
-        double f = getFrequency(si, so, n);
+    public double getProbability(Sign inputSign, Sign outputSign, double n, boolean addCurrentInstance) {
+        double frequency = getFrequency(inputSign, outputSign, n);
 
         // Add the current instance
         if(addCurrentInstance) {
-            f += 1.0;
+            frequency += 1.0;
             n += 1.0;
         }
 
-        return Bound.UPPER.probability(f, n);
+        return Bound.UPPER.probability(frequency, n);
     }
 
     @Override
