@@ -110,6 +110,19 @@ public class PatternSynapse extends ConjunctiveSynapse<
         setModified();
     }
 
+    public void updateFrequencyForIandO(boolean iActive,boolean oActive){
+        if(iActive && oActive) {
+            frequencyIPosOPos += 1.0;
+            setModified();
+        } else if(iActive) {
+            frequencyIPosONeg += 1.0;
+            setModified();
+        } else if(oActive) {
+            frequencyINegOPos += 1.0;
+            setModified();
+        }
+    }
+
     @Override
     public void count(PatternLink l) {
         double oldN = sampleSpace.getN();
@@ -136,17 +149,7 @@ public class PatternSynapse extends ConjunctiveSynapse<
                 );
         }
 
-        if(iActive && oActive) {
-            frequencyIPosOPos += 1.0;
-            setModified();
-        } else if(iActive) {
-            frequencyIPosONeg += 1.0;
-            setModified();
-        } else if(oActive) {
-            frequencyINegOPos += 1.0;
-            setModified();
-        }
-
+        updateFrequencyForIandO(iActive,oActive);
         sampleSpace.updateLastPosition(absoluteRange);
     }
 
