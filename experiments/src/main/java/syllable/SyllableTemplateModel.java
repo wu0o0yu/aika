@@ -204,7 +204,7 @@ public class SyllableTemplateModel {
                 .adjustBias(valueTarget);
 
         new PositiveFeedbackSynapse()
-                .setWeight(netTarget)
+                .setWeight(netTarget / patternValueTarget)
                 .init(syllablePatternN, bn)
                 .adjustBias(patternValueTarget);
 
