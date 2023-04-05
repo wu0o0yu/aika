@@ -22,6 +22,8 @@ import network.aika.debugger.stepmanager.StepManager;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -30,9 +32,17 @@ import java.awt.event.KeyListener;
 public class DebuggerKeyListener implements KeyListener {
 
     private AIKADebugger debugger;
+    private Map<Character, KeyEventAction> actions;
 
     public DebuggerKeyListener(AIKADebugger debugger) {
         this.debugger = debugger;
+        actions = new HashMap<>();
+        actions.put('m', new MAction());
+        actions.put('e', new EAction());
+        actions.put('r', new RAction());
+        actions.put('b', new BAction());
+        actions.put('l', new LAction());
+        actions.put('o', new OAction());
     }
 
     @Override
@@ -45,52 +55,81 @@ public class DebuggerKeyListener implements KeyListener {
         if(avm == null)
             return;
 
-        StepManager sm = avm.getStepManager();
-
         char c = e.getKeyChar();
+        KeyEventAction action = actions.get(c);
+        if (action != null) {
+            action.execute(avm);
+        } else if(e.isControlDown() && Character.isDigit(c)) {
+            int testCaseId = Integer.parseInt("" + c);
+            Runnable testCase = debugger.getTestCaseListeners().get(testCaseId);
+            StepManager sm = avm.getStepManager();
 
-        switch(c) {
-            case 'm':
-                System.out.println("Metric: " + debugger.getActivationViewManager().getCamera().getMetrics());
-                return;
-            case 'e':
-                sm.setStopAfterProcessed(true);
+            if(testCase != null && testCase != debugger.getCurrentTestCase()) {
+                sm.setRestartTestcaseSignal(true);
+                debugger.setCurrentTestCase(testCase);
                 sm.click();
-                break;
-            case 'r':
-                sm.setStepMode(false);
-                sm.setBreakpoint(null);
-                sm.resetTimestamp();
-                sm.click();
-                break;
-            case 'b':
-                sm.setStepMode(false);
-                sm.resetTimestamp();
-                sm.setBreakpoint(debugger.getNextBreakpoint());
-                sm.click();
-                break;
-            case 'l':
-                sm.setStepMode(true);
-                sm.click();
-                break;
-            default:
-                if(e.isControlDown() && Character.isDigit(c)) {
-                    int testCaseId = Integer.parseInt("" + c);
-                    Runnable testCase = debugger.getTestCaseListeners().get(testCaseId);
-
-                    if(testCase != null && testCase != debugger.getCurrentTestCase()) {
-                        sm.setRestartTestcaseSignal(true);
-                        debugger.setCurrentTestCase(testCase);
-                        sm.click();
-                    }
-                }
+            }
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        char c = e.getKeyChar();
-        if(c == 'o') {
+    }
+
+    private interface KeyEventAction {
+        void execute(ActivationViewManager avm);
+    }
+
+    private class MAction implements KeyEventAction {
+        @Override
+        public void execute(ActivationViewManager avm) {
+            System.out.println("Metric: " + debugger.getActivationViewManager().getCamera().getMetrics());
+        }
+    }
+
+    private class EAction implements KeyEventAction {
+        @Override
+        public void execute(ActivationViewManager avm) {
+            StepManager sm = avm.getStepManager();
+            sm.setStopAfterProcessed(true);
+            sm.click();
+        }
+    }
+
+    private class RAction implements KeyEventAction {
+        @Override
+        public void execute(ActivationViewManager avm) {
+            StepManager sm = avm.getStepManager();
+            sm.setStepMode(false);
+            sm.setBreakpoint(null);
+            sm.resetTimestamp();
+            sm.click();
+        }
+    }
+
+    private class BAction implements KeyEventAction {
+        @Override
+        public void execute(ActivationViewManager avm) {
+            StepManager sm = avm.getStepManager();
+            sm.setStepMode(false);
+            sm.resetTimestamp();
+            sm.setBreakpoint(debugger.getNextBreakpoint());
+            sm.click();
+        }
+    }
+
+    private class LAction implements KeyEventAction {
+        @Override
+        public void execute(ActivationViewManager avm) {
+            StepManager sm = avm.getStepManager();
+            sm.setStepMode(true);
+            sm.click();
+        }
+    }
+
+    private class OAction implements KeyEventAction {
+        @Override
+        public void execute(ActivationViewManager avm) {
             debugger.getActivationViewManager().dumpNetworkCoordinates();
             debugger.getNeuronViewManager().dumpNetworkCoordinates();
         }
