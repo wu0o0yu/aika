@@ -18,6 +18,7 @@ package syllable.logger;
 
 import network.aika.elements.activations.PatternActivation;
 import network.aika.text.Document;
+import org.apache.commons.csv.CSVFormat;
 
 import java.io.File;
 import java.util.TreeMap;
@@ -27,6 +28,8 @@ import java.util.TreeMap;
  * @author Lukas Molzberger
  */
 public class ExperimentLogger {
+
+    public static CSVFormat CSV_FORMAT = CSVFormat.EXCEL;
 
     File experimentPath = new File("experiments/src/main/resources/experiments/");
 

@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static syllable.logger.ExperimentLogger.CSV_FORMAT;
+
 /**
  * @author Lukas Molzberger
  */
@@ -56,8 +58,10 @@ public class PatternLogger {
             }
 
             FileWriter fw = new FileWriter(f);
-            printer = new CSVPrinter(fw, CSVFormat.DEFAULT
-                    .withHeader(headerLabels.toArray(new String[0])));
+            printer = new CSVPrinter(
+                    fw,
+                    CSV_FORMAT.withHeader(headerLabels.toArray(new String[0]))
+            );
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

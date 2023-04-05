@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static syllable.logger.ExperimentLogger.CSV_FORMAT;
 import static syllable.logger.StatisticLogger.Key.*;
 
 /**
@@ -49,8 +50,10 @@ public class StatisticLogger  {
                     .collect(Collectors.toList());
 
             FileWriter fw = new FileWriter(f);
-            printer = new CSVPrinter(fw, CSVFormat.DEFAULT
-                    .withHeader(headerLabels.toArray(new String[0])));
+            printer = new CSVPrinter(
+                    fw,
+                    CSV_FORMAT.withHeader(headerLabels.toArray(new String[0]))
+            );
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
