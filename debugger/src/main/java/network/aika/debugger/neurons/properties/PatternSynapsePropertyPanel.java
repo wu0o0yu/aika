@@ -41,7 +41,7 @@ public class PatternSynapsePropertyPanel extends ConjunctiveSynapsePropertyPanel
         addConstant("Frequency(POS, NEG): ", frequencyToString(POS, NEG, s, range));
         addConstant("Frequency(NEG, POS): ", frequencyToString(NEG, POS, s, range));
         addConstant("Frequency(NEG, NEG): ", frequencyToString(NEG, NEG, s, range));
-        addConstant("SampleSpace: ", "" + s.getSampleSpace());
+        addConstant("SampleSpace: ", "" + s.getSampleSpace().toString(range));
         addConstant("P(POS, POS) :", probabilityToString(POS, POS, s, range));
         addConstant("P(POS, NEG) :", probabilityToString(POS, NEG, s, range));
         addConstant("P(NEG, POS) :", probabilityToString(NEG, POS, s, range));
@@ -51,8 +51,6 @@ public class PatternSynapsePropertyPanel extends ConjunctiveSynapsePropertyPanel
         addConstant("Surprisal(NEG, POS): ", surprisalToString(NEG, POS, s, range));
         addConstant("Surprisal(NEG, NEG): ", surprisalToString(NEG, NEG, s, range));
     }
-
-
 
     private String frequencyToString(Sign is, Sign os, PatternSynapse s, Range range) {
         double N = s.getSampleSpace().getN(range);

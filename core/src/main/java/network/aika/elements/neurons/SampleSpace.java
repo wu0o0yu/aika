@@ -114,7 +114,11 @@ public class SampleSpace implements Writable {
             lastPosition = in.readLong();
     }
 
+    public String toString(Range r) {
+        return "N:" + getN(r) + " lastPosition:" + (lastPosition != null ? lastPosition : "X");
+    }
+
     public String toString() {
-        return "N:" + N + " lastPosition:" + (lastPosition != null ? lastPosition : "X");
+        return toString(null);
     }
 }

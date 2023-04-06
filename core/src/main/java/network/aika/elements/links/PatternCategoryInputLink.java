@@ -41,8 +41,4 @@ public class PatternCategoryInputLink extends CategoryInputLink {
     @Override
     protected void connectGradientFields() {
     }
-
-    @Override
-    public void patternVisit(Visitor v) {
-    }
 }

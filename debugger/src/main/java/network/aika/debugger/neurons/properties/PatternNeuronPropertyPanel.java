@@ -40,7 +40,7 @@ public class PatternNeuronPropertyPanel<E extends PatternNeuron> extends Conjunc
         Range range = ref != null ? ref.getAbsoluteRange() : null;
         addConstant("Range: ", range != null ? "" + range : NOT_SET_STR);
         addConstant("Frequency: ", "" + Utils.round(n.getFrequency()));
-        addConstant("SampleSpace: ", "" + n.getSampleSpace());
+        addConstant("SampleSpace: ", "" + n.getSampleSpace().toString(range));
         addConstant("P(POS): ", probabilityToString(POS, n, range));
         addConstant("P(NEG): ", probabilityToString(NEG, n, range));
         addConstant("Surprisal(POS): ", surprisalToString(POS, n, range));
