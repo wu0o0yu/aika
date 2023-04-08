@@ -105,7 +105,10 @@ public class SyllablesExperiment {
         return new Config() {
             public String getLabel(Activation act) {
                 Document doc = (Document) act.getThought();
-                return doc.getTextSegment(act.getRange());
+                String label = doc.getTextSegment(act.getRange());
+
+                System.out.println("   Instantiating " + act.getClass().getSimpleName() + " " + label);
+                return label;
             }
         };
     }
@@ -171,7 +174,7 @@ public class SyllablesExperiment {
             AIKADebugger debugger = null;
             System.out.println(counter[0] + " " + w);
             if(counter[0] >= 11) {// 3, 6, 11
-             //   debugger = AIKADebugger.createAndShowGUI(doc);
+                debugger = AIKADebugger.createAndShowGUI(doc);
             }
 
             processTokens(

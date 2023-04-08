@@ -24,6 +24,9 @@ import network.aika.elements.activations.Activation;
  */
 public class Config {
     private Double alpha = null; //0.99;
+
+    private double annealStepSize = 0.001;
+
     private double learnRate;
 
     private double learnRateForAbstract;
@@ -53,6 +56,15 @@ public class Config {
 
     public Config setLearnRateForAbstract(double learnRate) {
         this.learnRateForAbstract = learnRateForAbstract;
+        return this;
+    }
+
+    public double getAnnealStepSize() {
+        return annealStepSize;
+    }
+
+    public Config setAnnealStepSize(double annealStepSize) {
+        this.annealStepSize = annealStepSize;
         return this;
     }
 
@@ -93,7 +105,7 @@ public class Config {
         return this;
     }
 
-    public String getLabel(Activation bs) {
+    public String getLabel(Activation act) {
         return "";
     }
 

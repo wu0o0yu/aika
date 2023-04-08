@@ -31,7 +31,6 @@ import static network.aika.steps.Phase.*;
  */
 public class AnnealStep extends Step<Thought> {
 
-    public static double STEP_SIZE = 0.05;
     double nextStep;
 
     public static void add(Thought t) {
@@ -46,7 +45,7 @@ public class AnnealStep extends Step<Thought> {
     public void process() {
         Thought t = getElement();
 
-        nextStep = STEP_SIZE / ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT.outerGrad(t.getAnnealing().getCurrentValue());
+        nextStep = t.getConfig().getAnnealStepSize() / ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT.outerGrad(t.getAnnealing().getCurrentValue());
         double nextAnnealValue = nextStep + t.getAnnealing().getCurrentValue();
         nextAnnealValue = Math.min(nextAnnealValue, 1.0);
 
