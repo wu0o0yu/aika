@@ -80,8 +80,11 @@ public abstract class AbstractFunction extends Field implements FieldInput {
 
     @Override
     public void receiveUpdate(AbstractFieldLink fl, double u) {
-        newValue += computeUpdate(fl, u);
+        double update = computeUpdate(fl, u);
+        if(update == 0.0)
+            return;
 
+        newValue += update;
         triggerUpdate();
     }
 }
