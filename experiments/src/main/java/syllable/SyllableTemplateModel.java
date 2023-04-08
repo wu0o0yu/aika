@@ -45,6 +45,9 @@ public class SyllableTemplateModel {
     double letterPatternNetTarget;
     double letterPatternValueTarget;
 
+    static double POS_MARGIN = 1.0;
+    static double NEG_MARGIN = 1.1;
+
 
     public SyllableTemplateModel(Model m) {
         model = m;
@@ -178,7 +181,7 @@ public class SyllableTemplateModel {
                 .init(bn, inhibitoryN);
 
         new NegativeFeedbackSynapse()
-                .setWeight(-20.0)
+                .setWeight(NEG_MARGIN * -netTarget)
                 .init(inhibitoryN, bn);
 
         if(lastPos == null || lastBN == null) {
@@ -210,7 +213,7 @@ public class SyllableTemplateModel {
 
         PatternSynapse pSyn = new PatternSynapse()
                 .setWeight(2.5)
-                .setOptional(true)
+                .setOptional(pos != 0)
                 .init(bn, syllablePatternN)
                 .adjustBias(valueTarget);
 
@@ -218,7 +221,7 @@ public class SyllableTemplateModel {
 
 
         PositiveFeedbackSynapse posFeedSyn = new PositiveFeedbackSynapse()
-                .setWeight(netTarget / patternValueTarget)
+                .setWeight(POS_MARGIN * (netTarget / patternValueTarget))
                 .init(syllablePatternN, bn)
                 .adjustBias(patternValueTarget);
 
@@ -269,7 +272,7 @@ public class SyllableTemplateModel {
                 .init(bn, inhibitoryN);
 
         new NegativeFeedbackSynapse()
-                .setWeight(-20.0)
+                .setWeight(NEG_MARGIN * -netTarget)
                 .init(inhibitoryN, bn)
                 .adjustBias();
 
@@ -304,7 +307,7 @@ public class SyllableTemplateModel {
                 .adjustBias(valueTarget);
 
         PositiveFeedbackSynapse posFeedSyn = new PositiveFeedbackSynapse()
-                .setWeight(netTarget / patternValueTarget)
+                .setWeight(POS_MARGIN * (netTarget / patternValueTarget))
                 .init(syllablePatternN, bn)
                 .adjustBias(patternValueTarget);
 
