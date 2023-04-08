@@ -17,9 +17,12 @@
 package network.aika.elements.activations;
 
 import network.aika.Thought;
+import network.aika.elements.links.CategoryInputLink;
 import network.aika.elements.links.ConjunctiveLink;
 import network.aika.elements.neurons.ConjunctiveNeuron;
 import network.aika.elements.synapses.ConjunctiveSynapse;
+
+import java.util.stream.Stream;
 
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.scale;

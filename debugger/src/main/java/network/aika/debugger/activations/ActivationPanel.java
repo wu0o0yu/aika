@@ -19,6 +19,7 @@ package network.aika.debugger.activations;
 import network.aika.debugger.ElementPanel;
 import network.aika.debugger.activations.properties.LinksPropertyPanel;
 import network.aika.debugger.activations.properties.SynapsesPropertyPanel;
+import network.aika.debugger.activations.properties.TemplateInstancesPropertyPanel;
 import network.aika.debugger.properties.AbstractPropertyPanel;
 import network.aika.direction.Direction;
 import network.aika.elements.activations.Activation;
@@ -107,6 +108,16 @@ public class ActivationPanel extends ElementPanel {
                         "PreAct Output-Synapses",
                         "Shows the PreAct Output-Synapses",
                         synapsesPropertyPanel
+                );
+        }
+
+        if(act.isAbstract()) {
+            AbstractPropertyPanel templateInstancesPropertyPanel = TemplateInstancesPropertyPanel.create(act);
+            if (templateInstancesPropertyPanel != null)
+                addTab(
+                        "Template-Instances",
+                        "Shows the Template-Instances",
+                        templateInstancesPropertyPanel
                 );
         }
     }

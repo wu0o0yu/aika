@@ -70,6 +70,13 @@ public class ActivationPropertyPanel<E extends Activation> extends AbstractPrope
         addField(act.getNetOuterGradient());
         addField(act.getUpdateValue());
         addField(act.getNegUpdateValue());
+
+        if(act.getTemplate() != null)
+            addConstant("Template: ", getShortString(act.getTemplate()));
+
+        Activation ati = act.getActiveTemplateInstance();
+        if(ati != null)
+            addConstant("Active Template-Instance: ", getShortString(ati));
     }
 
     public static ActivationPropertyPanel create(Activation act) {

@@ -161,6 +161,10 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         return isNewInstance;
     }
 
+    public boolean isAbstract() {
+        return neuron.isAbstract();
+    }
+
     public void setNet(double v) {
         net.setValue(v);
     }
@@ -475,6 +479,15 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(null);
+    }
+
+    public Stream<Activation> getTemplateInstances() {
+        CategoryInputLink cil = getCategoryInputLink();
+        if(cil == null || cil.getInput() == null)
+            return Stream.empty();
+
+        return cil.getInput()
+                .getCategoryInputs();
     }
 
     public boolean isActiveTemplateInstance() {

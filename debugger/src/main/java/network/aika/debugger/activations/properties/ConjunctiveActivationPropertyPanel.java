@@ -16,9 +16,7 @@
  */
 package network.aika.debugger.activations.properties;
 
-import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.ConjunctiveActivation;
-import network.aika.elements.links.CategoryInputLink;
 
 /**
  * @author Lukas Molzberger
@@ -30,25 +28,4 @@ public class ConjunctiveActivationPropertyPanel<E extends ConjunctiveActivation>
         super(act);
     }
 
-    @Override
-    public void initTrainingSection(E act) {
-        super.initTrainingSection(act);
-
-        if(act.getTemplate() != null)
-            addConstant("Template: ", getShortString(act.getTemplate()));
-
-        Activation ati = act.getActiveTemplateInstance();
-        if(ati != null)
-            addConstant("Active Template-Instance: ", getShortString(ati));
-
-        CategoryInputLink cil = act.getCategoryInputLink();
-        if(cil == null || cil.getInput() == null)
-            return;
-
-        cil.getInput()
-                .getCategoryInputs()
-                .forEach(tiAct ->
-                        addConstant("Template-Instance: ", getShortString(tiAct))
-                );
-    }
 }
