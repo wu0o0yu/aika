@@ -25,7 +25,7 @@ import network.aika.elements.activations.Activation;
 public class Config {
     private Double alpha = null; //0.99;
 
-    private double annealStepSize = 0.001;
+    private double annealStepSize = 0.05;
 
     private double learnRate;
 

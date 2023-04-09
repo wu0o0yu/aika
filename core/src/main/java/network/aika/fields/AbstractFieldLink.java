@@ -102,6 +102,10 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
                 0.0;
     }
 
+    public double getNewInputValue() {
+        return input.getNewValue();
+    }
+
     public int getArgument() {
         return arg;
     }
