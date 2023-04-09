@@ -53,7 +53,7 @@ import static network.aika.utils.Utils.TOLERANCE;
  */
 public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neuron<OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends Activation> extends FieldObject implements Element, Writable {
 
-    private static final Logger log = LoggerFactory.getLogger(Synapse.class);
+    protected static final Logger log = LoggerFactory.getLogger(Synapse.class);
 
     protected NeuronProvider input;
     protected NeuronProvider output;

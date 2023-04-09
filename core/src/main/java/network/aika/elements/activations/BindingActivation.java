@@ -24,6 +24,8 @@ import network.aika.fields.*;
 import network.aika.elements.neurons.BindingNeuron;
 import network.aika.visitor.DownVisitor;
 
+import java.util.stream.Stream;
+
 import static network.aika.fields.Fields.isTrue;
 import static network.aika.utils.Utils.TOLERANCE;
 
@@ -44,10 +46,14 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     public boolean isActiveTemplateInstance() {
         return isNewInstance || (
                 isTrue(isFired) &&
-                        getInputLinksByType(PositiveFeedbackLink.class)
-                                .map(Link::getInput)
-                                .anyMatch(act -> act.isFired())
+                        getPatternActivations()
+                                .anyMatch(Activation::isFired)
         );
+    }
+
+    public Stream<PatternActivation> getPatternActivations() {
+        return getInputLinksByType(PositiveFeedbackLink.class)
+                .map(Link::getInput);
     }
 
     @Override

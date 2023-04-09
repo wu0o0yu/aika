@@ -17,8 +17,10 @@
 package network.aika.elements.synapses;
 
 import network.aika.Model;
+import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
+import network.aika.elements.links.Link;
 import network.aika.elements.links.PatternLink;
 import network.aika.elements.neurons.PatternNeuron;
 import network.aika.elements.neurons.Range;
@@ -31,6 +33,8 @@ import network.aika.utils.Utils;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
@@ -62,7 +66,23 @@ public class PatternSynapse extends ConjunctiveSynapse<
 
     @Override
     public PatternLink createLink(BindingActivation input, PatternActivation output) {
+        checkAlreadyLinkedToPattern(input);
+
         return new PatternLink(this, input, output);
+    }
+
+    private static void checkAlreadyLinkedToPattern(BindingActivation input) {
+        if(input == null)
+            return;
+
+        if(input.getOutputLinksByType(PatternLink.class).count() > 0) {
+            log.warn("Already linked to Pattern: " +
+                    input.getOutputLinksByType(PatternLink.class)
+                            .map(Link::getOutput)
+                            .map(Activation::toString)
+                            .collect(Collectors.joining(", "))
+            );
+        }
     }
 
     @Override
