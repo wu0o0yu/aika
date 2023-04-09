@@ -22,6 +22,7 @@ import network.aika.elements.links.Link;
 import network.aika.elements.neurons.Range;
 import network.aika.elements.neurons.CategoryNeuron;
 
+import java.util.Comparator;
 import java.util.stream.Stream;
 
 /**
@@ -44,8 +45,12 @@ public class CategoryActivation extends DisjunctiveActivation<CategoryNeuron> {
     @Override
     public Activation getActiveTemplateInstance() {
         return getCategoryInputs()
-                .filter(act -> act.isActiveTemplateInstance())
-                .findFirst()
+                .filter(Activation::isActiveTemplateInstance)
+                .max(
+                        Comparator.comparingDouble(act ->
+                                act.getNet().getCurrentValue()
+                        )
+                )
                 .orElse(null);
     }
 

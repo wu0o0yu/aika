@@ -18,11 +18,13 @@ package network.aika.elements.activations;
 
 import network.aika.Thought;
 import network.aika.elements.links.Link;
+import network.aika.elements.links.PositiveFeedbackLink;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
 import network.aika.fields.*;
 import network.aika.elements.neurons.BindingNeuron;
 import network.aika.visitor.DownVisitor;
 
+import static network.aika.fields.Fields.isTrue;
 import static network.aika.utils.Utils.TOLERANCE;
 
 /**
@@ -36,6 +38,16 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
 
     public BindingActivation(int id, Thought t, BindingNeuron n) {
         super(id, t, n);
+    }
+
+    @Override
+    public boolean isActiveTemplateInstance() {
+        return isNewInstance || (
+                isTrue(isFired) &&
+                        getInputLinksByType(PositiveFeedbackLink.class)
+                                .map(Link::getInput)
+                                .anyMatch(act -> act.isFired())
+        );
     }
 
     @Override

@@ -515,7 +515,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 this;
     }
 
-    public void instantiateTemplateNodes() {
+    public void instantiateTemplateNode() {
         N n = (N) neuron.instantiateTemplate();
 
         Activation<N> ti = n.createActivation(getThought());

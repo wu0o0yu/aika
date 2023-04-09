@@ -48,7 +48,7 @@ public class InstantiationNodes extends Step<Activation> {
     @Override
     public void process() {
         getElement()
-                .instantiateTemplateNodes();
+                .instantiateTemplateNode();
 
         getElement().instantiationNodesIsQueued = false;
     }
