@@ -17,11 +17,14 @@
 package network.aika.elements.activations;
 
 import network.aika.Thought;
+import network.aika.elements.links.InputPatternLink;
 import network.aika.elements.links.Link;
+import network.aika.elements.synapses.Scope;
 import network.aika.fields.*;
 import network.aika.elements.neurons.PatternNeuron;
 import network.aika.visitor.DownVisitor;
 import network.aika.sign.Sign;
+import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
 
 import static network.aika.fields.Fields.*;
 import static network.aika.utils.Utils.TOLERANCE;
@@ -96,5 +99,13 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
             super.inhibVisitDown(v, lastLink);
 
         v.up(this);
+    }
+
+    @Override
+    public void patternCatVisitDown(PatternCategoryDownVisitor v, Link lastLink) {
+        if(lastLink != null && lastLink.getSynapse().getScope() == Scope.INPUT)
+            v.up(this);
+        else
+            super.patternCatVisitDown(v, lastLink);
     }
 }

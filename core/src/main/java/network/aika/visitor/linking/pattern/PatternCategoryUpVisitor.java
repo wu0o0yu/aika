@@ -27,11 +27,17 @@ import network.aika.visitor.linking.inhibitory.InhibitoryDownVisitor;
 /**
  * @author Lukas Molzberger
  */
-public class PatternCategoryUpVisitor extends LinkingUpVisitor<BindingActivation> {
+public class PatternCategoryUpVisitor extends LinkingUpVisitor<PatternActivation> {
 
+    private PatternCategoryDownVisitor parent;
 
-    protected PatternCategoryUpVisitor(PatternCategoryDownVisitor parent, BindingActivation origin) {
+    protected PatternCategoryUpVisitor(PatternCategoryDownVisitor parent, PatternActivation origin) {
         super(parent, origin);
+        this.parent = parent;
+    }
+
+    public BindingActivation getReferenceAct() {
+        return parent.getReferenceAct();
     }
 
     public void check(Link lastLink, Activation act) {

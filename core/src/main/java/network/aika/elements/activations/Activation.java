@@ -32,6 +32,8 @@ import network.aika.fields.*;
 import network.aika.elements.synapses.Synapse;
 import network.aika.steps.activation.InstantiationEdges;
 import network.aika.visitor.DownVisitor;
+import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
+import network.aika.visitor.linking.pattern.PatternCategoryUpVisitor;
 import network.aika.visitor.selfref.SelfRefDownVisitor;
 import network.aika.visitor.UpVisitor;
 import network.aika.steps.activation.Counting;
@@ -209,11 +211,11 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         v.next(this);
     }
 
-    public void patternCatVisitDown(DownVisitor v, Link lastLink) {
+    public void patternCatVisitDown(PatternCategoryDownVisitor v, Link lastLink) {
         v.next(this);
     }
 
-    public void patternCatVisitUp(UpVisitor v, Link lastLink) {
+    public void patternCatVisitUp(PatternCategoryUpVisitor v, Link lastLink) {
         v.check(lastLink, this);
         v.next(this);
     }

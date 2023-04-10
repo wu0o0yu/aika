@@ -23,6 +23,8 @@ import network.aika.elements.synapses.PositiveFeedbackSynapse;
 import network.aika.fields.*;
 import network.aika.elements.neurons.BindingNeuron;
 import network.aika.visitor.DownVisitor;
+import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
+import network.aika.visitor.linking.pattern.PatternCategoryUpVisitor;
 
 import java.util.stream.Stream;
 
@@ -70,8 +72,15 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     @Override
-    public void patternCatVisitDown(DownVisitor v, Link lastLink) {
-        v.up(this);
+    public void patternCatVisitDown(PatternCategoryDownVisitor v, Link lastLink) {
+        v.setReferenceAct(this);
+        super.patternCatVisitDown(v, lastLink);
+    }
+
+    @Override
+    public void patternCatVisitUp(PatternCategoryUpVisitor v, Link lastLink) {
+        if(v.getReferenceAct().getTemplate() == getTemplate())
+            super.patternCatVisitUp(v, lastLink);
     }
 
     @Override

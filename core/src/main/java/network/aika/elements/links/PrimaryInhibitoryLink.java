@@ -39,4 +39,8 @@ public class PrimaryInhibitoryLink extends DisjunctiveLink<PrimaryInhibitorySyna
     @Override
     public void patternVisit(Visitor v) {
     }
+
+    @Override
+    public void patternCatVisit(Visitor v) {
+    }
 }

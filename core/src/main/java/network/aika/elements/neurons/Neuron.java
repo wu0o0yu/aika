@@ -149,7 +149,6 @@ public abstract class Neuron<A extends Activation> extends FieldObject implement
 
     public abstract void startVisitor(LinkingOperator c, Activation act, Synapse syn);
 
-
     public void linkOutgoing(Synapse synA, Activation iAct) {
         synA.getOutput().startVisitor(
                 new LinkLinkingOperator(iAct, synA),

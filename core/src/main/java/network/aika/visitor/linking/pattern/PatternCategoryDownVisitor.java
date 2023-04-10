@@ -28,14 +28,24 @@ import network.aika.visitor.linking.inhibitory.InhibitoryUpVisitor;
 /**
  * @author Lukas Molzberger
  */
-public class PatternCategoryDownVisitor extends LinkingDownVisitor<BindingActivation> {
+public class PatternCategoryDownVisitor extends LinkingDownVisitor<PatternActivation> {
+
+    private BindingActivation refAct;
 
     public PatternCategoryDownVisitor(Thought t, LinkingOperator operator) {
         super(t, operator);
     }
 
+    public BindingActivation getReferenceAct() {
+        return refAct;
+    }
+
+    public void setReferenceAct(BindingActivation refAct) {
+        this.refAct = refAct;
+    }
+
     @Override
-    public void up(BindingActivation origin) {
+    public void up(PatternActivation origin) {
         new PatternCategoryUpVisitor(this, origin)
                 .visitUp(origin, null);
     }

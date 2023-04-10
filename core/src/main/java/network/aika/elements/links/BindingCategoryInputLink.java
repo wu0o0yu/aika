@@ -20,6 +20,7 @@ import network.aika.elements.activations.*;
 import network.aika.elements.synapses.BindingCategoryInputSynapse;
 import network.aika.elements.synapses.BindingCategorySynapse;
 import network.aika.elements.synapses.CategorySynapse;
+import network.aika.visitor.Visitor;
 
 
 /**
@@ -34,5 +35,9 @@ public class BindingCategoryInputLink extends CategoryInputLink {
     @Override
     protected CategorySynapse createCategorySynapse() {
         return new BindingCategorySynapse();
+    }
+
+    @Override
+    public void patternCatVisit(Visitor v) {
     }
 }

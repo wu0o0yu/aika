@@ -19,6 +19,7 @@ package network.aika.elements.links;
 import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.activations.InhibitoryActivation;
 import network.aika.elements.synapses.InhibitoryCategorySynapse;
+import network.aika.visitor.Visitor;
 
 /**
  * @author Lukas Molzberger
@@ -27,5 +28,9 @@ public class InhibitoryCategoryLink extends CategoryLink<InhibitoryCategorySynap
 
     public InhibitoryCategoryLink(InhibitoryCategorySynapse s, InhibitoryActivation input, CategoryActivation output) {
         super(s, input, output);
+    }
+
+    @Override
+    public void patternCatVisit(Visitor v) {
     }
 }
