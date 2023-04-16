@@ -17,28 +17,29 @@
 package network.aika.fields;
 
 import network.aika.FieldObject;
-import network.aika.callbacks.UpdateListener;
-
-import java.util.Collection;
+import network.aika.steps.Phase;
+import network.aika.utils.Utils;
 
 /**
  * @author Lukas Molzberger
  */
-public interface FieldInput extends UpdateListener {
+public class QueuedMaxField extends QueueSumField {
 
-    String getLabel();
+    public QueuedMaxField(FieldObject ref, Phase phase, String label, Double tolerance) {
+        super(ref, phase, label, tolerance);
+    }
 
-    void addInput(FieldLink fl);
+    @Override
+    public void receiveUpdate(AbstractFieldLink fl, double u) {
+        computeUpdate(fl);
 
-    void removeInput(FieldLink fl);
+        if(Utils.belowTolerance(tolerance, newValue - currentValue))
+            return;
 
-    Collection<FieldLink> getInputs();
+        triggerUpdate();
+    }
 
-    void connectInputs(boolean initialize);
-
-    void disconnectInputs(boolean deinitialize);
-
-    int getNextArg();
-
-    FieldObject getReference();
+    private void computeUpdate(AbstractFieldLink fl) {
+        newValue = Math.max(currentValue, fl.getNewInputValue());
+    }
 }

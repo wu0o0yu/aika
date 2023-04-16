@@ -51,8 +51,7 @@ import static network.aika.elements.neurons.Range.tokenPositionEquals;
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.*;
 import static network.aika.fields.ThresholdOperator.Type.*;
-import static network.aika.steps.Phase.INFERENCE;
-import static network.aika.steps.Phase.TRAINING;
+import static network.aika.steps.Phase.*;
 import static network.aika.utils.Utils.TOLERANCE;
 
 /**
@@ -73,6 +72,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     protected FieldOutput negValue;
 
     protected SumField net;
+    protected SumField netPreAnneal;
 
     protected FieldOutput isFired;
 
@@ -154,6 +154,9 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         net = new ValueSortedQueueField(this, INFERENCE, "net", null);
         linkAndConnect(getNeuron().getBias(), net)
                 .setPropagateUpdates(false);
+
+        netPreAnneal = new QueuedMaxField(this, POST_CLOSE, "netPreAnneal", TOLERANCE);
+        linkAndConnect(net, netPreAnneal);
     }
 
     protected void initDummyLinks() {
@@ -228,9 +231,9 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         netOuterGradient =
                 func(
                         this,
-                        "f'(net)",
+                        "f'(netPreAnneal)",
                         TOLERANCE,
-                        net,
+                        netPreAnneal,
                         x -> getNeuron().getActivationFunction().outerGrad(x)
         );
     }
@@ -273,6 +276,10 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
     public SumField getNet() {
         return net;
+    }
+
+    public SumField getNetPreAnneal() {
+        return netPreAnneal;
     }
 
     public Timestamp getCreated() {

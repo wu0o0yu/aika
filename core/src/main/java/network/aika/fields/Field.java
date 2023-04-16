@@ -26,6 +26,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Stream;
 
 import static network.aika.fields.ListenerFieldLink.createEventListener;
 

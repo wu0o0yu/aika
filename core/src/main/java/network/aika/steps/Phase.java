@@ -27,6 +27,7 @@ public enum Phase {
     OUTPUT_LINKING("OL"),
     INFERENCE("I"),
     CLOSE("C"),
+    POST_CLOSE("PC"),
     ANNEAL("A"),
     TRAINING("T"),
     COUNTING("C"),
