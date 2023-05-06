@@ -42,7 +42,7 @@ public class SyllableTemplateModel {
 
     CategoryNeuron syllableCategory;
 
-    double letterPatternNetTarget;
+    double letterPatternNetTarget = 5.0;
     double letterPatternValueTarget;
 
     static double POS_MARGIN = 1.0;
@@ -65,7 +65,6 @@ public class SyllableTemplateModel {
                 .setWeight(0.01)
                 .init(letterCategory, letterPN);
 
-        letterPatternNetTarget = 4.0;
         letterPatternValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
                 .f(letterPatternNetTarget);
 

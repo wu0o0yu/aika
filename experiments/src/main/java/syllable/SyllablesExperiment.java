@@ -96,7 +96,7 @@ public class SyllablesExperiment {
         });
 
         for(TokenActivation tAct: tokenActs) {
-            tAct.setNet(10.0);
+            tAct.setNet(m.letterPatternNetTarget);
         }
     }
 
