@@ -21,6 +21,7 @@ import network.aika.elements.synapses.ConjunctiveSynapse;
 import network.aika.elements.synapses.PatternSynapse;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
 import network.aika.elements.synapses.SamePatternSynapse;
+import network.aika.utils.Utils;
 
 
 /**
@@ -38,7 +39,7 @@ public class ConjunctiveSynapsePropertyPanel<E extends ConjunctiveSynapse> exten
         addField(s.getSynapseBias());
         addConstant("isOptional", "" + s.isOptional());
 
-        addConstant("Sum of Lower Weights:", "" + s.getSumOfLowerWeights());
+        addConstant("Sum of Lower Weights:", "" + Utils.round(s.getSumOfLowerWeights(), 10000.0));
         addConstant("Sorting Weight:", "" + s.getSortingWeight());
     }
 
