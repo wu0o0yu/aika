@@ -62,7 +62,7 @@ public class SyllableTemplateModel {
                 .init(model, "Abstract Letter");
 
         CategoryInputSynapse pCatInputSyn = new PatternCategoryInputSynapse()
-                .setWeight(0.01)
+                .setWeight(1.0)
                 .init(letterCategory, letterPN);
 
         letterPatternValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
@@ -116,13 +116,13 @@ public class SyllableTemplateModel {
         );
 
         new PatternCategoryInputSynapse()
-                .setWeight(0.01)
+                .setWeight(1.0)
                 .init(syllableCategory, syllablePatternN);
 
         syllablePatternN.setBias(patternNetTarget);
 
         new InhibitoryCategoryInputSynapse()
-                .setWeight(0.01)
+                .setWeight(1.0)
                 .init(inhibCat, inhibitoryN);
     }
 
@@ -233,7 +233,7 @@ public class SyllableTemplateModel {
                 .adjustBias(letterPatternValueTarget);
 
         new BindingCategoryInputSynapse()
-                .setWeight(0.01)
+                .setWeight(1.0)
                 .init(catN, bn);
 
         bn.setBias(netTarget);
@@ -319,7 +319,7 @@ public class SyllableTemplateModel {
                 .adjustBias(letterPatternValueTarget);
 
         new BindingCategoryInputSynapse()
-                .setWeight(0.01)
+                .setWeight(1.0)
                 .init(catN, bn);
 
         bn.setBias(netTarget);
