@@ -62,7 +62,7 @@ public class SyllableTemplateModel {
                 .init(model, "Abstract Letter");
 
         CategoryInputSynapse pCatInputSyn = new PatternCategoryInputSynapse()
-                .setWeight(1.0)
+                .setWeight(0.01)
                 .init(letterCategory, letterPN);
 
         letterPatternNetTarget = 4.0;
@@ -117,13 +117,13 @@ public class SyllableTemplateModel {
         );
 
         new PatternCategoryInputSynapse()
-                .setWeight(1.0)
+                .setWeight(0.01)
                 .init(syllableCategory, syllablePatternN);
 
         syllablePatternN.setBias(patternNetTarget);
 
         new InhibitoryCategoryInputSynapse()
-                .setWeight(1.0)
+                .setWeight(0.01)
                 .init(inhibCat, inhibitoryN);
     }
 
@@ -234,7 +234,7 @@ public class SyllableTemplateModel {
                 .adjustBias(letterPatternValueTarget);
 
         new BindingCategoryInputSynapse()
-                .setWeight(1.0)
+                .setWeight(0.01)
                 .init(catN, bn);
 
         bn.setBias(netTarget);
@@ -320,7 +320,7 @@ public class SyllableTemplateModel {
                 .adjustBias(letterPatternValueTarget);
 
         new BindingCategoryInputSynapse()
-                .setWeight(1.0)
+                .setWeight(0.01)
                 .init(catN, bn);
 
         bn.setBias(netTarget);

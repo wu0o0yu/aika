@@ -523,7 +523,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 .map(Link::getInput)
                 .filter(Objects::nonNull)
                 .findFirst()
-                .map(Activation::getActiveTemplateInstance)
+                .map(CategoryActivation::getActiveTemplateInstance)
                 .orElse(null);
     }
 
