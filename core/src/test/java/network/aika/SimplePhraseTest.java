@@ -49,7 +49,7 @@ public class SimplePhraseTest {
 
         Config c = getConfig()
                         .setAlpha(0.99)
-                        .setLearnRate(-0.1)
+                        .setLearnRate(0.1)
                         .setTrainingEnabled(false);
 
         Random r = new Random(1);

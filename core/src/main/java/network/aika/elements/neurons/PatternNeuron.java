@@ -126,7 +126,7 @@ public class PatternNeuron extends ConjunctiveNeuron<PatternActivation> {
     public double getSurprisal(Sign s, Range range, boolean addCurrentInstance) {
         double n = sampleSpace.getN(range);
         double p = getProbability(s, n, addCurrentInstance);
-        return Utils.surprisal(p);
+        return -Utils.surprisal(p);
     }
 
     public double getProbability(Sign s, double n, boolean addCurrentInstance) {

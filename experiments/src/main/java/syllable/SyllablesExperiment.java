@@ -246,7 +246,7 @@ public class SyllablesExperiment {
         doc.setConfig(
                 getConfig()
                         .setAlpha(null)
-                        .setLearnRate(-0.01)
+                        .setLearnRate(0.01)
                         .setTrainingEnabled(false)
         );
 

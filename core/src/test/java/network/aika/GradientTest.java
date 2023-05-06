@@ -40,7 +40,7 @@ public class GradientTest {
         doc.setConfig(
                 getConfig()
                 .setAlpha(0.99)
-                .setLearnRate(-0.1)
+                .setLearnRate(0.1)
                 .setTrainingEnabled(true)
         );
 /*
@@ -74,7 +74,7 @@ public class GradientTest {
         doc.setConfig(
                 getConfig()
                         .setAlpha(0.99)
-                        .setLearnRate(-0.1)
+                        .setLearnRate(0.1)
                         .setTrainingEnabled(true)
         );
 
@@ -107,7 +107,7 @@ public class GradientTest {
         doc1.setConfig(
                 getConfig()
                         .setAlpha(0.99)
-                        .setLearnRate(-0.1)
+                        .setLearnRate(0.1)
                         .setTrainingEnabled(true)
         );
         processDoc(m, doc1);
@@ -125,7 +125,7 @@ public class GradientTest {
         doc2.setConfig(
                 getConfig()
                         .setAlpha(0.99)
-                        .setLearnRate(-0.1)
+                        .setLearnRate(0.1)
                         .setTrainingEnabled(true)
         );
         processDoc(m, doc2);

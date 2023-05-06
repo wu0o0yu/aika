@@ -62,7 +62,7 @@ public class TestFsModel {
 
         Config c = TestUtils.getConfig()
                 .setAlpha(0.99)
-                .setLearnRate(-0.011)
+                .setLearnRate(0.01)
                 .setTrainingEnabled(train);
         doc.setConfig(c);
 

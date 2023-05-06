@@ -53,7 +53,7 @@ public class TheDogAndCatTest {
 
         Config c = getConfig()
                 .setAlpha(0.99)
-                .setLearnRate(-0.011)
+                .setLearnRate(0.01)
                 .setTrainingEnabled(false);
         doc.setConfig(c);
 

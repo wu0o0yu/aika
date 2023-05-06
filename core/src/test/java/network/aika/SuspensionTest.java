@@ -81,7 +81,7 @@ public class SuspensionTest {
 
         Config c = getConfig()
                 .setAlpha(0.99)
-                .setLearnRate(-0.1)
+                .setLearnRate(0.1)
                 .setTrainingEnabled(false);
 
         Document doc = new Document(m, "test");

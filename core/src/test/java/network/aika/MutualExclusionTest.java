@@ -119,7 +119,7 @@ public class MutualExclusionTest {
 
         Config c = getConfig()
                 .setAlpha(0.99)
-                .setLearnRate(-0.011)
+                .setLearnRate(0.01)
                 .setTrainingEnabled(true);
         doc.setConfig(c);
 
@@ -188,7 +188,7 @@ public class MutualExclusionTest {
         doc.setConfig(
                 getConfig()
                         .setAlpha(0.99)
-                        .setLearnRate(-0.011)
+                        .setLearnRate(0.01)
                         .setTrainingEnabled(true)
         );
 
