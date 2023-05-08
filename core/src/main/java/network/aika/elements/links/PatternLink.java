@@ -18,14 +18,17 @@ package network.aika.elements.links;
 
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
+import network.aika.elements.neurons.Range;
 import network.aika.fields.AbstractFunction;
 import network.aika.elements.synapses.PatternSynapse;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
+import network.aika.fields.Field;
 import network.aika.fields.SumField;
 import network.aika.sign.Sign;
 import network.aika.steps.link.LinkCounting;
 import network.aika.visitor.Visitor;
 
+import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.func;
 import static network.aika.fields.Fields.scale;
@@ -58,8 +61,11 @@ public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivati
     public void connectGradientFields() {
         gradient = new SumField(this, "Gradient", TOLERANCE);
 
-        linkAndConnect(input.getGradient(), gradient);
+        if(input != null)
+            linkAndConnect(input.getGradient(), gradient);
         linkAndConnect(gradient, output.getGradient());
+
+        Range r = (input != null ? input : output).getAbsoluteRange();
 
         informationGain = func(
                 this,
@@ -70,7 +76,7 @@ public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivati
                         synapse.getSurprisal(
                                 Sign.getSign(x1),
                                 Sign.getSign(x2),
-                                input.getAbsoluteRange(),
+                                r,
                                 true
                         ),
                 gradient
@@ -82,13 +88,13 @@ public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivati
         );
     }
 
-    public SumField getInputPatternNet() {
+    public Field getInputPatternNet() {
         if(input == null)
-            return null;
+            return ZERO;
 
         PatternActivation inputPatternAct = input.getInputPatternActivation();
         if(inputPatternAct == null)
-            return null;
+            return ZERO;
 
         return inputPatternAct.getNet();
     }

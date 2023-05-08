@@ -73,7 +73,7 @@ public class DebugStepManager implements StepManager {
         if(nextBreakpoint == null) {
             long diff = lastTimestamp != null ? System.currentTimeMillis() - lastTimestamp : 0;
             lastTimestamp = System.currentTimeMillis();
-            if(diff > 1000 && switchToDebugModeOnDelay)
+            if(diff > 2000 && switchToDebugModeOnDelay)
                 stepMode = true;
         }
 
