@@ -56,7 +56,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
         link();
 
-        if(input != null && output != null) {
+        if(output != null) {
             initWeightInput();
 
             if (getConfig().isTrainingEnabled() && getSynapse().isTrainingAllowed()) {
