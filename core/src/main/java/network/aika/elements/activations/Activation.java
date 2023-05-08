@@ -295,7 +295,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     }
 
     public boolean isFired() {
-        return isTrue(isFired);
+        return isTrue(net, 0.0);
     }
 
     public Thought getThought() {
@@ -509,7 +509,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     }
 
     public boolean isActiveTemplateInstance() {
-        return isNewInstance || isTrue(isFired);
+        return isNewInstance || isTrue(net, 0.5);
     }
 
     public CategoryInputLink getCategoryInputLink() {
@@ -523,7 +523,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 .map(Link::getInput)
                 .filter(Objects::nonNull)
                 .findFirst()
-                .map(Activation::getActiveTemplateInstance)
+                .map(CategoryActivation::getActiveTemplateInstance)
                 .orElse(null);
     }
 

@@ -50,7 +50,7 @@ public class ThresholdOperator extends AbstractFunction {
         if(isFinal && currentValue > 0.5)
             return 0.0;
 
-        return threshold(fl.getInput().getNewValue()) - newValue;
+        return threshold(fl.getInput().getUpdatedCurrentValue()) - newValue;
     }
 
     protected double threshold(double x) {

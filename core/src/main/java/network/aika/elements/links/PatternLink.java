@@ -64,7 +64,7 @@ public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivati
         informationGain = func(
                 this,
                 "Information-Gain",
-                input.getNet(),
+                getInputPatternNet(),
                 output.getNet(),
                 (x1, x2) ->
                         synapse.getSurprisal(
@@ -80,7 +80,17 @@ public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivati
                 output.getEntropy(),
                 gradient
         );
+    }
 
+    public SumField getInputPatternNet() {
+        if(input == null)
+            return null;
+
+        PatternActivation inputPatternAct = input.getInputPatternActivation();
+        if(inputPatternAct == null)
+            return null;
+
+        return inputPatternAct.getNet();
     }
 
     public AbstractFunction getOutputEntropy() {

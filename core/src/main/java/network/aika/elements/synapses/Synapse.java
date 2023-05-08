@@ -76,7 +76,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     public abstract double getSumOfLowerWeights();
 
     public boolean checkLinkingEvent(Activation act) {
-        return isTrue(act.getIsFired());
+        return act.isFired();
     }
 
     public Scope getScope() {
