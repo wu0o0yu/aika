@@ -222,6 +222,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         link();
         linkFields();
 
+        setInitialWeight(templateSyn);
+    }
+
+    protected void setInitialWeight(Synapse templateSyn) {
         weight.setInitialValue(
                 templateSyn.weight.getUpdatedCurrentValue()
         );

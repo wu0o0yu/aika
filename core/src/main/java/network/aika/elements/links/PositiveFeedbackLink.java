@@ -61,7 +61,7 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
     protected Multiplication initWeightedInput() {
         return mul(
                 this,
-                "isClosed * iAct(id:" + getInput().getId() + ").value * weight",
+                "isClosed * iAct(" + getInputKeyString() + ").value * weight",
                 getThought().getIsClosed(),
                 super.initWeightedInput()
         );

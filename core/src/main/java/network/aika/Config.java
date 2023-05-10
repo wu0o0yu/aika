@@ -31,10 +31,11 @@ public class Config {
 
     private double learnRateForAbstract;
 
+    private double initialCategorySynapseWeight = 1.0;
+
     private boolean trainingEnabled;
     private boolean countingEnabled;
     private boolean metaInstantiationEnabled;
-
 
     public double getLearnRate(boolean isAbstract) {
         return isAbstract ? learnRateForAbstract : learnRate;
@@ -75,6 +76,15 @@ public class Config {
     public Config setAlpha(Double alpha) {
         this.alpha = alpha;
         return this;
+    }
+
+    public Config setInitialCategorySynapseWeight(double initialCategorySynapseWeight) {
+        this.initialCategorySynapseWeight = initialCategorySynapseWeight;
+        return this;
+    }
+
+    public double getInitialCategorySynapseWeight() {
+        return initialCategorySynapseWeight;
     }
 
     public boolean isTrainingEnabled() {

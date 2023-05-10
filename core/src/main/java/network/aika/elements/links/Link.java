@@ -125,7 +125,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected FieldOutput initWeightedInput() {
         Multiplication weightedInput = mul(
                 this,
-                "iAct(id:" + (getInput() != null ? getInput().getId() : "--") + ").value * s.weight",
+                "iAct(" + getInputKeyString() + ").value * s.weight",
                 getInputValue(),
                 synapse.getWeight()
         );
@@ -242,11 +242,11 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return output.getThought();
     }
 
-    private String getInputKeyString() {
+    protected String getInputKeyString() {
         return (input != null ? input.toKeyString() : "id:X n:[" + synapse.getInput() + "]");
     }
 
-    private String getOutputKeyString() {
+    protected String getOutputKeyString() {
         return (output != null ? output.toKeyString() : "id:X n:[" + synapse.getOutput() + "]");
     }
 

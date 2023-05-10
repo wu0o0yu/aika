@@ -54,7 +54,7 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
     protected FieldOutput initWeightedInput() {
         return Fields.mul(
                 this,
-                "annealing * iAct(id:" + getInput().getId() + ").value * weight",
+                "annealing * iAct(" + getInputKeyString() + ").value * weight",
                 getThought().getAnnealing(),
                 super.initWeightedInput()
         );
