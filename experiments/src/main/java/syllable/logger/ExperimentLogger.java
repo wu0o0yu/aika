@@ -39,7 +39,7 @@ public class ExperimentLogger {
 
     AnnealingLogger annealingLogger = new AnnealingLogger();
 
-    public ExperimentLogger(long... patternNeuronIds) {
+    public ExperimentLogger() {
         if(experimentPath.exists()) {
             Arrays.stream(experimentPath.listFiles()).forEach(f ->
                     f.delete()
@@ -50,12 +50,6 @@ public class ExperimentLogger {
         experimentPath.mkdir();
 
         statLogger.open(new File(experimentPath, "statistic.csv"));
-
-        for(long id: patternNeuronIds) {
-            PatternLogger pl = new PatternLogger();
-            pl.open(new File(experimentPath, "pattern-" + id + ".csv"));
-            patternLogger.put(id, pl);
-        }
     }
 
     public void annealingLogInit(Document doc) {
@@ -75,7 +69,9 @@ public class ExperimentLogger {
                 .filter(act -> act instanceof PatternActivation)
                 .map(act -> (PatternActivation)act)
                 .forEach(act -> {
-                    PatternLogger pl = patternLogger.get(act.getNeuron().getId());
+                    PatternLogger pl = patternLogger.computeIfAbsent(act.getNeuron().getId(), id ->
+                            new PatternLogger(experimentPath, act)
+                    );
                     if(pl != null)
                         pl.log(act);
                 });

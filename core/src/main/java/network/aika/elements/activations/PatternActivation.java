@@ -37,6 +37,8 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
 
     private FieldFunction entropy;
 
+    private Double[] cachedSurprisal;
+
     public PatternActivation(int id, Thought t, PatternNeuron patternNeuron) {
         super(id, t, patternNeuron);
     }
@@ -48,12 +50,7 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
                 "entropy",
                 TOLERANCE,
                 net,
-                x ->
-                        getNeuron().getSurprisal(
-                                Sign.getSign(x),
-                                getAbsoluteRange(),
-                                true
-                        ),
+                x -> getSurprisal(Sign.getSign(x)),
                 gradient
         );
 
@@ -107,5 +104,17 @@ public class PatternActivation extends ConjunctiveActivation<PatternNeuron> {
             v.up(this);
         else
             super.patternCatVisitDown(v, lastLink);
+    }
+
+    public double getSurprisal(Sign sign) {
+        if(cachedSurprisal == null)
+            cachedSurprisal = new Double[2];
+
+        Double s = cachedSurprisal[sign.index()];
+        if(s == null) {
+            s = neuron.getSurprisal(sign, getAbsoluteRange(), true);
+            cachedSurprisal[sign.index()] = s;
+        }
+        return s;
     }
 }

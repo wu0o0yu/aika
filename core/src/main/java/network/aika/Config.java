@@ -17,6 +17,7 @@
 package network.aika;
 
 import network.aika.elements.activations.Activation;
+import network.aika.elements.neurons.Neuron;
 
 /**
  *
@@ -115,8 +116,8 @@ public class Config {
         return this;
     }
 
-    public String getLabel(Activation act) {
-        return "";
+    public void updateLabel(Activation templateAct, Activation instanceAct) {
+        instanceAct.getNeuron().setLabel("");
     }
 
     public String toString() {

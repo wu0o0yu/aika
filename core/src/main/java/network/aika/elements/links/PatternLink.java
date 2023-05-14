@@ -42,6 +42,8 @@ public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivati
     private AbstractFunction outputEntropy;
     private AbstractFunction informationGain;
 
+    private Double[][] cachedSurprisal;
+
     public PatternLink(PatternSynapse s, BindingActivation input, PatternActivation output) {
         super(s, input, output);
 
@@ -65,19 +67,15 @@ public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivati
             linkAndConnect(input.getGradient(), gradient);
         linkAndConnect(gradient, output.getGradient());
 
-        Range r = (input != null ? input : output).getAbsoluteRange();
-
         informationGain = func(
                 this,
                 "Information-Gain",
                 getInputPatternNet(),
                 output.getNet(),
                 (x1, x2) ->
-                        synapse.getSurprisal(
+                        getSurprisal(
                                 Sign.getSign(x1),
-                                Sign.getSign(x2),
-                                r,
-                                true
+                                Sign.getSign(x2)
                         ),
                 gradient
         );
@@ -86,6 +84,23 @@ public class PatternLink extends ConjunctiveLink<PatternSynapse, BindingActivati
                 output.getEntropy(),
                 gradient
         );
+    }
+
+    public double getSurprisal(Sign is, Sign os) {
+        if(cachedSurprisal == null)
+            cachedSurprisal = new Double[2][2];
+
+        Double s = cachedSurprisal[is.index()][os.index()];
+        if(s == null) {
+            s = synapse.getSurprisal(is, os, getAbsoluteRange(), true);
+            cachedSurprisal[is.index()][os.index()] = s;
+        }
+        return s;
+    }
+
+    private Range getAbsoluteRange() {
+        Range r = (input != null ? input : output).getAbsoluteRange();
+        return r;
     }
 
     public Field getInputPatternNet() {

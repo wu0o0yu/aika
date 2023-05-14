@@ -582,9 +582,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                         )
                 );
 
-        instanceAct.getNeuron().setLabel(
-                getConfig().getLabel(this)
-        );
+        getConfig().updateLabel(this, instanceAct);
 
         instanceAct.initDummyLinks();
         instanceAct.initFromTemplate();

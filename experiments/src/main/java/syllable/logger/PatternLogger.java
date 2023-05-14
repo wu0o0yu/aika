@@ -21,7 +21,7 @@ import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.links.Link;
 import network.aika.elements.links.PatternLink;
 import network.aika.text.Document;
-import org.apache.commons.csv.CSVFormat;
+import network.aika.utils.Utils;
 import org.apache.commons.csv.CSVPrinter;
 
 import java.io.File;
@@ -38,7 +38,17 @@ import static syllable.logger.ExperimentLogger.CSV_FORMAT;
  */
 public class PatternLogger {
 
+    public static final double PRECISION = 10000.0;
+
     CSVPrinter printer;
+
+    public PatternLogger() {
+
+    }
+
+    public PatternLogger(File path, PatternActivation act) {
+        open(new File(path, "pattern-" + act.getNeuron().getId() + ".csv"));
+    }
 
 
     public void open(File f)  {
@@ -85,10 +95,10 @@ public class PatternLogger {
                             ((Document) pAct.getThought()).getContent(),
                             pAct.getLabel(),
                             pAct.getId(),
-                            pAct.getNeuron().getId(),
-                            pAct.getNet().getCurrentValue(),
-                            pAct.getGradient().getCurrentValue(),
-                            pAct.getNeuron().getBias().getCurrentValue())
+                            pAct.getNeuron().getId() + (pAct.getNeuron().isAbstract() ? "-abstr" : ""),
+                            Utils.round(pAct.getNet().getCurrentValue(), PRECISION),
+                            Utils.round(pAct.getGradient().getCurrentValue(), PRECISION),
+                            Utils.round(pAct.getNeuron().getBias().getCurrentValue(), PRECISION))
             );
 
             List<Link> inputLinks = pAct.getInputLinks()
@@ -106,11 +116,11 @@ public class PatternLogger {
                         List.of(
                                 iAct.getLabel(),
                                 iAct.getId(),
-                                iAct.getNeuron().getId(),
-                                iAct.getNet().getCurrentValue(),
-                                iAct.getGradient().getCurrentValue(),
-                                iAct.getNeuron().getBias().getCurrentValue(),
-                                il.getSynapse().getWeight().getCurrentValue()
+                                iAct.getNeuron().getId() + (iAct.getNeuron().isAbstract() ? "-abstr" : ""),
+                                Utils.round(iAct.getNet().getCurrentValue(), PRECISION),
+                                Utils.round(iAct.getGradient().getCurrentValue(), PRECISION),
+                                Utils.round(iAct.getNeuron().getBias().getCurrentValue(), PRECISION),
+                                Utils.round(il.getSynapse().getWeight().getCurrentValue(), PRECISION)
                         )
                 );
             }

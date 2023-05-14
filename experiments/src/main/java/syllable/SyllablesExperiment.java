@@ -69,11 +69,7 @@ public class SyllablesExperiment {
         PatternActivation maxSurprisalAct = tokenActs.stream().filter(PatternActivation.class::isInstance)
                 .map(PatternActivation.class::cast)
                 .max(Comparator.comparingDouble(act ->
-                        act.getNeuron().getSurprisal(
-                                Sign.POS,
-                                act.getAbsoluteRange(),
-                                true
-                        )
+                        act.getSurprisal(Sign.POS)
                 )).orElse(null);
 
         doc.setActivationCheckCallback(act -> {
@@ -103,12 +99,17 @@ public class SyllablesExperiment {
 
     public static Config getConfig() {
         return new Config() {
-            public String getLabel(Activation act) {
-                Document doc = (Document) act.getThought();
-                String label = doc.getTextSegment(act.getRange());
+            public void updateLabel(Activation templateAct, Activation instanceAct) {
+                Document doc = (Document) templateAct.getThought();
+                String label = doc.getTextSegment(templateAct.getRange());
 
-                System.out.println("   Instantiating " + act.getClass().getSimpleName() + " " + label);
-                return label;
+                instanceAct.getNeuron().setLabel(label);
+
+                System.out.println("   Instantiating " +
+                        instanceAct.getClass().getSimpleName() +
+                        " " + label +
+                        " nId:" + instanceAct.getNeuron().getId()
+                );
             }
         };
     }
@@ -162,7 +163,7 @@ public class SyllablesExperiment {
 
         int[] counter = new int[1];
 
-        ExperimentLogger el = new ExperimentLogger(43, 31, 24, 70);
+        ExperimentLogger el = new ExperimentLogger();
 
         inputs.forEach(w -> {
             Document doc = initDocument(model, w);
@@ -174,7 +175,7 @@ public class SyllablesExperiment {
             AIKADebugger debugger = null;
             System.out.println(counter[0] + " " + w);
             if(counter[0] >= 1) {// 3, 6, 11, 18, 100
-                debugger = AIKADebugger.createAndShowGUI(doc);
+//                debugger = AIKADebugger.createAndShowGUI(doc);
             }
 
             processTokens(
