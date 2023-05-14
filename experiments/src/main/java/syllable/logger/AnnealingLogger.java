@@ -105,7 +105,8 @@ public class AnnealingLogger {
 
     public void close() {
         try {
-            printer.close();
+            if(printer != null)
+                printer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -21,6 +21,7 @@ import network.aika.text.Document;
 import org.apache.commons.csv.CSVFormat;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.TreeMap;
 
 
@@ -39,8 +40,12 @@ public class ExperimentLogger {
     AnnealingLogger annealingLogger = new AnnealingLogger();
 
     public ExperimentLogger(long... patternNeuronIds) {
-        if(experimentPath.exists())
+        if(experimentPath.exists()) {
+            Arrays.stream(experimentPath.listFiles()).forEach(f ->
+                    f.delete()
+            );
             experimentPath.delete();
+        }
 
         experimentPath.mkdir();
 

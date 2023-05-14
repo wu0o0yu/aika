@@ -173,7 +173,7 @@ public class SyllablesExperiment {
 
             AIKADebugger debugger = null;
             System.out.println(counter[0] + " " + w);
-            if(counter[0] >= 100) {// 3, 6, 11, 18, 100
+            if(counter[0] >= 1) {// 3, 6, 11, 18, 100
                 debugger = AIKADebugger.createAndShowGUI(doc);
             }
 
@@ -197,7 +197,7 @@ public class SyllablesExperiment {
 
             doc.close();
 
-            el.annealingLogInit(doc);
+//            el.annealingLogInit(doc);
 
             doc.anneal();
 
