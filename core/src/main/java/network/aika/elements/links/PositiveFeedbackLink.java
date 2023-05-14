@@ -39,6 +39,9 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
     protected void connectGradientFields() {
         super.connectGradientFields();
 
+        if(input == null)
+            return;
+
         scale(
                 this,
                 "updateValue = lr * in.grad * f'(out.net)",
