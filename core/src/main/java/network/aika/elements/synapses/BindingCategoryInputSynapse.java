@@ -20,13 +20,22 @@ import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.links.BindingCategoryInputLink;
 import network.aika.elements.activations.CategoryActivation;
+import network.aika.elements.neurons.CategoryNeuron;
+import network.aika.elements.neurons.Neuron;
 
 /**
  * The Same Pattern Binding Neuron Synapse is an inner synapse between two binding neurons of the same pattern.
  *
  * @author Lukas Molzberger
  */
-public class BindingCategoryInputSynapse extends CategoryInputSynapse
+public class BindingCategoryInputSynapse extends DisjunctiveSynapse<
+        BindingCategoryInputSynapse,
+        CategoryNeuron,
+        Neuron<Activation>,
+        BindingCategoryInputLink,
+        CategoryActivation,
+        Activation
+        > implements CategoryInputSynapse
 {
     public BindingCategoryInputSynapse() {
         super(Scope.INPUT);

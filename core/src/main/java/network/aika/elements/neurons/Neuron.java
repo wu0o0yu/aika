@@ -340,7 +340,7 @@ public abstract class Neuron<A extends Activation> extends FieldObject implement
                 .map(synapseType::cast);
     }
 
-    public <OS extends Synapse> OS getOutputSynapseByType(Class<OS> synapseType) {
+    public <OS> OS getOutputSynapseByType(Class<OS> synapseType) {
         return getProvider().getOutputSynapses()
                 .filter(synapseType::isInstance)
                 .map(synapseType::cast)

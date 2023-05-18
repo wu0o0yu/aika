@@ -387,13 +387,13 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 .findAny();
     }
 
-    public <IL extends Link> Stream<IL> getInputLinksByType(Class<IL> linkType) {
+    public <IL> Stream<IL> getInputLinksByType(Class<IL> linkType) {
         return getInputLinks()
                 .filter(linkType::isInstance)
                 .map(linkType::cast);
     }
 
-    public <OL extends Link> Stream<OL> getOutputLinksByType(Class<OL> linkType) {
+    public <OL> Stream<OL> getOutputLinksByType(Class<OL> linkType) {
         return getOutputLinks()
                 .filter(linkType::isInstance)
                 .map(linkType::cast);
@@ -520,7 +520,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
     public Activation getActiveTemplateInstance() {
         return getInputLinksByType(CategoryInputLink.class)
-                .map(Link::getInput)
+                .map(CategoryInputLink::getInput)
                 .filter(Objects::nonNull)
                 .findFirst()
                 .map(CategoryActivation::getActiveTemplateInstance)
@@ -558,7 +558,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         if(cl == null)
             cl = createCategoryInputLink();
 
-        cl.instantiateTemplate(cl.getInput(), ti);
+        cl.instantiateTemplate(cl.getInput(), ti, (Link) cl);
     }
 
     private CategoryInputLink createCategoryInputLink() {

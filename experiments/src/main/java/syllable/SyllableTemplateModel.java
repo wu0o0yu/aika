@@ -61,7 +61,7 @@ public class SyllableTemplateModel {
         letterPN = new TokenNeuron()
                 .init(model, "Abstract Letter");
 
-        CategoryInputSynapse pCatInputSyn = new PatternCategoryInputSynapse()
+        PatternCategoryInputSynapse pCatInputSyn = new PatternCategoryInputSynapse()
                 .setWeight(0.01)
                 .init(letterCategory, letterPN);
 
@@ -122,7 +122,7 @@ public class SyllableTemplateModel {
         syllablePatternN.setBias(patternNetTarget);
 
         new InhibitoryCategoryInputSynapse()
-                .setWeight(0.01)
+                .setWeight(1.0)
                 .init(inhibCat, inhibitoryN);
     }
 

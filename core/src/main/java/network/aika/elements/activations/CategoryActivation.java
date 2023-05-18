@@ -37,7 +37,7 @@ public class CategoryActivation extends DisjunctiveActivation<CategoryNeuron> {
     @Override
     public Activation getTemplate() {
         return getOutputLinksByType(CategoryInputLink.class)
-                .map(Link::getOutput)
+                .map(CategoryInputLink::getOutput)
                 .findFirst()
                 .orElse(null);
     }

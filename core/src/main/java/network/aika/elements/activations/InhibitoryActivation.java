@@ -46,4 +46,18 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
     public boolean isActiveTemplateInstance() {
         return true;
     }
+
+    public void connectOutgoingLinks(InhibitoryLink il) {
+        getOutputLinksByType(NegativeFeedbackLink.class)
+                .forEach(ol ->
+                        connectFields(il, ol)
+                );
+    }
+
+    public void connectIncomingLinks(NegativeFeedbackLink ol) {
+        getInputLinksByType(InhibitoryLink.class)
+                .forEach(il ->
+                        connectFields(il, ol)
+                );
+    }
 }

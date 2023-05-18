@@ -38,7 +38,7 @@ import static syllable.logger.ExperimentLogger.CSV_FORMAT;
  */
 public class PatternLogger {
 
-    public static final double PRECISION = 10000.0;
+    public static final double PRECISION = 100000.0;
 
     CSVPrinter printer;
 
@@ -63,7 +63,7 @@ public class PatternLogger {
 
             for(int i = 0; i < 5; i++) {
                 headerLabels.addAll(
-                    List.of(i + "-bLabel", i + "-bAct Id", i + "-BN-Id", i + "-net", i + "-gradient", i + "-bias", i + "-weight-pl")
+                    List.of(i + "-bLabel", i + "-bAct Id", i + "-BN-Id", i + "-net", i + "-bGrad", i + "-bias", i + "-biasSum", i + "-weight-pl", i + "-synBias-pl")
                 );
             }
 
@@ -106,8 +106,8 @@ public class PatternLogger {
                     .collect(Collectors.toList());
 
             for(int i = 0; i < Math.min(5, inputLinks.size()); i++) {
-                Link il = inputLinks.get(i);
-                BindingActivation iAct = (BindingActivation) il.getInput();
+                PatternLink il = (PatternLink) inputLinks.get(i);
+                BindingActivation iAct = il.getInput();
 
                 if(iAct == null)
                     continue;
@@ -120,7 +120,9 @@ public class PatternLogger {
                                 Utils.round(iAct.getNet().getCurrentValue(), PRECISION),
                                 Utils.round(iAct.getGradient().getCurrentValue(), PRECISION),
                                 Utils.round(iAct.getNeuron().getBias().getCurrentValue(), PRECISION),
-                                Utils.round(il.getSynapse().getWeight().getCurrentValue(), PRECISION)
+                                Utils.round(iAct.getNeuron().getSynapseBiasSum().getCurrentValue(), PRECISION),
+                                Utils.round(il.getSynapse().getWeight().getCurrentValue(), PRECISION),
+                                Utils.round(il.getSynapse().getSynapseBias().getCurrentValue(), PRECISION)
                         )
                 );
             }

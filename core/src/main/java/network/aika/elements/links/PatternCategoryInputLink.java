@@ -18,6 +18,7 @@ package network.aika.elements.links;
 
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.CategoryActivation;
+import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.elements.synapses.CategorySynapse;
 import network.aika.elements.synapses.PatternCategoryInputSynapse;
 import network.aika.elements.synapses.PatternCategorySynapse;
@@ -27,18 +28,23 @@ import network.aika.visitor.Visitor;
 /**
  * @author Lukas Molzberger
  */
-public class PatternCategoryInputLink extends CategoryInputLink {
+public class PatternCategoryInputLink extends DisjunctiveLink<PatternCategoryInputSynapse, CategoryActivation, Activation>   implements CategoryInputLink {
 
     public PatternCategoryInputLink(PatternCategoryInputSynapse s, CategoryActivation input, Activation output) {
         super(s, input, output);
     }
 
     @Override
-    protected CategorySynapse createCategorySynapse() {
+    public CategorySynapse createCategorySynapse() {
         return new PatternCategorySynapse();
     }
 
     @Override
     protected void connectGradientFields() {
+    }
+
+    @Override
+    public void instantiateTemplate(CategoryActivation iAct, Activation oAct) {
+        instantiateTemplate(iAct, oAct, this);
     }
 }
