@@ -73,7 +73,7 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
                 Fields.mul(
                         this,
                         "weight update",
-                        getInput().getIsFired(),
+                        getInputIsFired(),
                         getOutput().getNegUpdateValue()
                 ),
                 synapse.getWeight()

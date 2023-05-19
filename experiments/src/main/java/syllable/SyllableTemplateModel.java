@@ -48,6 +48,8 @@ public class SyllableTemplateModel {
     static double POS_MARGIN = 1.0;
     static double NEG_MARGIN = 1.1;
 
+    static double PASSIVE_SYNAPSE_WEIGHT = 0.0;
+
 
     public SyllableTemplateModel(Model m) {
         model = m;
@@ -62,7 +64,7 @@ public class SyllableTemplateModel {
                 .init(model, "Abstract Letter");
 
         PatternCategoryInputSynapse pCatInputSyn = new PatternCategoryInputSynapse()
-                .setWeight(0.01)
+                .setWeight(PASSIVE_SYNAPSE_WEIGHT)
                 .init(letterCategory, letterPN);
 
         letterPatternValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
@@ -116,7 +118,7 @@ public class SyllableTemplateModel {
         );
 
         new PatternCategoryInputSynapse()
-                .setWeight(0.01)
+                .setWeight(PASSIVE_SYNAPSE_WEIGHT)
                 .init(syllableCategory, syllablePatternN);
 
         syllablePatternN.setBias(patternNetTarget);
@@ -172,7 +174,7 @@ public class SyllableTemplateModel {
                 .init(model, "Abstract (S) Pos:" + pos);
 
         new PrimaryInhibitorySynapse()
-                .setWeight(1.0)
+                .setWeight(PASSIVE_SYNAPSE_WEIGHT)
                 .init(letterPN, inhibitoryN);
 
         new InhibitorySynapse(Scope.INPUT)
@@ -233,7 +235,7 @@ public class SyllableTemplateModel {
                 .adjustBias(letterPatternValueTarget);
 
         new BindingCategoryInputSynapse()
-                .setWeight(0.01)
+                .setWeight(PASSIVE_SYNAPSE_WEIGHT)
                 .init(catN, bn);
 
         bn.setBias(netTarget);
@@ -263,7 +265,7 @@ public class SyllableTemplateModel {
                 .init(model, "Abstract (W) Pos:" + pos);
 
         new PrimaryInhibitorySynapse()
-                .setWeight(1.0)
+                .setWeight(PASSIVE_SYNAPSE_WEIGHT)
                 .init(letterPN, inhibitoryN);
 
         new InhibitorySynapse(Scope.INPUT)
@@ -319,7 +321,7 @@ public class SyllableTemplateModel {
                 .adjustBias(letterPatternValueTarget);
 
         new BindingCategoryInputSynapse()
-                .setWeight(0.01)
+                .setWeight(PASSIVE_SYNAPSE_WEIGHT)
                 .init(catN, bn);
 
         bn.setBias(netTarget);

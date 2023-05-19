@@ -567,7 +567,9 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
             return null;
 
         CategoryActivation catAct = catSyn.getInput().createActivation(thought);
-        return catSyn.createAndInitLink(catAct, this);
+
+        Synapse s = ((Synapse)catSyn);
+        return (CategoryInputLink) s.createAndInitLink(catAct, this);
     }
 
     protected void instantiateBias(Activation<N> ti) {

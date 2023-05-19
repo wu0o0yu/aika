@@ -24,7 +24,7 @@ import network.aika.visitor.Visitor;
 /**
  * @author Lukas Molzberger
  */
-public class InhibitoryCategoryInputLink extends DisjunctiveLink<InhibitoryCategoryInputSynapse, CategoryActivation, Activation> implements CategoryInputLink {
+public class InhibitoryCategoryInputLink extends AbstractInhibitoryLink<InhibitoryCategoryInputSynapse, CategoryActivation> implements CategoryInputLink {
 
     public InhibitoryCategoryInputLink(InhibitoryCategoryInputSynapse s, CategoryActivation input, InhibitoryActivation output) {
         super(s, input, output);
@@ -40,7 +40,7 @@ public class InhibitoryCategoryInputLink extends DisjunctiveLink<InhibitoryCateg
     }
 
     @Override
-    public void instantiateTemplate(CategoryActivation iAct, Activation oAct) {
+    public void instantiateTemplate(CategoryActivation iAct, InhibitoryActivation oAct) {
         instantiateTemplate(iAct, oAct, this);
     }
 }

@@ -16,50 +16,20 @@
  */
 package network.aika.elements.synapses;
 
-import network.aika.Model;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.InhibitoryActivation;
 import network.aika.elements.links.InhibitoryLink;
 import network.aika.elements.neurons.BindingNeuron;
 import network.aika.elements.neurons.InhibitoryNeuron;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 /**
  *
  * @author Lukas Molzberger
  */
-public class InhibitorySynapse extends DisjunctiveSynapse<
-        InhibitorySynapse,
-        BindingNeuron,
-        InhibitoryNeuron,
-        InhibitoryLink,
-        BindingActivation,
-        InhibitoryActivation
-        >
-{
-    private Scope type;
-
-    public InhibitorySynapse() {
-        super(null);
-    }
+public class InhibitorySynapse extends AbstractInhibitorySynapse<InhibitorySynapse, BindingNeuron, InhibitoryLink, BindingActivation> {
 
     public InhibitorySynapse(Scope type) {
-        this();
-        this.type = type;
-    }
-
-    public Scope getType() {
-        return type;
-    }
-
-    @Override
-    public InhibitorySynapse instantiateTemplate(BindingNeuron input, InhibitoryNeuron output) {
-        InhibitorySynapse s = new InhibitorySynapse(type);
-        s.initFromTemplate(input, output, this);
-        return s;
+        super(type);
     }
 
     @Override
@@ -68,16 +38,9 @@ public class InhibitorySynapse extends DisjunctiveSynapse<
     }
 
     @Override
-    public void write(DataOutput out) throws IOException {
-        super.write(out);
-
-        out.writeInt(type.ordinal());
-    }
-
-    @Override
-    public void readFields(DataInput in, Model m) throws IOException {
-        super.readFields(in, m);
-
-        type = Scope.values()[in.readInt()];
+    public InhibitorySynapse instantiateTemplate(BindingNeuron input, InhibitoryNeuron output) {
+        InhibitorySynapse s = new InhibitorySynapse(getType());
+        s.initFromTemplate(input, output, this);
+        return s;
     }
 }

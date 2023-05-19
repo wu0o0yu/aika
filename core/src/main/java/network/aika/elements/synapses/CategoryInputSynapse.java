@@ -16,9 +16,6 @@
  */
 package network.aika.elements.synapses;
 
-import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.CategoryActivation;
-import network.aika.elements.links.CategoryInputLink;
 import network.aika.elements.neurons.CategoryNeuron;
 import network.aika.elements.neurons.Neuron;
 
@@ -33,8 +30,6 @@ public interface CategoryInputSynapse {
     }
 
     CategoryNeuron getInput();
-
-    CategoryInputLink createAndInitLink(CategoryActivation catAct, Activation nActivation);
 
     Neuron getOutput();
 }

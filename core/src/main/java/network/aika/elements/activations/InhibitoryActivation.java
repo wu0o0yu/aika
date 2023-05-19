@@ -17,11 +17,9 @@
 package network.aika.elements.activations;
 
 import network.aika.Thought;
-import network.aika.elements.links.InhibitoryLink;
+import network.aika.elements.links.AbstractInhibitoryLink;
 import network.aika.elements.links.NegativeFeedbackLink;
 import network.aika.elements.neurons.InhibitoryNeuron;
-
-import static network.aika.fields.FieldLink.linkAndConnect;
 
 
 /**
@@ -35,29 +33,23 @@ public class InhibitoryActivation extends DisjunctiveActivation<InhibitoryNeuron
         super(id, t, neuron);
     }
 
-    public void connectFields(InhibitoryLink in, NegativeFeedbackLink out) {
-        if(isSelfRef(in.getInput(), out.getOutput()))
-            return;
-
-        linkAndConnect(in.getNet(), out.getInputValue());
-    }
 
     @Override
     public boolean isActiveTemplateInstance() {
         return true;
     }
 
-    public void connectOutgoingLinks(InhibitoryLink il) {
+    public void connectOutgoingLinks(AbstractInhibitoryLink il) {
         getOutputLinksByType(NegativeFeedbackLink.class)
                 .forEach(ol ->
-                        connectFields(il, ol)
+                        il.connectFields(ol)
                 );
     }
 
     public void connectIncomingLinks(NegativeFeedbackLink ol) {
-        getInputLinksByType(InhibitoryLink.class)
+        getInputLinksByType(AbstractInhibitoryLink.class)
                 .forEach(il ->
-                        connectFields(il, ol)
+                        il.connectFields(ol)
                 );
     }
 }

@@ -24,11 +24,11 @@ public enum ActivationFunction {
 
     RECTIFIED_HYPERBOLIC_TANGENT(
             x -> Math.max(0.0, Math.tanh(x)),
-            x -> x > 0.0 ? 1.0 - Math.pow(Math.tanh(x), 2.0) : 0.0
+            x -> x >= 0.0 ? 1.0 - Math.pow(Math.tanh(x), 2.0) : 0.0
     ),
     LIMITED_RECTIFIED_LINEAR_UNIT(
             x -> Math.max(0.0, Math.min(1.0, x)),
-            x -> x > 0.0 && x <= 1.0 ? 1.0 : 0.0
+            x -> x >= 0.0 && x <= 1.0 ? 1.0 : 0.0
     );
 
     private final Function f;

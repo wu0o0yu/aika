@@ -177,6 +177,13 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         return input.getValue();
     }
 
+    public FieldOutput getInputIsFired() {
+        if(input == null)
+            return ZERO;
+
+        return input.getIsFired();
+    }
+
     public FieldOutput getNegInputValue() {
         if(input == null)
             return ONE;
