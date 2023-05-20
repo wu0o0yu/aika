@@ -39,31 +39,8 @@ public class TokenActivationParticle extends PatternActivationParticle<TokenActi
         if(!act.getNeuron().isAbstract())
             node.setAttribute("layout.frozen");
 
-        Double x = getActivationXCoordinate(ls.getLastInputAct());
-        if(x == null) {
-            x = ls.getLastInputActXPos();
-        }
-
-        if(x != null) {
-            x += STANDARD_DISTANCE_X;
-        } else {
-            x = 0.0;
-        }
+        Double x = ls.getInitialXPos(act);
 
         node.setAttribute("x", x);
-
-        ls.setLastInputActXPos(x);
-        ls.setLastInputAct(act);
-    }
-
-    private Double getActivationXCoordinate(Activation act) {
-        if(act == null)
-            return null;
-
-        ActivationParticle originParticle = graphManager.getParticle(act.getId());
-        if(originParticle == null)
-            return null;
-
-        return originParticle.getPosition().x;
     }
 }
