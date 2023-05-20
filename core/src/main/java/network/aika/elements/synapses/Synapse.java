@@ -61,9 +61,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     protected S template;
 
     protected SumField weight = (SumField) new QueueSumField(this, TRAINING, "weight", TOLERANCE, true)
-            .addListener("onWeightModified", () ->
-                    setModified()
-            );
+            .addListener("onWeightModified", () -> {
+                checkWeight();
+                setModified();
+            });
 
     protected boolean trainingAllowed = true;
 
@@ -77,6 +78,10 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     public boolean checkLinkingEvent(Activation act) {
         return act.isFired();
+    }
+
+    protected void checkWeight() {
+        assert !isNegative();
     }
 
     public Scope getScope() {
@@ -336,7 +341,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public boolean isNegative() {
-        return weight.getCurrentValue() < 0.0;
+        return weight.getUpdatedCurrentValue() < 0.0;
     }
 
     @Override

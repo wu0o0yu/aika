@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 public class SynapsesPropertyPanel extends AbstractPropertyPanel {
 
     public SynapsesPropertyPanel(Stream<? extends Synapse> synapses) {
-        List<? extends Synapse> sortedSynapses = synapses.collect(Collectors.toList());
+        List<? extends Synapse> sortedSynapses = synapses.toList();
 
         Collections.sort(sortedSynapses, Comparator.comparingDouble(s -> -s.getSortingWeight()));
         sortedSynapses.stream()

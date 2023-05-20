@@ -414,14 +414,14 @@ public abstract class Neuron<A extends Activation> extends FieldObject implement
     public void suspend() {
         for (Synapse s : getInputSynapsesAsStream()
                 .filter(s -> s.getStoredAt() == OUTPUT)
-                .collect(Collectors.toList())
+                .toList()
         ) {
             provider.removeInputSynapse(s);
             s.getPInput().removeOutputSynapse(s);
         }
         for (Synapse s : getOutputSynapsesAsStream()
                 .filter(s -> s.getStoredAt() == INPUT)
-                .collect(Collectors.toList())
+                .toList()
         ) {
             provider.removeOutputSynapse(s);
             s.getPOutput().removeInputSynapse(s);

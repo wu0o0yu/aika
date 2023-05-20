@@ -75,7 +75,7 @@ public class AnnealingLogger {
                                 getLinkLabel(l) + "-net"
                         )
                 )
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private static String getLinkLabel(NegativeFeedbackLink l) {
@@ -91,7 +91,7 @@ public class AnnealingLogger {
                                 "" + Utils.round(l.getOutput().getNet().getCurrentValue())
                         )
                 )
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public Stream<NegativeFeedbackLink> getNegativeFeedbackLinks(Document doc) {

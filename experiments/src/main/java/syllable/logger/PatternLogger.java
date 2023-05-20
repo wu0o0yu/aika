@@ -103,7 +103,7 @@ public class PatternLogger {
 
             List<Link> inputLinks = pAct.getInputLinks()
                     .filter(l -> l instanceof PatternLink)
-                    .collect(Collectors.toList());
+                    .toList();
 
             for(int i = 0; i < Math.min(5, inputLinks.size()); i++) {
                 PatternLink il = (PatternLink) inputLinks.get(i);

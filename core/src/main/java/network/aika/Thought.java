@@ -261,7 +261,7 @@ public abstract class Thought extends FieldObject implements Element {
                 .values()
                 .stream()
                 .filter(s -> s.getElement() == element)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public int createActivationId() {

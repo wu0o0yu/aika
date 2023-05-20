@@ -43,7 +43,7 @@ public class BindingNeuron extends ConjunctiveNeuron<BindingActivation> {
         return getInputSynapsesAsStream()
                 .filter(s -> s instanceof RelationInputSynapse)
                 .map(s -> (RelationInputSynapse) s)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

@@ -47,7 +47,7 @@ public class StatisticLogger  {
 
             List<String> headerLabels = Arrays.stream(values())
                     .map(k -> k.name())
-                    .collect(Collectors.toList());
+                    .toList();
 
             FileWriter fw = new FileWriter(f);
             printer = new CSVPrinter(
@@ -113,10 +113,13 @@ public class StatisticLogger  {
                 );
 
         try {
-            List<String> entry =
+            List<String> entry = new ArrayList<>();
+
+            entry.addAll(
                     Arrays.stream(values())
-                            .map(k -> "" + getCount(k))
-                            .collect(Collectors.toList());
+                    .map(k -> "" + getCount(k))
+                    .toList()
+            );
 
             printer.printRecord(entry.toArray());
             printer.flush();

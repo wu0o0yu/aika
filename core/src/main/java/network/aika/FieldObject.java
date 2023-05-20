@@ -48,7 +48,7 @@ public abstract class FieldObject {
 
     public void disconnect(Direction dir, boolean deinitialize, boolean unlink, boolean borderCrossingOnly) {
         getFieldLinks(dir, borderCrossingOnly)
-                .collect(Collectors.toList())
+                .toList()
                 .forEach(fl -> {
                     fl.disconnect(deinitialize);
                     if(unlink)

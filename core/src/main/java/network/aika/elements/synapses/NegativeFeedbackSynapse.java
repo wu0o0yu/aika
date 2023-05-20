@@ -38,6 +38,11 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
     }
 
     @Override
+    protected void checkWeight() {
+        assert isNegative();
+    }
+
+    @Override
     public NegativeFeedbackLink createLink(InhibitoryActivation input, BindingActivation output) {
         return new NegativeFeedbackLink(this, input, output);
     }

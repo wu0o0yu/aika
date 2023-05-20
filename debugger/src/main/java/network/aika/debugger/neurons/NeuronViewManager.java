@@ -86,9 +86,9 @@ public class NeuronViewManager extends AbstractViewManager<Neuron, NeuronGraphMa
 
 
     public void expandNeuron(Neuron<?> n) {
-        List<Synapse> outputSyns = n.getOutputSynapsesAsStream()
+        List<? extends Synapse> outputSyns = n.getOutputSynapsesAsStream()
                 .limit(20)
-                .collect(Collectors.toList());
+                .toList();
 
         double count = outputSyns.size();
 
@@ -105,7 +105,7 @@ public class NeuronViewManager extends AbstractViewManager<Neuron, NeuronGraphMa
 
         List<Synapse> inputSyns = n.getInputSynapsesAsStream()
                 .limit(20)
-                .collect(Collectors.toList());
+                .toList();
 
         count = inputSyns.size();
 
@@ -176,7 +176,7 @@ public class NeuronViewManager extends AbstractViewManager<Neuron, NeuronGraphMa
                 .getActiveNeurons()
                 .stream()
                 .map(p -> p.getNeuron())
-                .collect(Collectors.toList());
+                .toList();
         return neurons;
     }
 

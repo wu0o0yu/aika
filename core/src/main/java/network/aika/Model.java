@@ -171,7 +171,7 @@ public class Model implements Writable {
                     .values()
                     .stream()
                     .filter(n -> !n.isSuspended())
-                    .collect(Collectors.toList())
+                    .toList()
                     .forEach(n -> suspend(retrievalCount, n, sm));
         }
     }

@@ -154,7 +154,7 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
 
     private ConjunctiveSynapse[] sortInputSynapses() {
         ConjunctiveSynapse[] inputsSynapses = getInputSynapsesByType(ConjunctiveSynapse.class)
-                .collect(Collectors.toList())
+                .toList()
                 .toArray(new ConjunctiveSynapse[0]);
 
         Arrays.sort(
