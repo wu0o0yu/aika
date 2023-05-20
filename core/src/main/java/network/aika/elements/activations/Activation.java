@@ -456,7 +456,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     }
 
     public Stream<Link> getOutputLinks() {
-        return new ArrayList<>(outputLinks.values())
+        return outputLinks.values()
                 .stream();
     }
 
