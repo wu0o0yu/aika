@@ -155,7 +155,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         linkAndConnect(getNeuron().getBias(), net)
                 .setPropagateUpdates(false);
 
-        netPreAnneal = new QueuedMaxField(this, POST_CLOSE, "netPreAnneal", TOLERANCE);
+        netPreAnneal = new QueueSumField(this, POST_CLOSE, "netPreAnneal", TOLERANCE);
         linkAndConnect(net, netPreAnneal);
     }
 

@@ -33,6 +33,7 @@ import org.graphstream.graph.Element;
 import org.graphstream.graph.Node;
 import org.graphstream.ui.geom.Point3;
 import org.graphstream.ui.graphicGraph.GraphicElement;
+import org.graphstream.ui.graphicGraph.GraphicGraph;
 import org.graphstream.ui.view.camera.DefaultCamera2D;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -279,11 +280,13 @@ public class ActivationViewManager extends AbstractViewManager<Activation, Activ
 
         DefaultCamera2D camera = (DefaultCamera2D) getGraphView().getCamera();
 
+        GraphicGraph gg = viewer.getGraphicGraph();
         GraphicElement gn = (GraphicElement) n;
 
         act.getInputLinks()
                 .map(l -> l.getInput())
-                .map(iAct -> (GraphicElement) getGraphManager().getNode(iAct)) // TODO: fixme
+                .map(iAct -> getGraphManager().getNode(iAct))
+                .map(in -> (GraphicElement) gg.getNode(in.getId()))
                 .forEach(in -> {
                     Point3 p = camera.transformPxToGuSwing(x, y);
                     in.move((in.getX() - gn.getX()) + p.x, (in.getY() - gn.getY()) + p.y, in.getZ());

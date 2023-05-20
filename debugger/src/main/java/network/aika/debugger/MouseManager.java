@@ -51,11 +51,8 @@ public class MouseManager implements MouseInputListener, org.graphstream.ui.view
     private final EnumSet<InteractiveElement> types;
     protected GraphicElement curElement;
     protected GraphicElement lastClickedElement;
-
-
     private AbstractViewManager viewManager;
     private MouseEvent lastMouseDragEvent;
-
 
     public MouseManager(AbstractViewManager viewManager) {
         this(EnumSet.of(InteractiveElement.NODE, InteractiveElement.SPRITE));

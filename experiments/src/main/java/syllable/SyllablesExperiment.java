@@ -174,7 +174,7 @@ public class SyllablesExperiment {
 
             AIKADebugger debugger = null;
             System.out.println(counter[0] + " " + w);
-            if(counter[0] >= 155) {// 3, 6, 11, 18, 100, 39
+            if(counter[0] >= 2) {// 3, 6, 11, 18, 100, 39
                 debugger = AIKADebugger.createAndShowGUI(doc);
             }
 
@@ -201,6 +201,20 @@ public class SyllablesExperiment {
 //            el.annealingLogInit(doc);
 
             doc.anneal();
+
+            doc.getActivations()
+                    .stream()
+                    .filter(Activation::isFired)
+                    .filter(act -> !act.isAbstract())
+                    .filter(act -> act instanceof PatternActivation)
+                    .filter(act -> !(act instanceof TokenActivation))
+                    .forEach(act ->
+                            System.out.println("   Matching " +
+                                    act.getClass().getSimpleName() +
+                                    " " + act.getLabel() +
+                                    " nId:" + act.getNeuron().getId()
+                            )
+                    );
 
             waitForClick(debugger);
 
