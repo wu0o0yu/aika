@@ -224,14 +224,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         output.linkInputLink(this);
     }
 
-    public void unlinkInput() {
-        input.unlinkOutputLink(this);
-    }
-
-    public void unlinkOutput() {
-        output.unlinkInputLink(this);
-    }
-
     public void propagateRangeOrTokenPos() {
         if(input == null)
             return;

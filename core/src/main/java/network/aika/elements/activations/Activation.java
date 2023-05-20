@@ -346,10 +346,6 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         return ID_COMPARATOR.compare(this, act);
     }
 
-    public OutputKey getOutputKey() {
-        return new OutputKey(getNeuronProvider(), getId());
-    }
-
     public String getLabel() {
         return getNeuron().getLabel();
     }
@@ -417,22 +413,10 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 .forEach(Link::linkInput);
     }
 
-    public void unlinkInputs() {
-        inputLinks
-                .values()
-                .forEach(Link::unlinkInput);
-    }
-
     public void linkOutputs() {
         outputLinks
                 .values()
                 .forEach(Link::linkOutput);
-    }
-
-    public void unlinkOutputs() {
-        outputLinks
-                .values()
-                .forEach(Link::unlinkOutput);
     }
 
     public void linkOutputLink(Link l) {
@@ -452,23 +436,9 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         assert el == null;
     }
 
-    public void unlinkOutputLink(Link l) {
-        OutputKey ok = l.getOutput().getOutputKey();
-        outputLinks.remove(ok, this);
-    }
-
-    public void unlinkInputLink(Link l) {
-        inputLinks.remove(l.getInput().getNeuronProvider(), l);
-    }
-
     public void link() {
         linkInputs();
         linkOutputs();
-    }
-
-    public void unlink() {
-        unlinkInputs();
-        unlinkOutputs();
     }
 
     @Override
