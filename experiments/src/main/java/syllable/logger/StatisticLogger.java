@@ -45,10 +45,16 @@ public class StatisticLogger  {
             if(f.exists())
                 f.delete();
 
-            List<String> headerLabels = Arrays.stream(values())
-                    .map(k -> k.name())
-                    .toList();
+            List<String> headerLabels = new ArrayList<>();
 
+            headerLabels.add("Doc ID");
+            headerLabels.add("Content");
+
+            headerLabels.addAll(
+                    Arrays.stream(values())
+                            .map(k -> k.name())
+                            .toList()
+            );
             FileWriter fw = new FileWriter(f);
             printer = new CSVPrinter(
                     fw,
@@ -114,6 +120,9 @@ public class StatisticLogger  {
 
         try {
             List<String> entry = new ArrayList<>();
+
+            entry.add("" + doc.getId());
+            entry.add(doc.getContent());
 
             entry.addAll(
                     Arrays.stream(values())
