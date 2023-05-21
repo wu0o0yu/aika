@@ -24,7 +24,6 @@ import network.aika.callbacks.InstantiationCallback;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.Element;
 import network.aika.elements.activations.Timestamp;
-import network.aika.elements.links.NegativeFeedbackLink;
 import network.aika.fields.*;
 import network.aika.elements.neurons.PreActivation;
 import network.aika.elements.neurons.NeuronProvider;
@@ -33,14 +32,12 @@ import network.aika.steps.Phase;
 import network.aika.steps.QueueKey;
 import network.aika.steps.Step;
 import network.aika.steps.activation.InactiveLinks;
-import network.aika.steps.activation.InstantiationNodes;
+import network.aika.steps.activation.Instantiation;
 import network.aika.steps.thought.AnnealStep;
 import network.aika.steps.thought.CloseStep;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static network.aika.callbacks.EventType.*;
 import static network.aika.fields.Fields.invert;
@@ -315,7 +312,7 @@ public abstract class Thought extends FieldObject implements Element {
         activationsById.values().stream()
                 .filter(act -> act.getNeuron().isAbstract())
                 .filter(act -> act.isFired())
-                .forEach(InstantiationNodes::add);
+                .forEach(Instantiation::add);
     }
 
     public String toString() {

@@ -30,7 +30,6 @@ import network.aika.elements.neurons.Range;
 import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.fields.*;
 import network.aika.elements.synapses.Synapse;
-import network.aika.steps.activation.InstantiationEdges;
 import network.aika.visitor.DownVisitor;
 import network.aika.visitor.linking.pattern.PatternCategoryDownVisitor;
 import network.aika.visitor.linking.pattern.PatternCategoryUpVisitor;
@@ -86,8 +85,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     protected Map<NeuronProvider, Link> inputLinks;
     protected NavigableMap<OutputKey, Link> outputLinks;
 
-    public boolean instantiationNodesIsQueued;
-    public boolean instantiationEdgesIsQueued;
+    public boolean instantiationIsQueued;
     protected boolean isNewInstance;
 
     protected Range range;
@@ -517,7 +515,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
         instantiateBias(ti);
 
-        InstantiationEdges.add(this, ti);
+        instantiateTemplateEdges(ti);
 
         if(thought.getInstantiationCallback() != null)
             thought.getInstantiationCallback().onInstantiation(ti);

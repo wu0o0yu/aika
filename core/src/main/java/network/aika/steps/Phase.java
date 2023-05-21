@@ -21,11 +21,10 @@ package network.aika.steps;
  * @author Lukas Molzberger
  */
 public enum Phase {
-    INSTANTIATION_NODES("IA"),
-    INSTANTIATION_EDGES("IB"),
+    INSTANTIATION("IS"),
     INPUT_LINKING("IL"),
     OUTPUT_LINKING("OL"),
-    INFERENCE("I"),
+    INFERENCE("IF"),
     CLOSE("C"),
     POST_CLOSE("PC"),
     ANNEAL("A"),

@@ -20,28 +20,28 @@ import network.aika.elements.activations.Activation;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
 
-import static network.aika.steps.Phase.INSTANTIATION_NODES;
+import static network.aika.steps.Phase.INSTANTIATION;
 
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class InstantiationNodes extends Step<Activation> {
+public class Instantiation extends Step<Activation> {
 
     public static void add(Activation act) {
-        if(act.instantiationNodesIsQueued)
+        if(act.instantiationIsQueued)
             return;
 
-        act.instantiationNodesIsQueued = true;
+        act.instantiationIsQueued = true;
 
         if(act.getActiveTemplateInstance() != null)
             return;
 
-        add(new InstantiationNodes(act));
+        add(new Instantiation(act));
     }
 
-    public InstantiationNodes(Activation act) {
+    public Instantiation(Activation act) {
         super(act);
     }
 
@@ -50,11 +50,11 @@ public class InstantiationNodes extends Step<Activation> {
         getElement()
                 .instantiateTemplateNode();
 
-        getElement().instantiationNodesIsQueued = false;
+        getElement().instantiationIsQueued = false;
     }
 
     @Override
     public Phase getPhase() {
-        return INSTANTIATION_NODES;
+        return INSTANTIATION;
     }
 }
