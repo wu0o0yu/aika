@@ -78,6 +78,9 @@ public class StatisticLogger  {
         FIRED_ACTS,
         INACTIVE_ACTS,
         STRONG_ACTS,
+        SUPPRESSED_ACTS,
+        PRIMARY_BINDING_ACTS,
+        INACTIVE_SECONDARY_BINDING_ACTS,
         REL_ACTS,
         NEW_INSTANCES,
         ABSTRACT_ACTS,
@@ -85,13 +88,24 @@ public class StatisticLogger  {
 
     private void count(Activation act) {
         count(ACTS);
-        if(act.isFired())
+        if(act.getNet().getCurrentValue() > 0.0)
             count(FIRED_ACTS);
         else
             count(INACTIVE_ACTS);
 
         if(act.getNet().getCurrentValue() > 0.9)
             count(STRONG_ACTS);
+
+        if(act.getNetPreAnneal().getCurrentValue() > 0.0 && act.getNet().getCurrentValue() <= 0.0)
+            count(SUPPRESSED_ACTS);
+
+        Activation tAct = act.getTemplate();
+        if(tAct != null) {
+            if (tAct.getLabel().equalsIgnoreCase("Abstract (S) Pos:0"))
+                count(PRIMARY_BINDING_ACTS);
+            else if(act.getNet().getCurrentValue() <= 0.0)
+                count(INACTIVE_SECONDARY_BINDING_ACTS);
+        }
 
         if(act instanceof LatentRelationActivation)
             count(REL_ACTS);
