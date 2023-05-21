@@ -20,6 +20,7 @@ import network.aika.debugger.properties.AbstractPropertyPanel;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.ConjunctiveActivation;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -33,7 +34,7 @@ import java.util.stream.Stream;
 public class TemplateInstancesPropertyPanel extends AbstractPropertyPanel {
 
     public TemplateInstancesPropertyPanel(Stream<? extends Activation> instances) {
-        List<? extends Activation> sortedInstances = instances.toList();
+        List<? extends Activation> sortedInstances = instances.collect(Collectors.toList());
 
         Collections.sort(sortedInstances, Comparator.comparingDouble(inst -> -inst.getNet().getCurrentValue()));
         sortedInstances.stream()

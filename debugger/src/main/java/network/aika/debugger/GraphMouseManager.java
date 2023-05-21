@@ -42,9 +42,9 @@ import java.util.EnumSet;
 /**
  * @author Lukas Molzberger
  */
-public class MouseManager implements MouseInputListener, org.graphstream.ui.view.util.MouseManager, MouseWheelListener {
+public class GraphMouseManager implements MouseInputListener, org.graphstream.ui.view.util.MouseManager, MouseWheelListener {
 
-    private static final Logger log = LoggerFactory.getLogger(MouseManager.class);
+    private static final Logger log = LoggerFactory.getLogger(GraphMouseManager.class);
 
     protected View view;
     protected GraphicGraph graph;
@@ -54,12 +54,12 @@ public class MouseManager implements MouseInputListener, org.graphstream.ui.view
     private AbstractViewManager viewManager;
     private MouseEvent lastMouseDragEvent;
 
-    public MouseManager(AbstractViewManager viewManager) {
+    public GraphMouseManager(AbstractViewManager viewManager) {
         this(EnumSet.of(InteractiveElement.NODE, InteractiveElement.SPRITE));
         this.viewManager = viewManager;
     }
 
-    public MouseManager(EnumSet<InteractiveElement> types) {
+    public GraphMouseManager(EnumSet<InteractiveElement> types) {
         this.types = types;
     }
 
@@ -112,12 +112,20 @@ public class MouseManager implements MouseInputListener, org.graphstream.ui.view
         }
     }
 
+    private void doPop(MouseEvent e) {
+        GraphContextMenu menu = new GraphContextMenu();
+        menu.show(e.getComponent(), e.getX(), e.getY());
+    }
+
     public void mouseClicked(MouseEvent event) {
         viewManager.getGraphView().requestFocusInWindow();
     }
 
     public void mousePressed(MouseEvent event) {
        //this.curElement = view.findGraphicElementAt(this.types, event.getX(), event.getY());
+
+        if (event.isPopupTrigger())
+            doPop(event);
 
         double x = event.getX();
         double y = event.getY();
@@ -209,6 +217,9 @@ public class MouseManager implements MouseInputListener, org.graphstream.ui.view
 
     public void mouseReleased(MouseEvent event) {
         lastMouseDragEvent = null;
+
+        if (event.isPopupTrigger())
+            doPop(event);
 
         if (this.curElement != null) {
             this.mouseButtonReleaseOffElement(this.curElement, event);

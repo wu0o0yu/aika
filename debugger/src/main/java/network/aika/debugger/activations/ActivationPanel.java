@@ -25,15 +25,19 @@ import network.aika.direction.Direction;
 import network.aika.elements.activations.Activation;
 
 import javax.swing.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 
 /**
  * @author Lukas Molzberger
  */
-public class ActivationPanel extends ElementPanel {
+public class ActivationPanel extends ElementPanel implements MouseListener {
 
+    ActivationPanelMode mode = ActivationPanelMode.CURRENT;
 
     public ActivationPanel(Activation act) {
+        addMouseListener(this);
 
         //The following line enables to use scrolling tabs.
         setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
@@ -41,6 +45,14 @@ public class ActivationPanel extends ElementPanel {
         setFocusCycleRoot(true);
 
         initTabs(act);
+    }
+
+    public ActivationPanelMode getMode() {
+        return mode;
+    }
+
+    public void setMode(ActivationPanelMode mode) {
+        this.mode = mode;
     }
 
     private void initTabs(Activation act) {
@@ -120,5 +132,43 @@ public class ActivationPanel extends ElementPanel {
                         templateInstancesPropertyPanel
                 );
         }
+    }
+
+    @Override
+    protected void addTab(String title, String tip, AbstractPropertyPanel panel) {
+        super.addTab(title, tip, panel);
+        panel.addMouseListener(this);
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    private void doPop(MouseEvent e) {
+        ActivationPanelContextMenu menu = new ActivationPanelContextMenu(this);
+        menu.show(e.getComponent(), e.getX(), e.getY());
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        if (e.isPopupTrigger())
+            doPop(e);
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if (e.isPopupTrigger())
+            doPop(e);
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
     }
 }

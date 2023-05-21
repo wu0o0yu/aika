@@ -73,7 +73,7 @@ public abstract class AbstractViewManager<N, G extends AbstractGraphManager> {
         graphView = (DefaultView)viewer.addDefaultView(false, new SwingGraphRenderer());
         graphView.enableMouseOptions();
 
-        MouseManager mouseManager = new MouseManager(this);
+        GraphMouseManager mouseManager = new GraphMouseManager(this);
         graphView.setMouseManager(mouseManager);
         graphView.addMouseWheelListener(mouseManager);
 

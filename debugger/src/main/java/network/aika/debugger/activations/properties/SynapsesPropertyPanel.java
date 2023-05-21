@@ -26,6 +26,7 @@ import network.aika.elements.neurons.Neuron;
 import network.aika.elements.neurons.PreActivation;
 import network.aika.elements.synapses.Synapse;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -39,7 +40,7 @@ import java.util.stream.Stream;
 public class SynapsesPropertyPanel extends AbstractPropertyPanel {
 
     public SynapsesPropertyPanel(Stream<? extends Synapse> synapses) {
-        List<? extends Synapse> sortedSynapses = synapses.toList();
+        List<? extends Synapse> sortedSynapses = synapses.collect(Collectors.toList());
 
         Collections.sort(sortedSynapses, Comparator.comparingDouble(s -> -s.getSortingWeight()));
         sortedSynapses.stream()
