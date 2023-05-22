@@ -14,23 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package syllable;
+package experiment;
 
+import meta.AbstractTemplateModel;
+import meta.SyllableTemplateModel;
 import network.aika.Config;
 import network.aika.Model;
 import network.aika.debugger.AIKADebugger;
 import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.CategoryActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.activations.TokenActivation;
-import network.aika.elements.links.CategoryLink;
-import network.aika.elements.links.Link;
 import network.aika.sign.Sign;
 import network.aika.steps.Phase;
 import network.aika.text.Document;
 import org.apache.commons.io.IOUtils;
-import syllable.logger.ExperimentLogger;
-import syllable.logger.LoggingListener;
+import experiment.logger.ExperimentLogger;
+import experiment.logger.LoggingListener;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,7 +43,7 @@ import java.util.List;
  */
 public class SyllablesExperiment {
 
-    public static void processTokens(SyllableTemplateModel m, Document doc, Iterable<String> tokens, int separatorLength) {
+    public static void processTokens(AbstractTemplateModel m, Document doc, Iterable<String> tokens, int separatorLength) {
         int i = 0;
         int pos = 0;
 
@@ -66,36 +65,12 @@ public class SyllablesExperiment {
             i = j + separatorLength;
         }
 
-        PatternActivation maxSurprisalAct = tokenActs.stream().filter(PatternActivation.class::isInstance)
-                .map(PatternActivation.class::cast)
-                .max(Comparator.comparingDouble(act ->
-                        act.getSurprisal(Sign.POS)
-                )).orElse(null);
+        doc.setActivationCheckCallback(act ->
+                m.evaluatePrimaryBindingActs(act)
+        );
 
-        doc.setActivationCheckCallback(act -> {
-            if (act == null)
-                return true;
-
-            Link l = act.getInputLink(m.letterCategory);
-            if(l == null)
-                return false;
-
-            CategoryActivation cAct = (CategoryActivation) l.getInput();
-            if (cAct == null)
-                return false;
-
-            CategoryLink catLink = (CategoryLink) cAct.getInputLinks().findAny().orElse(null);
-            if(catLink == null)
-                return false;
-
-            return maxSurprisalAct == catLink.getInput();
-        });
-
-        for(TokenActivation tAct: tokenActs) {
-            tAct.setNet(m.letterPatternNetTarget);
-        }
+        m.setTokenInputNet(tokenActs);
     }
-
 
     public static Config getConfig() {
         return new Config() {
@@ -131,7 +106,7 @@ public class SyllablesExperiment {
     private void train(List<String> inputs) {
         Model model = new Model();
 
-        SyllableTemplateModel syllableModel = new SyllableTemplateModel(model);
+        AbstractTemplateModel syllableModel = new SyllableTemplateModel(model);
 
         model.setN(0);
 

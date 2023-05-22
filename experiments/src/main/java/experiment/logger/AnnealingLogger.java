@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package syllable.logger;
+package experiment.logger;
 
 import network.aika.elements.links.NegativeFeedbackLink;
 import network.aika.fields.Field;
 import network.aika.text.Document;
 import network.aika.utils.Utils;
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 import java.io.File;
@@ -28,10 +27,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static syllable.logger.ExperimentLogger.CSV_FORMAT;
+import static experiment.logger.ExperimentLogger.CSV_FORMAT;
 
 /**
  * @author Lukas Molzberger

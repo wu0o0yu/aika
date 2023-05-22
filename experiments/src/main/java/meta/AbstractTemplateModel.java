@@ -14,17 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package syllable;
+package meta;
 
 import network.aika.Model;
+import network.aika.elements.activations.Activation;
+import network.aika.elements.activations.PatternActivation;
+import network.aika.elements.activations.TokenActivation;
 import network.aika.elements.neurons.*;
 import network.aika.elements.synapses.*;
+
+import java.util.List;
 
 /**
  *
  * @author Lukas Molzberger
  */
-public class SyllableTemplateModel {
+public abstract class AbstractTemplateModel {
 
     Model model;
 
@@ -38,12 +43,16 @@ public class SyllableTemplateModel {
 
     CategoryNeuron inhibCat;
 
-    PatternNeuron syllablePatternN;
+    PatternNeuron patternN;
 
-    CategoryNeuron syllableCategory;
+    CategoryNeuron patternCategory;
 
     double letterPatternNetTarget = 5.0;
     double letterPatternValueTarget;
+
+    double patternNetTarget = 0.7;
+    double patternValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
+            .f(patternNetTarget);
 
     static double POS_MARGIN = 1.0;
     static double NEG_MARGIN = 1.1;
@@ -51,7 +60,7 @@ public class SyllableTemplateModel {
     static double PASSIVE_SYNAPSE_WEIGHT = 0.0;
 
 
-    public SyllableTemplateModel(Model m) {
+    public AbstractTemplateModel(Model m) {
         model = m;
 
         relPT = TokenPositionRelationNeuron.lookupRelation(model, -1, -1);
@@ -75,14 +84,25 @@ public class SyllableTemplateModel {
         letterPN.setBias(letterPatternNetTarget - pCatInputSyn.getWeight().getCurrentValue());
     }
 
+    public boolean evaluatePrimaryBindingActs(Activation act) {
+        return false;
+    }
+
+    public void setTokenInputNet(List<TokenActivation> tokenActs) {
+        for(TokenActivation tAct: tokenActs) {
+            tAct.setNet(letterPatternNetTarget);
+        }
+    }
+
+    public abstract String getPatternType();
 
     public void initMeta() {
         // Abstract
-        syllablePatternN = new PatternNeuron()
-                .init(model, "Syllable");
+        patternN = new PatternNeuron()
+                .init(model, getPatternType());
 
-        syllableCategory = new PatternCategoryNeuron()
-                .init(model, "Syllable Category");
+        patternCategory = new PatternCategoryNeuron()
+                .init(model, getPatternType() + " Category");
 
         inhibitoryN =new InhibitoryNeuron()
                 .init(model, "I");
@@ -90,45 +110,24 @@ public class SyllableTemplateModel {
         inhibCat = new InhibitoryCategoryNeuron()
                 .init(model, "Inhib. Category");
 
-        double patternNetTarget = 0.7;
-        double patternValueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
-                .f(patternNetTarget);
+        System.out.println(getPatternType() + " Pattern: netTarget:" + patternNetTarget + " valueTarget:" + patternValueTarget);
 
-        System.out.println("Syllable Pattern: netTarget:" + patternNetTarget + " valueTarget:" + patternValueTarget);
-
-        BindingNeuron sylBeginBN = createStrongBindingNeuron(
-                patternValueTarget,
-                0,
-                null,
-                null
-        );
-
-        expandContinueBindingNeurons(
-                patternValueTarget,
-                sylBeginBN,
-                5,
-                1
-        );
-
-        expandContinueBindingNeurons(
-                patternValueTarget,
-                sylBeginBN,
-                5,
-                -1
-        );
+        initTemplateBindingNeurons();
 
         new PatternCategoryInputSynapse()
                 .setWeight(PASSIVE_SYNAPSE_WEIGHT)
-                .init(syllableCategory, syllablePatternN);
+                .init(patternCategory, patternN);
 
-        syllablePatternN.setBias(patternNetTarget);
+        patternN.setBias(patternNetTarget);
 
         new InhibitoryCategoryInputSynapse()
                 .setWeight(1.0)
                 .init(inhibCat, inhibitoryN);
     }
 
-    private void expandContinueBindingNeurons(
+    protected abstract void initTemplateBindingNeurons();
+
+    protected void expandContinueBindingNeurons(
             double patternValueTarget,
             BindingNeuron sylBeginBN,
             int length,
@@ -155,7 +154,7 @@ public class SyllableTemplateModel {
         }
     }
 
-    private BindingNeuron createStrongBindingNeuron(
+    protected BindingNeuron createStrongBindingNeuron(
             double patternValueTarget,
             int pos,
             Integer lastPos,
@@ -215,7 +214,7 @@ public class SyllableTemplateModel {
         PatternSynapse pSyn = new PatternSynapse()
                 .setWeight(2.5)
                 .setOptional(pos != 0)
-                .init(bn, syllablePatternN)
+                .init(bn, patternN)
                 .adjustBias(valueTarget);
 
         System.out.println("  " + pSyn + " targetNetContr:" + -pSyn.getSynapseBias().getCurrentValue());
@@ -223,7 +222,7 @@ public class SyllableTemplateModel {
 
         PositiveFeedbackSynapse posFeedSyn = new PositiveFeedbackSynapse()
                 .setWeight(POS_MARGIN * (netTarget / patternValueTarget))
-                .init(syllablePatternN, bn)
+                .init(patternN, bn)
                 .adjustBias(patternValueTarget);
 
         System.out.println("  " + posFeedSyn + " targetNetContr:" + -posFeedSyn.getSynapseBias().getCurrentValue());
@@ -246,7 +245,7 @@ public class SyllableTemplateModel {
         return bn;
     }
 
-    private BindingNeuron createWeakBindingNeuron(
+    protected BindingNeuron createWeakBindingNeuron(
             double patternValueTarget,
             int pos,
             BindingNeuron lastBN
@@ -304,12 +303,12 @@ public class SyllableTemplateModel {
         new PatternSynapse()
                 .setWeight(0.5)
                 .setOptional(true)
-                .init(bn, syllablePatternN)
+                .init(bn, patternN)
                 .adjustBias(valueTarget);
 
         PositiveFeedbackSynapse posFeedSyn = new PositiveFeedbackSynapse()
                 .setWeight(POS_MARGIN * (netTarget / patternValueTarget))
-                .init(syllablePatternN, bn)
+                .init(patternN, bn)
                 .adjustBias(patternValueTarget);
 
         System.out.println("  " + posFeedSyn + " targetNetContr:" + -posFeedSyn.getSynapseBias().getCurrentValue());
