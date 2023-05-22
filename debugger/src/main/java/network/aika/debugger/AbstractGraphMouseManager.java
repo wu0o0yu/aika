@@ -16,6 +16,7 @@
  */
 package network.aika.debugger;
 
+import network.aika.debugger.activations.ActivationGraphContextMenu;
 import network.aika.debugger.graphics.CubicCurveShape;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Element;
@@ -42,9 +43,9 @@ import java.util.EnumSet;
 /**
  * @author Lukas Molzberger
  */
-public class GraphMouseManager implements MouseInputListener, org.graphstream.ui.view.util.MouseManager, MouseWheelListener {
+public abstract class AbstractGraphMouseManager implements MouseInputListener, org.graphstream.ui.view.util.MouseManager, MouseWheelListener {
 
-    private static final Logger log = LoggerFactory.getLogger(GraphMouseManager.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractGraphMouseManager.class);
 
     protected View view;
     protected GraphicGraph graph;
@@ -54,12 +55,12 @@ public class GraphMouseManager implements MouseInputListener, org.graphstream.ui
     private AbstractViewManager viewManager;
     private MouseEvent lastMouseDragEvent;
 
-    public GraphMouseManager(AbstractViewManager viewManager) {
+    public AbstractGraphMouseManager(AbstractViewManager viewManager) {
         this(EnumSet.of(InteractiveElement.NODE, InteractiveElement.SPRITE));
         this.viewManager = viewManager;
     }
 
-    public GraphMouseManager(EnumSet<InteractiveElement> types) {
+    private AbstractGraphMouseManager(EnumSet<InteractiveElement> types) {
         this.types = types;
     }
 
@@ -112,10 +113,7 @@ public class GraphMouseManager implements MouseInputListener, org.graphstream.ui
         }
     }
 
-    private void doPop(MouseEvent e) {
-        GraphContextMenu menu = new GraphContextMenu();
-        menu.show(e.getComponent(), e.getX(), e.getY());
-    }
+    protected abstract void doContextMenuPop(MouseEvent e);
 
     public void mouseClicked(MouseEvent event) {
         viewManager.getGraphView().requestFocusInWindow();
@@ -125,7 +123,7 @@ public class GraphMouseManager implements MouseInputListener, org.graphstream.ui
        //this.curElement = view.findGraphicElementAt(this.types, event.getX(), event.getY());
 
         if (event.isPopupTrigger())
-            doPop(event);
+            doContextMenuPop(event);
 
         double x = event.getX();
         double y = event.getY();
@@ -219,7 +217,7 @@ public class GraphMouseManager implements MouseInputListener, org.graphstream.ui
         lastMouseDragEvent = null;
 
         if (event.isPopupTrigger())
-            doPop(event);
+            doContextMenuPop(event);
 
         if (this.curElement != null) {
             this.mouseButtonReleaseOffElement(this.curElement, event);

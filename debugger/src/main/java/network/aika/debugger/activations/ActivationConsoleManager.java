@@ -40,7 +40,8 @@ public class ActivationConsoleManager extends JSplitPane implements EventListene
     private Element currentMainElement = null;
     private Element currentSelectedElement = null;
 
-    private ElementPanel activationPanel = new ActivationPanel(null);
+
+    private ActivationPanel activationPanel = new ActivationPanel(null);
 
     private boolean sticky;
 
@@ -54,6 +55,10 @@ public class ActivationConsoleManager extends JSplitPane implements EventListene
         setResizeWeight(0.65);
 
         doc.addEventListener(this);
+    }
+
+    public ActivationPanel getActivationPanel() {
+        return activationPanel;
     }
 
     public QueueConsole getQueueConsole() {
@@ -74,7 +79,7 @@ public class ActivationConsoleManager extends JSplitPane implements EventListene
         if (activationPanel != null)
             activationPanel.remove();
 
-        ElementPanel newActPanel = ElementPanel.createElementPanel(e);
+        ActivationPanel newActPanel = (ActivationPanel) ElementPanel.createElementPanel(e);
         if(sticky) {
             currentSelectedElement = e;
         }else {

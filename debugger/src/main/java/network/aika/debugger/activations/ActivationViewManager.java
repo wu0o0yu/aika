@@ -95,11 +95,18 @@ public class ActivationViewManager extends AbstractViewManager<Activation, Activ
     }
 
     @Override
+    protected AbstractGraphMouseManager initMouseManager() {
+        return new ActivationGraphMouseManager(this);
+    }
+
+    @Override
     public Component getConsoleManager() {
         return consoleManager;
     }
 
     public void showElementContext(GraphicElement ge) {
+        consoleManager.getActivationPanel().setMode(ActivationPanelMode.SELECTED);
+
         if(ge instanceof Node) {
             Node n = (Node) ge;
 
@@ -108,7 +115,6 @@ public class ActivationViewManager extends AbstractViewManager<Activation, Activ
                 return;
 
             consoleManager.showSelectedElementContext(act);
-
         } else if(ge instanceof Edge) {
             Edge e = (Edge) ge;
 

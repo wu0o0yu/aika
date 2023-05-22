@@ -17,8 +17,10 @@
 package network.aika.debugger.neurons;
 
 import network.aika.Model;
+import network.aika.debugger.AbstractGraphMouseManager;
 import network.aika.debugger.AbstractParticleLink;
 import network.aika.debugger.AbstractViewManager;
+import network.aika.debugger.activations.ActivationGraphMouseManager;
 import network.aika.direction.Direction;
 import network.aika.elements.neurons.Neuron;
 import network.aika.elements.synapses.Synapse;
@@ -201,6 +203,10 @@ public class NeuronViewManager extends AbstractViewManager<Neuron, NeuronGraphMa
 
     }
 
+    @Override
+    protected AbstractGraphMouseManager initMouseManager() {
+        return new NeuronGraphMouseManager(this);
+    }
 
     @Override
     public Component getConsoleManager() {
