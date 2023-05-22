@@ -34,8 +34,6 @@ import java.awt.event.MouseListener;
  */
 public class ActivationPanel extends ElementPanel implements MouseListener {
 
-    ActivationPanelMode mode = ActivationPanelMode.CURRENT;
-
     public ActivationPanel(Activation act) {
         addMouseListener(this);
 
@@ -47,12 +45,9 @@ public class ActivationPanel extends ElementPanel implements MouseListener {
         initTabs(act);
     }
 
-    public ActivationPanelMode getMode() {
-        return mode;
-    }
-
-    public void setMode(ActivationPanelMode mode) {
-        this.mode = mode;
+    public ActivationPanel(ActivationConsoleManager consoleManager, Activation act) {
+        this(act);
+        this.consoleManager = consoleManager;
     }
 
     private void initTabs(Activation act) {
@@ -146,7 +141,7 @@ public class ActivationPanel extends ElementPanel implements MouseListener {
     }
 
     private void doPop(MouseEvent e) {
-        ActivationPanelContextMenu menu = new ActivationPanelContextMenu(this);
+        ActivationPanelContextMenu menu = new ActivationPanelContextMenu((ActivationConsoleManager) consoleManager);
         menu.show(e.getComponent(), e.getX(), e.getY());
     }
 

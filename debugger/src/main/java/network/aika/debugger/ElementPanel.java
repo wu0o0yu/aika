@@ -16,6 +16,7 @@
  */
 package network.aika.debugger;
 
+import network.aika.debugger.activations.ActivationConsoleManager;
 import network.aika.debugger.activations.ActivationPanel;
 import network.aika.debugger.activations.LinkPanel;
 import network.aika.debugger.neurons.NeuronPanel;
@@ -36,17 +37,27 @@ import static network.aika.debugger.activations.ActivationConsoleManager.getScro
  */
 public class ElementPanel extends JTabbedPane {
 
-    public static ElementPanel createElementPanel(Element e) {
-        if(e instanceof Activation<?>)
-            return new ActivationPanel((Activation) e);
-        else if(e instanceof Link)
-            return new LinkPanel((Link) e);
-        if(e instanceof Neuron)
-            return new NeuronPanel((Neuron) e);
-        else if(e instanceof Synapse)
-            return new SynapsePanel((Synapse) e);
+    protected AbstractConsoleManager consoleManager;
 
-        return null;
+    public static ElementPanel createElementPanel(AbstractConsoleManager consoleManager, Element e) {
+        ElementPanel ep = null;
+        if(e instanceof Activation<?>)
+            ep = new ActivationPanel((Activation) e);
+        else if(e instanceof Link)
+            ep = new LinkPanel((Link) e);
+        if(e instanceof Neuron)
+            ep = new NeuronPanel((Neuron) e);
+        else if(e instanceof Synapse)
+            ep = new SynapsePanel((Synapse) e);
+
+        if(ep != null)
+            ep.consoleManager = consoleManager;
+
+        return ep;
+    }
+
+    public AbstractConsoleManager getConsoleManager() {
+        return consoleManager;
     }
 
     protected void addTab(String title, String tip, AbstractPropertyPanel panel) {

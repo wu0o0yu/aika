@@ -19,6 +19,7 @@ package network.aika.debugger.activations;
 import network.aika.Thought;
 import network.aika.callbacks.EventListener;
 import network.aika.callbacks.EventType;
+import network.aika.debugger.AbstractConsoleManager;
 import network.aika.debugger.ElementPanel;
 import network.aika.elements.Element;
 import network.aika.elements.activations.Activation;
@@ -33,15 +34,16 @@ import java.awt.*;
 /**
  * @author Lukas Molzberger
  */
-public class ActivationConsoleManager extends JSplitPane implements EventListener {
+public class ActivationConsoleManager extends JSplitPane implements AbstractConsoleManager, EventListener {
 
     private QueueConsole queueConsole;
 
     private Element currentMainElement = null;
     private Element currentSelectedElement = null;
 
+    protected ActivationPanelMode mode = ActivationPanelMode.CURRENT;
 
-    private ActivationPanel activationPanel = new ActivationPanel(null);
+    private ElementPanel activationPanel = new ActivationPanel(this, null);
 
     private boolean sticky;
 
@@ -57,9 +59,15 @@ public class ActivationConsoleManager extends JSplitPane implements EventListene
         doc.addEventListener(this);
     }
 
-    public ActivationPanel getActivationPanel() {
-        return activationPanel;
+
+    public ActivationPanelMode getMode() {
+        return mode;
     }
+
+    public void setMode(ActivationPanelMode mode) {
+        this.mode = mode;
+    }
+
 
     public QueueConsole getQueueConsole() {
         return queueConsole;
@@ -79,7 +87,7 @@ public class ActivationConsoleManager extends JSplitPane implements EventListene
         if (activationPanel != null)
             activationPanel.remove();
 
-        ActivationPanel newActPanel = (ActivationPanel) ElementPanel.createElementPanel(e);
+        ElementPanel newActPanel = ElementPanel.createElementPanel(this, e);
         if(sticky) {
             currentSelectedElement = e;
         }else {

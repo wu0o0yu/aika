@@ -105,7 +105,7 @@ public class ActivationViewManager extends AbstractViewManager<Activation, Activ
     }
 
     public void showElementContext(GraphicElement ge) {
-        consoleManager.getActivationPanel().setMode(ActivationPanelMode.SELECTED);
+        consoleManager.setMode(ActivationPanelMode.SELECTED);
 
         if(ge instanceof Node) {
             Node n = (Node) ge;

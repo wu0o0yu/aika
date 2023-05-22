@@ -16,6 +16,7 @@
  */
 package network.aika.debugger.neurons;
 
+import network.aika.debugger.AbstractConsoleManager;
 import network.aika.debugger.ElementPanel;
 import network.aika.elements.Element;
 import network.aika.elements.neurons.Neuron;
@@ -27,7 +28,7 @@ import java.awt.*;
 /**
  * @author Lukas Molzberger
  */
-public class NeuronConsoleManager extends JPanel {
+public class NeuronConsoleManager extends JPanel implements AbstractConsoleManager {
 
     protected ElementPanel neuronPanel;
 
@@ -64,7 +65,7 @@ public class NeuronConsoleManager extends JPanel {
         removeAll();
         invalidate();
 
-        neuronPanel = ElementPanel.createElementPanel(e);
+        neuronPanel = ElementPanel.createElementPanel(this, e);
         add(neuronPanel, c1);
 
         revalidate();

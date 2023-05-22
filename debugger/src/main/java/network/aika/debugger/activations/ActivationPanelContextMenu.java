@@ -1,5 +1,6 @@
 package network.aika.debugger.activations;
 
+
 import javax.swing.*;
 
 import static network.aika.debugger.activations.ActivationPanelMode.CURRENT;
@@ -7,11 +8,11 @@ import static network.aika.debugger.activations.ActivationPanelMode.SELECTED;
 
 public class ActivationPanelContextMenu extends JPopupMenu {
 
-    ActivationPanel actPanel;
+    ActivationConsoleManager actPanel;
 
     JMenuItem currentVsSelectedItem;
 
-    public ActivationPanelContextMenu(ActivationPanel actPanel) {
+    public ActivationPanelContextMenu(ActivationConsoleManager actPanel) {
         this.actPanel = actPanel;
 
         currentVsSelectedItem = new JMenuItem(actPanel.getMode().getTxt());
