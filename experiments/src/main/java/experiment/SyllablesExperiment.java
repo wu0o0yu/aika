@@ -24,7 +24,6 @@ import network.aika.debugger.AIKADebugger;
 import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.activations.TokenActivation;
-import network.aika.sign.Sign;
 import network.aika.steps.Phase;
 import network.aika.text.Document;
 import org.apache.commons.io.IOUtils;
@@ -35,7 +34,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -134,7 +132,7 @@ public class SyllablesExperiment {
             doc.disconnect();
         });
 
-        syllableModel.initMeta();
+        syllableModel.initTemplates();
 
         int[] counter = new int[1];
 
