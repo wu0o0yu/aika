@@ -158,6 +158,7 @@ public abstract class AbstractTemplateModel {
 
     protected void expandContinueBindingNeurons(
             double patternValueTarget,
+            int optionalStart,
             BindingNeuron sylBeginBN,
             int length,
             int dir
@@ -168,6 +169,7 @@ public abstract class AbstractTemplateModel {
             if(pos < 2) {
                 lastSylBN = createStrongBindingNeuron(
                         patternValueTarget,
+                        pos >= optionalStart,
                         dir * pos,
                         dir * lastPos,
                         lastSylBN
@@ -185,6 +187,7 @@ public abstract class AbstractTemplateModel {
 
     protected BindingNeuron createStrongBindingNeuron(
             double patternValueTarget,
+            boolean isOptional,
             int pos,
             Integer lastPos,
             BindingNeuron lastBN
@@ -244,7 +247,7 @@ public abstract class AbstractTemplateModel {
 
         PatternSynapse pSyn = new PatternSynapse()
                 .setWeight(2.5)
-                .setOptional(pos != 0)
+                .setOptional(isOptional)
                 .init(bn, patternN.getNeuron())
                 .adjustBias(valueTarget);
 

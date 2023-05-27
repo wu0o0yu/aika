@@ -18,8 +18,6 @@ package meta;
 
 import network.aika.Model;
 import network.aika.elements.activations.Activation;
-import network.aika.elements.activations.BindingActivation;
-import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.neurons.BindingNeuron;
 
 /**
@@ -41,6 +39,7 @@ public class SyllableTemplateModel extends AbstractTemplateModel {
     protected void initTemplateBindingNeurons() {
         BindingNeuron primaryBN = createStrongBindingNeuron(
                 patternValueTarget,
+                false,
                 0,
                 null,
                 null
@@ -48,6 +47,7 @@ public class SyllableTemplateModel extends AbstractTemplateModel {
 
         expandContinueBindingNeurons(
                 patternValueTarget,
+                2,
                 primaryBN,
                 4,
                 1

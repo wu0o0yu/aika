@@ -44,7 +44,8 @@ public abstract class DownVisitor<T extends Activation> extends Visitor {
     }
 
     public void next(Link<?, ?, ?> l) {
-        visitDown(l.getInput(), l);
+        if(l.getInput() != null)
+            visitDown(l.getInput(), l);
     }
 
     protected abstract void visitDown(Link l);

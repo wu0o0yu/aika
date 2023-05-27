@@ -26,6 +26,7 @@ import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.activations.TokenActivation;
 import network.aika.steps.Phase;
 import network.aika.text.Document;
+import network.aika.utils.Utils;
 import org.apache.commons.io.IOUtils;
 import experiment.logger.ExperimentLogger;
 import experiment.logger.LoggingListener;
@@ -78,11 +79,7 @@ public class SyllablesExperiment {
 
                 instanceAct.getNeuron().setLabel(label);
 
-                System.out.println("   Instantiating " +
-                        instanceAct.getClass().getSimpleName() +
-                        " " + label +
-                        " nId:" + instanceAct.getNeuron().getId()
-                );
+                logInstantiation(instanceAct, label);
             }
         };
     }
@@ -147,7 +144,7 @@ public class SyllablesExperiment {
 
             AIKADebugger debugger = null;
             System.out.println(counter[0] + " " + w);
-            if(counter[0] >= 2) {// 3, 6, 11, 18, 100, 39
+            if(counter[0] >= 15) {// 3, 6, 11, 18, 100, 39
                 debugger = AIKADebugger.createAndShowGUI(doc);
             }
 
@@ -179,20 +176,6 @@ public class SyllablesExperiment {
 
             doc.anneal();
 
-            doc.getActivations()
-                    .stream()
-                    .filter(Activation::isFired)
-                    .filter(act -> !act.isAbstract())
-                    .filter(act -> act instanceof PatternActivation)
-                    .filter(act -> !(act instanceof TokenActivation))
-                    .forEach(act ->
-                            System.out.println("   Matching " +
-                                    act.getClass().getSimpleName() +
-                                    " " + act.getLabel() +
-                                    " nId:" + act.getNeuron().getId()
-                            )
-                    );
-
             waitForClick(debugger);
 
             doc.instantiateTemplates();
@@ -202,6 +185,8 @@ public class SyllablesExperiment {
             doc.close();
 
             doc.train();
+
+            logPatternMatches(doc);
 
             el.log(doc);
 
@@ -218,6 +203,37 @@ public class SyllablesExperiment {
         });
 
         el.close();
+    }
+
+    private static void logPatternMatches(Document doc) {
+        doc.getActivations()
+                .stream()
+                .filter(act -> act instanceof PatternActivation)
+                .filter(act -> !(act instanceof TokenActivation))
+                .forEach(act ->
+                        logPatternMatch((PatternActivation) act)
+                );
+    }
+
+    private static void logPatternMatch(PatternActivation act) {
+        System.out.println("   " +
+                (act.isFired() ? "Matching " : "Inactive Match ") +
+                (act.isAbstract() ? "abstract " : "") +
+                act.getClass().getSimpleName() +
+                " '" + act.getLabel() + "'" +
+                " nId:" + act.getNeuron().getId() +
+                " r:" + act.getRange() +
+                " grad:" + Utils.round(act.getGradient().getCurrentValue(), 10000.0)
+        );
+    }
+
+    private static void logInstantiation(Activation instanceAct, String label) {
+        System.out.println("   Instantiating " +
+                instanceAct.getClass().getSimpleName() +
+                " '" + label + "'" +
+                " nId:" + instanceAct.getNeuron().getId() +
+                " r:" + instanceAct.getRange()
+        );
     }
 
     private static void waitForClick(AIKADebugger debugger) {

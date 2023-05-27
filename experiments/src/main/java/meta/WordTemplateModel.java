@@ -38,6 +38,7 @@ public class WordTemplateModel extends AbstractTemplateModel {
     protected void initTemplateBindingNeurons() {
         BindingNeuron primaryBN = createStrongBindingNeuron(
                 patternValueTarget,
+                false,
                 0,
                 null,
                 null
@@ -45,6 +46,7 @@ public class WordTemplateModel extends AbstractTemplateModel {
 
         expandContinueBindingNeurons(
                 patternValueTarget,
+                1,
                 primaryBN,
                 5,
                 1
@@ -52,6 +54,7 @@ public class WordTemplateModel extends AbstractTemplateModel {
 
         expandContinueBindingNeurons(
                 patternValueTarget,
+                1,
                 primaryBN,
                 5,
                 -1

@@ -18,8 +18,6 @@ package meta;
 
 import network.aika.Model;
 import network.aika.elements.activations.*;
-import network.aika.elements.links.CategoryLink;
-import network.aika.elements.links.Link;
 import network.aika.elements.neurons.BindingNeuron;
 import network.aika.sign.Sign;
 
@@ -48,6 +46,7 @@ public class PhraseTemplateModel extends AbstractTemplateModel {
     protected void initTemplateBindingNeurons() {
         BindingNeuron primaryBN = createStrongBindingNeuron(
                 patternValueTarget,
+                false,
                 0,
                 null,
                 null
@@ -55,6 +54,7 @@ public class PhraseTemplateModel extends AbstractTemplateModel {
 
         expandContinueBindingNeurons(
                 patternValueTarget,
+                1,
                 primaryBN,
                 5,
                 1
@@ -62,6 +62,7 @@ public class PhraseTemplateModel extends AbstractTemplateModel {
 
         expandContinueBindingNeurons(
                 patternValueTarget,
+                1,
                 primaryBN,
                 5,
                 -1
