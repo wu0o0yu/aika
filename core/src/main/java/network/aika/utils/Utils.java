@@ -78,6 +78,12 @@ public class Utils {
     }
 
     public static double round(double x, double precision) {
+        if(x >= 0.0 && x < precision)
+            return 0.0;
+
+        if(x < 0.0 && x > precision)
+            return -0.0;
+
         return Math.round(x * precision) / precision;
     }
 }

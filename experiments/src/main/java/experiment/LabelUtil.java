@@ -17,12 +17,17 @@
 package experiment;
 
 import network.aika.direction.Direction;
+import network.aika.elements.activations.PatternActivation;
+import network.aika.elements.links.Link;
 import network.aika.elements.neurons.BindingNeuron;
 import network.aika.elements.neurons.NeuronProvider;
 import network.aika.elements.neurons.PatternNeuron;
 import network.aika.elements.synapses.PatternSynapse;
 import network.aika.elements.synapses.RelationInputSynapse;
 import network.aika.elements.synapses.Synapse;
+
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
@@ -33,8 +38,34 @@ import static network.aika.direction.Direction.OUTPUT;
  */
 public class LabelUtil {
 
+    public static String generateLabel(PatternActivation pAct, boolean fired) {
+        PatternNeuron pn = pAct.getNeuron();
+        return generateLabel(pn, bn -> {
+            Link l = pAct.getInputLink(bn);
+            return l != null && l.getInput() != null && (!fired || l.getInput().isFired());
+        });
+    }
 
     public static String generateLabel(PatternNeuron pn) {
+        return generateLabel(pn, bn -> {
+            PatternSynapse s = (PatternSynapse) bn.getOutputSynapse(pn.getProvider());
+            return (-s.getSynapseBias().getCurrentValue() > pn.getBias().getCurrentValue());
+        });
+    }
+
+    public static String generateLabel(PatternNeuron pn, Predicate<BindingNeuron> test) {
+        BindingNeuron[] bn = getOrderedBindingNeurons(pn);
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < bn.length; i++) {
+            if (test.test(bn[i])) {
+                sb.append(bn[i].getLabel());
+            }
+        }
+        return sb.toString();
+    }
+
+    private static BindingNeuron[] getOrderedBindingNeurons(PatternNeuron pn) {
         BindingNeuron[] bn = pn.getInputSynapsesByType(PatternSynapse.class)
                 .map(Synapse::getInput)
                 .toList()
@@ -51,15 +82,7 @@ public class LabelUtil {
                 }
             }
         }
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < bn.length; i++) {
-            PatternSynapse s = (PatternSynapse) bn[i].getOutputSynapse(pn.getProvider());
-            if (-s.getSynapseBias().getCurrentValue() > pn.getBias().getCurrentValue()) {
-                sb.append(bn[i].getLabel());
-            }
-        }
-        return sb.toString();
+        return bn;
     }
 
     private static Direction getDirection(BindingNeuron n) {

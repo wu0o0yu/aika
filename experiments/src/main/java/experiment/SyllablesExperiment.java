@@ -145,8 +145,8 @@ public class SyllablesExperiment {
 
             AIKADebugger debugger = null;
             System.out.println(counter[0] + " " + w);
-            if(counter[0] >= 15) {// 3, 6, 11, 18, 100, 39
-                debugger = AIKADebugger.createAndShowGUI(doc);
+            if(counter[0] >= 1) {// 3, 6, 11, 18, 100, 39
+                //debugger = AIKADebugger.createAndShowGUI(doc);
             }
 
             if(w.equalsIgnoreCase("herankam")) {

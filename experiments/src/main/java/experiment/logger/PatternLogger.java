@@ -16,10 +16,16 @@
  */
 package experiment.logger;
 
+import experiment.LabelUtil;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.links.Link;
 import network.aika.elements.links.PatternLink;
+import network.aika.elements.neurons.BindingNeuron;
+import network.aika.elements.neurons.PatternNeuron;
+import network.aika.elements.synapses.PatternSynapse;
+import network.aika.elements.synapses.Synapse;
+import network.aika.fields.FieldOutput;
 import network.aika.text.Document;
 import network.aika.utils.Utils;
 import org.apache.commons.csv.CSVPrinter;
@@ -27,6 +33,7 @@ import org.apache.commons.csv.CSVPrinter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +49,6 @@ public class PatternLogger {
     CSVPrinter printer;
 
     public PatternLogger() {
-
     }
 
     public PatternLogger(File path, PatternActivation act) {
@@ -57,12 +63,41 @@ public class PatternLogger {
 
             List<String> headerLabels = new ArrayList<>();
             headerLabels.addAll(
-                    List.of("DocId", "Content", "pLabel", "pAct-Id", "PN-Id", "net", "gradient", "bias")
+                    List.of(
+                            "doc-id",
+                            "content",
+                            "orig.-label",
+                            "cur.-label",
+                            "match",
+                            "match-fired",
+                            "act-id",
+                            "n-id",
+                            "net",
+                            "f'(net)",
+                            "down-grad.",
+                            "uv",
+                            "neg-uv",
+                            "bias",
+                            "bias-sum"
+                    )
             );
 
             for(int i = 0; i < 5; i++) {
                 headerLabels.addAll(
-                    List.of(i + "-bLabel", i + "-bAct Id", i + "-BN-Id", i + "-net", i + "-bGrad", i + "-bias", i + "-biasSum", i + "-weight-pl", i + "-synBias-pl")
+                    List.of(
+                            i + "-label",
+                            i + "-act-id",
+                            i + "-n-id",
+                            i + "-syn-weight",
+                            i + "-syn-bias",
+                            i + "-net",
+                            i + "-f'(net)",
+                            i + "-up-grad.",
+                            i + "-uv",
+                            i + "-neg-uv",
+                            i + "-bias",
+                            i + "-bias-sum"
+                    )
                 );
             }
 
@@ -85,44 +120,45 @@ public class PatternLogger {
     }
 
     public void log(PatternActivation pAct) {
+        PatternNeuron pn = pAct.getNeuron();
+        Document doc = (Document) pAct.getThought();
         try {
             List entry = new ArrayList();
 
             entry.addAll(
                     List.of(
-                            pAct.getThought().getId(),
-                            ((Document) pAct.getThought()).getContent(),
+                            doc.getId(),
+                            doc.getContent(),
                             pAct.getLabel(),
+                            LabelUtil.generateLabel(pn),
+                            LabelUtil.generateLabel(pAct, false),
+                            LabelUtil.generateLabel(pAct, true),
                             pAct.getId(),
-                            pAct.getNeuron().getId() + (pAct.getNeuron().isAbstract() ? "-abstr" : ""),
-                            Utils.round(pAct.getNet().getCurrentValue(), PRECISION),
-                            Utils.round(pAct.getGradient().getCurrentValue(), PRECISION),
-                            Utils.round(pAct.getNeuron().getBias().getCurrentValue(), PRECISION))
+                            pn.getId() + (pn.isAbstract() ? "-abstr" : ""),
+                            print(pAct.getNet()),
+                            print(pAct.getNetOuterGradient()),
+                            print(pAct.getGradient()),
+                            print(pAct.getUpdateValue()),
+                            print(pAct.getNegUpdateValue()),
+                            print(pn.getBias()),
+                            print(pn.getSynapseBiasSum())
+                    )
             );
 
-            List<Link> inputLinks = pAct.getInputLinks()
-                    .filter(l -> l instanceof PatternLink)
+            List<PatternSynapse> inputSynapses = pn.getInputSynapsesByType(PatternSynapse.class)
                     .toList();
 
-            for(int i = 0; i < Math.min(5, inputLinks.size()); i++) {
-                PatternLink il = (PatternLink) inputLinks.get(i);
+            for(int i = 0; i < Math.min(5, inputSynapses.size()); i++) {
+                PatternSynapse s = inputSynapses.get(i);
+                BindingNeuron bn = s.getInput();
+
+                PatternLink il = (PatternLink) pAct.getInputLink(bn);
                 BindingActivation iAct = il.getInput();
 
-                if(iAct == null)
-                    continue;
-
                 entry.addAll(
-                        List.of(
-                                iAct.getLabel(),
-                                iAct.getId(),
-                                iAct.getNeuron().getId() + (iAct.getNeuron().isAbstract() ? "-abstr" : ""),
-                                Utils.round(iAct.getNet().getCurrentValue(), PRECISION),
-                                Utils.round(iAct.getGradient().getCurrentValue(), PRECISION),
-                                Utils.round(iAct.getNeuron().getBias().getCurrentValue(), PRECISION),
-                                Utils.round(iAct.getNeuron().getSynapseBiasSum().getCurrentValue(), PRECISION),
-                                Utils.round(il.getSynapse().getWeight().getCurrentValue(), PRECISION),
-                                Utils.round(il.getSynapse().getSynapseBias().getCurrentValue(), PRECISION)
-                        )
+                        iAct != null ?
+                                getEntry(s, bn, iAct) :
+                                getEntry(s, bn)
                 );
             }
 
@@ -131,5 +167,46 @@ public class PatternLogger {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static List<? extends Serializable> getEntry(PatternSynapse s, BindingNeuron bn, BindingActivation iAct) {
+        return List.of(
+                iAct.getLabel(),
+                iAct.getId(),
+                bn.getId() + (bn.isAbstract() ? "-abstr" : ""),
+                print(iAct.getNet()),
+                print(iAct.getNetOuterGradient()),
+                print(s.getWeight()),
+                print(s.getSynapseBias()),
+                print(iAct.getGradient()),
+                print(iAct.getUpdateValue()),
+                print(iAct.getNegUpdateValue()),
+                print(bn.getBias()),
+                print(bn.getSynapseBiasSum())
+        );
+    }
+
+    private static List<? extends Serializable> getEntry(PatternSynapse s, BindingNeuron bn) {
+        return List.of(
+                "--",
+                "--",
+                bn.getId() + (bn.isAbstract() ? "-abstr" : ""),
+                "--",
+                "--",
+                print(s.getWeight()),
+                print(s.getSynapseBias()),
+                "--",
+                "--",
+                "--",
+                print(bn.getBias()),
+                print(bn.getSynapseBiasSum())
+        );
+    }
+
+    private static String print(FieldOutput f) {
+        if(f == null)
+            return "--";
+
+        return "" + Utils.round(f.getCurrentValue(), PRECISION);
     }
 }
