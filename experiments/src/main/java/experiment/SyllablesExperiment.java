@@ -37,6 +37,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * @author Lukas Molzberger
  */
@@ -221,6 +222,7 @@ public class SyllablesExperiment {
                 (act.isAbstract() ? "abstract " : "") +
                 act.getClass().getSimpleName() +
                 " '" + act.getLabel() + "'" +
+                (!act.isAbstract() ? " '" + LabelUtil.generateLabel(act.getNeuron()) + "'" : "") +
                 " nId:" + act.getNeuron().getId() +
                 " r:" + act.getRange() +
                 " grad:" + Utils.round(act.getGradient().getCurrentValue(), 10000.0)
@@ -326,4 +328,5 @@ public class SyllablesExperiment {
         }
         return inputs;
     }
+
 }
