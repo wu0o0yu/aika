@@ -86,11 +86,12 @@ public class PatternLogger {
             for(int i = 0; i < 5; i++) {
                 headerLabels.addAll(
                     List.of(
+                            "|",
+                            i + "-syn-weight",
+                            i + "-syn-bias",
                             i + "-label",
                             i + "-act-id",
                             i + "-n-id",
-                            i + "-syn-weight",
-                            i + "-syn-bias",
                             i + "-net",
                             i + "-net-pre-anneal",
                             i + "-f'(net)",
@@ -175,14 +176,15 @@ public class PatternLogger {
 
     private static List<? extends Serializable> getEntry(PatternSynapse s, BindingNeuron bn, BindingActivation iAct) {
         return List.of(
+                "|",
+                print(s.getWeight()),
+                print(s.getSynapseBias()),
                 iAct.getLabel(),
                 iAct.getId(),
                 bn.getId() + (bn.isAbstract() ? "-abstr" : ""),
                 print(iAct.getNet()),
                 print(iAct.getNetPreAnneal()),
                 print(iAct.getNetOuterGradient()),
-                print(s.getWeight()),
-                print(s.getSynapseBias()),
                 print(iAct.getGradient()),
                 print(iAct.getUpdateValue()),
                 print(iAct.getNegUpdateValue()),
@@ -193,13 +195,15 @@ public class PatternLogger {
 
     private static List<? extends Serializable> getEntry(PatternSynapse s, BindingNeuron bn) {
         return List.of(
+                "|",
+                print(s.getWeight()),
+                print(s.getSynapseBias()),
                 "--",
                 "--",
                 bn.getId() + (bn.isAbstract() ? "-abstr" : ""),
                 "--",
                 "--",
-                print(s.getWeight()),
-                print(s.getSynapseBias()),
+                "--",
                 "--",
                 "--",
                 "--",
