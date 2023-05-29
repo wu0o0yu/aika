@@ -26,6 +26,7 @@ import network.aika.utils.Utils;
 import static network.aika.debugger.AbstractConsole.NOT_SET_STR;
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
+import static network.aika.utils.Utils.doubleToString;
 
 
 /**
@@ -39,7 +40,7 @@ public class PatternNeuronPropertyPanel<E extends PatternNeuron> extends Conjunc
 
         Range range = ref != null ? ref.getAbsoluteRange() : null;
         addConstant("Range: ", range != null ? "" + range : NOT_SET_STR);
-        addConstant("Frequency: ", "" + Utils.round(n.getFrequency()));
+        addConstant("Frequency: ", "" + doubleToString(n.getFrequency()));
         addConstant("SampleSpace: ", "" + n.getSampleSpace().toString(range));
         addConstant("P(POS): ", probabilityToString(POS, n, range));
         addConstant("P(NEG): ", probabilityToString(NEG, n, range));
@@ -61,7 +62,7 @@ public class PatternNeuronPropertyPanel<E extends PatternNeuron> extends Conjunc
             return NOT_SET_STR;
 
         try {
-            return "" + Utils.round(n.getProbability(s, N, false), 100000000.0);
+            return doubleToString(n.getProbability(s, N, false), "#.########");
         } catch(IllegalStateException e) {
             return NOT_SET_STR;
         }
@@ -73,7 +74,7 @@ public class PatternNeuronPropertyPanel<E extends PatternNeuron> extends Conjunc
             return NOT_SET_STR;
 
         try {
-            return "" + Utils.round(n.getSurprisal(s, range, false));
+            return "" + doubleToString(n.getSurprisal(s, range, false));
         } catch(IllegalStateException e) {
             return NOT_SET_STR;
         }

@@ -17,6 +17,11 @@
 package network.aika.utils;
 
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+
 /**
  *
  * @author Lukas Molzberger
@@ -73,17 +78,13 @@ public class Utils {
         return Math.abs(x) < tolerance;
     }
 
-    public static double round(double x) {
-        return round(x, 10000.0);
+    public static String doubleToString(double x) {
+        return doubleToString(x, "#.######");
     }
 
-    public static double round(double x, double precision) {
-        if(x >= 0.0 && x < precision)
-            return 0.0;
-
-        if(x < 0.0 && x > precision)
-            return -0.0;
-
-        return Math.round(x * precision) / precision;
+    public static String doubleToString(double d, String format) {
+        DecimalFormat formatter = new DecimalFormat(format, DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+        formatter.setRoundingMode( RoundingMode.DOWN );
+        return formatter.format(d);
     }
 }

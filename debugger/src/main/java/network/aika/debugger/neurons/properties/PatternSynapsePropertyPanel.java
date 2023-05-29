@@ -25,6 +25,7 @@ import network.aika.utils.Utils;
 import static network.aika.debugger.AbstractConsole.NOT_SET_STR;
 import static network.aika.sign.Sign.NEG;
 import static network.aika.sign.Sign.POS;
+import static network.aika.utils.Utils.doubleToString;
 
 /**
  * @author Lukas Molzberger
@@ -58,7 +59,7 @@ public class PatternSynapsePropertyPanel extends ConjunctiveSynapsePropertyPanel
             return NOT_SET_STR;
 
         try {
-            return "" + Utils.round(s.getFrequency(is, os, s.getSampleSpace().getN(range)));
+            return doubleToString(s.getFrequency(is, os, s.getSampleSpace().getN(range)));
         } catch(IllegalStateException e) {
             return NOT_SET_STR;
         }
@@ -70,7 +71,7 @@ public class PatternSynapsePropertyPanel extends ConjunctiveSynapsePropertyPanel
             return NOT_SET_STR;
 
         try {
-            return "" + Utils.round(s.getProbability(is, os, N, false), 100000000.0);
+            return doubleToString(s.getProbability(is, os, N, false), "#.########");
         } catch(IllegalStateException e) {
             return NOT_SET_STR;
         }
@@ -82,7 +83,7 @@ public class PatternSynapsePropertyPanel extends ConjunctiveSynapsePropertyPanel
             return NOT_SET_STR;
 
         try {
-            return "" + Utils.round(s.getSurprisal(is, os, range, false));
+            return "" + doubleToString(s.getSurprisal(is, os, range, false));
         } catch(IllegalStateException e) {
             return NOT_SET_STR;
         }

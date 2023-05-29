@@ -43,6 +43,7 @@ import java.awt.*;
 import static network.aika.debugger.AbstractGraphManager.STANDARD_DISTANCE_X;
 import static network.aika.debugger.AbstractGraphManager.STANDARD_DISTANCE_Y;
 import static network.aika.debugger.stepmanager.StepManager.When.*;
+import static network.aika.utils.Utils.doubleToString;
 
 /**
  * @author Lukas Molzberger
@@ -261,8 +262,8 @@ public class ActivationViewManager extends AbstractViewManager<Activation, Activ
     public void dumpNetworkCoordinates() {
         System.out.println("Activations: ");
 
-        System.out.println("camera.setViewPercent(" + Utils.round(getCamera().getViewPercent()) + ");");
-        System.out.println("camera.setViewCenter(" + Utils.round(getCamera().getViewCenter().x) + ", " + Utils.round(getCamera().getViewCenter().y) + ", 0);");
+        System.out.println("camera.setViewPercent(" + doubleToString(getCamera().getViewPercent()) + ");");
+        System.out.println("camera.setViewCenter(" + doubleToString(getCamera().getViewCenter().x) + ", " + doubleToString(getCamera().getViewCenter().y) + ", 0);");
 
         doc.getActivations().forEach(act ->
                 dumpActivation(act)
@@ -272,7 +273,7 @@ public class ActivationViewManager extends AbstractViewManager<Activation, Activ
     private void dumpActivation(Activation act) {
         ActivationParticle p = graphManager.getParticle(act);
         if(p != null && p.getPosition() != null) {
-            System.out.println("coords.put(" + act.getId() + ", new double[]{" + Utils.round(p.getPosition().x) + ", " + Utils.round(p.getPosition().y) + "});");
+            System.out.println("coords.put(" + act.getId() + ", new double[]{" + doubleToString(p.getPosition().x) + ", " + doubleToString(p.getPosition().y) + "});");
         } else {
             System.out.println("//coords.put(" + act.getId() + ", new double[]{ });");
         }

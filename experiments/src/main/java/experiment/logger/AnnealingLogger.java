@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static experiment.logger.ExperimentLogger.CSV_FORMAT;
+import static network.aika.utils.Utils.doubleToString;
 
 /**
  * @author Lukas Molzberger
@@ -84,9 +85,9 @@ public class AnnealingLogger {
         return getNegativeFeedbackLinks(doc)
                 .flatMap(l ->
                         Stream.of(
-                                "" + Utils.round(l.getMaxInput().getCurrentValue()),
-                                "" + Utils.round(l.getSynapse().getWeight().getCurrentValue()),
-                                "" + Utils.round(l.getOutput().getNet().getCurrentValue())
+                                doubleToString(l.getMaxInput().getCurrentValue()),
+                                doubleToString(l.getSynapse().getWeight().getCurrentValue()),
+                                doubleToString(l.getOutput().getNet().getCurrentValue())
                         )
                 )
                 .toList();
@@ -113,7 +114,7 @@ public class AnnealingLogger {
     public void log(Document doc) {
         try {
             List<String> entry = new ArrayList<>();
-            entry.add("" + Utils.round(doc.getAnnealing().getCurrentValue()));
+            entry.add("" + doubleToString(doc.getAnnealing().getCurrentValue()));
             entry.addAll(createEntry(doc));
 
             printer.printRecord(entry.toArray());

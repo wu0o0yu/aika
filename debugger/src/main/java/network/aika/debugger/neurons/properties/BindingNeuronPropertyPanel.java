@@ -21,6 +21,8 @@ import network.aika.elements.neurons.BindingNeuron;
 import network.aika.elements.neurons.LatentRelationNeuron;
 import network.aika.utils.Utils;
 
+import static network.aika.utils.Utils.doubleToString;
+
 
 /**
  * @author Lukas Molzberger
@@ -31,7 +33,7 @@ public class BindingNeuronPropertyPanel<E extends BindingNeuron> extends Conjunc
     public BindingNeuronPropertyPanel(E n, Activation ref) {
         super(n, ref);
 
-        addConstant("PreNetUBDummyWeightSum: ", "" + Utils.round(n.getPreNetUBDummyWeightSum()));
+        addConstant("PreNetUBDummyWeightSum: ", doubleToString(n.getPreNetUBDummyWeightSum()));
     }
 
     public static BindingNeuronPropertyPanel create(BindingNeuron n, Activation ref) {

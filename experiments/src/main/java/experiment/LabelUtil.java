@@ -17,6 +17,8 @@
 package experiment;
 
 import network.aika.direction.Direction;
+import network.aika.elements.activations.Activation;
+import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.links.Link;
 import network.aika.elements.neurons.BindingNeuron;
@@ -38,11 +40,18 @@ import static network.aika.direction.Direction.OUTPUT;
  */
 public class LabelUtil {
 
-    public static String generateLabel(PatternActivation pAct, boolean fired) {
+    public static String generateLabel(PatternActivation pAct, boolean fired, boolean netPreAnneal) {
         PatternNeuron pn = pAct.getNeuron();
         return generateLabel(pn, bn -> {
             Link l = pAct.getInputLink(bn);
-            return l != null && l.getInput() != null && (!fired || l.getInput().isFired());
+
+            if(l == null)
+                return false;
+
+            BindingActivation act = (BindingActivation) l.getInput();
+            return act != null &&
+                    (!fired || act.isFired()) &&
+                    (!netPreAnneal || act.getNetPreAnneal().getCurrentValue() > 0.0);
         });
     }
 

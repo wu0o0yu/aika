@@ -23,6 +23,7 @@ import network.aika.elements.synapses.Synapse;
 import network.aika.utils.Utils;
 
 import static network.aika.elements.synapses.Synapse.getLatentLinkingPreNet;
+import static network.aika.utils.Utils.doubleToString;
 
 
 /**
@@ -47,8 +48,8 @@ public class SynapsePropertyPanel<E extends Synapse> extends AbstractPropertyPan
     }
 
     protected void initSynapseProperties(E s) {
-        addConstant("Propagate Pre net: ", "" + Utils.round(s.getPropagatePreNet(null)));
-        addConstant("Latent-Linking Pre net: ", "" + Utils.round(getLatentLinkingPreNet(s, null)));
+        addConstant("Propagate Pre net: ", doubleToString(s.getPropagatePreNet(null)));
+        addConstant("Latent-Linking Pre net: ", doubleToString(getLatentLinkingPreNet(s, null)));
         addConstant("Is Training Allowed: ", "" + s.isTrainingAllowed());
         addConstant("Stored At: ", "" + s.getStoredAt());
         addConstant("Scope: ", "" + s.getScope());

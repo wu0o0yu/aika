@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static network.aika.debugger.AbstractGraphManager.STANDARD_DISTANCE_X;
+import static network.aika.utils.Utils.doubleToString;
 
 /**
  * @author Lukas Molzberger
@@ -185,14 +186,14 @@ public class NeuronViewManager extends AbstractViewManager<Neuron, NeuronGraphMa
     public void dumpNetworkCoordinates() {
         System.out.println("Neurons: ");
 
-        System.out.println("camera.setViewPercent(" + Utils.round(getCamera().getViewPercent()) + ");");
-        System.out.println("camera.setViewCenter(" + Utils.round(getCamera().getViewCenter().x) + ", " + Utils.round(getCamera().getViewCenter().y) + ", 0);");
+        System.out.println("camera.setViewPercent(" + doubleToString(getCamera().getViewPercent()) + ");");
+        System.out.println("camera.setViewCenter(" + doubleToString(getCamera().getViewCenter().x) + ", " + doubleToString(getCamera().getViewCenter().y) + ", 0);");
 
         getNeurons()
                 .forEach(n -> {
                     NeuronParticle p = graphManager.getParticle(n);
                     if(p != null) {
-                        System.out.println("coords.put(" + n.getId() + "l, new double[]{" + Utils.round(p.getPosition().x) + ", " + Utils.round(p.getPosition().y) + "});");
+                        System.out.println("coords.put(" + n.getId() + "l, new double[]{" + doubleToString(p.getPosition().x) + ", " + doubleToString(p.getPosition().y) + "});");
                     }
                 }
         );

@@ -37,6 +37,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static network.aika.utils.Utils.doubleToString;
+
 
 /**
  * @author Lukas Molzberger
@@ -145,8 +147,8 @@ public class SyllablesExperiment {
 
             AIKADebugger debugger = null;
             System.out.println(counter[0] + " " + w);
-            if(counter[0] >= 1) {// 3, 6, 11, 18, 100, 39
-                //debugger = AIKADebugger.createAndShowGUI(doc);
+            if(counter[0] >= 0) {// 3, 6, 11, 18, 100, 39
+//                debugger = AIKADebugger.createAndShowGUI(doc);
             }
 
             if(w.equalsIgnoreCase("herankam")) {
@@ -225,7 +227,7 @@ public class SyllablesExperiment {
                 (!act.isAbstract() ? " '" + LabelUtil.generateLabel(act.getNeuron()) + "'" : "") +
                 " nId:" + act.getNeuron().getId() +
                 " r:" + act.getRange() +
-                " grad:" + Utils.round(act.getGradient().getCurrentValue(), 10000.0)
+                " grad:" + doubleToString(act.getGradient().getCurrentValue(), "#.######")
         );
     }
 

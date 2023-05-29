@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.stream.Stream;
 
 import static network.aika.fields.ListenerFieldLink.createEventListener;
+import static network.aika.utils.Utils.doubleToString;
 
 
 /**
@@ -209,6 +210,6 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public String getValueString() {
-        return "[ov:" + Utils.round(getCurrentValue()) + " nv:" + Utils.round(getNewValue()) + "]";
+        return "[ov:" + doubleToString(getCurrentValue()) + " nv:" + doubleToString(getNewValue()) + "]";
     }
 }

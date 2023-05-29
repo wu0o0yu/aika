@@ -23,6 +23,7 @@ import network.aika.steps.Step;
 import network.aika.utils.Utils;
 
 import static network.aika.steps.Phase.*;
+import static network.aika.utils.Utils.doubleToString;
 
 
 /**
@@ -63,7 +64,7 @@ public class AnnealStep extends Step<Thought> {
     @Override
     public String toString() {
         return "docId:" + getElement().getId() +
-                " NextStep:" + Utils.round(nextStep, 100000.0) +
-                " NextAnnealValue:" + Utils.round(getElement().getAnnealing().getCurrentValue(), 100000.0);
+                " NextStep:" + doubleToString(nextStep, "#.######") +
+                " NextAnnealValue:" + doubleToString(getElement().getAnnealing().getCurrentValue(), "#.######");
     }
 }

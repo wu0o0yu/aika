@@ -38,13 +38,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static experiment.logger.ExperimentLogger.CSV_FORMAT;
+import static network.aika.utils.Utils.doubleToString;
 
 /**
  * @author Lukas Molzberger
  */
 public class PatternLogger {
-
-    public static final double PRECISION = 100000.0;
 
     CSVPrinter printer;
 
@@ -69,10 +68,12 @@ public class PatternLogger {
                             "orig.-label",
                             "cur.-label",
                             "match",
+                            "match-pre-anneal",
                             "match-fired",
                             "act-id",
                             "n-id",
                             "net",
+                            "net-pre-anneal",
                             "f'(net)",
                             "down-grad.",
                             "uv",
@@ -91,6 +92,7 @@ public class PatternLogger {
                             i + "-syn-weight",
                             i + "-syn-bias",
                             i + "-net",
+                            i + "-net-pre-anneal",
                             i + "-f'(net)",
                             i + "-up-grad.",
                             i + "-uv",
@@ -131,11 +133,13 @@ public class PatternLogger {
                             doc.getContent(),
                             pAct.getLabel(),
                             LabelUtil.generateLabel(pn),
-                            LabelUtil.generateLabel(pAct, false),
-                            LabelUtil.generateLabel(pAct, true),
+                            LabelUtil.generateLabel(pAct, false, false),
+                            LabelUtil.generateLabel(pAct, false, true),
+                            LabelUtil.generateLabel(pAct, true, false),
                             pAct.getId(),
                             pn.getId() + (pn.isAbstract() ? "-abstr" : ""),
                             print(pAct.getNet()),
+                            print(pAct.getNetPreAnneal()),
                             print(pAct.getNetOuterGradient()),
                             print(pAct.getGradient()),
                             print(pAct.getUpdateValue()),
@@ -175,6 +179,7 @@ public class PatternLogger {
                 iAct.getId(),
                 bn.getId() + (bn.isAbstract() ? "-abstr" : ""),
                 print(iAct.getNet()),
+                print(iAct.getNetPreAnneal()),
                 print(iAct.getNetOuterGradient()),
                 print(s.getWeight()),
                 print(s.getSynapseBias()),
@@ -207,6 +212,6 @@ public class PatternLogger {
         if(f == null)
             return "--";
 
-        return "" + Utils.round(f.getCurrentValue(), PRECISION);
+        return doubleToString(f.getCurrentValue(), "#.#######");
     }
 }
