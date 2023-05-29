@@ -57,10 +57,6 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
             return false;
     }
 
-    public void setConnected(boolean connected) {
-        this.connected = connected;
-    }
-
     public void setInput(FieldOutput input) {
         this.input = input;
     }

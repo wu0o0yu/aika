@@ -32,6 +32,12 @@ public class ListenerFieldLink extends AbstractFieldLink<UpdateListener> {
         });
     }
 
+    public static ListenerFieldLink createUpdateListener(FieldOutput in, String listenerName, FieldOnTrueEvent eventListener) {
+        return createUpdateListener(in, listenerName, (arg, u) ->
+            eventListener.onTrue()
+        );
+    }
+
     public static ListenerFieldLink createUpdateListener(FieldOutput in, String listenerName, UpdateListener updateListener) {
         return new ListenerFieldLink(in, listenerName, updateListener);
     }

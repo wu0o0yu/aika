@@ -155,6 +155,10 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
 
         netPreAnneal = new QueueSumField(this, POST_CLOSE, "netPreAnneal", TOLERANCE);
         linkAndConnect(net, netPreAnneal);
+
+        netPreAnneal.addUpdateListener("disconnect listener", () ->
+                netPreAnneal.disconnectInputs(false)
+        );
     }
 
     protected void initDummyLinks() {
