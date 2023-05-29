@@ -36,6 +36,13 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
     }
 
     @Override
+    public void initFromTemplate(Link template) {
+        super.initFromTemplate(template);
+
+        synapse.initDummyLink(output);
+    }
+
+    @Override
     protected void connectGradientFields() {
         super.connectGradientFields();
 

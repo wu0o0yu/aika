@@ -47,11 +47,6 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
     }
 
     @Override
-    public void initFromTemplate(Link template) {
-        super.initFromTemplate(template);
-    }
-
-    @Override
     public void connectWeightUpdate() {
         weightUpdatePosCase = mul(
                 this,
