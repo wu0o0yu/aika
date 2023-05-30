@@ -22,9 +22,7 @@ import java.awt.*;
 /**
  * @author Lukas Molzberger
  */
-public interface ConsoleRenderer<E> {
-
-    void render(StyledDocument sDoc, E e);
+public interface ConsoleRenderer {
 
     default void appendEntry(StyledDocument sDoc, String fieldName, String fieldValue, Color c) {
         appendText(sDoc, fieldName, "bold", c);

@@ -36,6 +36,8 @@ import java.awt.*;
  */
 public class ActivationConsoleManager extends JSplitPane implements AbstractConsoleManager, EventListener {
 
+    private Document doc;
+
     private QueueConsole queueConsole;
 
     private Element currentMainElement = null;
@@ -49,10 +51,11 @@ public class ActivationConsoleManager extends JSplitPane implements AbstractCons
 
     public ActivationConsoleManager(Document doc) {
         super(JSplitPane.VERTICAL_SPLIT);
+        this.doc = doc;
 
         setTopComponent(activationPanel);
 
-        queueConsole = new QueueConsole();
+        queueConsole = new QueueConsole(this);
         setBottomComponent(getScrollPane(queueConsole));
         setResizeWeight(0.65);
 
@@ -75,33 +78,46 @@ public class ActivationConsoleManager extends JSplitPane implements AbstractCons
 
     public void showSelectedElementContext(Element e) {
         sticky = true;
-        update(e, "Selected");
-        updateQueue(e.getThought(), null);
+        update(e);
+        updateQueue(null);
     }
 
-    private void update(Element e, String source) {
-        Element currentElement = sticky ? currentSelectedElement : currentMainElement;
+    private void update(Element e) {
+        Element currentElement = getCurrentElement();
         if(e == currentElement)
             return;
 
+        setCurrentElement(e);
+
+        update();
+    }
+
+    public void update() {
         if (activationPanel != null)
             activationPanel.remove();
 
-        ElementPanel newActPanel = ElementPanel.createElementPanel(this, e);
-        if(sticky) {
-            currentSelectedElement = e;
-        }else {
-            currentMainElement = e;
-        }
+        ElementPanel newActPanel = ElementPanel.createElementPanel(this, getCurrentElement());
+
         activationPanel = newActPanel;
 
         setTopComponent(activationPanel);
     }
 
-    private void updateQueue(Thought t, Step s) {
-        queueConsole.render(sDoc ->
-                queueConsole.renderQueue(sDoc, t, s, currentSelectedElement)
-        );
+    private void setCurrentElement(Element e) {
+        if(sticky)
+            currentSelectedElement = e;
+        else
+            currentMainElement = e;
+    }
+
+    private Element getCurrentElement() {
+        return sticky ?
+                currentSelectedElement :
+                currentMainElement;
+    }
+
+    private void updateQueue(Step s) {
+        queueConsole.update(s, getCurrentElement());
     }
 
     public static JScrollPane getScrollPane(Component comp) {
@@ -139,26 +155,30 @@ public class ActivationConsoleManager extends JSplitPane implements AbstractCons
     }
 
     public void queueEntryAddedEvent(Step s) {
-        updateQueue(s.getElement().getThought(), null);
+        updateQueue(null);
     }
 
 
     public void beforeProcessedEvent(Step s) {
-        updateQueue(s.getElement().getThought(), s);
-        update(s.getElement(), "Before");
+        updateQueue(s);
+        update(s.getElement());
     }
 
 
     public void afterProcessedEvent(Step s) {
-        updateQueue(s.getElement().getThought(), s);
-        update(s.getElement(), "After");
+        updateQueue(s);
+        update(s.getElement());
     }
 
     public void onActivationEvent(EventType et, Activation act) {
-        update(act, "New");
+        update(act);
     }
 
     public void onLinkEvent(EventType et, Link l) {
-        update(l, "New");
+        update(l);
+    }
+
+    public Thought getThought() {
+        return doc;
     }
 }

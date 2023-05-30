@@ -18,6 +18,7 @@ package network.aika.debugger.activations.renderer;
 
 import network.aika.Thought;
 import network.aika.debugger.ConsoleRenderer;
+import network.aika.debugger.Visible;
 import network.aika.elements.activations.Timestamp;
 import network.aika.steps.Step;
 
@@ -27,20 +28,20 @@ import java.awt.*;
 /**
  * @author Lukas Molzberger
  */
-public class StepConsoleRenderer implements ConsoleRenderer<Step> {
+public class StepConsoleRenderer implements ConsoleRenderer {
 
     private Thought t;
     private boolean selected;
 
-    public StepConsoleRenderer(Thought t, boolean selected) {
+    private Visible sortKey;
+
+    public StepConsoleRenderer(Thought t, boolean selected, Visible sortKey) {
         this.t = t;
+        this.sortKey = sortKey;
         this.selected = selected;
     }
 
-    @Override
     public void render(StyledDocument sDoc, Step s) {
-        boolean showQueueKey = false;
-
         Timestamp currentTimestamp = t.getTimestampOnProcess();
 
         Color c = new Color(
@@ -53,9 +54,15 @@ public class StepConsoleRenderer implements ConsoleRenderer<Step> {
 
         appendEntry(
                 sDoc,
-                s.getPhase() .getLabel() + " " + s.getStepName() + (showQueueKey && s.getQueueKey() != null ? " QueueKey:" + s.getQueueKey() : "") + " ",
+                stepToPrefix(s),
                 s.toString(),
                 c
         );
+    }
+
+    private String stepToPrefix(Step s) {
+        return s.getPhase().getLabel() + " " +
+                s.getStepName() +
+                (sortKey == Visible.SHOW && s.getQueueKey() != null ? " " + s.getQueueKey() : "") + " ";
     }
 }

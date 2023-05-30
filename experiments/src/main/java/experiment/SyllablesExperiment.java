@@ -22,11 +22,11 @@ import network.aika.Config;
 import network.aika.Model;
 import network.aika.debugger.AIKADebugger;
 import network.aika.elements.activations.Activation;
+import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.activations.TokenActivation;
 import network.aika.steps.Phase;
 import network.aika.text.Document;
-import network.aika.utils.Utils;
 import org.apache.commons.io.IOUtils;
 import experiment.logger.ExperimentLogger;
 import experiment.logger.LoggingListener;
@@ -147,8 +147,8 @@ public class SyllablesExperiment {
 
             AIKADebugger debugger = null;
             System.out.println(counter[0] + " " + w);
-            if(counter[0] >= 0) {// 3, 6, 11, 18, 100, 39
-//                debugger = AIKADebugger.createAndShowGUI(doc);
+            if(counter[0] >= 49) {// 3, 6, 11, 18, 100, 39
+                debugger = AIKADebugger.createAndShowGUI(doc);
             }
 
             if(w.equalsIgnoreCase("herankam")) {
@@ -219,6 +219,9 @@ public class SyllablesExperiment {
     }
 
     private static void logPatternMatch(PatternActivation act) {
+        if(act.getNetPreAnneal().getCurrentValue() <= 0.0 || act.isAbstract())
+            return;
+
         System.out.println("   " +
                 (act.isFired() ? "Matching " : "Inactive Match ") +
                 (act.isAbstract() ? "abstract " : "") +
@@ -232,6 +235,9 @@ public class SyllablesExperiment {
     }
 
     private static void logInstantiation(Activation instanceAct, String label) {
+        if(instanceAct instanceof BindingActivation)
+            return;
+
         System.out.println("   Instantiating " +
                 instanceAct.getClass().getSimpleName() +
                 " '" + label + "'" +

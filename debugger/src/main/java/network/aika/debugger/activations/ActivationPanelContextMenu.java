@@ -17,11 +17,7 @@ public class ActivationPanelContextMenu extends JPopupMenu {
 
         currentVsSelectedItem = new JMenuItem(actPanel.getMode().getTxt());
         currentVsSelectedItem.addActionListener(l ->
-            actPanel.setMode(
-                    actPanel.getMode() == CURRENT ?
-                            SELECTED :
-                            CURRENT
-                    )
+            actPanel.setMode(actPanel.getMode().getInverted())
         );
         add(currentVsSelectedItem);
     }

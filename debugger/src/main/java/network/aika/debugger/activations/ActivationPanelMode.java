@@ -6,6 +6,17 @@ public enum ActivationPanelMode {
 
     String txt;
 
+    ActivationPanelMode inverted;
+
+    static {
+        SELECTED.inverted = CURRENT;
+        CURRENT.inverted = SELECTED;
+    }
+
+    public ActivationPanelMode getInverted() {
+        return inverted;
+    }
+
     ActivationPanelMode(String txt) {
         this.txt = txt;
     }
