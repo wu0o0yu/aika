@@ -19,9 +19,8 @@ package network.aika.steps;
 import network.aika.Thought;
 import network.aika.elements.Element;
 import network.aika.elements.activations.Timestamp;
-import network.aika.utils.Utils;
-
-import static network.aika.utils.Utils.TOLERANCE;
+import network.aika.steps.keys.FiredQueueKey;
+import network.aika.steps.keys.QueueKey;
 
 
 /**
@@ -30,9 +29,7 @@ import static network.aika.utils.Utils.TOLERANCE;
 public abstract class Step<E extends Element> {
 
     private E element;
-    private QueueKey queueKey;
-    private int sortValue = Integer.MAX_VALUE;
-
+    protected QueueKey queueKey;
 
     public Step(E element) {
         this.element = element;
@@ -47,30 +44,12 @@ public abstract class Step<E extends Element> {
     }
 
     public void createQueueKey(Timestamp timestamp) {
-        queueKey = new QueueKey(getPhase(), element, sortValue, timestamp);
+        queueKey = new FiredQueueKey(getPhase(), element, timestamp);
     }
 
     public void removeQueueKey() {
         queueKey = null;
     }
-
-    public void updateSortValue(double newSortValue) {
-        if(Utils.belowTolerance(TOLERANCE, sortValue - newSortValue))
-            return;
-
-        if(isQueued()) {
-            Thought t = getElement().getThought();
-            t.removeStep(this);
-            sortValue = convertSortValue(newSortValue);
-            t.addStep(this);
-        } else
-            sortValue = convertSortValue(newSortValue);
-    }
-
-    private int convertSortValue(double newSortValue) {
-        return (int) (1000.0 * newSortValue);
-    }
-
 
     public String getStepName() {
         return getClass().getSimpleName();
@@ -96,4 +75,5 @@ public abstract class Step<E extends Element> {
     public String toString() {
         return "" + getElement();
     }
+
 }

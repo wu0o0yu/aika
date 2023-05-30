@@ -84,7 +84,7 @@ public abstract class AbstractGraphMouseManager implements MouseInputListener, o
         lastClickedElement = element;
 
         this.view.freezeElement(element, true);
-        if(event.isControlDown()) {
+        if(event.isAltDown()) {
             viewManager.reactToCtrlSelection(element);
         } else if (event.getButton() == 3) {
             element.setAttribute("ui.selected", new Object[0]);
@@ -98,7 +98,7 @@ public abstract class AbstractGraphMouseManager implements MouseInputListener, o
     protected void elementMoving(GraphicElement element, MouseEvent event) {
         viewManager.setMovedManually(element.getLabel(), true);
 
-        if(event.isShiftDown() && element instanceof Node) {
+        if(event.isControlDown() && element instanceof Node) {
             Node n = (Node) element;
             viewManager.moveNodeGroup(n, event.getX(), event.getY());
         }

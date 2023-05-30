@@ -17,8 +17,10 @@
 package network.aika.steps.thought;
 
 import network.aika.Thought;
+import network.aika.elements.activations.Timestamp;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
+import network.aika.steps.keys.DocQueueKey;
 import network.aika.text.Document;
 
 import static network.aika.steps.Phase.CLOSE;
@@ -35,6 +37,11 @@ public class CloseStep extends Step<Thought> {
 
     public CloseStep(Thought element) {
         super(element);
+    }
+
+    @Override
+    public void createQueueKey(Timestamp timestamp) {
+        queueKey = new DocQueueKey(getPhase(), timestamp);
     }
 
     @Override

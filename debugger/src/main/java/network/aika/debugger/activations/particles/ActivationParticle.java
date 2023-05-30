@@ -112,6 +112,9 @@ public class ActivationParticle<E extends Activation> extends AbstractParticle<A
 
     @Override
     protected void attraction(Vector3 delta) {
+        if(graphManager.isDisabledForces())
+            return;
+
         SpringBox box = (SpringBox) this.box;
         Energies energies = box.getEnergies();
 

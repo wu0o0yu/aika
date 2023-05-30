@@ -29,6 +29,7 @@ public enum Phase {
     POST_CLOSE("PC"),
     ANNEAL("A"),
     TRAINING("T"),
+    INACTIVE_LINKS("IL"),
     COUNTING("C"),
     SAVE("S");
 

@@ -14,37 +14,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.steps.activation;
+package network.aika.steps.keys;
 
-import network.aika.elements.neurons.Neuron;
-import network.aika.elements.activations.Activation;
+import network.aika.elements.activations.Timestamp;
 import network.aika.steps.Phase;
-import network.aika.steps.Step;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class InactiveLinks extends Step<Activation> {
+public class DocQueueKey implements QueueKey {
 
-    public static void add(Activation act) {
-        Step.add(new InactiveLinks(act));
-    }
+    private Phase phase;
 
-    public InactiveLinks(Activation act) {
-        super(act);
+    private Timestamp currentTimestamp;
+
+    public DocQueueKey(Phase phase, Timestamp currentTimestamp) {
+        this.phase = phase;
+        this.currentTimestamp = currentTimestamp;
     }
 
     @Override
     public Phase getPhase() {
-        return Phase.INACTIVE_LINKS;
+        return phase;
     }
 
     @Override
-    public void process() {
-        Activation act = getElement();
-        Neuron n = act.getNeuron();
+    public Timestamp getCurrentTimestamp() {
+        return currentTimestamp;
+    }
 
-        n.addInactiveLinks(act);
+    @Override
+    public int compareTo(QueueKey qk) {
+        return 0;
+    }
+
+    public String toString() {
+        return "[p:" + getPhase() + "-" + getPhase().ordinal() +
+                ",ts:" + getCurrentTimestamp() +
+                "]";
     }
 }

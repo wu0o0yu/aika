@@ -17,10 +17,11 @@
 package network.aika.steps.thought;
 
 import network.aika.Thought;
+import network.aika.elements.activations.Timestamp;
 import network.aika.elements.neurons.ActivationFunction;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
-import network.aika.utils.Utils;
+import network.aika.steps.keys.DocQueueKey;
 
 import static network.aika.steps.Phase.*;
 import static network.aika.utils.Utils.doubleToString;
@@ -40,6 +41,11 @@ public class AnnealStep extends Step<Thought> {
 
     public AnnealStep(Thought t) {
         super(t);
+    }
+
+    @Override
+    public void createQueueKey(Timestamp timestamp) {
+        queueKey = new DocQueueKey(getPhase(), timestamp);
     }
 
     @Override

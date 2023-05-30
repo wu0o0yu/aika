@@ -35,6 +35,8 @@ public class ActivationGraphManager extends AbstractGraphManager<Activation, Lin
 
     private Thought thought;
 
+    private boolean disabledForces = false;
+
     public ActivationGraphManager(Graph graph, Thought t) {
         super(graph);
         thought = t;
@@ -43,6 +45,14 @@ public class ActivationGraphManager extends AbstractGraphManager<Activation, Lin
         K1Init = 0.06f;
         K1Final = 0.01f;
         K2 = 0.005f;
+    }
+
+    public boolean isDisabledForces() {
+        return disabledForces;
+    }
+
+    public void setDisabledForces(boolean disabledForces) {
+        this.disabledForces = disabledForces;
     }
 
     public Thought getThought() {

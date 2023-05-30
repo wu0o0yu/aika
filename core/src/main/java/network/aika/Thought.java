@@ -29,7 +29,7 @@ import network.aika.elements.neurons.PreActivation;
 import network.aika.elements.neurons.NeuronProvider;
 import network.aika.elements.neurons.Range;
 import network.aika.steps.Phase;
-import network.aika.steps.QueueKey;
+import network.aika.steps.keys.QueueKey;
 import network.aika.steps.Step;
 import network.aika.steps.activation.InactiveLinks;
 import network.aika.steps.activation.Instantiation;

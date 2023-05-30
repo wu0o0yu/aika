@@ -16,8 +16,10 @@
  */
 package network.aika;
 
+import network.aika.elements.activations.Timestamp;
+import network.aika.steps.keys.FieldQueueKey;
 import network.aika.steps.Phase;
-import network.aika.steps.QueueKey;
+import network.aika.steps.keys.QueueKey;
 import org.junit.jupiter.api.Test;
 
 import java.util.TreeMap;
@@ -36,12 +38,12 @@ public class QueueSortTest {
         testQueue.put(new TestQueueKey(337l, 316, 0.0, 384), 2);
 */
 
-        QueueKey tqk3 = new QueueKey(Phase.INFERENCE, null, 36, -1802, 78);
+        QueueKey tqk3 = new FieldQueueKey(Phase.INFERENCE, -1802,  new Timestamp(78));
 
         testQueue.put(tqk3, 3);
 
-        testQueue.put(new QueueKey(Phase.INFERENCE, null, 386, 0, 393), 2);
-        testQueue.put(new QueueKey(Phase.INFERENCE, 6l, 2, 0, 339), 1);
+        testQueue.put(new FieldQueueKey(Phase.INFERENCE, 0,  new Timestamp(393)), 2);
+        testQueue.put(new FieldQueueKey(Phase.INFERENCE, 0,  new Timestamp(339)), 1);
 
         System.out.println();
 

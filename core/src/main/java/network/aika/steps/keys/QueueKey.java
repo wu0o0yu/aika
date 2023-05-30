@@ -14,37 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.steps.activation;
+package network.aika.steps.keys;
 
-import network.aika.elements.neurons.Neuron;
-import network.aika.elements.activations.Activation;
+import network.aika.elements.activations.Timestamp;
 import network.aika.steps.Phase;
-import network.aika.steps.Step;
+
+import java.util.Comparator;
+import java.util.function.Function;
 
 /**
- *
  * @author Lukas Molzberger
  */
-public class InactiveLinks extends Step<Activation> {
+public interface QueueKey extends Comparable<QueueKey> {
 
-    public static void add(Activation act) {
-        Step.add(new InactiveLinks(act));
-    }
+    Comparator<QueueKey> COMPARATOR = Comparator
+            .<QueueKey>comparingInt(k -> k.getPhase().ordinal())
+            .thenComparing(Function.identity())
+            .thenComparing(QueueKey::getCurrentTimestamp);
 
-    public InactiveLinks(Activation act) {
-        super(act);
-    }
+     Phase getPhase();
 
-    @Override
-    public Phase getPhase() {
-        return Phase.INACTIVE_LINKS;
-    }
+    Timestamp getCurrentTimestamp();
 
-    @Override
-    public void process() {
-        Activation act = getElement();
-        Neuron n = act.getNeuron();
-
-        n.addInactiveLinks(act);
-    }
 }

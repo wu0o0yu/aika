@@ -158,7 +158,7 @@ public class PatternLogger {
                 BindingNeuron bn = s.getInput();
 
                 PatternLink il = (PatternLink) pAct.getInputLink(bn);
-                BindingActivation iAct = il.getInput();
+                BindingActivation iAct = il != null ? il.getInput() : null;
 
                 entry.addAll(
                         iAct != null ?

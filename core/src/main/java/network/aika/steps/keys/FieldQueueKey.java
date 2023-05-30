@@ -14,60 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package network.aika.steps;
+package network.aika.steps.keys;
 
-import network.aika.elements.Element;
 import network.aika.elements.activations.Timestamp;
+import network.aika.steps.Phase;
 
-import java.util.Comparator;
-
-import static network.aika.elements.activations.Timestamp.FIRED_COMPARATOR;
-import static network.aika.elements.activations.Timestamp.NOT_SET;
 
 /**
  * @author Lukas Molzberger
  */
-public class QueueKey {
-
-    public static Comparator<QueueKey> COMPARATOR = Comparator
-            .<QueueKey>comparingInt(k -> k.getPhase().ordinal())
-            .thenComparing(k -> k.fired)
-            .thenComparingInt(k -> -k.getSortValue())
-            .thenComparing(k -> k.created)
-            .thenComparing(k -> k.currentTimestamp);
+public class FieldQueueKey implements QueueKey {
 
     private Phase phase;
-    private Timestamp created;
-    private Timestamp fired;
+
     private int sortValue;
     private Timestamp currentTimestamp;
 
-    public QueueKey(Phase phase, Element element, int sortValue, Timestamp currentTimestamp) {
+    public FieldQueueKey(Phase phase, int sortValue, Timestamp currentTimestamp) {
         this.phase = phase;
-        this.created = element.getCreated();
-        this.fired = element.getFired();
         this.sortValue = sortValue;
         this.currentTimestamp = currentTimestamp;
     }
 
-    public QueueKey(Phase phase, Long fired, long created, int sortValue, long currentTimestamp) {
-        this.phase = phase;
-        this.fired = fired != null ? new Timestamp(fired) : NOT_SET;
-        this.created = new Timestamp(created);
-        this.sortValue = sortValue;
-        this.currentTimestamp = new Timestamp(currentTimestamp);
-    }
-
     public Phase getPhase() {
         return phase;
-    }
-
-    public Timestamp getFired() {
-        return fired;
-    }
-
-    public Timestamp getCreated() {
-        return created;
     }
 
     public int getSortValue() {
@@ -78,18 +48,21 @@ public class QueueKey {
         return currentTimestamp;
     }
 
-    public String toString() {
-        String firedStr = getFired() == NOT_SET ?
-                "NOT_FIRED" : "" +
-                getFired();
 
+    @Override
+    public int compareTo(QueueKey qk) {
+        return Integer.compare(
+                ((FieldQueueKey) qk).sortValue,
+                sortValue
+        );
+    }
+
+    public String toString() {
         String svStr = getSortValue() == Integer.MAX_VALUE ?
                 "MAX" :
                 "" + getSortValue();
 
         return "[p:" + getPhase() + "-" + getPhase().ordinal() +
-                ",f:" + firedStr +
-                ",c:" + getCreated() +
                 ",sv:" + svStr +
                 ",ts:" + getCurrentTimestamp() +
                 "]";

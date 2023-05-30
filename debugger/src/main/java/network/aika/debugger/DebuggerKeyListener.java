@@ -59,7 +59,7 @@ public class DebuggerKeyListener implements KeyListener {
         KeyEventAction action = actions.get(c);
         if (action != null) {
             action.execute(avm);
-        } else if(e.isControlDown() && Character.isDigit(c)) {
+        } else if(e.isAltDown() && Character.isDigit(c)) {
             int testCaseId = Integer.parseInt("" + c);
             Runnable testCase = debugger.getTestCaseListeners().get(testCaseId);
             StepManager sm = avm.getStepManager();
@@ -70,10 +70,17 @@ public class DebuggerKeyListener implements KeyListener {
                 sm.click();
             }
         }
+
+        updateDisabledForces(e);
+    }
+
+    private void updateDisabledForces(KeyEvent e) {
+        debugger.getActivationViewManager().graphManager.setDisabledForces(e.isControlDown());
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
+        updateDisabledForces(e);
     }
 
     private interface KeyEventAction {

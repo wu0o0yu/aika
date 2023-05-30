@@ -16,8 +16,10 @@
  */
 package network.aika.steps;
 
+import network.aika.elements.activations.Timestamp;
 import network.aika.fields.IQueueField;
 import network.aika.elements.Element;
+import network.aika.steps.keys.FieldQueueKey;
 
 /**
  *
@@ -29,11 +31,26 @@ public class FieldStep<E extends Element> extends Step<E> {
 
     private Phase phase;
 
+    private int sortValue = Integer.MAX_VALUE;
+
+
     public FieldStep(E e, Phase p, IQueueField qf) {
         super(e);
         this.field = qf;
         this.phase = p;
         this.field.setStep(this);
+    }
+
+    public void setSortValue(int sortValue) {
+        this.sortValue = sortValue;
+    }
+
+    public int getSortValue() {
+        return sortValue;
+    }
+
+    public void createQueueKey(Timestamp timestamp) {
+        queueKey = new FieldQueueKey(getPhase(), sortValue, timestamp);
     }
 
     @Override
