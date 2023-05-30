@@ -51,7 +51,7 @@ public class PatternLogger {
     }
 
     public PatternLogger(File path, PatternActivation act) {
-        open(new File(path, "pattern-" + act.getNeuron().getId() + ".csv"));
+        open(new File(path, "pattern-" + act.getNeuron().getId() + "-" + act.getLabel() + ".csv"));
     }
 
 
