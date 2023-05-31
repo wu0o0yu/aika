@@ -23,7 +23,7 @@ import network.aika.elements.synapses.CategorySynapse;
 import network.aika.elements.synapses.CategoryInputSynapse;
 import network.aika.elements.synapses.ConjunctiveSynapse;
 import network.aika.elements.synapses.Synapse;
-import network.aika.fields.QueueSumField;
+import network.aika.fields.AbstractQueueSumField;
 import network.aika.fields.SumField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.stream.Collectors;
 
 import static network.aika.direction.Direction.INPUT;
 import static network.aika.direction.Direction.OUTPUT;
@@ -64,7 +63,7 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
     }
 
     protected SumField initSynapseBiasSum() {
-        return (SumField) new QueueSumField(this, TRAINING, "synapseBiasSum", TOLERANCE)
+        return (SumField) new AbstractQueueSumField(this, TRAINING, "synapseBiasSum", TOLERANCE)
                 .addListener("onSynapseBiasSumModified", () ->
                         setModified()
                 );

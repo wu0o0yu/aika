@@ -25,7 +25,7 @@ import network.aika.elements.Element;
 import network.aika.elements.links.Link;
 import network.aika.elements.activations.Timestamp;
 import network.aika.direction.Direction;
-import network.aika.fields.QueueSumField;
+import network.aika.fields.AbstractQueueSumField;
 import network.aika.fields.SumField;
 import network.aika.elements.neurons.Neuron;
 import network.aika.elements.neurons.NeuronProvider;
@@ -41,7 +41,6 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
-import static network.aika.fields.Fields.isTrue;
 import static network.aika.elements.activations.Timestamp.MAX;
 import static network.aika.elements.activations.Timestamp.MIN;
 import static network.aika.steps.Phase.TRAINING;
@@ -60,7 +59,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected S template;
 
-    protected SumField weight = (SumField) new QueueSumField(this, TRAINING, "weight", TOLERANCE, true)
+    protected SumField weight = (SumField) new AbstractQueueSumField(this, TRAINING, "weight", TOLERANCE, true)
             .addListener("onWeightModified", () -> {
                 checkWeight();
                 setModified();

@@ -40,7 +40,6 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static network.aika.direction.Direction.INPUT;
@@ -249,7 +248,7 @@ public abstract class Neuron<A extends Activation> extends FieldObject implement
     }
 
     protected SumField initBias() {
-        return (SumField) new QueueSumField(this, TRAINING, "bias", TOLERANCE)
+        return (SumField) new AbstractQueueSumField(this, TRAINING, "bias", TOLERANCE)
                 .addListener("onBiasModified", () ->
                         setModified()
                 );
