@@ -109,6 +109,7 @@ public class QueueSumField extends SumField implements IQueueField {
         withinUpdate = true;
         newValue = currentValue + s.getDelta();
         propagateUpdate(s.getDelta());
+        currentStep = null;
         currentValue = newValue;
         withinUpdate = false;
 
