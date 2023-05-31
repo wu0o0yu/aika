@@ -50,6 +50,10 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
         return connected;
     }
 
+    public boolean isFeedback() {
+        return input.getReference().isFeedback();
+    }
+
     public boolean crossesBorder() {
         if(output instanceof FieldOutput) {
             return input.getReference() != ((FieldOutput) output).getReference();

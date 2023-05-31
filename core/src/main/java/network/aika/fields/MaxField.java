@@ -38,7 +38,7 @@ public class MaxField extends SumField {
     @Override
     public void receiveUpdate(AbstractFieldLink fl, double u) {
         computeUpdate(fl);
-        triggerUpdate();
+        triggerUpdate(fl.isFeedback());
     }
 
     private void computeUpdate(AbstractFieldLink fl) {

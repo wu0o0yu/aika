@@ -34,6 +34,10 @@ public abstract class FieldObject {
 
     List<Field> fields = new ArrayList<>();
 
+    public boolean isFeedback() {
+        return false;
+    }
+
     public void register(Field field) {
         assert field != null;
         fields.add(field);

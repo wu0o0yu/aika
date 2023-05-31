@@ -40,7 +40,8 @@ public abstract class FeedbackSynapse<S extends FeedbackSynapse, I extends Neuro
     protected void warmUpInputNeuron(Thought t) {
     }
 
-    public boolean isFeedbackSynapse() {
+    @Override
+    public boolean isFeedback() {
         return true;
     }
 }

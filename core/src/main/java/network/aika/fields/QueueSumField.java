@@ -16,48 +16,81 @@
  */
 package network.aika.fields;
 
+
 import network.aika.FieldObject;
-import network.aika.Thought;
+import network.aika.callbacks.FieldObserver;
 import network.aika.elements.Element;
+import network.aika.steps.FieldStep;
 import network.aika.steps.Phase;
+import network.aika.steps.Step;
 import network.aika.utils.Utils;
 
-import static network.aika.steps.keys.FieldQueueKey.SORT_VALUE_PRECISION;
-import static network.aika.utils.Utils.TOLERANCE;
+import java.util.ArrayList;
+import java.util.List;
+
+
 
 /**
  * @author Lukas Molzberger
  */
-public class QueueSumField extends AbstractQueueSumField {
+public class QueueSumField extends SumField implements IQueueField {
+
+    private Phase phase;
+
+    protected FieldStep currentStep;
+
+    protected FieldStep nextStep;
+
+    //         step = new FieldStep((Element) e, phase, this);
+
+    protected List<FieldObserver> observers = new ArrayList<>();
 
     public QueueSumField(FieldObject e, Phase p, String label, Double tolerance) {
-        super(e, p, label, tolerance);
+        super(e, label, tolerance);
+        phase = p;
+    }
+
+    public QueueSumField(FieldObject e, Phase p, String label, Double tolerance, boolean weakRefs) {
+        super(e, label, tolerance, weakRefs);
+        phase = p;
+    }
+
+
+    @Override
+    public void addObserver(FieldObserver observer) {
+        if(observers.contains(observer))
+            return;
+
+        observers.add(observer);
     }
 
     @Override
-    public void triggerUpdate() {
+    public void removeObserver(FieldObserver observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void triggerUpdate(boolean isFeedback) {
         if(Utils.belowTolerance(tolerance, newValue - currentValue))
             return;
 
-        updateSortValue(Math.abs(newValue - currentValue));
-        super.triggerUpdate();
+        updateObservers();
+
+        if(!step.isQueued()) {
+            if(!Step.add(step)) {
+                process(step);
+            }
+        }
     }
 
-    public void updateSortValue(double newSortValue) {
-        if(Utils.belowTolerance(TOLERANCE, step.getSortValue() - newSortValue))
-            return;
-
-        if(isQueued()) {
-            Element ref = (Element) getReference();
-            Thought t = ref.getThought();
-            t.removeStep(step);
-            step.setSortValue(convertSortValue(newSortValue));
-            t.addStep(step);
-        } else
-            step.setSortValue(convertSortValue(newSortValue));
+    public void process(FieldStep s) {
+        triggerInternal();
+        updateObservers();
     }
 
-    private int convertSortValue(double newSortValue) {
-        return (int) (SORT_VALUE_PRECISION * newSortValue);
+    private void updateObservers() {
+        observers.forEach(o ->
+                o.receiveUpdate(currentValue, newValue)
+        );
     }
 }

@@ -124,6 +124,6 @@ public class BindingActivation extends ConjunctiveActivation<BindingNeuron> {
     }
 
     public void updateBias(double u) {
-        getNet().receiveUpdate(u);
+        getNet().receiveUpdate(u, false);
     }
 }

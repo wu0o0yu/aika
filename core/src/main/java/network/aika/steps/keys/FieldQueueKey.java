@@ -19,6 +19,9 @@ package network.aika.steps.keys;
 import network.aika.elements.activations.Timestamp;
 import network.aika.steps.Phase;
 
+import java.util.Comparator;
+import java.util.function.Function;
+
 
 /**
  * @author Lukas Molzberger
@@ -27,14 +30,21 @@ public class FieldQueueKey implements QueueKey {
 
     public static final double SORT_VALUE_PRECISION = 1000.0;
 
+    Comparator<FieldQueueKey> COMPARATOR = Comparator
+            .<FieldQueueKey>comparingInt(k -> k.round)
+            .thenComparingInt(k -> -k.sortValue);
 
     private Phase phase;
 
+    private int round;
+
     private int sortValue;
+
     private Timestamp currentTimestamp;
 
-    public FieldQueueKey(Phase phase, int sortValue, Timestamp currentTimestamp) {
+    public FieldQueueKey(Phase phase, int round, int sortValue, Timestamp currentTimestamp) {
         this.phase = phase;
+        this.round = round;
         this.sortValue = sortValue;
         this.currentTimestamp = currentTimestamp;
     }
@@ -43,8 +53,18 @@ public class FieldQueueKey implements QueueKey {
         return phase;
     }
 
+    public int getRound() {
+        return round;
+    }
+
     public int getSortValue() {
         return sortValue;
+    }
+
+    private String getSortValueAsString() {
+        return getSortValue() == Integer.MAX_VALUE ?
+                "MAX" :
+                "" + getSortValue();
     }
 
     public Timestamp getCurrentTimestamp() {
@@ -54,19 +74,13 @@ public class FieldQueueKey implements QueueKey {
 
     @Override
     public int compareTo(QueueKey qk) {
-        return Integer.compare(
-                ((FieldQueueKey) qk).sortValue,
-                sortValue
-        );
+        return COMPARATOR.compare(this, (FieldQueueKey) qk);
     }
 
     public String toString() {
-        String svStr = getSortValue() == Integer.MAX_VALUE ?
-                "MAX" :
-                "" + getSortValue();
-
         return "[p:" + getPhase() + "-" + getPhase().ordinal() +
-                ",sv:" + svStr +
+                ",r:" + round +
+                ",sv:" + getSortValueAsString() +
                 ",ts:" + getCurrentTimestamp() +
                 "]";
     }

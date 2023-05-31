@@ -18,9 +18,7 @@ public interface IQueueField extends FieldOutput {
 
     void removeObserver(FieldObserver observer);
 
-    void setStep(FieldStep step);
-
-    void process();
+    void process(FieldStep step);
 
     FieldObject getReference();
 }

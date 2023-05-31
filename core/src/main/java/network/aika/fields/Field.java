@@ -93,7 +93,7 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     public void setValue(double v) {
         newValue = v;
 
-        triggerUpdate();
+        triggerUpdate(false);
     }
 
     @Override
@@ -160,17 +160,20 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public void receiveUpdate(AbstractFieldLink fl, double u) {
-        receiveUpdate(u);
+        receiveUpdate(
+                u,
+                fl.isFeedback()
+        );
     }
 
-    public void receiveUpdate(double u) {
+    public void receiveUpdate(double u, boolean isFeedback) {
         assert !withinUpdate;
 
         newValue += u;
-        triggerUpdate();
+        triggerUpdate(isFeedback);
     }
 
-    public void triggerUpdate() {
+    public void triggerUpdate(boolean isFeedback) {
         if(Utils.belowTolerance(tolerance, newValue - currentValue))
             return;
 

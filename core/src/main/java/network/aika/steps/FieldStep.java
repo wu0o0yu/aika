@@ -16,10 +16,15 @@
  */
 package network.aika.steps;
 
+import network.aika.Thought;
 import network.aika.elements.activations.Timestamp;
 import network.aika.fields.IQueueField;
 import network.aika.elements.Element;
 import network.aika.steps.keys.FieldQueueKey;
+import network.aika.utils.Utils;
+
+import static network.aika.steps.keys.FieldQueueKey.SORT_VALUE_PRECISION;
+import static network.aika.utils.Utils.TOLERANCE;
 
 /**
  *
@@ -31,31 +36,57 @@ public class FieldStep<E extends Element> extends Step<E> {
 
     private Phase phase;
 
+    private int round;
+
     private int sortValue = Integer.MAX_VALUE;
 
+    private double delta = 0.0;
 
-    public FieldStep(E e, Phase p, IQueueField qf) {
+
+    public FieldStep(E e, Phase p, int round, IQueueField qf) {
         super(e);
-        this.field = qf;
         this.phase = p;
-        this.field.setStep(this);
+        this.round = round;
+
+        this.field = qf;
     }
 
-    public void setSortValue(int sortValue) {
-        this.sortValue = sortValue;
+
+    private void updateSortValue(double newSortValue) {
+        if(Utils.belowTolerance(TOLERANCE, sortValue - newSortValue))
+            return;
+
+        if(isQueued()) {
+            Element ref = (Element) field.getReference();
+            Thought t = ref.getThought();
+            t.removeStep(this);
+            sortValue = convertSortValue(newSortValue);
+            t.addStep(this);
+        } else
+            sortValue = convertSortValue(newSortValue);
+    }
+
+    private int convertSortValue(double newSortValue) {
+        return (int) (SORT_VALUE_PRECISION * newSortValue);
     }
 
     public int getSortValue() {
         return sortValue;
     }
 
+    public void updateDelta(double delta) {
+        this.delta += delta;
+
+        updateSortValue(Math.abs(delta));
+    }
+
     public void createQueueKey(Timestamp timestamp) {
-        queueKey = new FieldQueueKey(getPhase(), sortValue, timestamp);
+        queueKey = new FieldQueueKey(getPhase(), round, sortValue, timestamp);
     }
 
     @Override
     public void process() {
-        field.process();
+        field.process(this);
     }
 
     @Override

@@ -159,7 +159,7 @@ public abstract class Neuron<A extends Activation> extends FieldObject implement
     public void latentLinkOutgoing(Synapse synA, Activation iActA) {
         getInputSynapsesAsStream()
                 .filter(synB -> synA != synB)
-                .filter(synB -> !synB.isFeedbackSynapse())
+                .filter(synB -> !synB.isFeedback())
                 .filter(synB -> getLatentLinkingPreNet(synA, synB) > 0.0)
                 .forEach(synB ->
                         synB.getOutput().startVisitor(
@@ -248,7 +248,7 @@ public abstract class Neuron<A extends Activation> extends FieldObject implement
     }
 
     protected SumField initBias() {
-        return (SumField) new AbstractQueueSumField(this, TRAINING, "bias", TOLERANCE)
+        return (SumField) new QueueSumField(this, TRAINING, "bias", TOLERANCE)
                 .addListener("onBiasModified", () ->
                         setModified()
                 );

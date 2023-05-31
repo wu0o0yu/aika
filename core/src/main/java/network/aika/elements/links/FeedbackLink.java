@@ -36,6 +36,11 @@ public abstract class FeedbackLink<S extends FeedbackSynapse, IA extends Activat
     }
 
     @Override
+    public boolean isFeedback() {
+        return true;
+    }
+
+    @Override
     public void propagateRangeOrTokenPos() {
     }
 

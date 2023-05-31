@@ -129,7 +129,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
                 value
         );
 
-        gradient = new AbstractQueueSumField(this, TRAINING, "gradient", TOLERANCE);
+        gradient = new QueueSumField(this, TRAINING, "gradient", TOLERANCE);
 
         if (getConfig().isTrainingEnabled() && neuron.isTrainingAllowed()) {
             connectGradientFields();
@@ -153,7 +153,7 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
         linkAndConnect(getNeuron().getBias(), net)
                 .setPropagateUpdates(false);
 
-        netPreAnneal = new AbstractQueueSumField(this, POST_CLOSE, "netPreAnneal", TOLERANCE);
+        netPreAnneal = new QueueSumField(this, POST_CLOSE, "netPreAnneal", TOLERANCE);
         linkAndConnect(net, netPreAnneal);
 
         netPreAnneal.addUpdateListener("disconnect listener", () ->

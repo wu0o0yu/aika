@@ -72,6 +72,9 @@ public class Utils {
     }
 
     public static boolean belowTolerance(Double tolerance, double x) {
+        if(x == 0.0)
+            return true;
+
         if(tolerance == null)
             return false;
 

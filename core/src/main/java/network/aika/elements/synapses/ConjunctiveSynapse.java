@@ -26,7 +26,7 @@ import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.ConjunctiveActivation;
 import network.aika.elements.links.Link;
 import network.aika.fields.FieldLink;
-import network.aika.fields.AbstractQueueSumField;
+import network.aika.fields.QueueSumField;
 import network.aika.fields.SumField;
 import network.aika.utils.Utils;
 
@@ -57,7 +57,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
                 >
 {
 
-    protected SumField synapseBias = (SumField) new AbstractQueueSumField(this, TRAINING, "synapseBias", TOLERANCE, true)
+    protected SumField synapseBias = (SumField) new QueueSumField(this, TRAINING, "synapseBias", TOLERANCE, true)
             .addListener("onSynapseBiasModified", () ->
                     setModified()
             );
@@ -169,7 +169,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
 
     public S adjustBias(double x) {
         if(weight.getCurrentValue() > 0.0)
-            synapseBias.receiveUpdate(-weight.getCurrentValue() * x);
+            synapseBias.receiveUpdate(-weight.getCurrentValue() * x, false);
 
         return (S) this;
     }

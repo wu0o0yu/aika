@@ -25,7 +25,7 @@ import network.aika.elements.Element;
 import network.aika.elements.links.Link;
 import network.aika.elements.activations.Timestamp;
 import network.aika.direction.Direction;
-import network.aika.fields.AbstractQueueSumField;
+import network.aika.fields.QueueSumField;
 import network.aika.fields.SumField;
 import network.aika.elements.neurons.Neuron;
 import network.aika.elements.neurons.NeuronProvider;
@@ -59,7 +59,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected S template;
 
-    protected SumField weight = (SumField) new AbstractQueueSumField(this, TRAINING, "weight", TOLERANCE, true)
+    protected SumField weight = (SumField) new QueueSumField(this, TRAINING, "weight", TOLERANCE, true)
             .addListener("onWeightModified", () -> {
                 checkWeight();
                 setModified();
@@ -175,7 +175,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         getOutput()
                 .linkOutgoing(this, act);
 
-        if (!isFeedbackSynapse())
+        if (!isFeedback())
             getOutput()
                     .latentLinkOutgoing(this, act);
 
@@ -184,10 +184,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         } else if(getStoredAt() == INPUT) {
             warmUpRelatedInputNeurons(act);
         }
-    }
-
-    public boolean isFeedbackSynapse() {
-        return false;
     }
 
     public void setModified() {
