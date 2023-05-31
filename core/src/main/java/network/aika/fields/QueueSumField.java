@@ -76,11 +76,28 @@ public class QueueSumField extends SumField implements IQueueField {
 
         updateObservers();
 
-        if(!step.isQueued()) {
-            if(!Step.add(step)) {
-                process(step);
+        FieldStep s = getStep(isFeedback);
+        if(s == null) {
+            s = new FieldStep<>((Element) getReference(), phase, 0, this);
+            setStep(isFeedback, s);
+        }
+
+        if(!s.isQueued()) {
+            if(!Step.add(s)) {
+                process(s);
             }
         }
+    }
+
+    private FieldStep getStep(boolean isFeedback) {
+        return isFeedback ? nextStep : currentStep;
+    }
+
+    private void setStep(boolean isFeedback, FieldStep s) {
+        if(isFeedback)
+            nextStep = s;
+        else
+            currentStep = s;
     }
 
     public void process(FieldStep s) {
