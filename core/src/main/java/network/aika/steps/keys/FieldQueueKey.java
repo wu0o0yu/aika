@@ -25,6 +25,9 @@ import network.aika.steps.Phase;
  */
 public class FieldQueueKey implements QueueKey {
 
+    public static final double SORT_VALUE_PRECISION = 1000.0;
+
+
     private Phase phase;
 
     private int sortValue;

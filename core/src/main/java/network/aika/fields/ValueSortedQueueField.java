@@ -22,13 +22,13 @@ import network.aika.elements.Element;
 import network.aika.steps.Phase;
 import network.aika.utils.Utils;
 
+import static network.aika.steps.keys.FieldQueueKey.SORT_VALUE_PRECISION;
 import static network.aika.utils.Utils.TOLERANCE;
 
 /**
  * @author Lukas Molzberger
  */
 public class ValueSortedQueueField extends QueueSumField {
-
 
     public ValueSortedQueueField(FieldObject e, Phase p, String label, Double tolerance) {
         super(e, p, label, tolerance);
@@ -39,7 +39,7 @@ public class ValueSortedQueueField extends QueueSumField {
         if(Utils.belowTolerance(tolerance, newValue - currentValue))
             return;
 
-        updateSortValue(newValue);
+        updateSortValue(Math.abs(newValue - currentValue));
         super.triggerUpdate();
     }
 
@@ -57,9 +57,7 @@ public class ValueSortedQueueField extends QueueSumField {
             step.setSortValue(convertSortValue(newSortValue));
     }
 
-
     private int convertSortValue(double newSortValue) {
-        return (int) (1000.0 * newSortValue);
+        return (int) (SORT_VALUE_PRECISION * newSortValue);
     }
-
 }
