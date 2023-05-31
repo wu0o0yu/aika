@@ -29,7 +29,7 @@ import static network.aika.fields.FieldLink.linkAndConnect;
  */
 public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, InhibitoryActivation> {
 
-    MinMaxField maxInput;
+    MaxField maxInput;
 
     public NegativeFeedbackLink(NegativeFeedbackSynapse s, InhibitoryActivation input, BindingActivation output) {
         super(s, input, output);
@@ -42,7 +42,7 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
 
     @Override
     protected void initWeightInput() {
-        maxInput = new MinMaxField(this, MinMax.MAX, "max-input-value");
+        maxInput = new MaxField(this, "max-input-value");
 
         super.initWeightInput();
     }
@@ -80,7 +80,7 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
         );
     }
 
-    public MinMaxField getMaxInput() {
+    public MaxField getMaxInput() {
         return maxInput;
     }
 }

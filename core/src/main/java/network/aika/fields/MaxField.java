@@ -23,22 +23,16 @@ import java.util.Comparator;
 /**
  * @author Lukas Molzberger
  */
-public class MinMaxField extends SumField {
+public class MaxField extends SumField {
 
-    MinMax mode;
     private AbstractFieldLink selectedInput;
 
-    public MinMaxField(FieldObject ref, MinMax m, String label) {
+    public MaxField(FieldObject ref, String label) {
         super(ref, label, null);
-        mode = m;
     }
 
     public AbstractFieldLink getSelectedInput() {
         return selectedInput;
-    }
-
-    public MinMax getMode() {
-        return mode;
     }
 
     @Override
@@ -62,10 +56,7 @@ public class MinMaxField extends SumField {
     }
 
     private Comparator<FieldLink> getComparator(AbstractFieldLink fl) {
-        return switch (mode) {
-            case MAX -> Comparator.comparingDouble(in -> getInput(in, fl));
-            case MIN -> Comparator.comparingDouble(in -> -getInput(in, fl));
-        };
+        return Comparator.comparingDouble(in -> getInput(in, fl));
     }
 
     private double getInput(AbstractFieldLink fl, AbstractFieldLink updateFL) {
