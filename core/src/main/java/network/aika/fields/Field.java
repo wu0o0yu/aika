@@ -26,7 +26,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.Stream;
 
 import static network.aika.fields.ListenerFieldLink.createEventListener;
 import static network.aika.utils.Utils.doubleToString;
@@ -93,7 +92,7 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     public void setValue(double v) {
         newValue = v;
 
-        triggerUpdate(false);
+        triggerUpdate();
     }
 
     @Override
@@ -170,10 +169,10 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         assert !withinUpdate;
 
         newValue += u;
-        triggerUpdate(isFeedback);
+        triggerUpdate();
     }
 
-    public void triggerUpdate(boolean isFeedback) {
+    public void triggerUpdate() {
         if(Utils.belowTolerance(tolerance, newValue - currentValue))
             return;
 

@@ -85,6 +85,6 @@ public abstract class AbstractFunction extends Field implements FieldInput {
             return;
 
         newValue += update;
-        triggerUpdate(fl.isFeedback());
+        triggerUpdate();
     }
 }

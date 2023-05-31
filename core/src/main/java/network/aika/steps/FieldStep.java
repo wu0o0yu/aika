@@ -25,6 +25,7 @@ import network.aika.utils.Utils;
 
 import static network.aika.steps.keys.FieldQueueKey.SORT_VALUE_PRECISION;
 import static network.aika.utils.Utils.TOLERANCE;
+import static network.aika.utils.Utils.doubleToString;
 
 /**
  *
@@ -50,7 +51,6 @@ public class FieldStep<E extends Element> extends Step<E> {
 
         this.field = qf;
     }
-
 
     private void updateSortValue(double newSortValue) {
         if(Utils.belowTolerance(TOLERANCE, sortValue - newSortValue))
@@ -94,11 +94,19 @@ public class FieldStep<E extends Element> extends Step<E> {
         return phase;
     }
 
+    public double getDelta() {
+        return delta;
+    }
+
     public IQueueField getField() {
         return field;
     }
 
     public String toString() {
-        return "Phase:" + phase + " Field: " + field + "  Ref:" + field.getReference();
+        return "Phase:" + phase +
+                " Round:" + round +
+                " Delta:" + doubleToString(delta) +
+                " Field: " + field +
+                " Ref:" + field.getReference();
     }
 }

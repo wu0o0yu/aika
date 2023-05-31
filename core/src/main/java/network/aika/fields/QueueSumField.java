@@ -41,8 +41,6 @@ public class QueueSumField extends SumField implements IQueueField {
 
     protected FieldStep nextStep;
 
-    //         step = new FieldStep((Element) e, phase, this);
-
     protected List<FieldObserver> observers = new ArrayList<>();
 
     public QueueSumField(FieldObject e, Phase p, String label, Double tolerance) {
@@ -70,9 +68,10 @@ public class QueueSumField extends SumField implements IQueueField {
     }
 
     @Override
-    public void triggerUpdate(boolean isFeedback) {
-        if(Utils.belowTolerance(tolerance, newValue - currentValue))
-            return;
+    public void receiveUpdate(double u, boolean isFeedback) {
+        assert !withinUpdate;
+
+//        newValue += u;
 
         updateObservers();
 
@@ -81,6 +80,7 @@ public class QueueSumField extends SumField implements IQueueField {
             s = new FieldStep<>((Element) getReference(), phase, 0, this);
             setStep(isFeedback, s);
         }
+        s.updateDelta(u);
 
         if(!s.isQueued()) {
             if(!Step.add(s)) {
@@ -101,7 +101,17 @@ public class QueueSumField extends SumField implements IQueueField {
     }
 
     public void process(FieldStep s) {
-        triggerInternal();
+        if(nextStep == s) {
+            currentStep = s;
+            nextStep = null;
+        }
+
+        withinUpdate = true;
+        newValue = currentValue + s.getDelta();
+        propagateUpdate(s.getDelta());
+        currentValue = newValue;
+        withinUpdate = false;
+
         updateObservers();
     }
 
