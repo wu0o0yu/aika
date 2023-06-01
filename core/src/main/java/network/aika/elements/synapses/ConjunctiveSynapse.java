@@ -115,7 +115,7 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
         super.initFromTemplate(input, output, templateSyn);
 
         synapseBias.setInitialValue(
-                ((ConjunctiveSynapse)templateSyn).synapseBias.getUpdatedCurrentValue()
+                ((ConjunctiveSynapse)templateSyn).synapseBias.getUpdatedValue()
         );
     }
 
@@ -168,8 +168,8 @@ public abstract class ConjunctiveSynapse<S extends ConjunctiveSynapse, I extends
     }
 
     public S adjustBias(double x) {
-        if(weight.getCurrentValue() > 0.0)
-            synapseBias.receiveUpdate(-weight.getCurrentValue() * x, false);
+        if(weight.getValue() > 0.0)
+            synapseBias.receiveUpdate(-weight.getValue() * x, false);
 
         return (S) this;
     }

@@ -16,7 +16,7 @@
  */
 package network.aika.elements.neurons;
 
-import network.aika.FieldObject;
+import network.aika.fields.FieldObject;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.elements.synapses.CategoryInputSynapse;
@@ -54,7 +54,7 @@ import static network.aika.utils.Utils.TOLERANCE;
  *
  * @author Lukas Molzberger
  */
-public abstract class Neuron<A extends Activation> extends FieldObject implements Element, Writable {
+public abstract class Neuron<A extends Activation> implements Element, Writable {
 
     volatile long retrievalCount = 0;
 
@@ -95,6 +95,15 @@ public abstract class Neuron<A extends Activation> extends FieldObject implement
 
     public void setCallActivationCheckCallback(boolean callActivationCheckCallback) {
         this.callActivationCheckCallback = callActivationCheckCallback;
+    }
+
+    @Override
+    public boolean isFeedback() {
+        return false;
+    }
+
+    @Override
+    public void disconnect() {
     }
 
     public void addProvider(Model m) {
@@ -213,7 +222,7 @@ public abstract class Neuron<A extends Activation> extends FieldObject implement
         addProvider(templateN.getModel());
 
         bias.setInitialValue(
-                templateN.getBias().getUpdatedCurrentValue()
+                templateN.getBias().getUpdatedValue()
         );
 
         CategoryInputSynapse cis = templateN.getCategoryInputSynapse();
@@ -407,7 +416,7 @@ public abstract class Neuron<A extends Activation> extends FieldObject implement
     }
 
     public double getCurrentCompleteBias() {
-        return getBias().getUpdatedCurrentValue();
+        return getBias().getUpdatedValue();
     }
 
     public void suspend() {

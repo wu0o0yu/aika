@@ -102,7 +102,7 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     @Override
     public void receiveUpdate(AbstractFieldLink fl, double u) {
         withinUpdate = true;
-        currentValueField.setValue(Double.valueOf(field.getCurrentValue()));
+        currentValueField.setValue(Double.valueOf(field.getValue()));
         withinUpdate = false;
     }
 
@@ -110,9 +110,9 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
         addGridEntry(jLabel, 0, pos, 1, insets);
         addGridEntry(currentValueField, 1, pos, 1, insets);
 
-        showReference(3, pos, insets);
+        showReference(2, pos, insets);
         if(isConnected != null || isPropagateUpdate != null)
-            showConnected(4, pos, insets);
+            showConnected(3, pos, insets);
     }
 
     protected void showReference(int xPos, int yPos, Insets insets) {
@@ -166,7 +166,7 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     }
 
     private void setCurrentValue(F f) {
-        currentValueField.setValue(Double.valueOf(f.getCurrentValue()));
+        currentValueField.setValue(Double.valueOf(f.getValue()));
     }
 
     public JLabel getLabel() {

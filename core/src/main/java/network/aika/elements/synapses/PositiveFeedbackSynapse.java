@@ -52,7 +52,7 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
             return;
 
         Multiplication dummyWeight = mul(
-                oAct,
+                this,
                 "pos-feedback-dummy",
                 oAct.getThought().getIsOpen(),
                 getWeight()
@@ -75,7 +75,7 @@ public class PositiveFeedbackSynapse extends FeedbackSynapse<
 
     @Override
     public double getPreNetDummyWeight() {
-        return weight.getCurrentValue();
+        return weight.getValue();
     }
 
     @Override

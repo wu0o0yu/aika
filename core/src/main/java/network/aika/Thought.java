@@ -47,7 +47,7 @@ import static network.aika.steps.Phase.*;
  *
  * @author Lukas Molzberger
  */
-public abstract class Thought extends FieldObject implements Element {
+public abstract class Thought implements Element {
 
     private Field annealing;
 

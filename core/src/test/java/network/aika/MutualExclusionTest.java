@@ -45,9 +45,7 @@ import network.aika.elements.synapses.NegativeFeedbackSynapse;
 import network.aika.text.Document;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
 import java.util.SortedSet;
-import java.util.TreeMap;
 
 import static network.aika.TestUtils.*;
 import static network.aika.elements.synapses.Scope.INPUT;
@@ -133,7 +131,7 @@ public class MutualExclusionTest {
         SortedSet<BindingActivation> nbActs = nb.getActivations(doc);
         Activation nbAct = nbActs.iterator().next();
 
-        assertTrue(nbAct.getValue().getCurrentValue() > 0.38);
+        assertTrue(nbAct.getValue().getValue() > 0.38);
     }
 
 

@@ -16,8 +16,6 @@
  */
 package network.aika.fields;
 
-import network.aika.FieldObject;
-
 import java.util.function.DoubleBinaryOperator;
 
 /**
@@ -41,14 +39,14 @@ public class BiFunction extends AbstractFunction {
     protected double computeUpdate(AbstractFieldLink fl, double u) {
         return switch (fl.getArgument()) {
             case 0 -> function.applyAsDouble(
-                    fl.getNewInputValue(),
+                    fl.getUpdatedInputValue(),
                     getInputValueByArg(1)
                 );
             case 1 -> function.applyAsDouble(
                     getInputValueByArg(0),
-                    fl.getNewInputValue()
+                    fl.getUpdatedInputValue()
                 );
             default -> throw new IllegalArgumentException();
-        } - newValue;
+        } - value;
     }
 }

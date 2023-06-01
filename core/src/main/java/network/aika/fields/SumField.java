@@ -1,7 +1,5 @@
 package network.aika.fields;
 
-import network.aika.FieldObject;
-
 import java.util.ArrayList;
 import java.util.Collection;
 

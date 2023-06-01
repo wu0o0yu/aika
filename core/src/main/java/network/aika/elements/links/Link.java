@@ -16,7 +16,7 @@
  */
 package network.aika.elements.links;
 
-import network.aika.FieldObject;
+import network.aika.fields.FieldObject;
 import network.aika.Thought;
 import network.aika.elements.Element;
 import network.aika.elements.activations.Activation;
@@ -38,14 +38,14 @@ import static network.aika.elements.activations.Timestamp.FIRED_COMPARATOR;
  *
  * @author Lukas Molzberger
  */
-public abstract class Link<S extends Synapse, I extends Activation<?>, O extends Activation> extends FieldObject implements Element {
+public abstract class Link<S extends Synapse, I extends Activation<?>, O extends Activation> implements Element {
 
     protected S synapse;
 
     protected final I input;
     protected O output;
 
-    protected FieldOutput weightedInput;
+    protected Field weightedInput;
 
     protected SumField gradient;
 
@@ -97,6 +97,16 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected void connectGradientFields() {
     }
 
+    @Override
+    public boolean isFeedback() {
+        return false;
+    }
+
+    @Override
+    public void disconnect() {
+        weightedInput.disconnectInputs(false);
+    }
+
     public void instantiateTemplate(I iAct, O oAct) {
         if(iAct == null || oAct == null)
             return;
@@ -122,7 +132,7 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
         linkAndConnect(weightedInput, getOutput().getNet());
     }
 
-    protected FieldOutput initWeightedInput() {
+    protected Field initWeightedInput() {
         Multiplication weightedInput = mul(
                 this,
                 "iAct(" + getInputKeyString() + ").value * s.weight",

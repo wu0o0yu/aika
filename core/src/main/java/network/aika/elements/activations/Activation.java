@@ -16,7 +16,7 @@
  */
 package network.aika.elements.activations;
 
-import network.aika.FieldObject;
+import network.aika.fields.FieldObject;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.elements.Element;
@@ -56,7 +56,7 @@ import static network.aika.utils.Utils.TOLERANCE;
 /**
  * @author Lukas Molzberger
  */
-public abstract class Activation<N extends Neuron> extends FieldObject implements Element, Comparable<Activation> {
+public abstract class Activation<N extends Neuron> implements Element, Comparable<Activation> {
 
     public static final Comparator<Activation> ID_COMPARATOR = Comparator.comparingInt(Activation::getId);
 
@@ -444,8 +444,19 @@ public abstract class Activation<N extends Neuron> extends FieldObject implement
     }
 
     @Override
+    public boolean isFeedback() {
+        return false;
+    }
+
+    @Override
     public void disconnect() {
-        super.disconnect();
+        net.disconnectInputs(false);
+
+        if(updateValue != null)
+            updateValue.disconnectOutputs(false);
+
+        if(negUpdateValue != null)
+            negUpdateValue.disconnectOutputs(false);
 
         getInputLinks().forEach(l ->
                 l.disconnect()

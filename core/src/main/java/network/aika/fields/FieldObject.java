@@ -16,28 +16,14 @@
  */
 package network.aika.fields;
 
-import network.aika.callbacks.UpdateListener;
-
-import java.util.Collection;
 
 /**
+ *
  * @author Lukas Molzberger
  */
-public interface FieldInput extends UpdateListener {
+public interface FieldObject {
 
-    String getLabel();
+    boolean isFeedback();
 
-    void addInput(FieldLink fl);
-
-    void removeInput(FieldLink fl);
-
-    Collection<FieldLink> getInputs();
-
-    void connectInputs(boolean initialize);
-
-    void disconnectInputs(boolean deinitialize);
-
-    int getNextArg();
-
-    FieldObject getReference();
+    void disconnect();
 }

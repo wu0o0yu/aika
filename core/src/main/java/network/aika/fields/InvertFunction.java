@@ -16,8 +16,6 @@
  */
 package network.aika.fields;
 
-import network.aika.FieldObject;
-
 /**
  * @author Lukas Molzberger
  */
@@ -30,6 +28,6 @@ public class InvertFunction extends AbstractFunction {
 
     @Override
     protected double computeUpdate(AbstractFieldLink fl, double u) {
-        return (1.0 - fl.getInput().getNewValue()) - newValue;
+        return (1.0 - fl.getInput().getUpdatedValue()) - value;
     }
 }

@@ -17,12 +17,9 @@
 package network.aika.elements.activations;
 
 import network.aika.Thought;
-import network.aika.elements.links.CategoryInputLink;
 import network.aika.elements.links.ConjunctiveLink;
 import network.aika.elements.neurons.ConjunctiveNeuron;
 import network.aika.elements.synapses.ConjunctiveSynapse;
-
-import java.util.stream.Stream;
 
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.scale;
@@ -43,7 +40,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?>> exte
         double optionalSynBiasSum = getInputLinksByType(ConjunctiveLink.class)
                 .map(l -> (ConjunctiveSynapse) l.getSynapse())
                 .filter(ConjunctiveSynapse::isOptional)
-                .mapToDouble(s -> s.getSynapseBias().getUpdatedCurrentValue())
+                .mapToDouble(s -> s.getSynapseBias().getUpdatedValue())
                 .sum();
         ti.getNeuron().getSynapseBiasSum().receiveUpdate(optionalSynBiasSum, false);
     }

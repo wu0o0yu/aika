@@ -66,6 +66,6 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
 
     @Override
     public double getPropagatePreNet(InhibitoryActivation iAct) {
-        return weight.getCurrentValue();
+        return weight.getValue();
     }
 }

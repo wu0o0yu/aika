@@ -16,8 +16,6 @@
  */
 package network.aika.fields;
 
-import network.aika.FieldObject;
-
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleFunction;
 
@@ -29,7 +27,7 @@ import static network.aika.fields.FieldLink.*;
 public class Fields {
 
     public static boolean isTrue(FieldOutput f, double threshold) {
-        return f != null && f.getCurrentValue() > threshold;
+        return f != null && f.getValue() > threshold;
     }
 
     public static Addition add(FieldObject ref, String label, FieldOutput in1, FieldOutput in2) {

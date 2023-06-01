@@ -16,7 +16,6 @@
  */
 package network.aika.fields;
 
-import network.aika.FieldObject;
 import network.aika.Model;
 import network.aika.utils.Utils;
 import network.aika.utils.Writable;
@@ -39,10 +38,10 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     private String label;
     private FieldObject reference;
 
-    protected double currentValue;
-    protected double newValue;
+    protected double value;
 
-    protected boolean withinUpdate;
+    private boolean withinUpdate;
+    private double updatedValue;
 
     private Collection<AbstractFieldLink> receivers;
 
@@ -56,9 +55,6 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         this.reference = reference;
         this.label = label;
         this.tolerance = tolerance;
-
-        if(reference != null)
-            reference.register(this);
 
         initIO(weakRefs);
     }
@@ -76,23 +72,12 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public Field setInitialValue(double initialValue) {
-        currentValue = initialValue;
-        newValue = initialValue;
+        value = initialValue;
         return this;
     }
 
-    public void setCurrentValue(double currentValue) {
-        this.currentValue = currentValue;
-    }
-
-    public void setNewValue(double newValue) {
-        this.newValue = newValue;
-    }
-
     public void setValue(double v) {
-        newValue = v;
-
-        triggerUpdate();
+        triggerUpdate(v - value);
     }
 
     @Override
@@ -110,26 +95,8 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     }
 
     @Override
-    public double getCurrentValue() {
-        return currentValue;
-    }
-
-    @Override
-    public double getUpdatedCurrentValue() {
-        return withinUpdate ?
-                newValue :
-                currentValue;
-    }
-
-    @Override
-    public double getNewValue() {
-        return newValue;
-    }
-
-    @Override
-    public void copyState(Field to) {
-        to.currentValue = getCurrentValue();
-        to.newValue = getNewValue();
+    public double getValue() {
+        return value;
     }
 
     public void connectInputs(boolean initialize) {
@@ -140,6 +107,12 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
 
     public void disconnectInputs(boolean deinitialize) {
         getInputs().forEach(fl ->
+                fl.disconnect(deinitialize)
+        );
+    }
+
+    public void disconnectOutputs(boolean deinitialize) {
+        getReceivers().forEach(fl ->
                 fl.disconnect(deinitialize)
         );
     }
@@ -168,22 +141,25 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     public void receiveUpdate(double u, boolean isFeedback) {
         assert !withinUpdate;
 
-        newValue += u;
-        triggerUpdate();
+        triggerUpdate(u);
     }
 
-    public void triggerUpdate() {
-        if(Utils.belowTolerance(tolerance, newValue - currentValue))
+    @Override
+    public double getUpdatedValue() {
+        return withinUpdate ?
+                updatedValue :
+                value;
+    }
+
+    public void triggerUpdate(double u) {
+        if(Utils.belowTolerance(tolerance, u))
             return;
 
-        triggerInternal();
-    }
-
-    protected void triggerInternal() {
         withinUpdate = true;
 
-        propagateUpdate(newValue - currentValue);
-        currentValue = newValue;
+        updatedValue = value + u;
+        propagateUpdate(u);
+        value = updatedValue;
 
         withinUpdate = false;
     }
@@ -198,12 +174,12 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeDouble(currentValue);
+        out.writeDouble(value);
     }
 
     @Override
     public void readFields(DataInput in, Model m) throws IOException {
-        currentValue = in.readDouble();
+        value = in.readDouble();
     }
 
     @Override
@@ -212,6 +188,6 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public String getValueString() {
-        return "[ov:" + doubleToString(getCurrentValue()) + " nv:" + doubleToString(getNewValue()) + "]";
+        return doubleToString(getValue());
     }
 }

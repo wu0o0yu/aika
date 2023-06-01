@@ -16,8 +16,6 @@
  */
 package network.aika.fields;
 
-import network.aika.FieldObject;
-
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -69,7 +67,7 @@ public abstract class AbstractFunction extends Field implements FieldInput {
     }
 
     public double getInputValueByArg(int arg) {
-        return getInputLinkByArg(arg).getCurrentInputValue();
+        return getInputLinkByArg(arg).getInputValue();
     }
 
     public FieldLink getInputLinkByArg(int arg) {
@@ -84,7 +82,6 @@ public abstract class AbstractFunction extends Field implements FieldInput {
         if(update == 0.0)
             return;
 
-        newValue += update;
-        triggerUpdate();
+        triggerUpdate(update);
     }
 }

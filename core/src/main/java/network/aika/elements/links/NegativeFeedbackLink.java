@@ -31,6 +31,8 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
 
     MaxField maxInput;
 
+    Field weightUpdate;
+
     public NegativeFeedbackLink(NegativeFeedbackSynapse s, InhibitoryActivation input, BindingActivation output) {
         super(s, input, output);
 
@@ -48,7 +50,7 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
     }
 
     @Override
-    protected FieldOutput initWeightedInput() {
+    protected Field initWeightedInput() {
         return Fields.mul(
                 this,
                 "annealing * iAct(" + getInputKeyString() + ").value * weight",
@@ -69,15 +71,23 @@ public class NegativeFeedbackLink extends FeedbackLink<NegativeFeedbackSynapse, 
 
     @Override
     public void connectWeightUpdate() {
+        weightUpdate = Fields.mul(
+                this,
+                "weight update",
+                getInputIsFired(),
+                getOutput().getNegUpdateValue()
+        );
+
         linkAndConnect(
-                Fields.mul(
-                        this,
-                        "weight update",
-                        getInputIsFired(),
-                        getOutput().getNegUpdateValue()
-                ),
+                weightUpdate,
                 synapse.getWeight()
         );
+    }
+
+    @Override
+    public void disconnect() {
+        super.disconnect();
+        weightUpdate.disconnectOutputs(false);
     }
 
     public MaxField getMaxInput() {

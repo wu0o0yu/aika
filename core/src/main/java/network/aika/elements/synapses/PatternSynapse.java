@@ -87,8 +87,8 @@ public class PatternSynapse extends ConjunctiveSynapse<
 
     @Override
     public double getPropagatePreNet(BindingActivation iAct) {
-        return getOutput().getBias().getCurrentValue() +
-                weight.getCurrentValue() +
+        return getOutput().getBias().getValue() +
+                weight.getValue() +
                 getSumOfLowerWeights();
     }
 

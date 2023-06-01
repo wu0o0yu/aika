@@ -16,7 +16,7 @@
  */
 package network.aika.sign;
 
-import network.aika.FieldObject;
+import network.aika.fields.FieldObject;
 import network.aika.fields.FieldOutput;
 import network.aika.fields.Fields;
 

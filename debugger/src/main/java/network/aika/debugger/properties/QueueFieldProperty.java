@@ -30,14 +30,11 @@ import java.text.NumberFormat;
  */
 public class QueueFieldProperty extends FieldOutputProperty<IQueueField> implements FieldObserver {
 
-    protected JFormattedTextField newValueField;
 
     public QueueFieldProperty(Container parent, IQueueField field, boolean showReference, Boolean isConnected, Boolean isPropagateUpdates) {
         super(parent, field, showReference, isConnected, isPropagateUpdates);
 
         Format fieldFormatter = NumberFormat.getNumberInstance();
-        newValueField = new JFormattedTextField(fieldFormatter);
-        newValueField.setColumns(10);
 
         currentValueField.addPropertyChangeListener("value", e -> {
             if(withinUpdate)
@@ -50,25 +47,7 @@ public class QueueFieldProperty extends FieldOutputProperty<IQueueField> impleme
             field.setValue(v.doubleValue());
         });
 
-        newValueField.addPropertyChangeListener("value", e -> {
-            if(withinUpdate)
-                return;
-
-            Number v = (Number) newValueField.getValue();
-            if(v == null)
-                return;
-
-            field.setNewValue(v.doubleValue());
-        });
-
-        setNewValue(field);
-
         currentValueField.setEnabled(true);
-        newValueField.setEnabled(true);
-    }
-
-    private void setNewValue(IQueueField f) {
-        newValueField.setValue(Double.valueOf(f.getNewValue()));
     }
 
     @Override
@@ -82,11 +61,10 @@ public class QueueFieldProperty extends FieldOutputProperty<IQueueField> impleme
     }
 
     @Override
-    public void receiveUpdate(double cv, double nv) {
+    public void receiveUpdate(double v) {
         SwingUtilities.invokeLater(() -> {
             withinUpdate = true;
-            newValueField.setValue(nv);
-            currentValueField.setValue(cv);
+            currentValueField.setValue(v);
             withinUpdate = false;
         });
     }
@@ -94,10 +72,9 @@ public class QueueFieldProperty extends FieldOutputProperty<IQueueField> impleme
     public void addField(int pos, Insets insets) {
         addGridEntry(jLabel, 0, pos, 1, insets);
         addGridEntry(currentValueField, 1, pos, 1, insets);
-        addGridEntry(newValueField, 2, pos, 1, insets);
 
-        showReference(3, pos, insets);
+        showReference(2, pos, insets);
         if(isConnected != null || isPropagateUpdate != null)
-            showConnected(4, pos, insets);
+            showConnected(3, pos, insets);
     }
 }

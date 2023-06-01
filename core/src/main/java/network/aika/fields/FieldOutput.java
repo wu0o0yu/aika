@@ -16,8 +16,6 @@
  */
 package network.aika.fields;
 
-import network.aika.FieldObject;
-
 import java.util.Collection;
 
 import static network.aika.fields.ListenerFieldLink.createEventListener;
@@ -32,13 +30,9 @@ public interface FieldOutput {
 
     String getValueString();
 
-    double getCurrentValue();
+    double getValue();
 
-    double getUpdatedCurrentValue();
-
-    double getNewValue();
-
-    void copyState(Field from);
+    double getUpdatedValue();
 
     void addOutput(AbstractFieldLink fl);
 
@@ -47,6 +41,8 @@ public interface FieldOutput {
     Collection<AbstractFieldLink> getReceivers();
 
     FieldObject getReference();
+
+    void disconnectOutputs(boolean deinitialize);
 
     default void addEventListener(String listenerName, FieldOnTrueEvent eventListener) {
         addEventListener(listenerName, eventListener, false);

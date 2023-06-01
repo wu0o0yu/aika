@@ -16,8 +16,6 @@
  */
 package network.aika.fields;
 
-import network.aika.FieldObject;
-
 import java.util.Comparator;
 
 /**
@@ -37,22 +35,22 @@ public class MaxField extends SumField {
 
     @Override
     public void receiveUpdate(AbstractFieldLink fl, double u) {
-        computeUpdate(fl);
-        triggerUpdate();
+        triggerUpdate(
+                computeUpdate(fl)
+        );
     }
 
-    private void computeUpdate(AbstractFieldLink fl) {
+    private double computeUpdate(AbstractFieldLink fl) {
         if(selectedInput == null) {
             selectedInput = fl;
-            newValue = fl.getNewInputValue();
-            return;
+            return fl.getUpdatedInputValue() - value;
         }
 
         selectedInput = getInputs().stream()
                 .max(getComparator(fl))
                 .orElse(null);
 
-        newValue = getInput(selectedInput, fl);
+        return getInput(selectedInput, fl) - value;
     }
 
     private Comparator<FieldLink> getComparator(AbstractFieldLink fl) {
@@ -61,7 +59,7 @@ public class MaxField extends SumField {
 
     private double getInput(AbstractFieldLink fl, AbstractFieldLink updateFL) {
         return fl == updateFL ?
-                fl.getNewInputValue() :
-                fl.getCurrentInputValue();
+                fl.getUpdatedInputValue() :
+                fl.getInputValue();
     }
 }

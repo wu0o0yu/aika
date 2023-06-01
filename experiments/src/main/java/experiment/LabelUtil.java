@@ -17,18 +17,15 @@
 package experiment;
 
 import network.aika.direction.Direction;
-import network.aika.elements.activations.Activation;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.links.Link;
 import network.aika.elements.neurons.BindingNeuron;
-import network.aika.elements.neurons.NeuronProvider;
 import network.aika.elements.neurons.PatternNeuron;
 import network.aika.elements.synapses.PatternSynapse;
 import network.aika.elements.synapses.RelationInputSynapse;
 import network.aika.elements.synapses.Synapse;
 
-import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 import static network.aika.direction.Direction.INPUT;
@@ -51,14 +48,14 @@ public class LabelUtil {
             BindingActivation act = (BindingActivation) l.getInput();
             return act != null &&
                     (!fired || act.isFired()) &&
-                    (!netPreAnneal || act.getNetPreAnneal().getCurrentValue() > 0.0);
+                    (!netPreAnneal || act.getNetPreAnneal().getValue() > 0.0);
         });
     }
 
     public static String generateLabel(PatternNeuron pn) {
         return generateLabel(pn, bn -> {
             PatternSynapse s = (PatternSynapse) bn.getOutputSynapse(pn.getProvider());
-            return (-s.getSynapseBias().getCurrentValue() > pn.getBias().getCurrentValue());
+            return (-s.getSynapseBias().getValue() > pn.getBias().getValue());
         });
     }
 

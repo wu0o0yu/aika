@@ -16,8 +16,6 @@
  */
 package network.aika.fields;
 
-import network.aika.FieldObject;
-
 import java.util.function.DoubleFunction;
 
 /**
@@ -34,6 +32,6 @@ public class FieldFunction extends AbstractFunction {
 
     @Override
     protected double computeUpdate(AbstractFieldLink fl, double u) {
-        return function.apply(fl.getInput().getNewValue()) - newValue;
+        return function.apply(fl.getInput().getUpdatedValue()) - value;
     }
 }

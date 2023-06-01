@@ -16,12 +16,10 @@
  */
 package network.aika.fields;
 
-import network.aika.FieldObject;
-
 /**
  * @author Lukas Molzberger
  */
-public class ThresholdOperator extends AbstractFunction {
+public class  ThresholdOperator extends AbstractFunction {
 
     public enum Type {
         ABOVE,
@@ -47,10 +45,10 @@ public class ThresholdOperator extends AbstractFunction {
 
     @Override
     protected double computeUpdate(AbstractFieldLink fl, double u) {
-        if(isFinal && currentValue > 0.5)
+        if(isFinal && value > 0.5)
             return 0.0;
 
-        return threshold(fl.getInput().getUpdatedCurrentValue()) - newValue;
+        return threshold(fl.getInput().getUpdatedValue()) - value;
     }
 
     protected double threshold(double x) {

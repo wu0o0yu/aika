@@ -19,15 +19,12 @@ package experiment.logger;
 import experiment.LabelUtil;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
-import network.aika.elements.links.Link;
 import network.aika.elements.links.PatternLink;
 import network.aika.elements.neurons.BindingNeuron;
 import network.aika.elements.neurons.PatternNeuron;
 import network.aika.elements.synapses.PatternSynapse;
-import network.aika.elements.synapses.Synapse;
 import network.aika.fields.FieldOutput;
 import network.aika.text.Document;
-import network.aika.utils.Utils;
 import org.apache.commons.csv.CSVPrinter;
 
 import java.io.File;
@@ -216,6 +213,6 @@ public class PatternLogger {
         if(f == null)
             return "--";
 
-        return doubleToString(f.getCurrentValue(), "#.#######");
+        return doubleToString(f.getValue(), "#.#######");
     }
 }

@@ -16,7 +16,7 @@
  */
 package network.aika.elements.synapses;
 
-import network.aika.FieldObject;
+import network.aika.fields.FieldObject;
 import network.aika.Model;
 import network.aika.Thought;
 import network.aika.callbacks.ActivationCheckCallback;
@@ -50,7 +50,7 @@ import static network.aika.utils.Utils.TOLERANCE;
  *
  * @author Lukas Molzberger
  */
-public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neuron<OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends Activation> extends FieldObject implements Element, Writable {
+public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neuron<OA>, L extends Link<S, IA, OA>, IA extends Activation<?>, OA extends Activation> implements Element, Writable {
 
     protected static final Logger log = LoggerFactory.getLogger(Synapse.class);
 
@@ -87,6 +87,15 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return scope;
     }
 
+    @Override
+    public boolean isFeedback() {
+        return false;
+    }
+
+    @Override
+    public void disconnect() {
+    }
+
     public void propagate(IA iAct) {
         if(propagateLinkExists(iAct))
             return;
@@ -110,14 +119,14 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         }
 
         return getOutput().getCurrentCompleteBias() +
-                getWeight().getUpdatedCurrentValue();
+                getWeight().getUpdatedValue();
     }
 
     public static double getLatentLinkingPreNet(Synapse synA, Synapse synB) {
-        double preUB = synA.getWeight().getUpdatedCurrentValue();
+        double preUB = synA.getWeight().getUpdatedValue();
 
         if(synB != null) {
-            preUB += synB.getWeight().getUpdatedCurrentValue() +
+            preUB += synB.getWeight().getUpdatedValue() +
                     Math.min(
                             synA.getSumOfLowerWeights(),
                             synB.getSumOfLowerWeights()
@@ -227,7 +236,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
 
     protected void setInitialWeight(Synapse templateSyn) {
         weight.setInitialValue(
-                templateSyn.weight.getUpdatedCurrentValue()
+                templateSyn.weight.getUpdatedValue()
         );
     }
 
@@ -296,7 +305,7 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public double getSortingWeight() {
-        return getWeight().getUpdatedCurrentValue();
+        return getWeight().getUpdatedValue();
     }
 
     public Direction getStoredAt() {
@@ -332,11 +341,11 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
     }
 
     public boolean isZero() {
-        return Utils.belowTolerance(TOLERANCE, weight.getCurrentValue());
+        return Utils.belowTolerance(TOLERANCE, weight.getValue());
     }
 
     public boolean isNegative() {
-        return weight.getUpdatedCurrentValue() < 0.0;
+        return weight.getUpdatedValue() < 0.0;
     }
 
     @Override

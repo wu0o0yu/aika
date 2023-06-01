@@ -19,7 +19,6 @@ package experiment.logger;
 import network.aika.elements.links.NegativeFeedbackLink;
 import network.aika.fields.Field;
 import network.aika.text.Document;
-import network.aika.utils.Utils;
 import org.apache.commons.csv.CSVPrinter;
 
 import java.io.File;
@@ -85,9 +84,9 @@ public class AnnealingLogger {
         return getNegativeFeedbackLinks(doc)
                 .flatMap(l ->
                         Stream.of(
-                                doubleToString(l.getMaxInput().getCurrentValue()),
-                                doubleToString(l.getSynapse().getWeight().getCurrentValue()),
-                                doubleToString(l.getOutput().getNet().getCurrentValue())
+                                doubleToString(l.getMaxInput().getValue()),
+                                doubleToString(l.getSynapse().getWeight().getValue()),
+                                doubleToString(l.getOutput().getNet().getValue())
                         )
                 )
                 .toList();
@@ -114,7 +113,7 @@ public class AnnealingLogger {
     public void log(Document doc) {
         try {
             List<String> entry = new ArrayList<>();
-            entry.add("" + doubleToString(doc.getAnnealing().getCurrentValue()));
+            entry.add("" + doubleToString(doc.getAnnealing().getValue()));
             entry.addAll(createEntry(doc));
 
             printer.printRecord(entry.toArray());

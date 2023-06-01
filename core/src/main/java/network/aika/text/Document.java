@@ -126,6 +126,11 @@ public class Document extends Thought {
     }
 
     @Override
+    public boolean isFeedback() {
+        return false;
+    }
+
+    @Override
     public Thought getThought() {
         return this;
     }

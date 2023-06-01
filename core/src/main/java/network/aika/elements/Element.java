@@ -19,13 +19,14 @@ package network.aika.elements;
 import network.aika.Config;
 import network.aika.Thought;
 import network.aika.elements.activations.Timestamp;
+import network.aika.fields.FieldObject;
 
 /**
  * An Element is either a node (Activation) or an edge (Link) in the Activation graph.
  *
  *  @author Lukas Molzberger
  */
-public interface Element {
+public interface Element extends FieldObject {
 
     Timestamp getCreated();
 

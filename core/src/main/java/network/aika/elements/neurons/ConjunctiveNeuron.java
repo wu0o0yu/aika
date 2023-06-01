@@ -83,8 +83,8 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
 
     @Override
     public double getCurrentCompleteBias() {
-        return getBias().getUpdatedCurrentValue() +
-                synapseBiasSum.getUpdatedCurrentValue();
+        return getBias().getUpdatedValue() +
+                synapseBiasSum.getUpdatedValue();
     }
 
     @Override
@@ -92,7 +92,7 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
         super.initFromTemplate(templateN);
 
         synapseBiasSum.setInitialValue(
-                ((ConjunctiveNeuron)templateN).getSynapseBiasSum().getUpdatedCurrentValue()
+                ((ConjunctiveNeuron)templateN).getSynapseBiasSum().getUpdatedValue()
         );
     }
 
@@ -124,9 +124,9 @@ public abstract class ConjunctiveNeuron<A extends ConjunctiveActivation> extends
     protected void updateSumOfLowerWeights() {
         ConjunctiveSynapse[] inputSynapses = sortInputSynapses();
 
-        double sum = bias.getUpdatedCurrentValue();
+        double sum = bias.getUpdatedValue();
         for(ConjunctiveSynapse s: inputSynapses) {
-            double w = s.getWeight().getUpdatedCurrentValue();
+            double w = s.getWeight().getUpdatedValue();
             if(w <= 0.0)
                 continue;
 

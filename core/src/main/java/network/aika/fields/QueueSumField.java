@@ -17,13 +17,11 @@
 package network.aika.fields;
 
 
-import network.aika.FieldObject;
 import network.aika.callbacks.FieldObserver;
 import network.aika.elements.Element;
 import network.aika.steps.FieldStep;
 import network.aika.steps.Phase;
 import network.aika.steps.Step;
-import network.aika.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +51,6 @@ public class QueueSumField extends SumField implements IQueueField {
         phase = p;
     }
 
-
     @Override
     public void addObserver(FieldObserver observer) {
         if(observers.contains(observer))
@@ -69,8 +66,6 @@ public class QueueSumField extends SumField implements IQueueField {
 
     @Override
     public void receiveUpdate(double u, boolean isFeedback) {
-        assert !withinUpdate;
-
         updateObservers();
 
         FieldStep s = getStep(isFeedback);
@@ -107,19 +102,15 @@ public class QueueSumField extends SumField implements IQueueField {
             nextStep = null;
         }
 
-        withinUpdate = true;
-        newValue = currentValue + s.getDelta();
-        propagateUpdate(s.getDelta());
-        currentStep.reset();
-        currentValue = newValue;
-        withinUpdate = false;
+        triggerUpdate(s.getDelta());
 
+        currentStep.reset();
         updateObservers();
     }
 
     private void updateObservers() {
         observers.forEach(o ->
-                o.receiveUpdate(currentValue, newValue)
+                o.receiveUpdate(value)
         );
     }
 }

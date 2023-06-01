@@ -16,8 +16,6 @@
  */
 package network.aika.fields;
 
-import network.aika.FieldObject;
-
 /**
  * @author Lukas Molzberger
  */
@@ -36,7 +34,7 @@ public class Division extends AbstractFunction {
     protected double computeUpdate(AbstractFieldLink fl, double u) {
         return switch (fl.getArgument()) {
             case 0 -> updateDiv1(u);
-            case 1 -> -(u * getInputValueByArg(0)) / Math.pow(fl.getCurrentInputValue(), 2.0);
+            case 1 -> -(u * getInputValueByArg(0)) / Math.pow(fl.getInputValue(), 2.0);
             default -> throw new IllegalArgumentException();
         };
     }

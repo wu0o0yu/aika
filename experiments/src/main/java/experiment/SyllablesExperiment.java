@@ -219,7 +219,7 @@ public class SyllablesExperiment {
     }
 
     private static void logPatternMatch(PatternActivation act) {
-        if(act.getNetPreAnneal().getCurrentValue() <= 0.0 || act.isAbstract())
+        if(act.getNetPreAnneal().getValue() <= 0.0 || act.isAbstract())
             return;
 
         System.out.println("   " +
@@ -230,7 +230,7 @@ public class SyllablesExperiment {
                 (!act.isAbstract() ? " '" + LabelUtil.generateLabel(act.getNeuron()) + "'" : "") +
                 " nId:" + act.getNeuron().getId() +
                 " r:" + act.getRange() +
-                " grad:" + doubleToString(act.getGradient().getCurrentValue(), "#.######")
+                " grad:" + doubleToString(act.getGradient().getValue(), "#.######")
         );
     }
 

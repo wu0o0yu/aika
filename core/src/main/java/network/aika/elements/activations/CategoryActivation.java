@@ -18,7 +18,6 @@ package network.aika.elements.activations;
 
 import network.aika.Thought;
 import network.aika.elements.links.CategoryInputLink;
-import network.aika.elements.links.Link;
 import network.aika.elements.neurons.Range;
 import network.aika.elements.neurons.CategoryNeuron;
 
@@ -48,7 +47,7 @@ public class CategoryActivation extends DisjunctiveActivation<CategoryNeuron> {
                 .filter(Activation::isActiveTemplateInstance)
                 .max(
                         Comparator.comparingDouble(act ->
-                                act.getNet().getCurrentValue()
+                                act.getNet().getValue()
                         )
                 )
                 .orElse(null);

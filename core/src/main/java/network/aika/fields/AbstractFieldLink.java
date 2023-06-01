@@ -75,7 +75,7 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
             return;
 
         if(initialize) {
-            double cv = input.getCurrentValue();
+            double cv = input.getValue();
             output.receiveUpdate(this, cv);
         }
 
@@ -87,7 +87,7 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
             return;
 
         if(deinitialize) {
-            double cv = input.getCurrentValue();
+            double cv = input.getValue();
             output.receiveUpdate(this, -cv);
         }
 
@@ -96,14 +96,16 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
 
     public abstract void unlink();
 
-    public double getCurrentInputValue() {
+    public double getInputValue() {
         return connected ?
-                input.getCurrentValue() :
+                input.getValue() :
                 0.0;
     }
 
-    public double getNewInputValue() {
-        return input.getNewValue();
+    public double getUpdatedInputValue() {
+        return connected ?
+                input.getUpdatedValue() :
+                0.0;
     }
 
     public int getArgument() {
