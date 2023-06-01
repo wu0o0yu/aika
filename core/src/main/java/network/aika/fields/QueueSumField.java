@@ -71,13 +71,14 @@ public class QueueSumField extends SumField implements IQueueField {
     public void receiveUpdate(double u, boolean isFeedback) {
         assert !withinUpdate;
 
-//        newValue += u;
-
         updateObservers();
 
         FieldStep s = getStep(isFeedback);
         if(s == null) {
-            s = new FieldStep<>((Element) getReference(), phase, 0, this);
+            int r = currentStep != null ? currentStep.getRound() : 0;
+            if(isFeedback)
+                r++;
+            s = new FieldStep<>((Element) getReference(), phase, r, this);
             setStep(isFeedback, s);
         }
         s.updateDelta(u);
@@ -109,7 +110,7 @@ public class QueueSumField extends SumField implements IQueueField {
         withinUpdate = true;
         newValue = currentValue + s.getDelta();
         propagateUpdate(s.getDelta());
-        currentStep = null;
+        currentStep.reset();
         currentValue = newValue;
         withinUpdate = false;
 

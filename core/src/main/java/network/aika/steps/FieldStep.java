@@ -80,6 +80,10 @@ public class FieldStep<E extends Element> extends Step<E> {
         updateSortValue(Math.abs(delta));
     }
 
+    public void reset() {
+        delta = 0.0;
+    }
+
     public void createQueueKey(Timestamp timestamp) {
         queueKey = new FieldQueueKey(getPhase(), round, sortValue, timestamp);
     }
@@ -87,6 +91,10 @@ public class FieldStep<E extends Element> extends Step<E> {
     @Override
     public void process() {
         field.process(this);
+    }
+
+    public int getRound() {
+        return round;
     }
 
     @Override
