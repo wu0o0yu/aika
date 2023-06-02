@@ -40,6 +40,9 @@ public class ActivationConsoleManager extends JSplitPane implements AbstractCons
 
     private QueueConsole queueConsole;
 
+    private int selectedActPanelTab = 0;
+    private int selectedLinkPanelTab = 0;
+
     private Element currentMainElement = null;
     private Element currentSelectedElement = null;
 
@@ -62,15 +65,34 @@ public class ActivationConsoleManager extends JSplitPane implements AbstractCons
         doc.addEventListener(this);
     }
 
-
     public ActivationPanelMode getMode() {
         return mode;
     }
 
     public void setMode(ActivationPanelMode mode) {
         this.mode = mode;
+        update();
     }
 
+    @Override
+    public int getSelectedActPanelTab() {
+        return selectedActPanelTab;
+    }
+
+    @Override
+    public void setSelectedActPanelTab(int selectedActPanelTab) {
+        this.selectedActPanelTab = selectedActPanelTab;
+    }
+
+    @Override
+    public int getSelectedLinkPanelTab() {
+        return selectedLinkPanelTab;
+    }
+
+    @Override
+    public void setSelectedLinkPanelTab(int selectedLinkPanelTab) {
+        this.selectedLinkPanelTab = selectedLinkPanelTab;
+    }
 
     public QueueConsole getQueueConsole() {
         return queueConsole;
@@ -117,7 +139,7 @@ public class ActivationConsoleManager extends JSplitPane implements AbstractCons
     }
 
     private void updateQueue(Step s) {
-        queueConsole.update(s, getCurrentElement());
+        queueConsole.update(getCurrentElement());
     }
 
     public static JScrollPane getScrollPane(Component comp) {

@@ -8,10 +8,10 @@ public class QueueConsoleContextMenu extends JPopupMenu {
     JMenuItem sortKeyItem;
 
     public QueueConsoleContextMenu(QueueConsole queueConsole) {
-        sortKeyItem = new JMenuItem(queueConsole.getSortKey().getInverted().getTxt() + " Sort Key");
+        sortKeyItem = new JMenuItem(queueConsole.getSortKeyVisible().getInverted().getTxt() + " Sort Key");
         sortKeyItem.addActionListener(l -> {
-                    queueConsole.setSortKey(
-                            queueConsole.getSortKey().getInverted()
+                    queueConsole.setSortKeyVisible(
+                            queueConsole.getSortKeyVisible().getInverted()
                     );
                     queueConsole.update();
                 }

@@ -71,4 +71,24 @@ public class NeuronConsoleManager extends JPanel implements AbstractConsoleManag
         revalidate();
         repaint();
     }
+
+    @Override
+    public int getSelectedActPanelTab() {
+        return 0;
+    }
+
+    @Override
+    public void setSelectedActPanelTab(int selectedActPanelTab) {
+
+    }
+
+    @Override
+    public int getSelectedLinkPanelTab() {
+        return 0;
+    }
+
+    @Override
+    public void setSelectedLinkPanelTab(int selectedLinkPanelTab) {
+
+    }
 }

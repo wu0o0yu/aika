@@ -16,6 +16,7 @@
  */
 package network.aika.debugger.activations;
 
+import network.aika.debugger.AbstractConsoleManager;
 import network.aika.debugger.ElementPanel;
 import network.aika.debugger.activations.properties.LinksPropertyPanel;
 import network.aika.debugger.activations.properties.SynapsesPropertyPanel;
@@ -127,6 +128,18 @@ public class ActivationPanel extends ElementPanel implements MouseListener {
                         templateInstancesPropertyPanel
                 );
         }
+    }
+
+    protected void setConsoleManager(AbstractConsoleManager cm) {
+        super.setConsoleManager(cm);
+
+        setSelectedIndex(consoleManager.getSelectedActPanelTab());
+        addChangeListener(e -> {
+            JTabbedPane sourceTabbedPane = (JTabbedPane) e.getSource();
+            consoleManager.setSelectedActPanelTab(
+                    sourceTabbedPane.getSelectedIndex()
+            );
+        });
     }
 
     @Override

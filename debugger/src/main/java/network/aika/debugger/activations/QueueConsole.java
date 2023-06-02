@@ -18,11 +18,9 @@ package network.aika.debugger.activations;
 
 import network.aika.Thought;
 import network.aika.debugger.AbstractConsole;
-import network.aika.debugger.AbstractGraphMouseManager;
 import network.aika.debugger.Visible;
 import network.aika.debugger.activations.renderer.QueueRenderer;
 import network.aika.elements.Element;
-import network.aika.steps.Step;
 
 import javax.swing.text.StyledDocument;
 
@@ -33,9 +31,8 @@ public class QueueConsole extends AbstractConsole {
 
     ActivationConsoleManager actConsoleManager;
             
-    Visible sortKey = Visible.HIDE;
-    
-    Step currentStep;
+    Visible sortKeyVisible = Visible.HIDE;
+
     Element highlightedElement;
 
     public QueueConsole(ActivationConsoleManager actConsoleManager) {
@@ -44,22 +41,21 @@ public class QueueConsole extends AbstractConsole {
         addMouseListener(new QueueConsoleMouseManager(this));
     }
 
-    public Visible getSortKey() {
-        return sortKey;
+    public Visible getSortKeyVisible() {
+        return sortKeyVisible;
     }
 
-    public void setSortKey(Visible sortKey) {
-        this.sortKey = sortKey;
+    public void setSortKeyVisible(Visible sortKeyVisible) {
+        this.sortKeyVisible = sortKeyVisible;
     }
 
     public void renderQueue(StyledDocument sDoc, Thought t) {
-        QueueRenderer queueRenderer = new QueueRenderer(t, currentStep, sortKey);
+        QueueRenderer queueRenderer = new QueueRenderer(t, sortKeyVisible);
 
         queueRenderer.render(sDoc, highlightedElement);
     }
 
-    public void update(Step s, Element highlightedElement) {
-        currentStep = s;
+    public void update(Element highlightedElement) {
         this.highlightedElement = highlightedElement;
 
         update();

@@ -67,6 +67,8 @@ public abstract class Thought implements Element {
 
     private long visitorCounter = 0;
 
+    private Step currentStep;
+
     private final NavigableMap<QueueKey, Step> queue = new TreeMap<>(QueueKey.COMPARATOR);
 
     private final TreeMap<Integer, Activation> activationsById = new TreeMap<>();
@@ -138,6 +140,10 @@ public abstract class Thought implements Element {
 
     public void setConfig(Config config) {
         this.config = config;
+    }
+
+    public Step getCurrentStep() {
+        return currentStep;
     }
 
     public void queueEvent(EventType et, Step s) {
@@ -217,14 +223,15 @@ public abstract class Thought implements Element {
             if(checkMaxPhaseReached(maxPhase))
                 break;
 
-            Step s = queue.pollFirstEntry().getValue();
-            s.removeQueueKey();
+            currentStep = queue.pollFirstEntry().getValue();
+            currentStep.removeQueueKey();
 
             timestampOnProcess = getCurrentTimestamp();
 
-            queueEvent(BEFORE, s);
-            s.process();
-            queueEvent(AFTER, s);
+            queueEvent(BEFORE, currentStep);
+            currentStep.process();
+            queueEvent(AFTER, currentStep);
+            currentStep = null;
         }
     }
 

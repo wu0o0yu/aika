@@ -32,21 +32,17 @@ public class QueueRenderer implements ConsoleRenderer {
 
     Thought thought;
 
-    private Step currentQE;
-
     private Visible sortKey;
 
-    public QueueRenderer(Thought t, Step currentQE, Visible sortKey) {
+    public QueueRenderer(Thought t, Visible sortKey) {
         this.thought = t;
-        this.currentQE = currentQE;
         this.sortKey = sortKey;
     }
 
-
     public void render(StyledDocument sDoc, Element highlightedElement) {
-        if(currentQE != null) {
-            new StepConsoleRenderer(thought, currentQE == highlightedElement, sortKey)
-                    .render(sDoc, currentQE);
+        if(thought.getCurrentStep() != null) {
+            new StepConsoleRenderer(thought, thought.getCurrentStep() == highlightedElement, sortKey)
+                    .render(sDoc, thought.getCurrentStep());
         }
 
         appendText(sDoc,

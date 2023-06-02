@@ -16,6 +16,7 @@
  */
 package network.aika.debugger.activations;
 
+import network.aika.debugger.AbstractConsoleManager;
 import network.aika.debugger.ElementPanel;
 import network.aika.debugger.properties.AbstractPropertyPanel;
 import network.aika.elements.links.Link;
@@ -58,6 +59,18 @@ public class LinkPanel extends ElementPanel {
                 "Shows the Neuron or Synapse",
                 neuronPropertyPanel
         );
+    }
+
+    protected void setConsoleManager(AbstractConsoleManager cm) {
+        super.setConsoleManager(cm);
+
+        setSelectedIndex(consoleManager.getSelectedLinkPanelTab());
+        addChangeListener(e -> {
+            JTabbedPane sourceTabbedPane = (JTabbedPane) e.getSource();
+            consoleManager.setSelectedLinkPanelTab(
+                    sourceTabbedPane.getSelectedIndex()
+            );
+        });
     }
 
     public void remove() {

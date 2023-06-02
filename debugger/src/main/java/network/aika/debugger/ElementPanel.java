@@ -16,7 +16,6 @@
  */
 package network.aika.debugger;
 
-import network.aika.debugger.activations.ActivationConsoleManager;
 import network.aika.debugger.activations.ActivationPanel;
 import network.aika.debugger.activations.LinkPanel;
 import network.aika.debugger.neurons.NeuronPanel;
@@ -51,9 +50,13 @@ public class ElementPanel extends JTabbedPane {
             ep = new SynapsePanel((Synapse) e);
 
         if(ep != null)
-            ep.consoleManager = consoleManager;
+            ep.setConsoleManager(consoleManager);
 
         return ep;
+    }
+
+    protected void setConsoleManager(AbstractConsoleManager cm) {
+        consoleManager = cm;
     }
 
     public AbstractConsoleManager getConsoleManager() {
