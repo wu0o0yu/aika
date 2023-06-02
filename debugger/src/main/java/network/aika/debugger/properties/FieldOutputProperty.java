@@ -100,7 +100,7 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     }
 
     @Override
-    public void receiveUpdate(AbstractFieldLink fl, double u) {
+    public void receiveUpdate(AbstractFieldLink fl, int r, double u) {
         withinUpdate = true;
         currentValueField.setValue(Double.valueOf(field.getValue()));
         withinUpdate = false;

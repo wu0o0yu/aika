@@ -79,7 +79,7 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     }
 
     public void setValue(double v) {
-        triggerUpdate(v - value);
+        triggerUpdate(0, v - value);
     }
 
     @Override
@@ -133,17 +133,17 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         this.receivers.remove(fl);
     }
 
-    public void receiveUpdate(AbstractFieldLink fl, double u) {
+    public void receiveUpdate(AbstractFieldLink fl, int r, double u) {
         receiveUpdate(
-                u,
-                fl.isFeedback()
+                r,
+                u
         );
     }
 
-    public void receiveUpdate(double u, boolean isFeedback) {
+    public void receiveUpdate(int r, double u) {
         assert !withinUpdate;
 
-        triggerUpdate(u);
+        triggerUpdate(r, u);
     }
 
     @Override
@@ -153,7 +153,7 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
                 value;
     }
 
-    public void triggerUpdate(double u) {
+    public void triggerUpdate(int r, double u) {
         if(Utils.belowTolerance(tolerance, u))
             return;
 
@@ -164,17 +164,17 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
             updatedValue = 0.0; // TODO: Find a better solution to this hack
         }
 
-        propagateUpdate(u);
+        propagateUpdate(r, u);
         value = updatedValue;
 
         withinUpdate = false;
     }
 
-    protected void propagateUpdate(double update) {
+    protected void propagateUpdate(int r, double update) {
         AbstractFieldLink[] recs = receivers.toArray(new AbstractFieldLink[0]);
 
         for(int i = 0; i < recs.length; i++) {
-            recs[i].receiveUpdate(update);
+            recs[i].receiveUpdate(r, update);
         }
     }
 

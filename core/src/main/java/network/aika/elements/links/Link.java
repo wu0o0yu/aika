@@ -98,11 +98,6 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     @Override
-    public boolean isFeedback() {
-        return false;
-    }
-
-    @Override
     public void disconnect() {
         weightedInput.disconnectInputs(false);
     }
@@ -129,7 +124,12 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected void initWeightInput() {
         weightedInput = initWeightedInput();
-        linkAndConnect(weightedInput, getOutput().getNet());
+        FieldLink fl = linkAndConnect(weightedInput, getOutput().getNet());
+        fl.setIncrementRound(incrementRound());
+    }
+
+    protected boolean incrementRound() {
+        return false;
     }
 
     protected Field initWeightedInput() {

@@ -78,6 +78,11 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
     }
 
     @Override
+    protected boolean incrementRound() {
+        return true;
+    }
+
+    @Override
     public void bindingVisit(Visitor v) {
         if(v.isDown())
             super.bindingVisit(v);

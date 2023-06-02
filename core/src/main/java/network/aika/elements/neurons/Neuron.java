@@ -96,12 +96,6 @@ public abstract class Neuron<A extends Activation> implements Element, Writable 
     public void setCallActivationCheckCallback(boolean callActivationCheckCallback) {
         this.callActivationCheckCallback = callActivationCheckCallback;
     }
-
-    @Override
-    public boolean isFeedback() {
-        return false;
-    }
-
     @Override
     public void disconnect() {
     }

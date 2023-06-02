@@ -31,6 +31,9 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
 
     protected boolean propagateUpdates = true;
 
+    private boolean incrementRound;
+
+
 
     public AbstractFieldLink(FieldOutput input, int arg, O output) {
         this.input = input;
@@ -50,24 +53,17 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
         return connected;
     }
 
-    public boolean isFeedback() {
-        return input.getReference().isFeedback();
-    }
-
-    public boolean crossesBorder() {
-        if(output instanceof FieldOutput) {
-            return input.getReference() != ((FieldOutput) output).getReference();
-        } else
-            return false;
+    public void setIncrementRound(boolean incrementRound) {
+        this.incrementRound = incrementRound;
     }
 
     public void setInput(FieldOutput input) {
         this.input = input;
     }
 
-    public void receiveUpdate(double u) {
+    public void receiveUpdate(int r, double u) {
         if(connected && propagateUpdates)
-            output.receiveUpdate(this, u);
+            output.receiveUpdate(this, incrementRound ? r + 1 : r, u);
     }
 
     public void connect(boolean initialize) {
@@ -76,7 +72,7 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
 
         if(initialize) {
             double cv = input.getValue();
-            output.receiveUpdate(this, cv);
+            output.receiveUpdate(this, 0, cv);
         }
 
         connected = true;
@@ -88,7 +84,7 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
 
         if(deinitialize) {
             double cv = input.getValue();
-            output.receiveUpdate(this, -cv);
+            output.receiveUpdate(this, 0, -cv);
         }
 
         connected = false;

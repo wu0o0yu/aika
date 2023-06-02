@@ -444,11 +444,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     }
 
     @Override
-    public boolean isFeedback() {
-        return false;
-    }
-
-    @Override
     public void disconnect() {
         net.disconnectInputs(false);
 

@@ -42,7 +42,7 @@ public abstract class ConjunctiveActivation<N extends ConjunctiveNeuron<?>> exte
                 .filter(ConjunctiveSynapse::isOptional)
                 .mapToDouble(s -> s.getSynapseBias().getUpdatedValue())
                 .sum();
-        ti.getNeuron().getSynapseBiasSum().receiveUpdate(optionalSynBiasSum, false);
+        ti.getNeuron().getSynapseBiasSum().receiveUpdate(0, optionalSynBiasSum);
     }
 
     @Override

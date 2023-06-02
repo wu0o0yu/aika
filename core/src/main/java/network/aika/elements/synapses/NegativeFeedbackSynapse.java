@@ -55,7 +55,7 @@ public class NegativeFeedbackSynapse extends FeedbackSynapse<
 
     @Override
     public NegativeFeedbackSynapse setWeight(double w) {
-        weight.receiveUpdate(w, false);
+        weight.receiveUpdate(0, w);
         return this;
     }
 

@@ -21,12 +21,6 @@ package network.aika.fields;
  */
 public class FieldLink extends AbstractFieldLink<FieldInput> {
 
-
-    @Override
-    public boolean crossesBorder() {
-        return input.getReference() != ((FieldOutput) output).getReference();
-    }
-
     public static FieldLink linkAndConnect(FieldOutput in, FieldInput out) {
         FieldLink fl = link(in, out.getNextArg(), out);
 

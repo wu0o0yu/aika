@@ -87,7 +87,6 @@ public abstract class Synapse<S extends Synapse, I extends Neuron, O extends Neu
         return scope;
     }
 
-    @Override
     public boolean isFeedback() {
         return false;
     }

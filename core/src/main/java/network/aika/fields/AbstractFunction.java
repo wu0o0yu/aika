@@ -77,11 +77,11 @@ public abstract class AbstractFunction extends Field implements FieldInput {
     protected abstract double computeUpdate(AbstractFieldLink fl, double u);
 
     @Override
-    public void receiveUpdate(AbstractFieldLink fl, double u) {
+    public void receiveUpdate(AbstractFieldLink fl, int r, double u) {
         double update = computeUpdate(fl, u);
         if(update == 0.0)
             return;
 
-        triggerUpdate(update);
+        triggerUpdate(r, update);
     }
 }

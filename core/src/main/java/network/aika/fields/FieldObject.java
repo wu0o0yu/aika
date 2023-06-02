@@ -23,7 +23,5 @@ package network.aika.fields;
  */
 public interface FieldObject {
 
-    boolean isFeedback();
-
     void disconnect();
 }

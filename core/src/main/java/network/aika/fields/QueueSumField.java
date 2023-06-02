@@ -35,9 +35,7 @@ public class QueueSumField extends SumField implements IQueueField {
 
     private Phase phase;
 
-    protected FieldStep currentStep;
-
-    protected FieldStep nextStep;
+    protected FieldStep step;
 
     protected List<FieldObserver> observers = new ArrayList<>();
 
@@ -51,12 +49,8 @@ public class QueueSumField extends SumField implements IQueueField {
         phase = p;
     }
 
-    public FieldStep getCurrentStep() {
-        return currentStep;
-    }
-
-    public FieldStep getNextStep() {
-        return nextStep;
+    public FieldStep getStep() {
+        return step;
     }
 
     @Override
@@ -73,17 +67,10 @@ public class QueueSumField extends SumField implements IQueueField {
     }
 
     @Override
-    public void receiveUpdate(double u, boolean isFeedback) {
+    public void receiveUpdate(int r, double u) {
         updateObservers();
 
-        FieldStep s = getStep(isFeedback);
-        if(s == null) {
-            int r = currentStep != null ? currentStep.getRound() : 0;
-            if(isFeedback)
-                r++;
-            s = new FieldStep<>((Element) getReference(), phase, r, this);
-            setStep(isFeedback, s);
-        }
+        FieldStep s = getStep(r);
         s.updateDelta(u);
 
         if(!s.isQueued()) {
@@ -93,26 +80,18 @@ public class QueueSumField extends SumField implements IQueueField {
         }
     }
 
-    private FieldStep getStep(boolean isFeedback) {
-        return isFeedback ? nextStep : currentStep;
+    private FieldStep getStep(int r) {
+        if(step == null || step.getRound() < r)
+            step = new FieldStep<>((Element) getReference(), phase, r, this);
+
+        return step;
     }
 
-    private void setStep(boolean isFeedback, FieldStep s) {
-        if(isFeedback)
-            nextStep = s;
-        else
-            currentStep = s;
-    }
 
     public void process(FieldStep s) {
-        if(nextStep == s) {
-            currentStep = s;
-            nextStep = null;
-        }
+        triggerUpdate(s.getRound(), s.getDelta());
 
-        triggerUpdate(s.getDelta());
-
-        currentStep.reset();
+        step.reset();
         updateObservers();
     }
 
