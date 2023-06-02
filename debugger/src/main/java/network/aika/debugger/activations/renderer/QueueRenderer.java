@@ -41,7 +41,7 @@ public class QueueRenderer implements ConsoleRenderer {
 
     public void render(StyledDocument sDoc, Element highlightedElement) {
         if(thought.getCurrentStep() != null) {
-            new StepConsoleRenderer(thought, thought.getCurrentStep() == highlightedElement, sortKey)
+            new StepConsoleRenderer(thought, thought.getCurrentStep().getElement() == highlightedElement, sortKey)
                     .render(sDoc, thought.getCurrentStep());
         }
 
