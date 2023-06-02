@@ -35,6 +35,8 @@ import static network.aika.utils.Utils.doubleToString;
  */
 public abstract class Field implements FieldInput, FieldOutput, Writable {
 
+    private static double MIN_TOLERANCE = 0.0000000001;
+
     private String label;
     private FieldObject reference;
 
@@ -158,6 +160,10 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         withinUpdate = true;
 
         updatedValue = value + u;
+        if(updatedValue > -MIN_TOLERANCE && updatedValue < MIN_TOLERANCE) {
+            updatedValue = 0.0; // TODO: Find a better solution to this hack
+        }
+
         propagateUpdate(u);
         value = updatedValue;
 
