@@ -17,10 +17,7 @@
 package network.aika.debugger.properties;
 
 import network.aika.direction.Direction;
-import network.aika.fields.AbstractFieldLink;
-import network.aika.fields.FieldInput;
-import network.aika.fields.FieldLink;
-import network.aika.fields.FieldOutput;
+import network.aika.fields.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -47,8 +44,6 @@ public class FieldReceiversDialog extends JDialog
     private PropertiesHolder properties = new PropertiesHolder();
 
     private Insets insets = new Insets(5, 5, 5, 5);
-
-    private FieldOutput field;
 
     private int posCounter = 0;
 
@@ -77,7 +72,6 @@ public class FieldReceiversDialog extends JDialog
     /** Creates the reusable dialog. */
     public FieldReceiversDialog(Frame aFrame, FieldOutput field) {
         super(aFrame, false);
-        this.field = field;
         setLayout(new GridBagLayout());
 
         setSize(500, 800);
@@ -89,6 +83,16 @@ public class FieldReceiversDialog extends JDialog
         addTitle("Current Field:");
         addConstant("Operator", field.getClass().getSimpleName());
         addField(field);
+
+        if(field instanceof QueueSumField) {
+            QueueSumField qsf = (QueueSumField) field;
+
+            if(qsf.getCurrentStep() != null)
+                addConstant("Current Step:", qsf.getCurrentStep().toShortString());
+
+            if(qsf.getNextStep() != null)
+                addConstant("Next Step:", qsf.getNextStep().toShortString());
+        }
 
         posCounter++;
 

@@ -110,6 +110,11 @@ public class FieldStep<E extends Element> extends Step<E> {
         return field;
     }
 
+    public String toShortString() {
+        return " Round:" + round +
+                " Delta:" + doubleToString(delta);
+    }
+
     public String toString() {
         return "Phase:" + phase +
                 " Round:" + round +

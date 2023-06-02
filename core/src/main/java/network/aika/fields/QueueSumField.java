@@ -51,6 +51,14 @@ public class QueueSumField extends SumField implements IQueueField {
         phase = p;
     }
 
+    public FieldStep getCurrentStep() {
+        return currentStep;
+    }
+
+    public FieldStep getNextStep() {
+        return nextStep;
+    }
+
     @Override
     public void addObserver(FieldObserver observer) {
         if(observers.contains(observer))
