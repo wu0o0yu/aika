@@ -90,8 +90,8 @@ public class QueueSumField extends SumField implements IQueueField {
 
     public void process(FieldStep s) {
         triggerUpdate(s.getRound(), s.getDelta());
+        step = null;
 
-        step.reset();
         updateObservers();
     }
 
