@@ -43,10 +43,10 @@ public class FieldLinkProperty {
         this.parent = parent;
 
         if(dir == INPUT) {
-            fieldProperty = createFieldProperty(parent, fl.getInput(), true, fl.isConnected(), fl.isPropagateUpdates());
+            fieldProperty = createFieldProperty(parent, fl.getInput(), true, fl.isIncrementRound(), fl.isConnected(), fl.isPropagateUpdates());
         } else {
             if(fl instanceof FieldLink) {
-                fieldProperty = createFieldProperty(parent, (FieldOutput) fl.getOutput(), true, fl.isConnected(), fl.isPropagateUpdates());
+                fieldProperty = createFieldProperty(parent, (FieldOutput) fl.getOutput(), true, fl.isIncrementRound(), fl.isConnected(), fl.isPropagateUpdates());
             } else if(fl instanceof ListenerFieldLink) {
                 ListenerFieldLink lfl = (ListenerFieldLink) fl;
                 fieldProperty = new ConstantProperty(parent, lfl.getListenerName(), "");

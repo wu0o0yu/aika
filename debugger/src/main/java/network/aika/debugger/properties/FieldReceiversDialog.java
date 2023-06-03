@@ -87,8 +87,7 @@ public class FieldReceiversDialog extends JDialog
         if(field instanceof QueueSumField) {
             QueueSumField qsf = (QueueSumField) field;
 
-            if(qsf.getStep() != null)
-                addConstant("Step:", qsf.getStep().toShortString());
+            addConstant("Step:", qsf.getStep() != null ? qsf.getStep().toShortString() : "--");
         }
 
         posCounter++;
@@ -157,7 +156,7 @@ public class FieldReceiversDialog extends JDialog
         if (f == null)
             return;
 
-        FieldOutputProperty property = createFieldProperty(this, f, true, null, null);
+        FieldOutputProperty property = createFieldProperty(this, f, true, null, null, null);
         properties.add(property);
         property.addField(posCounter, insets);
 

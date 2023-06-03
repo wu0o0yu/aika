@@ -57,6 +57,10 @@ public abstract class AbstractFieldLink<O extends UpdateListener> {
         this.incrementRound = incrementRound;
     }
 
+    public boolean isIncrementRound() {
+        return incrementRound;
+    }
+
     public void setInput(FieldOutput input) {
         this.input = input;
     }

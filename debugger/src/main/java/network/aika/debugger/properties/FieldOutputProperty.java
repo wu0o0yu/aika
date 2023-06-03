@@ -43,39 +43,42 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     protected Boolean isConnected;
     protected Boolean isPropagateUpdate;
 
+    protected Boolean isIncrementRound;
+
     protected boolean withinUpdate;
 
-    protected JLabel jLabel;
+    protected JLabel fieldLabel;
     protected JFormattedTextField currentValueField;
 
-    public static FieldOutputProperty createFieldProperty(Container parent, FieldOutput f, boolean showReference, Boolean isConnected, Boolean isPropagateUpdates) {
+    public static FieldOutputProperty createFieldProperty(Container parent, FieldOutput f, boolean showReference, Boolean isIncrementRound, Boolean isConnected, Boolean isPropagateUpdates) {
         if(f instanceof IQueueField) {
-            return new QueueFieldProperty(parent, (IQueueField) f, showReference, isConnected, isPropagateUpdates);
+            return new QueueFieldProperty(parent, (IQueueField) f, showReference, isIncrementRound, isConnected, isPropagateUpdates);
         } else {
-            return new FieldOutputProperty(parent, f, showReference, isConnected, isPropagateUpdates);
+            return new FieldOutputProperty(parent, f, showReference, isIncrementRound, isConnected, isPropagateUpdates);
         }
     }
 
-    public FieldOutputProperty(Container parent, F f, boolean showReference, Boolean isConnected, Boolean isPropagateUpdate) {
+    public FieldOutputProperty(Container parent, F f, boolean showReference, Boolean isIncrementRound, Boolean isConnected, Boolean isPropagateUpdate) {
         super(parent);
         this.showReference = showReference;
         this.isConnected = isConnected;
         this.isPropagateUpdate = isPropagateUpdate;
+        this.isIncrementRound = isIncrementRound;
 
         Frame frame = (Frame) SwingUtilities.getWindowAncestor(parent);
         field = f;
 
-        jLabel = new JLabel(f.getLabel());
+        fieldLabel = new JLabel(f.getLabel());
 
         Format fieldFormatter = NumberFormat.getNumberInstance();
         currentValueField = new JFormattedTextField(fieldFormatter);
-        jLabel.setLabelFor(currentValueField);
+        fieldLabel.setLabelFor(currentValueField);
 
         setCurrentValue(f);
 
         currentValueField.setColumns(10);
 
-        addMouseListener(frame, jLabel);
+        addMouseListener(frame, fieldLabel);
 
         registerListener();
 
@@ -107,11 +110,11 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     }
 
     public void addField(int pos, Insets insets) {
-        addGridEntry(jLabel, 0, pos, 1, insets);
+        addGridEntry(fieldLabel, 0, pos, 1, insets);
         addGridEntry(currentValueField, 1, pos, 1, insets);
 
         showReference(2, pos, insets);
-        if(isConnected != null || isPropagateUpdate != null)
+        if((isIncrementRound != null && isIncrementRound) || isConnected != null || isPropagateUpdate != null)
             showConnected(3, pos, insets);
     }
 
@@ -129,6 +132,9 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
 
     protected void showConnected(int xPos, int yPos, Insets insets) {
         String label = "";
+
+        if(isIncrementRound != null)
+            label += isIncrementRound ? "incrRound" : "";
 
         if(isConnected != null)
             label += isConnected ? "connected" : "unconnected";
@@ -170,10 +176,10 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     }
 
     public JLabel getLabel() {
-        return jLabel;
+        return fieldLabel;
     }
 
     public String toString() {
-        return getClass().getSimpleName() + " " + parent.getName() + " " + jLabel.getText();
+        return getClass().getSimpleName() + " " + parent.getName() + " " + fieldLabel.getText();
     }
 }

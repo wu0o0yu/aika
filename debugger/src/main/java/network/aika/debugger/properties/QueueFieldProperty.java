@@ -21,8 +21,6 @@ import network.aika.fields.IQueueField;
 
 import javax.swing.*;
 import java.awt.*;
-import java.text.Format;
-import java.text.NumberFormat;
 
 
 /**
@@ -31,10 +29,8 @@ import java.text.NumberFormat;
 public class QueueFieldProperty extends FieldOutputProperty<IQueueField> implements FieldObserver {
 
 
-    public QueueFieldProperty(Container parent, IQueueField field, boolean showReference, Boolean isConnected, Boolean isPropagateUpdates) {
-        super(parent, field, showReference, isConnected, isPropagateUpdates);
-
-        Format fieldFormatter = NumberFormat.getNumberInstance();
+    public QueueFieldProperty(Container parent, IQueueField field, boolean showReference, Boolean isIncrementRound, Boolean isConnected, Boolean isPropagateUpdates) {
+        super(parent, field, showReference, isIncrementRound, isConnected, isPropagateUpdates);
 
         currentValueField.addPropertyChangeListener("value", e -> {
             if(withinUpdate)
@@ -67,14 +63,5 @@ public class QueueFieldProperty extends FieldOutputProperty<IQueueField> impleme
             currentValueField.setValue(v);
             withinUpdate = false;
         });
-    }
-
-    public void addField(int pos, Insets insets) {
-        addGridEntry(jLabel, 0, pos, 1, insets);
-        addGridEntry(currentValueField, 1, pos, 1, insets);
-
-        showReference(2, pos, insets);
-        if(isConnected != null || isPropagateUpdate != null)
-            showConnected(3, pos, insets);
     }
 }
