@@ -284,6 +284,8 @@ public abstract class AbstractTemplateModel {
             int pos,
             BindingNeuron lastBN
     ) {
+        double weakInputMargin = -0.05;
+
         double netTarget = 0.5;
         double valueTarget = ActivationFunction.RECTIFIED_HYPERBOLIC_TANGENT
                 .f(netTarget);
@@ -339,7 +341,7 @@ public abstract class AbstractTemplateModel {
                 .setWeight(0.5)
                 .setOptional(true)
                 .init(bn, patternN.getNeuron())
-                .adjustBias(valueTarget);
+                .adjustBias(valueTarget + weakInputMargin);
 
         PositiveFeedbackSynapse posFeedSyn = new PositiveFeedbackSynapse()
                 .setWeight(POS_MARGIN * (netTarget / patternValueTarget))
