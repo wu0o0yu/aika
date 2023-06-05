@@ -51,6 +51,7 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
 
     protected JLabel fieldLabel;
     protected JFormattedTextField currentValueField;
+    protected JLabel lastRoundLabel;
 
     public static FieldOutputProperty createFieldProperty(Container parent, FieldOutput f, boolean showReference, Boolean isIncrementRound, Boolean isConnected, Boolean isPropagateUpdates) {
         if(f instanceof IQueueField) {
@@ -75,6 +76,8 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
         Format fieldFormatter = NumberFormat.getNumberInstance();
         currentValueField = new JFormattedTextField(fieldFormatter);
         fieldLabel.setLabelFor(currentValueField);
+
+        lastRoundLabel = new JLabel("" + f.getLastRound());
 
         setCurrentValue(f);
 
@@ -114,10 +117,11 @@ public class FieldOutputProperty<F extends FieldOutput> extends AbstractProperty
     public void addField(int pos, Insets insets) {
         addGridEntry(fieldLabel, 0, pos, 1, insets);
         addGridEntry(currentValueField, 1, pos, 1, insets);
+        addGridEntry(lastRoundLabel, 2, pos, 1, insets);
 
-        showReference(2, pos, insets);
+        showReference(3, pos, insets);
         if((isIncrementRound != null && isIncrementRound) || isConnected != null || isPropagateUpdate != null)
-            showConnected(3, pos, insets);
+            showConnected(4, pos, insets);
     }
 
     protected void showReference(int xPos, int yPos, Insets insets) {

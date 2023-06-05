@@ -96,6 +96,11 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
     }
 
     @Override
+    public int getLastRound() {
+        return lastRound;
+    }
+
+    @Override
     public String getLabel() {
         return label;
     }
@@ -105,8 +110,7 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         if(r < 0)
             return 1.0;
 
-        if(r == MAX_VALUE)
-            r = lastRound;
+        r = checkRound(r);
 
         return value[r];
     }
@@ -116,12 +120,19 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         if (r < 0)
             return 1.0;
 
-        if (r == MAX_VALUE)
-            r = lastRound;
+        r = checkRound(r);
 
         return withinUpdate ?
                 updatedValue :
                 value[r];
+    }
+
+    private int checkRound(int r) {
+        if(r == MAX_VALUE)
+            r = lastRound;
+
+        r = Math.min(r, lastRound);
+        return r;
     }
 
     public void connectInputs(boolean initialize) {
@@ -173,6 +184,7 @@ public abstract class Field implements FieldInput, FieldOutput, Writable {
         if(Utils.belowTolerance(tolerance, u))
             return;
 
+        assert r >= lastRound;
         lastRound = r;
 
         withinUpdate = true;

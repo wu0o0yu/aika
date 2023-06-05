@@ -85,7 +85,7 @@ public class AnnealingLogger {
         return getNegativeFeedbackLinks(doc)
                 .flatMap(l ->
                         Stream.of(
-                                doubleToString(l.getMaxInput().getValue(MAX_VALUE)),
+                                doubleToString(l.getInputValue().getValue(MAX_VALUE)),
                                 doubleToString(l.getSynapse().getWeight().getValue(MAX_VALUE)),
                                 doubleToString(l.getOutput().getNet().getValue(MAX_VALUE))
                         )

@@ -42,6 +42,8 @@ public interface FieldOutput {
 
     FieldObject getReference();
 
+    int getLastRound();
+
     void disconnectOutputs(boolean deinitialize);
 
     default void addEventListener(String listenerName, FieldOnTrueEvent eventListener) {

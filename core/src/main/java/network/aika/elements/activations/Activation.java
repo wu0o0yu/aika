@@ -68,7 +68,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
     protected Timestamp fired = Timestamp.NOT_SET;
 
     protected FieldOutput value;
-    protected FieldOutput negValue;
 
     protected SumField net;
     protected SumField netPreAnneal;
@@ -119,14 +118,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
                 TOLERANCE,
                 net,
                 x -> getActivationFunction().f(x)
-        );
-
-        negValue = threshold(
-                this,
-                "!value",
-                0.0,
-                BELOW_OR_EQUAL,
-                value
         );
 
         gradient = new QueueSumField(this, TRAINING, "gradient", TOLERANCE);
@@ -266,10 +257,6 @@ public abstract class Activation<N extends Neuron> implements Element, Comparabl
 
     public FieldOutput getValue() {
         return value;
-    }
-
-    public FieldOutput getNegValue() {
-        return negValue;
     }
 
     public boolean isInput() {

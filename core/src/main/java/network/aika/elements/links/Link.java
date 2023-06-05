@@ -16,7 +16,6 @@
  */
 package network.aika.elements.links;
 
-import network.aika.fields.FieldObject;
 import network.aika.Thought;
 import network.aika.elements.Element;
 import network.aika.elements.activations.Activation;
@@ -29,11 +28,12 @@ import network.aika.steps.link.LinkingIn;
 
 import static network.aika.callbacks.EventType.CREATE;
 import static network.aika.fields.ConstantField.ONE;
-import static network.aika.fields.ConstantField.ZERO;
 import static network.aika.fields.FieldLink.link;
 import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.*;
 import static network.aika.elements.activations.Timestamp.FIRED_COMPARATOR;
+import static network.aika.fields.ThresholdOperator.Type.ABOVE;
+import static network.aika.fields.ThresholdOperator.Type.BELOW_OR_EQUAL;
 
 /**
  *
@@ -47,6 +47,8 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     protected O output;
 
     protected AbstractFunction inputValue;
+    protected AbstractFunction inputIsFired;
+    protected AbstractFunction negInputIsFired;
     protected Multiplication weightedInput;
 
     protected SumField gradient;
@@ -126,8 +128,14 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
 
     protected void initWeightInput() {
         inputValue = new IdentityFunction(this, "input value");
+        inputIsFired = threshold(this, "inputIsFired", 0.0, ABOVE, inputValue);
+        negInputIsFired = invert(this,"!inputIsFired", inputIsFired);
+
         weightedInput = initWeightedInput();
         linkAndConnect(weightedInput, getOutput().getNet());
+
+        if(input != null)
+            linkAndConnect(input.getValue(), 0, inputValue);
     }
 
     protected boolean incrementRound() {
@@ -186,17 +194,11 @@ public abstract class Link<S extends Synapse, I extends Activation<?>, O extends
     }
 
     public FieldOutput getInputIsFired() {
-        if(input == null)
-            return ZERO;
-
-        return input.getIsFired(); // TODO
+        return inputIsFired;
     }
 
-    public FieldOutput getNegInputValue() {
-        if(input == null)
-            return ONE;
-
-        return input.getNegValue(); // TODO
+    public FieldOutput getNegInputIsFired() {
+        return negInputIsFired;
     }
 
     public S getSynapse() {

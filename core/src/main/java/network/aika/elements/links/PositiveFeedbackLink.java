@@ -19,14 +19,13 @@ package network.aika.elements.links;
 import network.aika.elements.activations.BindingActivation;
 import network.aika.elements.activations.PatternActivation;
 import network.aika.elements.synapses.PositiveFeedbackSynapse;
-import network.aika.fields.FieldLink;
-import network.aika.fields.FieldOutput;
-import network.aika.fields.Multiplication;
+import network.aika.fields.*;
 import network.aika.visitor.Visitor;
 
 import static network.aika.callbacks.EventType.CREATE;
 import static network.aika.fields.ConstantField.ONE;
 import static network.aika.fields.ConstantField.ZERO;
+import static network.aika.fields.FieldLink.linkAndConnect;
 import static network.aika.fields.Fields.mul;
 import static network.aika.fields.Fields.scale;
 
@@ -35,6 +34,8 @@ import static network.aika.fields.Fields.scale;
  * @author Lukas Molzberger
  */
 public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, PatternActivation> {
+
+    protected AbstractFunction inputGradient;
 
     public PositiveFeedbackLink(PositiveFeedbackSynapse s, PatternActivation input, BindingActivation output) {
         super(s, input, output);
@@ -50,8 +51,8 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
 
         linkInput();
 
-        FieldLink il = inputValue.getInputLinkByArg(0);
-        il.relinkInput(getInputValue());
+        linkAndConnect(input.getValue(), 0, inputValue);
+        linkAndConnect(input.getGradient(), 0, inputGradient);
 
         getThought().onElementEvent(CREATE, this);
     }
@@ -67,8 +68,7 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
     protected void connectGradientFields() {
         super.connectGradientFields();
 
-        if(input == null)
-            return;
+        inputGradient = new IdentityFunction(this, "input gradient");
 
         scale(
                 this,
@@ -77,27 +77,14 @@ public class PositiveFeedbackLink extends FeedbackLink<PositiveFeedbackSynapse, 
                 mul(
                         this,
                         "in.gradient * f'(out.net)",
-                        input.getGradient(),
+                        inputGradient,
                         output.getNetOuterGradient()
                 ),
                 output.getUpdateValue()
         );
-    }
 
-    @Override
-    public FieldOutput getInputIsFired() {
-        if(input == null)
-            return ONE;
-
-        return input.getIsFired();
-    }
-
-    @Override
-    public FieldOutput getNegInputValue() {
-        if(input == null)
-            return ZERO;
-
-        return input.getNegValue();
+        if(input != null)
+            linkAndConnect(input.getGradient(), 0, inputGradient);
     }
 
     @Override

@@ -34,7 +34,6 @@ public class InputPatternLink extends BindingNeuronLink<InputPatternSynapse, Pat
         super(s, input, output);
     }
 
-
     public AbstractFunction getInputEntropy() {
         return inputEntropy;
     }

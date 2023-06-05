@@ -63,7 +63,7 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
                 mul(
                         this,
                         "weight update (neg case)",
-                        getNegInputValue(),
+                        getNegInputIsFired(),
                         getOutput().getNegUpdateValue()
                 ),
                 synapse.getWeight()
@@ -72,7 +72,7 @@ public abstract class ConjunctiveLink<S extends ConjunctiveSynapse, IA extends A
         biasUpdateNegCase = mul(
                 this,
                 "bias update (neg case)",
-                getNegInputValue(),
+                getNegInputIsFired(),
                 getOutput().getNegUpdateValue(),
                 getSynapse().getSynapseBias()
         );
